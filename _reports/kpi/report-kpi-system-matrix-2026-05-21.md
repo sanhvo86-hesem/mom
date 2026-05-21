@@ -1,6 +1,6 @@
 # KPI System Matrix Audit
 
-Generated: 2026-05-21T15:13:49+00:00
+Generated: 2026-05-21T15:33:26+00:00
 
 ## Summary
 
@@ -161,7 +161,7 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 | `REPEAT_NCR_RATE` | executive_scorecard_kpi | 2 | 2 | ≤5% | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
 | `SUPPLIER_READINESS` | executive_scorecard_kpi | 2 | 2 | ≥90 composite_score | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
 | `SCRAP_RATE` | local_or_unmapped_metric | 1 | 11 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | legacy_alias_seen |
-| `DSO` | governance_kpi | 1 | 6 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `DSO` | governance_kpi | 1 | 6 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `QUOTE_HIT_RATE` | governance_kpi | 1 | 3 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `DOWNTIME_IMPACT` | local_or_unmapped_metric | 1 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | legacy_alias_seen |
 | `REWORK_RATE` | local_or_unmapped_metric | 1 | 2 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | unmapped_or_local_name |
@@ -171,10 +171,10 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 | `CYCLE_TIME_VARIANCE` | operating_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `FINAL_RELEASE_RFT` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `GROSS_MARGIN_JOB_FAMILY` | executive_scorecard_kpi | 1 | 1 | ≥28% | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
-| `INCIDENT_ACTION_CLOSURE_AGING` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `INVOICE_RFT` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `INCIDENT_ACTION_CLOSURE_AGING` | governance_kpi | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `INVOICE_RFT` | governance_kpi | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `IN_PROCESS_REJECT_RATE` | operating_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `MATERIAL_AVAILABILITY_PLAN` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `MATERIAL_AVAILABILITY_PLAN` | governance_kpi | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `NCR_RATE` | local_or_unmapped_metric | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | unmapped_or_local_name |
 | `ORDER_REVIEW_RFT` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `RECORDABLE_INCIDENT_RATE` | safety_gate | 1 | 1 | ≤0 count | not_declared_or_informational | registered_target_not_repeated_in_docs | canonical_or_mapped_name |

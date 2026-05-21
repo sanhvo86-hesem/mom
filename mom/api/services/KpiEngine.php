@@ -186,6 +186,23 @@ final class KpiEngine
     public const METRIC_LABOR_EFFICIENCY     = 'LABOR_EFF';
     public const METRIC_PUT_THRU_INDEX       = 'PUT_THRU';
 
+    /** Governance KPIs graduated to runtime calculation in Stage 4. */
+    public const METRIC_PLAN_ADHERENCE       = 'PLAN_ADHERENCE';
+    public const METRIC_WIP_AGING            = 'WIP_AGING';
+    public const METRIC_NCR_CLOSURE_AGING    = 'NCR_CLOSURE_AGING';
+    public const METRIC_ECO_CLOSURE_AGING    = 'ECO_CLOSURE_AGING';
+    public const METRIC_MATERIAL_AVAILABILITY_PLAN = 'MATERIAL_AVAILABILITY_PLAN';
+    public const METRIC_INVENTORY_ACCURACY   = 'INVENTORY_ACCURACY';
+    public const METRIC_DSO                  = 'DSO';
+    public const METRIC_INVOICE_RFT          = 'INVOICE_RFT';
+    public const METRIC_INCIDENT_ACTION_CLOSURE_AGING = 'INCIDENT_ACTION_CLOSURE_AGING';
+
+    /** Age thresholds (days) past which an open item counts as aged. */
+    private const AGE_DAYS_WIP             = 21;
+    private const AGE_DAYS_NCR             = 30;
+    private const AGE_DAYS_ECO             = 45;
+    private const AGE_DAYS_INCIDENT_ACTION = 30;
+
     /** All metric codes in calculation order. */
     public const ALL_METRICS = [
         self::METRIC_OEE,
@@ -207,6 +224,15 @@ final class KpiEngine
         self::METRIC_INVENTORY_TURNS,
         self::METRIC_LABOR_EFFICIENCY,
         self::METRIC_PUT_THRU_INDEX,
+        self::METRIC_PLAN_ADHERENCE,
+        self::METRIC_WIP_AGING,
+        self::METRIC_NCR_CLOSURE_AGING,
+        self::METRIC_ECO_CLOSURE_AGING,
+        self::METRIC_MATERIAL_AVAILABILITY_PLAN,
+        self::METRIC_INVENTORY_ACCURACY,
+        self::METRIC_DSO,
+        self::METRIC_INVOICE_RFT,
+        self::METRIC_INCIDENT_ACTION_CLOSURE_AGING,
     ];
 
     /** Default target values per metric. */
@@ -230,6 +256,15 @@ final class KpiEngine
         self::METRIC_INVENTORY_TURNS     => 6.0,
         self::METRIC_LABOR_EFFICIENCY    => 85.0,
         self::METRIC_PUT_THRU_INDEX      => 0.0,      // revenue / labor-hr
+        self::METRIC_PLAN_ADHERENCE      => 90.0,
+        self::METRIC_WIP_AGING           => 5.0,      // ≤ 5% aged WIP
+        self::METRIC_NCR_CLOSURE_AGING   => 10.0,     // ≤ 10% aged open NCR
+        self::METRIC_ECO_CLOSURE_AGING   => 10.0,     // ≤ 10% aged open ECO
+        self::METRIC_MATERIAL_AVAILABILITY_PLAN => 95.0,
+        self::METRIC_INVENTORY_ACCURACY  => 98.0,
+        self::METRIC_DSO                 => 45.0,     // ≤ 45 days
+        self::METRIC_INVOICE_RFT         => 98.0,
+        self::METRIC_INCIDENT_ACTION_CLOSURE_AGING => 10.0,
     ];
 
     /** Units per metric. */
@@ -253,6 +288,15 @@ final class KpiEngine
         self::METRIC_INVENTORY_TURNS     => 'turns',
         self::METRIC_LABOR_EFFICIENCY    => '%',
         self::METRIC_PUT_THRU_INDEX      => '$/hr',
+        self::METRIC_PLAN_ADHERENCE      => '%',
+        self::METRIC_WIP_AGING           => '%',
+        self::METRIC_NCR_CLOSURE_AGING   => '%',
+        self::METRIC_ECO_CLOSURE_AGING   => '%',
+        self::METRIC_MATERIAL_AVAILABILITY_PLAN => '%',
+        self::METRIC_INVENTORY_ACCURACY  => '%',
+        self::METRIC_DSO                 => 'day',
+        self::METRIC_INVOICE_RFT         => '%',
+        self::METRIC_INCIDENT_ACTION_CLOSURE_AGING => '%',
     ];
 
     /** Metrics where lower is better (invert RAG logic). */
@@ -264,6 +308,11 @@ final class KpiEngine
         self::METRIC_SETUP_TIME_RATIO,
         self::METRIC_NCR_RATE,
         self::METRIC_COMPLAINT_RATE,
+        self::METRIC_WIP_AGING,
+        self::METRIC_NCR_CLOSURE_AGING,
+        self::METRIC_ECO_CLOSURE_AGING,
+        self::METRIC_DSO,
+        self::METRIC_INCIDENT_ACTION_CLOSURE_AGING,
     ];
 
     private Connection $db;
@@ -296,6 +345,24 @@ final class KpiEngine
         $target = $this->getKpiTarget($metricCode);
         $unit   = self::UNITS[$metricCode] ?? '%';
         $status = $this->evaluateStatus($metricCode, $value, $target);
+
+        // Insufficient-data gate: when a calculator reports a sample_size
+        // below the registry-declared minimum (formula.min_sample), the
+        // ratio is statistically meaningless or the source is still
+        // accumulating data. Show grey "insufficient data", never a
+        // misleading red/green. Honors prompt 03 min_sample + prompt 04
+        // empty-source handling.
+        if (array_key_exists('sample_size', $breakdown)) {
+            $sampleSize = (int) $breakdown['sample_size'];
+            $minSample  = $this->registryMinSample($metricCode);
+            if ($sampleSize < max(1, $minSample)) {
+                $status = KpiStatus::GREY;
+                $breakdown['insufficient_data'] = true;
+                $breakdown['insufficient_data_reason'] = $sampleSize === 0
+                    ? 'no source data in period — metric is accumulating data'
+                    : "sample size {$sampleSize} below minimum {$minSample}";
+            }
+        }
 
         return new KpiResult(
             metricCode:   $metricCode,
@@ -795,7 +862,7 @@ final class KpiEngine
         $total  = (int) ($row['total'] ?? 0);
         $pct    = $total > 0 ? ($onTime / $total) * 100 : 0;
 
-        return ['value' => round($pct, 2), 'on_time' => $onTime, 'total' => $total];
+        return ['value' => round($pct, 2), 'sample_size' => $total, 'on_time' => $onTime, 'total' => $total];
     }
 
     /**
@@ -1045,7 +1112,7 @@ final class KpiEngine
         $total  = (int) ($row['total'] ?? 0);
         $pct    = $total > 0 ? ($onTime / $total) * 100 : 0;
 
-        return ['value' => round($pct, 2), 'on_time' => $onTime, 'total' => $total];
+        return ['value' => round($pct, 2), 'sample_size' => $total, 'on_time' => $onTime, 'total' => $total];
     }
 
     /**
@@ -1066,7 +1133,7 @@ final class KpiEngine
         $total     = (int) ($row['total'] ?? 0);
         $pct       = $total > 0 ? ($completed / $total) * 100 : 0;
 
-        return ['value' => round($pct, 2), 'completed' => $completed, 'total' => $total];
+        return ['value' => round($pct, 2), 'sample_size' => $total, 'completed' => $completed, 'total' => $total];
     }
 
     /**
@@ -1085,6 +1152,7 @@ final class KpiEngine
 
         return [
             'value'        => round((float) ($row['avg_otd'] ?? 0), 2),
+            'sample_size'  => (int) ($row['vendor_count'] ?? 0),
             'vendor_count' => (int) ($row['vendor_count'] ?? 0),
         ];
     }
@@ -1131,7 +1199,7 @@ final class KpiEngine
 
         $ppm = $shipments > 0 ? ($complaints / $shipments) * 1_000_000 : 0;
 
-        return ['value' => round($ppm, 0), 'complaints' => $complaints, 'shipments' => $shipments];
+        return ['value' => round($ppm, 0), 'sample_size' => $shipments, 'complaints' => $complaints, 'shipments' => $shipments];
     }
 
     /**
@@ -1202,6 +1270,285 @@ final class KpiEngine
         return ['value' => round($index, 2), 'revenue' => round($revenue, 2), 'labor_hrs' => round($laborHrs, 2)];
     }
 
+    // ── Stage 4 graduated governance KPI calculators ────────────────────────
+
+    /**
+     * Plan Adherence = Jobs started on/before the planned start / Jobs planned
+     * to start in the period x 100. Re-sequences approved via the
+     * approved_resequence metadata flag are excluded from the lateness count
+     * (registry attribution_rule for PLAN_ADHERENCE).
+     */
+    private function calcPlanAdherence(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) AS total,
+                COUNT(*) FILTER (
+                    WHERE start_date_actual IS NOT NULL
+                      AND start_date_actual <= start_date_planned
+                ) AS on_plan,
+                COUNT(*) FILTER (
+                    WHERE COALESCE((metadata->>'approved_resequence')::boolean, FALSE) = TRUE
+                ) AS approved_resequence
+             FROM job_orders
+             WHERE start_date_planned BETWEEN :s AND :e",
+            [':s' => $period->start, ':e' => $period->end],
+        );
+
+        $total      = (int) ($row['total'] ?? 0);
+        $onPlan     = (int) ($row['on_plan'] ?? 0);
+        $resequence = (int) ($row['approved_resequence'] ?? 0);
+        // Approved re-sequences are not counted as adherence failures.
+        $adhered = min($total, $onPlan + $resequence);
+        $pct     = $total > 0 ? ($adhered / $total) * 100 : 0.0;
+
+        return [
+            'value'               => round($pct, 2),
+            'sample_size'         => $total,
+            'jobs_planned'        => $total,
+            'jobs_on_plan'        => $onPlan,
+            'approved_resequence' => $resequence,
+        ];
+    }
+
+    /**
+     * WIP Aging = Open jobs older than the WIP age threshold / Open jobs x 100.
+     * "Open" = released/active jobs as of the period end; age counts from the
+     * job creation date so a late close cannot improve the number.
+     */
+    private function calcWipAging(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) AS open_jobs,
+                COUNT(*) FILTER (
+                    WHERE created_at < (:e::date - make_interval(days => :age))
+                ) AS aged
+             FROM job_orders
+             WHERE job_status IN ('released', 'active', 'on_hold')
+               AND created_at <= (:e || ' 23:59:59')::timestamptz",
+            [':e' => $period->end, ':age' => self::AGE_DAYS_WIP],
+        );
+
+        $open = (int) ($row['open_jobs'] ?? 0);
+        $aged = (int) ($row['aged'] ?? 0);
+        $pct  = $open > 0 ? ($aged / $open) * 100 : 0.0;
+
+        return [
+            'value'          => round($pct, 2),
+            'sample_size'    => $open,
+            'open_jobs'      => $open,
+            'aged_jobs'      => $aged,
+            'age_threshold_days' => self::AGE_DAYS_WIP,
+        ];
+    }
+
+    /**
+     * NCR Closure Aging = Open NCRs older than the NCR age threshold / Open
+     * NCRs x 100. Age counts from the NCR open date (created_at), not the
+     * close date, so deferring a closure cannot flatter the number.
+     */
+    private function calcNcrClosureAging(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) AS open_ncr,
+                COUNT(*) FILTER (
+                    WHERE created_at < (:e::date - make_interval(days => :age))
+                ) AS aged
+             FROM ncr_records
+             WHERE (ncr_status IS NULL OR ncr_status NOT IN ('Closed', 'Verified'))
+               AND created_at <= (:e || ' 23:59:59')::timestamptz",
+            [':e' => $period->end, ':age' => self::AGE_DAYS_NCR],
+        );
+
+        $open = (int) ($row['open_ncr'] ?? 0);
+        $aged = (int) ($row['aged'] ?? 0);
+        $pct  = $open > 0 ? ($aged / $open) * 100 : 0.0;
+
+        return [
+            'value'              => round($pct, 2),
+            'sample_size'        => $open,
+            'open_ncr'           => $open,
+            'aged_ncr'           => $aged,
+            'age_threshold_days' => self::AGE_DAYS_NCR,
+        ];
+    }
+
+    /**
+     * ECO Closure Aging = Open engineering change requests older than the ECO
+     * age threshold / Open ECRs x 100. Age counts from the request open date.
+     */
+    private function calcEcoClosureAging(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) AS open_eco,
+                COUNT(*) FILTER (
+                    WHERE created_at < (:e::date - make_interval(days => :age))
+                ) AS aged
+             FROM engineering_change_requests
+             WHERE (ecr_status IS NULL OR ecr_status NOT IN ('Closed', 'Rejected'))
+               AND created_at <= (:e || ' 23:59:59')::timestamptz",
+            [':e' => $period->end, ':age' => self::AGE_DAYS_ECO],
+        );
+
+        $open = (int) ($row['open_eco'] ?? 0);
+        $aged = (int) ($row['aged'] ?? 0);
+        $pct  = $open > 0 ? ($aged / $open) * 100 : 0.0;
+
+        return [
+            'value'              => round($pct, 2),
+            'sample_size'        => $open,
+            'open_eco'           => $open,
+            'aged_eco'           => $aged,
+            'age_threshold_days' => self::AGE_DAYS_ECO,
+        ];
+    }
+
+    /**
+     * Material Availability for Plan = Planned jobs with material ready /
+     * Jobs planned to start in the period x 100.
+     */
+    private function calcMaterialAvailabilityPlan(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) AS total,
+                COUNT(*) FILTER (
+                    WHERE LOWER(COALESCE(material_readiness_status, '')) IN
+                          ('ready', 'available', 'complete', 'ok', 'cleared')
+                ) AS ready
+             FROM job_orders
+             WHERE start_date_planned BETWEEN :s AND :e",
+            [':s' => $period->start, ':e' => $period->end],
+        );
+
+        $total = (int) ($row['total'] ?? 0);
+        $ready = (int) ($row['ready'] ?? 0);
+        $pct   = $total > 0 ? ($ready / $total) * 100 : 0.0;
+
+        return [
+            'value'        => round($pct, 2),
+            'sample_size'  => $total,
+            'jobs_planned' => $total,
+            'material_ready' => $ready,
+        ];
+    }
+
+    /**
+     * Inventory Accuracy = Cycle-count lines with zero variance / Cycle-count
+     * lines counted in the period x 100.
+     */
+    private function calcInventoryAccuracy(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) AS total,
+                COUNT(*) FILTER (WHERE COALESCE(variance_qty, 0) = 0) AS accurate
+             FROM wms_cycle_count_results
+             WHERE created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz",
+            [':s' => $period->start, ':e' => $period->end],
+        );
+
+        $total    = (int) ($row['total'] ?? 0);
+        $accurate = (int) ($row['accurate'] ?? 0);
+        $pct      = $total > 0 ? ($accurate / $total) * 100 : 0.0;
+
+        return [
+            'value'         => round($pct, 2),
+            'sample_size'   => $total,
+            'lines_counted' => $total,
+            'lines_accurate' => $accurate,
+        ];
+    }
+
+    /**
+     * DSO = Average (payment date - invoice date) over AR invoices paid in
+     * the period, in days.
+     */
+    private function calcDso(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) AS paid_count,
+                COALESCE(AVG((payment_date - invoice_date)), 0) AS dso_days
+             FROM ap_ar_invoices
+             WHERE UPPER(COALESCE(ledger_type, '')) = 'AR'
+               AND payment_date IS NOT NULL
+               AND invoice_date BETWEEN :s AND :e",
+            [':s' => $period->start, ':e' => $period->end],
+        );
+
+        $count = (int) ($row['paid_count'] ?? 0);
+        $dso   = (float) ($row['dso_days'] ?? 0);
+
+        return [
+            'value'      => round($dso, 1),
+            'sample_size' => $count,
+            'paid_count' => $count,
+        ];
+    }
+
+    /**
+     * Invoice Right-First-Time = Invoices passing three-way match / Invoices
+     * issued in the period x 100.
+     */
+    private function calcInvoiceRft(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) AS total,
+                COUNT(*) FILTER (WHERE three_way_match_status = 'matched') AS rft
+             FROM ap_ar_invoices
+             WHERE invoice_date BETWEEN :s AND :e",
+            [':s' => $period->start, ':e' => $period->end],
+        );
+
+        $total = (int) ($row['total'] ?? 0);
+        $rft   = (int) ($row['rft'] ?? 0);
+        $pct   = $total > 0 ? ($rft / $total) * 100 : 0.0;
+
+        return [
+            'value'         => round($pct, 2),
+            'sample_size'   => $total,
+            'invoices'      => $total,
+            'invoices_rft'  => $rft,
+        ];
+    }
+
+    /**
+     * Incident Action Closure Aging = Open incidents older than the incident
+     * action age threshold / Open incidents x 100. Age counts from the
+     * incident open date.
+     */
+    private function calcIncidentActionClosureAging(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) AS open_incidents,
+                COUNT(*) FILTER (
+                    WHERE created_at < (:e::date - make_interval(days => :age))
+                ) AS aged
+             FROM ehs_incidents
+             WHERE LOWER(COALESCE(incident_status, '')) NOT IN ('closed', 'cancelled', 'void')
+               AND created_at <= (:e || ' 23:59:59')::timestamptz",
+            [':e' => $period->end, ':age' => self::AGE_DAYS_INCIDENT_ACTION],
+        );
+
+        $open = (int) ($row['open_incidents'] ?? 0);
+        $aged = (int) ($row['aged'] ?? 0);
+        $pct  = $open > 0 ? ($aged / $open) * 100 : 0.0;
+
+        return [
+            'value'              => round($pct, 2),
+            'sample_size'        => $open,
+            'open_incidents'     => $open,
+            'aged_incidents'     => $aged,
+            'age_threshold_days' => self::AGE_DAYS_INCIDENT_ACTION,
+        ];
+    }
+
     // ── Internal Helpers ────────────────────────────────────────────────────
 
     /**
@@ -1234,6 +1581,15 @@ final class KpiEngine
             self::METRIC_INVENTORY_TURNS     => $this->calcInventoryTurns(...),
             self::METRIC_LABOR_EFFICIENCY    => $this->calcLaborEfficiency(...),
             self::METRIC_PUT_THRU_INDEX      => $this->calcPutThru(...),
+            self::METRIC_PLAN_ADHERENCE      => $this->calcPlanAdherence(...),
+            self::METRIC_WIP_AGING           => $this->calcWipAging(...),
+            self::METRIC_NCR_CLOSURE_AGING   => $this->calcNcrClosureAging(...),
+            self::METRIC_ECO_CLOSURE_AGING   => $this->calcEcoClosureAging(...),
+            self::METRIC_MATERIAL_AVAILABILITY_PLAN => $this->calcMaterialAvailabilityPlan(...),
+            self::METRIC_INVENTORY_ACCURACY  => $this->calcInventoryAccuracy(...),
+            self::METRIC_DSO                 => $this->calcDso(...),
+            self::METRIC_INVOICE_RFT         => $this->calcInvoiceRft(...),
+            self::METRIC_INCIDENT_ACTION_CLOSURE_AGING => $this->calcIncidentActionClosureAging(...),
             default => throw new RuntimeException("Unknown metric: {$metricCode}"),
         };
     }
@@ -1484,6 +1840,25 @@ final class KpiEngine
     {
         $version = $this->loadKpiAuthorityRegistry()['schema_version'] ?? 0;
         return is_int($version) ? $version : (int) $version;
+    }
+
+    /**
+     * Minimum sample size declared for a governance KPI
+     * (annex122_governance_kpis[].formula.min_sample). 0 when not declared.
+     */
+    private function registryMinSample(string $metricCode): int
+    {
+        $code = strtoupper(trim($metricCode));
+        foreach ($this->registryRows($this->loadKpiAuthorityRegistry(), 'annex122_governance_kpis') as $row) {
+            if ($this->codeField($row, 'canonical_code') === $code) {
+                $formula = $row['formula'] ?? null;
+                if (is_array($formula) && isset($formula['min_sample'])) {
+                    return (int) $formula['min_sample'];
+                }
+                return 0;
+            }
+        }
+        return 0;
     }
 
     /**

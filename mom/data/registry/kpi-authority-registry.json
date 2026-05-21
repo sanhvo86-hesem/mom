@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
   "version": "2026-05-21",
-  "schema_version": 3,
+  "schema_version": 4,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. Existing ANNEX-122 KPIs are retained, legacy metric aliases are mapped to canonical codes, and proposed CNC operating metrics are staged without granting automatic runtime authority.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -35,7 +35,16 @@
     "COMPLAINT_RATE",
     "INV_TURNS",
     "LABOR_EFF",
-    "PUT_THRU"
+    "PUT_THRU",
+    "PLAN_ADHERENCE",
+    "WIP_AGING",
+    "NCR_CLOSURE_AGING",
+    "ECO_CLOSURE_AGING",
+    "MATERIAL_AVAILABILITY_PLAN",
+    "INVENTORY_ACCURACY",
+    "DSO",
+    "INVOICE_RFT",
+    "INCIDENT_ACTION_CLOSURE_AGING"
   ],
   "legacy_aliases": {
     "SCRAP": "SCRAP_RATE",
@@ -369,7 +378,7 @@
           "has_deputy",
           "last_review_date"
         ],
-        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+        "evidence": "Nhập tay theo quý từ diễn tập tính liên tục + ANNEX-123 ma trận phó/dự phòng; không có dòng giao dịch để tính tự động."
       },
       "owner_role": "QMS",
       "data_stewardship_role": "HR",
@@ -381,7 +390,7 @@
       "attribution_rule": "Khoảng trống dự phòng thuộc trách nhiệm chung QMS/HR/trưởng phòng; không quy cho một cá nhân.",
       "counter_metric": null,
       "reward_eligible": false,
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "manual",
       "status": "retained"
     },
     {
@@ -508,11 +517,11 @@
           "job_orders"
         ],
         "columns": [
-          "scheduled_start",
-          "actual_start",
-          "approved_resequence_flag"
+          "start_date_planned",
+          "start_date_actual",
+          "metadata->approved_resequence"
         ],
-        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+        "evidence": "KpiEngine::calcPlanAdherence — job_orders đã xác nhận schema; re-sequence có phê duyệt loại trừ qua metadata.approved_resequence."
       },
       "owner_role": "PPL",
       "data_stewardship_role": "PD",
@@ -524,7 +533,7 @@
       "attribution_rule": "Lệch lịch do job gấp khách yêu cầu (re-sequence có phê duyệt) KHÔNG tính cho PPL; lệch do máy/vật tư tách về WKM/SCM.",
       "counter_metric": null,
       "reward_eligible": false,
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "status": "retained"
     },
     {
@@ -604,11 +613,10 @@
           "job_orders"
         ],
         "columns": [
-          "created_date",
-          "job_status",
-          "gate_code"
+          "created_at",
+          "job_status"
         ],
-        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+        "evidence": "KpiEngine::calcWipAging — lệnh mở (released/active/on_hold) quá 21 ngày kể từ created_at."
       },
       "owner_role": "PPL",
       "data_stewardship_role": "PD",
@@ -620,7 +628,7 @@
       "attribution_rule": "Lệnh quá tuổi do chờ phê duyệt/vật tư/engineering tách về owner cổng tương ứng; PPL chịu phần điều độ.",
       "counter_metric": null,
       "reward_eligible": false,
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "status": "retained"
     },
     {
@@ -745,14 +753,14 @@
       "data_source": {
         "system": "ERP",
         "tables": [
-          "invoices",
-          "ar_receipts"
+          "ap_ar_invoices"
         ],
         "columns": [
+          "ledger_type",
           "invoice_date",
           "payment_date"
         ],
-        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+        "evidence": "KpiEngine::calcDso — trung bình (payment_date - invoice_date) hóa đơn AR đã thu."
       },
       "owner_role": "FIN",
       "data_stewardship_role": "FIN",
@@ -764,7 +772,7 @@
       "attribution_rule": "DSO cao do điều khoản khách hoặc tranh chấp chất lượng tách khỏi phần thuộc FIN; phần do hóa đơn lỗi liên kết INVOICE_RFT.",
       "counter_metric": null,
       "reward_eligible": false,
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "status": "retained"
     },
     {
@@ -935,14 +943,13 @@
       "data_source": {
         "system": "ERP",
         "tables": [
-          "eco_records"
+          "engineering_change_requests"
         ],
         "columns": [
           "created_at",
-          "closed_at",
-          "eco_status"
+          "ecr_status"
         ],
-        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+        "evidence": "KpiEngine::calcEcoClosureAging — ECR mở (không Closed/Rejected) quá 45 ngày kể từ created_at."
       },
       "owner_role": "ENGM",
       "data_stewardship_role": "ENGM",
@@ -954,7 +961,7 @@
       "attribution_rule": "ECO chờ phê duyệt/đánh giá liên phòng tách về owner bước tương ứng; ENGM chịu phần điều phối.",
       "counter_metric": null,
       "reward_eligible": false,
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "status": "retained"
     },
     {
@@ -987,10 +994,9 @@
         ],
         "columns": [
           "created_at",
-          "closed_at",
           "ncr_status"
         ],
-        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+        "evidence": "KpiEngine::calcNcrClosureAging — NCR mở (không Closed/Verified) quá 30 ngày kể từ created_at."
       },
       "owner_role": "QA",
       "data_stewardship_role": "QMS",
@@ -1002,7 +1008,7 @@
       "attribution_rule": "NCR mở chờ ECO/đổi vật tư/hành động khắc phục phòng khác tách về owner tương ứng; QA chịu phần điều phối đóng.",
       "counter_metric": null,
       "reward_eligible": false,
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "status": "retained"
     },
     {
@@ -1078,16 +1084,15 @@
         "basis": "Sẵn sàng vật tư cho lịch đã khoá nên ≥95%; dưới 85% gây dừng chuyền. Căn cứ thực tiễn MRP/Lean."
       },
       "data_source": {
-        "system": "ERP",
+        "system": "MOM",
         "tables": [
-          "purchase_orders",
-          "inventory_balances"
+          "job_orders"
         ],
         "columns": [
-          "material_status",
-          "required_date"
+          "start_date_planned",
+          "material_readiness_status"
         ],
-        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+        "evidence": "KpiEngine::calcMaterialAvailabilityPlan — job_orders.material_readiness_status cho lệnh trong lịch."
       },
       "owner_role": "SCM",
       "data_stewardship_role": "SCM",
@@ -1099,7 +1104,7 @@
       "attribution_rule": "Thiếu vật tư do nhà cung cấp trễ liên kết SUPPLIER_OTD; SCM chịu phần lập kế hoạch mua.",
       "counter_metric": null,
       "reward_eligible": false,
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "status": "retained"
     },
     {
@@ -1126,15 +1131,15 @@
         "basis": "Độ chính xác tồn kho chuẩn ≥98%; dưới 95% làm sai kế hoạch vật tư. Căn cứ thực tiễn cycle-count."
       },
       "data_source": {
-        "system": "ERP",
+        "system": "WMS",
         "tables": [
-          "cycle_count_results"
+          "wms_cycle_count_results"
         ],
         "columns": [
-          "counted_qty",
-          "system_qty"
+          "variance_qty",
+          "created_at"
         ],
-        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+        "evidence": "KpiEngine::calcInventoryAccuracy — dòng cycle-count có variance_qty = 0."
       },
       "owner_role": "SCM",
       "data_stewardship_role": "SCM",
@@ -1146,7 +1151,7 @@
       "attribution_rule": "Sai lệch do giao dịch chưa ghi ở khâu sản xuất tách về D-PROD; D-SCM/D-WHS chịu phần kho.",
       "counter_metric": null,
       "reward_eligible": false,
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "status": "retained"
     },
     {
@@ -1271,13 +1276,13 @@
       "data_source": {
         "system": "ERP",
         "tables": [
-          "invoices"
+          "ap_ar_invoices"
         ],
         "columns": [
-          "error_count",
-          "invoice_date"
+          "invoice_date",
+          "three_way_match_status"
         ],
-        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+        "evidence": "KpiEngine::calcInvoiceRft — hóa đơn three_way_match_status = matched."
       },
       "owner_role": "FIN",
       "data_stewardship_role": "FIN",
@@ -1289,7 +1294,7 @@
       "attribution_rule": "Lỗi do dữ liệu nguồn sai (giá, số lượng) tách về vai trò xác nhận dữ liệu nguồn; FIN chịu phần lập hóa đơn.",
       "counter_metric": null,
       "reward_eligible": false,
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "status": "retained"
     },
     {
@@ -1462,14 +1467,13 @@
       "data_source": {
         "system": "EHS",
         "tables": [
-          "incident_logs",
-          "incident_actions"
+          "ehs_incidents"
         ],
         "columns": [
           "created_at",
-          "closed_at"
+          "incident_status"
         ],
-        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+        "evidence": "KpiEngine::calcIncidentActionClosureAging — sự cố mở quá 30 ngày kể từ created_at."
       },
       "owner_role": "EHS",
       "data_stewardship_role": "EHS",
@@ -1481,7 +1485,7 @@
       "attribution_rule": "Hành động chờ phòng khác thực hiện tách về owner tương ứng; EHS chịu phần điều phối.",
       "counter_metric": null,
       "reward_eligible": false,
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "status": "retained"
     },
     {

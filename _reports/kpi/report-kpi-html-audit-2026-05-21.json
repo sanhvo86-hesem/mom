@@ -1,20 +1,20 @@
 {
-    "generated_at": "2026-05-21T15:13:38+00:00",
+    "generated_at": "2026-05-21T15:33:14+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-21",
     "summary": {
         "html_file_count": 870,
         "files_with_kpi": 686,
-        "kpi_occurrences": 4185,
+        "kpi_occurrences": 4191,
         "unique_coded_kpi_ids": 85,
         "unique_likely_operational_kpi_ids": 48,
         "unique_canonical_metric_codes_seen": 35,
         "unique_legacy_alias_codes_seen": 4,
-        "kpi_row_candidates": 3652
+        "kpi_row_candidates": 3653
     },
     "registry_counts": {
-        "runtime_calculated_metrics": 19,
+        "runtime_calculated_metrics": 28,
         "legacy_aliases": 34,
         "executive_scorecard": 15,
         "annex122_governance_kpis": 33,
@@ -22,8 +22,8 @@
         "unique_known_metric_codes": 95
     },
     "backend_observation": {
-        "runtime_metrics_have_calculators": 19,
-        "non_runtime_metrics_need_data_contract_before_calculation": 42
+        "runtime_metrics_have_calculators": 28,
+        "non_runtime_metrics_need_data_contract_before_calculation": 33
     },
     "coded_kpi_ids": [
         "KPI-01",
@@ -209,8 +209,8 @@
         "annex_references": {
             "html_files": 76,
             "files_with_kpi": 59,
-            "kpi_occurrences": 602,
-            "kpi_row_candidates": 474,
+            "kpi_occurrences": 608,
+            "kpi_row_candidates": 475,
             "coded_kpi_ids": [
                 "KPI-01",
                 "KPI-01OTDOTD",
@@ -589,8 +589,8 @@
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
             "bucket": "annex_references",
             "title": "KPI System Matrix and Document Usage",
-            "kpi_occurrences": 148,
-            "kpi_row_candidates": 54,
+            "kpi_occurrences": 154,
+            "kpi_row_candidates": 55,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-AND-ESCALATION",
@@ -1780,8 +1780,8 @@
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
             "bucket": "annex_references",
             "title": "KPI System Matrix and Document Usage",
-            "kpi_occurrences": 148,
-            "kpi_row_candidates": 54,
+            "kpi_occurrences": 154,
+            "kpi_row_candidates": 55,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-AND-ESCALATION",

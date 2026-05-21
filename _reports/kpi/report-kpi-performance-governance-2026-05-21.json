@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-05-21T15:13:40+00:00",
+    "generated_at": "2026-05-21T15:33:17+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-21",
@@ -285,7 +285,7 @@
                 "KPI-OPERATING-MECHANISM-ASSESSMENT"
             ],
             "canonical_metric_codes": [],
-            "snippet": "OTDOn-Time Deliveryexecutive_scorecard_kpiruntime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis, gate_control_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides147388≥95%<90%; red <90%; yellow 90; ≥95%runtime_calculated_with_registry_contractactive_runtimet",
+            "snippet": "OTDOn-Time Deliveryexecutive_scorecard_kpiruntime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis, gate_control_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides147390≥95%<90%; red <90%; yellow 90; ≥95%runtime_calculated_with_registry_contractactive_runtimet",
             "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
         },
         {
@@ -334,6 +334,19 @@
             "row_index": 26,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
+                "KPI-AUTHORITY-REGISTRY-AND-OPERATIONAL-METRICS",
+                "KPI-CASCADE-DICTIONARY"
+            ],
+            "canonical_metric_codes": [],
+            "snippet": "COMPLAINT_RATECustomer Quality Escape / Complaint Rateexecutive_scorecard_kpiruntime_calculated_metrics, legacy_aliases, annex122_governance_kpis, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides1041≤1 complaints_per_100_shipmentsruntime_calculated_with_registry_contractmanual_govern",
+            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
+        },
+        {
+            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
+            "bucket": "annex_references",
+            "row_index": 27,
+            "coded_kpi_ids": [
+                "KPI-AND-DEPUTY-CONTROL",
                 "KPI-CASCADE-DICTIONARY"
             ],
             "canonical_metric_codes": [],
@@ -343,25 +356,13 @@
         {
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
             "bucket": "annex_references",
-            "row_index": 27,
-            "coded_kpi_ids": [
-                "KPI-AND-DEPUTY-CONTROL",
-                "KPI-AUTHORITY-REGISTRY-AND-OPERATIONAL-METRICS"
-            ],
-            "canonical_metric_codes": [],
-            "snippet": "COMPLAINT_RATECustomer Quality Escape / Complaint Rateexecutive_scorecard_kpiruntime_calculated_metrics, legacy_aliases, annex122_governance_kpis, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides939≤1 complaints_per_100_shipmentsruntime_calculated_with_registry_contractmanual_governe",
-            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
-        },
-        {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
-            "bucket": "annex_references",
-            "row_index": 78,
+            "row_index": 77,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-CASCADE-DICTIONARY"
             ],
             "canonical_metric_codes": [],
-            "snippet": "SUPPLIER_OTDPO/Processor On-Timegovernance_kpiruntime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis44>= 90%not_declared_or_informationallocal_target_requires_classificationcanonical_or_mapped_nameDocumentsmom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex",
+            "snippet": "SUPPLIER_OTDPO/Processor On-Timegovernance_kpiruntime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis45>= 90%not_declared_or_informationallocal_target_requires_classificationcanonical_or_mapped_nameDocumentsmom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex",
             "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
         },
         {
@@ -418,7 +419,22 @@
         {
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
             "bucket": "annex_references",
-            "row_index": 142,
+            "row_index": 136,
+            "coded_kpi_ids": [
+                "KPI-AND-DEPUTY-CONTROL",
+                "KPI-CASCADE-DICTIONARY",
+                "KPI-OPERATING-MECHANISM-ASSESSMENT"
+            ],
+            "canonical_metric_codes": [
+                "OTD"
+            ],
+            "snippet": "SUPPLIER_READINESSSupplier readiness composite from OTD and incoming qualityexecutive_scorecard_kpiproposed_operating_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides22≥90 composite_scorecandidate_data_contract_required_before_payoutcandidate_data_contractregistered_target_n",
+            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
+        },
+        {
+            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
+            "bucket": "annex_references",
+            "row_index": 143,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL"
             ],
@@ -429,7 +445,7 @@
         {
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
             "bucket": "annex_references",
-            "row_index": 146,
+            "row_index": 147,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-CASCADE-DICTIONARY"
@@ -441,27 +457,13 @@
         {
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
             "bucket": "annex_references",
-            "row_index": 152,
+            "row_index": 154,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-CASCADE-DICTIONARY"
             ],
             "canonical_metric_codes": [],
             "snippet": "RECORDABLE_INCIDENT_RATERecordable Incident / LTI Ratesafety_gateannex122_governance_kpis, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides11≤0 countnot_declared_or_informationalgate_onlyregistered_target_not_repeated_in_docscanonical_or_mapped_nameDocumentsmom/docs/operations/refere",
-            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
-        },
-        {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
-            "bucket": "annex_references",
-            "row_index": 156,
-            "coded_kpi_ids": [
-                "KPI-AND-DEPUTY-CONTROL",
-                "KPI-OPERATING-MECHANISM-ASSESSMENT"
-            ],
-            "canonical_metric_codes": [
-                "OTD"
-            ],
-            "snippet": "SUPPLIER_READINESSSupplier readiness composite from OTD and incoming qualityexecutive_scorecard_kpiproposed_operating_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides11≥90 composite_scorecandidate_data_contract_required_before_payoutcandidate_data_contractregistered_target_n",
             "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
         },
         {
@@ -2612,7 +2614,7 @@
             "governance_signals": {
                 "evaluation_terms": 18,
                 "recognition_terms": 13,
-                "discipline_or_corrective_terms": 32,
+                "discipline_or_corrective_terms": 33,
                 "action_ownership_terms": 101,
                 "has_evaluation": true,
                 "has_recognition": true,
@@ -2770,7 +2772,7 @@
             "bucket": "annex_references",
             "title": "KPI System Matrix and Document Usage",
             "has_kpi": true,
-            "kpi_occurrences": 148,
+            "kpi_occurrences": 154,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-AND-ESCALATION",
