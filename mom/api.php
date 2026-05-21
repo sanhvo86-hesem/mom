@@ -16028,22 +16028,77 @@ switch ($action) {
     $docs = $data['docs'] ?? [];
     if (!is_array($docs)) $docs = [];
     $out = [];
+    $dccPendingCodes = []; // non-form doc codes needing DCC overlay
     foreach ($docs as $d) {
       if (!is_array($d)) continue;
       $code = (string)($d['code'] ?? '');
       $basePath = (string)($d['base_path'] ?? ($d['path'] ?? ''));
       if ($code === '') continue;
-      if (trim($basePath) === '') continue;
-      $formEntry = form_registry_get_entry($FORM_CONTROL_REGISTRY_FILE, $code, $basePath);
+      $formEntry = trim($basePath) !== ''
+        ? form_registry_get_entry($FORM_CONTROL_REGISTRY_FILE, $code, $basePath)
+        : null;
       if (is_array($formEntry)) {
         $st = form_load_state_existing($DATA_DIR, (string)$formEntry['code']);
         if (!is_array($st)) $st = form_state_fallback_from_registry($formEntry);
         $out[$code] = $st;
         continue;
       }
-      $st = load_doc_state($ROOT_DIR, $basePath, $ARCHIVE_DIR, $code);
-      if ($st) {
-        $out[$code] = $st;
+      $dccPendingCodes[] = $code;
+      if (trim($basePath) !== '') {
+        $st = load_doc_state($ROOT_DIR, $basePath, $ARCHIVE_DIR, $code);
+        if (is_array($st)) {
+          $out[$code] = $st;
+        }
+      }
+    }
+    // Overlay DCC-canonical revision/status from dcc_document_header in one
+    // batch query so the listing always reflects DB state rather than stale JSON.
+    if (!empty($dccPendingCodes)) {
+      try {
+        $layer = runtime_data_layer();
+        $dccParams = [];
+        $dccPlaceholders = [];
+        foreach (array_values($dccPendingCodes) as $ci => $cv) {
+          $pk = ':c' . $ci;
+          $dccPlaceholders[] = $pk;
+          $dccParams[$pk] = strtoupper(trim($cv));
+        }
+        $dccRows = $layer->query(
+          'SELECT doc_code, revision, status, effective_date
+             FROM dcc_document_header
+            WHERE doc_code IN (' . implode(',', $dccPlaceholders) . ')',
+          $dccParams
+        );
+        if (is_array($dccRows)) {
+          $activeWorkflowStates = ['draft', 'in_review', 'pending_approval', 'rejected'];
+          foreach ($dccRows as $dccRow) {
+            $dc = (string)($dccRow['doc_code'] ?? '');
+            if (!in_array($dc, $dccPendingCodes, true)) continue;
+            $rawRev = trim((string)($dccRow['revision'] ?? ''));
+            if ($rawRev === '' || strtoupper($rawRev) === 'V0') continue;
+            $legacyRev = trim(preg_replace('/^[vV]\s*/', '', $rawRev) ?? $rawRev);
+            if ($legacyRev === '') continue;
+            $dccStatus = strtolower(trim((string)($dccRow['status'] ?? '')));
+            $effDate   = trim((string)($dccRow['effective_date'] ?? ''));
+            $state = $out[$dc] ?? [];
+            $stateStatus = strtolower(trim((string)($state['status'] ?? '')));
+            $state['released_revision'] = $legacyRev;
+            $state['has_release'] = true;
+            if (
+              !in_array($stateStatus, $activeWorkflowStates, true)
+              && !in_array($dccStatus, ['draft'], true)
+              && $dccStatus !== ''
+            ) {
+              $state['revision'] = $legacyRev;
+              $state['status']   = $dccStatus;
+            }
+            if ($effDate !== '') $state['effective_date'] = $effDate;
+            $state['version_source'] = 'dcc_document_header';
+            $out[$dc] = $state;
+          }
+        }
+      } catch (Throwable $_dccErr) {
+        // Non-fatal: DCC overlay unavailable; client falls back to __dccRevision/__dccStatus
       }
     }
     api_json(['ok' => true, 'states' => $out, 'server_time' => now_iso()]);
