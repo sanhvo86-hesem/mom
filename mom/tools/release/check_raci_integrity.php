@@ -20,6 +20,8 @@ declare(strict_types=1);
  *   3. Every data row has at least one Responsible (R).
  *   4. Every RACI cell holds only A / R / C / I (or blank).
  *   5. Every CDR code used in ANNEX-121 has an id="cdr-XX" anchor in ANNEX-120.
+ *   6. In the §4 / §6 tables the Accountable (A) cell names exactly one
+ *      role and is never a role bundle (a bundle cannot be Accountable).
  *
  * P1 findings (warn, do not block)
  * ────────────────────────────────
@@ -228,6 +230,16 @@ foreach ([['§4 value-stream RACI', ['Hoạt động ngang','Bằng chứng'], 5
         }
         if (cellText($tds[1]) === '') { $p0[] = "ANNEX-121 $name row $rn: empty Accountable (A)."; }
         if (cellText($tds[2]) === '') { $p0[] = "ANNEX-121 $name row $rn: empty Responsible (R)."; }
+        // The Accountable cell must name exactly one role and never a
+        // role bundle — under RACI a bundle/committee cannot be 'A'.
+        $aCell = $tds[1];
+        $aHtml = (string)$doc->saveHTML($aCell);
+        $aLinks = $aCell->getElementsByTagName('a')->length;
+        if (str_contains($aHtml, 'bundle')) {
+            $p0[] = "ANNEX-121 $name row $rn: Accountable (A) is a role bundle — A must be a single role.";
+        } elseif ($aLinks > 1) {
+            $p0[] = "ANNEX-121 $name row $rn: Accountable (A) names $aLinks roles — A must be exactly one.";
+        }
     }
     echo "  $name: $rn rows\n";
 }
