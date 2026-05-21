@@ -456,24 +456,21 @@
    * Click on bone → gate detail panel
    * ======================================================================= */
   function renderFishboneSOP201(canvas) {
-    var W = 1010, H = 490, spineY = 245;
-    var tipTopY = 78, tipBotY = 412;
+    var W = 1010, H = 580, spineY = 290;
+    var tipTopY = 76, tipBotY = 504;
 
-    /* Top bones: G0 G1 G3 G5 (alternating to show left-right sequence) */
-    var topGates = [0, 1, 3, 5]; /* GATES indices */
-    var topSX = [165, 320, 480, 640]; /* spine junction X */
-    var topTX = [105, 260, 420, 580]; /* tip X */
+    var topGates = [0, 1, 3, 5];
+    var topSX    = [165, 320, 480, 640];
+    var topTX    = [105, 260, 420, 580];
 
-    /* Bottom bones: G2 G4 G6 G7 */
     var botGates = [2, 4, 6, 7];
-    var botSX = [243, 400, 560, 720];
-    var botTX = [183, 340, 500, 660];
+    var botSX    = [243, 400, 560, 720];
+    var botTX    = [183, 340, 500, 660];
 
     var bp = cv('brand-primary', '#1565c0');
     var s = '';
     s += '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" class="dov-fishbone-svg">';
 
-    /* Arrowhead marker */
     s += '<defs>';
     s += '<marker id="dovArr201" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">';
     s += '<path d="M0,0 L10,5 L0,10 Z" fill="' + bp + '"/></marker>';
@@ -483,75 +480,83 @@
     s += '<line x1="72" y1="' + spineY + '" x2="838" y2="' + spineY +
          '" stroke="' + bp + '" stroke-width="3.5" stroke-linecap="round" marker-end="url(#dovArr201)"/>';
 
-    /* RFQ tail label */
-    s += '<rect x="4" y="' + (spineY - 18) + '" width="64" height="36" rx="8" fill="' + bp + '" fill-opacity="0.12" stroke="' + bp + '" stroke-width="1.5"/>';
-    s += '<text x="36" y="' + (spineY - 5) + '" text-anchor="middle" font-size="10" font-weight="700" fill="' + bp + '" font-family="inherit">RFQ</text>';
-    s += '<text x="36" y="' + (spineY + 8) + '" text-anchor="middle" font-size="9" fill="' + bp + '" font-family="inherit" opacity="0.8">khách hàng</text>';
+    /* RFQ tail */
+    s += '<rect x="4" y="' + (spineY - 20) + '" width="66" height="40" rx="8"' +
+         ' fill="' + bp + '" fill-opacity="0.1" stroke="' + bp + '" stroke-width="1.5"/>';
+    s += '<text x="37" y="' + (spineY - 4) + '" text-anchor="middle" font-size="10"' +
+         ' font-weight="700" fill="' + bp + '" font-family="inherit">RFQ</text>';
+    s += '<text x="37" y="' + (spineY + 10) + '" text-anchor="middle" font-size="9"' +
+         ' fill="' + bp + '" font-family="inherit" opacity="0.8">khách hàng</text>';
 
-    /* Head box — "Đơn hàng CNC xuất sắc" */
-    s += '<rect x="842" y="' + (spineY - 48) + '" width="158" height="96" rx="10" fill="' + bp + '"/>';
-    s += '<text x="921" y="' + (spineY - 24) + '" text-anchor="middle" font-size="11.5" font-weight="700" fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">Sản phẩm CNC</text>';
-    s += '<text x="921" y="' + (spineY - 8)  + '" text-anchor="middle" font-size="11" font-weight="600" fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">đúng chất lượng</text>';
-    s += '<text x="921" y="' + (spineY + 8)  + '" text-anchor="middle" font-size="10.5" fill="rgba(255,255,255,0.85)" font-family="inherit">đúng số lượng</text>';
-    s += '<text x="921" y="' + (spineY + 24) + '" text-anchor="middle" font-size="10.5" fill="rgba(255,255,255,0.85)" font-family="inherit">giao đúng hạn</text>';
+    /* Head box */
+    s += '<rect x="842" y="' + (spineY - 54) + '" width="162" height="108" rx="12" fill="' + bp + '"/>';
+    s += '<text x="923" y="' + (spineY - 27) + '" text-anchor="middle" font-size="11.5"' +
+         ' font-weight="700" fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">Sản phẩm CNC</text>';
+    s += '<text x="923" y="' + (spineY - 10) + '" text-anchor="middle" font-size="11"' +
+         ' font-weight="600" fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">đúng chất lượng</text>';
+    s += '<text x="923" y="' + (spineY + 8) + '" text-anchor="middle" font-size="10.5"' +
+         ' fill="rgba(255,255,255,0.85)" font-family="inherit">đúng số lượng</text>';
+    s += '<text x="923" y="' + (spineY + 25) + '" text-anchor="middle" font-size="10.5"' +
+         ' fill="rgba(255,255,255,0.85)" font-family="inherit">giao đúng hạn</text>';
 
-    /* SOP-201 label on spine */
-    s += '<text x="74" y="' + (spineY - 10) + '" font-size="10.5" font-weight="700" fill="' + bp + '" font-family="inherit" opacity="0.7">SOP-201 · Luồng RFQ → Cash</text>';
+    /* Spine label */
+    s += '<text x="76" y="' + (spineY - 12) + '" font-size="10.5" font-weight="700"' +
+         ' fill="' + bp + '" font-family="inherit" opacity="0.7">SOP-201 · Luồng RFQ → Cash</text>';
 
-    /* ── Draw bones ──────────────────────────────────────────────────── */
     function drawGateBone(gi, sx, tx, ty, isTop) {
       var gate = GATES[gi];
       var col  = palette(gate.col);
-      var n    = Math.min(gate.docs.length, 5);
-      var lbW  = 108, lbH = 52;
+      var n    = gate.docs.length;
+      var lbW  = 112, lbH = 62, hdrH = 19;
       var lbX  = tx - lbW / 2;
-      var lbY  = isTop ? ty - lbH - 4 : ty + 4;
+      var lbY  = isTop ? ty - lbH - 8 : ty + 8;
 
-      /* Main bone line */
+      /* Main bone */
       s += '<line x1="' + tx + '" y1="' + ty + '" x2="' + sx + '" y2="' + spineY +
            '" stroke="' + col + '" stroke-width="2.5" class="dov-bone"/>';
 
-      /* Sub-bones: one tick per document (up to 5) */
-      for (var j = 0; j < n; j++) {
-        var t = 0.18 + j * (0.64 / Math.max(n - 1, 1));
+      /* Dots along bone — one per document, no text labels */
+      for (var j = 0; j < n && j < 5; j++) {
+        var t  = 0.22 + j * (0.56 / Math.max(n - 1, 1));
         var bx = tx + t * (sx - tx);
         var by = ty + t * (spineY - ty);
-        var ex = bx + (isTop ? 32 : 32);
-        var ey = by + (isTop ? 3 : -3);
-        s += '<line x1="' + bx + '" y1="' + by + '" x2="' + ex + '" y2="' + ey +
-             '" stroke="' + col + '" stroke-width="1.4" opacity="0.65"/>';
-        s += '<text x="' + (bx - 3) + '" y="' + (isTop ? by - 4 : by + 11) +
-             '" font-size="9" fill="' + col + '" text-anchor="end" font-family="monospace" font-weight="700" opacity="0.85">' +
-             esc(gate.docs[j]) + '</text>';
+        s += '<circle cx="' + bx + '" cy="' + by + '" r="3.5" fill="' + col + '" opacity="0.45"/>';
       }
 
       /* Junction dot on spine */
-      s += '<circle cx="' + sx + '" cy="' + spineY + '" r="5" fill="' + col + '"/>';
+      s += '<circle cx="' + sx + '" cy="' + spineY + '" r="5.5" fill="' + col + '"/>';
 
-      /* Parallel indicator */
-      var parallelNote = gate.parallel
-        ? '<title>' + gate.id + ' ∥ ' + gate.parallel + '</title>'
-        : '';
-
-      /* Label box (clickable) */
+      /* White-card label box */
       s += '<g class="dov-gate-lbl" data-gi="' + gi + '" role="button" tabindex="0" aria-label="' + esc(T(gate.label)) + '">';
-      s += parallelNote;
+      if (gate.parallel) s += '<title>' + gate.id + ' ∥ ' + gate.parallel + '</title>';
+      /* Card body */
       s += '<rect x="' + lbX + '" y="' + lbY + '" width="' + lbW + '" height="' + lbH +
-           '" rx="8" fill="' + col + '" fill-opacity="0.12" stroke="' + col + '" stroke-width="1.5"/>';
-      /* Gate ID badge */
-      s += '<rect x="' + (lbX + 6) + '" y="' + (lbY + 6) + '" width="30" height="16" rx="4" fill="' + col + '"/>';
-      s += '<text x="' + (lbX + 21) + '" y="' + (lbY + 18) + '" text-anchor="middle" font-size="9.5" font-weight="800" fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">' + esc(gate.id) + '</text>';
-      /* Gate short label */
-      s += '<text x="' + tx + '" y="' + (lbY + 27) + '" text-anchor="middle" font-size="11" font-weight="700" fill="' + col + '" font-family="inherit">' + esc(T(gate.short)) + '</text>';
-      /* Role */
-      s += '<text x="' + tx + '" y="' + (lbY + 41) + '" text-anchor="middle" font-size="9" fill="' + col + '" font-family="inherit" opacity="0.82">' + esc(gate.role) + '</text>';
-      s += '</g>';
-
-      /* Parallel badge */
+           '" rx="9" fill="' + cv('bg-surface', '#fff') + '" stroke="' + col + '" stroke-width="1.5"/>';
+      /* Colored header strip */
+      s += '<rect x="' + lbX + '" y="' + lbY + '" width="' + lbW + '" height="' + hdrH +
+           '" rx="9" fill="' + col + '"/>';
+      s += '<rect x="' + lbX + '" y="' + (lbY + 10) + '" width="' + lbW + '" height="' + (hdrH - 10) +
+           '" fill="' + col + '"/>';
+      /* Gate ID */
+      s += '<text x="' + (lbX + 7) + '" y="' + (lbY + 14) + '" font-size="10.5" font-weight="800"' +
+           ' fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">' + esc(gate.id) + '</text>';
+      /* Parallel badge in header */
       if (gate.parallel) {
-        s += '<text x="' + (lbX + lbW - 4) + '" y="' + (lbY + 12) +
-             '" text-anchor="end" font-size="9" fill="' + col + '" font-family="inherit" font-weight="600" opacity="0.75">∥' + gate.parallel + '</text>';
+        s += '<text x="' + (lbX + lbW - 6) + '" y="' + (lbY + 14) + '" text-anchor="end" font-size="8.5"' +
+             ' fill="rgba(255,255,255,0.88)" font-family="inherit" font-weight="600">∥' + gate.parallel + '</text>';
       }
+      /* Short name */
+      s += '<text x="' + tx + '" y="' + (lbY + hdrH + 15) + '" text-anchor="middle" font-size="11.5"' +
+           ' font-weight="700" fill="' + col + '" font-family="inherit">' + esc(T(gate.short)) + '</text>';
+      /* Role */
+      s += '<text x="' + (lbX + 7) + '" y="' + (lbY + lbH - 9) + '" font-size="8.5"' +
+           ' fill="' + col + '" font-family="inherit" opacity="0.75">' + esc(gate.role) + '</text>';
+      /* Doc count badge */
+      s += '<rect x="' + (lbX + lbW - 31) + '" y="' + (lbY + lbH - 18) + '" width="27" height="13"' +
+           ' rx="4" fill="' + col + '" fill-opacity="0.15"/>';
+      s += '<text x="' + (lbX + lbW - 17) + '" y="' + (lbY + lbH - 8) + '" text-anchor="middle" font-size="8.5"' +
+           ' font-weight="700" fill="' + col + '" font-family="inherit">' + n + ' TL</text>';
+      s += '</g>';
     }
 
     topGates.forEach(function (gi, i) { drawGateBone(gi, topSX[i], topTX[i], tipTopY, true); });
@@ -559,7 +564,6 @@
 
     s += '</svg>';
 
-    /* Detail panel placeholder */
     s += '<div class="dov-detail-panel" id="dov-gate-panel">' +
          '<p class="dov-detail-hint">' +
          esc(T({ vi: 'Nhấn vào cổng kiểm soát để xem tài liệu liên quan', en: 'Click a control gate to view linked documents' })) +
@@ -567,7 +571,6 @@
 
     canvas.innerHTML = '<div class="dov-fishbone-wrap">' + s + '</div>';
 
-    /* Bind bone clicks */
     canvas.querySelectorAll('.dov-gate-lbl').forEach(function (el) {
       el.addEventListener('click', function () {
         showGateDetail(parseInt(el.getAttribute('data-gi')), canvas);
@@ -786,7 +789,7 @@
         layout: 'radial',
         symbol: 'emptyCircle',
         symbolSize: function (v) { return v ? Math.min(8 + v * 0.08, 16) : 6; },
-        initialTreeDepth: 2,
+        initialTreeDepth: 1,
         lineStyle: { color: '#e2e8f0', width: 1.5, curveness: 0.6 },
         label: {
           position: 'top', fontSize: 11, fontWeight: '600',
