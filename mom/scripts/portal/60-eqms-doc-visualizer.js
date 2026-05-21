@@ -650,6 +650,7 @@
     var W = 1010, H = 340, midY = 170;
     var G1Y = 95, G2Y = 245;
     var bW = 90, bH = 44; /* box width/height */
+    var CAT_COL = { SOP: '#1565c0', WI: '#16a34a', ANNEX: '#7c3aed', FRM: '#d97706' };
 
     /* Gate box center X positions */
     var cx = { G0:135, G1:280, G2:280, G3:430, G4:545, G5:660, G6:775, G7:895 };
@@ -677,24 +678,55 @@
     s += '<rect x="232" y="65" width="96" height="210" rx="10" fill="rgba(100,116,139,0.05)" stroke="rgba(100,116,139,0.18)" stroke-dasharray="5,3" stroke-width="1.2"/>';
     s += '<text x="280" y="58" text-anchor="middle" font-size="9.5" fill="' + cv('text-tertiary', '#94a3b8') + '" font-family="inherit" font-weight="600">Song song</text>';
 
-    /* Gate boxes */
+    /* Gate boxes with perpendicular sub-branches per doc */
     function gateBox(gateId, centerX, centerY) {
       var gi  = GATES.findIndex(function (g) { return g.id === gateId; });
       if (gi < 0) return;
-      var gate = GATES[gi];
-      var col  = palette(gate.col);
-      var x    = centerX - bW / 2;
-      var y    = centerY - bH / 2;
+      var gate    = GATES[gi];
+      var col     = palette(gate.col);
+      var n       = gate.docs.length;
+      var x       = centerX - bW / 2;
+      var y       = centerY - bH / 2;
+      var boxTop  = y;
+      var boxBot  = y + bH;
+      /* G2 is the lower parallel gate — branches grow downward */
+      var goDown  = (gateId === 'G2');
+      var bLen    = 20;
+
+      /* Branch x positions spread across box width (10px margin each side) */
+      function brkX(k) {
+        if (n <= 1) return centerX;
+        return (centerX - bW / 2 + 10) + k * (bW - 20) / (n - 1);
+      }
+
+      /* Sub-branches drawn before the box so box renders on top */
+      for (var k = 0; k < n; k++) {
+        var code = gate.docs[k];
+        var ccat = catOfCode(code);
+        var cc   = CAT_COL[ccat] || col;
+        var bx   = brkX(k);
+        var by1  = goDown ? boxBot  : boxTop;
+        var by2  = goDown ? boxBot  + bLen : boxTop - bLen;
+        var trot = goDown ? 90 : -90;
+        var ty   = goDown ? by2 + 2 : by2 - 2;
+        s += '<line x1="' + bx + '" y1="' + by1 + '" x2="' + bx + '" y2="' + by2 +
+             '" stroke="' + cc + '" stroke-width="1.5" opacity="0.85"/>';
+        s += '<circle cx="' + bx + '" cy="' + by1 + '" r="2.5" fill="' + cc + '" opacity="0.7"/>';
+        s += '<text transform="rotate(' + trot + ',' + bx + ',' + ty + ')"' +
+             ' x="' + bx + '" y="' + ty + '" font-size="7.5" font-weight="700"' +
+             ' font-family="monospace" fill="' + cc + '" text-anchor="start">' + esc(code) + '</text>';
+      }
+
+      /* Gate box (rendered above branches) */
       s += '<g class="dov-gf-node" data-gi="' + gi + '" role="button" tabindex="0" aria-label="' + esc(T(gate.label)) + '">';
       s += '<rect x="' + x + '" y="' + y + '" width="' + bW + '" height="' + bH +
            '" rx="8" fill="' + col + '" fill-opacity="0.13" stroke="' + col + '" stroke-width="1.8"/>';
-      /* Top strip */
       s += '<rect x="' + x + '" y="' + y + '" width="' + bW + '" height="16" rx="8" fill="' + col + '"/>';
       s += '<rect x="' + x + '" y="' + (y + 8) + '" width="' + bW + '" height="8" fill="' + col + '"/>';
-      /* Gate ID */
-      s += '<text x="' + centerX + '" y="' + (y + 12) + '" text-anchor="middle" font-size="10" font-weight="800" fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">' + esc(gateId) + '</text>';
-      /* Short label */
-      s += '<text x="' + centerX + '" y="' + (y + 31) + '" text-anchor="middle" font-size="10.5" font-weight="700" fill="' + col + '" font-family="inherit">' + esc(T(gate.short)) + '</text>';
+      s += '<text x="' + centerX + '" y="' + (y + 12) + '" text-anchor="middle" font-size="10" font-weight="800"' +
+           ' fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">' + esc(gateId) + '</text>';
+      s += '<text x="' + centerX + '" y="' + (y + 31) + '" text-anchor="middle" font-size="10.5" font-weight="700"' +
+           ' fill="' + col + '" font-family="inherit">' + esc(T(gate.short)) + '</text>';
       s += '</g>';
     }
 
