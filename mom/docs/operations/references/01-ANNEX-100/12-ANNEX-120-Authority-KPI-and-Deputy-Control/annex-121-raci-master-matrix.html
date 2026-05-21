@@ -153,6 +153,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#r1">1. Mục đích</a><a href="#r2">2. Quy tắc dùng RACI khi đang vận hành</a><a href="#r3">3. Đường xử lý xung đột và khoảng trống trách nhiệm</a><a href="#r4">4. RACI mức hoạt động theo luồng giá trị vận hành</a><a href="#r5gate">5. RACI theo cổng G0→G7</a><a href="#r6">6. RACI mức tài liệu</a><a href="#r7">7. Bàn giao và leo thang</a><a href="#r8">8. Đồng bộ SOP — WI — ANNEX — JD — quyền hệ thống</a><a href="#r9">9. Kích hoạt rà soát</a></div></div>
 <h2 class="h2" id="r1">1. Mục đích</h2>
 <p><a href="annex-121-raci-master-matrix.html">ANNEX-121</a> mô tả <b>ai chịu trách nhiệm làm, ai chịu trách nhiệm cuối cùng, ai phải được tham vấn và ai cần được biết</b> ở hai cấp: (1) hoạt động/luồng giá trị vận hành và (2) quản lý tài sản của tài liệu/hồ sơ hệ thống. Mục tiêu là khóa đường bàn giao, ngăn khoảng trống người chịu trách nhiệm, và giúp SOP/WI/ANNEX/JD chạy cùng một logic thực thi.</p>
+<div class="req"><span class="req-tag shall">PHẢI</span><div><a href="annex-121-raci-master-matrix.html">ANNEX-121</a> là <b>nguồn RACI gốc duy nhất (SSOT)</b> của hệ thống. Mọi bảng RACI nhúng trong SOP (mục “Vai trò, quyền hạn &amp; RACI”), trong JD (mục “Giao diện liên phòng — RACI”) hoặc trong các trang tóm tắt RACI chỉ là <b>bản phái sinh</b>; khi có khác biệt, ANNEX-121 quyết định. Thẩm quyền ký cuối tra <a href="annex-120-authority-matrix.html">ANNEX-120</a>; cơ chế phó và dự phòng tra <a href="annex-123-deputy-backup-matrix.html">ANNEX-123</a>. <span class="iso-clause">§5.3 / §7.5</span></div></div>
 <h2 class="h2" id="r2">2. Quy tắc dùng RACI khi đang vận hành</h2>
 <div class="legend-row">
 <div class="legend-item"><div class="legend-swatch" style="background:#e3f2fd;color:#1565c0;">A</div><b>chịu trách nhiệm cuối</b> — một vai trò duy nhất chịu trách nhiệm về đầu ra và quyết định dừng/chạy tiếp của hoạt động.</div>
@@ -205,15 +206,16 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </tbody></table></div>
 <h2 class="h2" id="r5gate">5. RACI theo cổng kiểm soát <a href="annex-121-raci-master-matrix.html#r5gate">G0</a>→<a href="annex-121-raci-master-matrix.html#r5gate">G7</a></h2>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Mỗi cổng kiểm soát có tối thiểu 3 hoạt động; mỗi hoạt động khớp mã CDR (<a href="annex-120-authority-matrix.html#cdr-A1">A1</a>–<a href="annex-120-authority-matrix.html#cdr-F6">F6</a>) và có ít nhất một FRM hoặc SOP trỏ về repo. Không dùng cụm mơ hồ trong cột R/C/I. <span class="iso-clause">§5.3 / §7.5 / §8.1</span></div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Một mã CDR có thể xuất hiện ở nhiều cổng (ví dụ <a href="annex-120-authority-matrix.html#cdr-E5">E5</a>, <a href="annex-120-authority-matrix.html#cdr-B7">B7</a>, <a href="annex-120-authority-matrix.html#cdr-D8">D8</a>, <a href="annex-120-authority-matrix.html#cdr-E7">E7</a>, <a href="annex-120-authority-matrix.html#cdr-A6">A6</a>): RACI phải đọc <b>theo ngữ cảnh cổng của từng dòng</b>. Nếu cùng một CDR có người chịu trách nhiệm cuối (A) khác nhau giữa các cổng — như A6 ở G0 (CEO) so với G7 (CS) — đó là dấu hiệu mã CDR bị dùng quá tải; mở hành động tách mã con theo cổng tại mục 9.</div></div>
 <div class="table-card"><table class="table">
 <colgroup>
-<col style="width:5%"/><col style="width:5%"/><col style="width:20%"/>
-<col style="width:5%"/><col style="width:5%"/><col style="width:5%"/><col style="width:5%"/><col style="width:5%"/><col style="width:5%"/><col style="width:5%"/><col style="width:5%"/><col style="width:5%"/><col style="width:5%"/>
+<col style="width:5%"/><col style="width:5%"/><col style="width:16%"/>
+<col style="width:5%"/><col style="width:5%"/><col style="width:5%"/><col style="width:5%"/><col style="width:5%"/><col style="width:5%"/><col style="width:5%"/><col style="width:5%"/><col style="width:5%"/><col style="width:4%"/><col style="width:5%"/>
 <col style="width:16%"/>
 </colgroup>
 <thead><tr>
 <th>G</th><th>CDR</th><th>Hoạt động</th>
-<th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a></th><th><a class="entity-link role-link" href="../../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html">ENG</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html">PPL</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html">HR</a>/<a class="entity-link role-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html">IT</a></th>
+<th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a></th><th><a class="entity-link role-link" href="../../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html">ENG</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html">PPL</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html">EHS</a></th><th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html">HR</a>/<a class="entity-link role-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html">IT</a></th>
 <th>FRM / SOP</th>
 </tr></thead>
 <tbody>
@@ -226,7 +228,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td></td>
 <td class="raci-cell raci-C">C</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -239,7 +241,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td class="raci-cell raci-C">C</td>
 <td></td>
 <td></td>
-<td class="raci-cell raci-A">A</td>
+<td class="raci-cell raci-A">A</td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -252,7 +254,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td></td>
 <td></td>
 <td></td>
-<td class="raci-cell raci-A">A</td>
+<td class="raci-cell raci-A">A</td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -265,7 +267,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td></td>
 <td></td>
 <td></td>
-<td class="raci-cell raci-A">A</td>
+<td class="raci-cell raci-A">A</td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -278,7 +280,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td class="raci-cell raci-R">R</td>
 <td class="raci-cell raci-R">R</td>
 <td class="raci-cell raci-C">C</td>
-<td class="raci-cell raci-A">A</td>
+<td class="raci-cell raci-A">A</td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -291,7 +293,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td class="raci-cell raci-R">R</td>
 <td class="raci-cell raci-C">C</td>
 <td></td>
-<td class="raci-cell raci-A">A</td>
+<td class="raci-cell raci-A">A</td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx">FRM-212</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -304,7 +306,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-C">C</td><td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-R">R</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-200-purchase/FRM-209_High_Risk_Job_Readiness_Review.xlsx">FRM-209</a> · <a href="../../../sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a></td>
 </tr>
@@ -317,7 +319,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-R">R</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-300-technical/FRM-306_Engineering_Release_and_Baseline_Package_Approval.xlsx">FRM-306</a> · <a href="../../../sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td>
 </tr>
@@ -330,7 +332,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-C">C</td><td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-R">R</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-100-sales/FRM-102_Document_Change_Request.xlsx">FRM-102</a> · <a href="../../../../forms/frm-100-sales/FRM-162_Change_Impact_Matrix.xlsx">FRM-162</a> · <a href="../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td>
 </tr>
@@ -343,7 +345,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-I">I</td><td></td>
 <td class="raci-cell raci-R">R</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-300-technical/FRM-307_Package_Supersedure_and_Withdrawal_Notice.xlsx">FRM-307</a> · <a href="../../../sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td>
 </tr>
@@ -356,7 +358,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-C">C</td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-500-production/FRM-501_Planning_Release_Checklist.xlsx">FRM-501</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -369,7 +371,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td></td>
 <td></td>
 <td class="raci-cell raci-R">R</td>
-<td class="raci-cell raci-A">A</td>
+<td class="raci-cell raci-A">A</td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-400-quality/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -382,7 +384,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td></td>
 <td class="raci-cell raci-R">R</td>
 <td class="raci-cell raci-R">R</td>
-<td class="raci-cell raci-A">A</td>
+<td class="raci-cell raci-A">A</td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-400-quality/FRM-402_Supplier_Evaluation_Form.xlsx">FRM-402</a> · <a href="../../../../forms/frm-400-quality/FRM-409_Supplier_Audit_Checklist.xlsx">FRM-409</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -395,7 +397,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-R">R</td>
-<td class="raci-cell raci-A">A</td>
+<td class="raci-cell raci-A">A</td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-400-quality/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -408,7 +410,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-I">I</td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-500-production/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -421,7 +423,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td class="raci-cell raci-A">A</td>
 <td class="raci-cell raci-C">C</td>
 <td></td>
-<td class="raci-cell raci-I">I</td>
+<td class="raci-cell raci-I">I</td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-500-production/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -434,7 +436,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-A">A</td><td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-C">C</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-300-technical/FRM-302_Setup_Sheet.xlsx">FRM-302</a> · <a href="../../../../forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> · <a href="../../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td>
 </tr>
@@ -447,7 +449,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-A">A</td><td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-I">I</td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-500-production/FRM-518_Work_Transfer_Validation_Record.xlsx">FRM-518</a> · <a href="../../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td>
 </tr>
@@ -460,7 +462,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td class="raci-cell raci-A">A</td>
 <td></td>
 <td></td>
-<td class="raci-cell raci-I">I</td>
+<td class="raci-cell raci-I">I</td><td></td>
 <td class="raci-cell raci-C">C</td>
 <td><a href="../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -469,11 +471,11 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-I">I</td>
 <td></td>
 <td></td>
-<td class="raci-cell raci-A">A</td>
-<td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td>
+<td class="raci-cell raci-R">R</td>
+<td class="raci-cell raci-R">R</td><td class="raci-cell raci-A">A</td>
 <td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-C">C</td>
-<td></td>
+<td></td><td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-C">C</td>
 <td><a href="../../../../forms/frm-500-production/FRM-512_Downtime_Log.xlsx">FRM-512</a> · <a href="../../../../forms/frm-500-production/FRM-522_Crash_Report.xlsx">FRM-522</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -486,7 +488,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td></td>
 <td class="raci-cell raci-C">C</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-300-technical/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM-305</a> · <a href="../../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td>
 </tr>
@@ -499,7 +501,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-C">C</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-100-sales/FRM-106_Pilot_Dry_Run_Log.xlsx">FRM-106</a> · <a href="../../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td>
 </tr>
@@ -512,7 +514,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-A">A</td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-400-quality/FRM-403_Outsourced_Process_Request.xlsx">FRM-403</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -525,7 +527,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-I">I</td><td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-R">R</td>
 <td class="raci-cell raci-A">A</td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-400-quality/FRM-404_Outsource_Dispatch_Checklist.xlsx">FRM-404</a> · <a href="../../../../forms/frm-400-quality/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -538,7 +540,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-R">R</td>
-<td class="raci-cell raci-A">A</td>
+<td class="raci-cell raci-A">A</td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-400-quality/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
@@ -551,7 +553,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td></td>
 <td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-R">R</td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-200-purchase/FRM-221_Customer_Property_Register.xlsx">FRM-221</a> · <a href="../../../sops/02-SOP-200/sop-203-customer-property-control.html">SOP-203</a></td>
 </tr>
@@ -564,7 +566,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td></td>
 <td class="raci-cell raci-I">I</td>
 <td></td>
-<td class="raci-cell raci-C">C</td>
+<td class="raci-cell raci-C">C</td><td></td>
 <td class="raci-cell raci-A">A</td>
 <td><a href="../../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> · <a href="../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td>
 </tr>
@@ -577,7 +579,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-I">I</td>
 <td></td>
-<td class="raci-cell raci-C">C</td>
+<td class="raci-cell raci-C">C</td><td></td>
 <td class="raci-cell raci-A">A</td>
 <td><a href="../../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> · <a href="../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td>
 </tr>
@@ -590,8 +592,8 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-C">C</td>
 <td></td>
+<td></td><td class="raci-cell raci-A">A</td>
 <td></td>
-<td class="raci-cell raci-A">A</td>
 <td><a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
 </tr>
 <tr>
@@ -603,7 +605,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-A">A</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-300-technical/FRM-311_FAI_Report.xlsx">FRM-311</a> · <a href="../../../../forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> · <a href="../../../sops/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a></td>
 </tr>
@@ -616,7 +618,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-A">A</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-300-technical/FRM-311_FAI_Report.xlsx">FRM-311</a> · <a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a></td>
 </tr>
@@ -629,7 +631,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-A">A</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
 </tr>
@@ -642,7 +644,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td></td>
 <td class="raci-cell raci-A">A</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
 </tr>
@@ -655,7 +657,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-A">A</td>
 <td class="raci-cell raci-C">C</td>
-<td class="raci-cell raci-I">I</td>
+<td class="raci-cell raci-I">I</td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> · <a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
 </tr>
@@ -668,7 +670,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-A">A</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td class="raci-cell raci-I">I</td>
 <td><a href="../../../../forms/frm-600-inspection/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
 </tr>
@@ -681,7 +683,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-A">A</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
 </tr>
@@ -694,7 +696,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-A">A</td>
 <td class="raci-cell raci-I">I</td>
-<td class="raci-cell raci-C">C</td>
+<td class="raci-cell raci-C">C</td><td class="raci-cell raci-I">I</td>
 <td></td>
 <td><a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
 </tr>
@@ -707,7 +709,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td></td>
 <td class="raci-cell raci-R">R</td>
 <td class="raci-cell raci-A">A</td>
-<td class="raci-cell raci-I">I</td>
+<td class="raci-cell raci-I">I</td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-400-quality/FRM-406_SCAR.xlsx">FRM-406</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
 </tr>
@@ -720,7 +722,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-A">A</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
 </tr>
@@ -733,7 +735,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td class="raci-cell raci-R">R</td><td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-A">A</td>
 <td class="raci-cell raci-C">C</td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-600-inspection/FRM-641_Final_Inspection_Report.xlsx">FRM-641</a> · <a href="../../../../forms/frm-600-inspection/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-642</a> · <a href="../../../sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td>
 </tr>
@@ -746,7 +748,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-A">A</td>
 <td></td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
 </tr>
@@ -759,7 +761,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td></td>
 <td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-R">R</td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-200-purchase/FRM-221_Customer_Property_Register.xlsx">FRM-221</a> · <a href="../../../sops/02-SOP-200/sop-203-customer-property-control.html">SOP-203</a></td>
 </tr>
@@ -772,7 +774,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-A">A</td>
 <td class="raci-cell raci-R">R</td>
-<td class="raci-cell raci-I">I</td>
+<td class="raci-cell raci-I">I</td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../../forms/frm-600-inspection/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-642</a> · <a href="../../../sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td>
 </tr>
@@ -785,7 +787,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-A">A</td>
 <td class="raci-cell raci-R">R</td>
-<td></td>
+<td></td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-600-inspection/FRM-641_Final_Inspection_Report.xlsx">FRM-641</a> · <a href="../../../../forms/frm-600-inspection/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-642</a> · <a href="../../../sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td>
 </tr>
@@ -798,7 +800,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td class="raci-cell raci-I">I</td>
 <td class="raci-cell raci-R">R</td>
 <td class="raci-cell raci-I">I</td>
-<td class="raci-cell raci-C">C</td>
+<td class="raci-cell raci-C">C</td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-200-purchase/FRM-211_Complaint_Log.xlsx">FRM-211</a> · <a href="../../../../forms/frm-200-purchase/FRM-213_RMA_Tracking_Log.xlsx">FRM-213</a> · <a href="../../../../forms/frm-200-purchase/FRM-654_Customer_Satisfaction_Survey.xlsx">FRM-654</a> · <a href="../../../sops/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html">SOP-202</a></td>
 </tr>
@@ -811,12 +813,29 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td></td><td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-C">C</td>
 <td class="raci-cell raci-I">I</td>
-<td class="raci-cell raci-C">C</td>
+<td class="raci-cell raci-C">C</td><td></td>
 <td></td>
 <td><a href="../../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx">FRM-212</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
 </tr>
 </tbody>
 </table></div>
+<h3>Vai trò hỗ trợ tham gia theo cổng kiểm soát</h3>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Bảng G0→G7 ở trên giữ 11 vai trò lõi (gồm cột EHS cho thẩm quyền an toàn). Hai chức năng hỗ trợ — Bảo trì (<a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html">MNT</a>) và Tài chính (<a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a>) — tham gia một số quyết định theo tình huống nhưng không phải vai trò thẩm quyền CDR; RACI của hai vai trò này tra tại bảng dưới để bảng lõi không bị loãng cột. Đọc kèm dòng CDR tương ứng ở bảng G0→G7.</div></div>
+<div class="table-card"><table class="table">
+<thead><tr><th>Cổng</th><th>CDR</th><th>Hoạt động</th><th>Vai trò hỗ trợ</th><th>RACI</th><th>Lý do tham gia</th></tr></thead>
+<tbody>
+<tr><td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A2">A2</a></td><td>Phê duyệt báo giá theo bậc giá trị</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a></td><td class="raci-cell raci-C">C</td><td>Thẩm định biên gộp và cấu trúc chi phí.</td></tr>
+<tr><td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A3">A3</a></td><td>Phê duyệt chiết khấu / điều kiện thương mại ngoại lệ</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a></td><td class="raci-cell raci-C">C</td><td>Đánh giá tác động biên lợi nhuận.</td></tr>
+<tr><td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A4">A4</a></td><td>Phê duyệt điều kiện thanh toán ngoại lệ</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a></td><td class="raci-cell raci-C">C</td><td>Đánh giá rủi ro tín dụng và dòng tiền.</td></tr>
+<tr><td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A5">A5</a></td><td>Chấp thuận đơn hàng và xem xét hợp đồng</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a></td><td class="raci-cell raci-C">C</td><td>Xác nhận điều kiện tín dụng/thanh toán của khách trước khi cam kết.</td></tr>
+<tr><td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A6">A6</a></td><td>CCR ảnh hưởng giá / lịch / phạm vi</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a></td><td class="raci-cell raci-C">C</td><td>Tác động biên lợi nhuận khi đổi giá.</td></tr>
+<tr><td>G2</td><td><a href="annex-120-authority-matrix.html#cdr-C1">C1</a></td><td>Phát hành kế hoạch đưa lệnh xuống xưởng</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html">MNT</a></td><td class="raci-cell raci-C">C</td><td>Cửa sổ bảo trì kế hoạch ảnh hưởng năng lực điều phối.</td></tr>
+<tr><td>G2</td><td><a href="annex-120-authority-matrix.html#cdr-E1">E1</a></td><td>Phê duyệt PO theo bậc giá trị</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a></td><td class="raci-cell raci-I">I</td><td>Cam kết chi tiền phải được tài chính nắm.</td></tr>
+<tr><td>G2</td><td><a href="annex-120-authority-matrix.html#cdr-E5">E5</a></td><td>Phê duyệt đơn mua khẩn / vật tư khẩn</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a></td><td class="raci-cell raci-I">I</td><td>Tác động dòng tiền tức thời.</td></tr>
+<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C4">C4</a></td><td>Phê duyệt thay đổi cài đặt máy ngoài kế hoạch</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html">MNT</a></td><td class="raci-cell raci-C">C</td><td>Tình trạng máy và rủi ro cơ khí.</td></tr>
+<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C7">C7</a></td><td>Phục hồi tiến độ sau dừng máy hoặc va chạm máy</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html">MNT</a></td><td class="raci-cell raci-R">R</td><td>Sửa chữa và phục hồi máy là việc của bảo trì.</td></tr><tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-E5">E5</a></td><td>Phê duyệt đơn mua khẩn / vật tư khẩn</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a></td><td class="raci-cell raci-I">I</td><td>Tác động dòng tiền.</td></tr><tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-F4">F4</a></td><td>Phê duyệt ứng phó sự cố EHS và dừng việc vì an toàn</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html">MNT</a></td><td class="raci-cell raci-C">C</td><td>Tham vấn khi sự cố liên quan thiết bị.</td></tr>
+<tr><td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-D9">D9</a></td><td>Phê duyệt xử lý phế phẩm theo bậc giá trị</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a></td><td class="raci-cell raci-C">C</td><td>Giá trị ghi giảm tài sản.</td></tr><tr><td>G7</td><td><a href="annex-120-authority-matrix.html#cdr-A6">A6</a></td><td>CCR muộn ảnh hưởng giá / lịch / phạm vi</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a></td><td class="raci-cell raci-C">C</td><td>Tác động biên lợi nhuận khi đổi giá ở giai đoạn giao hàng.</td></tr>
+</tbody></table></div>
 <h2 class="h2" id="r6">6. RACI mức tài liệu / tài liệu quản lý tài sản</h2>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Danh sách dưới đây giữ 11 tài liệu <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html">QMS</a> trọng yếu để đồng bộ với RACI hoạt động. Tên tài liệu phải giữ đúng tiền tố repo như ANNEX-, SOP- và FRM-. <span class="iso-clause">§7.5</span></div></div>
 <div class="table-card"><table class="table">
