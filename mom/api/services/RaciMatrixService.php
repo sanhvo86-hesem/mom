@@ -128,6 +128,21 @@ final class RaciMatrixService
             $config['rows'][$i]['roles'] = $roles;
         }
 
+        // Auxiliary datasets (§4 value-stream, §6 document-level, support
+        // supplement) — accept the edited cells, but only when the payload
+        // keeps the stored row/column shape, so a partial post cannot drop
+        // rows. sanitiseCell() in normaliseCells() strips active markup.
+        foreach (['value_stream', 'document_level', 'support'] as $key) {
+            if (!is_array($incoming[$key] ?? null)) {
+                continue;
+            }
+            $stored  = is_array($config[$key] ?? null) ? $config[$key] : [];
+            $cleaned = $this->normaliseCells($incoming[$key]);
+            if (count($cleaned) === count($stored)) {
+                $config[$key] = $cleaned;
+            }
+        }
+
         $this->validate($config);
 
         $now = gmdate('c');
