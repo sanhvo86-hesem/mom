@@ -52,7 +52,9 @@ final class RaciMatrixService
         if (!is_array($stored) || empty($stored['rows'])) {
             $stored = FileHelper::readJson($this->bootstrapPath());
         }
-        return $this->normalise(is_array($stored) ? $stored : []);
+        $config = $this->normalise(is_array($stored) ? $stored : []);
+        $config['linked_documents'] = $this->linkedDocuments();
+        return $config;
     }
 
     /**
@@ -91,9 +93,51 @@ final class RaciMatrixService
             'document'     => $published,
         ];
 
-        FileHelper::writeJson($this->configPath(), $config);
+        // linked_documents is a code-defined registry — never persisted.
+        $persist = $config;
+        unset($persist['linked_documents']);
+        FileHelper::writeJson($this->configPath(), $persist);
 
         return ['config' => $config, 'updated_documents' => [$published]];
+    }
+
+    /**
+     * Registry of every document linked to the RACI matrix. Surfaced in the
+     * admin module so it becomes the single hub for the RACI ecosystem.
+     * Code-defined and never persisted into raci_matrix.json.
+     *
+     * relation: auto = regenerated on save · live = reads ANNEX-121 live ·
+     *           summary = manual-sync summary · sibling = adjacent authority
+     *           document · derived = embedded derived view · guard = CI check.
+     *
+     * @return array<int, array<string, string>>
+     */
+    private function linkedDocuments(): array
+    {
+        $ref = 'docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/';
+        $hub = 'docs/system/organization/04-RACI-Authority/';
+        return [
+            ['code' => 'ANNEX-121', 'title' => 'Ma trận RACI tổng thể (mục 5 G0→G7)',
+             'url' => $ref . 'annex-121-raci-master-matrix.html', 'relation' => 'auto'],
+            ['code' => 'ANNEX-120', 'title' => 'Ma trận thẩm quyền & ngưỡng L1/L2/L3',
+             'url' => $ref . 'annex-120-authority-matrix.html', 'relation' => 'sibling'],
+            ['code' => 'ANNEX-123', 'title' => 'Ma trận phó / dự phòng cho vai trò giữ chữ A',
+             'url' => $ref . 'annex-123-deputy-backup-matrix.html', 'relation' => 'sibling'],
+            ['code' => 'RACI-MASTER', 'title' => 'Tóm tắt RACI theo cổng (04-RACI-Authority)',
+             'url' => $hub . 'raci-master-matrix.html', 'relation' => 'summary'],
+            ['code' => 'AUTHORITY-MATRIX', 'title' => 'Trang tra cứu thẩm quyền nhanh',
+             'url' => $hub . 'authority-matrix.html', 'relation' => 'summary'],
+            ['code' => 'ROLE-BUNDLES', 'title' => 'Từ điển mã vai trò & bản đồ gộp cột RACI',
+             'url' => $hub . 'role-and-department-bundles.html', 'relation' => 'summary'],
+            ['code' => 'SIDEBAR', 'title' => 'Sidebar “Thẩm quyền & RACI” hiển thị trên mọi SOP/JD',
+             'url' => '', 'relation' => 'live'],
+            ['code' => 'SOP §4', 'title' => '37 SOP — bảng RACI nhúng (mục Vai trò & RACI)',
+             'url' => '', 'relation' => 'derived'],
+            ['code' => 'JD §6', 'title' => '39 JD — bảng RACI nhúng (mục Giao diện liên phòng)',
+             'url' => '', 'relation' => 'derived'],
+            ['code' => 'CI GUARD', 'title' => 'check_raci_integrity.php — kiểm bất biến mỗi lần deploy',
+             'url' => '', 'relation' => 'guard'],
+        ];
     }
 
     /* ── Normalisation ──────────────────────────────────────────────────── */

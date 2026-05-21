@@ -250,7 +250,24 @@ function _render(){
     .rm-flag{font-size:11px;font-weight:800}
     .rm-flag.bad{color:var(--danger)}
     .rm-flag.ok{color:var(--success)}
-    @media (max-width:1150px){.rm-workbench{grid-template-columns:1fr}.rm-sidebar{position:static;max-height:none}.rm-gate-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.rm-meta-grid{grid-template-columns:1fr}.rm-head{flex-direction:column}}
+    .rm-docs{border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+    .rm-docs>summary{cursor:pointer;padding:12px 14px;font-weight:800;list-style:none}
+    .rm-docs>summary::-webkit-details-marker{display:none}
+    .rm-docs>summary::before{content:'▸ ';color:var(--text-2)}
+    .rm-docs[open]>summary::before{content:'▾ '}
+    .rm-docs-note{padding:0 14px 10px;color:var(--text-2);font-size:12px;line-height:1.5}
+    .rm-docs-list{display:flex;flex-direction:column;border-top:1px solid var(--border)}
+    .rm-doc{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border)}
+    .rm-doc:last-child{border-bottom:none}
+    .rm-doc-main{flex:1 1 auto;min-width:0;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+    .rm-doc-code{font-weight:800;font-size:11px;color:var(--accent-contrast);background:var(--accent);border-radius:4px;padding:2px 7px;white-space:nowrap}
+    .rm-doc-title{color:var(--text-1);font-size:12.5px}
+    .rm-doc-rel{font-size:11px;font-weight:700;border-radius:5px;padding:3px 8px;white-space:nowrap;border:1px solid var(--border);color:var(--text-2)}
+    .rm-doc-rel--ok{color:var(--success);border-color:var(--success)}
+    .rm-doc-rel--warn{color:var(--warning,var(--accent));border-color:var(--warning,var(--accent))}
+    .rm-doc-open{font-size:12px;font-weight:700;color:var(--accent);text-decoration:none;white-space:nowrap}
+    .rm-doc-open--none{color:var(--text-2)}
+    @media (max-width:1150px){.rm-workbench{grid-template-columns:1fr}.rm-sidebar{position:static;max-height:none}.rm-gate-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.rm-meta-grid{grid-template-columns:1fr}.rm-head{flex-direction:column}.rm-doc{flex-wrap:wrap}}
   </style>
   <div class="rm-head">
     <div>
@@ -271,6 +288,7 @@ function _render(){
     <div class="rm-meta"><b>${_t('Cập nhật lần cuối', 'Last updated')}</b><span>${_esc(cfg.updated_at || _t('Chưa có', 'Not yet'))} · ${_esc(cfg.updated_by || '—')}</span></div>
     <div class="rm-meta"><b>${_t('Tài liệu đồng bộ', 'Published document')}</b><span>ANNEX-121 §5</span></div>
   </div>
+  ${_renderLinkedDocs(cfg)}
   <div class="rm-field">
     <label>${_t('Lý do cập nhật', 'Change reason')}</label>
     <textarea class="rm-reason" oninput="_rmSetReason(this.value)" placeholder="${_t('Ví dụ: chuyển PD thành R cho A5 theo IATF 16949 §8.2.3.1.3...', 'Example: set PD to R on A5 per IATF 16949 §8.2.3.1.3...')}">${_esc(_state.reason || '')}</textarea>
@@ -334,6 +352,52 @@ function _renderCard(row, idx){
   <div class="rm-activity">${row.activity_html || _esc(row.cdr || '')}</div>
   <div class="rm-role-grid">${rolesHtml}</div>
 </article>`;
+}
+
+/* ── Linked documents (RACI ecosystem hub) ────────────────────────── */
+function _docHref(url){
+  if(!url) return '';
+  var base = location.pathname.replace(/[^/]*$/, '');
+  return location.origin + base + url;
+}
+
+function _relationMeta(rel){
+  var m = {
+    auto:    {vi:'Tự cập nhật khi lưu',                  en:'Auto-updated on save',            cls:'ok'},
+    live:    {vi:'Tự phản ánh — đọc ANNEX-121 trực tiếp', en:'Live — reads ANNEX-121',          cls:'ok'},
+    summary: {vi:'Tóm tắt — đồng bộ thủ công',           en:'Summary — manual sync',           cls:'warn'},
+    sibling: {vi:'Tài liệu thẩm quyền anh em',           en:'Sibling authority document',      cls:'neutral'},
+    derived: {vi:'Bản phái sinh — ANNEX-121 quyết định', en:'Derived view — ANNEX-121 governs', cls:'neutral'},
+    guard:   {vi:'Cơ chế kiểm tra tự động',              en:'Automated guard',                 cls:'neutral'}
+  };
+  return m[rel] || {vi:rel, en:rel, cls:'neutral'};
+}
+
+function _renderLinkedDocs(cfg){
+  var docs = Array.isArray(cfg.linked_documents) ? cfg.linked_documents : [];
+  if(!docs.length) return '';
+  var rows = docs.map(function(d){
+    var meta = _relationMeta(d.relation);
+    var href = _docHref(d.url);
+    var link = href
+      ? `<a class="rm-doc-open" href="${_esc(href)}" target="_blank" rel="noopener">${_t('Mở', 'Open')} ↗</a>`
+      : `<span class="rm-doc-open rm-doc-open--none">—</span>`;
+    return `
+    <div class="rm-doc">
+      <div class="rm-doc-main">
+        <span class="rm-doc-code">${_esc(d.code)}</span>
+        <span class="rm-doc-title">${_esc(d.title)}</span>
+      </div>
+      <span class="rm-doc-rel rm-doc-rel--${_esc(meta.cls)}">${_esc(_t(meta.vi, meta.en))}</span>
+      ${link}
+    </div>`;
+  }).join('');
+  return `
+  <details class="rm-docs" open>
+    <summary>${_t('Tài liệu liên quan trong hệ sinh thái RACI', 'Linked documents in the RACI ecosystem')} (${docs.length})</summary>
+    <div class="rm-docs-note">${_t('Lưu ở module này tái tạo bảng RACI mục 5 của ANNEX-121; sidebar “Thẩm quyền &amp; RACI” trên mọi SOP/JD đọc ANNEX-121 nên tự phản ánh thay đổi. Tài liệu tóm tắt và anh em được đồng bộ theo cơ chế riêng.', 'Saving here regenerates ANNEX-121 §5; the “Authority &amp; RACI” sidebar on every SOP/JD reads ANNEX-121 so it reflects the change live. Summary and sibling documents sync via their own mechanism.')}</div>
+    <div class="rm-docs-list">${rows}</div>
+  </details>`;
 }
 
 window._rmReload = _load;
