@@ -6,15 +6,18 @@
  * Archetype : analytical-list
  * Load order: AFTER 40-eqms-shell.js
  *
- * Views: mindmap (ECharts tree) | fishbone (SVG Ishikawa) |
- *        flow (ECharts graph)   | matrix (HTML table)
+ * Two top-level perspectives:
+ *   A) Quy trình vận hành  — centered on SOP-201 (RFQ→Cash, 8 gates)
+ *      · Xương cá SOP-201  — Ishikawa with G0–G7 as bones
+ *      · Luồng G0→G7       — SVG gate-flow showing parallel G1∥G2
+ *   B) Cấu trúc tài liệu   — organised by process group
+ *      · Sơ đồ cây          — ECharts radial tree (9 groups)
+ *      · Ma trận            — count table (group × doc-type)
  *
- * All data is LIVE from the portal DOCS array (scan_folders API).
- * Doc codes follow {CAT}-{NNN} convention; hundreds digit = process group.
- * All navigation uses openDoc(code) or navigateTo('documents', cat).
- *
- * All colors from GraphicsAuthority — no hex literals in logic paths.
- * var(--css-var, #fallback) used only in SVG attribute strings.
+ * All live doc data from window.DOCS (scan_folders API).
+ * Gate→doc mapping is static structural config derived from SOP-201 §10.
+ * All navigation uses openDoc(code) / navigateTo('documents', cat).
+ * All colours from GraphicsAuthority. var(--tok,#fallback) in SVG strings.
  */
 (function () {
   'use strict';
@@ -28,114 +31,202 @@
   }
   function cv(varName, fb) { return 'var(--' + varName + ',' + fb + ')'; }
 
-  /* ── Palette: one token per group ─────────────────────────────────────── */
+  /* ── Palette ──────────────────────────────────────────────────────────── */
   var PALETTE_KEYS = [
-    { key: 'brand.primary',        fb: '#1565c0' }, // 100 SYS
-    { key: 'statusColors.success', fb: '#16a34a' }, // 200 COM
-    { key: 'statusColors.purple',  fb: '#7c3aed' }, // 300 ENG
-    { key: 'statusColors.warning', fb: '#d97706' }, // 400 SUP
-    { key: 'brand.light',          fb: '#1e88e5' }, // 500 PRD
-    { key: 'statusColors.error',   fb: '#dc2626' }, // 600 QC
-    { key: 'statusColors.cyan',    fb: '#0891b2' }, // 700 LOG
-    { key: 'brand.dark',           fb: '#0c2d48' }, // 800 HR
-    { key: 'brand.accent',         fb: '#f9a825' }  // 900 IMP
+    { key: 'brand.primary',        fb: '#1565c0' },
+    { key: 'statusColors.success', fb: '#16a34a' },
+    { key: 'statusColors.purple',  fb: '#7c3aed' },
+    { key: 'statusColors.warning', fb: '#d97706' },
+    { key: 'brand.light',          fb: '#1e88e5' },
+    { key: 'statusColors.error',   fb: '#dc2626' },
+    { key: 'statusColors.cyan',    fb: '#0891b2' },
+    { key: 'brand.dark',           fb: '#0c2d48' },
+    { key: 'brand.accent',         fb: '#f9a825' }
   ];
-  function palette(i) { var p = PALETTE_KEYS[i]; return tok(p.key, p.fb); }
+  function palette(i) { var p = PALETTE_KEYS[i % PALETTE_KEYS.length]; return tok(p.key, p.fb); }
 
   /* =========================================================================
-   * PROCESS GROUP REGISTRY — structural config only.
-   * All counts and document lists are derived live from DOCS at render time.
+   * PROCESS GROUP REGISTRY (for Document Structure view)
    * ======================================================================= */
   var GROUPS = [
-    { id: 100, abbr: 'SYS', label: { vi: 'Hệ thống & Quản trị',    en: 'System & Governance'  }, fish: { vi: 'Hệ thống quản trị',        en: 'Governance'     } },
-    { id: 200, abbr: 'COM', label: { vi: 'Thương mại & Khách hàng', en: 'Commercial & Customer'}, fish: { vi: 'Thương mại / Khách hàng',   en: 'Commercial'     } },
-    { id: 300, abbr: 'ENG', label: { vi: 'Kỹ thuật & FAI',          en: 'Engineering & FAI'    }, fish: { vi: 'Kỹ thuật / FAI',            en: 'Engineering'    } },
-    { id: 400, abbr: 'SUP', label: { vi: 'Nhà cung cấp & Mua hàng', en: 'Supplier & Purchasing'}, fish: { vi: 'Nhà cung cấp',              en: 'Suppliers'      } },
-    { id: 500, abbr: 'PRD', label: { vi: 'Sản xuất CNC',            en: 'CNC Production'       }, fish: { vi: 'Sản xuất CNC',              en: 'Production'     } },
-    { id: 600, abbr: 'QC',  label: { vi: 'Kiểm tra & Chất lượng',   en: 'Inspection & Quality' }, fish: { vi: 'Đo lường / Kiểm tra',       en: 'Measurement'    } },
-    { id: 700, abbr: 'LOG', label: { vi: 'Đóng gói & Logistics',    en: 'Packaging & Logistics'}, fish: { vi: 'Môi trường / Logistics',     en: 'Environment'    } },
-    { id: 800, abbr: 'HR',  label: { vi: 'Con người & EHS',         en: 'People & EHS'         }, fish: { vi: 'Con người & EHS',           en: 'People'         } },
-    { id: 900, abbr: 'IMP', label: { vi: 'Cải tiến liên tục',       en: 'Continuous Improvement'}, fish: { vi: 'Cải tiến liên tục',        en: 'Improvement'    } }
+    { id: 100, abbr: 'SYS', label: { vi: 'Hệ thống & Quản trị',    en: 'System & Governance'   } },
+    { id: 200, abbr: 'COM', label: { vi: 'Thương mại & Khách hàng', en: 'Commercial & Customer'  } },
+    { id: 300, abbr: 'ENG', label: { vi: 'Kỹ thuật & FAI',          en: 'Engineering & FAI'      } },
+    { id: 400, abbr: 'SUP', label: { vi: 'Nhà cung cấp & Mua hàng', en: 'Supplier & Purchasing'  } },
+    { id: 500, abbr: 'PRD', label: { vi: 'Sản xuất CNC',            en: 'CNC Production'         } },
+    { id: 600, abbr: 'QC',  label: { vi: 'Kiểm tra & Chất lượng',   en: 'Inspection & Quality'   } },
+    { id: 700, abbr: 'LOG', label: { vi: 'Đóng gói & Logistics',    en: 'Packaging & Logistics'  } },
+    { id: 800, abbr: 'HR',  label: { vi: 'Con người & EHS',         en: 'People & EHS'           } },
+    { id: 900, abbr: 'IMP', label: { vi: 'Cải tiến liên tục',       en: 'Continuous Improvement' } }
   ];
 
   var DOC_CATS = ['SOP', 'WI', 'ANNEX', 'FRM'];
 
   /* =========================================================================
-   * LIVE DATA HELPERS
-   * All queries against window.DOCS populated by api.php?action=scan_folders
+   * GATE REGISTRY (SOP-201 §6 + §10 — static structural config)
+   * Docs listed are the minimum required evidence per gate as specified in
+   * SOP-201. Counts/paths are NOT hardcoded — openDocSafe() resolves live.
    * ======================================================================= */
+  var GATES = [
+    {
+      id: 'G0',
+      label:  { vi: 'G0 · Hợp đồng',  en: 'G0 · Contract'   },
+      short:  { vi: 'Hợp đồng',        en: 'Contract'         },
+      role:   'CS + D-SCS',
+      dept:   { vi: 'Sales / Báo giá', en: 'Sales / Quoting'  },
+      desc:   { vi: 'Rà soát & khóa cam kết thương mại, kỹ thuật, năng lực trước khi nhận PO',
+                en: 'Lock commercial, technical & capacity commitment before accepting PO' },
+      docs:   ['SOP-201','FRM-201','FRM-202','FRM-204'],
+      col: 0
+    },
+    {
+      id: 'G1',
+      label:  { vi: 'G1 · Kỹ thuật',  en: 'G1 · Engineering' },
+      short:  { vi: 'Kỹ thuật',        en: 'Engineering'       },
+      role:   'ENGM',
+      dept:   { vi: 'Phòng Kỹ thuật',  en: 'Engineering'       },
+      desc:   { vi: 'DFM, phát hành gói baseline (BOM, route, bản vẽ) — song song với G2',
+                en: 'DFM review, baseline package release (BOM, route, drawings) — parallel with G2' },
+      docs:   ['SOP-301','SOP-303'],
+      parallel: 'G2',
+      col: 2
+    },
+    {
+      id: 'G2',
+      label:  { vi: 'G2 · IQC',        en: 'G2 · IQC'           },
+      short:  { vi: 'IQC',              en: 'IQC'                 },
+      role:   'D-PUR + QCL',
+      dept:   { vi: 'Mua hàng + QA',   en: 'Purchasing + QA'     },
+      desc:   { vi: 'Kiểm tra nguyên vật liệu đầu vào, truy xuất — song song với G1',
+                en: 'Incoming material QC, traceability — parallel with G1' },
+      docs:   ['SOP-401','SOP-402'],
+      parallel: 'G1',
+      col: 3
+    },
+    {
+      id: 'G3',
+      label:  { vi: 'G3 · Setup',       en: 'G3 · Setup'          },
+      short:  { vi: 'Setup',             en: 'Setup'                },
+      role:   'PPL + OPR',
+      dept:   { vi: 'Hoạch định + Sản xuất', en: 'Planning + Production' },
+      desc:   { vi: 'Lập lịch, điều độ & lắp đặt setup — chỉ mở sau khi G1 và G2 hoàn tất',
+                en: 'Scheduling & setup execution — opens only after both G1 and G2 complete' },
+      docs:   ['SOP-501','SOP-504','ANNEX-501','WI-519'],
+      col: 4
+    },
+    {
+      id: 'G4',
+      label:  { vi: 'G4 · FAI',         en: 'G4 · FAI'             },
+      short:  { vi: 'FAI',               en: 'FAI'                   },
+      role:   'QCL',
+      dept:   { vi: 'QA / QC',           en: 'QA / QC'               },
+      desc:   { vi: 'Kiểm tra & phê duyệt chi tiết đầu tiên trước sản xuất hàng loạt',
+                en: 'First article inspection & approval before production run' },
+      docs:   ['SOP-302','FRM-205'],
+      col: 5
+    },
+    {
+      id: 'G5',
+      label:  { vi: 'G5 · IPQC',        en: 'G5 · IPQC'            },
+      short:  { vi: 'IPQC',              en: 'IPQC'                  },
+      role:   'QCL + OPR',
+      dept:   { vi: 'QA / QC + Sản xuất', en: 'QA / QC + Production' },
+      desc:   { vi: 'Kiểm soát chất lượng liên tục trong quá trình gia công CNC',
+                en: 'Continuous quality control during CNC machining process' },
+      docs:   ['SOP-502','SOP-503','SOP-505','WI-201'],
+      col: 1
+    },
+    {
+      id: 'G6',
+      label:  { vi: 'G6 · QC Cuối',     en: 'G6 · Final QC'        },
+      short:  { vi: 'QC Cuối',           en: 'Final QC'              },
+      role:   'QCL',
+      dept:   { vi: 'QA / QC',           en: 'QA / QC'               },
+      desc:   { vi: 'Kiểm tra cuối, phát hành CoC & chốt chất lượng trước giao hàng',
+                en: 'Final inspection, CoC issuance & quality sign-off before shipment' },
+      docs:   ['SOP-603','SOP-604','SOP-605','FRM-206'],
+      col: 6
+    },
+    {
+      id: 'G7',
+      label:  { vi: 'G7 · Giao hàng',   en: 'G7 · Shipment'        },
+      short:  { vi: 'Giao hàng',         en: 'Shipment'              },
+      role:   'D-LOG + FIN',
+      dept:   { vi: 'Logistics + Tài chính', en: 'Logistics + Finance' },
+      desc:   { vi: 'Đóng gói, xuất hàng, phát hành hóa đơn & đóng hồ sơ đơn hàng',
+                en: 'Pack, ship, issue invoice & close job dossier' },
+      docs:   ['SOP-701','WI-206','FRM-207','SOP-803'],
+      col: 7
+    }
+  ];
 
-  /* Return the live DOCS array, or [] if not yet available */
+  /* Cross-cutting support docs visible on all gates */
+  var SUPPORT_DOCS = [
+    { id: 'SYS', label: { vi: 'Hệ thống', en: 'System' },
+      docs: ['SOP-101','SOP-102','WI-203','WI-202'] },
+    { id: 'HR',  label: { vi: 'Con người', en: 'People' },
+      docs: ['SOP-801','SOP-804','WI-207'] },
+    { id: 'IMP', label: { vi: 'Cải tiến',  en: 'Improve' },
+      docs: ['SOP-606','SOP-901','SOP-903'] }
+  ];
+
+  /* =========================================================================
+   * LIVE DATA HELPERS
+   * ======================================================================= */
   function liveDocs() {
     return (typeof DOCS !== 'undefined' && Array.isArray(DOCS)) ? DOCS : [];
   }
-
-  /* True when docs have finished loading from the server */
   function isDocsReady() {
     return typeof DOCS_LOADED !== 'undefined' && !!DOCS_LOADED;
   }
-
-  /*
-   * Derive process group from a doc code.
-   * Code format: {CAT}-{NNN}[...] where the 1-3 digit number after the dash
-   * determines the group: floor(N / 100) * 100.
-   * Examples: SOP-101 → 100, WI-452 → 400, FRM-100-003 → 100
-   */
-  function groupIdFromCode(code) {
-    var m = String(code || '').match(/\d+/);
-    if (!m) return null;
-    var n = parseInt(m[0], 10);
-    return Math.floor(n / 100) * 100;
-  }
-
-  /* All docs in a process group for a specific category */
   function getGroupDocs(groupId, cat) {
     return liveDocs().filter(function (d) {
       if (!d || d.cat !== cat) return false;
-      return groupIdFromCode(d.code) === groupId;
+      var m = String(d.code || '').match(/\d+/);
+      if (!m) return false;
+      return Math.floor(parseInt(m[0], 10) / 100) * 100 === groupId;
     });
   }
-
-  /* Count helper per group × category */
   function groupCatCount(g, cat) { return getGroupDocs(g.id, cat).length; }
-
-  /* Total docs (all types) for a group */
   function totalGroupDocs(g) {
     return DOC_CATS.reduce(function (sum, cat) { return sum + groupCatCount(g, cat); }, 0);
   }
-
-  /* Grand total across all groups and categories */
   function grandTotal() {
-    return liveDocs().filter(function (d) {
-      return d && DOC_CATS.indexOf(d.cat) >= 0;
-    }).length;
+    return liveDocs().filter(function (d) { return d && DOC_CATS.indexOf(d.cat) >= 0; }).length;
   }
-
-  /* Display title for a doc (uses portal helper if available) */
   function docTitle(d) {
+    if (!d) return '';
     if (typeof getDocDisplayTitle === 'function') return getDocDisplayTitle(d);
-    return String(d.standard_title || d.__displayTitle || d.title || d.code || '');
+    return d.title || d.code || '';
   }
-
-  /* Safe navigation to a document — uses portal openDoc if available */
   function openDocSafe(code) {
-    if (typeof openDoc === 'function') {
-      openDoc(code);
-    } else {
-      var d = liveDocs().find(function (x) { return x && x.code === code; });
-      if (d && d.path) window.open(d.path, '_blank');
-    }
+    if (typeof openDoc === 'function') { openDoc(code); return; }
+    var d = liveDocs().find(function (x) { return x && x.code === code; });
+    if (d && d.path) window.open(d.path, '_blank');
   }
-
-  /* Navigate to a document category listing */
   function navToCat(cat) {
     if (typeof navigateTo === 'function') navigateTo('documents', cat);
   }
+  function liveDocForCode(code) {
+    return liveDocs().find(function (d) { return d && d.code === code; }) || null;
+  }
+  function catOfCode(code) {
+    var m = String(code || '').match(/^([A-Z]+)-/);
+    return m ? m[1] : '';
+  }
 
   /* ── State ────────────────────────────────────────────────────────────── */
-  var state = { view: 'mindmap', selectedGroup: null, charts: {} };
-  var _root = null;
-  var _retryTimer = null;
+  var state = {
+    mode: 'process',        // 'process' | 'doc'
+    processView: 'fishbone201', // 'fishbone201' | 'gateflow'
+    docView: 'mindmap',     // 'mindmap' | 'matrix'
+    selectedGate: null,     // GATES index (process mode)
+    selectedGroup: null,    // GROUPS index (doc mode fishbone legacy)
+    detailCat: 'SOP',
+    charts: {}
+  };
+  var _root        = null;
+  var _retryTimer  = null;
 
   /* =========================================================================
    * CSS INJECTION (idempotent)
@@ -145,6 +236,7 @@
     var s = document.createElement('style');
     s.id = 'dov-styles';
     s.textContent = [
+      /* layout */
       '.dov-wrap{display:flex;flex-direction:column;min-height:0}',
       '.dov-header{padding:20px 24px 0}',
       '.dov-title{font-size:20px;font-weight:700;color:var(--text-primary,#1e293b);margin:0 0 4px}',
@@ -152,40 +244,57 @@
       '.dov-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:48px 24px;color:var(--text-secondary,#64748b);font-size:14px}',
       '.dov-spinner{width:28px;height:28px;border:3px solid var(--border,#e2e8f0);border-top-color:var(--brand-primary,#1565c0);border-radius:50%;animation:dov-spin 0.8s linear infinite}',
       '@keyframes dov-spin{to{transform:rotate(360deg)}}',
-      '.dov-tabs{display:flex;gap:4px;padding:12px 24px 0;background:var(--bg-surface,#fff);border-bottom:1px solid var(--border,#e2e8f0);overflow-x:auto}',
+      /* mode switcher */
+      '.dov-modes{display:flex;gap:6px;padding:12px 24px 0}',
+      '.dov-mode-btn{padding:7px 16px;border-radius:8px;border:1.5px solid var(--border,#e2e8f0);background:var(--bg-surface-alt,#f8fafc);font-size:13px;font-weight:600;color:var(--text-secondary,#64748b);cursor:pointer;transition:all 0.15s}',
+      '.dov-mode-btn:hover{border-color:var(--brand-primary,#1565c0);color:var(--brand-primary,#1565c0)}',
+      '.dov-mode-btn--active{background:var(--brand-primary,#1565c0);color:#fff;border-color:var(--brand-primary,#1565c0)}',
+      '.dov-mode-btn--active:hover{background:var(--brand-primary,#1565c0);color:#fff}',
+      /* sub-tabs */
+      '.dov-tabs{display:flex;gap:4px;padding:10px 24px 0;border-bottom:1px solid var(--border,#e2e8f0);overflow-x:auto}',
       '.dov-tab{display:flex;align-items:center;gap:6px;padding:8px 16px;border:none;border-bottom:2px solid transparent;background:none;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-secondary,#64748b);white-space:nowrap;transition:color 0.15s,border-color 0.15s}',
       '.dov-tab:hover{color:var(--brand-primary,#1565c0)}',
       '.dov-tab--active{color:var(--brand-primary,#1565c0);border-bottom-color:var(--brand-primary,#1565c0)}',
       '.dov-tab-icon{font-size:16px;line-height:1}',
+      /* canvas */
       '.dov-canvas{padding:20px 24px;overflow:auto}',
-      '.dov-chart-box{height:560px;position:relative}',
+      '.dov-chart-box{height:540px;position:relative}',
+      /* mindmap legend */
       '.dov-chart-legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:12px;padding:10px 0}',
       '.dov-legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-secondary,#64748b)}',
       '.dov-legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}',
-      '.dov-fishbone-wrap{overflow:auto}',
-      '.dov-fishbone-svg{width:100%;max-width:1000px;min-width:640px;height:auto;display:block}',
+      /* fishbone SVG */
+      '.dov-fishbone-wrap{overflow-x:auto}',
+      '.dov-fishbone-svg{width:100%;max-width:1010px;min-width:700px;height:auto;display:block}',
       '.dov-bone{stroke-linecap:round}',
-      '.dov-bone-lbl{outline:none}',
-      '.dov-bone-lbl:focus rect,.dov-bone-lbl:hover rect{filter:brightness(1.06)}',
-      '.dov-bone-detail{margin-top:16px;padding:16px;background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;min-height:80px}',
+      '.dov-gate-lbl{outline:none;cursor:pointer}',
+      '.dov-gate-lbl:focus rect,.dov-gate-lbl:hover rect{filter:brightness(1.08)}',
+      /* gate flow SVG */
+      '.dov-gateflow-wrap{overflow-x:auto}',
+      '.dov-gateflow-svg{width:100%;max-width:1010px;min-width:760px;height:auto;display:block}',
+      '.dov-gf-node{cursor:pointer;outline:none}',
+      '.dov-gf-node:hover rect,.dov-gf-node:hover circle{filter:brightness(1.1)}',
+      /* detail panel (shared) */
+      '.dov-detail-panel{margin-top:16px;padding:18px;background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px}',
       '.dov-detail-hint{color:var(--text-tertiary,#94a3b8);font-size:13px;text-align:center;padding:20px 0}',
-      '.dov-detail-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}',
-      '.dov-detail-badge{padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;color:#fff}',
-      '.dov-detail-name{font-size:15px;font-weight:700;color:var(--text-primary,#1e293b)}',
-      '.dov-detail-counts{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}',
-      '.dov-count-chip{padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;background:var(--bg-surface-alt,#f1f5f9);color:var(--text-secondary,#64748b);cursor:pointer;border:1px solid transparent;transition:border-color 0.12s}',
-      '.dov-count-chip:hover{border-color:var(--brand-primary,#1565c0);color:var(--brand-primary,#1565c0)}',
+      '.dov-detail-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}',
+      '.dov-detail-badge{padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;color:#fff;letter-spacing:.3px}',
+      '.dov-detail-name{font-size:16px;font-weight:700;color:var(--text-primary,#1e293b)}',
+      '.dov-detail-role{font-size:12px;color:var(--text-secondary,#64748b);margin-bottom:6px}',
+      '.dov-detail-desc{font-size:13px;color:var(--text-secondary,#64748b);margin-bottom:14px;line-height:1.6}',
       '.dov-doc-list{display:flex;flex-direction:column;gap:4px;max-height:320px;overflow-y:auto}',
-      '.dov-doc-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;color:var(--text-primary,#1e293b);font-size:13px;border:1px solid var(--border,#e2e8f0);background:var(--bg-surface,#fff);cursor:pointer;transition:background 0.12s}',
+      '.dov-doc-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;font-size:13px;border:1px solid var(--border,#e2e8f0);background:var(--bg-surface,#fff);cursor:pointer;transition:background 0.12s}',
       '.dov-doc-item:hover{background:var(--bg-hover,#f8fafc);border-color:var(--brand-primary,#1565c0)}',
-      '.dov-doc-code{font-family:monospace;font-size:11px;font-weight:700;color:var(--text-secondary,#64748b);min-width:56px;flex-shrink:0}',
-      '.dov-doc-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.dov-doc-code{font-family:monospace;font-size:11px;font-weight:700;color:var(--text-secondary,#64748b);min-width:62px;flex-shrink:0}',
+      '.dov-doc-cat{padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}',
+      '.dov-doc-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-primary,#1e293b)}',
+      /* doc-structure detail tabs */
       '.dov-cat-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}',
       '.dov-cat-btn{padding:4px 10px;border-radius:6px;border:1px solid var(--border,#e2e8f0);background:var(--bg-surface-alt,#f1f5f9);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.12s}',
       '.dov-cat-btn--active,.dov-cat-btn:hover{background:var(--brand-primary,#1565c0);color:#fff;border-color:var(--brand-primary,#1565c0)}',
-      '.dov-sop-links{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}',
-      '.dov-sop-link-btn{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:500;border:1px solid var(--border,#e2e8f0);color:var(--text-secondary,#64748b);background:var(--bg-surface,#fff);cursor:pointer;transition:border-color 0.12s,color 0.12s}',
-      '.dov-sop-link-btn:hover{border-color:var(--brand-primary,#1565c0);color:var(--brand-primary,#1565c0)}',
+      '.dov-browse-btn{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:500;border:1px solid var(--border,#e2e8f0);color:var(--text-secondary,#64748b);background:var(--bg-surface,#fff);cursor:pointer;margin-top:10px;transition:border-color 0.12s,color 0.12s}',
+      '.dov-browse-btn:hover{border-color:var(--brand-primary,#1565c0);color:var(--brand-primary,#1565c0)}',
+      /* matrix */
       '.dov-matrix-wrap{overflow-x:auto}',
       '.dov-matrix-table{width:100%;border-collapse:collapse;font-size:13px;background:var(--bg-surface,#fff);border-radius:8px;overflow:hidden;border:1px solid var(--border,#e2e8f0)}',
       '.dov-matrix-table th{padding:10px 14px;background:var(--bg-surface-alt,#f1f5f9);font-weight:600;color:var(--text-secondary,#64748b);text-align:left;white-space:nowrap;border-bottom:1px solid var(--border,#e2e8f0)}',
@@ -196,77 +305,119 @@
       '.dov-mat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}',
       '.dov-mat-cell{display:inline-flex;align-items:center;justify-content:center;min-width:32px;padding:3px 8px;border-radius:5px;font-weight:700;font-size:13px;cursor:pointer;transition:opacity 0.12s}',
       '.dov-mat-cell:hover{opacity:0.75}',
-      '.dov-mat-cell-zero{color:var(--text-tertiary,#94a3b8);font-size:13px}',
+      '.dov-mat-cell-zero{color:var(--text-tertiary,#94a3b8)}',
       '.dov-mat-total{font-weight:700;color:var(--text-primary,#1e293b)}',
-      '.dov-mat-footer td{background:var(--bg-surface-alt,#f1f5f9);font-weight:700;border-top:2px solid var(--border,#e2e8f0)}',
-      '.dov-flow-info{margin-top:12px;font-size:12px;color:var(--text-secondary,#64748b);text-align:center}'
+      '.dov-mat-footer td{background:var(--bg-surface-alt,#f1f5f9);font-weight:700;border-top:2px solid var(--border,#e2e8f0)}'
     ].join('\n');
     document.head.appendChild(s);
   })();
 
   /* =========================================================================
    * RENDER ENTRY
-   * Waits for DOCS to be ready; shows loading spinner if not.
    * ======================================================================= */
   function render(container) {
     _root = container;
     if (_retryTimer) { clearInterval(_retryTimer); _retryTimer = null; }
-
     if (!isDocsReady()) {
       container.innerHTML =
-        '<div class="dov-loading">' +
-        '<div class="dov-spinner"></div>' +
-        '<span>' + esc(T({ vi: 'Đang tải danh mục tài liệu…', en: 'Loading document catalog…' })) + '</span>' +
-        '</div>';
+        '<div class="dov-loading"><div class="dov-spinner"></div><span>' +
+        esc(T({ vi: 'Đang tải danh mục tài liệu…', en: 'Loading document catalog…' })) +
+        '</span></div>';
       _retryTimer = setInterval(function () {
         if (isDocsReady() && _root) { clearInterval(_retryTimer); _retryTimer = null; render(_root); }
       }, 600);
       return;
     }
-
     container.innerHTML = buildShell();
-    bindTabEvents(container);
+    bindAllEvents(container);
     renderView(container);
   }
 
+  /* ── Shell HTML ──────────────────────────────────────────────────────── */
   function buildShell() {
     var total = grandTotal();
     var html = '<div class="dov-wrap">';
     html += '<div class="dov-header">';
-    html += '<h2 class="dov-title">' + esc(T({ vi: 'Sơ đồ Tổng quan Tài liệu Vận hành', en: 'Operational Document Visual Map' })) + '</h2>';
-    html += '<p class="dov-subtitle">' + esc(T({
-      vi: '9 nhóm quy trình · ' + total + ' tài liệu kiểm soát (SOP + WI + ANNEX + FRM)',
-      en: '9 process groups · ' + total + ' controlled documents (SOP + WI + ANNEX + FRM)'
-    })) + '</p>';
+    html += '<h2 class="dov-title">' +
+      esc(T({ vi: 'Sơ đồ Tổng quan Tài liệu Vận hành', en: 'Operational Document Visual Map' })) + '</h2>';
+    html += '<p class="dov-subtitle">9 ' +
+      esc(T({ vi: 'nhóm quy trình', en: 'process groups' })) + ' · <strong>' + total + '</strong> ' +
+      esc(T({ vi: 'tài liệu kiểm soát (SOP + WI + ANNEX + FRM)', en: 'controlled documents (SOP + WI + ANNEX + FRM)' })) +
+      '</p>';
     html += '</div>';
 
-    var tabs = [
-      { id: 'mindmap',  icon: '🗺',  label: { vi: 'Sơ đồ cây',      en: 'Mind Map'      } },
-      { id: 'fishbone', icon: '🐟', label: { vi: 'Xương cá',        en: 'Fishbone'      } },
-      { id: 'flow',     icon: '⬡',  label: { vi: 'Luồng quy trình', en: 'Process Flow'  } },
-      { id: 'matrix',   icon: '📊', label: { vi: 'Ma trận',         en: 'Matrix'        } }
-    ];
-    html += '<div class="dov-tabs" role="tablist">';
-    tabs.forEach(function (tab) {
-      var active = state.view === tab.id ? ' dov-tab--active' : '';
-      html += '<button class="dov-tab' + active + '" data-dov-tab="' + tab.id + '" role="tab">' +
-              '<span class="dov-tab-icon">' + tab.icon + '</span>' +
-              '<span>' + esc(T(tab.label)) + '</span></button>';
+    /* Mode switcher */
+    html += '<div class="dov-modes">';
+    [
+      { id: 'process', icon: '🔄', label: { vi: 'Quy trình vận hành', en: 'Operational Process' } },
+      { id: 'doc',     icon: '📚', label: { vi: 'Cấu trúc tài liệu',  en: 'Document Structure'  } }
+    ].forEach(function (m) {
+      var act = state.mode === m.id ? ' dov-mode-btn--active' : '';
+      html += '<button class="dov-mode-btn' + act + '" data-dov-mode="' + m.id + '">' +
+        m.icon + ' ' + esc(T(m.label)) + '</button>';
     });
     html += '</div>';
-    html += '<div class="dov-canvas" id="dov-canvas"></div></div>';
+
+    /* Sub-tabs */
+    html += '<div class="dov-tabs" id="dov-subtabs">' + buildSubTabs() + '</div>';
+    html += '<div class="dov-canvas" id="dov-canvas"></div>';
+    html += '</div>';
     return html;
   }
 
-  function bindTabEvents(root) {
+  function buildSubTabs() {
+    var tabs = state.mode === 'process'
+      ? [
+          { id: 'fishbone201', icon: '🐟', label: { vi: 'Xương cá SOP-201', en: 'SOP-201 Fishbone' } },
+          { id: 'gateflow',    icon: '➡',  label: { vi: 'Luồng G0→G7',      en: 'Gate Flow G0→G7'  } }
+        ]
+      : [
+          { id: 'mindmap', icon: '🗺', label: { vi: 'Sơ đồ cây', en: 'Tree Map' } },
+          { id: 'matrix',  icon: '📊', label: { vi: 'Ma trận',   en: 'Matrix'   } }
+        ];
+    var activeView = state.mode === 'process' ? state.processView : state.docView;
+    return tabs.map(function (t) {
+      var act = activeView === t.id ? ' dov-tab--active' : '';
+      return '<button class="dov-tab' + act + '" data-dov-tab="' + t.id + '">' +
+        '<span class="dov-tab-icon">' + t.icon + '</span>' + esc(T(t.label)) + '</button>';
+    }).join('');
+  }
+
+  /* ── Event binding ────────────────────────────────────────────────────── */
+  function bindAllEvents(root) {
+    /* Mode switcher */
+    root.querySelectorAll('[data-dov-mode]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var m = btn.getAttribute('data-dov-mode');
+        if (m === state.mode) return;
+        state.mode = m;
+        state.selectedGate = null;
+        state.selectedGroup = null;
+        disposeCharts();
+        /* Refresh sub-tabs */
+        var stEl = root.querySelector('#dov-subtabs');
+        if (stEl) stEl.innerHTML = buildSubTabs();
+        /* Re-bind (new sub-tab buttons) */
+        bindAllEvents(root);
+        /* Highlight active mode button */
+        root.querySelectorAll('[data-dov-mode]').forEach(function (b) {
+          b.classList.toggle('dov-mode-btn--active', b.getAttribute('data-dov-mode') === state.mode);
+        });
+        renderView(root);
+      });
+    });
+
+    /* Sub-tab switcher */
     root.querySelectorAll('[data-dov-tab]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var v = btn.getAttribute('data-dov-tab');
-        if (v === state.view) return;
-        state.view = v;
+        var cur = state.mode === 'process' ? state.processView : state.docView;
+        if (v === cur) return;
+        if (state.mode === 'process') state.processView = v;
+        else state.docView = v;
+        state.selectedGate = null;
         state.selectedGroup = null;
-        Object.keys(state.charts).forEach(function (k) { try { state.charts[k].dispose(); } catch (e) {} });
-        state.charts = {};
+        disposeCharts();
         root.querySelectorAll('[data-dov-tab]').forEach(function (b) {
           b.classList.toggle('dov-tab--active', b.getAttribute('data-dov-tab') === v);
         });
@@ -275,483 +426,417 @@
     });
   }
 
+  function disposeCharts() {
+    Object.keys(state.charts).forEach(function (k) {
+      try { state.charts[k].dispose(); } catch (e) {}
+    });
+    state.charts = {};
+  }
+
+  /* ── View router ──────────────────────────────────────────────────────── */
   function renderView(root) {
     var canvas = root.querySelector('#dov-canvas');
     if (!canvas) return;
-    canvas.innerHTML = '';
-    if      (state.view === 'mindmap')  renderMindmap(canvas);
-    else if (state.view === 'fishbone') renderFishbone(canvas);
-    else if (state.view === 'flow')     renderFlow(canvas);
-    else if (state.view === 'matrix')   renderMatrix(canvas);
+    var view = state.mode === 'process' ? state.processView : state.docView;
+    if      (view === 'fishbone201') renderFishboneSOP201(canvas);
+    else if (view === 'gateflow')    renderGateFlow(canvas);
+    else if (view === 'mindmap')     renderMindmap(canvas);
+    else if (view === 'matrix')      renderMatrix(canvas);
   }
 
   function destroy() {
     if (_retryTimer) { clearInterval(_retryTimer); _retryTimer = null; }
-    Object.keys(state.charts).forEach(function (k) { try { state.charts[k].dispose(); } catch (e) {} });
-    state.charts = {};
+    disposeCharts();
     _root = null;
   }
 
   /* =========================================================================
-   * VIEW 1 — MINDMAP (ECharts tree, radial)
-   * Leaf nodes → navigateTo('documents', cat) — no hardcoded paths
+   * VIEW A1 — FISHBONE SOP-201
+   * 8 gates as bones (4 top / 4 bottom), centered on "Đơn hàng xuất sắc"
+   * Click on bone → gate detail panel
+   * ======================================================================= */
+  function renderFishboneSOP201(canvas) {
+    var W = 1010, H = 490, spineY = 245;
+    var tipTopY = 78, tipBotY = 412;
+
+    /* Top bones: G0 G1 G3 G5 (alternating to show left-right sequence) */
+    var topGates = [0, 1, 3, 5]; /* GATES indices */
+    var topSX = [165, 320, 480, 640]; /* spine junction X */
+    var topTX = [105, 260, 420, 580]; /* tip X */
+
+    /* Bottom bones: G2 G4 G6 G7 */
+    var botGates = [2, 4, 6, 7];
+    var botSX = [243, 400, 560, 720];
+    var botTX = [183, 340, 500, 660];
+
+    var bp = cv('brand-primary', '#1565c0');
+    var s = '';
+    s += '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" class="dov-fishbone-svg">';
+
+    /* Arrowhead marker */
+    s += '<defs>';
+    s += '<marker id="dovArr201" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">';
+    s += '<path d="M0,0 L10,5 L0,10 Z" fill="' + bp + '"/></marker>';
+    s += '</defs>';
+
+    /* Spine */
+    s += '<line x1="72" y1="' + spineY + '" x2="838" y2="' + spineY +
+         '" stroke="' + bp + '" stroke-width="3.5" stroke-linecap="round" marker-end="url(#dovArr201)"/>';
+
+    /* RFQ tail label */
+    s += '<rect x="4" y="' + (spineY - 18) + '" width="64" height="36" rx="8" fill="' + bp + '" fill-opacity="0.12" stroke="' + bp + '" stroke-width="1.5"/>';
+    s += '<text x="36" y="' + (spineY - 5) + '" text-anchor="middle" font-size="10" font-weight="700" fill="' + bp + '" font-family="inherit">RFQ</text>';
+    s += '<text x="36" y="' + (spineY + 8) + '" text-anchor="middle" font-size="9" fill="' + bp + '" font-family="inherit" opacity="0.8">khách hàng</text>';
+
+    /* Head box — "Đơn hàng CNC xuất sắc" */
+    s += '<rect x="842" y="' + (spineY - 48) + '" width="158" height="96" rx="10" fill="' + bp + '"/>';
+    s += '<text x="921" y="' + (spineY - 24) + '" text-anchor="middle" font-size="11.5" font-weight="700" fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">Sản phẩm CNC</text>';
+    s += '<text x="921" y="' + (spineY - 8)  + '" text-anchor="middle" font-size="11" font-weight="600" fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">đúng chất lượng</text>';
+    s += '<text x="921" y="' + (spineY + 8)  + '" text-anchor="middle" font-size="10.5" fill="rgba(255,255,255,0.85)" font-family="inherit">đúng số lượng</text>';
+    s += '<text x="921" y="' + (spineY + 24) + '" text-anchor="middle" font-size="10.5" fill="rgba(255,255,255,0.85)" font-family="inherit">giao đúng hạn</text>';
+
+    /* SOP-201 label on spine */
+    s += '<text x="74" y="' + (spineY - 10) + '" font-size="10.5" font-weight="700" fill="' + bp + '" font-family="inherit" opacity="0.7">SOP-201 · Luồng RFQ → Cash</text>';
+
+    /* ── Draw bones ──────────────────────────────────────────────────── */
+    function drawGateBone(gi, sx, tx, ty, isTop) {
+      var gate = GATES[gi];
+      var col  = palette(gate.col);
+      var n    = Math.min(gate.docs.length, 5);
+      var lbW  = 108, lbH = 52;
+      var lbX  = tx - lbW / 2;
+      var lbY  = isTop ? ty - lbH - 4 : ty + 4;
+
+      /* Main bone line */
+      s += '<line x1="' + tx + '" y1="' + ty + '" x2="' + sx + '" y2="' + spineY +
+           '" stroke="' + col + '" stroke-width="2.5" class="dov-bone"/>';
+
+      /* Sub-bones: one tick per document (up to 5) */
+      for (var j = 0; j < n; j++) {
+        var t = 0.18 + j * (0.64 / Math.max(n - 1, 1));
+        var bx = tx + t * (sx - tx);
+        var by = ty + t * (spineY - ty);
+        var ex = bx + (isTop ? 32 : 32);
+        var ey = by + (isTop ? 3 : -3);
+        s += '<line x1="' + bx + '" y1="' + by + '" x2="' + ex + '" y2="' + ey +
+             '" stroke="' + col + '" stroke-width="1.4" opacity="0.65"/>';
+        s += '<text x="' + (bx - 3) + '" y="' + (isTop ? by - 4 : by + 11) +
+             '" font-size="9" fill="' + col + '" text-anchor="end" font-family="monospace" font-weight="700" opacity="0.85">' +
+             esc(gate.docs[j]) + '</text>';
+      }
+
+      /* Junction dot on spine */
+      s += '<circle cx="' + sx + '" cy="' + spineY + '" r="5" fill="' + col + '"/>';
+
+      /* Parallel indicator */
+      var parallelNote = gate.parallel
+        ? '<title>' + gate.id + ' ∥ ' + gate.parallel + '</title>'
+        : '';
+
+      /* Label box (clickable) */
+      s += '<g class="dov-gate-lbl" data-gi="' + gi + '" role="button" tabindex="0" aria-label="' + esc(T(gate.label)) + '">';
+      s += parallelNote;
+      s += '<rect x="' + lbX + '" y="' + lbY + '" width="' + lbW + '" height="' + lbH +
+           '" rx="8" fill="' + col + '" fill-opacity="0.12" stroke="' + col + '" stroke-width="1.5"/>';
+      /* Gate ID badge */
+      s += '<rect x="' + (lbX + 6) + '" y="' + (lbY + 6) + '" width="30" height="16" rx="4" fill="' + col + '"/>';
+      s += '<text x="' + (lbX + 21) + '" y="' + (lbY + 18) + '" text-anchor="middle" font-size="9.5" font-weight="800" fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">' + esc(gate.id) + '</text>';
+      /* Gate short label */
+      s += '<text x="' + tx + '" y="' + (lbY + 27) + '" text-anchor="middle" font-size="11" font-weight="700" fill="' + col + '" font-family="inherit">' + esc(T(gate.short)) + '</text>';
+      /* Role */
+      s += '<text x="' + tx + '" y="' + (lbY + 41) + '" text-anchor="middle" font-size="9" fill="' + col + '" font-family="inherit" opacity="0.82">' + esc(gate.role) + '</text>';
+      s += '</g>';
+
+      /* Parallel badge */
+      if (gate.parallel) {
+        s += '<text x="' + (lbX + lbW - 4) + '" y="' + (lbY + 12) +
+             '" text-anchor="end" font-size="9" fill="' + col + '" font-family="inherit" font-weight="600" opacity="0.75">∥' + gate.parallel + '</text>';
+      }
+    }
+
+    topGates.forEach(function (gi, i) { drawGateBone(gi, topSX[i], topTX[i], tipTopY, true); });
+    botGates.forEach(function (gi, i) { drawGateBone(gi, botSX[i], botTX[i], tipBotY, false); });
+
+    s += '</svg>';
+
+    /* Detail panel placeholder */
+    s += '<div class="dov-detail-panel" id="dov-gate-panel">' +
+         '<p class="dov-detail-hint">' +
+         esc(T({ vi: 'Nhấn vào cổng kiểm soát để xem tài liệu liên quan', en: 'Click a control gate to view linked documents' })) +
+         '</p></div>';
+
+    canvas.innerHTML = '<div class="dov-fishbone-wrap">' + s + '</div>';
+
+    /* Bind bone clicks */
+    canvas.querySelectorAll('.dov-gate-lbl').forEach(function (el) {
+      el.addEventListener('click', function () {
+        showGateDetail(parseInt(el.getAttribute('data-gi')), canvas);
+      });
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') showGateDetail(parseInt(el.getAttribute('data-gi')), canvas);
+      });
+    });
+  }
+
+  /* ── Gate detail panel ─────────────────────────────────────────────── */
+  function showGateDetail(gi, canvas) {
+    state.selectedGate = gi;
+    renderGateDetailPanel(gi, canvas.querySelector('#dov-gate-panel'));
+  }
+
+  function renderGateDetailPanel(gi, panel) {
+    if (!panel) return;
+    var gate = GATES[gi];
+    var col  = palette(gate.col);
+
+    var html = '<div class="dov-detail-header">';
+    html += '<span class="dov-detail-badge" style="background:' + col + '">' + esc(gate.id) + '</span>';
+    html += '<span class="dov-detail-name">' + esc(T(gate.label)) + '</span>';
+    html += '</div>';
+    html += '<div class="dov-detail-role">👥 ' + esc(gate.role) + ' &nbsp;·&nbsp; ' + esc(T(gate.dept)) + '</div>';
+    html += '<div class="dov-detail-desc">' + esc(T(gate.desc)) + '</div>';
+
+    html += '<div class="dov-doc-list">';
+    gate.docs.forEach(function (code) {
+      var live = liveDocForCode(code);
+      var title = live ? docTitle(live) : code;
+      var cat   = catOfCode(code);
+      var catColors = { SOP:'#1565c0', WI:'#16a34a', ANNEX:'#7c3aed', FRM:'#d97706' };
+      var cc = catColors[cat] || '#64748b';
+      html += '<div class="dov-doc-item" data-doc-code="' + esc(code) + '">' +
+              '<span class="dov-doc-code">' + esc(code) + '</span>' +
+              '<span class="dov-doc-cat" style="background:' + cc + '">' + esc(cat || '?') + '</span>' +
+              '<span class="dov-doc-title" title="' + esc(title) + '">' + esc(title) + '</span>' +
+              '</div>';
+    });
+    html += '</div>';
+
+    /* Parallel note */
+    if (gate.parallel) {
+      html += '<p style="margin-top:10px;font-size:12px;color:var(--text-secondary,#64748b)">⚡ ' +
+        esc(T({ vi: 'Cổng này thực hiện song song với ' + gate.parallel,
+                en: 'This gate runs in parallel with ' + gate.parallel })) + '</p>';
+    }
+
+    panel.innerHTML = html;
+
+    /* Bind doc item clicks */
+    panel.querySelectorAll('[data-doc-code]').forEach(function (el) {
+      el.addEventListener('click', function () { openDocSafe(el.getAttribute('data-doc-code')); });
+    });
+  }
+
+  /* =========================================================================
+   * VIEW A2 — GATE FLOW (SVG, G0→G7 with parallel G1∥G2)
+   * ======================================================================= */
+  function renderGateFlow(canvas) {
+    var W = 1010, H = 340, midY = 170;
+    var G1Y = 95, G2Y = 245;
+    var bW = 90, bH = 44; /* box width/height */
+
+    /* Gate box center X positions */
+    var cx = { G0:135, G1:280, G2:280, G3:430, G4:545, G5:660, G6:775, G7:895 };
+
+    var s = '';
+    s += '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" class="dov-gateflow-svg">';
+
+    /* Arrowhead */
+    s += '<defs><marker id="dovGfArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">';
+    s += '<path d="M0,0 L10,5 L0,10 Z" fill="' + cv('text-secondary', '#64748b') + '"/></marker></defs>';
+
+    function arrow(x1, y1, x2, y2) {
+      var col = cv('text-tertiary', '#94a3b8');
+      s += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 +
+           '" stroke="' + col + '" stroke-width="1.8" marker-end="url(#dovGfArr)"/>';
+    }
+
+    /* RFQ start */
+    var bp = cv('brand-primary', '#1565c0');
+    s += '<circle cx="50" cy="' + midY + '" r="30" fill="' + bp + '" fill-opacity="0.1" stroke="' + bp + '" stroke-width="1.5"/>';
+    s += '<text x="50" y="' + (midY - 6) + '" text-anchor="middle" font-size="10" font-weight="700" fill="' + bp + '" font-family="inherit">RFQ</text>';
+    s += '<text x="50" y="' + (midY + 8) + '" text-anchor="middle" font-size="9" fill="' + bp + '" font-family="inherit">KH</text>';
+
+    /* Parallel G1∥G2 background zone */
+    s += '<rect x="232" y="65" width="96" height="210" rx="10" fill="rgba(100,116,139,0.05)" stroke="rgba(100,116,139,0.18)" stroke-dasharray="5,3" stroke-width="1.2"/>';
+    s += '<text x="280" y="58" text-anchor="middle" font-size="9.5" fill="' + cv('text-tertiary', '#94a3b8') + '" font-family="inherit" font-weight="600">Song song</text>';
+
+    /* Gate boxes */
+    function gateBox(gateId, centerX, centerY) {
+      var gi  = GATES.findIndex(function (g) { return g.id === gateId; });
+      if (gi < 0) return;
+      var gate = GATES[gi];
+      var col  = palette(gate.col);
+      var x    = centerX - bW / 2;
+      var y    = centerY - bH / 2;
+      s += '<g class="dov-gf-node" data-gi="' + gi + '" role="button" tabindex="0" aria-label="' + esc(T(gate.label)) + '">';
+      s += '<rect x="' + x + '" y="' + y + '" width="' + bW + '" height="' + bH +
+           '" rx="8" fill="' + col + '" fill-opacity="0.13" stroke="' + col + '" stroke-width="1.8"/>';
+      /* Top strip */
+      s += '<rect x="' + x + '" y="' + y + '" width="' + bW + '" height="16" rx="8" fill="' + col + '"/>';
+      s += '<rect x="' + x + '" y="' + (y + 8) + '" width="' + bW + '" height="8" fill="' + col + '"/>';
+      /* Gate ID */
+      s += '<text x="' + centerX + '" y="' + (y + 12) + '" text-anchor="middle" font-size="10" font-weight="800" fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">' + esc(gateId) + '</text>';
+      /* Short label */
+      s += '<text x="' + centerX + '" y="' + (y + 31) + '" text-anchor="middle" font-size="10.5" font-weight="700" fill="' + col + '" font-family="inherit">' + esc(T(gate.short)) + '</text>';
+      s += '</g>';
+    }
+
+    gateBox('G0', cx.G0, midY);
+    gateBox('G1', cx.G1, G1Y);
+    gateBox('G2', cx.G2, G2Y);
+    gateBox('G3', cx.G3, midY);
+    gateBox('G4', cx.G4, midY);
+    gateBox('G5', cx.G5, midY);
+    gateBox('G6', cx.G6, midY);
+    gateBox('G7', cx.G7, midY);
+
+    /* Arrows */
+    arrow(80, midY, cx.G0 - bW / 2 - 2, midY);                              /* RFQ → G0 */
+    arrow(cx.G0 + bW / 2, midY, cx.G1 - bW / 2 - 2, G1Y);                  /* G0 → G1  */
+    arrow(cx.G0 + bW / 2, midY, cx.G2 - bW / 2 - 2, G2Y);                  /* G0 → G2  */
+    arrow(cx.G1 + bW / 2, G1Y, cx.G3 - bW / 2 - 2, midY);                  /* G1 → G3  */
+    arrow(cx.G2 + bW / 2, G2Y, cx.G3 - bW / 2 - 2, midY);                  /* G2 → G3  */
+    arrow(cx.G3 + bW / 2 + 2, midY, cx.G4 - bW / 2 - 2, midY);             /* G3 → G4  */
+    arrow(cx.G4 + bW / 2 + 2, midY, cx.G5 - bW / 2 - 2, midY);             /* G4 → G5  */
+    arrow(cx.G5 + bW / 2 + 2, midY, cx.G6 - bW / 2 - 2, midY);             /* G5 → G6  */
+    arrow(cx.G6 + bW / 2 + 2, midY, cx.G7 - bW / 2 - 2, midY);             /* G6 → G7  */
+
+    /* Cash end */
+    var cashX = 975;
+    arrow(cx.G7 + bW / 2 + 2, midY, cashX - 30, midY);                      /* G7 → 💰  */
+    s += '<circle cx="' + cashX + '" cy="' + midY + '" r="28" fill="' + cv('statusColors-success', '#16a34a') + '" fill-opacity="0.12" stroke="' + cv('statusColors-success', '#16a34a') + '" stroke-width="1.5"/>';
+    s += '<text x="' + cashX + '" y="' + (midY - 5) + '" text-anchor="middle" font-size="14" font-family="inherit">💰</text>';
+    s += '<text x="' + cashX + '" y="' + (midY + 12) + '" text-anchor="middle" font-size="9" font-weight="700" fill="' + cv('statusColors-success', '#16a34a') + '" font-family="inherit">Cash</text>';
+
+    s += '</svg>';
+
+    /* Gate detail panel */
+    s += '<div class="dov-detail-panel" id="dov-gf-panel">' +
+         '<p class="dov-detail-hint">' +
+         esc(T({ vi: 'Nhấn vào cổng kiểm soát để xem tài liệu & vai trò', en: 'Click a control gate to view documents & roles' })) +
+         '</p></div>';
+
+    canvas.innerHTML = '<div class="dov-gateflow-wrap">' + s + '</div>';
+
+    canvas.querySelectorAll('.dov-gf-node').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var gi = parseInt(el.getAttribute('data-gi'));
+        showGateDetail(gi, { querySelector: function (sel) { return canvas.querySelector('#dov-gf-panel'); } });
+        renderGateDetailPanel(gi, canvas.querySelector('#dov-gf-panel'));
+      });
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          renderGateDetailPanel(parseInt(el.getAttribute('data-gi')), canvas.querySelector('#dov-gf-panel'));
+        }
+      });
+    });
+  }
+
+  /* =========================================================================
+   * VIEW B1 — MINDMAP (ECharts radial tree, by process group)
    * ======================================================================= */
   function renderMindmap(canvas) {
     if (!window.echarts) {
       canvas.innerHTML = '<p style="padding:24px;color:var(--text-secondary,#64748b)">ECharts chưa tải.</p>';
       return;
     }
-
     var treeData = {
-      name: 'HESEM QMS',
+      name: 'HESEM\nQMS',
       children: GROUPS.map(function (g, i) {
-        var col = palette(i);
-        var children = DOC_CATS.map(function (cat) {
-          var cnt = groupCatCount(g, cat);
-          if (cnt === 0) return null;
-          return {
-            name: cat + ' (' + cnt + ')',
-            value: cnt,
-            cat: cat,
-            itemStyle: { color: col, opacity: 0.7 },
-            label: { color: col }
-          };
-        }).filter(Boolean);
-
+        var col   = palette(i);
+        var cats  = DOC_CATS.filter(function (c) { return groupCatCount(g, c) > 0; });
+        var total = totalGroupDocs(g);
         return {
-          name: g.abbr + '-' + g.id + '\n' + T(g.label),
-          value: totalGroupDocs(g),
-          gi: i,
-          itemStyle: { color: col, borderColor: col },
-          label: { color: col, fontWeight: '600' },
-          children: children
+          name: g.abbr + '\n' + T(g.label),
+          itemStyle: { color: col },
+          label: { color: col },
+          value: total,
+          children: cats.map(function (cat) {
+            var cnt = groupCatCount(g, cat);
+            return {
+              name: cat + ' ×' + cnt,
+              value: cnt,
+              itemStyle: { color: col, opacity: 0.8 },
+              label: { color: col },
+              cat: cat
+            };
+          })
         };
       })
     };
 
-    var box = document.createElement('div');
-    box.className = 'dov-chart-box';
-    box.style.height = '560px';
-    canvas.appendChild(box);
+    var el = document.createElement('div');
+    el.style.cssText = 'height:540px;width:100%';
+    var legendHtml = '<div class="dov-chart-legend">' +
+      GROUPS.map(function (g, i) {
+        return '<span class="dov-legend-item"><span class="dov-legend-dot" style="background:' + palette(i) + '"></span>' +
+               esc(g.abbr + ' — ' + T(g.label)) + '</span>';
+      }).join('') + '</div>';
+    canvas.innerHTML = '';
+    canvas.appendChild(el);
+    canvas.insertAdjacentHTML('beforeend', legendHtml);
 
-    var chart = window.echarts.init(box, null, { renderer: 'svg' });
+    var chart = window.echarts.init(el, null, { renderer: 'canvas' });
     state.charts['mindmap'] = chart;
-
-    var textCol   = tok('colorsLight.textPrimary', '#1e293b');
-    var borderCol = tok('colorsLight.border', '#e2e8f0');
-
     chart.setOption({
-      backgroundColor: 'transparent',
-      tooltip: {
-        trigger: 'item',
-        formatter: function (p) {
-          if (!p.data) return '';
-          return '<div style="font-size:12px">' + esc(String(p.data.name || '').replace('\n', ' — ')) + '</div>';
-        }
-      },
       series: [{
         type: 'tree',
         data: [treeData],
+        top: '5%', bottom: '5%', left: '12%', right: '12%',
         layout: 'radial',
-        top: '5%', left: '5%', bottom: '5%', right: '5%',
-        symbol: 'circle',
-        symbolSize: function (v) { return v ? Math.min(14, 6 + Math.sqrt(v)) : 6; },
-        initialTreeDepth: 1,
-        expandAndCollapse: true,
-        animationDuration: 300,
+        symbol: 'emptyCircle',
+        symbolSize: function (v) { return v ? Math.min(8 + v * 0.08, 16) : 6; },
+        initialTreeDepth: 2,
+        lineStyle: { color: '#e2e8f0', width: 1.5, curveness: 0.6 },
         label: {
-          position: 'top',
-          verticalAlign: 'middle',
-          fontSize: 11,
-          color: textCol,
-          formatter: function (p) { return (p.data.name || '').split('\n')[0]; }
+          position: 'top', fontSize: 11, fontWeight: '600',
+          formatter: function (p) { return p.data.name; }
         },
-        leaves: { label: { position: 'right', verticalAlign: 'middle', fontSize: 11 } },
-        lineStyle: { color: borderCol, width: 1.5 }
+        leaves: { label: { position: 'right', fontSize: 10 } }
       }]
     });
 
-    /* Click leaf (SOP/WI/ANNEX/FRM) → navigate to that category */
     chart.on('click', function (p) {
-      var cat = p.data && p.data.cat;
-      if (cat) navToCat(cat);
+      if (p.data && p.data.cat) navToCat(p.data.cat);
     });
-
-    var legend = document.createElement('div');
-    legend.className = 'dov-chart-legend';
-    GROUPS.forEach(function (g, i) {
-      legend.innerHTML +=
-        '<span class="dov-legend-item">' +
-        '<span class="dov-legend-dot" style="background:' + palette(i) + '"></span>' +
-        '<span>' + esc(g.abbr) + ' · ' + esc(T(g.label)) + '</span></span>';
-    });
-    canvas.appendChild(legend);
-
-    var note = document.createElement('p');
-    note.className = 'dov-flow-info';
-    note.textContent = T({
-      vi: 'Nhấn vào nút để mở rộng/thu gọn · Nhấn loại tài liệu (SOP/WI…) để xem danh sách',
-      en: 'Click node to expand/collapse · Click doc type (SOP/WI…) to browse that category'
-    });
-    canvas.appendChild(note);
-
-    var ro = new ResizeObserver(function () { chart.resize(); });
-    ro.observe(box);
   }
 
   /* =========================================================================
-   * VIEW 2 — FISHBONE SVG (Ishikawa)
-   * Top: SYS(100) ENG(300) PRD(500) LOG(700) IMP(900)
-   * Bot: COM(200) SUP(400) QC(600)  HR(800)
-   * Bone click → detail panel with live doc list from DOCS
-   * ======================================================================= */
-  function renderFishbone(canvas) {
-    var W = 1000, H = 490;
-    var spineY = 245;
-    var tipTopY = 80,  tipBotY = 410;
-    var topIdx = [0, 2, 4, 6, 8]; /* GROUPS indices top */
-    var botIdx = [1, 3, 5, 7];    /* GROUPS indices bottom */
-    var topSX  = [160, 295, 430, 565, 700];
-    var topTX  = [100, 235, 370, 505, 640];
-    var botSX  = [228, 363, 498, 633];
-    var botTX  = [168, 303, 438, 573];
-
-    var s = '';
-    s += '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" class="dov-fishbone-svg">';
-
-    var brandPri = cv('brand-primary', '#1565c0');
-    s += '<defs><marker id="dovArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">';
-    s += '<path d="M0,0 L10,5 L0,10 Z" fill="' + brandPri + '"/></marker></defs>';
-
-    /* Spine */
-    s += '<line x1="75" y1="' + spineY + '" x2="835" y2="' + spineY + '" stroke="' + brandPri + '" stroke-width="3.5" stroke-linecap="round" marker-end="url(#dovArr)"/>';
-
-    /* Head box */
-    s += '<rect x="838" y="' + (spineY - 44) + '" width="152" height="88" rx="9" fill="' + cv('brand-primary', '#1565c0') + '"/>';
-    s += '<text x="914" y="' + (spineY - 20) + '" text-anchor="middle" font-size="12" font-weight="700" fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">Sản phẩm CNC</text>';
-    s += '<text x="914" y="' + (spineY - 4) + '" text-anchor="middle" font-size="12" font-weight="600" fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">chất lượng cao</text>';
-    s += '<text x="914" y="' + (spineY + 14) + '" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.82)" font-family="inherit">giao đúng hạn</text>';
-
-    function drawBone(gi, sx, tx, ty, isTop) {
-      var g   = GROUPS[gi];
-      var col = palette(gi);
-      var sopCount = groupCatCount(g, 'SOP');
-      var lbx = tx - 52, lby = isTop ? ty - 58 : ty;
-      var lbh = 58, lbw = 104;
-
-      s += '<line x1="' + tx + '" y1="' + ty + '" x2="' + sx + '" y2="' + spineY +
-           '" stroke="' + col + '" stroke-width="2.5" class="dov-bone" data-gi="' + gi + '"/>';
-
-      /* sub-bones: one tick per SOP (up to 6) */
-      var n = Math.min(sopCount, 6);
-      for (var j = 0; j < n; j++) {
-        var t = 0.22 + j * (0.65 / Math.max(n - 1, 1));
-        var bx = tx + t * (sx - tx);
-        var by = ty + t * (spineY - ty);
-        var tx2 = bx + 34, ty2 = by + (isTop ? 4 : -4);
-        s += '<line x1="' + bx + '" y1="' + by + '" x2="' + tx2 + '" y2="' + ty2 +
-             '" stroke="' + col + '" stroke-width="1.5" opacity="0.6"/>';
-        s += '<text x="' + (bx - 5) + '" y="' + (isTop ? by - 5 : by + 13) +
-             '" font-size="9.5" fill="' + col + '" text-anchor="end" font-family="monospace" font-weight="600" opacity="0.8">SOP-' +
-             (g.id + j + 1) + '</text>';
-      }
-
-      /* junction dot */
-      s += '<circle cx="' + sx + '" cy="' + spineY + '" r="5.5" fill="' + col + '"/>';
-
-      /* label box (clickable) */
-      var totalCnt = totalGroupDocs(g);
-      s += '<g class="dov-bone-lbl" data-gi="' + gi + '" style="cursor:pointer" role="button" tabindex="0" aria-label="' + esc(T(g.label)) + '">';
-      s += '<rect x="' + lbx + '" y="' + lby + '" width="' + lbw + '" height="' + lbh +
-           '" rx="7" fill="' + col + '" fill-opacity="0.13" stroke="' + col + '" stroke-width="1.5"/>';
-      var labY1 = isTop ? lby + 17 : lby + 16;
-      s += '<text x="' + tx + '" y="' + labY1 + '" text-anchor="middle" font-size="12" font-weight="800" fill="' + col + '" font-family="inherit">' + esc(g.abbr) + '</text>';
-      s += '<text x="' + tx + '" y="' + (labY1 + 14) + '" text-anchor="middle" font-size="10.5" font-weight="600" fill="' + col + '" font-family="inherit">' + esc(shortLbl(T(g.fish))) + '</text>';
-      s += '<text x="' + tx + '" y="' + (labY1 + 27) + '" text-anchor="middle" font-size="10" fill="' + col + '" font-family="inherit" opacity="0.8">' + sopCount + ' SOP · ' + totalCnt + ' TL</text>';
-      s += '</g>';
-    }
-
-    topIdx.forEach(function (gi, i) { drawBone(gi, topSX[i], topTX[i], tipTopY, true); });
-    botIdx.forEach(function (gi, i) { drawBone(gi, botSX[i], botTX[i], tipBotY, false); });
-
-    s += '<text x="78" y="' + (spineY - 10) + '" font-size="11" fill="' + brandPri + '" font-weight="600" font-family="inherit">Quy trình vận hành HESEM</text>';
-    s += '</svg>';
-
-    s += '<div class="dov-bone-detail" id="dov-bd">' +
-         '<p class="dov-detail-hint">' +
-         esc(T({ vi: 'Nhấn vào nhóm quy trình để xem danh sách tài liệu', en: 'Click a process group to view documents' })) +
-         '</p></div>';
-
-    canvas.innerHTML = '<div class="dov-fishbone-wrap">' + s + '</div>';
-
-    /* Bind bone click events */
-    canvas.querySelectorAll('[data-gi]').forEach(function (el) {
-      el.addEventListener('click', function () { showGroupDetail(parseInt(el.getAttribute('data-gi')), canvas); });
-      el.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') showGroupDetail(parseInt(el.getAttribute('data-gi')), canvas);
-      });
-    });
-  }
-
-  /* ── Group detail panel (used by fishbone; shared state for selected cat) ─ */
-  var _detailCat = 'SOP';
-
-  function showGroupDetail(gi, canvas) {
-    state.selectedGroup = gi;
-    _detailCat = 'SOP';
-    renderDetailPanel(gi, canvas);
-  }
-
-  function renderDetailPanel(gi, canvas) {
-    var g   = GROUPS[gi];
-    var col = palette(gi);
-    var bd  = canvas.querySelector('#dov-bd');
-    if (!bd) return;
-
-    var html = '<div class="dov-detail-header">';
-    html += '<span class="dov-detail-badge" style="background:' + col + '">' + esc(g.abbr + '-' + g.id) + '</span>';
-    html += '<span class="dov-detail-name">' + esc(T(g.label)) + '</span>';
-    html += '</div>';
-
-    /* Category tabs with live counts */
-    html += '<div class="dov-cat-tabs">';
-    DOC_CATS.forEach(function (cat) {
-      var cnt = groupCatCount(g, cat);
-      if (cnt === 0) return;
-      var active = cat === _detailCat ? ' dov-cat-btn--active' : '';
-      html += '<button class="dov-cat-btn' + active + '" data-detail-cat="' + cat + '">' + cat + ' ×' + cnt + '</button>';
-    });
-    html += '</div>';
-
-    /* Doc list for selected category */
-    var docs = getGroupDocs(g.id, _detailCat);
-    html += '<div class="dov-doc-list">';
-    if (docs.length === 0) {
-      html += '<p class="dov-detail-hint">' + esc(T({ vi: 'Không có tài liệu.', en: 'No documents.' })) + '</p>';
-    } else {
-      docs.forEach(function (d) {
-        var title = docTitle(d);
-        html += '<div class="dov-doc-item" data-doc-code="' + esc(d.code) + '">' +
-                '<span class="dov-doc-code">' + esc(d.code) + '</span>' +
-                '<span class="dov-doc-title" title="' + esc(title) + '">' + esc(title) + '</span>' +
-                '</div>';
-      });
-    }
-    html += '</div>';
-
-    /* View-all button */
-    html += '<div class="dov-sop-links">';
-    DOC_CATS.forEach(function (cat) {
-      var cnt = groupCatCount(g, cat);
-      if (cnt === 0) return;
-      html += '<button class="dov-sop-link-btn" data-nav-cat="' + cat + '">' +
-              esc(T({ vi: 'Xem tất cả ' + cat + ' (' + cnt + ')', en: 'View all ' + cat + ' (' + cnt + ')' })) +
-              '</button>';
-    });
-    html += '</div>';
-
-    bd.innerHTML = html;
-
-    /* Bind: doc item click → openDoc */
-    bd.querySelectorAll('[data-doc-code]').forEach(function (el) {
-      el.addEventListener('click', function () { openDocSafe(el.getAttribute('data-doc-code')); });
-    });
-
-    /* Bind: category tab switch */
-    bd.querySelectorAll('[data-detail-cat]').forEach(function (el) {
-      el.addEventListener('click', function () {
-        _detailCat = el.getAttribute('data-detail-cat');
-        renderDetailPanel(gi, canvas);
-      });
-    });
-
-    /* Bind: view-all → navigateTo */
-    bd.querySelectorAll('[data-nav-cat]').forEach(function (el) {
-      el.addEventListener('click', function () { navToCat(el.getAttribute('data-nav-cat')); });
-    });
-  }
-
-  /* Short fishbone label (truncate at space if > 14 chars) */
-  function shortLbl(s) {
-    if (!s || s.length <= 16) return s;
-    var i = s.lastIndexOf(' ', 14);
-    return i > 0 ? s.slice(0, i) + '…' : s.slice(0, 14) + '…';
-  }
-
-  /* =========================================================================
-   * VIEW 3 — PROCESS FLOW (ECharts graph)
-   * Operational sequence: COM → ENG → SUP → PRD → QC → LOG
-   * Cross-cutting: SYS (top), HR (bottom), IMP (feedback)
-   * Node click → navigateTo('documents', 'SOP') for that group
-   * ======================================================================= */
-  function renderFlow(canvas) {
-    if (!window.echarts) {
-      canvas.innerHTML = '<p style="padding:24px;color:var(--text-secondary,#64748b)">ECharts chưa tải.</p>';
-      return;
-    }
-
-    var nodes = [
-      { gi: 1,  x: 120, y: 280 }, /* COM  200 */
-      { gi: 2,  x: 270, y: 280 }, /* ENG  300 */
-      { gi: 3,  x: 420, y: 280 }, /* SUP  400 */
-      { gi: 4,  x: 570, y: 280 }, /* PRD  500 */
-      { gi: 5,  x: 720, y: 280 }, /* QC   600 */
-      { gi: 6,  x: 870, y: 280 }, /* LOG  700 */
-      { gi: 0,  x: 500, y: 80  }, /* SYS  100 */
-      { gi: 7,  x: 500, y: 480 }, /* HR   800 */
-      { gi: 8,  x: 280, y: 480 }, /* IMP  900 */
-      { gi: -1, x: 40,  y: 280, special: true, label: { vi: 'KH',   en: 'Customer' }, abbr: 'KH' },
-      { gi: -2, x: 960, y: 280, special: true, label: { vi: 'Giao', en: 'Deliver'  }, abbr: '✓' }
-    ];
-
-    var echNodes = nodes.map(function (n) {
-      var g   = n.gi >= 0 ? GROUPS[n.gi] : null;
-      var col = n.gi >= 0 ? palette(n.gi) : tok('brand.primary', '#1565c0');
-      var sopCnt = g ? groupCatCount(g, 'SOP') : 0;
-      return {
-        id:       String(n.gi),
-        name:     g ? g.abbr + '\n' + T(g.label) : T(n.label),
-        abbr:     g ? g.abbr : n.abbr,
-        x: n.x, y: n.y,
-        gi:       n.gi,
-        symbolSize: n.special ? 38 : 56,
-        itemStyle:  { color: col, borderColor: col, borderWidth: n.special ? 2 : 0 },
-        label:      { show: true, fontSize: 11, fontWeight: '700', color: '#fff',
-                      formatter: function (p) { return p.data.abbr || ''; } },
-        sopCount: sopCnt
-      };
-    });
-
-    var mainFlow = [['-1','1'],['1','2'],['2','3'],['3','4'],['4','5'],['5','6'],['6','-2']];
-    var crossTop = [['0','1'],['0','2'],['0','3'],['0','4'],['0','5'],['0','6']];
-    var crossBot = [['7','4'],['7','5']];
-    var feedback = [['8','1'],['5','8']];
-
-    function edge(s, t, style) { return { source: s, target: t, lineStyle: style }; }
-    var bPri  = tok('brand.primary', '#1565c0');
-    var cross = tok('statusColors.info', '#2563eb');
-    var purp  = tok('statusColors.purple', '#7c3aed');
-    var green = tok('statusColors.success', '#16a34a');
-
-    var echEdges = [].concat(
-      mainFlow.map(function (e) { return edge(e[0], e[1], { color: bPri,  width: 2.5, curveness: 0 }); }),
-      crossTop.map(function (e) { return edge(e[0], e[1], { color: cross, width: 1.2, type: 'dashed', curveness: 0.3 }); }),
-      crossBot.map(function (e) { return edge(e[0], e[1], { color: purp,  width: 1.2, type: 'dashed', curveness: 0.3 }); }),
-      feedback.map(function (e) { return edge(e[0], e[1], { color: green, width: 1.5, curveness: 0.45 }); })
-    );
-
-    var box = document.createElement('div');
-    box.className = 'dov-chart-box';
-    box.style.height = '580px';
-    canvas.appendChild(box);
-
-    var chart = window.echarts.init(box, null, { renderer: 'svg' });
-    state.charts['flow'] = chart;
-
-    chart.setOption({
-      backgroundColor: 'transparent',
-      tooltip: {
-        trigger: 'item',
-        formatter: function (p) {
-          if (!p.data || !p.data.name) return '';
-          var gi = typeof p.data.gi !== 'undefined' ? p.data.gi : -99;
-          var sopLine = '';
-          if (gi >= 0) {
-            var g = GROUPS[gi];
-            DOC_CATS.forEach(function (cat) {
-              var cnt = groupCatCount(g, cat);
-              if (cnt > 0) sopLine += ' · ' + cnt + ' ' + cat;
-            });
-          }
-          return '<div style="font-size:12px">' + esc(String(p.data.name || '').replace('\n', ' — ')) + sopLine + '</div>';
-        }
-      },
-      series: [{
-        type: 'graph', layout: 'none',
-        data: echNodes, edges: echEdges,
-        roam: false, focusNodeAdjacency: true,
-        edgeSymbol: ['none', 'arrow'], edgeSymbolSize: 8,
-        left: 10, right: 10, top: 30, bottom: 30,
-        label: { show: true },
-        lineStyle: { opacity: 0.9 }
-      }]
-    });
-
-    /* Node click → navigate to SOP category for that group */
-    chart.on('click', function (p) {
-      var gi = p.data && typeof p.data.gi !== 'undefined' ? p.data.gi : -99;
-      if (gi >= 0) navToCat('SOP');
-    });
-
-    var info = document.createElement('p');
-    info.className = 'dov-flow-info';
-    info.textContent = T({
-      vi: '→ Luồng chính (xanh dương) · -- Hệ thống quản trị (xanh nhạt) · ↩ Cải tiến phản hồi (xanh lá) · Nhấn node để xem SOP',
-      en: '→ Main flow (blue) · -- Governance (light blue) · ↩ Improvement loop (green) · Click node to browse SOPs'
-    });
-    canvas.appendChild(info);
-
-    var ro = new ResizeObserver(function () { chart.resize(); });
-    ro.observe(box);
-  }
-
-  /* =========================================================================
-   * VIEW 4 — MATRIX (HTML table)
-   * Rows: 9 process groups · Cols: SOP WI ANNEX FRM Total
-   * Cell click → navigateTo('documents', cat)
+   * VIEW B2 — MATRIX (count table, group × doc-type)
    * ======================================================================= */
   function renderMatrix(canvas) {
-    /* Compute live counts */
-    var counts = GROUPS.map(function (g) {
-      var row = { total: 0 };
-      DOC_CATS.forEach(function (cat) {
-        var c = groupCatCount(g, cat);
-        row[cat] = c;
-        row.total += c;
-      });
+    var catColors = { SOP: '#1565c0', WI: '#16a34a', ANNEX: '#7c3aed', FRM: '#d97706' };
+    var counts = GROUPS.map(function (g, i) {
+      var row = { label: T(g.label), abbr: g.abbr, color: palette(i), total: totalGroupDocs(g) };
+      DOC_CATS.forEach(function (cat) { row[cat] = groupCatCount(g, cat); });
       return row;
     });
 
-    /* Max per column for heat shading */
-    var maxes = {};
-    DOC_CATS.forEach(function (cat) {
-      maxes[cat] = Math.max.apply(null, counts.map(function (r) { return r[cat]; }));
-    });
-
-    function heatOpacity(val, max) { return (!val || !max) ? 0 : 0.08 + 0.55 * (val / max); }
-
-    var html = '<div class="dov-matrix-wrap"><table class="dov-matrix-table">';
-    html += '<thead><tr>';
+    var html = '<div class="dov-matrix-wrap"><table class="dov-matrix-table"><thead><tr>';
     html += '<th>' + esc(T({ vi: 'Nhóm quy trình', en: 'Process Group' })) + '</th>';
-    DOC_CATS.forEach(function (cat) { html += '<th style="text-align:center">' + cat + '</th>'; });
+    DOC_CATS.forEach(function (cat) {
+      html += '<th style="text-align:center;color:' + (catColors[cat] || '#64748b') + '">' + cat + '</th>';
+    });
     html += '<th style="text-align:center">' + esc(T({ vi: 'Tổng', en: 'Total' })) + '</th>';
     html += '</tr></thead><tbody>';
 
-    GROUPS.forEach(function (g, i) {
-      var row = counts[i];
-      var col = palette(i);
+    counts.forEach(function (row) {
       html += '<tr>';
-      html += '<td><div class="dov-mat-group">' +
-              '<span class="dov-mat-dot" style="background:' + col + '"></span>' +
-              '<span><strong>' + esc(g.abbr) + '-' + g.id + '</strong> ' + esc(T(g.label)) + '</span>' +
-              '</div></td>';
+      html += '<td><div class="dov-mat-group"><span class="dov-mat-dot" style="background:' + row.color + '"></span><strong style="color:' + row.color + '">' + esc(row.abbr) + '</strong>&nbsp;' + esc(row.label) + '</div></td>';
       DOC_CATS.forEach(function (cat) {
-        var val = row[cat];
-        var op  = heatOpacity(val, maxes[cat]);
-        html += '<td style="text-align:center">';
-        if (val > 0) {
-          html += '<span class="dov-mat-cell" data-nav-cat="' + cat + '" ' +
-                  'style="background:' + col + ';color:#fff;opacity:' + (0.15 + op * 0.85) + '">' + val + '</span>';
+        var n = row[cat];
+        if (n === 0) {
+          html += '<td style="text-align:center"><span class="dov-mat-cell-zero">—</span></td>';
         } else {
-          html += '<span class="dov-mat-cell-zero">—</span>';
+          var cc = catColors[cat] || '#64748b';
+          html += '<td style="text-align:center"><span class="dov-mat-cell" style="background:' + cc + '18;color:' + cc + '" data-nav-cat="' + cat + '">' + n + '</span></td>';
         }
-        html += '</td>';
       });
       html += '<td style="text-align:center"><span class="dov-mat-total">' + row.total + '</span></td>';
       html += '</tr>';
     });
 
-    /* Footer totals */
+    /* Footer row */
     html += '</tbody><tfoot><tr class="dov-mat-footer">';
     html += '<td><strong>' + esc(T({ vi: 'Tổng cộng', en: 'Grand Total' })) + '</strong></td>';
     DOC_CATS.forEach(function (cat) {
@@ -763,14 +848,13 @@
 
     canvas.innerHTML = html;
 
-    /* Cell click → navigate to that doc category */
     canvas.querySelectorAll('[data-nav-cat]').forEach(function (el) {
       el.addEventListener('click', function () { navToCat(el.getAttribute('data-nav-cat')); });
     });
   }
 
   /* =========================================================================
-   * REGISTER WITH EQMS SHELL
+   * REGISTER WITH EQMS SHELL + PORTAL
    * ======================================================================= */
   window.EqmsModules = window.EqmsModules || {};
   window.EqmsModules['doc-overview'] = { render: render, destroy: destroy };
