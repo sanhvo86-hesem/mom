@@ -24,6 +24,7 @@
     { id: 'customer-satisfaction',label: { vi: 'Đo lường KH hài lòng', en: 'Customer Satisfaction' },    icon: '\u2B50', group: 'quality-events', archetype: 'analytical-list' },
 
     // --- Documents & Change ---
+    { id: 'doc-overview',         label: { vi: 'Sơ đồ Tài liệu',     en: 'Document Visual Map' },         icon: '\u{1F5FA}️', group: 'docs-change', archetype: 'analytical-list' },
     { id: 'change-control',       label: { vi: 'Kiểm soát thay đổi', en: 'Change Control' },              icon: '\u{1F504}', group: 'docs-change', archetype: 'evidence-workspace' },
     { id: 'engineering-change',   label: { vi: 'Thay đổi kỹ thuật', en: 'Engineering Change' },           icon: '\u2699\uFE0F', group: 'docs-change', archetype: 'evidence-workspace' },
     { id: 'documents',            label: { vi: 'Kiểm soát tài liệu', en: 'Document Control' },            icon: '\u{1F4C4}', group: 'docs-change', archetype: 'evidence-workspace' },
