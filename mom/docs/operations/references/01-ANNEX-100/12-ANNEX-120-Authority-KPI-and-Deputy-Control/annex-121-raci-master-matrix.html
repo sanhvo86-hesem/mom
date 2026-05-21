@@ -156,7 +156,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <h2 class="h2" id="r2">2. Quy tắc dùng RACI khi đang vận hành</h2>
 <div class="legend-row">
 <div class="legend-item"><div class="legend-swatch" style="background:#e3f2fd;color:#1565c0;">A</div><b>chịu trách nhiệm cuối</b> — một vai trò duy nhất chịu trách nhiệm về đầu ra và quyết định dừng/chạy tiếp của hoạt động.</div>
-<div class="legend-item"><div class="legend-swatch" style="background:#e7f5ff;color:#1864ab;">R</div><b>thực hiện</b> — trực tiếp làm việc, điều phối hoặc gom bằng chứng.</div>
+<div class="legend-item"><div class="legend-swatch" style="background:#e7f5ff;color:#1864ab;">R</div><b>thực hiện</b> — trực tiếp làm việc, điều phối, gom bằng chứng hoặc lập và biện minh yêu cầu để tạo ra kết quả công việc của hoạt động.</div>
 <div class="legend-item"><div class="legend-swatch" style="background:#fff9db;color:#e67700;">C</div><b>tham vấn</b> — phải được hỏi trước khi chốt vì giữ tri thức kỹ thuật, chất lượng, giao hàng, tài chính hoặc khách hàng.</div>
 <div class="legend-item"><div class="legend-swatch" style="background:#ebfbee;color:#2b8a3e;">I</div><b>nhận thông tin</b> — phải nhận cập nhật để đồng bộ hệ thống, ca, hồ sơ hoặc cam kết.</div>
 </div>
@@ -166,6 +166,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tbody>
 <tr><td>Một hoạt động chỉ có một A</td><td>Người vận hành phải biết chính xác ai được dừng, nhả, ký hoặc chuyển cổng. Nếu bảng ghi nhóm mà thực tế đã có người ký cụ thể, dùng mã vai trò cụ thể.</td><td>Nhiều người đều nghĩ mình có quyền quyết định cuối.</td></tr>
 <tr><td>R không tự xác minh kết quả của chính mình</td><td>Người chạy máy, cài đặt, lập trình hoặc điều độ không tự thay vai trò xác minh độc lập cho FAI, đặc tính trọng yếu, giữ hàng, CoC hoặc chặn giao hàng.</td><td>Cùng một người vừa làm, vừa kiểm, vừa nhả khi có rủi ro chất lượng.</td></tr>
+<tr><td>A và R là hai vai trò khác nhau</td><td>Trong bảng G0–G7, chữ A và chữ R luôn được gán cho hai vai trò khác nhau để giữ nguyên tắc người làm khác người duyệt. Khi một cột chỉ hiện A (ví dụ ENG tại B1–B4), vai trò đó vừa chịu trách nhiệm cuối vừa điều hành phần việc của chức năng mình; chữ R ở cột khác là người thực thi hoặc người gác cổng độc lập của hoạt động.</td><td>Một vai trò vừa giữ A vừa giữ R cho cùng một quyết định có rủi ro chất lượng.</td></tr>
 <tr><td>C phải tham vấn trước khi chốt</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a>, <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>, <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> hoặc <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> được ghi C phải được hỏi trước khi chốt kỹ thuật, chất lượng, vật tư hoặc cam kết khách hàng. Quyết định ảnh hưởng giá, dòng tiền hoặc vượt ngưỡng phải đưa <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> chốt cuối theo <a href="annex-120-authority-matrix.html">ANNEX-120</a>.</td><td>Chỉ gửi thông báo sau khi đã quyết định.</td></tr>
 <tr><td>I phải nhận thông tin đủ để hành động</td><td>Thông báo phải có mã lệnh sản xuất, cổng G, mã CDR, bằng chứng cần đọc, việc cần làm và thời hạn. Chỉ cc email không đủ nếu người nhận phải cập nhật ERP, lịch ca hoặc hồ sơ.</td><td>Người nhận biết quá muộn, không biết việc cần làm, hoặc không truy được hồ sơ.</td></tr>
 <tr><td>RACI thấp hơn thẩm quyền</td><td>Khi RACI và <a href="annex-120-authority-matrix.html">ANNEX-120</a> mâu thuẫn, <a href="annex-120-authority-matrix.html">ANNEX-120</a> quyết định người ký cuối; RACI chỉ điều phối trách nhiệm thực hiện và bàn giao.</td><td>Người R dùng RACI để tự nhả giữ, tự duyệt ngoại lệ hoặc tự hứa với khách.</td></tr>
@@ -244,8 +245,8 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </tr>
 <tr>
 <td><a href="annex-121-raci-master-matrix.html#r5gate">G0</a></td><td><a href="annex-120-authority-matrix.html#cdr-A3">A3</a></td><td>Phê duyệt chiết khấu / điều kiện thương mại ngoại lệ</td>
-<td class="raci-cell raci-R">R</td>
 <td class="raci-cell raci-C">C</td>
+<td class="raci-cell raci-R">R</td>
 <td></td>
 <td></td>
 <td></td><td></td>
