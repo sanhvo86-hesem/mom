@@ -68,8 +68,36 @@ final class RaciMatrixService
         $boot    = FileHelper::readJson($this->bootstrapPath());
         $boot    = is_array($boot) ? $boot : [];
 
-        $gateSrc = !empty($runtime['rows']) ? $runtime : $boot;
-        $config  = $this->normalise($gateSrc);
+        // The bootstrap seed is the STRUCTURAL source of truth — it defines
+        // which CDR rows exist (gate, code, activity, forms). The runtime
+        // file only carries the live A/R/C/I letter state. Merging the two
+        // means a new CDR row added to the bootstrap appears immediately,
+        // while any letter edited through the admin UI is preserved.
+        $bootRows    = is_array($boot['rows'] ?? null) ? $boot['rows'] : [];
+        $runtimeRows = is_array($runtime['rows'] ?? null) ? $runtime['rows'] : [];
+        if ($bootRows) {
+            $rtByKey = [];
+            foreach ($runtimeRows as $rr) {
+                if (!is_array($rr)) { continue; }
+                $rtByKey[$this->rowKey($rr)] = $rr;
+            }
+            $merged = [];
+            foreach ($bootRows as $br) {
+                if (!is_array($br)) { continue; }
+                $rt = $rtByKey[$this->rowKey($br)] ?? null;
+                if (is_array($rt) && is_array($rt['roles'] ?? null)) {
+                    $br['roles'] = $rt['roles'];
+                }
+                $merged[] = $br;
+            }
+            $gateSrc = ['rows' => $merged];
+        } else {
+            $gateSrc = !empty($runtime['rows']) ? $runtime : $boot;
+        }
+        foreach (['updated_at', 'updated_by', 'reason'] as $metaKey) {
+            $gateSrc[$metaKey] = (string)($runtime[$metaKey] ?? $boot[$metaKey] ?? '');
+        }
+        $config = $this->normalise($gateSrc);
 
         // Auxiliary datasets (value-stream §4, document-level §6, support) —
         // runtime copy if present, otherwise the bootstrap seed.
@@ -245,6 +273,19 @@ final class RaciMatrixService
             'reason'         => (string)($config['reason'] ?? ''),
             'rows'           => $rows,
         ];
+    }
+
+    /**
+     * Stable identity of a gate-matrix row — gate + CDR + activity text.
+     * Used to carry runtime letter edits across a bootstrap structure change.
+     *
+     * @param array<string, mixed> $row
+     */
+    private function rowKey(array $row): string
+    {
+        return trim((string)($row['gate'] ?? '')) . '|'
+             . trim((string)($row['cdr'] ?? '')) . '|'
+             . $this->plainText((string)($row['activity_html'] ?? ''));
     }
 
     private function cleanLetter(string $value): string

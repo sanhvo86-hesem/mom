@@ -215,6 +215,27 @@
       }
     },
     {
+      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G1</a>",
+      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-B8\">B8</a>",
+      "gate": "G1",
+      "cdr": "B8",
+      "activity_html": "Phê duyệt Control Plan và PFMEA trước khi phát hành gói nền",
+      "frm_html": "<a href=\"../../../../forms/frm-300-technical/FRM-303_DFM_Review_Checklist.xlsx\">FRM-303</a> · <a href=\"../../../sops/01-SOP-100/sop-103-risk-opportunity-fmea-and-control-plan.html\">SOP-103</a> · <a href=\"../../../sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html\">SOP-301</a>",
+      "roles": {
+        "CS": "",
+        "EST": "",
+        "ENG": "R",
+        "PPL": "I",
+        "WKM": "C",
+        "PD": "C",
+        "QA": "A",
+        "SCM": "",
+        "CEO": "",
+        "EHS": "",
+        "HR/IT": ""
+      }
+    },
+    {
       "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G2</a>",
       "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-C1\">C1</a>",
       "gate": "G2",
@@ -230,6 +251,27 @@
         "PD": "C",
         "QA": "C",
         "SCM": "C",
+        "CEO": "",
+        "EHS": "",
+        "HR/IT": ""
+      }
+    },
+    {
+      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G2</a>",
+      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D10\">D10</a>",
+      "gate": "G2",
+      "cdr": "D10",
+      "activity_html": "Nghiệm thu vật tư mua vào, đối chiếu chứng chỉ truy xuất và sàng lọc hàng giả",
+      "frm_html": "<a href=\"../../../sops/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html\">SOP-402</a>",
+      "roles": {
+        "CS": "",
+        "EST": "",
+        "ENG": "C",
+        "PPL": "I",
+        "WKM": "",
+        "PD": "",
+        "QA": "A",
+        "SCM": "R",
         "CEO": "",
         "EHS": "",
         "HR/IT": ""
