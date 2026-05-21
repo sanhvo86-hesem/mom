@@ -369,7 +369,9 @@ final class KpiEngine
 
         $value  = (float) ($breakdown['value'] ?? 0.0);
         $target = $this->getKpiTarget($metricCode);
-        $unit   = self::UNITS[$metricCode] ?? '%';
+        // $metricCode is guaranteed to be in ALL_METRICS here (non-runtime
+        // metrics returned above), so UNITS always has the key.
+        $unit   = self::UNITS[$metricCode];
         $status = $this->evaluateStatus($metricCode, $value, $target);
 
         // Insufficient-data gate: when a calculator reports a sample_size
