@@ -2890,6 +2890,12 @@
     var active = String(p.status || 'active') !== 'inactive';
     if (S.filter.status === 'active'   && !active) return false;
     if (S.filter.status === 'inactive' &&  active) return false;
+    // Positions in an inactive org unit are treated as inactive for display
+    // purposes — they must not appear in the active-only chart view.
+    if (S.filter.status === 'active') {
+      var unit = S.byUnitId[String(p.hcm_org_unit_id || '')];
+      if (unit && String(unit.status || 'active') === 'inactive') return false;
+    }
     return true;
   }
 
