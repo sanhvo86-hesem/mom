@@ -2963,8 +2963,12 @@ function renderSidebar(){
   SIDEBAR_SECTIONS.forEach(sec => {
     if(!isPortalSidebarSectionVisible(sec.id)) return;
     const catsInSec = CATEGORIES.filter(c => !c.hidden && isPortalSidebarCategoryVisible(c.id) && c.section === sec.id && (VDOCS.some(d => d.cat === c.id) || portalCategoryHasPhysicalTree(c.id)));
-    if(catsInSec.length === 0) return;
+    const hasDocOverviewEntry = sec.id === 'ops' && canUserAccessModule('eqms');
+    if(catsInSec.length === 0 && !hasDocOverviewEntry) return;
     html += `<div class="nav-section"><div class="nav-section-title">${sec.label}</div>`;
+    if(hasDocOverviewEntry) {
+      html += `<button class="nav-item" onclick="navigateTo('eqms');setTimeout(function(){if(window.EqmsShell&&typeof window.EqmsShell.navigate==='function')window.EqmsShell.navigate('doc-overview');},80)"><span class="icon">🗺️</span><span>${lang==='en'?'Document Visual Map':'Sơ đồ Tài liệu'}</span></button>`;
+    }
     catsInSec.forEach(cat => {
       let cnt = VDOCS.filter(d=>d.cat===cat.id).length;
       const physicalCount = getPortalCategoryPhysicalNodeCount(cat.id);
