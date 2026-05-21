@@ -1,13 +1,15 @@
 /* ===================================================================
    00n-admin-raci-matrix.js
-   Admin: RACI Console — single control point for the four RACI datasets
-   inside the controlled ANNEX-121 document.
-     • Ma trận cổng    — §5 gate matrix G0→G7 (A/R/C/I editor)
-     • Chuỗi giá trị   — §4 value-stream RACI
-     • Tài liệu        — §6 document-level RACI
-     • Bảng phụ trợ    — support-function supplement
-   Saving validates the gate-matrix RACI invariants and regenerates every
-   marked region inside ANNEX-121 (and the embedded SOP/JD regions).
+   Admin: RACI Console — single control point for every RACI dataset in
+   the controlled QMS document set. Dashboard landing + six datasets:
+     • Ma trận cổng §5   — gate matrix G0→G7 (A/R/C/I editor)
+     • Chuỗi giá trị §4  — value-stream RACI (ANNEX-121)
+     • Tài liệu §6       — document-level RACI (ANNEX-121)
+     • Bảng phụ trợ      — support-function supplement (ANNEX-121)
+     • Giao diện JD      — per-JD §6 interface RACI table (39 JD)
+     • Vai trò SOP §4    — per-SOP §4 role / authority RACI table (37 SOP)
+   Saving validates the gate-matrix invariants and regenerates every
+   marked region across ANNEX-121 and the embedded SOP/JD documents.
    =================================================================== */
 
 (function(){
@@ -18,32 +20,69 @@ var _lang = 'vi';
 var ROLES = ['CS','EST','ENG','PPL','WKM','PD','QA','SCM','CEO','EHS','HR/IT'];
 var LETTERS = ['', 'A', 'R', 'C', 'I'];
 
-/* Auxiliary-dataset section descriptors — column headers mirror ANNEX-121. */
+/* Cell-table datasets (ANNEX-121 §4 / §6 / support supplement). */
 var AUX = {
   value_stream: {
-    vi: 'Chuỗi giá trị §4', en: 'Value stream §4',
     headVi: ['Hoạt động ngang', 'A', 'R', 'C/I', 'Bằng chứng'],
-    headEn: ['Horizontal activity', 'A', 'R', 'C/I', 'Evidence'],
-    descVi: 'RACI mục 4 — các hoạt động RACI chạy ngang chuỗi giá trị, không gắn cổng.',
-    descEn: 'Section 4 RACI — horizontal value-stream activities not tied to a gate.'
+    headEn: ['Horizontal activity', 'A', 'R', 'C/I', 'Evidence']
   },
   document_level: {
-    vi: 'Tài liệu §6', en: 'Document level §6',
     headVi: ['Tài liệu', 'A', 'R', 'C', 'Duyệt', 'Người dùng chính'],
-    headEn: ['Document', 'A', 'R', 'C', 'Approve', 'Primary user'],
-    descVi: 'RACI mục 6 — quyền sở hữu, duyệt và sử dụng từng tài liệu thẩm quyền.',
-    descEn: 'Section 6 RACI — ownership, approval and use of each authority document.'
+    headEn: ['Document', 'A', 'R', 'C', 'Approve', 'Primary user']
   },
   support: {
-    vi: 'Bảng phụ trợ', en: 'Support supplement',
     headVi: ['Cổng', 'CDR', 'Hoạt động', 'Vai trò hỗ trợ', 'RACI', 'Lý do tham gia'],
-    headEn: ['Gate', 'CDR', 'Activity', 'Support role', 'RACI', 'Reason for involvement'],
-    descVi: 'Bảng phụ trợ — vai trò hỗ trợ (Tài chính, Bảo trì…) tham vấn tại các cổng.',
-    descEn: 'Support supplement — support roles (Finance, Maintenance…) consulted at gates.'
+    headEn: ['Gate', 'CDR', 'Activity', 'Support role', 'RACI', 'Reason']
   }
 };
-var AUX_KEYS = ['value_stream', 'document_level', 'support'];
-var SECTIONS = ['gate', 'value_stream', 'document_level', 'support', 'jd'];
+
+/* Document-keyed HTML datasets (one verbatim table per source document). */
+var DOCMAP = {
+  jd: {
+    stateKey: 'jd_interface', active: 'activeJd',
+    labelVi: 'Bản mô tả công việc', labelEn: 'Job description',
+    fieldVi: 'HTML bảng giao diện RACI', fieldEn: 'Interface RACI table HTML'
+  },
+  sop_roles: {
+    stateKey: 'sop_roles', active: 'activeSop',
+    labelVi: 'Quy trình (SOP)', labelEn: 'Procedure (SOP)',
+    fieldVi: 'HTML mục §4 Vai trò &amp; RACI', fieldEn: 'Section 4 role / RACI HTML'
+  }
+};
+
+/* Six datasets — drives the dashboard tiles and the section navigator. */
+var DATASETS = [
+  { key:'gate', code:'§5', kind:'gate',
+    vi:'Ma trận cổng', en:'Gate matrix',
+    descVi:'Phân công A/R/C/I cho 46 hoạt động kiểm soát theo cổng G0→G7.',
+    descEn:'A/R/C/I assignment for 46 gated activities, G0→G7.',
+    unitVi:'hoạt động', unitEn:'activities', sync:'ANNEX-121 §5' },
+  { key:'value_stream', code:'§4', kind:'aux',
+    vi:'Chuỗi giá trị', en:'Value stream',
+    descVi:'RACI các hoạt động chạy ngang chuỗi giá trị, không gắn cổng.',
+    descEn:'RACI for horizontal value-stream activities.',
+    unitVi:'dòng', unitEn:'rows', sync:'ANNEX-121 §4' },
+  { key:'document_level', code:'§6', kind:'aux',
+    vi:'Tài liệu', en:'Document level',
+    descVi:'Quyền sở hữu, duyệt và sử dụng từng tài liệu thẩm quyền.',
+    descEn:'Ownership, approval and use of each authority document.',
+    unitVi:'dòng', unitEn:'rows', sync:'ANNEX-121 §6' },
+  { key:'support', code:'SUP', kind:'aux',
+    vi:'Bảng phụ trợ', en:'Support supplement',
+    descVi:'Vai trò hỗ trợ (Tài chính, Bảo trì…) tham vấn tại các cổng.',
+    descEn:'Support roles consulted at the control gates.',
+    unitVi:'dòng', unitEn:'rows', sync:'ANNEX-121 phụ lục' },
+  { key:'jd', code:'JD', kind:'docmap',
+    vi:'Giao diện JD', en:'JD interface',
+    descVi:'Bảng “Giao diện liên phòng ban — RACI / Bàn giao” trong từng JD.',
+    descEn:'The cross-department interface RACI table inside each JD.',
+    unitVi:'tài liệu', unitEn:'documents', sync:'39 tài liệu JD' },
+  { key:'sop_roles', code:'SOP', kind:'docmap',
+    vi:'Vai trò SOP §4', en:'SOP §4 roles',
+    descVi:'Bảng “Vai trò, quyền hạn & RACI” mục §4 trong từng quy trình SOP.',
+    descEn:'The §4 role / authority / RACI table inside each SOP.',
+    unitVi:'tài liệu', unitEn:'documents', sync:'37 tài liệu SOP' }
+];
 
 var _state = {
   loading: false,
@@ -54,8 +93,9 @@ var _state = {
   draft: null,
   reason: '',
   activeGate: 'all',
-  activeSection: 'gate',
-  activeJd: ''
+  activeSection: 'overview',
+  activeJd: '',
+  activeSop: ''
 };
 
 window._renderAdminRaciMatrix = function(el, langCode){
@@ -78,6 +118,7 @@ function _esc(value){
 
 function _clone(value){ return JSON.parse(JSON.stringify(value || {})); }
 
+/* ── Dataset accessors ────────────────────────────────────────────── */
 function _rows(){
   var d = _state.draft || {};
   return Array.isArray(d.rows) ? d.rows : [];
@@ -88,13 +129,25 @@ function _auxRows(key){
   return Array.isArray(d[key]) ? d[key] : [];
 }
 
-function _jdMap(){
+function _docMap(key){
   var d = _state.draft || {};
-  return (d.jd_interface && typeof d.jd_interface === 'object') ? d.jd_interface : {};
+  var sk = DOCMAP[key].stateKey;
+  return (d[sk] && typeof d[sk] === 'object') ? d[sk] : {};
 }
 
-function _jdSlugs(){
-  return Object.keys(_jdMap()).sort();
+function _docSlugs(key){ return Object.keys(_docMap(key)).sort(); }
+
+function _datasetCount(ds){
+  if(ds.kind === 'gate') return _rows().length;
+  if(ds.kind === 'aux') return _auxRows(ds.key).length;
+  return _docSlugs(ds.key).length;
+}
+
+function _datasetById(key){
+  for(var i = 0; i < DATASETS.length; i++){
+    if(DATASETS[i].key === key) return DATASETS[i];
+  }
+  return null;
 }
 
 function _gates(){
@@ -122,7 +175,7 @@ function _invalidCount(){
   return _rows().filter(function(row){ return _rowFlags(row).invalid; }).length;
 }
 
-/* ── Data ─────────────────────────────────────────────────────────── */
+/* ── Data load / save ─────────────────────────────────────────────── */
 function _load(){
   _state.loading = true;
   _state.error = '';
@@ -147,8 +200,8 @@ function _load(){
 function _save(){
   if(_state.saving) return;
   if(_invalidCount() > 0){
-    _state.error = _t('Còn dòng vi phạm bất biến RACI — mỗi dòng ma trận cổng phải có đúng 1 chữ A và ít nhất 1 chữ R.',
-                      'Some gate-matrix rows violate the RACI invariants — each needs exactly one A and at least one R.');
+    _state.error = _t('Còn dòng ma trận cổng vi phạm bất biến RACI — mỗi dòng cần đúng 1 chữ A và ít nhất 1 chữ R.',
+                      'Gate-matrix rows violate the RACI invariants — each needs exactly one A and at least one R.');
     _syncStatus();
     return;
   }
@@ -165,8 +218,8 @@ function _save(){
       _state.config = data.config || {};
       _state.draft = _clone(_state.config);
       _state.reason = '';
-      _state.message = _t('Đã lưu và tái tạo cả bốn vùng RACI trong ANNEX-121.',
-                          'Saved and regenerated all four RACI regions inside ANNEX-121.');
+      _state.message = _t('Đã lưu và tái tạo các vùng RACI trong ANNEX-121, JD và SOP liên quan.',
+                          'Saved and regenerated the RACI regions across ANNEX-121, the JDs and the SOPs.');
     })
     .catch(function(err){
       _state.error = _t('Không lưu được. ', 'Save failed. ') + (err && err.message ? err.message : '');
@@ -177,6 +230,7 @@ function _save(){
     });
 }
 
+/* ── Mutators ─────────────────────────────────────────────────────── */
 function _setRole(idx, role, value){
   var rows = _rows();
   if(!rows[idx]) return;
@@ -197,13 +251,13 @@ function _setAuxCell(key, rowIdx, colIdx, value){
   _state.message = '';
 }
 
-function _setJd(slug){
-  _state.activeJd = slug || '';
+function _setDocSel(key, slug){
+  _state[DOCMAP[key].active] = slug || '';
   _render();
 }
 
-function _setJdHtml(slug, value){
-  var map = _jdMap();
+function _setDocHtml(key, slug, value){
+  var map = _docMap(key);
   if(!map[slug]) return;
   map[slug].html = value;
   _state.error = '';
@@ -225,12 +279,14 @@ function _setGate(gate){
   _render();
 }
 
-function _setSection(section){
-  _state.activeSection = section || 'gate';
+function _go(section){
+  _state.activeSection = section || 'overview';
   _render();
+  var host = _el || document.getElementById('admin-content');
+  if(host && host.scrollIntoView) host.scrollIntoView({ block: 'start' });
 }
 
-/* ── Rendering ────────────────────────────────────────────────────── */
+/* ── Status helpers ───────────────────────────────────────────────── */
 function _setAlert(id, text){
   var node = document.getElementById(id);
   if(!node) return;
@@ -251,10 +307,11 @@ function _syncStatus(){
     saveBtn.disabled = !!(_state.saving || bad > 0);
     saveBtn.textContent = _state.saving
       ? _t('Đang lưu...', 'Saving...')
-      : _t('Lưu và cập nhật ANNEX-121', 'Save and publish ANNEX-121');
+      : _t('Lưu & đồng bộ tài liệu', 'Save & sync documents');
   }
 }
 
+/* ── Root render ──────────────────────────────────────────────────── */
 function _render(){
   var el = _el || document.getElementById('admin-content');
   if(!el || !document.contains(el)) return;
@@ -264,197 +321,152 @@ function _render(){
     return;
   }
 
+  var section = _state.activeSection;
+  if(section !== 'overview' && !_datasetById(section)){
+    section = _state.activeSection = 'overview';
+  }
   var cfg = _state.draft || {};
+  var badCount = _invalidCount();
+
+  var body;
+  if(section === 'overview'){
+    body = _renderOverview(cfg);
+  } else {
+    var ds = _datasetById(section);
+    body = _renderSectionNav(ds)
+      + (ds.kind === 'gate' ? _renderGateSection()
+         : ds.kind === 'aux' ? _renderAuxSection(ds)
+         : _renderDocMapSection(ds));
+  }
+
+  el.innerHTML = `
+<section class="raci-console">
+  ${_styleBlock()}
+  <header class="rc-head">
+    <div class="rc-head-main">
+      <div class="rc-head-titles">
+        <span class="rc-eyebrow">${_t('Quản trị điều hành', 'Operations governance')}</span>
+        <h2>${_t('Console RACI', 'RACI console')}</h2>
+        <p>${_t('Điểm điều khiển duy nhất cho toàn bộ RACI trong hệ tài liệu kiểm soát — ma trận cổng, RACI chuỗi giá trị, RACI tài liệu, bảng phụ trợ, giao diện JD và vai trò SOP. Mọi thay đổi lưu tại đây sẽ tái tạo các vùng tương ứng trong ANNEX-121 và các tài liệu JD / SOP nhúng.', 'The single control point for every RACI dataset in the controlled document set. Saving here regenerates the matching regions inside ANNEX-121 and the embedded JD / SOP documents.')}</p>
+      </div>
+    </div>
+    <div class="rc-actions">
+      <button class="rc-btn" type="button" onclick="_rmReload()">${_t('Tải lại', 'Reload')}</button>
+      <button class="rc-btn" type="button" onclick="_rmReset()">${_t('Hoàn tác', 'Reset')}</button>
+      <button class="rc-btn primary" id="rm-save-btn" type="button" ${(_state.saving || badCount > 0) ? 'disabled' : ''} onclick="_rmSave()">${_state.saving ? _t('Đang lưu...', 'Saving...') : _t('Lưu & đồng bộ tài liệu', 'Save & sync documents')}</button>
+    </div>
+  </header>
+  <div class="rc-alert error" id="rm-error-alert" ${_state.error ? '' : 'hidden'}>${_esc(_state.error)}</div>
+  <div class="rc-alert ok" id="rm-message-alert" ${_state.message ? '' : 'hidden'}>${_esc(_state.message)}</div>
+  <div class="rc-alert error" id="rm-invalid-alert" ${badCount > 0 ? '' : 'hidden'}>${_esc(badCount + ' ' + _t('dòng ma trận cổng vi phạm bất biến RACI (cần đúng 1 A và ≥ 1 R).', 'gate-matrix row(s) violate the RACI invariants.'))}</div>
+  <div class="rc-field">
+    <label>${_t('Lý do cập nhật (ghi vào nhật ký kiểm toán)', 'Change reason (written to the audit log)')}</label>
+    <textarea class="rc-reason" oninput="_rmSetReason(this.value)" placeholder="${_t('Ví dụ: chuyển PD thành R cho A5 theo IATF 16949 §8.2.3.1.3...', 'Example: set PD to R on A5 per IATF 16949 §8.2.3.1.3...')}">${_esc(_state.reason || '')}</textarea>
+  </div>
+  ${body}
+</section>`;
+  _syncStatus();
+}
+
+/* ── Overview / dashboard landing ─────────────────────────────────── */
+function _renderOverview(cfg){
+  var totalRows = 0;
+  DATASETS.forEach(function(ds){ totalRows += _datasetCount(ds); });
+  var managedDocs = 1 + _docSlugs('jd').length + _docSlugs('sop_roles').length;
+
+  var stats = [
+    { v: totalRows, vi: 'Mục dữ liệu RACI', en: 'RACI data rows' },
+    { v: DATASETS.length, vi: 'Tập dữ liệu', en: 'Datasets' },
+    { v: managedDocs, vi: 'Tài liệu tự đồng bộ', en: 'Auto-synced documents' },
+    { v: _esc(cfg.updated_by || '—'), vi: 'Cập nhật bởi', en: 'Updated by', small: true }
+  ];
+  var statHtml = stats.map(function(s){
+    return `<div class="rc-stat">
+      <span class="rc-stat-v ${s.small ? 'sm' : ''}">${s.v}</span>
+      <span class="rc-stat-l">${_t(s.vi, s.en)}</span>
+    </div>`;
+  }).join('');
+
+  var tiles = DATASETS.map(function(ds){
+    var n = _datasetCount(ds);
+    return `
+    <button class="rc-tile" type="button" onclick="_rmGo('${ds.key}')">
+      <div class="rc-tile-top">
+        <span class="rc-badge rc-badge--${ds.kind}">${_esc(ds.code)}</span>
+        <span class="rc-tile-count">${n}<small>${_esc(_t(ds.unitVi, ds.unitEn))}</small></span>
+      </div>
+      <div class="rc-tile-name">${_t(ds.vi, ds.en)}</div>
+      <div class="rc-tile-desc">${_t(ds.descVi, ds.descEn)}</div>
+      <div class="rc-tile-foot">
+        <span class="rc-sync">↻ ${_esc(ds.sync)}</span>
+        <span class="rc-tile-go">${_t('Mở', 'Open')} →</span>
+      </div>
+    </button>`;
+  }).join('');
+
+  return `
+  <div class="rc-statbar">${statHtml}</div>
+  <div class="rc-section-cap">
+    <b>${_t('Sáu tập dữ liệu RACI', 'Six RACI datasets')}</b>
+    <span>${_t('Chọn một tập để xem và chỉnh sửa. Lưu sẽ kiểm tra bất biến rồi đồng bộ ra tài liệu.', 'Pick a dataset to view and edit. Saving validates the invariants then syncs to the documents.')}</span>
+  </div>
+  <div class="rc-tiles">${tiles}</div>
+  ${_renderLinkedDocs(cfg)}`;
+}
+
+/* ── Section navigator (breadcrumb + dataset pills) ───────────────── */
+function _renderSectionNav(active){
+  var pills = DATASETS.map(function(ds){
+    return `<button class="rc-pill ${ds.key === active.key ? 'active' : ''}" type="button" onclick="_rmGo('${ds.key}')">
+      <span class="rc-pill-code">${_esc(ds.code)}</span>${_t(ds.vi, ds.en)}
+    </button>`;
+  }).join('');
+  return `
+  <nav class="rc-nav">
+    <button class="rc-back" type="button" onclick="_rmGo('overview')">← ${_t('Tổng quan', 'Overview')}</button>
+    <div class="rc-pills">${pills}</div>
+  </nav>`;
+}
+
+/* ── Gate matrix §5 ───────────────────────────────────────────────── */
+function _renderGateSection(){
   var rows = _rows();
   var gates = _gates();
   if(_state.activeGate !== 'all' && gates.indexOf(_state.activeGate) < 0){
     _state.activeGate = 'all';
   }
-  if(SECTIONS.indexOf(_state.activeSection) < 0){
-    _state.activeSection = 'gate';
-  }
-  var badCount = _invalidCount();
-
-  el.innerHTML = `
-<section class="raci-matrix-admin">
-  <style>
-    .raci-matrix-admin{display:flex;flex-direction:column;gap:16px;color:var(--text-1)}
-    .rm-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding:18px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
-    .rm-head h2{margin:0;font-size:22px;line-height:1.2}
-    .rm-head p{margin:8px 0 0;color:var(--text-2);max-width:880px}
-    .rm-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
-    .rm-btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text-1);border-radius:7px;padding:9px 12px;font-weight:700;cursor:pointer}
-    .rm-btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-contrast)}
-    .rm-btn:disabled{opacity:.48;cursor:not-allowed}
-    .rm-alert{border:1px solid var(--border);border-radius:8px;padding:12px 14px;background:var(--surface);color:var(--text-2)}
-    .rm-alert[hidden]{display:none}
-    .rm-alert.error{border-color:var(--danger);color:var(--danger)}
-    .rm-alert.ok{border-color:var(--success);color:var(--success)}
-    .rm-tabs{display:flex;flex-wrap:wrap;gap:6px;border:1px solid var(--border);border-radius:8px;background:var(--surface);padding:6px}
-    .rm-tab{flex:1 1 auto;display:flex;flex-direction:column;gap:2px;text-align:left;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--text-2);padding:8px 11px;cursor:pointer;font-weight:800}
-    .rm-tab b{font-size:13px;color:var(--text-1)}
-    .rm-tab span{font-size:11px;font-weight:700}
-    .rm-tab.active{border-color:var(--accent);background:var(--surface-2)}
-    .rm-tab.active b{color:var(--accent)}
-    .rm-meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-    .rm-meta{border:1px solid var(--border);border-radius:8px;background:var(--surface);padding:12px}
-    .rm-meta b{display:block;margin-bottom:5px}
-    .rm-meta span{color:var(--text-2)}
-    .rm-reason{width:100%;min-height:64px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-1);padding:10px;font:inherit;resize:vertical}
-    .rm-field label{font-size:12px;font-weight:800;color:var(--text-2);text-transform:uppercase;display:block;margin-bottom:5px}
-    .rm-workbench{display:grid;grid-template-columns:240px minmax(0,1fr);gap:16px;align-items:start}
-    .rm-sidebar{position:sticky;top:12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);padding:12px;max-height:calc(100vh - 120px);overflow:auto}
-    .rm-sidebar-head b{display:block;font-size:13px;text-transform:uppercase;color:var(--text-2);letter-spacing:.04em}
-    .rm-sidebar-head span{display:block;margin-top:4px;color:var(--text-2);font-size:12px;line-height:1.45;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:10px}
-    .rm-gate-list{display:flex;flex-direction:column;gap:7px}
-    .rm-gate-btn{width:100%;display:flex;justify-content:space-between;gap:8px;align-items:center;text-align:left;border:1px solid var(--border);border-radius:7px;background:var(--surface-2);color:var(--text-1);padding:9px 11px;cursor:pointer;font-weight:700}
-    .rm-gate-btn span{font-size:12px;font-weight:800;color:var(--accent)}
-    .rm-gate-btn.active{border-color:var(--accent);background:var(--surface)}
-    .rm-editor{display:flex;flex-direction:column;gap:12px;min-width:0}
-    .rm-card{border:1px solid var(--border);border-radius:8px;background:var(--surface);padding:13px;display:flex;flex-direction:column;gap:10px}
-    .rm-card--invalid{border-color:var(--danger);box-shadow:inset 3px 0 0 var(--danger)}
-    .rm-card-head{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
-    .rm-gate-tag{font-weight:800;font-size:11px;color:var(--accent-contrast);background:var(--accent);border-radius:4px;padding:2px 7px}
-    .rm-cdr{font-weight:800;color:var(--accent)}
-    .rm-activity{color:var(--text-1);font-size:13px}
-    .rm-activity a{color:var(--accent)}
-    .rm-role-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
-    .rm-role{display:flex;flex-direction:column;gap:3px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);padding:6px 7px}
-    .rm-role label{font-size:11px;font-weight:800;color:var(--text-2)}
-    .rm-role select{border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text-1);font:inherit;padding:4px;font-weight:800}
-    .rm-role select[data-val="A"]{background:var(--accent);color:var(--accent-contrast);border-color:var(--accent)}
-    .rm-role select[data-val="R"]{border-color:var(--accent);color:var(--accent)}
-    .rm-role select[data-val="C"]{border-color:var(--warning,var(--accent))}
-    .rm-role select[data-val="I"]{border-color:var(--success,var(--accent))}
-    .rm-flag{font-size:11px;font-weight:800}
-    .rm-flag.bad{color:var(--danger)}
-    .rm-flag.ok{color:var(--success)}
-    .rm-aux{border:1px solid var(--border);border-radius:8px;background:var(--surface);overflow:hidden}
-    .rm-aux-head{padding:13px 14px;border-bottom:1px solid var(--border)}
-    .rm-aux-head b{display:block;font-size:14px}
-    .rm-aux-head span{display:block;margin-top:3px;color:var(--text-2);font-size:12px;line-height:1.5}
-    .rm-aux-scroll{overflow:auto}
-    table.rm-aux-table{width:100%;border-collapse:collapse;font-size:12.5px}
-    table.rm-aux-table th{background:var(--surface-2);color:var(--text-2);text-transform:uppercase;font-size:11px;letter-spacing:.03em;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);position:sticky;top:0}
-    table.rm-aux-table td{vertical-align:top;padding:6px 8px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
-    table.rm-aux-table td:last-child{border-right:none}
-    table.rm-aux-table tr:last-child td{border-bottom:none}
-    .rm-rownum{color:var(--text-2);font-weight:800;text-align:right;width:34px}
-    .rm-cell-ta{width:100%;min-width:120px;min-height:46px;border:1px solid var(--border);border-radius:5px;background:var(--surface-2);color:var(--text-1);font:inherit;font-size:12px;padding:5px 6px;resize:vertical;line-height:1.45}
-    .rm-cell-ta:focus{border-color:var(--accent);background:var(--surface);outline:none}
-    .rm-aux-note{padding:9px 14px;color:var(--text-2);font-size:11.5px;line-height:1.5;border-top:1px solid var(--border)}
-    .rm-jd-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border)}
-    .rm-jd-bar label{font-size:11px;font-weight:800;color:var(--text-2);text-transform:uppercase}
-    .rm-jd-select{flex:1 1 320px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text-1);font:inherit;font-weight:700;padding:7px 9px}
-    .rm-jd-open{font-size:12px;font-weight:700;color:var(--accent);text-decoration:none;white-space:nowrap}
-    .rm-jd-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
-    .rm-jd-html{width:100%;min-height:260px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text-1);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;padding:9px 10px;resize:vertical;line-height:1.5}
-    .rm-jd-html:focus{border-color:var(--accent);background:var(--surface);outline:none}
-    .rm-jd-preview{border:1px dashed var(--border);border-radius:6px;padding:10px;overflow:auto}
-    .rm-jd-preview-cap{font-size:11px;font-weight:800;color:var(--text-2);text-transform:uppercase;margin-bottom:6px}
-    .rm-jd-preview table{width:100%;border-collapse:collapse;font-size:12px}
-    .rm-jd-preview th,.rm-jd-preview td{border:1px solid var(--border);padding:5px 7px;text-align:left;vertical-align:top}
-    .rm-docs{border:1px solid var(--border);border-radius:8px;background:var(--surface)}
-    .rm-docs>summary{cursor:pointer;padding:12px 14px;font-weight:800;list-style:none}
-    .rm-docs>summary::-webkit-details-marker{display:none}
-    .rm-docs>summary::before{content:'▸ ';color:var(--text-2)}
-    .rm-docs[open]>summary::before{content:'▾ '}
-    .rm-docs-note{padding:0 14px 10px;color:var(--text-2);font-size:12px;line-height:1.5}
-    .rm-docs-list{display:flex;flex-direction:column;border-top:1px solid var(--border)}
-    .rm-doc{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border)}
-    .rm-doc:last-child{border-bottom:none}
-    .rm-doc-main{flex:1 1 auto;min-width:0;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
-    .rm-doc-code{font-weight:800;font-size:11px;color:var(--accent-contrast);background:var(--accent);border-radius:4px;padding:2px 7px;white-space:nowrap}
-    .rm-doc-title{color:var(--text-1);font-size:12.5px}
-    .rm-doc-rel{font-size:11px;font-weight:700;border-radius:5px;padding:3px 8px;white-space:nowrap;border:1px solid var(--border);color:var(--text-2)}
-    .rm-doc-rel--ok{color:var(--success);border-color:var(--success)}
-    .rm-doc-rel--warn{color:var(--warning,var(--accent));border-color:var(--warning,var(--accent))}
-    .rm-doc-open{font-size:12px;font-weight:700;color:var(--accent);text-decoration:none;white-space:nowrap}
-    .rm-doc-open--none{color:var(--text-2)}
-    @media (max-width:1150px){.rm-workbench{grid-template-columns:1fr}.rm-sidebar{position:static;max-height:none}.rm-gate-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.rm-meta-grid{grid-template-columns:1fr}.rm-head{flex-direction:column}.rm-doc{flex-wrap:wrap}}
-  </style>
-  <div class="rm-head">
-    <div>
-      <h2>${_t('Console RACI', 'RACI console')}</h2>
-      <p>${_t('Điểm điều khiển duy nhất cho cả bốn tập RACI trong tài liệu kiểm soát ANNEX-121: ma trận cổng G0→G7, RACI chuỗi giá trị mục 4, RACI tài liệu mục 6 và bảng phụ trợ. Khi lưu, hệ thống kiểm tra bất biến ma trận cổng rồi tái tạo cả bốn vùng trong ANNEX-121 và các bảng RACI nhúng trong SOP/JD.', 'The single control point for all four RACI datasets inside the controlled ANNEX-121 document: the G0→G7 gate matrix, the §4 value-stream RACI, the §6 document-level RACI and the support supplement. On save the gate-matrix invariants are checked and all four ANNEX-121 regions — plus the embedded SOP/JD RACI tables — are regenerated.')}</p>
-    </div>
-    <div class="rm-actions">
-      <button class="rm-btn" type="button" onclick="_rmReload()">${_t('Tải lại', 'Reload')}</button>
-      <button class="rm-btn" type="button" onclick="_rmReset()">${_t('Hoàn tác', 'Reset')}</button>
-      <button class="rm-btn primary" id="rm-save-btn" type="button" ${(_state.saving || badCount > 0) ? 'disabled' : ''} onclick="_rmSave()">${_state.saving ? _t('Đang lưu...', 'Saving...') : _t('Lưu và cập nhật ANNEX-121', 'Save and publish ANNEX-121')}</button>
-    </div>
-  </div>
-  <div class="rm-alert error" id="rm-error-alert" ${_state.error ? '' : 'hidden'}>${_esc(_state.error)}</div>
-  <div class="rm-alert ok" id="rm-message-alert" ${_state.message ? '' : 'hidden'}>${_esc(_state.message)}</div>
-  <div class="rm-alert error" id="rm-invalid-alert" ${badCount > 0 ? '' : 'hidden'}>${_esc(badCount + ' ' + _t('dòng ma trận cổng vi phạm bất biến RACI (cần đúng 1 A và ≥ 1 R).', 'gate-matrix row(s) violate the RACI invariants (need exactly one A and at least one R).'))}</div>
-  ${_renderTabs(cfg)}
-  <div class="rm-meta-grid">
-    <div class="rm-meta"><b>${_t('Cập nhật lần cuối', 'Last updated')}</b><span>${_esc(cfg.updated_at || _t('Chưa có', 'Not yet'))} · ${_esc(cfg.updated_by || '—')}</span></div>
-    <div class="rm-meta"><b>${_t('Lý do gần nhất', 'Last reason')}</b><span>${_esc(cfg.reason || '—')}</span></div>
-    <div class="rm-meta"><b>${_t('Tài liệu đồng bộ', 'Published document')}</b><span>ANNEX-121 §4·§5·§6 + ${_t('bảng phụ trợ', 'support')}</span></div>
-  </div>
-  ${_renderLinkedDocs(cfg)}
-  <div class="rm-field">
-    <label>${_t('Lý do cập nhật', 'Change reason')}</label>
-    <textarea class="rm-reason" oninput="_rmSetReason(this.value)" placeholder="${_t('Ví dụ: chuyển PD thành R cho A5 theo IATF 16949 §8.2.3.1.3...', 'Example: set PD to R on A5 per IATF 16949 §8.2.3.1.3...')}">${_esc(_state.reason || '')}</textarea>
-  </div>
-  ${_state.activeSection === 'gate' ? _renderGateSection(rows, gates)
-    : _state.activeSection === 'jd' ? _renderJdSection()
-    : _renderAuxSection(_state.activeSection)}
-</section>`;
-  _syncStatus();
-}
-
-function _renderTabs(cfg){
-  var defs = [{
-    key: 'gate', vi: 'Ma trận cổng §5', en: 'Gate matrix §5',
-    count: _rows().length
-  }];
-  AUX_KEYS.forEach(function(k){
-    defs.push({ key: k, vi: AUX[k].vi, en: AUX[k].en, count: _auxRows(k).length });
-  });
-  defs.push({ key: 'jd', vi: 'Giao diện JD', en: 'JD interface', count: _jdSlugs().length, unit: 'JD' });
-  var html = '<div class="rm-tabs">';
-  defs.forEach(function(d){
-    var unit = d.unit || _t('dòng', 'rows');
-    html += `
-    <button class="rm-tab ${_state.activeSection === d.key ? 'active' : ''}" type="button" onclick="_rmSetSection('${d.key}')">
-      <b>${_t(d.vi, d.en)}</b><span>${d.count} ${_esc(unit)}</span>
-    </button>`;
-  });
-  return html + '</div>';
-}
-
-function _renderGateSection(rows, gates){
   var visible = rows.map(function(row, idx){ return { row: row, idx: idx }; })
     .filter(function(rec){
       return _state.activeGate === 'all' || String(rec.row.gate || '') === _state.activeGate;
     });
   return `
-  <div class="rm-workbench">
-    ${_renderGateNav(gates, rows)}
-    <div class="rm-editor">
-      ${visible.map(function(rec){ return _renderCard(rec.row, rec.idx); }).join('')}
+  <div class="rc-panel">
+    <div class="rc-panel-head">
+      <b>${_t('Ma trận cổng §5 — G0→G7', 'Gate matrix §5 — G0→G7')}</b>
+      <span>${_t('Sửa phân công A/R/C/I cho từng hoạt động. Mỗi dòng cần đúng 1 chữ A và ít nhất 1 chữ R.', 'Edit the A/R/C/I assignment. Each row needs exactly one A and at least one R.')}</span>
+    </div>
+    <div class="rc-workbench">
+      ${_renderGateNav(gates, rows)}
+      <div class="rc-editor">
+        ${visible.map(function(rec){ return _renderCard(rec.row, rec.idx); }).join('')}
+      </div>
     </div>
   </div>`;
 }
 
 function _renderGateNav(gates, rows){
   var html = `
-<aside class="rm-sidebar">
-  <div class="rm-sidebar-head">
-    <b>${_t('Cổng kiểm soát', 'Control gates')}</b>
-    <span>${_t('Chọn cổng để lọc các hoạt động cần sửa.', 'Pick a gate to filter the activities.')}</span>
-  </div>
-  <div class="rm-gate-list">
-    <button class="rm-gate-btn ${_state.activeGate === 'all' ? 'active' : ''}" type="button" onclick="_rmSetGate('all')">
-      <span>${_t('Tất cả', 'All')}</span><span>${rows.length}</span>
+<aside class="rc-sidebar">
+  <div class="rc-sidebar-head">${_t('Cổng kiểm soát', 'Control gates')}</div>
+  <div class="rc-gate-list">
+    <button class="rc-gate-btn ${_state.activeGate === 'all' ? 'active' : ''}" type="button" onclick="_rmSetGate('all')">
+      <span>${_t('Tất cả', 'All')}</span><b>${rows.length}</b>
     </button>`;
   gates.forEach(function(g){
     var n = rows.filter(function(row){ return String(row.gate || '') === g; }).length;
     html += `
-    <button class="rm-gate-btn ${_state.activeGate === g ? 'active' : ''}" type="button" onclick="_rmSetGate('${_esc(g)}')">
-      <span>${_esc(g)}</span><span>${n}</span>
+    <button class="rc-gate-btn ${_state.activeGate === g ? 'active' : ''}" type="button" onclick="_rmSetGate('${_esc(g)}')">
+      <span>${_esc(g)}</span><b>${n}</b>
     </button>`;
   });
   return html + `
@@ -471,83 +483,83 @@ function _renderCard(row, idx){
       return '<option value="' + L + '"' + (L === cur ? ' selected' : '') + '>' + (L || '—') + '</option>';
     }).join('');
     return `
-    <div class="rm-role">
+    <div class="rc-role">
       <label>${_esc(role)}</label>
       <select data-val="${_esc(cur)}" onchange="_rmSetRole(${idx},'${_esc(role)}',this.value);this.setAttribute('data-val',this.value)">${opts}</select>
     </div>`;
   }).join('');
   return `
 <article class="rm-card${flags.invalid ? ' rm-card--invalid' : ''}" data-rm-idx="${idx}">
-  <div class="rm-card-head">
-    <span class="rm-gate-tag">${_esc(row.gate || '')}</span>
-    <span class="rm-cdr">${_esc(row.cdr || '')}</span>
-    <span class="rm-flag ${flags.invalid ? 'bad' : 'ok'}">${flags.invalid
-      ? _t('⚠ ' + flags.a + ' A · ' + flags.r + ' R', '⚠ ' + flags.a + ' A · ' + flags.r + ' R')
-      : _t('✓ 1 A · ' + flags.r + ' R', '✓ 1 A · ' + flags.r + ' R')}</span>
+  <div class="rc-card-head">
+    <span class="rc-gate-tag">${_esc(row.gate || '')}</span>
+    <span class="rc-cdr">${_esc(row.cdr || '')}</span>
+    <span class="rc-flag ${flags.invalid ? 'bad' : 'ok'}">${flags.invalid
+      ? '⚠ ' + flags.a + ' A · ' + flags.r + ' R'
+      : '✓ 1 A · ' + flags.r + ' R'}</span>
   </div>
-  <div class="rm-activity">${row.activity_html || _esc(row.cdr || '')}</div>
-  <div class="rm-role-grid">${rolesHtml}</div>
+  <div class="rc-activity">${row.activity_html || _esc(row.cdr || '')}</div>
+  <div class="rc-role-grid">${rolesHtml}</div>
 </article>`;
 }
 
-/* ── Auxiliary RACI datasets (§4 / §6 / support) ──────────────────── */
-function _renderAuxSection(key){
-  var def = AUX[key];
-  var rows = _auxRows(key);
+/* ── Cell-table datasets (§4 / §6 / support) ──────────────────────── */
+function _renderAuxSection(ds){
+  var def = AUX[ds.key];
+  var rows = _auxRows(ds.key);
   var head = _lang === 'en' ? def.headEn : def.headVi;
   var cols = head.length;
 
-  var thead = '<tr><th class="rm-rownum">#</th>';
+  var thead = '<tr><th class="rc-rownum">#</th>';
   head.forEach(function(h){ thead += '<th>' + _esc(h) + '</th>'; });
   thead += '</tr>';
 
-  var body = '';
-  rows.forEach(function(row, ri){
+  var bodyRows = rows.map(function(row, ri){
     var cells = Array.isArray(row.cells) ? row.cells : [];
-    body += '<tr><td class="rm-rownum">' + (ri + 1) + '</td>';
+    var tds = '<td class="rc-rownum">' + (ri + 1) + '</td>';
     for(var ci = 0; ci < cols; ci++){
       var val = cells[ci] == null ? '' : String(cells[ci]);
-      body += '<td><textarea class="rm-cell-ta" spellcheck="false"'
-        + ' oninput="_rmSetAuxCell(\'' + key + '\',' + ri + ',' + ci + ',this.value)">'
+      tds += '<td><textarea class="rc-cell-ta" spellcheck="false"'
+        + ' oninput="_rmSetAuxCell(\'' + ds.key + '\',' + ri + ',' + ci + ',this.value)">'
         + _esc(val) + '</textarea></td>';
     }
-    body += '</tr>';
-  });
+    return '<tr>' + tds + '</tr>';
+  }).join('');
   if(!rows.length){
-    body = '<tr><td colspan="' + (cols + 1) + '" style="padding:14px;color:var(--text-2)">'
+    bodyRows = '<tr><td colspan="' + (cols + 1) + '" class="rc-empty">'
       + _t('Chưa có dòng nào.', 'No rows yet.') + '</td></tr>';
   }
 
   return `
-  <div class="rm-aux">
-    <div class="rm-aux-head">
-      <b>${_t(def.vi, def.en)}</b>
-      <span>${_t(def.descVi, def.descEn)}</span>
+  <div class="rc-panel">
+    <div class="rc-panel-head">
+      <b>${_t(ds.vi, ds.en)} — ${_esc(ds.sync)}</b>
+      <span>${_t(ds.descVi, ds.descEn)}</span>
     </div>
-    <div class="rm-aux-scroll">
-      <table class="rm-aux-table">
+    <div class="rc-scroll">
+      <table class="rc-table">
         <thead>${thead}</thead>
-        <tbody>${body}</tbody>
+        <tbody>${bodyRows}</tbody>
       </table>
     </div>
-    <div class="rm-aux-note">${_t('Ô chứa HTML gốc của ANNEX-121 (giữ liên kết vai trò/tài liệu). Khi lưu, mã script và thuộc tính sự kiện bị loại bỏ; số dòng và số cột phải giữ nguyên để cập nhật được chấp nhận.', 'Cells hold the original ANNEX-121 HTML (role/document links preserved). On save, scripts and event attributes are stripped; the row and column count must stay unchanged for the update to be accepted.')}</div>
+    <div class="rc-note">${_t('Ô chứa HTML gốc của ANNEX-121 (giữ liên kết vai trò/tài liệu). Khi lưu, mã script và thuộc tính sự kiện bị loại bỏ; số dòng và số cột phải giữ nguyên.', 'Cells hold the original ANNEX-121 HTML. On save scripts are stripped; row and column counts must stay unchanged.')}</div>
   </div>`;
 }
 
-/* ── JD interface RACI (§6 "Giao diện liên phòng ban") ────────────── */
-function _renderJdSection(){
-  var map = _jdMap();
-  var slugs = _jdSlugs();
+/* ── Document-keyed HTML datasets (JD interface / SOP §4 roles) ───── */
+function _renderDocMapSection(ds){
+  var dm = DOCMAP[ds.key];
+  var map = _docMap(ds.key);
+  var slugs = _docSlugs(ds.key);
   if(!slugs.length){
-    return '<div class="rm-aux"><div class="rm-aux-head"><b>'
-      + _t('Giao diện JD', 'JD interface') + '</b><span>'
-      + _t('Chưa có bản mô tả công việc nào.', 'No job descriptions captured.')
-      + '</span></div></div>';
+    return `<div class="rc-panel"><div class="rc-panel-head"><b>${_t(ds.vi, ds.en)}</b>
+      <span>${_t('Chưa có tài liệu nào.', 'No documents captured.')}</span></div></div>`;
   }
-  if(slugs.indexOf(_state.activeJd) < 0){ _state.activeJd = slugs[0]; }
-  var slug = _state.activeJd;
+  var activeKey = dm.active;
+  if(slugs.indexOf(_state[activeKey]) < 0){ _state[activeKey] = slugs[0]; }
+  var slug = _state[activeKey];
   var entry = map[slug] || { title: slug, html: '' };
   var html = entry.html == null ? '' : String(entry.html);
+  var idx = slugs.indexOf(slug);
 
   var options = slugs.map(function(s){
     var t = (map[s] && map[s].title) ? map[s].title : s;
@@ -555,30 +567,34 @@ function _renderJdSection(){
       + _esc(t) + '  ·  ' + _esc(s) + '</option>';
   }).join('');
 
-  var href = _docHref('docs/system/organization/03-Job-Descriptions/');
+  var prev = slugs[(idx - 1 + slugs.length) % slugs.length];
+  var next = slugs[(idx + 1) % slugs.length];
 
   return `
-  <div class="rm-aux">
-    <div class="rm-aux-head">
-      <b>${_t('Giao diện JD §6 — RACI liên phòng ban', 'JD §6 interface — cross-department RACI')}</b>
-      <span>${_t('Bảng “Giao diện liên phòng ban — RACI / Bàn giao” trong từng bản mô tả công việc. Mỗi bảng là vùng quản lý nhúng trong tài liệu JD; lưu ở đây sẽ tái tạo lại bảng đó.', 'The “Cross-department interface — RACI / handover” table inside each job description. Each table is a managed region embedded in its JD document; saving here regenerates it.')}</span>
+  <div class="rc-panel">
+    <div class="rc-panel-head">
+      <b>${_t(ds.vi, ds.en)} — ${_esc(ds.sync)}</b>
+      <span>${_t(ds.descVi, ds.descEn)}</span>
     </div>
-    <div class="rm-jd-bar">
-      <label>${_t('Bản mô tả công việc', 'Job description')}</label>
-      <select class="rm-jd-select" onchange="_rmSetJd(this.value)">${options}</select>
+    <div class="rc-doc-bar">
+      <label>${_t(dm.labelVi, dm.labelEn)}</label>
+      <select class="rc-doc-select" onchange="_rmSetDocSel('${ds.key}',this.value)">${options}</select>
+      <span class="rc-doc-count">${idx + 1} / ${slugs.length}</span>
+      <button class="rc-btn rc-btn-sm" type="button" onclick="_rmSetDocSel('${ds.key}','${_esc(prev)}')">‹</button>
+      <button class="rc-btn rc-btn-sm" type="button" onclick="_rmSetDocSel('${ds.key}','${_esc(next)}')">›</button>
     </div>
-    <div class="rm-jd-body">
-      <div class="rm-field">
-        <label>${_t('HTML bảng giao diện RACI', 'Interface RACI table HTML')}</label>
-        <textarea class="rm-jd-html" spellcheck="false"
-          oninput="_rmSetJdHtml('${_esc(slug)}',this.value)">${_esc(html)}</textarea>
+    <div class="rc-doc-body">
+      <div class="rc-field">
+        <label>${_t(dm.fieldVi, dm.fieldEn)}</label>
+        <textarea class="rc-doc-html" spellcheck="false"
+          oninput="_rmSetDocHtml('${ds.key}','${_esc(slug)}',this.value)">${_esc(html)}</textarea>
       </div>
-      <div class="rm-jd-preview">
-        <div class="rm-jd-preview-cap">${_t('Xem trước', 'Preview')}</div>
+      <div class="rc-preview">
+        <div class="rc-preview-cap">${_t('Xem trước', 'Preview')}</div>
         ${html}
       </div>
     </div>
-    <div class="rm-aux-note">${_t('Ô chứa HTML gốc của tài liệu JD (giữ nguyên liên kết vai trò/tài liệu tương đối). Khi lưu, mã script và thuộc tính sự kiện bị loại bỏ; bảng được ghi lại đúng vào vùng quản lý của tài liệu JD tương ứng.', 'The field holds the original JD document HTML (relative role/document links preserved). On save, scripts and event attributes are stripped; the table is written back into the matching JD document managed region.')}</div>
+    <div class="rc-note">${_t('Ô chứa HTML gốc của tài liệu (giữ nguyên liên kết tương đối). Khi lưu, mã script bị loại bỏ; bảng được ghi lại đúng vào vùng quản lý của tài liệu tương ứng.', 'The field holds the original document HTML. On save scripts are stripped and the table is written back into the matching managed region.')}</div>
   </div>`;
 }
 
@@ -608,35 +624,180 @@ function _renderLinkedDocs(cfg){
     var meta = _relationMeta(d.relation);
     var href = _docHref(d.url);
     var link = href
-      ? `<a class="rm-doc-open" href="${_esc(href)}" target="_blank" rel="noopener">${_t('Mở', 'Open')} ↗</a>`
-      : `<span class="rm-doc-open rm-doc-open--none">—</span>`;
+      ? `<a class="rc-doc-open" href="${_esc(href)}" target="_blank" rel="noopener">${_t('Mở', 'Open')} ↗</a>`
+      : `<span class="rc-doc-open none">—</span>`;
     return `
-    <div class="rm-doc">
-      <div class="rm-doc-main">
-        <span class="rm-doc-code">${_esc(d.code)}</span>
-        <span class="rm-doc-title">${_esc(d.title)}</span>
+    <div class="rc-link">
+      <div class="rc-link-main">
+        <span class="rc-link-code">${_esc(d.code)}</span>
+        <span class="rc-link-title">${_esc(d.title)}</span>
       </div>
-      <span class="rm-doc-rel rm-doc-rel--${_esc(meta.cls)}">${_esc(_t(meta.vi, meta.en))}</span>
+      <span class="rc-link-rel rel-${_esc(meta.cls)}">${_esc(_t(meta.vi, meta.en))}</span>
       ${link}
     </div>`;
   }).join('');
   return `
-  <details class="rm-docs" open>
+  <details class="rc-links" open>
     <summary>${_t('Tài liệu liên quan trong hệ sinh thái RACI', 'Linked documents in the RACI ecosystem')} (${docs.length})</summary>
-    <div class="rm-docs-note">${_t('Lưu ở Console này tái tạo cả bốn vùng RACI của ANNEX-121; sidebar “Thẩm quyền &amp; RACI” trên mọi SOP/JD đọc ANNEX-121 nên tự phản ánh thay đổi. Tài liệu tóm tắt và anh em được đồng bộ theo cơ chế riêng.', 'Saving here regenerates all four ANNEX-121 RACI regions; the “Authority &amp; RACI” sidebar on every SOP/JD reads ANNEX-121 so it reflects the change live. Summary and sibling documents sync via their own mechanism.')}</div>
-    <div class="rm-docs-list">${rows}</div>
+    <div class="rc-links-note">${_t('Lưu ở Console này tái tạo các vùng RACI của ANNEX-121 và các tài liệu JD / SOP nhúng; sidebar “Thẩm quyền &amp; RACI” trên mọi tài liệu đọc ANNEX-121 nên tự phản ánh thay đổi.', 'Saving here regenerates the ANNEX-121 RACI regions and the embedded JD / SOP documents; the “Authority &amp; RACI” sidebar reads ANNEX-121 so it reflects changes live.')}</div>
+    <div class="rc-links-list">${rows}</div>
   </details>`;
 }
 
+/* ── Styles (Graphics Authority tokens) ───────────────────────────── */
+function _styleBlock(){
+  return `<style>
+  .raci-console{display:flex;flex-direction:column;gap:16px;color:var(--text-1)}
+  .raci-console *{box-sizing:border-box}
+  .rc-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;padding:20px 22px;border:1px solid var(--border);border-radius:12px;background:linear-gradient(180deg,var(--surface),var(--surface-2))}
+  .rc-eyebrow{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+  .rc-head h2{margin:4px 0 0;font-size:24px;line-height:1.15}
+  .rc-head p{margin:8px 0 0;color:var(--text-2);max-width:920px;line-height:1.55;font-size:13px}
+  .rc-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;flex:0 0 auto}
+  .rc-btn{border:1px solid var(--border);background:var(--surface);color:var(--text-1);border-radius:8px;padding:9px 14px;font-weight:700;font-size:13px;cursor:pointer;transition:border-color .12s,background .12s}
+  .rc-btn:hover{border-color:var(--accent)}
+  .rc-btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-contrast)}
+  .rc-btn.primary:hover{filter:brightness(1.06)}
+  .rc-btn:disabled{opacity:.46;cursor:not-allowed}
+  .rc-btn-sm{padding:6px 11px;font-size:15px;line-height:1}
+  .rc-alert{border:1px solid var(--border);border-radius:9px;padding:11px 14px;background:var(--surface);color:var(--text-2);font-size:13px}
+  .rc-alert[hidden]{display:none}
+  .rc-alert.error{border-color:var(--danger);color:var(--danger)}
+  .rc-alert.ok{border-color:var(--success);color:var(--success)}
+  .rc-field label{display:block;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--text-2);margin-bottom:5px}
+  .rc-reason{width:100%;min-height:54px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text-1);padding:10px 12px;font:inherit;font-size:13px;resize:vertical}
+  .rc-reason:focus{border-color:var(--accent);outline:none}
+  /* statbar */
+  .rc-statbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  .rc-stat{border:1px solid var(--border);border-radius:11px;background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:3px}
+  .rc-stat-v{font-size:26px;font-weight:800;color:var(--accent);line-height:1.05}
+  .rc-stat-v.sm{font-size:16px;color:var(--text-1)}
+  .rc-stat-l{font-size:12px;color:var(--text-2);font-weight:600}
+  /* section caption */
+  .rc-section-cap{padding:2px 2px 0}
+  .rc-section-cap b{display:block;font-size:15px}
+  .rc-section-cap span{display:block;margin-top:3px;color:var(--text-2);font-size:12.5px}
+  /* tiles */
+  .rc-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+  .rc-tile{display:flex;flex-direction:column;gap:9px;text-align:left;border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:16px;cursor:pointer;transition:transform .12s,border-color .12s,box-shadow .12s;color:var(--text-1)}
+  .rc-tile:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 6px 20px -12px var(--accent)}
+  .rc-tile-top{display:flex;justify-content:space-between;align-items:flex-start}
+  .rc-badge{display:inline-flex;align-items:center;justify-content:center;min-width:42px;height:30px;padding:0 8px;border-radius:8px;font-weight:800;font-size:13px;background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}
+  .rc-badge--gate{background:var(--accent);color:var(--accent-contrast);border-color:var(--accent)}
+  .rc-badge--aux{color:var(--accent);border-color:var(--accent)}
+  .rc-badge--docmap{color:var(--success);border-color:var(--success)}
+  .rc-tile-count{font-size:23px;font-weight:800;color:var(--text-1);display:flex;align-items:baseline;gap:4px}
+  .rc-tile-count small{font-size:11px;font-weight:700;color:var(--text-2)}
+  .rc-tile-name{font-size:15px;font-weight:800}
+  .rc-tile-desc{font-size:12.5px;color:var(--text-2);line-height:1.5;flex:1 1 auto}
+  .rc-tile-foot{display:flex;justify-content:space-between;align-items:center;padding-top:9px;border-top:1px solid var(--border)}
+  .rc-sync{font-size:11px;font-weight:700;color:var(--text-2)}
+  .rc-tile-go{font-size:12px;font-weight:800;color:var(--accent)}
+  /* nav */
+  .rc-nav{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:8px;border:1px solid var(--border);border-radius:11px;background:var(--surface)}
+  .rc-back{border:1px solid var(--border);background:var(--surface-2);color:var(--text-1);border-radius:8px;padding:8px 13px;font-weight:800;font-size:12.5px;cursor:pointer;white-space:nowrap}
+  .rc-back:hover{border-color:var(--accent)}
+  .rc-pills{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 auto}
+  .rc-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-2);border-radius:999px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer}
+  .rc-pill:hover{border-color:var(--accent)}
+  .rc-pill.active{background:var(--accent);border-color:var(--accent);color:var(--accent-contrast)}
+  .rc-pill-code{font-weight:800;font-size:11px;opacity:.85}
+  /* panel */
+  .rc-panel{border:1px solid var(--border);border-radius:12px;background:var(--surface);overflow:hidden}
+  .rc-panel-head{padding:14px 16px;border-bottom:1px solid var(--border);background:var(--surface-2)}
+  .rc-panel-head b{display:block;font-size:14.5px}
+  .rc-panel-head span{display:block;margin-top:3px;color:var(--text-2);font-size:12.5px;line-height:1.5}
+  .rc-note{padding:10px 16px;color:var(--text-2);font-size:11.5px;line-height:1.55;border-top:1px solid var(--border);background:var(--surface-2)}
+  .rc-empty{padding:18px;color:var(--text-2);text-align:center}
+  /* gate workbench */
+  .rc-workbench{display:grid;grid-template-columns:210px minmax(0,1fr);gap:14px;padding:14px}
+  .rc-sidebar{position:sticky;top:12px;border:1px solid var(--border);border-radius:10px;background:var(--surface-2);padding:11px;max-height:calc(100vh - 130px);overflow:auto}
+  .rc-sidebar-head{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--text-2);padding-bottom:9px;border-bottom:1px solid var(--border);margin-bottom:9px}
+  .rc-gate-list{display:flex;flex-direction:column;gap:6px}
+  .rc-gate-btn{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;text-align:left;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-1);padding:9px 11px;cursor:pointer;font-weight:700;font-size:13px}
+  .rc-gate-btn b{color:var(--accent);font-size:12px}
+  .rc-gate-btn.active{border-color:var(--accent);background:var(--surface-2)}
+  .rc-editor{display:flex;flex-direction:column;gap:11px;min-width:0}
+  .rm-card{border:1px solid var(--border);border-radius:10px;background:var(--surface-2);padding:13px;display:flex;flex-direction:column;gap:10px}
+  .rm-card--invalid{border-color:var(--danger);box-shadow:inset 3px 0 0 var(--danger)}
+  .rc-card-head{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+  .rc-gate-tag{font-weight:800;font-size:11px;color:var(--accent-contrast);background:var(--accent);border-radius:5px;padding:3px 8px}
+  .rc-cdr{font-weight:800;color:var(--accent)}
+  .rc-flag{font-size:11px;font-weight:800;margin-left:auto}
+  .rc-flag.bad{color:var(--danger)}
+  .rc-flag.ok{color:var(--success)}
+  .rc-activity{color:var(--text-1);font-size:13px;line-height:1.5}
+  .rc-activity a{color:var(--accent)}
+  .rc-role-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:7px}
+  .rc-role{display:flex;flex-direction:column;gap:3px;border:1px solid var(--border);border-radius:7px;background:var(--surface);padding:6px 7px}
+  .rc-role label{font-size:11px;font-weight:800;color:var(--text-2)}
+  .rc-role select{border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text-1);font:inherit;font-weight:800;padding:4px}
+  .rc-role select[data-val="A"]{background:var(--accent);color:var(--accent-contrast);border-color:var(--accent)}
+  .rc-role select[data-val="R"]{border-color:var(--accent);color:var(--accent)}
+  .rc-role select[data-val="C"]{border-color:var(--warning,var(--accent))}
+  .rc-role select[data-val="I"]{border-color:var(--success,var(--accent))}
+  /* cell table */
+  .rc-scroll{overflow:auto}
+  table.rc-table{width:100%;border-collapse:collapse;font-size:12.5px}
+  table.rc-table th{background:var(--surface-2);color:var(--text-2);text-transform:uppercase;font-size:11px;letter-spacing:.03em;text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);position:sticky;top:0}
+  table.rc-table td{vertical-align:top;padding:6px 8px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+  table.rc-table td:last-child{border-right:none}
+  table.rc-table tr:last-child td{border-bottom:none}
+  .rc-rownum{color:var(--text-2);font-weight:800;text-align:right;width:36px}
+  .rc-cell-ta{width:100%;min-width:120px;min-height:46px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text-1);font:inherit;font-size:12px;padding:5px 7px;resize:vertical;line-height:1.45}
+  .rc-cell-ta:focus{border-color:var(--accent);outline:none}
+  /* doc map */
+  .rc-doc-bar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)}
+  .rc-doc-bar label{font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text-2)}
+  .rc-doc-select{flex:1 1 300px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text-1);font:inherit;font-weight:700;font-size:13px;padding:8px 10px}
+  .rc-doc-count{font-size:12px;font-weight:800;color:var(--text-2)}
+  .rc-doc-body{padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+  .rc-doc-html{width:100%;min-height:240px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text-1);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;padding:10px 11px;resize:vertical;line-height:1.55}
+  .rc-doc-html:focus{border-color:var(--accent);outline:none}
+  .rc-preview{border:1px dashed var(--border);border-radius:8px;padding:12px;overflow:auto;background:var(--surface-2)}
+  .rc-preview-cap{font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text-2);margin-bottom:8px}
+  .rc-preview table{width:100%;border-collapse:collapse;font-size:12px}
+  .rc-preview th,.rc-preview td{border:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top}
+  .rc-preview a{color:var(--accent)}
+  /* linked docs */
+  .rc-links{border:1px solid var(--border);border-radius:12px;background:var(--surface)}
+  .rc-links>summary{cursor:pointer;padding:14px 16px;font-weight:800;font-size:14px;list-style:none}
+  .rc-links>summary::-webkit-details-marker{display:none}
+  .rc-links>summary::before{content:'▸ ';color:var(--text-2)}
+  .rc-links[open]>summary::before{content:'▾ '}
+  .rc-links-note{padding:0 16px 10px;color:var(--text-2);font-size:12px;line-height:1.55}
+  .rc-links-list{display:flex;flex-direction:column;border-top:1px solid var(--border)}
+  .rc-link{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)}
+  .rc-link:last-child{border-bottom:none}
+  .rc-link-main{flex:1 1 auto;min-width:0;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+  .rc-link-code{font-weight:800;font-size:11px;color:var(--accent-contrast);background:var(--accent);border-radius:5px;padding:3px 8px;white-space:nowrap}
+  .rc-link-title{color:var(--text-1);font-size:12.5px}
+  .rc-link-rel{font-size:11px;font-weight:700;border-radius:6px;padding:3px 9px;white-space:nowrap;border:1px solid var(--border);color:var(--text-2)}
+  .rc-link-rel.rel-ok{color:var(--success);border-color:var(--success)}
+  .rc-link-rel.rel-warn{color:var(--warning,var(--accent));border-color:var(--warning,var(--accent))}
+  .rc-doc-open{font-size:12px;font-weight:700;color:var(--accent);text-decoration:none;white-space:nowrap}
+  .rc-doc-open.none{color:var(--text-2)}
+  @media (max-width:1080px){
+    .rc-head{flex-direction:column}
+    .rc-statbar{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .rc-workbench{grid-template-columns:1fr}
+    .rc-sidebar{position:static;max-height:none}
+    .rc-gate-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+    .rc-link{flex-wrap:wrap}
+  }
+  </style>`;
+}
+
+/* ── Globals ──────────────────────────────────────────────────────── */
 window._rmReload = _load;
 window._rmReset = _resetDraft;
 window._rmSave = _save;
+window._rmGo = _go;
 window._rmSetRole = _setRole;
 window._rmSetAuxCell = _setAuxCell;
+window._rmSetDocSel = _setDocSel;
+window._rmSetDocHtml = _setDocHtml;
 window._rmSetReason = _setReason;
 window._rmSetGate = _setGate;
-window._rmSetSection = _setSection;
-window._rmSetJd = _setJd;
-window._rmSetJdHtml = _setJdHtml;
 
 })();

@@ -80,20 +80,26 @@ final class RaciMatrixService
         }
 
         // JD interface RACI — per-JD authored "Giao diện liên phòng ban"
-        // table, keyed by document slug.
-        $jdSrc = is_array($runtime['jd_interface'] ?? null) ? $runtime['jd_interface']
-               : (is_array($boot['jd_interface'] ?? null) ? $boot['jd_interface'] : []);
-        $config['jd_interface'] = $this->normaliseJdInterface($jdSrc);
+        // table, keyed by document slug. SOP role RACI — per-SOP §4
+        // "Vai trò, quyền hạn & RACI" content, keyed by document slug.
+        foreach (['jd_interface', 'sop_roles'] as $key) {
+            $src = is_array($runtime[$key] ?? null) ? $runtime[$key]
+                 : (is_array($boot[$key] ?? null) ? $boot[$key] : []);
+            $config[$key] = $this->normaliseDocHtmlMap($src);
+        }
 
         $config['linked_documents'] = $this->linkedDocuments();
         return $config;
     }
 
     /**
+     * Normalise a document-keyed {slug: {title, html}} map (JD interface
+     * tables, SOP §4 role tables).
+     *
      * @param array<string, mixed> $src
      * @return array<string, array{title: string, html: string}>
      */
-    private function normaliseJdInterface(array $src): array
+    private function normaliseDocHtmlMap(array $src): array
     {
         $out = [];
         foreach ($src as $slug => $entry) {
@@ -166,18 +172,21 @@ final class RaciMatrixService
             }
         }
 
-        // JD interface RACI — accept edited entries for slugs that already
-        // exist in the store; unknown slugs are ignored so a stray payload
-        // cannot register a document the publisher would not recognise.
-        if (is_array($incoming['jd_interface'] ?? null)) {
-            $stored  = is_array($config['jd_interface'] ?? null) ? $config['jd_interface'] : [];
-            $cleaned = $this->normaliseJdInterface($incoming['jd_interface']);
+        // JD interface RACI + SOP role RACI — accept edited entries for
+        // slugs that already exist in the store; unknown slugs are ignored
+        // so a stray payload cannot register an unrecognised document.
+        foreach (['jd_interface', 'sop_roles'] as $key) {
+            if (!is_array($incoming[$key] ?? null)) {
+                continue;
+            }
+            $stored  = is_array($config[$key] ?? null) ? $config[$key] : [];
+            $cleaned = $this->normaliseDocHtmlMap($incoming[$key]);
             foreach ($cleaned as $slug => $entry) {
                 if (isset($stored[$slug])) {
                     $stored[$slug] = $entry;
                 }
             }
-            $config['jd_interface'] = $stored;
+            $config[$key] = $stored;
         }
 
         $this->validate($config);
@@ -347,30 +356,50 @@ final class RaciMatrixService
     private function publishManagedDoc(string $path, array $config): ?array
     {
         $html = @file_get_contents($path);
-        if ($html === false || !str_contains($html, '<!-- RACI-MATRIX:START')) {
+        if ($html === false) {
             return null;
         }
-        $p = $this->markerParams($html);
-        // JD interface region — emit the per-JD authored table verbatim.
-        // SOP regions (and any JD without a captured entry) keep the
-        // gate-matrix projection.
-        $jdStore = is_array($config['jd_interface'] ?? null) ? $config['jd_interface'] : [];
-        if ($p['kind'] === 'jd' && $p['jd'] !== '' && isset($jdStore[$p['jd']]['html'])) {
-            $block = (string)$jdStore[$p['jd']]['html'];
-        } else {
-            $block = $this->buildRegionTable($p['kind'], $p['key'], $config['rows']);
-        }
-        $updated = $this->replaceManagedRegion($html, $block);
-        if ($updated === null || $updated === $html) {
+        $hasMatrix = str_contains($html, '<!-- RACI-MATRIX:START');
+        $hasRoles  = str_contains($html, '<!-- RACI-ROLES:START');
+        if (!$hasMatrix && !$hasRoles) {
             return null;
         }
-        $rev = $this->bumpRevision($updated);
+        $original = $html;
+
+        // RACI-MATRIX region — JD interface table (verbatim) or SOP gate
+        // projection. Exactly one per managed document.
+        if ($hasMatrix) {
+            $p = $this->markerParams($html);
+            $jdStore = is_array($config['jd_interface'] ?? null) ? $config['jd_interface'] : [];
+            if ($p['kind'] === 'jd' && $p['jd'] !== '' && isset($jdStore[$p['jd']]['html'])) {
+                $block = (string)$jdStore[$p['jd']]['html'];
+            } else {
+                $block = $this->buildRegionTable($p['kind'], $p['key'], $config['rows']);
+            }
+            $r = $this->replaceManagedRegion($html, $block);
+            if ($r !== null) { $html = $r; }
+        }
+
+        // RACI-ROLES region — SOP §4 "Vai trò, quyền hạn & RACI" content,
+        // emitted verbatim from the sop_roles store.
+        if ($hasRoles) {
+            $slug = $this->rolesMarkerSlug($html);
+            $roleStore = is_array($config['sop_roles'] ?? null) ? $config['sop_roles'] : [];
+            if ($slug !== '' && isset($roleStore[$slug]['html'])) {
+                $r = $this->replaceRolesRegion($html, (string)$roleStore[$slug]['html']);
+                if ($r !== null) { $html = $r; }
+            }
+        }
+
+        if ($html === $original) {
+            return null;
+        }
+        $rev = $this->bumpRevision($html);
         if (@file_put_contents($path, $rev['html'], LOCK_EX) === false) {
             throw new RuntimeException('raci_matrix_managed_doc_not_writable:' . basename($path));
         }
         $rel = ltrim(str_replace($this->rootDir, '', $path), '/');
-        $code = $p['key'] !== '' ? strtoupper($p['key']) : strtoupper(basename($path, '.html'));
-        return ['doc_code' => $code, 'path' => $rel,
+        return ['doc_code' => strtoupper(basename($path, '.html')), 'path' => $rel,
                 'previous_revision' => $rev['previous_revision'],
                 'new_revision' => $rev['new_revision'], 'changed' => 'yes'];
     }
@@ -525,6 +554,30 @@ final class RaciMatrixService
             $count
         );
         return ($count === 1 && $next !== null) ? $next : null;
+    }
+
+    /** Replaces a RACI-ROLES region while preserving the START marker params. */
+    private function replaceRolesRegion(string $html, string $block): ?string
+    {
+        $pattern = '/(<!-- RACI-ROLES:START\b[^>]*-->).*?(<!-- RACI-ROLES:END -->)/s';
+        $next = preg_replace_callback(
+            $pattern,
+            static fn(array $m): string => $m[1] . "\n" . $block . "\n" . $m[2],
+            $html,
+            1,
+            $count
+        );
+        return ($count === 1 && $next !== null) ? $next : null;
+    }
+
+    /** Reads the sop=<slug> attribute from the first RACI-ROLES marker. */
+    private function rolesMarkerSlug(string $html): string
+    {
+        if (preg_match('/<!-- RACI-ROLES:START\s+([^>]*?)-->/', $html, $m)
+            && preg_match('/sop=(\S+)/', $m[1], $s)) {
+            return $s[1];
+        }
+        return '';
     }
 
     /** @return array{kind: string, key: string, jd: string} */
