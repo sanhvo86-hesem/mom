@@ -10,6 +10,7 @@ use MOM\Api\Services\DecisionThresholdService;
 use MOM\Api\Services\GraphicsGovernanceException;
 use MOM\Api\Services\GraphicsGovernanceService;
 use MOM\Api\Services\LocalRuntimeSyncService;
+use MOM\Api\Services\RaciMatrixService;
 use MOM\Api\Services\VersionControlService;
 use Throwable;
 
@@ -28,6 +29,8 @@ class AdminController extends BaseController
 
     private ?DecisionThresholdService $decisionThresholdService = null;
 
+    private ?RaciMatrixService $raciMatrixService = null;
+
     private ?LocalRuntimeSyncService $localRuntimeSyncService = null;
 
     private function graphicsGovernance(): GraphicsGovernanceService
@@ -44,6 +47,14 @@ class AdminController extends BaseController
             $this->decisionThresholdService = new DecisionThresholdService($this->rootDir, $this->dataDir);
         }
         return $this->decisionThresholdService;
+    }
+
+    private function raciMatrix(): RaciMatrixService
+    {
+        if ($this->raciMatrixService === null) {
+            $this->raciMatrixService = new RaciMatrixService($this->rootDir, $this->dataDir);
+        }
+        return $this->raciMatrixService;
     }
 
     private function localRuntimeSync(): LocalRuntimeSyncService
@@ -1085,6 +1096,96 @@ class AdminController extends BaseController
         } catch (Throwable $e) {
             $this->auditLog('admin_decision_thresholds_mirror_failed', [
                 'file' => 'decision_thresholds.json',
+                'error' => $e->getMessage(),
+            ], (string)($user['username'] ?? 'admin'));
+
+            return [
+                'status' => 'failed',
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * GET admin_raci_matrix_get — Load the editable RACI gate matrix.
+     *
+     * @return never
+     */
+    public function raciMatrixGet(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, array_values(array_unique(array_merge(admin_roles(), ['ceo', 'general_director']))));
+
+        try {
+            $this->success(['config' => $this->raciMatrix()->load()]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('raci_matrix_get_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST admin_raci_matrix_save — Save the RACI matrix and regenerate the
+     * §5 gate-matrix region inside the controlled ANNEX-121 document.
+     *
+     * @return never
+     */
+    public function raciMatrixSave(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAnyRole($user, array_values(array_unique(array_merge(admin_roles(), ['ceo', 'general_director']))));
+
+        $body = $this->jsonBody();
+        $config = $body['config'] ?? null;
+        if (!is_array($config) || !is_array($config['rows'] ?? null)) {
+            $this->error('invalid_config', 400, 'RACI matrix config must be an object with a rows array.');
+        }
+
+        try {
+            $result = $this->raciMatrix()->save(
+                $config,
+                $user,
+                trim((string)($body['reason'] ?? ''))
+            );
+            $mirrorSync = $this->syncRaciMatrixMirror($user);
+            $result['mirror_sync'] = $mirrorSync;
+            $this->auditLog('admin_raci_matrix_save', [
+                'row_count' => count($config['rows']),
+                'mirror_sync_status' => (string)($mirrorSync['status'] ?? 'unknown'),
+            ], (string)($user['username'] ?? 'admin'));
+            $this->success($result);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $msg = $e->getMessage();
+            if (str_starts_with($msg, 'raci_matrix_invalid_accountable')
+                || str_starts_with($msg, 'raci_matrix_missing_responsible')
+                || $msg === 'raci_matrix_empty') {
+                $this->error('raci_matrix_invalid', 422, 'Vi phạm bất biến RACI (1 chữ A và ít nhất 1 chữ R mỗi dòng): ' . $msg);
+            }
+            $this->error('raci_matrix_save_failed', 500, $msg);
+        }
+    }
+
+    /**
+     * Keep the VPS data-private mirror current after the RACI matrix editor
+     * republishes runtime-owned data.
+     */
+    private function syncRaciMatrixMirror(array $user): array
+    {
+        try {
+            $actor = (string)($user['username'] ?? 'admin');
+            $result = $this->dataSyncMutator()->resolveMirrorDrift(
+                'raci_matrix.json',
+                'site_to_mirror',
+                $actor,
+                'admin_raci_matrix_save'
+            );
+
+            return array_merge(['status' => 'synced'], $result);
+        } catch (Throwable $e) {
+            $this->auditLog('admin_raci_matrix_mirror_failed', [
+                'file' => 'raci_matrix.json',
                 'error' => $e->getMessage(),
             ], (string)($user['username'] ?? 'admin'));
 
