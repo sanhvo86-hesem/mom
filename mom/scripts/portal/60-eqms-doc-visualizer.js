@@ -1,6 +1,6 @@
 /**
  * Sơ đồ Tổng quan Tài liệu Vận hành — HESEM EQMS
- * HESEM MOM Portal · 50-eqms-doc-visualizer.js
+ * HESEM MOM Portal · 60-eqms-doc-visualizer.js
  *
  * Module ID : doc-overview
  * Archetype : analytical-list
@@ -9,9 +9,12 @@
  * Views: mindmap (ECharts tree) | fishbone (SVG Ishikawa) |
  *        flow (ECharts graph)   | matrix (HTML table)
  *
- * All colors flow from GraphicsAuthority — no hex literals in logic paths.
- * var(--css-token, #fallback) used only in SVG attribute strings where
- * CSS-variable resolution requires a fallback for unconfigured themes.
+ * All data is LIVE from the portal DOCS array (scan_folders API).
+ * Doc codes follow {CAT}-{NNN} convention; hundreds digit = process group.
+ * All navigation uses openDoc(code) or navigateTo('documents', cat).
+ *
+ * All colors from GraphicsAuthority — no hex literals in logic paths.
+ * var(--css-var, #fallback) used only in SVG attribute strings.
  */
 (function () {
   'use strict';
@@ -23,245 +26,166 @@
   function tok(key, fb) {
     return (window.GraphicsAuthority && window.GraphicsAuthority.tokens.read(key, fb)) || fb;
   }
-  /* CSS-var reference safe for use in SVG attribute strings */
   function cv(varName, fb) { return 'var(--' + varName + ',' + fb + ')'; }
 
-  /* ── Palette: one token per group (9 distinct, from authority) ─────────── */
+  /* ── Palette: one token per group ─────────────────────────────────────── */
   var PALETTE_KEYS = [
-    { key: 'brand.primary',         fb: '#1565c0' }, // 100 SYS
-    { key: 'statusColors.success',  fb: '#16a34a' }, // 200 COM
-    { key: 'statusColors.purple',   fb: '#7c3aed' }, // 300 ENG
-    { key: 'statusColors.warning',  fb: '#d97706' }, // 400 SUP
-    { key: 'brand.light',           fb: '#1e88e5' }, // 500 PRD
-    { key: 'statusColors.error',    fb: '#dc2626' }, // 600 QC
-    { key: 'statusColors.cyan',     fb: '#0891b2' }, // 700 LOG
-    { key: 'brand.dark',            fb: '#0c2d48' }, // 800 HR
-    { key: 'brand.accent',          fb: '#f9a825' }  // 900 IMP
+    { key: 'brand.primary',        fb: '#1565c0' }, // 100 SYS
+    { key: 'statusColors.success', fb: '#16a34a' }, // 200 COM
+    { key: 'statusColors.purple',  fb: '#7c3aed' }, // 300 ENG
+    { key: 'statusColors.warning', fb: '#d97706' }, // 400 SUP
+    { key: 'brand.light',          fb: '#1e88e5' }, // 500 PRD
+    { key: 'statusColors.error',   fb: '#dc2626' }, // 600 QC
+    { key: 'statusColors.cyan',    fb: '#0891b2' }, // 700 LOG
+    { key: 'brand.dark',           fb: '#0c2d48' }, // 800 HR
+    { key: 'brand.accent',         fb: '#f9a825' }  // 900 IMP
   ];
   function palette(i) { var p = PALETTE_KEYS[i]; return tok(p.key, p.fb); }
 
-  /* ── Document base ────────────────────────────────────────────────────── */
-  var BASE = '/docs';
-
   /* =========================================================================
-   * PROCESS GROUP REGISTRY
-   * Each group = one 100-series number, 4 doc types, list of key SOPs
+   * PROCESS GROUP REGISTRY — structural config only.
+   * All counts and document lists are derived live from DOCS at render time.
    * ======================================================================= */
   var GROUPS = [
-    {
-      id: 100, abbr: 'SYS',
-      label: { vi: 'Hệ thống & Quản trị',      en: 'System & Governance' },
-      fish:  { vi: 'Hệ thống quản trị',         en: 'Governance' },
-      sop: 8, wi: 7, annex: 22, frm: 20,
-      sopPath:   BASE + '/operations/sops/01-SOP-100/',
-      wiPath:    BASE + '/operations/work-instructions/01-WI-100/',
-      annexPath: BASE + '/operations/references/01-ANNEX-100/',
-      frmPath:   BASE + '/forms/frm-100-sales/',
-      sops: [
-        { n: 101, vi: 'Kiểm soát tài liệu & dữ liệu',        en: 'Document & Data Control',           f: 'sop-101-document-and-data-control.html' },
-        { n: 102, vi: 'Chính sách & bối cảnh tổ chức',        en: 'Quality Policy & Context',          f: 'sop-102-quality-policy-objectives-and-organizational-context.html' },
-        { n: 103, vi: 'Rủi ro, FMEA & kế hoạch kiểm soát',   en: 'Risk, FMEA & Control Plan',         f: 'sop-103-risk-opportunity-fmea-and-control-plan.html' },
-        { n: 104, vi: 'Quản trị dữ liệu & bảo mật IP',       en: 'Data Governance & IP Security',     f: 'sop-104-data-governance-records-security-and-ip-protection.html' },
-        { n: 105, vi: 'Quản lý tri thức tổ chức',             en: 'Organizational Knowledge',          f: 'sop-105-organizational-knowledge-management.html' },
-        { n: 106, vi: 'Quản lý thay đổi & cấu hình',         en: 'Change & Configuration Mgmt',       f: 'sop-106-change-and-configuration-management.html' },
-        { n: 107, vi: 'Quản lý truyền thông nội bộ',          en: 'Communication Management',          f: 'sop-107-communication-management.html' },
-        { n: 108, vi: 'Kế hoạch dự phòng vận hành',           en: 'Operational Contingency Plan',      f: 'sop-108-operational-contingency-plan.html' }
-      ]
-    },
-    {
-      id: 200, abbr: 'COM',
-      label: { vi: 'Thương mại & Khách hàng',   en: 'Commercial & Customer' },
-      fish:  { vi: 'Thương mại / Khách hàng',   en: 'Commercial' },
-      sop: 3, wi: 7, annex: 0, frm: 14,
-      sopPath:   BASE + '/operations/sops/02-SOP-200/',
-      wiPath:    BASE + '/operations/work-instructions/02-WI-200/',
-      annexPath: null,
-      frmPath:   BASE + '/forms/frm-200-purchase/',
-      sops: [
-        { n: 201, vi: 'Thực hiện đơn hàng (RFQ → Thu tiền)',  en: 'Order Fulfillment: RFQ to Cash',    f: 'sop-201-order-fulfillment-rfq-to-cash.html' },
-        { n: 202, vi: 'Khiếu nại KH, phản hồi & RMA',        en: 'Customer Complaint, Feedback & RMA',f: 'sop-202-customer-complaint-feedback-rma-and-escape.html' },
-        { n: 203, vi: 'Kiểm soát tài sản khách hàng',         en: 'Customer Property Control',         f: 'sop-203-customer-property-control.html' }
-      ]
-    },
-    {
-      id: 300, abbr: 'ENG',
-      label: { vi: 'Kỹ thuật & FAI',            en: 'Engineering & FAI' },
-      fish:  { vi: 'Kỹ thuật / FAI',            en: 'Engineering' },
-      sop: 3, wi: 2, annex: 2, frm: 8,
-      sopPath:   BASE + '/operations/sops/03-SOP-300/',
-      wiPath:    BASE + '/operations/work-instructions/03-WI-300/',
-      annexPath: BASE + '/operations/references/03-ANNEX-300/',
-      frmPath:   BASE + '/forms/frm-300-technical/',
-      sops: [
-        { n: 301, vi: 'Kỹ thuật, DFM, báo giá & lập kế hoạch', en: 'Engineering, DFM, Quoting & Planning', f: 'sop-301-engineering-dfm-quoting-and-machining-planning.html' },
-        { n: 302, vi: 'Kiểm tra lần đầu (FAI)',                 en: 'First Article Inspection',            f: 'sop-302-first-article-inspection-fai.html' },
-        { n: 303, vi: 'Phát hành kỹ thuật & baseline package',  en: 'Engineering Release & Baseline',      f: 'sop-303-engineering-release-baseline-package-and-job-snapshot-control.html' }
-      ]
-    },
-    {
-      id: 400, abbr: 'SUP',
-      label: { vi: 'Nhà cung cấp & Mua hàng',   en: 'Supplier & Procurement' },
-      fish:  { vi: 'Nhà cung cấp',              en: 'Supplier' },
-      sop: 2, wi: 0, annex: 3, frm: 11,
-      sopPath:   BASE + '/operations/sops/04-SOP-400/',
-      wiPath:    null,
-      annexPath: BASE + '/operations/references/04-ANNEX-400/',
-      frmPath:   BASE + '/forms/frm-400-quality/',
-      sops: [
-        { n: 401, vi: 'Kiểm soát NCC & gia công đặc biệt',   en: 'Supplier Control & Special Process',   f: 'sop-401-supplier-control-and-special-process.html' },
-        { n: 402, vi: 'Xác minh vật liệu & ngăn hàng giả',   en: 'Material Verification & Counterfeit',  f: 'sop-402-material-verification-traceability-and-counterfeit-prevention.html' }
-      ]
-    },
-    {
-      id: 500, abbr: 'PRD',
-      label: { vi: 'Sản xuất CNC',              en: 'CNC Production' },
-      fish:  { vi: 'Sản xuất CNC',              en: 'Production' },
-      sop: 5, wi: 11, annex: 7, frm: 15,
-      sopPath:   BASE + '/operations/sops/05-SOP-500/',
-      wiPath:    BASE + '/operations/work-instructions/05-WI-500/',
-      annexPath: BASE + '/operations/references/05-ANNEX-500/',
-      frmPath:   BASE + '/forms/frm-500-production/',
-      sops: [
-        { n: 501, vi: 'Lập kế hoạch, lịch & điều phối SX',   en: 'Production Planning, Scheduling & Dispatch', f: 'sop-501-production-planning-scheduling-and-dispatch-control.html' },
-        { n: 502, vi: 'Vận hành gia công CNC',                en: 'CNC Machining Operations',                   f: 'sop-502-cnc-machining-operations.html' },
-        { n: 503, vi: 'Bảo trì dụng cụ, PM & ứng phó sự cố', en: 'Tooling Maintenance, PM & Breakdown',        f: 'sop-503-tooling-maintenance-pm-and-breakdown-response.html' },
-        { n: 504, vi: 'Phát hành chương trình, setup & first-piece', en: 'Program Release, Setup & First Piece',f: 'sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html' },
-        { n: 505, vi: 'Hoàn thiện, tua ba & gia công phụ',    en: 'Finishing, Deburr & Secondary Ops',          f: 'sop-505-finishing-deburr-and-secondary-operations-control.html' }
-      ]
-    },
-    {
-      id: 600, abbr: 'QC',
-      label: { vi: 'Kiểm tra & Chất lượng',     en: 'Inspection & Quality' },
-      fish:  { vi: 'Đo lường / Kiểm tra',       en: 'Measurement' },
-      sop: 6, wi: 6, annex: 8, frm: 14,
-      sopPath:   BASE + '/operations/sops/06-SOP-600/',
-      wiPath:    BASE + '/operations/work-instructions/06-WI-600/',
-      annexPath: BASE + '/operations/references/06-ANNEX-600/',
-      frmPath:   BASE + '/forms/frm-600-inspection/',
-      sops: [
-        { n: 601, vi: 'Hiệu chuẩn & kiểm soát dụng cụ đo',   en: 'Calibration & Gage Control',         f: 'sop-601-calibration-and-gage-control.html' },
-        { n: 602, vi: 'Phân tích hệ thống đo lường MSA/GR&R', en: 'Measurement System Analysis',        f: 'sop-602-measurement-system-analysis-msagr-r.html' },
-        { n: 603, vi: 'Lấy mẫu kiểm tra theo AQL',            en: 'AQL Sampling Inspection',            f: 'sop-603-aql-sampling-inspection.html' },
-        { n: 604, vi: 'SPC & kiểm soát năng lực quá trình',   en: 'SPC & Process Capability',           f: 'sop-604-spc-and-capability-control.html' },
-        { n: 605, vi: 'Kiểm tra cuối, CoC & xuất hàng',       en: 'Final Inspection, CoC & Shipment',   f: 'sop-605-final-inspection-coc-and-shipment-release.html' },
-        { n: 606, vi: 'NCR, CAPA & phản ứng IPQC',            en: 'NCR, CAPA & IPQC Reaction',          f: 'sop-606-ncr-capa-and-ipqc-reaction.html' }
-      ]
-    },
-    {
-      id: 700, abbr: 'LOG',
-      label: { vi: 'Đóng gói & Logistics',      en: 'Packaging & Logistics' },
-      fish:  { vi: 'Môi trường / Logistics',    en: 'Environment' },
-      sop: 3, wi: 2, annex: 3, frm: 15,
-      sopPath:   BASE + '/operations/sops/07-SOP-700/',
-      wiPath:    BASE + '/operations/work-instructions/07-WI-700/',
-      annexPath: BASE + '/operations/references/07-ANNEX-700/',
-      frmPath:   BASE + '/forms/frm-700-maintenance/',
-      sops: [
-        { n: 701, vi: 'Nhận hàng, đóng gói & lưu kho',       en: 'Receiving, Packaging & Storage',     f: 'sop-701-receiving-packaging-handling-and-storage.html' },
-        { n: 702, vi: 'Kiểm soát ô nhiễm & vệ sinh',          en: 'Contamination Control & Cleanliness',f: 'sop-702-contamination-control-and-cleanliness.html' },
-        { n: 703, vi: 'An toàn sản phẩm & phòng ngừa FOD',   en: 'Product Safety & FOD Prevention',    f: 'sop-703-product-safety-conformity-and-fod-prevention.html' }
-      ]
-    },
-    {
-      id: 800, abbr: 'HR',
-      label: { vi: 'Nhân sự, EHS & Tài chính', en: 'HR, EHS & Finance' },
-      fish:  { vi: 'Con người & EHS',           en: 'People' },
-      sop: 4, wi: 0, annex: 3, frm: 12,
-      sopPath:   BASE + '/operations/sops/08-SOP-800/',
-      wiPath:    null,
-      annexPath: BASE + '/operations/references/08-ANNEX-800/',
-      frmPath:   BASE + '/forms/frm-800-hr/',
-      sops: [
-        { n: 801, vi: 'Đào tạo, năng lực & chứng nhận',       en: 'Competence, Training & Certification',f: 'sop-801-competence-training-and-certification.html' },
-        { n: 802, vi: 'Sự cố, gần tai nạn & EHS',             en: 'Incident, Near-Miss & EHS',           f: 'sop-802-incident-near-miss-and-ehs.html' },
-        { n: 803, vi: 'Lập hóa đơn, chi phí công việc & AP/AR',en: 'Invoicing, Job Costing & AR/AP',     f: 'sop-803-invoicing-job-costing-and-arap.html' },
-        { n: 804, vi: 'Yếu tố con người & chống lỗi',         en: 'Human Factors & Error-Proofing',     f: 'sop-804-human-factors-and-error-proofing.html' }
-      ]
-    },
-    {
-      id: 900, abbr: 'IMP',
-      label: { vi: 'Cải tiến & Đánh giá',      en: 'Improvement & Audit' },
-      fish:  { vi: 'Cải tiến liên tục',         en: 'Improvement' },
-      sop: 3, wi: 0, annex: 0, frm: 3,
-      sopPath:   BASE + '/operations/sops/09-SOP-900/',
-      wiPath:    null,
-      annexPath: null,
-      frmPath:   BASE + '/forms/frm-900-admin/',
-      sops: [
-        { n: 901, vi: 'Đánh giá nội bộ & LPA',               en: 'Internal Audit & LPA',               f: 'sop-901-internal-audit-and-lpa.html' },
-        { n: 902, vi: 'Xem xét của lãnh đạo',                 en: 'Management Review',                  f: 'sop-902-management-review.html' },
-        { n: 903, vi: 'Cải tiến liên tục & Kaizen',           en: 'Continual Improvement & Kaizen',     f: 'sop-903-continual-improvement-and-kaizen.html' }
-      ]
-    }
+    { id: 100, abbr: 'SYS', label: { vi: 'Hệ thống & Quản trị',    en: 'System & Governance'  }, fish: { vi: 'Hệ thống quản trị',        en: 'Governance'     } },
+    { id: 200, abbr: 'COM', label: { vi: 'Thương mại & Khách hàng', en: 'Commercial & Customer'}, fish: { vi: 'Thương mại / Khách hàng',   en: 'Commercial'     } },
+    { id: 300, abbr: 'ENG', label: { vi: 'Kỹ thuật & FAI',          en: 'Engineering & FAI'    }, fish: { vi: 'Kỹ thuật / FAI',            en: 'Engineering'    } },
+    { id: 400, abbr: 'SUP', label: { vi: 'Nhà cung cấp & Mua hàng', en: 'Supplier & Purchasing'}, fish: { vi: 'Nhà cung cấp',              en: 'Suppliers'      } },
+    { id: 500, abbr: 'PRD', label: { vi: 'Sản xuất CNC',            en: 'CNC Production'       }, fish: { vi: 'Sản xuất CNC',              en: 'Production'     } },
+    { id: 600, abbr: 'QC',  label: { vi: 'Kiểm tra & Chất lượng',   en: 'Inspection & Quality' }, fish: { vi: 'Đo lường / Kiểm tra',       en: 'Measurement'    } },
+    { id: 700, abbr: 'LOG', label: { vi: 'Đóng gói & Logistics',    en: 'Packaging & Logistics'}, fish: { vi: 'Môi trường / Logistics',     en: 'Environment'    } },
+    { id: 800, abbr: 'HR',  label: { vi: 'Con người & EHS',         en: 'People & EHS'         }, fish: { vi: 'Con người & EHS',           en: 'People'         } },
+    { id: 900, abbr: 'IMP', label: { vi: 'Cải tiến liên tục',       en: 'Continuous Improvement'}, fish: { vi: 'Cải tiến liên tục',        en: 'Improvement'    } }
   ];
 
-  /* ── Derived counts ────────────────────────────────────────────────────── */
-  function totalDocs(g) { return g.sop + g.wi + g.annex + g.frm; }
+  var DOC_CATS = ['SOP', 'WI', 'ANNEX', 'FRM'];
+
+  /* =========================================================================
+   * LIVE DATA HELPERS
+   * All queries against window.DOCS populated by api.php?action=scan_folders
+   * ======================================================================= */
+
+  /* Return the live DOCS array, or [] if not yet available */
+  function liveDocs() {
+    return (typeof DOCS !== 'undefined' && Array.isArray(DOCS)) ? DOCS : [];
+  }
+
+  /* True when docs have finished loading from the server */
+  function isDocsReady() {
+    return typeof DOCS_LOADED !== 'undefined' && !!DOCS_LOADED;
+  }
+
+  /*
+   * Derive process group from a doc code.
+   * Code format: {CAT}-{NNN}[...] where the 1-3 digit number after the dash
+   * determines the group: floor(N / 100) * 100.
+   * Examples: SOP-101 → 100, WI-452 → 400, FRM-100-003 → 100
+   */
+  function groupIdFromCode(code) {
+    var m = String(code || '').match(/\d+/);
+    if (!m) return null;
+    var n = parseInt(m[0], 10);
+    return Math.floor(n / 100) * 100;
+  }
+
+  /* All docs in a process group for a specific category */
+  function getGroupDocs(groupId, cat) {
+    return liveDocs().filter(function (d) {
+      if (!d || d.cat !== cat) return false;
+      return groupIdFromCode(d.code) === groupId;
+    });
+  }
+
+  /* Count helper per group × category */
+  function groupCatCount(g, cat) { return getGroupDocs(g.id, cat).length; }
+
+  /* Total docs (all types) for a group */
+  function totalGroupDocs(g) {
+    return DOC_CATS.reduce(function (sum, cat) { return sum + groupCatCount(g, cat); }, 0);
+  }
+
+  /* Grand total across all groups and categories */
   function grandTotal() {
-    return GROUPS.reduce(function(s, g) { return s + totalDocs(g); }, 0);
-  }
-  function shortLbl(vi) {
-    // Abbreviate long Vietnamese labels for fishbone tips
-    return vi.replace('& Quản trị', '').replace('& Khách hàng', '').replace('& Tài chính', '').replace('& Đánh giá', '').trim();
+    return liveDocs().filter(function (d) {
+      return d && DOC_CATS.indexOf(d.cat) >= 0;
+    }).length;
   }
 
-  /* =========================================================================
-   * STATE
-   * ======================================================================= */
-  var state = {
-    view:          'mindmap',
-    selectedGroup: null,
-    charts:        {}
-  };
+  /* Display title for a doc (uses portal helper if available) */
+  function docTitle(d) {
+    if (typeof getDocDisplayTitle === 'function') return getDocDisplayTitle(d);
+    return String(d.standard_title || d.__displayTitle || d.title || d.code || '');
+  }
+
+  /* Safe navigation to a document — uses portal openDoc if available */
+  function openDocSafe(code) {
+    if (typeof openDoc === 'function') {
+      openDoc(code);
+    } else {
+      var d = liveDocs().find(function (x) { return x && x.code === code; });
+      if (d && d.path) window.open(d.path, '_blank');
+    }
+  }
+
+  /* Navigate to a document category listing */
+  function navToCat(cat) {
+    if (typeof navigateTo === 'function') navigateTo('documents', cat);
+  }
+
+  /* ── State ────────────────────────────────────────────────────────────── */
+  var state = { view: 'mindmap', selectedGroup: null, charts: {} };
   var _root = null;
+  var _retryTimer = null;
 
   /* =========================================================================
-   * CSS INJECTION  (single block, idempotent)
+   * CSS INJECTION (idempotent)
    * ======================================================================= */
-  (function injectCSS() {
+  (function injectStyles() {
     if (document.getElementById('dov-styles')) return;
     var s = document.createElement('style');
     s.id = 'dov-styles';
     s.textContent = [
-      '.dov-wrap{display:flex;flex-direction:column;height:100%;min-height:500px;background:var(--bg-page,#f8fafc);font-family:inherit}',
-      '.dov-header{padding:20px 24px 12px;border-bottom:1px solid var(--border,#e2e8f0);background:var(--bg-surface,#fff)}',
-      '.dov-title{margin:0 0 4px;font-size:18px;font-weight:700;color:var(--text-primary,#1e293b)}',
-      '.dov-subtitle{margin:0;font-size:13px;color:var(--text-secondary,#64748b)}',
+      '.dov-wrap{display:flex;flex-direction:column;min-height:0}',
+      '.dov-header{padding:20px 24px 0}',
+      '.dov-title{font-size:20px;font-weight:700;color:var(--text-primary,#1e293b);margin:0 0 4px}',
+      '.dov-subtitle{font-size:13px;color:var(--text-secondary,#64748b);margin:0 0 8px}',
+      '.dov-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:48px 24px;color:var(--text-secondary,#64748b);font-size:14px}',
+      '.dov-spinner{width:28px;height:28px;border:3px solid var(--border,#e2e8f0);border-top-color:var(--brand-primary,#1565c0);border-radius:50%;animation:dov-spin 0.8s linear infinite}',
+      '@keyframes dov-spin{to{transform:rotate(360deg)}}',
       '.dov-tabs{display:flex;gap:4px;padding:12px 24px 0;background:var(--bg-surface,#fff);border-bottom:1px solid var(--border,#e2e8f0);overflow-x:auto}',
       '.dov-tab{display:flex;align-items:center;gap:6px;padding:8px 16px;border:none;border-bottom:2px solid transparent;background:none;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-secondary,#64748b);white-space:nowrap;transition:color 0.15s,border-color 0.15s}',
       '.dov-tab:hover{color:var(--brand-primary,#1565c0)}',
       '.dov-tab--active{color:var(--brand-primary,#1565c0);border-bottom-color:var(--brand-primary,#1565c0)}',
       '.dov-tab-icon{font-size:16px;line-height:1}',
-      '.dov-canvas{flex:1;overflow:auto;padding:20px 24px}',
-
-      /* mindmap */
-      '.dov-chart-box{width:100%;border-radius:8px;background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);overflow:hidden}',
-      '.dov-chart-legend{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;border-top:1px solid var(--border,#e2e8f0)}',
+      '.dov-canvas{padding:20px 24px;overflow:auto}',
+      '.dov-chart-box{height:560px;position:relative}',
+      '.dov-chart-legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:12px;padding:10px 0}',
       '.dov-legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-secondary,#64748b)}',
-      '.dov-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}',
-
-      /* fishbone */
-      '.dov-fishbone-wrap{display:flex;flex-direction:column;gap:16px}',
-      '.dov-fishbone-svg{width:100%;height:auto;border-radius:8px;background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0)}',
-      '.dov-bone{cursor:pointer;transition:opacity 0.15s}',
-      '.dov-bone-lbl{cursor:pointer}',
-      '.dov-bone-lbl:hover rect{opacity:0.85}',
-      '.dov-bone-detail{border-radius:8px;background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);padding:16px;min-height:80px}',
+      '.dov-legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}',
+      '.dov-fishbone-wrap{overflow:auto}',
+      '.dov-fishbone-svg{width:100%;max-width:1000px;min-width:640px;height:auto;display:block}',
+      '.dov-bone{stroke-linecap:round}',
+      '.dov-bone-lbl{outline:none}',
+      '.dov-bone-lbl:focus rect,.dov-bone-lbl:hover rect{filter:brightness(1.06)}',
+      '.dov-bone-detail{margin-top:16px;padding:16px;background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;min-height:80px}',
       '.dov-detail-hint{color:var(--text-tertiary,#94a3b8);font-size:13px;text-align:center;padding:20px 0}',
       '.dov-detail-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}',
       '.dov-detail-badge{padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;color:#fff}',
       '.dov-detail-name{font-size:15px;font-weight:700;color:var(--text-primary,#1e293b)}',
       '.dov-detail-counts{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}',
-      '.dov-count-chip{padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;background:var(--bg-surface-alt,#f1f5f9);color:var(--text-secondary,#64748b)}',
-      '.dov-sop-list{display:flex;flex-direction:column;gap:4px}',
-      '.dov-sop-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;text-decoration:none;color:var(--text-primary,#1e293b);font-size:13px;border:1px solid var(--border,#e2e8f0);background:var(--bg-surface,#fff);transition:background 0.12s}',
-      '.dov-sop-item:hover{background:var(--bg-hover,#f8fafc);border-color:var(--brand-primary,#1565c0)}',
-      '.dov-sop-code{font-family:monospace;font-size:11px;font-weight:700;color:var(--text-secondary,#64748b);min-width:44px}',
+      '.dov-count-chip{padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;background:var(--bg-surface-alt,#f1f5f9);color:var(--text-secondary,#64748b);cursor:pointer;border:1px solid transparent;transition:border-color 0.12s}',
+      '.dov-count-chip:hover{border-color:var(--brand-primary,#1565c0);color:var(--brand-primary,#1565c0)}',
+      '.dov-doc-list{display:flex;flex-direction:column;gap:4px;max-height:320px;overflow-y:auto}',
+      '.dov-doc-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;color:var(--text-primary,#1e293b);font-size:13px;border:1px solid var(--border,#e2e8f0);background:var(--bg-surface,#fff);cursor:pointer;transition:background 0.12s}',
+      '.dov-doc-item:hover{background:var(--bg-hover,#f8fafc);border-color:var(--brand-primary,#1565c0)}',
+      '.dov-doc-code{font-family:monospace;font-size:11px;font-weight:700;color:var(--text-secondary,#64748b);min-width:56px;flex-shrink:0}',
+      '.dov-doc-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.dov-cat-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}',
+      '.dov-cat-btn{padding:4px 10px;border-radius:6px;border:1px solid var(--border,#e2e8f0);background:var(--bg-surface-alt,#f1f5f9);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.12s}',
+      '.dov-cat-btn--active,.dov-cat-btn:hover{background:var(--brand-primary,#1565c0);color:#fff;border-color:var(--brand-primary,#1565c0)}',
       '.dov-sop-links{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}',
-      '.dov-sop-link-btn{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:500;text-decoration:none;border:1px solid var(--border,#e2e8f0);color:var(--text-secondary,#64748b);background:var(--bg-surface,#fff);cursor:pointer;transition:border-color 0.12s,color 0.12s}',
+      '.dov-sop-link-btn{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:500;border:1px solid var(--border,#e2e8f0);color:var(--text-secondary,#64748b);background:var(--bg-surface,#fff);cursor:pointer;transition:border-color 0.12s,color 0.12s}',
       '.dov-sop-link-btn:hover{border-color:var(--brand-primary,#1565c0);color:var(--brand-primary,#1565c0)}',
-
-      /* matrix */
       '.dov-matrix-wrap{overflow-x:auto}',
       '.dov-matrix-table{width:100%;border-collapse:collapse;font-size:13px;background:var(--bg-surface,#fff);border-radius:8px;overflow:hidden;border:1px solid var(--border,#e2e8f0)}',
       '.dov-matrix-table th{padding:10px 14px;background:var(--bg-surface-alt,#f1f5f9);font-weight:600;color:var(--text-secondary,#64748b);text-align:left;white-space:nowrap;border-bottom:1px solid var(--border,#e2e8f0)}',
@@ -270,13 +194,11 @@
       '.dov-matrix-table tr:hover td{background:var(--bg-hover,#f8fafc)}',
       '.dov-mat-group{display:flex;align-items:center;gap:8px}',
       '.dov-mat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}',
-      '.dov-mat-cell-link{display:inline-flex;align-items:center;justify-content:center;min-width:32px;padding:3px 8px;border-radius:5px;font-weight:700;text-decoration:none;font-size:13px;transition:opacity 0.12s}',
-      '.dov-mat-cell-link:hover{opacity:0.8}',
+      '.dov-mat-cell{display:inline-flex;align-items:center;justify-content:center;min-width:32px;padding:3px 8px;border-radius:5px;font-weight:700;font-size:13px;cursor:pointer;transition:opacity 0.12s}',
+      '.dov-mat-cell:hover{opacity:0.75}',
       '.dov-mat-cell-zero{color:var(--text-tertiary,#94a3b8);font-size:13px}',
       '.dov-mat-total{font-weight:700;color:var(--text-primary,#1e293b)}',
       '.dov-mat-footer td{background:var(--bg-surface-alt,#f1f5f9);font-weight:700;border-top:2px solid var(--border,#e2e8f0)}',
-
-      /* flow desc */
       '.dov-flow-info{margin-top:12px;font-size:12px;color:var(--text-secondary,#64748b);text-align:center}'
     ].join('\n');
     document.head.appendChild(s);
@@ -284,12 +206,27 @@
 
   /* =========================================================================
    * RENDER ENTRY
+   * Waits for DOCS to be ready; shows loading spinner if not.
    * ======================================================================= */
-  function render(container, context) {
+  function render(container) {
     _root = container;
-    _root.innerHTML = buildShell();
-    bindTabEvents(_root);
-    renderView(_root);
+    if (_retryTimer) { clearInterval(_retryTimer); _retryTimer = null; }
+
+    if (!isDocsReady()) {
+      container.innerHTML =
+        '<div class="dov-loading">' +
+        '<div class="dov-spinner"></div>' +
+        '<span>' + esc(T({ vi: 'Đang tải danh mục tài liệu…', en: 'Loading document catalog…' })) + '</span>' +
+        '</div>';
+      _retryTimer = setInterval(function () {
+        if (isDocsReady() && _root) { clearInterval(_retryTimer); _retryTimer = null; render(_root); }
+      }, 600);
+      return;
+    }
+
+    container.innerHTML = buildShell();
+    bindTabEvents(container);
+    renderView(container);
   }
 
   function buildShell() {
@@ -304,17 +241,17 @@
     html += '</div>';
 
     var tabs = [
-      { id: 'mindmap',  icon: '🗺',  label: { vi: 'Sơ đồ cây',      en: 'Mind Map' } },
-      { id: 'fishbone', icon: '🐟', label: { vi: 'Xương cá',        en: 'Fishbone' } },
-      { id: 'flow',     icon: '⬡',  label: { vi: 'Luồng quy trình', en: 'Process Flow' } },
-      { id: 'matrix',   icon: '📊', label: { vi: 'Ma trận',         en: 'Matrix' } }
+      { id: 'mindmap',  icon: '🗺',  label: { vi: 'Sơ đồ cây',      en: 'Mind Map'      } },
+      { id: 'fishbone', icon: '🐟', label: { vi: 'Xương cá',        en: 'Fishbone'      } },
+      { id: 'flow',     icon: '⬡',  label: { vi: 'Luồng quy trình', en: 'Process Flow'  } },
+      { id: 'matrix',   icon: '📊', label: { vi: 'Ma trận',         en: 'Matrix'        } }
     ];
     html += '<div class="dov-tabs" role="tablist">';
     tabs.forEach(function (tab) {
       var active = state.view === tab.id ? ' dov-tab--active' : '';
-      html += '<button class="dov-tab' + active + '" data-dov-tab="' + tab.id + '" role="tab">';
-      html += '<span class="dov-tab-icon">' + tab.icon + '</span>';
-      html += '<span>' + esc(T(tab.label)) + '</span></button>';
+      html += '<button class="dov-tab' + active + '" data-dov-tab="' + tab.id + '" role="tab">' +
+              '<span class="dov-tab-icon">' + tab.icon + '</span>' +
+              '<span>' + esc(T(tab.label)) + '</span></button>';
     });
     html += '</div>';
     html += '<div class="dov-canvas" id="dov-canvas"></div></div>';
@@ -328,12 +265,8 @@
         if (v === state.view) return;
         state.view = v;
         state.selectedGroup = null;
-        // Destroy old ECharts instances
-        Object.keys(state.charts).forEach(function (k) {
-          try { state.charts[k].dispose(); } catch (e) {}
-        });
+        Object.keys(state.charts).forEach(function (k) { try { state.charts[k].dispose(); } catch (e) {} });
         state.charts = {};
-        // Re-render tabs active state
         root.querySelectorAll('[data-dov-tab]').forEach(function (b) {
           b.classList.toggle('dov-tab--active', b.getAttribute('data-dov-tab') === v);
         });
@@ -353,15 +286,15 @@
   }
 
   function destroy() {
-    Object.keys(state.charts).forEach(function (k) {
-      try { state.charts[k].dispose(); } catch (e) {}
-    });
+    if (_retryTimer) { clearInterval(_retryTimer); _retryTimer = null; }
+    Object.keys(state.charts).forEach(function (k) { try { state.charts[k].dispose(); } catch (e) {} });
     state.charts = {};
     _root = null;
   }
 
   /* =========================================================================
-   * VIEW 1 — MINDMAP  (ECharts tree, radial)
+   * VIEW 1 — MINDMAP (ECharts tree, radial)
+   * Leaf nodes → navigateTo('documents', cat) — no hardcoded paths
    * ======================================================================= */
   function renderMindmap(canvas) {
     if (!window.echarts) {
@@ -369,38 +302,33 @@
       return;
     }
 
-    /* Build tree data */
-    function docTypeNode(label, count, path) {
-      return {
-        name: label + ' (' + count + ')',
-        value: count,
-        itemStyle: { opacity: path ? 1 : 0.4 },
-        url: path || null
-      };
-    }
-
     var treeData = {
       name: 'HESEM QMS',
       children: GROUPS.map(function (g, i) {
         var col = palette(i);
-        var children = [];
-        if (g.sop > 0)   children.push(docTypeNode('SOP',   g.sop,   g.sopPath));
-        if (g.wi > 0)    children.push(docTypeNode('WI',    g.wi,    g.wiPath));
-        if (g.annex > 0) children.push(docTypeNode('ANNEX', g.annex, g.annexPath));
-        if (g.frm > 0)   children.push(docTypeNode('FRM',   g.frm,   g.frmPath));
+        var children = DOC_CATS.map(function (cat) {
+          var cnt = groupCatCount(g, cat);
+          if (cnt === 0) return null;
+          return {
+            name: cat + ' (' + cnt + ')',
+            value: cnt,
+            cat: cat,
+            itemStyle: { color: col, opacity: 0.7 },
+            label: { color: col }
+          };
+        }).filter(Boolean);
+
         return {
           name: g.abbr + '-' + g.id + '\n' + T(g.label),
-          value: totalDocs(g),
+          value: totalGroupDocs(g),
+          gi: i,
           itemStyle: { color: col, borderColor: col },
-          label:     { color: col, fontWeight: '600' },
-          children:  children.map(function (c) {
-            return Object.assign({ itemStyle: { color: col, opacity: 0.7 }, label: { color: col } }, c);
-          })
+          label: { color: col, fontWeight: '600' },
+          children: children
         };
       })
     };
 
-    /* Container */
     var box = document.createElement('div');
     box.className = 'dov-chart-box';
     box.style.height = '560px';
@@ -409,7 +337,7 @@
     var chart = window.echarts.init(box, null, { renderer: 'svg' });
     state.charts['mindmap'] = chart;
 
-    var textCol = tok('colorsLight.textPrimary', '#1e293b');
+    var textCol   = tok('colorsLight.textPrimary', '#1e293b');
     var borderCol = tok('colorsLight.border', '#e2e8f0');
 
     chart.setOption({
@@ -418,8 +346,7 @@
         trigger: 'item',
         formatter: function (p) {
           if (!p.data) return '';
-          var n = p.data.name || '';
-          return '<div style="font-size:12px">' + esc(n.replace('\n', ' — ')) + '</div>';
+          return '<div style="font-size:12px">' + esc(String(p.data.name || '').replace('\n', ' — ')) + '</div>';
         }
       },
       series: [{
@@ -439,24 +366,17 @@
           color: textCol,
           formatter: function (p) { return (p.data.name || '').split('\n')[0]; }
         },
-        leaves: {
-          label: {
-            position: 'right',
-            verticalAlign: 'middle',
-            fontSize: 11
-          }
-        },
+        leaves: { label: { position: 'right', verticalAlign: 'middle', fontSize: 11 } },
         lineStyle: { color: borderCol, width: 1.5 }
       }]
     });
 
-    /* Click → open doc folder in new tab */
+    /* Click leaf (SOP/WI/ANNEX/FRM) → navigate to that category */
     chart.on('click', function (p) {
-      var url = p.data && p.data.url;
-      if (url) window.open(url, '_blank');
+      var cat = p.data && p.data.cat;
+      if (cat) navToCat(cat);
     });
 
-    /* Legend */
     var legend = document.createElement('div');
     legend.className = 'dov-chart-legend';
     GROUPS.forEach(function (g, i) {
@@ -467,92 +387,72 @@
     });
     canvas.appendChild(legend);
 
-    /* Note */
     var note = document.createElement('p');
     note.className = 'dov-flow-info';
-    note.textContent = T({ vi: 'Nhấn vào nút để mở rộng/thu gọn · Nhấn nhãn loại tài liệu (SOP/WI/ANNEX/FRM) để mở thư mục', en: 'Click node to expand/collapse · Click doc-type label (SOP/WI/ANNEX/FRM) to open folder' });
+    note.textContent = T({
+      vi: 'Nhấn vào nút để mở rộng/thu gọn · Nhấn loại tài liệu (SOP/WI…) để xem danh sách',
+      en: 'Click node to expand/collapse · Click doc type (SOP/WI…) to browse that category'
+    });
     canvas.appendChild(note);
 
-    /* Responsive resize */
     var ro = new ResizeObserver(function () { chart.resize(); });
     ro.observe(box);
   }
 
   /* =========================================================================
-   * VIEW 2 — FISHBONE SVG  (Ishikawa)
-   * Top spine: SYS(100) ENG(300) PRD(500) LOG(700) IMP(900)
-   * Bot spine: COM(200) SUP(400) QC(600)  HR(800)
+   * VIEW 2 — FISHBONE SVG (Ishikawa)
+   * Top: SYS(100) ENG(300) PRD(500) LOG(700) IMP(900)
+   * Bot: COM(200) SUP(400) QC(600)  HR(800)
+   * Bone click → detail panel with live doc list from DOCS
    * ======================================================================= */
   function renderFishbone(canvas) {
     var W = 1000, H = 490;
     var spineY = 245;
     var tipTopY = 80,  tipBotY = 410;
+    var topIdx = [0, 2, 4, 6, 8]; /* GROUPS indices top */
+    var botIdx = [1, 3, 5, 7];    /* GROUPS indices bottom */
+    var topSX  = [160, 295, 430, 565, 700];
+    var topTX  = [100, 235, 370, 505, 640];
+    var botSX  = [228, 363, 498, 633];
+    var botTX  = [168, 303, 438, 573];
 
-    /* index into GROUPS: top=0,2,4,6,8 / bot=1,3,5,7 */
-    var topIdx = [0, 2, 4, 6, 8];
-    var botIdx = [1, 3, 5, 7];
-
-    /* spine-attach X for top bones */
-    var topSX = [160, 295, 430, 565, 700];
-    /* label tip X for top bones (shifted left) */
-    var topTX = [100, 235, 370, 505, 640];
-
-    /* spine-attach X for bottom bones */
-    var botSX = [228, 363, 498, 633];
-    /* label tip X for bottom bones */
-    var botTX = [168, 303, 438, 573];
-
-    /* ── SVG build ────────────────────────────────────────────────────── */
     var s = '';
     s += '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" class="dov-fishbone-svg">';
 
-    /* Defs: arrowhead */
     var brandPri = cv('brand-primary', '#1565c0');
-    s += '<defs>';
-    s += '<marker id="dovArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">';
-    s += '<path d="M0,0 L10,5 L0,10 Z" fill="' + brandPri + '"/>';
-    s += '</marker>';
-    /* Sub-bone tick marker */
-    s += '</defs>';
+    s += '<defs><marker id="dovArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">';
+    s += '<path d="M0,0 L10,5 L0,10 Z" fill="' + brandPri + '"/></marker></defs>';
 
     /* Spine */
     s += '<line x1="75" y1="' + spineY + '" x2="835" y2="' + spineY + '" stroke="' + brandPri + '" stroke-width="3.5" stroke-linecap="round" marker-end="url(#dovArr)"/>';
 
     /* Head box */
-    var hbg  = cv('brand-primary', '#1565c0');
-    var htxt = cv('text-inverse', '#fff');
-    s += '<rect x="838" y="' + (spineY - 44) + '" width="152" height="88" rx="9" fill="' + hbg + '"/>';
-    s += '<text x="914" y="' + (spineY - 20) + '" text-anchor="middle" font-size="12" font-weight="700" fill="' + htxt + '" font-family="inherit">Sản phẩm CNC</text>';
-    s += '<text x="914" y="' + (spineY - 4) + '"  text-anchor="middle" font-size="12" font-weight="600" fill="' + htxt + '" font-family="inherit">chất lượng cao</text>';
+    s += '<rect x="838" y="' + (spineY - 44) + '" width="152" height="88" rx="9" fill="' + cv('brand-primary', '#1565c0') + '"/>';
+    s += '<text x="914" y="' + (spineY - 20) + '" text-anchor="middle" font-size="12" font-weight="700" fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">Sản phẩm CNC</text>';
+    s += '<text x="914" y="' + (spineY - 4) + '" text-anchor="middle" font-size="12" font-weight="600" fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">chất lượng cao</text>';
     s += '<text x="914" y="' + (spineY + 14) + '" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.82)" font-family="inherit">giao đúng hạn</text>';
 
-    /* ── Draw bones ─────────────────────────────────────────────────── */
     function drawBone(gi, sx, tx, ty, isTop) {
       var g   = GROUPS[gi];
       var col = palette(gi);
+      var sopCount = groupCatCount(g, 'SOP');
       var lbx = tx - 52, lby = isTop ? ty - 58 : ty;
       var lbh = 58, lbw = 104;
 
-      /* main bone line */
       s += '<line x1="' + tx + '" y1="' + ty + '" x2="' + sx + '" y2="' + spineY +
            '" stroke="' + col + '" stroke-width="2.5" class="dov-bone" data-gi="' + gi + '"/>';
 
-      /* sub-bones: short horizontal ticks for each SOP along the bone */
-      var n = Math.min(g.sop, 6);
+      /* sub-bones: one tick per SOP (up to 6) */
+      var n = Math.min(sopCount, 6);
       for (var j = 0; j < n; j++) {
         var t = 0.22 + j * (0.65 / Math.max(n - 1, 1));
         var bx = tx + t * (sx - tx);
         var by = ty + t * (spineY - ty);
-        var tickLen = 34;
-        /* sub-bones point rightward (toward head) */
-        var tx2 = bx + tickLen, ty2 = by + (isTop ? 4 : -4);
+        var tx2 = bx + 34, ty2 = by + (isTop ? 4 : -4);
         s += '<line x1="' + bx + '" y1="' + by + '" x2="' + tx2 + '" y2="' + ty2 +
              '" stroke="' + col + '" stroke-width="1.5" opacity="0.6"/>';
-        /* SOP number label */
-        var lblX = bx - 5;
-        var lblY = isTop ? by - 5 : by + 13;
-        s += '<text x="' + lblX + '" y="' + lblY + '" font-size="9.5" fill="' + col +
-             '" text-anchor="end" font-family="monospace" font-weight="600" opacity="0.8">SOP-' +
+        s += '<text x="' + (bx - 5) + '" y="' + (isTop ? by - 5 : by + 13) +
+             '" font-size="9.5" fill="' + col + '" text-anchor="end" font-family="monospace" font-weight="600" opacity="0.8">SOP-' +
              (g.id + j + 1) + '</text>';
       }
 
@@ -560,50 +460,49 @@
       s += '<circle cx="' + sx + '" cy="' + spineY + '" r="5.5" fill="' + col + '"/>';
 
       /* label box (clickable) */
+      var totalCnt = totalGroupDocs(g);
       s += '<g class="dov-bone-lbl" data-gi="' + gi + '" style="cursor:pointer" role="button" tabindex="0" aria-label="' + esc(T(g.label)) + '">';
       s += '<rect x="' + lbx + '" y="' + lby + '" width="' + lbw + '" height="' + lbh +
            '" rx="7" fill="' + col + '" fill-opacity="0.13" stroke="' + col + '" stroke-width="1.5"/>';
-      /* abbr */
       var labY1 = isTop ? lby + 17 : lby + 16;
       s += '<text x="' + tx + '" y="' + labY1 + '" text-anchor="middle" font-size="12" font-weight="800" fill="' + col + '" font-family="inherit">' + esc(g.abbr) + '</text>';
-      /* fish label */
-      var labY2 = labY1 + 14;
-      s += '<text x="' + tx + '" y="' + labY2 + '" text-anchor="middle" font-size="10.5" font-weight="600" fill="' + col + '" font-family="inherit">' + esc(shortLbl(T(g.fish))) + '</text>';
-      /* sop count */
-      var labY3 = labY2 + 13;
-      s += '<text x="' + tx + '" y="' + labY3 + '" text-anchor="middle" font-size="10" fill="' + col + '" font-family="inherit" opacity="0.8">' + g.sop + ' SOP · ' + totalDocs(g) + ' TL</text>';
+      s += '<text x="' + tx + '" y="' + (labY1 + 14) + '" text-anchor="middle" font-size="10.5" font-weight="600" fill="' + col + '" font-family="inherit">' + esc(shortLbl(T(g.fish))) + '</text>';
+      s += '<text x="' + tx + '" y="' + (labY1 + 27) + '" text-anchor="middle" font-size="10" fill="' + col + '" font-family="inherit" opacity="0.8">' + sopCount + ' SOP · ' + totalCnt + ' TL</text>';
       s += '</g>';
     }
 
     topIdx.forEach(function (gi, i) { drawBone(gi, topSX[i], topTX[i], tipTopY, true); });
     botIdx.forEach(function (gi, i) { drawBone(gi, botSX[i], botTX[i], tipBotY, false); });
 
-    /* Spine label */
     s += '<text x="78" y="' + (spineY - 10) + '" font-size="11" fill="' + brandPri + '" font-weight="600" font-family="inherit">Quy trình vận hành HESEM</text>';
-
     s += '</svg>';
 
-    /* Detail panel */
     s += '<div class="dov-bone-detail" id="dov-bd">' +
          '<p class="dov-detail-hint">' +
-         esc(T({ vi: 'Nhấn vào nhóm quy trình để xem danh sách SOP', en: 'Click a process group to view SOPs' })) +
+         esc(T({ vi: 'Nhấn vào nhóm quy trình để xem danh sách tài liệu', en: 'Click a process group to view documents' })) +
          '</p></div>';
 
     canvas.innerHTML = '<div class="dov-fishbone-wrap">' + s + '</div>';
 
-    /* Bind click events */
+    /* Bind bone click events */
     canvas.querySelectorAll('[data-gi]').forEach(function (el) {
-      el.addEventListener('click', function () {
-        showBoneDetail(parseInt(el.getAttribute('data-gi')), canvas);
-      });
+      el.addEventListener('click', function () { showGroupDetail(parseInt(el.getAttribute('data-gi')), canvas); });
       el.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') showBoneDetail(parseInt(el.getAttribute('data-gi')), canvas);
+        if (e.key === 'Enter' || e.key === ' ') showGroupDetail(parseInt(el.getAttribute('data-gi')), canvas);
       });
     });
   }
 
-  function showBoneDetail(gi, canvas) {
+  /* ── Group detail panel (used by fishbone; shared state for selected cat) ─ */
+  var _detailCat = 'SOP';
+
+  function showGroupDetail(gi, canvas) {
     state.selectedGroup = gi;
+    _detailCat = 'SOP';
+    renderDetailPanel(gi, canvas);
+  }
+
+  function renderDetailPanel(gi, canvas) {
     var g   = GROUPS[gi];
     var col = palette(gi);
     var bd  = canvas.querySelector('#dov-bd');
@@ -614,50 +513,76 @@
     html += '<span class="dov-detail-name">' + esc(T(g.label)) + '</span>';
     html += '</div>';
 
-    /* Count chips */
-    html += '<div class="dov-detail-counts">';
-    var types = [
-      { label: 'SOP',   count: g.sop,   path: g.sopPath },
-      { label: 'WI',    count: g.wi,    path: g.wiPath },
-      { label: 'ANNEX', count: g.annex, path: g.annexPath },
-      { label: 'FRM',   count: g.frm,   path: g.frmPath }
-    ];
-    types.forEach(function (t) {
-      if (t.count > 0) {
-        var href = t.path ? ' onclick="window.open(\'' + t.path + '\',\'_blank\')" style="cursor:pointer"' : '';
-        html += '<span class="dov-count-chip"' + href + '>' + t.label + ' ×' + t.count + '</span>';
-      }
+    /* Category tabs with live counts */
+    html += '<div class="dov-cat-tabs">';
+    DOC_CATS.forEach(function (cat) {
+      var cnt = groupCatCount(g, cat);
+      if (cnt === 0) return;
+      var active = cat === _detailCat ? ' dov-cat-btn--active' : '';
+      html += '<button class="dov-cat-btn' + active + '" data-detail-cat="' + cat + '">' + cat + ' ×' + cnt + '</button>';
     });
     html += '</div>';
 
-    /* SOP list */
-    html += '<div class="dov-sop-list">';
-    g.sops.forEach(function (sop) {
-      var href = g.sopPath + sop.f;
-      html += '<a class="dov-sop-item" href="' + esc(href) + '" target="_blank">';
-      html += '<span class="dov-sop-code">SOP-' + sop.n + '</span>';
-      html += '<span>' + esc(T({ vi: sop.vi, en: sop.en })) + '</span>';
-      html += '</a>';
-    });
+    /* Doc list for selected category */
+    var docs = getGroupDocs(g.id, _detailCat);
+    html += '<div class="dov-doc-list">';
+    if (docs.length === 0) {
+      html += '<p class="dov-detail-hint">' + esc(T({ vi: 'Không có tài liệu.', en: 'No documents.' })) + '</p>';
+    } else {
+      docs.forEach(function (d) {
+        var title = docTitle(d);
+        html += '<div class="dov-doc-item" data-doc-code="' + esc(d.code) + '">' +
+                '<span class="dov-doc-code">' + esc(d.code) + '</span>' +
+                '<span class="dov-doc-title" title="' + esc(title) + '">' + esc(title) + '</span>' +
+                '</div>';
+      });
+    }
     html += '</div>';
 
-    /* Quick links row */
+    /* View-all button */
     html += '<div class="dov-sop-links">';
-    types.forEach(function (t) {
-      if (t.count > 0 && t.path) {
-        html += '<a class="dov-sop-link-btn" href="' + esc(t.path) + '" target="_blank">' +
-                T({ vi: 'Xem tất cả ' + t.label, en: 'View all ' + t.label }) + ' (' + t.count + ')</a>';
-      }
+    DOC_CATS.forEach(function (cat) {
+      var cnt = groupCatCount(g, cat);
+      if (cnt === 0) return;
+      html += '<button class="dov-sop-link-btn" data-nav-cat="' + cat + '">' +
+              esc(T({ vi: 'Xem tất cả ' + cat + ' (' + cnt + ')', en: 'View all ' + cat + ' (' + cnt + ')' })) +
+              '</button>';
     });
     html += '</div>';
 
     bd.innerHTML = html;
+
+    /* Bind: doc item click → openDoc */
+    bd.querySelectorAll('[data-doc-code]').forEach(function (el) {
+      el.addEventListener('click', function () { openDocSafe(el.getAttribute('data-doc-code')); });
+    });
+
+    /* Bind: category tab switch */
+    bd.querySelectorAll('[data-detail-cat]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        _detailCat = el.getAttribute('data-detail-cat');
+        renderDetailPanel(gi, canvas);
+      });
+    });
+
+    /* Bind: view-all → navigateTo */
+    bd.querySelectorAll('[data-nav-cat]').forEach(function (el) {
+      el.addEventListener('click', function () { navToCat(el.getAttribute('data-nav-cat')); });
+    });
+  }
+
+  /* Short fishbone label (truncate at space if > 14 chars) */
+  function shortLbl(s) {
+    if (!s || s.length <= 16) return s;
+    var i = s.lastIndexOf(' ', 14);
+    return i > 0 ? s.slice(0, i) + '…' : s.slice(0, 14) + '…';
   }
 
   /* =========================================================================
-   * VIEW 3 — PROCESS FLOW  (ECharts graph)
+   * VIEW 3 — PROCESS FLOW (ECharts graph)
    * Operational sequence: COM → ENG → SUP → PRD → QC → LOG
    * Cross-cutting: SYS (top), HR (bottom), IMP (feedback)
+   * Node click → navigateTo('documents', 'SOP') for that group
    * ======================================================================= */
   function renderFlow(canvas) {
     if (!window.echarts) {
@@ -665,68 +590,54 @@
       return;
     }
 
-    /* Node positions (x%, y% of chart area) */
     var nodes = [
-      /* flow lane */
-      { gi: 1, x: 120,  y: 280 }, /* COM  200 */
-      { gi: 2, x: 270,  y: 280 }, /* ENG  300 */
-      { gi: 3, x: 420,  y: 280 }, /* SUP  400 */
-      { gi: 4, x: 570,  y: 280 }, /* PRD  500 */
-      { gi: 5, x: 720,  y: 280 }, /* QC   600 */
-      { gi: 6, x: 870,  y: 280 }, /* LOG  700 */
-      /* cross-cutting */
-      { gi: 0, x: 500,  y: 80  }, /* SYS  100 */
-      { gi: 7, x: 500,  y: 480 }, /* HR   800 */
-      { gi: 8, x: 280,  y: 480 }, /* IMP  900 */
-      /* customer nodes */
-      { gi: -1, x: 40,   y: 280, special: true, label: { vi: 'KH',    en: 'Customer' }, abbr: 'KH' },
-      { gi: -2, x: 960,  y: 280, special: true, label: { vi: 'Giao',  en: 'Deliver'  }, abbr: '✓' }
+      { gi: 1,  x: 120, y: 280 }, /* COM  200 */
+      { gi: 2,  x: 270, y: 280 }, /* ENG  300 */
+      { gi: 3,  x: 420, y: 280 }, /* SUP  400 */
+      { gi: 4,  x: 570, y: 280 }, /* PRD  500 */
+      { gi: 5,  x: 720, y: 280 }, /* QC   600 */
+      { gi: 6,  x: 870, y: 280 }, /* LOG  700 */
+      { gi: 0,  x: 500, y: 80  }, /* SYS  100 */
+      { gi: 7,  x: 500, y: 480 }, /* HR   800 */
+      { gi: 8,  x: 280, y: 480 }, /* IMP  900 */
+      { gi: -1, x: 40,  y: 280, special: true, label: { vi: 'KH',   en: 'Customer' }, abbr: 'KH' },
+      { gi: -2, x: 960, y: 280, special: true, label: { vi: 'Giao', en: 'Deliver'  }, abbr: '✓' }
     ];
 
     var echNodes = nodes.map(function (n) {
-      var g = n.gi >= 0 ? GROUPS[n.gi] : null;
+      var g   = n.gi >= 0 ? GROUPS[n.gi] : null;
       var col = n.gi >= 0 ? palette(n.gi) : tok('brand.primary', '#1565c0');
+      var sopCnt = g ? groupCatCount(g, 'SOP') : 0;
       return {
-        id:   String(n.gi),
-        name: g ? g.abbr + '\n' + T(g.label) : T(n.label),
-        abbr: g ? g.abbr : n.abbr,
+        id:       String(n.gi),
+        name:     g ? g.abbr + '\n' + T(g.label) : T(n.label),
+        abbr:     g ? g.abbr : n.abbr,
         x: n.x, y: n.y,
+        gi:       n.gi,
         symbolSize: n.special ? 38 : 56,
         itemStyle:  { color: col, borderColor: col, borderWidth: n.special ? 2 : 0 },
         label:      { show: true, fontSize: 11, fontWeight: '700', color: '#fff',
                       formatter: function (p) { return p.data.abbr || ''; } },
-        url: g ? g.sopPath : null,
-        sopCount: g ? g.sop : 0
+        sopCount: sopCnt
       };
     });
 
-    /* Edges */
-    var mainFlow  = [['-1','1'],['1','2'],['2','3'],['3','4'],['4','5'],['5','6'],['6','-2']];
-    var crossTop  = [['0','1'],['0','2'],['0','3'],['0','4'],['0','5'],['0','6']];
-    var crossBot  = [['7','4'],['7','5']];
-    var feedback  = [['8','1'],['5','8']];
+    var mainFlow = [['-1','1'],['1','2'],['2','3'],['3','4'],['4','5'],['5','6'],['6','-2']];
+    var crossTop = [['0','1'],['0','2'],['0','3'],['0','4'],['0','5'],['0','6']];
+    var crossBot = [['7','4'],['7','5']];
+    var feedback = [['8','1'],['5','8']];
 
-    function edge(s, t, style) {
-      return Object.assign({ source: s, target: t, lineStyle: style }, {});
-    }
-
-    var edgeCol   = tok('colorsLight.border',         '#e2e8f0');
-    var accentCol = tok('brand.accent',               '#f9a825');
-    var crossCol  = tok('statusColors.info',           '#2563eb');
+    function edge(s, t, style) { return { source: s, target: t, lineStyle: style }; }
+    var bPri  = tok('brand.primary', '#1565c0');
+    var cross = tok('statusColors.info', '#2563eb');
+    var purp  = tok('statusColors.purple', '#7c3aed');
+    var green = tok('statusColors.success', '#16a34a');
 
     var echEdges = [].concat(
-      mainFlow.map(function (e) {
-        return edge(e[0], e[1], { color: tok('brand.primary', '#1565c0'), width: 2.5, curveness: 0 });
-      }),
-      crossTop.map(function (e) {
-        return edge(e[0], e[1], { color: crossCol, width: 1.2, type: 'dashed', curveness: 0.3 });
-      }),
-      crossBot.map(function (e) {
-        return edge(e[0], e[1], { color: tok('statusColors.purple', '#7c3aed'), width: 1.2, type: 'dashed', curveness: 0.3 });
-      }),
-      feedback.map(function (e) {
-        return edge(e[0], e[1], { color: tok('statusColors.success', '#16a34a'), width: 1.5, curveness: 0.45 });
-      })
+      mainFlow.map(function (e) { return edge(e[0], e[1], { color: bPri,  width: 2.5, curveness: 0 }); }),
+      crossTop.map(function (e) { return edge(e[0], e[1], { color: cross, width: 1.2, type: 'dashed', curveness: 0.3 }); }),
+      crossBot.map(function (e) { return edge(e[0], e[1], { color: purp,  width: 1.2, type: 'dashed', curveness: 0.3 }); }),
+      feedback.map(function (e) { return edge(e[0], e[1], { color: green, width: 1.5, curveness: 0.45 }); })
     );
 
     var box = document.createElement('div');
@@ -740,40 +651,43 @@
     chart.setOption({
       backgroundColor: 'transparent',
       tooltip: {
-        trigger:   'item',
+        trigger: 'item',
         formatter: function (p) {
           if (!p.data || !p.data.name) return '';
-          var sopLine = p.data.sopCount ? ' · ' + p.data.sopCount + ' SOP' : '';
-          return '<div style="font-size:12px">' + esc(p.data.name.replace('\n', ' — ')) + sopLine + '</div>';
+          var gi = typeof p.data.gi !== 'undefined' ? p.data.gi : -99;
+          var sopLine = '';
+          if (gi >= 0) {
+            var g = GROUPS[gi];
+            DOC_CATS.forEach(function (cat) {
+              var cnt = groupCatCount(g, cat);
+              if (cnt > 0) sopLine += ' · ' + cnt + ' ' + cat;
+            });
+          }
+          return '<div style="font-size:12px">' + esc(String(p.data.name || '').replace('\n', ' — ')) + sopLine + '</div>';
         }
       },
       series: [{
-        type:               'graph',
-        layout:             'none',
-        coordinateSystem:   undefined,
-        data:               echNodes,
-        edges:              echEdges,
-        roam:               false,
-        focusNodeAdjacency: true,
-        edgeSymbol:         ['none', 'arrow'],
-        edgeSymbolSize:     8,
+        type: 'graph', layout: 'none',
+        data: echNodes, edges: echEdges,
+        roam: false, focusNodeAdjacency: true,
+        edgeSymbol: ['none', 'arrow'], edgeSymbolSize: 8,
         left: 10, right: 10, top: 30, bottom: 30,
         label: { show: true },
         lineStyle: { opacity: 0.9 }
       }]
     });
 
+    /* Node click → navigate to SOP category for that group */
     chart.on('click', function (p) {
-      var url = p.data && p.data.url;
-      if (url) window.open(url, '_blank');
+      var gi = p.data && typeof p.data.gi !== 'undefined' ? p.data.gi : -99;
+      if (gi >= 0) navToCat('SOP');
     });
 
-    /* Legend */
     var info = document.createElement('p');
     info.className = 'dov-flow-info';
     info.textContent = T({
-      vi: '→ Luồng chính (xanh dương) · -- Hệ thống quản trị (xanh nhạt) · ↩ Cải tiến phản hồi (xanh lá) · Nhấn node để mở thư mục SOP',
-      en: '→ Main flow (blue) · -- Governance (light blue) · ↩ Improvement loop (green) · Click node to open SOP folder'
+      vi: '→ Luồng chính (xanh dương) · -- Hệ thống quản trị (xanh nhạt) · ↩ Cải tiến phản hồi (xanh lá) · Nhấn node để xem SOP',
+      en: '→ Main flow (blue) · -- Governance (light blue) · ↩ Improvement loop (green) · Click node to browse SOPs'
     });
     canvas.appendChild(info);
 
@@ -782,77 +696,77 @@
   }
 
   /* =========================================================================
-   * VIEW 4 — MATRIX  (HTML table)
+   * VIEW 4 — MATRIX (HTML table)
    * Rows: 9 process groups · Cols: SOP WI ANNEX FRM Total
+   * Cell click → navigateTo('documents', cat)
    * ======================================================================= */
   function renderMatrix(canvas) {
-    var colDefs = [
-      { key: 'sop',   label: 'SOP',   pathKey: 'sopPath' },
-      { key: 'wi',    label: 'WI',    pathKey: 'wiPath' },
-      { key: 'annex', label: 'ANNEX', pathKey: 'annexPath' },
-      { key: 'frm',   label: 'FRM',   pathKey: 'frmPath' }
-    ];
-
-    /* Max count for heat shading */
-    var maxes = {};
-    colDefs.forEach(function (c) {
-      maxes[c.key] = Math.max.apply(null, GROUPS.map(function (g) { return g[c.key]; }));
+    /* Compute live counts */
+    var counts = GROUPS.map(function (g) {
+      var row = { total: 0 };
+      DOC_CATS.forEach(function (cat) {
+        var c = groupCatCount(g, cat);
+        row[cat] = c;
+        row.total += c;
+      });
+      return row;
     });
 
-    function heatOpacity(val, max) {
-      if (!val || !max) return 0;
-      return 0.08 + 0.55 * (val / max);
-    }
+    /* Max per column for heat shading */
+    var maxes = {};
+    DOC_CATS.forEach(function (cat) {
+      maxes[cat] = Math.max.apply(null, counts.map(function (r) { return r[cat]; }));
+    });
+
+    function heatOpacity(val, max) { return (!val || !max) ? 0 : 0.08 + 0.55 * (val / max); }
 
     var html = '<div class="dov-matrix-wrap"><table class="dov-matrix-table">';
-
-    /* Head */
     html += '<thead><tr>';
     html += '<th>' + esc(T({ vi: 'Nhóm quy trình', en: 'Process Group' })) + '</th>';
-    colDefs.forEach(function (c) { html += '<th style="text-align:center">' + c.label + '</th>'; });
+    DOC_CATS.forEach(function (cat) { html += '<th style="text-align:center">' + cat + '</th>'; });
     html += '<th style="text-align:center">' + esc(T({ vi: 'Tổng', en: 'Total' })) + '</th>';
     html += '</tr></thead><tbody>';
 
-    /* Rows */
     GROUPS.forEach(function (g, i) {
+      var row = counts[i];
       var col = palette(i);
-      var tot = totalDocs(g);
       html += '<tr>';
       html += '<td><div class="dov-mat-group">' +
               '<span class="dov-mat-dot" style="background:' + col + '"></span>' +
               '<span><strong>' + esc(g.abbr) + '-' + g.id + '</strong> ' + esc(T(g.label)) + '</span>' +
               '</div></td>';
-      colDefs.forEach(function (c) {
-        var val  = g[c.key];
-        var path = g[c.pathKey];
-        var op   = heatOpacity(val, maxes[c.key]);
+      DOC_CATS.forEach(function (cat) {
+        var val = row[cat];
+        var op  = heatOpacity(val, maxes[cat]);
         html += '<td style="text-align:center">';
-        if (val > 0 && path) {
-          html += '<a class="dov-mat-cell-link" href="' + esc(path) + '" target="_blank" ' +
-                  'style="background:' + col + ';color:#fff;opacity:' + op + ';' +
-                  'background-color:' + col + '">' + val + '</a>';
-        } else if (val > 0) {
-          html += '<span style="font-weight:700;color:' + col + '">' + val + '</span>';
+        if (val > 0) {
+          html += '<span class="dov-mat-cell" data-nav-cat="' + cat + '" ' +
+                  'style="background:' + col + ';color:#fff;opacity:' + (0.15 + op * 0.85) + '">' + val + '</span>';
         } else {
           html += '<span class="dov-mat-cell-zero">—</span>';
         }
         html += '</td>';
       });
-      html += '<td style="text-align:center"><span class="dov-mat-total">' + tot + '</span></td>';
+      html += '<td style="text-align:center"><span class="dov-mat-total">' + row.total + '</span></td>';
       html += '</tr>';
     });
 
     /* Footer totals */
     html += '</tbody><tfoot><tr class="dov-mat-footer">';
     html += '<td><strong>' + esc(T({ vi: 'Tổng cộng', en: 'Grand Total' })) + '</strong></td>';
-    colDefs.forEach(function (c) {
-      var sum = GROUPS.reduce(function (acc, g) { return acc + g[c.key]; }, 0);
+    DOC_CATS.forEach(function (cat) {
+      var sum = counts.reduce(function (acc, r) { return acc + r[cat]; }, 0);
       html += '<td style="text-align:center;font-size:14px">' + sum + '</td>';
     });
     html += '<td style="text-align:center;font-size:15px">' + grandTotal() + '</td>';
     html += '</tr></tfoot></table></div>';
 
     canvas.innerHTML = html;
+
+    /* Cell click → navigate to that doc category */
+    canvas.querySelectorAll('[data-nav-cat]').forEach(function (el) {
+      el.addEventListener('click', function () { navToCat(el.getAttribute('data-nav-cat')); });
+    });
   }
 
   /* =========================================================================
