@@ -458,16 +458,26 @@
     (S.assignments || []).forEach(function(a){
       var eid = String(a.employee_id || '').trim();
       var posId = String(a.hcm_position_id || '').trim();
-      if (eid && posId) assignmentSeen[eid + '|' + posId] = true;
+      if (!eid || !posId) return;
       var position = S.byPositionId[posId] || {};
       var status = String(a.assignment_status || 'active');
-      // Hide ended/inactive/terminated assignments from every consumer, and
-      // treat the soft-end pattern (status=active but effective_to<=today)
-      // the same way — Xóa should make the row disappear, not just relabel
-      // it to "Đã kết thúc".
-      if (status === 'ended' || status === 'inactive' || status === 'terminated') return;
+      // Intentional soft-end via "Xóa" → mark seen so hcmEmployees/users.json
+      // fallbacks cannot resurrect the row. This was the original guard against
+      // stale users.json[user].hcm_position_id bringing back removed assignments.
+      if (status === 'ended' || status === 'inactive' || status === 'terminated') {
+        assignmentSeen[eid + '|' + posId] = true;
+        return;
+      }
+      // Date-expired-only assignments (status still 'active' but effective_to has
+      // passed) are NOT intentional removals. Do NOT mark seen here — the primary
+      // fallback (hcmEmployees priority 30) must be allowed to fire so the employee
+      // still appears on their primary position card. The old code marked seen
+      // BEFORE this check, silently dropping employees from positions after their
+      // concurrent assignment date lapsed (root cause of missing kiêm nhiệm).
       var effTo = String(a.effective_to || '').slice(0, 10);
       if (effTo && effTo <= today) return;
+      // Valid, non-expired assignment — mark seen and emit the row.
+      assignmentSeen[eid + '|' + posId] = true;
       put(Object.assign({}, a, {
         employee_id: eid,
         hcm_position_id: posId,
