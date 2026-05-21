@@ -138,7 +138,7 @@
       "activity_html": "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html\">DFM</a> rà soát và phân loại rủi ro kỹ thuật",
       "frm_html": "<a href=\"../../../../forms/frm-200-purchase/FRM-209_High_Risk_Job_Readiness_Review.xlsx\">FRM-209</a> · <a href=\"../../../sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html\">SOP-301</a>",
       "roles": {
-        "CS": "",
+        "CS": "I",
         "EST": "C",
         "ENG": "A",
         "PPL": "I",
@@ -201,7 +201,7 @@
       "activity_html": "Phê duyệt Package Supersedure và Withdrawal",
       "frm_html": "<a href=\"../../../../forms/frm-300-technical/FRM-307_Package_Supersedure_and_Withdrawal_Notice.xlsx\">FRM-307</a> · <a href=\"../../../sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html\">SOP-303</a>",
       "roles": {
-        "CS": "",
+        "CS": "I",
         "EST": "",
         "ENG": "A",
         "PPL": "I",
@@ -399,7 +399,7 @@
         "QA": "C",
         "SCM": "",
         "CEO": "",
-        "EHS": "",
+        "EHS": "C",
         "HR/IT": ""
       }
     },
@@ -752,7 +752,7 @@
         "ENG": "C",
         "PPL": "I",
         "WKM": "R",
-        "PD": "",
+        "PD": "C",
         "QA": "A",
         "SCM": "",
         "CEO": "",
@@ -1035,10 +1035,10 @@
     },
     {
       "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G7</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-A6\">A6</a>",
+      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-A7\">A7</a>",
       "gate": "G7",
-      "cdr": "A6",
-      "activity_html": "Phê duyệt yêu cầu thay đổi của khách hàng (CCR) ảnh hưởng giá / lịch / phạm vi",
+      "cdr": "A7",
+      "activity_html": "Phê duyệt yêu cầu thay đổi muộn của khách hàng (CCR) sau xác nhận đơn — ảnh hưởng giá / lịch / phạm vi",
       "frm_html": "<a href=\"../../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx\">FRM-212</a> · <a href=\"../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html\">SOP-201</a>",
       "roles": {
         "CS": "A",
@@ -1095,8 +1095,8 @@
     {
       "cells": [
         "Rà soát phó vai trò trọng yếu",
-        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-direct-line-mgrs\">DIRECT_LINE_MGRS</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html\">HR</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-direct-line-mgrs\">DIRECT_LINE_MGRS</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
         "<a href=\"annex-123-deputy-backup-matrix.html\">ANNEX-123</a> · <a href=\"../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx\">FRM-504</a>"
       ]
@@ -1366,7 +1366,7 @@
     {
       "cells": [
         "G7",
-        "<a href=\"annex-120-authority-matrix.html#cdr-A6\">A6</a>",
+        "<a href=\"annex-120-authority-matrix.html#cdr-A7\">A7</a>",
         "CCR muộn ảnh hưởng giá / lịch / phạm vi",
         "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "C",
