@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-05-21T18:10:40+00:00",
+    "generated_at": "2026-05-21T18:26:33+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-21",
@@ -2587,7 +2587,7 @@
             "bucket": "annex_references",
             "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
             "has_kpi": true,
-            "kpi_occurrences": 50,
+            "kpi_occurrences": 51,
             "coded_kpi_ids": [
                 "KPI-AUTHORITY-REGISTRY",
                 "KPI-GX"
@@ -2617,10 +2617,10 @@
                 "SUPPLIER_OTD"
             ],
             "governance_signals": {
-                "evaluation_terms": 18,
+                "evaluation_terms": 16,
                 "recognition_terms": 13,
-                "discipline_or_corrective_terms": 37,
-                "action_ownership_terms": 101,
+                "discipline_or_corrective_terms": 39,
+                "action_ownership_terms": 93,
                 "has_evaluation": true,
                 "has_recognition": true,
                 "has_discipline_or_corrective": true,
