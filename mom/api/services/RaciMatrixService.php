@@ -375,7 +375,7 @@ final class RaciMatrixService
         }
         $pattern = '/' . preg_quote($start, '/') . '.*?' . preg_quote($end, '/') . '/s';
         $managed = $start . "\n" . $block . "\n" . $end;
-        $next = preg_replace($pattern, fn() => $managed, $html, 1, $count);
+        $next = preg_replace_callback($pattern, static fn(): string => $managed, $html, 1, $count);
         if ($count !== 1 || $next === null) {
             throw new RuntimeException('raci_matrix_region_replace_failed:' . $key);
         }
