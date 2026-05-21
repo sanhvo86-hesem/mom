@@ -485,6 +485,9 @@ final class KpiEngine
                 'name' => $this->stringField($row, 'name'),
                 'local_id' => $this->stringField($row, 'local_id'),
                 'classification' => $this->stringField($row, 'classification'),
+                'gate' => $this->stringField($row, 'gate'),
+                'linked_cdr' => is_array($row['linked_cdr'] ?? null) ? $row['linked_cdr'] : null,
+                'gate_pass_condition' => $this->stringField($row, 'gate_pass_condition'),
             ], $aliases);
         }
 

@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
   "version": "2026-05-21",
-  "schema_version": 4,
+  "schema_version": 5,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. Existing ANNEX-122 KPIs are retained, legacy metric aliases are mapped to canonical codes, and proposed CNC operating metrics are staged without granting automatic runtime authority.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -1863,115 +1863,347 @@
       "local_id": "KPI-G0-01",
       "canonical_code": "RFQ_TURNAROUND_TIME",
       "name": "RFQ Turnaround Time",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G0",
+      "linked_cdr": [
+        "A1"
+      ],
+      "gate_pass_condition": "RFQ phản hồi ≤ 4 giờ làm việc trước khi chuyển sang bước báo giá (CDR A1).",
+      "target": "≤ 4h",
+      "owner_role": "CS",
+      "cadence": "per-event",
+      "data_source": "Epicor Quote",
+      "calculation_status": "staged_data_contract"
     },
     {
       "local_id": "KPI-G0-02",
       "canonical_code": "ORDER_REVIEW_RFT",
       "name": "Contract Review FTR",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G0",
+      "linked_cdr": [
+        "A2",
+        "A5"
+      ],
+      "gate_pass_condition": "≥95% đơn hàng qua soát xét hợp đồng đúng lần đầu trước khi chấp thuận đơn (CDR A2/A5).",
+      "target": "≥ 95%",
+      "owner_role": "CS",
+      "cadence": "monthly",
+      "data_source": "FRM-202",
+      "calculation_status": "staged_data_contract"
     },
     {
       "local_id": "KPI-G1-01",
       "canonical_code": "ENGINEERING_RELEASE_RFT",
       "name": "Engineering First-Time-Right",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G1",
+      "linked_cdr": [
+        "B1",
+        "B2"
+      ],
+      "gate_pass_condition": "≥95% gói nền phát hành đúng lần đầu sau DFM, không phải mở lại (CDR B1/B2).",
+      "target": "≥ 95%",
+      "owner_role": "ENGM",
+      "cadence": "monthly",
+      "data_source": "FRM-306",
+      "calculation_status": "staged_data_contract"
     },
     {
       "local_id": "KPI-G1-02",
       "canonical_code": "ECN_LEAD_TIME",
       "name": "ECN Lead Time",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G1",
+      "linked_cdr": [
+        "B3"
+      ],
+      "gate_pass_condition": "Lệnh thay đổi kỹ thuật (ECO) xử lý ≤ 48 giờ (CDR B3).",
+      "target": "≤ 48h",
+      "owner_role": "ENGM",
+      "cadence": "per-event",
+      "data_source": "Epicor ECO",
+      "calculation_status": "staged_data_contract"
+    },
+    {
+      "local_id": "KPI-G1-03",
+      "canonical_code": "CONTROL_PLAN_PFMEA_APPROVAL",
+      "name": "Control Plan / PFMEA Approval Before Baseline",
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G1",
+      "linked_cdr": [
+        "B8"
+      ],
+      "gate_pass_condition": "100% gói nền có Control Plan và PFMEA được phê duyệt TRƯỚC khi phát hành (CDR B8 — mới).",
+      "target": "100%",
+      "owner_role": "QA",
+      "cadence": "per-event",
+      "data_source": "job_orders.control_plan_id + FRM Control Plan",
+      "calculation_status": "staged_data_contract"
     },
     {
       "local_id": "KPI-G2-01",
       "canonical_code": "IQC_PASS_RATE",
       "name": "IQC Pass Rate",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G2",
+      "linked_cdr": [
+        "D10"
+      ],
+      "gate_pass_condition": "≥99% lô vật tư mua vào đạt kiểm tra đầu vào trước khi nhập kho (CDR D10).",
+      "target": "≥ 99%",
+      "owner_role": "QA",
+      "cadence": "monthly",
+      "data_source": "FRM-701",
+      "calculation_status": "staged_data_contract"
     },
     {
       "local_id": "KPI-G2-02",
       "canonical_code": "TRACEABILITY_COMPLETENESS",
       "name": "Traceability Completeness",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G2",
+      "linked_cdr": [
+        "D10"
+      ],
+      "gate_pass_condition": "100% lô nhập có chứng chỉ truy xuất nguồn gốc đối chiếu đầy đủ (CDR D10).",
+      "target": "100%",
+      "owner_role": "SCM",
+      "cadence": "per-event",
+      "data_source": "Epicor Receipt",
+      "calculation_status": "staged_data_contract"
     },
     {
       "local_id": "KPI-G3-01",
       "canonical_code": "SETUP_FIRST_PASS",
       "name": "Setup First-Pass Success",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G3",
+      "linked_cdr": [
+        "B5",
+        "B6"
+      ],
+      "gate_pass_condition": "≥95% lần cài đặt đạt ngay sau pilot/dry-run, không phải lặp (CDR B5/B6).",
+      "target": "≥ 95%",
+      "owner_role": "WKM",
+      "cadence": "monthly",
+      "data_source": "FRM-511",
+      "calculation_status": "staged_data_contract"
     },
     {
       "local_id": "KPI-G3-02",
       "canonical_code": "CHANGEOVER_TIME",
       "name": "Changeover Time",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G3",
+      "linked_cdr": [
+        "C4"
+      ],
+      "gate_pass_condition": "Thời gian chuyển công đoạn được đo và kiểm soát theo chuẩn SMED (CDR C4).",
+      "target": "Measured",
+      "owner_role": "WKM",
+      "cadence": "per-event",
+      "data_source": "Time Entry",
+      "calculation_status": "staged_data_contract"
     },
     {
       "local_id": "KPI-G4-01",
       "canonical_code": "FAI_FIRST_PASS",
       "name": "FAI First-Pass Rate",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G4",
+      "linked_cdr": [
+        "D1",
+        "D2"
+      ],
+      "gate_pass_condition": "≥98% mẫu đầu/FAI đạt ngay lần kiểm đầu tiên trước khi nhả loạt (CDR D1/D2). Cùng mã canonical với KPI value-stream FAI_FIRST_PASS.",
+      "target": "≥ 98%",
+      "owner_role": "QA",
+      "cadence": "monthly",
+      "data_source": "FRM-311",
+      "calculation_status": "staged_data_contract"
     },
     {
       "local_id": "KPI-G4-02",
       "canonical_code": "FAI_CYCLE_TIME",
       "name": "FAI Cycle Time",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G4",
+      "linked_cdr": [
+        "D1",
+        "D12"
+      ],
+      "gate_pass_condition": "Chu kỳ kiểm FAI ≤ 2 giờ; hồ sơ FAI/PPAP nộp khách đúng hạn (CDR D1/D12).",
+      "target": "≤ 2h",
+      "owner_role": "QA",
+      "cadence": "per-event",
+      "data_source": "FRM-311",
+      "calculation_status": "staged_data_contract"
     },
     {
       "local_id": "KPI-G5-01",
       "canonical_code": "IN_PROCESS_REJECT_RATE",
       "name": "In-Process Rejection Rate",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G5",
+      "linked_cdr": [
+        "D3"
+      ],
+      "gate_pass_condition": "Tỷ lệ loại trong quá trình ≤ 1%; vượt ngưỡng phải mở NCR (CDR D3).",
+      "target": "≤ 1%",
+      "owner_role": "WKM",
+      "cadence": "weekly",
+      "data_source": "FRM-651",
+      "calculation_status": "staged_data_contract"
     },
     {
       "local_id": "KPI-G5-02",
       "canonical_code": "SPC_SIGNAL_REACTION_TIME",
       "name": "SPC Signal Reaction Time",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G5",
+      "linked_cdr": [
+        "D3",
+        "D4"
+      ],
+      "gate_pass_condition": "Phản ứng tín hiệu SPC ≤ 15 phút trước khi xử lý NCR (CDR D3/D4).",
+      "target": "≤ 15min",
+      "owner_role": "WKM",
+      "cadence": "per-event",
+      "data_source": "FRM-631",
+      "calculation_status": "staged_data_contract"
     },
     {
       "local_id": "KPI-G6-01",
       "canonical_code": "SHIP_PACKET_COMPLETENESS",
       "name": "Release Package Completeness",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G6",
+      "linked_cdr": [
+        "D8"
+      ],
+      "gate_pass_condition": "100% gói phát hành/CoC đầy đủ trước khi ký kiểm cuối (CDR D8).",
+      "target": "100%",
+      "owner_role": "QA",
+      "cadence": "per-event",
+      "data_source": "FRM-642",
+      "calculation_status": "staged_data_contract"
     },
     {
       "local_id": "KPI-G6-02",
       "canonical_code": "TRACEABILITY_DRILL_TIME",
       "name": "Traceability Drill Time",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G6",
+      "linked_cdr": [
+        "D8"
+      ],
+      "gate_pass_condition": "Truy xuất ngược một lô bất kỳ ≤ 60 giây khi diễn tập (CDR D8).",
+      "target": "≤ 60s",
+      "owner_role": "QA",
+      "cadence": "monthly",
+      "data_source": "Drill test",
+      "calculation_status": "manual"
     },
     {
       "local_id": "KPI-G7-01",
       "canonical_code": "OTD",
-      "name": "On-Time Delivery",
-      "classification": "gate_metric_not_annex122_count"
+      "name": "On-Time Delivery (gate view)",
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G7",
+      "linked_cdr": [
+        "D7"
+      ],
+      "gate_pass_condition": "≥95% lô dỡ chặn giao hàng và giao đúng cam kết (CDR D7). Cùng mã canonical với KPI công ty OTD.",
+      "target": "≥ 95%",
+      "owner_role": "SCM",
+      "cadence": "monthly",
+      "data_source": "Epicor Ship",
+      "calculation_status": "runtime_calculated"
     },
     {
       "local_id": "KPI-G7-02",
       "canonical_code": "SHIP_READY_TO_INVOICE_LT",
       "name": "Ship-to-Invoice Turnaround",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G7",
+      "linked_cdr": [
+        "D8"
+      ],
+      "gate_pass_condition": "Thời gian từ phát hành/giao đến xuất hóa đơn ≤ 24 giờ (CDR D8). Cùng mã canonical với KPI value-stream SHIP_READY_TO_INVOICE_LT.",
+      "target": "≤ 24h",
+      "owner_role": "FIN",
+      "cadence": "per-event",
+      "data_source": "Epicor AR",
+      "calculation_status": "staged_data_contract"
+    },
+    {
+      "local_id": "KPI-G7-03",
+      "canonical_code": "CUSTOMER_ESCAPE_NOTIFICATION_LT",
+      "name": "Customer Escape Notification Lead Time",
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "G7",
+      "linked_cdr": [
+        "D11"
+      ],
+      "gate_pass_condition": "Thông báo khách ≤ 24 giờ kể từ khi phát hiện sản phẩm không phù hợp đã hoặc có thể đã giao (CDR D11 — mới).",
+      "target": "≤ 24h",
+      "owner_role": "QA",
+      "cadence": "per-event",
+      "data_source": "FRM khiếu nại + sổ thông báo khách",
+      "calculation_status": "manual"
     },
     {
       "local_id": "KPI-ALL-01",
       "canonical_code": "COPQ",
       "name": "Cost of Poor Quality",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "ALL",
+      "linked_cdr": [
+        "D3",
+        "D5",
+        "D9"
+      ],
+      "gate_pass_condition": "Chi phí chất lượng kém ≤ 2% doanh thu, gộp NCR/CAPA/phế phẩm mọi cổng (CDR D3/D5/D9).",
+      "target": "≤ 2%",
+      "owner_role": "QA",
+      "cadence": "monthly",
+      "data_source": "Epicor Cost",
+      "calculation_status": "runtime_calculated"
     },
     {
       "local_id": "KPI-ALL-02",
       "canonical_code": "FPY",
       "name": "First Pass Yield",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "ALL",
+      "linked_cdr": [
+        "D1",
+        "D3"
+      ],
+      "gate_pass_condition": "Hiệu suất đạt ngay lần đầu ≥ 98%, gộp FAI và kiểm trong quá trình (CDR D1/D3).",
+      "target": "≥ 98%",
+      "owner_role": "QA",
+      "cadence": "monthly",
+      "data_source": "FRM-651",
+      "calculation_status": "runtime_calculated"
     },
     {
       "local_id": "KPI-ALL-03",
       "canonical_code": "OEE",
       "name": "Overall Equipment Effectiveness",
-      "classification": "gate_metric_not_annex122_count"
+      "classification": "gate_metric_not_annex122_count",
+      "gate": "ALL",
+      "linked_cdr": [
+        "C4",
+        "C7"
+      ],
+      "gate_pass_condition": "Hiệu suất thiết bị tổng thể ≥ 85% qua các cổng sản xuất (CDR C4/C7).",
+      "target": "≥ 85%",
+      "owner_role": "WKM",
+      "cadence": "daily",
+      "data_source": "Epicor MES",
+      "calculation_status": "runtime_calculated"
     }
   ],
   "document_audit": {
