@@ -56,7 +56,7 @@ try {
     ];
 
     $controller = (new class($dataLayer, QMS_TEST_ROOT_DIR, $tmpDataDir) extends AdminController {
-        protected function jsonBody(): array
+        protected function jsonBody(int $maxBytes = 10485760): array
         {
             return is_array($GLOBALS['__test_json_body'] ?? null) ? $GLOBALS['__test_json_body'] : [];
         }
