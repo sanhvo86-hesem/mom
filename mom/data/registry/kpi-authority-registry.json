@@ -1,6 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
-  "version": "2026-04-18",
+  "version": "2026-05-21",
+  "schema_version": 2,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. Existing ANNEX-122 KPIs are retained, legacy metric aliases are mapped to canonical codes, and proposed CNC operating metrics are staged without granting automatic runtime authority.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -90,91 +91,1785 @@
     "RECORDABLE_INCIDENT_RATE"
   ],
   "annex122_governance_kpis": [
-    {"no": 1, "canonical_code": "OTD", "name": "On-Time Delivery", "tier": "company", "status": "retained"},
-    {"no": 2, "canonical_code": "COMPLAINT_RATE", "name": "Customer Quality Escape/Complaint", "tier": "company", "status": "retained"},
-    {"no": 3, "canonical_code": "FINAL_RELEASE_RFT", "name": "Final Release Right-First-Time", "tier": "company", "status": "retained"},
-    {"no": 4, "canonical_code": "GROSS_MARGIN_JOB_FAMILY", "name": "Gross Margin by Job/Product Family", "tier": "company", "status": "retained"},
-    {"no": 5, "canonical_code": "RECORDABLE_INCIDENT_RATE", "name": "Recordable Incident/LTI", "tier": "company", "status": "retained"},
-    {"no": 6, "canonical_code": "BCP_READINESS", "name": "Business Continuity Readiness", "tier": "company", "status": "retained"},
-    {"no": 7, "canonical_code": "RFQ_TURNAROUND_TIME", "name": "RFQ Turnaround Time", "tier": "value_stream", "status": "retained"},
-    {"no": 8, "canonical_code": "ORDER_REVIEW_RFT", "name": "Order Review Right-First-Time", "tier": "value_stream", "status": "retained"},
-    {"no": 9, "canonical_code": "PLAN_ADHERENCE", "name": "Plan Adherence/Dispatch Stability", "tier": "value_stream", "status": "retained"},
-    {"no": 10, "canonical_code": "FAI_FIRST_PASS", "name": "First-Piece/FAI First-Pass Acceptance", "tier": "value_stream", "status": "retained"},
-    {"no": 11, "canonical_code": "WIP_AGING", "name": "Queue Aging/WIP Aging", "tier": "value_stream", "status": "retained"},
-    {"no": 12, "canonical_code": "SUPPLIER_OTD", "name": "Supplier OTD/Incoming Readiness", "tier": "value_stream", "status": "retained"},
-    {"no": 13, "canonical_code": "SHIP_READY_TO_INVOICE_LT", "name": "Ship-Ready to Invoice Lead Time", "tier": "value_stream", "status": "retained"},
-    {"no": 14, "canonical_code": "DSO", "name": "AR Collection Lead Time/DSO", "tier": "value_stream", "status": "retained"},
-    {"no": 15, "canonical_code": "SCHEDULE_RECOVERY_EFFECTIVENESS", "name": "Production Schedule Adherence/Recovery Effectiveness", "tier": "department", "status": "retained"},
-    {"no": 16, "canonical_code": "FOD_LINE_CLEARANCE_COMPLIANCE", "name": "FOD/Line Clearance/Release Discipline", "tier": "department", "status": "retained"},
-    {"no": 17, "canonical_code": "ENGINEERING_RELEASE_ON_TIME", "name": "Engineering Release On Time", "tier": "department", "status": "retained"},
-    {"no": 18, "canonical_code": "ECO_CLOSURE_AGING", "name": "ECO Closure Aging", "tier": "department", "status": "retained"},
-    {"no": 19, "canonical_code": "NCR_CLOSURE_AGING", "name": "NCR Closure Aging", "tier": "department", "status": "retained"},
-    {"no": 20, "canonical_code": "CAL_COMPLIANCE", "name": "Calibration/Metrology Readiness", "tier": "department", "status": "retained"},
-    {"no": 21, "canonical_code": "MATERIAL_AVAILABILITY_PLAN", "name": "Material Availability for Plan", "tier": "department", "status": "retained"},
-    {"no": 22, "canonical_code": "INVENTORY_ACCURACY", "name": "Inventory Accuracy/Tool Accountability", "tier": "department", "status": "retained"},
-    {"no": 23, "canonical_code": "QUOTE_HIT_RATE", "name": "Quote Hit Rate vs Qualified RFQ", "tier": "department", "status": "retained"},
-    {"no": 24, "canonical_code": "CUSTOMER_COMM_CLOSURE_OT", "name": "Customer Communication Closure On Time", "tier": "department", "status": "retained"},
-    {"no": 25, "canonical_code": "INVOICE_RFT", "name": "Invoice Right-First-Time", "tier": "department", "status": "retained"},
-    {"no": 26, "canonical_code": "MONTH_END_CLOSE_OT", "name": "Month-End Close On Time", "tier": "department", "status": "retained"},
-    {"no": 27, "canonical_code": "TRAINING_COMP", "name": "Training Completion On Time", "tier": "department", "status": "retained"},
-    {"no": 28, "canonical_code": "CRITICAL_ROLE_BACKUP_COVERAGE", "name": "Certified Role Backup Coverage", "tier": "department", "status": "retained"},
-    {"no": 29, "canonical_code": "INCIDENT_ACTION_CLOSURE_AGING", "name": "Incident Action Closure Aging", "tier": "department", "status": "retained"},
-    {"no": 30, "canonical_code": "SAFETY_ONBOARDING_COMPLIANCE", "name": "Safety Onboarding Training Compliance", "tier": "department", "status": "retained"},
-    {"no": 31, "canonical_code": "SERVICE_TICKET_SLA", "name": "Service Ticket Closure Within SLA", "tier": "department", "status": "retained"},
-    {"no": 32, "canonical_code": "CRITICAL_SYSTEM_AVAILABILITY", "name": "Critical System Availability/Readiness", "tier": "department", "status": "retained"},
-    {"no": 33, "canonical_code": "MASTER_DATA_EXCEPTION_AGING", "name": "Master Data/Transaction Exception Aging", "tier": "department", "status": "retained"}
+    {
+      "no": 1,
+      "canonical_code": "OTD",
+      "name": "On-Time Delivery",
+      "name_vi": "Giao hàng đúng hạn",
+      "tier": "company",
+      "layer": "bsc_monthly",
+      "purpose": "Đo độ tin cậy cam kết giao hàng để quyết định leo thang rủi ro giao hàng và phân bổ năng lực.",
+      "formula": {
+        "numerator": "Số lô giao hàng có delivery_date_actual <= delivery_date_est trong kỳ",
+        "denominator": "Tổng số lô có shipment_status = 'delivered' trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "Lô bị khách huỷ trước ship không tính",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥95%",
+        "yellow": "90–94.99%",
+        "red": "<90%"
+      },
+      "data_source": {
+        "system": "MOM/ERP",
+        "tables": [
+          "shipments"
+        ],
+        "columns": [
+          "delivery_date_actual",
+          "delivery_date_est",
+          "ship_date",
+          "shipment_status"
+        ],
+        "evidence": "Hồ sơ giao hàng + ngày cam kết khách đã duyệt."
+      },
+      "owner_role": "PD",
+      "data_stewardship_role": "CS",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "paired_metric": "PLAN_ADHERENCE",
+      "decision_action": "Đỏ: mở bảng rủi ro giao hàng, soát năng lực/vật tư/chất lượng đang chặn; PD triệu tập trong 24h.",
+      "counter_metric": "PROMISE_DATE_REVISION_RATE",
+      "reward_eligible": true,
+      "calculation_status": "runtime_calculated",
+      "status": "retained"
+    },
+    {
+      "no": 2,
+      "canonical_code": "COMPLAINT_RATE",
+      "name": "Customer Quality Escape / Complaint Rate",
+      "name_vi": "Tỷ lệ lỗi thoát ra khách hàng",
+      "tier": "company",
+      "layer": "bsc_monthly",
+      "purpose": "Đo lỗi thoát ra khách hàng để quyết định bao vây, thông báo khách và mở CAPA.",
+      "formula": {
+        "numerator": "Số NCR có nonconformance_source = 'Customer' trong kỳ × 1.000.000",
+        "denominator": "Tổng số lô có shipment_status = 'delivered' trong kỳ",
+        "unit": "ppm",
+        "rounding": "round to integer",
+        "exclusions": "none",
+        "direction": "lower_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≤100 ppm",
+        "yellow": "101–200 ppm",
+        "red": ">200 ppm"
+      },
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "ncr_records",
+          "records",
+          "shipments"
+        ],
+        "columns": [
+          "nonconformance_source",
+          "created_at",
+          "ship_date",
+          "shipment_status"
+        ],
+        "evidence": "Sổ khiếu nại EQMS + liên kết NCR/CAPA."
+      },
+      "owner_role": "QA",
+      "data_stewardship_role": "CS",
+      "cadence": "monthly",
+      "lead_or_lag": "lag",
+      "paired_metric": "FPY",
+      "decision_action": "Đỏ: CEO/QA soát xét, mở bao vây trong 24h và thông báo khách nếu cần.",
+      "counter_metric": "COMPLAINT_ACK_SLA_COMPLIANCE",
+      "reward_eligible": true,
+      "calculation_status": "runtime_calculated",
+      "status": "retained"
+    },
+    {
+      "no": 3,
+      "canonical_code": "FINAL_RELEASE_RFT",
+      "name": "Final Release Right-First-Time",
+      "name_vi": "Tỷ lệ phát hành cuối đúng ngay lần đầu",
+      "tier": "company",
+      "layer": "bsc_monthly",
+      "purpose": "Đo tỷ lệ lô qua phát hành cuối không bị mở lại để quyết định củng cố cổng phát hành.",
+      "formula": {
+        "numerator": "Số lô qua final release không bị re-open trong kỳ",
+        "denominator": "Tổng số lô đưa vào final release trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥98%",
+        "yellow": "95–97.99%",
+        "red": "<95%"
+      },
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "inspection_results",
+          "trusted_release_records"
+        ],
+        "columns": [
+          "release_decision",
+          "reopened_at"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "QA",
+      "data_stewardship_role": "QC",
+      "cadence": "monthly",
+      "lead_or_lag": "lag",
+      "paired_metric": "FAI_FIRST_PASS",
+      "decision_action": "Vàng/đỏ: phân tích nguồn lỗi theo nhóm sản phẩm/quy trình; QA mở hành động khắc phục.",
+      "counter_metric": "COMPLAINT_RATE",
+      "reward_eligible": true,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 4,
+      "canonical_code": "GROSS_MARGIN_JOB_FAMILY",
+      "name": "Gross Margin by Job / Product Family",
+      "name_vi": "Biên lợi nhuận gộp theo nhóm lệnh/sản phẩm",
+      "tier": "company",
+      "layer": "bsc_monthly",
+      "purpose": "Đo biên lợi nhuận theo nhóm để quyết định cơ cấu mặt hàng và chính sách báo giá.",
+      "formula": {
+        "numerator": "Doanh thu trừ giá vốn theo nhóm lệnh/sản phẩm trong kỳ",
+        "denominator": "Doanh thu theo nhóm lệnh/sản phẩm trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "Lệnh nội bộ/bảo hành không tính",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥28%",
+        "yellow": "22–27.99%",
+        "red": "<22%"
+      },
+      "data_source": {
+        "system": "ERP",
+        "tables": [
+          "job_orders",
+          "invoices"
+        ],
+        "columns": [
+          "job_cost",
+          "revenue",
+          "product_family"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "FIN",
+      "data_stewardship_role": "FIN",
+      "cadence": "monthly",
+      "lead_or_lag": "lag",
+      "paired_metric": "QUOTE_HIT_RATE",
+      "decision_action": "Đỏ: soát biên lợi nhuận theo khách/quy trình/nguyên nhân làm lại; FIN trình CEO.",
+      "counter_metric": null,
+      "reward_eligible": true,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 5,
+      "canonical_code": "RECORDABLE_INCIDENT_RATE",
+      "name": "Recordable Incident / LTI Rate",
+      "name_vi": "Tỷ lệ tai nạn ghi nhận / mất ngày công",
+      "tier": "company",
+      "layer": "bsc_monthly",
+      "purpose": "Đo an toàn lao động — cổng không đánh đổi; quyết định dừng việc, điều tra và bài học.",
+      "formula": {
+        "numerator": "Số sự cố ghi nhận (recordable + LTI) × 200.000",
+        "denominator": "Tổng giờ công lao động trong kỳ",
+        "unit": "rate",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "lower_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "0 sự cố ghi nhận",
+        "yellow": "1 sự cố ghi nhận, không LTI",
+        "red": "≥1 LTI hoặc ≥2 recordable"
+      },
+      "data_source": {
+        "system": "EHS",
+        "tables": [
+          "incident_logs"
+        ],
+        "columns": [
+          "severity",
+          "incident_date",
+          "lost_days"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "EHS",
+      "data_stewardship_role": "EHS",
+      "cadence": "monthly",
+      "lead_or_lag": "lag",
+      "paired_metric": "SAFETY_ONBOARDING_COMPLIANCE",
+      "decision_action": "Bất kỳ sự cố nghiêm trọng: lãnh đạo soát xét ngay; EHS mở điều tra trong 24h.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 6,
+      "canonical_code": "BCP_READINESS",
+      "name": "Business Continuity Readiness",
+      "name_vi": "Mức sẵn sàng về tính liên tục kinh doanh",
+      "tier": "company",
+      "layer": "bsc_monthly",
+      "purpose": "Đo mức sẵn sàng dự phòng người/hệ thống/tài liệu để quyết định lấp khoảng trống năng lực.",
+      "formula": {
+        "numerator": "Số chức năng trọng yếu có phương án dự phòng + phó + soát xét gần đây",
+        "denominator": "Tổng số chức năng trọng yếu",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "100%",
+        "yellow": "90–99.99%",
+        "red": "<90%"
+      },
+      "data_source": {
+        "system": "form",
+        "tables": [
+          "role_backup_certifications"
+        ],
+        "columns": [
+          "function_code",
+          "has_deputy",
+          "last_review_date"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "QMS",
+      "data_stewardship_role": "HR",
+      "cadence": "monthly",
+      "lead_or_lag": "lead",
+      "paired_metric": "CRITICAL_ROLE_BACKUP_COVERAGE",
+      "decision_action": "Đỏ: lập kế hoạch lấp khoảng trống về người/hệ thống/tài liệu; QMS trình CEO theo quý.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 7,
+      "canonical_code": "RFQ_TURNAROUND_TIME",
+      "name": "RFQ Turnaround Time",
+      "name_vi": "Thời gian xử lý yêu cầu báo giá (RFQ)",
+      "tier": "value_stream",
+      "layer": "bsc_monthly",
+      "purpose": "Đo thời gian từ RFQ đầy đủ đến báo giá để quyết định cải thiện chất lượng tiếp nhận và hỗ trợ kỹ thuật.",
+      "formula": {
+        "numerator": "Tổng số ngày làm việc từ rfq_received_at đến quoted_at của các RFQ hoàn tất trong kỳ",
+        "denominator": "Số RFQ hoàn tất báo giá trong kỳ",
+        "unit": "day",
+        "rounding": "round to 1 decimal",
+        "exclusions": "RFQ khách rút lại trước khi báo giá không tính",
+        "direction": "lower_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≤3 ngày",
+        "yellow": "3.01–5 ngày",
+        "red": ">5 ngày"
+      },
+      "data_source": {
+        "system": "ERP",
+        "tables": [
+          "rfq_records"
+        ],
+        "columns": [
+          "received_at",
+          "quoted_at",
+          "rfq_status"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "CS",
+      "data_stewardship_role": "EST",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "paired_metric": "QUOTE_HIT_RATE",
+      "decision_action": "Vượt ngưỡng: soát chất lượng RFQ tiếp nhận và hỗ trợ kỹ thuật; CS chủ trì.",
+      "counter_metric": "RFQ_COMPLETENESS_SCORE",
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 8,
+      "canonical_code": "ORDER_REVIEW_RFT",
+      "name": "Order Review Right-First-Time",
+      "name_vi": "Tỷ lệ soát xét đơn hàng đúng lần đầu",
+      "tier": "value_stream",
+      "layer": "bsc_monthly",
+      "purpose": "Đo tỷ lệ đơn vào sản xuất không phải mở lại vì thiếu điều kiện soát xét.",
+      "formula": {
+        "numerator": "Số đơn vào sản xuất không phải mở lại soát xét trong kỳ",
+        "denominator": "Tổng số đơn được soát xét trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥97%",
+        "yellow": "92–96.99%",
+        "red": "<92%"
+      },
+      "data_source": {
+        "system": "ERP",
+        "tables": [
+          "job_orders"
+        ],
+        "columns": [
+          "order_review_status",
+          "review_reopened_at"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "CS",
+      "data_stewardship_role": "QA",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "paired_metric": "RFQ_COMPLETENESS_SCORE",
+      "decision_action": "Đỏ: soát lại bàn giao tại bước báo giá/chấp nhận đơn hàng; CS + D-ENG cùng xử lý.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 9,
+      "canonical_code": "PLAN_ADHERENCE",
+      "name": "Plan Adherence / Dispatch Stability",
+      "name_vi": "Mức tuân thủ kế hoạch / độ ổn định điều độ",
+      "tier": "value_stream",
+      "layer": "toc_weekly",
+      "purpose": "Đo độ ổn định lịch sản xuất để quyết định kỷ luật hot-job và ràng buộc vật tư/dụng cụ.",
+      "formula": {
+        "numerator": "Số lệnh sản xuất bám lịch đã khoá hoặc tái sắp xếp có phê duyệt",
+        "denominator": "Tổng số lệnh sản xuất trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "Lệnh có cờ approved_resequence (re-sequence khách yêu cầu được duyệt) không tính là lệch",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥90%",
+        "yellow": "80–89.99%",
+        "red": "<80%"
+      },
+      "data_source": {
+        "system": "MOM",
+        "tables": [
+          "job_orders"
+        ],
+        "columns": [
+          "scheduled_start",
+          "actual_start",
+          "approved_resequence_flag"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "PPL",
+      "data_stewardship_role": "PD",
+      "cadence": "daily",
+      "lead_or_lag": "lead",
+      "paired_metric": "OTD",
+      "decision_action": "Đỏ: soát kỷ luật hot-job và ràng buộc vật tư/dụng cụ; PPL mở hành động trong ngày.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 10,
+      "canonical_code": "FAI_FIRST_PASS",
+      "name": "First-Piece / FAI First-Pass Acceptance",
+      "name_vi": "Tỷ lệ chấp nhận mẫu đầu / FAI ngay lần đầu",
+      "tier": "value_stream",
+      "layer": "qms_mes_gate",
+      "purpose": "Đo tỷ lệ mẫu đầu đạt không cần lặp để quyết định soát CAM/setup/quy trình/đo lường.",
+      "formula": {
+        "numerator": "Số FAI đạt ngay lần kiểm đầu tiên (attempt_number = 1) trong kỳ",
+        "denominator": "Tổng số FAI thực hiện trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥95%",
+        "yellow": "88–94.99%",
+        "red": "<88%"
+      },
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "inspection_results"
+        ],
+        "columns": [
+          "inspection_type",
+          "attempt_number",
+          "result"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "QA",
+      "data_stewardship_role": "QC",
+      "cadence": "weekly",
+      "lead_or_lag": "lead",
+      "paired_metric": "FINAL_RELEASE_RFT",
+      "decision_action": "Đỏ: liên kết soát CAM/setup/quy trình/đo lường; D-ENG + QA xử lý trong 48h.",
+      "counter_metric": "SETUP_FIRST_PASS",
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 11,
+      "canonical_code": "WIP_AGING",
+      "name": "Queue Aging / WIP Aging",
+      "name_vi": "Tuổi tồn WIP / thời gian chờ hàng đợi",
+      "tier": "value_stream",
+      "layer": "toc_weekly",
+      "purpose": "Đo số lệnh quá tuổi trong từng cổng để quyết định ưu tiên gỡ nút thắt.",
+      "formula": {
+        "numerator": "Số lệnh sản xuất đang mở có (ngày hiện tại - created_date) vượt ngưỡng tuổi của cổng",
+        "denominator": "Tổng số lệnh sản xuất đang mở trong cổng",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "lower_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≤5%",
+        "yellow": "5.01–12%",
+        "red": ">12%"
+      },
+      "data_source": {
+        "system": "MOM",
+        "tables": [
+          "job_orders"
+        ],
+        "columns": [
+          "created_date",
+          "job_status",
+          "gate_code"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "PPL",
+      "data_stewardship_role": "PD",
+      "cadence": "daily",
+      "lead_or_lag": "lead",
+      "paired_metric": "OTD",
+      "decision_action": "Đỏ: mở soát luồng-control; ưu tiên gỡ nút thắt; PPL + PD chủ trì TOC tuần.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 12,
+      "canonical_code": "SUPPLIER_OTD",
+      "name": "Supplier OTD / Incoming Readiness",
+      "name_vi": "Giao hàng đúng hạn nhà cung cấp / sẵn sàng đầu vào",
+      "tier": "value_stream",
+      "layer": "bsc_monthly",
+      "purpose": "Đo độ tin cậy giao hàng nhà cung cấp để quyết định hành động nhà cung cấp hoặc đổi nguồn.",
+      "formula": {
+        "numerator": "Trung bình otd_pct của các nhà cung cấp được đánh giá trong kỳ",
+        "denominator": "Số nhà cung cấp có đánh giá trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥90%",
+        "yellow": "85–89.99%",
+        "red": "<85%"
+      },
+      "data_source": {
+        "system": "ERP",
+        "tables": [
+          "vendor_ratings"
+        ],
+        "columns": [
+          "otd_pct",
+          "period_start",
+          "period_end"
+        ],
+        "evidence": "Sổ nhà cung cấp + trạng thái nhận hàng."
+      },
+      "owner_role": "SCM",
+      "data_stewardship_role": "SCM",
+      "cadence": "monthly",
+      "lead_or_lag": "lag",
+      "paired_metric": "MATERIAL_AVAILABILITY_PLAN",
+      "decision_action": "Đỏ: mở hành động nhà cung cấp hoặc quyết định đổi nguồn; SCM chủ trì.",
+      "counter_metric": "SUPPLIER_IQC_PASS_RATE",
+      "reward_eligible": false,
+      "calculation_status": "runtime_calculated",
+      "status": "retained"
+    },
+    {
+      "no": 13,
+      "canonical_code": "SHIP_READY_TO_INVOICE_LT",
+      "name": "Ship-Ready to Invoice Lead Time",
+      "name_vi": "Thời gian từ sẵn sàng giao đến xuất hóa đơn",
+      "tier": "value_stream",
+      "layer": "bsc_monthly",
+      "purpose": "Đo thời gian từ phát hành/giao đến xuất hóa đơn để quyết định đóng khoảng trống lập hóa đơn.",
+      "formula": {
+        "numerator": "Tổng số ngày từ ngày sẵn sàng giao đến ngày xuất hóa đơn của các lô trong kỳ",
+        "denominator": "Số lô được xuất hóa đơn trong kỳ",
+        "unit": "day",
+        "rounding": "round to 1 decimal",
+        "exclusions": "none",
+        "direction": "lower_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≤2 ngày",
+        "yellow": "2.01–4 ngày",
+        "red": ">4 ngày"
+      },
+      "data_source": {
+        "system": "ERP",
+        "tables": [
+          "shipments",
+          "invoices"
+        ],
+        "columns": [
+          "ship_date",
+          "invoice_date"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "FIN",
+      "data_stewardship_role": "CS",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "paired_metric": "INVOICE_RFT",
+      "decision_action": "Đỏ: đóng khoảng trống lập hóa đơn bằng bằng chứng; FIN + CS xử lý trong tuần.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 14,
+      "canonical_code": "DSO",
+      "name": "AR Collection Lead Time / DSO",
+      "name_vi": "Số ngày công nợ tồn đọng (DSO)",
+      "tier": "value_stream",
+      "layer": "bsc_monthly",
+      "purpose": "Đo tuổi công nợ từ hóa đơn đến tiền mặt để quyết định kế hoạch thu hồi và leo thang thương mại.",
+      "formula": {
+        "numerator": "Tổng số ngày từ ngày hóa đơn đến ngày thu tiền của các hóa đơn trong kỳ",
+        "denominator": "Số hóa đơn được thu trong kỳ",
+        "unit": "day",
+        "rounding": "round to 1 decimal",
+        "exclusions": "none",
+        "direction": "lower_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≤45 ngày",
+        "yellow": "45.01–60 ngày",
+        "red": ">60 ngày"
+      },
+      "data_source": {
+        "system": "ERP",
+        "tables": [
+          "invoices",
+          "ar_receipts"
+        ],
+        "columns": [
+          "invoice_date",
+          "payment_date"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "FIN",
+      "data_stewardship_role": "FIN",
+      "cadence": "monthly",
+      "lead_or_lag": "lag",
+      "paired_metric": "INVOICE_RFT",
+      "decision_action": "Đỏ: lập kế hoạch thu hồi và leo thang thương mại; FIN chủ trì.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 15,
+      "canonical_code": "SCHEDULE_RECOVERY_EFFECTIVENESS",
+      "name": "Production Schedule Adherence / Recovery Effectiveness",
+      "name_vi": "Mức tuân thủ lịch sản xuất / hiệu quả khôi phục tiến độ",
+      "tier": "department",
+      "layer": "lean_daily",
+      "purpose": "Đo hiệu quả khôi phục tiến độ sau lệch lịch để quyết định sắp xếp lại và hành động năng lực.",
+      "formula": {
+        "numerator": "Số lệnh lệch lịch được khôi phục về cam kết trong cửa sổ phục hồi",
+        "denominator": "Tổng số lệnh lệch lịch trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥85%",
+        "yellow": "70–84.99%",
+        "red": "<70%"
+      },
+      "data_source": {
+        "system": "MOM",
+        "tables": [
+          "job_orders"
+        ],
+        "columns": [
+          "scheduled_start",
+          "actual_start",
+          "recovery_window_end"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "PD",
+      "data_stewardship_role": "PPL",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "paired_metric": "PLAN_ADHERENCE",
+      "decision_action": "Đỏ: sắp xếp lại và mở hành động năng lực; PD chủ trì họp tầng.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 16,
+      "canonical_code": "FOD_LINE_CLEARANCE_COMPLIANCE",
+      "name": "FOD / Line Clearance / Release Discipline",
+      "name_vi": "Tuân thủ vệ sinh FOD / kiểm tra dây chuyền / kỷ luật phát hành",
+      "tier": "department",
+      "layer": "qms_mes_gate",
+      "purpose": "Đo kỷ luật vệ sinh FOD và kiểm tra dây chuyền để quyết định bao vây và đào tạo lại.",
+      "formula": {
+        "numerator": "Số lần kiểm tra FOD/line-clearance đạt trong kỳ",
+        "denominator": "Tổng số lần kiểm tra FOD/line-clearance thực hiện",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "100%",
+        "yellow": "98–99.99%",
+        "red": "<98%"
+      },
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "quality_audits"
+        ],
+        "columns": [
+          "audit_type",
+          "result"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "WKM",
+      "data_stewardship_role": "SL",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "paired_metric": "FAI_FIRST_PASS",
+      "decision_action": "Lặp lỗi: mở bao vây và đào tạo lại; WKM xử lý trong ca.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 17,
+      "canonical_code": "ENGINEERING_RELEASE_ON_TIME",
+      "name": "Engineering Release On Time",
+      "name_vi": "Phát hành kỹ thuật đúng hạn",
+      "tier": "department",
+      "layer": "bsc_monthly",
+      "purpose": "Đo tỷ lệ phát hành kỹ thuật đúng hạn để quyết định soát nút thắt và thay đổi thứ tự hàng đợi.",
+      "formula": {
+        "numerator": "Số gói phát hành kỹ thuật hoàn tất trước hoặc đúng due_date",
+        "denominator": "Tổng số gói phát hành kỹ thuật trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥95%",
+        "yellow": "88–94.99%",
+        "red": "<88%"
+      },
+      "data_source": {
+        "system": "ERP",
+        "tables": [
+          "engineering_releases"
+        ],
+        "columns": [
+          "due_date",
+          "released_at"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "ENGM",
+      "data_stewardship_role": "ENGM",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "paired_metric": "ORDER_REVIEW_RFT",
+      "decision_action": "Trễ: soát nút thắt và thay đổi thứ tự hàng đợi; ENGM chủ trì.",
+      "counter_metric": "ENGINEERING_RELEASE_DEFECT_RATE",
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 18,
+      "canonical_code": "ECO_CLOSURE_AGING",
+      "name": "ECO Closure Aging",
+      "name_vi": "Tuổi tồn đóng ECO",
+      "tier": "department",
+      "layer": "bsc_monthly",
+      "purpose": "Đo tuổi tồn ECO mở để quyết định leo thang khi công việc/đơn hàng bị ảnh hưởng.",
+      "formula": {
+        "numerator": "Số ECO đang mở có (ngày hiện tại - created_at) vượt ngưỡng tuổi",
+        "denominator": "Tổng số ECO đang mở",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "Tính theo ngày mở, không theo ngày đóng",
+        "direction": "lower_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≤10%",
+        "yellow": "10.01–25%",
+        "red": ">25%"
+      },
+      "data_source": {
+        "system": "ERP",
+        "tables": [
+          "eco_records"
+        ],
+        "columns": [
+          "created_at",
+          "closed_at",
+          "eco_status"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "ENGM",
+      "data_stewardship_role": "ENGM",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "paired_metric": "ENGINEERING_RELEASE_ON_TIME",
+      "decision_action": "Quá hạn: leo thang báo cáo công việc/đơn hàng bị ảnh hưởng; ENGM trình tầng kế.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 19,
+      "canonical_code": "NCR_CLOSURE_AGING",
+      "name": "NCR Closure Aging",
+      "name_vi": "Tuổi tồn đóng NCR",
+      "tier": "department",
+      "layer": "bsc_monthly",
+      "purpose": "Đo tuổi tồn NCR mở để quyết định leo thang hàng tuần và bảo vệ chống dời ngày đóng.",
+      "formula": {
+        "numerator": "Số NCR đang mở có (ngày hiện tại - created_at) vượt ngưỡng tuổi",
+        "denominator": "Tổng số NCR đang mở",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "Tính theo ngày mở (created_at), không theo ngày đóng",
+        "direction": "lower_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≤10%",
+        "yellow": "10.01–25%",
+        "red": ">25%"
+      },
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "ncr_records"
+        ],
+        "columns": [
+          "created_at",
+          "closed_at",
+          "ncr_status"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "QA",
+      "data_stewardship_role": "QMS",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "paired_metric": "CAPA_EFFECTIVENESS",
+      "decision_action": "Quá hạn: leo thang hàng tuần; QA chủ trì soát root-cause cùng phòng liên quan.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 20,
+      "canonical_code": "CAL_COMPLIANCE",
+      "name": "Calibration / Metrology Readiness",
+      "name_vi": "Tuân thủ hiệu chuẩn / sẵn sàng đo lường",
+      "tier": "department",
+      "layer": "bsc_monthly",
+      "purpose": "Đo mức sẵn sàng hiệu chuẩn để quyết định tạm giữ hoạt động phụ thuộc đo lường.",
+      "formula": {
+        "numerator": "Số thiết bị có lần hiệu chuẩn mới nhất calibration_date <= calibration_due",
+        "denominator": "Tổng số thiết bị đang hoạt động có calibration_due trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "100%",
+        "yellow": "98–99.99%",
+        "red": "<98%"
+      },
+      "data_source": {
+        "system": "MOM",
+        "tables": [
+          "equipment",
+          "calibration_records"
+        ],
+        "columns": [
+          "calibration_due",
+          "calibration_date",
+          "is_active"
+        ],
+        "evidence": "Sổ hiệu chuẩn + lịch hiệu chuẩn thiết bị."
+      },
+      "owner_role": "QA",
+      "data_stewardship_role": "QC",
+      "cadence": "monthly",
+      "lead_or_lag": "lead",
+      "paired_metric": "FAI_FIRST_PASS",
+      "decision_action": "Quá hạn: tạm giữ hoạt động phụ thuộc đo lường; QA + MCS xử lý trong 24h.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "runtime_calculated",
+      "status": "retained"
+    },
+    {
+      "no": 21,
+      "canonical_code": "MATERIAL_AVAILABILITY_PLAN",
+      "name": "Material Availability for Plan",
+      "name_vi": "Mức sẵn sàng nguyên vật liệu cho kế hoạch",
+      "tier": "department",
+      "layer": "lean_daily",
+      "purpose": "Đo mức sẵn sàng vật tư cho lịch đã khoá để quyết định đẩy nhanh tiến độ hoặc đổi nguồn.",
+      "formula": {
+        "numerator": "Số lệnh sản xuất trong lịch có đủ vật tư sẵn sàng trước freeze",
+        "denominator": "Tổng số lệnh sản xuất trong lịch đã khoá",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥95%",
+        "yellow": "85–94.99%",
+        "red": "<85%"
+      },
+      "data_source": {
+        "system": "ERP",
+        "tables": [
+          "purchase_orders",
+          "inventory_balances"
+        ],
+        "columns": [
+          "material_status",
+          "required_date"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "SCM",
+      "data_stewardship_role": "SCM",
+      "cadence": "daily",
+      "lead_or_lag": "lead",
+      "paired_metric": "PLAN_ADHERENCE",
+      "decision_action": "Đỏ: đẩy nhanh tiến độ hoặc quyết định đổi nguồn; SCM xử lý trong ngày.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 22,
+      "canonical_code": "INVENTORY_ACCURACY",
+      "name": "Inventory Accuracy / Tool Accountability",
+      "name_vi": "Độ chính xác tồn kho / trách nhiệm dụng cụ",
+      "tier": "department",
+      "layer": "bsc_monthly",
+      "purpose": "Đo độ khớp giữa đếm thực tế và hệ thống để quyết định đếm lại và hành động kiểm soát.",
+      "formula": {
+        "numerator": "Số dòng cycle-count có số đếm khớp số hệ thống",
+        "denominator": "Tổng số dòng cycle-count thực hiện trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥98%",
+        "yellow": "95–97.99%",
+        "red": "<95%"
+      },
+      "data_source": {
+        "system": "ERP",
+        "tables": [
+          "cycle_count_results"
+        ],
+        "columns": [
+          "counted_qty",
+          "system_qty"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "SCM",
+      "data_stewardship_role": "SCM",
+      "cadence": "monthly",
+      "lead_or_lag": "lag",
+      "paired_metric": "MATERIAL_AVAILABILITY_PLAN",
+      "decision_action": "Chênh lệch: đếm lại và mở hành động kiểm soát; D-SCM + D-WHS xử lý.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 23,
+      "canonical_code": "QUOTE_HIT_RATE",
+      "name": "Quote Hit Rate vs Qualified RFQ",
+      "name_vi": "Tỷ lệ trúng báo giá trên RFQ đủ năng lực",
+      "tier": "department",
+      "layer": "bsc_monthly",
+      "purpose": "Đo tỷ lệ báo giá thắng để quyết định soát định giá, đánh giá năng lực và phản hồi chất lượng.",
+      "formula": {
+        "numerator": "Số RFQ chuyển thành đơn hàng trong kỳ",
+        "denominator": "Tổng số RFQ đủ năng lực được báo giá trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "RFQ ngoài năng lực không tính vào mẫu số",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥35%",
+        "yellow": "25–34.99%",
+        "red": "<25%"
+      },
+      "data_source": {
+        "system": "ERP",
+        "tables": [
+          "rfq_records"
+        ],
+        "columns": [
+          "rfq_status",
+          "won_at",
+          "qualified_flag"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "CS",
+      "data_stewardship_role": "EST",
+      "cadence": "monthly",
+      "lead_or_lag": "lag",
+      "paired_metric": "GROSS_MARGIN_JOB_FAMILY",
+      "decision_action": "Soát định giá, đánh giá năng lực, phản hồi chất lượng; CS + EST chủ trì.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 24,
+      "canonical_code": "CUSTOMER_COMM_CLOSURE_OT",
+      "name": "Customer Communication Closure On Time",
+      "name_vi": "Đóng trao đổi khách hàng đúng hạn",
+      "tier": "department",
+      "layer": "lean_daily",
+      "purpose": "Đo tỷ lệ đóng trao đổi khách đúng hạn để quyết định leo thang tài khoản rủi ro.",
+      "formula": {
+        "numerator": "Số trao đổi khách hàng đóng trong SLA",
+        "denominator": "Tổng số trao đổi khách hàng trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥95%",
+        "yellow": "85–94.99%",
+        "red": "<85%"
+      },
+      "data_source": {
+        "system": "ERP",
+        "tables": [
+          "customer_communication_log"
+        ],
+        "columns": [
+          "created_at",
+          "closed_at",
+          "sla_hours"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "CS",
+      "data_stewardship_role": "CS",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "paired_metric": "COMPLAINT_RATE",
+      "decision_action": "Quá hạn: leo thang lãnh đạo trên tài khoản rủi ro; CS chủ trì.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 25,
+      "canonical_code": "INVOICE_RFT",
+      "name": "Invoice Right-First-Time",
+      "name_vi": "Hóa đơn đúng ngay lần đầu",
+      "tier": "department",
+      "layer": "bsc_monthly",
+      "purpose": "Đo tỷ lệ hóa đơn không lỗi để quyết định truy nguyên nhân gốc theo vai trò xác nhận dữ liệu.",
+      "formula": {
+        "numerator": "Số hóa đơn không có lỗi (error_count = 0) trong kỳ",
+        "denominator": "Tổng số hóa đơn phát hành trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥98%",
+        "yellow": "95–97.99%",
+        "red": "<95%"
+      },
+      "data_source": {
+        "system": "ERP",
+        "tables": [
+          "invoices"
+        ],
+        "columns": [
+          "error_count",
+          "invoice_date"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "FIN",
+      "data_stewardship_role": "FIN",
+      "cadence": "weekly",
+      "lead_or_lag": "lead",
+      "paired_metric": "DSO",
+      "decision_action": "Lỗi: truy nguyên nhân gốc theo vai trò xác nhận dữ liệu nguồn; FIN xử lý.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 26,
+      "canonical_code": "MONTH_END_CLOSE_OT",
+      "name": "Month-End Close On Time",
+      "name_vi": "Đóng sổ cuối tháng đúng hạn",
+      "tier": "department",
+      "layer": "bsc_monthly",
+      "purpose": "Đo tính đúng hạn của đóng sổ cuối tháng để quyết định sửa công đoạn dữ liệu hoặc bố trí nhân sự.",
+      "formula": {
+        "numerator": "Số bước đóng sổ hoàn tất đúng lịch",
+        "denominator": "Tổng số bước trong lịch đóng sổ cuối tháng",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "100%",
+        "yellow": "90–99.99%",
+        "red": "<90%"
+      },
+      "data_source": {
+        "system": "ERP",
+        "tables": [
+          "finance_close_log"
+        ],
+        "columns": [
+          "step_code",
+          "due_date",
+          "completed_at"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "FIN",
+      "data_stewardship_role": "FIN",
+      "cadence": "monthly",
+      "lead_or_lag": "lag",
+      "paired_metric": "INVOICE_RFT",
+      "decision_action": "Chậm trễ: sửa dữ liệu công đoạn trước hoặc bố trí nhân sự; FIN chủ trì.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 27,
+      "canonical_code": "TRAINING_COMP",
+      "name": "Training Completion On Time",
+      "name_vi": "Hoàn thành đào tạo đúng hạn",
+      "tier": "department",
+      "layer": "bsc_monthly",
+      "purpose": "Đo tỷ lệ hoàn thành đào tạo để quyết định khoá quyền thực hiện công việc khi bắt buộc.",
+      "formula": {
+        "numerator": "Số bản ghi đào tạo có assessment_result thuộc ('Pass','Conditional')",
+        "denominator": "Tổng số bản ghi đào tạo trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥95%",
+        "yellow": "85–94.99%",
+        "red": "<85%"
+      },
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "training_records"
+        ],
+        "columns": [
+          "assessment_result",
+          "recorded_at"
+        ],
+        "evidence": "Biểu mẫu FRM-801–806."
+      },
+      "owner_role": "HR",
+      "data_stewardship_role": "HR",
+      "cadence": "monthly",
+      "lead_or_lag": "lead",
+      "paired_metric": "CRITICAL_ROLE_BACKUP_COVERAGE",
+      "decision_action": "Quá hạn: khoá quyền được uỷ quyền thực hiện công việc ở nơi bắt buộc; HR + trưởng phòng xử lý.",
+      "counter_metric": "TRAINING_COMPETENCY_VERIFIED_RATE",
+      "reward_eligible": false,
+      "calculation_status": "runtime_calculated",
+      "status": "retained"
+    },
+    {
+      "no": 28,
+      "canonical_code": "CRITICAL_ROLE_BACKUP_COVERAGE",
+      "name": "Certified Role Backup Coverage",
+      "name_vi": "Mức bao phủ dự phòng vai trò đã chứng nhận",
+      "tier": "department",
+      "layer": "bsc_monthly",
+      "purpose": "Đo mức bao phủ dự phòng vai trò trọng yếu để quyết định mở kế hoạch đào tạo chéo.",
+      "formula": {
+        "numerator": "Số vai trò trọng yếu có ít nhất một người dự phòng được chứng nhận còn hiệu lực",
+        "denominator": "Tổng số vai trò trọng yếu",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "100%",
+        "yellow": "85–99.99%",
+        "red": "<85%"
+      },
+      "data_source": {
+        "system": "form",
+        "tables": [
+          "role_backup_certifications"
+        ],
+        "columns": [
+          "role_code",
+          "backup_employee_id",
+          "certified_at",
+          "expires_at"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "HR",
+      "data_stewardship_role": "HR",
+      "cadence": "monthly",
+      "lead_or_lag": "lead",
+      "paired_metric": "BCP_READINESS",
+      "decision_action": "Khoảng trống: mở kế hoạch đào tạo chéo; HR + trưởng phòng chủ trì.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 29,
+      "canonical_code": "INCIDENT_ACTION_CLOSURE_AGING",
+      "name": "Incident Action Closure Aging",
+      "name_vi": "Tuổi tồn đóng hành động sự cố",
+      "tier": "department",
+      "layer": "bsc_monthly",
+      "purpose": "Đo tuổi tồn hành động sự cố mở để quyết định leo thang an toàn.",
+      "formula": {
+        "numerator": "Số hành động sự cố đang mở có (ngày hiện tại - created_at) vượt ngưỡng tuổi",
+        "denominator": "Tổng số hành động sự cố đang mở",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "Tính theo ngày mở hành động",
+        "direction": "lower_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≤10%",
+        "yellow": "10.01–25%",
+        "red": ">25%"
+      },
+      "data_source": {
+        "system": "EHS",
+        "tables": [
+          "incident_logs",
+          "incident_actions"
+        ],
+        "columns": [
+          "created_at",
+          "closed_at"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "EHS",
+      "data_stewardship_role": "EHS",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "paired_metric": "RECORDABLE_INCIDENT_RATE",
+      "decision_action": "Quá hạn: leo thang an toàn; EHS chủ trì soát xét tuần.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 30,
+      "canonical_code": "SAFETY_ONBOARDING_COMPLIANCE",
+      "name": "Safety Onboarding Training Compliance",
+      "name_vi": "Tuân thủ đào tạo an toàn hội nhập",
+      "tier": "department",
+      "layer": "bsc_monthly",
+      "purpose": "Đo tỷ lệ hoàn thành đào tạo an toàn hội nhập để quyết định khoá quyền vào xưởng.",
+      "formula": {
+        "numerator": "Số nhân sự mới hoàn thành đào tạo an toàn hội nhập đúng hạn",
+        "denominator": "Tổng số nhân sự mới trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "100%",
+        "yellow": "95–99.99%",
+        "red": "<95%"
+      },
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "training_records"
+        ],
+        "columns": [
+          "training_type",
+          "assessment_result",
+          "recorded_at"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "EHS",
+      "data_stewardship_role": "HR",
+      "cadence": "monthly",
+      "lead_or_lag": "lead",
+      "paired_metric": "RECORDABLE_INCIDENT_RATE",
+      "decision_action": "Chưa đủ: khoá quyền vào xưởng cho đến khi hoàn thành; EHS + HR xử lý.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 31,
+      "canonical_code": "SERVICE_TICKET_SLA",
+      "name": "Service Ticket Closure Within SLA",
+      "name_vi": "Đóng phiếu dịch vụ trong SLA",
+      "tier": "department",
+      "layer": "lean_daily",
+      "purpose": "Đo tỷ lệ phiếu dịch vụ đóng trong SLA để quyết định bổ sung nguồn lực hỗ trợ.",
+      "formula": {
+        "numerator": "Số phiếu dịch vụ đóng trong SLA",
+        "denominator": "Tổng số phiếu dịch vụ trong kỳ",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "none",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥95%",
+        "yellow": "85–94.99%",
+        "red": "<85%"
+      },
+      "data_source": {
+        "system": "MOM",
+        "tables": [
+          "service_tickets"
+        ],
+        "columns": [
+          "created_at",
+          "resolved_at",
+          "sla_hours"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "ITA",
+      "data_stewardship_role": "ITA",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "paired_metric": "CRITICAL_SYSTEM_AVAILABILITY",
+      "decision_action": "Đỏ: bổ sung nguồn lực hỗ trợ; ITA chủ trì.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 32,
+      "canonical_code": "CRITICAL_SYSTEM_AVAILABILITY",
+      "name": "Critical System Availability / Readiness",
+      "name_vi": "Mức sẵn sàng hệ thống trọng yếu",
+      "tier": "department",
+      "layer": "bsc_monthly",
+      "purpose": "Đo mức sẵn sàng hệ thống trọng yếu để quyết định đầu tư hạ tầng hoặc phương án dự phòng.",
+      "formula": {
+        "numerator": "Tổng thời gian hệ thống trọng yếu sẵn sàng trong kỳ",
+        "denominator": "Tổng thời gian theo lịch của hệ thống trọng yếu",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "Bảo trì kế hoạch không tính là downtime",
+        "direction": "higher_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≥99.5%",
+        "yellow": "98–99.49%",
+        "red": "<98%"
+      },
+      "data_source": {
+        "system": "MOM",
+        "tables": [
+          "system_uptime_logs"
+        ],
+        "columns": [
+          "system_code",
+          "downtime_minutes"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "ITA",
+      "data_stewardship_role": "ITA",
+      "cadence": "monthly",
+      "lead_or_lag": "lag",
+      "paired_metric": "SERVICE_TICKET_SLA",
+      "decision_action": "Đỏ: quyết định đầu tư hạ tầng hoặc phương án dự phòng; ITA trình lãnh đạo.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    },
+    {
+      "no": 33,
+      "canonical_code": "MASTER_DATA_EXCEPTION_AGING",
+      "name": "Master Data / Transaction Exception Aging",
+      "name_vi": "Tuổi tồn ngoại lệ dữ liệu gốc / giao dịch",
+      "tier": "department",
+      "layer": "bsc_monthly",
+      "purpose": "Đo tuổi tồn ngoại lệ dữ liệu để quyết định đếm lại và làm sạch dữ liệu gốc.",
+      "formula": {
+        "numerator": "Số ngoại lệ dữ liệu đang mở có (ngày hiện tại - created_at) vượt ngưỡng tuổi",
+        "denominator": "Tổng số ngoại lệ dữ liệu đang mở",
+        "unit": "%",
+        "rounding": "round to 2 decimals",
+        "exclusions": "Tính theo ngày mở ngoại lệ",
+        "direction": "lower_is_better",
+        "min_sample": 0
+      },
+      "thresholds": {
+        "green": "≤10%",
+        "yellow": "10.01–25%",
+        "red": ">25%"
+      },
+      "data_source": {
+        "system": "MOM",
+        "tables": [
+          "data_exceptions"
+        ],
+        "columns": [
+          "created_at",
+          "resolved_at",
+          "exception_type"
+        ],
+        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+      },
+      "owner_role": "ITA",
+      "data_stewardship_role": "SCM",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "paired_metric": "INVENTORY_ACCURACY",
+      "decision_action": "Quá hạn: mở hành động làm sạch dữ liệu gốc; ITA + D-SCM xử lý.",
+      "counter_metric": null,
+      "reward_eligible": false,
+      "calculation_status": "staged_data_contract",
+      "status": "retained"
+    }
   ],
   "proposed_operating_metrics": [
-    {"canonical_code": "OEE_BOTTLENECK", "name": "OEE at current constraint resource", "layer": "toc_weekly", "status": "staged_data_contract"},
-    {"canonical_code": "BOTTLENECK_BUFFER_STATUS", "name": "Constraint buffer red/yellow/green status", "layer": "toc_weekly", "status": "staged_data_contract"},
-    {"canonical_code": "THROUGHPUT_PER_CONSTRAINT_HOUR", "name": "Revenue/throughput per constraint hour", "layer": "toc_weekly", "status": "staged_data_contract"},
-    {"canonical_code": "CONSTRAINT_LOST_HOURS", "name": "Lost available hours at constraint", "layer": "toc_weekly", "status": "staged_data_contract"},
-    {"canonical_code": "WIP_BEFORE_CONSTRAINT", "name": "Released WIP before constraint", "layer": "toc_weekly", "status": "staged_data_contract"},
-    {"canonical_code": "SETUP_FIRST_PASS", "name": "Setup ready-to-run first-pass acceptance", "layer": "lean_daily", "status": "staged_data_contract"},
-    {"canonical_code": "FAI_FIRST_PASS", "name": "FAI/first-piece first-pass acceptance", "layer": "qms_mes_gate", "status": "retained_from_annex122"},
-    {"canonical_code": "IN_PROCESS_REJECT_RATE", "name": "In-process reject rate", "layer": "lean_daily", "status": "staged_data_contract"},
-    {"canonical_code": "REPEAT_NCR_RATE", "name": "Repeat NCR rate", "layer": "bsc_monthly", "status": "staged_data_contract"},
-    {"canonical_code": "CAPA_EFFECTIVENESS", "name": "CAPA effectiveness after verification window", "layer": "qms_mes_gate", "status": "staged_data_contract"},
-    {"canonical_code": "SUPPLIER_READINESS", "name": "Supplier readiness composite from OTD and incoming quality", "layer": "bsc_monthly", "status": "staged_data_contract"},
-    {"canonical_code": "CRITICAL_ROLE_CERT_COVERAGE", "name": "Critical role certification coverage", "layer": "bsc_monthly", "status": "staged_data_contract"},
-    {"canonical_code": "CYCLE_TIME_VARIANCE", "name": "Actual cycle time variance vs standard", "layer": "lean_daily", "status": "staged_data_contract"},
-    {"canonical_code": "MTBF", "name": "Mean time between failures", "layer": "lean_daily", "status": "staged_data_contract"},
-    {"canonical_code": "MTTR", "name": "Mean time to repair", "layer": "lean_daily", "status": "staged_data_contract"}
+    {
+      "canonical_code": "OEE_BOTTLENECK",
+      "name": "OEE at current constraint resource",
+      "layer": "toc_weekly",
+      "status": "staged_data_contract"
+    },
+    {
+      "canonical_code": "BOTTLENECK_BUFFER_STATUS",
+      "name": "Constraint buffer red/yellow/green status",
+      "layer": "toc_weekly",
+      "status": "staged_data_contract"
+    },
+    {
+      "canonical_code": "THROUGHPUT_PER_CONSTRAINT_HOUR",
+      "name": "Revenue/throughput per constraint hour",
+      "layer": "toc_weekly",
+      "status": "staged_data_contract"
+    },
+    {
+      "canonical_code": "CONSTRAINT_LOST_HOURS",
+      "name": "Lost available hours at constraint",
+      "layer": "toc_weekly",
+      "status": "staged_data_contract"
+    },
+    {
+      "canonical_code": "WIP_BEFORE_CONSTRAINT",
+      "name": "Released WIP before constraint",
+      "layer": "toc_weekly",
+      "status": "staged_data_contract"
+    },
+    {
+      "canonical_code": "SETUP_FIRST_PASS",
+      "name": "Setup ready-to-run first-pass acceptance",
+      "layer": "lean_daily",
+      "status": "staged_data_contract"
+    },
+    {
+      "canonical_code": "FAI_FIRST_PASS",
+      "name": "FAI/first-piece first-pass acceptance",
+      "layer": "qms_mes_gate",
+      "status": "retained_from_annex122"
+    },
+    {
+      "canonical_code": "IN_PROCESS_REJECT_RATE",
+      "name": "In-process reject rate",
+      "layer": "lean_daily",
+      "status": "staged_data_contract"
+    },
+    {
+      "canonical_code": "REPEAT_NCR_RATE",
+      "name": "Repeat NCR rate",
+      "layer": "bsc_monthly",
+      "status": "staged_data_contract"
+    },
+    {
+      "canonical_code": "CAPA_EFFECTIVENESS",
+      "name": "CAPA effectiveness after verification window",
+      "layer": "qms_mes_gate",
+      "status": "staged_data_contract"
+    },
+    {
+      "canonical_code": "SUPPLIER_READINESS",
+      "name": "Supplier readiness composite from OTD and incoming quality",
+      "layer": "bsc_monthly",
+      "status": "staged_data_contract"
+    },
+    {
+      "canonical_code": "CRITICAL_ROLE_CERT_COVERAGE",
+      "name": "Critical role certification coverage",
+      "layer": "bsc_monthly",
+      "status": "staged_data_contract"
+    },
+    {
+      "canonical_code": "CYCLE_TIME_VARIANCE",
+      "name": "Actual cycle time variance vs standard",
+      "layer": "lean_daily",
+      "status": "staged_data_contract"
+    },
+    {
+      "canonical_code": "MTBF",
+      "name": "Mean time between failures",
+      "layer": "lean_daily",
+      "status": "staged_data_contract"
+    },
+    {
+      "canonical_code": "MTTR",
+      "name": "Mean time to repair",
+      "layer": "lean_daily",
+      "status": "staged_data_contract"
+    }
   ],
   "dashboard_core_kpis": [
-    {"local_id": "KPI-01", "canonical_code": "OTD", "name": "OTD Release", "backend_status": "runtime_calculated", "primary_endpoint": "GET /api/kpi/OTD"},
-    {"local_id": "KPI-02", "canonical_code": "PROMISE_DATE_RISK", "name": "Promise-Date Risk", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"},
-    {"local_id": "KPI-03", "canonical_code": "WIP_AGING", "name": "WIP Aging", "backend_status": "widget_only", "primary_endpoint": "GET /api/dashboard/widget?widget_type=wip_aging"},
-    {"local_id": "KPI-04", "canonical_code": "PLAN_ADHERENCE", "name": "Dispatch/Plan Adherence", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"},
-    {"local_id": "KPI-05", "canonical_code": "FPY", "name": "First Pass Yield", "backend_status": "runtime_calculated", "primary_endpoint": "GET /api/kpi/FPY"},
-    {"local_id": "KPI-06", "canonical_code": "QC_HOLD_SLA", "name": "QC Hold SLA", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"},
-    {"local_id": "KPI-07", "canonical_code": "REPEAT_NCR_RATE", "name": "Repeat NCR Rate", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"},
-    {"local_id": "KPI-08", "canonical_code": "DOWNTIME_IMPACT", "name": "Downtime Impact", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"},
-    {"local_id": "KPI-09", "canonical_code": "SHIP_PACKET_COMPLETENESS", "name": "Ship Packet Completeness", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"},
-    {"local_id": "KPI-10", "canonical_code": "SUPPLIER_OTD", "name": "PO/Processor On-Time", "backend_status": "runtime_calculated_partial", "primary_endpoint": "GET /api/kpi/SUPPLIER_OTD"},
-    {"local_id": "KPI-11", "canonical_code": "INVENTORY_ACCURACY", "name": "Inventory Accuracy", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"},
-    {"local_id": "KPI-12", "canonical_code": "TIME_ENTRY_COMPLIANCE", "name": "Time Entry Compliance", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"}
+    {
+      "local_id": "KPI-01",
+      "canonical_code": "OTD",
+      "name": "OTD Release",
+      "backend_status": "runtime_calculated",
+      "primary_endpoint": "GET /api/kpi/OTD"
+    },
+    {
+      "local_id": "KPI-02",
+      "canonical_code": "PROMISE_DATE_RISK",
+      "name": "Promise-Date Risk",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog"
+    },
+    {
+      "local_id": "KPI-03",
+      "canonical_code": "WIP_AGING",
+      "name": "WIP Aging",
+      "backend_status": "widget_only",
+      "primary_endpoint": "GET /api/dashboard/widget?widget_type=wip_aging"
+    },
+    {
+      "local_id": "KPI-04",
+      "canonical_code": "PLAN_ADHERENCE",
+      "name": "Dispatch/Plan Adherence",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog"
+    },
+    {
+      "local_id": "KPI-05",
+      "canonical_code": "FPY",
+      "name": "First Pass Yield",
+      "backend_status": "runtime_calculated",
+      "primary_endpoint": "GET /api/kpi/FPY"
+    },
+    {
+      "local_id": "KPI-06",
+      "canonical_code": "QC_HOLD_SLA",
+      "name": "QC Hold SLA",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog"
+    },
+    {
+      "local_id": "KPI-07",
+      "canonical_code": "REPEAT_NCR_RATE",
+      "name": "Repeat NCR Rate",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog"
+    },
+    {
+      "local_id": "KPI-08",
+      "canonical_code": "DOWNTIME_IMPACT",
+      "name": "Downtime Impact",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog"
+    },
+    {
+      "local_id": "KPI-09",
+      "canonical_code": "SHIP_PACKET_COMPLETENESS",
+      "name": "Ship Packet Completeness",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog"
+    },
+    {
+      "local_id": "KPI-10",
+      "canonical_code": "SUPPLIER_OTD",
+      "name": "PO/Processor On-Time",
+      "backend_status": "runtime_calculated_partial",
+      "primary_endpoint": "GET /api/kpi/SUPPLIER_OTD"
+    },
+    {
+      "local_id": "KPI-11",
+      "canonical_code": "INVENTORY_ACCURACY",
+      "name": "Inventory Accuracy",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog"
+    },
+    {
+      "local_id": "KPI-12",
+      "canonical_code": "TIME_ENTRY_COMPLIANCE",
+      "name": "Time Entry Compliance",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog"
+    }
   ],
   "gate_control_metrics": [
-    {"local_id": "KPI-G0-01", "canonical_code": "RFQ_TURNAROUND_TIME", "name": "RFQ Turnaround Time", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-G0-02", "canonical_code": "ORDER_REVIEW_RFT", "name": "Contract Review FTR", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-G1-01", "canonical_code": "ENGINEERING_RELEASE_RFT", "name": "Engineering First-Time-Right", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-G1-02", "canonical_code": "ECN_LEAD_TIME", "name": "ECN Lead Time", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-G2-01", "canonical_code": "IQC_PASS_RATE", "name": "IQC Pass Rate", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-G2-02", "canonical_code": "TRACEABILITY_COMPLETENESS", "name": "Traceability Completeness", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-G3-01", "canonical_code": "SETUP_FIRST_PASS", "name": "Setup First-Pass Success", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-G3-02", "canonical_code": "CHANGEOVER_TIME", "name": "Changeover Time", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-G4-01", "canonical_code": "FAI_FIRST_PASS", "name": "FAI First-Pass Rate", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-G4-02", "canonical_code": "FAI_CYCLE_TIME", "name": "FAI Cycle Time", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-G5-01", "canonical_code": "IN_PROCESS_REJECT_RATE", "name": "In-Process Rejection Rate", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-G5-02", "canonical_code": "SPC_SIGNAL_REACTION_TIME", "name": "SPC Signal Reaction Time", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-G6-01", "canonical_code": "SHIP_PACKET_COMPLETENESS", "name": "Release Package Completeness", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-G6-02", "canonical_code": "TRACEABILITY_DRILL_TIME", "name": "Traceability Drill Time", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-G7-01", "canonical_code": "OTD", "name": "On-Time Delivery", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-G7-02", "canonical_code": "SHIP_READY_TO_INVOICE_LT", "name": "Ship-to-Invoice Turnaround", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-ALL-01", "canonical_code": "COPQ", "name": "Cost of Poor Quality", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-ALL-02", "canonical_code": "FPY", "name": "First Pass Yield", "classification": "gate_metric_not_annex122_count"},
-    {"local_id": "KPI-ALL-03", "canonical_code": "OEE", "name": "Overall Equipment Effectiveness", "classification": "gate_metric_not_annex122_count"}
+    {
+      "local_id": "KPI-G0-01",
+      "canonical_code": "RFQ_TURNAROUND_TIME",
+      "name": "RFQ Turnaround Time",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-G0-02",
+      "canonical_code": "ORDER_REVIEW_RFT",
+      "name": "Contract Review FTR",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-G1-01",
+      "canonical_code": "ENGINEERING_RELEASE_RFT",
+      "name": "Engineering First-Time-Right",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-G1-02",
+      "canonical_code": "ECN_LEAD_TIME",
+      "name": "ECN Lead Time",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-G2-01",
+      "canonical_code": "IQC_PASS_RATE",
+      "name": "IQC Pass Rate",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-G2-02",
+      "canonical_code": "TRACEABILITY_COMPLETENESS",
+      "name": "Traceability Completeness",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-G3-01",
+      "canonical_code": "SETUP_FIRST_PASS",
+      "name": "Setup First-Pass Success",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-G3-02",
+      "canonical_code": "CHANGEOVER_TIME",
+      "name": "Changeover Time",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-G4-01",
+      "canonical_code": "FAI_FIRST_PASS",
+      "name": "FAI First-Pass Rate",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-G4-02",
+      "canonical_code": "FAI_CYCLE_TIME",
+      "name": "FAI Cycle Time",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-G5-01",
+      "canonical_code": "IN_PROCESS_REJECT_RATE",
+      "name": "In-Process Rejection Rate",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-G5-02",
+      "canonical_code": "SPC_SIGNAL_REACTION_TIME",
+      "name": "SPC Signal Reaction Time",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-G6-01",
+      "canonical_code": "SHIP_PACKET_COMPLETENESS",
+      "name": "Release Package Completeness",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-G6-02",
+      "canonical_code": "TRACEABILITY_DRILL_TIME",
+      "name": "Traceability Drill Time",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-G7-01",
+      "canonical_code": "OTD",
+      "name": "On-Time Delivery",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-G7-02",
+      "canonical_code": "SHIP_READY_TO_INVOICE_LT",
+      "name": "Ship-to-Invoice Turnaround",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-ALL-01",
+      "canonical_code": "COPQ",
+      "name": "Cost of Poor Quality",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-ALL-02",
+      "canonical_code": "FPY",
+      "name": "First Pass Yield",
+      "classification": "gate_metric_not_annex122_count"
+    },
+    {
+      "local_id": "KPI-ALL-03",
+      "canonical_code": "OEE",
+      "name": "Overall Equipment Effectiveness",
+      "classification": "gate_metric_not_annex122_count"
+    }
   ],
   "document_audit": {
     "audit_report": "_reports/kpi/report-kpi-html-audit-2026-04-18.json",
@@ -200,7 +1895,13 @@
     "preferred_label": "Role Performance Measures",
     "rule": "JD measures support performance review and OJT but are not official enterprise KPIs unless mapped to this registry.",
     "recommended_per_role": "3-5 controlled measures",
-    "required_columns_when_revised": ["measure_name", "mapped_canonical_kpi", "evidence_source", "cadence", "owner"]
+    "required_columns_when_revised": [
+      "measure_name",
+      "mapped_canonical_kpi",
+      "evidence_source",
+      "cadence",
+      "owner"
+    ]
   },
   "performance_governance_policy": {
     "naming_rule": "A measurement may be called KPI only when it has an approved evaluation use. If it is not used for evaluation, call it operating metric, control metric, gate metric, role performance measure, or health indicator.",
@@ -239,10 +1940,35 @@
   },
   "metric_governance_schema": {
     "rule": "Every catalog metric must expose intent, behavior motive, expected result, decision purpose, evaluation use, consequence guardrail, anti-gaming counter metric, and data-contract status. Official KPI means metric_type = kpi and evaluation_use is approved.",
-    "metric_types": ["kpi", "operating_metric", "gate_control_metric", "role_performance_measure", "health_indicator"],
-    "result_types": ["outcome", "driver", "gate", "compliance", "health"],
-    "calculation_statuses": ["runtime_calculated", "runtime_calculated_partial", "widget_only", "staged_data_contract", "data_contract_required", "not_calculated"],
-    "scorecard_scoring_statuses": ["active_runtime", "manual_governed", "candidate_data_contract", "gate_only", "not_applicable"],
+    "metric_types": [
+      "kpi",
+      "operating_metric",
+      "gate_control_metric",
+      "role_performance_measure",
+      "health_indicator"
+    ],
+    "result_types": [
+      "outcome",
+      "driver",
+      "gate",
+      "compliance",
+      "health"
+    ],
+    "calculation_statuses": [
+      "runtime_calculated",
+      "runtime_calculated_partial",
+      "widget_only",
+      "staged_data_contract",
+      "data_contract_required",
+      "not_calculated"
+    ],
+    "scorecard_scoring_statuses": [
+      "active_runtime",
+      "manual_governed",
+      "candidate_data_contract",
+      "gate_only",
+      "not_applicable"
+    ],
     "required_catalog_fields": [
       "canonical_code",
       "metric_type",
@@ -301,25 +2027,77 @@
     "cadence": "monthly scorecard, quarterly calibration, annual Hoshin refresh",
     "weight_total_pct": 100,
     "rating_scale": [
-      {"rating": "stretch", "points": 4, "achievement_pct": 110, "meaning": "Above target with clean evidence and no counter-metric breach."},
-      {"rating": "green", "points": 3, "achievement_pct": 100, "meaning": "Meets target with approved evidence."},
-      {"rating": "yellow", "points": 2, "achievement_pct": 50, "meaning": "Within tolerance but requires owner action."},
-      {"rating": "red", "points": 1, "achievement_pct": 0, "meaning": "Outside tolerance; requires containment, RCA, CAPA or resource review."},
-      {"rating": "blocked", "points": 0, "achievement_pct": 0, "meaning": "Safety, data integrity, customer escape, or gate bypass blocks recognition regardless of numeric result."}
+      {
+        "rating": "stretch",
+        "points": 4,
+        "achievement_pct": 110,
+        "meaning": "Above target with clean evidence and no counter-metric breach."
+      },
+      {
+        "rating": "green",
+        "points": 3,
+        "achievement_pct": 100,
+        "meaning": "Meets target with approved evidence."
+      },
+      {
+        "rating": "yellow",
+        "points": 2,
+        "achievement_pct": 50,
+        "meaning": "Within tolerance but requires owner action."
+      },
+      {
+        "rating": "red",
+        "points": 1,
+        "achievement_pct": 0,
+        "meaning": "Outside tolerance; requires containment, RCA, CAPA or resource review."
+      },
+      {
+        "rating": "blocked",
+        "points": 0,
+        "achievement_pct": 0,
+        "meaning": "Safety, data integrity, customer escape, or gate bypass blocks recognition regardless of numeric result."
+      }
     ],
     "company_score_bands": [
-      {"band": "green", "weighted_score_min": 90, "action": "eligible for calibrated recognition and standardization of best practice"},
-      {"band": "yellow", "weighted_score_min": 75, "weighted_score_max": 89.99, "action": "management review action plan required before monetary recognition"},
-      {"band": "red", "weighted_score_max": 74.99, "action": "no performance payout; resource review, RCA/CAPA or Hoshin adjustment required"}
+      {
+        "band": "green",
+        "weighted_score_min": 90,
+        "action": "eligible for calibrated recognition and standardization of best practice"
+      },
+      {
+        "band": "yellow",
+        "weighted_score_min": 75,
+        "weighted_score_max": 89.99,
+        "action": "management review action plan required before monetary recognition"
+      },
+      {
+        "band": "red",
+        "weighted_score_max": 74.99,
+        "action": "no performance payout; resource review, RCA/CAPA or Hoshin adjustment required"
+      }
     ],
     "reward_policy": {
       "eligibility_rule": "Quarterly monetary/team recognition may be considered only when weighted score is at least 90, no current scorecard KPI is red, every yellow KPI has a closed owner action plan, no candidate_data_contract KPI is counted for payout, and no blocking condition is open.",
       "score_cap_rule": "If any current scorecard KPI is red, cap company score at yellow for management review and block monetary recognition. If a safety, quality escape, data integrity, or gate-bypass blocker is open, scorecard recognition is blocked regardless of numeric score.",
       "recognition_bands": [
-        {"weighted_score_min": 95, "recognition": "full team recognition pool after HR/QMS/CEO calibration"},
-        {"weighted_score_min": 90, "weighted_score_max": 94.99, "recognition": "partial team recognition pool after calibration"},
-        {"weighted_score_min": 80, "weighted_score_max": 89.99, "recognition": "kaizen resource priority or coaching acknowledgement only; no monetary performance recognition"},
-        {"weighted_score_max": 79.99, "recognition": "no performance recognition; corrective-action mode"}
+        {
+          "weighted_score_min": 95,
+          "recognition": "full team recognition pool after HR/QMS/CEO calibration"
+        },
+        {
+          "weighted_score_min": 90,
+          "weighted_score_max": 94.99,
+          "recognition": "partial team recognition pool after calibration"
+        },
+        {
+          "weighted_score_min": 80,
+          "weighted_score_max": 89.99,
+          "recognition": "kaizen resource priority or coaching acknowledgement only; no monetary performance recognition"
+        },
+        {
+          "weighted_score_max": 79.99,
+          "recognition": "no performance recognition; corrective-action mode"
+        }
       ],
       "blocking_conditions": [
         "recordable_incident_or_serious_near_miss_with_open_action",
@@ -332,80 +2110,556 @@
       "calibration_rule": "Final recognition and reward decisions require HR/QMS/CEO calibration. KPI output is an input, not an automatic payout or discipline engine."
     },
     "executive_scorecard_items": [
-      {"canonical_code": "OTD", "scorecard_weight_pct": 11, "unit": "percent", "target": 95, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 98, "green_min": 95, "yellow_min": 90, "red_below": 90}, "rating_criteria": "Measure shipped order lines or jobs against committed customer date after approved promise-date change control.", "reward_rule": "Eligible only when complaint rate, FPY and ship-packet counter-metrics are not red.", "blocking_conditions": ["customer_escape_without_containment", "promise_date_changed_without_approval"]},
-      {"canonical_code": "COMPLAINT_RATE", "scorecard_weight_pct": 8, "unit": "complaints_per_100_shipments", "target": 1, "higher_is_better": false, "quantitative_thresholds": {"stretch_max": 0, "green_max": 1, "yellow_max": 2, "red_above": 2}, "rating_criteria": "Count confirmed customer complaints or escapes per 100 shipments; major escape is red regardless of rate.", "reward_rule": "Blocks quality/delivery recognition when containment or customer response is overdue.", "blocking_conditions": ["major_customer_escape", "containment_overdue"]},
-      {"canonical_code": "GROSS_MARGIN_JOB_FAMILY", "scorecard_weight_pct": 8, "unit": "percent", "target": 28, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 35, "green_min": 28, "yellow_min": 22, "red_below": 22}, "rating_criteria": "Use finance-approved gross margin by job/customer/product family with COPQ and expedite cost included.", "reward_rule": "Eligible only when margin improvement does not come from hidden COPQ, late delivery or customer escape.", "blocking_conditions": ["unapproved_cost_exclusion", "copq_cost_bucket_not_approved"]},
-      {"canonical_code": "THROUGHPUT_PER_CONSTRAINT_HOUR", "scorecard_weight_pct": 8, "unit": "baseline_index", "target": 1.1, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 1.2, "green_min": 1.1, "yellow_min": 1, "red_below": 1}, "rating_criteria": "Compare contribution or revenue per active constraint hour against frozen baseline and approved job mix.", "reward_rule": "Eligible only when OTD, quality escape and WIP aging counter-metrics are not red.", "blocking_conditions": ["constraint_baseline_changed_without_approval", "bottleneck_oee_missing_reason_codes"]},
-      {"canonical_code": "COPQ", "scorecard_weight_pct": 7, "unit": "percent_of_sales", "target": 2, "higher_is_better": false, "quantitative_thresholds": {"stretch_max": 1, "green_max": 2, "yellow_max": 4, "red_above": 4}, "rating_criteria": "Use finance-approved cost buckets for scrap, rework, concession, expedite and escape cost.", "reward_rule": "Eligible only when NCR rate is not being suppressed and repeat NCR is not red.", "blocking_conditions": ["unapproved_quality_cost_adjustment", "repeat_ncr_red"]},
-      {"canonical_code": "FPY", "scorecard_weight_pct": 9, "unit": "percent", "target": 98, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 99, "green_min": 98, "yellow_min": 95, "red_below": 95}, "rating_criteria": "Count first-pass accepted units or operations using approved inspection population and no sampling bypass.", "reward_rule": "Eligible only when complaint rate, scrap and rework counter-metrics are not red.", "blocking_conditions": ["inspection_bypass", "customer_escape_without_containment"]},
-      {"canonical_code": "OEE_BOTTLENECK", "scorecard_weight_pct": 8, "unit": "percent", "target": 80, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 85, "green_min": 80, "yellow_min": 70, "red_below": 70}, "rating_criteria": "Calculate only for active constraint resource with availability, performance, quality and reason-code loss tree.", "reward_rule": "Eligible only when safety, scrap and maintenance-bypass counter-metrics are clean.", "blocking_conditions": ["unsafe_speed_or_bypass", "missing_downtime_reason_codes"]},
-      {"canonical_code": "WIP_AGING", "scorecard_weight_pct": 6, "unit": "aged_wip_percent", "target": 5, "higher_is_better": false, "quantitative_thresholds": {"stretch_max": 2, "green_max": 5, "yellow_max": 10, "red_above": 10}, "rating_criteria": "Measure released jobs over approved aging threshold by work center, hold reason and owner.", "reward_rule": "Eligible only when WIP aging is not reset by move transactions without physical progress.", "blocking_conditions": ["manual_age_reset_without_evidence", "unowned_red_wip"]},
-      {"canonical_code": "SETUP_FIRST_PASS", "scorecard_weight_pct": 6, "unit": "percent", "target": 95, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 98, "green_min": 95, "yellow_min": 90, "red_below": 90}, "rating_criteria": "Count setup ready-to-run first-pass acceptance using first submit, not after repeated undocumented prove-out loops.", "reward_rule": "Eligible only when FAI, setup scrap and rework counter-metrics are not red.", "blocking_conditions": ["prove_out_loop_hidden", "setup_record_missing"]},
-      {"canonical_code": "FAI_FIRST_PASS", "scorecard_weight_pct": 7, "unit": "percent", "target": 98, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 99, "green_min": 98, "yellow_min": 95, "red_below": 95}, "rating_criteria": "Count first FAI or first-piece submission outcome by part revision and operation.", "reward_rule": "Eligible only when no FAI hold/release bypass or customer escape is open.", "blocking_conditions": ["fai_release_bypass", "wrong_revision_or_gage_used"]},
-      {"canonical_code": "REPEAT_NCR_RATE", "scorecard_weight_pct": 6, "unit": "percent", "target": 5, "higher_is_better": false, "quantitative_thresholds": {"stretch_max": 2, "green_max": 5, "yellow_max": 10, "red_above": 10}, "rating_criteria": "Measure recurrence by defect family, root cause, process, supplier or customer after containment/CAPA window.", "reward_rule": "Eligible only when NCR creation is not suppressed and CAPA effectiveness is not red.", "blocking_conditions": ["ncr_suppression", "repeat_major_escape"]},
-      {"canonical_code": "CAPA_EFFECTIVENESS", "scorecard_weight_pct": 7, "unit": "percent", "target": 90, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 95, "green_min": 90, "yellow_min": 80, "red_below": 80}, "rating_criteria": "Count CAPA effective after 30/60/90-day verification window with recurrence evidence.", "reward_rule": "Eligible only when overdue repeat NCR and customer complaint counter-metrics are not red.", "blocking_conditions": ["capa_closed_without_effectiveness_evidence", "recurrence_after_capa"]},
-      {"canonical_code": "SUPPLIER_READINESS", "scorecard_weight_pct": 5, "unit": "composite_score", "target": 90, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 95, "green_min": 90, "yellow_min": 80, "red_below": 80}, "rating_criteria": "Composite: supplier OTD 40%, incoming quality 35%, SCAR aging 15%, ASL/audit/cert readiness 10%.", "reward_rule": "Eligible only when no critical shortage, incoming escape or overdue SCAR is open.", "blocking_conditions": ["critical_material_shortage", "supplier_escape_without_scar"]},
-      {"canonical_code": "CRITICAL_ROLE_CERT_COVERAGE", "scorecard_weight_pct": 4, "unit": "percent", "target": 95, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 100, "green_min": 95, "yellow_min": 85, "red_below": 85}, "rating_criteria": "Measure certified backup coverage for setup, CMM, QC release, planner, maintenance and critical operator roles.", "reward_rule": "Eligible only when training completion is backed by competence pass and no unauthorized work event is open.", "blocking_conditions": ["unauthorized_work_performed", "critical_role_no_backup"]},
-      {"canonical_code": "RECORDABLE_INCIDENT_RATE", "scorecard_weight_pct": 0, "unit": "count", "target": 0, "higher_is_better": false, "quantitative_thresholds": {"green_max": 0, "yellow_condition": "0 recordable incidents but high-potential near-miss action overdue", "red_above": 0}, "rating_criteria": "Any recordable incident is red for the period; serious near miss with overdue action blocks recognition.", "reward_rule": "Safety is a non-tradeable gate: any open serious safety action blocks monetary recognition regardless of total score.", "blocking_conditions": ["recordable_incident", "serious_near_miss_action_overdue", "unsafe_act_verified"]}
+      {
+        "canonical_code": "OTD",
+        "scorecard_weight_pct": 11,
+        "unit": "percent",
+        "target": 95,
+        "higher_is_better": true,
+        "quantitative_thresholds": {
+          "stretch_min": 98,
+          "green_min": 95,
+          "yellow_min": 90,
+          "red_below": 90
+        },
+        "rating_criteria": "Measure shipped order lines or jobs against committed customer date after approved promise-date change control.",
+        "reward_rule": "Eligible only when complaint rate, FPY and ship-packet counter-metrics are not red.",
+        "blocking_conditions": [
+          "customer_escape_without_containment",
+          "promise_date_changed_without_approval"
+        ]
+      },
+      {
+        "canonical_code": "COMPLAINT_RATE",
+        "scorecard_weight_pct": 8,
+        "unit": "complaints_per_100_shipments",
+        "target": 1,
+        "higher_is_better": false,
+        "quantitative_thresholds": {
+          "stretch_max": 0,
+          "green_max": 1,
+          "yellow_max": 2,
+          "red_above": 2
+        },
+        "rating_criteria": "Count confirmed customer complaints or escapes per 100 shipments; major escape is red regardless of rate.",
+        "reward_rule": "Blocks quality/delivery recognition when containment or customer response is overdue.",
+        "blocking_conditions": [
+          "major_customer_escape",
+          "containment_overdue"
+        ]
+      },
+      {
+        "canonical_code": "GROSS_MARGIN_JOB_FAMILY",
+        "scorecard_weight_pct": 8,
+        "unit": "percent",
+        "target": 28,
+        "higher_is_better": true,
+        "quantitative_thresholds": {
+          "stretch_min": 35,
+          "green_min": 28,
+          "yellow_min": 22,
+          "red_below": 22
+        },
+        "rating_criteria": "Use finance-approved gross margin by job/customer/product family with COPQ and expedite cost included.",
+        "reward_rule": "Eligible only when margin improvement does not come from hidden COPQ, late delivery or customer escape.",
+        "blocking_conditions": [
+          "unapproved_cost_exclusion",
+          "copq_cost_bucket_not_approved"
+        ]
+      },
+      {
+        "canonical_code": "THROUGHPUT_PER_CONSTRAINT_HOUR",
+        "scorecard_weight_pct": 8,
+        "unit": "baseline_index",
+        "target": 1.1,
+        "higher_is_better": true,
+        "quantitative_thresholds": {
+          "stretch_min": 1.2,
+          "green_min": 1.1,
+          "yellow_min": 1,
+          "red_below": 1
+        },
+        "rating_criteria": "Compare contribution or revenue per active constraint hour against frozen baseline and approved job mix.",
+        "reward_rule": "Eligible only when OTD, quality escape and WIP aging counter-metrics are not red.",
+        "blocking_conditions": [
+          "constraint_baseline_changed_without_approval",
+          "bottleneck_oee_missing_reason_codes"
+        ]
+      },
+      {
+        "canonical_code": "COPQ",
+        "scorecard_weight_pct": 7,
+        "unit": "percent_of_sales",
+        "target": 2,
+        "higher_is_better": false,
+        "quantitative_thresholds": {
+          "stretch_max": 1,
+          "green_max": 2,
+          "yellow_max": 4,
+          "red_above": 4
+        },
+        "rating_criteria": "Use finance-approved cost buckets for scrap, rework, concession, expedite and escape cost.",
+        "reward_rule": "Eligible only when NCR rate is not being suppressed and repeat NCR is not red.",
+        "blocking_conditions": [
+          "unapproved_quality_cost_adjustment",
+          "repeat_ncr_red"
+        ]
+      },
+      {
+        "canonical_code": "FPY",
+        "scorecard_weight_pct": 9,
+        "unit": "percent",
+        "target": 98,
+        "higher_is_better": true,
+        "quantitative_thresholds": {
+          "stretch_min": 99,
+          "green_min": 98,
+          "yellow_min": 95,
+          "red_below": 95
+        },
+        "rating_criteria": "Count first-pass accepted units or operations using approved inspection population and no sampling bypass.",
+        "reward_rule": "Eligible only when complaint rate, scrap and rework counter-metrics are not red.",
+        "blocking_conditions": [
+          "inspection_bypass",
+          "customer_escape_without_containment"
+        ]
+      },
+      {
+        "canonical_code": "OEE_BOTTLENECK",
+        "scorecard_weight_pct": 8,
+        "unit": "percent",
+        "target": 80,
+        "higher_is_better": true,
+        "quantitative_thresholds": {
+          "stretch_min": 85,
+          "green_min": 80,
+          "yellow_min": 70,
+          "red_below": 70
+        },
+        "rating_criteria": "Calculate only for active constraint resource with availability, performance, quality and reason-code loss tree.",
+        "reward_rule": "Eligible only when safety, scrap and maintenance-bypass counter-metrics are clean.",
+        "blocking_conditions": [
+          "unsafe_speed_or_bypass",
+          "missing_downtime_reason_codes"
+        ]
+      },
+      {
+        "canonical_code": "WIP_AGING",
+        "scorecard_weight_pct": 6,
+        "unit": "aged_wip_percent",
+        "target": 5,
+        "higher_is_better": false,
+        "quantitative_thresholds": {
+          "stretch_max": 2,
+          "green_max": 5,
+          "yellow_max": 10,
+          "red_above": 10
+        },
+        "rating_criteria": "Measure released jobs over approved aging threshold by work center, hold reason and owner.",
+        "reward_rule": "Eligible only when WIP aging is not reset by move transactions without physical progress.",
+        "blocking_conditions": [
+          "manual_age_reset_without_evidence",
+          "unowned_red_wip"
+        ]
+      },
+      {
+        "canonical_code": "SETUP_FIRST_PASS",
+        "scorecard_weight_pct": 6,
+        "unit": "percent",
+        "target": 95,
+        "higher_is_better": true,
+        "quantitative_thresholds": {
+          "stretch_min": 98,
+          "green_min": 95,
+          "yellow_min": 90,
+          "red_below": 90
+        },
+        "rating_criteria": "Count setup ready-to-run first-pass acceptance using first submit, not after repeated undocumented prove-out loops.",
+        "reward_rule": "Eligible only when FAI, setup scrap and rework counter-metrics are not red.",
+        "blocking_conditions": [
+          "prove_out_loop_hidden",
+          "setup_record_missing"
+        ]
+      },
+      {
+        "canonical_code": "FAI_FIRST_PASS",
+        "scorecard_weight_pct": 7,
+        "unit": "percent",
+        "target": 98,
+        "higher_is_better": true,
+        "quantitative_thresholds": {
+          "stretch_min": 99,
+          "green_min": 98,
+          "yellow_min": 95,
+          "red_below": 95
+        },
+        "rating_criteria": "Count first FAI or first-piece submission outcome by part revision and operation.",
+        "reward_rule": "Eligible only when no FAI hold/release bypass or customer escape is open.",
+        "blocking_conditions": [
+          "fai_release_bypass",
+          "wrong_revision_or_gage_used"
+        ]
+      },
+      {
+        "canonical_code": "REPEAT_NCR_RATE",
+        "scorecard_weight_pct": 6,
+        "unit": "percent",
+        "target": 5,
+        "higher_is_better": false,
+        "quantitative_thresholds": {
+          "stretch_max": 2,
+          "green_max": 5,
+          "yellow_max": 10,
+          "red_above": 10
+        },
+        "rating_criteria": "Measure recurrence by defect family, root cause, process, supplier or customer after containment/CAPA window.",
+        "reward_rule": "Eligible only when NCR creation is not suppressed and CAPA effectiveness is not red.",
+        "blocking_conditions": [
+          "ncr_suppression",
+          "repeat_major_escape"
+        ]
+      },
+      {
+        "canonical_code": "CAPA_EFFECTIVENESS",
+        "scorecard_weight_pct": 7,
+        "unit": "percent",
+        "target": 90,
+        "higher_is_better": true,
+        "quantitative_thresholds": {
+          "stretch_min": 95,
+          "green_min": 90,
+          "yellow_min": 80,
+          "red_below": 80
+        },
+        "rating_criteria": "Count CAPA effective after 30/60/90-day verification window with recurrence evidence.",
+        "reward_rule": "Eligible only when overdue repeat NCR and customer complaint counter-metrics are not red.",
+        "blocking_conditions": [
+          "capa_closed_without_effectiveness_evidence",
+          "recurrence_after_capa"
+        ]
+      },
+      {
+        "canonical_code": "SUPPLIER_READINESS",
+        "scorecard_weight_pct": 5,
+        "unit": "composite_score",
+        "target": 90,
+        "higher_is_better": true,
+        "quantitative_thresholds": {
+          "stretch_min": 95,
+          "green_min": 90,
+          "yellow_min": 80,
+          "red_below": 80
+        },
+        "rating_criteria": "Composite: supplier OTD 40%, incoming quality 35%, SCAR aging 15%, ASL/audit/cert readiness 10%.",
+        "reward_rule": "Eligible only when no critical shortage, incoming escape or overdue SCAR is open.",
+        "blocking_conditions": [
+          "critical_material_shortage",
+          "supplier_escape_without_scar"
+        ]
+      },
+      {
+        "canonical_code": "CRITICAL_ROLE_CERT_COVERAGE",
+        "scorecard_weight_pct": 4,
+        "unit": "percent",
+        "target": 95,
+        "higher_is_better": true,
+        "quantitative_thresholds": {
+          "stretch_min": 100,
+          "green_min": 95,
+          "yellow_min": 85,
+          "red_below": 85
+        },
+        "rating_criteria": "Measure certified backup coverage for setup, CMM, QC release, planner, maintenance and critical operator roles.",
+        "reward_rule": "Eligible only when training completion is backed by competence pass and no unauthorized work event is open.",
+        "blocking_conditions": [
+          "unauthorized_work_performed",
+          "critical_role_no_backup"
+        ]
+      },
+      {
+        "canonical_code": "RECORDABLE_INCIDENT_RATE",
+        "scorecard_weight_pct": 0,
+        "unit": "count",
+        "target": 0,
+        "higher_is_better": false,
+        "quantitative_thresholds": {
+          "green_max": 0,
+          "yellow_condition": "0 recordable incidents but high-potential near-miss action overdue",
+          "red_above": 0
+        },
+        "rating_criteria": "Any recordable incident is red for the period; serious near miss with overdue action blocks recognition.",
+        "reward_rule": "Safety is a non-tradeable gate: any open serious safety action blocks monetary recognition regardless of total score.",
+        "blocking_conditions": [
+          "recordable_incident",
+          "serious_near_miss_action_overdue",
+          "unsafe_act_verified"
+        ]
+      }
     ]
   },
   "scorecard_evidence_contracts": {
-    "OTD": {"scorecard_scoring_status": "active_runtime", "scorecard_contributes_to_reward": true, "data_contract_approval_id": "KPI-DC-OTD-001", "evidence_manifest_id": "KPI-EV-OTD-001", "source_system": "ERP shipping plus approved promise-date change control", "source_table_or_record": "shipments; com_order_promises or approved promise revision record", "authority_service_path": "KpiEngine::calculateOtd with promise-date approval bridge", "evidence_record": "shipment record with frozen committed promise date and approved promise-date revision when changed", "freshness_rule": "monthly close; promise revisions approved before shipment is scored", "lineage_rule": "unapproved promise-date change blocks reward even when shipment is on revised date"},
-    "COMPLAINT_RATE": {"scorecard_scoring_status": "manual_governed", "scorecard_contributes_to_reward": true, "data_contract_approval_id": "KPI-DC-COMPLAINT-001", "evidence_manifest_id": "KPI-EV-COMPLAINT-001", "source_system": "EQMS customer complaint and escape lifecycle", "source_table_or_record": "eqms_complaints; customer_complaints; complaint containment evidence", "authority_service_path": "EQMS complaint command path; KpiEngine catalog contract until runtime formula is aligned", "evidence_record": "confirmed complaint/escape, shipment denominator, containment timestamp, customer response record", "freshness_rule": "event review within complaint SLA and monthly BSC close", "lineage_rule": "NCR proxy or PPM runtime value cannot be used for reward until reconciled to complaint authority"},
-    "GROSS_MARGIN_JOB_FAMILY": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-MARGIN-001", "source_system": "ERP finance quote/job-cost close", "source_table_or_record": "job cost close package; invoice/revenue ledger; COPQ allocation record", "authority_service_path": "Finance-approved management review pack", "evidence_record": "job-family revenue, material/labor/overhead, outsource, expedite and COPQ allocation", "freshness_rule": "monthly finance close only", "lineage_rule": "unapproved cost exclusions block scorecard use"},
-    "THROUGHPUT_PER_CONSTRAINT_HOUR": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-TOC-001", "source_system": "MOM planning plus approved TOC constraint register", "source_table_or_record": "aps_constraint_resources; constraint register; job mix baseline; constraint-hour evidence", "authority_service_path": "TOC weekly constraint review data contract", "evidence_record": "approved active constraint, frozen baseline, contribution/revenue and available constraint hours", "freshness_rule": "weekly constraint review before monthly BSC", "lineage_rule": "baseline or bottleneck changes after the fact block reward use"},
-    "COPQ": {"scorecard_scoring_status": "manual_governed", "scorecard_contributes_to_reward": true, "data_contract_approval_id": "KPI-DC-COPQ-001", "evidence_manifest_id": "KPI-EV-COPQ-001", "source_system": "EQMS quality cost plus finance-approved sales denominator", "source_table_or_record": "ncr_records quality-cost buckets; finance sales close; concession/rework/escape cost evidence", "authority_service_path": "Finance/QMS COPQ close package; KpiEngine catalog contract until runtime percent-of-sales formula is aligned", "evidence_record": "scrap, rework, concession, expedite and escape cost with finance approval; sales denominator", "freshness_rule": "monthly close after finance cost-bucket approval", "lineage_rule": "prevention/appraisal investment is separated from poor-quality cost for reward scoring"},
-    "FPY": {"scorecard_scoring_status": "active_runtime", "scorecard_contributes_to_reward": true, "data_contract_approval_id": "KPI-DC-FPY-001", "evidence_manifest_id": "KPI-EV-FPY-001", "source_system": "QMS/MES inspection event evidence", "source_table_or_record": "inspection_results; operation inspection event; sampling bypass record", "authority_service_path": "KpiEngine::calculateFpy with QMS/MES first-pass evidence bridge", "evidence_record": "first-submission inspection population, accepted/rejected result, defect family and sampling approval", "freshness_rule": "daily tier review and monthly BSC close", "lineage_rule": "rework or repeated submission cannot be counted as first pass"},
-    "OEE_BOTTLENECK": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-OEE-BN-001", "source_system": "MES OEE snapshots with active constraint binding", "source_table_or_record": "mes_oee_snapshots; aps_constraint_resources; constraint register", "authority_service_path": "MES performance read model with lineage to execution events", "evidence_record": "availability, performance, quality losses, reason-code completeness and active constraint version", "freshness_rule": "shift capture, weekly TOC review, monthly BSC close", "lineage_rule": "OEE without active-constraint approval or reason codes is not rewardable"},
-    "WIP_AGING": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-WIP-001", "source_system": "MES/WIP movement and hold-owner evidence", "source_table_or_record": "job_orders projection; operation movement events; hold reason and owner log", "authority_service_path": "Lean Daily Management WIP aging data contract", "evidence_record": "released WIP age, hold reason, owner, physical-progress event and age-reset evidence", "freshness_rule": "daily tier review and weekly constraint review", "lineage_rule": "manual age reset without physical progress blocks scorecard use"},
-    "SETUP_FIRST_PASS": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-SETUP-001", "source_system": "MES setup readiness and first-piece gate evidence", "source_table_or_record": "setup checklist; CNC program revision; first-piece gate decision event", "authority_service_path": "MES/QMS setup gate data contract", "evidence_record": "first setup submission, ready-to-run decision, failure reason and approved setup sheet/program/gage revision", "freshness_rule": "per setup event and daily tier review", "lineage_rule": "hidden prove-out loops or missing setup record block scorecard use"},
-    "FAI_FIRST_PASS": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-FAI-001", "source_system": "EQMS FAI and QMS/MES gate evidence", "source_table_or_record": "eqms_fai_reports; fai_records; first-piece gate decision event", "authority_service_path": "EQMS FAI release command path", "evidence_record": "first FAI/first-piece submission, revision, gage, inspection plan and release decision", "freshness_rule": "per event and monthly BSC close", "lineage_rule": "wrong revision, waived gate, or release bypass blocks reward use"},
-    "REPEAT_NCR_RATE": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-REPEAT-NCR-001", "source_system": "EQMS NCR recurrence and root-cause evidence", "source_table_or_record": "ncr_records; eqms event backbone; recurrence classification", "authority_service_path": "EQMS NCR/CAPA review data contract", "evidence_record": "defect family, root cause, recurrence window, containment and CAPA link", "freshness_rule": "monthly CAPA review and management review", "lineage_rule": "NCR suppression or unclassified recurrence blocks scorecard use"},
-    "CAPA_EFFECTIVENESS": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-CAPA-EFF-001", "source_system": "EQMS CAPA verification evidence", "source_table_or_record": "eqms_capa_records; capa_records; effectiveness_result; verification_evidence", "authority_service_path": "EQMS CAPA effectiveness command path", "evidence_record": "30/60/90-day verification result, recurrence check and approved evidence", "freshness_rule": "verification-window close and monthly BSC review", "lineage_rule": "CAPA closure without effectiveness evidence cannot be scored as effective"},
-    "SUPPLIER_READINESS": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-SUPPLIER-READINESS-001", "source_system": "Procurement supplier quality and incoming readiness", "source_table_or_record": "vendor_ratings; supplier OTD; incoming inspection; SCAR aging; ASL/audit/cert readiness", "authority_service_path": "Supplier recovery and SCAR review data contract", "evidence_record": "component scorecard: supplier OTD 40%, incoming quality 35%, SCAR aging 15%, ASL/audit/cert readiness 10%", "freshness_rule": "weekly supplier recovery and monthly BSC close", "lineage_rule": "critical shortage, supplier escape or overdue SCAR blocks scorecard use"},
-    "CRITICAL_ROLE_CERT_COVERAGE": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-ROLE-CERT-001", "source_system": "Training/OJT certification authority", "source_table_or_record": "training_records; competency matrix; role authorization and backup coverage record", "authority_service_path": "Training certification gate data contract", "evidence_record": "critical role list, certified primary/backup, pass evidence and authorization status", "freshness_rule": "monthly workforce capability review and quarterly Hoshin", "lineage_rule": "training completion without competence pass cannot count as certification coverage"},
-    "RECORDABLE_INCIDENT_RATE": {"scorecard_scoring_status": "gate_only", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-SAFETY-GATE-001", "source_system": "EHS incident and high-potential near-miss evidence", "source_table_or_record": "ehs_incidents; incident action closure record; safety classification evidence", "authority_service_path": "EHS incident review and corrective-action gate", "evidence_record": "recordability classification, high-potential near-miss flag, corrective action due/closed state and verification", "freshness_rule": "same-day incident review and monthly BSC gate review", "lineage_rule": "safety is gate-only; under-reporting, late classification or overdue serious action blocks recognition"}
+    "OTD": {
+      "scorecard_scoring_status": "active_runtime",
+      "scorecard_contributes_to_reward": true,
+      "data_contract_approval_id": "KPI-DC-OTD-001",
+      "evidence_manifest_id": "KPI-EV-OTD-001",
+      "source_system": "ERP shipping plus approved promise-date change control",
+      "source_table_or_record": "shipments; com_order_promises or approved promise revision record",
+      "authority_service_path": "KpiEngine::calculateOtd with promise-date approval bridge",
+      "evidence_record": "shipment record with frozen committed promise date and approved promise-date revision when changed",
+      "freshness_rule": "monthly close; promise revisions approved before shipment is scored",
+      "lineage_rule": "unapproved promise-date change blocks reward even when shipment is on revised date"
+    },
+    "COMPLAINT_RATE": {
+      "scorecard_scoring_status": "manual_governed",
+      "scorecard_contributes_to_reward": true,
+      "data_contract_approval_id": "KPI-DC-COMPLAINT-001",
+      "evidence_manifest_id": "KPI-EV-COMPLAINT-001",
+      "source_system": "EQMS customer complaint and escape lifecycle",
+      "source_table_or_record": "eqms_complaints; customer_complaints; complaint containment evidence",
+      "authority_service_path": "EQMS complaint command path; KpiEngine catalog contract until runtime formula is aligned",
+      "evidence_record": "confirmed complaint/escape, shipment denominator, containment timestamp, customer response record",
+      "freshness_rule": "event review within complaint SLA and monthly BSC close",
+      "lineage_rule": "NCR proxy or PPM runtime value cannot be used for reward until reconciled to complaint authority"
+    },
+    "GROSS_MARGIN_JOB_FAMILY": {
+      "scorecard_scoring_status": "candidate_data_contract",
+      "scorecard_contributes_to_reward": false,
+      "data_contract_approval_id": null,
+      "evidence_manifest_id": "KPI-EV-MARGIN-001",
+      "source_system": "ERP finance quote/job-cost close",
+      "source_table_or_record": "job cost close package; invoice/revenue ledger; COPQ allocation record",
+      "authority_service_path": "Finance-approved management review pack",
+      "evidence_record": "job-family revenue, material/labor/overhead, outsource, expedite and COPQ allocation",
+      "freshness_rule": "monthly finance close only",
+      "lineage_rule": "unapproved cost exclusions block scorecard use"
+    },
+    "THROUGHPUT_PER_CONSTRAINT_HOUR": {
+      "scorecard_scoring_status": "candidate_data_contract",
+      "scorecard_contributes_to_reward": false,
+      "data_contract_approval_id": null,
+      "evidence_manifest_id": "KPI-EV-TOC-001",
+      "source_system": "MOM planning plus approved TOC constraint register",
+      "source_table_or_record": "aps_constraint_resources; constraint register; job mix baseline; constraint-hour evidence",
+      "authority_service_path": "TOC weekly constraint review data contract",
+      "evidence_record": "approved active constraint, frozen baseline, contribution/revenue and available constraint hours",
+      "freshness_rule": "weekly constraint review before monthly BSC",
+      "lineage_rule": "baseline or bottleneck changes after the fact block reward use"
+    },
+    "COPQ": {
+      "scorecard_scoring_status": "manual_governed",
+      "scorecard_contributes_to_reward": true,
+      "data_contract_approval_id": "KPI-DC-COPQ-001",
+      "evidence_manifest_id": "KPI-EV-COPQ-001",
+      "source_system": "EQMS quality cost plus finance-approved sales denominator",
+      "source_table_or_record": "ncr_records quality-cost buckets; finance sales close; concession/rework/escape cost evidence",
+      "authority_service_path": "Finance/QMS COPQ close package; KpiEngine catalog contract until runtime percent-of-sales formula is aligned",
+      "evidence_record": "scrap, rework, concession, expedite and escape cost with finance approval; sales denominator",
+      "freshness_rule": "monthly close after finance cost-bucket approval",
+      "lineage_rule": "prevention/appraisal investment is separated from poor-quality cost for reward scoring"
+    },
+    "FPY": {
+      "scorecard_scoring_status": "active_runtime",
+      "scorecard_contributes_to_reward": true,
+      "data_contract_approval_id": "KPI-DC-FPY-001",
+      "evidence_manifest_id": "KPI-EV-FPY-001",
+      "source_system": "QMS/MES inspection event evidence",
+      "source_table_or_record": "inspection_results; operation inspection event; sampling bypass record",
+      "authority_service_path": "KpiEngine::calculateFpy with QMS/MES first-pass evidence bridge",
+      "evidence_record": "first-submission inspection population, accepted/rejected result, defect family and sampling approval",
+      "freshness_rule": "daily tier review and monthly BSC close",
+      "lineage_rule": "rework or repeated submission cannot be counted as first pass"
+    },
+    "OEE_BOTTLENECK": {
+      "scorecard_scoring_status": "candidate_data_contract",
+      "scorecard_contributes_to_reward": false,
+      "data_contract_approval_id": null,
+      "evidence_manifest_id": "KPI-EV-OEE-BN-001",
+      "source_system": "MES OEE snapshots with active constraint binding",
+      "source_table_or_record": "mes_oee_snapshots; aps_constraint_resources; constraint register",
+      "authority_service_path": "MES performance read model with lineage to execution events",
+      "evidence_record": "availability, performance, quality losses, reason-code completeness and active constraint version",
+      "freshness_rule": "shift capture, weekly TOC review, monthly BSC close",
+      "lineage_rule": "OEE without active-constraint approval or reason codes is not rewardable"
+    },
+    "WIP_AGING": {
+      "scorecard_scoring_status": "candidate_data_contract",
+      "scorecard_contributes_to_reward": false,
+      "data_contract_approval_id": null,
+      "evidence_manifest_id": "KPI-EV-WIP-001",
+      "source_system": "MES/WIP movement and hold-owner evidence",
+      "source_table_or_record": "job_orders projection; operation movement events; hold reason and owner log",
+      "authority_service_path": "Lean Daily Management WIP aging data contract",
+      "evidence_record": "released WIP age, hold reason, owner, physical-progress event and age-reset evidence",
+      "freshness_rule": "daily tier review and weekly constraint review",
+      "lineage_rule": "manual age reset without physical progress blocks scorecard use"
+    },
+    "SETUP_FIRST_PASS": {
+      "scorecard_scoring_status": "candidate_data_contract",
+      "scorecard_contributes_to_reward": false,
+      "data_contract_approval_id": null,
+      "evidence_manifest_id": "KPI-EV-SETUP-001",
+      "source_system": "MES setup readiness and first-piece gate evidence",
+      "source_table_or_record": "setup checklist; CNC program revision; first-piece gate decision event",
+      "authority_service_path": "MES/QMS setup gate data contract",
+      "evidence_record": "first setup submission, ready-to-run decision, failure reason and approved setup sheet/program/gage revision",
+      "freshness_rule": "per setup event and daily tier review",
+      "lineage_rule": "hidden prove-out loops or missing setup record block scorecard use"
+    },
+    "FAI_FIRST_PASS": {
+      "scorecard_scoring_status": "candidate_data_contract",
+      "scorecard_contributes_to_reward": false,
+      "data_contract_approval_id": null,
+      "evidence_manifest_id": "KPI-EV-FAI-001",
+      "source_system": "EQMS FAI and QMS/MES gate evidence",
+      "source_table_or_record": "eqms_fai_reports; fai_records; first-piece gate decision event",
+      "authority_service_path": "EQMS FAI release command path",
+      "evidence_record": "first FAI/first-piece submission, revision, gage, inspection plan and release decision",
+      "freshness_rule": "per event and monthly BSC close",
+      "lineage_rule": "wrong revision, waived gate, or release bypass blocks reward use"
+    },
+    "REPEAT_NCR_RATE": {
+      "scorecard_scoring_status": "candidate_data_contract",
+      "scorecard_contributes_to_reward": false,
+      "data_contract_approval_id": null,
+      "evidence_manifest_id": "KPI-EV-REPEAT-NCR-001",
+      "source_system": "EQMS NCR recurrence and root-cause evidence",
+      "source_table_or_record": "ncr_records; eqms event backbone; recurrence classification",
+      "authority_service_path": "EQMS NCR/CAPA review data contract",
+      "evidence_record": "defect family, root cause, recurrence window, containment and CAPA link",
+      "freshness_rule": "monthly CAPA review and management review",
+      "lineage_rule": "NCR suppression or unclassified recurrence blocks scorecard use"
+    },
+    "CAPA_EFFECTIVENESS": {
+      "scorecard_scoring_status": "candidate_data_contract",
+      "scorecard_contributes_to_reward": false,
+      "data_contract_approval_id": null,
+      "evidence_manifest_id": "KPI-EV-CAPA-EFF-001",
+      "source_system": "EQMS CAPA verification evidence",
+      "source_table_or_record": "eqms_capa_records; capa_records; effectiveness_result; verification_evidence",
+      "authority_service_path": "EQMS CAPA effectiveness command path",
+      "evidence_record": "30/60/90-day verification result, recurrence check and approved evidence",
+      "freshness_rule": "verification-window close and monthly BSC review",
+      "lineage_rule": "CAPA closure without effectiveness evidence cannot be scored as effective"
+    },
+    "SUPPLIER_READINESS": {
+      "scorecard_scoring_status": "candidate_data_contract",
+      "scorecard_contributes_to_reward": false,
+      "data_contract_approval_id": null,
+      "evidence_manifest_id": "KPI-EV-SUPPLIER-READINESS-001",
+      "source_system": "Procurement supplier quality and incoming readiness",
+      "source_table_or_record": "vendor_ratings; supplier OTD; incoming inspection; SCAR aging; ASL/audit/cert readiness",
+      "authority_service_path": "Supplier recovery and SCAR review data contract",
+      "evidence_record": "component scorecard: supplier OTD 40%, incoming quality 35%, SCAR aging 15%, ASL/audit/cert readiness 10%",
+      "freshness_rule": "weekly supplier recovery and monthly BSC close",
+      "lineage_rule": "critical shortage, supplier escape or overdue SCAR blocks scorecard use"
+    },
+    "CRITICAL_ROLE_CERT_COVERAGE": {
+      "scorecard_scoring_status": "candidate_data_contract",
+      "scorecard_contributes_to_reward": false,
+      "data_contract_approval_id": null,
+      "evidence_manifest_id": "KPI-EV-ROLE-CERT-001",
+      "source_system": "Training/OJT certification authority",
+      "source_table_or_record": "training_records; competency matrix; role authorization and backup coverage record",
+      "authority_service_path": "Training certification gate data contract",
+      "evidence_record": "critical role list, certified primary/backup, pass evidence and authorization status",
+      "freshness_rule": "monthly workforce capability review and quarterly Hoshin",
+      "lineage_rule": "training completion without competence pass cannot count as certification coverage"
+    },
+    "RECORDABLE_INCIDENT_RATE": {
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "data_contract_approval_id": null,
+      "evidence_manifest_id": "KPI-EV-SAFETY-GATE-001",
+      "source_system": "EHS incident and high-potential near-miss evidence",
+      "source_table_or_record": "ehs_incidents; incident action closure record; safety classification evidence",
+      "authority_service_path": "EHS incident review and corrective-action gate",
+      "evidence_record": "recordability classification, high-potential near-miss flag, corrective action due/closed state and verification",
+      "freshness_rule": "same-day incident review and monthly BSC gate review",
+      "lineage_rule": "safety is gate-only; under-reporting, late classification or overdue serious action blocks recognition"
+    }
   },
   "blocking_condition_registry": {
     "rule": "Every scorecard blocking condition is a canonical condition id. A blocker stops recognition and triggers evidence review, containment, CAPA, resource escalation, or coaching; it is not automatic individual discipline.",
     "groups": {
       "safety": {
-        "condition_ids": ["recordable_incident_or_serious_near_miss_with_open_action", "recordable_incident", "serious_near_miss_action_overdue", "unsafe_act_verified", "unsafe_speed_or_bypass"],
+        "condition_ids": [
+          "recordable_incident_or_serious_near_miss_with_open_action",
+          "recordable_incident",
+          "serious_near_miss_action_overdue",
+          "unsafe_act_verified",
+          "unsafe_speed_or_bypass"
+        ],
         "source_domain": "EHS / MOM execution",
         "source_table_or_record": "ehs_incidents; safety observation; incident corrective-action record",
         "open_predicate": "recordable or high-potential event is open, serious action is overdue, or verified unsafe act/bypass is not contained",
         "waiver_authority": "No monetary-recognition waiver while safety action is open; HR/QMS/CEO may only classify uncontrollable cause after closure"
       },
       "quality_escape": {
-        "condition_ids": ["customer_escape_without_containment", "major_customer_escape", "containment_overdue", "supplier_escape_without_scar", "repeat_major_escape", "repeat_ncr_red"],
+        "condition_ids": [
+          "customer_escape_without_containment",
+          "major_customer_escape",
+          "containment_overdue",
+          "supplier_escape_without_scar",
+          "repeat_major_escape",
+          "repeat_ncr_red"
+        ],
         "source_domain": "EQMS complaints / NCR / supplier quality",
         "source_table_or_record": "eqms_complaints; customer_complaints; ncr_records; scar record",
         "open_predicate": "confirmed escape, overdue containment/SCAR, or repeat major issue remains open in the review period",
         "waiver_authority": "QMS/CEO calibration after containment and customer-risk review"
       },
       "gate_bypass": {
-        "condition_ids": ["required_gate_bypass", "inspection_bypass", "fai_release_bypass", "wrong_revision_or_gage_used", "setup_record_missing", "prove_out_loop_hidden", "capa_closed_without_effectiveness_evidence", "recurrence_after_capa"],
+        "condition_ids": [
+          "required_gate_bypass",
+          "inspection_bypass",
+          "fai_release_bypass",
+          "wrong_revision_or_gage_used",
+          "setup_record_missing",
+          "prove_out_loop_hidden",
+          "capa_closed_without_effectiveness_evidence",
+          "recurrence_after_capa"
+        ],
         "source_domain": "QMS/MES gate evidence",
         "source_table_or_record": "FAI/first-piece gate; inspection result; setup checklist; CAPA verification evidence",
         "open_predicate": "required gate missing, bypassed, waived without authority, or accepted with wrong revision/gage/evidence",
         "waiver_authority": "QMS authority and management review; bypass/falsification may trigger discipline only after behavior evidence"
       },
       "data_integrity": {
-        "condition_ids": ["verified_data_falsification", "promise_date_changed_without_approval", "constraint_baseline_changed_without_approval", "manual_age_reset_without_evidence", "missing_downtime_reason_codes", "bottleneck_oee_missing_reason_codes", "unapproved_cost_exclusion", "unapproved_quality_cost_adjustment", "copq_cost_bucket_not_approved"],
+        "condition_ids": [
+          "verified_data_falsification",
+          "promise_date_changed_without_approval",
+          "constraint_baseline_changed_without_approval",
+          "manual_age_reset_without_evidence",
+          "missing_downtime_reason_codes",
+          "bottleneck_oee_missing_reason_codes",
+          "unapproved_cost_exclusion",
+          "unapproved_quality_cost_adjustment",
+          "copq_cost_bucket_not_approved"
+        ],
         "source_domain": "ERP/MOM/MES/EQMS audit and finance close",
         "source_table_or_record": "audit trail; promise-date approval; constraint register; OEE reason-code log; finance cost-bucket approval",
         "open_predicate": "required approval, reason code, baseline, finance approval, or source lineage is missing or disputed",
         "waiver_authority": "Data owner plus QMS/Finance/CEO calibration after corrected evidence is posted"
       },
       "flow_and_readiness": {
-        "condition_ids": ["critical_material_shortage", "unowned_red_wip", "ncr_suppression", "critical_role_no_backup", "unauthorized_work_performed"],
+        "condition_ids": [
+          "critical_material_shortage",
+          "unowned_red_wip",
+          "ncr_suppression",
+          "critical_role_no_backup",
+          "unauthorized_work_performed"
+        ],
         "source_domain": "Planning / supplier readiness / training authority",
         "source_table_or_record": "material shortage log; WIP hold owner; NCR classification; training authorization record",
         "open_predicate": "red WIP, material shortage, suppressed NCR, missing critical backup, or unauthorized work remains open",
         "waiver_authority": "Process owner, QMS and CEO calibration after resource/action plan is approved"
       },
       "audit": {
-        "condition_ids": ["major_audit_nonconformance_overdue", "open_red_quality_or_safety_counter_metric"],
+        "condition_ids": [
+          "major_audit_nonconformance_overdue",
+          "open_red_quality_or_safety_counter_metric"
+        ],
         "source_domain": "Audit risk / management review",
         "source_table_or_record": "audit nonconformance; counter-metric scorecard",
         "open_predicate": "major audit nonconformance or red safety/quality counter-metric is open past due",
@@ -426,9 +2680,18 @@
       "accountable_owner": "Production Director / Supply Chain Manager",
       "review_cadence": "weekly recovery and monthly BSC",
       "review_forum": "T2/T3 delivery recovery and monthly BSC",
-      "counter_metric": ["COMPLAINT_RATE", "FPY", "SHIP_PACKET_COMPLETENESS"],
+      "counter_metric": [
+        "COMPLAINT_RATE",
+        "FPY",
+        "SHIP_PACKET_COMPLETENESS"
+      ],
       "data_confidence_level": "runtime_calculated",
-      "drilldown_dimensions": ["customer", "job_family", "work_center", "promise_date_owner"]
+      "drilldown_dimensions": [
+        "customer",
+        "job_family",
+        "work_center",
+        "promise_date_owner"
+      ]
     },
     "COMPLAINT_RATE": {
       "metric_type": "kpi",
@@ -442,9 +2705,18 @@
       "accountable_owner": "QA Manager / Sales and Customer Service Manager",
       "review_cadence": "monthly BSC and event review",
       "review_forum": "management review and customer complaint review",
-      "counter_metric": ["OTD", "FPY", "REPEAT_NCR_RATE"],
+      "counter_metric": [
+        "OTD",
+        "FPY",
+        "REPEAT_NCR_RATE"
+      ],
       "data_confidence_level": "runtime_calculated",
-      "drilldown_dimensions": ["customer", "part_family", "defect_family", "root_cause"]
+      "drilldown_dimensions": [
+        "customer",
+        "part_family",
+        "defect_family",
+        "root_cause"
+      ]
     },
     "GROSS_MARGIN_JOB_FAMILY": {
       "metric_type": "kpi",
@@ -458,9 +2730,18 @@
       "accountable_owner": "CEO / Finance Manager / Sales Manager",
       "review_cadence": "monthly BSC and quarterly Hoshin",
       "review_forum": "management review and quote review",
-      "counter_metric": ["OTD", "COPQ", "COMPLAINT_RATE"],
+      "counter_metric": [
+        "OTD",
+        "COPQ",
+        "COMPLAINT_RATE"
+      ],
       "data_confidence_level": "staged_data_contract",
-      "drilldown_dimensions": ["customer", "job_family", "part_family", "routing_family"]
+      "drilldown_dimensions": [
+        "customer",
+        "job_family",
+        "part_family",
+        "routing_family"
+      ]
     },
     "THROUGHPUT_PER_CONSTRAINT_HOUR": {
       "metric_type": "kpi",
@@ -474,9 +2755,18 @@
       "accountable_owner": "CEO / Production Director / Planning Manager",
       "review_cadence": "weekly TOC and monthly BSC",
       "review_forum": "constraint review and management review",
-      "counter_metric": ["OTD", "COMPLAINT_RATE", "WIP_AGING"],
+      "counter_metric": [
+        "OTD",
+        "COMPLAINT_RATE",
+        "WIP_AGING"
+      ],
       "data_confidence_level": "staged_data_contract",
-      "drilldown_dimensions": ["constraint_resource", "job_family", "customer", "lost_hour_reason"]
+      "drilldown_dimensions": [
+        "constraint_resource",
+        "job_family",
+        "customer",
+        "lost_hour_reason"
+      ]
     },
     "COPQ": {
       "metric_type": "kpi",
@@ -490,9 +2780,19 @@
       "accountable_owner": "QA Manager / Finance Manager",
       "review_cadence": "monthly BSC",
       "review_forum": "management review and CAPA review",
-      "counter_metric": ["NCR_RATE", "COMPLAINT_RATE", "REPEAT_NCR_RATE"],
+      "counter_metric": [
+        "NCR_RATE",
+        "COMPLAINT_RATE",
+        "REPEAT_NCR_RATE"
+      ],
       "data_confidence_level": "runtime_calculated",
-      "drilldown_dimensions": ["defect_family", "process", "supplier", "customer", "cost_bucket"]
+      "drilldown_dimensions": [
+        "defect_family",
+        "process",
+        "supplier",
+        "customer",
+        "cost_bucket"
+      ]
     },
     "FPY": {
       "metric_type": "kpi",
@@ -506,9 +2806,19 @@
       "accountable_owner": "Production Director / QA Manager",
       "review_cadence": "daily tier and monthly BSC",
       "review_forum": "Lean Daily Management and BSC review",
-      "counter_metric": ["COMPLAINT_RATE", "SCRAP_RATE", "REWORK_RATE"],
+      "counter_metric": [
+        "COMPLAINT_RATE",
+        "SCRAP_RATE",
+        "REWORK_RATE"
+      ],
       "data_confidence_level": "runtime_calculated",
-      "drilldown_dimensions": ["operation", "machine", "part_family", "shift", "defect_family"]
+      "drilldown_dimensions": [
+        "operation",
+        "machine",
+        "part_family",
+        "shift",
+        "defect_family"
+      ]
     },
     "OEE_BOTTLENECK": {
       "metric_type": "kpi",
@@ -522,9 +2832,19 @@
       "accountable_owner": "Production Director / Maintenance Manager / Planning Manager",
       "review_cadence": "weekly TOC and monthly BSC",
       "review_forum": "constraint review and BSC review",
-      "counter_metric": ["SCRAP_RATE", "COMPLAINT_RATE", "RECORDABLE_INCIDENT_RATE"],
+      "counter_metric": [
+        "SCRAP_RATE",
+        "COMPLAINT_RATE",
+        "RECORDABLE_INCIDENT_RATE"
+      ],
       "data_confidence_level": "staged_data_contract",
-      "drilldown_dimensions": ["constraint_resource", "availability_loss", "performance_loss", "quality_loss", "reason_code"]
+      "drilldown_dimensions": [
+        "constraint_resource",
+        "availability_loss",
+        "performance_loss",
+        "quality_loss",
+        "reason_code"
+      ]
     },
     "WIP_AGING": {
       "metric_type": "kpi",
@@ -538,9 +2858,18 @@
       "accountable_owner": "Planning Manager / Production Director",
       "review_cadence": "daily tier and weekly TOC",
       "review_forum": "Lean Daily Management and constraint review",
-      "counter_metric": ["OTD", "WIP_BEFORE_CONSTRAINT", "PLAN_ADHERENCE"],
+      "counter_metric": [
+        "OTD",
+        "WIP_BEFORE_CONSTRAINT",
+        "PLAN_ADHERENCE"
+      ],
       "data_confidence_level": "widget_only",
-      "drilldown_dimensions": ["work_center", "hold_reason", "job_family", "owner"]
+      "drilldown_dimensions": [
+        "work_center",
+        "hold_reason",
+        "job_family",
+        "owner"
+      ]
     },
     "SETUP_FIRST_PASS": {
       "metric_type": "kpi",
@@ -554,9 +2883,18 @@
       "accountable_owner": "Production Director / Engineering Manager / QA Manager",
       "review_cadence": "daily tier and monthly BSC",
       "review_forum": "setup readiness review and BSC review",
-      "counter_metric": ["FAI_FIRST_PASS", "SCRAP_RATE", "REWORK_RATE"],
+      "counter_metric": [
+        "FAI_FIRST_PASS",
+        "SCRAP_RATE",
+        "REWORK_RATE"
+      ],
       "data_confidence_level": "staged_data_contract",
-      "drilldown_dimensions": ["machine", "job_family", "setup_owner", "program_revision"]
+      "drilldown_dimensions": [
+        "machine",
+        "job_family",
+        "setup_owner",
+        "program_revision"
+      ]
     },
     "FAI_FIRST_PASS": {
       "metric_type": "kpi",
@@ -570,9 +2908,19 @@
       "accountable_owner": "QA Manager / Production Director / Engineering Manager",
       "review_cadence": "per event and monthly BSC",
       "review_forum": "QMS/MES gate review and BSC review",
-      "counter_metric": ["COMPLAINT_RATE", "REPEAT_NCR_RATE", "SETUP_FIRST_PASS"],
+      "counter_metric": [
+        "COMPLAINT_RATE",
+        "REPEAT_NCR_RATE",
+        "SETUP_FIRST_PASS"
+      ],
       "data_confidence_level": "staged_data_contract",
-      "drilldown_dimensions": ["part_revision", "operation", "machine", "gage", "failure_reason"]
+      "drilldown_dimensions": [
+        "part_revision",
+        "operation",
+        "machine",
+        "gage",
+        "failure_reason"
+      ]
     },
     "REPEAT_NCR_RATE": {
       "metric_type": "kpi",
@@ -586,9 +2934,19 @@
       "accountable_owner": "QA Manager",
       "review_cadence": "monthly BSC and CAPA review",
       "review_forum": "CAPA review and management review",
-      "counter_metric": ["NCR_RATE", "CAPA_EFFECTIVENESS", "COMPLAINT_RATE"],
+      "counter_metric": [
+        "NCR_RATE",
+        "CAPA_EFFECTIVENESS",
+        "COMPLAINT_RATE"
+      ],
       "data_confidence_level": "staged_data_contract",
-      "drilldown_dimensions": ["root_cause", "defect_family", "process", "supplier", "customer"]
+      "drilldown_dimensions": [
+        "root_cause",
+        "defect_family",
+        "process",
+        "supplier",
+        "customer"
+      ]
     },
     "CAPA_EFFECTIVENESS": {
       "metric_type": "kpi",
@@ -602,9 +2960,18 @@
       "accountable_owner": "QA Manager",
       "review_cadence": "monthly BSC and 30/60/90-day effectiveness review",
       "review_forum": "CAPA review and management review",
-      "counter_metric": ["REPEAT_NCR_RATE", "COMPLAINT_RATE", "CAPA_CLOSURE"],
+      "counter_metric": [
+        "REPEAT_NCR_RATE",
+        "COMPLAINT_RATE",
+        "CAPA_CLOSURE"
+      ],
       "data_confidence_level": "staged_data_contract",
-      "drilldown_dimensions": ["capa_category", "root_cause", "process", "owner"]
+      "drilldown_dimensions": [
+        "capa_category",
+        "root_cause",
+        "process",
+        "owner"
+      ]
     },
     "SUPPLIER_READINESS": {
       "metric_type": "kpi",
@@ -618,9 +2985,18 @@
       "accountable_owner": "Supply Chain Manager / QA Manager",
       "review_cadence": "weekly supplier recovery and monthly scorecard",
       "review_forum": "supplier review and BSC review",
-      "counter_metric": ["SUPPLIER_OTD", "SUPPLIER_QUAL", "MATERIAL_AVAILABILITY_PLAN"],
+      "counter_metric": [
+        "SUPPLIER_OTD",
+        "SUPPLIER_QUAL",
+        "MATERIAL_AVAILABILITY_PLAN"
+      ],
       "data_confidence_level": "staged_data_contract",
-      "drilldown_dimensions": ["supplier", "commodity", "outsource_process", "part_family"]
+      "drilldown_dimensions": [
+        "supplier",
+        "commodity",
+        "outsource_process",
+        "part_family"
+      ]
     },
     "CRITICAL_ROLE_CERT_COVERAGE": {
       "metric_type": "kpi",
@@ -634,9 +3010,18 @@
       "accountable_owner": "HR Manager / Department Managers",
       "review_cadence": "monthly BSC and quarterly Hoshin",
       "review_forum": "workforce capability review",
-      "counter_metric": ["TRAINING_COMP", "QUALITY_ESCAPE", "SETUP_FIRST_PASS"],
+      "counter_metric": [
+        "TRAINING_COMP",
+        "QUALITY_ESCAPE",
+        "SETUP_FIRST_PASS"
+      ],
       "data_confidence_level": "staged_data_contract",
-      "drilldown_dimensions": ["role", "department", "skill_level", "backup_status"]
+      "drilldown_dimensions": [
+        "role",
+        "department",
+        "skill_level",
+        "backup_status"
+      ]
     },
     "RECORDABLE_INCIDENT_RATE": {
       "metric_type": "kpi",
@@ -650,9 +3035,18 @@
       "accountable_owner": "EHS Owner / Production Director",
       "review_cadence": "daily incident review and monthly BSC",
       "review_forum": "EHS review and management review",
-      "counter_metric": ["NEAR_MISS_REPORTING", "TRAINING_COMP", "OEE_BOTTLENECK"],
+      "counter_metric": [
+        "NEAR_MISS_REPORTING",
+        "TRAINING_COMP",
+        "OEE_BOTTLENECK"
+      ],
       "data_confidence_level": "staged_data_contract",
-      "drilldown_dimensions": ["area", "hazard_type", "work_center", "root_cause"]
+      "drilldown_dimensions": [
+        "area",
+        "hazard_type",
+        "work_center",
+        "root_cause"
+      ]
     }
   },
   "data_contract_required_fields": [

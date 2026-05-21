@@ -357,9 +357,24 @@ final class KpiEngine
             }
             $this->upsertCatalogMetric($catalog, $code, 'annex122_governance_kpis', [
                 'name' => $this->stringField($row, 'name'),
+                'name_vi' => $this->stringField($row, 'name_vi'),
                 'tier' => $this->stringField($row, 'tier'),
+                'layer' => $this->stringField($row, 'layer'),
                 'registry_status' => $this->stringField($row, 'status'),
+                'registry_calculation_status' => $this->stringField($row, 'calculation_status'),
                 'annex122_no' => $row['no'] ?? null,
+                'purpose' => $this->stringField($row, 'purpose'),
+                'formula' => is_array($row['formula'] ?? null) ? $row['formula'] : null,
+                'thresholds' => is_array($row['thresholds'] ?? null) ? $row['thresholds'] : null,
+                'registry_data_source' => is_array($row['data_source'] ?? null) ? $row['data_source'] : null,
+                'owner_role' => $this->stringField($row, 'owner_role'),
+                'data_stewardship_role' => $this->stringField($row, 'data_stewardship_role'),
+                'cadence' => $this->stringField($row, 'cadence'),
+                'lead_or_lag' => $this->stringField($row, 'lead_or_lag'),
+                'paired_metric' => $this->stringField($row, 'paired_metric'),
+                'decision_action' => $this->stringField($row, 'decision_action'),
+                'registry_counter_metric' => $this->stringField($row, 'counter_metric'),
+                'reward_eligible' => $row['reward_eligible'] ?? null,
             ], $aliases);
         }
 
@@ -410,6 +425,7 @@ final class KpiEngine
         return [
             'registry_id' => is_string($registry['registry_id'] ?? null) ? $registry['registry_id'] : null,
             'registry_version' => is_string($registry['version'] ?? null) ? $registry['version'] : null,
+            'registry_schema_version' => $this->registrySchemaVersion(),
             'authority_rule' => is_string($registry['authority_rule'] ?? null) ? $registry['authority_rule'] : null,
             'counts' => [
                 'runtime_calculated_metrics' => count(self::ALL_METRICS),
@@ -582,6 +598,12 @@ final class KpiEngine
             default           => 'grey',
         };
 
+        // Stamp the registry schema version onto the snapshot so a later
+        // schema bump (changed formula/threshold definitions) can gate this
+        // structurally stale row out of trend reads.
+        $meta = $result->breakdown;
+        $meta['schema_version'] = $this->registrySchemaVersion();
+
         $this->db->execute(
             'INSERT INTO kpi_snapshots
                 (kpi_id, period_start, period_end, actual_value, target_value, kpi_status, metadata)
@@ -595,7 +617,7 @@ final class KpiEngine
                 ':av'     => $result->value,
                 ':tv'     => $result->target,
                 ':status' => $statusEnum,
-                ':meta'   => json_encode($result->breakdown, JSON_UNESCAPED_UNICODE),
+                ':meta'   => json_encode($meta, JSON_UNESCAPED_UNICODE),
             ],
         );
     }
@@ -1300,6 +1322,11 @@ final class KpiEngine
                 default   => 'ks.period_start',
             };
 
+            // Schema-version gate: ignore snapshots persisted under an older
+            // registry schema (their formula/threshold definitions are stale).
+            // getKpiTrend falls back to live recalculation when this yields
+            // nothing, so the gate never loses data — it only forces a
+            // recompute under the current definitions.
             $rows = $this->db->query(
                 "SELECT {$truncFn}::date AS bucket, AVG(ks.actual_value) AS avg_value,
                         AVG(ks.target_value) AS avg_target, MAX(ks.kpi_status) AS status
@@ -1307,9 +1334,11 @@ final class KpiEngine
                  JOIN kpi_definitions kd ON kd.kpi_id = ks.kpi_id
                  WHERE kd.metric_code = :code
                    AND ks.period_start >= :s AND ks.period_end <= :e
+                   AND COALESCE((ks.metadata->>'schema_version')::int, 0) >= :sv
                  GROUP BY bucket
                  ORDER BY bucket",
-                [':code' => $metricCode, ':s' => $period->start, ':e' => $period->end],
+                [':code' => $metricCode, ':s' => $period->start, ':e' => $period->end,
+                 ':sv' => $this->registrySchemaVersion()],
             );
 
             return array_map(fn(array $r) => [
@@ -1440,6 +1469,19 @@ final class KpiEngine
         }
 
         return $this->kpiAuthorityRegistry;
+    }
+
+    /**
+     * Registry schema version (prompt 02). Acts as a runtime-snapshot gate:
+     * a snapshot persisted under an older schema is structurally stale once
+     * the registry bumps schema_version (formula/threshold/data-source
+     * definitions changed), so trend reads ignore it. Mirrors the
+     * schema-version gate in RaciMatrixService::load().
+     */
+    private function registrySchemaVersion(): int
+    {
+        $version = $this->loadKpiAuthorityRegistry()['schema_version'] ?? 0;
+        return is_int($version) ? $version : (int) $version;
     }
 
     /**
@@ -1775,13 +1817,21 @@ final class KpiEngine
      */
     private function inferCalculationStatus(array $metric): string
     {
+        if (($metric['runtime_calculated'] ?? false) === true) {
+            return 'runtime_calculated';
+        }
+
+        // The KPI authority registry is the SSOT for calculation status of a
+        // governed KPI (prompt 02). A registry-authored value wins over any
+        // inference from declared_backend_status or registry_status.
+        $registryCalc = $this->stringField($metric, 'registry_calculation_status');
+        if ($registryCalc !== '') {
+            return $registryCalc;
+        }
+
         $declared = $this->stringField($metric, 'declared_backend_status');
         if ($declared !== '') {
             return $declared;
-        }
-
-        if (($metric['runtime_calculated'] ?? false) === true) {
-            return 'runtime_calculated';
         }
 
         $registryStatus = $this->stringField($metric, 'registry_status');
@@ -1843,11 +1893,16 @@ final class KpiEngine
      */
     private function applyGovernanceLists(array &$metric, array $override): void
     {
+        // Precedence: metric_governance_overrides → registry-authored
+        // counter_metric on the governance KPI row (prompt 02) → kpi default.
         $counterMetric = $override['counter_metric'] ?? null;
+        $registryCounter = $this->stringField($metric, 'registry_counter_metric');
         if (is_array($counterMetric)) {
             $metric['counter_metric'] = array_values(array_filter($counterMetric, static fn(mixed $item): bool => is_string($item) && trim($item) !== ''));
         } elseif (is_string($counterMetric) && trim($counterMetric) !== '') {
             $metric['counter_metric'] = [trim($counterMetric)];
+        } elseif ($registryCounter !== '') {
+            $metric['counter_metric'] = [$registryCounter];
         } elseif (($metric['metric_type'] ?? null) === 'kpi') {
             $metric['counter_metric'] = ['SAFETY_QUALITY_DELIVERY_DATA_INTEGRITY_GATE'];
         } else {
