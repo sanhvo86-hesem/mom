@@ -775,4 +775,8 @@
   window.EqmsModules = window.EqmsModules || {};
   window.EqmsModules['doc-overview'] = { render: render, destroy: destroy };
 
+  /* Top-level portal page hooks (used by navigateTo('doc-overview')) */
+  window._renderDocOverview  = render;
+  window._destroyDocOverview = destroy;
+
 })();

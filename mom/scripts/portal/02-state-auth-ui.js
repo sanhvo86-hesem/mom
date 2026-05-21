@@ -2967,7 +2967,7 @@ function renderSidebar(){
     if(catsInSec.length === 0 && !hasDocOverviewEntry) return;
     html += `<div class="nav-section"><div class="nav-section-title">${sec.label}</div>`;
     if(hasDocOverviewEntry) {
-      html += `<button class="nav-item" onclick="navigateTo('eqms');setTimeout(function(){if(window.EqmsShell&&typeof window.EqmsShell.navigate==='function')window.EqmsShell.navigate('doc-overview');},80)"><span class="icon">🗺️</span><span>${lang==='en'?'Document Visual Map':'Sơ đồ Tài liệu'}</span></button>`;
+      html += `<button class="nav-item ${currentPage==='doc-overview'?'active':''}" onclick="navigateTo('doc-overview')"><span class="icon">🗺️</span><span>${lang==='en'?'Document Visual Map':'Sơ đồ Tài liệu'}</span></button>`;
     }
     catsInSec.forEach(cat => {
       let cnt = VDOCS.filter(d=>d.cat===cat.id).length;
@@ -2992,6 +2992,9 @@ function teardownCurrentPageModule(){
   try{
     if(currentPage === 'schema-studio' && window.SchemaStudio && typeof window.SchemaStudio.destroy === 'function'){
       window.SchemaStudio.destroy();
+    }
+    if(currentPage === 'doc-overview' && typeof window._destroyDocOverview === 'function'){
+      window._destroyDocOverview();
     }
   }catch(_teardownErr){}
 }
@@ -3159,7 +3162,7 @@ function navigateTo(page, filter, bypassGuard){
       adminTab = firstAccessibleAdminTab();
     }
   }
-  if(page !== 'admin' && !canUserAccessModule(page)){
+  if(page !== 'admin' && page !== 'doc-overview' && !canUserAccessModule(page)){
     const fallbackPage = firstAccessiblePortalModule();
     if(!bypassGuard && page !== fallbackPage){
       showToast(lang==='en' ? 'You do not have access to that module.' : 'Bạn không có quyền truy cập module đó.');
@@ -3187,11 +3190,13 @@ function navigateTo(page, filter, bypassGuard){
   // Track page view for activity log
   const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành','vps-control':'VPS Control Tower',mes:'Trung tâm điều hành MES',exceptions:'Bảng ngoại lệ',orders:'Quản lý đơn hàng',purchasing:'Mua hàng & IQC',forms:'Kiểm soát chứng cứ','quality-exceptions':'Quản lý ngoại lệ chất lượng','supplier-quality':'Quản lý chất lượng NCC','quoting':'Báo giá & Ước tính',evidence:'Kho chứng cứ','customer-portal':'Cổng khách hàng','cnc-programs':'Chương trình CNC','product-passport':'Hộ chiếu sản phẩm số','ai-scheduling':'AI Chất lượng & Lịch trình','compliance-reports':'Báo cáo tuân thủ',fmea:'FMEA & Control Plan','apqp-ppap':'APQP / PPAP','mobile-shopfloor':'Xưởng di động','knowledge-base':'Kho kiến thức','continuous-improvement':'Cải tiến liên tục','energy-dashboard':'Giám sát năng lượng','schema-studio':'Schema Studio'};
   pageTitles['module-builder'] = 'Module Builder';
+  pageTitles['doc-overview'] = 'Sơ đồ Tài liệu';
   trackPageView(page + (filter ? '/'+filter : ''), (pageTitles[page]||page) + (filter ? ' — '+filter : ''));
   
   const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triển khai vận hành','vps-control':'VPS Control Tower',mes:lang==='en'?'MES Control Center':'Trung tâm điều hành MES',exceptions:lang==='en'?'Exception Dashboard':'Bảng ngoại lệ',orders:lang==='en'?'Order Management':'Quản lý đơn hàng',purchasing:lang==='en'?'Purchasing & IQC':'Mua hàng & IQC',forms:lang==='en'?'Evidence Control':'Kiểm soát chứng cứ','quality-exceptions':lang==='en'?'Quality Exception Hub':'Quản lý ngoại lệ chất lượng','supplier-quality':lang==='en'?'Supplier Quality':'Quản lý chất lượng NCC',quoting:lang==='en'?'Quoting & Estimation':'Báo giá & Ước tính',evidence:lang==='en'?'Evidence Vault':'Kho chứng cứ','customer-portal':lang==='en'?'Customer Portal Admin':'Quản trị cổng khách hàng','cnc-programs':lang==='en'?'CNC Programs':'Chương trình CNC','product-passport':lang==='en'?'Digital Product Passport':'Hộ chiếu sản phẩm số','ai-scheduling':lang==='en'?'AI Quality & Scheduling':'AI Chất lượng & Lịch trình','compliance-reports':lang==='en'?'Compliance Reports':'Báo cáo tuân thủ',fmea:lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan','apqp-ppap':lang==='en'?'APQP / PPAP':'APQP / PPAP','mobile-shopfloor':lang==='en'?'Shop Floor Mobile':'Xưởng di động','knowledge-base':lang==='en'?'Knowledge Base':'Kho kiến thức','continuous-improvement':lang==='en'?'Continuous Improvement':'Cải tiến liên tục','energy-dashboard':lang==='en'?'Energy Monitor':'Giám sát năng lượng','schema-studio':'Schema Studio'};
   titles['template-demo'] = 'Master Module Template';
   titles['module-builder'] = 'Module Builder';
+  titles['doc-overview'] = lang==='en'?'Document Visual Map':'Sơ đồ Tài liệu';
   // Reset header breadcrumb for non-documents pages
   if(page !== 'documents'){
     const bcEl = document.getElementById('header-breadcrumb');
@@ -3238,6 +3243,7 @@ function navigateTo(page, filter, bypassGuard){
   if(page==='dispatch' && typeof window._renderProductionDispatch==='function'){ var dsp=document.getElementById('page-dispatch'); if(dsp) window._renderProductionDispatch(dsp); }
   if(page==='module-builder'){ renderModuleBuilderPage(); }
   if(page==='schema-studio' && typeof window._renderSchemaStudio==='function'){ var ssp=document.getElementById('page-schema-studio'); if(ssp) window._renderSchemaStudio(ssp); }
+  if(page==='doc-overview' && typeof window._renderDocOverview==='function'){ var dovp=document.getElementById('page-doc-overview'); if(dovp) window._renderDocOverview(dovp); }
   if(page==='eqms' && typeof window._renderEqmsSuite==='function'){ var eqp=document.getElementById('page-eqms'); if(eqp) window._renderEqmsSuite(eqp); }
   if(page==='admin'){ if(!canUserAccessModule('admin')){navigateTo(firstAccessiblePortalModule());return;} renderAdmin(); }
   
