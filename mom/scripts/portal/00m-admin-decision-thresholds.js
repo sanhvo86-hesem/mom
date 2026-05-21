@@ -57,38 +57,44 @@ function _decisionGroups(){
     {
       id: 'commercial',
       label: _t('Thương mại', 'Commercial'),
-      summary: _t('Báo giá, chiết khấu, điều kiện thanh toán', 'Quote, discount, payment terms'),
-      keys: ['quote', 'discount', 'payment_terms']
+      summary: _t('RFQ, báo giá, chiết khấu, điều kiện thanh toán, chấp nhận đơn hàng', 'RFQ, quote, discount, payment terms, order acceptance'),
+      keys: ['rfq_review', 'quote', 'discount', 'payment_terms', 'order_acceptance']
     },
     {
       id: 'customer',
-      label: _t('Thay đổi khách hàng', 'Customer change'),
-      summary: _t('CCR và ảnh hưởng cam kết khách', 'CCR and customer commitment impact'),
-      keys: ['customer_change']
+      label: _t('Quan hệ khách hàng', 'Customer relations'),
+      summary: _t('CCR, khiếu nại RMA, tài sản khách hàng ngoại lệ', 'CCR, complaint RMA, customer property exception'),
+      keys: ['customer_change', 'complaint_rma', 'customer_property_exception']
+    },
+    {
+      id: 'engineering',
+      label: _t('Kỹ thuật', 'Engineering'),
+      summary: _t('DFM, phát hành kỹ thuật, ECO, CAM, pilot, lệch kỹ thuật', 'DFM, engineering release, ECO, CAM, pilot dry-run, tech deviation'),
+      keys: ['dfm_review', 'engineering_release', 'eco_approval', 'package_withdrawal', 'cam_program_release', 'pilot_dryrun', 'tech_deviation']
     },
     {
       id: 'production',
       label: _t('Sản xuất', 'Production'),
-      summary: _t('Tải máy, tăng ca, tiến độ xưởng', 'Capacity, overtime, shopfloor schedule'),
-      keys: ['overtime']
+      summary: _t('Lệnh SX, điều phối ca, đóng băng lịch, thay đổi máy, chuyển việc, tăng ca, phục hồi sự cố', 'Production order, shift dispatch, schedule freeze, machine setup, work transfer, overtime, downtime recovery'),
+      keys: ['production_order_release', 'daily_shift_dispatch', 'schedule_freeze_break', 'machine_setup_change', 'work_transfer', 'overtime', 'recovery_after_downtime']
     },
     {
       id: 'quality',
       label: _t('Chất lượng', 'Quality'),
-      summary: _t('Phế phẩm, giữ hàng, chặn giao hàng', 'Scrap, hold release, stop ship'),
-      keys: ['scrap', 'hold_release', 'stop_ship']
+      summary: _t('FAI, NCR, CAPA, giữ hàng, chặn giao, CoC, phế phẩm', 'FAI, NCR, CAPA, hold, stop ship, CoC, scrap'),
+      keys: ['fai_release', 'fai_fail_disposition', 'ncr_open_classify', 'ncr_disposition', 'capa_close', 'hold_release', 'stop_ship', 'coc_release', 'scrap']
     },
     {
       id: 'supply',
       label: _t('Cung ứng', 'Supply'),
-      summary: _t('PO, mua khẩn, gia công ngoài', 'PO, emergency buy, outsource'),
-      keys: ['purchase_order', 'outsource', 'emergency_po']
+      summary: _t('PO, đủ điều kiện NCC, gia công kỹ thuật, gia công đầu vào, mua khẩn, SCAR', 'PO, supplier qualification, tech outsource, incoming outsource, emergency PO, SCAR'),
+      keys: ['purchase_order', 'supplier_qualification', 'outsource_tech', 'outsource_incoming', 'emergency_po', 'scar_escalation']
     },
     {
       id: 'system',
-      label: _t('Hệ thống', 'System'),
-      summary: _t('Truy cập ERP khẩn cấp', 'Emergency ERP access'),
-      keys: ['erp_breakglass']
+      label: _t('Hệ thống & EHS', 'System & EHS'),
+      summary: _t('Truy cập IT, ERP khẩn, kích hoạt phó, sự cố EHS, rủi ro khí hậu', 'IT access, ERP emergency, deputy activation, EHS incident, climate risk'),
+      keys: ['it_access', 'erp_breakglass', 'deputy_activation', 'ehs_incident', 'climate_risk']
     }
   ];
 }
