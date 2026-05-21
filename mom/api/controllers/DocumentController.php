@@ -2758,7 +2758,7 @@ class DocumentController extends BaseController
     {
         $this->requireAuth();
 
-        // Release session lock early â€” this action can be heavy.
+        // Release session lock early — this action can be heavy.
         if (session_status() === PHP_SESSION_ACTIVE) {
             @session_write_close();
         }
@@ -2771,15 +2771,18 @@ class DocumentController extends BaseController
         $archiveDir   = $this->rootDir . '/archive';
 
         $out = [];
+        $docCodes = []; // non-form document codes for batch DCC overlay
+
         foreach ($docs as $d) {
             if (!is_array($d)) continue;
             $code     = (string)($d['code'] ?? '');
             $basePath = (string)($d['base_path'] ?? ($d['path'] ?? ''));
             if ($code === '') continue;
-            if (trim($basePath) === '') continue;
 
             // Try form registry first
-            $formEntry = form_registry_get_entry($registryFile, $code, $basePath);
+            $formEntry = trim($basePath) !== ''
+                ? form_registry_get_entry($registryFile, $code, $basePath)
+                : null;
             if (is_array($formEntry)) {
                 $st = form_load_state_existing($this->dataDir, (string)$formEntry['code']);
                 if (!is_array($st)) $st = form_state_fallback_from_registry($formEntry);
@@ -2787,13 +2790,121 @@ class DocumentController extends BaseController
                 continue;
             }
 
-            // Fall back to document state
-            $st = load_doc_state($this->rootDir, $basePath, $archiveDir, $code);
-            if ($st) {
-                $out[$code] = $st;
+            // Track for DCC overlay (even when no filesystem path available)
+            $docCodes[] = $code;
+
+            // Load filesystem state when path is available
+            if (trim($basePath) !== '') {
+                $st = load_doc_state($this->rootDir, $basePath, $archiveDir, $code);
+                if (is_array($st)) {
+                    $out[$code] = $st;
+                }
             }
         }
 
+        // Overlay DCC revision/status in one batch query so the listing always
+        // reflects the DB-canonical state rather than stale filesystem JSON.
+        $this->applyBatchDccStateOverlay($out, $docCodes);
+
         $this->success(['states' => $out, 'server_time' => $this->nowIso()]);
+    }
+
+    /**
+     * Overlay DCC-canonical revision and status onto the snapshot states array
+     * in a single bulk query. Handles two cases:
+     *   • state.json exists but is stale (approved doc still shows draft)
+     *   • state.json does not exist (no filesystem state for the doc)
+     *
+     * For docs that are NOT currently in an active workflow step (draft /
+     * in_review / pending_approval / rejected), the DCC header values win.
+     * For docs with an active in-flight step the released_revision is set so
+     * the revision column shows the last approved version, but the in-flight
+     * status is preserved.
+     *
+     * @param array<string, mixed> $states Map of code → state (modified in place)
+     * @param list<string>         $codes  All non-form document codes
+     */
+    private function applyBatchDccStateOverlay(array &$states, array $codes): void
+    {
+        if ($codes === []) {
+            return;
+        }
+
+        // Canonicalise and build canonical → original-code lookup
+        $codeMap = [];
+        foreach ($codes as $origCode) {
+            $canonical = DocumentControlService::canonicalizeCode($origCode);
+            if ($canonical !== '' && !isset($codeMap[$canonical])) {
+                $codeMap[$canonical] = $origCode;
+            }
+        }
+        if ($codeMap === []) {
+            return;
+        }
+
+        $canonicals = array_values(array_keys($codeMap));
+        $params = [];
+        $placeholders = [];
+        foreach ($canonicals as $i => $c) {
+            $key = ':c' . $i;
+            $placeholders[] = $key;
+            $params[$key] = $c;
+        }
+
+        $rows = $this->data->query(
+            'SELECT doc_code, revision, status, effective_date
+               FROM dcc_document_header
+              WHERE doc_code IN (' . implode(',', $placeholders) . ')',
+            $params
+        ) ?? [];
+
+        foreach ($rows as $row) {
+            $canonical = (string)($row['doc_code'] ?? '');
+            $origCode  = $codeMap[$canonical] ?? null;
+            if ($origCode === null) {
+                continue;
+            }
+
+            $rawRevision = trim((string)($row['revision'] ?? ''));
+            if ($rawRevision === '' || strtoupper($rawRevision) === 'V0') {
+                continue;
+            }
+
+            $revision       = $this->normaliseDccRevision($rawRevision);
+            $legacyRevision = $this->legacyRevisionFromDcc($revision);
+            if ($legacyRevision === '') {
+                continue;
+            }
+
+            $dccStatus     = strtolower(trim((string)($row['status'] ?? '')));
+            $effectiveDate = trim((string)($row['effective_date'] ?? ''));
+
+            $state       = $states[$origCode] ?? [];
+            $stateStatus = strtolower(trim((string)($state['status'] ?? '')));
+
+            // Always surface the last-released revision so the listing column
+            // can show it even when an in-flight draft is in progress.
+            $state['released_revision'] = $legacyRevision;
+            $state['has_release']       = true;
+
+            // Override revision/status only when there is no active in-flight
+            // workflow step and DCC is not itself in draft.
+            $activeStates = ['draft', 'in_review', 'pending_approval', 'rejected'];
+            if (
+                !in_array($stateStatus, $activeStates, true)
+                && !in_array($dccStatus, ['draft'], true)
+                && $dccStatus !== ''
+            ) {
+                $state['revision'] = $legacyRevision;
+                $state['status']   = $dccStatus;
+            }
+
+            if ($effectiveDate !== '') {
+                $state['effective_date'] = $effectiveDate;
+            }
+            $state['version_source'] = 'dcc_document_header';
+
+            $states[$origCode] = $state;
+        }
     }
 }

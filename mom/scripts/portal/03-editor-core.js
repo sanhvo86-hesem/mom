@@ -239,12 +239,17 @@ function getDocRevision(doc){
   const state=getDocState(doc.code)||{};
   const fallbackReleased=String(state.released_revision||'').replace(/^v/i,'').trim();
   if(fallbackReleased) return fallbackReleased;
+  // Fall through to DCC overlay data loaded from dcc_document_header
+  if(doc.__dccRevision) return String(doc.__dccRevision).replace(/^v/i,'').trim();
   return String(doc.rev||'0').replace(/^v/i,'').trim() || '0';
 }
 
 function getDocStatus(doc){
   const state=getDocState(doc.code);
-  return state ? state.status : (doc.status || 'draft');
+  if(state) return state.status;
+  // Fall through to DCC overlay data loaded from dcc_document_header
+  if(doc.__dccStatus) return doc.__dccStatus;
+  return doc.status || 'draft';
 }
 
 function statusLabel(status){
@@ -259,6 +264,8 @@ function statusLabel(status){
     pending_approval:T('wf_pending'),
     approved:T('wf_approved'),
     initial_release:(lang==='en'?'Initial Release':'Phát hành lần đầu'),
+    effective:(lang==='en'?'Effective':'Có hiệu lực'),
+    superseded:(lang==='en'?'Superseded':'Đã thay thế'),
     obsolete:T('wf_obsolete')
   };
   return map[status]||status;
@@ -276,6 +283,8 @@ function statusColor(status){
     pending_approval:'var(--purple,#8b5cf6)',
     approved:'var(--green-light,#16a34a)',
     initial_release:'var(--green-light,#16a34a)',
+    effective:'var(--green-light,#16a34a)',
+    superseded:'var(--amber-dark,#f59e0b)',
     obsolete:'var(--gray-400,#94a3b8)'
   };
   return map[status]||'var(--gray-400,#94a3b8)';
