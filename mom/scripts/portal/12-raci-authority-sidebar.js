@@ -21,7 +21,7 @@
 'use strict';
 
 var WIDGET_VERSION = '2026-05-21-1';
-var ROLE_COLS = ['CS','EST','ENG','PPL','WKM','PD','QA','SCM','CEO','EHS','HR/IT'];
+var ROLE_COLS = ['CS','EST','ENG','PPL','WKM','PD','QA','SCM','CEO','EHS','HR','IT'];
 /* RACI source docs — never render the sidebar on the matrices themselves. */
 var SOURCE_DOCS = { 'ANNEX-120':1, 'ANNEX-121':1, 'RACI-MASTER-MATRIX':1, 'AUTHORITY-MATRIX':1 };
 
@@ -94,7 +94,7 @@ function _parseGateMatrix(doc){
     var out = [];
     for (var r = 0; r < rows.length; r++) {
         var tds = rows[r].children;
-        if (tds.length !== 15) continue;
+        if (tds.length !== 16) continue;
         var roles = {};
         for (var c = 0; c < ROLE_COLS.length; c++) {
             var v = (tds[c + 3].textContent || '').trim().toUpperCase();
@@ -185,7 +185,7 @@ function _relevantRows(info, gateRows, suppRows){
         if (!role) return [];
         // map common JD sub-roles onto core RACI columns
         var ALIAS = { ENGM:'ENG', PE:'ENG', CAM:'ENG', DFM:'ENG', BUY:'SCM', XNK:'SCM',
-                      ITA:'HR/IT', ESA:'HR/IT', QCL:'QA', QC:'QA', QE:'QA',
+                      ITA:'IT', ESA:'IT', QCL:'QA', QC:'QA', QE:'QA',
                       SL:'WKM', SET:'WKM', OPR:'WKM' };
         var col = ALIAS[role] || role;
         var main = gateRows.filter(function(row){ return !!row.roles[col]; }).map(function(row){

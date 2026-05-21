@@ -17,7 +17,7 @@
 
 var _el = null;
 var _lang = 'vi';
-var ROLES = ['CS','EST','ENG','PPL','WKM','PD','QA','SCM','CEO','EHS','HR/IT'];
+var ROLES = ['CS','EST','ENG','PPL','WKM','PD','QA','SCM','CEO','EHS','HR','IT'];
 var LETTERS = ['', 'A', 'R', 'C', 'I'];
 
 /* Cell-table datasets (ANNEX-121 §4 / §6 / support supplement). */

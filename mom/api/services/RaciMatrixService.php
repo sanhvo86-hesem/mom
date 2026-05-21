@@ -36,13 +36,13 @@ final class RaciMatrixService
     private const GATE_REGION = 'RACI-GATE-MATRIX';
 
     /** @var array<int, string> */
-    private const ROLES = ['CS','EST','ENG','PPL','WKM','PD','QA','SCM','CEO','EHS','HR/IT'];
+    private const ROLES = ['CS','EST','ENG','PPL','WKM','PD','QA','SCM','CEO','EHS','HR','IT'];
     /** @var array<int, string> */
     private const LETTERS = ['A','R','C','I'];
     /** @var array<string, string> */
     private const ALIAS = [
         'ENGM'=>'ENG','PE'=>'ENG','CAM'=>'ENG','DFM'=>'ENG',
-        'BUY'=>'SCM','XNK'=>'SCM','ITA'=>'HR/IT','ESA'=>'HR/IT','HR'=>'HR/IT','IT'=>'HR/IT',
+        'BUY'=>'SCM','XNK'=>'SCM','ITA'=>'IT','ESA'=>'IT',
         'QCL'=>'QA','QC'=>'QA','QE'=>'QA','SL'=>'WKM','SET'=>'WKM','OPR'=>'WKM',
     ];
     /** @var array<int, string> Globs (relative to rootDir) for managed SOP/JD docs. */

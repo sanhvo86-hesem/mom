@@ -15,7 +15,8 @@ declare(strict_types=1);
  *
  * P0 findings (block deploy)
  * ──────────────────────────
- *   1. The G0→G7 matrix has exactly 15 columns.
+ *   1. The G0→G7 matrix has exactly 16 columns (gate, CDR, activity,
+ *      12 role columns, FRM/SOP).
  *   2. Every data row has exactly one Accountable (A).
  *   3. Every data row has at least one Responsible (R).
  *   4. Every RACI cell holds only A / R / C / I (or blank).
@@ -38,11 +39,11 @@ $base     = dirname(__DIR__, 2);                 // -> repo .../mom
 $annex121 = $base.'/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html';
 $annex120 = $base.'/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html';
 
-$ROLE_COLS = ['CS','EST','ENG','PPL','WKM','PD','QA','SCM','CEO','EHS','HR/IT'];
+$ROLE_COLS = ['CS','EST','ENG','PPL','WKM','PD','QA','SCM','CEO','EHS','HR','IT'];
 // Sub-role → RACI-column alias map. Authoritative source: ROLE-AND-DEPARTMENT-
 // BUNDLES §6. Keep this in sync with that table.
 $ALIAS     = ['PE'=>'ENG','ENGM'=>'ENG','CAM'=>'ENG','DFM'=>'ENG',
-              'BUY'=>'SCM','XNK'=>'SCM','ITA'=>'HR/IT','ESA'=>'HR/IT',
+              'BUY'=>'SCM','XNK'=>'SCM','ITA'=>'IT','ESA'=>'IT',
               'QCL'=>'QA','QC'=>'QA','QE'=>'QA','SL'=>'WKM','SET'=>'WKM','OPR'=>'WKM'];
 $R_SEMANTICS_WHITELIST = [];             // no exceptions — F1/F2 realigned to IT=R
 
@@ -133,8 +134,8 @@ if ($gateTable === null) {
     $ths = $gateTable->getElementsByTagName('thead')->item(0)
                      ->getElementsByTagName('tr')->item(0)
                      ->getElementsByTagName('th');
-    if ($ths->length !== 15) {
-        $p0[] = "ANNEX-121: gate matrix header has {$ths->length} columns, expected 15.";
+    if ($ths->length !== 16) {
+        $p0[] = "ANNEX-121: gate matrix header has {$ths->length} columns, expected 16.";
     }
     $rowCount = 0;
     foreach ($gateTable->getElementsByTagName('tbody')->item(0)
@@ -148,12 +149,12 @@ if ($gateTable === null) {
         if (rowStray($tr)) {
             $p0[] = "ANNEX-121 row $label: stray content outside a <td> (malformed row).";
         }
-        if (count($tds) !== 15) {
-            $p0[] = "ANNEX-121 row $label: ".count($tds)." cells, expected 15.";
+        if (count($tds) !== 16) {
+            $p0[] = "ANNEX-121 row $label: ".count($tds)." cells, expected 16.";
             continue;
         }
         $aRoles = $rRoles = [];
-        for ($i = 3; $i <= 13; $i++) {
+        for ($i = 3; $i <= 14; $i++) {
             $v = strtoupper(cellText($tds[$i]));
             $role = $GLOBALS['ROLE_COLS'][$i - 3];
             if (!in_array($v, ['A','R','C','I',''], true)) {
