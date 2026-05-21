@@ -82,6 +82,11 @@ final class RepoBoundaryScanner
         // durable prompt content and mirrored by .gitignore
         // "!_reports/kpi-upgrade-prompts/".
         '#^_reports/kpi-upgrade-prompts/.*$#',
+        // KPI upgrade audit/report evidence — the prompt pack (01→09)
+        // produces audit reports that must survive a fresh clone and be
+        // visible on GitHub. Same allowlist policy as the prompt pack
+        // itself; mirrored by .gitignore "!_reports/kpi/".
+        '#^_reports/kpi/.*$#',
     ];
 
     /**
