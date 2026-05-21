@@ -595,31 +595,6 @@
             "foundation_governance.*"
         ]
     },
-    "tool_storekeeper": {
-        "canCreateDocs": false,
-        "permissions": [
-            "inventory.*.read",
-            "outsource_execution.*.read",
-            "purchasing.*.read",
-            "shipping_compliance.*.read",
-            "supplier_relationship.*.read",
-            "traceability_serialization.*.read",
-            "transportation.*.read",
-            "warehouse_management.*.read"
-        ],
-        "denies": [
-            "*.delete",
-            "module_schema.*",
-            "registry.*",
-            "schema_studio.*",
-            "core_system.*",
-            "system_infrastructure.*",
-            "forms_system.*",
-            "record_system.*",
-            "master_data_governance.*",
-            "customer_portal.*"
-        ]
-    },
     "logistics_coordinator": {
         "canCreateDocs": false,
         "permissions": [
