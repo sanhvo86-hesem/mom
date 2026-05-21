@@ -590,6 +590,12 @@ let MODULE_ACCESS_CONFIG_DRAFT = null;
 let moduleAccessConfigDirty = false;
 let moduleAccessConfigHydrated = false;
 let moduleAccessConfigLoadPromise = null;
+let moduleAccessUsersLoadAttempted = false;
+let moduleAccessUsersLoadInFlight = false;
+let moduleAccessRoleFilterDept = '';
+let moduleAccessRoleFilterTitle = '';
+let moduleAccessRoleFilterSearch = '';
+let moduleAccessRoleFilterTimer = null;
 
 function normalizeAccessRole(value){
   const token = String(value || '').trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '');
@@ -685,7 +691,8 @@ function moduleAccessAdminTabCatalog(){
     {id:'version_control', group:'operations', icon:'🔄', labelEn:'Version control', labelVi:'Điều khiển phiên bản', noteEn:'Git synchronization and release hygiene.', noteVi:'Đồng bộ Git và vệ sinh phát hành.', defaultAccess:'admin'},
     {id:'ai_control', group:'operations', icon:'🤖', labelEn:'AI Control', labelVi:'Điều khiển AI', noteEn:'AI engine on/off, model selection, feature toggles, usage and cost tracking.', noteVi:'Bật/tắt AI engine, chọn model, tính năng, theo dõi sử dụng và chi phí.', defaultAccess:'admin'},
     {id:'translation_module', group:'operations', icon:'🌍', labelEn:'Translation Module', labelVi:'Module Dịch Thuật', noteEn:'Multi-provider routing (NLLB / Claude CLI / Codex CLI / API), credentials vault, model discovery, cost log, side-by-side test bench. Backed by migration 157.', noteVi:'Định tuyến đa engine (NLLB / Claude CLI / Codex CLI / API), kho API key mã hóa, chọn model, log chi phí, test song song. Migration 157.', defaultAccess:'admin'},
-    {id:'appearance', group:'content', icon:'🎨', labelEn:'Appearance', labelVi:'Giao diện', noteEn:'Portal design system and theme settings.', noteVi:'Thiết lập giao diện và design system.', defaultAccess:'admin'}
+    {id:'appearance', group:'content', icon:'🎨', labelEn:'Appearance', labelVi:'Giao diện', noteEn:'Portal design system and theme settings.', noteVi:'Thiết lập giao diện và design system.', defaultAccess:'admin'},
+    {id:'doc_visualizer', group:'content', icon:'🗺️', labelEn:'Doc diagram gates', labelVi:'Sơ đồ tài liệu — Cổng', noteEn:'Manage which documents appear per gate in the fishbone & gate-flow diagrams.', noteVi:'Quản lý tài liệu hiển thị trên từng nhánh sơ đồ xương cá và luồng cổng.', defaultAccess:'admin'}
   ];
 }
 
@@ -9509,6 +9516,7 @@ function renderAdmin(){
   if(adminTab==='iam_console') renderAdminIamConsole();
   if(adminTab==='ai_control') renderAdminAiControl();
   if(adminTab==='appearance') renderAdminAppearance();
+  if(adminTab==='doc_visualizer') renderAdminDocVisualizer();
 }
 
 /* ── Admin: Governance tabs (Permission Catalog / SoD Matrix / Access Reviews) ─ */
@@ -9736,6 +9744,254 @@ function renderAdminMetadataStudio(){
   document.head.appendChild(script);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * DOC VISUALIZER GATES — Admin tab (manage docs per gate in fishbone/flow)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+var _dvGatesDraft     = null;   // {G0:[...], G1:[...], ...}
+var _dvGatesDirty     = false;
+var _dvGatesHydrated  = false;
+var _dvGatesLoadProm  = null;
+var _dvSelGate        = 'G0';
+
+function _dvGatesMeta() {
+  return [
+    {id:'G0', short:'Hợp đồng',  role:'CS + D-SCS',     col:0},
+    {id:'G1', short:'Kỹ thuật',  role:'ENGM',            col:2},
+    {id:'G2', short:'IQC',       role:'D-PUR + QCL',     col:3},
+    {id:'G3', short:'Setup',     role:'PPL + OPR',       col:4},
+    {id:'G4', short:'FAI',       role:'QCL',             col:5},
+    {id:'G5', short:'IPQC',      role:'QCL + OPR',       col:1},
+    {id:'G6', short:'OQC',       role:'QCL',             col:6},
+    {id:'G7', short:'Giao hàng', role:'D-LOG + FIN',     col:7},
+  ];
+}
+function _dvPalette(col) {
+  var P = ['#1565c0','#16a34a','#7c3aed','#d97706','#1e88e5','#dc2626','#0891b2','#0c2d48'];
+  return P[col % P.length];
+}
+function _dvDefaults() {
+  return {
+    G0:['SOP-201','SOP-202','SOP-203','WI-201','FRM-201','FRM-202','FRM-203','FRM-204','ANNEX-201'],
+    G1:['SOP-301','SOP-303','FRM-301','FRM-302','FRM-303','FRM-305','FRM-306','ANNEX-301','ANNEX-302'],
+    G2:['SOP-401','SOP-402','FRM-401','FRM-402','FRM-403','FRM-405','FRM-408','FRM-409','FRM-411','FRM-413','FRM-701','ANNEX-401','ANNEX-402','ANNEX-403'],
+    G3:['SOP-501','SOP-503','SOP-504','WI-517','WI-518','WI-519','FRM-501','FRM-502','FRM-504','FRM-511','FRM-513','FRM-519','FRM-521','FRM-523','ANNEX-501','ANNEX-502','ANNEX-503'],
+    G4:['SOP-302','SOP-601','SOP-602','WI-302','WI-602','FRM-205','FRM-305','FRM-311','FRM-601','FRM-602','FRM-611','FRM-612','FRM-613','ANNEX-602','ANNEX-604'],
+    G5:['SOP-502','SOP-503','SOP-505','SOP-606','WI-501','WI-604','WI-606','FRM-511','FRM-512','FRM-621','FRM-631','FRM-651','ANNEX-601','ANNEX-507'],
+    G6:['SOP-603','SOP-604','SOP-605','WI-603','WI-605','FRM-206','FRM-621','FRM-641','FRM-642','FRM-643','ANNEX-601','ANNEX-603','ANNEX-606'],
+    G7:['SOP-701','SOP-702','SOP-703','SOP-803','WI-206','WI-701','WI-714','FRM-702','FRM-704','FRM-706','FRM-707','FRM-708','FRM-712','FRM-821','ANNEX-701','ANNEX-702'],
+  };
+}
+
+function loadDvGatesConfig() {
+  if (_dvGatesHydrated) return Promise.resolve(_dvGatesDraft);
+  if (_dvGatesLoadProm) return _dvGatesLoadProm;
+  _dvGatesLoadProm = apiCall('doc_visualizer_gates_get').then(function(res) {
+    _dvGatesDraft    = (res && res.ok && res.gates) ? res.gates : _dvDefaults();
+    _dvGatesHydrated = true; _dvGatesLoadProm = null;
+    return _dvGatesDraft;
+  }).catch(function() {
+    _dvGatesDraft    = _dvDefaults();
+    _dvGatesHydrated = true; _dvGatesLoadProm = null;
+    return _dvGatesDraft;
+  });
+  return _dvGatesLoadProm;
+}
+
+async function saveDocVisualizerGatesConfig() {
+  if (!isAdmin()) return;
+  try {
+    const res = await apiCall('admin_doc_visualizer_gates_save', {gates: _dvGatesDraft});
+    if (!(res && res.ok)) {
+      showToast('⚠ ' + ((res && res.error) || (lang==='en' ? 'Save failed.' : 'Lưu thất bại.')));
+      return;
+    }
+    if (res.gates) _dvGatesDraft = res.gates;
+    _dvGatesDirty = false;
+    renderAdminDocVisualizer();
+    showToast(lang==='en' ? 'Diagram gates saved.' : 'Đã lưu cấu hình sơ đồ tài liệu.');
+  } catch(e) {
+    showToast('⚠ ' + ((e && e.message) || (lang==='en' ? 'Save failed.' : 'Lưu thất bại.')));
+  }
+}
+
+function dvAddDoc(gateId) {
+  const inp = document.getElementById('dv-add-inp');
+  if (!inp) return;
+  const code = inp.value.trim().toUpperCase();
+  if (!code || !/^[A-Z]+-\d+/.test(code)) {
+    showToast(lang==='en' ? 'Enter a valid code (e.g. SOP-201)' : 'Nhập mã hợp lệ (VD: SOP-201)');
+    return;
+  }
+  const draft = _dvGatesDraft || _dvDefaults();
+  const docs  = (draft[gateId] || []).slice();
+  if (docs.indexOf(code) >= 0) {
+    showToast(lang==='en' ? code + ' already in gate' : code + ' đã có trong cổng này');
+    inp.value = ''; return;
+  }
+  docs.push(code);
+  _dvGatesDraft = Object.assign({}, draft, {[gateId]: docs});
+  _dvGatesDirty = true;
+  inp.value = '';
+  renderAdminDocVisualizer();
+}
+
+function dvRemoveDoc(gateId, idx) {
+  const draft = _dvGatesDraft || _dvDefaults();
+  const docs  = (draft[gateId] || []).slice();
+  if (idx < 0 || idx >= docs.length) return;
+  docs.splice(idx, 1);
+  _dvGatesDraft = Object.assign({}, draft, {[gateId]: docs});
+  _dvGatesDirty = true;
+  renderAdminDocVisualizer();
+}
+
+function dvResetGate(gateId) {
+  const draft    = Object.assign({}, _dvGatesDraft || _dvDefaults());
+  draft[gateId]  = (_dvDefaults()[gateId] || []).slice();
+  _dvGatesDraft  = draft;
+  _dvGatesDirty  = true;
+  renderAdminDocVisualizer();
+}
+
+function renderAdminDocVisualizer() {
+  const el = document.getElementById('admin-content');
+  if (!el) return;
+
+  if (!_dvGatesHydrated) {
+    el.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:60px;color:var(--text-secondary,#64748b);font-size:14px">'
+      + '<div style="width:28px;height:28px;border:3px solid var(--border,#e2e8f0);border-top-color:var(--brand-primary,#1565c0);border-radius:50%;animation:dov-spin 0.8s linear infinite"></div>'
+      + (lang==='en' ? 'Loading gate configuration…' : 'Đang tải cấu hình sơ đồ…') + '</div>';
+    loadDvGatesConfig().then(function() {
+      if (document.getElementById('admin-content') === el) renderAdminDocVisualizer();
+    });
+    return;
+  }
+
+  if (!document.getElementById('dv-admin-css')) {
+    const s = document.createElement('style'); s.id = 'dv-admin-css';
+    s.textContent = [
+      '.dv-shell{display:flex;flex-direction:column;height:100%;min-height:0}',
+      '.dv-hero{padding:20px 24px 14px;border-bottom:1px solid var(--border,#e2e8f0)}',
+      '.dv-hero h3{margin:0 0 4px;font-size:17px;font-weight:700;color:var(--text-primary,#1e293b)}',
+      '.dv-hero p{margin:0;font-size:12px;color:var(--text-secondary,#64748b)}',
+      '.dv-stats{display:flex;gap:18px;margin-top:10px}',
+      '.dv-stat strong{display:block;font-size:20px;font-weight:800;color:var(--brand-primary,#1565c0);line-height:1}',
+      '.dv-stat span{font-size:11px;color:var(--text-secondary,#64748b)}',
+      '.dv-body{display:flex;flex:1;min-height:0;overflow:hidden}',
+      '.dv-sidebar{width:190px;flex-shrink:0;border-right:1px solid var(--border,#e2e8f0);overflow-y:auto;padding:6px 0}',
+      '.dv-gate-btn{display:flex;align-items:center;gap:7px;width:100%;padding:7px 10px;border:none;background:transparent;cursor:pointer;transition:background .12s;text-align:left}',
+      '.dv-gate-btn:hover{background:var(--bg-hover,#f8fafc)}',
+      '.dv-gate-btn.active{background:color-mix(in srgb,var(--gc) 10%,transparent)}',
+      '.dv-badge{padding:2px 7px;border-radius:5px;font-size:10px;font-weight:800;color:#fff;flex-shrink:0}',
+      '.dv-badge-lg{padding:4px 12px;border-radius:7px;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}',
+      '.dv-gate-name{flex:1;font-size:12px;font-weight:600;color:var(--text-primary,#1e293b);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.dv-cnt{font-size:11px;font-weight:700;color:var(--text-tertiary,#94a3b8);background:var(--bg-surface-alt,#f1f5f9);padding:1px 6px;border-radius:10px;flex-shrink:0}',
+      '.dv-main{flex:1;overflow-y:auto;padding:18px 22px;min-width:0}',
+      '.dv-detail-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px}',
+      '.dv-detail-title{font-size:15px;font-weight:700}',
+      '.dv-detail-role{font-size:11px;color:var(--text-secondary,#64748b);margin-top:1px}',
+      '.dv-cnt-label{margin-left:auto;font-size:12px;font-weight:700;color:var(--text-secondary,#64748b)}',
+      '.dv-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;min-height:32px}',
+      '.dv-chip{display:inline-flex;align-items:center;border:1px solid color-mix(in srgb,var(--cc) 28%,transparent);border-radius:5px;overflow:hidden;font-size:11px}',
+      '.dv-chip-cat{padding:3px 5px;background:var(--cc);color:#fff;font-size:9px;font-weight:800;letter-spacing:.3px;flex-shrink:0}',
+      '.dv-chip-code{padding:3px 7px;font-family:monospace;font-size:11px;font-weight:600;color:var(--cc);background:color-mix(in srgb,var(--cc) 8%,#fff)}',
+      '.dv-chip-rm{padding:2px 6px;background:transparent;border:none;border-left:1px solid color-mix(in srgb,var(--cc) 20%,transparent);cursor:pointer;color:var(--text-tertiary,#94a3b8);font-size:12px;line-height:1;transition:color .12s,background .12s}',
+      '.dv-chip-rm:hover{background:color-mix(in srgb,var(--cc) 14%,transparent);color:var(--cc)}',
+      '.dv-add-row{display:flex;gap:7px;align-items:center;padding-top:10px;border-top:1px solid var(--border,#e2e8f0);flex-wrap:wrap}',
+      '.dv-code-inp{flex:1;min-width:140px;padding:6px 10px;border:1.5px solid var(--border,#e2e8f0);border-radius:7px;font-size:13px;font-family:monospace;outline:none;background:var(--bg-surface,#fff);color:var(--text-primary,#1e293b)}',
+      '.dv-code-inp:focus{border-color:var(--brand-primary,#1565c0)}',
+    ].join('\n');
+    document.head.appendChild(s);
+  }
+
+  const draft    = _dvGatesDraft || _dvDefaults();
+  const gates    = _dvGatesMeta();
+  const totalDoc = Object.values(draft).reduce((s,a) => s + (Array.isArray(a) ? a.length : 0), 0);
+  const catCol   = {SOP:'#1565c0', WI:'#16a34a', ANNEX:'#7c3aed', FRM:'#d97706'};
+
+  const sideHtml = gates.map(function(g) {
+    const docs = Array.isArray(draft[g.id]) ? draft[g.id] : [];
+    const col  = _dvPalette(g.col);
+    const act  = _dvSelGate === g.id ? ' active' : '';
+    return `<button class="dv-gate-btn${act}" style="--gc:${col}" onclick="_dvSelGate='${g.id}';renderAdminDocVisualizer()">
+      <span class="dv-badge" style="background:${col}">${escapeHtml(g.id)}</span>
+      <span class="dv-gate-name">${escapeHtml(g.short)}</span>
+      <span class="dv-cnt">${docs.length}</span>
+    </button>`;
+  }).join('');
+
+  const sel     = gates.find(g => g.id === _dvSelGate) || gates[0];
+  const selDocs = Array.isArray(draft[sel.id]) ? draft[sel.id] : [];
+  const selCol  = _dvPalette(sel.col);
+
+  const chipsHtml = selDocs.map(function(code, i) {
+    const cat = String(code || '').split('-')[0] || '';
+    const cc  = catCol[cat] || '#64748b';
+    return `<span class="dv-chip" style="--cc:${cc}">
+      <span class="dv-chip-cat">${escapeHtml(cat)}</span>
+      <span class="dv-chip-code">${escapeHtml(code)}</span>
+      <button class="dv-chip-rm" onclick="dvRemoveDoc('${escapeHtml(sel.id)}',${i})" title="${lang==='en'?'Remove':'Xóa'}">×</button>
+    </span>`;
+  }).join('');
+
+  const emptyNote = selDocs.length === 0
+    ? `<span style="font-size:12px;color:var(--text-tertiary,#94a3b8);padding:4px 0">${lang==='en'?'No documents configured for this gate.':'Chưa có tài liệu nào cho cổng này.'}</span>`
+    : '';
+
+  const detailHtml = `
+    <div class="dv-detail-hdr">
+      <span class="dv-badge-lg" style="background:${selCol}">${escapeHtml(sel.id)}</span>
+      <div>
+        <div class="dv-detail-title" style="color:${selCol}">${escapeHtml(sel.short)}</div>
+        <div class="dv-detail-role">${escapeHtml(sel.role)}</div>
+      </div>
+      <span class="dv-cnt-label">${selDocs.length} ${lang==='en'?'docs':'tài liệu'}</span>
+    </div>
+    <div class="dv-chips">${chipsHtml}${emptyNote}</div>
+    <div class="dv-add-row">
+      <input id="dv-add-inp" class="dv-code-inp" type="text"
+        placeholder="${lang==='en'?'Code, e.g. SOP-201':'Mã, VD: SOP-201'}"
+        onkeydown="if(event.key==='Enter')dvAddDoc('${escapeHtml(sel.id)}')">
+      <button class="btn-admin primary" onclick="dvAddDoc('${escapeHtml(sel.id)}')" style="white-space:nowrap">
+        + ${lang==='en'?'Add':'Thêm'}
+      </button>
+      <button class="btn-admin secondary" onclick="dvResetGate('${escapeHtml(sel.id)}')" style="white-space:nowrap">
+        ↩ ${lang==='en'?'Reset to defaults':'Khôi phục mặc định'}
+      </button>
+    </div>`;
+
+  const saveBar = _dvGatesDirty ? `
+    <div class="admin-save-bar">
+      <span class="save-hint"><b>⚠ ${lang==='en'?'Unsaved diagram changes':'Chưa lưu thay đổi sơ đồ'}</b></span>
+      <button class="btn-admin secondary" onclick="_dvGatesDraft=_dvDefaults();_dvGatesDirty=false;renderAdminDocVisualizer()">
+        ↩ ${lang==='en'?'Reset all':'Khôi phục tất cả'}
+      </button>
+      <button class="btn-admin primary" onclick="saveDocVisualizerGatesConfig()" style="padding:8px 24px;font-size:13px">
+        💾 ${lang==='en'?'SAVE':'LƯU'}
+      </button>
+    </div>` : '';
+
+  el.innerHTML = `
+    <div class="dv-shell">
+      <div class="dv-hero">
+        <h3>${lang==='en'?'Document diagram — gate configuration':'Sơ đồ tài liệu — Cấu hình cổng'}</h3>
+        <p>${lang==='en'
+          ? 'Add or remove documents per gate. Changes are applied to the fishbone and gate-flow diagrams on next open.'
+          : 'Thêm hoặc xóa tài liệu cho từng cổng. Thay đổi áp dụng lên sơ đồ xương cá và luồng cổng khi mở lại.'}</p>
+        <div class="dv-stats">
+          <div class="dv-stat"><strong>8</strong><span>${lang==='en'?'Gates':'Cổng'}</span></div>
+          <div class="dv-stat"><strong>${totalDoc}</strong><span>${lang==='en'?'Total docs':'Tổng tài liệu'}</span></div>
+          ${_dvGatesDirty?`<div class="dv-stat"><strong style="color:#d97706">⚠</strong><span>${lang==='en'?'Unsaved':'Chưa lưu'}</span></div>`:''}
+        </div>
+      </div>
+      <div class="dv-body">
+        <div class="dv-sidebar">${sideHtml}</div>
+        <div class="dv-main">${detailHtml}</div>
+      </div>
+      ${saveBar}
+    </div>`;
+}
+
 function renderAdminAppearance(){
   const el=document.getElementById('admin-content');
   if(!el) return;
@@ -9906,10 +10162,17 @@ function setModuleAccessConfigDirty(value){
 function moduleAccessRoleOptions(){
   const out = [];
   const seen = new Set();
+  const usersByRole = {};
+  (Array.isArray(USERS) ? USERS : []).forEach(user => {
+    const id = normalizeAccessRole(user && user.role);
+    if(!id) return;
+    if(!usersByRole[id]) usersByRole[id] = [];
+    usersByRole[id].push(user);
+  });
   const candidateRoles = [
     ...ADMIN_ROLES,
     ...Object.keys(ROLES || {}),
-    ...(Array.isArray(USERS) ? USERS.map(user => user && user.role) : []),
+    ...Object.keys(usersByRole),
     ...PURCHASING_MODULE_DEFAULT_ROLES
   ];
   candidateRoles.forEach(role => {
@@ -9917,14 +10180,28 @@ function moduleAccessRoleOptions(){
     if(!id || seen.has(id)) return;
     seen.add(id);
     const meta = ROLES[id] || {};
+    const roleUsers = usersByRole[id] || [];
+    const depts = moduleAccessUniqueSorted([meta.dept].concat(roleUsers.map(user => user && user.dept)));
+    const titles = moduleAccessUniqueSorted(roleUsers.map(moduleAccessUserTitle));
+    const activeUsers = roleUsers.filter(user => user && user.active !== false).length;
+    const label = lang==='en' ? (meta.labelEn || meta.label || id) : (meta.label || meta.labelEn || id);
     out.push({
       id,
-      label: lang==='en' ? (meta.labelEn || meta.label || id) : (meta.label || meta.labelEn || id),
-      group: ADMIN_ROLES.includes(id) ? 'admin' : 'ops'
+      label,
+      icon: meta.icon || '',
+      group: ADMIN_ROLES.includes(id) ? 'admin' : 'ops',
+      depts,
+      titles,
+      activeUsers,
+      allUsers: roleUsers.length,
+      searchText: [id, label, meta.label, meta.labelEn, meta.dept].concat(depts, titles).join(' ')
     });
   });
   return out.sort((a, b) => {
     if(a.group !== b.group) return a.group === 'admin' ? -1 : 1;
+    const deptA = (a.depts && a.depts[0]) || '';
+    const deptB = (b.depts && b.depts[0]) || '';
+    if(deptA !== deptB) return deptA.localeCompare(deptB, lang==='en' ? 'en' : 'vi');
     return String(a.label).localeCompare(String(b.label), lang==='en' ? 'en' : 'vi');
   });
 }
@@ -10016,7 +10293,132 @@ function moduleAccessGroupLabel(scope, group){
   return groups[group] || group;
 }
 
-function renderModuleAccessScope(scope, roleOptions){
+function moduleAccessUniqueSorted(values){
+  return Array.from(new Set((Array.isArray(values) ? values : []).map(value => String(value || '').trim()).filter(Boolean)))
+    .sort((a, b) => a.localeCompare(b, lang==='en' ? 'en' : 'vi'));
+}
+
+function moduleAccessUserTitle(user){
+  if(!user || typeof user !== 'object') return '';
+  return String(user.title || user.jd_title || '').trim();
+}
+
+function moduleAccessRoleGlyph(role){
+  const icon = role && String(role.icon || '').trim();
+  if(icon) return icon;
+  const label = role && String(role.label || role.id || '').trim();
+  return label ? label.charAt(0).toUpperCase() : '#';
+}
+
+function moduleAccessDepartmentLabel(code){
+  const target = String(code || '').trim();
+  if(!target) return lang==='en' ? 'No department' : 'Chưa có phòng ban';
+  const dept = Array.isArray(DEPARTMENTS)
+    ? DEPARTMENTS.find(item => String(item.code || '') === target)
+    : null;
+  if(!dept) return target;
+  return String(lang==='en' ? (dept.labelEn || dept.label || dept.code) : (dept.label || dept.labelEn || dept.code));
+}
+
+function moduleAccessRoleFilterData(roleOptions){
+  const userRows = Array.isArray(USERS) ? USERS.filter(user => user && user.active !== false) : [];
+  const depts = moduleAccessUniqueSorted([]
+    .concat((roleOptions || []).flatMap(role => role.depts || []))
+    .concat(userRows.map(user => user.dept)));
+  const titles = moduleAccessUniqueSorted(userRows.map(moduleAccessUserTitle));
+  return {depts, titles};
+}
+
+function moduleAccessFilterRoleOptions(roleOptions){
+  const dept = String(moduleAccessRoleFilterDept || '').trim();
+  const title = String(moduleAccessRoleFilterTitle || '').trim();
+  const search = String(moduleAccessRoleFilterSearch || '').trim().toLowerCase();
+  return (roleOptions || []).filter(role => {
+    if(dept && !(role.depts || []).includes(dept)) return false;
+    if(title && !(role.titles || []).includes(title)) return false;
+    if(search){
+      const hay = String(role.searchText || '').toLowerCase();
+      if(!hay.includes(search)) return false;
+    }
+    return true;
+  });
+}
+
+function renderModuleAccessRoleFilters(roleOptions, filteredRoleOptions){
+  const data = moduleAccessRoleFilterData(roleOptions);
+  const selectedDept = String(moduleAccessRoleFilterDept || '');
+  const selectedTitle = String(moduleAccessRoleFilterTitle || '');
+  const search = String(moduleAccessRoleFilterSearch || '');
+  const titleCount = data.titles.length;
+  const activeUsers = (Array.isArray(USERS) ? USERS : []).filter(user => user && user.active !== false).length;
+  return `<section class="module-access-filter-panel" aria-label="${escapeHtml(lang==='en'?'Role filters':'Bộ lọc vai trò')}">
+    <div class="module-access-filter-copy">
+      <b>${escapeHtml(lang==='en' ? 'Role picker' : 'Bộ chọn vai trò')}</b>
+      <span>${escapeHtml(lang==='en'
+        ? 'Department and title filters come from active user profiles.'
+        : 'Bộ lọc phòng ban và chức danh lấy từ hồ sơ user đang hoạt động.')}</span>
+    </div>
+    <div class="module-access-filter-controls">
+      <input id="module-access-role-search" class="module-access-filter-input" type="search"
+        placeholder="${escapeHtml(lang==='en' ? 'Search role, code, title...' : 'Tìm vai trò, mã, chức danh...')}"
+        value="${escapeHtml(search)}"
+        oninput="setModuleAccessRoleFilter('search', this.value, true)">
+      <select class="module-access-filter-input" onchange="setModuleAccessRoleFilter('dept', this.value)">
+        <option value="">${escapeHtml(lang==='en' ? 'All departments' : 'Tất cả phòng ban')}</option>
+        ${data.depts.map(dept => `<option value="${escapeHtml(dept)}" ${selectedDept===dept?'selected':''}>${escapeHtml(moduleAccessDepartmentLabel(dept))}</option>`).join('')}
+      </select>
+      <select class="module-access-filter-input" onchange="setModuleAccessRoleFilter('title', this.value)">
+        <option value="">${escapeHtml(lang==='en' ? 'All user titles' : 'Tất cả chức danh user')}</option>
+        ${data.titles.map(title => `<option value="${escapeHtml(title)}" ${selectedTitle===title?'selected':''}>${escapeHtml(title)}</option>`).join('')}
+      </select>
+      <button type="button" class="btn-admin secondary module-access-filter-reset" onclick="resetModuleAccessRoleFilters()">${escapeHtml(lang==='en' ? 'Reset' : 'Xóa lọc')}</button>
+    </div>
+    <div class="module-access-filter-metrics">
+      <span><b>${filteredRoleOptions.length}</b>/${roleOptions.length} ${escapeHtml(lang==='en'?'roles shown':'vai trò hiện')}</span>
+      <span><b>${titleCount}</b> ${escapeHtml(lang==='en'?'synced titles':'chức danh đồng bộ')}</span>
+      <span><b>${activeUsers}</b> ${escapeHtml(lang==='en'?'active users':'user hoạt động')}</span>
+    </div>
+  </section>`;
+}
+
+function setModuleAccessRoleFilter(kind, value, defer){
+  if(kind === 'dept') moduleAccessRoleFilterDept = String(value || '');
+  else if(kind === 'title') moduleAccessRoleFilterTitle = String(value || '');
+  else if(kind === 'search') moduleAccessRoleFilterSearch = String(value || '');
+  if(moduleAccessRoleFilterTimer) clearTimeout(moduleAccessRoleFilterTimer);
+  const rerender = function(){ renderAdminModuleAccess(); };
+  if(defer){
+    moduleAccessRoleFilterTimer = setTimeout(rerender, 180);
+  }else{
+    rerender();
+  }
+}
+
+function resetModuleAccessRoleFilters(){
+  moduleAccessRoleFilterDept = '';
+  moduleAccessRoleFilterTitle = '';
+  moduleAccessRoleFilterSearch = '';
+  if(moduleAccessRoleFilterTimer) clearTimeout(moduleAccessRoleFilterTimer);
+  renderAdminModuleAccess();
+}
+
+function requestModuleAccessUsersLoad(){
+  if(moduleAccessUsersLoadAttempted || moduleAccessUsersLoadInFlight) return;
+  if(Array.isArray(USERS) && USERS.length) return;
+  if(typeof window.loadSharedAdminUsers !== 'function') return;
+  moduleAccessUsersLoadAttempted = true;
+  moduleAccessUsersLoadInFlight = true;
+  window.loadSharedAdminUsers(false).then(function(){
+    if(currentPage === 'admin' && adminTab === 'module_access') renderAdminModuleAccess();
+  }).catch(function(){
+    /* Non-blocking: module access can still render from role catalog only. */
+  }).finally(function(){
+    moduleAccessUsersLoadInFlight = false;
+  });
+}
+
+function renderModuleAccessScope(scope, roleOptions, visibleRoleOptions){
+  visibleRoleOptions = Array.isArray(visibleRoleOptions) ? visibleRoleOptions : roleOptions;
   const draft = ensureModuleAccessConfigDraft();
   const bucket = scope === 'admin_tabs' ? draft.admin_tabs : draft.portal_modules;
   const grouped = {};
@@ -10028,13 +10430,39 @@ function renderModuleAccessScope(scope, roleOptions){
   return Object.keys(grouped).map(group => {
     const rows = grouped[group].map(meta => {
       const policy = sanitizeModuleAccessPolicy(bucket[meta.id], meta);
-      const roleChecks = roleOptions.map(role => {
-        const checked = Array.isArray(policy.roles) && policy.roles.includes(role.id) ? 'checked' : '';
+      const selectedRoles = new Set(Array.isArray(policy.roles) ? policy.roles : []);
+      const visibleRoleIds = new Set(visibleRoleOptions.map(role => role.id));
+      const hiddenSelected = Array.from(selectedRoles).filter(roleId => !visibleRoleIds.has(roleId));
+      const roleChecks = visibleRoleOptions.map(role => {
+        const checked = selectedRoles.has(role.id) ? 'checked' : '';
+        const deptLine = role.depts && role.depts.length
+          ? role.depts.map(moduleAccessDepartmentLabel).join(', ')
+          : (lang==='en' ? 'No department' : 'Chưa có phòng ban');
+        const titleLine = role.titles && role.titles.length
+          ? role.titles.slice(0, 3).join(' / ') + (role.titles.length > 3 ? ' +' + (role.titles.length - 3) : '')
+          : (lang==='en' ? 'No synced user title' : 'Chưa có chức danh user');
+        const userLine = role.activeUsers
+          ? `${role.activeUsers} ${lang==='en' ? 'active users' : 'user hoạt động'}`
+          : (lang==='en' ? 'No active user' : 'Chưa có user hoạt động');
         return `<label class="module-access-role-chip ${checked ? 'is-active' : ''}">
-          <input type="checkbox" ${checked} onchange="toggleModuleAccessRole('${scope}','${meta.id}','${role.id}', this.checked)">
-          <span>${escapeHtml(role.label)}</span>
+          <input class="module-access-role-checkbox" type="checkbox" ${checked} onchange="toggleModuleAccessRole('${scope}','${meta.id}','${role.id}', this.checked)">
+          <span class="module-access-role-icon" aria-hidden="true">${escapeHtml(moduleAccessRoleGlyph(role))}</span>
+          <span class="module-access-role-copy">
+            <span class="module-access-role-label">${escapeHtml(role.label)}</span>
+            <span class="module-access-role-meta">${escapeHtml(deptLine)} · ${escapeHtml(userLine)}</span>
+            <span class="module-access-role-title">${escapeHtml(titleLine)}</span>
+          </span>
+          <span class="module-access-role-state" aria-hidden="true">${checked ? '✓' : ''}</span>
         </label>`;
       }).join('');
+      const rolePanel = policy.access === 'roles' ? `<div class="module-access-roles-panel">
+        <div class="module-access-roles-head">
+          <span>${escapeHtml(lang==='en' ? 'Assigned roles' : 'Vai trò được cấp')}</span>
+          <small>${selectedRoles.size} ${escapeHtml(lang==='en' ? 'selected' : 'đã chọn')} · ${visibleRoleOptions.length}/${roleOptions.length} ${escapeHtml(lang==='en' ? 'visible' : 'đang hiện')}</small>
+          ${hiddenSelected.length ? `<em>${escapeHtml(lang==='en' ? `${hiddenSelected.length} selected role hidden by filters` : `${hiddenSelected.length} vai trò đã chọn đang ẩn do bộ lọc`)}</em>` : ''}
+        </div>
+        <div class="module-access-roles">${roleChecks || `<div class="module-access-role-empty">${escapeHtml(lang==='en' ? 'No roles match the current filters.' : 'Không có vai trò khớp bộ lọc hiện tại.')}</div>`}</div>
+      </div>` : '';
       const deprecatedBadge = meta.deprecated
         ? ` <span style="display:inline-block;font-size:0.7em;padding:1px 5px;border-radius:3px;background:rgba(255,160,0,0.15);color:var(--amber-light,#f59e0b);vertical-align:middle;font-weight:600">${lang==='en'?'Deprecated':'Đã hợp nhất'}</span>`
         : '';
@@ -10056,7 +10484,7 @@ function renderModuleAccessScope(scope, roleOptions){
           </select>
           ${meta.locked ? `<span class="portal-display-chip is-static">${lang==='en' ? 'Locked' : 'Cố định'}</span>` : ''}
         </div>
-        ${policy.access === 'roles' ? `<div class="module-access-roles">${roleChecks}</div>` : ''}
+        ${rolePanel}
       </article>`;
     }).join('');
     return `<section class="module-access-scope-card">
@@ -10074,11 +10502,13 @@ function renderModuleAccessScope(scope, roleOptions){
 function renderAdminModuleAccess(){
   const el = document.getElementById('admin-content');
   if(!el) return;
+  requestModuleAccessUsersLoad();
   const draft = ensureModuleAccessConfigDraft();
   const isLoadingConfig = !moduleAccessConfigHydrated && !!moduleAccessConfigLoadPromise;
   const portalEnabled = Object.values(draft.portal_modules || {}).filter(policy => policy && policy.enabled !== false).length;
   const adminEnabled = Object.values(draft.admin_tabs || {}).filter(policy => policy && policy.enabled !== false).length;
   const roleOptions = moduleAccessRoleOptions();
+  const filteredRoleOptions = moduleAccessFilterRoleOptions(roleOptions);
 
   el.innerHTML = `
     <div class="module-access-admin">
@@ -10095,8 +10525,11 @@ function renderAdminModuleAccess(){
           <div class="module-access-hero-stat"><strong>${portalEnabled}</strong><span>${lang==='en' ? 'Portal modules enabled' : 'Module portal đang bật'}</span></div>
           <div class="module-access-hero-stat"><strong>${adminEnabled}</strong><span>${lang==='en' ? 'Admin workspaces enabled' : 'Workspace admin đang bật'}</span></div>
           <div class="module-access-hero-stat"><strong>${roleOptions.length}</strong><span>${lang==='en' ? 'Roles available' : 'Vai trò khả dụng'}</span></div>
+          <div class="module-access-hero-stat"><strong>${filteredRoleOptions.length}</strong><span>${lang==='en' ? 'Roles after filters' : 'Vai trò sau lọc'}</span></div>
         </div>
       </div>
+
+      ${renderModuleAccessRoleFilters(roleOptions, filteredRoleOptions)}
 
       <div class="module-access-grid">
         <section class="module-access-card">
@@ -10108,7 +10541,7 @@ function renderAdminModuleAccess(){
                 : 'Các quy tắc này điều khiển menu trái và route trực tiếp cho sản xuất, chất lượng, hồ sơ, công cụ và workspace hướng khách hàng.'}</p>
             </div>
           </div>
-          <div class="module-access-stack">${renderModuleAccessScope('portal_modules', roleOptions)}</div>
+          <div class="module-access-stack">${renderModuleAccessScope('portal_modules', roleOptions, filteredRoleOptions)}</div>
         </section>
 
         <section class="module-access-card">
@@ -10120,7 +10553,7 @@ function renderAdminModuleAccess(){
                 : 'Các workspace nhạy cảm như metadata, hạ tầng và điều khiển Git giờ nằm sau cùng một ma trận quyền thay vì guard rời rạc từng nơi.'}</p>
             </div>
           </div>
-          <div class="module-access-stack">${renderModuleAccessScope('admin_tabs', roleOptions)}</div>
+          <div class="module-access-stack">${renderModuleAccessScope('admin_tabs', roleOptions, filteredRoleOptions)}</div>
         </section>
       </div>
 

@@ -88,7 +88,8 @@ $ROLE_PERMS_FILE   = $CONF_DIR . '/role_permissions.json';
 $CUSTOM_DOCS_FILE  = $CONF_DIR . '/docs_custom.local.json';
 $DOC_VIS_FILE     = $CONF_DIR . '/docs_visibility.json';
 $PORTAL_DISPLAY_CONFIG_FILE = $CONF_DIR . '/portal_display_config.json';
-$MODULE_ACCESS_CONFIG_FILE = $CONF_DIR . '/module_access_config.json';
+$MODULE_ACCESS_CONFIG_FILE   = $CONF_DIR . '/module_access_config.json';
+$DOC_VIS_GATES_CONFIG_FILE   = $CONF_DIR . '/doc_visualizer_gates.json';
 $FORM_CONTROL_REGISTRY_FILE = $CONF_DIR . '/form_control_registry.json';
 $EVIDENCE_RETENTION_POLICY_FILE = $CONF_DIR . '/evidence_retention_policy.json';
 $EVIDENCE_REVIEW_SLA_POLICY_FILE = $CONF_DIR . '/evidence_review_sla_policy.json';
@@ -2375,6 +2376,7 @@ function module_access_admin_tab_catalog(): array {
     ['id' => 'version_control', 'default_access' => 'admin', 'default_roles' => []],
     ['id' => 'mfa', 'default_access' => 'admin', 'default_roles' => []],
     ['id' => 'appearance', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'doc_visualizer', 'default_access' => 'admin', 'default_roles' => []],
   ];
 }
 
@@ -2476,6 +2478,54 @@ function module_access_save_config(string $file, array $config): array {
   portal_system_config_shadow_write('module_access_config', $payload);
 
   return $normalized;
+}
+
+// ── Doc Visualizer Gates Config ──────────────────────────────────────────────
+
+function doc_vis_gates_default_docs(): array {
+  return [
+    'G0' => ['SOP-201','SOP-202','SOP-203','WI-201','FRM-201','FRM-202','FRM-203','FRM-204','ANNEX-201'],
+    'G1' => ['SOP-301','SOP-303','FRM-301','FRM-302','FRM-303','FRM-305','FRM-306','ANNEX-301','ANNEX-302'],
+    'G2' => ['SOP-401','SOP-402','FRM-401','FRM-402','FRM-403','FRM-405','FRM-408','FRM-409','FRM-411','FRM-413','FRM-701','ANNEX-401','ANNEX-402','ANNEX-403'],
+    'G3' => ['SOP-501','SOP-503','SOP-504','WI-517','WI-518','WI-519','FRM-501','FRM-502','FRM-504','FRM-511','FRM-513','FRM-519','FRM-521','FRM-523','ANNEX-501','ANNEX-502','ANNEX-503'],
+    'G4' => ['SOP-302','SOP-601','SOP-602','WI-302','WI-602','FRM-205','FRM-305','FRM-311','FRM-601','FRM-602','FRM-611','FRM-612','FRM-613','ANNEX-602','ANNEX-604'],
+    'G5' => ['SOP-502','SOP-503','SOP-505','SOP-606','WI-501','WI-604','WI-606','FRM-511','FRM-512','FRM-621','FRM-631','FRM-651','ANNEX-601','ANNEX-507'],
+    'G6' => ['SOP-603','SOP-604','SOP-605','WI-603','WI-605','FRM-206','FRM-621','FRM-641','FRM-642','FRM-643','ANNEX-601','ANNEX-603','ANNEX-606'],
+    'G7' => ['SOP-701','SOP-702','SOP-703','SOP-803','WI-206','WI-701','WI-714','FRM-702','FRM-704','FRM-706','FRM-707','FRM-708','FRM-712','FRM-821','ANNEX-701','ANNEX-702'],
+  ];
+}
+
+function doc_vis_gates_load_config(string $file): array {
+  $raw = read_json_file($file);
+  if (!is_array($raw)) $raw = [];
+  $defaults = doc_vis_gates_default_docs();
+  $gates = [];
+  foreach ($defaults as $gateId => $defaultDocs) {
+    $saved = $raw['gates'][$gateId] ?? null;
+    $gates[$gateId] = is_array($saved)
+      ? array_values(array_unique(array_filter(array_map('strval', $saved), static fn($c) => $c !== '')))
+      : $defaultDocs;
+  }
+  return ['gates' => $gates, 'updated_at' => $raw['updated_at'] ?? null];
+}
+
+function doc_vis_gates_save_config(string $file, array $gatesIn): array {
+  $defaults = doc_vis_gates_default_docs();
+  $gates = [];
+  foreach ($defaults as $gateId => $_) {
+    $seen = [];
+    $cleaned = [];
+    foreach ((array)($gatesIn[$gateId] ?? []) as $code) {
+      $code = strtoupper(trim((string)$code));
+      if ($code === '' || isset($seen[$code])) continue;
+      $seen[$code] = true;
+      $cleaned[] = $code;
+    }
+    $gates[$gateId] = $cleaned;
+  }
+  $payload = ['gates' => $gates, 'updated_at' => now_iso()];
+  write_json_file($file, $payload);
+  return $payload;
 }
 
 function module_access_can_role_access(array $policy, string $role): bool {
@@ -15603,6 +15653,29 @@ switch ($action) {
     api_json(['ok' => true, 'config' => module_access_public_payload($saved), 'server_time' => now_iso()]);
   }
 
+
+  case 'doc_visualizer_gates_get': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    require_logged_in($store);
+    $cfg = doc_vis_gates_load_config($DOC_VIS_GATES_CONFIG_FILE);
+    api_json(['ok' => true, 'gates' => $cfg['gates'], 'updated_at' => $cfg['updated_at'], 'server_time' => now_iso()]);
+  }
+
+  case 'admin_doc_visualizer_gates_save': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    $data = read_json_body();
+    $gatesIn = $data['gates'] ?? null;
+    if (!is_array($gatesIn)) api_json(['ok' => false, 'error' => 'invalid_config'], 400);
+    $saved = doc_vis_gates_save_config($DOC_VIS_GATES_CONFIG_FILE, $gatesIn);
+    portal_legacy_admin_audit_log('admin_doc_visualizer_gates_save', [
+      'gate_count' => count($saved['gates']),
+      'total_docs' => array_sum(array_map('count', $saved['gates'])),
+    ], $me);
+    api_json(['ok' => true, 'gates' => $saved['gates'], 'updated_at' => $saved['updated_at'], 'server_time' => now_iso()]);
+  }
 
   // ==========================================================
   // CUSTOM DOCUMENTS LIST (server-backed)

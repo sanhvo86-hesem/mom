@@ -215,6 +215,24 @@
     return m ? m[1] : '';
   }
 
+  /* ── Remote gate config (admin-editable, loaded once per module lifetime) */
+  var _remoteCfgLoaded = false;
+
+  function _loadRemoteGateConfig(cb) {
+    if (_remoteCfgLoaded) { cb(); return; }
+    if (typeof apiCall !== 'function') { _remoteCfgLoaded = true; cb(); return; }
+    apiCall('doc_visualizer_gates_get').then(function(res) {
+      if (res && res.ok && res.gates && typeof res.gates === 'object') {
+        GATES.forEach(function(g) {
+          if (Array.isArray(res.gates[g.id]) && res.gates[g.id].length > 0) {
+            g.docs = res.gates[g.id];
+          }
+        });
+      }
+      _remoteCfgLoaded = true; cb();
+    }).catch(function() { _remoteCfgLoaded = true; cb(); });
+  }
+
   /* ── State ────────────────────────────────────────────────────────────── */
   var state = {
     mode: 'process',        // 'process' | 'doc'
@@ -326,6 +344,14 @@
       _retryTimer = setInterval(function () {
         if (isDocsReady() && _root) { clearInterval(_retryTimer); _retryTimer = null; render(_root); }
       }, 600);
+      return;
+    }
+    if (!_remoteCfgLoaded) {
+      container.innerHTML =
+        '<div class="dov-loading"><div class="dov-spinner"></div><span>' +
+        esc(T({ vi: 'Đang tải cấu hình sơ đồ…', en: 'Loading diagram config…' })) +
+        '</span></div>';
+      _loadRemoteGateConfig(function() { if (_root) render(_root); });
       return;
     }
     container.innerHTML = buildShell();
@@ -447,6 +473,7 @@
   function destroy() {
     if (_retryTimer) { clearInterval(_retryTimer); _retryTimer = null; }
     disposeCharts();
+    _remoteCfgLoaded = false;  /* reset so next render picks up any admin changes */
     _root = null;
   }
 
