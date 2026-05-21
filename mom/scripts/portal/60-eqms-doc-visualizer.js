@@ -809,17 +809,21 @@
       series: [{
         type: 'tree',
         data: [treeData],
-        top: '3%', bottom: '3%', left: '10%', right: '10%',
-        layout: 'radial',
+        top: '3%', bottom: '3%', left: '18%', right: '22%',
+        layout: 'orthogonal',
+        orient: 'LR',
         symbol: 'emptyCircle',
-        symbolSize: function (v) { return v ? Math.min(8 + v * 0.08, 16) : 6; },
+        symbolSize: function (v) { return v ? Math.min(8 + v * 0.1, 18) : 7; },
         initialTreeDepth: 2,
-        lineStyle: { color: '#e2e8f0', width: 1.5, curveness: 0.6 },
+        expandAndCollapse: true,
+        lineStyle: { color: '#e2e8f0', width: 1.5, curveness: 0.5 },
         label: {
-          position: 'top', fontSize: 11, fontWeight: '600',
+          position: 'left', fontSize: 12, fontWeight: '700',
           formatter: function (p) { return p.data.name; }
         },
-        leaves: { label: { position: 'right', fontSize: 9, rotate: 'radial' } }
+        leaves: {
+          label: { position: 'right', fontSize: 10, fontWeight: '600' }
+        }
       }]
     });
 
