@@ -16,6 +16,10 @@ tests/e2e/node_modules/
 # a6a5fa65 as feature content for the AI authoring flow). Without this
 # exception the deploy CI's repo-boundary check blocks every push.
 !_reports/deploy-playbook/
+# Whitelist the KPI upgrade prompt pack — a sequential AI execution plan
+# (10 stages) the user points an AI session at. Tracked so it survives a
+# fresh clone and is available to any AI session.
+!_reports/kpi-upgrade-prompts/
 _build/
 _Deleted/
 .tmp/
