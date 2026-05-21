@@ -70,6 +70,28 @@ function tdChildren(DOMNode $tr): array {
     }
     return $out;
 }
+/** True if the row carries content outside any <td>/<th> (malformed markup). */
+function rowStray(DOMNode $tr): bool {
+    foreach ($tr->childNodes as $c) {
+        if ($c->nodeType === XML_ELEMENT_NODE) {
+            $nn = strtolower($c->nodeName);
+            if ($nn !== 'td' && $nn !== 'th') { return true; }
+        } elseif ($c->nodeType === XML_TEXT_NODE && trim($c->textContent) !== '') {
+            return true;
+        }
+    }
+    return false;
+}
+function findTableByHead(DOMDocument $doc, array $needles): ?DOMElement {
+    foreach ($doc->getElementsByTagName('table') as $tbl) {
+        $th = $tbl->getElementsByTagName('thead');
+        if ($th->length === 0) { continue; }
+        $h = $th->item(0)->textContent;
+        foreach ($needles as $n) { if (!str_contains($h, $n)) { continue 2; } }
+        return $tbl;
+    }
+    return null;
+}
 
 /* ── ANNEX-120: CDR anchor set + primary R-role per CDR ────────────────────── */
 $doc120   = loadDoc($annex120);
@@ -121,6 +143,9 @@ if ($gateTable === null) {
         $gate = cellText($tds[0]);
         $cdr  = cellText($tds[1]);
         $label = "$gate/$cdr";
+        if (rowStray($tr)) {
+            $p0[] = "ANNEX-121 row $label: stray content outside a <td> (malformed row).";
+        }
         if (count($tds) !== 15) {
             $p0[] = "ANNEX-121 row $label: ".count($tds)." cells, expected 15.";
             continue;
@@ -181,6 +206,30 @@ if ($supTable === null) {
         }
     }
     echo "  support supplement: $n rows\n";
+}
+
+/* ── §4 value-stream RACI + §6 document-level RACI integrity ──────────────── */
+foreach ([['§4 value-stream RACI', ['Hoạt động ngang','Bằng chứng'], 5],
+          ['§6 document-level RACI', ['Tài liệu','Người dùng chính'], 6]] as $spec) {
+    [$name, $needles, $ncol] = $spec;
+    $tbl = findTableByHead($doc, $needles);
+    if ($tbl === null) { $p1[] = "ANNEX-121: $name table not found."; continue; }
+    $rn = 0;
+    foreach ($tbl->getElementsByTagName('tbody')->item(0)->getElementsByTagName('tr') as $tr) {
+        $tds = tdChildren($tr);
+        if (count($tds) === 0) { continue; }
+        $rn++;
+        if (rowStray($tr)) {
+            $p0[] = "ANNEX-121 $name row $rn: stray content outside a <td> (malformed row).";
+        }
+        if (count($tds) !== $ncol) {
+            $p0[] = "ANNEX-121 $name row $rn: ".count($tds)." cells, expected $ncol.";
+            continue;
+        }
+        if (cellText($tds[1]) === '') { $p0[] = "ANNEX-121 $name row $rn: empty Accountable (A)."; }
+        if (cellText($tds[2]) === '') { $p0[] = "ANNEX-121 $name row $rn: empty Responsible (R)."; }
+    }
+    echo "  $name: $rn rows\n";
 }
 
 /* ── Cross-check: ANNEX-120 primary R-role vs ANNEX-121 A∪R ───────────────── */
