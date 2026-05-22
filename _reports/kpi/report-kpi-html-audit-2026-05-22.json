@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-05-22T00:03:57+00:00",
+    "generated_at": "2026-05-22T02:18:00+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-21",
@@ -9,9 +9,9 @@
         "kpi_occurrences": 4209,
         "unique_coded_kpi_ids": 85,
         "unique_likely_operational_kpi_ids": 48,
-        "unique_canonical_metric_codes_seen": 41,
+        "unique_canonical_metric_codes_seen": 42,
         "unique_legacy_alias_codes_seen": 4,
-        "kpi_row_candidates": 3664
+        "kpi_row_candidates": 3665
     },
     "registry_counts": {
         "runtime_calculated_metrics": 28,
@@ -176,6 +176,7 @@
         "ENGINEERING_RELEASE_ON_TIME",
         "FAI_FIRST_PASS",
         "FINAL_RELEASE_RFT",
+        "FOD_LINE_CLEARANCE_COMPLIANCE",
         "FPY",
         "GROSS_MARGIN_JOB_FAMILY",
         "INCIDENT_ACTION_CLOSURE_AGING",
@@ -216,7 +217,7 @@
             "html_files": 76,
             "files_with_kpi": 59,
             "kpi_occurrences": 626,
-            "kpi_row_candidates": 486,
+            "kpi_row_candidates": 487,
             "coded_kpi_ids": [
                 "KPI-01",
                 "KPI-01OTDOTD",
@@ -274,6 +275,7 @@
                 "ENGINEERING_RELEASE_ON_TIME",
                 "FAI_FIRST_PASS",
                 "FINAL_RELEASE_RFT",
+                "FOD_LINE_CLEARANCE_COMPLIANCE",
                 "FPY",
                 "GROSS_MARGIN_JOB_FAMILY",
                 "INCIDENT_ACTION_CLOSURE_AGING",
@@ -755,7 +757,7 @@
             "bucket": "annex_references",
             "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
             "kpi_occurrences": 51,
-            "kpi_row_candidates": 34,
+            "kpi_row_candidates": 35,
             "coded_kpi_ids": [
                 "KPI-AUTHORITY-REGISTRY",
                 "KPI-GX"
@@ -764,12 +766,14 @@
                 "BCP_READINESS",
                 "CAPA_EFFECTIVENESS",
                 "COMPLAINT_RATE",
+                "COPQ",
                 "CRITICAL_ROLE_BACKUP_COVERAGE",
                 "CRITICAL_SYSTEM_AVAILABILITY",
                 "DSO",
                 "ENGINEERING_RELEASE_ON_TIME",
                 "FAI_FIRST_PASS",
                 "FINAL_RELEASE_RFT",
+                "FOD_LINE_CLEARANCE_COMPLIANCE",
                 "FPY",
                 "GROSS_MARGIN_JOB_FAMILY",
                 "INCIDENT_ACTION_CLOSURE_AGING",
@@ -1953,7 +1957,7 @@
             "bucket": "annex_references",
             "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
             "kpi_occurrences": 51,
-            "kpi_row_candidates": 34,
+            "kpi_row_candidates": 35,
             "coded_kpi_ids": [
                 "KPI-AUTHORITY-REGISTRY",
                 "KPI-GX"
@@ -1962,12 +1966,14 @@
                 "BCP_READINESS",
                 "CAPA_EFFECTIVENESS",
                 "COMPLAINT_RATE",
+                "COPQ",
                 "CRITICAL_ROLE_BACKUP_COVERAGE",
                 "CRITICAL_SYSTEM_AVAILABILITY",
                 "DSO",
                 "ENGINEERING_RELEASE_ON_TIME",
                 "FAI_FIRST_PASS",
                 "FINAL_RELEASE_RFT",
+                "FOD_LINE_CLEARANCE_COMPLIANCE",
                 "FPY",
                 "GROSS_MARGIN_JOB_FAMILY",
                 "INCIDENT_ACTION_CLOSURE_AGING",

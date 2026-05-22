@@ -26,6 +26,8 @@ declare(strict_types=1);
  *   6. A gate metric linked_cdr references a CDR absent from ANNEX-121.
  *   8. A gate / proposed metric is missing a counter-metric, or its
  *      thresholds (where present) are non-numeric or wrongly ordered.
+ *   9. A counter-metric code is reused by two KPIs in the same group —
+ *      every KPI must have its own counter-metric.
  *   7. A governance KPI is missing a counter_metric, or its counter is not a
  *      known code / is the KPI itself.
  *
@@ -309,6 +311,33 @@ foreach ($dashboard as $row) {
         $code = (string) ($row['canonical_code'] ?? '?');
         $p1[] = "Dashboard $code: primary_endpoint '$ep' is outside the "
             . "/api/kpi/ namespace.";
+    }
+}
+
+// ── P0.9 — counter-metric uniqueness within each group ──────────────────────
+// Each KPI must have its own counter-metric; a counter code may not be the
+// counter for two KPIs in the same group (governance / gate / proposed).
+foreach ([
+    'governance' => $governance,
+    'gate'       => $gateMetrics,
+    'proposed'   => $proposed,
+] as $label => $set) {
+    $seenCounter = [];
+    foreach ($set as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $counter = strtoupper(trim((string) ($row['counter_metric'] ?? '')));
+        if ($counter === '') {
+            continue;
+        }
+        $owner = (string) ($row['canonical_code'] ?? '?');
+        if (isset($seenCounter[$counter])) {
+            $p0[] = "$label: counter-metric '$counter' is shared by "
+                . "{$seenCounter[$counter]} and {$owner} — each KPI needs its own counter.";
+        } else {
+            $seenCounter[$counter] = $owner;
+        }
     }
 }
 

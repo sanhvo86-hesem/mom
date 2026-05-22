@@ -1,6 +1,6 @@
 # KPI System Matrix Audit
 
-Generated: 2026-05-22T00:04:09+00:00
+Generated: 2026-05-22T02:18:14+00:00
 
 ## Summary
 
@@ -9,7 +9,7 @@ Generated: 2026-05-22T00:04:09+00:00
 | `html_file_count` | 869 |
 | `documents_with_metric_usage` | 256 |
 | `registry_metric_count` | 76 |
-| `metric_codes_seen` | 145 |
+| `metric_codes_seen` | 147 |
 | `executive_scorecard_metrics_seen` | 15 |
 | `role_measure_codes_seen` | 95 |
 | `findings_total` | 11 |
@@ -42,14 +42,14 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 
 | Code | Class | Docs | Uses | Target | Backend/statistical plan | Target consistency | Name consistency |
 |---|---|---:|---:|---|---|---|---|
-| `OTD` | executive_scorecard_kpi | 147 | 393 | ≥95% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
+| `OTD` | executive_scorecard_kpi | 147 | 391 | ≥95% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
 | `FPY` | executive_scorecard_kpi | 49 | 71 | ≥98% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
-| `COPQ` | executive_scorecard_kpi | 42 | 71 | ≤2 percent_of_sales | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
+| `COPQ` | executive_scorecard_kpi | 43 | 72 | ≤2 percent_of_sales | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
 | `OEE` | gate_control_metric | 41 | 113 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CAPA_EFFECTIVENESS` | executive_scorecard_kpi | 19 | 21 | ≥90% | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
 | `WIP_AGING` | executive_scorecard_kpi | 13 | 17 | ≤5 aged_wip_percent | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
 | `MTTR` | operating_metric | 12 | 16 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `COMPLAINT_RATE` | executive_scorecard_kpi | 10 | 42 | ≤1 complaints_per_100_shipments | runtime_calculated_with_registry_contract | registered_target_not_repeated_in_docs | legacy_alias_seen |
+| `COMPLAINT_RATE` | executive_scorecard_kpi | 10 | 41 | ≤1 complaints_per_100_shipments | runtime_calculated_with_registry_contract | registered_target_not_repeated_in_docs | legacy_alias_seen |
 | `INVENTORY_ACCURACY` | governance_kpi | 10 | 14 |  | candidate_data_contract_required_before_payout | local_target_requires_classification | canonical_or_mapped_name |
 | `C18-M1` | role_performance_measure | 6 | 16 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `PLAN_ADHERENCE` | governance_kpi | 6 | 13 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
@@ -159,24 +159,27 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 | `MTBF` | operating_metric | 2 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `PUT_THRU` | local_or_unmapped_metric | 2 | 2 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | unmapped_or_local_name |
 | `REPEAT_NCR_RATE` | executive_scorecard_kpi | 2 | 2 | ≤5% | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
+| `SHIP_PACKET_COMPLETENESS` | gate_control_metric | 2 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `SUPPLIER_READINESS` | executive_scorecard_kpi | 2 | 2 | ≥90 composite_score | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
 | `SCRAP_RATE` | local_or_unmapped_metric | 1 | 11 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | legacy_alias_seen |
 | `DSO` | governance_kpi | 1 | 6 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `INVOICE_RFT` | governance_kpi | 1 | 4 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `QUOTE_HIT_RATE` | governance_kpi | 1 | 3 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `RECORDABLE_INCIDENT_RATE` | safety_gate | 1 | 3 | ≤0 count | not_declared_or_informational | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
 | `CRITICAL_ROLE_BACKUP_COVERAGE` | governance_kpi | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CRITICAL_SYSTEM_AVAILABILITY` | governance_kpi | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `DOWNTIME_IMPACT` | local_or_unmapped_metric | 1 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | legacy_alias_seen |
 | `GROSS_MARGIN_JOB_FAMILY` | executive_scorecard_kpi | 1 | 2 | ≥28% | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
 | `MATERIAL_AVAILABILITY_PLAN` | governance_kpi | 1 | 2 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `RECORDABLE_INCIDENT_RATE` | safety_gate | 1 | 2 | ≤0 count | not_declared_or_informational | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
 | `REWORK_RATE` | local_or_unmapped_metric | 1 | 2 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | unmapped_or_local_name |
 | `SHIP_READY_TO_INVOICE_LT` | gate_control_metric | 1 | 2 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `BCP_READINESS` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CRITICAL_ROLE_CERT_COVERAGE` | executive_scorecard_kpi | 1 | 1 | ≥95% | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
+| `CUSTOMER_ESCAPE_NOTIFICATION_LT` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CYCLE_TIME_VARIANCE` | operating_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `ENGINEERING_RELEASE_ON_TIME` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `FINAL_RELEASE_RFT` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `FOD_LINE_CLEARANCE_COMPLIANCE` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `INCIDENT_ACTION_CLOSURE_AGING` | governance_kpi | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `IN_PROCESS_REJECT_RATE` | operating_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `NCR_RATE` | local_or_unmapped_metric | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | unmapped_or_local_name |
@@ -185,7 +188,6 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 | `SAFETY_ONBOARDING_COMPLIANCE` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `SCHEDULE_RECOVERY_EFFECTIVENESS` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `SERVICE_TICKET_SLA` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `SHIP_PACKET_COMPLETENESS` | gate_control_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `WIP_BEFORE_CONSTRAINT` | operating_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 
 ## Benchmark Rule
