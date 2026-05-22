@@ -383,7 +383,43 @@ final class KpiRegistryAdminService
                 }
             }
         }
+        // Every counter-metric carries a derived code + endpoint stamped from
+        // its KPI's canonical code — never trusted from a Console override.
+        foreach ($rows as $i => $row) {
+            $rows[$i]['counter_metric'] = $this->stampCounter(
+                (string) ($row['canonical_code'] ?? ''),
+                $row['counter_metric'] ?? null,
+            );
+        }
         return $rows;
+    }
+
+    /** Derived counter-metric code for a KPI canonical code. */
+    private function counterCodeFor(string $canonical): string
+    {
+        return strtoupper(trim($canonical)) . '-CTR';
+    }
+
+    /**
+     * Stamp a counter-metric object with its derived code + data-input
+     * endpoint (1:1 with the KPI). Returns null when the object has no
+     * name_vi (no counter authored).
+     *
+     * @return array<string, mixed>|null
+     */
+    private function stampCounter(string $canonical, mixed $cm): ?array
+    {
+        if (!is_array($cm) || trim((string) ($cm['name_vi'] ?? '')) === '') {
+            return null;
+        }
+        $code = $this->counterCodeFor($canonical);
+        return [
+            'code'     => $code,
+            'endpoint' => 'POST /api/kpi/' . $code . '/input',
+            'name_vi'  => $this->plainText((string) ($cm['name_vi'] ?? '')),
+            'name'     => $this->plainText((string) ($cm['name'] ?? '')),
+            'intent'   => $this->plainText((string) ($cm['intent'] ?? '')),
+        ];
     }
 
     /**
@@ -700,7 +736,7 @@ final class KpiRegistryAdminService
             'owner_role'         => $owner,
             'data_stewardship_role' => $owner,
             'applicable_jds'     => $owner !== '' ? [$owner] : [],
-            'counter_metric'     => $counter,
+            'counter_metric'     => $this->stampCounter($code, $counter),
             'cadence'            => $cadence,
             'layer'              => $this->plainText((string) ($patch['layer'] ?? 'bsc_monthly')),
             'lead_or_lag'        => ($patch['lead_or_lag'] ?? '') === 'lead' ? 'lead' : 'lag',
@@ -902,14 +938,17 @@ final class KpiRegistryAdminService
         if (!empty($k['paired_metric'])) {
             $extras[] = 'Ghép cặp: <span class="role-code">' . $e($k['paired_metric']) . '</span>';
         }
-        $counterName = $this->counterName($k['counter_metric'] ?? null);
-        if ($counterName !== '') {
-            $extras[] = 'Counter-metric: <b>' . $e($counterName) . '</b>';
-            $counterIntent = is_array($k['counter_metric'] ?? null)
-                ? trim((string) ($k['counter_metric']['intent'] ?? '')) : '';
-            if ($counterIntent !== '') {
-                $extras[] = '<span class="mini-note">' . $e($counterIntent) . '</span>';
+        // Counter-metric — show the unique code (the addressable token); the
+        // name + anti-gaming intent ride in the title tooltip.
+        $cm = is_array($k['counter_metric'] ?? null) ? $k['counter_metric'] : null;
+        if ($cm !== null && trim((string) ($cm['code'] ?? '')) !== '') {
+            $tip = trim((string) ($cm['name_vi'] ?? ''));
+            $intent = trim((string) ($cm['intent'] ?? ''));
+            if ($intent !== '') {
+                $tip .= ($tip !== '' ? ' — ' : '') . $intent;
             }
+            $extras[] = 'Counter-metric: <span class="role-code" title="' . $e($tip) . '">'
+                . $e($cm['code']) . '</span>';
         }
         if (($k['reward_eligible'] ?? false) === true) {
             $extras[] = '<b>Gắn khen thưởng</b> (có counter-metric)';

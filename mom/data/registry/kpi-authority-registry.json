@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
   "version": "2026-05-21",
-  "schema_version": 12,
+  "schema_version": 13,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. Existing ANNEX-122 KPIs are retained, legacy metric aliases are mapped to canonical codes, and proposed CNC operating metrics are staged without granting automatic runtime authority.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -147,6 +147,8 @@
       "action_reference": "WI-202 họp tầng T2 + ANNEX-117 ma trận leo thang; CDR cổng G6 phát hành/giao.",
       "attribution_rule": "Đỏ phải tách breakdown nguyên nhân (nhà cung cấp trễ, máy hỏng, engineering trễ, thiếu vật tư, khách đổi yêu cầu) trước khi quy trách nhiệm cho PD; phần do bộ phận khác chuyển về owner tương ứng.",
       "counter_metric": {
+        "code": "OTD-CTR",
+        "endpoint": "POST /api/kpi/OTD-CTR/input",
         "name_vi": "Tỷ lệ lô phải giao gấp hoặc giao thiếu để kịp hạn",
         "name": "Expedited or short-shipment rate",
         "intent": "Bắt việc ép OTD bằng cách giao gấp tốn chi phí hoặc giao thiếu số lượng."
@@ -210,6 +212,8 @@
       "action_reference": "SOP-902 xem xét của lãnh đạo + quy trình NCR/CAPA; CDR cổng G6.",
       "attribution_rule": "Khiếu nại phải được ghi nhận đầy đủ — cấm nén số bằng cách không mở NCR; kiểm tra chéo qua data-integrity gate.",
       "counter_metric": {
+        "code": "COMPLAINT_RATE-CTR",
+        "endpoint": "POST /api/kpi/COMPLAINT_RATE-CTR/input",
         "name_vi": "Tỷ lệ khiếu nại bị ghi nhận trễ hoặc không mở NCR",
         "name": "Suppressed / late-logged complaint rate",
         "intent": "Bắt việc làm đẹp số khiếu nại bằng cách giấu hoặc trì hoãn mở NCR."
@@ -270,6 +274,8 @@
       "action_reference": "Quy trình phát hành cuối + SOP-902; CDR cổng G6.",
       "attribution_rule": "Đỏ tách theo nhóm sản phẩm/quy trình; lỗi do engineering hoặc setup chuyển về D-ENG/WKM, không quy hết cho QA.",
       "counter_metric": {
+        "code": "FINAL_RELEASE_RFT-CTR",
+        "endpoint": "POST /api/kpi/FINAL_RELEASE_RFT-CTR/input",
         "name_vi": "Tỷ lệ hồ sơ bị phát hiện lỗi sau khi đã phát hành",
         "name": "Post-release defect escape rate",
         "intent": "Bắt việc duyệt phát hành dễ dãi để đạt RFT, lỗi lọt ra sau phát hành."
@@ -332,6 +338,8 @@
       "action_reference": "SOP-902 + soát giá theo nhóm; CDR review báo giá cổng G0.",
       "attribution_rule": "Đỏ tách theo khách/quy trình/nguyên nhân làm lại; biên thấp do giá đầu vào tăng thuộc SCM, do làm lại thuộc D-PROD/QA — không quy hết cho FIN.",
       "counter_metric": {
+        "code": "GROSS_MARGIN_JOB_FAMILY-CTR",
+        "endpoint": "POST /api/kpi/GROSS_MARGIN_JOB_FAMILY-CTR/input",
         "name_vi": "Chi phí ẩn chưa phân bổ vào giá thành lô",
         "name": "Unallocated hidden job cost",
         "intent": "Bắt việc thổi biên lợi nhuận bằng cách không tính chi phí làm lại / bảo hành."
@@ -392,6 +400,8 @@
       "action_reference": "ANNEX-117 leo thang an toàn + điều tra sự cố EHS trong 24h.",
       "attribution_rule": "Sự cố an toàn không phân bổ điểm; luôn điều tra nguyên nhân hệ thống, không quy lỗi cá nhân vận hành trừ khi có hành vi cố ý mất an toàn.",
       "counter_metric": {
+        "code": "RECORDABLE_INCIDENT_RATE-CTR",
+        "endpoint": "POST /api/kpi/RECORDABLE_INCIDENT_RATE-CTR/input",
         "name_vi": "Tỷ lệ vụ suýt-tai-nạn được báo cáo",
         "name": "Near-miss reporting rate",
         "intent": "Bắt việc giữ tỷ lệ tai nạn thấp bằng cách không khai báo sự cố và near-miss."
@@ -451,6 +461,8 @@
       "action_reference": "Soát xét lãnh đạo theo quý + ANNEX-123; CDR rà soát năng lực.",
       "attribution_rule": "Khoảng trống dự phòng thuộc trách nhiệm chung QMS/HR/trưởng phòng; không quy cho một cá nhân.",
       "counter_metric": {
+        "code": "BCP_READINESS-CTR",
+        "endpoint": "POST /api/kpi/BCP_READINESS-CTR/input",
         "name_vi": "Tỷ lệ hạng mục diễn tập liên tục kinh doanh thất bại khi chạy thật",
         "name": "Continuity drill failure rate",
         "intent": "Bắt việc khai BCP sẵn sàng trên giấy trong khi diễn tập thực tế không đạt."
@@ -511,6 +523,8 @@
       "action_reference": "WI-202 họp tầng T2 + soát chất lượng tiếp nhận RFQ; CDR cổng G0.",
       "attribution_rule": "Trễ do thiếu dữ liệu kỹ thuật từ khách hoặc chờ hỗ trợ D-ENG phải tách khỏi phần thuộc CS/EST.",
       "counter_metric": {
+        "code": "RFQ_TURNAROUND_TIME-CTR",
+        "endpoint": "POST /api/kpi/RFQ_TURNAROUND_TIME-CTR/input",
         "name_vi": "Tỷ lệ báo giá phải hiệu chỉnh sau khi gửi",
         "name": "Quote rework rate",
         "intent": "Bắt việc rút ngắn thời gian báo giá bằng cách bỏ bước rà soát, sai phải sửa lại."
@@ -570,6 +584,8 @@
       "action_reference": "Bảng kiểm soát xét đơn hàng + WI-202 T2; CDR cổng G0.",
       "attribution_rule": "Đỏ do bản vẽ/thông số khách thiếu tách khỏi phần thuộc CS; lỗi điều kiện kỹ thuật chuyển D-ENG.",
       "counter_metric": {
+        "code": "ORDER_REVIEW_RFT-CTR",
+        "endpoint": "POST /api/kpi/ORDER_REVIEW_RFT-CTR/input",
         "name_vi": "Tỷ lệ đơn hàng bị thay đổi điều khoản sau khi đã xác nhận",
         "name": "Post-confirmation order change rate",
         "intent": "Bắt việc soát xét đơn hàng hời hợt để đạt RFT, sai sót lộ ra sau xác nhận."
@@ -630,6 +646,8 @@
       "action_reference": "WI-202 họp tầng T1/T2 + ANNEX-117; CDR điều độ cổng G3.",
       "attribution_rule": "Lệch lịch do job gấp khách yêu cầu (re-sequence có phê duyệt) KHÔNG tính cho PPL; lệch do máy/vật tư tách về WKM/SCM.",
       "counter_metric": {
+        "code": "PLAN_ADHERENCE-CTR",
+        "endpoint": "POST /api/kpi/PLAN_ADHERENCE-CTR/input",
         "name_vi": "Tỷ lệ đơn khó / ưu tiên cao bị bỏ lại ngoài kế hoạch",
         "name": "Hard-job deferral rate",
         "intent": "Bắt việc bám kế hoạch bằng cách chỉ chọn việc dễ và đẩy đơn khó ra sau."
@@ -690,6 +708,8 @@
       "action_reference": "Soát DFM/CAM/setup trước lô kế + quy trình FAI; CDR cổng G4.",
       "attribution_rule": "Đỏ tách: lỗi bản vẽ/program thuộc D-ENG, lỗi setup/đồ gá thuộc WKM, lỗi đo lường thuộc QC — không quy hết cho QA.",
       "counter_metric": {
+        "code": "FAI_FIRST_PASS-CTR",
+        "endpoint": "POST /api/kpi/FAI_FIRST_PASS-CTR/input",
         "name_vi": "Tỷ lệ lỗi lọt xuống loạt sản xuất sau khi FAI đã đạt",
         "name": "Post-FAI production defect leakage",
         "intent": "Bắt việc nới tiêu chí FAI để đạt lần đầu, lỗi xuất hiện khi vào loạt."
@@ -749,6 +769,8 @@
       "action_reference": "WI-202 họp tầng TOC tuần + ANNEX-117; CDR luồng-control.",
       "attribution_rule": "Lệnh quá tuổi do chờ phê duyệt/vật tư/engineering tách về owner cổng tương ứng; PPL chịu phần điều độ.",
       "counter_metric": {
+        "code": "WIP_AGING-CTR",
+        "endpoint": "POST /api/kpi/WIP_AGING-CTR/input",
         "name_vi": "Số đơn chờ thả lệnh chưa vào hàng đợi WIP",
         "name": "Un-released backlog count",
         "intent": "Bắt việc giữ WIP trẻ bằng cách không thả lệnh, đơn dồn ngoài hàng đợi."
@@ -809,6 +831,8 @@
       "action_reference": "Quy trình đánh giá nhà cung cấp + WI-202 T3; CDR mua hàng cổng G2.",
       "attribution_rule": "Đỏ do nhà cung cấp; SCM chịu trách nhiệm quản lý nhà cung cấp, không bị quy vì năng lực nội bộ nhà cung cấp.",
       "counter_metric": {
+        "code": "SUPPLIER_OTD-CTR",
+        "endpoint": "POST /api/kpi/SUPPLIER_OTD-CTR/input",
         "name_vi": "Tỷ lệ lô nhà cung cấp giao đúng hạn nhưng không đạt chất lượng",
         "name": "On-time-but-defective supplier lot rate",
         "intent": "Bắt việc nhà cung cấp giao đúng hạn nhưng đẩy hàng kém chất lượng."
@@ -868,6 +892,8 @@
       "action_reference": "WI-202 T2 + đóng khoảng trống lập hóa đơn; CDR cổng G7.",
       "attribution_rule": "Trễ do hồ sơ giao hàng thiếu tách về CS/D-WHS; phần lập hóa đơn thuộc FIN.",
       "counter_metric": {
+        "code": "SHIP_READY_TO_INVOICE_LT-CTR",
+        "endpoint": "POST /api/kpi/SHIP_READY_TO_INVOICE_LT-CTR/input",
         "name_vi": "Tỷ lệ hóa đơn sai phải phát hành lại",
         "name": "Invoice reissue rate",
         "intent": "Bắt việc rút ngắn thời gian xuất hóa đơn bằng cách bỏ bước kiểm, hóa đơn sai."
@@ -928,6 +954,8 @@
       "action_reference": "SOP-902 + kế hoạch thu hồi công nợ; CDR cổng G7.",
       "attribution_rule": "DSO cao do điều khoản khách hoặc tranh chấp chất lượng tách khỏi phần thuộc FIN; phần do hóa đơn lỗi liên kết INVOICE_RFT.",
       "counter_metric": {
+        "code": "DSO-CTR",
+        "endpoint": "POST /api/kpi/DSO-CTR/input",
         "name_vi": "Tỷ lệ khách hàng phản ánh / rời đi do áp lực thu hồi công nợ",
         "name": "Collection-pressure customer friction rate",
         "intent": "Bắt việc ép DSO xuống bằng cách thu hồi gắt làm tổn hại quan hệ khách hàng."
@@ -987,6 +1015,8 @@
       "action_reference": "WI-202 họp tầng T1/T2 hằng ngày; CDR điều độ.",
       "attribution_rule": "Khôi phục phụ thuộc năng lực sẵn có; thiếu năng lực do quyết định nguồn lực quản lý không quy cho PD.",
       "counter_metric": {
+        "code": "SCHEDULE_RECOVERY_EFFECTIVENESS-CTR",
+        "endpoint": "POST /api/kpi/SCHEDULE_RECOVERY_EFFECTIVENESS-CTR/input",
         "name_vi": "Tỷ lệ kế hoạch tái lệch ngay sau khi tuyên bố phục hồi",
         "name": "Post-recovery re-slippage rate",
         "intent": "Bắt việc khai phục hồi tiến độ trong khi kế hoạch lệch lại ngay kỳ sau."
@@ -1046,6 +1076,8 @@
       "action_reference": "Quy trình line-clearance + đào tạo lại; CDR cổng G3/G5.",
       "attribution_rule": "Lặp lỗi do thiếu đào tạo tách về HR/WKM; cá nhân chỉ bị xử lý khi cố ý bỏ bước.",
       "counter_metric": {
+        "code": "FOD_LINE_CLEARANCE_COMPLIANCE-CTR",
+        "endpoint": "POST /api/kpi/FOD_LINE_CLEARANCE_COMPLIANCE-CTR/input",
         "name_vi": "Số vụ nhiễm bẩn / lẫn vật lạ phát hiện sau khi đã ký dọn chuyền",
         "name": "Post-clearance FOD contamination count",
         "intent": "Bắt việc ký dọn chuyền hình thức trong khi vật lạ vẫn lọt vào sản phẩm."
@@ -1105,6 +1137,8 @@
       "action_reference": "WI-202 T2 + soát nút thắt kỹ thuật; CDR cổng G1.",
       "attribution_rule": "Trễ do chờ thông tin khách hoặc thay đổi phạm vi tách khỏi phần thuộc D-ENG.",
       "counter_metric": {
+        "code": "ENGINEERING_RELEASE_ON_TIME-CTR",
+        "endpoint": "POST /api/kpi/ENGINEERING_RELEASE_ON_TIME-CTR/input",
         "name_vi": "Số ECN phải mở để sửa bản phát hành trong vòng 30 ngày",
         "name": "Post-release ECN churn",
         "intent": "Bắt việc phát hành kỹ thuật vội cho đúng hạn, phải sửa bằng nhiều ECN sau đó."
@@ -1163,6 +1197,8 @@
       "action_reference": "WI-202 T2/T3 leo thang ECO; CDR quản lý thay đổi cổng G1.",
       "attribution_rule": "ECO chờ phê duyệt/đánh giá liên phòng tách về owner bước tương ứng; ENGM chịu phần điều phối.",
       "counter_metric": {
+        "code": "ECO_CLOSURE_AGING-CTR",
+        "endpoint": "POST /api/kpi/ECO_CLOSURE_AGING-CTR/input",
         "name_vi": "Tỷ lệ ECO đóng nhưng thay đổi chưa thực thi đầy đủ tại hiện trường",
         "name": "Incompletely-implemented closed-ECO rate",
         "intent": "Bắt việc đóng ECO cho nhanh trong khi thay đổi chưa được áp dụng thực tế."
@@ -1221,6 +1257,8 @@
       "action_reference": "Quy trình NCR/CAPA + WI-202 T3 leo thang; SOP-902 nếu vượt L2.",
       "attribution_rule": "NCR mở chờ ECO/đổi vật tư/hành động khắc phục phòng khác tách về owner tương ứng; QA chịu phần điều phối đóng.",
       "counter_metric": {
+        "code": "NCR_CLOSURE_AGING-CTR",
+        "endpoint": "POST /api/kpi/NCR_CLOSURE_AGING-CTR/input",
         "name_vi": "Tỷ lệ NCR cùng nguyên nhân tái diễn sau khi đã đóng",
         "name": "Repeat-cause NCR recurrence rate",
         "intent": "Bắt việc đóng NCR nhanh hình thức trong khi nguyên nhân gốc chưa được xử lý."
@@ -1282,6 +1320,8 @@
       "action_reference": "Lịch hiệu chuẩn + tạm giữ hoạt động phụ thuộc đo lường; CDR cổng G4/G5.",
       "attribution_rule": "Quá hạn do nhà hiệu chuẩn ngoài trễ tách khỏi phần thuộc QA/MCS.",
       "counter_metric": {
+        "code": "CAL_COMPLIANCE-CTR",
+        "endpoint": "POST /api/kpi/CAL_COMPLIANCE-CTR/input",
         "name_vi": "Số thiết bị đo phát hiện lệch chuẩn giữa hai kỳ hiệu chuẩn",
         "name": "Out-of-tolerance gauge findings",
         "intent": "Bắt việc khai hiệu chuẩn đầy đủ trên giấy trong khi thiết bị đo vẫn lệch chuẩn."
@@ -1341,6 +1381,8 @@
       "action_reference": "WI-202 T1/T2 + đẩy nhanh tiến độ mua; CDR cổng G2.",
       "attribution_rule": "Thiếu vật tư do nhà cung cấp trễ liên kết SUPPLIER_OTD; SCM chịu phần lập kế hoạch mua.",
       "counter_metric": {
+        "code": "MATERIAL_AVAILABILITY_PLAN-CTR",
+        "endpoint": "POST /api/kpi/MATERIAL_AVAILABILITY_PLAN-CTR/input",
         "name_vi": "Số lệnh sản xuất phải dừng do thiếu vật tư đã khai sẵn sàng",
         "name": "Phantom-availability stoppage count",
         "intent": "Bắt việc khai vật tư sẵn sàng ảo, thiếu hụt lộ ra khi lệnh vào sản xuất."
@@ -1399,6 +1441,8 @@
       "action_reference": "Quy trình cycle-count + hành động kiểm soát; CDR kho.",
       "attribution_rule": "Sai lệch do giao dịch chưa ghi ở khâu sản xuất tách về D-PROD; D-SCM/D-WHS chịu phần kho.",
       "counter_metric": {
+        "code": "INVENTORY_ACCURACY-CTR",
+        "endpoint": "POST /api/kpi/INVENTORY_ACCURACY-CTR/input",
         "name_vi": "Tỷ lệ tồn kho khớp sổ nhưng sai vị trí hoặc không dùng được",
         "name": "Booked-but-unusable stock rate",
         "intent": "Bắt việc khai tồn kho khớp sổ trong khi hàng sai vị trí hoặc đã hỏng/chết."
@@ -1459,6 +1503,8 @@
       "action_reference": "SOP-902 soát định giá + phản hồi chất lượng; CDR cổng G0.",
       "attribution_rule": "Tỷ lệ thấp do giá thị trường hoặc năng lực kỹ thuật không đủ tách về phần tương ứng; CS/EST chịu phần chất lượng báo giá.",
       "counter_metric": {
+        "code": "QUOTE_HIT_RATE-CTR",
+        "endpoint": "POST /api/kpi/QUOTE_HIT_RATE-CTR/input",
         "name_vi": "Tỷ lệ đơn thắng thầu có biên lợi nhuận dưới ngưỡng tối thiểu",
         "name": "Below-floor-margin won-quote rate",
         "intent": "Bắt việc nâng tỷ lệ thắng thầu bằng cách phá giá xuống dưới biên an toàn."
@@ -1519,6 +1565,8 @@
       "action_reference": "WI-202 T2 + leo thang tài khoản rủi ro; CDR dịch vụ khách hàng.",
       "attribution_rule": "Trao đổi chờ phòng khác trả lời tách khỏi phần thuộc CS.",
       "counter_metric": {
+        "code": "CUSTOMER_COMM_CLOSURE_OT-CTR",
+        "endpoint": "POST /api/kpi/CUSTOMER_COMM_CLOSURE_OT-CTR/input",
         "name_vi": "Tỷ lệ liên hệ khách hàng đã đóng nhưng bị mở lại",
         "name": "Reopened customer-communication rate",
         "intent": "Bắt việc đóng liên hệ khách đúng hạn hình thức trong khi vấn đề chưa giải quyết."
@@ -1577,6 +1625,8 @@
       "action_reference": "Quy trình lập hóa đơn + truy nguyên nhân gốc; CDR cổng G7.",
       "attribution_rule": "Lỗi do dữ liệu nguồn sai (giá, số lượng) tách về vai trò xác nhận dữ liệu nguồn; FIN chịu phần lập hóa đơn.",
       "counter_metric": {
+        "code": "INVOICE_RFT-CTR",
+        "endpoint": "POST /api/kpi/INVOICE_RFT-CTR/input",
         "name_vi": "Thời gian trễ phát hành hóa đơn so với mốc sẵn sàng giao",
         "name": "Invoice issuance delay",
         "intent": "Bắt việc đạt hóa đơn chính xác bằng cách kéo dài thời gian phát hành."
@@ -1636,6 +1686,8 @@
       "action_reference": "Lịch đóng sổ + bố trí nhân sự; SOP-902.",
       "attribution_rule": "Chậm do dữ liệu công đoạn trước (giao hàng, mua hàng) chưa khoá tách về phòng nguồn; FIN chịu phần đóng sổ.",
       "counter_metric": {
+        "code": "MONTH_END_CLOSE_OT-CTR",
+        "endpoint": "POST /api/kpi/MONTH_END_CLOSE_OT-CTR/input",
         "name_vi": "Số bút toán điều chỉnh hồi tố sau khi đã chốt sổ",
         "name": "Post-close adjustment entry count",
         "intent": "Bắt việc chốt sổ đúng hạn bằng cách đẩy sai sót sang bút toán điều chỉnh kỳ sau."
@@ -1694,6 +1746,8 @@
       "action_reference": "Kế hoạch đào tạo + khoá quyền thực hiện công việc khi bắt buộc; CDR năng lực.",
       "attribution_rule": "Chưa hoàn thành do lịch sản xuất chiếm chỗ tách trách nhiệm chung HR/trưởng phòng; không quy cho riêng HR.",
       "counter_metric": {
+        "code": "TRAINING_COMP-CTR",
+        "endpoint": "POST /api/kpi/TRAINING_COMP-CTR/input",
         "name_vi": "Tỷ lệ nhân sự rớt đánh giá năng lực thực tế sau đào tạo",
         "name": "Post-training competency failure rate",
         "intent": "Bắt việc tick hoàn thành đào tạo hình thức trong khi năng lực thực tế không đạt."
@@ -1754,6 +1808,8 @@
       "action_reference": "ANNEX-123 + kế hoạch đào tạo chéo; CDR rà soát năng lực.",
       "attribution_rule": "Khoảng trống dự phòng là trách nhiệm chung HR/trưởng phòng.",
       "counter_metric": {
+        "code": "CRITICAL_ROLE_BACKUP_COVERAGE-CTR",
+        "endpoint": "POST /api/kpi/CRITICAL_ROLE_BACKUP_COVERAGE-CTR/input",
         "name_vi": "Tỷ lệ người dự phòng được khai nhưng chưa có chứng nhận hiệu lực",
         "name": "Uncertified declared-backup rate",
         "intent": "Bắt việc khai đã có người dự phòng trong khi người đó chưa được chứng nhận."
@@ -1812,6 +1868,8 @@
       "action_reference": "ANNEX-117 leo thang an toàn + soát xét tuần EHS.",
       "attribution_rule": "Hành động chờ phòng khác thực hiện tách về owner tương ứng; EHS chịu phần điều phối.",
       "counter_metric": {
+        "code": "INCIDENT_ACTION_CLOSURE_AGING-CTR",
+        "endpoint": "POST /api/kpi/INCIDENT_ACTION_CLOSURE_AGING-CTR/input",
         "name_vi": "Tỷ lệ sự cố lặp lại sau khi hành động khắc phục đã đóng",
         "name": "Post-closure incident recurrence rate",
         "intent": "Bắt việc đóng hành động sự cố cho nhanh trong khi nguyên nhân chưa được xử lý."
@@ -1871,6 +1929,8 @@
       "action_reference": "Quy trình hội nhập + khoá quyền vào xưởng; CDR an toàn.",
       "attribution_rule": "Chưa hoàn thành là cổng chặn; không phân bổ điểm, luôn hoàn thành trước khi bố trí việc.",
       "counter_metric": {
+        "code": "SAFETY_ONBOARDING_COMPLIANCE-CTR",
+        "endpoint": "POST /api/kpi/SAFETY_ONBOARDING_COMPLIANCE-CTR/input",
         "name_vi": "Số vi phạm an toàn của nhân sự mới trong 90 ngày đầu",
         "name": "New-hire safety violation count",
         "intent": "Bắt việc hoàn tất onboarding an toàn hình thức trong khi người mới vẫn vi phạm."
@@ -1931,6 +1991,8 @@
       "action_reference": "Quy trình ITSM + bổ sung nguồn lực hỗ trợ; CDR dịch vụ IT.",
       "attribution_rule": "Phiếu chờ phụ thuộc nhà cung cấp ngoài tách khỏi phần thuộc ITA.",
       "counter_metric": {
+        "code": "SERVICE_TICKET_SLA-CTR",
+        "endpoint": "POST /api/kpi/SERVICE_TICKET_SLA-CTR/input",
         "name_vi": "Tỷ lệ ticket dịch vụ bị mở lại sau khi đã đóng trong SLA",
         "name": "Reopened in-SLA ticket rate",
         "intent": "Bắt việc đóng ticket trong SLA hình thức trong khi sự cố chưa được xử lý dứt."
@@ -1989,6 +2051,8 @@
       "action_reference": "SOP-902 quyết định đầu tư hạ tầng; CDR hạ tầng IT.",
       "attribution_rule": "Downtime do nhà cung cấp hạ tầng/điện ngoài tầm tách khỏi phần thuộc ITA.",
       "counter_metric": {
+        "code": "CRITICAL_SYSTEM_AVAILABILITY-CTR",
+        "endpoint": "POST /api/kpi/CRITICAL_SYSTEM_AVAILABILITY-CTR/input",
         "name_vi": "Số sự cố hệ thống không được ghi nhận vào nhật ký uptime",
         "name": "Unlogged outage count",
         "intent": "Bắt việc báo uptime đẹp bằng cách không ghi nhận các lần gián đoạn dịch vụ."
@@ -2048,6 +2112,8 @@
       "action_reference": "WI-202 T3 + hành động làm sạch dữ liệu; CDR quản trị dữ liệu.",
       "attribution_rule": "Ngoại lệ do nhập liệu sai ở phòng nghiệp vụ tách về phòng nguồn; ITA chịu phần quản trị.",
       "counter_metric": {
+        "code": "MASTER_DATA_EXCEPTION_AGING-CTR",
+        "endpoint": "POST /api/kpi/MASTER_DATA_EXCEPTION_AGING-CTR/input",
         "name_vi": "Số lỗi dữ liệu lan sang giao dịch hạ nguồn từ ngoại lệ chưa xử lý đúng",
         "name": "Downstream data-error propagation count",
         "intent": "Bắt việc xử lý ngoại lệ dữ liệu hời hợt khiến lỗi lan sang giao dịch khác."
@@ -2080,6 +2146,8 @@
         "basis": "Ngưỡng đề xuất cho metric OEE_BOTTLENECK; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": {
+        "code": "OEE_BOTTLENECK-CTR",
+        "endpoint": "POST /api/kpi/OEE_BOTTLENECK-CTR/input",
         "name_vi": "Số giờ mất tại nút thắt không được ghi nhận",
         "name": "Unlogged constraint lost hours",
         "intent": "Bắt việc nâng OEE nút thắt bằng cách không ghi nhận đủ giờ dừng tại nút thắt."
@@ -2108,6 +2176,8 @@
         "basis": "Ngưỡng đề xuất cho metric BOTTLENECK_BUFFER_STATUS; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": {
+        "code": "BOTTLENECK_BUFFER_STATUS-CTR",
+        "endpoint": "POST /api/kpi/BOTTLENECK_BUFFER_STATUS-CTR/input",
         "name_vi": "Tỷ lệ trạng thái đệm xanh đạt được nhờ thả WIP quá mức",
         "name": "Over-released green-buffer rate",
         "intent": "Bắt việc giữ đệm nút thắt ở xanh bằng cách thả WIP nhiều quá mức cho phép."
@@ -2137,6 +2207,8 @@
         "calibration_pending": true
       },
       "counter_metric": {
+        "code": "THROUGHPUT_PER_CONSTRAINT_HOUR-CTR",
+        "endpoint": "POST /api/kpi/THROUGHPUT_PER_CONSTRAINT_HOUR-CTR/input",
         "name_vi": "Tỷ lệ lỗi chất lượng tại nút thắt",
         "name": "Constraint-station defect rate",
         "intent": "Bắt việc ép thông lượng mỗi giờ nút thắt bằng cách hy sinh chất lượng tại đó."
@@ -2165,6 +2237,8 @@
         "basis": "Ngưỡng đề xuất cho metric CONSTRAINT_LOST_HOURS; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": {
+        "code": "CONSTRAINT_LOST_HOURS-CTR",
+        "endpoint": "POST /api/kpi/CONSTRAINT_LOST_HOURS-CTR/input",
         "name_vi": "Tỷ lệ giờ dừng nút thắt phân loại sai để không tính là giờ mất",
         "name": "Misclassified constraint downtime rate",
         "intent": "Bắt việc giảm giờ mất bằng cách phân loại giờ dừng sang hạng mục không bị tính."
@@ -2194,6 +2268,8 @@
         "calibration_pending": true
       },
       "counter_metric": {
+        "code": "WIP_BEFORE_CONSTRAINT-CTR",
+        "endpoint": "POST /api/kpi/WIP_BEFORE_CONSTRAINT-CTR/input",
         "name_vi": "Số giờ nút thắt đói việc do cắt WIP trước nút thắt quá mức",
         "name": "Constraint starvation hours",
         "intent": "Bắt việc giảm WIP trước nút thắt quá tay khiến nút thắt thiếu việc để chạy."
@@ -2222,6 +2298,8 @@
         "basis": "Ngưỡng đề xuất cho metric SETUP_FIRST_PASS; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": {
+        "code": "SETUP_FIRST_PASS-CTR",
+        "endpoint": "POST /api/kpi/SETUP_FIRST_PASS-CTR/input",
         "name_vi": "Số lần phải chỉnh lại máy giữa loạt sau khi setup đã nghiệm thu",
         "name": "Mid-run re-adjustment count",
         "intent": "Bắt việc khai setup đạt lần đầu trong khi phải chỉnh lại nhiều lần khi chạy."
@@ -2250,6 +2328,8 @@
         "basis": "Ngưỡng đề xuất cho metric FAI_FIRST_PASS; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": {
+        "code": "FAI_FIRST_PASS-CTR",
+        "endpoint": "POST /api/kpi/FAI_FIRST_PASS-CTR/input",
         "name_vi": "Tỷ lệ lỗi lọt xuống loạt sản xuất sau khi FAI đã đạt",
         "name": "Post-FAI production defect leakage",
         "intent": "Bắt việc nới tiêu chí FAI để đạt lần đầu, lỗi xuất hiện khi vào loạt."
@@ -2278,6 +2358,8 @@
         "basis": "Ngưỡng đề xuất cho metric IN_PROCESS_REJECT_RATE; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": {
+        "code": "IN_PROCESS_REJECT_RATE-CTR",
+        "endpoint": "POST /api/kpi/IN_PROCESS_REJECT_RATE-CTR/input",
         "name_vi": "Số lần nới tiêu chí kiểm trong chuyền không có phê duyệt",
         "name": "Unauthorized in-line criteria relaxation count",
         "intent": "Bắt việc ép tỷ lệ loại trong chuyền xuống bằng cách tự nới tiêu chí kiểm."
@@ -2306,6 +2388,8 @@
         "basis": "Ngưỡng đề xuất cho metric REPEAT_NCR_RATE; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": {
+        "code": "REPEAT_NCR_RATE-CTR",
+        "endpoint": "POST /api/kpi/REPEAT_NCR_RATE-CTR/input",
         "name_vi": "Số NCR tái diễn bị tách mã / đổi phân loại để không tính là lặp",
         "name": "Re-coded recurring NCR count",
         "intent": "Bắt việc ép tỷ lệ NCR tái diễn xuống bằng cách đổi mã hoặc phân loại lại NCR."
@@ -2334,6 +2418,8 @@
         "basis": "Ngưỡng đề xuất cho metric CAPA_EFFECTIVENESS; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": {
+        "code": "CAPA_EFFECTIVENESS-CTR",
+        "endpoint": "POST /api/kpi/CAPA_EFFECTIVENESS-CTR/input",
         "name_vi": "Tỷ lệ CAPA tuyên bố hiệu lực khi chưa qua đủ cửa kiểm chứng",
         "name": "Prematurely-closed CAPA rate",
         "intent": "Bắt việc khai CAPA hiệu lực trước khi qua đủ thời gian / cửa kiểm chứng."
@@ -2362,6 +2448,8 @@
         "basis": "Ngưỡng đề xuất cho metric SUPPLIER_READINESS; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": {
+        "code": "SUPPLIER_READINESS-CTR",
+        "endpoint": "POST /api/kpi/SUPPLIER_READINESS-CTR/input",
         "name_vi": "Tỷ lệ lô thực nhận lỗi từ nhà cung cấp có điểm sẵn sàng cao",
         "name": "Defective lots from high-readiness suppliers",
         "intent": "Bắt việc điểm sẵn sàng nhà cung cấp đẹp nhưng lô hàng thực tế vẫn lỗi."
@@ -2390,6 +2478,8 @@
         "basis": "Ngưỡng đề xuất cho metric CRITICAL_ROLE_CERT_COVERAGE; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": {
+        "code": "CRITICAL_ROLE_CERT_COVERAGE-CTR",
+        "endpoint": "POST /api/kpi/CRITICAL_ROLE_CERT_COVERAGE-CTR/input",
         "name_vi": "Tỷ lệ chứng chỉ vai trò trọng yếu đã hết hạn nhưng vẫn tính phủ",
         "name": "Expired-cert coverage rate",
         "intent": "Bắt việc khai phủ chứng chỉ vai trò trọng yếu trong khi chứng chỉ đã hết hạn."
@@ -2418,6 +2508,8 @@
         "basis": "Ngưỡng đề xuất cho metric CYCLE_TIME_VARIANCE; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": {
+        "code": "CYCLE_TIME_VARIANCE-CTR",
+        "endpoint": "POST /api/kpi/CYCLE_TIME_VARIANCE-CTR/input",
         "name_vi": "Số lần nới thời gian chuẩn để giảm sai lệch chu kỳ trên giấy",
         "name": "Standard-time relaxation count",
         "intent": "Bắt việc ép sai lệch chu kỳ xuống bằng cách nới lỏng thời gian chuẩn."
@@ -2447,6 +2539,8 @@
         "calibration_pending": true
       },
       "counter_metric": {
+        "code": "MTBF-CTR",
+        "endpoint": "POST /api/kpi/MTBF-CTR/input",
         "name_vi": "Số sự cố nhỏ / dừng máy ngắn không được ghi nhận",
         "name": "Unlogged minor-failure count",
         "intent": "Bắt việc kéo dài MTBF bằng cách không ghi nhận các sự cố nhỏ và dừng ngắn."
@@ -2475,6 +2569,8 @@
         "basis": "Ngưỡng đề xuất cho metric MTTR; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": {
+        "code": "MTTR-CTR",
+        "endpoint": "POST /api/kpi/MTTR-CTR/input",
         "name_vi": "Tỷ lệ thiết bị hỏng lại do sửa tạm để rút ngắn thời gian khắc phục",
         "name": "Temporary-fix repeat-failure rate",
         "intent": "Bắt việc ép MTTR xuống bằng cách sửa tạm, thiết bị hỏng lại ngay sau đó."
@@ -2591,6 +2687,8 @@
       "data_source": "Epicor Quote",
       "calculation_status": "staged_data_contract",
       "counter_metric": {
+        "code": "RFQ_TURNAROUND_TIME-CTR",
+        "endpoint": "POST /api/kpi/RFQ_TURNAROUND_TIME-CTR/input",
         "name_vi": "Tỷ lệ báo giá phải hiệu chỉnh sau khi gửi",
         "name": "Quote rework rate",
         "intent": "Bắt việc rút ngắn thời gian báo giá bằng cách bỏ bước rà soát, sai phải sửa lại."
@@ -2618,6 +2716,8 @@
       "data_source": "FRM-202",
       "calculation_status": "staged_data_contract",
       "counter_metric": {
+        "code": "ORDER_REVIEW_RFT-CTR",
+        "endpoint": "POST /api/kpi/ORDER_REVIEW_RFT-CTR/input",
         "name_vi": "Tỷ lệ đơn hàng bị thay đổi điều khoản sau khi đã xác nhận",
         "name": "Post-confirmation order change rate",
         "intent": "Bắt việc soát xét đơn hàng hời hợt để đạt RFT, sai sót lộ ra sau xác nhận."
@@ -2653,6 +2753,8 @@
         "basis": "Phát hành kỹ thuật đúng lần đầu chuẩn ≥95%."
       },
       "counter_metric": {
+        "code": "ENGINEERING_RELEASE_RFT-CTR",
+        "endpoint": "POST /api/kpi/ENGINEERING_RELEASE_RFT-CTR/input",
         "name_vi": "Số vòng sửa bản vẽ sau lần phát hành đầu tiên",
         "name": "Drawing rework loop count",
         "intent": "Bắt việc đạt phát hành lần đầu bằng cách bỏ bước rà soát, phải sửa nhiều vòng."
@@ -2687,6 +2789,8 @@
         "basis": "ECO xử lý ≤48 giờ; >96 giờ là tồn đọng kỹ thuật."
       },
       "counter_metric": {
+        "code": "ECN_LEAD_TIME-CTR",
+        "endpoint": "POST /api/kpi/ECN_LEAD_TIME-CTR/input",
         "name_vi": "Tỷ lệ ECN ban hành thiếu đánh giá tác động đầy đủ",
         "name": "Impact-incomplete ECN rate",
         "intent": "Bắt việc rút ngắn thời gian ECN bằng cách bỏ qua đánh giá tác động."
@@ -2721,6 +2825,8 @@
         "basis": "Control Plan + PFMEA duyệt trước phát hành — chuẩn 100%."
       },
       "counter_metric": {
+        "code": "CONTROL_PLAN_PFMEA_APPROVAL-CTR",
+        "endpoint": "POST /api/kpi/CONTROL_PLAN_PFMEA_APPROVAL-CTR/input",
         "name_vi": "Số lỗi quá trình thoát ra do control plan / PFMEA duyệt hình thức",
         "name": "Process-escape from rubber-stamped control plan",
         "intent": "Bắt việc duyệt control plan / PFMEA cho kịp baseline mà không rà soát thực chất."
@@ -2755,6 +2861,8 @@
         "basis": "IQC pass rate ≥99% trước khi nhập kho."
       },
       "counter_metric": {
+        "code": "IQC_PASS_RATE-CTR",
+        "endpoint": "POST /api/kpi/IQC_PASS_RATE-CTR/input",
         "name_vi": "Số lô vật tư lỗi lọt vào sản xuất sau khi IQC đã cho qua",
         "name": "Post-IQC defective-lot leakage",
         "intent": "Bắt việc nâng tỷ lệ IQC đạt bằng cách nới tiêu chí kiểm tra đầu vào."
@@ -2789,6 +2897,8 @@
         "basis": "Truy xuất nguồn gốc lô nhập đầy đủ — chuẩn 100%."
       },
       "counter_metric": {
+        "code": "TRACEABILITY_COMPLETENESS-CTR",
+        "endpoint": "POST /api/kpi/TRACEABILITY_COMPLETENESS-CTR/input",
         "name_vi": "Tỷ lệ truy vết thất bại khi tra cứu thực tế dù hồ sơ khai đủ",
         "name": "Failed-drill traceability rate",
         "intent": "Bắt việc khai hồ sơ truy xuất đầy đủ trong khi không tra ngược được khi cần."
@@ -2824,6 +2934,8 @@
         "basis": "Cài đặt đạt ngay lần đầu chuẩn ≥95%."
       },
       "counter_metric": {
+        "code": "SETUP_FIRST_PASS-CTR",
+        "endpoint": "POST /api/kpi/SETUP_FIRST_PASS-CTR/input",
         "name_vi": "Số lần phải chỉnh lại máy giữa loạt sau khi setup đã nghiệm thu",
         "name": "Mid-run re-adjustment count",
         "intent": "Bắt việc khai setup đạt lần đầu trong khi phải chỉnh lại nhiều lần khi chạy."
@@ -2858,6 +2970,8 @@
         "basis": "Thời gian chuyển công đoạn theo chuẩn SMED ≤30 phút."
       },
       "counter_metric": {
+        "code": "CHANGEOVER_TIME-CTR",
+        "endpoint": "POST /api/kpi/CHANGEOVER_TIME-CTR/input",
         "name_vi": "Tỷ lệ mẻ đầu sau đổi mẫu bị lỗi",
         "name": "First-piece-after-changeover defect rate",
         "intent": "Bắt việc rút ngắn thời gian đổi mẫu bằng cách làm ẩu, mẻ đầu bị lỗi."
@@ -2885,6 +2999,8 @@
       "data_source": "FRM-311",
       "calculation_status": "staged_data_contract",
       "counter_metric": {
+        "code": "FAI_FIRST_PASS-CTR",
+        "endpoint": "POST /api/kpi/FAI_FIRST_PASS-CTR/input",
         "name_vi": "Tỷ lệ lỗi lọt xuống loạt sản xuất sau khi FAI đã đạt",
         "name": "Post-FAI production defect leakage",
         "intent": "Bắt việc nới tiêu chí FAI để đạt lần đầu, lỗi xuất hiện khi vào loạt."
@@ -2920,6 +3036,8 @@
         "basis": "Chu kỳ kiểm FAI ≤2 giờ."
       },
       "counter_metric": {
+        "code": "FAI_CYCLE_TIME-CTR",
+        "endpoint": "POST /api/kpi/FAI_CYCLE_TIME-CTR/input",
         "name_vi": "Số bước kiểm FAI bị bỏ qua để rút ngắn thời gian",
         "name": "Skipped FAI inspection steps",
         "intent": "Bắt việc rút ngắn chu kỳ FAI bằng cách bỏ bớt bước kiểm bắt buộc."
@@ -2954,6 +3072,8 @@
         "basis": "Tỷ lệ loại trong quá trình ≤1%."
       },
       "counter_metric": {
+        "code": "IN_PROCESS_REJECT_RATE-CTR",
+        "endpoint": "POST /api/kpi/IN_PROCESS_REJECT_RATE-CTR/input",
         "name_vi": "Số lần nới tiêu chí kiểm trong chuyền không có phê duyệt",
         "name": "Unauthorized in-line criteria relaxation count",
         "intent": "Bắt việc ép tỷ lệ loại trong chuyền xuống bằng cách tự nới tiêu chí kiểm."
@@ -2989,6 +3109,8 @@
         "basis": "Phản ứng tín hiệu SPC ≤15 phút."
       },
       "counter_metric": {
+        "code": "SPC_SIGNAL_REACTION_TIME-CTR",
+        "endpoint": "POST /api/kpi/SPC_SIGNAL_REACTION_TIME-CTR/input",
         "name_vi": "Tỷ lệ tín hiệu SPC tái phát sau khi đã đóng",
         "name": "Recurring SPC signal rate",
         "intent": "Bắt việc đóng tín hiệu SPC nhanh mà không hành động, tín hiệu lặp lại."
@@ -3023,6 +3145,8 @@
         "basis": "Gói phát hành/CoC đầy đủ — chuẩn 100%."
       },
       "counter_metric": {
+        "code": "SHIP_PACKET_COMPLETENESS-CTR",
+        "endpoint": "POST /api/kpi/SHIP_PACKET_COMPLETENESS-CTR/input",
         "name_vi": "Tỷ lệ bộ hồ sơ giao đủ đầu mục nhưng sai nội dung",
         "name": "Complete-but-wrong shipping packet rate",
         "intent": "Bắt việc khai bộ hồ sơ giao đầy đủ trong khi nội dung tài liệu sai."
@@ -3057,6 +3181,8 @@
         "basis": "Truy xuất ngược một lô ≤60 giây khi diễn tập."
       },
       "counter_metric": {
+        "code": "TRACEABILITY_DRILL_TIME-CTR",
+        "endpoint": "POST /api/kpi/TRACEABILITY_DRILL_TIME-CTR/input",
         "name_vi": "Tỷ lệ diễn tập truy xuất hoàn tất nhanh nhưng dữ liệu không đầy đủ",
         "name": "Fast-but-incomplete drill rate",
         "intent": "Bắt việc rút ngắn thời gian diễn tập truy xuất bằng cách bỏ sót dữ liệu."
@@ -3083,6 +3209,8 @@
       "data_source": "Epicor Ship",
       "calculation_status": "runtime_calculated",
       "counter_metric": {
+        "code": "OTD-CTR",
+        "endpoint": "POST /api/kpi/OTD-CTR/input",
         "name_vi": "Tỷ lệ lô phải giao gấp hoặc giao thiếu để kịp hạn",
         "name": "Expedited or short-shipment rate",
         "intent": "Bắt việc ép OTD bằng cách giao gấp tốn chi phí hoặc giao thiếu số lượng."
@@ -3109,6 +3237,8 @@
       "data_source": "Epicor AR",
       "calculation_status": "staged_data_contract",
       "counter_metric": {
+        "code": "SHIP_READY_TO_INVOICE_LT-CTR",
+        "endpoint": "POST /api/kpi/SHIP_READY_TO_INVOICE_LT-CTR/input",
         "name_vi": "Tỷ lệ hóa đơn sai phải phát hành lại",
         "name": "Invoice reissue rate",
         "intent": "Bắt việc rút ngắn thời gian xuất hóa đơn bằng cách bỏ bước kiểm, hóa đơn sai."
@@ -3143,6 +3273,8 @@
         "basis": "Thông báo khách ≤24 giờ kể từ khi phát hiện sản phẩm không phù hợp."
       },
       "counter_metric": {
+        "code": "CUSTOMER_ESCAPE_NOTIFICATION_LT-CTR",
+        "endpoint": "POST /api/kpi/CUSTOMER_ESCAPE_NOTIFICATION_LT-CTR/input",
         "name_vi": "Tỷ lệ thông báo escape gửi khách khi chưa đủ thông tin containment",
         "name": "Premature escape-notification rate",
         "intent": "Bắt việc báo khách nhanh để đạt mốc nhưng thông tin khoanh vùng chưa đủ."
@@ -3179,6 +3311,8 @@
         "basis": "Chi phí chất lượng kém ≤2% doanh thu."
       },
       "counter_metric": {
+        "code": "COPQ-CTR",
+        "endpoint": "POST /api/kpi/COPQ-CTR/input",
         "name_vi": "Tỷ lệ chi phí lỗi thực tế không được ghi nhận vào COPQ",
         "name": "Unrecorded poor-quality cost rate",
         "intent": "Bắt việc báo COPQ thấp bằng cách không ghi nhận đủ chi phí lỗi phát sinh."
@@ -3214,6 +3348,8 @@
         "basis": "Hiệu suất đạt ngay lần đầu ≥98%."
       },
       "counter_metric": {
+        "code": "FPY-CTR",
+        "endpoint": "POST /api/kpi/FPY-CTR/input",
         "name_vi": "Số lần kiểm lại / sửa trước khi tính điểm yield lần đầu",
         "name": "Pre-count rework pass count",
         "intent": "Bắt việc thổi FPY bằng cách sửa và kiểm lại trước khi ghi nhận yield lần đầu."
@@ -3249,6 +3385,8 @@
         "basis": "OEE ≥85% — chuẩn world-class."
       },
       "counter_metric": {
+        "code": "OEE-CTR",
+        "endpoint": "POST /api/kpi/OEE-CTR/input",
         "name_vi": "Tỷ lệ giờ máy nút thắt bị bỏ trống trong khi chạy máy không nút thắt",
         "name": "Constraint idle while non-constraint runs",
         "intent": "Bắt việc làm đẹp OEE bằng cách chạy máy không phải nút thắt, để nút thắt đói việc."

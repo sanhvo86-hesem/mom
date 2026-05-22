@@ -78,8 +78,10 @@ function _esc(v) {
 function _injectStyle() {
   if (document.getElementById('kpi-rag-badge-style')) return;
   var css =
-    '.kpi-rag-badge{display:inline-flex;flex-direction:column;gap:3px;align-items:flex-start;' +
-      'border:1px dashed #2b8a3e;border-radius:8px;padding:5px 7px;background:#ebfbee}' +
+    /* the G/Y/R box sits on its own line; the Căn cứ note drops below it */
+    '.kpi-rag-badge{display:flex;flex-direction:column;gap:3px;align-items:flex-start;' +
+      'width:fit-content;border:1px dashed #2b8a3e;border-radius:8px;' +
+      'padding:5px 7px;background:#ebfbee;margin-bottom:4px}' +
     '.kpi-rag-badge[data-kpi-rag-state="unlinked"]{border-color:#e67700;background:#fff9db}' +
     '.kpi-rag-badge .kpi-good,.kpi-rag-badge .kpi-warn,.kpi-rag-badge .kpi-bad{' +
       'padding:1px 5px;border-radius:4px;white-space:nowrap}' +

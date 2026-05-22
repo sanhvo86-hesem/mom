@@ -541,9 +541,9 @@ function _renderAddForm(){
   return html;
 }
 
-/* Display name of a (dedicated-object) counter-metric. */
+/* Compact display token of a counter-metric — its unique code. */
 function _counterDisplay(cm){
-  if(cm && typeof cm === 'object') return cm.name_vi || cm.name || '';
+  if(cm && typeof cm === 'object') return cm.code || cm.name_vi || '';
   return cm ? String(cm) : '';
 }
 
@@ -720,9 +720,13 @@ function _renderEditCard(m, section, inline){
   }
   html += '</div>';
 
-  // Dedicated counter-metric — its own definition, not a borrowed KPI code.
+  // Dedicated counter-metric — unique code + endpoint (1:1 with the KPI),
+  // plus an editable name + anti-gaming intent.
+  var ctrCode = c(code) + '-CTR';
   html += '<div class="kc-counter-edit"><div class="kc-counter-head">↔ ' +
     _t('Counter-metric chuyên biệt (chống gaming)', 'Dedicated counter-metric (anti-gaming)') + '</div>' +
+    '<div class="kc-counter-id"><span class="kc-code">' + ctrCode + '</span>' +
+      '<span class="kc-mini">POST /api/kpi/' + ctrCode + '/input</span></div>' +
     _field(_t('Tên counter-metric (tiếng Việt)', 'Counter-metric name (VI)'),
       '<input class="kc-input" type="text" value="' + c(_counterVal(m,section,'name_vi')) +
       '" oninput="_kpiSetCounter(\'' + section + '\',\'' + c(code) + '\',\'name_vi\',this.value)">') +
@@ -933,6 +937,7 @@ function _styleBlock(){
     'padding:8px 10px;display:flex;flex-direction:column;gap:6px;background:var(--surface-2,#f8fafc)}' +
   '.kc-counter-head{font-size:11px;font-weight:700;color:var(--text-2,#55617a);' +
     'text-transform:uppercase;letter-spacing:.3px}' +
+  '.kc-counter-id{display:flex;align-items:center;gap:8px;flex-wrap:wrap}' +
   '</style>';
 }
 

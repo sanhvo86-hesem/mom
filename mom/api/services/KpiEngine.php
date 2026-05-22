@@ -649,10 +649,15 @@ final class KpiEngine
         }
 
         $runtimeCalculated = in_array($canonicalCode, self::ALL_METRICS, true);
-        $knownMetric = $metric !== null || $runtimeCalculated;
+        // A counter-metric code (<KPI>-CTR) is a governed metric too — it
+        // owns a data-input endpoint so the frontend can feed it 1:1.
+        $counterCodes = $this->counterMetricCodes();
+        $isCounter = isset($counterCodes[$canonicalCode]);
+        $knownMetric = $metric !== null || $runtimeCalculated || $isCounter;
         $backendStatus = $runtimeCalculated
             ? 'runtime_calculated'
-            : ($knownMetric ? 'data_contract_required' : 'unknown_metric');
+            : ($isCounter ? 'counter_metric_manual'
+                : ($knownMetric ? 'data_contract_required' : 'unknown_metric'));
         if (is_array($metric) && is_string($metric['calculation_status'] ?? null)) {
             $backendStatus = $metric['calculation_status'];
         }
@@ -663,6 +668,7 @@ final class KpiEngine
             'alias_normalized' => $requestedCode !== $canonicalCode,
             'known_metric' => $knownMetric,
             'runtime_calculated' => $runtimeCalculated,
+            'is_counter_metric' => $isCounter,
             'backend_status' => $backendStatus,
             'calculation_status' => $backendStatus,
             'metric_type' => is_array($metric) ? ($metric['metric_type'] ?? null) : null,
@@ -671,6 +677,32 @@ final class KpiEngine
             'consequence' => is_array($metric) ? ($metric['consequence'] ?? null) : null,
             'metric' => $metric,
         ];
+    }
+
+    /**
+     * Every dedicated counter-metric code → its definition object. Each KPI
+     * owns exactly one counter-metric with a unique code (<KPI>-CTR) and a
+     * data-input endpoint, so the frontend addresses them 1:1.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public function counterMetricCodes(): array
+    {
+        $registry = $this->loadKpiAuthorityRegistry();
+        $out = [];
+        foreach (['annex122_governance_kpis', 'gate_control_metrics',
+                  'proposed_operating_metrics'] as $section) {
+            foreach (($registry[$section] ?? []) as $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+                $cm = $row['counter_metric'] ?? null;
+                if (is_array($cm) && trim((string) ($cm['code'] ?? '')) !== '') {
+                    $out[strtoupper(trim((string) $cm['code']))] = $cm;
+                }
+            }
+        }
+        return $out;
     }
 
     /**

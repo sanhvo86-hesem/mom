@@ -165,9 +165,14 @@ foreach ($governance as $row) {
     // the KPI by construction (no longer a borrowed headline-KPI code).
     $counter = $row['counter_metric'] ?? null;
     if (!is_array($counter) || trim((string) ($counter['name_vi'] ?? '')) === ''
-        || trim((string) ($counter['intent'] ?? '')) === '') {
+        || trim((string) ($counter['intent'] ?? '')) === ''
+        || trim((string) ($counter['code'] ?? '')) === ''
+        || trim((string) ($counter['endpoint'] ?? '')) === '') {
         $p0[] = "Registry $code: counter_metric must be a dedicated definition "
-            . "object with a non-empty name_vi and intent.";
+            . "object with code, endpoint, name_vi and intent.";
+    } elseif (strtoupper(trim((string) $counter['code'])) !== strtoupper($code) . '-CTR') {
+        $p0[] = "Registry $code: counter_metric.code '{$counter['code']}' must be "
+            . "the KPI code + '-CTR'.";
     }
 
     // ── P1 — lag without lead pairing ────────────────────────────────────────
@@ -263,9 +268,11 @@ foreach (['gate_control_metrics' => $gateMetrics, 'proposed_operating_metrics' =
         $rc = strtoupper(trim((string) ($row['canonical_code'] ?? '?')));
         $counter = $row['counter_metric'] ?? null;
         if (!is_array($counter) || trim((string) ($counter['name_vi'] ?? '')) === ''
-            || trim((string) ($counter['intent'] ?? '')) === '') {
+            || trim((string) ($counter['intent'] ?? '')) === ''
+            || trim((string) ($counter['code'] ?? '')) === ''
+            || trim((string) ($counter['endpoint'] ?? '')) === '') {
             $p0[] = "$label $rc: counter_metric must be a dedicated definition "
-                . "object with a non-empty name_vi and intent.";
+                . "object with code, endpoint, name_vi and intent.";
         }
         $t = $row['thresholds'] ?? null;
         if (is_array($t) && isset($t['green_point'])) {
