@@ -21,6 +21,7 @@ mới sang file kế. Không gộp file, không bỏ bước tự phản biện.
 | # | File | Kết quả |
 |---|------|---------|
 | 00 | `00-ground-rules.md` | Quy tắc bất biến — đọc trước MỌI prompt |
+| A1 | `A1-researched-baseline.md` | **Dữ liệu nền đã khảo sát sẵn** (28 hàm engine, 33 KPI computed/chưa, bảng DB, drift) — đọc cùng 00 |
 | 01 | `01-deep-audit-and-critique.md` | Báo cáo audit + phản biện gay gắt (không sửa code) |
 | 02 | `02-registry-as-full-ssot.md` | Registry mang định nghĩa KPI đầy đủ — SSOT thật |
 | 03 | `03-thresholds-actions-fairness.md` | Ngưỡng định lượng + action rule + counter-metric + reward |

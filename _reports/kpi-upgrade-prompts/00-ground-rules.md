@@ -7,6 +7,10 @@ Mọi prompt trong thư mục này kế thừa các quy tắc dưới đây. Vi 
   `.ai/repo-map.json`.
 - Chạy `bash tools/ai/preflight.sh` đầu phiên (ghi branch_base_sha, bật githooks).
 - `README.md` của thư mục này (ngữ cảnh hiện trạng KPI).
+- **`A1-researched-baseline.md`** — dữ liệu nền đã khảo sát: 28 hàm `calc*`
+  thật của KpiEngine kèm target/đơn vị/bảng nguồn, 33 governance KPI nào đã
+  tính / nào chưa, bảng DB liên quan, drift đã phát hiện, đường dẫn chuẩn.
+  Dùng A1 làm điểm xuất phát — chỉ `verify`, không dò lại từ đầu.
 
 ## B. Ngôn ngữ
 - Backend (PHP, SQL identifier, log, comment, commit message) = **tiếng Anh**.
