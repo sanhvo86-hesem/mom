@@ -22,6 +22,7 @@ def scan(root: str):
         for f in fs
         if f.endswith(".html")
     ]
+    tag_rx = re.compile(r"<[^!][^>]*>")
     rx = re.compile(
         r'\b(?:href|src|data-dcc-logo|data-href|action)\s*=\s*["\']([^"\']+)["\']'
     )
@@ -33,18 +34,22 @@ def scan(root: str):
             continue
         bd = os.path.dirname(p)
         seen = set()
-        for m in rx.finditer(text):
-            r = m.group(1)
-            if not r or r.startswith(("#", "mailto:", "tel:", "javascript:", "data:", "/")):
+        for tag in tag_rx.finditer(text):
+            tag_text = tag.group(0)
+            if tag_text.startswith(("<!--", "<!DOCTYPE")):
                 continue
-            if re.match(r"^[a-z]+://", r):
-                continue
-            c = r.split("?", 1)[0].split("#", 1)[0]
-            if not c or (p, c) in seen:
-                continue
-            seen.add((p, c))
-            if not os.path.exists(os.path.normpath(os.path.join(bd, c))):
-                broken.append((p, c))
+            for m in rx.finditer(tag_text):
+                r = m.group(1)
+                if not r or r.startswith(("#", "mailto:", "tel:", "javascript:", "data:", "/")):
+                    continue
+                if re.match(r"^[a-z]+://", r):
+                    continue
+                c = r.split("?", 1)[0].split("#", 1)[0]
+                if not c or (p, c) in seen:
+                    continue
+                seen.add((p, c))
+                if not os.path.exists(os.path.normpath(os.path.join(bd, c))):
+                    broken.append((p, c))
     return docs, broken
 
 

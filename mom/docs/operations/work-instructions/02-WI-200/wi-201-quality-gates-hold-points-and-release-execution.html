@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>WI-201 - Thực thi cổng chất lượng, điểm giữ và phát hành | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap — computes absolute URLs from location.pathname so the
@@ -25,7 +24,7 @@
   document.head.appendChild(js);
 })();
 </script>
-<link href="../../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../../assets/style.css" rel="stylesheet">
 <style>
 .page-body h1 { font-size: 24px; line-height: 1.35; margin: 0 0 10px; }
 .page-body h2 { font-size: 18px; line-height: 1.4; margin: 18px 0 10px; color: var(--navy); }
@@ -49,7 +48,7 @@ ul.tight li { margin: 4px 0; }
 <div class="page">
 <div class="page-body">
 <div class="dcc-header" data-dcc-bootstrap='{"header":{"doc_code":"WI-201","title":"Thực thi cổng chất lượng, điểm giữ và phát hành","subtitle":"Thực thi G0-G7, hold point và release evidence theo chương trình W0-W12.","doc_type":"WI","revision":"V1","effective_date":"2026-05-14","owner_role_code":"QA","approver_role_code":"CEO","iso_clause":null,"status":"released"},"labels":{"doc_id":{"short":"Mã","long":"Mã tài liệu","sort":10},"revision":{"short":"PB","long":"Phiên bản","sort":20},"effective_date":{"short":"HL","long":"Ngày hiệu lực","sort":30},"owner":{"short":"CSH","long":"Chủ sở hữu","sort":40},"approver":{"short":"Duyệt","long":"Người phê duyệt","sort":50}}}' data-dcc-doc-code="WI-201" data-dcc-locale="vi" data-dcc-logo="../../../../assets/hesem-logo.svg"></div>
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng trong W3-W4 để QA pilot chạy song song SOP-605 + WI-201, W5-W6 khi Đợt 2 áp cổng G0-G3, W7-W8 khi Sản xuất + Kỹ thuật áp G3-G7 đầy đủ và W11 khi cập nhật bài học. Mọi quyết định ĐẠT, TẠM GIỮ, phát hành hoặc bàn giao phải gắn gate code P2-01/P2-03/P2-04/P3-01/P3-03/P3-04/P4-03 và bằng chứng trong issues.json, drills.json, readiness.json hoặc dcc_document_revision.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng trong W3-W4 để QA pilot chạy song song SOP-605 + WI-201, W5-W6 khi Đợt 2 áp cổng G0-G3, W7-W8 khi Sản xuất + Kỹ thuật áp G3-G7 đầy đủ và W11 khi cập nhật bài học. Mọi quyết định ĐẠT, TẠM GIỮ, phát hành hoặc bàn giao phải gắn gate code P2-01/P2-03/P2-04/P3-01/P3-03/P3-04/P4-03 và bằng chứng trong issues.json, drills.json, readiness.json hoặc dcc_document_revision.</div>
 <section class="wi-section" id="wi-s1">
 <h2>1. Mục đích</h2>
 <ul class="tight">
@@ -57,7 +56,7 @@ ul.tight li { margin: 4px 0; }
 <li>Chặn việc “cho chạy trước, bổ sung hồ sơ sau” bằng thao tác TẠM GIỮ, ghi nhật ký và bàn giao rõ ngay tại điểm phát sinh.</li>
 <li>Để người nhận việc sau thấy được trạng thái thật của lệnh sản xuất, không phải đoán theo trí nhớ hay tin nhắn rời.</li>
 </ul>
-<div class="callout-danger"><strong>DỪNG</strong><br/>Nếu không chứng minh được đúng lệnh sản xuất, đúng mã chi tiết/phiên bản, đúng lô hoặc đúng bộ bằng chứng của điểm kiểm soát hiện tại, phải đưa lệnh sản xuất vào TẠM GIỮ ngay. Không có ngoại lệ miệng và không dùng kinh nghiệm cá nhân để bỏ qua cổng kiểm soát.</div>
+<div class="callout-danger"><strong>DỪNG</strong><br>Nếu không chứng minh được đúng lệnh sản xuất, đúng mã chi tiết/phiên bản, đúng lô hoặc đúng bộ bằng chứng của điểm kiểm soát hiện tại, phải đưa lệnh sản xuất vào TẠM GIỮ ngay. Không có ngoại lệ miệng và không dùng kinh nghiệm cá nhân để bỏ qua cổng kiểm soát.</div>
 </section>
 <section class="wi-section" id="wi-s2">
 <h2>2. Phạm vi &amp; đối tượng áp dụng</h2>
@@ -145,7 +144,7 @@ ul.tight li { margin: 4px 0; }
 </tbody>
 </table>
 </div>
-<div class="callout-warning"><strong>TẠM GIỮ</strong><br/>Nếu thiếu một điều kiện tiên quyết, phải chuyển ngay sang trạng thái TẠM GIỮ thay vì “giữ tạm trong đầu”. TẠM GIỮ chỉ được coi là hợp lệ khi đã gắn rõ phạm vi ảnh hưởng, người giữ và bằng chứng còn thiếu.</div>
+<div class="callout-warning"><strong>TẠM GIỮ</strong><br>Nếu thiếu một điều kiện tiên quyết, phải chuyển ngay sang trạng thái TẠM GIỮ thay vì “giữ tạm trong đầu”. TẠM GIỮ chỉ được coi là hợp lệ khi đã gắn rõ phạm vi ảnh hưởng, người giữ và bằng chứng còn thiếu.</div>
 </section>
 <section class="wi-section" id="wi-s5">
 <h2>5. Các bước thực hiện</h2>
@@ -194,7 +193,7 @@ ul.tight li { margin: 4px 0; }
 <p>Nếu cổng kiểm soát được giữ bằng bộ dự phòng ngoại tuyến, nhập bù đầy đủ hồ sơ số và đối chiếu lại chuỗi bằng chứng ngay sau khi hệ thống phục hồi.</p>
 <div class="note-soft">Lý do: ngoại tuyến không phải lý do để tồn tại hai phiên bản sự thật của cùng một quyết định cổng kiểm soát.</div>
 </div>
-<div class="callout-ok"><strong>Kết quả mong đợi</strong><br/>Kết thúc WI-201, lệnh sản xuất hoặc đã được giữ với lý do rõ và phạm vi rõ, hoặc đã được phát hành sạch cùng dấu vết bằng chứng đủ để bàn giao sang điểm kiểm soát kế tiếp.</div>
+<div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Kết thúc WI-201, lệnh sản xuất hoặc đã được giữ với lý do rõ và phạm vi rõ, hoặc đã được phát hành sạch cùng dấu vết bằng chứng đủ để bàn giao sang điểm kiểm soát kế tiếp.</div>
 </section>
 <section class="wi-section" id="wi-s6">
 <h2>6. Hồ sơ &amp; bằng chứng</h2>
@@ -324,28 +323,28 @@ ul.tight li { margin: 4px 0; }
 <td>W4 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W04.html">TRN-DEP-W04</a></td>
 <td>P2 · <code>pilot</code> + <code>gov</code></td>
 <td><code>P2-03</code> + <code>P2-04</code></td>
-<td><span class="role-code">CEO</span> + <span class="role-code">QMS</span> ký quyết định Đi/Không đi Đợt 2 khi bằng chứng G0-G7 đã đạt và không còn Sev-1/Sev-2 mở.</td>
+<td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="role-code">CEO</span></a> + <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="role-code">QMS</span></a> ký quyết định Đi/Không đi Đợt 2 khi bằng chứng G0-G7 đã đạt và không còn Sev-1/Sev-2 mở.</td>
 <td><code>mgmt-reviews.json</code>, biên bản Đi/Không đi, snapshot G0-G7</td>
 </tr>
 <tr>
 <td>W5-W6 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W05.html">TRN-DEP-W05</a> / <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W06.html">TRN-DEP-W06</a></td>
 <td>P3 · <code>golive</code> + <code>pilot</code></td>
 <td><code>P3-02</code> + <code>P3-04</code></td>
-<td><span class="dept-code">D-SCM</span> / <span class="dept-code">D-SCS</span> áp G0-G3 cho Job Order đầu tiên; mọi lần nhả cổng phải nối tới hồ sơ Job Dossier và tỷ lệ mở đúng tài liệu đạt <code>KPI-FLD-01 >= 95%</code>.</td>
+<td><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phòng Chuỗi cung ứng)"><span class="dept-code">D-SCM</span></a> / <a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html" title="Sales and Customer Service Department (Phòng Kinh doanh và Dịch vụ khách hàng)"><span class="dept-code">D-SCS</span></a> áp G0-G3 cho Job Order đầu tiên; mọi lần nhả cổng phải nối tới hồ sơ Job Dossier và tỷ lệ mở đúng tài liệu đạt <code>KPI-FLD-01 &gt;= 95%</code>.</td>
 <td><code>readiness.json</code>, <code>audit_events</code>, mẫu Job Dossier đầu tiên</td>
 </tr>
 <tr>
 <td>W7-W8 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W07.html">TRN-DEP-W07</a> / <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W08.html">TRN-DEP-W08</a></td>
 <td>P3 · <code>golive</code> + <code>pilot</code></td>
 <td><code>P3-01</code> + <code>P3-03</code></td>
-<td><span class="dept-code">D-PROD</span> + <span class="dept-code">D-ENG</span> áp G3-G7 theo ca; trung tâm điều hành ghi rõ người giữ cổng, trạng thái hold và MTTR Sev-1.</td>
+<td><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="dept-code">D-PROD</span></a> + <a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="dept-code">D-ENG</span></a> áp G3-G7 theo ca; trung tâm điều hành ghi rõ người giữ cổng, trạng thái hold và MTTR Sev-1.</td>
 <td>MTTR snapshot, <code>issues.json</code>, <code>audit_events</code></td>
 </tr>
 <tr>
 <td>W11 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W11.html">TRN-DEP-W11</a></td>
 <td>P4 · <code>doc</code></td>
 <td><code>P4-03</code></td>
-<td><span class="role-code">QMS</span> cập nhật WI-201 bằng bài học pilot/đợt; mọi thay đổi tiêu chí G0-G7 phải đi qua DCC, không sửa riêng trên bản in hoặc bảng ca.</td>
+<td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="role-code">QMS</span></a> cập nhật WI-201 bằng bài học pilot/đợt; mọi thay đổi tiêu chí G0-G7 phải đi qua DCC, không sửa riêng trên bản in hoặc bảng ca.</td>
 <td><code>dcc_document_revision</code>, action log bài học W11</td>
 </tr>
 </tbody>
@@ -355,9 +354,9 @@ ul.tight li { margin: 4px 0; }
 <section class="wi-section section" id="wi-s9">
 <h2>9. KPI điều hành phải theo dõi</h2>
 <div class="metric-grid">
-<div class="metric-card"><strong>KPI-FLD-01</strong><br/>Định tuyến đúng thư mục <code>>= 95%</code>; đo trên lần mở WI-201, SOP-605 và hồ sơ Job Dossier trong từng đợt.</div>
-<div class="metric-card"><strong>KPI-DEP-02</strong><br/>Đóng phiếu việc đúng hạn <code>>= 95%</code>; nguồn <code>issues.json</code> và action log họp tầng.</div>
-<div class="metric-card"><strong>KPI-DEP-07</strong><br/>MTTR sự cố Mức 1 <code>&lt;= 24 h</code>; nguồn MTTR snapshot và nhật ký trực ca.</div>
+<div class="metric-card"><strong>KPI-FLD-01</strong><br>Định tuyến đúng thư mục <code>&gt;= 95%</code>; đo trên lần mở WI-201, SOP-605 và hồ sơ Job Dossier trong từng đợt.</div>
+<div class="metric-card"><strong>KPI-DEP-02</strong><br>Đóng phiếu việc đúng hạn <code>&gt;= 95%</code>; nguồn <code>issues.json</code> và action log họp tầng.</div>
+<div class="metric-card"><strong>KPI-DEP-07</strong><br>MTTR sự cố Mức 1 <code>&lt;= 24 h</code>; nguồn MTTR snapshot và nhật ký trực ca.</div>
 </div>
 <p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code> với severity tương ứng, leo thang theo <a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> và cập nhật <code>readiness.json</code> trước cuộc họp gate kế tiếp.</p>
 </section>

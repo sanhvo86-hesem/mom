@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 783,
-        "generated_at": "2026-05-19T19:02:07+00:00"
+        "table_count": 785,
+        "generated_at": "2026-05-22T08:11:39+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -3409,6 +3409,13 @@
             "foreign_keys": [],
             "contract": null
         },
+        "error_code_registry": {
+            "defined_in": "192_error_code_registry_restore.sql",
+            "extended_in": [],
+            "primary_key": "code",
+            "foreign_keys": [],
+            "contract": null
+        },
         "escalation_log": {
             "defined_in": "034_exception_management.sql",
             "extended_in": [],
@@ -5378,6 +5385,13 @@
                     "ref": "departments(dept_code)"
                 }
             ],
+            "contract": null
+        },
+        "kpi_manual_inputs": {
+            "defined_in": "196_kpi_manual_inputs.sql",
+            "extended_in": [],
+            "primary_key": "input_id",
+            "foreign_keys": [],
             "contract": null
         },
         "kpi_snapshots": {

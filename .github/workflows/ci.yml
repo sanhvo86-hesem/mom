@@ -128,7 +128,7 @@ jobs:
         run: spectral lint mom/api/openapi.yaml --fail-severity warn
 
   doc-health:
-    name: Doc Health (broken-refs + DCC audit)
+    name: Doc Health (links + DCC audit)
     runs-on: ubuntu-latest
     needs: repo-boundary
     steps:
@@ -136,13 +136,10 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-      - name: Broken-refs regression gate (baseline 95)
-        # Baseline 95 leaves a +2 buffer over the current 93 known content
-        # gaps tracked in _reports/doc-link-orphans-2026-05-09.md. Any commit
-        # that introduces a NEW broken internal link will trip this gate.
-        # When intentionally lowering the gap (e.g. authoring a missing page),
-        # update the threshold here in the same PR.
-        run: python3 scripts/doc-broken-refs-scan.py mom/docs --max-broken 95
+      - name: Broken-refs gate
+        run: python3 scripts/doc-broken-refs-scan.py mom/docs --max-broken 0
+      - name: Actor-link gate
+        run: python3 scripts/doc-actor-links-scan.py mom/docs --max-unlinked 0 --max-nested 0 --max-unknown 0
       - name: DCC header audit (compliant-count regression gate)
         # Asserts ≥389 of 390 HTML docs satisfy the DCC pattern. Baseline 389
         # accommodates the one pre-existing fragment template

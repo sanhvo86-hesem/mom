@@ -919,9 +919,9 @@ def role_alias_map() -> dict[str, dict]:
         "Tool Crib": expr("TOOL"),
         "Tooling Thủ kho": expr("TOOL"),
         "Thủ kho Dao cụ": expr("TOOL"),
-        "Logistics / Shipping Coordinator": expr("LOG"),
-        "Shipping Coordinator": expr("LOG"),
-        "Hậu cần / Giao vận Điều phối viên": expr("LOG"),
+        "Logistics / Shipping Coordinator": expr("XNK"),
+        "Shipping Coordinator": expr("XNK"),
+        "Hậu cần / Giao vận Điều phối viên": expr("XNK"),
         "IT Administrator": expr("ITA"),
         "IT Admin": expr("ITA"),
         "IT Manager": expr("ITA"),
@@ -1731,14 +1731,14 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
         set_row_cell_html(doc, "Finance / billing packs", 2, chips(expr("FIN", "APAR")))
         set_row_cell_html(doc, "Ph\u00e1t h\u00e0nh k\u1ef9 thu\u1eadt / routing / revision", 2, chips(expr("ENGM", "DFM", "PE", "CAM")))
         set_row_cell_html(doc, "Labor / machine / WIP / completion", 2, f'{chips(expr("PPL"))} / {chips(bundle("FRONTLINE_LEADS"))}')
-        set_row_cell_html(doc, "Shipment / x\u00e1c nh\u1eadn giao h\u00e0ng (ship confirm)", 2, f'{chips(expr("D-WHS"))} / {chips(expr("LOG"))} / {chips(expr("QA"))}')
+        set_row_cell_html(doc, "Shipment / x\u00e1c nh\u1eadn giao h\u00e0ng (ship confirm)", 2, f'{chips(expr("D-WHS"))} / {chips(expr("XNK"))} / {chips(expr("QA"))}')
         set_row_cell_html(doc, "Invoice / AR / job close", 2, chips(expr("FIN", "APAR")))
         replace_text_fragments(
             doc,
             {
                 "Ng\u01b0\u1eddi ph\u1ee5 tr\u00e1ch Engineering": "ENGM / ENG_RELEASE_CORE",
                 "Ng\u01b0\u1eddi ph\u1ee5 tr\u00e1ch Production / PPL": "PPL / FRONTLINE_LEADS",
-                "Warehouse / Logistics + QA release th\u1ea9m quy\u1ec1n": "D-WHS / LOG / QA",
+                "Warehouse / Logistics + QA release th\u1ea9m quy\u1ec1n": "D-WHS / XNK / QA",
                 "Ng\u01b0\u1eddi ph\u1ee5 tr\u00e1ch Finance": "FIN / APAR",
             },
         )
@@ -1776,7 +1776,7 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
             2,
             f'{chips(expr("QA"))} hoặc người được ủy quyền theo ANNEX-120',
         )
-        set_row_cell_html(doc, "Customer / supplier communication", 2, chips(expr("CS", "LOG", "SCM")))
+        set_row_cell_html(doc, "Customer / supplier communication", 2, chips(expr("CS", "XNK", "SCM")))
         set_row_cell_html(doc, "Job trạng thái / operation moves", 2, chips(expr("PPL", "WKM")))
         set_row_cell_html(doc, "Bảng điều khiển / bộ hồ sơ rà soát", 2, chips(bundle("MR_REPORT_OWNERS")))
         set_row_cell_html(doc, "Bảng điều khiển / bộ hồ sơ rà soát", 3, f'{chips(expr("QMS"))} / {chips(expr("ITA", "ESA"))}')
@@ -1822,7 +1822,7 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
         replace_text_fragments(
             doc,
             {
-                "NHẬT KÝ": "LOG",
+                "NHẬT KÝ": "XNK",
                 "người chịu trách nhiệm KPI": "MR_REPORT_OWNERS",
                 "QMS Engineer / doc điều phối viên": "QMS[DC]",
                 "Chủ quá trình": "OPS_SCOPE_OWNERS",
@@ -1853,7 +1853,7 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
         set_row_cell_html(doc, "Support", 0, chips(bundle("SUPPORT_ENABLEMENT")))
 
     if current_file.name == "annex-123-deputy-backup-matrix.html":
-        set_row_cell_html(doc, "JD-CPS", 4, "CPS vắng mặt hoặc tuyến clean-pack cần duy trì handoff sang LOG.")
+        set_row_cell_html(doc, "JD-CPS", 4, "CPS vắng mặt hoặc tuyến clean-pack cần duy trì handoff sang XNK.")
         set_row_cell_html(doc, "QA", 4, "QA vắng mặt hoặc bận xử lý sự cố lớn.")
         set_row_cell_html(doc, "CS", 1, chips(expr("D-SCS")))
         set_row_cell_html(doc, "EST", 1, chips(expr("D-SCS")))
@@ -1938,7 +1938,7 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
         set_row_cell_html(doc, "8. Setup & first-off approval", 4, chips(expr("SET", "SL", "QA", "MCS")))
         set_row_cell_html(doc, "9. Serial / lệnh sản xuất execution", 2, chips(expr("OPR", "WKM", "QE", "QC")))
         set_row_cell_html(doc, "10. Kiểm tra / metrology / final release", 2, chips(expr("QC", "QE", "MCS")))
-        set_row_cell_html(doc, "11. Packing / shipping / export", 1, chips(expr("CPS", "LOG")))
+        set_row_cell_html(doc, "11. Packing / shipping / export", 1, chips(expr("CPS", "XNK")))
         set_row_cell_html(doc, "11. Packing / shipping / export", 3, f'{chips(expr("SCM", "QA"))} theo rule release')
         set_row_cell_html(doc, "12. Khiếu nại / NCR / CAPA / learning", 3, f'{chips(expr("QA", "CEO"))} theo mức ảnh hưởng')
         set_row_cell_html(doc, "kiểm tra cuối / phê duyệt giao hàng (phê duyệt giao hàng) chưa đủ bằng chứng", 2, f'{chips(expr("QA", "CEO"))} theo khách hàng rủi ro')
@@ -1966,14 +1966,14 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
     if current_file.name == "annex-115-epicor-transaction-and-interface-map.html":
         set_row_cell_html(doc, "Ph\u00e1t h\u00e0nh k\u1ef9 thu\u1eadt / routing / revision", 2, chips(expr("ENGM", "DFM", "PE", "CAM")))
         set_row_cell_html(doc, "Labor / machine / WIP / completion", 2, f'{chips(expr("PPL"))} / {chips(bundle("FRONTLINE_LEADS"))}')
-        set_row_cell_html(doc, "Shipment / x\u00e1c nh\u1eadn giao h\u00e0ng (ship confirm)", 2, f'{chips(expr("D-WHS"))} / {chips(expr("LOG"))} / {chips(expr("QA"))}')
+        set_row_cell_html(doc, "Shipment / x\u00e1c nh\u1eadn giao h\u00e0ng (ship confirm)", 2, f'{chips(expr("D-WHS"))} / {chips(expr("XNK"))} / {chips(expr("QA"))}')
         set_row_cell_html(doc, "Invoice / AR / job close", 2, chips(expr("FIN", "APAR")))
         replace_text_fragments(
             doc,
             {
                 "Người phụ trách Engineering": "ENGM / ENG_RELEASE_CORE",
                 "Người phụ trách Production / PPL": "PPL / FRONTLINE_LEADS",
-                "Warehouse / Logistics + QA release thẩm quyền": "D-WHS / LOG / QA",
+                "Warehouse / Logistics + QA release thẩm quyền": "D-WHS / XNK / QA",
                 "Người phụ trách Finance": "FIN / APAR",
             },
         )
@@ -2355,7 +2355,7 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
         set_section_role_cell(doc, "p4", 4, bundle("DEPLOYMENT_LEADS"), current_file, registry)
         set_section_cell_html(doc, "p8", 3, 2, chips(bundle("OPS_SCOPE_OWNERS")))
         set_section_cell_html(doc, "p9", 0, 1, chips(expr("QA", "QMS")), table_index=2)
-        set_section_cell_html(doc, "p9", 1, 1, chips(expr("QA", "QMS", "CS", "EST", "PPL", "PD", "ENGM", "SCM", "FIN", "HR", "EHS", "ITA", "WKM", "SL", "QCL", "LOG")), table_index=2)
+        set_section_cell_html(doc, "p9", 1, 1, chips(expr("QA", "QMS", "CS", "EST", "PPL", "PD", "ENGM", "SCM", "FIN", "HR", "EHS", "ITA", "WKM", "SL", "QCL", "XNK")), table_index=2)
         set_section_cell_html(doc, "p9", 2, 1, chips(bundle("OPS_SCOPE_OWNERS")), table_index=2)
         set_section_cell_html(doc, "p9", 3, 1, chips(bundle("OPS_SCOPE_OWNERS")), table_index=2)
         replace_text_fragments(
@@ -2462,7 +2462,7 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
                 "Engineering Lead + QA + Sales Lead": "ENGM + QA + EST",
                 "Sales Lead": "CS / EST",
                 "Chủ trì rủi ro": "QA[QMR]",
-                "Logistics + AR": "LOG + APAR",
+                "Logistics + AR": "XNK + APAR",
             },
         )
 
@@ -2552,7 +2552,7 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
             doc,
             '//div[contains(@class,"role-note")]',
             "RACI nền: QC giữ R cho stop và containment đầu tiên; QA Manager giữ A cho disposition và CAPA trigger; QMS Engineer giữ R cho logic hồ sơ và hiệu lực; Process Owner giữ R cho action gốc tại quá trình; Planner hoặc Shipping giữ R cho integrity của lot trong containment.",
-            "<b>RACI nền:</b> QC giữ R cho stop và containment đầu tiên; QA giữ A cho disposition và CAPA trigger; QMS giữ R cho logic hồ sơ và hiệu lực; WKM / ENGM / QE / SCM / HR / MNT giữ R cho action gốc tại quá trình; PPL / LOG giữ R cho integrity của lot trong containment.",
+            "<b>RACI nền:</b> QC giữ R cho stop và containment đầu tiên; QA giữ A cho disposition và CAPA trigger; QMS giữ R cho logic hồ sơ và hiệu lực; WKM / ENGM / QE / SCM / HR / MNT giữ R cho action gốc tại quá trình; PPL / XNK giữ R cho integrity của lot trong containment.",
         )
         replace_text_fragments(
             doc,
@@ -2653,7 +2653,7 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
             doc,
             {
                 "Áp dụng cho Chief Executive Officer, QA Manager, QMS Engineer, Process Owner, Department Head, Data Owner, IT Administrator và mọi chức năng cung cấp đầu vào hoặc nhận action từ xem xét của lãnh đạo.":
-                "Áp dụng cho CEO, QA, QMS và các vai trò cung cấp đầu vào hoặc nhận action từ xem xét của lãnh đạo, gồm CS, EST, PPL, PD, ENGM, SCM, FIN, HR, EHS, ITA, WKM, SL, QCL và LOG.",
+                "Áp dụng cho CEO, QA, QMS và các vai trò cung cấp đầu vào hoặc nhận action từ xem xét của lãnh đạo, gồm CS, EST, PPL, PD, ENGM, SCM, FIN, HR, EHS, ITA, WKM, SL, QCL và XNK.",
                 "Khi phát hiện dữ liệu sai sau mốc khóa dữ liệu, Data Owner phải mở controlled note; QA Manager quyết định re-review, bổ sung appendix hay hủy kết luận cũ để họp lại.":
                 "Khi phát hiện dữ liệu sai sau mốc khóa dữ liệu, vai trò sở hữu metric hoặc nguồn dữ liệu trong OPS_SCOPE_OWNERS phải mở controlled note; QA quyết định re-review, bổ sung appendix hay hủy kết luận cũ để họp lại.",
                 "Khi quyết định cần ngân sách hoặc thay đổi lớn vượt ngoài thẩm quyền hiện hữu, Process Owner phải escalate theo ANNEX-120 và giữ temporary control cho tới khi có quyết định cuối cùng.":
@@ -2690,7 +2690,7 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
             doc,
             {
                 "Đo lường, QC Team Leader, QA": "MCS, QCL, QA",
-                "QC Team Leader, QA, Hậu cần, Customer Dịch vụ": "QCL, QA, LOG, CS",
+                "QC Team Leader, QA, Hậu cần, Customer Dịch vụ": "QCL, QA, XNK, CS",
                 "Không thay QC Team Leader trong bố trí nguồn lực kiểm hằng ngày; không tự disposition sản phẩm": "Không thay QC Inspector Lead trong bố trí nguồn lực kiểm hằng ngày; không tự disposition sản phẩm",
             },
         )
@@ -4072,9 +4072,9 @@ def apply_jd_specific_tweaks(doc: etree._Element, role_code: str, current_file: 
         replace_text_fragments(
             doc,
             {
-                "Supervisor/QA/Hậu cần": "CPS / QA / LOG",
+                "Supervisor/QA/Hậu cần": "CPS / QA / XNK",
                 "Supervisor xác nhận": "CPS xác nhận",
-                "Supervisor hoặc Hậu cần": "CPS / LOG",
+                "Supervisor hoặc Hậu cần": "CPS / XNK",
             },
         )
 
@@ -4162,14 +4162,14 @@ def apply_jd_specific_tweaks(doc: etree._Element, role_code: str, current_file: 
         set_row_first_cell_html(
             doc,
             "Nhân viên mua hàng / Kho / Tool kho dụng cụ (tool kho dụng cụ (tool kho dụng cụ (tool crib)) / Hậu cần",
-            render_token_cluster(["BUY", "WAR", "TOOL", "LOG"], current_file, registry),
+            render_token_cluster(["BUY", "WAR", "TOOL", "XNK"], current_file, registry),
         )
 
     if role_code == "CS":
         set_row_first_cell_html(
             doc,
             "Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên / key tài khoản",
-            render_token_cluster(["CEO", "ENGM", "PPL", "QA", "SCM", "FIN", "WKM", "LOG"], current_file, registry),
+            render_token_cluster(["CEO", "ENGM", "PPL", "QA", "SCM", "FIN", "WKM", "XNK"], current_file, registry),
         )
         replace_text_fragments(
             doc,
@@ -4680,7 +4680,7 @@ def main() -> None:
         },
         "training-matrix-warehouse.html": {
             "Team Leader kho": expr("D-WHS"),
-            "H???u c???n / Giao v???n Nh??n vi??n": expr("LOG"),
+            "H???u c???n / Giao v???n Nh??n vi??n": expr("XNK"),
         },
         "drill-setup-firstarticle-ir.html": {
             "Setup/Operator": expr("SET", "OPR", joiner=" + "),

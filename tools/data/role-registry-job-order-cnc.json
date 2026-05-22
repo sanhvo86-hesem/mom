@@ -425,7 +425,7 @@
       "type": "department",
       "parent_department": null,
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html",
-      "lead_roles": ["SCM", "BUY", "WAR", "TOOL", "LOG"]
+      "lead_roles": ["SCM", "BUY", "WAR", "TOOL", "XNK"]
     },
     "D-PUR": {
       "title_en": "Purchasing Function",
@@ -461,7 +461,7 @@
       "type": "subfunction",
       "parent_department": "D-SCM",
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html",
-      "lead_roles": ["LOG", "SCM"]
+      "lead_roles": ["XNK", "SCM"]
     },
     "D-FIN": {
       "title_en": "Finance Department",
@@ -709,7 +709,7 @@
     "SUPPORT_ENABLEMENT": ["SCM", "D-FIN", "D-HR", "D-EHS", "D-IT", "D-ERP"],
     "AREA_LEADS": ["SL", "WKM", "CPS", "QCL"],
     "POU_LEADS": ["WKM", "SL", "QCL", "SCM"],
-    "OPS_SCOPE_OWNERS": ["CS", "EST", "PPL", "PD", "ENGM", "QA[QMR]", "QMS", "SCM", "FIN", "HR", "EHS", "ITA", "WKM", "SL", "QCL", "LOG"],
+    "OPS_SCOPE_OWNERS": ["CS", "EST", "PPL", "PD", "ENGM", "QA[QMR]", "QMS", "SCM", "FIN", "HR", "EHS", "ITA", "WKM", "SL", "QCL", "XNK"],
     "FRONTLINE_LEADS": ["WKM", "SL", "DBL", "CPS", "QCL"],
     "DEPLOYMENT_LEADS": ["WKM", "SL", "DBL", "CPS", "QCL", "HR"],
     "DIRECT_LINE_MGRS": ["CEO", "PD", "ENGM", "QA[QMR]", "SCM", "FIN", "HR", "EHS", "ITA", "WKM", "SL", "DBL", "CPS", "QCL"],

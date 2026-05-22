@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>WI-519 - Kiểm nhanh bộ hồ sơ công việc và xác minh trước chạy | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap — computes absolute URLs from location.pathname so the
@@ -25,7 +24,7 @@
   document.head.appendChild(js);
 })();
 </script>
-<link href="../../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../../assets/style.css" rel="stylesheet">
 <style>
 .page-body h1 { font-size: 24px; line-height: 1.35; margin: 0 0 10px; }
 .page-body h2 { font-size: 18px; line-height: 1.4; margin: 18px 0 10px; color: var(--navy); }
@@ -50,7 +49,7 @@ ul.tight li { margin: 4px 0; }
 <div class="page-body">
 <!-- DCC Document Change Control header (values served by /api/v1/dcc; bootstrap seed is preview-only) -->
 <div class="dcc-header" data-dcc-bootstrap='{"header":{"doc_code":"WI-519","title":"Kiểm nhanh bộ hồ sơ job và xác minh trước chạy","subtitle":"Pre-run job packet verification cho W3 pilot và W7-W8 production go-live.","doc_type":"WI","revision":"V1","effective_date":"2026-05-14","owner_role_code":"QA","approver_role_code":"CEO","iso_clause":null,"status":"released"},"labels":{"doc_id":{"short":"Mã","long":"Mã tài liệu","sort":10},"revision":{"short":"PB","long":"Phiên bản","sort":20},"effective_date":{"short":"HL","long":"Ngày hiệu lực","sort":30},"owner":{"short":"CSH","long":"Chủ sở hữu","sort":40},"approver":{"short":"Duyệt","long":"Người phê duyệt","sort":50}}}' data-dcc-doc-code="WI-519" data-dcc-locale="vi" data-dcc-logo="../../../../assets/hesem-logo.svg"></div>
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng ở W3 để diễn tập pre-run cho 5 job packet mẫu, W7-W8 khi Đợt Sản xuất yêu cầu mọi Job Order qua kiểm nhanh trước khi máy chạy, W8 hypercare đưa bảng kiểm vào trung tâm điều hành và W11 cập nhật bảng kiểm theo bài học thực địa.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng ở W3 để diễn tập pre-run cho 5 job packet mẫu, W7-W8 khi Đợt Sản xuất yêu cầu mọi Job Order qua kiểm nhanh trước khi máy chạy, W8 hypercare đưa bảng kiểm vào trung tâm điều hành và W11 cập nhật bảng kiểm theo bài học thực địa.</div>
 <section class="wi-section" id="wi-s1">
 <h2>1. Mục đích</h2>
 <ul class="tight">
@@ -58,7 +57,7 @@ ul.tight li { margin: 4px 0; }
 <li>Buộc điểm kiểm trước khi chạy có kết quả ĐẠT hoặc TẠM GIỮ nhìn thấy rõ trên hồ sơ và tại máy.</li>
 <li>Giữ một quyết định vận hành duy nhất trước nhát cắt đầu, không chạy thử “xem sao”.</li>
 </ul>
-<div class="callout-danger"><strong>DỪNG</strong><br/>Nếu thiếu một bằng chứng tối thiểu hoặc có một điểm không giải thích được tại máy, lệnh sản xuất phải vào TẠM GIỮ. Không được chạy máy để bù cho việc hồ sơ chưa sạch.</div>
+<div class="callout-danger"><strong>DỪNG</strong><br>Nếu thiếu một bằng chứng tối thiểu hoặc có một điểm không giải thích được tại máy, lệnh sản xuất phải vào TẠM GIỮ. Không được chạy máy để bù cho việc hồ sơ chưa sạch.</div>
 </section>
 <section class="wi-section" id="wi-s2">
 <h2>2. Phạm vi &amp; đối tượng áp dụng</h2>
@@ -216,7 +215,7 @@ ul.tight li { margin: 4px 0; }
 </tbody>
 </table>
 </div>
-<div class="callout-ok"><strong>Kết quả mong đợi</strong><br/>Kết thúc WI-519, máy hoặc được phép chạy theo một quyết định trước khi chạy sạch, hoặc bị giữ với lý do và phạm vi rõ ràng để xử lý tiếp.</div>
+<div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Kết thúc WI-519, máy hoặc được phép chạy theo một quyết định trước khi chạy sạch, hoặc bị giữ với lý do và phạm vi rõ ràng để xử lý tiếp.</div>
 </section>
 <section class="wi-section" id="wi-s6">
 <h2>6. Hồ sơ &amp; bằng chứng</h2>
@@ -270,10 +269,10 @@ ul.tight li { margin: 4px 0; }
 <table class="table matrix-table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>Tuần</th><th>Pha · trụ</th><th>Cổng kiểm liên quan</th><th>Cách dùng tài liệu này</th><th>Bằng chứng đóng cổng</th></tr></thead>
 <tbody>
-<tr><td>W3 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W03.html">TRN-DEP-W03</a></td><td>P2 · <code>pilot</code></td><td><code>P2-02</code></td><td><span class="role-code">WKM</span> + <span class="role-code">QA</span> diễn tập pre-run cho 5 job packet mẫu; mỗi packet phải có checklist, điểm lệch và người xử lý.</td><td><code>drills.json</code>, <code>issues.json</code>, FRM-519 sample</td></tr>
+<tr><td>W3 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W03.html">TRN-DEP-W03</a></td><td>P2 · <code>pilot</code></td><td><code>P2-02</code></td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="role-code">WKM</span></a> + <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="role-code">QA</span></a> diễn tập pre-run cho 5 job packet mẫu; mỗi packet phải có checklist, điểm lệch và người xử lý.</td><td><code>drills.json</code>, <code>issues.json</code>, FRM-519 sample</td></tr>
 <tr><td>W7 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W07.html">TRN-DEP-W07</a></td><td>P3 · <code>golive</code> + <code>pilot</code></td><td><code>P3-04</code></td><td>Mỗi Job Order trước khi chạy máy đều qua WI-519; sai lệch pre-run phải <code>&lt;= 1%</code> trong ngày đầu Đợt Sản xuất.</td><td><code>audit_events</code>, checklist pre-run theo JobNum</td></tr>
 <tr><td>W8 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W08.html">TRN-DEP-W08</a></td><td>P3 · <code>golive</code></td><td><code>P3-03</code></td><td>Hypercare đưa bảng kiểm pre-run vào trung tâm điều hành; mọi điểm đỏ có severity, owner và giờ đóng theo WI-202.</td><td><code>readiness.json</code>, <code>issues.json</code>, MTTR snapshot</td></tr>
-<tr><td>W11 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W11.html">TRN-DEP-W11</a></td><td>P4 · <code>doc</code></td><td><code>P4-03</code></td><td><span class="role-code">QMS</span> cập nhật bảng kiểm theo bài học về sai revision, dao cụ, WCS, bù trừ và điều kiện máy.</td><td><code>dcc_document_revision</code>, lesson-learned action log</td></tr>
+<tr><td>W11 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W11.html">TRN-DEP-W11</a></td><td>P4 · <code>doc</code></td><td><code>P4-03</code></td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="role-code">QMS</span></a> cập nhật bảng kiểm theo bài học về sai revision, dao cụ, WCS, bù trừ và điều kiện máy.</td><td><code>dcc_document_revision</code>, lesson-learned action log</td></tr>
 </tbody>
 </table>
 </div>
@@ -281,9 +280,9 @@ ul.tight li { margin: 4px 0; }
 <section class="wi-section section" id="wi-s9">
 <h2>9. KPI điều hành phải theo dõi</h2>
 <div class="metric-grid">
-<div class="metric-card"><strong>KPI-FLD-01</strong><br/>Định tuyến đúng thư mục <code>>= 95%</code>; đo khi operator mở WI-519, WI-302 và job packet đúng nguồn.</div>
-<div class="metric-card"><strong>KPI-DEP-03</strong><br/>Tỉ lệ thay đổi thất bại <code>&lt;= 10%</code>; đo trên thay đổi setup, chương trình, đồ gá và pre-run.</div>
-<div class="metric-card"><strong>KPI-DEP-07</strong><br/>MTTR sự cố Mức 1 <code>&lt;= 24 h</code>; dùng khi pre-run phát hiện rủi ro chặn máy.</div>
+<div class="metric-card"><strong>KPI-FLD-01</strong><br>Định tuyến đúng thư mục <code>&gt;= 95%</code>; đo khi operator mở WI-519, WI-302 và job packet đúng nguồn.</div>
+<div class="metric-card"><strong>KPI-DEP-03</strong><br>Tỉ lệ thay đổi thất bại <code>&lt;= 10%</code>; đo trên thay đổi setup, chương trình, đồ gá và pre-run.</div>
+<div class="metric-card"><strong>KPI-DEP-07</strong><br>MTTR sự cố Mức 1 <code>&lt;= 24 h</code>; dùng khi pre-run phát hiện rủi ro chặn máy.</div>
 </div>
 <p class="note"><strong>Khi báo đỏ:</strong> mở <code>issues.json</code>, chặn chạy máy bằng trạng thái TẠM GIỮ, leo thang theo <a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> và cập nhật <code>readiness.json</code> trước khi nhả máy.</p>
 </section>
