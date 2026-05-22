@@ -22,6 +22,12 @@
   js.defer = true;
   js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
   document.head.appendChild(js);
+  /* JD KPI-scorecard renderer — hydrates the KPI section from the
+   * KPI Authority registry (jd_kpi_scorecards). */
+  var jdsc = document.createElement('script');
+  jdsc.defer = true;
+  jdsc.src = appBase + '/scripts/portal/13-jd-scorecard-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(jdsc);
 })();
 </script>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
