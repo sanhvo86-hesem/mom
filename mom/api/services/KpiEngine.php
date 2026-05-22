@@ -546,7 +546,8 @@ final class KpiEngine
                 'decision_action' => $this->stringField($row, 'decision_action'),
                 'action_reference' => $this->stringField($row, 'action_reference'),
                 'attribution_rule' => $this->stringField($row, 'attribution_rule'),
-                'registry_counter_metric' => $this->stringField($row, 'counter_metric'),
+                'registry_counter_metric' => is_array($row['counter_metric'] ?? null)
+                    ? $row['counter_metric'] : null,
                 'reward_eligible' => $row['reward_eligible'] ?? null,
             ], $aliases);
         }
@@ -2592,22 +2593,19 @@ final class KpiEngine
      */
     private function applyGovernanceLists(array &$metric, array $override): void
     {
-        // Precedence: a counter_metric authored on the governance KPI row is
-        // the SSOT (prompt 02/03) and wins over legacy
-        // metric_governance_overrides; overrides still apply to non-governance
-        // metrics, which carry no registry_counter_metric.
+        // counter_metric is a dedicated per-KPI definition object
+        // {name_vi, name, intent} authored on the registry row — the SSOT.
+        // It names the side-effect that appears when the KPI is gamed; it is
+        // NOT a borrowed headline-KPI code. The registry row wins; legacy
+        // metric_governance_overrides apply only when the row carries none.
+        $registryCounter = $metric['registry_counter_metric'] ?? null;
         $counterMetric = $override['counter_metric'] ?? null;
-        $registryCounter = $this->stringField($metric, 'registry_counter_metric');
-        if ($registryCounter !== '') {
-            $metric['counter_metric'] = [$registryCounter];
-        } elseif (is_array($counterMetric)) {
-            $metric['counter_metric'] = array_values(array_filter($counterMetric, static fn(mixed $item): bool => is_string($item) && trim($item) !== ''));
-        } elseif (is_string($counterMetric) && trim($counterMetric) !== '') {
-            $metric['counter_metric'] = [trim($counterMetric)];
-        } elseif (($metric['metric_type'] ?? null) === 'kpi') {
-            $metric['counter_metric'] = ['SAFETY_QUALITY_DELIVERY_DATA_INTEGRITY_GATE'];
+        if (is_array($registryCounter) && ($registryCounter['name_vi'] ?? '') !== '') {
+            $metric['counter_metric'] = $registryCounter;
+        } elseif (is_array($counterMetric) && ($counterMetric['name_vi'] ?? '') !== '') {
+            $metric['counter_metric'] = $counterMetric;
         } else {
-            $metric['counter_metric'] = [];
+            $metric['counter_metric'] = null;
         }
 
         $drilldowns = $override['drilldown_dimensions'] ?? null;

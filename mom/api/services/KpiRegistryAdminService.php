@@ -571,8 +571,7 @@ final class KpiRegistryAdminService
             }
 
             if (($row['reward_eligible'] ?? false) === true) {
-                $counter = trim((string) ($row['counter_metric'] ?? ''));
-                if ($counter === '') {
+                if ($this->counterName($row['counter_metric'] ?? null) === '') {
                     throw new RuntimeException('kpi_registry_reward_without_counter:' . $code);
                 }
             }
@@ -603,10 +602,38 @@ final class KpiRegistryAdminService
             }
             return $out;
         }
-        if ($field === 'counter_metric' && ($value === null || $value === '')) {
-            return null;
+        if ($field === 'counter_metric') {
+            // Dedicated per-KPI counter definition {name_vi, name, intent}.
+            return $this->sanitizeCounterMetric($value);
         }
         return $this->plainText((string) $value);
+    }
+
+    /**
+     * Normalize a counter-metric value to the dedicated-definition object
+     * {name_vi, name, intent} (each plain text). Returns null when empty.
+     */
+    private function sanitizeCounterMetric(mixed $value): ?array
+    {
+        if (!is_array($value)) {
+            return null;
+        }
+        $out = [];
+        foreach (['name_vi', 'name', 'intent'] as $k) {
+            if (isset($value[$k])) {
+                $out[$k] = $this->plainText((string) $value[$k]);
+            }
+        }
+        return ($out['name_vi'] ?? '') !== '' ? $out : null;
+    }
+
+    /** Display name of a dedicated counter-metric object (Vietnamese first). */
+    private function counterName(mixed $counter): string
+    {
+        if (is_array($counter)) {
+            return trim((string) ($counter['name_vi'] ?? ($counter['name'] ?? '')));
+        }
+        return trim((string) $counter);
     }
 
     /**
@@ -660,7 +687,7 @@ final class KpiRegistryAdminService
         if (!in_array($cadence, self::VALID_CADENCE, true)) {
             $cadence = 'monthly';
         }
-        $counter = trim((string) ($patch['counter_metric'] ?? ''));
+        $counter = $this->sanitizeCounterMetric($patch['counter_metric'] ?? null);
 
         return [
             'canonical_code'     => $code,
@@ -673,7 +700,7 @@ final class KpiRegistryAdminService
             'owner_role'         => $owner,
             'data_stewardship_role' => $owner,
             'applicable_jds'     => $owner !== '' ? [$owner] : [],
-            'counter_metric'     => $counter !== '' ? strtoupper($counter) : null,
+            'counter_metric'     => $counter,
             'cadence'            => $cadence,
             'layer'              => $this->plainText((string) ($patch['layer'] ?? 'bsc_monthly')),
             'lead_or_lag'        => ($patch['lead_or_lag'] ?? '') === 'lead' ? 'lead' : 'lag',
@@ -713,14 +740,11 @@ final class KpiRegistryAdminService
                 && trim((string) ($t['red'] ?? '')) !== '') {
                 $withThresholds++;
             }
-            if (trim((string) ($row['counter_metric'] ?? '')) !== '') {
+            if ($this->counterName($row['counter_metric'] ?? null) !== '') {
                 $withCounter++;
             }
             if (($row['reward_eligible'] ?? false) === true) {
                 $rewardEligible++;
-                if (trim((string) ($row['counter_metric'] ?? '')) !== '') {
-                    // reward KPI with counter — counted in coverage below
-                }
             }
         }
         return [
@@ -800,7 +824,7 @@ final class KpiRegistryAdminService
             . '<colgroup><col style="width:15%"><col style="width:20%">'
             . '<col style="width:12%"><col style="width:12%"><col style="width:16%">'
             . '<col style="width:11%"><col style="width:14%"></colgroup>'
-            . '<thead><tr><th>KPI</th><th>Công thức</th><th>Ngưỡng X/V/Đ</th>'
+            . '<thead><tr><th>KPI</th><th>Công thức</th><th>Ngưỡng G/Y/R</th>'
             . '<th>Owner / xác nhận dữ liệu</th><th>Nguồn dữ liệu</th>'
             . '<th>Nhịp · lớp · loại</th><th>Quyết định khi lệch ngưỡng</th></tr></thead><tbody>';
         $body = '';
@@ -838,9 +862,9 @@ final class KpiRegistryAdminService
         // threshold cell without it is hardcoded.
         [$tg, $ty, $tr] = $this->thresholdDisplay($t);
         $thresholds = '<div class="kpi-rag-badge" data-kpi-rag="authority" data-kpi-code="' . $e($code) . '">'
-            . '<span class="kpi-good" style="padding:1px 5px;border-radius:4px">Xanh ' . $e($tg) . '</span><br>'
-            . '<span class="kpi-warn" style="padding:1px 5px;border-radius:4px">Vàng ' . $e($ty) . '</span><br>'
-            . '<span class="kpi-bad" style="padding:1px 5px;border-radius:4px">Đỏ ' . $e($tr) . '</span>'
+            . '<span class="kpi-good" style="padding:1px 5px;border-radius:4px">G ' . $e($tg) . '</span><br>'
+            . '<span class="kpi-warn" style="padding:1px 5px;border-radius:4px">Y ' . $e($ty) . '</span><br>'
+            . '<span class="kpi-bad" style="padding:1px 5px;border-radius:4px">R ' . $e($tr) . '</span>'
             . '</div>';
         if (!empty($t['basis'])) {
             $thresholds .= '<span class="mini-note">Căn cứ: ' . $e($t['basis']) . '</span>';
@@ -878,8 +902,14 @@ final class KpiRegistryAdminService
         if (!empty($k['paired_metric'])) {
             $extras[] = 'Ghép cặp: <span class="role-code">' . $e($k['paired_metric']) . '</span>';
         }
-        if (!empty($k['counter_metric'])) {
-            $extras[] = 'Counter-metric: <span class="role-code">' . $e($k['counter_metric']) . '</span>';
+        $counterName = $this->counterName($k['counter_metric'] ?? null);
+        if ($counterName !== '') {
+            $extras[] = 'Counter-metric: <b>' . $e($counterName) . '</b>';
+            $counterIntent = is_array($k['counter_metric'] ?? null)
+                ? trim((string) ($k['counter_metric']['intent'] ?? '')) : '';
+            if ($counterIntent !== '') {
+                $extras[] = '<span class="mini-note">' . $e($counterIntent) . '</span>';
+            }
         }
         if (($k['reward_eligible'] ?? false) === true) {
             $extras[] = '<b>Gắn khen thưởng</b> (có counter-metric)';

@@ -108,9 +108,9 @@ function _paint(box, rec) {
   var retired = rec.retired ? ' · KPI đã ngừng dùng' : '';
   box.setAttribute('data-kpi-rag-state', 'linked');
   box.innerHTML =
-    '<span class="kpi-good">Xanh ' + _esc(rag.green) + '</span>' +
-    '<span class="kpi-warn">Vàng ' + _esc(rag.yellow) + '</span>' +
-    '<span class="kpi-bad">Đỏ ' + _esc(rag.red) + '</span>' +
+    '<span class="kpi-good">G ' + _esc(rag.green) + '</span>' +
+    '<span class="kpi-warn">Y ' + _esc(rag.yellow) + '</span>' +
+    '<span class="kpi-bad">R ' + _esc(rag.red) + '</span>' +
     '<span class="kpi-rag-mark" title="Ngưỡng đồng bộ trực tiếp từ KPI Authority registry' +
       ' (mã ' + _esc(rec.code) + ')' + _esc(retired) + '">🔗 Authority KPI</span>';
 }

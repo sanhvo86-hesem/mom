@@ -159,18 +159,15 @@ foreach ($governance as $row) {
         }
     }
 
-    // ── P0.7 — every governance KPI must have a real counter-metric ──────────
-    // A counter-metric is the opposite-pressure metric that blocks gaming;
-    // it is mandatory for every company / value-stream / department KPI and
-    // must resolve to a known metric code (and never to the KPI itself).
-    $counter = strtoupper(trim((string) ($row['counter_metric'] ?? '')));
-    if ($counter === '') {
-        $p0[] = "Registry $code: counter_metric is empty — every governance KPI "
-            . "needs an anti-gaming counter-metric.";
-    } elseif (!isset($knownCodes[$counter])) {
-        $p0[] = "Registry $code: counter_metric '$counter' is not a known metric code.";
-    } elseif ($counter === $code) {
-        $p0[] = "Registry $code: counter_metric cannot be the KPI itself.";
+    // ── P0.7 — every governance KPI must have a dedicated counter-metric ─────
+    // counter_metric is a dedicated definition object {name_vi, name, intent}
+    // — the side-effect that appears when the KPI is gamed. It is unique to
+    // the KPI by construction (no longer a borrowed headline-KPI code).
+    $counter = $row['counter_metric'] ?? null;
+    if (!is_array($counter) || trim((string) ($counter['name_vi'] ?? '')) === ''
+        || trim((string) ($counter['intent'] ?? '')) === '') {
+        $p0[] = "Registry $code: counter_metric must be a dedicated definition "
+            . "object with a non-empty name_vi and intent.";
     }
 
     // ── P1 — lag without lead pairing ────────────────────────────────────────
@@ -264,12 +261,11 @@ foreach (['gate_control_metrics' => $gateMetrics, 'proposed_operating_metrics' =
             continue;
         }
         $rc = strtoupper(trim((string) ($row['canonical_code'] ?? '?')));
-        $counter = strtoupper(trim((string) ($row['counter_metric'] ?? '')));
-        if ($counter === '') {
-            $p0[] = "$label $rc: counter_metric is empty — every metric needs an "
-                . "anti-gaming counter-metric.";
-        } elseif (!isset($knownCodes[$counter])) {
-            $p0[] = "$label $rc: counter_metric '$counter' is not a known metric code.";
+        $counter = $row['counter_metric'] ?? null;
+        if (!is_array($counter) || trim((string) ($counter['name_vi'] ?? '')) === ''
+            || trim((string) ($counter['intent'] ?? '')) === '') {
+            $p0[] = "$label $rc: counter_metric must be a dedicated definition "
+                . "object with a non-empty name_vi and intent.";
         }
         $t = $row['thresholds'] ?? null;
         if (is_array($t) && isset($t['green_point'])) {
@@ -314,29 +310,29 @@ foreach ($dashboard as $row) {
     }
 }
 
-// ── P0.9 — counter-metric uniqueness within each group ──────────────────────
-// Each KPI must have its own counter-metric; a counter code may not be the
-// counter for two KPIs in the same group (governance / gate / proposed).
+// ── P0.9 — counter-metric definitions are dedicated, not borrowed codes ─────
+// Each KPI now owns a dedicated counter-metric definition object, so the old
+// "counter code reused by two KPIs" failure mode is gone by construction.
+// What can still drift is a counter_metric whose name_vi accidentally equals
+// a registry KPI code (a borrowed code sneaking back in) — flag that.
 foreach ([
     'governance' => $governance,
     'gate'       => $gateMetrics,
     'proposed'   => $proposed,
 ] as $label => $set) {
-    $seenCounter = [];
     foreach ($set as $row) {
         if (!is_array($row)) {
             continue;
         }
-        $counter = strtoupper(trim((string) ($row['counter_metric'] ?? '')));
-        if ($counter === '') {
+        $counter = $row['counter_metric'] ?? null;
+        if (!is_array($counter)) {
             continue;
         }
-        $owner = (string) ($row['canonical_code'] ?? '?');
-        if (isset($seenCounter[$counter])) {
-            $p0[] = "$label: counter-metric '$counter' is shared by "
-                . "{$seenCounter[$counter]} and {$owner} — each KPI needs its own counter.";
-        } else {
-            $seenCounter[$counter] = $owner;
+        $nameVi = trim((string) ($counter['name_vi'] ?? ''));
+        if ($nameVi !== '' && isset($knownCodes[strtoupper($nameVi)])) {
+            $owner = (string) ($row['canonical_code'] ?? '?');
+            $p0[] = "$label $owner: counter_metric.name_vi '$nameVi' is a KPI "
+                . "code — it must be a dedicated description, not a borrowed code.";
         }
     }
 }

@@ -16,29 +16,10 @@
 var _el = null;
 var _lang = 'vi';
 
-/* All KPI groups are uniformly editable — thresholds + counter-metric. */
-var GROUPS = [
-  { key:'company',      tier:'company',      section:'governance', editable:true,
-    vi:'KPI cấp công ty', en:'Company KPIs',
-    descVi:'KPI lãnh đạo — giao hàng, chất lượng, an toàn, biên lợi nhuận.',
-    descEn:'Leadership KPIs — delivery, quality, safety, margin.' },
-  { key:'value_stream', tier:'value_stream', section:'governance', editable:true,
-    vi:'KPI value-stream', en:'Value-stream KPIs',
-    descVi:'KPI hiệu lực RFQ → Plan → sản xuất → Ship → Hóa đơn.',
-    descEn:'Value-stream effectiveness KPIs.' },
-  { key:'department',   tier:'department',   section:'governance', editable:true,
-    vi:'KPI phòng ban', en:'Department KPIs',
-    descVi:'KPI trong phạm vi kiểm soát của từng phòng ban.',
-    descEn:'Department-scoped KPIs.' },
-  { key:'gate',         tier:null,           section:'gate',      editable:true,
-    vi:'Gate metric', en:'Gate metrics',
-    descVi:'Metric đo điều kiện pass cổng G0→G7 — chỉnh ngưỡng & counter-metric.',
-    descEn:'Gate pass-condition metrics G0→G7 — editable thresholds & counter.' },
-  { key:'proposed',     tier:null,           section:'proposed',  editable:true,
-    vi:'Metric đề xuất', en:'Proposed metrics',
-    descVi:'Metric TOC / Lean đề xuất — chỉnh ngưỡng & counter-metric.',
-    descEn:'Proposed TOC / Lean metrics — editable thresholds & counter.' }
-];
+/* Tier display labels — tier is a filter chip in the library-only console. */
+var TIER_VI = {
+  company:'Cấp công ty', value_stream:'Value-stream', department:'Phòng ban'
+};
 
 var _state = {
   loading:false, saving:false, error:'', message:'',
@@ -54,15 +35,18 @@ var _state = {
   retiredBaseline:{ governance:[], gate:[], proposed:[] },
   /* add-KPI form draft — null when the form is closed */
   addForm:null,
-  reason:'', activeGroup:'library',
-  /* KPI Library filters */
-  filters:{ process:'', category:'', group:'', jd:'', status:'', search:'', retired:'' }
+  /* the one library card expanded into its inline editor: "group:CODE" */
+  expandedCode:'',
+  reason:'',
+  /* KPI Library filters (the only view; group + tier are filter chips) */
+  filters:{ process:'', category:'', group:'', tier:'', jd:'', status:'', search:'', retired:'' }
 };
 
 /* A fresh add-KPI form draft. */
 function _newAddForm(){
   return { group:'governance', tier:'department', canonical_code:'', name:'', name_vi:'',
-    process:'unclassified', category:'internal', owner_role:'', counter_metric:'',
+    process:'unclassified', category:'internal', owner_role:'',
+    counter_metric:{ name_vi:'', name:'', intent:'' },
     cadence:'monthly', direction:'higher_is_better', unit:'percent',
     green_point:'', yellow_point:'', target:'', purpose:'' };
 }
@@ -103,8 +87,10 @@ function _retiredChanged(){
   return norm(_state.retired) !== norm(_state.retiredBaseline);
 }
 
-/* Group key → section, for jumping from a library row to its editor. */
-var _GROUP_OF_SECTION = { governance:'company', gate:'gate', proposed:'proposed' };
+/* Group display labels. */
+var GROUP_VI = {
+  governance:'Governance', gate:'Gate', proposed:'Đề xuất'
+};
 
 /* Category display labels. */
 var CATEGORY_VI = {
@@ -185,9 +171,6 @@ function _kpis(){
   return (_state.config && Array.isArray(_state.config.governance_kpis))
     ? _state.config.governance_kpis : [];
 }
-function _kpisByTier(tier){
-  return _kpis().filter(function(k){ return k.tier === tier; });
-}
 function _sectionMetrics(section){
   if(!_state.config) return [];
   if(section === 'gate') return _state.config.gate_control_metrics || [];
@@ -244,6 +227,26 @@ function _setThreshold(section, code, key, value){
   _refreshRag(section, code);
 }
 
+/* Effective value of one key inside the dedicated counter-metric object. */
+function _counterVal(m, section, key){
+  var cm = _val(m, section, 'counter_metric');
+  return (cm && typeof cm === 'object' && cm[key] != null) ? cm[key] : '';
+}
+/* Edit one key of the dedicated counter-metric object on the override draft. */
+function _setCounter(section, code, key, value){
+  var metric = null, list = _sectionMetrics(section);
+  for(var i=0;i<list.length;i++){ if(list[i].canonical_code===code){ metric=list[i]; break; } }
+  if(!metric) return;
+  var sec = _state.overrides[section] || {};
+  var existing = (sec[code] && sec[code].counter_metric && typeof sec[code].counter_metric === 'object')
+    ? sec[code].counter_metric : null;
+  var base = (metric.counter_metric && typeof metric.counter_metric === 'object')
+    ? metric.counter_metric : {};
+  var cur = existing || Object.assign({}, base);
+  cur[key] = value;
+  _setField(section, code, 'counter_metric', cur);
+}
+
 /* Derive (green,yellow,red) display bands from numeric thresholds — mirrors
    the registry-render logic so the editor preview matches ANNEX-122. */
 function _ragBands(t){
@@ -264,12 +267,6 @@ function _reset(){
   _state.reason = '';
   _state.error = ''; _state.message = _t('Đã hoàn tác các thay đổi chưa lưu.', 'Reverted unsaved changes.');
   _render();
-}
-function _go(group){
-  _state.activeGroup = group || 'overview';
-  _render();
-  var host = _el || document.getElementById('admin-content');
-  if(host && host.scrollIntoView) host.scrollIntoView({ block:'start' });
 }
 
 /* ── Status helpers ───────────────────────────────────────────────── */
@@ -294,19 +291,16 @@ function _render(){
     el.innerHTML = '<div class="hm-empty">' + _t('Đang tải Console KPI...', 'Loading KPI console...') + '</div>';
     return;
   }
-  var group = _state.activeGroup;
-  var body = (group === 'overview') ? _renderOverview()
-           : (group === 'library')  ? _renderLibrary()
-           : _renderGroup(group);
+  var body = _renderLibrary();
 
   el.innerHTML =
 '<section class="kpi-console">' + _styleBlock() +
   '<header class="kc-head">' +
     '<div class="kc-head-titles">' +
       '<span class="kc-eyebrow">' + _t('Quản trị điều hành', 'Operations governance') + '</span>' +
-      '<h2>' + _t('Console KPI', 'KPI console') + '</h2>' +
-      '<p>' + _t('Điểm điều khiển duy nhất cho hệ KPI thực chiến — xem và biên tập ngưỡng, owner, nhịp, hành động và counter-metric. Lưu tại đây ghi overlay runtime và tái tạo các vùng §4/§5/§6 trong ANNEX-122.',
-                 'The single control point for the operating KPI system. Saving writes the runtime overlay and regenerates the §4/§5/§6 regions of ANNEX-122.') + '</p>' +
+      '<h2>' + _t('Console KPI — Thư viện', 'KPI Console — Library') + '</h2>' +
+      '<p>' + _t('Thư viện KPI thực chiến: lọc, mở thẻ để biên tập ngưỡng / owner / nhịp / counter-metric. Lưu ghi overlay runtime và tái tạo §4/§5/§6 trong ANNEX-122.',
+                 'The operating-KPI library: filter, open a card to edit thresholds / owner / cadence / counter-metric. Saving writes the runtime overlay and regenerates ANNEX-122 §4/§5/§6.') + '</p>' +
     '</div>' +
     '<div class="kc-actions">' +
       '<button class="kc-btn" type="button" onclick="_kpiReload()">' + _t('Tải lại', 'Reload') + '</button>' +
@@ -326,56 +320,7 @@ function _render(){
   _syncStatus();
 }
 
-function _renderOverview(){
-  var cfg = _state.config || {};
-  var st = cfg.stats || {};
-  var bs = st.by_calculation_status || {};
-  var stats = [
-    { v: st.total || 0, label: _t('KPI governance', 'Governance KPIs') },
-    { v: (bs.runtime_calculated || 0), label: _t('Tính runtime', 'Runtime-calculated') },
-    { v: (bs.staged_data_contract || 0), label: _t('Chờ data contract', 'Staged data contract') },
-    { v: (bs.manual || 0), label: _t('Nhập tay', 'Manual') },
-    { v: (st.threshold_coverage_pct || 0) + '%', label: _t('Đủ ngưỡng', 'Threshold coverage') },
-    { v: (st.counter_coverage_pct || 0) + '%', label: _t('Có counter-metric', 'Counter coverage') }
-  ];
-  var statHtml = stats.map(function(s){
-    return '<div class="kc-stat"><span class="kc-stat-v">' + _esc(s.v) + '</span>' +
-           '<span class="kc-stat-l">' + _esc(s.label) + '</span></div>';
-  }).join('');
-
-  var tiles = GROUPS.map(function(g){
-    var count = (g.section === 'governance') ? _kpisByTier(g.tier).length
-      : (g.section === 'gate' ? (cfg.gate_control_metrics || []).length
-                              : (cfg.proposed_operating_metrics || []).length);
-    return '<button class="kc-tile" type="button" onclick="_kpiGo(\'' + g.key + '\')">' +
-      '<span class="kc-tile-top"><span class="kc-tile-name">' + _esc(_t(g.vi, g.en)) + '</span>' +
-      '<span class="kc-tile-count">' + count + '</span></span>' +
-      '<span class="kc-tile-desc">' + _esc(_t(g.descVi, g.descEn)) + '</span>' +
-      '<span class="kc-tag kc-tag-edit">' + _t('Biên tập được', 'Editable') + '</span>' +
-    '</button>';
-  }).join('');
-
-  var meta = '<p class="kc-meta">' +
-    _esc(_t('Registry', 'Registry')) + ': <b>' + _esc(cfg.registry_version || '—') + '</b> · ' +
-    _esc(_t('schema', 'schema')) + ' v' + _esc(cfg.schema_version || '—') + ' · ' +
-    (cfg.overlay_present
-      ? _esc(_t('Overlay runtime cập nhật bởi', 'Runtime overlay updated by')) + ' ' + _esc(cfg.overlay_updated_by || '—')
-      : _esc(_t('Chưa có overlay runtime', 'No runtime overlay'))) +
-    '</p>';
-
-  var libCount = (cfg.library || []).length;
-  var libBtn = '<button class="kc-lib-cta" type="button" onclick="_kpiGo(\'library\')">' +
-    '<span class="kc-lib-cta-ico">📚</span>' +
-    '<span class="kc-lib-cta-txt"><b>' + _t('Thư viện KPI', 'KPI Library') + '</b>' +
-    '<span>' + _t('Tra cứu & lọc ' + libCount + ' KPI theo quá trình, phân loại, JD, trạng thái',
-                   'Browse & filter ' + libCount + ' KPIs by process, category, JD, status') + '</span></span>' +
-    '<span class="kc-lib-cta-go">→</span></button>';
-
-  return '<div class="kc-stats">' + statHtml + '</div>' + meta + libBtn +
-         '<div class="kc-tiles">' + tiles + '</div>';
-}
-
-/* ── KPI Library — classified, multi-filter browse view ────────────── */
+/* ── KPI Library — the single console view ─────────────────────────── */
 /* Draft (unsaved this session) Console-added KPIs in library row shape.
    Persisted Console-added KPIs already arrive inside config.library. */
 function _draftLibRows(){
@@ -417,6 +362,7 @@ function _filteredLib(){
     if(f.process  && r.process  !== f.process)  return false;
     if(f.category && r.category !== f.category) return false;
     if(f.group    && r.group    !== f.group)    return false;
+    if(f.tier     && r.tier     !== f.tier)     return false;
     if(f.status   && r.calculation_status !== f.status) return false;
     if(f.jd && (r.applicable_jds || []).indexOf(f.jd) < 0) return false;
     if(q){
@@ -441,8 +387,6 @@ function _renderLibrary(){
   var nav = '<div class="kc-nav">' +
     '<span class="kc-nav-title">📚 ' + _t('Thư viện KPI', 'KPI Library') + '</span>' +
     '<span class="kc-nav-spacer"></span>' +
-    '<button class="kc-btn" type="button" onclick="_kpiGo(\'overview\')">' +
-      _t('Tổng quan & nhóm', 'Overview & groups') + ' ›</button>' +
     '<button class="kc-btn primary" type="button" onclick="_kpiAddOpen()">+ ' +
       _t('Thêm KPI', 'Add KPI') + '</button></div>';
 
@@ -459,6 +403,10 @@ function _renderLibrary(){
   });
   var grpOpts = [['', _t('— Mọi nhóm —', '— All groups —')],
     ['governance', _t('Governance', 'Governance')], ['gate', 'Gate'], ['proposed', _t('Đề xuất', 'Proposed')]];
+  var tierOpts = [['', _t('— Mọi cấp —', '— All tiers —')]];
+  Object.keys(facets.tier || {}).forEach(function(k){
+    if(TIER_VI[k]) tierOpts.push([k, TIER_VI[k] + ' (' + facets.tier[k] + ')']);
+  });
   var jdOpts = [['', _t('— Mọi JD / vai trò —', '— All JDs / roles —')]];
   Object.keys(facets.applicable_jds || {}).forEach(function(k){
     jdOpts.push([k, k + ' (' + facets.applicable_jds[k] + ')']);
@@ -480,6 +428,7 @@ function _renderLibrary(){
       '<select class="kc-input" onchange="_kpiSetFilter(\'process\',this.value)">' + _selOptions(procOpts, f.process) + '</select>' +
       '<select class="kc-input" onchange="_kpiSetFilter(\'category\',this.value)">' + _selOptions(catOpts, f.category) + '</select>' +
       '<select class="kc-input" onchange="_kpiSetFilter(\'group\',this.value)">' + _selOptions(grpOpts, f.group) + '</select>' +
+      '<select class="kc-input" onchange="_kpiSetFilter(\'tier\',this.value)">' + _selOptions(tierOpts, f.tier) + '</select>' +
       '<select class="kc-input" onchange="_kpiSetFilter(\'jd\',this.value)">' + _selOptions(jdOpts, f.jd) + '</select>' +
       '<select class="kc-input" onchange="_kpiSetFilter(\'status\',this.value)">' + _selOptions(stOpts, f.status) + '</select>' +
       '<select class="kc-input" onchange="_kpiSetFilter(\'retired\',this.value)">' + _selOptions(retOpts, f.retired) + '</select>' +
@@ -566,9 +515,13 @@ function _renderAddForm(){
     row(_t('Mục tiêu (target)', 'Target'),
       '<input class="kc-input" type="number" step="any" value="' + _esc(a.target) +
       '" oninput="_kpiAddField(\'target\',this.value)">') +
-    row(_t('Counter-metric', 'Counter-metric'),
-      '<select class="kc-input" onchange="_kpiAddField(\'counter_metric\',this.value)">' + _counterOptions(a.counter_metric) + '</select>') +
+    row(_t('Counter-metric — tên (VI)', 'Counter-metric name (VI)'),
+      '<input class="kc-input" type="text" value="' + _esc(a.counter_metric.name_vi) +
+      '" placeholder="' + _t('VD: Tỷ lệ lô giao gấp / giao thiếu', 'e.g. Expedited shipment rate') +
+      '" oninput="_kpiAddCounter(\'name_vi\',this.value)">') +
     '</div>' +
+    _field(_t('Counter-metric — ý nghĩa chống gaming', 'Counter-metric — anti-gaming intent'),
+      '<textarea class="kc-input kc-ta" oninput="_kpiAddCounter(\'intent\',this.value)">' + _esc(a.counter_metric.intent) + '</textarea>') +
     _field(_t('Mục đích / cách dùng', 'Purpose / usage'),
       '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'purpose\',this.value)">' + _esc(a.purpose) + '</textarea>');
 
@@ -588,19 +541,24 @@ function _renderAddForm(){
   return html;
 }
 
+/* Display name of a (dedicated-object) counter-metric. */
+function _counterDisplay(cm){
+  if(cm && typeof cm === 'object') return cm.name_vi || cm.name || '';
+  return cm ? String(cm) : '';
+}
+
 function _renderLibCard(r){
   var c = function(s){ return _esc(s == null ? '' : s); };
   var b = _ragBands(r.thresholds || {});
   var procLabel = r.process;
   var facets = (_state.config || {}).facets || {};
   (facets.process || []).forEach(function(p){ if(p.key === r.process) procLabel = p.label; });
-  var groupKey = _GROUP_OF_SECTION[r.group] || 'overview';
   var retired = _isRetired(r);
   var code = String(r.canonical_code);
-  var openAttr = r._draft
-    ? ''
-    : ' onclick="_kpiGo(\'' + groupKey + '\')" role="button" tabindex="0" title="' +
-      _t('Mở trình biên tập', 'Open editor') + '"';
+  var key = r.group + ':' + code.toUpperCase();
+  var expanded = !r._draft && _state.expandedCode === key;
+  var counterName = _counterDisplay(r.counter_metric) || '—';
+  var tierLabel = TIER_VI[r.tier] || r.tier;
 
   /* footer action — retire / restore / drop-draft */
   var action;
@@ -618,19 +576,24 @@ function _renderLibCard(r){
       _t('Ngừng dùng', 'Retire') + '</button>';
   }
 
-  return '<div class="kc-lib-card' + (retired ? ' kc-lib-card--retired' : '') +
-    (r._draft ? ' kc-lib-card--draft' : '') + '"' + openAttr + '>' +
+  var mainOpen = r._draft ? '' :
+    ' onclick="_kpiToggleCard(\'' + c(r.group) + '\',\'' + c(code) + '\')" role="button" tabindex="0" title="' +
+    _t('Mở / đóng trình biên tập', 'Open / close the editor') + '"';
+
+  var head = '<div class="kc-lib-card-main"' + mainOpen + '>' +
     '<div class="kc-lib-card-top">' +
       '<span class="kc-code">' + c(code) + '</span>' +
-      (r._draft ? '<span class="kc-badge kc-badge-manual">' + _t('Bản nháp', 'Draft') + '</span>'
-        : retired ? '<span class="kc-badge kc-badge-bad">' + _t('Ngừng dùng', 'Retired') + '</span>'
-        : _calcBadge(r.calculation_status)) +
+      (r._draft
+        ? '<span class="kc-badge kc-badge-manual">' + _t('Bản nháp', 'Draft') + '</span>'
+        : '<span class="kc-lib-status">' + _calcBadge(retired ? 'retired' : r.calculation_status) +
+          '<span class="kc-caret">' + (expanded ? '▾' : '▸') + '</span></span>') +
     '</div>' +
     '<div class="kc-lib-card-name">' + c(r.name_vi || r.name) + '</div>' +
     '<div class="kc-lib-tags">' +
       '<span class="kc-chip kc-chip-proc">' + c(procLabel) + '</span>' +
       '<span class="kc-chip kc-chip-cat kc-cat-' + c(r.category) + '">' + c(CATEGORY_VI[r.category] || r.category) + '</span>' +
-      '<span class="kc-chip">' + c(r.group) + '</span>' +
+      '<span class="kc-chip">' + c(GROUP_VI[r.group] || r.group) + '</span>' +
+      (tierLabel ? '<span class="kc-chip">' + c(tierLabel) + '</span>' : '') +
       (r.gate ? '<span class="kc-chip">' + c(r.gate) + '</span>' : '') +
     '</div>' +
     (b ? '<div class="kc-rag"><span class="kc-badge kc-badge-ok">' + _esc(b.green) + '</span>' +
@@ -638,27 +601,29 @@ function _renderLibCard(r){
          '<span class="kc-badge kc-badge-bad">' + _esc(b.red) + '</span></div>' : '') +
     '<div class="kc-lib-foot">' +
       '<span class="kc-mini">JD: ' + c((r.applicable_jds || []).join(', ') || '—') + '</span>' +
-      '<span class="kc-mini">↔ ' + c(r.counter_metric || '—') + '</span>' +
-    '</div>' +
-    '<div class="kc-lib-act">' + action + '</div>' +
+      '<span class="kc-mini" title="' + _t('Counter-metric', 'Counter-metric') + '">↔ ' + c(counterName) + '</span>' +
+    '</div></div>';
+
+  return '<div class="kc-lib-card' + (retired ? ' kc-lib-card--retired' : '') +
+    (r._draft ? ' kc-lib-card--draft' : '') + (expanded ? ' kc-lib-card--expanded' : '') + '">' +
+    head + '<div class="kc-lib-act">' + action + '</div>' +
+    (expanded ? '<div class="kc-lib-editor">' + _inlineEditor(r) + '</div>' : '') +
   '</div>';
 }
 
-function _renderGroup(key){
-  var g = null;
-  for(var i=0;i<GROUPS.length;i++){ if(GROUPS[i].key===key){ g=GROUPS[i]; break; } }
-  if(!g) return _renderOverview();
-
-  var nav = '<div class="kc-nav"><button class="kc-btn" type="button" onclick="_kpiGo(\'overview\')">‹ ' +
-    _t('Tổng quan', 'Overview') + '</button><span class="kc-nav-title">' + _esc(_t(g.vi, g.en)) + '</span></div>';
-
-  var list = (g.section === 'governance') ? _kpisByTier(g.tier) : _sectionMetrics(g.section);
-  var rows = list.map(function(m){ return _renderEditCard(m, g.section); }).join('');
-  if(!rows) rows = '<div class="hm-empty">' + _t('Không có KPI.', 'No KPIs.') + '</div>';
-  return nav + '<div class="kc-cards">' + rows + '</div>';
+/* Inline editor for an expanded library card — the only place a KPI is
+   edited now that the group views are gone. */
+function _inlineEditor(r){
+  var section = r.group;
+  var list = _sectionMetrics(section), metric = null;
+  for(var i=0;i<list.length;i++){
+    if(list[i].canonical_code === r.canonical_code){ metric = list[i]; break; }
+  }
+  if(!metric) return '<div class="hm-empty">' + _t('Không mở được trình biên tập.', 'Cannot open the editor.') + '</div>';
+  return _renderEditCard(metric, section, true);
 }
 
-/* Role / counter-metric option lists. */
+/* Role / cadence option lists. */
 function _roleOptions(selected){
   var roles = (_state.config && _state.config.role_codes) || [];
   return ['<option value=""' + (!selected ? ' selected' : '') + '>—</option>'].concat(
@@ -673,29 +638,30 @@ function _cadenceOptions(selected){
       return '<option value="' + _esc(c) + '"' + (c === selected ? ' selected' : '') + '>' + _esc(c) + '</option>';
     })).join('');
 }
-function _counterOptions(selected){
-  // Span every governed metric code (governance + gate + proposed) so a
-  // counter-metric can be picked across groups.
-  var codes = (_state.config && _state.config.all_metric_codes) || [];
-  return ['<option value=""' + (!selected ? ' selected' : '') + '>— ' + _t('không có', 'none') + ' —</option>'].concat(
-    codes.map(function(c){
-      return '<option value="' + _esc(c) + '"' + (c === selected ? ' selected' : '') + '>' + _esc(c) + '</option>';
-    })).join('');
-}
-
+/* Calculation status as a compact symbol — runtime ⚙ / manual ✎ / staged ○.
+   Full wording is kept in the tooltip so the card stays narrow. */
 function _calcBadge(status){
   if(status === 'runtime_calculated')
-    return '<span class="kc-badge kc-badge-ok">' + _t('Tính runtime', 'Runtime') + '</span>';
+    return '<span class="kc-stat-sym kc-sym-ok" title="' +
+      _t('Tính runtime — số tính tự động từ hệ thống', 'Runtime — computed automatically') +
+      '">⚙</span>';
   if(status === 'manual')
-    return '<span class="kc-badge kc-badge-manual">' + _t('Nhập tay', 'Manual') + '</span>';
-  return '<span class="kc-badge kc-badge-staged">' + _t('Chưa có data contract', 'No data contract') + '</span>';
+    return '<span class="kc-stat-sym kc-sym-manual" title="' +
+      _t('Nhập tay — nạp số qua endpoint nhập liệu', 'Manual — fed via the data-input endpoint') +
+      '">✎</span>';
+  if(status === 'retired')
+    return '<span class="kc-stat-sym kc-sym-bad" title="' +
+      _t('Đã ngừng dùng', 'Retired') + '">⊘</span>';
+  return '<span class="kc-stat-sym kc-sym-staged" title="' +
+    _t('Chờ hợp đồng dữ liệu — chưa có nguồn số', 'Awaiting data contract — no source yet') +
+    '">○</span>';
 }
 
 /* Unified edit card for every group. Threshold + counter-metric are
    editable for all metrics; governance KPIs additionally expose owner,
    data steward, cadence, decision and action; gate metrics expose owner
    and cadence. Structural fields (formula, gate, linked_cdr) are read-only. */
-function _renderEditCard(m, section){
+function _renderEditCard(m, section, inline){
   var code = m.canonical_code;
   var c = function(s){ return _esc(s == null ? '' : s); };
   var sec = _state.overrides[section] || {};
@@ -703,12 +669,15 @@ function _renderEditCard(m, section){
   var hasThresholds = !!(_val(m, section, 'thresholds') || m.thresholds);
   var status = m.calculation_status || (m.status === 'retained_from_annex122' ? 'staged_data_contract' : m.status);
 
-  var html = '<article class="kc-card' + (dirty ? ' kc-card--dirty' : '') + '" data-kpi-code="' + c(code) + '">' +
-    '<div class="kc-card-head">' +
+  var html = '<article class="kc-card' + (dirty ? ' kc-card--dirty' : '') +
+    (inline ? ' kc-card--inline' : '') + '" data-kpi-code="' + c(code) + '">';
+  if(!inline){
+    html += '<div class="kc-card-head">' +
       '<div><span class="kc-code">' + c(code) + '</span> ' +
         '<span class="kc-card-name">' + c(m.name_vi || m.name) + '</span></div>' +
       _calcBadge(status) +
     '</div>';
+  }
 
   if(section === 'gate'){
     html += '<div class="kc-mini">' + _t('Cổng', 'Gate') + ' ' + c(m.gate || '—') +
@@ -749,10 +718,18 @@ function _renderEditCard(m, section){
       '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'data_stewardship_role\',this.value)">' +
       _roleOptions(_val(m,section,'data_stewardship_role')) + '</select>');
   }
-  html += _field(_t('Counter-metric', 'Counter-metric'),
-    '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'counter_metric\',this.value)">' +
-    _counterOptions(_val(m,section,'counter_metric')) + '</select>');
   html += '</div>';
+
+  // Dedicated counter-metric — its own definition, not a borrowed KPI code.
+  html += '<div class="kc-counter-edit"><div class="kc-counter-head">↔ ' +
+    _t('Counter-metric chuyên biệt (chống gaming)', 'Dedicated counter-metric (anti-gaming)') + '</div>' +
+    _field(_t('Tên counter-metric (tiếng Việt)', 'Counter-metric name (VI)'),
+      '<input class="kc-input" type="text" value="' + c(_counterVal(m,section,'name_vi')) +
+      '" oninput="_kpiSetCounter(\'' + section + '\',\'' + c(code) + '\',\'name_vi\',this.value)">') +
+    _field(_t('Ý nghĩa — phát hiện gaming khi nào', 'Intent — what gaming it detects'),
+      '<textarea class="kc-input kc-ta" oninput="_kpiSetCounter(\'' + section + '\',\'' + c(code) + '\',\'intent\',this.value)">' +
+      c(_counterVal(m,section,'intent')) + '</textarea>') +
+    '</div>';
 
   if(hasThresholds){
     html += _field(_t('Căn cứ ngưỡng', 'Threshold basis'),
@@ -937,6 +914,25 @@ function _styleBlock(){
     'background:var(--surface,#fff);display:flex;flex-direction:column;gap:10px}' +
   '.kc-addform h3{margin:0;font-size:16px;color:var(--text-1,#1a2233)}' +
   '.kc-addform-actions{display:flex;gap:8px;justify-content:flex-end}' +
+  /* ── library-only console: status symbols, expandable cards ── */
+  '.kc-stat-sym{font-size:14px;line-height:1;cursor:help;border-radius:999px;' +
+    'width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center}' +
+  '.kc-sym-ok{background:var(--success-soft,#ebfbee);color:var(--success,#2b8a3e)}' +
+  '.kc-sym-manual{background:var(--accent-soft,#eef2ff);color:var(--accent,#3730a3)}' +
+  '.kc-sym-staged{background:var(--warning-soft,#fff9db);color:var(--warning,#e67700)}' +
+  '.kc-sym-bad{background:var(--danger-soft,#fff5f5);color:var(--danger,#c92a2a)}' +
+  '.kc-lib-status{display:inline-flex;align-items:center;gap:4px}' +
+  '.kc-caret{font-size:11px;color:var(--text-3,#7a869a)}' +
+  '.kc-lib-card-main{display:flex;flex-direction:column;gap:7px}' +
+  '.kc-lib-card-main[role=button]{cursor:pointer}' +
+  '.kc-lib-card--expanded{grid-column:1/-1;border-color:var(--accent,#2563eb);' +
+    'box-shadow:0 1px 8px rgba(37,99,235,.14)}' +
+  '.kc-lib-editor{margin-top:8px;border-top:1px solid var(--border,#d7deea);padding-top:8px}' +
+  '.kc-card--inline{border:0;padding:0;gap:8px}' +
+  '.kc-counter-edit{border:1px solid var(--border,#d7deea);border-radius:8px;' +
+    'padding:8px 10px;display:flex;flex-direction:column;gap:6px;background:var(--surface-2,#f8fafc)}' +
+  '.kc-counter-head{font-size:11px;font-weight:700;color:var(--text-2,#55617a);' +
+    'text-transform:uppercase;letter-spacing:.3px}' +
   '</style>';
 }
 
@@ -976,11 +972,15 @@ function _addSubmit(){
   var thr = { direction:a.direction, unit:a.unit, green_point:gp, yellow_point:yp };
   var tgt = parseFloat(a.target);
   if(!isNaN(tgt)) thr.target = tgt;
+  var cm = a.counter_metric || {};
+  var counter = (cm.name_vi || cm.intent)
+    ? { name_vi:(cm.name_vi || ''), name:(cm.name || cm.name_vi || ''), intent:(cm.intent || '') }
+    : null;
   var row = {
     canonical_code:code, name:(a.name || a.name_vi), name_vi:(a.name_vi || a.name),
     tier:(a.group === 'governance') ? (a.tier || 'department') : '',
     process:a.process || 'unclassified', category:a.category || 'internal',
-    owner_role:a.owner_role || '', counter_metric:a.counter_metric || '',
+    owner_role:a.owner_role || '', counter_metric:counter,
     cadence:a.cadence || 'monthly', purpose:a.purpose || '', thresholds:thr
   };
   if(!_state.addedDraft[a.group]) _state.addedDraft[a.group] = [];
@@ -996,18 +996,29 @@ function _addSubmit(){
 window._kpiReload    = function(){ _state.config = null; _load(); };
 window._kpiReset     = function(){ _reset(); };
 window._kpiSave      = function(){ _save(); };
-window._kpiGo        = function(g){ _state.addForm = null; _go(g); };
 window._kpiSetReason = function(v){ _setReason(v); };
 window._kpiSetField  = function(section, code, field, value){ _setField(section, code, field, value); };
 window._kpiSetThreshold = function(section, code, key, value){ _setThreshold(section, code, key, value); };
+window._kpiSetCounter = function(section, code, key, value){ _setCounter(section, code, key, value); };
 window._kpiSetFilter = function(key, value){ _setFilter(key, value); };
 window._kpiClearFilters = function(){
-  _state.filters = { process:'', category:'', group:'', jd:'', status:'', search:'', retired:'' };
+  _state.filters = { process:'', category:'', group:'', tier:'', jd:'', status:'', search:'', retired:'' };
+  _render();
+};
+/* Toggle the inline editor for one library card (only one open at a time). */
+window._kpiToggleCard = function(group, code){
+  var key = group + ':' + String(code).toUpperCase();
+  _state.expandedCode = (_state.expandedCode === key) ? '' : key;
   _render();
 };
 window._kpiAddOpen   = function(){ _state.addForm = _newAddForm(); _state.error = ''; _state.message = ''; _render(); };
 window._kpiAddClose  = function(){ _state.addForm = null; _render(); };
 window._kpiAddField  = function(key, value){ _afSet(key, value); };
+window._kpiAddCounter = function(key, value){
+  if(!_state.addForm) return;
+  if(!_state.addForm.counter_metric) _state.addForm.counter_metric = {};
+  _state.addForm.counter_metric[key] = value;
+};
 window._kpiAddSubmit = function(){ _addSubmit(); };
 window._kpiRetire    = function(group, code){
   code = String(code).toUpperCase();
