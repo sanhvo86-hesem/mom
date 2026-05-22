@@ -17,7 +17,7 @@ use RuntimeException;
  *   1. accepts ONLY the A/R/C/I role letters from the admin payload — the
  *      structural cells are kept server-side, blocking markup injection;
  *   2. validates the RACI invariants (exactly one A, at least one R per row);
- *   3. regenerates the RACI-GATE-MATRIX region inside ANNEX-121 §5, AND every
+ *   3. regenerates the RACI-GATE-MATRIX region inside RACI-MASTER-MATRIX §5, AND every
  *      RACI-MATRIX region embedded in the managed SOP / JD documents;
  *   4. bumps the DCC minor revision of every document it actually changed.
  *
@@ -31,8 +31,7 @@ final class RaciMatrixService
     private const CONFIG_RELATIVE_PATH    = 'config/raci_matrix.json';
     private const BOOTSTRAP_RELATIVE_PATH = 'config/raci_matrix.bootstrap.json';
     private const ANNEX121_RELATIVE_PATH  =
-        'mom/docs/operations/references/01-ANNEX-100/'
-        . '12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html';
+        'mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html';
     private const GATE_REGION = 'RACI-GATE-MATRIX';
 
     /** @var array<int, string> */
@@ -383,7 +382,7 @@ final class RaciMatrixService
         if ($html === false) {
             throw new RuntimeException('raci_matrix_annex121_not_readable');
         }
-        // Regenerate all four ANNEX-121 RACI regions in one read-modify-write.
+        // Regenerate all four RACI-MASTER-MATRIX RACI regions in one read-modify-write.
         $updated = $html;
         $updated = $this->replaceRegionIfPresent($updated, self::GATE_REGION,
             $this->buildGateBlock($config['rows']));
@@ -395,14 +394,14 @@ final class RaciMatrixService
             $this->buildSimpleBlock($config['support'] ?? []));
 
         if ($updated === $html) {
-            return ['doc_code' => 'ANNEX-121', 'path' => self::ANNEX121_RELATIVE_PATH,
+            return ['doc_code' => 'RACI-MASTER-MATRIX', 'path' => self::ANNEX121_RELATIVE_PATH,
                     'previous_revision' => '', 'new_revision' => '', 'changed' => 'no'];
         }
         $rev = $this->bumpRevision($updated);
         if (@file_put_contents($path, $rev['html'], LOCK_EX) === false) {
             throw new RuntimeException('raci_matrix_annex121_not_writable');
         }
-        return ['doc_code' => 'ANNEX-121', 'path' => self::ANNEX121_RELATIVE_PATH,
+        return ['doc_code' => 'RACI-MASTER-MATRIX', 'path' => self::ANNEX121_RELATIVE_PATH,
                 'previous_revision' => $rev['previous_revision'],
                 'new_revision' => $rev['new_revision'], 'changed' => 'yes'];
     }
@@ -497,7 +496,7 @@ final class RaciMatrixService
     /* ── Region builders ────────────────────────────────────────────────── */
 
     /**
-     * ANNEX-121 §5 gate matrix — full 15-column tbody rows.
+     * RACI-MASTER-MATRIX §5 gate matrix — full 15-column tbody rows.
      *
      * @param array<int, array<string, mixed>> $rows
      */
@@ -725,22 +724,18 @@ final class RaciMatrixService
         $ref = 'docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/';
         $hub = 'docs/system/organization/04-RACI-Authority/';
         return [
-            ['code' => 'ANNEX-121', 'title' => 'Ma trận RACI tổng thể (mục 5 G0→G7)',
-             'url' => $ref . 'annex-121-raci-master-matrix.html', 'relation' => 'auto'],
+            ['code' => 'RACI-MASTER-MATRIX', 'title' => 'Ma trận RACI tổng thể (mục 5 G0→G7)',
+             'url' => $hub . 'raci-master-matrix.html', 'relation' => 'auto'],
             ['code' => 'SOP §4', 'title' => '10 SOP — bảng RACI nhúng sinh tự động',
              'url' => '', 'relation' => 'auto'],
             ['code' => 'JD §6', 'title' => '24 JD — bảng RACI nhúng sinh tự động',
              'url' => '', 'relation' => 'auto'],
             ['code' => 'SIDEBAR', 'title' => 'Sidebar “Thẩm quyền & RACI” trên mọi SOP/JD',
              'url' => '', 'relation' => 'live'],
-            ['code' => 'ANNEX-120', 'title' => 'Ma trận thẩm quyền & ngưỡng L1/L2/L3',
-             'url' => $ref . 'annex-120-authority-matrix.html', 'relation' => 'sibling'],
             ['code' => 'ANNEX-123', 'title' => 'Ma trận phó / dự phòng cho vai trò giữ chữ A',
              'url' => $ref . 'annex-123-deputy-backup-matrix.html', 'relation' => 'sibling'],
-            ['code' => 'RACI-MASTER', 'title' => 'Tóm tắt RACI theo cổng (04-RACI-Authority)',
-             'url' => $hub . 'raci-master-matrix.html', 'relation' => 'summary'],
-            ['code' => 'AUTHORITY-MATRIX', 'title' => 'Trang tra cứu thẩm quyền nhanh',
-             'url' => $hub . 'authority-matrix.html', 'relation' => 'summary'],
+            ['code' => 'AUTHORITY-MATRIX', 'title' => 'Ma trận thẩm quyền — sổ đăng ký quyết định & ngưỡng L1/L2/L3',
+             'url' => $hub . 'authority-matrix.html', 'relation' => 'sibling'],
             ['code' => 'ROLE-BUNDLES', 'title' => 'Từ điển mã vai trò & bản đồ gộp cột RACI',
              'url' => $hub . 'role-and-department-bundles.html', 'relation' => 'summary'],
             ['code' => 'CI GUARD', 'title' => 'check_raci_integrity.php — kiểm bất biến mỗi lần deploy',

@@ -36,7 +36,7 @@ These tokens are codes, acronyms, role identifiers, or system names. They MUST a
 
 **Role codes (Vietnamese internal codes — keep literal)**: CEO, PD, QA, QC, QCL, QAM, ENGM, SCM, FIN, HR, EHS, ITA, ESA, PE, CAM, WKM, PPL, EST, CS, LOG, FUNC_OWNERS, FUNC_HEADS, QUALITY_CORE, D-HR, D-EHS, D-SCS, D-ENG, D-PROD, D-QUAL, D-SCM, D-FIN, D-IT, D-ERP.
 
-**Document codes**: any token matching `[A-Z]{2,}-[A-Z0-9-]+-\d+`, e.g. `QMS-MAN-001`, `SOP-102`, `ANNEX-120`, `ANNEX-121`, `WI-IQC-007`, `JD-QA-MANAGER`. Keep verbatim.
+**Document codes**: any token matching `[A-Z]{2,}-[A-Z0-9-]+-\d+`, e.g. `QMS-MAN-001`, `SOP-102`, `ANNEX-120`, `RACI-MASTER-MATRIX`, `WI-IQC-007`, `JD-QA-MANAGER`. Keep verbatim.
 
 **Identifier patterns**: any token of the shape `[A-Z]{2,}_[A-Z_]+` (e.g. `FUNC_OWNERS`), part numbers, employee IDs, lot numbers, drawing revisions (`Rev A`, `V1.0`).
 

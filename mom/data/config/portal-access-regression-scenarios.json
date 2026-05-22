@@ -11,7 +11,7 @@
       "id": "ROLE-001",
       "title": "CEO sees authority matrix",
       "role": "ceo",
-      "doc_code": "ANNEX-120",
+      "doc_code": "AUTHORITY-MATRIX",
       "expected": true,
       "risk_group": "authority"
     },
@@ -19,7 +19,7 @@
       "id": "ROLE-002",
       "title": "CNC operator cannot see authority matrix",
       "role": "cnc_operator",
-      "doc_code": "ANNEX-120",
+      "doc_code": "AUTHORITY-MATRIX",
       "expected": false,
       "risk_group": "authority"
     },

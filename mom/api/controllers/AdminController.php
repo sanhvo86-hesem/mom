@@ -1137,7 +1137,7 @@ class AdminController extends BaseController
 
     /**
      * POST admin_raci_matrix_save — Save the RACI matrix and regenerate the
-     * §5 gate-matrix region inside the controlled ANNEX-121 document.
+     * §5 gate-matrix region inside the controlled RACI-MASTER-MATRIX document.
      *
      * @return never
      */

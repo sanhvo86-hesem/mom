@@ -3,13 +3,13 @@
    Admin: RACI Console — single control point for every RACI dataset in
    the controlled QMS document set. Dashboard landing + six datasets:
      • Ma trận cổng §5   — gate matrix G0→G7 (A/R/C/I editor)
-     • Chuỗi giá trị §4  — value-stream RACI (ANNEX-121)
-     • Tài liệu §6       — document-level RACI (ANNEX-121)
-     • Bảng phụ trợ      — support-function supplement (ANNEX-121)
+     • Chuỗi giá trị §4  — value-stream RACI (RACI-MASTER-MATRIX)
+     • Tài liệu §6       — document-level RACI (RACI-MASTER-MATRIX)
+     • Bảng phụ trợ      — support-function supplement (RACI-MASTER-MATRIX)
      • Giao diện JD      — per-JD §6 interface RACI table (39 JD)
      • Vai trò SOP §4    — per-SOP §4 role / authority RACI table (37 SOP)
    Saving validates the gate-matrix invariants and regenerates every
-   marked region across ANNEX-121 and the embedded SOP/JD documents.
+   marked region across RACI-MASTER-MATRIX and the embedded SOP/JD documents.
    =================================================================== */
 
 (function(){
@@ -20,7 +20,7 @@ var _lang = 'vi';
 var ROLES = ['CS','EST','ENG','PPL','WKM','PD','QA','SCM','CEO','EHS','HR','IT'];
 var LETTERS = ['', 'A', 'R', 'C', 'I'];
 
-/* Cell-table datasets (ANNEX-121 §4 / §6 / support supplement). */
+/* Cell-table datasets (RACI-MASTER-MATRIX §4 / §6 / support supplement). */
 var AUX = {
   value_stream: {
     headVi: ['Hoạt động ngang', 'A', 'R', 'C/I', 'Bằng chứng'],
@@ -56,22 +56,22 @@ var DATASETS = [
     vi:'Ma trận cổng', en:'Gate matrix',
     descVi:'Phân công A/R/C/I cho 46 hoạt động kiểm soát theo cổng G0→G7.',
     descEn:'A/R/C/I assignment for 46 gated activities, G0→G7.',
-    unitVi:'hoạt động', unitEn:'activities', sync:'ANNEX-121 §5' },
+    unitVi:'hoạt động', unitEn:'activities', sync:'RACI-MASTER-MATRIX §5' },
   { key:'value_stream', code:'§4', kind:'aux',
     vi:'Chuỗi giá trị', en:'Value stream',
     descVi:'RACI các hoạt động chạy ngang chuỗi giá trị, không gắn cổng.',
     descEn:'RACI for horizontal value-stream activities.',
-    unitVi:'dòng', unitEn:'rows', sync:'ANNEX-121 §4' },
+    unitVi:'dòng', unitEn:'rows', sync:'RACI-MASTER-MATRIX §4' },
   { key:'document_level', code:'§6', kind:'aux',
     vi:'Tài liệu', en:'Document level',
     descVi:'Quyền sở hữu, duyệt và sử dụng từng tài liệu thẩm quyền.',
     descEn:'Ownership, approval and use of each authority document.',
-    unitVi:'dòng', unitEn:'rows', sync:'ANNEX-121 §6' },
+    unitVi:'dòng', unitEn:'rows', sync:'RACI-MASTER-MATRIX §6' },
   { key:'support', code:'SUP', kind:'aux',
     vi:'Bảng phụ trợ', en:'Support supplement',
     descVi:'Vai trò hỗ trợ (Tài chính, Bảo trì…) tham vấn tại các cổng.',
     descEn:'Support roles consulted at the control gates.',
-    unitVi:'dòng', unitEn:'rows', sync:'ANNEX-121 phụ lục' },
+    unitVi:'dòng', unitEn:'rows', sync:'RACI-MASTER-MATRIX phụ lục' },
   { key:'jd', code:'JD', kind:'docmap',
     vi:'Giao diện JD', en:'JD interface',
     descVi:'Bảng “Giao diện liên phòng ban — RACI / Bàn giao” trong từng JD.',
@@ -218,8 +218,8 @@ function _save(){
       _state.config = data.config || {};
       _state.draft = _clone(_state.config);
       _state.reason = '';
-      _state.message = _t('Đã lưu và tái tạo các vùng RACI trong ANNEX-121, JD và SOP liên quan.',
-                          'Saved and regenerated the RACI regions across ANNEX-121, the JDs and the SOPs.');
+      _state.message = _t('Đã lưu và tái tạo các vùng RACI trong RACI-MASTER-MATRIX, JD và SOP liên quan.',
+                          'Saved and regenerated the RACI regions across RACI-MASTER-MATRIX, the JDs and the SOPs.');
     })
     .catch(function(err){
       _state.error = _t('Không lưu được. ', 'Save failed. ') + (err && err.message ? err.message : '');
@@ -365,7 +365,7 @@ function _render(){
       <div class="rc-head-titles">
         <span class="rc-eyebrow">${_t('Quản trị điều hành', 'Operations governance')}</span>
         <h2>${_t('Console RACI', 'RACI console')}</h2>
-        <p>${_t('Điểm điều khiển duy nhất cho toàn bộ RACI trong hệ tài liệu kiểm soát — ma trận cổng, RACI chuỗi giá trị, RACI tài liệu, bảng phụ trợ, giao diện JD và vai trò SOP. Mọi thay đổi lưu tại đây sẽ tái tạo các vùng tương ứng trong ANNEX-121 và các tài liệu JD / SOP nhúng.', 'The single control point for every RACI dataset in the controlled document set. Saving here regenerates the matching regions inside ANNEX-121 and the embedded JD / SOP documents.')}</p>
+        <p>${_t('Điểm điều khiển duy nhất cho toàn bộ RACI trong hệ tài liệu kiểm soát — ma trận cổng, RACI chuỗi giá trị, RACI tài liệu, bảng phụ trợ, giao diện JD và vai trò SOP. Mọi thay đổi lưu tại đây sẽ tái tạo các vùng tương ứng trong RACI-MASTER-MATRIX và các tài liệu JD / SOP nhúng.', 'The single control point for every RACI dataset in the controlled document set. Saving here regenerates the matching regions inside RACI-MASTER-MATRIX and the embedded JD / SOP documents.')}</p>
       </div>
     </div>
     <div class="rc-actions">
@@ -629,10 +629,10 @@ function _docHref(url){
 function _relationMeta(rel){
   var m = {
     auto:    {vi:'Tự cập nhật khi lưu',                  en:'Auto-updated on save',            cls:'ok'},
-    live:    {vi:'Tự phản ánh — đọc ANNEX-121 trực tiếp', en:'Live — reads ANNEX-121',          cls:'ok'},
+    live:    {vi:'Tự phản ánh — đọc RACI-MASTER-MATRIX trực tiếp', en:'Live — reads RACI-MASTER-MATRIX',          cls:'ok'},
     summary: {vi:'Tóm tắt — đồng bộ thủ công',           en:'Summary — manual sync',           cls:'warn'},
     sibling: {vi:'Tài liệu thẩm quyền anh em',           en:'Sibling authority document',      cls:'neutral'},
-    derived: {vi:'Bản phái sinh — ANNEX-121 quyết định', en:'Derived view — ANNEX-121 governs', cls:'neutral'},
+    derived: {vi:'Bản phái sinh — RACI-MASTER-MATRIX quyết định', en:'Derived view — RACI-MASTER-MATRIX governs', cls:'neutral'},
     guard:   {vi:'Cơ chế kiểm tra tự động',              en:'Automated guard',                 cls:'neutral'}
   };
   return m[rel] || {vi:rel, en:rel, cls:'neutral'};
@@ -660,7 +660,7 @@ function _renderLinkedDocs(cfg){
   return `
   <details class="rc-links" open>
     <summary>${_t('Tài liệu liên quan trong hệ sinh thái RACI', 'Linked documents in the RACI ecosystem')} (${docs.length})</summary>
-    <div class="rc-links-note">${_t('Lưu ở Console này tái tạo các vùng RACI của ANNEX-121 và các tài liệu JD / SOP nhúng; sidebar “Thẩm quyền &amp; RACI” trên mọi tài liệu đọc ANNEX-121 nên tự phản ánh thay đổi.', 'Saving here regenerates the ANNEX-121 RACI regions and the embedded JD / SOP documents; the “Authority &amp; RACI” sidebar reads ANNEX-121 so it reflects changes live.')}</div>
+    <div class="rc-links-note">${_t('Lưu ở Console này tái tạo các vùng RACI của RACI-MASTER-MATRIX và các tài liệu JD / SOP nhúng; sidebar “Thẩm quyền &amp; RACI” trên mọi tài liệu đọc RACI-MASTER-MATRIX nên tự phản ánh thay đổi.', 'Saving here regenerates the RACI-MASTER-MATRIX RACI regions and the embedded JD / SOP documents; the “Authority &amp; RACI” sidebar reads RACI-MASTER-MATRIX so it reflects changes live.')}</div>
     <div class="rc-links-list">${rows}</div>
   </details>`;
 }

@@ -2,11 +2,11 @@
   "schema_version": 5,
   "updated_at": "2026-05-21T08:56:06.309513Z",
   "updated_by": "bootstrap-extract",
-  "reason": "Initial seed extracted from ANNEX-121 §5 gate matrix",
+  "reason": "Initial seed extracted from RACI-MASTER-MATRIX §5 gate matrix",
   "rows": [
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G0</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-A1\">A1</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G0</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-A1\">A1</a>",
       "gate": "G0",
       "cdr": "A1",
       "activity_html": "Tiếp nhận RFQ và làm rõ yêu cầu khách hàng",
@@ -27,8 +27,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G0</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-A2\">A2</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G0</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-A2\">A2</a>",
       "gate": "G0",
       "cdr": "A2",
       "activity_html": "Phê duyệt báo giá theo bậc giá trị",
@@ -49,8 +49,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G0</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-A3\">A3</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G0</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-A3\">A3</a>",
       "gate": "G0",
       "cdr": "A3",
       "activity_html": "Phê duyệt chiết khấu / điều kiện thương mại ngoại lệ",
@@ -71,8 +71,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G0</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-A4\">A4</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G0</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-A4\">A4</a>",
       "gate": "G0",
       "cdr": "A4",
       "activity_html": "Phê duyệt điều kiện thanh toán ngoại lệ",
@@ -93,8 +93,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G0</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-A5\">A5</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G0</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-A5\">A5</a>",
       "gate": "G0",
       "cdr": "A5",
       "activity_html": "Chấp thuận đơn hàng và xem xét hợp đồng",
@@ -115,8 +115,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G0</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-A6\">A6</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G0</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-A6\">A6</a>",
       "gate": "G0",
       "cdr": "A6",
       "activity_html": "Phê duyệt yêu cầu thay đổi của khách hàng (CCR) ảnh hưởng giá / lịch / phạm vi",
@@ -137,8 +137,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G1</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-B1\">B1</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G1</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-B1\">B1</a>",
       "gate": "G1",
       "cdr": "B1",
       "activity_html": "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html\">DFM</a> rà soát và phân loại rủi ro kỹ thuật",
@@ -159,8 +159,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G1</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-B2\">B2</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G1</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-B2\">B2</a>",
       "gate": "G1",
       "cdr": "B2",
       "activity_html": "Phê duyệt phát hành kỹ thuật / gói nền",
@@ -181,8 +181,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G1</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-B3\">B3</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G1</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-B3\">B3</a>",
       "gate": "G1",
       "cdr": "B3",
       "activity_html": "Phê duyệt lệnh thay đổi kỹ thuật (ECO)",
@@ -203,8 +203,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G1</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-B4\">B4</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G1</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-B4\">B4</a>",
       "gate": "G1",
       "cdr": "B4",
       "activity_html": "Phê duyệt Package Supersedure và Withdrawal",
@@ -225,8 +225,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G1</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-B8\">B8</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G1</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-B8\">B8</a>",
       "gate": "G1",
       "cdr": "B8",
       "activity_html": "Phê duyệt Control Plan và PFMEA trước khi phát hành gói nền",
@@ -247,8 +247,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G2</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-C1\">C1</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G2</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-C1\">C1</a>",
       "gate": "G2",
       "cdr": "C1",
       "activity_html": "Phát hành kế hoạch đưa lệnh xuống xưởng",
@@ -269,8 +269,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G2</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D10\">D10</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G2</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-D10\">D10</a>",
       "gate": "G2",
       "cdr": "D10",
       "activity_html": "Nghiệm thu vật tư mua vào, đối chiếu chứng chỉ truy xuất và sàng lọc hàng giả",
@@ -291,8 +291,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G2</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-E1\">E1</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G2</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-E1\">E1</a>",
       "gate": "G2",
       "cdr": "E1",
       "activity_html": "Phê duyệt PO theo bậc giá trị",
@@ -313,8 +313,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G2</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-E2\">E2</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G2</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-E2\">E2</a>",
       "gate": "G2",
       "cdr": "E2",
       "activity_html": "Phê duyệt nhà cung cấp mới (qualify)",
@@ -335,8 +335,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G2</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-E5\">E5</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G2</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-E5\">E5</a>",
       "gate": "G2",
       "cdr": "E5",
       "activity_html": "Phê duyệt đơn mua khẩn / vật tư khẩn",
@@ -357,8 +357,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-C2\">C2</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-C2\">C2</a>",
       "gate": "G3",
       "cdr": "C2",
       "activity_html": "Phê duyệt điều phối ngày/ca",
@@ -379,8 +379,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-C3\">C3</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-C3\">C3</a>",
       "gate": "G3",
       "cdr": "C3",
       "activity_html": "Phê duyệt phá băng lịch / đổi ưu tiên khẩn cấp",
@@ -401,8 +401,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-C4\">C4</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-C4\">C4</a>",
       "gate": "G3",
       "cdr": "C4",
       "activity_html": "Phê duyệt thay đổi cài đặt máy ngoài kế hoạch",
@@ -423,8 +423,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-C5\">C5</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-C5\">C5</a>",
       "gate": "G3",
       "cdr": "C5",
       "activity_html": "Phê duyệt chuyển việc giữa máy/ca",
@@ -445,8 +445,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-C6\">C6</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-C6\">C6</a>",
       "gate": "G3",
       "cdr": "C6",
       "activity_html": "Phê duyệt OT theo bậc giờ",
@@ -467,8 +467,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-C7\">C7</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-C7\">C7</a>",
       "gate": "G3",
       "cdr": "C7",
       "activity_html": "Phê duyệt phục hồi tiến độ sau dừng máy hoặc va chạm máy",
@@ -489,8 +489,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-B5\">B5</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-B5\">B5</a>",
       "gate": "G3",
       "cdr": "B5",
       "activity_html": "Phát hành chương trình <a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html\">CAM</a>/NC (mới + sửa đổi)",
@@ -511,8 +511,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-B6\">B6</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-B6\">B6</a>",
       "gate": "G3",
       "cdr": "B6",
       "activity_html": "Phê duyệt Pilot/Dry-run trước loạt",
@@ -533,8 +533,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-E3\">E3</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-E3\">E3</a>",
       "gate": "G3",
       "cdr": "E3",
       "activity_html": "Phê duyệt yêu cầu gia công ngoài",
@@ -555,8 +555,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-E4\">E4</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-E4\">E4</a>",
       "gate": "G3",
       "cdr": "E4",
       "activity_html": "Phê duyệt giao gia công ngoài và xác minh đầu vào",
@@ -577,8 +577,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-E5\">E5</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-E5\">E5</a>",
       "gate": "G3",
       "cdr": "E5",
       "activity_html": "Phê duyệt đơn mua khẩn / vật tư khẩn",
@@ -599,8 +599,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-E7\">E7</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-E7\">E7</a>",
       "gate": "G3",
       "cdr": "E7",
       "activity_html": "Xử lý ngoại lệ tài sản khách hàng",
@@ -621,8 +621,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-F1\">F1</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-F1\">F1</a>",
       "gate": "G3",
       "cdr": "F1",
       "activity_html": "Phê duyệt yêu cầu cấp, đổi hoặc gỡ quyền CNTT",
@@ -643,8 +643,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-F2\">F2</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-F2\">F2</a>",
       "gate": "G3",
       "cdr": "F2",
       "activity_html": "Phê duyệt truy cập ERP khẩn cấp",
@@ -665,8 +665,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-F4\">F4</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-F4\">F4</a>",
       "gate": "G3",
       "cdr": "F4",
       "activity_html": "Phê duyệt ứng phó sự cố <a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html\">EHS</a> và dừng việc vì an toàn",
@@ -687,8 +687,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G4</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D1\">D1</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G4</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-D1\">D1</a>",
       "gate": "G4",
       "cdr": "D1",
       "activity_html": "Phê duyệt nhả mẫu đầu tiên đạt",
@@ -709,8 +709,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G4</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D2\">D2</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G4</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-D2\">D2</a>",
       "gate": "G4",
       "cdr": "D2",
       "activity_html": "Xử lý mẫu đầu tiên không đạt (sửa lại / loại bỏ / xin chấp thuận khách hàng)",
@@ -731,8 +731,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G4</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D12\">D12</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G4</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-D12\">D12</a>",
       "gate": "G4",
       "cdr": "D12",
       "activity_html": "Nộp hồ sơ FAI/FAIR/PPAP cho khách hàng và xin phê duyệt trước khi sản xuất loạt",
@@ -753,8 +753,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G4</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-B7\">B7</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G4</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-B7\">B7</a>",
       "gate": "G4",
       "cdr": "B7",
       "activity_html": "Phê duyệt sai lệch/nhượng bộ kỹ thuật (chấp thuận nhượng bộ)",
@@ -775,8 +775,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G5</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D3\">D3</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-D3\">D3</a>",
       "gate": "G5",
       "cdr": "D3",
       "activity_html": "Mở NCR và phân loại nhỏ/lớn/nghiêm trọng",
@@ -797,8 +797,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G5</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D4\">D4</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-D4\">D4</a>",
       "gate": "G5",
       "cdr": "D4",
       "activity_html": "Phê duyệt xử lý NCR",
@@ -819,8 +819,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G5</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D5\">D5</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-D5\">D5</a>",
       "gate": "G5",
       "cdr": "D5",
       "activity_html": "Phê duyệt đóng CAPA và xác minh hiệu lực",
@@ -841,8 +841,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G5</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D6\">D6</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-D6\">D6</a>",
       "gate": "G5",
       "cdr": "D6",
       "activity_html": "Phê duyệt nhả giữ hàng",
@@ -863,8 +863,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G5</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D9\">D9</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-D9\">D9</a>",
       "gate": "G5",
       "cdr": "D9",
       "activity_html": "Phê duyệt xử lý phế phẩm theo bậc giá trị",
@@ -885,8 +885,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G5</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-E6\">E6</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-E6\">E6</a>",
       "gate": "G5",
       "cdr": "E6",
       "activity_html": "Phê duyệt SCAR leo thang",
@@ -907,8 +907,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G5</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-B7\">B7</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-B7\">B7</a>",
       "gate": "G5",
       "cdr": "B7",
       "activity_html": "Phê duyệt sai lệch/nhượng bộ kỹ thuật (chấp thuận nhượng bộ)",
@@ -929,8 +929,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G6</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D8\">D8</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G6</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-D8\">D8</a>",
       "gate": "G6",
       "cdr": "D8",
       "activity_html": "Phê duyệt phát hành CoC / ký kiểm cuối",
@@ -951,8 +951,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G6</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-B7\">B7</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G6</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-B7\">B7</a>",
       "gate": "G6",
       "cdr": "B7",
       "activity_html": "Phê duyệt sai lệch/nhượng bộ kỹ thuật (chấp thuận nhượng bộ)",
@@ -973,8 +973,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G6</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-E7\">E7</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G6</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-E7\">E7</a>",
       "gate": "G6",
       "cdr": "E7",
       "activity_html": "Xử lý ngoại lệ tài sản khách hàng",
@@ -995,8 +995,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G7</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D7\">D7</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G7</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-D7\">D7</a>",
       "gate": "G7",
       "cdr": "D7",
       "activity_html": "Phê duyệt chặn giao hàng và dỡ chặn giao hàng",
@@ -1017,8 +1017,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G7</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D8\">D8</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G7</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-D8\">D8</a>",
       "gate": "G7",
       "cdr": "D8",
       "activity_html": "Phê duyệt phát hành CoC / ký kiểm cuối",
@@ -1039,8 +1039,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G7</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-F5\">F5</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G7</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-F5\">F5</a>",
       "gate": "G7",
       "cdr": "F5",
       "activity_html": "Tiếp nhận khiếu nại khách hàng / chấp thuận RMA",
@@ -1061,8 +1061,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G7</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D11\">D11</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G7</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-D11\">D11</a>",
       "gate": "G7",
       "cdr": "D11",
       "activity_html": "Thông báo khách hàng khi phát hiện sản phẩm không phù hợp đã hoặc có thể đã giao (quality escape)",
@@ -1083,8 +1083,8 @@
       }
     },
     {
-      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G7</a>",
-      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-A7\">A7</a>",
+      "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G7</a>",
+      "cdr_html": "<a href=\"authority-matrix.html#cdr-A7\">A7</a>",
       "gate": "G7",
       "cdr": "A7",
       "activity_html": "Phê duyệt yêu cầu thay đổi muộn của khách hàng (CCR) sau xác nhận đơn — ảnh hưởng giá / lịch / phạm vi",
@@ -1112,7 +1112,7 @@
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span> / <span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-heads\">FUNC_HEADS</a></span>",
-        "<a href=\"annex-120-authority-matrix.html\">ANNEX-120</a> · <a href=\"annex-123-deputy-backup-matrix.html\">ANNEX-123</a>"
+        "<a href=\"authority-matrix.html\">AUTHORITY-MATRIX</a> · <a href=\"annex-123-deputy-backup-matrix.html\">ANNEX-123</a>"
       ]
     },
     {
@@ -1173,7 +1173,7 @@
   "document_level": [
     {
       "cells": [
-        "<a href=\"annex-120-authority-matrix.html\">ANNEX-120 Ma trận thẩm quyền</a>",
+        "<a href=\"authority-matrix.html\">AUTHORITY-MATRIX Ma trận thẩm quyền</a>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-heads\">FUNC_HEADS</a></span>",
@@ -1183,7 +1183,7 @@
     },
     {
       "cells": [
-        "<a href=\"annex-121-raci-master-matrix.html\">ANNEX-121 Ma trận RACI tổng</a>",
+        "<a href=\"raci-master-matrix.html\">RACI-MASTER-MATRIX — Ma trận RACI tổng thể</a>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-owners\">FUNC_OWNERS</a></span>",
@@ -1208,7 +1208,7 @@
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html\">EST</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html\">PPL</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
-        "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G0</a> / <a href=\"annex-121-raci-master-matrix.html#r5gate\">G2</a> / <a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>"
+        "<a href=\"raci-master-matrix.html#r5gate\">G0</a> / <a href=\"raci-master-matrix.html#r5gate\">G2</a> / <a href=\"raci-master-matrix.html#r5gate\">G3</a>"
       ]
     },
     {
@@ -1218,7 +1218,7 @@
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html\">EST</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html\">PPL</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
-        "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G1</a>"
+        "<a href=\"raci-master-matrix.html#r5gate\">G1</a>"
       ]
     },
     {
@@ -1228,7 +1228,7 @@
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html\">QCL</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html\">ENG</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html\">WKM</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
-        "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G4</a>"
+        "<a href=\"raci-master-matrix.html#r5gate\">G4</a>"
       ]
     },
     {
@@ -1238,7 +1238,7 @@
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html\">PE</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html\">PPL</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
-        "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G1</a> / <a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>"
+        "<a href=\"raci-master-matrix.html#r5gate\">G1</a> / <a href=\"raci-master-matrix.html#r5gate\">G3</a>"
       ]
     },
     {
@@ -1248,7 +1248,7 @@
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html\">PPL</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html\">ENG</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html\">PD</a></span>",
-        "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G3</a>"
+        "<a href=\"raci-master-matrix.html#r5gate\">G3</a>"
       ]
     },
     {
@@ -1258,7 +1258,7 @@
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html\">QCL</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html\">SCM</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html\">CS</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
-        "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G6</a> / <a href=\"annex-121-raci-master-matrix.html#r5gate\">G7</a>"
+        "<a href=\"raci-master-matrix.html#r5gate\">G6</a> / <a href=\"raci-master-matrix.html#r5gate\">G7</a>"
       ]
     },
     {
@@ -1268,7 +1268,7 @@
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html\">QE</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html\">WKM</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html\">ENG</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html\">SCM</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
-        "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G5</a> / kiểm soát hỗ trợ"
+        "<a href=\"raci-master-matrix.html#r5gate\">G5</a> / kiểm soát hỗ trợ"
       ]
     },
     {
@@ -1278,7 +1278,7 @@
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html\">ITA</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html\">ESA</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-heads\">FUNC_HEADS</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
-        "<a href=\"annex-120-authority-matrix.html#cdr-F1\">F1</a> / <a href=\"annex-120-authority-matrix.html#cdr-F2\">F2</a> / <a href=\"annex-120-authority-matrix.html#cdr-B3\">B3</a>"
+        "<a href=\"authority-matrix.html#cdr-F1\">F1</a> / <a href=\"authority-matrix.html#cdr-F2\">F2</a> / <a href=\"authority-matrix.html#cdr-B3\">B3</a>"
       ]
     }
   ],
@@ -1286,7 +1286,7 @@
     {
       "cells": [
         "G0",
-        "<a href=\"annex-120-authority-matrix.html#cdr-A2\">A2</a>",
+        "<a href=\"authority-matrix.html#cdr-A2\">A2</a>",
         "Phê duyệt báo giá theo bậc giá trị",
         "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "C",
@@ -1296,7 +1296,7 @@
     {
       "cells": [
         "G0",
-        "<a href=\"annex-120-authority-matrix.html#cdr-A3\">A3</a>",
+        "<a href=\"authority-matrix.html#cdr-A3\">A3</a>",
         "Phê duyệt chiết khấu / điều kiện thương mại ngoại lệ",
         "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "C",
@@ -1306,7 +1306,7 @@
     {
       "cells": [
         "G0",
-        "<a href=\"annex-120-authority-matrix.html#cdr-A4\">A4</a>",
+        "<a href=\"authority-matrix.html#cdr-A4\">A4</a>",
         "Phê duyệt điều kiện thanh toán ngoại lệ",
         "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "C",
@@ -1316,7 +1316,7 @@
     {
       "cells": [
         "G0",
-        "<a href=\"annex-120-authority-matrix.html#cdr-A5\">A5</a>",
+        "<a href=\"authority-matrix.html#cdr-A5\">A5</a>",
         "Chấp thuận đơn hàng và xem xét hợp đồng",
         "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "C",
@@ -1326,7 +1326,7 @@
     {
       "cells": [
         "G0",
-        "<a href=\"annex-120-authority-matrix.html#cdr-A6\">A6</a>",
+        "<a href=\"authority-matrix.html#cdr-A6\">A6</a>",
         "CCR ảnh hưởng giá / lịch / phạm vi",
         "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "C",
@@ -1336,7 +1336,7 @@
     {
       "cells": [
         "G2",
-        "<a href=\"annex-120-authority-matrix.html#cdr-C1\">C1</a>",
+        "<a href=\"authority-matrix.html#cdr-C1\">C1</a>",
         "Phát hành kế hoạch đưa lệnh xuống xưởng",
         "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html\">MNT</a>",
         "C",
@@ -1346,7 +1346,7 @@
     {
       "cells": [
         "G2",
-        "<a href=\"annex-120-authority-matrix.html#cdr-E1\">E1</a>",
+        "<a href=\"authority-matrix.html#cdr-E1\">E1</a>",
         "Phê duyệt PO theo bậc giá trị",
         "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "I",
@@ -1356,7 +1356,7 @@
     {
       "cells": [
         "G2",
-        "<a href=\"annex-120-authority-matrix.html#cdr-E5\">E5</a>",
+        "<a href=\"authority-matrix.html#cdr-E5\">E5</a>",
         "Phê duyệt đơn mua khẩn / vật tư khẩn",
         "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "I",
@@ -1366,7 +1366,7 @@
     {
       "cells": [
         "G3",
-        "<a href=\"annex-120-authority-matrix.html#cdr-C4\">C4</a>",
+        "<a href=\"authority-matrix.html#cdr-C4\">C4</a>",
         "Phê duyệt thay đổi cài đặt máy ngoài kế hoạch",
         "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html\">MNT</a>",
         "C",
@@ -1376,7 +1376,7 @@
     {
       "cells": [
         "G3",
-        "<a href=\"annex-120-authority-matrix.html#cdr-C7\">C7</a>",
+        "<a href=\"authority-matrix.html#cdr-C7\">C7</a>",
         "Phục hồi tiến độ sau dừng máy hoặc va chạm máy",
         "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html\">MNT</a>",
         "R",
@@ -1386,7 +1386,7 @@
     {
       "cells": [
         "G3",
-        "<a href=\"annex-120-authority-matrix.html#cdr-E5\">E5</a>",
+        "<a href=\"authority-matrix.html#cdr-E5\">E5</a>",
         "Phê duyệt đơn mua khẩn / vật tư khẩn",
         "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "I",
@@ -1396,7 +1396,7 @@
     {
       "cells": [
         "G3",
-        "<a href=\"annex-120-authority-matrix.html#cdr-F4\">F4</a>",
+        "<a href=\"authority-matrix.html#cdr-F4\">F4</a>",
         "Phê duyệt ứng phó sự cố EHS và dừng việc vì an toàn",
         "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html\">MNT</a>",
         "C",
@@ -1406,7 +1406,7 @@
     {
       "cells": [
         "G5",
-        "<a href=\"annex-120-authority-matrix.html#cdr-D9\">D9</a>",
+        "<a href=\"authority-matrix.html#cdr-D9\">D9</a>",
         "Phê duyệt xử lý phế phẩm theo bậc giá trị",
         "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "C",
@@ -1416,7 +1416,7 @@
     {
       "cells": [
         "G7",
-        "<a href=\"annex-120-authority-matrix.html#cdr-A7\">A7</a>",
+        "<a href=\"authority-matrix.html#cdr-A7\">A7</a>",
         "CCR muộn ảnh hưởng giá / lịch / phạm vi",
         "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "C",

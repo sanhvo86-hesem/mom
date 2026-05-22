@@ -31,7 +31,7 @@ final class DecisionThresholdService
 
     /** @var array<string, string> */
     private const SYSTEM_DOC_LINKS = [
-        'ANNEX-120' => '../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html',
+        'ANNEX-120' => 'authority-matrix.html',
         'ANNEX-121' => '../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html',
         'ANNEX-123' => '../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html',
         'FRM-202'   => '../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx',
@@ -46,7 +46,7 @@ final class DecisionThresholdService
 
     /** @var array<string, string> */
     private const ANNEX_DOC_LINKS = [
-        'ANNEX-120' => 'annex-120-authority-matrix.html',
+        'ANNEX-120' => '../../../../system/organization/04-RACI-Authority/authority-matrix.html',
         'ANNEX-121' => 'annex-121-raci-master-matrix.html',
         'ANNEX-123' => 'annex-123-deputy-backup-matrix.html',
         'FRM-202'   => '../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx',
@@ -729,10 +729,6 @@ final class DecisionThresholdService
                 'doc_code' => 'ANNEX-121',
                 'path' => 'mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html',
             ],
-            [
-                'doc_code' => 'ANNEX-120',
-                'path' => 'mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html',
-            ],
         ];
     }
 
@@ -757,11 +753,6 @@ final class DecisionThresholdService
             'ANNEX-121',
             'mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html',
             fn(string $html): string => $this->updateAnnex121Html($html)
-        );
-        $results[] = $this->updateDocument(
-            'ANNEX-120',
-            'mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html',
-            fn(string $html): string => $this->updateAnnex120Html($html, $config)
         );
 
         return $results;
@@ -814,6 +805,11 @@ final class DecisionThresholdService
             $html
         );
         $html = $this->removeFinanceDeputyAuthority($html);
+        foreach ($this->items($config) as $item) {
+            foreach ($item['cdrs'] as $cdr) {
+                $html = $this->replaceCdrRow($html, (string)$cdr, $item);
+            }
+        }
 
         return $html;
     }
@@ -1001,22 +997,6 @@ final class DecisionThresholdService
         return $html;
     }
 
-    /**
-     * @param array<string, mixed> $config
-     */
-    private function updateAnnex120Html(string $html, array $config): string
-    {
-        $html = $this->normaliseAnnexRoleWrapping($html);
-        foreach ($this->items($config) as $item) {
-            foreach ($item['cdrs'] as $cdr) {
-                $html = $this->replaceCdrRow($html, (string)$cdr, $item);
-            }
-        }
-        $html = $this->removeFinanceFromAnnexAuthorityNotes($html);
-
-        return $html;
-    }
-
     private function removeFinanceDeputyAuthority(string $html): string
     {
         $ceoRow = '<tr><td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></td><td>L1: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a>; L2: hội đồng <a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-func-heads">FUNC_HEADS</a> do <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> chỉ định trước</td><td>≥ 24 giờ + xác nhận đa số <a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-func-heads">FUNC_HEADS</a>.</td><td><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html#d4">ANNEX-123 d4</a></td></tr>';
@@ -1035,29 +1015,6 @@ final class DecisionThresholdService
         return $html;
     }
 
-    private function removeFinanceFromAnnexAuthorityNotes(string $html): string
-    {
-        $html = $this->replaceDirectorLabelWithCeo($html);
-        $html = preg_replace(
-            '/<span class="inline-tag"><span class="role-cluster"><span class="role-code"><a class="entity-link role-link" href="\.\.\/\.\.\/\.\.\/\.\.\/system\/organization\/03-Job-Descriptions\/07-JD-Finance\/jd-finance-manager\.html">FIN<\/a><\/span><\/span><\/span>/',
-            '',
-            $html
-        ) ?? $html;
-        $html = str_replace(
-            'Ngưỡng VND là ngưỡng vận hành nội bộ cho xưởng CNC bán dẫn quy mô vừa; <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a> + <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> phải rà soát lại mỗi quý hoặc khi tỷ giá, giá vật liệu hoặc giá máy biến động trên 20%.',
-            'Ngưỡng VND là ngưỡng vận hành nội bộ cho xưởng CNC bán dẫn quy mô vừa; <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> phải rà soát lại mỗi quý hoặc khi tỷ giá, giá vật liệu hoặc giá máy biến động trên 20%.',
-            $html
-        );
-        $html = str_replace(
-            'bỏ bước <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>/<a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a>/<a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> bắt buộc',
-            'bỏ bước <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>/<a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> bắt buộc',
-            $html
-        );
-        $html = $this->removeFinanceRoleLinks($html);
-
-        return $html;
-    }
-
     private function removeFinanceFromAnnex121Intro(string $html): string
     {
         $html = $this->replaceDirectorLabelWithCeo($html);
@@ -1069,7 +1026,7 @@ final class DecisionThresholdService
 
         $html = str_replace(
             '<tr><td>C phải tham vấn trước khi chốt</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a>, <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>, <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a>, <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a> hoặc <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> được ghi C phải được hỏi trước khi quyết định ảnh hưởng kỹ thuật, chất lượng, vật tư, tiền hoặc khách hàng.</td><td>Chỉ gửi thông báo sau khi đã quyết định.</td></tr>',
-            '<tr><td>C phải tham vấn trước khi chốt</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a>, <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>, <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> hoặc <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> được ghi C phải được hỏi trước khi chốt kỹ thuật, chất lượng, vật tư hoặc cam kết khách hàng. Quyết định ảnh hưởng giá, dòng tiền hoặc vượt ngưỡng phải đưa <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> chốt cuối theo <a href="annex-120-authority-matrix.html">ANNEX-120</a>.</td><td>Chỉ gửi thông báo sau khi đã quyết định.</td></tr>',
+            '<tr><td>C phải tham vấn trước khi chốt</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a>, <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>, <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> hoặc <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> được ghi C phải được hỏi trước khi chốt kỹ thuật, chất lượng, vật tư hoặc cam kết khách hàng. Quyết định ảnh hưởng giá, dòng tiền hoặc vượt ngưỡng phải đưa <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> chốt cuối theo <a href="../../../../system/organization/04-RACI-Authority/authority-matrix.html">ANNEX-120</a>.</td><td>Chỉ gửi thông báo sau khi đã quyết định.</td></tr>',
             $html
         );
 
@@ -1161,7 +1118,7 @@ final class DecisionThresholdService
         string $evidenceHtml
     ): string {
         $row = '<tr>' . "\n"
-            . '  <td><a href="annex-121-raci-master-matrix.html#r5gate">' . $this->e($gate) . '</a></td><td><a href="annex-120-authority-matrix.html#cdr-' . $this->e($cdr) . '">' . $this->e($cdr) . '</a></td><td>' . $activityHtml . '</td>' . "\n"
+            . '  <td><a href="annex-121-raci-master-matrix.html#r5gate">' . $this->e($gate) . '</a></td><td><a href="../../../../system/organization/04-RACI-Authority/authority-matrix.html#cdr-' . $this->e($cdr) . '">' . $this->e($cdr) . '</a></td><td>' . $activityHtml . '</td>' . "\n"
             . '  ' . $this->raciCell($cells['CS']) . "\n"
             . '  ' . $this->raciCell($cells['EST']) . "\n"
             . '  ' . $this->raciCell($cells['ENG']) . "\n"
@@ -1174,7 +1131,7 @@ final class DecisionThresholdService
             . '  <td>' . $evidenceHtml . '</td>' . "\n"
             . '</tr>';
 
-        $pattern = '/<tr>\s*<td><a href="annex-121-raci-master-matrix\.html#r5gate">' . preg_quote($gate, '/') . '<\/a><\/td><td><a href="annex-120-authority-matrix\.html#cdr-' . preg_quote($cdr, '/') . '">' . preg_quote($cdr, '/') . '<\/a><\/td>.*?<\/tr>/s';
+        $pattern = '/<tr>\s*<td><a href="annex-121-raci-master-matrix\.html#r5gate">' . preg_quote($gate, '/') . '<\/a><\/td><td><a href="../../../../system/organization/04-RACI-Authority/authority-matrix\.html#cdr-' . preg_quote($cdr, '/') . '">' . preg_quote($cdr, '/') . '<\/a><\/td>.*?<\/tr>/s';
         $next = preg_replace($pattern, $row, $html, 1, $count);
         if ($count !== 1 || $next === null) {
             throw new RuntimeException('decision_threshold_annex121_row_not_found:' . $gate . ':' . $cdr);
@@ -1332,15 +1289,15 @@ final class DecisionThresholdService
     private function replaceCdrRow(string $html, string $cdr, array $item): string
     {
         $row = '<tr id="cdr-' . $this->e($cdr) . '">' . "\n"
-            . '  <td><a href="annex-120-authority-matrix.html#cdr-' . $this->e($cdr) . '">' . $this->e($cdr) . '</a></td>' . "\n"
+            . '  <td><a href="authority-matrix.html#cdr-' . $this->e($cdr) . '">' . $this->e($cdr) . '</a></td>' . "\n"
             . '  <td>' . $this->e($this->cdrDecisionLabel($cdr, $item)) . '</td>' . "\n"
-            . '  <td>' . $this->linkText($item['condition'], 'annex') . '</td>' . "\n"
-            . '  <td>' . $this->linkText($item['l1'], 'annex') . '</td>' . "\n"
-            . '  <td>' . $this->linkText($item['l2'], 'annex') . '</td>' . "\n"
-            . '  <td>' . $this->linkText($item['l3'], 'annex') . '</td>' . "\n"
-            . '  <td><span class="role-code">' . $this->linkText($item['r'], 'annex') . '</span></td>' . "\n"
-            . '  <td>' . $this->linkText($item['evidence'], 'annex') . '</td>' . "\n"
-            . '  <td>' . $this->linkText($item['escalation'], 'annex') . '</td>' . "\n"
+            . '  <td>' . $this->linkText($item['condition'], 'system') . '</td>' . "\n"
+            . '  <td>' . $this->linkText($item['l1'], 'system') . '</td>' . "\n"
+            . '  <td>' . $this->linkText($item['l2'], 'system') . '</td>' . "\n"
+            . '  <td>' . $this->linkText($item['l3'], 'system') . '</td>' . "\n"
+            . '  <td><span class="role-code">' . $this->linkText($item['r'], 'system') . '</span></td>' . "\n"
+            . '  <td>' . $this->linkText($item['evidence'], 'system') . '</td>' . "\n"
+            . '  <td>' . $this->linkText($item['escalation'], 'system') . '</td>' . "\n"
             . '</tr>';
 
         $pattern = '/<tr id="cdr-' . preg_quote($cdr, '/') . '">.*?<\/tr>/s';
@@ -1489,8 +1446,8 @@ final class DecisionThresholdService
     private function cdrLinks(array $cdrs, string $context): string
     {
         $base = $context === 'annex'
-            ? 'annex-120-authority-matrix.html'
-            : '../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html';
+            ? '../../../../system/organization/04-RACI-Authority/authority-matrix.html'
+            : 'authority-matrix.html';
         return implode(', ', array_map(static fn(string $cdr): string => '<a href="' . $base . '#cdr-' . htmlspecialchars($cdr, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '">' . htmlspecialchars($cdr, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a>', $cdrs));
     }
 

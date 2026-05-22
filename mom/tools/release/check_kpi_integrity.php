@@ -23,7 +23,7 @@ declare(strict_types=1);
  *      registry.runtime_calculated_metrics or from KpiEngine.php.
  *   4. Duplicate canonical_code among governance KPIs.
  *   5. A legacy alias maps to a code that is not a known metric.
- *   6. A gate metric linked_cdr references a CDR absent from ANNEX-121.
+ *   6. A gate metric linked_cdr references a CDR absent from RACI-MASTER-MATRIX.
  *   8. A gate / proposed metric is missing a counter-metric, or its
  *      thresholds (where present) are non-numeric or wrongly ordered.
  *   9. A counter-metric code is reused by two KPIs in the same group —
@@ -48,7 +48,7 @@ $base       = dirname(__DIR__, 2);                // -> repo .../mom
 $registryFp = $base . '/data/registry/kpi-authority-registry.json';
 $annexDir   = $base . '/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control';
 $annex122Fp = $annexDir . '/annex-122-kpi-cascade-dictionary.html';
-$annex121Fp = $annexDir . '/annex-121-raci-master-matrix.html';
+$annex121Fp = $base . '/docs/system/organization/04-RACI-Authority/raci-master-matrix.html';
 $annex128Fp = $annexDir . '/annex-128-kpi-system-matrix-and-document-usage.html';
 $engineFp   = $base . '/api/services/KpiEngine.php';
 
@@ -240,7 +240,7 @@ foreach ($aliases as $alias => $target) {
     }
 }
 
-// ── P0.6 — gate linked_cdr must exist in ANNEX-121 ───────────────────────────
+// ── P0.6 — gate linked_cdr must exist in RACI-MASTER-MATRIX ───────────────────────────
 $annex121 = readText($annex121Fp);
 preg_match_all('/\b([A-F][0-9]{1,2})\b/', $annex121, $cm);
 $cdrCodes = array_unique($cm[1] ?? []);
@@ -252,7 +252,7 @@ foreach ($gateMetrics as $g) {
     foreach ((array) ($g['linked_cdr'] ?? []) as $cdr) {
         $cdr = strtoupper(trim((string) $cdr));
         if ($cdr !== '' && !in_array($cdr, $cdrCodes, true)) {
-            $p0[] = "Gate metric $local: linked_cdr '$cdr' does not exist in ANNEX-121.";
+            $p0[] = "Gate metric $local: linked_cdr '$cdr' does not exist in RACI-MASTER-MATRIX.";
         }
     }
 }

@@ -573,7 +573,7 @@ const _MGR = [
   "SOP-1*","SOP-9*",
   "DEPT*",
   "JD*","ANNEX*",
-  "ANNEX-120*","ANNEX-121*","ANNEX-122*","ANNEX-123*",
+  "ANNEX-120*","RACI-MASTER-MATRIX*","ANNEX-122*","ANNEX-123*",
   "LAB*",
   "FRM-1*","FRM-9*",
   "SOP-801*","SOP-804*","FRM-812*",
@@ -909,7 +909,6 @@ function normalizeDocPattern(pattern){
   const out = new Set([base]);
   const aliasMap = {
     'AUTHORITY-MATRIX':'ANNEX-120',
-    'RACI-MASTER-MATRIX':'ANNEX-121',
     'ANNEX-HR-LAB*':'LAB*',
     'ANNEX-JOB*':'JD*',
     'ANNEX-108*':'ANNEX-131*',

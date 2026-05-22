@@ -6,7 +6,7 @@
  * to the current document.
  *
  * Single-source-of-truth model — NOTHING is duplicated:
- *   - RACI (A/R/C/I per CDR/gate) is read live from ANNEX-121 §5 gate matrix.
+ *   - RACI (A/R/C/I per CDR/gate) is read live from RACI-MASTER-MATRIX §5 gate matrix.
  *   - Authority thresholds (L1/L2/L3 + escalation) are read live from the
  *     ANNEX-120 decision register.
  * Both are fetched and parsed in the browser at open time, so the panel can
@@ -23,7 +23,7 @@
 var WIDGET_VERSION = '2026-05-21-1';
 var ROLE_COLS = ['CS','EST','ENG','PPL','WKM','PD','QA','SCM','CEO','EHS','HR','IT'];
 /* RACI source docs — never render the sidebar on the matrices themselves. */
-var SOURCE_DOCS = { 'ANNEX-120':1, 'ANNEX-121':1, 'RACI-MASTER-MATRIX':1, 'AUTHORITY-MATRIX':1 };
+var SOURCE_DOCS = { 'RACI-MASTER-MATRIX':1, 'AUTHORITY-MATRIX':1 };
 
 /* ── Self-discovery of deployment base (mirrors the DCC renderer) ───────── */
 var _scriptUrl = (function(){
@@ -51,9 +51,8 @@ function _docRoot(){
     if (i >= 0) return p.slice(0, i) + '/docs/';
     return APP_BASE + '/docs/';
 }
-function _annexUrl(name){
-    return _docRoot() + 'operations/references/01-ANNEX-100/'
-         + '12-ANNEX-120-Authority-KPI-and-Deputy-Control/' + name;
+function _raciUrl(name){
+    return _docRoot() + 'system/organization/04-RACI-Authority/' + name;
 }
 
 /* ── Current document identity ──────────────────────────────────────────── */
@@ -65,6 +64,8 @@ function _docInfo(){
     if ((m = base.match(/^(sop-\d{3})/)))      { info.code = m[1].toUpperCase(); info.type = 'SOP'; }
     else if ((m = base.match(/^(annex-\d{3})/))){ info.code = m[1].toUpperCase(); info.type = 'ANNEX'; }
     else if (/^jd-/.test(base))                { info.code = base.toUpperCase(); info.type = 'JD'; }
+    else if (base === 'raci-master-matrix')    { info.code = 'RACI-MASTER-MATRIX'; info.type = 'ANNEX'; }
+    else if (base === 'authority-matrix')      { info.code = 'AUTHORITY-MATRIX'; info.type = 'ANNEX'; }
     return info;
 }
 
@@ -78,7 +79,7 @@ function _fetchDoc(url){
         .then(function(html){ return new DOMParser().parseFromString(html, 'text/html'); });
 }
 
-/* ── Parse ANNEX-121 §5 gate matrix ─────────────────────────────────────── */
+/* ── Parse RACI-MASTER-MATRIX §5 gate matrix ────────────────────────────── */
 function _parseGateMatrix(doc){
     var tables = doc.querySelectorAll('table');
     var gate = null;
@@ -129,7 +130,7 @@ function _parseThresholds(doc){
     return map;
 }
 
-/* ── Parse ANNEX-121 support-function supplement (MNT / FIN) ────────────── */
+/* ── Parse RACI-MASTER-MATRIX support-function supplement (MNT / FIN) ────── */
 function _parseSupplement(doc){
     var tables = doc.querySelectorAll('table');
     var sup = null;
@@ -252,10 +253,10 @@ function _card(row, thr){
     }
 
     var links = _el('div', 'raci-sb-links');
-    links.appendChild(_link(_annexUrl('annex-120-authority-matrix.html') + '#cdr-' + row.cdr,
-                            'ANNEX-120 · ' + row.cdr));
-    links.appendChild(_link(_annexUrl('annex-121-raci-master-matrix.html') + '#r5gate',
-                            'ANNEX-121 §5'));
+    links.appendChild(_link(_raciUrl('authority-matrix.html') + '#cdr-' + row.cdr,
+                            'Ma trận thẩm quyền · ' + row.cdr));
+    links.appendChild(_link(_raciUrl('raci-master-matrix.html') + '#r5gate',
+                            'RACI-MASTER-MATRIX §5'));
     card.appendChild(links);
     return card;
 }
@@ -296,10 +297,10 @@ function _setBody(panel, node){
 function _populate(panel, info){
     if (_loaded || _loading) return;
     _loading = true;
-    _setBody(panel, _el('div', 'raci-sb-msg', 'Đang tải RACI từ ANNEX-121…'));
+    _setBody(panel, _el('div', 'raci-sb-msg', 'Đang tải RACI từ RACI-MASTER-MATRIX…'));
     Promise.all([
-        _fetchDoc(_annexUrl('annex-121-raci-master-matrix.html')),
-        _fetchDoc(_annexUrl('annex-120-authority-matrix.html'))
+        _fetchDoc(_raciUrl('raci-master-matrix.html')),
+        _fetchDoc(_raciUrl('authority-matrix.html'))
     ]).then(function(docs){
         var gateRows = _parseGateMatrix(docs[0]);
         var suppRows = _parseSupplement(docs[0]);
@@ -309,11 +310,11 @@ function _populate(panel, info){
         if (!rows.length) {
             var msg = _el('div', 'raci-sb-msg',
                 info.type === 'JD'
-                    ? 'Không xác định được vai trò RACI từ trang JD này. Tra trực tiếp tại ANNEX-121 §5.'
-                    : 'Không có mã CDR nào trỏ trực tiếp về tài liệu này. Tra ANNEX-121 §5.');
+                    ? 'Không xác định được vai trò RACI từ trang JD này. Tra trực tiếp tại RACI-MASTER-MATRIX §5.'
+                    : 'Không có mã CDR nào trỏ trực tiếp về tài liệu này. Tra RACI-MASTER-MATRIX §5.');
             frag.appendChild(msg);
-            frag.appendChild(_link(_annexUrl('annex-121-raci-master-matrix.html') + '#r5gate',
-                                   'Mở ANNEX-121 §5'));
+            frag.appendChild(_link(_raciUrl('raci-master-matrix.html') + '#r5gate',
+                                   'Mở RACI-MASTER-MATRIX §5'));
         } else {
             rows.sort(function(a,b){ return a.gate < b.gate ? -1 : a.gate > b.gate ? 1 : 0; });
             for (var i = 0; i < rows.length; i++) {
@@ -353,7 +354,7 @@ function _build(info){
     head.appendChild(close);
     panel.appendChild(head);
     panel.appendChild(_el('div', 'raci-sb-panel__sub',
-        info.code + ' — nguồn: ANNEX-121 (RACI) + ANNEX-120 (ngưỡng)'));
+        info.code + ' — nguồn: RACI-MASTER-MATRIX (RACI) + AUTHORITY-MATRIX (ngưỡng)'));
     panel.appendChild(_el('div', 'raci-sb-panel__body'));
     var foot = _el('div', 'raci-sb-panel__foot',
         'Bảng phái sinh đọc trực tiếp từ SSOT — không chỉnh sửa tại đây.');
