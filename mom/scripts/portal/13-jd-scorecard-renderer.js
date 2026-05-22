@@ -125,33 +125,44 @@ function _render(role) {
       '<tbody>' + rows + '</tbody></table></div>';
 }
 
-/* Find the §KPI section heading and swap its table for the live scorecard. */
+/* Universal rule for every JD document (all 39, regardless of the §KPI
+ * section's internal markup):
+ *   1. find the §KPI heading — text contains "KPI" (both wordings:
+ *      "8. KPI cá nhân" and "8. … (KPI) cá nhân");
+ *   2. remove EVERY sibling element after it up to the next heading —
+ *      the old intro paragraph + old table, whatever they were;
+ *   3. insert the live registry scorecard right after the heading.
+ * This makes the result identical on every JD and never duplicates the
+ * old static table. */
 function _hydrate(role) {
   _injectStyle();
-  var heads = document.querySelectorAll('h1,h2,h3');
-  var heading = null;
+  // The §KPI section appears under several heading wordings across the 39
+  // JDs — "KPI cá nhân", "… (KPI) cá nhân", "Chỉ số đánh giá hiệu quả công
+  // việc", "Chỉ số đánh giá kết quả". The stable stem is "chỉ số đánh giá"
+  // (or the word "KPI"). Match either, lower-cased — diacritic-safe.
+  var heads = document.querySelectorAll('h1,h2,h3,h4');
+  var heading = null, generic = null;
   for (var i = 0; i < heads.length; i++) {
-    var txt = (heads[i].textContent || '').trim();
-    if (/KPI\s*c[áa]\s*nh[âa]n/i.test(txt) || /\bKPI\b/.test(txt)) { heading = heads[i]; break; }
+    var low = (heads[i].textContent || '').trim().toLowerCase();
+    var isKpi = low.indexOf('kpi') >= 0 || low.indexOf('chỉ số đánh giá') >= 0;
+    if (!isKpi) continue;
+    if (low.indexOf('cá nhân') >= 0) { heading = heads[i]; break; }
+    if (!generic) generic = heads[i];
   }
+  heading = heading || generic;
   var html = _render(role);
-  if (heading) {
-    var sib = heading.nextElementSibling;
-    if (sib && (sib.classList.contains('table-card') || sib.tagName === 'TABLE'
-        || sib.querySelector('table'))) {
-      var holder = document.createElement('div');
-      holder.innerHTML = html;
-      sib.parentNode.replaceChild(holder, sib);
-      while (holder.firstChild) holder.parentNode.insertBefore(holder.firstChild, holder);
-      holder.parentNode.removeChild(holder);
-    } else {
-      heading.insertAdjacentHTML('afterend', html);
-    }
-  } else {
+  if (!heading) {
     var body = document.querySelector('.page-body') || document.body;
-    body.insertAdjacentHTML('beforeend',
-      '<h2 class="h2">KPI cá nhân</h2>' + html);
+    body.insertAdjacentHTML('beforeend', '<h2 class="h2">KPI cá nhân</h2>' + html);
+    return;
   }
+  var node = heading.nextElementSibling;
+  while (node && !/^H[1-4]$/.test(node.tagName)) {
+    var next = node.nextElementSibling;
+    node.parentNode.removeChild(node);
+    node = next;
+  }
+  heading.insertAdjacentHTML('afterend', html);
 }
 
 function render() {

@@ -128,6 +128,52 @@ foreach ($others as $fp) {
     }
 }
 
+// ── 5. JD KPI scorecards — every job description is registry-linked ─────────
+// Rule for all 39 JD documents: the role has a scorecard, the jd_file exists,
+// the doc loads the JD-scorecard renderer, and it has a §KPI section heading
+// the renderer can target. Any JD that fails is showing a hardcoded /
+// un-linked KPI section.
+$jdRoles = $reg['jd_kpi_scorecards']['roles'] ?? null;
+$jdDir = $base . '/docs/system/organization/03-Job-Descriptions';
+if (is_array($jdRoles)) {
+    $jdFiles = glob($jdDir . '/*/jd-*.html') ?: [];
+    $covered = [];
+    $jdBad = 0;
+    foreach ($jdRoles as $rc => $card) {
+        if (!is_array($card)) {
+            continue;
+        }
+        $rel = (string) ($card['jd_file'] ?? '');
+        $fp = $base . '/' . preg_replace('#^mom/#', '', $rel);
+        if (!is_file($fp)) {
+            $findings[] = "JD scorecard $rc: jd_file '$rel' does not exist.";
+            $jdBad++;
+            continue;
+        }
+        $covered[realpath($fp)] = true;
+        $doc = (string) @file_get_contents($fp);
+        if (strpos($doc, '13-jd-scorecard-renderer.js') === false) {
+            $findings[] = "JD $rc: " . basename($fp) . " does not load the JD-scorecard renderer.";
+            $jdBad++;
+        }
+        if (!preg_match('/<h[1-4][^>]*>[^<]*(?:KPI|Chỉ số đánh giá)[^<]*<\/h[1-4]>/u', $doc)) {
+            $findings[] = "JD $rc: " . basename($fp) . " has no §KPI section heading to hydrate.";
+            $jdBad++;
+        }
+    }
+    foreach ($jdFiles as $fp) {
+        if (!isset($covered[realpath($fp)])) {
+            $findings[] = 'JD document ' . basename($fp)
+                . ' has no scorecard in jd_kpi_scorecards.';
+            $jdBad++;
+        }
+    }
+    if ($jdBad === 0) {
+        $ok[] = sprintf('JD scorecards: all %d job descriptions are registry-linked '
+            . '(scorecard + renderer + §KPI section).', count($jdRoles));
+    }
+}
+
 // ── Report ──────────────────────────────────────────────────────────────────
 echo "── KPI Hardcode Audit ──────────────────────────────────────────\n";
 foreach ($ok as $line) {
