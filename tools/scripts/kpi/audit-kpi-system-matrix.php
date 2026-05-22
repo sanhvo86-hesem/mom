@@ -415,11 +415,19 @@ function htmlFiles(string $root): array
             if ($fileInfo->getFilename() === 'annex-128-kpi-system-matrix-and-document-usage.html') {
                 continue;
             }
+            if (isGeneratedLocaleCache($fileInfo->getFilename())) {
+                continue;
+            }
             $files[] = $fileInfo->getPathname();
         }
     }
     sort($files);
     return $files;
+}
+
+function isGeneratedLocaleCache(string $filename): bool
+{
+    return preg_match('/^_.+\.en\.html$/i', $filename) === 1;
 }
 
 function extractTitle(string $html): string
@@ -1073,7 +1081,7 @@ function renderAnnexHtml(array $report): string
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANNEX-128 - KPI System Matrix and Document Usage | HESEM MOM</title>
-<link rel="stylesheet" href="../../../../assets/style.css">
+<link rel="stylesheet" href="../../../../../assets/style.css">
 <style>
 .page-body h1{font-size:24px;line-height:1.35;margin:0 0 10px}
 .page-body h2{font-size:18px;line-height:1.4;margin:18px 0 10px;color:var(--navy)}
@@ -1092,7 +1100,7 @@ td,th{vertical-align:top}
 <body>
 <div class="container"><div class="page"><div class="page-body">
 <div class="form-header">
-<div class="fh-left"><a class="brand-logo" href="../../../../mom/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a><div class="fh-company"><a href="../../../../mom/portal.html">HESEM ENGINEERING</a><span>Tài liệu vận hành • Annex</span></div></div>
+<div class="fh-left"><a class="brand-logo" href="../../../../../portal.html"><img alt="HESEM Logo" src="../../../../../assets/hesem-logo.svg"></a><div class="fh-company"><a href="../../../../../portal.html">HESEM ENGINEERING</a><span>Tài liệu vận hành • Annex</span></div></div>
 <div class="title"><strong class="doc-name">KPI System Matrix and Document Usage</strong><span class="sub-vn">Ma trận phân bổ KPI/metric theo tài liệu, số lần sử dụng, target, classification và data/evaluation status</span></div>
 <div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-128</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS / Analytics Owner</span></div></div>
 </div>
