@@ -1214,10 +1214,22 @@ class AdminController extends BaseController
         $governance = $body['governance_overrides'] ?? [];
         $gate       = $body['gate_overrides'] ?? [];
         $proposed   = $body['proposed_overrides'] ?? [];
-        if (!is_array($governance) || !is_array($gate) || !is_array($proposed)) {
+        $added      = $body['added_kpis'] ?? [];
+        $retired    = $body['retired_codes'] ?? [];
+        if (!is_array($governance) || !is_array($gate) || !is_array($proposed)
+            || !is_array($added) || !is_array($retired)) {
             $this->error('invalid_config', 400, 'KPI registry save needs override objects.');
         }
-        if ($governance === [] && $gate === [] && $proposed === []) {
+        $nonEmptyGroups = static function (array $g): bool {
+            foreach ($g as $v) {
+                if (is_array($v) && $v !== []) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        if ($governance === [] && $gate === [] && $proposed === []
+            && !$nonEmptyGroups($added) && !$nonEmptyGroups($retired)) {
             $this->error('invalid_config', 400, 'No KPI changes supplied to save.');
         }
 
@@ -1227,12 +1239,16 @@ class AdminController extends BaseController
                     'governance_overrides' => $governance,
                     'gate_overrides'       => $gate,
                     'proposed_overrides'   => $proposed,
+                    'added_kpis'           => $added,
+                    'retired_codes'        => $retired,
                 ],
                 $user,
                 trim((string)($body['reason'] ?? '')),
             );
             $this->auditLog('admin_kpi_registry_save', [
                 'override_count'   => (int)($result['override_count'] ?? 0),
+                'added_count'      => (int)($result['added_count'] ?? 0),
+                'retired_count'    => (int)($result['retired_count'] ?? 0),
                 'annex122_updated' => (bool)($result['annex122_updated'] ?? false),
             ], (string)($user['username'] ?? 'admin'));
             $this->success($result);
@@ -1243,6 +1259,9 @@ class AdminController extends BaseController
                 || str_starts_with($msg, 'kpi_registry_reward_without_counter')
                 || str_starts_with($msg, 'kpi_registry_duplicate_code')
                 || str_starts_with($msg, 'kpi_registry_invalid_cadence')
+                || str_starts_with($msg, 'kpi_registry_threshold_order')
+                || str_starts_with($msg, 'kpi_registry_added_missing_code')
+                || str_starts_with($msg, 'kpi_registry_added_code_conflict')
                 || str_starts_with($msg, 'kpi_registry_missing_code')) {
                 $this->error('kpi_registry_invalid', 422, 'Vi phạm quy tắc KPI: ' . $msg);
             }

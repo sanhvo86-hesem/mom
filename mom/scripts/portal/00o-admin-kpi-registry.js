@@ -45,10 +45,23 @@ var _state = {
   config:null,
   /* overrides keyed by section then code */
   overrides:{ governance:{}, gate:{}, proposed:{} },
-  reason:'', activeGroup:'overview',
+  /* Console-added KPI drafts + retired codes, keyed by library group */
+  added:{ governance:[], gate:[], proposed:[] },
+  retired:{ governance:[], gate:[], proposed:[] },
+  /* add-KPI form draft — null when the form is closed */
+  addForm:null,
+  reason:'', activeGroup:'library',
   /* KPI Library filters */
-  filters:{ process:'', category:'', group:'', jd:'', status:'', search:'' }
+  filters:{ process:'', category:'', group:'', jd:'', status:'', search:'', retired:'' }
 };
+
+/* A fresh add-KPI form draft. */
+function _newAddForm(){
+  return { group:'governance', tier:'department', canonical_code:'', name:'', name_vi:'',
+    process:'unclassified', category:'internal', owner_role:'', counter_metric:'',
+    cadence:'monthly', direction:'higher_is_better', unit:'percent',
+    green_point:'', yellow_point:'', target:'', purpose:'' };
+}
 
 /* Group key → section, for jumping from a library row to its editor. */
 var _GROUP_OF_SECTION = { governance:'company', gate:'gate', proposed:'proposed' };
@@ -83,6 +96,9 @@ function _load(){
       if(!data || data.ok === false) throw new Error((data && (data.message || data.error)) || 'load_failed');
       _state.config = data.config || {};
       _state.overrides = { governance:{}, gate:{}, proposed:{} };
+      _state.added = { governance:[], gate:[], proposed:[] };
+      _state.retired = { governance:[], gate:[], proposed:[] };
+      _state.addForm = null;
       _state.reason = '';
     })
     .catch(function(err){
@@ -104,14 +120,22 @@ function _save(){
     governance_overrides: _state.overrides.governance || {},
     gate_overrides:       _state.overrides.gate || {},
     proposed_overrides:   _state.overrides.proposed || {},
+    added_kpis:           _state.added || {},
+    retired_codes:        _state.retired || {},
     reason: _state.reason || ''
   }, 'POST', 90000)
     .then(function(data){
       if(!data || data.ok === false) throw new Error((data && (data.message || data.error)) || 'save_failed');
       _state.config = data.config || {};
       _state.overrides = { governance:{}, gate:{}, proposed:{} };
+      _state.added = { governance:[], gate:[], proposed:[] };
+      _state.retired = { governance:[], gate:[], proposed:[] };
+      _state.addForm = null;
       _state.reason = '';
+      var nAdd = (data.added_count || 0), nRet = (data.retired_count || 0);
       _state.message = _t('Đã lưu và đồng bộ ANNEX-122.', 'Saved and synced ANNEX-122.')
+        + (nAdd ? ' +' + nAdd + ' ' + _t('KPI mới', 'new KPI') : '')
+        + (nRet ? ' · ' + nRet + ' ' + _t('KPI ngừng dùng', 'retired') : '')
         + (data.annex122_updated ? '' : ' ' + _t('(ANNEX-122 không đổi)', '(ANNEX-122 unchanged)'));
     })
     .catch(function(err){
@@ -135,11 +159,15 @@ function _sectionMetrics(section){
   return _kpis();
 }
 function _dirty(){
-  var o = _state.overrides;
+  var o = _state.overrides, a = _state.added, r = _state.retired;
   return Object.keys(o.governance||{}).length
        + Object.keys(o.gate||{}).length
-       + Object.keys(o.proposed||{}).length > 0;
+       + Object.keys(o.proposed||{}).length
+       + (a.governance||[]).length + (a.gate||[]).length + (a.proposed||[]).length
+       + (r.governance||[]).length + (r.gate||[]).length + (r.proposed||[]).length > 0;
 }
+/* group key (governance/gate/proposed) ↔ section name used by overrides. */
+function _groupOfLib(group){ return group; }
 
 /* Effective value of an editable field: override wins over config. */
 function _val(metric, section, field){
@@ -194,6 +222,9 @@ function _ragBands(t){
 function _setReason(value){ _state.reason = value; }
 function _reset(){
   _state.overrides = { governance:{}, gate:{}, proposed:{} };
+  _state.added = { governance:[], gate:[], proposed:[] };
+  _state.retired = { governance:[], gate:[], proposed:[] };
+  _state.addForm = null;
   _state.reason = '';
   _state.error = ''; _state.message = _t('Đã hoàn tác các thay đổi chưa lưu.', 'Reverted unsaved changes.');
   _render();
@@ -309,8 +340,32 @@ function _renderOverview(){
 }
 
 /* ── KPI Library — classified, multi-filter browse view ────────────── */
+/* Draft (unsaved) Console-added KPIs mapped to the library row shape. */
+function _draftLibRows(){
+  var out = [];
+  ['governance','gate','proposed'].forEach(function(grp){
+    (_state.added[grp] || []).forEach(function(r, idx){
+      out.push({
+        canonical_code:r.canonical_code, name:r.name, name_vi:r.name_vi,
+        group:grp, tier:r.tier, process:r.process, category:r.category,
+        gate:null, calculation_status:'manual', owner_role:r.owner_role,
+        applicable_jds:r.owner_role ? [r.owner_role] : [],
+        counter_metric:r.counter_metric, thresholds:r.thresholds || {},
+        retired:false, origin:'console_added', _draft:true, _draftIdx:idx
+      });
+    });
+  });
+  return out;
+}
 function _libRows(){
-  return (_state.config && Array.isArray(_state.config.library)) ? _state.config.library : [];
+  var base = (_state.config && Array.isArray(_state.config.library)) ? _state.config.library : [];
+  return base.concat(_draftLibRows());
+}
+/* A row is retired when the registry marks it OR a draft retire is pending. */
+function _isRetired(r){
+  if(r.retired === true) return true;
+  var list = _state.retired[r.group] || [];
+  return list.indexOf(String(r.canonical_code).toUpperCase()) >= 0;
 }
 function _setFilter(key, value){ _state.filters[key] = value; _render(); }
 
@@ -318,6 +373,9 @@ function _filteredLib(){
   var f = _state.filters;
   var q = (f.search || '').trim().toLowerCase();
   return _libRows().filter(function(r){
+    var retired = _isRetired(r);
+    if(f.retired === 'active' && retired) return false;
+    if(f.retired === 'retired' && !retired) return false;
     if(f.process  && r.process  !== f.process)  return false;
     if(f.category && r.category !== f.category) return false;
     if(f.group    && r.group    !== f.group)    return false;
@@ -342,9 +400,15 @@ function _renderLibrary(){
   var cfg = _state.config || {};
   var f = _state.filters;
   var facets = cfg.facets || {};
-  var nav = '<div class="kc-nav"><button class="kc-btn" type="button" onclick="_kpiGo(\'overview\')">‹ ' +
-    _t('Tổng quan', 'Overview') + '</button><span class="kc-nav-title">📚 ' +
-    _t('Thư viện KPI', 'KPI Library') + '</span></div>';
+  var nav = '<div class="kc-nav">' +
+    '<span class="kc-nav-title">📚 ' + _t('Thư viện KPI', 'KPI Library') + '</span>' +
+    '<span class="kc-nav-spacer"></span>' +
+    '<button class="kc-btn" type="button" onclick="_kpiGo(\'overview\')">' +
+      _t('Tổng quan & nhóm', 'Overview & groups') + ' ›</button>' +
+    '<button class="kc-btn primary" type="button" onclick="_kpiAddOpen()">+ ' +
+      _t('Thêm KPI', 'Add KPI') + '</button></div>';
+
+  if(_state.addForm) return nav + _renderAddForm();
 
   /* filter option lists */
   var procOpts = [['', _t('— Mọi quá trình —', '— All processes —')]];
@@ -365,6 +429,10 @@ function _renderLibrary(){
     ['runtime_calculated', _t('Tính runtime', 'Runtime')],
     ['staged_data_contract', _t('Chờ data contract', 'Staged')],
     ['manual', _t('Nhập tay', 'Manual')]];
+  var nRetired = (facets.retired || 0);
+  var retOpts = [['', _t('— Đang dùng & ngừng dùng —', '— Active & retired —')],
+    ['active', _t('Chỉ KPI đang dùng', 'Active only')],
+    ['retired', _t('Chỉ KPI ngừng dùng', 'Retired only') + (nRetired ? ' (' + nRetired + ')' : '')]];
 
   var filterBar =
     '<div class="kc-filterbar">' +
@@ -376,6 +444,7 @@ function _renderLibrary(){
       '<select class="kc-input" onchange="_kpiSetFilter(\'group\',this.value)">' + _selOptions(grpOpts, f.group) + '</select>' +
       '<select class="kc-input" onchange="_kpiSetFilter(\'jd\',this.value)">' + _selOptions(jdOpts, f.jd) + '</select>' +
       '<select class="kc-input" onchange="_kpiSetFilter(\'status\',this.value)">' + _selOptions(stOpts, f.status) + '</select>' +
+      '<select class="kc-input" onchange="_kpiSetFilter(\'retired\',this.value)">' + _selOptions(retOpts, f.retired) + '</select>' +
       '<button class="kc-btn" type="button" onclick="_kpiClearFilters()">' + _t('Xóa lọc', 'Clear') + '</button>' +
     '</div>';
 
@@ -390,6 +459,97 @@ function _renderLibrary(){
   return nav + filterBar + resultHead + '<div class="kc-lib-grid">' + grid + '</div>';
 }
 
+/* ── Add-KPI form ──────────────────────────────────────────────────── */
+function _afSet(key, value){
+  if(!_state.addForm) return;
+  _state.addForm[key] = value;
+  if(key === 'group'){
+    /* gate / proposed metrics carry no tier */
+    _state.addForm.tier = (value === 'governance') ? 'department' : '';
+    _render();
+  }
+}
+function _renderAddForm(){
+  var a = _state.addForm;
+  var cfg = _state.config || {};
+  var grpOpts = [['governance', _t('Governance (công ty / value-stream / phòng ban)', 'Governance')],
+    ['gate', _t('Gate metric', 'Gate metric')], ['proposed', _t('Metric đề xuất', 'Proposed metric')]];
+  var tierOpts = [['company', _t('Cấp công ty', 'Company')],
+    ['value_stream', _t('Value-stream', 'Value-stream')], ['department', _t('Phòng ban', 'Department')]];
+  var catOpts = Object.keys(CATEGORY_VI).map(function(k){ return [k, CATEGORY_VI[k]]; });
+  var dirOpts = [['higher_is_better', _t('Cao hơn là tốt', 'Higher is better')],
+    ['lower_is_better', _t('Thấp hơn là tốt', 'Lower is better')]];
+  var unitOpts = [['percent','%'],['ppm','ppm'],['day',_t('ngày','day')],['rate','rate'],
+    ['ratio','ratio'],['count',_t('đếm','count')],['vnd','VND ₫']];
+  var procOpts = [['unclassified', _t('— Chưa phân loại —', '— Unclassified —')]];
+  (cfg.facets && cfg.facets.process || []).forEach(function(p){ procOpts.push([p.key, p.label]); });
+  var pcat = cfg.process_catalog || {};
+  Object.keys(pcat).forEach(function(k){
+    if(!procOpts.some(function(o){ return o[0] === k; }))
+      procOpts.push([k, (pcat[k] && pcat[k].vi) || k]);
+  });
+
+  function row(label, control){ return _field(label, control); }
+  var html = '<div class="kc-addform"><h3>+ ' + _t('Thêm KPI mới', 'Add a new KPI') + '</h3>' +
+    '<p class="kc-mini">' + _t('KPI mới mặc định ở trạng thái nhập tay — nạp số qua endpoint nhập liệu. Lưu để ghi vào overlay runtime.',
+      'A new KPI defaults to manual status — feed it via the data-input endpoint. Save writes it to the runtime overlay.') + '</p>' +
+    '<div class="kc-grid">' +
+    row(_t('Nhóm', 'Group'),
+      '<select class="kc-input" onchange="_kpiAddField(\'group\',this.value)">' + _selOptions(grpOpts, a.group) + '</select>') +
+    (a.group === 'governance' ? row(_t('Cấp (tier)', 'Tier'),
+      '<select class="kc-input" onchange="_kpiAddField(\'tier\',this.value)">' + _selOptions(tierOpts, a.tier) + '</select>') : '') +
+    row(_t('Mã KPI (A–Z, 0–9, _)', 'KPI code (A–Z, 0–9, _)'),
+      '<input class="kc-input" type="text" value="' + _esc(a.canonical_code) +
+      '" placeholder="VD: TOOL_LIFE_VARIANCE" oninput="_kpiAddField(\'canonical_code\',this.value)">') +
+    row(_t('Tên (tiếng Việt)', 'Name (Vietnamese)'),
+      '<input class="kc-input" type="text" value="' + _esc(a.name_vi) +
+      '" oninput="_kpiAddField(\'name_vi\',this.value)">') +
+    row(_t('Tên (tiếng Anh)', 'Name (English)'),
+      '<input class="kc-input" type="text" value="' + _esc(a.name) +
+      '" oninput="_kpiAddField(\'name\',this.value)">') +
+    row(_t('Quá trình', 'Process'),
+      '<select class="kc-input" onchange="_kpiAddField(\'process\',this.value)">' + _selOptions(procOpts, a.process) + '</select>') +
+    row(_t('Phân loại', 'Category'),
+      '<select class="kc-input" onchange="_kpiAddField(\'category\',this.value)">' + _selOptions(catOpts, a.category) + '</select>') +
+    row(_t('Owner', 'Owner'),
+      '<select class="kc-input" onchange="_kpiAddField(\'owner_role\',this.value)">' + _roleOptions(a.owner_role) + '</select>') +
+    row(_t('Nhịp', 'Cadence'),
+      '<select class="kc-input" onchange="_kpiAddField(\'cadence\',this.value)">' + _cadenceOptions(a.cadence) + '</select>') +
+    row(_t('Chiều', 'Direction'),
+      '<select class="kc-input" onchange="_kpiAddField(\'direction\',this.value)">' + _selOptions(dirOpts, a.direction) + '</select>') +
+    row(_t('Đơn vị', 'Unit'),
+      '<select class="kc-input" onchange="_kpiAddField(\'unit\',this.value)">' + _selOptions(unitOpts, a.unit) + '</select>') +
+    row(_t('Điểm xanh (green_point)', 'Green point'),
+      '<input class="kc-input" type="number" step="any" value="' + _esc(a.green_point) +
+      '" oninput="_kpiAddField(\'green_point\',this.value)">') +
+    row(_t('Điểm vàng (yellow_point)', 'Yellow point'),
+      '<input class="kc-input" type="number" step="any" value="' + _esc(a.yellow_point) +
+      '" oninput="_kpiAddField(\'yellow_point\',this.value)">') +
+    row(_t('Mục tiêu (target)', 'Target'),
+      '<input class="kc-input" type="number" step="any" value="' + _esc(a.target) +
+      '" oninput="_kpiAddField(\'target\',this.value)">') +
+    row(_t('Counter-metric', 'Counter-metric'),
+      '<select class="kc-input" onchange="_kpiAddField(\'counter_metric\',this.value)">' + _counterOptions(a.counter_metric) + '</select>') +
+    '</div>' +
+    _field(_t('Mục đích / cách dùng', 'Purpose / usage'),
+      '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'purpose\',this.value)">' + _esc(a.purpose) + '</textarea>');
+
+  var b = _ragBands({ green_point:parseFloat(a.green_point), yellow_point:parseFloat(a.yellow_point),
+    direction:a.direction, unit:a.unit });
+  if(b){
+    html += '<div class="kc-rag"><span class="kc-badge kc-badge-ok">' + _esc(b.green) + '</span>' +
+      '<span class="kc-badge kc-badge-staged">' + _esc(b.yellow) + '</span>' +
+      '<span class="kc-badge kc-badge-bad">' + _esc(b.red) + '</span></div>';
+  }
+  html += '<div class="kc-addform-actions">' +
+    '<button class="kc-btn" type="button" onclick="_kpiAddClose()">' + _t('Hủy', 'Cancel') + '</button>' +
+    '<button class="kc-btn primary" type="button" onclick="_kpiAddSubmit()">' +
+      _t('Thêm vào danh sách lưu', 'Add to save list') + '</button></div>' +
+    '<p class="kc-mini">' + _t('KPI sẽ được ghi khi bấm “Lưu & đồng bộ tài liệu”.',
+      'The KPI is persisted when you click “Save & sync documents”.') + '</p></div>';
+  return html;
+}
+
 function _renderLibCard(r){
   var c = function(s){ return _esc(s == null ? '' : s); };
   var b = _ragBands(r.thresholds || {});
@@ -397,10 +557,36 @@ function _renderLibCard(r){
   var facets = (_state.config || {}).facets || {};
   (facets.process || []).forEach(function(p){ if(p.key === r.process) procLabel = p.label; });
   var groupKey = _GROUP_OF_SECTION[r.group] || 'overview';
-  return '<button class="kc-lib-card" type="button" onclick="_kpiGo(\'' + groupKey + '\')">' +
+  var retired = _isRetired(r);
+  var code = String(r.canonical_code);
+  var openAttr = r._draft
+    ? ''
+    : ' onclick="_kpiGo(\'' + groupKey + '\')" role="button" tabindex="0" title="' +
+      _t('Mở trình biên tập', 'Open editor') + '"';
+
+  /* footer action — retire / restore / drop-draft */
+  var action;
+  if(r._draft){
+    action = '<button class="kc-act kc-act-del" type="button" ' +
+      'onclick="_kpiDropDraft(\'' + c(r.group) + '\',' + r._draftIdx + ')">✕ ' +
+      _t('Bỏ nháp', 'Drop draft') + '</button>';
+  } else if(retired){
+    action = '<button class="kc-act kc-act-restore" type="button" ' +
+      'onclick="event.stopPropagation();_kpiRestore(\'' + c(r.group) + '\',\'' + c(code) + '\')">↩ ' +
+      _t('Khôi phục', 'Restore') + '</button>';
+  } else {
+    action = '<button class="kc-act kc-act-del" type="button" ' +
+      'onclick="event.stopPropagation();_kpiRetire(\'' + c(r.group) + '\',\'' + c(code) + '\')">🗑 ' +
+      _t('Ngừng dùng', 'Retire') + '</button>';
+  }
+
+  return '<div class="kc-lib-card' + (retired ? ' kc-lib-card--retired' : '') +
+    (r._draft ? ' kc-lib-card--draft' : '') + '"' + openAttr + '>' +
     '<div class="kc-lib-card-top">' +
-      '<span class="kc-code">' + c(r.canonical_code) + '</span>' +
-      _calcBadge(r.calculation_status) +
+      '<span class="kc-code">' + c(code) + '</span>' +
+      (r._draft ? '<span class="kc-badge kc-badge-manual">' + _t('Bản nháp', 'Draft') + '</span>'
+        : retired ? '<span class="kc-badge kc-badge-bad">' + _t('Ngừng dùng', 'Retired') + '</span>'
+        : _calcBadge(r.calculation_status)) +
     '</div>' +
     '<div class="kc-lib-card-name">' + c(r.name_vi || r.name) + '</div>' +
     '<div class="kc-lib-tags">' +
@@ -416,7 +602,8 @@ function _renderLibCard(r){
       '<span class="kc-mini">JD: ' + c((r.applicable_jds || []).join(', ') || '—') + '</span>' +
       '<span class="kc-mini">↔ ' + c(r.counter_metric || '—') + '</span>' +
     '</div>' +
-  '</button>';
+    '<div class="kc-lib-act">' + action + '</div>' +
+  '</div>';
 }
 
 function _renderGroup(key){
@@ -643,9 +830,12 @@ function _styleBlock(){
   '.kc-result-head{font-size:13px;color:var(--text-2,#55617a);padding:2px 2px}' +
   '.kc-result-head b{color:var(--accent,#2563eb);font-size:15px}' +
   '.kc-lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}' +
-  '.kc-lib-card{text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:7px;' +
+  '.kc-lib-card{text-align:left;display:flex;flex-direction:column;gap:7px;' +
     'border:1px solid var(--border,#d7deea);border-radius:10px;padding:12px;background:var(--surface,#fff)}' +
-  '.kc-lib-card:hover{border-color:var(--accent,#2563eb);box-shadow:0 1px 6px rgba(0,0,0,.08)}' +
+  '.kc-lib-card[role=button]{cursor:pointer}' +
+  '.kc-lib-card[role=button]:hover{border-color:var(--accent,#2563eb);box-shadow:0 1px 6px rgba(0,0,0,.08)}' +
+  '.kc-lib-card--retired{opacity:.62;background:var(--surface-2,#f8fafc)}' +
+  '.kc-lib-card--draft{border-color:var(--accent,#2563eb);border-style:dashed}' +
   '.kc-lib-card-top{display:flex;justify-content:space-between;align-items:center;gap:8px}' +
   '.kc-lib-card-name{font-size:13px;font-weight:600;color:var(--text-1,#1a2233)}' +
   '.kc-lib-tags{display:flex;gap:4px;flex-wrap:wrap}' +
@@ -659,20 +849,104 @@ function _styleBlock(){
   '.kc-cat-system{background:#f3f0ff;color:#5f3dc4}' +
   '.kc-lib-foot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;' +
     'border-top:1px solid var(--border,#d7deea);padding-top:6px}' +
+  '.kc-lib-act{display:flex;justify-content:flex-end}' +
+  '.kc-act{font-size:11px;font-weight:600;border-radius:6px;padding:4px 10px;cursor:pointer;' +
+    'border:1px solid var(--border,#d7deea);background:var(--surface,#fff)}' +
+  '.kc-act-del{color:var(--danger,#c92a2a);border-color:var(--danger,#c92a2a)}' +
+  '.kc-act-restore{color:var(--success,#2b8a3e);border-color:var(--success,#2b8a3e)}' +
+  '.kc-nav-spacer{flex:1}' +
+  '.kc-addform{border:1px solid var(--accent,#2563eb);border-radius:12px;padding:16px;' +
+    'background:var(--surface,#fff);display:flex;flex-direction:column;gap:10px}' +
+  '.kc-addform h3{margin:0;font-size:16px;color:var(--text-1,#1a2233)}' +
+  '.kc-addform-actions{display:flex;gap:8px;justify-content:flex-end}' +
   '</style>';
+}
+
+/* ── Add / retire KPI ─────────────────────────────────────────────── */
+function _addSubmit(){
+  var a = _state.addForm;
+  if(!a) return;
+  var code = String(a.canonical_code || '').toUpperCase().replace(/[^A-Z0-9_]/g, '');
+  if(!code){
+    _state.error = _t('Cần nhập mã KPI hợp lệ (A–Z, 0–9, _).', 'Enter a valid KPI code (A–Z, 0–9, _).');
+    _render(); return;
+  }
+  if(_libRows().some(function(r){ return String(r.canonical_code).toUpperCase() === code; })){
+    _state.error = _t('Mã KPI đã tồn tại: ', 'KPI code already exists: ') + code;
+    _render(); return;
+  }
+  if(!a.name_vi && !a.name){
+    _state.error = _t('Cần nhập tên KPI.', 'Enter a KPI name.');
+    _render(); return;
+  }
+  var gp = parseFloat(a.green_point), yp = parseFloat(a.yellow_point);
+  if(isNaN(gp) || isNaN(yp)){
+    _state.error = _t('Cần nhập điểm xanh và điểm vàng (dạng số).',
+      'Green and yellow points are required numbers.');
+    _render(); return;
+  }
+  if(a.direction === 'higher_is_better' && gp < yp){
+    _state.error = _t('Cao hơn là tốt: điểm xanh phải ≥ điểm vàng.',
+      'higher_is_better: green point must be ≥ yellow point.');
+    _render(); return;
+  }
+  if(a.direction === 'lower_is_better' && gp > yp){
+    _state.error = _t('Thấp hơn là tốt: điểm xanh phải ≤ điểm vàng.',
+      'lower_is_better: green point must be ≤ yellow point.');
+    _render(); return;
+  }
+  var thr = { direction:a.direction, unit:a.unit, green_point:gp, yellow_point:yp };
+  var tgt = parseFloat(a.target);
+  if(!isNaN(tgt)) thr.target = tgt;
+  var row = {
+    canonical_code:code, name:(a.name || a.name_vi), name_vi:(a.name_vi || a.name),
+    tier:(a.group === 'governance') ? (a.tier || 'department') : '',
+    process:a.process || 'unclassified', category:a.category || 'internal',
+    owner_role:a.owner_role || '', counter_metric:a.counter_metric || '',
+    cadence:a.cadence || 'monthly', purpose:a.purpose || '', thresholds:thr
+  };
+  if(!_state.added[a.group]) _state.added[a.group] = [];
+  _state.added[a.group].push(row);
+  _state.addForm = null;
+  _state.error = '';
+  _state.message = _t('Đã thêm KPI nháp: ', 'Draft KPI added: ') + code + ' — ' +
+    _t('bấm “Lưu & đồng bộ tài liệu” để ghi.', 'click “Save & sync documents” to persist.');
+  _render();
 }
 
 /* ── Window-exposed handlers ──────────────────────────────────────── */
 window._kpiReload    = function(){ _state.config = null; _load(); };
 window._kpiReset     = function(){ _reset(); };
 window._kpiSave      = function(){ _save(); };
-window._kpiGo        = function(g){ _go(g); };
+window._kpiGo        = function(g){ _state.addForm = null; _go(g); };
 window._kpiSetReason = function(v){ _setReason(v); };
 window._kpiSetField  = function(section, code, field, value){ _setField(section, code, field, value); };
 window._kpiSetThreshold = function(section, code, key, value){ _setThreshold(section, code, key, value); };
 window._kpiSetFilter = function(key, value){ _setFilter(key, value); };
 window._kpiClearFilters = function(){
-  _state.filters = { process:'', category:'', group:'', jd:'', status:'', search:'' };
+  _state.filters = { process:'', category:'', group:'', jd:'', status:'', search:'', retired:'' };
+  _render();
+};
+window._kpiAddOpen   = function(){ _state.addForm = _newAddForm(); _state.error = ''; _state.message = ''; _render(); };
+window._kpiAddClose  = function(){ _state.addForm = null; _render(); };
+window._kpiAddField  = function(key, value){ _afSet(key, value); };
+window._kpiAddSubmit = function(){ _addSubmit(); };
+window._kpiRetire    = function(group, code){
+  code = String(code).toUpperCase();
+  if(!_state.retired[group]) _state.retired[group] = [];
+  if(_state.retired[group].indexOf(code) < 0) _state.retired[group].push(code);
+  _state.message = _t('Đã đánh dấu ngừng dùng: ', 'Marked for retirement: ') + code;
+  _render();
+};
+window._kpiRestore   = function(group, code){
+  code = String(code).toUpperCase();
+  var list = _state.retired[group] || [];
+  _state.retired[group] = list.filter(function(c){ return c !== code; });
+  _render();
+};
+window._kpiDropDraft = function(group, idx){
+  var list = _state.added[group] || [];
+  if(idx >= 0 && idx < list.length) list.splice(idx, 1);
   _render();
 };
 

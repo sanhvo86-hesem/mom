@@ -133,12 +133,19 @@ final class KpiRegistryAdminService
      * @param array<string, mixed> $actor
      * @return array<string, mixed>
      */
-    /** Registry section → overlay override-map key. */
+    /** Registry section → [overlay override-map key, library group name]. */
     private const OVERRIDE_SECTIONS = [
         'annex122_governance_kpis'   => 'governance_overrides',
         'gate_control_metrics'       => 'gate_overrides',
         'proposed_operating_metrics' => 'proposed_overrides',
     ];
+    /** Registry section → KPI Library group key. */
+    private const SECTION_GROUP = [
+        'annex122_governance_kpis'   => 'governance',
+        'gate_control_metrics'       => 'gate',
+        'proposed_operating_metrics' => 'proposed',
+    ];
+    private const VALID_DIRECTION = ['higher_is_better', 'lower_is_better'];
 
     public function save(array $incoming, array $actor, string $reason = ''): array
     {
@@ -153,8 +160,14 @@ final class KpiRegistryAdminService
         ];
         $totalOverrides = 0;
         $effectiveGovernance = [];
+        $addedAll   = ['governance' => [], 'gate' => [], 'proposed' => []];
+        $retiredAll = ['governance' => [], 'gate' => [], 'proposed' => []];
+
+        $rawAdded   = is_array($incoming['added_kpis'] ?? null) ? $incoming['added_kpis'] : [];
+        $rawRetired = is_array($incoming['retired_codes'] ?? null) ? $incoming['retired_codes'] : [];
 
         foreach (self::OVERRIDE_SECTIONS as $section => $key) {
+            $group    = self::SECTION_GROUP[$section];
             $seedRows = is_array($seed[$section] ?? null) ? $seed[$section] : [];
             $knownCodes = [];
             foreach ($seedRows as $row) {
@@ -185,7 +198,39 @@ final class KpiRegistryAdminService
                 }
             }
 
-            // Effective rows = seed + overrides → validate before persisting.
+            // Console-added KPIs for this group — sanitized, codes must not
+            // collide with a seed code or with each other.
+            $added = [];
+            $addedCodes = [];
+            foreach (($rawAdded[$group] ?? []) as $patch) {
+                if (!is_array($patch)) {
+                    continue;
+                }
+                $row = $this->sanitizeAddedKpi($patch);
+                $cc  = strtoupper((string) $row['canonical_code']);
+                if ($cc === '') {
+                    throw new RuntimeException('kpi_registry_added_missing_code');
+                }
+                if (isset($knownCodes[$cc]) || isset($addedCodes[$cc])) {
+                    throw new RuntimeException('kpi_registry_added_code_conflict:' . $cc);
+                }
+                $addedCodes[$cc] = true;
+                $added[] = $row;
+            }
+            $addedAll[$group] = $added;
+
+            // Retired codes — only seed or just-added codes may be retired.
+            $retired = [];
+            foreach (($rawRetired[$group] ?? []) as $c) {
+                $c = strtoupper(trim((string) $c));
+                if ($c !== '' && (isset($knownCodes[$c]) || isset($addedCodes[$c]))) {
+                    $retired[$c] = true;
+                }
+            }
+            $retiredAll[$group] = array_keys($retired);
+
+            // Effective rows = seed + overrides + added → validate the live
+            // (non-retired) set before persisting.
             $effective = [];
             foreach ($seedRows as $row) {
                 if (!is_array($row)) {
@@ -199,24 +244,39 @@ final class KpiRegistryAdminService
                 }
                 $effective[] = $row;
             }
+            foreach ($added as $row) {
+                $effective[] = $row;
+            }
+            $live = array_values(array_filter(
+                $effective,
+                static fn(array $r): bool => !isset($retired[strtoupper(trim((string) ($r['canonical_code'] ?? '')))]),
+            ));
             if ($section === 'annex122_governance_kpis') {
-                $this->validate($effective);
-                $effectiveGovernance = $effective;
+                $this->validate($live);
+                $effectiveGovernance = $live;
             } else {
-                $this->validateMetricThresholds($effective, $section);
+                $this->validateMetricThresholds($live, $section);
             }
 
             $overlay[$key] = $overrides;
             $totalOverrides += count($overrides);
         }
 
+        $overlay['added_kpis']   = $addedAll;
+        $overlay['retired_codes']= $retiredAll;
+
         FileHelper::writeJson($this->overlayPath(), $overlay);
         $regenerated = $this->regenerateAnnex122($effectiveGovernance);
+
+        $addedCount   = count($addedAll['governance']) + count($addedAll['gate']) + count($addedAll['proposed']);
+        $retiredCount = count($retiredAll['governance']) + count($retiredAll['gate']) + count($retiredAll['proposed']);
 
         return [
             'saved'            => true,
             'overlay'          => $overlay,
             'override_count'   => $totalOverrides,
+            'added_count'      => $addedCount,
+            'retired_count'    => $retiredCount,
             'annex122_updated' => $regenerated,
             'config'           => $this->load(),
         ];
@@ -256,21 +316,45 @@ final class KpiRegistryAdminService
 
         $seedSchema    = (int) ($seed['schema_version'] ?? 0);
         $overlaySchema = is_array($overlay) ? (int) ($overlay['schema_version'] ?? 0) : 0;
-        $overrides = is_array($overlay) ? ($overlay[$overrideKey] ?? null) : null;
         // Stale overlay (seed advanced past it) → ignore, same gate as engine.
-        if (!is_array($overrides) || ($seedSchema > 0 && $overlaySchema < $seedSchema)) {
+        if (!is_array($overlay) || ($seedSchema > 0 && $overlaySchema < $seedSchema)) {
             return $rows;
         }
 
-        foreach ($rows as $i => $row) {
-            $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
-            $patch = $overrides[$code] ?? null;
-            if (!is_array($patch)) {
-                continue;
+        // Field-level overrides onto seed rows.
+        $overrides = $overlay[$overrideKey] ?? null;
+        if (is_array($overrides)) {
+            foreach ($rows as $i => $row) {
+                $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+                $patch = $overrides[$code] ?? null;
+                if (!is_array($patch)) {
+                    continue;
+                }
+                foreach (KpiEngine::CONSOLE_EDITABLE_FIELDS as $field) {
+                    if (array_key_exists($field, $patch)) {
+                        $rows[$i][$field] = $patch[$field];
+                    }
+                }
             }
-            foreach (KpiEngine::CONSOLE_EDITABLE_FIELDS as $field) {
-                if (array_key_exists($field, $patch)) {
-                    $rows[$i][$field] = $patch[$field];
+        }
+
+        // Console-added KPIs + soft-retire markers.
+        $group = self::SECTION_GROUP[$section] ?? str_replace('_overrides', '', $overrideKey);
+        foreach (($overlay['added_kpis'][$group] ?? []) as $add) {
+            if (is_array($add) && trim((string) ($add['canonical_code'] ?? '')) !== '') {
+                $rows[] = $add;
+            }
+        }
+        $retired = [];
+        foreach (($overlay['retired_codes'][$group] ?? []) as $c) {
+            $retired[strtoupper(trim((string) $c))] = true;
+        }
+        if ($retired !== []) {
+            foreach ($rows as $i => $row) {
+                $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+                if (isset($retired[$code])) {
+                    $rows[$i]['retired'] = true;
+                    $rows[$i]['calculation_status'] = 'retired';
                 }
             }
         }
@@ -342,6 +426,8 @@ final class KpiRegistryAdminService
                 'purpose'            => $row['purpose'] ?? '',
                 'thresholds'         => $t,
                 'reward_eligible'    => (bool) ($row['reward_eligible'] ?? false),
+                'retired'            => (bool) ($row['retired'] ?? false),
+                'origin'             => (string) ($row['origin'] ?? 'seed'),
             ];
         };
         foreach ($governance as $r) {
@@ -399,6 +485,16 @@ final class KpiRegistryAdminService
                 'count' => $n,
             ];
         }
+        $retiredCount = 0;
+        $addedCount   = 0;
+        foreach ($library as $row) {
+            if (($row['retired'] ?? false) === true) {
+                $retiredCount++;
+            }
+            if (($row['origin'] ?? 'seed') === 'console_added') {
+                $addedCount++;
+            }
+        }
         return [
             'process'            => $processFacet,
             'category'           => $count('category'),
@@ -406,6 +502,8 @@ final class KpiRegistryAdminService
             'tier'               => $count('tier'),
             'calculation_status' => $count('calculation_status'),
             'applicable_jds'     => $count('applicable_jds'),
+            'retired'            => $retiredCount,
+            'console_added'      => $addedCount,
             'total'              => count($library),
         ];
     }
@@ -498,6 +596,69 @@ final class KpiRegistryAdminService
         $value = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/u', '', $value) ?? $value;
         $value = trim($value);
         return mb_substr($value, 0, 2000);
+    }
+
+    /**
+     * Build a clean KPI row from a Console "Add KPI" form payload. Only a
+     * minimal, manually-tracked KPI is created — runtime calculation requires
+     * a code change, so a Console-added KPI is always calculation_status
+     * 'manual' and feeds from kpi_manual_inputs.
+     *
+     * @param array<string, mixed> $patch
+     * @return array<string, mixed>
+     */
+    private function sanitizeAddedKpi(array $patch): array
+    {
+        $code = strtoupper(trim((string) ($patch['canonical_code'] ?? '')));
+        $code = preg_replace('/[^A-Z0-9_]/', '', $code) ?? '';
+
+        $t   = is_array($patch['thresholds'] ?? null) ? $patch['thresholds'] : [];
+        $dir = (string) ($t['direction'] ?? 'higher_is_better');
+        if (!in_array($dir, self::VALID_DIRECTION, true)) {
+            $dir = 'higher_is_better';
+        }
+        $thr = [
+            'direction' => $dir,
+            'unit'      => $this->plainText((string) ($t['unit'] ?? 'percent')),
+        ];
+        foreach (['green_point', 'yellow_point', 'target'] as $k) {
+            if (isset($t[$k]) && is_numeric($t[$k])) {
+                $thr[$k] = (float) $t[$k];
+            }
+        }
+        if (isset($t['basis'])) {
+            $thr['basis'] = $this->plainText((string) $t['basis']);
+        }
+
+        $owner   = $this->plainText((string) ($patch['owner_role'] ?? ''));
+        $cadence = (string) ($patch['cadence'] ?? 'monthly');
+        if (!in_array($cadence, self::VALID_CADENCE, true)) {
+            $cadence = 'monthly';
+        }
+        $counter = trim((string) ($patch['counter_metric'] ?? ''));
+
+        return [
+            'canonical_code'     => $code,
+            'local_id'           => null,
+            'name'               => $this->plainText((string) ($patch['name'] ?? '')),
+            'name_vi'            => $this->plainText((string) ($patch['name_vi'] ?? '')),
+            'tier'               => $this->plainText((string) ($patch['tier'] ?? 'department')),
+            'process'            => $this->plainText((string) ($patch['process'] ?? 'unclassified')),
+            'category'           => $this->plainText((string) ($patch['category'] ?? 'internal')),
+            'owner_role'         => $owner,
+            'data_stewardship_role' => $owner,
+            'applicable_jds'     => $owner !== '' ? [$owner] : [],
+            'counter_metric'     => $counter !== '' ? strtoupper($counter) : null,
+            'cadence'            => $cadence,
+            'layer'              => $this->plainText((string) ($patch['layer'] ?? 'bsc_monthly')),
+            'lead_or_lag'        => ($patch['lead_or_lag'] ?? '') === 'lead' ? 'lead' : 'lag',
+            'calculation_status' => 'manual',
+            'thresholds'         => $thr,
+            'purpose'            => $this->plainText((string) ($patch['purpose'] ?? '')),
+            'decision_action'    => $this->plainText((string) ($patch['decision_action'] ?? '')),
+            'reward_eligible'    => false,
+            'origin'             => 'console_added',
+        ];
     }
 
     // ── Statistics ───────────────────────────────────────────────────────

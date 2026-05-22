@@ -2024,31 +2024,66 @@ final class KpiEngine
             return; // stale overlay — seed advanced past it
         }
 
-        // Each registry section the Console can edit has its own override map.
+        // Each registry section the Console can edit has its own override map
+        // plus optional Console-added KPIs and a retired-code list.
         $sections = [
-            'annex122_governance_kpis'   => 'governance_overrides',
-            'gate_control_metrics'       => 'gate_overrides',
-            'proposed_operating_metrics' => 'proposed_overrides',
+            'annex122_governance_kpis'   => ['governance_overrides', 'governance'],
+            'gate_control_metrics'       => ['gate_overrides', 'gate'],
+            'proposed_operating_metrics' => ['proposed_overrides', 'proposed'],
         ];
+        $addedAll   = is_array($overlay['added_kpis'] ?? null) ? $overlay['added_kpis'] : [];
+        $retiredAll = is_array($overlay['retired_codes'] ?? null) ? $overlay['retired_codes'] : [];
         $applied = false;
-        foreach ($sections as $section => $overrideKey) {
+        foreach ($sections as $section => [$overrideKey, $group]) {
             $overrides = $overlay[$overrideKey] ?? null;
-            $rows = $registry[$section] ?? null;
-            if (!is_array($overrides) || !is_array($rows)) {
+            $rows      = $registry[$section] ?? null;
+            $added     = is_array($addedAll[$group] ?? null) ? $addedAll[$group] : [];
+            $retired   = is_array($retiredAll[$group] ?? null) ? $retiredAll[$group] : [];
+            if (!is_array($rows)) {
                 continue;
             }
-            foreach ($rows as $i => $row) {
-                if (!is_array($row)) {
-                    continue;
+            $hasWork = is_array($overrides) || $added !== [] || $retired !== [];
+            if (!$hasWork) {
+                continue;
+            }
+            // Field-level overrides onto seed rows.
+            if (is_array($overrides)) {
+                foreach ($rows as $i => $row) {
+                    if (!is_array($row)) {
+                        continue;
+                    }
+                    $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+                    $patch = $overrides[$code] ?? null;
+                    if (!is_array($patch)) {
+                        continue;
+                    }
+                    foreach (self::CONSOLE_EDITABLE_FIELDS as $field) {
+                        if (array_key_exists($field, $patch)) {
+                            $rows[$i][$field] = $patch[$field];
+                        }
+                    }
                 }
-                $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
-                $patch = $overrides[$code] ?? null;
-                if (!is_array($patch)) {
-                    continue;
+            }
+            // Append Console-added KPIs.
+            foreach ($added as $row) {
+                if (is_array($row) && trim((string) ($row['canonical_code'] ?? '')) !== '') {
+                    $rows[] = $row;
                 }
-                foreach (self::CONSOLE_EDITABLE_FIELDS as $field) {
-                    if (array_key_exists($field, $patch)) {
-                        $rows[$i][$field] = $patch[$field];
+            }
+            // Mark retired KPIs — soft retire (never physical delete).
+            if ($retired !== []) {
+                $retiredMap = [];
+                foreach ($retired as $c) {
+                    $retiredMap[strtoupper(trim((string) $c))] = true;
+                }
+                foreach ($rows as $i => $row) {
+                    if (!is_array($row)) {
+                        continue;
+                    }
+                    $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+                    if (isset($retiredMap[$code])) {
+                        $rows[$i]['retired'] = true;
+                        $rows[$i]['calculation_status'] = 'retired';
                     }
                 }
             }
