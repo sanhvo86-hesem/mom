@@ -3960,13 +3960,13 @@
   },
   "FRM-703": {
     "code": "FRM-703",
-    "title": "WIP Card",
+    "title": "WIP / Product Identification Tag",
     "path": "mom/docs/forms/frm-700-maintenance/FRM-703_WIP_Tag.xlsx",
     "folder": "mom/docs/forms/frm-700-maintenance",
     "filename": "FRM-703_WIP_Tag.xlsx",
     "ext": "xlsx",
     "rev": "V0",
-    "effective_date": "2026-03-21",
+    "effective_date": "2026-05-22",
     "status": "approved",
     "control_status": "RELEASED",
     "delivery_mode": "download",
@@ -3975,9 +3975,10 @@
     "pack": "B",
     "source_bundle": "Pack_B_Final_Handoff_Package_Reaudited_v3.zip",
     "source_rel": "Pack-B/workbooks/FRM-703_WIP_Tag.xlsx",
-    "sha256": "8f1472c9be6a826cc3457b8c132f1490e7452aa12bcde41f4ac6c1be44c50855",
+    "sha256": "5aa35dd37c0be7229b0379d07423927686e08be80c6d81ebdd7724308c4937e0",
     "notes": [
-      "Initial controlled baseline V0. No archive or backup is retained inside this repository package."
+      "Initial controlled baseline V0. No archive or backup is retained inside this repository package.",
+      "Rebuilt 2026-05-22: absorbed FRM-722 design (consolidation). FRM-722 withdrawn."
     ],
     "active_delivery_profile": "download_only_desktop_excel",
     "browser_open_enabled": false,
@@ -5563,42 +5564,6 @@
     ],
     "server_attachment_policy_path": "mom/docs/forms/.htaccess"
   },
-  "FRM-722": {
-    "code": "FRM-722",
-    "title": "Product Identification Tag",
-    "path": "mom/docs/forms/frm-700-maintenance/FRM-722_Product_Identification_Tag.xlsx",
-    "folder": "mom/docs/forms/frm-700-maintenance",
-    "filename": "FRM-722_Product_Identification_Tag.xlsx",
-    "ext": "xlsx",
-    "rev": "V0",
-    "effective_date": "2026-05-22",
-    "status": "approved",
-    "control_status": "RELEASED",
-    "delivery_mode": "download",
-    "portal_behavior": "download_on_open",
-    "owner": "Warehouse / Production",
-    "pack": "CNC-PROCESS-GAP",
-    "source_bundle": "HESEM_CNC_Process_Form_Gap_Closure_2026-05-22",
-    "source_rel": "CNC-Process-Gap/workbooks/FRM-722_Product_Identification_Tag.xlsx",
-    "sha256": "7826bae71ea360072224d522569737ef5cd7821cbcb017a87cae3c1732bf8136",
-    "notes": [
-      "Controlled baseline V0 — CNC in-process form gap-closure batch (report report-cnc-process-form-gap-analysis-2026-05-22)."
-    ],
-    "active_delivery_profile": "download_only_desktop_excel",
-    "browser_open_enabled": false,
-    "release_workflow_id": "QMS-FRM-EXCEL-V0-BASELINE",
-    "version_control_model": "v0_registry_checksum_control",
-    "desktop_excel_required": true,
-    "delivery_policy_status": "LOCKED_DOWNLOAD_ONLY",
-    "browser_open_adoption_status": "NOT_ADOPTED",
-    "static_package_audit_status": "PASS",
-    "delivery_enforcement": [
-      "portal_download_on_open",
-      "html_anchor_download_attribute",
-      "apache_content_disposition_attachment"
-    ],
-    "server_attachment_policy_path": "mom/docs/forms/.htaccess"
-  },
   "WI-703": {
     "code": "WI-703",
     "title": "Tray Color Identification Instruction",
@@ -5616,7 +5581,7 @@
     "pack": "CNC-PROCESS-GAP",
     "source_bundle": "HESEM_CNC_Process_Form_Gap_Closure_2026-05-22",
     "source_rel": "CNC-Process-Gap/workbooks/WI-703_Tray_Color_Identification_Instruction.xlsx",
-    "sha256": "f579c3c569bc38c502ebe9f117af322e6c8f5ef1ee3a20348a9b507d8ddda17c",
+    "sha256": "8008f330050cb9150be34991a6dfb3b76af14df7bad2989278b7dac6b4b7e7f3",
     "notes": [
       "Controlled baseline V0 — CNC in-process form gap-closure batch (report report-cnc-process-form-gap-analysis-2026-05-22)."
     ],
