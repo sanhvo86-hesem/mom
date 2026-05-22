@@ -760,6 +760,80 @@ final class KpiEngine
         return $out;
     }
 
+    /**
+     * Per-JD weighted KPI scorecards, enriched for document rendering — each
+     * scorecard item carries the KPI's name, numeric thresholds, status and
+     * counter-metric code resolved from the registry. The JD-scorecard
+     * renderer (13-jd-scorecard-renderer.js) hydrates the §KPI section of
+     * every job-description document from this.
+     *
+     * @return array<string, mixed>
+     */
+    public function jdScorecards(): array
+    {
+        $registry = $this->loadKpiAuthorityRegistry();
+        $roles = $registry['jd_kpi_scorecards']['roles'] ?? null;
+        if (!is_array($roles)) {
+            return ['roles' => []];
+        }
+        // canonical code → display metadata
+        $meta = [];
+        foreach (['annex122_governance_kpis', 'gate_control_metrics',
+                  'proposed_operating_metrics'] as $section) {
+            foreach (($registry[$section] ?? []) as $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+                $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+                if ($code === '' || isset($meta[$code])) {
+                    continue;
+                }
+                $cm = $row['counter_metric'] ?? null;
+                $meta[$code] = [
+                    'name_vi'            => (string) ($row['name_vi'] ?? ''),
+                    'name'               => (string) ($row['name'] ?? ''),
+                    'thresholds'         => is_array($row['thresholds'] ?? null)
+                        ? $row['thresholds'] : null,
+                    'calculation_status' => (string) ($row['calculation_status']
+                        ?? ($row['status'] ?? '')),
+                    'tier'               => (string) ($row['tier'] ?? ''),
+                    'counter_code'       => is_array($cm)
+                        ? (string) ($cm['code'] ?? '') : '',
+                ];
+            }
+        }
+        $out = [];
+        foreach ($roles as $roleCode => $card) {
+            if (!is_array($card)) {
+                continue;
+            }
+            $items = [];
+            foreach (($card['scorecard'] ?? []) as $it) {
+                if (!is_array($it)) {
+                    continue;
+                }
+                $code = strtoupper(trim((string) ($it['kpi_code'] ?? '')));
+                $m = $meta[$code] ?? [];
+                $items[] = [
+                    'kpi_code'           => $code,
+                    'weight'             => (int) ($it['weight'] ?? 0),
+                    'rationale'          => (string) ($it['rationale'] ?? ''),
+                    'name_vi'            => $m['name_vi'] ?? '',
+                    'thresholds'         => $m['thresholds'] ?? null,
+                    'calculation_status' => $m['calculation_status'] ?? '',
+                    'counter_code'       => $m['counter_code'] ?? '',
+                ];
+            }
+            $out[strtoupper((string) $roleCode)] = [
+                'role_code'   => (string) ($card['role_code'] ?? $roleCode),
+                'jd_title_vi' => (string) ($card['jd_title_vi'] ?? ''),
+                'jd_file'     => (string) ($card['jd_file'] ?? ''),
+                'scorecard'   => $items,
+            ];
+        }
+        return ['roles' => $out];
+    }
+
     public function isRuntimeCalculatedMetric(string $metricCode): bool
     {
         return in_array($this->normalizeMetricCode($metricCode), self::ALL_METRICS, true);

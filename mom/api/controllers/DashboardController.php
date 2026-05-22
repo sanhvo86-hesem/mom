@@ -443,6 +443,19 @@ final class DashboardController extends BaseController
         $this->success(['badges' => $badges, 'count' => count($badges)]);
     }
 
+    /**
+     * GET /api/kpi/jd-scorecards  (?action=kpi_jd_scorecards)
+     *
+     * Per-JD weighted KPI scorecards for the JD-scorecard renderer to hydrate
+     * the §KPI section of every job-description document. Read-only and
+     * non-sensitive — any authenticated portal user may read it.
+     */
+    public function kpiJdScorecards(): never
+    {
+        $this->requireAuth();
+        $this->success($this->kpi->jdScorecards());
+    }
+
     // ── KPI manual data-input endpoints ──────────────────────────────────────
     // Every KPI in the governed registry exposes a data-input endpoint a
     // frontend can POST to. Runtime KPIs are computed from the DB; staged /
