@@ -1755,8 +1755,11 @@ final class KpiEngine
     }
 
     /**
-     * Numeric thresholds authored for a governance KPI in the registry.
-     * Returns null when the code is not a governance KPI.
+     * Numeric thresholds authored for a metric in the registry. Scans all
+     * three governed sections — governance KPIs, gate control metrics, and
+     * proposed operating metrics — so every KPI (not just governance) gets
+     * arithmetic RAG. Governance wins for a code that appears in more than
+     * one section (single canonical definition).
      *
      * @return array{green_point: float, yellow_point: float, target: float, direction: string, unit: string}|null
      */
@@ -1765,19 +1768,25 @@ final class KpiEngine
         $code = strtoupper(trim($metricCode));
         if ($this->governanceThresholdMap === null) {
             $this->governanceThresholdMap = [];
-            foreach ($this->registryRows($this->loadKpiAuthorityRegistry(), 'annex122_governance_kpis') as $row) {
-                $rc = $this->codeField($row, 'canonical_code');
-                $t = $row['thresholds'] ?? null;
-                if ($rc === '' || !is_array($t) || !isset($t['green_point'], $t['yellow_point'])) {
-                    continue;
+            $registry = $this->loadKpiAuthorityRegistry();
+            // Order matters: governance first (highest authority), then gate,
+            // then proposed — first writer wins for an overlapping code.
+            foreach (['annex122_governance_kpis', 'gate_control_metrics', 'proposed_operating_metrics'] as $section) {
+                foreach ($this->registryRows($registry, $section) as $row) {
+                    $rc = $this->codeField($row, 'canonical_code');
+                    $t = $row['thresholds'] ?? null;
+                    if ($rc === '' || isset($this->governanceThresholdMap[$rc])
+                        || !is_array($t) || !isset($t['green_point'], $t['yellow_point'])) {
+                        continue;
+                    }
+                    $this->governanceThresholdMap[$rc] = [
+                        'green_point'  => (float) $t['green_point'],
+                        'yellow_point' => (float) $t['yellow_point'],
+                        'target'       => (float) ($t['target'] ?? $t['green_point']),
+                        'direction'    => (string) ($t['direction'] ?? 'higher_is_better'),
+                        'unit'         => (string) ($t['unit'] ?? ''),
+                    ];
                 }
-                $this->governanceThresholdMap[$rc] = [
-                    'green_point'  => (float) $t['green_point'],
-                    'yellow_point' => (float) $t['yellow_point'],
-                    'target'       => (float) ($t['target'] ?? $t['green_point']),
-                    'direction'    => (string) ($t['direction'] ?? 'higher_is_better'),
-                    'unit'         => (string) ($t['unit'] ?? ''),
-                ];
             }
         }
         return $this->governanceThresholdMap[$code] ?? null;
@@ -2015,33 +2024,41 @@ final class KpiEngine
             return; // stale overlay — seed advanced past it
         }
 
-        $overrides = $overlay['governance_overrides'] ?? null;
-        if (!is_array($overrides)) {
-            return;
-        }
-
-        $rows = $registry['annex122_governance_kpis'] ?? null;
-        if (!is_array($rows)) {
-            return;
-        }
-        foreach ($rows as $i => $row) {
-            if (!is_array($row)) {
+        // Each registry section the Console can edit has its own override map.
+        $sections = [
+            'annex122_governance_kpis'   => 'governance_overrides',
+            'gate_control_metrics'       => 'gate_overrides',
+            'proposed_operating_metrics' => 'proposed_overrides',
+        ];
+        $applied = false;
+        foreach ($sections as $section => $overrideKey) {
+            $overrides = $overlay[$overrideKey] ?? null;
+            $rows = $registry[$section] ?? null;
+            if (!is_array($overrides) || !is_array($rows)) {
                 continue;
             }
-            $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
-            $patch = $overrides[$code] ?? null;
-            if (!is_array($patch)) {
-                continue;
-            }
-            foreach (self::CONSOLE_EDITABLE_FIELDS as $field) {
-                if (array_key_exists($field, $patch)) {
-                    $rows[$i][$field] = $patch[$field];
+            foreach ($rows as $i => $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+                $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+                $patch = $overrides[$code] ?? null;
+                if (!is_array($patch)) {
+                    continue;
+                }
+                foreach (self::CONSOLE_EDITABLE_FIELDS as $field) {
+                    if (array_key_exists($field, $patch)) {
+                        $rows[$i][$field] = $patch[$field];
+                    }
                 }
             }
+            $registry[$section] = $rows;
+            $applied = true;
         }
-        $registry['annex122_governance_kpis'] = $rows;
-        $registry['runtime_overlay_applied'] = true;
-        $registry['runtime_overlay_updated_at'] = (string) ($overlay['updated_at'] ?? '');
+        if ($applied) {
+            $registry['runtime_overlay_applied'] = true;
+            $registry['runtime_overlay_updated_at'] = (string) ($overlay['updated_at'] ?? '');
+        }
     }
 
     /**

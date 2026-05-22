@@ -24,6 +24,8 @@ declare(strict_types=1);
  *   4. Duplicate canonical_code among governance KPIs.
  *   5. A legacy alias maps to a code that is not a known metric.
  *   6. A gate metric linked_cdr references a CDR absent from ANNEX-121.
+ *   8. A gate / proposed metric is missing a counter-metric, or its
+ *      thresholds (where present) are non-numeric or wrongly ordered.
  *   7. A governance KPI is missing a counter_metric, or its counter is not a
  *      known code / is the KPI itself.
  *
@@ -247,6 +249,39 @@ foreach ($gateMetrics as $g) {
         $cdr = strtoupper(trim((string) $cdr));
         if ($cdr !== '' && !in_array($cdr, $cdrCodes, true)) {
             $p0[] = "Gate metric $local: linked_cdr '$cdr' does not exist in ANNEX-121.";
+        }
+    }
+}
+
+// ── P0.8 — gate + proposed metrics uniform: counter-metric + numeric ─────────
+// thresholds, identical to governance KPIs (no metric is left without an
+// anti-gaming counter; thresholds, where present, are numeric and ordered).
+foreach (['gate_control_metrics' => $gateMetrics, 'proposed_operating_metrics' => $proposed] as $label => $set) {
+    foreach ($set as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $rc = strtoupper(trim((string) ($row['canonical_code'] ?? '?')));
+        $counter = strtoupper(trim((string) ($row['counter_metric'] ?? '')));
+        if ($counter === '') {
+            $p0[] = "$label $rc: counter_metric is empty — every metric needs an "
+                . "anti-gaming counter-metric.";
+        } elseif (!isset($knownCodes[$counter])) {
+            $p0[] = "$label $rc: counter_metric '$counter' is not a known metric code.";
+        }
+        $t = $row['thresholds'] ?? null;
+        if (is_array($t) && isset($t['green_point'])) {
+            if (!is_numeric($t['green_point']) || !is_numeric($t['yellow_point'] ?? null)) {
+                $p0[] = "$label $rc: thresholds present but not numeric.";
+            } else {
+                $gp = (float) $t['green_point'];
+                $yp = (float) $t['yellow_point'];
+                $dir = (string) ($t['direction'] ?? 'higher_is_better');
+                if (($dir === 'higher_is_better' && $gp < $yp)
+                    || ($dir === 'lower_is_better' && $gp > $yp)) {
+                    $p0[] = "$label $rc: threshold points not ordered for direction $dir.";
+                }
+            }
         }
     }
 }

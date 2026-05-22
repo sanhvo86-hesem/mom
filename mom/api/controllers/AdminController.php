@@ -1211,14 +1211,23 @@ class AdminController extends BaseController
         $this->requireAnyRole($user, array_values(array_unique(array_merge(admin_roles(), ['ceo', 'general_director']))));
 
         $body = $this->jsonBody();
-        $overrides = $body['governance_overrides'] ?? null;
-        if (!is_array($overrides)) {
-            $this->error('invalid_config', 400, 'KPI registry save needs a governance_overrides object.');
+        $governance = $body['governance_overrides'] ?? [];
+        $gate       = $body['gate_overrides'] ?? [];
+        $proposed   = $body['proposed_overrides'] ?? [];
+        if (!is_array($governance) || !is_array($gate) || !is_array($proposed)) {
+            $this->error('invalid_config', 400, 'KPI registry save needs override objects.');
+        }
+        if ($governance === [] && $gate === [] && $proposed === []) {
+            $this->error('invalid_config', 400, 'No KPI changes supplied to save.');
         }
 
         try {
             $result = $this->kpiRegistryAdmin()->save(
-                ['governance_overrides' => $overrides],
+                [
+                    'governance_overrides' => $governance,
+                    'gate_overrides'       => $gate,
+                    'proposed_overrides'   => $proposed,
+                ],
                 $user,
                 trim((string)($body['reason'] ?? '')),
             );

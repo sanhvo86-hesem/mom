@@ -16,33 +16,36 @@
 var _el = null;
 var _lang = 'vi';
 
-/* Editable governance groups + read-only reference groups. */
+/* All KPI groups are uniformly editable — thresholds + counter-metric. */
 var GROUPS = [
-  { key:'company',      tier:'company',      editable:true,
+  { key:'company',      tier:'company',      section:'governance', editable:true,
     vi:'KPI cấp công ty', en:'Company KPIs',
     descVi:'KPI lãnh đạo — giao hàng, chất lượng, an toàn, biên lợi nhuận.',
     descEn:'Leadership KPIs — delivery, quality, safety, margin.' },
-  { key:'value_stream', tier:'value_stream', editable:true,
+  { key:'value_stream', tier:'value_stream', section:'governance', editable:true,
     vi:'KPI value-stream', en:'Value-stream KPIs',
     descVi:'KPI hiệu lực RFQ → Plan → sản xuất → Ship → Hóa đơn.',
     descEn:'Value-stream effectiveness KPIs.' },
-  { key:'department',   tier:'department',   editable:true,
+  { key:'department',   tier:'department',   section:'governance', editable:true,
     vi:'KPI phòng ban', en:'Department KPIs',
     descVi:'KPI trong phạm vi kiểm soát của từng phòng ban.',
     descEn:'Department-scoped KPIs.' },
-  { key:'gate',         tier:null,           editable:false,
+  { key:'gate',         tier:null,           section:'gate',      editable:true,
     vi:'Gate metric', en:'Gate metrics',
-    descVi:'Metric đo điều kiện pass cổng G0→G7 (chỉ xem).',
-    descEn:'Gate pass-condition metrics G0→G7 (read-only).' },
-  { key:'proposed',     tier:null,           editable:false,
+    descVi:'Metric đo điều kiện pass cổng G0→G7 — chỉnh ngưỡng & counter-metric.',
+    descEn:'Gate pass-condition metrics G0→G7 — editable thresholds & counter.' },
+  { key:'proposed',     tier:null,           section:'proposed',  editable:true,
     vi:'Metric đề xuất', en:'Proposed metrics',
-    descVi:'Metric TOC / Lean đề xuất, chờ data contract (chỉ xem).',
-    descEn:'Proposed TOC / Lean metrics (read-only).' }
+    descVi:'Metric TOC / Lean đề xuất — chỉnh ngưỡng & counter-metric.',
+    descEn:'Proposed TOC / Lean metrics — editable thresholds & counter.' }
 ];
 
 var _state = {
   loading:false, saving:false, error:'', message:'',
-  config:null, overrides:{}, reason:'', activeGroup:'overview'
+  config:null,
+  /* overrides keyed by section then code */
+  overrides:{ governance:{}, gate:{}, proposed:{} },
+  reason:'', activeGroup:'overview'
 };
 
 window._renderAdminKpiRegistry = function(el, langCode){
@@ -68,7 +71,7 @@ function _load(){
     .then(function(data){
       if(!data || data.ok === false) throw new Error((data && (data.message || data.error)) || 'load_failed');
       _state.config = data.config || {};
-      _state.overrides = {};
+      _state.overrides = { governance:{}, gate:{}, proposed:{} };
       _state.reason = '';
     })
     .catch(function(err){
@@ -87,13 +90,15 @@ function _save(){
   _state.saving = true; _state.error = ''; _state.message = '';
   _render();
   apiCall('admin_kpi_registry_save', {
-    governance_overrides: _state.overrides,
+    governance_overrides: _state.overrides.governance || {},
+    gate_overrides:       _state.overrides.gate || {},
+    proposed_overrides:   _state.overrides.proposed || {},
     reason: _state.reason || ''
   }, 'POST', 90000)
     .then(function(data){
       if(!data || data.ok === false) throw new Error((data && (data.message || data.error)) || 'save_failed');
       _state.config = data.config || {};
-      _state.overrides = {};
+      _state.overrides = { governance:{}, gate:{}, proposed:{} };
       _state.reason = '';
       _state.message = _t('Đã lưu và đồng bộ ANNEX-122.', 'Saved and synced ANNEX-122.')
         + (data.annex122_updated ? '' : ' ' + _t('(ANNEX-122 không đổi)', '(ANNEX-122 unchanged)'));
@@ -104,7 +109,7 @@ function _save(){
     .finally(function(){ _state.saving = false; _render(); });
 }
 
-/* ── Draft model — overrides keyed by code ─────────────────────────── */
+/* ── Draft model — overrides keyed by section then code ────────────── */
 function _kpis(){
   return (_state.config && Array.isArray(_state.config.governance_kpis))
     ? _state.config.governance_kpis : [];
@@ -112,34 +117,48 @@ function _kpis(){
 function _kpisByTier(tier){
   return _kpis().filter(function(k){ return k.tier === tier; });
 }
-function _dirty(){ return Object.keys(_state.overrides).length > 0; }
+function _sectionMetrics(section){
+  if(!_state.config) return [];
+  if(section === 'gate') return _state.config.gate_control_metrics || [];
+  if(section === 'proposed') return _state.config.proposed_operating_metrics || [];
+  return _kpis();
+}
+function _dirty(){
+  var o = _state.overrides;
+  return Object.keys(o.governance||{}).length
+       + Object.keys(o.gate||{}).length
+       + Object.keys(o.proposed||{}).length > 0;
+}
 
 /* Effective value of an editable field: override wins over config. */
-function _val(kpi, field){
-  var code = kpi.canonical_code;
-  if(_state.overrides[code] && Object.prototype.hasOwnProperty.call(_state.overrides[code], field)){
-    return _state.overrides[code][field];
+function _val(metric, section, field){
+  var sec = _state.overrides[section] || {};
+  var code = metric.canonical_code;
+  if(sec[code] && Object.prototype.hasOwnProperty.call(sec[code], field)){
+    return sec[code][field];
   }
-  return kpi[field];
+  return metric[field];
 }
-function _threshold(kpi, key){
-  var t = _val(kpi, 'thresholds') || kpi.thresholds || {};
+function _threshold(metric, section, key){
+  var t = _val(metric, section, 'thresholds') || metric.thresholds || {};
   return t[key] != null ? t[key] : '';
 }
 
-function _setField(code, field, value){
-  if(!_state.overrides[code]) _state.overrides[code] = {};
-  _state.overrides[code][field] = value;
+function _setField(section, code, field, value){
+  if(!_state.overrides[section]) _state.overrides[section] = {};
+  if(!_state.overrides[section][code]) _state.overrides[section][code] = {};
+  _state.overrides[section][code][field] = value;
   _state.error = ''; _state.message = '';
   _syncStatus();
 }
-function _setThreshold(code, key, value){
-  var kpi = null, list = _kpis();
-  for(var i=0;i<list.length;i++){ if(list[i].canonical_code===code){ kpi=list[i]; break; } }
-  if(!kpi) return;
-  var cur = (_state.overrides[code] && _state.overrides[code].thresholds)
-    ? _state.overrides[code].thresholds
-    : Object.assign({}, kpi.thresholds || {});
+function _setThreshold(section, code, key, value){
+  var metric = null, list = _sectionMetrics(section);
+  for(var i=0;i<list.length;i++){ if(list[i].canonical_code===code){ metric=list[i]; break; } }
+  if(!metric) return;
+  var sec = _state.overrides[section] || {};
+  var cur = (sec[code] && sec[code].thresholds)
+    ? sec[code].thresholds
+    : Object.assign({}, metric.thresholds || {});
   // green_point / yellow_point / target are numeric SSOT fields.
   if(key === 'green_point' || key === 'yellow_point' || key === 'target'){
     var n = parseFloat(value);
@@ -147,7 +166,7 @@ function _setThreshold(code, key, value){
   } else {
     cur[key] = value;
   }
-  _setField(code, 'thresholds', cur);
+  _setField(section, code, 'thresholds', cur);
 }
 
 /* Derive (green,yellow,red) display bands from numeric thresholds — mirrors
@@ -163,7 +182,8 @@ function _ragBands(t){
 }
 function _setReason(value){ _state.reason = value; }
 function _reset(){
-  _state.overrides = {}; _state.reason = '';
+  _state.overrides = { governance:{}, gate:{}, proposed:{} };
+  _state.reason = '';
   _state.error = ''; _state.message = _t('Đã hoàn tác các thay đổi chưa lưu.', 'Reverted unsaved changes.');
   _render();
 }
@@ -244,15 +264,14 @@ function _renderOverview(){
   }).join('');
 
   var tiles = GROUPS.map(function(g){
-    var count = g.editable ? _kpisByTier(g.tier).length
-      : (g.key === 'gate' ? (cfg.gate_control_metrics || []).length
-                          : (cfg.proposed_operating_metrics || []).length);
+    var count = (g.section === 'governance') ? _kpisByTier(g.tier).length
+      : (g.section === 'gate' ? (cfg.gate_control_metrics || []).length
+                              : (cfg.proposed_operating_metrics || []).length);
     return '<button class="kc-tile" type="button" onclick="_kpiGo(\'' + g.key + '\')">' +
       '<span class="kc-tile-top"><span class="kc-tile-name">' + _esc(_t(g.vi, g.en)) + '</span>' +
       '<span class="kc-tile-count">' + count + '</span></span>' +
       '<span class="kc-tile-desc">' + _esc(_t(g.descVi, g.descEn)) + '</span>' +
-      '<span class="kc-tag ' + (g.editable ? 'kc-tag-edit' : 'kc-tag-ro') + '">' +
-        (g.editable ? _t('Biên tập được', 'Editable') : _t('Chỉ xem', 'Read-only')) + '</span>' +
+      '<span class="kc-tag kc-tag-edit">' + _t('Biên tập được', 'Editable') + '</span>' +
     '</button>';
   }).join('');
 
@@ -276,21 +295,10 @@ function _renderGroup(key){
   var nav = '<div class="kc-nav"><button class="kc-btn" type="button" onclick="_kpiGo(\'overview\')">‹ ' +
     _t('Tổng quan', 'Overview') + '</button><span class="kc-nav-title">' + _esc(_t(g.vi, g.en)) + '</span></div>';
 
-  var rows;
-  if(g.editable){
-    rows = _kpisByTier(g.tier).map(_renderEditCard).join('');
-    if(!rows) rows = '<div class="hm-empty">' + _t('Không có KPI.', 'No KPIs.') + '</div>';
-    return nav + '<div class="kc-cards">' + rows + '</div>';
-  }
-  var list = (key === 'gate')
-    ? (_state.config.gate_control_metrics || [])
-    : (_state.config.proposed_operating_metrics || []);
-  rows = list.map(_renderReadOnlyRow).join('');
-  return nav +
-    '<div class="kc-table-wrap"><table class="kc-table"><thead><tr>' +
-      '<th>' + _t('Mã', 'Code') + '</th><th>' + _t('Tên', 'Name') + '</th>' +
-      '<th>' + _t('Chi tiết', 'Detail') + '</th><th>' + _t('Trạng thái', 'Status') + '</th>' +
-    '</tr></thead><tbody>' + (rows || '') + '</tbody></table></div>';
+  var list = (g.section === 'governance') ? _kpisByTier(g.tier) : _sectionMetrics(g.section);
+  var rows = list.map(function(m){ return _renderEditCard(m, g.section); }).join('');
+  if(!rows) rows = '<div class="hm-empty">' + _t('Không có KPI.', 'No KPIs.') + '</div>';
+  return nav + '<div class="kc-cards">' + rows + '</div>';
 }
 
 /* Role / counter-metric option lists. */
@@ -309,7 +317,9 @@ function _cadenceOptions(selected){
     })).join('');
 }
 function _counterOptions(selected){
-  var codes = _kpis().map(function(k){ return k.canonical_code; });
+  // Span every governed metric code (governance + gate + proposed) so a
+  // counter-metric can be picked across groups.
+  var codes = (_state.config && _state.config.all_metric_codes) || [];
   return ['<option value=""' + (!selected ? ' selected' : '') + '>— ' + _t('không có', 'none') + ' —</option>'].concat(
     codes.map(function(c){
       return '<option value="' + _esc(c) + '"' + (c === selected ? ' selected' : '') + '>' + _esc(c) + '</option>';
@@ -324,83 +334,98 @@ function _calcBadge(status){
   return '<span class="kc-badge kc-badge-staged">' + _t('Chưa có data contract', 'No data contract') + '</span>';
 }
 
-function _renderEditCard(kpi){
-  var code = kpi.canonical_code;
-  var dirty = !!_state.overrides[code];
+/* Unified edit card for every group. Threshold + counter-metric are
+   editable for all metrics; governance KPIs additionally expose owner,
+   data steward, cadence, decision and action; gate metrics expose owner
+   and cadence. Structural fields (formula, gate, linked_cdr) are read-only. */
+function _renderEditCard(m, section){
+  var code = m.canonical_code;
   var c = function(s){ return _esc(s == null ? '' : s); };
-  return '<article class="kc-card' + (dirty ? ' kc-card--dirty' : '') + '" data-kpi-code="' + c(code) + '">' +
+  var sec = _state.overrides[section] || {};
+  var dirty = !!sec[code];
+  var hasThresholds = !!(_val(m, section, 'thresholds') || m.thresholds);
+  var status = m.calculation_status || (m.status === 'retained_from_annex122' ? 'staged_data_contract' : m.status);
+
+  var html = '<article class="kc-card' + (dirty ? ' kc-card--dirty' : '') + '" data-kpi-code="' + c(code) + '">' +
     '<div class="kc-card-head">' +
       '<div><span class="kc-code">' + c(code) + '</span> ' +
-        '<span class="kc-card-name">' + c(kpi.name_vi || kpi.name) + '</span></div>' +
-      _calcBadge(kpi.calculation_status) +
-    '</div>' +
-    (kpi.calculation_status === 'staged_data_contract'
-      ? '<div class="kc-warn">' + _t('KPI chưa có hợp đồng dữ liệu — số liệu hiển thị là tạm.', 'KPI has no data contract yet — values shown are provisional.') + '</div>'
-      : '') +
-    _ragPreview(kpi) +
-    '<div class="kc-grid">' +
-      _field(_t('Điểm xanh (green_point)', 'Green point'),
-        '<input class="kc-input" type="number" step="any" value="' + c(_threshold(kpi,'green_point')) +
-        '" oninput="_kpiSetThreshold(\'' + c(code) + '\',\'green_point\',this.value)">') +
+        '<span class="kc-card-name">' + c(m.name_vi || m.name) + '</span></div>' +
+      _calcBadge(status) +
+    '</div>';
+
+  if(section === 'gate'){
+    html += '<div class="kc-mini">' + _t('Cổng', 'Gate') + ' ' + c(m.gate || '—') +
+      ' · CDR ' + c((m.linked_cdr || []).join(', ')) + '</div>';
+  }
+  if(status === 'staged_data_contract'){
+    html += '<div class="kc-warn">' + _t('KPI chưa có hợp đồng dữ liệu — nhập số qua endpoint nhập liệu.',
+      'KPI has no data contract — feed it via the data-input endpoint.') + '</div>';
+  }
+  html += _ragPreview(m, section);
+
+  html += '<div class="kc-grid">';
+  if(hasThresholds){
+    html += _field(_t('Điểm xanh (green_point)', 'Green point'),
+        '<input class="kc-input" type="number" step="any" value="' + c(_threshold(m,section,'green_point')) +
+        '" oninput="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'green_point\',this.value)">') +
       _field(_t('Điểm vàng (yellow_point)', 'Yellow point'),
-        '<input class="kc-input" type="number" step="any" value="' + c(_threshold(kpi,'yellow_point')) +
-        '" oninput="_kpiSetThreshold(\'' + c(code) + '\',\'yellow_point\',this.value)">') +
+        '<input class="kc-input" type="number" step="any" value="' + c(_threshold(m,section,'yellow_point')) +
+        '" oninput="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'yellow_point\',this.value)">') +
       _field(_t('Chiều / đơn vị', 'Direction / unit'),
         '<input class="kc-input" type="text" disabled value="' +
-        c((_threshold(kpi,'direction')||'') + ' · ' + (_threshold(kpi,'unit')||'')) + '">') +
-      _field(_t('Owner', 'Owner'),
-        '<select class="kc-input" onchange="_kpiSetField(\'' + c(code) + '\',\'owner_role\',this.value)">' +
-        _roleOptions(_val(kpi,'owner_role')) + '</select>') +
-      _field(_t('Xác nhận dữ liệu', 'Data steward'),
-        '<select class="kc-input" onchange="_kpiSetField(\'' + c(code) + '\',\'data_stewardship_role\',this.value)">' +
-        _roleOptions(_val(kpi,'data_stewardship_role')) + '</select>') +
+        c((_threshold(m,section,'direction')||'') + ' · ' + (_threshold(m,section,'unit')||'')) + '">');
+  } else {
+    html += _field(_t('Ngưỡng', 'Thresholds'),
+      '<input class="kc-input" type="text" disabled value="' +
+      _t('Quản lý ở KPI governance cùng mã', 'Managed on the governance KPI of the same code') + '">');
+  }
+  if(section === 'governance' || section === 'gate'){
+    html += _field(_t('Owner', 'Owner'),
+      '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'owner_role\',this.value)">' +
+      _roleOptions(_val(m,section,'owner_role')) + '</select>') +
       _field(_t('Nhịp', 'Cadence'),
-        '<select class="kc-input" onchange="_kpiSetField(\'' + c(code) + '\',\'cadence\',this.value)">' +
-        _cadenceOptions(_val(kpi,'cadence')) + '</select>') +
-      _field(_t('Counter-metric', 'Counter-metric'),
-        '<select class="kc-input" onchange="_kpiSetField(\'' + c(code) + '\',\'counter_metric\',this.value)">' +
-        _counterOptions(_val(kpi,'counter_metric')) + '</select>') +
-    '</div>' +
-    _field(_t('Căn cứ ngưỡng', 'Threshold basis'),
-      '<textarea class="kc-input kc-ta" oninput="_kpiSetThreshold(\'' + c(code) + '\',\'basis\',this.value)">' +
-      c(_threshold(kpi,'basis')) + '</textarea>') +
-    _field(_t('Quyết định khi lệch ngưỡng', 'Decision on threshold breach'),
-      '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + c(code) + '\',\'decision_action\',this.value)">' +
-      c(_val(kpi,'decision_action')) + '</textarea>') +
-    _field(_t('Tham chiếu hành động (CDR / SOP / WI)', 'Action reference (CDR / SOP / WI)'),
-      '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + c(code) + '\',\'action_reference\',this.value)">' +
-      c(_val(kpi,'action_reference')) + '</textarea>') +
-  '</article>';
+      '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'cadence\',this.value)">' +
+      _cadenceOptions(_val(m,section,'cadence')) + '</select>');
+  }
+  if(section === 'governance'){
+    html += _field(_t('Xác nhận dữ liệu', 'Data steward'),
+      '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'data_stewardship_role\',this.value)">' +
+      _roleOptions(_val(m,section,'data_stewardship_role')) + '</select>');
+  }
+  html += _field(_t('Counter-metric', 'Counter-metric'),
+    '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'counter_metric\',this.value)">' +
+    _counterOptions(_val(m,section,'counter_metric')) + '</select>');
+  html += '</div>';
+
+  if(hasThresholds){
+    html += _field(_t('Căn cứ ngưỡng', 'Threshold basis'),
+      '<textarea class="kc-input kc-ta" oninput="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'basis\',this.value)">' +
+      c(_threshold(m,section,'basis')) + '</textarea>');
+  }
+  if(section === 'governance'){
+    html += _field(_t('Quyết định khi lệch ngưỡng', 'Decision on threshold breach'),
+      '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'governance\',\'' + c(code) + '\',\'decision_action\',this.value)">' +
+      c(_val(m,section,'decision_action')) + '</textarea>') +
+      _field(_t('Tham chiếu hành động (CDR / SOP / WI)', 'Action reference (CDR / SOP / WI)'),
+      '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'governance\',\'' + c(code) + '\',\'action_reference\',this.value)">' +
+      c(_val(m,section,'action_reference')) + '</textarea>');
+  }
+  return html + '</article>';
 }
 
 function _field(label, control){
   return '<div class="kc-f"><label>' + _esc(label) + '</label>' + control + '</div>';
 }
 
-/* Live RAG-band preview computed from the (possibly edited) numeric
-   thresholds — shows the editor what green/yellow/red resolve to. */
-function _ragPreview(kpi){
-  var t = _val(kpi, 'thresholds') || kpi.thresholds || {};
+/* Live RAG-band preview from the (possibly edited) numeric thresholds. */
+function _ragPreview(m, section){
+  var t = _val(m, section, 'thresholds') || m.thresholds || {};
   var b = _ragBands(t);
   if(!b) return '';
   return '<div class="kc-rag">' +
     '<span class="kc-badge kc-badge-ok">' + _esc(b.green) + '</span> ' +
     '<span class="kc-badge kc-badge-staged">' + _esc(b.yellow) + '</span> ' +
     '<span class="kc-badge kc-badge-bad">' + _esc(b.red) + '</span></div>';
-}
-
-function _renderReadOnlyRow(m){
-  var detail;
-  if(m.gate){
-    detail = _t('Cổng', 'Gate') + ' ' + _esc(m.gate) +
-      ' · CDR ' + _esc((m.linked_cdr || []).join(', ')) +
-      '<br><span class="kc-mini">' + _esc(m.gate_pass_condition || '') + '</span>';
-  } else {
-    detail = _esc(m.layer || '') + '<br><span class="kc-mini">' + _esc(m.name || '') + '</span>';
-  }
-  return '<tr><td><span class="kc-code">' + _esc(m.canonical_code || m.local_id || '') + '</span></td>' +
-    '<td>' + _esc(m.name || '') + '</td><td>' + detail + '</td>' +
-    '<td>' + _calcBadge(m.calculation_status || (m.status === 'retained' ? 'staged_data_contract' : m.status)) + '</td></tr>';
 }
 
 /* ── Styles — Graphics Authority tokens only ──────────────────────── */
@@ -477,7 +502,7 @@ window._kpiReset     = function(){ _reset(); };
 window._kpiSave      = function(){ _save(); };
 window._kpiGo        = function(g){ _go(g); };
 window._kpiSetReason = function(v){ _setReason(v); };
-window._kpiSetField  = function(code, field, value){ _setField(code, field, value); };
-window._kpiSetThreshold = function(code, key, value){ _setThreshold(code, key, value); };
+window._kpiSetField  = function(section, code, field, value){ _setField(section, code, field, value); };
+window._kpiSetThreshold = function(section, code, key, value){ _setThreshold(section, code, key, value); };
 
 })();

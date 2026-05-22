@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
   "version": "2026-05-21",
-  "schema_version": 7,
+  "schema_version": 8,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. Existing ANNEX-122 KPIs are retained, legacy metric aliases are mapped to canonical codes, and proposed CNC operating metrics are staged without granting automatic runtime authority.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -1754,91 +1754,274 @@
       "canonical_code": "OEE_BOTTLENECK",
       "name": "OEE at current constraint resource",
       "layer": "toc_weekly",
-      "status": "staged_data_contract"
+      "status": "staged_data_contract",
+      "name_vi": "OEE tại nguồn lực điểm thắt cổ chai",
+      "purpose": "Đo hiệu suất thiết bị tại điểm thắt cổ chai để quyết định gỡ nút thắt theo TOC.",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 85.0,
+        "yellow_point": 70.0,
+        "target": 85.0,
+        "basis": "Ngưỡng đề xuất cho metric OEE_BOTTLENECK; hiệu chỉnh khi có dữ liệu thật."
+      },
+      "counter_metric": "FPY",
+      "calculation_status": "staged_data_contract"
     },
     {
       "canonical_code": "BOTTLENECK_BUFFER_STATUS",
       "name": "Constraint buffer red/yellow/green status",
       "layer": "toc_weekly",
-      "status": "staged_data_contract"
+      "status": "staged_data_contract",
+      "name_vi": "Trạng thái đệm điểm thắt cổ chai",
+      "purpose": "Đo mức đệm trước điểm thắt cổ chai để quyết định nạp/giữ WIP.",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 80.0,
+        "yellow_point": 50.0,
+        "target": 80.0,
+        "basis": "Ngưỡng đề xuất cho metric BOTTLENECK_BUFFER_STATUS; hiệu chỉnh khi có dữ liệu thật."
+      },
+      "counter_metric": "THROUGHPUT_PER_CONSTRAINT_HOUR",
+      "calculation_status": "staged_data_contract"
     },
     {
       "canonical_code": "THROUGHPUT_PER_CONSTRAINT_HOUR",
       "name": "Revenue/throughput per constraint hour",
       "layer": "toc_weekly",
-      "status": "staged_data_contract"
+      "status": "staged_data_contract",
+      "name_vi": "Thông lượng trên mỗi giờ điểm thắt cổ chai",
+      "purpose": "Đo giá trị tạo ra trên mỗi giờ điểm thắt cổ chai để quyết định ưu tiên đơn hàng.",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "ratio",
+        "green_point": 1.0,
+        "yellow_point": 0.8,
+        "target": 1.0,
+        "basis": "Ngưỡng đề xuất cho metric THROUGHPUT_PER_CONSTRAINT_HOUR; hiệu chỉnh khi có dữ liệu thật.",
+        "calibration_pending": true
+      },
+      "counter_metric": "FPY",
+      "calculation_status": "staged_data_contract"
     },
     {
       "canonical_code": "CONSTRAINT_LOST_HOURS",
       "name": "Lost available hours at constraint",
       "layer": "toc_weekly",
-      "status": "staged_data_contract"
+      "status": "staged_data_contract",
+      "name_vi": "Giờ mất tại điểm thắt cổ chai",
+      "purpose": "Đo giờ khả dụng bị mất tại điểm thắt cổ chai để quyết định hành động khôi phục.",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hour",
+        "green_point": 4.0,
+        "yellow_point": 12.0,
+        "target": 4.0,
+        "basis": "Ngưỡng đề xuất cho metric CONSTRAINT_LOST_HOURS; hiệu chỉnh khi có dữ liệu thật."
+      },
+      "counter_metric": "THROUGHPUT_PER_CONSTRAINT_HOUR",
+      "calculation_status": "staged_data_contract"
     },
     {
       "canonical_code": "WIP_BEFORE_CONSTRAINT",
       "name": "Released WIP before constraint",
       "layer": "toc_weekly",
-      "status": "staged_data_contract"
+      "status": "staged_data_contract",
+      "name_vi": "WIP trước điểm thắt cổ chai",
+      "purpose": "Đo lượng WIP đã nạp trước điểm thắt cổ chai để giữ đệm đủ mà không ứ đọng.",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hour",
+        "green_point": 16.0,
+        "yellow_point": 40.0,
+        "target": 16.0,
+        "basis": "Ngưỡng đề xuất cho metric WIP_BEFORE_CONSTRAINT; hiệu chỉnh khi có dữ liệu thật.",
+        "calibration_pending": true
+      },
+      "counter_metric": "WIP_AGING",
+      "calculation_status": "staged_data_contract"
     },
     {
       "canonical_code": "SETUP_FIRST_PASS",
       "name": "Setup ready-to-run first-pass acceptance",
       "layer": "lean_daily",
-      "status": "staged_data_contract"
+      "status": "staged_data_contract",
+      "name_vi": "Cài đặt đạt ngay lần đầu",
+      "purpose": "Đo tỷ lệ cài đặt đạt ngay lần đầu để quyết định soát quy trình/đồ gá.",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95.0,
+        "yellow_point": 88.0,
+        "target": 95.0,
+        "basis": "Ngưỡng đề xuất cho metric SETUP_FIRST_PASS; hiệu chỉnh khi có dữ liệu thật."
+      },
+      "counter_metric": "FAI_FIRST_PASS",
+      "calculation_status": "staged_data_contract"
     },
     {
       "canonical_code": "FAI_FIRST_PASS",
       "name": "FAI/first-piece first-pass acceptance",
       "layer": "qms_mes_gate",
-      "status": "retained_from_annex122"
+      "status": "retained_from_annex122",
+      "name_vi": "Chấp nhận mẫu đầu/FAI ngay lần đầu",
+      "purpose": "Đo tỷ lệ FAI đạt ngay lần đầu — đồng bộ với KPI value-stream cùng mã.",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95.0,
+        "yellow_point": 88.0,
+        "target": 95.0,
+        "basis": "Ngưỡng đề xuất cho metric FAI_FIRST_PASS; hiệu chỉnh khi có dữ liệu thật."
+      },
+      "counter_metric": "FINAL_RELEASE_RFT",
+      "calculation_status": "retained_from_annex122"
     },
     {
       "canonical_code": "IN_PROCESS_REJECT_RATE",
       "name": "In-process reject rate",
       "layer": "lean_daily",
-      "status": "staged_data_contract"
+      "status": "staged_data_contract",
+      "name_vi": "Tỷ lệ loại trong quá trình",
+      "purpose": "Đo tỷ lệ loại trong quá trình để quyết định mở NCR và soát quy trình.",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 1.0,
+        "yellow_point": 3.0,
+        "target": 1.0,
+        "basis": "Ngưỡng đề xuất cho metric IN_PROCESS_REJECT_RATE; hiệu chỉnh khi có dữ liệu thật."
+      },
+      "counter_metric": "FPY",
+      "calculation_status": "staged_data_contract"
     },
     {
       "canonical_code": "REPEAT_NCR_RATE",
       "name": "Repeat NCR rate",
       "layer": "bsc_monthly",
-      "status": "staged_data_contract"
+      "status": "staged_data_contract",
+      "name_vi": "Tỷ lệ NCR tái diễn",
+      "purpose": "Đo tỷ lệ NCR lặp lại để quyết định nâng cấp CAPA.",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 5.0,
+        "yellow_point": 15.0,
+        "target": 5.0,
+        "basis": "Ngưỡng đề xuất cho metric REPEAT_NCR_RATE; hiệu chỉnh khi có dữ liệu thật."
+      },
+      "counter_metric": "CAPA_EFFECTIVENESS",
+      "calculation_status": "staged_data_contract"
     },
     {
       "canonical_code": "CAPA_EFFECTIVENESS",
       "name": "CAPA effectiveness after verification window",
       "layer": "qms_mes_gate",
-      "status": "staged_data_contract"
+      "status": "staged_data_contract",
+      "name_vi": "Hiệu lực CAPA sau xác minh",
+      "purpose": "Đo tỷ lệ CAPA còn hiệu lực sau xác minh để quyết định mở lại hành động.",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95.0,
+        "yellow_point": 85.0,
+        "target": 95.0,
+        "basis": "Ngưỡng đề xuất cho metric CAPA_EFFECTIVENESS; hiệu chỉnh khi có dữ liệu thật."
+      },
+      "counter_metric": "REPEAT_NCR_RATE",
+      "calculation_status": "staged_data_contract"
     },
     {
       "canonical_code": "SUPPLIER_READINESS",
       "name": "Supplier readiness composite from OTD and incoming quality",
       "layer": "bsc_monthly",
-      "status": "staged_data_contract"
+      "status": "staged_data_contract",
+      "name_vi": "Mức sẵn sàng nhà cung cấp tổng hợp",
+      "purpose": "Đo mức sẵn sàng nhà cung cấp (OTD + chất lượng) để quyết định đổi nguồn.",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 90.0,
+        "yellow_point": 80.0,
+        "target": 90.0,
+        "basis": "Ngưỡng đề xuất cho metric SUPPLIER_READINESS; hiệu chỉnh khi có dữ liệu thật."
+      },
+      "counter_metric": "COMPLAINT_RATE",
+      "calculation_status": "staged_data_contract"
     },
     {
       "canonical_code": "CRITICAL_ROLE_CERT_COVERAGE",
       "name": "Critical role certification coverage",
       "layer": "bsc_monthly",
-      "status": "staged_data_contract"
+      "status": "staged_data_contract",
+      "name_vi": "Bao phủ chứng nhận vai trò trọng yếu",
+      "purpose": "Đo tỷ lệ vai trò trọng yếu có người được chứng nhận để quyết định đào tạo chéo.",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100.0,
+        "yellow_point": 85.0,
+        "target": 100.0,
+        "basis": "Ngưỡng đề xuất cho metric CRITICAL_ROLE_CERT_COVERAGE; hiệu chỉnh khi có dữ liệu thật."
+      },
+      "counter_metric": "TRAINING_COMP",
+      "calculation_status": "staged_data_contract"
     },
     {
       "canonical_code": "CYCLE_TIME_VARIANCE",
       "name": "Actual cycle time variance vs standard",
       "layer": "lean_daily",
-      "status": "staged_data_contract"
+      "status": "staged_data_contract",
+      "name_vi": "Sai lệch thời gian chu kỳ so với chuẩn",
+      "purpose": "Đo độ lệch thời gian chu kỳ thực tế so với chuẩn để quyết định hiệu chỉnh định mức.",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 10.0,
+        "yellow_point": 25.0,
+        "target": 10.0,
+        "basis": "Ngưỡng đề xuất cho metric CYCLE_TIME_VARIANCE; hiệu chỉnh khi có dữ liệu thật."
+      },
+      "counter_metric": "FAI_FIRST_PASS",
+      "calculation_status": "staged_data_contract"
     },
     {
       "canonical_code": "MTBF",
       "name": "Mean time between failures",
       "layer": "lean_daily",
-      "status": "staged_data_contract"
+      "status": "staged_data_contract",
+      "name_vi": "Thời gian trung bình giữa hai lần hỏng",
+      "purpose": "Đo độ tin cậy thiết bị để quyết định kế hoạch bảo trì phòng ngừa.",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "hour",
+        "green_point": 200.0,
+        "yellow_point": 100.0,
+        "target": 200.0,
+        "basis": "Ngưỡng đề xuất cho metric MTBF; hiệu chỉnh khi có dữ liệu thật.",
+        "calibration_pending": true
+      },
+      "counter_metric": "MTTR",
+      "calculation_status": "staged_data_contract"
     },
     {
       "canonical_code": "MTTR",
       "name": "Mean time to repair",
       "layer": "lean_daily",
-      "status": "staged_data_contract"
+      "status": "staged_data_contract",
+      "name_vi": "Thời gian trung bình khắc phục sự cố",
+      "purpose": "Đo tốc độ khắc phục sự cố thiết bị để quyết định nguồn lực bảo trì.",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hour",
+        "green_point": 4.0,
+        "yellow_point": 8.0,
+        "target": 4.0,
+        "basis": "Ngưỡng đề xuất cho metric MTTR; hiệu chỉnh khi có dữ liệu thật."
+      },
+      "counter_metric": "MTBF",
+      "calculation_status": "staged_data_contract"
     }
   ],
   "dashboard_core_kpis": [
@@ -1942,7 +2125,8 @@
       "owner_role": "CS",
       "cadence": "per-event",
       "data_source": "Epicor Quote",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "counter_metric": "QUOTE_HIT_RATE"
     },
     {
       "local_id": "KPI-G0-02",
@@ -1959,7 +2143,8 @@
       "owner_role": "CS",
       "cadence": "monthly",
       "data_source": "FRM-202",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "counter_metric": "RFQ_TURNAROUND_TIME"
     },
     {
       "local_id": "KPI-G1-01",
@@ -1976,7 +2161,16 @@
       "owner_role": "ENGM",
       "cadence": "monthly",
       "data_source": "FRM-306",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95.0,
+        "yellow_point": 88.0,
+        "target": 95.0,
+        "basis": "Phát hành kỹ thuật đúng lần đầu chuẩn ≥95%."
+      },
+      "counter_metric": "FAI_FIRST_PASS"
     },
     {
       "local_id": "KPI-G1-02",
@@ -1992,7 +2186,16 @@
       "owner_role": "ENGM",
       "cadence": "per-event",
       "data_source": "Epicor ECO",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hour",
+        "green_point": 48.0,
+        "yellow_point": 96.0,
+        "target": 48.0,
+        "basis": "ECO xử lý ≤48 giờ; >96 giờ là tồn đọng kỹ thuật."
+      },
+      "counter_metric": "ENGINEERING_RELEASE_RFT"
     },
     {
       "local_id": "KPI-G1-03",
@@ -2008,7 +2211,16 @@
       "owner_role": "QA",
       "cadence": "per-event",
       "data_source": "job_orders.control_plan_id + FRM Control Plan",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100.0,
+        "yellow_point": 95.0,
+        "target": 100.0,
+        "basis": "Control Plan + PFMEA duyệt trước phát hành — chuẩn 100%."
+      },
+      "counter_metric": "FAI_FIRST_PASS"
     },
     {
       "local_id": "KPI-G2-01",
@@ -2024,7 +2236,16 @@
       "owner_role": "QA",
       "cadence": "monthly",
       "data_source": "FRM-701",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 99.0,
+        "yellow_point": 95.0,
+        "target": 99.0,
+        "basis": "IQC pass rate ≥99% trước khi nhập kho."
+      },
+      "counter_metric": "SUPPLIER_OTD"
     },
     {
       "local_id": "KPI-G2-02",
@@ -2040,7 +2261,16 @@
       "owner_role": "SCM",
       "cadence": "per-event",
       "data_source": "Epicor Receipt",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100.0,
+        "yellow_point": 98.0,
+        "target": 100.0,
+        "basis": "Truy xuất nguồn gốc lô nhập đầy đủ — chuẩn 100%."
+      },
+      "counter_metric": "IQC_PASS_RATE"
     },
     {
       "local_id": "KPI-G3-01",
@@ -2057,7 +2287,16 @@
       "owner_role": "WKM",
       "cadence": "monthly",
       "data_source": "FRM-511",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95.0,
+        "yellow_point": 88.0,
+        "target": 95.0,
+        "basis": "Cài đặt đạt ngay lần đầu chuẩn ≥95%."
+      },
+      "counter_metric": "FAI_FIRST_PASS"
     },
     {
       "local_id": "KPI-G3-02",
@@ -2073,7 +2312,16 @@
       "owner_role": "WKM",
       "cadence": "per-event",
       "data_source": "Time Entry",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "minute",
+        "green_point": 30.0,
+        "yellow_point": 60.0,
+        "target": 30.0,
+        "basis": "Thời gian chuyển công đoạn theo chuẩn SMED ≤30 phút."
+      },
+      "counter_metric": "SETUP_FIRST_PASS"
     },
     {
       "local_id": "KPI-G4-01",
@@ -2090,7 +2338,8 @@
       "owner_role": "QA",
       "cadence": "monthly",
       "data_source": "FRM-311",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "counter_metric": "FINAL_RELEASE_RFT"
     },
     {
       "local_id": "KPI-G4-02",
@@ -2107,7 +2356,16 @@
       "owner_role": "QA",
       "cadence": "per-event",
       "data_source": "FRM-311",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hour",
+        "green_point": 2.0,
+        "yellow_point": 4.0,
+        "target": 2.0,
+        "basis": "Chu kỳ kiểm FAI ≤2 giờ."
+      },
+      "counter_metric": "FAI_FIRST_PASS"
     },
     {
       "local_id": "KPI-G5-01",
@@ -2123,7 +2381,16 @@
       "owner_role": "WKM",
       "cadence": "weekly",
       "data_source": "FRM-651",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 1.0,
+        "yellow_point": 3.0,
+        "target": 1.0,
+        "basis": "Tỷ lệ loại trong quá trình ≤1%."
+      },
+      "counter_metric": "FPY"
     },
     {
       "local_id": "KPI-G5-02",
@@ -2140,7 +2407,16 @@
       "owner_role": "WKM",
       "cadence": "per-event",
       "data_source": "FRM-631",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "minute",
+        "green_point": 15.0,
+        "yellow_point": 30.0,
+        "target": 15.0,
+        "basis": "Phản ứng tín hiệu SPC ≤15 phút."
+      },
+      "counter_metric": "IN_PROCESS_REJECT_RATE"
     },
     {
       "local_id": "KPI-G6-01",
@@ -2156,7 +2432,16 @@
       "owner_role": "QA",
       "cadence": "per-event",
       "data_source": "FRM-642",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100.0,
+        "yellow_point": 98.0,
+        "target": 100.0,
+        "basis": "Gói phát hành/CoC đầy đủ — chuẩn 100%."
+      },
+      "counter_metric": "OTD"
     },
     {
       "local_id": "KPI-G6-02",
@@ -2172,7 +2457,16 @@
       "owner_role": "QA",
       "cadence": "monthly",
       "data_source": "Drill test",
-      "calculation_status": "manual"
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "second",
+        "green_point": 60.0,
+        "yellow_point": 120.0,
+        "target": 60.0,
+        "basis": "Truy xuất ngược một lô ≤60 giây khi diễn tập."
+      },
+      "counter_metric": "TRACEABILITY_COMPLETENESS"
     },
     {
       "local_id": "KPI-G7-01",
@@ -2188,7 +2482,8 @@
       "owner_role": "SCM",
       "cadence": "monthly",
       "data_source": "Epicor Ship",
-      "calculation_status": "runtime_calculated"
+      "calculation_status": "runtime_calculated",
+      "counter_metric": "COMPLAINT_RATE"
     },
     {
       "local_id": "KPI-G7-02",
@@ -2204,7 +2499,8 @@
       "owner_role": "FIN",
       "cadence": "per-event",
       "data_source": "Epicor AR",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "counter_metric": "INVOICE_RFT"
     },
     {
       "local_id": "KPI-G7-03",
@@ -2220,7 +2516,16 @@
       "owner_role": "QA",
       "cadence": "per-event",
       "data_source": "FRM khiếu nại + sổ thông báo khách",
-      "calculation_status": "manual"
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hour",
+        "green_point": 24.0,
+        "yellow_point": 48.0,
+        "target": 24.0,
+        "basis": "Thông báo khách ≤24 giờ kể từ khi phát hiện sản phẩm không phù hợp."
+      },
+      "counter_metric": "COMPLAINT_RATE"
     },
     {
       "local_id": "KPI-ALL-01",
@@ -2238,7 +2543,16 @@
       "owner_role": "QA",
       "cadence": "monthly",
       "data_source": "Epicor Cost",
-      "calculation_status": "runtime_calculated"
+      "calculation_status": "runtime_calculated",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 2.0,
+        "yellow_point": 4.0,
+        "target": 2.0,
+        "basis": "Chi phí chất lượng kém ≤2% doanh thu."
+      },
+      "counter_metric": "FPY"
     },
     {
       "local_id": "KPI-ALL-02",
@@ -2255,7 +2569,16 @@
       "owner_role": "QA",
       "cadence": "monthly",
       "data_source": "FRM-651",
-      "calculation_status": "runtime_calculated"
+      "calculation_status": "runtime_calculated",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98.0,
+        "yellow_point": 92.0,
+        "target": 98.0,
+        "basis": "Hiệu suất đạt ngay lần đầu ≥98%."
+      },
+      "counter_metric": "COPQ"
     },
     {
       "local_id": "KPI-ALL-03",
@@ -2272,7 +2595,16 @@
       "owner_role": "WKM",
       "cadence": "daily",
       "data_source": "Epicor MES",
-      "calculation_status": "runtime_calculated"
+      "calculation_status": "runtime_calculated",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 85.0,
+        "yellow_point": 70.0,
+        "target": 85.0,
+        "basis": "OEE ≥85% — chuẩn world-class."
+      },
+      "counter_metric": "FPY"
     }
   ],
   "document_audit": {

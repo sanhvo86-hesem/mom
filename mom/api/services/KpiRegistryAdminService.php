@@ -84,6 +84,20 @@ final class KpiRegistryAdminService
         $seed    = $this->readRegistrySeed();
         $overlay = FileHelper::readJson($this->overlayPath());
         $governance = $this->mergedGovernanceKpis($seed, $overlay);
+        $gate       = $this->mergedSection($seed, $overlay, 'gate_control_metrics', 'gate_overrides');
+        $proposed   = $this->mergedSection($seed, $overlay, 'proposed_operating_metrics', 'proposed_overrides');
+
+        // All metric codes — the Console counter-metric dropdown spans every
+        // governed KPI so a counter can be picked across groups.
+        $allCodes = [];
+        foreach ([$governance, $gate, $proposed] as $set) {
+            foreach ($set as $row) {
+                $c = (string) ($row['canonical_code'] ?? '');
+                if ($c !== '') {
+                    $allCodes[$c] = true;
+                }
+            }
+        }
 
         return [
             'registry_id'       => $seed['registry_id'] ?? null,
@@ -95,9 +109,10 @@ final class KpiRegistryAdminService
             'editable_fields'   => KpiEngine::CONSOLE_EDITABLE_FIELDS,
             'role_codes'        => array_keys(self::ROLE_LINKS),
             'cadence_options'   => self::VALID_CADENCE,
+            'all_metric_codes'  => array_keys($allCodes),
             'governance_kpis'   => $governance,
-            'gate_control_metrics'      => $seed['gate_control_metrics'] ?? [],
-            'proposed_operating_metrics'=> $seed['proposed_operating_metrics'] ?? [],
+            'gate_control_metrics'      => $gate,
+            'proposed_operating_metrics'=> $proposed,
             'dashboard_core_kpis'       => $seed['dashboard_core_kpis'] ?? [],
             'stats'             => $this->computeStats($governance),
         ];
@@ -111,76 +126,90 @@ final class KpiRegistryAdminService
      * @param array<string, mixed> $actor
      * @return array<string, mixed>
      */
+    /** Registry section → overlay override-map key. */
+    private const OVERRIDE_SECTIONS = [
+        'annex122_governance_kpis'   => 'governance_overrides',
+        'gate_control_metrics'       => 'gate_overrides',
+        'proposed_operating_metrics' => 'proposed_overrides',
+    ];
+
     public function save(array $incoming, array $actor, string $reason = ''): array
     {
         $seed = $this->readRegistrySeed();
-        $seedKpis = is_array($seed['annex122_governance_kpis'] ?? null)
-            ? $seed['annex122_governance_kpis'] : [];
 
-        $seedByCode = [];
-        foreach ($seedKpis as $row) {
-            if (is_array($row) && isset($row['canonical_code'])) {
-                $seedByCode[(string) $row['canonical_code']] = $row;
-            }
-        }
-
-        $rawOverrides = $incoming['governance_overrides'] ?? null;
-        if (!is_array($rawOverrides)) {
-            throw new RuntimeException('kpi_registry_invalid_payload');
-        }
-
-        // Accept only known codes and only editable fields; structural fields
-        // (formula, data_source, calculation_status, tier…) are never writable.
-        $overrides = [];
-        foreach ($rawOverrides as $code => $patch) {
-            $code = strtoupper(trim((string) $code));
-            if (!isset($seedByCode[$code]) || !is_array($patch)) {
-                continue;
-            }
-            $clean = [];
-            foreach (KpiEngine::CONSOLE_EDITABLE_FIELDS as $field) {
-                if (array_key_exists($field, $patch)) {
-                    $clean[$field] = $this->sanitizeField($field, $patch[$field]);
-                }
-            }
-            if ($clean !== []) {
-                $overrides[$code] = $clean;
-            }
-        }
-
-        // Build the effective governance set (seed + overrides) and validate.
-        $effective = [];
-        foreach ($seedKpis as $row) {
-            if (!is_array($row)) {
-                continue;
-            }
-            $code = (string) ($row['canonical_code'] ?? '');
-            if (isset($overrides[$code])) {
-                foreach ($overrides[$code] as $field => $value) {
-                    $row[$field] = $value;
-                }
-            }
-            $effective[] = $row;
-        }
-        $this->validate($effective);
-
-        $now = gmdate('c');
         $overlay = [
-            'overlay_id'          => 'KPI-CONSOLE-OVERLAY',
-            'schema_version'      => (int) ($seed['schema_version'] ?? 0),
-            'updated_at'          => $now,
-            'updated_by'          => $this->actorName($actor),
-            'reason'              => trim($reason),
-            'governance_overrides'=> $overrides,
+            'overlay_id'     => 'KPI-CONSOLE-OVERLAY',
+            'schema_version' => (int) ($seed['schema_version'] ?? 0),
+            'updated_at'     => gmdate('c'),
+            'updated_by'     => $this->actorName($actor),
+            'reason'         => trim($reason),
         ];
-        FileHelper::writeJson($this->overlayPath(), $overlay);
+        $totalOverrides = 0;
+        $effectiveGovernance = [];
 
-        $regenerated = $this->regenerateAnnex122($effective);
+        foreach (self::OVERRIDE_SECTIONS as $section => $key) {
+            $seedRows = is_array($seed[$section] ?? null) ? $seed[$section] : [];
+            $knownCodes = [];
+            foreach ($seedRows as $row) {
+                if (is_array($row) && isset($row['canonical_code'])) {
+                    $knownCodes[strtoupper(trim((string) $row['canonical_code']))] = true;
+                }
+            }
+
+            // Accept only known codes + editable fields; structural fields
+            // (formula, data_source, calculation_status, gate…) never writable.
+            $raw = $incoming[$key] ?? [];
+            $overrides = [];
+            if (is_array($raw)) {
+                foreach ($raw as $code => $patch) {
+                    $code = strtoupper(trim((string) $code));
+                    if (!isset($knownCodes[$code]) || !is_array($patch)) {
+                        continue;
+                    }
+                    $clean = [];
+                    foreach (KpiEngine::CONSOLE_EDITABLE_FIELDS as $field) {
+                        if (array_key_exists($field, $patch)) {
+                            $clean[$field] = $this->sanitizeField($field, $patch[$field]);
+                        }
+                    }
+                    if ($clean !== []) {
+                        $overrides[$code] = $clean;
+                    }
+                }
+            }
+
+            // Effective rows = seed + overrides → validate before persisting.
+            $effective = [];
+            foreach ($seedRows as $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+                $code = (string) ($row['canonical_code'] ?? '');
+                if (isset($overrides[$code])) {
+                    foreach ($overrides[$code] as $field => $value) {
+                        $row[$field] = $value;
+                    }
+                }
+                $effective[] = $row;
+            }
+            if ($section === 'annex122_governance_kpis') {
+                $this->validate($effective);
+                $effectiveGovernance = $effective;
+            } else {
+                $this->validateMetricThresholds($effective, $section);
+            }
+
+            $overlay[$key] = $overrides;
+            $totalOverrides += count($overrides);
+        }
+
+        FileHelper::writeJson($this->overlayPath(), $overlay);
+        $regenerated = $this->regenerateAnnex122($effectiveGovernance);
 
         return [
             'saved'            => true,
             'overlay'          => $overlay,
-            'override_count'   => count($overrides),
+            'override_count'   => $totalOverrides,
             'annex122_updated' => $regenerated,
             'config'           => $this->load(),
         ];
@@ -197,8 +226,22 @@ final class KpiRegistryAdminService
      */
     private function mergedGovernanceKpis(array $seed, ?array $overlay): array
     {
+        return $this->mergedSection($seed, $overlay, 'annex122_governance_kpis', 'governance_overrides');
+    }
+
+    /**
+     * Apply the runtime overlay's editable fields onto a seed registry
+     * section, honoring the schema-version gate. Mirrors
+     * KpiEngine::applyRuntimeOverlay so Console and engine never diverge.
+     *
+     * @param array<string, mixed>      $seed
+     * @param array<string, mixed>|null $overlay
+     * @return array<int, array<string, mixed>>
+     */
+    private function mergedSection(array $seed, ?array $overlay, string $section, string $overrideKey): array
+    {
         $rows = [];
-        foreach (($seed['annex122_governance_kpis'] ?? []) as $row) {
+        foreach (($seed[$section] ?? []) as $row) {
             if (is_array($row)) {
                 $rows[] = $row;
             }
@@ -206,7 +249,7 @@ final class KpiRegistryAdminService
 
         $seedSchema    = (int) ($seed['schema_version'] ?? 0);
         $overlaySchema = is_array($overlay) ? (int) ($overlay['schema_version'] ?? 0) : 0;
-        $overrides = is_array($overlay) ? ($overlay['governance_overrides'] ?? null) : null;
+        $overrides = is_array($overlay) ? ($overlay[$overrideKey] ?? null) : null;
         // Stale overlay (seed advanced past it) → ignore, same gate as engine.
         if (!is_array($overrides) || ($seedSchema > 0 && $overlaySchema < $seedSchema)) {
             return $rows;
@@ -225,6 +268,36 @@ final class KpiRegistryAdminService
             }
         }
         return $rows;
+    }
+
+    /**
+     * Light validation for gate / proposed metrics — they carry numeric
+     * thresholds and a counter_metric but not the full governance schema.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     */
+    private function validateMetricThresholds(array $rows, string $section): void
+    {
+        foreach ($rows as $row) {
+            $code = (string) ($row['canonical_code'] ?? '');
+            $t = $row['thresholds'] ?? null;
+            // Gate metrics that share a governance code legitimately carry no
+            // own thresholds (the governance KPI is the canonical definition).
+            if (is_array($t) && isset($t['green_point'])) {
+                if (!is_numeric($t['green_point']) || !is_numeric($t['yellow_point'] ?? null)) {
+                    throw new RuntimeException('kpi_registry_threshold_incomplete:' . $code);
+                }
+                $gp = (float) $t['green_point'];
+                $yp = (float) $t['yellow_point'];
+                $dir = (string) ($t['direction'] ?? 'higher_is_better');
+                if ($dir === 'higher_is_better' && $gp < $yp) {
+                    throw new RuntimeException('kpi_registry_threshold_order:' . $code);
+                }
+                if ($dir === 'lower_is_better' && $gp > $yp) {
+                    throw new RuntimeException('kpi_registry_threshold_order:' . $code);
+                }
+            }
+        }
     }
 
     // ── Validation ───────────────────────────────────────────────────────
