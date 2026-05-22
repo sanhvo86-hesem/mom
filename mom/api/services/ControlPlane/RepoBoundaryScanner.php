@@ -80,8 +80,9 @@ final class RepoBoundaryScanner
         '#^_reports/deploy-playbook/.*$#',
         // KPI upgrade prompt pack — sequential AI execution plan committed as
         // durable prompt content and mirrored by .gitignore
-        // "!_reports/kpi-upgrade-prompts/".
+        // "!_reports/kpi-upgrade-prompts/" and "!_reports/kpi-upgrade-prompts-v2/".
         '#^_reports/kpi-upgrade-prompts/.*$#',
+        '#^_reports/kpi-upgrade-prompts-v2/.*$#',
         // KPI upgrade audit/report evidence — the prompt pack (01→09)
         // produces audit reports that must survive a fresh clone and be
         // visible on GitHub. Same allowlist policy as the prompt pack
