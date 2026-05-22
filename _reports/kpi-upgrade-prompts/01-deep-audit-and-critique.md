@@ -35,7 +35,9 @@ giấy; cái nào tính được, cái nào không; cái nào gây gaming; cái 
   `svc_service_kpi_snapshots` — cột nào có sẵn để nuôi KPI.
 
 ### 2. Bảng "KPI có thực chiến không" — cho TỪNG KPI
-Với mỗi mã trong 33 governance KPI + 15 proposed + 12 dashboard, lập 1 dòng:
+"33 governance KPI" chỉ là tồn kho hiện tại — KHÔNG coi là bộ cố định. Audit
+vừa soi từng KPI đang có, vừa phải chỉ ra KPI vận hành CÒN THIẾU (xem mục 4a).
+Với mỗi mã trong bộ governance hiện tại + proposed + dashboard, lập 1 dòng:
 - Có hàm `calc*` trong KpiEngine? (có/không — tên hàm)
 - Nguồn dữ liệu: bảng/cột thật tồn tại? (có/không/một phần)
 - Có ngưỡng xanh/vàng/đỏ định lượng? công thức tử/mẫu/đơn vị?
@@ -61,11 +63,21 @@ Baldrige. Trả lời thẳng:
 - KPI nào **trùng lặp / mâu thuẫn** (ví dụ FAI_FIRST_PASS xuất hiện cả §5 lẫn
   proposed; SUPPLIER_OTD vừa runtime vừa governance)?
 - Cổng G0→G7 nào **thiếu KPI đo điều kiện pass** của cổng đó?
-- Dashboard điều hành: 8/12 KPI `staged_data_contract` → CEO đang nhìn số rỗng?
-- 26/33 governance KPI không có `calc*` → hệ thống có thực sự đo không?
+- Dashboard điều hành: 9/12 KPI `staged_data_contract` → CEO đang nhìn số rỗng?
+- ~19/33 governance KPI không có `calc*` → hệ thống có thực sự đo không?
 - KPI nào thiếu lead pairing (chỉ có lag → phát hiện trễ)?
 - Tầng BSC: KPI nào đặt sai lớp (đưa metric thao tác vào scorecard điều hành)?
 Sau đó **đánh giá công bằng** điểm mạnh (kiến trúc registry/engine/audit tốt…).
+
+### 4a. KPI vận hành CÒN THIẾU (số lượng KPI không cố định)
+Bộ 33 hiện tại KHÔNG phải bộ đúng. Mô phỏng vận hành một xưởng CNC qua đủ
+G0→G7 và chỉ ra **hoạt động/quyết định trọng yếu chưa có KPI nào đo**, ví dụ
+cần soi: tải máy theo điểm thắt cổ chai (TOC), thời gian setup/first-piece,
+biến động cycle time so chuẩn, MTBF/MTTR thiết bị, tồn đọng WIP trước điểm
+thắt, tỷ lệ tái phát NCR, hiệu lực CAPA, độ phủ chứng nhận vai trò trọng yếu,
+biên lợi nhuận theo họ sản phẩm, rủi ro ngày cam kết. Mỗi đề xuất KPI mới phải
+qua checklist ANNEX-129 §8. Đồng thời chỉ ra KPI hiện có nào nên **gộp**
+(trùng/chồng lấn) hoặc **khai tử** (không ai dùng, không đo được, không đáng đo).
 
 ### 5. Rà tiếng Việt máy dịch
 Liệt kê mọi cụm từ hỏng trong ANNEX-122/-128/-110/WI-202 kèm vị trí.

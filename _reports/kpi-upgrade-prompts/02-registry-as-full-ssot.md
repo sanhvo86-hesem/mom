@@ -45,15 +45,23 @@ Schema này phải được KpiEngine `enrichCatalogGovernance` đọc được 
 `applyDataContract / applyConsequence / applyScorecardRules` để khớp tên field;
 nếu lệch, đổi field name cho khớp engine (đừng đổi engine trừ khi cần).
 
-### 2. Điền đầy đủ 33 governance KPI
-Lấy nội dung định nghĩa từ ANNEX-122 §1–§9 + report audit prompt 01. Với mỗi
-KPI: copy công thức/ngưỡng/owner/nguồn từ ANNEX-122 vào registry. Nếu ANNEX-122
-thiếu (nhiều KPI sẽ thiếu) → đánh dấu `calculation_status: staged_data_contract`
-và ghi `data_source` còn trống — prompt 04 sẽ hoàn tất. KHÔNG bịa số.
-- KPI runtime (19 mã trong `runtime_calculated_metrics`): `calculation_status`
-  = `runtime_calculated`; công thức phải KHỚP đúng hàm `calc*` tương ứng trong
-  KpiEngine. Đọc hàm để chép đúng tử/mẫu, đừng tự nghĩ.
+### 2. Điền đầy đủ cho BỘ KPI đã chốt ở prompt 01
+Bộ KPI = kết quả audit prompt 01, KHÔNG phải con số 33 cố định. Cụ thể:
+- **Giữ + điền đủ field** cho mọi KPI prompt 01 phán quyết là cần.
+- **Thêm** các KPI vận hành mới prompt 01 đề xuất (đã qua checklist ANNEX-129
+  §8) — gán mã chuẩn, tier/layer, đủ field schema.
+- **Gộp** các KPI trùng/chồng lấn về một mã chuẩn (mã cũ vào `legacy_aliases`).
+- **Khai tử** KPI vô dụng: `status: retired` + lý do; gỡ khỏi scorecard/dashboard.
+Với mỗi KPI giữ lại: copy công thức/ngưỡng/owner/nguồn từ ANNEX-122 + audit.
+Nếu ANNEX-122 thiếu → `calculation_status: staged_data_contract`, `data_source`
+để trống — prompt 04 hoàn tất. KHÔNG bịa số.
+- KPI có hàm `calc*` trong KpiEngine (xem A1.1 — engine có 28 hàm, KHÔNG phải
+  19): `calculation_status: runtime_calculated`; công thức KHỚP đúng hàm
+  `calc*`. Đọc hàm để chép đúng tử/mẫu, đừng tự nghĩ.
 - KPI không có hàm `calc*`: `staged_data_contract` hoặc `manual`.
+- **Sửa `runtime_calculated_metrics`** cho khớp đúng số hàm `calc*` thật của
+  KpiEngine (A1.1 ghi 28; danh sách hiện chỉ 19 — drift phải đóng).
+- Đếm KPI cuối cùng là KẾT QUẢ — đừng ép về 33 hay bất kỳ con số nào.
 
 ### 3. Bump `version` và `schema_version`
 Thêm field `schema_version` (số nguyên) vào registry. Tăng nó (ví dụ 1→2). Đây

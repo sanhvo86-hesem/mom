@@ -47,6 +47,15 @@ php tools/scripts/kpi/audit-kpi-system-matrix.php
 Audit fail (P0) → sửa sạch trước khi commit.
 
 ## F. Quy tắc "KPI thực chiến" (kim chỉ nam của cả bộ prompt)
+
+0. **SỐ LƯỢNG KPI KHÔNG CỐ ĐỊNH.** Con số "33 governance KPI" hiện nay chỉ là
+   *tồn kho hiện tại*, KHÔNG phải mục tiêu, KHÔNG phải hạn mức. Đợt nâng cấp tự
+   quyết bộ KPI ĐÚNG cho vận hành nhà máy CNC: thêm KPI vận hành đang thiếu,
+   gộp KPI trùng/chồng lấn, khai tử KPI vô dụng. Bộ KPI cuối cùng có thể là 25,
+   30 hay 45 — con số là KẾT QUẢ của phân tích nhu cầu, không phải đầu vào.
+   Mỗi KPI tồn tại vì một nhu cầu vận hành thật và một quyết định thật; không
+   giữ KPI chỉ để "đủ con số", không thêm KPI chỉ để "cho nhiều". Ràng buộc
+   "Giữ 33 KPI" trong ANNEX-127 §4 phải được cập nhật lại theo nguyên tắc này.
 1. **Không tính được = không phải KPI.** Mỗi KPI phải có data contract: bảng/cột
    thật trong DB hoặc form/log cụ thể. KPI không nguồn dữ liệu → hoặc cấp nguồn,
    hoặc hạ xuống `health_indicator`, hoặc khai tử trung thực. Không để KPI giấy.

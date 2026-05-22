@@ -53,9 +53,11 @@ xử lý chia 0 (`$total > 0 ? ... : 0`); lọc kỳ bằng `BETWEEN :s AND :e`.
 
 ---
 
-## A1.2 — 33 governance KPI: cái nào ĐÃ tính, cái nào CHƯA
+## A1.2 — Governance KPI hiện tại: cái nào ĐÃ tính, cái nào CHƯA
 
-`registry.annex122_governance_kpis` có 33 KPI. Đối soát với 28 hàm engine:
+`registry.annex122_governance_kpis` HIỆN có 33 KPI — đây là *tồn kho hiện tại*,
+KHÔNG phải bộ cố định. Đợt nâng cấp được thêm/gộp/khai tử (xem 00 §F.0). Bảng
+dưới đối soát 33 KPI hiện có với 28 hàm engine:
 
 **14/33 ĐÃ có hàm engine** (graduate dễ — chỉ cần thêm vào
 `runtime_calculated_metrics` + điền data contract):

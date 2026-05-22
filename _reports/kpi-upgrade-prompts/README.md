@@ -37,6 +37,9 @@ phần nội dung KPI. 06 là công cụ. 07–09 hoàn thiện + bảo vệ.
 
 ## Triết lý (bắt buộc thấm trước khi làm)
 
+- **Số lượng KPI không cố định.** "33" hiện nay chỉ là tồn kho, KHÔNG phải mục
+  tiêu. Đợt nâng cấp tự quyết bộ KPI đúng cho vận hành: thêm cái thiếu, gộp cái
+  trùng, bỏ cái vô dụng. Bộ cuối cùng bao nhiêu là do nhu cầu thật quyết định.
 - KPI để **hệ thống chạy đúng thiết kế**, không phải để làm khó nhau. Mọi KPI
   phải kéo hành vi tích cực và có counter-metric chặn gaming.
 - Không đo để ra quyết định thì **không gọi là KPI** (ANNEX-129 §8). Đặt là
@@ -80,11 +83,16 @@ Routes: `kpi_catalog / kpi_get / kpi_trend / kpi_alerts` trong
 `audit-kpi-performance-governance.php`, `audit-kpi-system-matrix.php`. Report ra
 `_reports/kpi/`.
 
-**Khe hở lớn nhất đã thấy:** trong 33 governance KPI, chỉ ~5–7 KPI thật sự được
-KpiEngine tính (OTD, COMPLAINT_RATE, CAL_COMPLIANCE, SUPPLIER_OTD, TRAINING_COMP…);
-~26 KPI còn lại KHÔNG có hàm `calc*` → là KPI giấy/thủ công. 8/12 dashboard KPI
-và 14/15 proposed metric ở trạng thái `staged_data_contract` (chưa có dữ liệu).
-→ Hệ KPI đẹp về kiến trúc nhưng **rỗng về vận hành**. Đây là trọng tâm nâng cấp.
+**Lưu ý về con số 33:** đó là *tồn kho governance KPI hiện tại* trong
+ANNEX-122/registry, KHÔNG phải bộ KPI mục tiêu. Đợt nâng cấp được phép và được
+yêu cầu thay đổi bộ này — thêm/gộp/khai tử theo nhu cầu vận hành thật.
+
+**Khe hở lớn nhất đã thấy:** trong bộ 33 governance KPI hiện tại, chỉ ~14 KPI
+thật sự được KpiEngine tính (xem `A1-researched-baseline.md` để có danh sách
+chính xác); ~19 KPI còn lại KHÔNG có hàm `calc*` → là KPI giấy/thủ công. 9/12
+dashboard KPI và 14/15 proposed metric ở trạng thái `staged_data_contract`
+(chưa có dữ liệu). → Hệ KPI đẹp về kiến trúc nhưng **rỗng về vận hành**. Đây là
+trọng tâm nâng cấp.
 
 ## Mẫu quy trình tham chiếu — đợt nâng cấp RACI (đã chạy thành công)
 
