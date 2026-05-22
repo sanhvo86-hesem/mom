@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
   "version": "2026-05-21",
-  "schema_version": 15,
+  "schema_version": 16,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. Existing ANNEX-122 KPIs are retained, legacy metric aliases are mapped to canonical codes, and proposed CNC operating metrics are staged without granting automatic runtime authority.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -3347,6 +3347,1266 @@
       "purpose": "Đo kỷ luật an toàn cá nhân tại hiện trường.",
       "reward_eligible": false,
       "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_CAM_PROGRAM_FPY",
+      "local_id": null,
+      "name": "NC program first-pass rate",
+      "name_vi": "Tỷ lệ chương trình NC chạy đạt ngay không phải sửa",
+      "tier": "position",
+      "process": "engineering",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "CAM",
+      "data_stewardship_role": "CAM",
+      "applicable_jds": [
+        "CAM"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 90,
+        "yellow_point": 80,
+        "target": 95,
+        "basis": "Chương trình lập trình CAM/NC chạy đạt ngay khi prove-out."
+      },
+      "counter_metric": {
+        "code": "POS_CAM_PROGRAM_FPY-CTR",
+        "endpoint": "POST /api/kpi/POS_CAM_PROGRAM_FPY-CTR/input",
+        "name_vi": "Số chương trình phải sửa sau khi đã phát hành",
+        "name": "Post-release program revision count",
+        "intent": "Bắt việc phát hành chương trình vội, lỗi lộ khi gia công."
+      },
+      "purpose": "Đo chất lượng lập trình NC của lập trình viên CAM.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_CAM_PROGRAM_ON_TIME",
+      "local_id": null,
+      "name": "NC program release on-time",
+      "name_vi": "Phát hành chương trình NC đúng hạn kế hoạch",
+      "tier": "position",
+      "process": "engineering",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "CAM",
+      "data_stewardship_role": "CAM",
+      "applicable_jds": [
+        "CAM"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 85,
+        "target": 100,
+        "basis": "Chương trình NC sẵn sàng trước mốc kế hoạch sản xuất."
+      },
+      "counter_metric": {
+        "code": "POS_CAM_PROGRAM_ON_TIME-CTR",
+        "endpoint": "POST /api/kpi/POS_CAM_PROGRAM_ON_TIME-CTR/input",
+        "name_vi": "Số chương trình lỗi do gấp rút cho kịp hạn",
+        "name": "Rushed-program defect count",
+        "intent": "Bắt việc ép hạn bằng cách bỏ kiểm tra chương trình."
+      },
+      "purpose": "Đo tiến độ giao chương trình NC cho sản xuất.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_CAM_PROVEOUT_TIME",
+      "local_id": null,
+      "name": "Program prove-out time variance",
+      "name_vi": "Sai lệch thời gian prove-out chương trình",
+      "tier": "position",
+      "process": "engineering",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "CAM",
+      "data_stewardship_role": "CAM",
+      "applicable_jds": [
+        "CAM"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 15,
+        "yellow_point": 30,
+        "target": 10,
+        "basis": "Thời gian chạy thử chương trình lệch ≤15% so với chuẩn."
+      },
+      "counter_metric": {
+        "code": "POS_CAM_PROVEOUT_TIME-CTR",
+        "endpoint": "POST /api/kpi/POS_CAM_PROVEOUT_TIME-CTR/input",
+        "name_vi": "Tỷ lệ chương trình bỏ qua bước mô phỏng",
+        "name": "Skipped-simulation rate",
+        "intent": "Bắt việc rút ngắn prove-out bằng cách bỏ mô phỏng."
+      },
+      "purpose": "Đo năng suất chạy thử chương trình.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_CAM_COLLISION_INCIDENTS",
+      "local_id": null,
+      "name": "Missed collision / gouge incidents",
+      "name_vi": "Số va chạm / lỗi mô phỏng bị bỏ sót",
+      "tier": "position",
+      "process": "engineering",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "monthly",
+      "lead_or_lag": "lead",
+      "owner_role": "CAM",
+      "data_stewardship_role": "CAM",
+      "applicable_jds": [
+        "CAM"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "count",
+        "green_point": 0,
+        "yellow_point": 1,
+        "target": 0,
+        "basis": "Va chạm dao/đồ gá lẽ ra mô phỏng phải phát hiện trước."
+      },
+      "counter_metric": {
+        "code": "POS_CAM_COLLISION_INCIDENTS-CTR",
+        "endpoint": "POST /api/kpi/POS_CAM_COLLISION_INCIDENTS-CTR/input",
+        "name_vi": "Số giờ máy dừng do va chạm chương trình",
+        "name": "Collision downtime hours",
+        "intent": "Bắt việc bỏ kiểm va chạm gây hư dao/máy."
+      },
+      "purpose": "Đo độ an toàn của chương trình NC.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_DFM_REVIEW_ON_TIME",
+      "local_id": null,
+      "name": "DFM review on-time completion",
+      "name_vi": "Hoàn thành rà soát DFM đúng hạn",
+      "tier": "position",
+      "process": "engineering",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lead",
+      "owner_role": "DFM",
+      "data_stewardship_role": "DFM",
+      "applicable_jds": [
+        "DFM"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 85,
+        "target": 100,
+        "basis": "Rà soát khả năng gia công hoàn tất trước cổng phát hành."
+      },
+      "counter_metric": {
+        "code": "POS_DFM_REVIEW_ON_TIME-CTR",
+        "endpoint": "POST /api/kpi/POS_DFM_REVIEW_ON_TIME-CTR/input",
+        "name_vi": "Số vấn đề DFM lọt xuống xưởng do rà soát vội",
+        "name": "DFM issue escape from rushed review",
+        "intent": "Bắt việc rà soát DFM hình thức cho kịp hạn."
+      },
+      "purpose": "Đo tiến độ rà soát DFM của kỹ sư.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_DFM_ISSUE_CATCH_RATE",
+      "local_id": null,
+      "name": "DFM issue catch rate",
+      "name_vi": "Tỷ lệ vấn đề gia công phát hiện trước khi phát hành",
+      "tier": "position",
+      "process": "engineering",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "DFM",
+      "data_stewardship_role": "DFM",
+      "applicable_jds": [
+        "DFM"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 90,
+        "yellow_point": 80,
+        "target": 95,
+        "basis": "Vấn đề DFM bắt được trước phát hành / tổng vấn đề."
+      },
+      "counter_metric": {
+        "code": "POS_DFM_ISSUE_CATCH_RATE-CTR",
+        "endpoint": "POST /api/kpi/POS_DFM_ISSUE_CATCH_RATE-CTR/input",
+        "name_vi": "Số ECN phát sinh do vấn đề DFM bị bỏ sót",
+        "name": "DFM-miss ECN count",
+        "intent": "Bắt việc rà soát DFM sót lỗi, phải sửa bằng ECN sau."
+      },
+      "purpose": "Đo hiệu lực rà soát DFM — chặn lỗi gia công từ thiết kế.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_ROUTING_ACCURACY",
+      "local_id": null,
+      "name": "Process routing accuracy",
+      "name_vi": "Độ chính xác routing / quy trình công nghệ",
+      "tier": "position",
+      "process": "engineering",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "PRE",
+      "data_stewardship_role": "PRE",
+      "applicable_jds": [
+        "PRE"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 88,
+        "target": 98,
+        "basis": "Routing không phải hiệu chỉnh khi đưa vào sản xuất."
+      },
+      "counter_metric": {
+        "code": "POS_ROUTING_ACCURACY-CTR",
+        "endpoint": "POST /api/kpi/POS_ROUTING_ACCURACY-CTR/input",
+        "name_vi": "Số routing phải sửa khi đang sản xuất",
+        "name": "In-production routing fix count",
+        "intent": "Bắt việc lập routing cảm tính, phải sửa khi chạy."
+      },
+      "purpose": "Đo chất lượng routing do kỹ sư quá trình lập.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_PROCESS_VALIDATION_OT",
+      "local_id": null,
+      "name": "Process validation on-time",
+      "name_vi": "Hoàn thành xác nhận quá trình đúng hạn",
+      "tier": "position",
+      "process": "engineering",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lead",
+      "owner_role": "PRE",
+      "data_stewardship_role": "PRE",
+      "applicable_jds": [
+        "PRE"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 85,
+        "target": 100,
+        "basis": "Xác nhận/PPAP quá trình hoàn tất trước mốc sản xuất loạt."
+      },
+      "counter_metric": {
+        "code": "POS_PROCESS_VALIDATION_OT-CTR",
+        "endpoint": "POST /api/kpi/POS_PROCESS_VALIDATION_OT-CTR/input",
+        "name_vi": "Số lô chạy loạt khi quá trình chưa xác nhận đủ",
+        "name": "Unvalidated-process run count",
+        "intent": "Bắt việc ký xác nhận quá trình hình thức cho kịp."
+      },
+      "purpose": "Đo tiến độ xác nhận quá trình.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_PPAP_SUBMISSION_OT",
+      "local_id": null,
+      "name": "PPAP / FAI submission on-time",
+      "name_vi": "Hồ sơ PPAP / FAI nộp khách đúng hạn",
+      "tier": "position",
+      "process": "quality_assurance",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "QE",
+      "data_stewardship_role": "QE",
+      "applicable_jds": [
+        "QE"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98,
+        "yellow_point": 90,
+        "target": 100,
+        "basis": "Hồ sơ PPAP/FAI nộp khách đúng mốc cam kết."
+      },
+      "counter_metric": {
+        "code": "POS_PPAP_SUBMISSION_OT-CTR",
+        "endpoint": "POST /api/kpi/POS_PPAP_SUBMISSION_OT-CTR/input",
+        "name_vi": "Tỷ lệ hồ sơ PPAP bị khách trả lại",
+        "name": "PPAP rejection rate",
+        "intent": "Bắt việc nộp PPAP cho kịp hạn nhưng hồ sơ thiếu/sai."
+      },
+      "purpose": "Đo tiến độ & chất lượng hồ sơ PPAP của kỹ sư chất lượng.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_NCR_INVESTIGATION_QUALITY",
+      "local_id": null,
+      "name": "NCR root-cause investigation quality",
+      "name_vi": "Chất lượng điều tra nguyên nhân gốc NCR",
+      "tier": "position",
+      "process": "quality_system",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "QE",
+      "data_stewardship_role": "QE",
+      "applicable_jds": [
+        "QE"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 90,
+        "yellow_point": 80,
+        "target": 95,
+        "basis": "Điều tra NCR được duyệt đạt ngay, không bị trả lại làm lại."
+      },
+      "counter_metric": {
+        "code": "POS_NCR_INVESTIGATION_QUALITY-CTR",
+        "endpoint": "POST /api/kpi/POS_NCR_INVESTIGATION_QUALITY-CTR/input",
+        "name_vi": "Tỷ lệ NCR tái diễn do điều tra hời hợt",
+        "name": "Recurrence from shallow investigation",
+        "intent": "Bắt việc điều tra NCR qua loa, nguyên nhân gốc sai."
+      },
+      "purpose": "Đo chiều sâu điều tra nguyên nhân gốc của kỹ sư chất lượng.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_INSPECTION_THROUGHPUT",
+      "local_id": null,
+      "name": "Inspection team throughput",
+      "name_vi": "Năng suất kiểm tra của tổ so với kế hoạch",
+      "tier": "position",
+      "process": "quality_assurance",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "QCL",
+      "data_stewardship_role": "QCL",
+      "applicable_jds": [
+        "QCL"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 85,
+        "target": 100,
+        "basis": "Sản lượng kiểm tra tổ so với kế hoạch giao."
+      },
+      "counter_metric": {
+        "code": "POS_INSPECTION_THROUGHPUT-CTR",
+        "endpoint": "POST /api/kpi/POS_INSPECTION_THROUGHPUT-CTR/input",
+        "name_vi": "Tỷ lệ lỗi lọt do kiểm nhanh chạy sản lượng",
+        "name": "Escape from rushed inspection",
+        "intent": "Bắt việc kiểm nhanh cho đủ sản lượng làm lọt lỗi."
+      },
+      "purpose": "Đo năng suất điều phối tổ kiểm tra.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_INSPECTION_ESCAPE_RATE",
+      "local_id": null,
+      "name": "Inspection escape rate",
+      "name_vi": "Tỷ lệ lỗi lọt qua tổ kiểm tra",
+      "tier": "position",
+      "process": "quality_assurance",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "QCL",
+      "data_stewardship_role": "QCL",
+      "applicable_jds": [
+        "QCL"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 0.5,
+        "yellow_point": 2,
+        "target": 0.2,
+        "basis": "Lỗi lẽ ra tổ kiểm phải bắt nhưng lọt xuống công đoạn sau / khách."
+      },
+      "counter_metric": {
+        "code": "POS_INSPECTION_ESCAPE_RATE-CTR",
+        "endpoint": "POST /api/kpi/POS_INSPECTION_ESCAPE_RATE-CTR/input",
+        "name_vi": "Tỷ lệ chi tiết đạt bị loại oan (báo động giả)",
+        "name": "False-reject rate",
+        "intent": "Bắt việc siết kiểm quá mức gây loại oan để ép escape thấp."
+      },
+      "purpose": "Đo hiệu lực phát hiện lỗi của tổ kiểm tra.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_AUDIT_PLAN_COMPLIANCE",
+      "local_id": null,
+      "name": "Internal audit plan compliance",
+      "name_vi": "Hoàn thành kế hoạch đánh giá nội bộ đúng hạn",
+      "tier": "position",
+      "process": "quality_system",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lead",
+      "owner_role": "IA",
+      "data_stewardship_role": "IA",
+      "applicable_jds": [
+        "IA"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 85,
+        "target": 100,
+        "basis": "Lượt đánh giá nội bộ thực hiện đúng lịch kế hoạch năm."
+      },
+      "counter_metric": {
+        "code": "POS_AUDIT_PLAN_COMPLIANCE-CTR",
+        "endpoint": "POST /api/kpi/POS_AUDIT_PLAN_COMPLIANCE-CTR/input",
+        "name_vi": "Số lượt đánh giá rút gọn phạm vi cho kịp lịch",
+        "name": "Scope-cut audit count",
+        "intent": "Bắt việc chạy đủ số lượt audit nhưng cắt phạm vi."
+      },
+      "purpose": "Đo kỷ luật thực hiện kế hoạch đánh giá nội bộ.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_AUDIT_FINDING_CLOSURE",
+      "local_id": null,
+      "name": "Audit finding closure on-time",
+      "name_vi": "Tỷ lệ phát hiện đánh giá đóng đúng hạn",
+      "tier": "position",
+      "process": "quality_system",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "IA",
+      "data_stewardship_role": "IA",
+      "applicable_jds": [
+        "IA"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 90,
+        "yellow_point": 80,
+        "target": 95,
+        "basis": "Phát hiện audit đóng đúng hạn cam kết khắc phục."
+      },
+      "counter_metric": {
+        "code": "POS_AUDIT_FINDING_CLOSURE-CTR",
+        "endpoint": "POST /api/kpi/POS_AUDIT_FINDING_CLOSURE-CTR/input",
+        "name_vi": "Tỷ lệ phát hiện đóng nhưng tái lập kỳ sau",
+        "name": "Reopened finding rate",
+        "intent": "Bắt việc đóng phát hiện hình thức cho đẹp số."
+      },
+      "purpose": "Đo kỷ luật theo dõi đóng phát hiện đánh giá.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_AUDIT_FINDING_EFFECTIVENESS",
+      "local_id": null,
+      "name": "Audit finding effectiveness",
+      "name_vi": "Phát hiện đánh giá không tái diễn ở kỳ sau",
+      "tier": "position",
+      "process": "quality_system",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "IA",
+      "data_stewardship_role": "IA",
+      "applicable_jds": [
+        "IA"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 90,
+        "yellow_point": 75,
+        "target": 95,
+        "basis": "Phát hiện đã đóng không xuất hiện lại ở lượt đánh giá sau."
+      },
+      "counter_metric": {
+        "code": "POS_AUDIT_FINDING_EFFECTIVENESS-CTR",
+        "endpoint": "POST /api/kpi/POS_AUDIT_FINDING_EFFECTIVENESS-CTR/input",
+        "name_vi": "Số phát hiện lặp lại qua các kỳ đánh giá",
+        "name": "Repeat audit finding count",
+        "intent": "Bắt việc khắc phục phát hiện chỉ chữa triệu chứng."
+      },
+      "purpose": "Đo chiều sâu khắc phục thực chất từ đánh giá nội bộ.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_PO_CYCLE_TIME",
+      "local_id": null,
+      "name": "Purchase-order cycle time",
+      "name_vi": "Thời gian xử lý đơn mua từ yêu cầu đến PO",
+      "tier": "position",
+      "process": "procurement",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "BUY",
+      "data_stewardship_role": "BUY",
+      "applicable_jds": [
+        "BUY"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "day",
+        "green_point": 3,
+        "yellow_point": 5,
+        "target": 2,
+        "basis": "Số ngày từ khi nhận yêu cầu mua đến khi phát hành PO."
+      },
+      "counter_metric": {
+        "code": "POS_PO_CYCLE_TIME-CTR",
+        "endpoint": "POST /api/kpi/POS_PO_CYCLE_TIME-CTR/input",
+        "name_vi": "Tỷ lệ PO sai phải hiệu chỉnh sau phát hành",
+        "name": "PO rework rate",
+        "intent": "Bắt việc ra PO nhanh nhưng sai thông tin phải sửa."
+      },
+      "purpose": "Đo tốc độ xử lý mua hàng của nhân viên mua.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_PURCHASE_PRICE_VARIANCE",
+      "local_id": null,
+      "name": "Purchase price variance",
+      "name_vi": "Sai lệch giá mua so với ngân sách / định mức",
+      "tier": "position",
+      "process": "procurement",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "monthly",
+      "lead_or_lag": "lag",
+      "owner_role": "BUY",
+      "data_stewardship_role": "BUY",
+      "applicable_jds": [
+        "BUY"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 2,
+        "yellow_point": 5,
+        "target": 0,
+        "basis": "Giá mua thực tế lệch ≤2% so với giá ngân sách/định mức."
+      },
+      "counter_metric": {
+        "code": "POS_PURCHASE_PRICE_VARIANCE-CTR",
+        "endpoint": "POST /api/kpi/POS_PURCHASE_PRICE_VARIANCE-CTR/input",
+        "name_vi": "Tỷ lệ lô giá rẻ nhưng kém chất lượng / trễ",
+        "name": "Cheap-but-bad lot rate",
+        "intent": "Bắt việc ép giá xuống bằng cách chọn NCC kém."
+      },
+      "purpose": "Đo hiệu quả thương lượng giá của nhân viên mua.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_CUSTOMS_CLEARANCE_OT",
+      "local_id": null,
+      "name": "Customs clearance on-time",
+      "name_vi": "Thông quan xuất nhập khẩu đúng hạn",
+      "tier": "position",
+      "process": "delivery",
+      "category": "customer",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "IMX",
+      "data_stewardship_role": "IMX",
+      "applicable_jds": [
+        "IMX"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 85,
+        "target": 100,
+        "basis": "Lô hàng thông quan đúng mốc kế hoạch giao/nhận."
+      },
+      "counter_metric": {
+        "code": "POS_CUSTOMS_CLEARANCE_OT-CTR",
+        "endpoint": "POST /api/kpi/POS_CUSTOMS_CLEARANCE_OT-CTR/input",
+        "name_vi": "Số lô bị phạt / giữ do hồ sơ hải quan sai",
+        "name": "Customs hold / penalty count",
+        "intent": "Bắt việc khai nhanh cho kịp nhưng hồ sơ sai bị giữ."
+      },
+      "purpose": "Đo tiến độ thông quan của nhân viên xuất nhập khẩu.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_EXPORT_DOC_ACCURACY",
+      "local_id": null,
+      "name": "Export / import document accuracy",
+      "name_vi": "Độ chính xác hồ sơ xuất nhập khẩu",
+      "tier": "position",
+      "process": "delivery",
+      "category": "customer",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "IMX",
+      "data_stewardship_role": "IMX",
+      "applicable_jds": [
+        "IMX"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 99,
+        "yellow_point": 95,
+        "target": 100,
+        "basis": "Bộ chứng từ XNK đúng, đủ, khớp với lô hàng và hợp đồng."
+      },
+      "counter_metric": {
+        "code": "POS_EXPORT_DOC_ACCURACY-CTR",
+        "endpoint": "POST /api/kpi/POS_EXPORT_DOC_ACCURACY-CTR/input",
+        "name_vi": "Số lần chứng từ phải sửa / phát hành lại",
+        "name": "Document reissue count",
+        "intent": "Bắt việc lập chứng từ ẩu phải sửa nhiều lần."
+      },
+      "purpose": "Đo chất lượng hồ sơ xuất nhập khẩu.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_SHIPMENT_DELAY_RATE",
+      "local_id": null,
+      "name": "XNK-caused shipment delay rate",
+      "name_vi": "Tỷ lệ lô bị chậm do thủ tục xuất nhập khẩu",
+      "tier": "position",
+      "process": "delivery",
+      "category": "customer",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "IMX",
+      "data_stewardship_role": "IMX",
+      "applicable_jds": [
+        "IMX"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 2,
+        "yellow_point": 5,
+        "target": 0,
+        "basis": "Lô giao trễ có nguyên nhân từ khâu thủ tục XNK."
+      },
+      "counter_metric": {
+        "code": "POS_SHIPMENT_DELAY_RATE-CTR",
+        "endpoint": "POST /api/kpi/POS_SHIPMENT_DELAY_RATE-CTR/input",
+        "name_vi": "Chi phí phát sinh do xử lý gấp lô chậm XNK",
+        "name": "Expedite cost from XNK delay",
+        "intent": "Bắt việc giảm tỷ lệ chậm bằng cách đẩy chi phí xử lý gấp."
+      },
+      "purpose": "Đo tác động của khâu XNK lên tiến độ giao hàng.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_STOCKOUT_RATE",
+      "local_id": null,
+      "name": "Material stockout rate",
+      "name_vi": "Tỷ lệ thiếu hụt vật tư gây dừng việc",
+      "tier": "position",
+      "process": "planning",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "MPC",
+      "data_stewardship_role": "MPC",
+      "applicable_jds": [
+        "MPC"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 2,
+        "yellow_point": 5,
+        "target": 0,
+        "basis": "Lệnh sản xuất phải dừng/chờ vì thiếu vật tư."
+      },
+      "counter_metric": {
+        "code": "POS_STOCKOUT_RATE-CTR",
+        "endpoint": "POST /api/kpi/POS_STOCKOUT_RATE-CTR/input",
+        "name_vi": "Mức tồn kho dư thừa do mua phòng hờ quá mức",
+        "name": "Excess buffer inventory",
+        "intent": "Bắt việc ép hết thiếu hụt bằng cách ôm tồn kho quá nhiều."
+      },
+      "purpose": "Đo năng lực đảm bảo vật tư của nhân viên kế hoạch vật tư.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_CYCLE_COUNT_COMPLIANCE",
+      "local_id": null,
+      "name": "Cycle-count schedule compliance",
+      "name_vi": "Tuân thủ lịch kiểm kê chu kỳ",
+      "tier": "position",
+      "process": "planning",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lead",
+      "owner_role": "MPC",
+      "data_stewardship_role": "MPC",
+      "applicable_jds": [
+        "MPC"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98,
+        "yellow_point": 90,
+        "target": 100,
+        "basis": "Lượt kiểm kê chu kỳ thực hiện đúng lịch."
+      },
+      "counter_metric": {
+        "code": "POS_CYCLE_COUNT_COMPLIANCE-CTR",
+        "endpoint": "POST /api/kpi/POS_CYCLE_COUNT_COMPLIANCE-CTR/input",
+        "name_vi": "Số chênh lệch tồn kho phát hiện ngoài kiểm kê",
+        "name": "Off-count discrepancy count",
+        "intent": "Bắt việc ghi kiểm kê hình thức không đếm thật."
+      },
+      "purpose": "Đo kỷ luật kiểm kê chu kỳ.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_EXCESS_INVENTORY",
+      "local_id": null,
+      "name": "Excess / obsolete inventory ratio",
+      "name_vi": "Tỷ lệ tồn kho dư thừa / chậm luân chuyển",
+      "tier": "position",
+      "process": "planning",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "monthly",
+      "lead_or_lag": "lag",
+      "owner_role": "MPC",
+      "data_stewardship_role": "MPC",
+      "applicable_jds": [
+        "MPC"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 10,
+        "yellow_point": 20,
+        "target": 5,
+        "basis": "Giá trị tồn kho dư/chậm luân chuyển trên tổng tồn kho."
+      },
+      "counter_metric": {
+        "code": "POS_EXCESS_INVENTORY-CTR",
+        "endpoint": "POST /api/kpi/POS_EXCESS_INVENTORY-CTR/input",
+        "name_vi": "Số lệnh dừng do cắt tồn kho quá tay",
+        "name": "Stockout from over-trimming",
+        "intent": "Bắt việc giảm tồn kho dư bằng cách cắt quá mức gây thiếu."
+      },
+      "purpose": "Đo hiệu quả quản trị mức tồn kho.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_TOOL_AVAILABILITY",
+      "local_id": null,
+      "name": "Tooling availability rate",
+      "name_vi": "Tỷ lệ dao / đồ gá sẵn sàng khi cần",
+      "tier": "position",
+      "process": "procurement",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "TCK",
+      "data_stewardship_role": "TCK",
+      "applicable_jds": [
+        "TCK"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98,
+        "yellow_point": 92,
+        "target": 100,
+        "basis": "Dao/đồ gá có sẵn đúng lúc setup/sản xuất cần."
+      },
+      "counter_metric": {
+        "code": "POS_TOOL_AVAILABILITY-CTR",
+        "endpoint": "POST /api/kpi/POS_TOOL_AVAILABILITY-CTR/input",
+        "name_vi": "Số giờ máy chờ do thiếu dao / đồ gá",
+        "name": "Tooling-wait downtime",
+        "intent": "Bắt việc khai dao sẵn sàng nhưng thực tế không có khi cần."
+      },
+      "purpose": "Đo mức sẵn sàng dụng cụ do thủ kho dao đảm bảo.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_TOOL_PRESET_ACCURACY",
+      "local_id": null,
+      "name": "Tool preset accuracy",
+      "name_vi": "Độ chính xác preset dao",
+      "tier": "position",
+      "process": "procurement",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "TCK",
+      "data_stewardship_role": "TCK",
+      "applicable_jds": [
+        "TCK"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98,
+        "yellow_point": 95,
+        "target": 100,
+        "basis": "Thông số preset dao khớp với yêu cầu khi giao cho máy."
+      },
+      "counter_metric": {
+        "code": "POS_TOOL_PRESET_ACCURACY-CTR",
+        "endpoint": "POST /api/kpi/POS_TOOL_PRESET_ACCURACY-CTR/input",
+        "name_vi": "Số chi tiết lỗi kích thước do preset dao sai",
+        "name": "Defect from wrong preset",
+        "intent": "Bắt việc preset nhanh ẩu gây sai kích thước gia công."
+      },
+      "purpose": "Đo chất lượng preset dao.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_TOOL_INVENTORY_ACCURACY",
+      "local_id": null,
+      "name": "Tool-crib inventory accuracy",
+      "name_vi": "Độ chính xác tồn kho dụng cụ",
+      "tier": "position",
+      "process": "procurement",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "TCK",
+      "data_stewardship_role": "TCK",
+      "applicable_jds": [
+        "TCK"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98,
+        "yellow_point": 95,
+        "target": 100,
+        "basis": "Tồn kho dao/đồ gá khớp giữa sổ và thực tế."
+      },
+      "counter_metric": {
+        "code": "POS_TOOL_INVENTORY_ACCURACY-CTR",
+        "endpoint": "POST /api/kpi/POS_TOOL_INVENTORY_ACCURACY-CTR/input",
+        "name_vi": "Số lần tìm không thấy dao đã ghi còn tồn",
+        "name": "Phantom-tool count",
+        "intent": "Bắt việc khai tồn kho dao khớp sổ nhưng thực tế thất lạc."
+      },
+      "purpose": "Đo độ chính xác quản lý kho dụng cụ.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_GOODS_RECEIPT_OT",
+      "local_id": null,
+      "name": "Goods receipt on-time posting",
+      "name_vi": "Nhập kho & ghi nhận đúng hạn",
+      "tier": "position",
+      "process": "procurement",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "WHC",
+      "data_stewardship_role": "WHC",
+      "applicable_jds": [
+        "WHC"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 85,
+        "target": 100,
+        "basis": "Hàng nhận được nhập kho và ghi sổ trong thời hạn quy định."
+      },
+      "counter_metric": {
+        "code": "POS_GOODS_RECEIPT_OT-CTR",
+        "endpoint": "POST /api/kpi/POS_GOODS_RECEIPT_OT-CTR/input",
+        "name_vi": "Số chênh lệch sổ sách do nhập kho trễ/gộp",
+        "name": "Posting-lag discrepancy",
+        "intent": "Bắt việc nhập kho dồn cho kịp gây sai lệch sổ."
+      },
+      "purpose": "Đo kỷ luật nhập kho của thủ kho.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_PICK_ACCURACY",
+      "local_id": null,
+      "name": "Order picking accuracy",
+      "name_vi": "Độ chính xác soạn / xuất hàng",
+      "tier": "position",
+      "process": "procurement",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "WHC",
+      "data_stewardship_role": "WHC",
+      "applicable_jds": [
+        "WHC"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 99,
+        "yellow_point": 97,
+        "target": 100,
+        "basis": "Phiếu xuất/soạn hàng đúng mã, đúng số lượng."
+      },
+      "counter_metric": {
+        "code": "POS_PICK_ACCURACY-CTR",
+        "endpoint": "POST /api/kpi/POS_PICK_ACCURACY-CTR/input",
+        "name_vi": "Số lần dừng việc do xuất sai vật tư",
+        "name": "Wrong-pick stoppage count",
+        "intent": "Bắt việc soạn hàng nhanh ẩu gây xuất sai."
+      },
+      "purpose": "Đo độ chính xác xuất hàng của thủ kho.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_AP_PAYMENT_OT",
+      "local_id": null,
+      "name": "Supplier payment on-time",
+      "name_vi": "Thanh toán nhà cung cấp đúng hạn",
+      "tier": "position",
+      "process": "finance",
+      "category": "financial",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "APA",
+      "data_stewardship_role": "APA",
+      "applicable_jds": [
+        "APA"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98,
+        "yellow_point": 90,
+        "target": 100,
+        "basis": "Khoản phải trả NCC thanh toán đúng điều khoản hợp đồng."
+      },
+      "counter_metric": {
+        "code": "POS_AP_PAYMENT_OT-CTR",
+        "endpoint": "POST /api/kpi/POS_AP_PAYMENT_OT-CTR/input",
+        "name_vi": "Tỷ lệ thanh toán sai phải thu hồi / điều chỉnh",
+        "name": "Payment correction rate",
+        "intent": "Bắt việc trả cho kịp hạn nhưng sai số tiền/đối tượng."
+      },
+      "purpose": "Đo kỷ luật thanh toán của kế toán công nợ.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_PAYMENT_ACCURACY",
+      "local_id": null,
+      "name": "Payment & reconciliation accuracy",
+      "name_vi": "Độ chính xác thanh toán & đối chiếu công nợ",
+      "tier": "position",
+      "process": "finance",
+      "category": "financial",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "APA",
+      "data_stewardship_role": "APA",
+      "applicable_jds": [
+        "APA"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 99.5,
+        "yellow_point": 98,
+        "target": 100,
+        "basis": "Giao dịch thanh toán & đối chiếu công nợ khớp, không sai sót."
+      },
+      "counter_metric": {
+        "code": "POS_PAYMENT_ACCURACY-CTR",
+        "endpoint": "POST /api/kpi/POS_PAYMENT_ACCURACY-CTR/input",
+        "name_vi": "Số bút toán điều chỉnh do sai thanh toán",
+        "name": "Payment adjustment entries",
+        "intent": "Bắt việc đối chiếu hình thức bỏ sót chênh lệch."
+      },
+      "purpose": "Đo độ chính xác xử lý công nợ & thanh toán.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_PAYROLL_ACCURACY",
+      "local_id": null,
+      "name": "Payroll accuracy",
+      "name_vi": "Độ chính xác bảng lương",
+      "tier": "position",
+      "process": "finance",
+      "category": "financial",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "GLA",
+      "data_stewardship_role": "GLA",
+      "applicable_jds": [
+        "GLA"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 99.5,
+        "yellow_point": 98,
+        "target": 100,
+        "basis": "Bảng lương đúng số, đúng người, đúng khấu trừ."
+      },
+      "counter_metric": {
+        "code": "POS_PAYROLL_ACCURACY-CTR",
+        "endpoint": "POST /api/kpi/POS_PAYROLL_ACCURACY-CTR/input",
+        "name_vi": "Số khiếu nại lương của nhân viên",
+        "name": "Payroll complaint count",
+        "intent": "Bắt việc chốt lương vội gây sai sót phải khiếu nại."
+      },
+      "purpose": "Đo độ chính xác tính lương của kế toán.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_PAYROLL_OT",
+      "local_id": null,
+      "name": "Payroll on-time payment",
+      "name_vi": "Trả lương đúng hạn",
+      "tier": "position",
+      "process": "finance",
+      "category": "financial",
+      "layer": "lean_daily",
+      "cadence": "monthly",
+      "lead_or_lag": "lag",
+      "owner_role": "GLA",
+      "data_stewardship_role": "GLA",
+      "applicable_jds": [
+        "GLA"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 98,
+        "target": 100,
+        "basis": "Lương trả đúng ngày cam kết mỗi kỳ."
+      },
+      "counter_metric": {
+        "code": "POS_PAYROLL_OT-CTR",
+        "endpoint": "POST /api/kpi/POS_PAYROLL_OT-CTR/input",
+        "name_vi": "Số sai sót lương do chốt gấp cho kịp ngày trả",
+        "name": "Rushed-payroll error count",
+        "intent": "Bắt việc trả đúng hạn nhưng chốt số ẩu."
+      },
+      "purpose": "Đo kỷ luật trả lương đúng hạn.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_GL_RECONCILIATION_OT",
+      "local_id": null,
+      "name": "GL reconciliation on-time",
+      "name_vi": "Đối chiếu sổ cái đúng hạn",
+      "tier": "position",
+      "process": "finance",
+      "category": "financial",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lag",
+      "owner_role": "GLA",
+      "data_stewardship_role": "GLA",
+      "applicable_jds": [
+        "GLA"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98,
+        "yellow_point": 90,
+        "target": 100,
+        "basis": "Các tài khoản sổ cái được đối chiếu đúng hạn mỗi kỳ."
+      },
+      "counter_metric": {
+        "code": "POS_GL_RECONCILIATION_OT-CTR",
+        "endpoint": "POST /api/kpi/POS_GL_RECONCILIATION_OT-CTR/input",
+        "name_vi": "Số chênh lệch sổ cái phát hiện ở kỳ kiểm toán",
+        "name": "Audit-found GL discrepancy",
+        "intent": "Bắt việc đánh dấu đối chiếu xong nhưng làm hình thức."
+      },
+      "purpose": "Đo kỷ luật đối chiếu sổ cái.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_BACKUP_SUCCESS_RATE",
+      "local_id": null,
+      "name": "System backup success rate",
+      "name_vi": "Tỷ lệ sao lưu hệ thống thành công",
+      "tier": "position",
+      "process": "it_systems",
+      "category": "system",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lead",
+      "owner_role": "ESA",
+      "data_stewardship_role": "ESA",
+      "applicable_jds": [
+        "ESA"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 98,
+        "target": 100,
+        "basis": "Lượt sao lưu hoàn tất & kiểm tra phục hồi thành công."
+      },
+      "counter_metric": {
+        "code": "POS_BACKUP_SUCCESS_RATE-CTR",
+        "endpoint": "POST /api/kpi/POS_BACKUP_SUCCESS_RATE-CTR/input",
+        "name_vi": "Số lần phục hồi dữ liệu thất bại khi cần",
+        "name": "Failed-restore count",
+        "intent": "Bắt việc báo sao lưu thành công nhưng không kiểm tra phục hồi."
+      },
+      "purpose": "Đo độ tin cậy sao lưu hệ thống.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
+    },
+    {
+      "canonical_code": "POS_SYSTEM_PATCH_COMPLIANCE",
+      "local_id": null,
+      "name": "System patch / update compliance",
+      "name_vi": "Tuân thủ vá & cập nhật hệ thống đúng hạn",
+      "tier": "position",
+      "process": "it_systems",
+      "category": "system",
+      "layer": "lean_daily",
+      "cadence": "weekly",
+      "lead_or_lag": "lead",
+      "owner_role": "ESA",
+      "data_stewardship_role": "ESA",
+      "applicable_jds": [
+        "ESA"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 85,
+        "target": 100,
+        "basis": "Bản vá bảo mật & cập nhật áp dụng trong thời hạn quy định."
+      },
+      "counter_metric": {
+        "code": "POS_SYSTEM_PATCH_COMPLIANCE-CTR",
+        "endpoint": "POST /api/kpi/POS_SYSTEM_PATCH_COMPLIANCE-CTR/input",
+        "name_vi": "Số sự cố / lỗ hổng do vá chậm",
+        "name": "Incident from delayed patch",
+        "intent": "Bắt việc hoãn vá để tránh gián đoạn, để hở lỗ hổng."
+      },
+      "purpose": "Đo kỷ luật cập nhật & vá hệ thống.",
+      "reward_eligible": false,
+      "origin": "wave3_position"
     }
   ],
   "dashboard_core_kpis": [
@@ -6276,6 +7536,428 @@
             "kpi_code": "CHANGEOVER_TIME",
             "weight": 10,
             "rationale": "Thời gian đổi mẫu — đối tượng tối ưu SMED."
+          }
+        ]
+      },
+      "CAM": {
+        "role_code": "CAM",
+        "jd_title_vi": "Lập trình viên CAM / NC",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html",
+        "wave": 3,
+        "scorecard": [
+          {
+            "kpi_code": "POS_CAM_PROGRAM_FPY",
+            "weight": 35,
+            "rationale": "Chương trình chạy đạt ngay — chất lượng lập trình."
+          },
+          {
+            "kpi_code": "POS_CAM_PROGRAM_ON_TIME",
+            "weight": 25,
+            "rationale": "Phát hành chương trình đúng hạn cho sản xuất."
+          },
+          {
+            "kpi_code": "POS_CAM_PROVEOUT_TIME",
+            "weight": 20,
+            "rationale": "Năng suất chạy thử chương trình."
+          },
+          {
+            "kpi_code": "POS_CAM_COLLISION_INCIDENTS",
+            "weight": 20,
+            "rationale": "An toàn chương trình — không va chạm bỏ sót."
+          }
+        ]
+      },
+      "DFM": {
+        "role_code": "DFM",
+        "jd_title_vi": "Kỹ sư DFM",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html",
+        "wave": 3,
+        "scorecard": [
+          {
+            "kpi_code": "POS_DFM_ISSUE_CATCH_RATE",
+            "weight": 30,
+            "rationale": "Bắt vấn đề gia công trước phát hành."
+          },
+          {
+            "kpi_code": "POS_DFM_REVIEW_ON_TIME",
+            "weight": 25,
+            "rationale": "Rà soát DFM đúng hạn, không chặn dòng."
+          },
+          {
+            "kpi_code": "ENGINEERING_RELEASE_RFT",
+            "weight": 25,
+            "rationale": "Phát hành kỹ thuật đúng lần đầu."
+          },
+          {
+            "kpi_code": "CONTROL_PLAN_PFMEA_APPROVAL",
+            "weight": 20,
+            "rationale": "Duyệt Control Plan/PFMEA trước baseline."
+          }
+        ]
+      },
+      "PRE": {
+        "role_code": "PRE",
+        "jd_title_vi": "Kỹ sư quá trình",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html",
+        "wave": 3,
+        "scorecard": [
+          {
+            "kpi_code": "POS_ROUTING_ACCURACY",
+            "weight": 30,
+            "rationale": "Routing chính xác — không sửa khi sản xuất."
+          },
+          {
+            "kpi_code": "SETUP_FIRST_PASS",
+            "weight": 20,
+            "rationale": "Setup đạt lần đầu — quá trình thiết kế tốt."
+          },
+          {
+            "kpi_code": "CYCLE_TIME_VARIANCE",
+            "weight": 20,
+            "rationale": "Ổn định thời gian chu kỳ vs chuẩn."
+          },
+          {
+            "kpi_code": "POS_PROCESS_VALIDATION_OT",
+            "weight": 15,
+            "rationale": "Xác nhận quá trình đúng hạn."
+          },
+          {
+            "kpi_code": "FPY",
+            "weight": 15,
+            "rationale": "Hiệu suất đạt ngay lần đầu — kết quả quá trình."
+          }
+        ]
+      },
+      "QE": {
+        "role_code": "QE",
+        "jd_title_vi": "Kỹ sư chất lượng",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html",
+        "wave": 3,
+        "scorecard": [
+          {
+            "kpi_code": "FAI_FIRST_PASS",
+            "weight": 22,
+            "rationale": "Chấp nhận FAI lần đầu."
+          },
+          {
+            "kpi_code": "POS_NCR_INVESTIGATION_QUALITY",
+            "weight": 22,
+            "rationale": "Chiều sâu điều tra nguyên nhân gốc NCR."
+          },
+          {
+            "kpi_code": "CAPA_EFFECTIVENESS",
+            "weight": 20,
+            "rationale": "Hiệu lực CAPA."
+          },
+          {
+            "kpi_code": "POS_PPAP_SUBMISSION_OT",
+            "weight": 18,
+            "rationale": "Hồ sơ PPAP/FAI nộp khách đúng hạn."
+          },
+          {
+            "kpi_code": "REPEAT_NCR_RATE",
+            "weight": 18,
+            "rationale": "NCR tái diễn — bằng chứng khắc phục thực chất."
+          }
+        ]
+      },
+      "QCL": {
+        "role_code": "QCL",
+        "jd_title_vi": "Tổ trưởng kiểm tra QC",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html",
+        "wave": 3,
+        "scorecard": [
+          {
+            "kpi_code": "POS_INSPECTION_ESCAPE_RATE",
+            "weight": 30,
+            "rationale": "Lỗi lọt qua tổ kiểm — hiệu lực phát hiện."
+          },
+          {
+            "kpi_code": "FINAL_RELEASE_RFT",
+            "weight": 25,
+            "rationale": "Phát hành cuối đúng lần đầu."
+          },
+          {
+            "kpi_code": "FAI_FIRST_PASS",
+            "weight": 20,
+            "rationale": "Chấp nhận mẫu đầu/FAI."
+          },
+          {
+            "kpi_code": "POS_INSPECTION_THROUGHPUT",
+            "weight": 15,
+            "rationale": "Năng suất điều phối tổ kiểm."
+          },
+          {
+            "kpi_code": "CAL_COMPLIANCE",
+            "weight": 10,
+            "rationale": "Tuân thủ hiệu chuẩn thiết bị đo."
+          }
+        ]
+      },
+      "IA": {
+        "role_code": "IA",
+        "jd_title_vi": "Đánh giá viên nội bộ",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-internal-auditor-outsource.html",
+        "wave": 3,
+        "scorecard": [
+          {
+            "kpi_code": "POS_AUDIT_PLAN_COMPLIANCE",
+            "weight": 30,
+            "rationale": "Hoàn thành kế hoạch đánh giá đúng lịch."
+          },
+          {
+            "kpi_code": "POS_AUDIT_FINDING_CLOSURE",
+            "weight": 30,
+            "rationale": "Đóng phát hiện đánh giá đúng hạn."
+          },
+          {
+            "kpi_code": "POS_AUDIT_FINDING_EFFECTIVENESS",
+            "weight": 25,
+            "rationale": "Phát hiện không tái diễn — khắc phục thực chất."
+          },
+          {
+            "kpi_code": "CAPA_EFFECTIVENESS",
+            "weight": 15,
+            "rationale": "Hiệu lực CAPA sinh ra từ đánh giá."
+          }
+        ]
+      },
+      "BUY": {
+        "role_code": "BUY",
+        "jd_title_vi": "Nhân viên mua hàng",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html",
+        "wave": 3,
+        "scorecard": [
+          {
+            "kpi_code": "SUPPLIER_OTD",
+            "weight": 25,
+            "rationale": "NCC giao đúng hạn — kết quả chọn & quản NCC."
+          },
+          {
+            "kpi_code": "POS_PO_CYCLE_TIME",
+            "weight": 20,
+            "rationale": "Tốc độ xử lý đơn mua."
+          },
+          {
+            "kpi_code": "POS_PURCHASE_PRICE_VARIANCE",
+            "weight": 20,
+            "rationale": "Kiểm soát giá mua so với ngân sách."
+          },
+          {
+            "kpi_code": "IQC_PASS_RATE",
+            "weight": 20,
+            "rationale": "Chất lượng đầu vào — hệ quả chọn NCC."
+          },
+          {
+            "kpi_code": "MATERIAL_AVAILABILITY_PLAN",
+            "weight": 15,
+            "rationale": "Vật tư sẵn sàng cho kế hoạch."
+          }
+        ]
+      },
+      "IMX": {
+        "role_code": "IMX",
+        "jd_title_vi": "Nhân viên xuất nhập khẩu",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-import-export-staff.html",
+        "wave": 3,
+        "scorecard": [
+          {
+            "kpi_code": "POS_CUSTOMS_CLEARANCE_OT",
+            "weight": 30,
+            "rationale": "Thông quan đúng hạn."
+          },
+          {
+            "kpi_code": "POS_EXPORT_DOC_ACCURACY",
+            "weight": 30,
+            "rationale": "Độ chính xác hồ sơ XNK."
+          },
+          {
+            "kpi_code": "POS_SHIPMENT_DELAY_RATE",
+            "weight": 25,
+            "rationale": "Không để khâu XNK gây chậm giao."
+          },
+          {
+            "kpi_code": "OTD",
+            "weight": 15,
+            "rationale": "Giao hàng đúng hạn — đích cuối khâu XNK góp phần."
+          }
+        ]
+      },
+      "MPC": {
+        "role_code": "MPC",
+        "jd_title_vi": "Nhân viên kế hoạch vật tư & kiểm soát tồn kho",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-material-planning-inventory-control.html",
+        "wave": 3,
+        "scorecard": [
+          {
+            "kpi_code": "MATERIAL_AVAILABILITY_PLAN",
+            "weight": 25,
+            "rationale": "Vật tư sẵn sàng cho kế hoạch sản xuất."
+          },
+          {
+            "kpi_code": "INVENTORY_ACCURACY",
+            "weight": 25,
+            "rationale": "Độ chính xác tồn kho."
+          },
+          {
+            "kpi_code": "POS_STOCKOUT_RATE",
+            "weight": 20,
+            "rationale": "Không để thiếu hụt gây dừng việc."
+          },
+          {
+            "kpi_code": "POS_CYCLE_COUNT_COMPLIANCE",
+            "weight": 15,
+            "rationale": "Kỷ luật kiểm kê chu kỳ."
+          },
+          {
+            "kpi_code": "POS_EXCESS_INVENTORY",
+            "weight": 15,
+            "rationale": "Kiểm soát tồn kho dư thừa."
+          }
+        ]
+      },
+      "TCK": {
+        "role_code": "TCK",
+        "jd_title_vi": "Thủ kho dụng cụ / dao cụ",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-tool-crib-tool-storekeeper.html",
+        "wave": 3,
+        "scorecard": [
+          {
+            "kpi_code": "POS_TOOL_AVAILABILITY",
+            "weight": 35,
+            "rationale": "Dao/đồ gá sẵn sàng khi cần — chống dừng máy."
+          },
+          {
+            "kpi_code": "POS_TOOL_PRESET_ACCURACY",
+            "weight": 25,
+            "rationale": "Độ chính xác preset dao."
+          },
+          {
+            "kpi_code": "POS_TOOL_INVENTORY_ACCURACY",
+            "weight": 25,
+            "rationale": "Độ chính xác tồn kho dụng cụ."
+          },
+          {
+            "kpi_code": "POS_AREA_5S_FOD_SCORE",
+            "weight": 15,
+            "rationale": "Kỷ luật 5S/FOD khu vực kho dao."
+          }
+        ]
+      },
+      "WHC": {
+        "role_code": "WHC",
+        "jd_title_vi": "Nhân viên kho",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-warehouse-clerk.html",
+        "wave": 3,
+        "scorecard": [
+          {
+            "kpi_code": "POS_PICK_ACCURACY",
+            "weight": 30,
+            "rationale": "Độ chính xác xuất/soạn hàng."
+          },
+          {
+            "kpi_code": "INVENTORY_ACCURACY",
+            "weight": 25,
+            "rationale": "Độ chính xác tồn kho."
+          },
+          {
+            "kpi_code": "POS_GOODS_RECEIPT_OT",
+            "weight": 25,
+            "rationale": "Nhập kho & ghi nhận đúng hạn."
+          },
+          {
+            "kpi_code": "TRACEABILITY_COMPLETENESS",
+            "weight": 20,
+            "rationale": "Hồ sơ truy xuất đầy đủ tại kho."
+          }
+        ]
+      },
+      "APA": {
+        "role_code": "APA",
+        "jd_title_vi": "Kế toán công nợ & thanh toán",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/07-JD-Finance/jd-ap-ar-and-payments-accountant.html",
+        "wave": 3,
+        "scorecard": [
+          {
+            "kpi_code": "DSO",
+            "weight": 25,
+            "rationale": "Số ngày thu tiền — hiệu quả thu hồi công nợ."
+          },
+          {
+            "kpi_code": "INVOICE_RFT",
+            "weight": 25,
+            "rationale": "Hóa đơn đúng lần đầu."
+          },
+          {
+            "kpi_code": "POS_AP_PAYMENT_OT",
+            "weight": 25,
+            "rationale": "Thanh toán NCC đúng hạn."
+          },
+          {
+            "kpi_code": "POS_PAYMENT_ACCURACY",
+            "weight": 25,
+            "rationale": "Độ chính xác thanh toán & đối chiếu."
+          }
+        ]
+      },
+      "GLA": {
+        "role_code": "GLA",
+        "jd_title_vi": "Kế toán sổ cái & lương",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/07-JD-Finance/jd-general-ledger-and-payroll-accountant.html",
+        "wave": 3,
+        "scorecard": [
+          {
+            "kpi_code": "MONTH_END_CLOSE_OT",
+            "weight": 25,
+            "rationale": "Đóng sổ cuối tháng đúng hạn."
+          },
+          {
+            "kpi_code": "POS_PAYROLL_ACCURACY",
+            "weight": 25,
+            "rationale": "Độ chính xác bảng lương."
+          },
+          {
+            "kpi_code": "POS_GL_RECONCILIATION_OT",
+            "weight": 25,
+            "rationale": "Đối chiếu sổ cái đúng hạn."
+          },
+          {
+            "kpi_code": "POS_PAYROLL_OT",
+            "weight": 25,
+            "rationale": "Trả lương đúng hạn."
+          }
+        ]
+      },
+      "ESA": {
+        "role_code": "ESA",
+        "jd_title_vi": "Quản trị viên hệ thống Epicor",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html",
+        "wave": 3,
+        "scorecard": [
+          {
+            "kpi_code": "CRITICAL_SYSTEM_AVAILABILITY",
+            "weight": 25,
+            "rationale": "Sẵn sàng hệ thống trọng yếu."
+          },
+          {
+            "kpi_code": "SERVICE_TICKET_SLA",
+            "weight": 20,
+            "rationale": "Đóng phiếu dịch vụ trong SLA."
+          },
+          {
+            "kpi_code": "POS_BACKUP_SUCCESS_RATE",
+            "weight": 20,
+            "rationale": "Sao lưu hệ thống thành công."
+          },
+          {
+            "kpi_code": "MASTER_DATA_EXCEPTION_AGING",
+            "weight": 20,
+            "rationale": "Tuổi tồn ngoại lệ dữ liệu gốc."
+          },
+          {
+            "kpi_code": "POS_SYSTEM_PATCH_COMPLIANCE",
+            "weight": 15,
+            "rationale": "Tuân thủ vá & cập nhật hệ thống."
           }
         ]
       }
