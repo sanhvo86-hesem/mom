@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
   "version": "2026-05-21",
-  "schema_version": 14,
+  "schema_version": 15,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. Existing ANNEX-122 KPIs are retained, legacy metric aliases are mapped to canonical codes, and proposed CNC operating metrics are staged without granting automatic runtime authority.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -2582,6 +2582,771 @@
       "applicable_jds": [
         "WKM"
       ]
+    },
+    {
+      "canonical_code": "POS_OP_PART_ACCEPT",
+      "local_id": null,
+      "name": "Operator part acceptance rate",
+      "name_vi": "Tỷ lệ chi tiết đạt của ca vận hành",
+      "tier": "position",
+      "process": "machining",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "owner_role": "OPR",
+      "data_stewardship_role": "OPR",
+      "applicable_jds": [
+        "OPR"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98,
+        "yellow_point": 95,
+        "target": 99,
+        "basis": "Chuẩn job-shop CNC chính xác lô nhỏ ≥98% đạt trong ca."
+      },
+      "counter_metric": {
+        "code": "POS_OP_PART_ACCEPT-CTR",
+        "endpoint": "POST /api/kpi/POS_OP_PART_ACCEPT-CTR/input",
+        "name_vi": "Tỷ lệ chi tiết bị QC/khách trả lại sau ca",
+        "name": "Post-shift rejected-part rate",
+        "intent": "Bắt việc cho qua chi tiết lỗi để đạt tỷ lệ đạt trong ca."
+      },
+      "purpose": "Đo chất lượng đầu ra trực tiếp của người vận hành CNC trong ca.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_OP_OUTPUT_ADHERENCE",
+      "local_id": null,
+      "name": "Operator output adherence",
+      "name_vi": "Hoàn thành sản lượng ca theo định mức",
+      "tier": "position",
+      "process": "machining",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "owner_role": "OPR",
+      "data_stewardship_role": "OPR",
+      "applicable_jds": [
+        "OPR"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 85,
+        "target": 100,
+        "basis": "Sản lượng ca so với định mức công đoạn đã chuẩn hoá."
+      },
+      "counter_metric": {
+        "code": "POS_OP_OUTPUT_ADHERENCE-CTR",
+        "endpoint": "POST /api/kpi/POS_OP_OUTPUT_ADHERENCE-CTR/input",
+        "name_vi": "Tỷ lệ chi tiết hỏng do chạy ép sản lượng",
+        "name": "Speed-driven scrap rate",
+        "intent": "Bắt việc chạy ép cho đủ sản lượng làm tăng phế phẩm."
+      },
+      "purpose": "Đo năng suất ca của người vận hành so với định mức.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_OP_MACHINE_UPTIME",
+      "local_id": null,
+      "name": "Tended-machine running ratio",
+      "name_vi": "Tỷ lệ máy chạy trên máy được phân công",
+      "tier": "position",
+      "process": "machining",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "owner_role": "OPR",
+      "data_stewardship_role": "OPR",
+      "applicable_jds": [
+        "OPR"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 75,
+        "yellow_point": 60,
+        "target": 80,
+        "basis": "Spindle-on / giờ khả dụng trên máy operator phụ trách."
+      },
+      "counter_metric": {
+        "code": "POS_OP_MACHINE_UPTIME-CTR",
+        "endpoint": "POST /api/kpi/POS_OP_MACHINE_UPTIME-CTR/input",
+        "name_vi": "Tỷ lệ giờ chạy không tạo chi tiết đạt",
+        "name": "Idle-spindle-but-running ratio",
+        "intent": "Bắt việc để máy chạy không tải nhằm làm đẹp tỷ lệ uptime."
+      },
+      "purpose": "Đo mức tận dụng máy của người vận hành trong ca.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_SETUP_SHEET_COMPLIANCE",
+      "local_id": null,
+      "name": "Setup-sheet & parameter compliance",
+      "name_vi": "Tuân thủ phiếu setup & thông số gia công",
+      "tier": "position",
+      "process": "machining",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lead",
+      "owner_role": "OPR",
+      "data_stewardship_role": "OPR",
+      "applicable_jds": [
+        "OPR"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 98,
+        "target": 100,
+        "basis": "Audit ngẫu nhiên: thông số máy khớp phiếu setup phê duyệt."
+      },
+      "counter_metric": {
+        "code": "POS_SETUP_SHEET_COMPLIANCE-CTR",
+        "endpoint": "POST /api/kpi/POS_SETUP_SHEET_COMPLIANCE-CTR/input",
+        "name_vi": "Số lần tự đổi thông số ngoài phiếu setup",
+        "name": "Off-sheet parameter overrides",
+        "intent": "Bắt việc tự ý đổi thông số ngoài phiếu setup đã phê duyệt."
+      },
+      "purpose": "Đo kỷ luật tuân thủ thông số gia công đã được phê duyệt.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_SELF_INSPECTION_COMPLIANCE",
+      "local_id": null,
+      "name": "In-process self-inspection compliance",
+      "name_vi": "Tuân thủ tự kiểm đầu / giữa / cuối loạt",
+      "tier": "position",
+      "process": "quality_assurance",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lead",
+      "owner_role": "OPR",
+      "data_stewardship_role": "OPR",
+      "applicable_jds": [
+        "OPR"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 97,
+        "target": 100,
+        "basis": "Hồ sơ tự kiểm có đủ mốc theo control plan."
+      },
+      "counter_metric": {
+        "code": "POS_SELF_INSPECTION_COMPLIANCE-CTR",
+        "endpoint": "POST /api/kpi/POS_SELF_INSPECTION_COMPLIANCE-CTR/input",
+        "name_vi": "Tỷ lệ lỗi lẽ ra tự kiểm phải phát hiện",
+        "name": "Missed self-check defect rate",
+        "intent": "Bắt việc ghi tự kiểm hình thức mà không đo thật."
+      },
+      "purpose": "Đo kỷ luật tự kiểm trong quá trình của người vận hành.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_TOOL_LIFE_ADHERENCE",
+      "local_id": null,
+      "name": "Tool-life change adherence",
+      "name_vi": "Tuân thủ thay dao theo tuổi thọ quy định",
+      "tier": "position",
+      "process": "machining",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "owner_role": "OPR",
+      "data_stewardship_role": "OPR",
+      "applicable_jds": [
+        "OPR"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 85,
+        "target": 98,
+        "basis": "Thay dao đúng mốc tuổi thọ / số chi tiết quy định."
+      },
+      "counter_metric": {
+        "code": "POS_TOOL_LIFE_ADHERENCE-CTR",
+        "endpoint": "POST /api/kpi/POS_TOOL_LIFE_ADHERENCE-CTR/input",
+        "name_vi": "Số chi tiết lỗi do dao quá hạn",
+        "name": "Worn-tool defect count",
+        "intent": "Bắt việc kéo dài dao quá tuổi thọ gây lỗi kích thước/bề mặt."
+      },
+      "purpose": "Đo kỷ luật quản lý tuổi thọ dao của người vận hành.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_AREA_5S_FOD_SCORE",
+      "local_id": null,
+      "name": "Workstation 5S / FOD score",
+      "name_vi": "Điểm 5S / FOD khu vực phụ trách",
+      "tier": "position",
+      "process": "machining",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "owner_role": "OPR",
+      "data_stewardship_role": "OPR",
+      "applicable_jds": [
+        "OPR",
+        "DBL"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 85,
+        "target": 100,
+        "basis": "Chấm 5S/FOD khu vực theo checklist xưởng."
+      },
+      "counter_metric": {
+        "code": "POS_AREA_5S_FOD_SCORE-CTR",
+        "endpoint": "POST /api/kpi/POS_AREA_5S_FOD_SCORE-CTR/input",
+        "name_vi": "Số vụ FOD / lẫn vật lạ truy về khu vực",
+        "name": "FOD incidents traced to area",
+        "intent": "Bắt việc chấm 5S đẹp nhưng vẫn để lọt vật lạ vào sản phẩm."
+      },
+      "purpose": "Đo kỷ luật 5S và phòng vật lạ tại khu vực làm việc.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_SETUP_TIME_VARIANCE",
+      "local_id": null,
+      "name": "Setup time variance vs standard",
+      "name_vi": "Sai lệch thời gian setup so với chuẩn",
+      "tier": "position",
+      "process": "machining",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "owner_role": "SETUP",
+      "data_stewardship_role": "SETUP",
+      "applicable_jds": [
+        "SETUP"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 10,
+        "yellow_point": 25,
+        "target": 5,
+        "basis": "SMED: setup thực tế lệch ≤10% so với thời gian chuẩn."
+      },
+      "counter_metric": {
+        "code": "POS_SETUP_TIME_VARIANCE-CTR",
+        "endpoint": "POST /api/kpi/POS_SETUP_TIME_VARIANCE-CTR/input",
+        "name_vi": "Tỷ lệ setup nhanh nhưng mẻ đầu lỗi",
+        "name": "Fast-setup first-piece defect rate",
+        "intent": "Bắt việc rút ngắn setup bằng cách bỏ bước, mẻ đầu bị lỗi."
+      },
+      "purpose": "Đo năng suất setup của kỹ thuật viên so với chuẩn.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_SETUP_DOC_QUALITY",
+      "local_id": null,
+      "name": "Setup & first-article document quality",
+      "name_vi": "Chất lượng phiếu setup & hồ sơ first-article",
+      "tier": "position",
+      "process": "machining",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lead",
+      "owner_role": "SETUP",
+      "data_stewardship_role": "SETUP",
+      "applicable_jds": [
+        "SETUP"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 98,
+        "target": 100,
+        "basis": "Phiếu setup/first-article lập đủ mục, đúng, ký duyệt."
+      },
+      "counter_metric": {
+        "code": "POS_SETUP_DOC_QUALITY-CTR",
+        "endpoint": "POST /api/kpi/POS_SETUP_DOC_QUALITY-CTR/input",
+        "name_vi": "Số sai lệch phát hiện khi audit phiếu setup",
+        "name": "Setup-doc audit findings",
+        "intent": "Bắt việc lập phiếu setup hình thức, thiếu hoặc sai thông tin."
+      },
+      "purpose": "Đo chất lượng hồ sơ setup mà kỹ thuật viên bàn giao.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_DEBURR_ESCAPE_RATE",
+      "local_id": null,
+      "name": "Deburr burr-escape rate",
+      "name_vi": "Tỷ lệ chi tiết còn bavia lọt sau deburr",
+      "tier": "position",
+      "process": "quality_assurance",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "owner_role": "DBT",
+      "data_stewardship_role": "DBT",
+      "applicable_jds": [
+        "DBT",
+        "DBL"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 0.5,
+        "yellow_point": 2,
+        "target": 0.2,
+        "basis": "Chi tiết còn bavia phát hiện sau công đoạn deburr."
+      },
+      "counter_metric": {
+        "code": "POS_DEBURR_ESCAPE_RATE-CTR",
+        "endpoint": "POST /api/kpi/POS_DEBURR_ESCAPE_RATE-CTR/input",
+        "name_vi": "Tỷ lệ chi tiết deburr lỗi bề mặt do làm quá tay",
+        "name": "Over-deburr surface-damage rate",
+        "intent": "Bắt việc deburr ẩu hoặc quá tay gây hỏng cạnh/bề mặt."
+      },
+      "purpose": "Đo chất lượng công đoạn làm sạch bavia.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_DEBURR_OUTPUT_ADHERENCE",
+      "local_id": null,
+      "name": "Deburr output adherence",
+      "name_vi": "Hoàn thành sản lượng deburr theo kế hoạch",
+      "tier": "position",
+      "process": "machining",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "owner_role": "DBT",
+      "data_stewardship_role": "DBT",
+      "applicable_jds": [
+        "DBT",
+        "DBL"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 85,
+        "target": 100,
+        "basis": "Sản lượng deburr ca so với kế hoạch giao."
+      },
+      "counter_metric": {
+        "code": "POS_DEBURR_OUTPUT_ADHERENCE-CTR",
+        "endpoint": "POST /api/kpi/POS_DEBURR_OUTPUT_ADHERENCE-CTR/input",
+        "name_vi": "Tỷ lệ chi tiết deburr phải làm lại",
+        "name": "Deburr rework rate",
+        "intent": "Bắt việc chạy nhanh cho đủ sản lượng làm tăng làm lại."
+      },
+      "purpose": "Đo năng suất công đoạn deburr.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_TEAM_BACKLOG_AGING",
+      "local_id": null,
+      "name": "Team queue backlog aging",
+      "name_vi": "Tuổi tồn hàng chờ tại tổ",
+      "tier": "position",
+      "process": "planning",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "owner_role": "DBL",
+      "data_stewardship_role": "DBL",
+      "applicable_jds": [
+        "DBL"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 10,
+        "yellow_point": 25,
+        "target": 5,
+        "basis": "Tỷ lệ chi tiết chờ quá ngưỡng thời gian tại tổ."
+      },
+      "counter_metric": {
+        "code": "POS_TEAM_BACKLOG_AGING-CTR",
+        "endpoint": "POST /api/kpi/POS_TEAM_BACKLOG_AGING-CTR/input",
+        "name_vi": "Tỷ lệ đơn ưu tiên bị bỏ lại để xử lý đơn dễ",
+        "name": "Priority-skip rate",
+        "intent": "Bắt việc giảm tồn bằng cách bỏ qua đơn khó / ưu tiên cao."
+      },
+      "purpose": "Đo năng lực điều phối hàng chờ của tổ trưởng.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_PM_SCHEDULE_COMPLIANCE",
+      "local_id": null,
+      "name": "Preventive-maintenance schedule compliance",
+      "name_vi": "Tuân thủ lịch bảo trì phòng ngừa",
+      "tier": "position",
+      "process": "maintenance",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lead",
+      "owner_role": "MNT",
+      "data_stewardship_role": "MNT",
+      "applicable_jds": [
+        "MNT"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98,
+        "yellow_point": 90,
+        "target": 100,
+        "basis": "Công việc PM hoàn thành đúng hạn theo lịch."
+      },
+      "counter_metric": {
+        "code": "POS_PM_SCHEDULE_COMPLIANCE-CTR",
+        "endpoint": "POST /api/kpi/POS_PM_SCHEDULE_COMPLIANCE-CTR/input",
+        "name_vi": "Số sự cố hỏng máy sau PM đã ký hoàn thành",
+        "name": "Post-PM breakdown count",
+        "intent": "Bắt việc ký hoàn thành PM hình thức mà không làm đủ."
+      },
+      "purpose": "Đo kỷ luật thực hiện bảo trì phòng ngừa.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_MAINT_RESPONSE_TIME",
+      "local_id": null,
+      "name": "Maintenance request response time",
+      "name_vi": "Thời gian đáp ứng yêu cầu sửa chữa",
+      "tier": "position",
+      "process": "maintenance",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "owner_role": "MNT",
+      "data_stewardship_role": "MNT",
+      "applicable_jds": [
+        "MNT"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "day",
+        "green_point": 2,
+        "yellow_point": 4,
+        "target": 1,
+        "basis": "Giờ từ khi nhận phiếu đến khi bắt đầu xử lý (đơn vị giờ)."
+      },
+      "counter_metric": {
+        "code": "POS_MAINT_RESPONSE_TIME-CTR",
+        "endpoint": "POST /api/kpi/POS_MAINT_RESPONSE_TIME-CTR/input",
+        "name_vi": "Tỷ lệ sửa chữa phải quay lại trong 7 ngày",
+        "name": "Repeat-repair rate",
+        "intent": "Bắt việc phản hồi nhanh nhưng sửa tạm, máy hỏng lại."
+      },
+      "purpose": "Đo tốc độ đáp ứng sự cố thiết bị.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_PM_BREAKDOWN_RATIO",
+      "local_id": null,
+      "name": "Preventive vs breakdown maintenance ratio",
+      "name_vi": "Tỷ lệ giờ bảo trì phòng ngừa trên tổng giờ bảo trì",
+      "tier": "position",
+      "process": "maintenance",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "owner_role": "MNT",
+      "data_stewardship_role": "MNT",
+      "applicable_jds": [
+        "MNT"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 80,
+        "yellow_point": 65,
+        "target": 85,
+        "basis": "Giờ PM / tổng giờ bảo trì — văn hoá phòng ngừa."
+      },
+      "counter_metric": {
+        "code": "POS_PM_BREAKDOWN_RATIO-CTR",
+        "endpoint": "POST /api/kpi/POS_PM_BREAKDOWN_RATIO-CTR/input",
+        "name_vi": "Số giờ dừng máy ngoài kế hoạch",
+        "name": "Unplanned downtime hours",
+        "intent": "Bắt việc dồn giờ vào PM nhưng máy vẫn dừng đột xuất nhiều."
+      },
+      "purpose": "Đo mức chủ động phòng ngừa so với chữa cháy của bảo trì.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_PACKAGING_DEFECT_RATE",
+      "local_id": null,
+      "name": "Packaging & labelling defect rate",
+      "name_vi": "Tỷ lệ lỗi đóng gói / dán nhãn / CoC",
+      "tier": "position",
+      "process": "delivery",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "owner_role": "CPT",
+      "data_stewardship_role": "CPT",
+      "applicable_jds": [
+        "CPT",
+        "CPS"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 0.5,
+        "yellow_point": 2,
+        "target": 0.1,
+        "basis": "Lô có lỗi đóng gói, sai nhãn hoặc thiếu CoC."
+      },
+      "counter_metric": {
+        "code": "POS_PACKAGING_DEFECT_RATE-CTR",
+        "endpoint": "POST /api/kpi/POS_PACKAGING_DEFECT_RATE-CTR/input",
+        "name_vi": "Tỷ lệ khách phản ánh về đóng gói / nhãn",
+        "name": "Customer packaging complaint rate",
+        "intent": "Bắt việc đóng gói nhanh ẩu gây sai nhãn / hư hại khi giao."
+      },
+      "purpose": "Đo chất lượng công đoạn đóng gói.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_CLEANLINESS_COMPLIANCE",
+      "local_id": null,
+      "name": "Part cleanliness process compliance",
+      "name_vi": "Tuân thủ quy trình làm sạch chi tiết trước đóng gói",
+      "tier": "position",
+      "process": "quality_assurance",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lead",
+      "owner_role": "CPT",
+      "data_stewardship_role": "CPT",
+      "applicable_jds": [
+        "CPT",
+        "CPS"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 98,
+        "target": 100,
+        "basis": "Audit: chi tiết được làm sạch đúng quy trình trước khi đóng gói."
+      },
+      "counter_metric": {
+        "code": "POS_CLEANLINESS_COMPLIANCE-CTR",
+        "endpoint": "POST /api/kpi/POS_CLEANLINESS_COMPLIANCE-CTR/input",
+        "name_vi": "Số chi tiết bẩn / nhiễm dầu phát hiện sau đóng gói",
+        "name": "Post-pack contamination count",
+        "intent": "Bắt việc bỏ bước làm sạch để kịp đóng gói."
+      },
+      "purpose": "Đo kỷ luật làm sạch chi tiết trước khi đóng gói.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_PACKAGING_OUTPUT_OT",
+      "local_id": null,
+      "name": "Packaging & dispatch on-time",
+      "name_vi": "Đóng gói & chuyển kho đúng hạn",
+      "tier": "position",
+      "process": "delivery",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "owner_role": "CPS",
+      "data_stewardship_role": "CPS",
+      "applicable_jds": [
+        "CPS",
+        "CPT"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 85,
+        "target": 100,
+        "basis": "Lô đóng gói xong và chuyển kho đúng mốc kế hoạch giao."
+      },
+      "counter_metric": {
+        "code": "POS_PACKAGING_OUTPUT_OT-CTR",
+        "endpoint": "POST /api/kpi/POS_PACKAGING_OUTPUT_OT-CTR/input",
+        "name_vi": "Tỷ lệ lô đóng gói đúng hạn nhưng lỗi",
+        "name": "On-time-but-defective pack rate",
+        "intent": "Bắt việc chạy cho kịp hạn đóng gói nhưng để lọt lỗi."
+      },
+      "purpose": "Đo tiến độ công đoạn đóng gói — mắt xích cuối trước giao.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_STD_TIME_ACCURACY",
+      "local_id": null,
+      "name": "Standard-time accuracy",
+      "name_vi": "Độ chính xác định mức thời gian chuẩn",
+      "tier": "position",
+      "process": "machining",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lag",
+      "owner_role": "IE",
+      "data_stewardship_role": "IE",
+      "applicable_jds": [
+        "IE"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 90,
+        "yellow_point": 80,
+        "target": 95,
+        "basis": "Thời gian chuẩn IE đặt lệch ≤10% so với thực tế đo."
+      },
+      "counter_metric": {
+        "code": "POS_STD_TIME_ACCURACY-CTR",
+        "endpoint": "POST /api/kpi/POS_STD_TIME_ACCURACY-CTR/input",
+        "name_vi": "Số công đoạn phải hiệu chỉnh lại định mức",
+        "name": "Re-timed operation count",
+        "intent": "Bắt việc đặt định mức cảm tính phải hiệu chỉnh nhiều lần."
+      },
+      "purpose": "Đo chất lượng định mức thời gian do kỹ sư công nghiệp lập.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_IE_IMPROVEMENT_DELIVERY",
+      "local_id": null,
+      "name": "Improvement project delivery",
+      "name_vi": "Cải tiến năng suất triển khai đúng kế hoạch",
+      "tier": "position",
+      "process": "machining",
+      "category": "internal",
+      "layer": "lean_daily",
+      "cadence": "monthly",
+      "lead_or_lag": "lead",
+      "owner_role": "IE",
+      "data_stewardship_role": "IE",
+      "applicable_jds": [
+        "IE"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 85,
+        "yellow_point": 70,
+        "target": 100,
+        "basis": "Dự án cải tiến đóng đúng hạn và đạt mục tiêu đề ra."
+      },
+      "counter_metric": {
+        "code": "POS_IE_IMPROVEMENT_DELIVERY-CTR",
+        "endpoint": "POST /api/kpi/POS_IE_IMPROVEMENT_DELIVERY-CTR/input",
+        "name_vi": "Tỷ lệ cải tiến bị tái lập vấn đề sau 90 ngày",
+        "name": "Improvement regression rate",
+        "intent": "Bắt việc đóng dự án cải tiến hình thức, vấn đề quay lại."
+      },
+      "purpose": "Đo hiệu quả triển khai cải tiến của kỹ sư công nghiệp.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
+    },
+    {
+      "canonical_code": "POS_SAFETY_PPE_COMPLIANCE",
+      "local_id": null,
+      "name": "Personal safety & PPE compliance",
+      "name_vi": "Tuân thủ an toàn cá nhân (PPE, LOTO, near-miss)",
+      "tier": "position",
+      "process": "ehs",
+      "category": "safety",
+      "layer": "lean_daily",
+      "cadence": "daily",
+      "lead_or_lag": "lead",
+      "owner_role": "DBT",
+      "data_stewardship_role": "DBT",
+      "applicable_jds": [
+        "DBT",
+        "DBL",
+        "CPT",
+        "CPS"
+      ],
+      "calculation_status": "manual",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 97,
+        "target": 100,
+        "basis": "Audit an toàn: tuân thủ PPE, LOTO, khai báo near-miss."
+      },
+      "counter_metric": {
+        "code": "POS_SAFETY_PPE_COMPLIANCE-CTR",
+        "endpoint": "POST /api/kpi/POS_SAFETY_PPE_COMPLIANCE-CTR/input",
+        "name_vi": "Số near-miss không được khai báo phát hiện sau",
+        "name": "Unreported near-miss count",
+        "intent": "Bắt việc làm đẹp điểm an toàn bằng cách không khai near-miss."
+      },
+      "purpose": "Đo kỷ luật an toàn cá nhân tại hiện trường.",
+      "reward_eligible": false,
+      "origin": "wave2_position"
     }
   ],
   "dashboard_core_kpis": [
@@ -5252,6 +6017,265 @@
             "kpi_code": "MASTER_DATA_EXCEPTION_AGING",
             "weight": 35,
             "rationale": "Tuổi tồn ngoại lệ dữ liệu gốc — kỷ luật quản trị dữ liệu."
+          }
+        ]
+      },
+      "OPR": {
+        "role_code": "OPR",
+        "jd_title_vi": "Nhân viên vận hành CNC",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html",
+        "wave": 2,
+        "scorecard": [
+          {
+            "kpi_code": "POS_OP_PART_ACCEPT",
+            "weight": 25,
+            "rationale": "Chất lượng chi tiết — kết quả cốt lõi của vận hành."
+          },
+          {
+            "kpi_code": "POS_SETUP_SHEET_COMPLIANCE",
+            "weight": 20,
+            "rationale": "Tuân thủ thông số gia công đã phê duyệt."
+          },
+          {
+            "kpi_code": "POS_SELF_INSPECTION_COMPLIANCE",
+            "weight": 15,
+            "rationale": "Kỷ luật tự kiểm trong loạt."
+          },
+          {
+            "kpi_code": "POS_OP_MACHINE_UPTIME",
+            "weight": 15,
+            "rationale": "Tận dụng máy — năng suất ca."
+          },
+          {
+            "kpi_code": "POS_OP_OUTPUT_ADHERENCE",
+            "weight": 15,
+            "rationale": "Hoàn thành sản lượng ca theo định mức."
+          },
+          {
+            "kpi_code": "POS_AREA_5S_FOD_SCORE",
+            "weight": 10,
+            "rationale": "Kỷ luật 5S/FOD khu vực làm việc."
+          }
+        ]
+      },
+      "SETUP": {
+        "role_code": "SETUP",
+        "jd_title_vi": "Kỹ thuật viên cài đặt máy",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html",
+        "wave": 2,
+        "scorecard": [
+          {
+            "kpi_code": "SETUP_FIRST_PASS",
+            "weight": 30,
+            "rationale": "Setup đạt ngay lần đầu — kết quả cốt lõi."
+          },
+          {
+            "kpi_code": "POS_SETUP_TIME_VARIANCE",
+            "weight": 20,
+            "rationale": "Năng suất setup so với chuẩn SMED."
+          },
+          {
+            "kpi_code": "POS_SETUP_DOC_QUALITY",
+            "weight": 20,
+            "rationale": "Chất lượng phiếu setup bàn giao."
+          },
+          {
+            "kpi_code": "CHANGEOVER_TIME",
+            "weight": 15,
+            "rationale": "Thời gian đổi mẫu — linh hoạt chuyền."
+          },
+          {
+            "kpi_code": "POS_TOOL_LIFE_ADHERENCE",
+            "weight": 15,
+            "rationale": "Quản lý dao đúng tuổi thọ khi setup."
+          }
+        ]
+      },
+      "DBL": {
+        "role_code": "DBL",
+        "jd_title_vi": "Tổ trưởng tổ deburr",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-deburr-team-lead.html",
+        "wave": 2,
+        "scorecard": [
+          {
+            "kpi_code": "POS_DEBURR_ESCAPE_RATE",
+            "weight": 30,
+            "rationale": "Bavia lọt — chất lượng đầu ra của tổ."
+          },
+          {
+            "kpi_code": "POS_DEBURR_OUTPUT_ADHERENCE",
+            "weight": 25,
+            "rationale": "Sản lượng deburr theo kế hoạch."
+          },
+          {
+            "kpi_code": "POS_TEAM_BACKLOG_AGING",
+            "weight": 20,
+            "rationale": "Điều phối hàng chờ — không ùn tại tổ."
+          },
+          {
+            "kpi_code": "POS_AREA_5S_FOD_SCORE",
+            "weight": 15,
+            "rationale": "Kỷ luật 5S/FOD khu vực tổ."
+          },
+          {
+            "kpi_code": "POS_SAFETY_PPE_COMPLIANCE",
+            "weight": 10,
+            "rationale": "An toàn của tổ — trách nhiệm tổ trưởng."
+          }
+        ]
+      },
+      "DBT": {
+        "role_code": "DBT",
+        "jd_title_vi": "Kỹ thuật viên deburr",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-deburr-technician.html",
+        "wave": 2,
+        "scorecard": [
+          {
+            "kpi_code": "POS_DEBURR_ESCAPE_RATE",
+            "weight": 35,
+            "rationale": "Bavia lọt — chất lượng công đoạn cốt lõi."
+          },
+          {
+            "kpi_code": "POS_DEBURR_OUTPUT_ADHERENCE",
+            "weight": 25,
+            "rationale": "Năng suất deburr cá nhân."
+          },
+          {
+            "kpi_code": "POS_SELF_INSPECTION_COMPLIANCE",
+            "weight": 20,
+            "rationale": "Tự kiểm chi tiết sau deburr."
+          },
+          {
+            "kpi_code": "POS_SAFETY_PPE_COMPLIANCE",
+            "weight": 20,
+            "rationale": "Tuân thủ an toàn cá nhân."
+          }
+        ]
+      },
+      "MNT": {
+        "role_code": "MNT",
+        "jd_title_vi": "Kỹ thuật viên bảo trì",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html",
+        "wave": 2,
+        "scorecard": [
+          {
+            "kpi_code": "POS_PM_SCHEDULE_COMPLIANCE",
+            "weight": 30,
+            "rationale": "Tuân thủ lịch bảo trì phòng ngừa."
+          },
+          {
+            "kpi_code": "MTTR",
+            "weight": 20,
+            "rationale": "Thời gian khắc phục sự cố — tốc độ phục hồi máy."
+          },
+          {
+            "kpi_code": "POS_MAINT_RESPONSE_TIME",
+            "weight": 20,
+            "rationale": "Tốc độ đáp ứng yêu cầu sửa chữa."
+          },
+          {
+            "kpi_code": "POS_PM_BREAKDOWN_RATIO",
+            "weight": 15,
+            "rationale": "Văn hoá phòng ngừa thay vì chữa cháy."
+          },
+          {
+            "kpi_code": "MTBF",
+            "weight": 15,
+            "rationale": "Độ tin cậy thiết bị — kết quả của bảo trì tốt."
+          }
+        ]
+      },
+      "CPS": {
+        "role_code": "CPS",
+        "jd_title_vi": "Giám sát làm sạch & đóng gói",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-and-packaging-supervisor.html",
+        "wave": 2,
+        "scorecard": [
+          {
+            "kpi_code": "POS_PACKAGING_DEFECT_RATE",
+            "weight": 25,
+            "rationale": "Lỗi đóng gói — chất lượng mắt xích cuối."
+          },
+          {
+            "kpi_code": "POS_PACKAGING_OUTPUT_OT",
+            "weight": 25,
+            "rationale": "Đóng gói & chuyển kho đúng hạn."
+          },
+          {
+            "kpi_code": "POS_CLEANLINESS_COMPLIANCE",
+            "weight": 20,
+            "rationale": "Kỷ luật làm sạch trước đóng gói."
+          },
+          {
+            "kpi_code": "SHIP_PACKET_COMPLETENESS",
+            "weight": 20,
+            "rationale": "Bộ hồ sơ giao đầy đủ — tuân thủ cổng G6."
+          },
+          {
+            "kpi_code": "POS_SAFETY_PPE_COMPLIANCE",
+            "weight": 10,
+            "rationale": "An toàn khu vực làm sạch/đóng gói."
+          }
+        ]
+      },
+      "CPT": {
+        "role_code": "CPT",
+        "jd_title_vi": "Kỹ thuật viên làm sạch & đóng gói",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-packaging-technician.html",
+        "wave": 2,
+        "scorecard": [
+          {
+            "kpi_code": "POS_CLEANLINESS_COMPLIANCE",
+            "weight": 30,
+            "rationale": "Làm sạch chi tiết đúng quy trình."
+          },
+          {
+            "kpi_code": "POS_PACKAGING_DEFECT_RATE",
+            "weight": 30,
+            "rationale": "Lỗi đóng gói/dán nhãn cá nhân."
+          },
+          {
+            "kpi_code": "POS_PACKAGING_OUTPUT_OT",
+            "weight": 20,
+            "rationale": "Đóng gói đúng tiến độ."
+          },
+          {
+            "kpi_code": "POS_SAFETY_PPE_COMPLIANCE",
+            "weight": 20,
+            "rationale": "Tuân thủ an toàn cá nhân."
+          }
+        ]
+      },
+      "IE": {
+        "role_code": "IE",
+        "jd_title_vi": "Kỹ sư sản xuất / công nghiệp",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-engineer-industrial-engineer.html",
+        "wave": 2,
+        "scorecard": [
+          {
+            "kpi_code": "POS_STD_TIME_ACCURACY",
+            "weight": 25,
+            "rationale": "Độ chính xác định mức thời gian chuẩn."
+          },
+          {
+            "kpi_code": "POS_IE_IMPROVEMENT_DELIVERY",
+            "weight": 25,
+            "rationale": "Hiệu quả triển khai cải tiến năng suất."
+          },
+          {
+            "kpi_code": "OEE",
+            "weight": 20,
+            "rationale": "Hiệu suất thiết bị tổng thể — đích cải tiến."
+          },
+          {
+            "kpi_code": "CYCLE_TIME_VARIANCE",
+            "weight": 20,
+            "rationale": "Ổn định thời gian chu kỳ vs chuẩn."
+          },
+          {
+            "kpi_code": "CHANGEOVER_TIME",
+            "weight": 10,
+            "rationale": "Thời gian đổi mẫu — đối tượng tối ưu SMED."
           }
         ]
       }

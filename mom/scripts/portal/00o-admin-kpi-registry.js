@@ -18,7 +18,8 @@ var _lang = 'vi';
 
 /* Tier display labels — tier is a filter chip in the library-only console. */
 var TIER_VI = {
-  company:'Cấp công ty', value_stream:'Value-stream', department:'Phòng ban'
+  company:'Cấp công ty', value_stream:'Value-stream', department:'Phòng ban',
+  position:'Cấp vị trí'
 };
 
 var _state = {
@@ -89,7 +90,7 @@ function _retiredChanged(){
 
 /* Group display labels. */
 var GROUP_VI = {
-  governance:'Governance', gate:'Gate', proposed:'Đề xuất'
+  governance:'Governance', gate:'Gate', proposed:'Đề xuất / Vị trí'
 };
 
 /* Category display labels. */
