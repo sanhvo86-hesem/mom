@@ -857,9 +857,9 @@ final class KpiRegistryAdminService
     private function renderGovernanceTable(array $rows): string
     {
         $head = '<div class="table-card"><table class="table" style="table-layout:fixed">'
-            . '<colgroup><col style="width:15%"><col style="width:20%">'
-            . '<col style="width:12%"><col style="width:12%"><col style="width:16%">'
-            . '<col style="width:11%"><col style="width:14%"></colgroup>'
+            . '<colgroup><col style="width:15%"><col style="width:18%">'
+            . '<col style="width:16%"><col style="width:12%"><col style="width:14%">'
+            . '<col style="width:10%"><col style="width:15%"></colgroup>'
             . '<thead><tr><th>KPI</th><th>Công thức</th><th>Ngưỡng G/Y/R</th>'
             . '<th>Owner / xác nhận dữ liệu</th><th>Nguồn dữ liệu</th>'
             . '<th>Nhịp · lớp · loại</th><th>Quyết định khi lệch ngưỡng</th></tr></thead><tbody>';
@@ -917,11 +917,7 @@ final class KpiRegistryAdminService
             . '<br><span class="mini-note">' . $e($ds['evidence'] ?? '') . '</span>';
 
         $calcStatus = (string) ($k['calculation_status'] ?? '');
-        $calcBadge = match ($calcStatus) {
-            'runtime_calculated' => '<span class="inline-tag" style="background:#ebfbee;color:#2b8a3e">Tính runtime</span>',
-            'manual' => '<span class="inline-tag" style="background:#eef2ff;color:#3730a3">Nhập tay</span>',
-            default => '<span class="inline-tag" style="background:#fff9db;color:#e67700">Chờ hợp đồng dữ liệu</span>',
-        };
+        $calcBadge = $this->calcStatusSymbol($calcStatus);
         $leadLag = ($k['lead_or_lag'] ?? '') === 'lead' ? 'Chỉ số dẫn (lead)' : 'Chỉ số kết quả (lag)';
         $cadenceCell = $e(self::CADENCE_VI[$k['cadence'] ?? ''] ?? ($k['cadence'] ?? ''))
             . ' · ' . $e(self::LAYER_VI[$k['layer'] ?? ''] ?? ($k['layer'] ?? ''))
@@ -961,7 +957,7 @@ final class KpiRegistryAdminService
             . '</span> <span class="mini-note">' . $e($k['name'] ?? '') . '</span>';
 
         return '<tr data-kpi-code="' . $e($code) . '"><td>' . $kpiCell . '</td>'
-            . '<td>' . $formula . '</td><td class="nowrap">' . $thresholds . '</td>'
+            . '<td>' . $formula . '</td><td>' . $thresholds . '</td>'
             . '<td>' . $owner . '</td><td>' . $src . '</td><td>' . $cadenceCell . '</td>'
             . '<td>' . $decision . '</td></tr>';
     }
@@ -993,6 +989,24 @@ final class KpiRegistryAdminService
             return ["≤ {$g}{$suf}", ">{$g} – ≤{$y}{$suf}", "> {$y}{$suf}"];
         }
         return ["≥ {$g}{$suf}", "{$y} – <{$g}{$suf}", "< {$y}{$suf}"];
+    }
+
+    /**
+     * Calculation status as a compact symbol — runtime ⚙ / manual ✎ /
+     * staged ○ — so the §4/§5/§6 cells stay narrow. Full wording rides in
+     * the title tooltip.
+     */
+    private function calcStatusSymbol(string $status): string
+    {
+        [$sym, $bg, $fg, $title] = match ($status) {
+            'runtime_calculated' => ['⚙', '#ebfbee', '#2b8a3e', 'Tính runtime — số tính tự động từ hệ thống'],
+            'manual'             => ['✎', '#eef2ff', '#3730a3', 'Nhập tay — nạp số qua endpoint nhập liệu'],
+            'retired'            => ['⊘', '#fff5f5', '#c92a2a', 'KPI đã ngừng dùng'],
+            default              => ['○', '#fff9db', '#e67700', 'Chờ hợp đồng dữ liệu — chưa có nguồn số'],
+        };
+        return '<span class="kpi-calc-sym" title="' . $this->esc($title) . '" style="display:inline-flex;'
+            . 'align-items:center;justify-content:center;width:20px;height:20px;border-radius:999px;'
+            . 'background:' . $bg . ';color:' . $fg . ';font-size:12px">' . $sym . '</span>';
     }
 
     private function roleLink(string $code): string
