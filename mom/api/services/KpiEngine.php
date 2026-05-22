@@ -672,6 +672,61 @@ final class KpiEngine
         ];
     }
 
+    /**
+     * Threshold-badge catalog — every governed KPI code mapped to its numeric
+     * thresholds and metadata. The ANNEX live RAG-badge renderer hydrates the
+     * xanh/vàng/đỏ boxes embedded in controlled documents from this, so a
+     * reader can tell a system-linked KPI (badge present, bound to the
+     * Authority registry) from a hardcoded one (no badge). Reads the registry
+     * with the runtime overlay applied, so Console edits and added KPIs show.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public function kpiThresholdBadges(): array
+    {
+        $registry = $this->loadKpiAuthorityRegistry();
+        $sections = [
+            'annex122_governance_kpis'   => 'governance',
+            'gate_control_metrics'       => 'gate',
+            'proposed_operating_metrics' => 'proposed',
+        ];
+        $out = [];
+        foreach ($sections as $section => $group) {
+            foreach (($registry[$section] ?? []) as $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+                $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+                // Governance is iterated first — the canonical row wins; a
+                // gate/proposed row sharing the code does not overwrite it.
+                if ($code === '' || isset($out[$code])) {
+                    continue;
+                }
+                $t = is_array($row['thresholds'] ?? null) ? $row['thresholds'] : [];
+                if (!isset($t['green_point'], $t['yellow_point'])
+                    || !is_numeric($t['green_point']) || !is_numeric($t['yellow_point'])) {
+                    continue;
+                }
+                $out[$code] = [
+                    'code'               => $code,
+                    'group'              => $group,
+                    'name_vi'            => (string) ($row['name_vi'] ?? ''),
+                    'direction'          => (string) ($t['direction'] ?? 'higher_is_better'),
+                    'unit'               => (string) ($t['unit'] ?? ''),
+                    'green_point'        => (float) $t['green_point'],
+                    'yellow_point'       => (float) $t['yellow_point'],
+                    'target'             => isset($t['target']) && is_numeric($t['target'])
+                        ? (float) $t['target'] : null,
+                    'calculation_status' => (string) ($row['calculation_status']
+                        ?? ($row['status'] ?? '')),
+                    'counter_metric'     => $row['counter_metric'] ?? null,
+                    'retired'            => ($row['retired'] ?? false) === true,
+                ];
+            }
+        }
+        return $out;
+    }
+
     public function isRuntimeCalculatedMetric(string $metricCode): bool
     {
         return in_array($this->normalizeMetricCode($metricCode), self::ALL_METRICS, true);

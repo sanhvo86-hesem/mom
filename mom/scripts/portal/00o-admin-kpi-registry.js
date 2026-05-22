@@ -240,6 +240,8 @@ function _setThreshold(section, code, key, value){
     cur[key] = value;
   }
   _setField(section, code, 'thresholds', cur);
+  // Live-link: the xanh/vàng/đỏ box reflects the edited points immediately.
+  _refreshRag(section, code);
 }
 
 /* Derive (green,yellow,red) display bands from numeric thresholds — mirrors
@@ -772,15 +774,49 @@ function _field(label, control){
   return '<div class="kc-f"><label>' + _esc(label) + '</label>' + control + '</div>';
 }
 
-/* Live RAG-band preview from the (possibly edited) numeric thresholds. */
-function _ragPreview(m, section){
+/* DOM id of a card's RAG badge box, so threshold edits can refresh it
+   in place without a full re-render (keeps the number input focused). */
+function _ragNodeId(section, code){
+  return 'kc-rag-' + section + '-' + String(code).replace(/[^A-Za-z0-9_]/g, '');
+}
+
+/* The xanh/vàng/đỏ badge box — the recognizable graphic that proves a
+   KPI's bands are bound to the Authority registry's numeric thresholds.
+   Carries data-kpi-authority so a reader (and the ANNEX renderer) can
+   tell a system-linked KPI from a hardcoded one. */
+function _ragBadgeBox(m, section){
   var t = _val(m, section, 'thresholds') || m.thresholds || {};
   var b = _ragBands(t);
-  if(!b) return '';
-  return '<div class="kc-rag">' +
-    '<span class="kc-badge kc-badge-ok">' + _esc(b.green) + '</span> ' +
-    '<span class="kc-badge kc-badge-staged">' + _esc(b.yellow) + '</span> ' +
-    '<span class="kc-badge kc-badge-bad">' + _esc(b.red) + '</span></div>';
+  if(!b){
+    return '<div class="kc-rag kc-rag--unlinked" title="' +
+      _t('KPI chưa có ngưỡng số trong Authority', 'KPI has no numeric thresholds in the Authority') +
+      '">' + _t('Chưa gắn ngưỡng số', 'No numeric thresholds') + '</div>';
+  }
+  return '<div class="kc-rag kc-rag--linked" data-kpi-authority="linked" data-kpi-code="' +
+      _esc(m.canonical_code) + '">' +
+    '<span class="kc-badge kc-badge-ok">' + _esc(b.green) + '</span>' +
+    '<span class="kc-badge kc-badge-staged">' + _esc(b.yellow) + '</span>' +
+    '<span class="kc-badge kc-badge-bad">' + _esc(b.red) + '</span>' +
+    '<span class="kc-rag-mark" title="' +
+      _t('Ngưỡng đồng bộ từ Authority KPI — đổi điểm xanh/vàng là hộp này đổi theo',
+         'Bands are bound to the KPI Authority — editing the green/yellow points updates this box') +
+      '">🔗 Authority</span>' +
+  '</div>';
+}
+
+/* Live RAG-band preview, wrapped in an id'd node for in-place refresh. */
+function _ragPreview(m, section){
+  return '<div id="' + _ragNodeId(section, m.canonical_code) + '">' +
+    _ragBadgeBox(m, section) + '</div>';
+}
+
+/* Re-render only one card's RAG box from the current (edited) thresholds. */
+function _refreshRag(section, code){
+  var node = document.getElementById(_ragNodeId(section, code));
+  if(!node) return;
+  var list = _sectionMetrics(section), metric = null;
+  for(var i=0;i<list.length;i++){ if(list[i].canonical_code===code){ metric=list[i]; break; } }
+  if(metric) node.innerHTML = _ragBadgeBox(metric, section);
 }
 
 /* ── Styles — Graphics Authority tokens only ──────────────────────── */
@@ -833,7 +869,13 @@ function _styleBlock(){
   '.kc-badge-staged{background:var(--warning-soft,#fff9db);color:var(--warning,#e67700)}' +
   '.kc-badge-manual{background:var(--accent-soft,#eef2ff);color:var(--accent,#3730a3)}' +
   '.kc-badge-bad{background:var(--danger-soft,#fff5f5);color:var(--danger,#c92a2a)}' +
-  '.kc-rag{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 4px}' +
+  '.kc-rag{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 4px;align-items:center}' +
+  '.kc-rag--linked{border:1px dashed var(--success,#2b8a3e);border-radius:8px;' +
+    'padding:5px 8px;background:var(--success-soft,#ebfbee)}' +
+  '.kc-rag--unlinked{font-size:11px;color:var(--text-3,#7a869a);' +
+    'border:1px dashed var(--border,#d7deea);border-radius:8px;padding:5px 8px}' +
+  '.kc-rag-mark{font-size:10px;font-weight:700;color:var(--success,#2b8a3e);' +
+    'margin-left:2px;letter-spacing:.2px}' +
   '.kc-warn{font-size:11px;color:var(--warning,#e67700);background:var(--warning-soft,#fff9db);' +
     'border-radius:6px;padding:5px 8px}' +
   '.kc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}' +

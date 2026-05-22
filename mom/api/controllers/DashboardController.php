@@ -427,6 +427,22 @@ final class DashboardController extends BaseController
         $this->success(['alerts' => $alerts, 'count' => count($alerts)]);
     }
 
+    /**
+     * GET /api/kpi/threshold-badges  (?action=kpi_threshold_badges)
+     *
+     * Every governed KPI code → numeric thresholds + metadata. The ANNEX
+     * live RAG-badge renderer hydrates the xanh/vàng/đỏ boxes embedded in
+     * controlled documents from this. Read-only and non-sensitive (threshold
+     * bands only), so any authenticated portal user — anyone who can open the
+     * controlled document — may read it.
+     */
+    public function kpiThresholdBadges(): never
+    {
+        $this->requireAuth();
+        $badges = $this->kpi->kpiThresholdBadges();
+        $this->success(['badges' => $badges, 'count' => count($badges)]);
+    }
+
     // ── KPI manual data-input endpoints ──────────────────────────────────────
     // Every KPI in the governed registry exposes a data-input endpoint a
     // frontend can POST to. Runtime KPIs are computed from the DB; staged /

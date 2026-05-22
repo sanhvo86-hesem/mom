@@ -831,12 +831,19 @@ final class KpiRegistryAdminService
             $formula .= '<br><span class="mini-note">Cỡ mẫu tối thiểu: ' . $e($f['min_sample']) . '</span>';
         }
 
+        // RAG badge box — wrapped in a data-kpi-rag element so the ANNEX
+        // live renderer (12-kpi-badge-renderer.js) can hydrate it from the
+        // KPI Authority API at view time. The marked-up box is the
+        // recognizable graphic that proves a KPI is system-linked; a
+        // threshold cell without it is hardcoded.
         [$tg, $ty, $tr] = $this->thresholdDisplay($t);
-        $thresholds = '<span class="kpi-good" style="padding:1px 5px;border-radius:4px">Xanh ' . $e($tg) . '</span><br>'
+        $thresholds = '<div class="kpi-rag-badge" data-kpi-rag="authority" data-kpi-code="' . $e($code) . '">'
+            . '<span class="kpi-good" style="padding:1px 5px;border-radius:4px">Xanh ' . $e($tg) . '</span><br>'
             . '<span class="kpi-warn" style="padding:1px 5px;border-radius:4px">Vàng ' . $e($ty) . '</span><br>'
-            . '<span class="kpi-bad" style="padding:1px 5px;border-radius:4px">Đỏ ' . $e($tr) . '</span>';
+            . '<span class="kpi-bad" style="padding:1px 5px;border-radius:4px">Đỏ ' . $e($tr) . '</span>'
+            . '</div>';
         if (!empty($t['basis'])) {
-            $thresholds .= '<br><span class="mini-note">Căn cứ: ' . $e($t['basis']) . '</span>';
+            $thresholds .= '<span class="mini-note">Căn cứ: ' . $e($t['basis']) . '</span>';
         }
 
         $owner = $this->roleLink((string) ($k['owner_role'] ?? ''));
