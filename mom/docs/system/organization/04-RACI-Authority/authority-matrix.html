@@ -5,9 +5,9 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Ma trận thẩm quyền | HESEM MOM</title>
 <script>
-/* DCC Header bootstrap (vi) — Khởi tạo đầu trang kiểm soát tài liệu: tự tính đường dẫn tuyệt đối từ location.pathname
- * để tải đúng biểu định dạng và bộ dựng đầu trang khi mở trực tiếp, trong cổng nội bộ
- * hoặc qua luồng xem tài liệu. Tham số phiên bản giúp trình duyệt nhận bản mới khi
+/* DCC Header bootstrap (vi) — Khởi tạo đầu trang kiểm soát tài liệu: tự tính đường dẫn tuyệt đối
+ * từ location.pathname để tải đúng biểu định dạng và bộ dựng đầu trang khi mở trực tiếp, trong
+ * cổng nội bộ hoặc qua luồng xem tài liệu. Tham số phiên bản giúp trình duyệt nhận bản mới khi
  * thành phần đầu trang được cập nhật. */
 (function () {
   var DCC_VERSION = '2026-04-24-1';
@@ -23,53 +23,157 @@
   document.head.appendChild(js);
 })();
 </script>
+<link rel="stylesheet" href="../../../../assets/style.css"/>
 <style>
-table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; }
-td,th { word-wrap:break-word; overflow-wrap:break-word; }
+@media print {
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: fixed; }
+td, th { max-width: 420px; overflow-wrap: anywhere; word-wrap: break-word; }
+.role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
+.raci-cell {text-align:center; font-weight:700; width:34px; min-width:34px; padding:6px 4px !important;}
+.raci-A {background:#fff5f5; color:#c92a2a;}
+.raci-R {background:#e7f5ff; color:#1864ab;}
+.raci-C {background:#fff9db; color:#e67700;}
+.raci-I {background:#ebfbee; color:#2b8a3e;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
+.portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
+.portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
+.doc-link-list {list-style:none; margin:0; padding:0;}
+.doc-link-list li {padding:6px 0 6px 16px; position:relative;}
+.doc-link-list li:before {content:"•"; position:absolute; left:0; color:var(--blue);}
+.inline-tag {display:inline-block;padding:3px 8px;border:1px solid var(--ln);border-radius:999px;font-size:10px;font-weight:700;background:var(--bg2);margin-right:6px;margin-bottom:6px;}
+.svg-wrap,.org-wrap {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:16px; overflow:auto;}
+.nav-toc a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;margin:6px 0;background:var(--bg);}
+kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2px 5px;border-radius:4px;background:#fff;}
+.org-tree{display:flex;flex-direction:column;gap:16px;margin:8px 0;}
+.org-level{display:grid;gap:14px;}
+.org-level.cols-1{grid-template-columns:1fr;}
+.org-level.cols-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+.org-level.cols-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.org-level.cols-4{grid-template-columns:repeat(4,minmax(0,1fr));}
+.org-level.cols-5{grid-template-columns:repeat(5,minmax(0,1fr));}
+.org-card{border:1px solid var(--ln);border-top:4px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
+.org-card h3{font-size:14px;color:var(--navy);margin:0 0 4px;}
+.org-card p{margin:4px 0;font-size:12px;}
+.org-row{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);margin:12px 0;}
+.org-row h3{margin:0 0 8px;font-size:13px;color:var(--navy);}
+.badge-soft{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:10px;font-weight:700;margin-right:6px;margin-bottom:6px;}
+.kpi-box{border:1px solid var(--ln);border-radius:var(--r);padding:12px;background:var(--bg);margin:8px 0;}
+.kpi-box b{display:block;font-size:11px;color:var(--navy);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
+.auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
+.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
+.role-boundary{border:1px solid #cfe0ff;border-left: 3px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
+.milestone-card{border:1px solid var(--ln);border-left: 3px solid var(--gold);border-radius:var(--r);padding:14px;background:#fffdf5;margin:12px 0;}
+.milestone-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
+.milestone-card p:last-child,.role-boundary p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
+.small-note{font-size:12px;color:var(--ink2);}
+
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);margin:0 0 18px}
+.toc-title{font-weight:700;color:var(--navy);margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.toc-grid a{display:block;padding:10px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg2)}
+
+.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
+.check-item{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:#eef6ff}
+.process-strip{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+.pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.mini-note{font-size:12px;color:var(--ink2)}
+.footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
+.decision-table th,.decision-table td{vertical-align:top}
+@media (max-width: 960px){.grid-2,.grid-3{grid-template-columns:1fr}.auth-grid{grid-template-columns:1fr}}
+
+.doc-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+.doc-grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.card h3{margin-top:0}
+.small{font-size:12px;color:var(--ink3);}
+.tight p{margin:8px 0;}
+.legend-row{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0 18px;}
+.legend-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--ln);border-radius:12px;padding:8px 10px;font-size:12px;}
+.legend-swatch{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;border:1px solid var(--ln2);}
+.kpi-good{background:#ebfbee;color:#2b8a3e}
+.kpi-warn{background:#fff9db;color:#e67700}
+.kpi-bad{background:#fff5f5;color:#c92a2a}
+.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;display:inline-block;box-sizing:border-box;max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:break-word;line-height:1.35;vertical-align:middle;text-align:center}
+.role-code a,.role-code .entity-link,.role-code .role-link,.role-code .bundle-link{display:inline;max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:break-word}
+.matrix-table{width:100%;border-collapse:collapse;font-size:12px;}
+.matrix-table th{padding:8px 10px;text-align:left;font-size:11px;font-weight:800;color:var(--navy);background:var(--th-bg);border:1px solid var(--th-bdr);text-transform:uppercase;letter-spacing:.3px;vertical-align:bottom}
+.matrix-table td{padding:8px 10px;border:1px solid var(--ln2);vertical-align:top;line-height:1.45}
+.matrix-table tbody tr:nth-child(even){background:#fafcfe}
+.matrix-table .section-row td{background:var(--navy)!important;color:#fff;font-weight:700;letter-spacing:.4px}
+.center{text-align:center}
+.nowrap{white-space:nowrap}
+.cell-a{background:#e3f2fd;color:#1565c0;font-weight:800;text-align:center}
+.cell-p{background:#fff3e0;color:#e65100;font-weight:700;text-align:center}
+.cell-v{background:#f3e5f5;color:#7b1fa2;font-weight:700;text-align:center}
+.cell-c{background:#fff9db;color:#e67700;font-weight:700;text-align:center}
+.cell-i{background:#e8f5e9;color:#2e7d32;font-weight:600;text-align:center}
+.cell-x{background:#f8f9fa;color:#868e96;text-align:center}
+.badge-strip{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+.badge-chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--ln);padding:6px 10px;border-radius:999px;font-size:12px}
+.footer-note{margin-top:18px;padding:14px 16px;border:1px dashed var(--ln2);border-radius:12px;background:var(--bg2);color:var(--ink2)}
+
 .quick-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:12px 0 18px; }
 .quick-card { border:1px solid var(--ln); border-radius:8px; padding:12px; background:var(--bg2); }
 .quick-card h3 { margin:0 0 8px; font-size:15px; color:var(--navy); }
 .quick-card ul { margin:0; padding-left:18px; }
 .quick-card li { margin:4px 0; }
-.mini-note { font-size:12px; color:var(--ink2); line-height:1.55; }
 </style>
-<link href="../../../../assets/style.css" rel="stylesheet"/>
 </head>
 <body>
 <div class="container">
 <div class="page">
 <div class="page-body">
-<div class="dcc-header" data-dcc-bootstrap='{"header":{"doc_code":"AUTHORITY-MATRIX","title":"Ma trận thẩm quyền","subtitle":"Tra cứu thẩm quyền cuối cho các quyết định vận hành: báo giá, kỹ thuật, điều độ, giữ/nhả chất lượng, chuỗi cung ứng và kích hoạt phó; mọi ngưỡng CDR dẫn về ANNEX-120, ANNEX-121 và ANNEX-123.","doc_type":"REF","revision":"V0.21","effective_date":"2026-05-19","owner_role_code":"QA","approver_role_code":"CEO","iso_clause":"ISO 9001:2015 §4.4, §5.3, §7.5, §8.1, §8.6, §8.7, §9.1, §10.2; ISO 9001:2015/Amd 1:2024","status":"draft"},"labels":{"doc_id":{"short":"Mã","long":"Mã tài liệu","sort":10},"revision":{"short":"Lần sửa","long":"Lần sửa đổi","sort":20},"effective_date":{"short":"Hiệu lực","long":"Ngày hiệu lực","sort":30},"owner":{"short":"Sở hữu","long":"Bộ phận sở hữu","sort":40},"approver":{"short":"Duyệt","long":"Người phê duyệt","sort":50}}}' data-dcc-doc-code="AUTHORITY-MATRIX" data-dcc-locale="vi" data-dcc-logo="../../../../assets/hesem-logo.svg"></div>
+<div class="dcc-header" data-dcc-bootstrap='{"header":{"doc_code":"AUTHORITY-MATRIX","title":"Ma trận thẩm quyền","subtitle":"Tài liệu thẩm quyền hợp nhất của HESEM: sổ đăng ký quyết định và ngưỡng phê duyệt theo mã CDR A1–F6, quy tắc dùng RACI, ủy quyền và kích hoạt phó, phân tách nhiệm vụ và dấu vết kiểm toán. Hợp nhất và thay thế ANNEX-120.","doc_type":"REF","revision":"V1.0","effective_date":"2026-05-22","owner_role_code":"QA","approver_role_code":"CEO","iso_clause":"ISO 9001:2015 §4.4, §5.3, §7.5, §8.1, §8.6, §8.7, §9.1, §10.2; ISO 9001:2015/Amd 1:2024","status":"draft"},"labels":{"doc_id":{"short":"Mã","long":"Mã tài liệu","sort":10},"revision":{"short":"Lần sửa","long":"Lần sửa đổi","sort":20},"effective_date":{"short":"Hiệu lực","long":"Ngày hiệu lực","sort":30},"owner":{"short":"Sở hữu","long":"Bộ phận sở hữu","sort":40},"approver":{"short":"Duyệt","long":"Người phê duyệt","sort":50}}}' data-dcc-doc-code="AUTHORITY-MATRIX" data-dcc-locale="vi" data-dcc-logo="../../../../assets/hesem-logo.svg"></div>
 <div class="doc-content" id="docContent">
 <div class="form-sheet">
 <div class="note-blue terminology-note" style="margin:12px 0">
 <p><b>Quy ước thuật ngữ viết tắt trong tài liệu:</b> Ma trận phân định trách nhiệm theo bốn trạng thái: thực hiện, chịu trách nhiệm phê duyệt, tham vấn và nhận thông tin (<b>RACI</b>); người chịu trách nhiệm phê duyệt (<b>A</b>); Tổ chức Tiêu chuẩn hóa Quốc tế (<b>ISO</b>); máy điều khiển số bằng máy tính (<b>CNC</b>); hệ thống hoạch định nguồn lực doanh nghiệp (<b>ERP</b>); hệ thống quản lý chất lượng (<b><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html">QMS</a></b>); phụ lục kiểm soát (<b>ANNEX</b>); báo cáo không phù hợp (<b>NCR</b>); hành động khắc phục và phòng ngừa (<b>CAPA</b>).</p>
-<p><b>Mã vai trò và nhóm:</b> chỉ dùng để định danh nhanh; không tạo quyền mới. Khi cần tra nghĩa nhóm, mở <a href="role-and-department-bundles.html">ROLE-AND-DEPARTMENT-BUNDLES</a>. Khi cần quyết định cuối, mở <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a> theo mã CDR.</p>
+<p><b>Mã vai trò và nhóm:</b> chỉ dùng để định danh nhanh; không tạo quyền mới. Khi cần tra nghĩa nhóm, mở <a href="role-and-department-bundles.html">ROLE-AND-DEPARTMENT-BUNDLES</a>. Khi cần ngưỡng và người quyết định cuối, xem mục 4 — sổ đăng ký quyết định — theo mã CDR.</p>
 </div>
+
 
 <div class="iso-map">
-<div class="iso-title">Mục đích điều hành / kiểm soát thẩm quyền</div>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Trang này là bản tra nhanh trong 1 phút. Mọi quyết định cuối vẫn phải đối chiếu <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>, RACI chi tiết tại <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a> và cơ chế phó tại <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a>. <span class="iso-clause">§5.3 / §8.1 / §8.6 / §8.7</span></div></div>
-</div>
-
+ <div class="iso-title">Phòng / Annex kiểm soát — mục đích</div>
+ <div class="req"><span class="req-tag shall">PHẢI</span><div>Mỗi quyết định chỉ được có <b>một người chịu trách nhiệm A</b>. Người đề xuất hoặc xác minh được quyền hỗ trợ hồ sơ nhưng không được tự mặc định thay quyền phê duyệt nếu không có ủy quyền tạm thời được ghi nhận theo <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a>. <span class="iso-clause">§7.5</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Quyền hệ thống, email phê duyệt, tin nhắn phê duyệt hay dấu ký tay chỉ là phương tiện ghi nhận; chúng không tự sinh thẩm quyền nếu thẩm quyền kinh doanh không tồn tại trong Tài liệu này. <span class="iso-clause">§7.5</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Tài liệu này phải được dùng như <b>quyết định sổ đăng ký gốc</b> để thiết kế luồng công việc trên Epicor/M365, viết JD, viết RACI và kiểm soát ngoại lệ; chỉ dùng <b>một ma trận quyền thống nhất</b>, không duy trì nhiều "ma trận quyền" rời rạc. <span class="iso-clause">§7.5</span></div></div>
+ </div>
+ 
 <div class="preface-block">
-<div class="grid-2">
-<div>
-<p><b>Vai trò sử dụng</b></p>
-<div><span class="inline-tag"><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a></span><span class="inline-tag"><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html">PPL</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html">QCL</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a></span><span class="inline-tag"><a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-func-heads">FUNC_HEADS</a> / <a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-quality-core">QUALITY_CORE</a></span></div>
-</div>
-<div>
-<p><b>Tài liệu chính</b></p>
-<div class="inline-doc-list"><span class="inline-tag"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></span><span class="inline-tag"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a></span><span class="inline-tag"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></span></div>
-</div>
-</div>
+ <div class="grid-2">
+ <div>
+ <p><b>Vai trò / người chịu trách nhiệm liên quan</b></p>
+ <div><span class="inline-tag"><span class="role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="role-code">CEO</span></a></span></span><span class="inline-tag"><span class="role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="role-code">PD</span></a></span></span><span class="inline-tag"><span class="role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="role-code">ENGM</span></a></span></span><span class="inline-tag"><span class="role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="role-code">QA</span></a></span></span><span class="inline-tag"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a></span></span><span class="inline-tag"><span class="role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="role-code">HR</span></a></span></span><span class="inline-tag"><span class="role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="role-code">EHS</span></a></span></span><span class="inline-tag"><span class="role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="role-code">ITA</span></a></span></span><span class="inline-tag"><span class="role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quản trị viên hệ thống Epicor)"><span class="role-code">ESA</span></a></span></span></div>
+ </div>
+ <div>
+ <p><b>Tài liệu / trục kiểm soát</b></p>
+ <div class="inline-doc-list"><span class="inline-tag"><a href="raci-master-matrix.html">RACI-MASTER-MATRIX</a></span><span class="inline-tag"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html">ANNEX-122</a></span><span class="inline-tag"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></span><span class="inline-tag"><a href="../../../operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a></span><span class="inline-tag"><a href="../../../operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-102-access-request-field-dictionary.html">ANNEX-102</a></span><span class="inline-tag"><a href="../../../operations/sops/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></span><span class="inline-tag"><a href="../../../operations/sops/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></span></div>
+ </div>
+ </div>
+ </div>
+ 
+<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#s1">1. Mục đích và phạm vi áp dụng</a><a href="#s2">2. Tra cứu thẩm quyền trong 1 phút</a><a href="#s3">3. Quy tắc dùng RACI và thẩm quyền tại hiện trường</a><a href="#s4">4. Sổ đăng ký quyết định và ngưỡng phê duyệt</a><a href="#s5">5. Quy tắc xử lý tình huống tại xưởng</a><a href="#s6">6. Quy tắc thực thi thẩm quyền tại hiện trường và trên hệ thống</a><a href="#s7">7. Ủy quyền tạm thời, phó ủy quyền và giới hạn không chuyển giao</a><a href="#s8">8. Quyền hệ thống, phân tách nhiệm vụ (SoD) và dấu vết kiểm toán</a><a href="#s9">9. Kích hoạt rà soát và cập nhật ma trận</a></div></div>
+<h2 class="h2" id="s1">1. Mục đích và phạm vi áp dụng</h2>
+<p>Tài liệu này khóa quyền <b>đề xuất (P) – xác minh (V) – phê duyệt/quyết định cuối (A) – tham vấn (C) – được thông tin (I)</b> cho các quyết định có ảnh hưởng tới chất lượng, tiến độ, an toàn, doanh thu, chi phí, tuân thủ khách hàng và tính toàn vẹn dữ liệu. Mọi quyết định làm thay đổi trạng thái lệnh sản xuất, thay đổi cổng kiểm soát, phát hành/hold, thay đổi nguồn lực, thay đổi dữ liệu gốc nhạy cảm, thay đổi dòng tiền, hoặc kích hoạt chế độ gián đoạn/khôi phục đều phải bám tài liệu này.</p>
+<div class="badge-strip">
+ <span class="badge-chip">Bằng chứng bắt buộc trước quyết định</span>
+ <span class="badge-chip">Mỗi quyết định chỉ có một người quyết định cuối</span>
+ <span class="badge-chip">Hold phải kích hoạt theo đúng phạm vi ảnh hưởng; phát hành phải quay đúng thẩm quyền</span>
+ <span class="badge-chip">Kỹ thuật quyền ≠ kinh doanh thẩm quyền</span>
 </div>
 
-<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#s1">1. Tra cứu 1 phút</a><a href="#s2">2. Quy tắc tại xưởng</a><a href="#s3">3. Khi nào phải tra ANNEX chi tiết</a></div></div>
+<h2 class="h2" id="s2">2. Tra cứu thẩm quyền trong 1 phút</h2>
 
-<h2 class="h2" id="s1">1. Tra cứu thẩm quyền trong 1 phút</h2>
-
-<p class="note"><b>Cách dùng link:</b> mọi mã chức danh, mã nhóm, mã CDR và tài liệu trong trang này đều phải bấm được. Người vận hành có thể mở trực tiếp <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A2">A2</a>, <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-C6">C6</a>, <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D7">D7</a> hoặc mở <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a> để đối chiếu toàn bộ ngưỡng thẩm quyền.</p>
+<p class="note"><b>Cách dùng link:</b> mọi mã chức danh, mã nhóm, mã CDR và tài liệu trong trang này đều phải bấm được. Người vận hành có thể mở trực tiếp <a href="authority-matrix.html#cdr-A2">A2</a>, <a href="authority-matrix.html#cdr-C6">C6</a>, <a href="authority-matrix.html#cdr-D7">D7</a> hoặc mở tài liệu này để đối chiếu toàn bộ ngưỡng thẩm quyền.</p>
 
 <!-- DECISION-THRESHOLDS:START -->
 <h3>Tôi cần duyệt cái gì?</h3>
@@ -77,32 +181,32 @@ td,th { word-wrap:break-word; overflow-wrap:break-word; }
 <colgroup><col style="width:27%"/><col style="width:57%"/><col style="width:16%"/></colgroup>
 <thead><tr><th>Loại quyết định</th><th>Luồng ngưỡng / leo thang</th><th>CDR</th></tr></thead>
 <tbody>
-<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Báo giá</strong><span class="decision-summary">Phê duyệt báo giá theo bậc giá trị</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body">≤ 3000 USD: <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> lập, <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> xác nhận yêu cầu</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body">&gt; 3000 USD: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> ký sau khi <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> hoàn tất bảng tính giá và biên gộp.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Biên gộp mục tiêu &lt; 30% → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A2">A2</a></td></tr>
-<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Chiết khấu</strong><span class="decision-summary">Phê duyệt chiết khấu / điều kiện thương mại ngoại lệ</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body">&gt; 0%: <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> đề xuất trên hồ sơ báo giá → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt</div></div></td><td class="cdr-cell"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A3">A3</a></td></tr>
-<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Điều kiện thanh toán ngoại lệ</strong><span class="decision-summary">Phê duyệt điều kiện thanh toán ngoại lệ</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body">≤ công nợ 30 ngày: <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> chuẩn bị hồ sơ, <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> xác nhận yêu cầu.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body">&gt; 30 ngày → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Khách có nợ quá hạn, điều kiện làm tăng rủi ro dòng tiền hoặc ảnh hưởng giao hàng → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A4">A4</a></td></tr>
-<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Yêu cầu thay đổi khách hàng</strong><span class="decision-summary">Phê duyệt yêu cầu thay đổi của khách hàng ảnh hưởng giá / lịch / phạm vi</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html">PPL</a> xử lý CCR tác động ≤ 1 ngày giao hoặc 2% giá trị.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> rà soát CCR tác động ≤ 3 ngày giao hoặc 5% giá trị.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> phê duyệt CCR vượt ngưỡng L2, vào G5-G7 hoặc ảnh hưởng cam kết khách.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">CCR muộn sau FAI, CoC, chặn giao hàng hoặc đổi điều kiện chất lượng → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>.</div></div></td><td class="cdr-cell"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A6">A6</a></td></tr>
-<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>PO mua hàng</strong><span class="decision-summary">Phê duyệt đơn mua hàng theo giá trị và rủi ro nguồn cung</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body">≤ 1 triệu VND: mua hàng phát hành khi có yêu cầu mua đã được xác nhận.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body">≤ 10 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> duyệt sau khi kiểm tra nhu cầu, giá và ngày cần hàng.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3</span><div class="threshold-body">&gt; ngưỡng L2, nhà cung cấp mới rủi ro cao hoặc ảnh hưởng giao hàng khách: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> quyết định cuối.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Mua ngoài kế hoạch, vượt ngân sách, thay nhà cung cấp nguồn đơn hoặc đe dọa ngày giao khách → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-E1">E1</a></td></tr>
-<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>OT/người/tuần</strong><span class="decision-summary">Phê duyệt tăng ca theo người và theo tuần</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a> phối hợp <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html">PPL</a> và <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> để đảm bảo tiến độ sản xuất.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Tăng ca do crash máy, vật tư về muộn hoặc nguy cơ trễ khách → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-C6">C6</a></td></tr>
-<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Phế phẩm</strong><span class="decision-summary">Quyết định loại bỏ phế phẩm và ghi nhận tổn thất</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body">≤ 5 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> xác nhận bằng chứng lỗi và cách ly.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body">≤ 30 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> quyết định loại bỏ sau khi phân tích ảnh hưởng.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3</span><div class="threshold-body">&gt; ngưỡng L2, ảnh hưởng khách hàng hoặc lặp lỗi hệ thống: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Vật tư, dao, thiết bị sản xuất phải nhập khẩu lại dẫn đến khả năng gây trể tiến độ hoặc lỗi tái diễn 3 lần → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D9">D9</a></td></tr>
-<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Nhả giữ hàng</strong><span class="decision-summary">Nhả hàng đang giữ sau kiểm soát không phù hợp</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body">Trong dung sai: <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html">QCL</a> nhả khi bằng chứng kiểm cuối đạt.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body">Ngoài dung sai nhưng có xử lý được: <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> xác nhận điều kiện nhả và ràng buộc hồ sơ.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3</span><div class="threshold-body">Ảnh hưởng khách hàng, nhượng bộ hoặc giao sát hạn: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> cùng ký.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Bằng chứng chưa đủ, khách hàng bị ảnh hưởng hoặc có nguy cơ lặp lỗi → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D6">D6</a></td></tr>
-<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Dỡ chặn giao hàng</strong><span class="decision-summary">Dỡ lệnh chặn giao hàng sau khi rủi ro được kiểm soát</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> xác nhận nguyên nhân chặn, phạm vi ảnh hưởng và bằng chứng kiểm cuối.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> đồng ký nếu lot đã sẵn sàng giao và không còn rủi ro mở.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> quyết định cuối khi có áp lực giao hàng, khiếu nại hoặc rủi ro danh tiếng.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Bất kỳ nghi ngờ về an toàn chức năng, sai bản vẽ hoặc truy xuất nguồn gốc → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D7">D7</a></td></tr>
-<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Đơn gia công ngoài</strong><span class="decision-summary">Phê duyệt điều kiện kỹ thuật và chất lượng cho gia công ngoài</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> kiểm nhà cung cấp và điều kiện giao nhận.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> ký điều kiện kỹ thuật, chất lượng và xác nhận đầu vào.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3 / PD</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> quyết định cuối nếu gia công ngoài ảnh hưởng CTQ, lịch giao khách hoặc nhà cung cấp chưa phê duyệt.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Nhà cung cấp mới, thiếu năng lực đo, thiếu chứng chỉ hoặc công đoạn có CTQ của khách bán dẫn → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-E3">E3</a>, <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-E4">E4</a></td></tr>
-<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Đơn mua khẩn</strong><span class="decision-summary">Phê duyệt đơn mua khẩn trước khi đặt hàng</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body">≤ 2 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html">BUYER</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> xác nhận lý do khẩn và nguồn hàng.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body">≤ 20 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> duyệt sau khi chứng minh không có lựa chọn tồn kho/thay thế phù hợp.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3</span><div class="threshold-body">&gt; ngưỡng L2 hoặc ảnh hưởng giao hàng khách: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt trước khi đặt hàng.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Mua khẩn ngoài kế hoạch, giá vượt chuẩn, nguồn đơn hoặc rủi ro giao hàng khách → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-E5">E5</a></td></tr>
-<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Truy cập ERP khẩn cấp</strong><span class="decision-summary">Kích hoạt quyền truy cập ERP khẩn cấp</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html">ESA</a> kích hoạt tối đa 2 giờ và ghi <a href="../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a>.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body">Kéo dài đến 8 giờ: <a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html">ESA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> đồng ý, đóng quyền ngay sau khi khôi phục.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3</span><div class="threshold-body">&gt; 8 giờ hoặc có rủi ro dữ liệu/chứng cứ: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt gia hạn.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Quyền còn mở sau thời hạn, có sửa dữ liệu nhạy cảm hoặc ảnh hưởng audit trail → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-F2">F2</a></td></tr>
+<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Báo giá</strong><span class="decision-summary">Phê duyệt báo giá theo bậc giá trị</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body">≤ 3000 USD: <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> lập, <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> xác nhận yêu cầu</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body">&gt; 3000 USD: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> ký sau khi <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> hoàn tất bảng tính giá và biên gộp.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Biên gộp mục tiêu &lt; 30% → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="authority-matrix.html#cdr-A2">A2</a></td></tr>
+<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Chiết khấu</strong><span class="decision-summary">Phê duyệt chiết khấu / điều kiện thương mại ngoại lệ</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body">&gt; 0%: <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> đề xuất trên hồ sơ báo giá → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt</div></div></td><td class="cdr-cell"><a href="authority-matrix.html#cdr-A3">A3</a></td></tr>
+<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Điều kiện thanh toán ngoại lệ</strong><span class="decision-summary">Phê duyệt điều kiện thanh toán ngoại lệ</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body">≤ công nợ 30 ngày: <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> chuẩn bị hồ sơ, <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> xác nhận yêu cầu.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body">&gt; 30 ngày → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Khách có nợ quá hạn, điều kiện làm tăng rủi ro dòng tiền hoặc ảnh hưởng giao hàng → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="authority-matrix.html#cdr-A4">A4</a></td></tr>
+<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Yêu cầu thay đổi khách hàng</strong><span class="decision-summary">Phê duyệt yêu cầu thay đổi của khách hàng ảnh hưởng giá / lịch / phạm vi</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html">PPL</a> xử lý CCR tác động ≤ 1 ngày giao hoặc 2% giá trị.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> rà soát CCR tác động ≤ 3 ngày giao hoặc 5% giá trị.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> phê duyệt CCR vượt ngưỡng L2, vào G5-G7 hoặc ảnh hưởng cam kết khách.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">CCR muộn sau FAI, CoC, chặn giao hàng hoặc đổi điều kiện chất lượng → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>.</div></div></td><td class="cdr-cell"><a href="authority-matrix.html#cdr-A6">A6</a></td></tr>
+<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>PO mua hàng</strong><span class="decision-summary">Phê duyệt đơn mua hàng theo giá trị và rủi ro nguồn cung</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body">≤ 1 triệu VND: mua hàng phát hành khi có yêu cầu mua đã được xác nhận.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body">≤ 10 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> duyệt sau khi kiểm tra nhu cầu, giá và ngày cần hàng.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3</span><div class="threshold-body">&gt; ngưỡng L2, nhà cung cấp mới rủi ro cao hoặc ảnh hưởng giao hàng khách: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> quyết định cuối.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Mua ngoài kế hoạch, vượt ngân sách, thay nhà cung cấp nguồn đơn hoặc đe dọa ngày giao khách → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="authority-matrix.html#cdr-E1">E1</a></td></tr>
+<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>OT/người/tuần</strong><span class="decision-summary">Phê duyệt tăng ca theo người và theo tuần</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a> phối hợp <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html">PPL</a> và <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> để đảm bảo tiến độ sản xuất.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Tăng ca do crash máy, vật tư về muộn hoặc nguy cơ trễ khách → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="authority-matrix.html#cdr-C6">C6</a></td></tr>
+<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Phế phẩm</strong><span class="decision-summary">Quyết định loại bỏ phế phẩm và ghi nhận tổn thất</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body">≤ 5 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> xác nhận bằng chứng lỗi và cách ly.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body">≤ 30 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> quyết định loại bỏ sau khi phân tích ảnh hưởng.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3</span><div class="threshold-body">&gt; ngưỡng L2, ảnh hưởng khách hàng hoặc lặp lỗi hệ thống: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Vật tư, dao, thiết bị sản xuất phải nhập khẩu lại dẫn đến khả năng gây trể tiến độ hoặc lỗi tái diễn 3 lần → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="authority-matrix.html#cdr-D9">D9</a></td></tr>
+<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Nhả giữ hàng</strong><span class="decision-summary">Nhả hàng đang giữ sau kiểm soát không phù hợp</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body">Trong dung sai: <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html">QCL</a> nhả khi bằng chứng kiểm cuối đạt.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body">Ngoài dung sai nhưng có xử lý được: <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> xác nhận điều kiện nhả và ràng buộc hồ sơ.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3</span><div class="threshold-body">Ảnh hưởng khách hàng, nhượng bộ hoặc giao sát hạn: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> cùng ký.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Bằng chứng chưa đủ, khách hàng bị ảnh hưởng hoặc có nguy cơ lặp lỗi → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="authority-matrix.html#cdr-D6">D6</a></td></tr>
+<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Dỡ chặn giao hàng</strong><span class="decision-summary">Dỡ lệnh chặn giao hàng sau khi rủi ro được kiểm soát</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> xác nhận nguyên nhân chặn, phạm vi ảnh hưởng và bằng chứng kiểm cuối.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> đồng ký nếu lot đã sẵn sàng giao và không còn rủi ro mở.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> quyết định cuối khi có áp lực giao hàng, khiếu nại hoặc rủi ro danh tiếng.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Bất kỳ nghi ngờ về an toàn chức năng, sai bản vẽ hoặc truy xuất nguồn gốc → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="authority-matrix.html#cdr-D7">D7</a></td></tr>
+<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Đơn gia công ngoài</strong><span class="decision-summary">Phê duyệt điều kiện kỹ thuật và chất lượng cho gia công ngoài</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> kiểm nhà cung cấp và điều kiện giao nhận.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> ký điều kiện kỹ thuật, chất lượng và xác nhận đầu vào.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3 / PD</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> quyết định cuối nếu gia công ngoài ảnh hưởng CTQ, lịch giao khách hoặc nhà cung cấp chưa phê duyệt.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Nhà cung cấp mới, thiếu năng lực đo, thiếu chứng chỉ hoặc công đoạn có CTQ của khách bán dẫn → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="authority-matrix.html#cdr-E3">E3</a>, <a href="authority-matrix.html#cdr-E4">E4</a></td></tr>
+<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Đơn mua khẩn</strong><span class="decision-summary">Phê duyệt đơn mua khẩn trước khi đặt hàng</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body">≤ 2 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html">BUYER</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> xác nhận lý do khẩn và nguồn hàng.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body">≤ 20 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> duyệt sau khi chứng minh không có lựa chọn tồn kho/thay thế phù hợp.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3</span><div class="threshold-body">&gt; ngưỡng L2 hoặc ảnh hưởng giao hàng khách: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt trước khi đặt hàng.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Mua khẩn ngoài kế hoạch, giá vượt chuẩn, nguồn đơn hoặc rủi ro giao hàng khách → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="authority-matrix.html#cdr-E5">E5</a></td></tr>
+<tr class="authority-decision-row"><td class="decision-subject-cell"><div class="decision-subject"><strong>Truy cập ERP khẩn cấp</strong><span class="decision-summary">Kích hoạt quyền truy cập ERP khẩn cấp</span></div></td><td class="threshold-cell"><div class="threshold-step threshold-step-l1"><span class="threshold-badge threshold-badge-l1">L1</span><div class="threshold-body"><a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html">ESA</a> kích hoạt tối đa 2 giờ và ghi <a href="../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a>.</div></div><div class="threshold-step threshold-step-l2"><span class="threshold-badge threshold-badge-l2">L2</span><div class="threshold-body">Kéo dài đến 8 giờ: <a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html">ESA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> đồng ý, đóng quyền ngay sau khi khôi phục.</div></div><div class="threshold-step threshold-step-l3"><span class="threshold-badge threshold-badge-l3">L3</span><div class="threshold-body">&gt; 8 giờ hoặc có rủi ro dữ liệu/chứng cứ: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt gia hạn.</div></div><div class="threshold-step threshold-escalation"><span class="threshold-badge threshold-badge-escalation">LEO THANG</span><div class="threshold-body">Quyền còn mở sau thời hạn, có sửa dữ liệu nhạy cảm hoặc ảnh hưởng audit trail → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</div></div></td><td class="cdr-cell"><a href="authority-matrix.html#cdr-F2">F2</a></td></tr>
 </tbody>
 </table></div>
 <!-- DECISION-THRESHOLDS:END -->
 
 <h3>Tôi đang ở cổng G nào?</h3>
 <div class="quick-grid">
-<div class="quick-card"><h3><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html#r5gate">G0</a> - Thương mại và hợp đồng</h3><ul><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A1">A1</a> nhận RFQ.</li><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A2">A2</a> báo giá.</li><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A6">A6</a> CCR sớm.</li></ul></div>
-<div class="quick-card"><h3><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html#r5gate">G1</a> - Kỹ thuật và gói nền</h3><ul><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-B1">B1</a> rà soát <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html">DFM</a>.</li><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-B2">B2</a> phát hành kỹ thuật.</li><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-B3">B3</a> ECO.</li></ul></div>
-<div class="quick-card"><h3><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html#r5gate">G2</a> - Kế hoạch, vật tư, nhà cung cấp</h3><ul><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-C1">C1</a> phát hành kế hoạch.</li><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-E1">E1</a> đơn mua.</li><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-E5">E5</a> đơn mua khẩn.</li></ul></div>
-<div class="quick-card"><h3><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html#r5gate">G3</a> - Thực thi xưởng</h3><ul><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-C2">C2</a> điều phối trong ngày.</li><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-B5">B5</a> phát hành <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html">CAM</a>/NC.</li><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-C7">C7</a> phục hồi sau va chạm máy.</li></ul></div>
-<div class="quick-card"><h3><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html#r5gate">G4</a> - FAI</h3><ul><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D1">D1</a> nhả mẫu đầu tiên đạt.</li><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D2">D2</a> mẫu đầu tiên không đạt.</li></ul></div>
-<div class="quick-card"><h3><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html#r5gate">G5</a> - NCR/CAPA và nhả giữ hàng</h3><ul><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D3">D3</a> mở NCR.</li><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D4">D4</a> quyết định xử lý.</li><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D5">D5</a> đóng CAPA.</li></ul></div>
-<div class="quick-card"><h3><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html#r5gate">G6</a> - Kiểm cuối và CoC</h3><ul><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D8">D8</a> CoC phát hành.</li><li>Kiểm cuối và hồ sơ giao hàng.</li></ul></div>
-<div class="quick-card"><h3><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html#r5gate">G7</a> - Giao hàng và phản hồi</h3><ul><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D7">D7</a> chặn giao hàng.</li><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-F5">F5</a> khiếu nại/RMA.</li><li><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A6">A6</a> CCR muộn.</li></ul></div>
+<div class="quick-card"><h3><a href="raci-master-matrix.html#r5gate">G0</a> - Thương mại và hợp đồng</h3><ul><li><a href="authority-matrix.html#cdr-A1">A1</a> nhận RFQ.</li><li><a href="authority-matrix.html#cdr-A2">A2</a> báo giá.</li><li><a href="authority-matrix.html#cdr-A6">A6</a> CCR sớm.</li></ul></div>
+<div class="quick-card"><h3><a href="raci-master-matrix.html#r5gate">G1</a> - Kỹ thuật và gói nền</h3><ul><li><a href="authority-matrix.html#cdr-B1">B1</a> rà soát <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html">DFM</a>.</li><li><a href="authority-matrix.html#cdr-B2">B2</a> phát hành kỹ thuật.</li><li><a href="authority-matrix.html#cdr-B3">B3</a> ECO.</li></ul></div>
+<div class="quick-card"><h3><a href="raci-master-matrix.html#r5gate">G2</a> - Kế hoạch, vật tư, nhà cung cấp</h3><ul><li><a href="authority-matrix.html#cdr-C1">C1</a> phát hành kế hoạch.</li><li><a href="authority-matrix.html#cdr-E1">E1</a> đơn mua.</li><li><a href="authority-matrix.html#cdr-E5">E5</a> đơn mua khẩn.</li></ul></div>
+<div class="quick-card"><h3><a href="raci-master-matrix.html#r5gate">G3</a> - Thực thi xưởng</h3><ul><li><a href="authority-matrix.html#cdr-C2">C2</a> điều phối trong ngày.</li><li><a href="authority-matrix.html#cdr-B5">B5</a> phát hành <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html">CAM</a>/NC.</li><li><a href="authority-matrix.html#cdr-C7">C7</a> phục hồi sau va chạm máy.</li></ul></div>
+<div class="quick-card"><h3><a href="raci-master-matrix.html#r5gate">G4</a> - FAI</h3><ul><li><a href="authority-matrix.html#cdr-D1">D1</a> nhả mẫu đầu tiên đạt.</li><li><a href="authority-matrix.html#cdr-D2">D2</a> mẫu đầu tiên không đạt.</li></ul></div>
+<div class="quick-card"><h3><a href="raci-master-matrix.html#r5gate">G5</a> - NCR/CAPA và nhả giữ hàng</h3><ul><li><a href="authority-matrix.html#cdr-D3">D3</a> mở NCR.</li><li><a href="authority-matrix.html#cdr-D4">D4</a> quyết định xử lý.</li><li><a href="authority-matrix.html#cdr-D5">D5</a> đóng CAPA.</li></ul></div>
+<div class="quick-card"><h3><a href="raci-master-matrix.html#r5gate">G6</a> - Kiểm cuối và CoC</h3><ul><li><a href="authority-matrix.html#cdr-D8">D8</a> CoC phát hành.</li><li>Kiểm cuối và hồ sơ giao hàng.</li></ul></div>
+<div class="quick-card"><h3><a href="raci-master-matrix.html#r5gate">G7</a> - Giao hàng và phản hồi</h3><ul><li><a href="authority-matrix.html#cdr-D7">D7</a> chặn giao hàng.</li><li><a href="authority-matrix.html#cdr-F5">F5</a> khiếu nại/RMA.</li><li><a href="authority-matrix.html#cdr-A6">A6</a> CCR muộn.</li></ul></div>
 </div>
 
 <h3>Người này vắng, ai làm thay?</h3>
@@ -120,16 +224,588 @@ td,th { word-wrap:break-word; overflow-wrap:break-word; }
 </tbody>
 </table></div>
 
-<h2 class="h2" id="s2">2. Quy tắc dùng tại xưởng</h2>
+
+<h2 class="h2" id="s3">3. Quy tắc dùng RACI và thẩm quyền tại hiện trường</h2>
+<div class="legend-row">
+ <div class="legend-item"><div class="legend-swatch cell-a">A</div><b>quyết định cuối</b> — người duy nhất chịu trách nhiệm phê duyệt hoặc dừng ở điểm kiểm soát.</div>
+ <div class="legend-item"><div class="legend-swatch cell-p">P</div><b>đề xuất</b> — người mở yêu cầu, gom hồ sơ và nêu phương án.</div>
+ <div class="legend-item"><div class="legend-swatch cell-v">V</div><b>xác minh</b> — người kiểm điều kiện, dữ liệu, hồ sơ, dụng cụ đo, chương trình và cổng kiểm soát.</div>
+ <div class="legend-item"><div class="legend-swatch cell-c">C</div><b>tham vấn</b> — người phải được hỏi trước khi chốt vì có rủi ro kỹ thuật, chất lượng, giao hàng, tài chính hoặc khách hàng.</div>
+ <div class="legend-item"><div class="legend-swatch cell-i">I</div><b>nhận thông tin</b> — người phải nhận cập nhật để đồng bộ lệnh, hồ sơ, ca hoặc hệ thống.</div>
+</div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Không lặp bảng định danh chức danh tại mục này. Danh mục ký hiệu chi tiết nằm trong JD và danh mục nhóm tại <a href="role-and-department-bundles.html">ROLE-AND-DEPARTMENT-BUNDLES</a>. tài liệu này chỉ trả lời câu hỏi vận hành: <b>ai được quyết định, bằng chứng nào phải có, khi nào phải dừng</b>. <span class="iso-clause">§5.3 / §7.5 / §8.1</span></div></div>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:24%"><col style="width:46%"><col style="width:30%"></colgroup>
+<thead><tr><th>Quy tắc cưỡng chế</th><th>Cách áp dụng tại xưởng CNC bán dẫn</th><th>Không được làm</th></tr></thead>
+<tbody>
+<tr><td>Mỗi quyết định chỉ có một A</td><td>Nếu lệnh sản xuất, nhả giữ, mẫu đầu tiên, nhả giao hàng hoặc đổi chương trình có hai người cùng ký cuối mà không rõ ai chịu trách nhiệm, dừng ở cổng hiện tại và leo thang theo CDR.</td><td>Không dùng nhóm, cuộc họp hoặc tin nhắn chung để che người chịu trách nhiệm cuối.</td></tr>
+<tr><td>Bằng chứng đi trước chữ ký</td><td>Người A chỉ được ký khi gói bằng chứng đã đủ: bản vẽ/phiên bản, quy trình, chương trình, đồ gá, dụng cụ đo còn hiệu lực, kết quả kiểm và hồ sơ truy xuất.</td><td>Không ký trước rồi bổ sung hồ sơ sau, kể cả khi lô gấp cho khách hàng bán dẫn cấp thiết bị như Lam Research hoặc Applied Materials.</td></tr>
+<tr><td>Chất lượng có quyền dừng</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>/<a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html">QCL</a>/<a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html">QC</a> được giữ hàng hoặc dừng giao khi có nghi ngờ sai phiên bản, sai đặc tính trọng yếu, sai dụng cụ đo, thiếu FAI, thiếu CoC, thiếu truy xuất hoặc rủi ro sạch/FOD.</td><td>Không dùng áp lực giao hàng để vượt quyền giữ hàng hoặc bỏ qua kiểm tra lại.</td></tr>
+<tr><td>Kỹ thuật khóa thay đổi quy trình</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a>/<a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html">PE</a>/<a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html">CAM</a> phải xác nhận mọi thay đổi liên quan chương trình, dao, đồ gá, đường chạy dao, bù trừ, máy thay thế, chuyển công đoạn hoặc đặc tính trọng yếu.</td><td>Không để thợ vận hành, tổ trưởng ca hoặc kế hoạch tự đổi phương pháp ngoài gói đã phát hành.</td></tr>
+<tr><td>RACI không thay thẩm quyền</td><td>Người R có thể làm và gom hồ sơ; người C có thể tư vấn; người I phải được biết. Quyền nhả giữ, nhả giao, phê duyệt ngoại lệ hoặc đổi kỹ thuật vẫn phải theo dòng A trong CDR.</td><td>Không viện dẫn “tôi là R” để tự phê duyệt, tự xác minh độc lập hoặc tự dỡ lệnh giữ.</td></tr>
+<tr><td>Phó chỉ dùng trong phạm vi đã đăng ký</td><td>Chỉ kích hoạt phó theo <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html#d4">ANNEX-123 d4</a>, có thời điểm bắt đầu/kết thúc, lý do, phạm vi và bằng chứng bàn giao.</td><td>Không dùng phó để vượt ngưỡng tài chính, nhả chặn giao hàng, bỏ chữ ký <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>/<a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> hoặc xử lý xung đột lợi ích.</td></tr>
+</tbody></table></div>
+<h3>Câu hỏi tự vấn trước khi ký, nhả hoặc cho chạy tiếp</h3>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:8%"><col style="width:62%"><col style="width:30%"></colgroup>
+<thead><tr><th>#</th><th>Câu hỏi phản biện</th><th>Nếu câu trả lời là “không”</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Đúng bản vẽ, đúng phiên bản, đúng yêu cầu khách hàng và đúng đặc tính trọng yếu chưa?</td><td>Giữ ở <a href="raci-master-matrix.html#r5gate">G0</a>/<a href="raci-master-matrix.html#r5gate">G1</a>/<a href="raci-master-matrix.html#r5gate">G3</a>; không phát hành xuống xưởng.</td></tr>
+<tr><td>2</td><td>Chương trình <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html">CAM</a>/NC, đồ gá, dao, bù trừ, máy và vật liệu có khớp gói đã phát hành không?</td><td>Dừng cài đặt máy/chạy loạt; gọi <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a>/<a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html">CAM</a>/<a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a>.</td></tr>
+<tr><td>3</td><td>Dụng cụ đo, chương trình CMM, chuẩn kiểm và người kiểm còn hiệu lực năng lực không?</td><td>Không ghi nhận kết quả kiểm; giữ FAI/kiểm cuối.</td></tr>
+<tr><td>4</td><td>FAI hoặc kiểm trong quá trình đã đạt đúng điều kiện trước khi chạy loạt chưa?</td><td>Không chạy loạt; mở <a href="authority-matrix.html#cdr-D1">D1</a>/<a href="authority-matrix.html#cdr-D2">D2</a>.</td></tr>
+<tr><td>5</td><td>Lô, serial, vật liệu, chứng chỉ, CoC và gói hồ sơ có truy xuất được từ khách hàng đến thành phẩm không?</td><td>Giữ hàng; mở hành động truy xuất hồ sơ.</td></tr>
+<tr><td>6</td><td>Có rủi ro FOD, sạch bề mặt, đóng gói, bảo vệ ren/bề mặt hoặc nhiễm bẩn ảnh hưởng ứng dụng bán dẫn không?</td><td>Dừng tại công đoạn sạch/đóng gói; gọi <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>/<a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a>.</td></tr>
+<tr><td>7</td><td>Ngoại lệ khách hàng, nhượng bộ, đổi ngày giao hoặc đổi phạm vi đã có người A đúng CDR chưa?</td><td>Không hứa với khách và không giao hàng.</td></tr>
+<tr><td>8</td><td>Nếu người giữ quyền vắng, phó đã được kích hoạt đúng phạm vi và có nhật ký chưa?</td><td>Chờ người có thẩm quyền hoặc kích hoạt <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a>.</td></tr>
+</tbody></table></div>
+
+<h2 class="h2" id="s4">4. Sổ đăng ký quyết định và ngưỡng phê duyệt</h2>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi quyết định trong bảng dưới đây phải khớp mã CDR (<a href="authority-matrix.html#cdr-A1">A1</a>–<a href="authority-matrix.html#cdr-F6">F6</a>). Khi tình huống không khớp mã nào, không được tự suy diễn; leo thang lên <a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-top-mgmt">TOP_MGMT</a> để bổ sung CDR. <span class="iso-clause">§5.3 / §8.1</span></div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Ngưỡng được đặt theo nguyên tắc kiểm soát thấp hơn thắng: giá trị tiền, phần trăm biên, số ngày giao hàng, cổng chất lượng và mức rủi ro khách hàng. Nếu một giao dịch cùng lúc vượt nhiều ngưỡng, dùng cấp phê duyệt cao nhất; không tách PO, tách báo giá, tách lô hoặc đổi tên hạng mục để né ngưỡng. <span class="iso-clause">§5.3 / §8.1 / §8.7</span></div></div>
+<p class="note"><b>Cơ sở đối chiếu:</b> mô hình dùng hạn mức ký và định tuyến theo giá trị giống các luồng phê duyệt ERP lớn; đồng thời áp dụng logic chất lượng của MOM/<a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html">QMS</a>: nhận diện, ngăn chặn, phân loại rủi ro, điều tra và xử lý cuối cùng phải truy xuất được. Ngưỡng VND là ngưỡng vận hành nội bộ cho xưởng CNC bán dẫn quy mô vừa; <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> phải rà soát lại mỗi quý hoặc khi tỷ giá, giá vật liệu hoặc giá máy biến động trên 20%.</p>
+<div class="table-card"><table class="table decision-table">
+<colgroup>
+<col style="width:5%"><col style="width:18%"><col style="width:13%">
+<col style="width:11%"><col style="width:11%"><col style="width:11%">
+<col style="width:8%"><col style="width:11%"><col style="width:12%">
+</colgroup>
+<thead><tr>
+<th>Mã</th><th>Quyết định</th><th>Điều kiện kích hoạt định lượng</th>
+<th>L1 (ngưỡng)</th><th>L2 (ngưỡng)</th><th>L3 / quyết định cuối</th>
+<th>R</th><th>FRM / SOP</th><th>Leo thang nếu</th>
+</tr></thead>
+<tbody>
+<tr id="cdr-A1">
+  <td><a href="authority-matrix.html#cdr-A1">A1</a></td>
+  <td>Tiếp nhận RFQ và làm rõ yêu cầu khách hàng</td>
+  <td>Mọi RFQ mới hoặc bản vẽ/yêu cầu kỹ thuật khách gửi</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> hoàn tất làm rõ ≤ 24 giờ làm việc</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> rà soát gói kỹ thuật ≤ 48 giờ làm việc</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> mở leo thang nếu RFQ treo &gt; ngưỡng L2</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)"><span class="role-code">CS</span></a></td>
+  <td><a href="../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+  <td>RFQ thiếu bản vẽ, yêu cầu kỹ thuật mâu thuẫn hoặc khách không phản hồi &gt; 72 giờ làm việc → <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></td>
+</tr>
+<tr id="cdr-A2">
+  <td><a href="authority-matrix.html#cdr-A2">A2</a></td>
+  <td>Phê duyệt báo giá theo bậc giá trị</td>
+  <td>Mọi báo giá ra ngoài</td>
+  <td>≤ 200 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> lập, <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> xác nhận yêu cầu.</td>
+  <td>≤ 1 tỷ VND: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> ký sau khi <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> hoàn tất bảng tính giá và biên gộp.</td>
+  <td>&gt; ngưỡng L2 hoặc biên gộp dự kiến &lt; 15%: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> quyết định cuối.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)"><span class="role-code">EST</span></a></td>
+  <td><a href="../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+  <td>Giá bán thấp hơn giá thành + biên gộp mục tiêu 15%, điều kiện giao hàng đặc biệt hoặc khách hàng chiến lược → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</td>
+</tr>
+<tr id="cdr-A3">
+  <td><a href="authority-matrix.html#cdr-A3">A3</a></td>
+  <td>Phê duyệt chiết khấu / điều kiện thương mại ngoại lệ</td>
+  <td>Chiết khấu, Incoterms, MOQ hoặc điều khoản giao hàng lệch chuẩn</td>
+  <td>≤ 2%: <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> đề xuất trên hồ sơ báo giá.</td>
+  <td>≤ 5%: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt khi còn đạt biên gộp mục tiêu.</td>
+  <td>&gt; ngưỡng L2 hoặc làm giảm biên gộp dưới mức mục tiêu: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> quyết định cuối.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)"><span class="role-code">EST</span></a></td>
+  <td><a href="../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+  <td>Chiết khấu cộng dồn vượt ngưỡng, đổi điều kiện thanh toán hoặc khách yêu cầu ngoại lệ thương mại → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</td>
+</tr>
+<tr id="cdr-A4">
+  <td><a href="authority-matrix.html#cdr-A4">A4</a></td>
+  <td>Phê duyệt điều kiện thanh toán ngoại lệ</td>
+  <td>Khách yêu cầu công nợ, đặt cọc, giữ thanh toán hoặc hạn mức tín dụng lệch chuẩn</td>
+  <td>≤ công nợ 30 ngày / 200 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> chuẩn bị hồ sơ, <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> xác nhận yêu cầu và <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt.</td>
+  <td>≤ công nợ 45 ngày / 500 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt sau khi có dữ liệu công nợ, lịch giao hàng và rủi ro thu tiền.</td>
+  <td>&gt; ngưỡng L2, có nợ quá hạn hoặc khách yêu cầu giữ thanh toán: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> quyết định cuối.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)"><span class="role-code">CS</span></a></td>
+  <td><a href="../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+  <td>Khách có nợ quá hạn, điều kiện làm tăng rủi ro dòng tiền hoặc ảnh hưởng giao hàng → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</td>
+</tr>
+<tr id="cdr-A5">
+  <td><a href="authority-matrix.html#cdr-A5">A5</a></td>
+  <td>Chấp thuận đơn hàng và xem xét hợp đồng</td>
+  <td>Đã nhận đơn mua/hợp đồng khách hàng, trước khi phát hành lệnh sản xuất</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> xác nhận hồ sơ đủ ≤ 24 giờ làm việc</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> rà soát rủi ro kỹ thuật, khả thi đo lường và khả thi sản xuất nếu có yêu cầu đặc biệt</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> ký khi giá/lịch/phạm vi vượt chuẩn</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)"><span class="role-code">CS</span></a></td>
+  <td><a href="../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+  <td>Khác biệt giữa báo giá và PO hoặc điều khoản chất lượng mới → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a></td>
+</tr>
+<tr id="cdr-A6">
+  <td><a href="authority-matrix.html#cdr-A6">A6</a></td>
+  <td>Phê duyệt yêu cầu thay đổi của khách hàng ảnh hưởng giá / lịch / phạm vi</td>
+  <td>CCR làm đổi giá, lịch, phạm vi, yêu cầu kỹ thuật hoặc cổng G0 đến G7</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html">PPL</a> xử lý CCR tác động ≤ 1 ngày giao hoặc 2% giá trị.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> rà soát CCR tác động ≤ 3 ngày giao hoặc 5% giá trị.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> phê duyệt CCR vượt ngưỡng L2, vào G5-G7 hoặc ảnh hưởng cam kết khách.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)"><span class="role-code">CS</span></a></td>
+  <td><a href="../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx">FRM-212</a> · <a href="../../../operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+  <td>CCR muộn sau FAI, CoC, chặn giao hàng hoặc đổi điều kiện chất lượng → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>.</td>
+</tr>
+<tr id="cdr-A7">
+  <td><a href="authority-matrix.html#cdr-A7">A7</a></td>
+  <td>Phê duyệt yêu cầu thay đổi muộn của khách hàng (CCR) phát sinh sau khi xác nhận đơn — giai đoạn sản xuất hoặc giao hàng</td>
+  <td>CCR làm đổi giá, lịch, phạm vi, yêu cầu kỹ thuật hoặc cổng G0 đến G7</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html">PPL</a> xử lý CCR tác động ≤ 1 ngày giao hoặc 2% giá trị.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> rà soát CCR tác động ≤ 3 ngày giao hoặc 5% giá trị.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> phê duyệt CCR vượt ngưỡng L2, vào G5-G7 hoặc ảnh hưởng cam kết khách.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)"><span class="role-code">CS</span></a></td>
+  <td><a href="../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx">FRM-212</a> · <a href="../../../operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+  <td>CCR muộn sau FAI, CoC, chặn giao hàng hoặc đổi điều kiện chất lượng → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>.</td>
+</tr>
+<tr id="cdr-B1">
+  <td><a href="authority-matrix.html#cdr-B1">B1</a></td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html">DFM</a> rà soát và phân loại rủi ro kỹ thuật</td>
+  <td>RFQ/lệnh có bản vẽ mới, dung sai chặt hoặc vật liệu mới</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html">PE</a> phân loại rủi ro thấp trong ≤ 48 giờ làm việc</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> duyệt rủi ro trung bình hoặc có ≥ 3 điểm chưa rõ</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> quyết định nếu rủi ro cao hoặc cần khách chấp thuận</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html" title="Process Engineer (Kỹ sư quy trình)"><span class="role-code">PE</span></a></td>
+  <td><a href="../../../operations/sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a></td>
+  <td>Thiếu dữ liệu CTQ, vật liệu hoặc năng lực máy → <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></td>
+</tr>
+<tr id="cdr-B2">
+  <td><a href="authority-matrix.html#cdr-B2">B2</a></td>
+  <td>Phê duyệt phát hành kỹ thuật / gói nền</td>
+  <td>Trước phát hành kế hoạch <a href="raci-master-matrix.html#r5gate">G2</a> hoặc sau thay đổi gói nền</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> phát hành gói tiêu chuẩn ≤ 1 lần sửa đổi</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> phát hành nếu ảnh hưởng CTQ hoặc kế hoạch kiểm tra</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> nếu thay đổi gói nền ảnh hưởng cam kết khách</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="role-code">ENGM</span></a></td>
+  <td><a href="../../../forms/frm-300-technical/FRM-306_Engineering_Release_and_Baseline_Package_Approval.xlsx">FRM-306</a> · <a href="../../../operations/sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td>
+  <td>Thiếu BOM, quy trình công nghệ, đặc tính kỹ thuật hoặc chữ ký <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> khi có CTQ → giữ phát hành kỹ thuật</td>
+</tr>
+<tr id="cdr-B3">
+  <td><a href="authority-matrix.html#cdr-B3">B3</a></td>
+  <td>Phê duyệt lệnh thay đổi kỹ thuật (ECO)</td>
+  <td>ECO đổi bản vẽ, BOM, quy trình công nghệ, chương trình hoặc kế hoạch kiểm tra</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> duyệt ECO nội bộ tác động thấp ≤ 1 công đoạn</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> duyệt ECO ảnh hưởng cổng chất lượng hoặc cài đặt máy</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + khách nếu ECO đổi giá/lịch/phạm vi</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="role-code">ENGM</span></a></td>
+  <td><a href="../../../forms/frm-100-sales/FRM-102_Document_Change_Request.xlsx">FRM-102</a> · <a href="../../../forms/frm-100-sales/FRM-162_Change_Impact_Matrix.xlsx">FRM-162</a> · <a href="../../../operations/sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td>
+  <td>ECO phát sinh khi lệnh đang chạy <a href="raci-master-matrix.html#r5gate">G3</a>+ → <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html">PPL</a></td>
+</tr>
+<tr id="cdr-B4">
+  <td><a href="authority-matrix.html#cdr-B4">B4</a></td>
+  <td>Phê duyệt thay thế hoặc thu hồi gói kỹ thuật</td>
+  <td>Có gói kỹ thuật bị thay thế, thu hồi hoặc hết hiệu lực</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> rút gói chưa phát hành ≤ 24 giờ làm việc</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> rút gói đã dùng cho lệnh đang mở</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> nếu ảnh hưởng giao hàng hoặc khách đã nhận gói kỹ thuật</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="role-code">ENGM</span></a></td>
+  <td><a href="../../../forms/frm-300-technical/FRM-307_Package_Supersedure_and_Withdrawal_Notice.xlsx">FRM-307</a> · <a href="../../../operations/sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td>
+  <td>Không đối soát được bản đang dùng tại xưởng → ngừng dùng + <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a></td>
+</tr>
+<tr id="cdr-B5">
+  <td><a href="authority-matrix.html#cdr-B5">B5</a></td>
+  <td>Phát hành chương trình <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html">CAM</a>/NC (mới + sửa đổi)</td>
+  <td>Chương trình <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html">CAM</a>/NC mới hoặc sửa đổi trước <a href="raci-master-matrix.html#r5gate">G3</a></td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html">CAM</a> phát hành chương trình nội bộ sau kiểm tra chéo</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> phát hành nếu có CTQ, đồ gá mới hoặc đường chạy dao sửa lớn</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>/<a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> nếu chương trình liên quan nhượng bộ kỹ thuật của khách</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lập trình viên CAM / NC)"><span class="role-code">CAM</span></a></td>
+  <td><a href="../../../forms/frm-300-technical/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM-305</a> · <a href="../../../operations/sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td>
+  <td>Chưa có phiếu cài đặt hoặc bằng chứng mô phỏng → giữ tại kỹ thuật</td>
+</tr>
+<tr id="cdr-B6">
+  <td><a href="authority-matrix.html#cdr-B6">B6</a></td>
+  <td>Phê duyệt Pilot/Dry-run trước loạt</td>
+  <td>Lệnh mới, đồ gá mới, vật liệu mới hoặc rủi ro gia công cao</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html">PE</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a> duyệt chạy thử ≤ 1 máy / 1 ca</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> duyệt loạt thử có CTQ hoặc khách chứng kiến</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> nếu loạt thử làm trễ giao &gt; 1 ngày giao hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html" title="Process Engineer (Kỹ sư quy trình)"><span class="role-code">PE</span></a></td>
+  <td><a href="../../../forms/frm-100-sales/FRM-106_Pilot_Dry_Run_Log.xlsx">FRM-106</a> · <a href="../../../operations/sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td>
+  <td>Chạy thử không đạt hoặc thiếu năng lực đo → <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a></td>
+</tr>
+<tr id="cdr-B7">
+  <td><a href="authority-matrix.html#cdr-B7">B7</a></td>
+  <td>Phê duyệt sai lệch/miễn trừ kỹ thuật</td>
+  <td>Sản phẩm lệch đặc tính kỹ thuật, khách yêu cầu miễn trừ, hoặc nội bộ xin chấp nhận dùng như hiện trạng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> duyệt nội bộ nếu không ảnh hưởng CTQ và ≤ 5 chi tiết</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt nếu ảnh hưởng giao hàng hoặc lot ≤ 50 chi tiết</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + khách ký nếu vượt L2 hoặc ảnh hưởng yêu cầu hợp đồng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="role-code">ENGM</span></a></td>
+  <td><a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../operations/sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+  <td>Có rủi ro an toàn, pháp lý hoặc lắp ghép tại khách → chặn giao hàng</td>
+</tr>
+<tr id="cdr-B8">
+  <td><a href="authority-matrix.html#cdr-B8">B8</a></td>
+  <td>Phê duyệt Control Plan và PFMEA của chi tiết trước khi phát hành gói nền</td>
+  <td>Chi tiết mới, hoặc thay đổi đặc tính trọng yếu (CTQ), vật liệu, nguyên công hoặc hệ thống đo</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> duyệt khi không phát sinh CTQ mới và không đổi nguyên công trọng yếu</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> duyệt khi có CTQ mới hoặc thay đổi nguyên công trọng yếu</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt khi khách hàng yêu cầu phê duyệt PFMEA/Control Plan hoặc thuộc chương trình PPAP</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Kỹ sư chất lượng)"><span class="role-code">QE</span></a></td>
+  <td><a href="../../../forms/frm-300-technical/FRM-303_DFM_Review_Checklist.xlsx">FRM-303</a> · <a href="../../../operations/sops/01-SOP-100/sop-103-risk-opportunity-fmea-and-control-plan.html">SOP-103</a></td>
+  <td>Phát hiện CTQ chưa được kiểm soát sau khi vào sản xuất → mở NCR và rà soát lại PFMEA/Control Plan</td>
+</tr>
+<tr id="cdr-C1">
+  <td><a href="authority-matrix.html#cdr-C1">C1</a></td>
+  <td>Phát hành kế hoạch đưa lệnh xuống xưởng</td>
+  <td>Lệnh đủ gói nền kỹ thuật, vật tư và năng lực sản xuất</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html">PPL</a> phát hành lệnh tiêu chuẩn ≤ 1 dây chuyền / 1 ca</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> phát hành nếu có rủi ro công suất hoặc vật tư chờ ≤ 2 ngày giao hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> nếu phát hành làm vỡ cam kết khách hoặc thiếu cổng bắt buộc</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Điều độ sản xuất)"><span class="role-code">PPL</span></a></td>
+  <td><a href="../../../forms/frm-500-production/FRM-501_Planning_Release_Checklist.xlsx">FRM-501</a> · <a href="../../../operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+  <td>Thiếu gói nền, vật tư hoặc kế hoạch <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> → không phát hành <a href="raci-master-matrix.html#r5gate">G2</a></td>
+</tr>
+<tr id="cdr-C2">
+  <td><a href="authority-matrix.html#cdr-C2">C2</a></td>
+  <td>Phê duyệt điều phối ngày/ca</td>
+  <td>Lệnh ngày/ca đưa xuống xưởng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-shift-leader.html">SL</a>/<a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html">PPL</a> điều phối ≤ 1 ca</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html">PPL</a> điều phối khi đổi thứ tự trong ngày</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> nếu đổi ưu tiên làm trễ lệnh khác &gt; 1 ngày giao hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Điều độ sản xuất)"><span class="role-code">PPL</span></a></td>
+  <td><a href="../../../forms/frm-500-production/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a> · <a href="../../../operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+  <td>Điều phối thiếu vật tư/máy/<a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html">QC</a> sẵn sàng → <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html">PPL</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a></td>
+</tr>
+<tr id="cdr-C3">
+  <td><a href="authority-matrix.html#cdr-C3">C3</a></td>
+  <td>Phê duyệt phá băng lịch / đổi ưu tiên khẩn cấp</td>
+  <td>Yêu cầu rút ngắn thời gian giao, khách VIP, máy hỏng hoặc vật tư về muộn</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html">PPL</a> đổi lịch tác động ≤ 1 ngày giao hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> duyệt tác động ≤ 3 ngày giao hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> duyệt &gt; ngưỡng L2 hoặc ảnh hưởng khách hàng chiến lược</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Điều độ sản xuất)"><span class="role-code">PPL</span></a></td>
+  <td><a href="../../../forms/frm-500-production/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a> · <a href="../../../operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+  <td>Đổi lịch làm vi phạm cam kết đã xác nhận → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a></td>
+</tr>
+<tr id="cdr-C4">
+  <td><a href="authority-matrix.html#cdr-C4">C4</a></td>
+  <td>Phê duyệt thay đổi cài đặt máy ngoài kế hoạch</td>
+  <td>Đổi cài đặt máy, đồ gá, dao, chương trình hoặc chi tiết đầu tiên ngoài kế hoạch</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a> duyệt cài đặt lệch nhỏ ≤ 1 giờ</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> duyệt nếu tác động ≤ 1 ca</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> nếu cài đặt máy đổi làm tăng rủi ro chất lượng/khách hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="role-code">WKM</span></a></td>
+  <td><a href="../../../forms/frm-300-technical/FRM-302_Setup_Sheet.xlsx">FRM-302</a> · <a href="../../../forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> · <a href="../../../operations/sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td>
+  <td>Không có chi tiết đầu tiên đạt sau đổi cài đặt máy → giữ lệnh</td>
+</tr>
+<tr id="cdr-C5">
+  <td><a href="authority-matrix.html#cdr-C5">C5</a></td>
+  <td>Phê duyệt chuyển việc giữa máy/ca</td>
+  <td>Chuyển lệnh giữa máy, ca, người vận hành hoặc công đoạn</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a> duyệt chuyển nội bộ giữa máy có cùng năng lực đã xác nhận</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> duyệt nếu CTQ hoặc mẫu đầu tiên cần lập lại</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> nếu chuyển làm trễ giao &gt; 1 ngày giao hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="role-code">WKM</span></a></td>
+  <td><a href="../../../forms/frm-500-production/FRM-518_Work_Transfer_Validation_Record.xlsx">FRM-518</a> · <a href="../../../operations/sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td>
+  <td>Máy nhận chưa có năng lực/chương trình/đồ gá được xác nhận → không chuyển</td>
+</tr>
+<tr id="cdr-C6">
+  <td><a href="authority-matrix.html#cdr-C6">C6</a></td>
+  <td>Phê duyệt tăng ca theo người và theo tuần</td>
+  <td>Tăng ca để giữ tiến độ job, phục hồi trễ hoặc xử lý sự cố xưởng</td>
+  <td>≤ 8 giờ/người/tuần: <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-shift-leader.html">SL</a> đề xuất và <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a> xác nhận tải máy.</td>
+  <td>≤ 16 giờ/người/tuần: <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/08-JD-HR/jd-hr-manager.html">HR</a> xác nhận an toàn lao động, năng lực và ghi nhận chấm công.</td>
+  <td>&gt; ngưỡng L2 hoặc tăng ca kéo dài nhiều tuần: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="role-code">WKM</span></a></td>
+  <td><a href="../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> · bảng chấm công · kế hoạch giao hàng</td>
+  <td>Tăng ca do thiếu người, crash máy, vật tư về muộn hoặc nguy cơ trễ khách → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</td>
+</tr>
+<tr id="cdr-C7">
+  <td><a href="authority-matrix.html#cdr-C7">C7</a></td>
+  <td>Phê duyệt phục hồi tiến độ sau dừng máy hoặc va chạm máy</td>
+  <td>Dừng máy, va chạm máy, thiếu vật tư hoặc lỗi chất lượng làm lệch lịch</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> duyệt phục hồi tác động ≤ 1 ngày giao hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt tác động ≤ 3 ngày giao hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> nếu &gt; ngưỡng L2 hoặc cần đổi cam kết khách</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="role-code">PD</span></a></td>
+  <td><a href="../../../forms/frm-500-production/FRM-512_Downtime_Log.xlsx">FRM-512</a> · <a href="../../../forms/frm-500-production/FRM-522_Crash_Report.xlsx">FRM-522</a> · <a href="../../../operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+  <td>Va chạm máy ảnh hưởng an toàn/chất lượng → <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html">EHS</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></td>
+</tr>
+<tr id="cdr-D1">
+  <td><a href="authority-matrix.html#cdr-D1">D1</a></td>
+  <td>Phê duyệt nhả FAI đạt</td>
+  <td>First article hoàn tất trước sản xuất loạt</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html">QCL</a> nhả FAI đạt đủ đặc tính ≤ 1 lô</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> nhả nếu sai lệch đã đóng hoặc khách chứng kiến</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> nếu FAI liên quan nhượng bộ kỹ thuật hoặc miễn trừ</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="role-code">QA</span></a></td>
+  <td><a href="../../../forms/frm-300-technical/FRM-311_FAI_Report.xlsx">FRM-311</a> · <a href="../../../forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> · <a href="../../../operations/sops/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a></td>
+  <td>Bất kỳ CTQ không đạt hoặc thiếu bằng chứng đo → không nhả</td>
+</tr>
+<tr id="cdr-D2">
+  <td><a href="authority-matrix.html#cdr-D2">D2</a></td>
+  <td>Xử lý FAI không đạt (sửa lại / loại bỏ / miễn trừ khách hàng)</td>
+  <td>FAI không đạt hoặc chi tiết đầu tiên không đạt</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> quyết định xử lý lỗi đơn lẻ ≤ 5 chi tiết</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> quyết định xử lý lô ≤ 50 chi tiết</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + khách nếu cần miễn trừ, loại bỏ lớn hoặc trễ giao</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="role-code">QA</span></a></td>
+  <td><a href="../../../forms/frm-300-technical/FRM-311_FAI_Report.xlsx">FRM-311</a> · <a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../operations/sops/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a></td>
+  <td>Khách yêu cầu giao gấp hoặc bỏ FAI → <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></td>
+</tr>
+<tr id="cdr-D3">
+  <td><a href="authority-matrix.html#cdr-D3">D3</a></td>
+  <td>Mở NCR và phân loại nhỏ/lớn/nghiêm trọng</td>
+  <td>Sai lỗi sản phẩm, thoát lỗi quá trình, lỗi nhà cung cấp hoặc khiếu nại khách hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> mở NCR và phân loại sơ bộ trong ≤ 4 giờ làm việc</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> phân loại lớn/nghiêm trọng trong ≤ 24 giờ và xác nhận phạm vi lô bị ảnh hưởng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> nếu nghiêm trọng, thoát lỗi lặp lại hoặc ảnh hưởng khách hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="role-code">QA</span></a></td>
+  <td><a href="../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> · <a href="../../../operations/sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+  <td>NCR lặp lại, nghi ngờ thoát lỗi hoặc có điều kiện chặn giao hàng → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></td>
+</tr>
+<tr id="cdr-D4">
+  <td><a href="authority-matrix.html#cdr-D4">D4</a></td>
+  <td>Phê duyệt xử lý NCR (dùng như hiện trạng / sửa lại / loại bỏ / trả nhà cung cấp)</td>
+  <td>NCR cần quyết định xử lý</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> quyết định lỗi nhỏ/sửa lại nội bộ ≤ 5 chi tiết</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> quyết định xử lý lô ≤ 50 chi tiết hoặc 20 triệu VND</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + khách nếu dùng như hiện trạng, loại bỏ lớn hoặc ảnh hưởng hợp đồng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="role-code">QA</span></a></td>
+  <td><a href="../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> · <a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../operations/sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+  <td>Quyết định xử lý làm đổi giao hàng hoặc yêu cầu khách hàng → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a></td>
+</tr>
+<tr id="cdr-D5">
+  <td><a href="authority-matrix.html#cdr-D5">D5</a></td>
+  <td>Phê duyệt đóng CAPA và xác minh hiệu lực</td>
+  <td>CAPA đến hạn xác minh hiệu lực</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> xác nhận ngăn chặn trong ≤ 24 giờ và đóng CAPA nhỏ sau xác minh ≤ 30 ngày</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + người sở hữu có kế hoạch khắc phục trong ≤ 5 ngày làm việc và đóng CAPA lớn ≤ 60 ngày</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt CAPA nghiêm trọng hoặc quá hạn L2</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="role-code">QA</span></a></td>
+  <td><a href="../../../forms/frm-600-inspection/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a> · <a href="../../../operations/sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+  <td>CAPA lặp lại hoặc xác minh không đạt → leo thang <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></td>
+</tr>
+<tr id="cdr-D6">
+  <td><a href="authority-matrix.html#cdr-D6">D6</a></td>
+  <td>Nhả hàng đang giữ sau kiểm soát không phù hợp</td>
+  <td>Lot/job đang giữ cần nhả để chạy tiếp, giao hàng hoặc xử lý lại</td>
+  <td>Trong dung sai: <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html">QCL</a> nhả khi bằng chứng kiểm cuối đạt.</td>
+  <td>Ngoài dung sai nhưng có xử lý được: <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> xác nhận điều kiện nhả và ràng buộc hồ sơ.</td>
+  <td>Ảnh hưởng khách hàng, nhượng bộ hoặc giao sát hạn: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> cùng ký.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="role-code">QA</span></a></td>
+  <td><a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · kết quả kiểm cuối · NCR/CAPA nếu có</td>
+  <td>Bằng chứng chưa đủ, khách hàng bị ảnh hưởng hoặc có nguy cơ lặp lỗi → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</td>
+</tr>
+<tr id="cdr-D7">
+  <td><a href="authority-matrix.html#cdr-D7">D7</a></td>
+  <td>Dỡ lệnh chặn giao hàng sau khi rủi ro được kiểm soát</td>
+  <td>Stop-ship nội bộ hoặc do khách hàng cần quyết định gỡ chặn</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> xác nhận nguyên nhân chặn, phạm vi ảnh hưởng và bằng chứng kiểm cuối.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> đồng ký nếu lot đã sẵn sàng giao và không còn rủi ro mở.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> quyết định cuối khi có áp lực giao hàng, khiếu nại hoặc rủi ro danh tiếng.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="role-code">QA</span></a></td>
+  <td><a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · kết quả kiểm cuối · phản hồi khách hàng nếu có</td>
+  <td>Bất kỳ nghi ngờ về an toàn chức năng, độ sạch, sai bản vẽ hoặc traceability → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</td>
+</tr>
+<tr id="cdr-D8">
+  <td><a href="authority-matrix.html#cdr-D8">D8</a></td>
+  <td>Phê duyệt phát hành CoC và ký xác nhận kiểm cuối</td>
+  <td>Kiểm cuối, CoC hoặc phát hành giao hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html">QCL</a> ký kiểm cuối đạt ≤ 1 lô</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> phát hành CoC nếu NCR/sai lệch đã đóng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> nếu có tranh chấp CoC, miễn trừ hoặc chặn giao hàng vừa dỡ</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="role-code">QA</span></a></td>
+  <td><a href="../../../forms/frm-600-inspection/FRM-641_Final_Inspection_Report.xlsx">FRM-641</a> · <a href="../../../forms/frm-600-inspection/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-642</a> · <a href="../../../operations/sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td>
+  <td>Thiếu truy xuất hoặc chứng nhận vật liệu → không phát hành CoC</td>
+</tr>
+<tr id="cdr-D9">
+  <td><a href="authority-matrix.html#cdr-D9">D9</a></td>
+  <td>Quyết định loại bỏ phế phẩm và ghi nhận tổn thất</td>
+  <td>Chi tiết không thể sửa, không thể nhượng bộ hoặc không còn giá trị sử dụng</td>
+  <td>≤ 5 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> xác nhận bằng chứng lỗi và cách ly.</td>
+  <td>≤ 30 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> quyết định loại bỏ sau khi phân tích ảnh hưởng.</td>
+  <td>&gt; ngưỡng L2, ảnh hưởng khách hàng hoặc lặp lỗi hệ thống: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="role-code">QA</span></a></td>
+  <td><a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · NCR/CAPA · ảnh bằng chứng</td>
+  <td>Phế phẩm liên quan vật tư đắt tiền, chi tiết Lam Research/AMAT, lot ưu tiên hoặc lỗi tái diễn → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</td>
+</tr>
+<tr id="cdr-D10">
+  <td><a href="authority-matrix.html#cdr-D10">D10</a></td>
+  <td>Nghiệm thu hoặc loại vật tư mua vào: kiểm tra ngoại quan/kích thước, đối chiếu chứng chỉ vật liệu và lô nhiệt, sàng lọc nguy cơ hàng giả</td>
+  <td>Mỗi lô vật tư hoặc bán thành phẩm nhận vào kho trước khi cấp cho sản xuất</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html">QCL</a> nghiệm thu khi chứng chỉ đầy đủ, truy xuất rõ ràng và đạt kiểm tra mẫu</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> xử lý khi sai lệch nhỏ hoặc thiếu mục chứng chỉ không trọng yếu, cần đánh giá kỹ thuật</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + khách hàng (nếu vật tư do khách chỉ định) khi nghi hàng giả, thiếu truy xuất hoặc sai vật liệu</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="role-code">QCL</span></a></td>
+  <td><a href="../../../operations/sops/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a></td>
+  <td>Xác nhận hàng giả hoặc vật tư không truy xuất được → cách ly, mở NCR, thông báo nhà cung cấp và khách hàng liên quan</td>
+</tr>
+<tr id="cdr-D11">
+  <td><a href="authority-matrix.html#cdr-D11">D11</a></td>
+  <td>Thông báo khách hàng về sản phẩm không phù hợp đã hoặc có thể đã giao (quality escape / containment notice)</td>
+  <td>Phát hiện lỗi sau khi sản phẩm rời xưởng, hoặc nghi ngờ lô đã giao chứa đặc tính không đạt</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> thông báo khi đã khoanh vùng, sản phẩm chưa rời kho khách và không rủi ro hiện trường</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> phê duyệt nội dung thông báo khi sản phẩm đã ở khách hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + khách hàng thống nhất hành động containment khi có rủi ro an toàn, lắp ghép hoặc pháp lý</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="role-code">QCL</span></a></td>
+  <td><a href="../../../forms/frm-200-purchase/FRM-211_Complaint_Log.xlsx">FRM-211</a> · <a href="../../../operations/sops/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html">SOP-202</a></td>
+  <td>Khách hàng yêu cầu sắp xếp lại lô, thu hồi hoặc 8D chính thức → mở CAPA và leo thang CEO</td>
+</tr>
+<tr id="cdr-D12">
+  <td><a href="authority-matrix.html#cdr-D12">D12</a></td>
+  <td>Nộp hồ sơ FAI/FAIR/PPAP cho khách hàng và xin phê duyệt trước khi sản xuất loạt</td>
+  <td>Chi tiết mới, thay đổi kỹ thuật, đổi nguồn vật tư hoặc khi hợp đồng/khách hàng yêu cầu FAIR/PPAP</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> duyệt nộp khi FAI nội bộ đạt và khách không yêu cầu phê duyệt trước</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> nộp hồ sơ và theo dõi phê duyệt khi khách hàng yêu cầu phê duyệt FAIR/PPAP trước loạt</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + khách hàng khi hồ sơ bị từ chối hoặc cần điều kiện sản xuất có bảo lưu</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="role-code">QCL</span></a></td>
+  <td><a href="../../../forms/frm-300-technical/FRM-311_FAI_Report.xlsx">FRM-311</a> · <a href="../../../operations/sops/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a></td>
+  <td>Khách hàng từ chối FAIR/PPAP → giữ sản xuất loạt, mở NCR và rà soát gói kỹ thuật</td>
+</tr>
+<tr id="cdr-E1">
+  <td><a href="authority-matrix.html#cdr-E1">E1</a></td>
+  <td>Phê duyệt đơn mua hàng theo giá trị và rủi ro nguồn cung</td>
+  <td>PO mua vật tư, dao cụ, dịch vụ hoặc nhà cung cấp mới</td>
+  <td>≤ 50 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html">BUY</a> phát hành khi có yêu cầu mua đã được xác nhận.</td>
+  <td>≤ 300 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> duyệt sau khi kiểm tra nhu cầu, giá và ngày cần hàng.</td>
+  <td>&gt; ngưỡng L2, nhà cung cấp mới rủi ro cao hoặc ảnh hưởng giao hàng khách: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> quyết định cuối.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhân viên mua hàng)"><span class="role-code">BUY</span></a></td>
+  <td>PO · báo giá nhà cung cấp · yêu cầu mua hàng</td>
+  <td>Mua ngoài kế hoạch, vượt ngân sách, thay nhà cung cấp nguồn đơn hoặc đe dọa ngày giao khách → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</td>
+</tr>
+<tr id="cdr-E2">
+  <td><a href="authority-matrix.html#cdr-E2">E2</a></td>
+  <td>Phê duyệt nhà cung cấp mới (qualify)</td>
+  <td>Nhà cung cấp mới, công đoạn gia công ngoài mới hoặc vật tư trọng yếu</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> đánh giá nhà cung cấp rủi ro thấp sau hồ sơ đủ ≤ 30 ngày</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> đánh giá nhà cung cấp trọng yếu hoặc đánh giá NC ≤ 2 NC nghiêm trọng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt nếu nhà cung cấp trọng yếu chưa đóng NC nhưng cần dùng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="role-code">SCM</span></a></td>
+  <td><a href="../../../forms/frm-400-quality/FRM-402_Supplier_Evaluation_Form.xlsx">FRM-402</a> · <a href="../../../forms/frm-400-quality/FRM-409_Supplier_Audit_Checklist.xlsx">FRM-409</a> · <a href="../../../operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+  <td>Đánh giá nhà cung cấp không đạt hoặc thiếu chứng nhận bắt buộc → <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></td>
+</tr>
+<tr id="cdr-E3">
+  <td><a href="authority-matrix.html#cdr-E3">E3</a></td>
+  <td>Phê duyệt điều kiện kỹ thuật cho gia công ngoài</td>
+  <td>Cần chuyển công đoạn, xử lý nhiệt, phủ, mài, đo kiểm hoặc gia công phụ ra ngoài</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> kiểm nhà cung cấp và điều kiện giao nhận.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> ký điều kiện kỹ thuật, chất lượng và xác nhận đầu vào.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> quyết định cuối nếu gia công ngoài ảnh hưởng CTQ, lịch giao khách hoặc nhà cung cấp chưa phê duyệt.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="role-code">SCM</span></a></td>
+  <td>PO gia công ngoài · yêu cầu kỹ thuật · kết quả kiểm đầu vào</td>
+  <td>Nhà cung cấp mới, thiếu năng lực đo, thiếu chứng chỉ hoặc công đoạn có CTQ của khách bán dẫn → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</td>
+</tr>
+<tr id="cdr-E4">
+  <td><a href="authority-matrix.html#cdr-E4">E4</a></td>
+  <td>Xác nhận chất lượng đầu vào sau gia công ngoài</td>
+  <td>Cần chuyển công đoạn, xử lý nhiệt, phủ, mài, đo kiểm hoặc gia công phụ ra ngoài</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> kiểm nhà cung cấp và điều kiện giao nhận.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> ký điều kiện kỹ thuật, chất lượng và xác nhận đầu vào.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> quyết định cuối nếu gia công ngoài ảnh hưởng CTQ, lịch giao khách hoặc nhà cung cấp chưa phê duyệt.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="role-code">SCM</span></a></td>
+  <td>PO gia công ngoài · yêu cầu kỹ thuật · kết quả kiểm đầu vào</td>
+  <td>Nhà cung cấp mới, thiếu năng lực đo, thiếu chứng chỉ hoặc công đoạn có CTQ của khách bán dẫn → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</td>
+</tr>
+<tr id="cdr-E5">
+  <td><a href="authority-matrix.html#cdr-E5">E5</a></td>
+  <td>Phê duyệt đơn mua khẩn trước khi đặt hàng</td>
+  <td>Mua khẩn để tránh dừng máy, trễ job, thiếu dao cụ/vật tư hoặc phục hồi sự cố</td>
+  <td>≤ 30 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html">BUY</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> xác nhận lý do khẩn và nguồn hàng.</td>
+  <td>≤ 150 triệu VND: <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> duyệt sau khi chứng minh không có lựa chọn tồn kho/thay thế phù hợp.</td>
+  <td>&gt; ngưỡng L2 hoặc ảnh hưởng giao hàng khách: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt trước khi đặt hàng.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="role-code">SCM</span></a></td>
+  <td>Yêu cầu mua khẩn · PO · bằng chứng thiếu vật tư hoặc nguy cơ dừng máy</td>
+  <td>Mua khẩn ngoài kế hoạch, giá vượt chuẩn, nguồn đơn hoặc rủi ro giao hàng khách → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</td>
+</tr>
+<tr id="cdr-E6">
+  <td><a href="authority-matrix.html#cdr-E6">E6</a></td>
+  <td>Phê duyệt SCAR leo thang</td>
+  <td>NC nhà cung cấp lặp lại, NC nghiêm trọng hoặc giao hàng ảnh hưởng khách</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> mở SCAR nhỏ/lớn ≤ 2 NC nghiêm trọng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> leo thang ≤ 5 NC/tháng/lệnh</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> nếu nhà cung cấp bị khóa, cần nguồn thay thế hoặc phát sinh yêu cầu bồi hoàn</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="role-code">SCM</span></a></td>
+  <td><a href="../../../forms/frm-400-quality/FRM-406_SCAR.xlsx">FRM-406</a> · <a href="../../../operations/sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+  <td>Nhà cung cấp không phản hồi đúng hạn hoặc lỗi lặp lại → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></td>
+</tr>
+<tr id="cdr-E7">
+  <td><a href="authority-matrix.html#cdr-E7">E7</a></td>
+  <td>Xử lý ngoại lệ tài sản khách hàng</td>
+  <td>Tài sản khách hỏng, mất, thiếu nhận diện hoặc dùng sai mục đích</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> xử lý ngoại lệ giá trị ≤ 5 triệu VND</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> xử lý nếu ảnh hưởng sản phẩm hoặc truy xuất</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + khách ký nếu tài sản mất/hỏng hoặc cần bồi hoàn</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)"><span class="role-code">CS</span></a></td>
+  <td><a href="../../../forms/frm-200-purchase/FRM-221_Customer_Property_Register.xlsx">FRM-221</a> · <a href="../../../operations/sops/02-SOP-200/sop-203-customer-property-control.html">SOP-203</a></td>
+  <td>Không truy xuất được tài sản khách hoặc có thiệt hại → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a></td>
+</tr>
+<tr id="cdr-F1">
+  <td><a href="authority-matrix.html#cdr-F1">F1</a></td>
+  <td>Phê duyệt yêu cầu cấp, đổi hoặc gỡ quyền CNTT</td>
+  <td>Yêu cầu cấp, đổi, khóa hoặc gỡ quyền hệ thống</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-it-admin.html">ITA</a> xử lý quyền tiêu chuẩn ≤ 24 giờ hành chính</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html">ESA</a> + người sở hữu duyệt quyền nhạy cảm hoặc ngoại lệ phân tách nhiệm vụ</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt quyền đặc quyền hoặc bỏ qua kiểm soát</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="role-code">ITA</span></a></td>
+  <td><a href="../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> · <a href="../../../operations/sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td>
+  <td>Quyền vượt thẩm quyền kinh doanh hoặc xung đột phân tách nhiệm vụ → <a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html">ESA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></td>
+</tr>
+<tr id="cdr-F2">
+  <td><a href="authority-matrix.html#cdr-F2">F2</a></td>
+  <td>Kích hoạt quyền truy cập ERP khẩn cấp</td>
+  <td>ERP/MES cần quyền khẩn cấp để phục hồi vận hành hoặc xử lý lỗi truy cập</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html">ESA</a> kích hoạt tối đa 2 giờ và ghi <a href="../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a>.</td>
+  <td>Kéo dài đến 8 giờ: <a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html">ESA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> đồng ý, đóng quyền ngay sau khi khôi phục.</td>
+  <td>&gt; 8 giờ hoặc có rủi ro dữ liệu/chứng cứ: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt gia hạn.</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quản trị viên hệ thống Epicor)"><span class="role-code">ESA</span></a></td>
+  <td><a href="../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> · nhật ký truy cập · biên bản đóng quyền</td>
+  <td>Quyền còn mở sau thời hạn, có sửa dữ liệu nhạy cảm hoặc ảnh hưởng audit trail → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>.</td>
+</tr>
+<tr id="cdr-F3">
+  <td><a href="authority-matrix.html#cdr-F3">F3</a></td>
+  <td>Kích hoạt phó/đại diện vai trò trọng yếu</td>
+  <td>Vai trò gốc vắng hoặc không phản hồi 2 kênh</td>
+  <td><a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-direct-line-mgrs">DIRECT_LINE_MGRS</a> kích hoạt phó sau vắng ≥ 4 giờ trong ca hoặc 24 giờ hành chính, có xác nhận của <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> hoặc trưởng chức năng liên quan</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> xác nhận nếu vai trò trọng yếu hoặc quyết định đang ở <a href="raci-master-matrix.html#r5gate">G5</a>–<a href="raci-master-matrix.html#r5gate">G7</a></td>
+  <td><a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-top-mgmt">TOP_MGMT</a> nếu <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> vắng và cần thay quyền khẩn</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="role-code">HR</span></a></td>
+  <td><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html#d4">ANNEX-123 d4</a></td>
+  <td>Thiếu nhật ký <a href="../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> hoặc không có phó hợp lệ → không chuyển quyền</td>
+</tr>
+<tr id="cdr-F4">
+  <td><a href="authority-matrix.html#cdr-F4">F4</a></td>
+  <td>Phê duyệt ứng phó sự cố <a class="entity-link role-link" href="../03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html">EHS</a> và dừng việc vì an toàn</td>
+  <td>Sự cố <a class="entity-link role-link" href="../03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html">EHS</a>, nguy cơ an toàn, hóa chất, cháy nổ hoặc điều kiện không an toàn</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html">EHS</a> kích hoạt dừng việc ngay khi có nguy cơ</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html">EHS</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> duyệt khôi phục sau khắc phục và kiểm tra</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt nếu sự cố nghiêm trọng hoặc có báo cáo bên ngoài</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="role-code">EHS</span></a></td>
+  <td><a href="../../../operations/sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+  <td>Mức độ sự cố vượt ngưỡng hoặc ảnh hưởng khách/cơ quan nhà nước → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></td>
+</tr>
+<tr id="cdr-F5">
+  <td><a href="authority-matrix.html#cdr-F5">F5</a></td>
+  <td>Tiếp nhận khiếu nại khách hàng / chấp thuận RMA</td>
+  <td>Khách gửi khiếu nại, RMA hoặc nghi ngờ thoát lỗi sau giao</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> mở khiếu nại/RMA trong ≤ 24 giờ làm việc</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> phân loại tổn thất ≤ 20 triệu VND trong ≤ 24 giờ làm việc</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> duyệt RMA/yêu cầu bồi hoàn vượt L2 hoặc chặn giao hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)"><span class="role-code">CS</span></a></td>
+  <td><a href="../../../forms/frm-200-purchase/FRM-211_Complaint_Log.xlsx">FRM-211</a> · <a href="../../../forms/frm-200-purchase/FRM-213_RMA_Tracking_Log.xlsx">FRM-213</a> · <a href="../../../forms/frm-200-purchase/FRM-654_Customer_Satisfaction_Survey.xlsx">FRM-654</a> · <a href="../../../operations/sops/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html">SOP-202</a></td>
+  <td>Khiếu nại nghiêm trọng, có thoát lỗi ngoài hiện trường hoặc khách dừng nhận hàng → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a></td>
+</tr>
+<tr id="cdr-F6">
+  <td><a href="authority-matrix.html#cdr-F6">F6</a></td>
+  <td>Phê duyệt hành động ứng phó rủi ro khí hậu</td>
+  <td>Rủi ro khí hậu ảnh hưởng năng lượng, vận chuyển, an toàn hoặc giao hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html">EHS</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> mở hành động nếu tác động ≤ 2 ngày giao hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> duyệt hành động ảnh hưởng lịch ≤ 3 ngày giao hàng</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> duyệt nếu cần đổi nguồn, đổi cam kết khách hoặc đầu tư khẩn</td>
+  <td><a class="entity-link role-link" href="../03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="role-code">EHS</span></a></td>
+  <td><a href="../../../forms/frm-100-sales/FRM-124_Climate_Change_Assessment_Record.xlsx">FRM-124</a> · <a href="../../../forms/frm-100-sales/FRM-121_Context_Analysis_SWOT_PESTLE.xlsx">FRM-121</a> · <a href="../../../operations/sops/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html">SOP-102</a></td>
+  <td>Thiên tai làm gián đoạn nguồn cung hoặc cam kết giao hàng → <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a></td>
+</tr>
+</tbody>
+</table></div>
+
+<h2 class="h2" id="s5">5. Quy tắc xử lý tình huống tại xưởng</h2>
 <div class="table-card"><table class="table">
 <colgroup><col style="width:28%"/><col style="width:48%"/><col style="width:24%"/></colgroup>
 <thead><tr><th>Nếu đang gặp tình huống</th><th>Việc phải làm ngay</th><th>Tài liệu mở tiếp</th></tr></thead>
 <tbody>
-<tr><td>Không biết ai được ký</td><td>Dừng quyết định, tra mã CDR trong <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>. Không hỏi miệng rồi ký thay.</td><td><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td></tr>
-<tr><td>Không biết ai phải làm</td><td>Tra RACI theo cổng <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html#r5gate">G0</a> đến <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html#r5gate">G7</a>; người A chịu trách nhiệm kéo các R/C/I vào đúng thời điểm.</td><td><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a></td></tr>
+<tr><td>Không biết ai được ký</td><td>Dừng quyết định, tra mã CDR trong tài liệu này. Không hỏi miệng rồi ký thay.</td><td>tài liệu này</td></tr>
+<tr><td>Không biết ai phải làm</td><td>Tra RACI theo cổng <a href="raci-master-matrix.html#r5gate">G0</a> đến <a href="raci-master-matrix.html#r5gate">G7</a>; người A chịu trách nhiệm kéo các R/C/I vào đúng thời điểm.</td><td><a href="raci-master-matrix.html">RACI-MASTER-MATRIX</a></td></tr>
 <tr><td>Người giữ quyền vắng</td><td>Kích hoạt phó theo ngưỡng, ghi thời điểm, phạm vi và việc không được chuyển giao.</td><td><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></td></tr>
-<tr><td>Chất lượng và tiến độ mâu thuẫn</td><td>Ưu tiên giữ bằng chứng chất lượng; <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> có quyền giữ hàng cho đến khi có quyết định đúng CDR.</td><td><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D1">D1</a> / <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D2">D2</a> / <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D3">D3</a> / <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D4">D4</a> / <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D5">D5</a> / <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D6">D6</a> / <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D7">D7</a> / <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D8">D8</a></td></tr>
-<tr><td>Khách hàng bán dẫn yêu cầu đổi muộn</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> mở CCR; <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> và <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> xác định ảnh hưởng trước khi hứa ngày giao, xin nhượng bộ hoặc giao tiếp.</td><td><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A6">A6</a> / <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-B7">B7</a> / <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-D7">D7</a></td></tr>
+<tr><td>Chất lượng và tiến độ mâu thuẫn</td><td>Ưu tiên giữ bằng chứng chất lượng; <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> có quyền giữ hàng cho đến khi có quyết định đúng CDR.</td><td><a href="authority-matrix.html#cdr-D1">D1</a> / <a href="authority-matrix.html#cdr-D2">D2</a> / <a href="authority-matrix.html#cdr-D3">D3</a> / <a href="authority-matrix.html#cdr-D4">D4</a> / <a href="authority-matrix.html#cdr-D5">D5</a> / <a href="authority-matrix.html#cdr-D6">D6</a> / <a href="authority-matrix.html#cdr-D7">D7</a> / <a href="authority-matrix.html#cdr-D8">D8</a></td></tr>
+<tr><td>Khách hàng bán dẫn yêu cầu đổi muộn</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> mở CCR; <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> và <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> xác định ảnh hưởng trước khi hứa ngày giao, xin nhượng bộ hoặc giao tiếp.</td><td><a href="authority-matrix.html#cdr-A6">A6</a> / <a href="authority-matrix.html#cdr-B7">B7</a> / <a href="authority-matrix.html#cdr-D7">D7</a></td></tr>
 <tr><td>ERP, bảng điều khiển hoặc hồ sơ điện tử không khớp thực tế</td><td>Lấy giao dịch gốc và hồ sơ kiểm soát làm nguồn thẩm quyền; không dùng ảnh chụp hoặc bảng điều khiển để thay phê duyệt.</td><td><a href="../../../operations/sops/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> / <a href="../../../operations/sops/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td></tr>
 </tbody>
 </table></div>
@@ -141,9 +817,42 @@ td,th { word-wrap:break-word; overflow-wrap:break-word; }
 <li>Có rủi ro FOD, sạch bề mặt, đóng gói, bảo vệ bề mặt hoặc truy xuất không?</li>
 <li>Nếu việc này thất bại trước khách hàng như Lam Research hoặc Applied Materials, hồ sơ có chứng minh ai quyết định và dựa trên bằng chứng nào không?</li>
 </ul>
-<h2 class="h2" id="s3">3. Khi nào phải tra ANNEX chi tiết</h2>
-<p>Bắt buộc mở ANNEX chi tiết khi tình huống ảnh hưởng tới khách hàng, doanh thu, tiền mặt, chất lượng, an toàn, tiến độ giao hàng, thay đổi kỹ thuật, truy cập hệ thống nhạy cảm hoặc kích hoạt phương án dự phòng. Trang tóm tắt này không đủ để ký giao dịch, nhả cổng kiểm soát, chấp thuận ngoại lệ hoặc thay đổi quyền hạn đã công bố.</p>
-<div class="footer-note">Trang này là bản tra nhanh. Khi có khác biệt giữa trang này và ANNEX chi tiết, ANNEX chi tiết giữ quyền ưu tiên.</div>
+
+<h2 class="h2" id="s6">6. Quy tắc thực thi thẩm quyền tại hiện trường và trên hệ thống</h2>
+<div class="card tight">
+ <ol class="doc-link-list">
+ <li><b>Quyền hold rộng hơn quyền phát hành.</b> Bất kỳ ai phát hiện nguy cơ an toàn, sai phiên bản, sai vật tư, thiếu chứng nhận, thiếu bằng chứng hoặc nghi ngờ thoát / bỏ qua đều có trách nhiệm kích hoạt dừng/ngăn chặn / chứa ban đầu; quyết định phát hành phải quay về đúng A/V của quyết định nhóm sản phẩm.</li>
+ <li><b>Xác minh phải độc lập với đề xuất.</b> Người lập hồ sơ hoặc hưởng lợi trực tiếp từ quyết định không được là Người xác minh duy nhất cho cùng giao dịch.</li>
+ <li><b>Mọi thẩm quyền phải đi cùng phạm vi.</b> Ví dụ quyền phê duyệt tăng ca không đồng nghĩa quyền chấp nhận rủi ro kỹ thuật; quyền khởi động lại máy không đồng nghĩa quyền phát hành sản phẩm.</li>
+ <li><b>Quyết định phải bám bộ bằng chứng.</b> Email hoặc bằng lời thỏa thuận chỉ hợp lệ khi gắn với hồ sơ gói hàng truy xuất nguồn gốc được và lưu trong nguồn kiểm soát.</li>
+ <li><b>Mỗi khi thay đổi một thẩm quyền, phải rà soát đồng thời</b> JD, RACI, phân quyền hệ thống, luồng phê duyệt, KPI liên quan và ma trận phó để không tạo ra lỗ hổng kiểm soát.</li>
+ </ol>
+</div>
+<div class="card tight gate-crosswalk">
+<p><b><a href="raci-master-matrix.html#r5gate">G0</a>–<a href="raci-master-matrix.html#r5gate">G7</a> không lặp tại tài liệu này.</b></p>
+<p>Thang cổng phát hành đã chuyển sang <a href="raci-master-matrix.html#r5gate">RACI-MASTER-MATRIX mục 5</a> để tránh hai nguồn thẩm quyền song song.</p>
+<p>tài liệu này chỉ giữ CDR, ngưỡng L1/L2/L3 và hồ sơ tối thiểu; mọi RACI theo cổng phải đối chiếu <a href="raci-master-matrix.html">RACI-MASTER-MATRIX</a> trước khi cấu hình luồng công việc.</p>
+</div>
+
+<h2 class="h2" id="s7">7. Ủy quyền tạm thời, phó ủy quyền và giới hạn không chuyển giao</h2>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Phó tự kích hoạt khi vai trò gốc vắng ≥4 giờ trong ca hoặc ≥24 giờ hành chính, có xác nhận của <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> hoặc trưởng chức năng liên quan và không phản hồi 2 kênh (gọi + tin nhắn nội bộ). Mọi kích hoạt phó phải ghi nhật ký tại <a href="../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> hoặc kênh tương đương, dẫn về <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html#d4">ANNEX-123 d4</a>. <span class="iso-clause">§5.3 / §7.5</span></div></div>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:20%"><col style="width:45%"><col style="width:35%"></colgroup>
+<thead><tr><th>Tình huống</th><th>Cách dùng phó / ủy quyền tạm thời</th><th>Không được chuyển giao</th></tr></thead>
+<tbody>
+<tr><td>Vắng mặt có kế hoạch</td><td>Áp dụng phó đã đăng ký trong <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html#d4">ANNEX-123 d4</a>. Biên bản bàn giao phải nêu quyết định đang mở, điểm chốt, rủi ro hiện hữu, người nhận phó và thời điểm kết thúc phó quyền.</td><td>Không chuyển giao quyền <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> đối với ngoại lệ thương mại, cam kết đặc biệt với khách hàng, thanh toán vượt ngưỡng L2, chặn giao hàng/dỡ chặn, truy cập khẩn cấp ERP và thay đổi thẩm quyền hệ thống.</td></tr>
+<tr><td>Vai trò gốc không phản hồi</td><td>Phó đã đăng ký được tự kích hoạt sau ngưỡng vắng ≥4 giờ trong ca hoặc ≥24 giờ hành chính, có xác nhận của <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> hoặc trưởng chức năng liên quan và bằng chứng không phản hồi đủ 2 kênh: gọi + tin nhắn nội bộ. Người kích hoạt phải ghi thời điểm bắt đầu, lý do, phạm vi quyết định và thời điểm trả quyền vào <a href="../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> hoặc nhật ký tương đương.</td><td>Không dùng phó để vượt ngưỡng L1/L2/L3, bỏ bước <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>/<a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> bắt buộc, hoặc ký thay quyết định có xung đột lợi ích.</td></tr>
+<tr><td>Sự cố/khủng hoảng</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> hoặc <a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-func-owners">FUNC_OWNERS</a> được kích hoạt quyền tạm thời theo phạm vi sự kiện, thời hạn và hồ sơ cụ thể. Quyền tạm thời hết hiệu lực khi sự kiện đóng hoặc khi vai trò gốc/phó hợp lệ nhận lại trách nhiệm.</td><td>Các quyết định thay đổi chính sách, thay đổi ma trận thẩm quyền, phát hành ảnh hưởng khách hàng, dỡ giữ hàng/chặn giao hàng, hoặc truy cập đặc quyền nếu chưa có hồ sơ chính thức.</td></tr>
+<tr><td>Thiếu người nhưng không có phó hợp lệ</td><td>Phải ngăn chặn, giữ việc hoặc xếp lại lịch. Không đôn tạm người chưa có JD, năng lực, SoD và phê duyệt phó trong <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a>.</td><td>Không giao phát hành chất lượng, phê duyệt thanh toán, truy cập khẩn cấp đặc quyền, phát hành kỹ thuật hoặc quyết định xử lý NCR cho người chưa được đăng ký phó.</td></tr>
+<tr><td>Chặn giao hàng / dỡ chặn</td><td>Chặn giao hàng chỉ được dỡ khi <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> cùng ký vào <a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> với bằng chứng kiểm cuối ≥ 100% đặc tính nghi ngờ của lô bị giữ; tối thiểu 10 mẫu đại diện khi áp dụng lấy mẫu (xem <a href="authority-matrix.html#cdr-D7">D7</a>). <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> không được tự dỡ; <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> chỉ phê duyệt sau khi <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> xác nhận đạt.</td><td>Không ủy quyền dỡ chặn giao hàng, không thay chữ ký <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> bằng email/tin nhắn, không mở lại lô giao hàng khi <a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> hoặc bằng chứng CoC còn thiếu.</td></tr>
+</tbody>
+</table></div>
+
+<h2 class="h2" id="s8">8. Quyền hệ thống, phân tách nhiệm vụ (SoD) và dấu vết kiểm toán</h2><div class="table-card"><table class="table"><colgroup><col style="width:20%"><col style="width:50%"><col style="width:30%"></colgroup><thead><tr><th>Chủ đề</th><th>Quy tắc bắt buộc</th><th>Liên kết tài liệu</th></tr></thead><tbody><tr><td>Truy cập theo vai trò</td><td>Phân quyền trên Epicor/M365/mạng nội bộ phải phản ánh đúng thẩm quyền kinh doanh và tuân theo nguyên tắc quyền tối thiểu; các quyền nhạy cảm cần rà soát SoD trước khi cấp.</td><td><a href="../../../operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a>, <a href="../../../operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-102-access-request-field-dictionary.html">ANNEX-102</a></td></tr><tr><td>Truy cập khẩn cấp có kiểm soát</td><td>Chỉ cấp có thời hạn rõ ràng, kèm lý do, có người phê duyệt, hậu kiểm bắt buộc và lưu nhật ký người dùng.</td><td><a href="../../../operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a>, <a download="" href="../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a>, <a download="" href="../../../forms/frm-100-sales/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a></td></tr><tr><td>Quyền thanh toán / nhật ký kế toán / dữ liệu gốc nhạy cảm</td><td>Không để một người đảm nhiệm đồng thời cả ba vai: tạo đối tượng, nhập giao dịch và phê duyệt trong cùng một luồng tiền/ghi nhận kế toán.</td><td><a href="../../../operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a>, Sổ tay Tài chính, <a download="" href="../../../forms/frm-100-sales/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a></td></tr><tr><td>Thiết kế luồng công việc</td><td>Luồng công việc điện tử phải thể hiện đúng các bước A/P/V/C/I trong tài liệu này; không được đơn giản hóa luồng gia công điện tử đến mức bỏ qua bước xác minh hoặc tham vấn bắt buộc.</td><td><a href="raci-master-matrix.html">RACI-MASTER-MATRIX</a>, <a href="../../../operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115</a></td></tr><tr><td>Dấu vết kiểm toán</td><td>Mọi thao tác ghi đè, mở lại giao dịch đã đóng, ghi ngược sổ hoặc sửa chữa thủ công đều phải có lý do rõ ràng và ghi rõ người thực hiện.</td><td><a href="../../../operations/sops/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>, <a href="../../../operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a>, <a download="" href="../../../forms/frm-100-sales/FRM-181_Business_Disruption_Event_Log.xlsx">FRM-181</a></td></tr></tbody></table></div>
+
+<h2 class="h2" id="s9">9. Kích hoạt rà soát và cập nhật ma trận</h2><div class="table-card"><table class="table"><colgroup><col style="width:22%"><col style="width:28%"><col style="width:50%"></colgroup><thead><tr><th>Kích hoạt cập nhật</th><th>Ví dụ điển hình</th><th>Tài liệu phải rà soát đồng bộ</th></tr></thead><tbody><tr><td>Thay đổi tổ chức / bổ sung vai trò</td><td>Bổ sung quản lý mới, tái cơ cấu nhóm, chuyển chức năng ra gia công ngoài, thay đổi tuyến báo cáo.</td><td>JD, sơ đồ tổ chức, RACI, phó, bản đồ truy cập.</td></tr><tr><td>Thay đổi SOP/WI/cổng kiểm soát vận hành</td><td>Thêm cổng kiểm soát chất lượng mới, thay đổi luồng phê duyệt gia công, điều chỉnh logic dự phòng, chuyển biểu mẫu sang luồng điện tử.</td><td>Ma trận thẩm quyền, RACI, nguồn dữ liệu KPI, truy cập.</td></tr><tr><td>Phát hiện lỗ hổng kiểm soát / phát hiện qua đánh giá</td><td>Phát hiện trường hợp tự phê duyệt, bỏ qua xác minh, phát hành sai thẩm quyền hoặc phân quyền hệ thống vượt thẩm quyền kinh doanh.</td><td>Ma trận thẩm quyền, bản đồ vai trò CNTT, gói hồ sơ đóng, đào tạo.</td></tr><tr><td>Triển khai hệ thống/mô-đun mới</td><td>Triển khai giao diện ERP mới, kết nối cổng ngân hàng mới, đưa vào sử dụng quy trình tự động hóa mới.</td><td>Ma trận thẩm quyền, rà soát SoD, dự phòng và bằng chứng quy tắc.</td></tr></tbody></table></div>
+
+<div class="footer-note">Tài liệu này phải được đọc cùng <a href="raci-master-matrix.html">RACI-MASTER-MATRIX</a>, <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html">ANNEX-122</a> và <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a>. Khi quyết định thực tế khác với ma trận này, chuẩn cần sửa là tài liệu hoặc luồng công việc — không phải "lách" bằng thói quen vận hành.</div>
 </div>
 </div>
 </div>

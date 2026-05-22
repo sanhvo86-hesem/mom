@@ -3065,7 +3065,7 @@
     "vi": "Yêu cầu thay đổi của khách hàng",
     "def": "CCR là yêu cầu thay đổi do khách hàng khởi tạo hoặc xác nhận, có thể ảnh hưởng giá, lịch giao, phạm vi, yêu cầu kỹ thuật, FAI/CoC, cổng G0-G7 hoặc cam kết giao hàng. Trong hệ thống HESEM hiện tại, CCR không dùng cho complaint/rate; nếu cần dùng nghĩa Critical Constraint Resource phải viết đầy đủ để tránh nhầm.",
     "ctx": "CS mở CCR; ENGM, QA, PPL và CEO tham gia đánh giá/duyệt theo ngưỡng trong ANNEX-120/121 và RACI authority matrix trước khi hứa ngày giao, xin nhượng bộ hoặc giao tiếp khách hàng.",
-    "rec": "FRM-212 Customer Change Request; ANNEX-120 A6; ANNEX-121 G0/G7; customer communication log; approval/decision log; job dossier evidence",
+    "rec": "FRM-212 Customer Change Request; ANNEX-120 A6; RACI-MASTER-MATRIX G0/G7; customer communication log; approval/decision log; job dossier evidence",
     "cat": "Commercial/Customer"
   },
   {
@@ -3081,9 +3081,9 @@
     "term": "CDR",
     "meaning": "Control Decision Record",
     "vi": "Mã quyết định kiểm soát",
-    "def": "CDR là mã định danh một điểm quyết định kiểm soát trong ANNEX-120 và ANNEX-121. Mỗi CDR phải làm rõ việc cần quyết định, người chịu trách nhiệm, ngưỡng áp dụng, bằng chứng bắt buộc, trạng thái dừng/chạy và tài liệu liên quan. CDR không phải chức danh và không tạo quyền mới; CDR giúp tra đúng thẩm quyền ký và RACI vận hành.",
+    "def": "CDR là mã định danh một điểm quyết định kiểm soát trong ANNEX-120 và RACI-MASTER-MATRIX. Mỗi CDR phải làm rõ việc cần quyết định, người chịu trách nhiệm, ngưỡng áp dụng, bằng chứng bắt buộc, trạng thái dừng/chạy và tài liệu liên quan. CDR không phải chức danh và không tạo quyền mới; CDR giúp tra đúng thẩm quyền ký và RACI vận hành.",
     "ctx": "Dùng trong RACI, ma trận thẩm quyền và luồng vận hành xưởng CNC bán dẫn khi cần tra ai được dừng, nhả, phê duyệt, đồng ký hoặc leo thang một quyết định tại các cổng G0-G7.",
-    "rec": "ANNEX-120 Authority Matrix; ANNEX-121 RACI Master Matrix; ANNEX-123 Deputy/Backup Matrix; form hoặc SOP được gắn trực tiếp với từng CDR.",
+    "rec": "ANNEX-120 Authority Matrix; RACI-MASTER-MATRIX RACI Master Matrix; ANNEX-123 Deputy/Backup Matrix; form hoặc SOP được gắn trực tiếp với từng CDR.",
     "cat": "ISO/QMS"
   },
   {
