@@ -921,10 +921,16 @@ final class DecisionThresholdService
     {
         $rows = [];
         foreach ($this->items($config) as $item) {
-            $rows[] = '<tr class="authority-decision-row">'
+            $cdrs = is_array($item['cdrs'] ?? null) ? $item['cdrs'] : [];
+            $primaryCdr = (string)($cdrs[0] ?? '');
+            $rowAttrs = 'class="authority-decision-row"';
+            if ($primaryCdr !== '') {
+                $rowAttrs .= ' id="cdr-' . htmlspecialchars($primaryCdr, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"';
+            }
+            $rows[] = '<tr ' . $rowAttrs . '>'
                 . '<td class="decision-subject-cell">' . $this->decisionSubjectBlock($item, 'system') . '</td>'
                 . '<td class="threshold-cell">' . $this->thresholdLookupLines($item, 'system') . '</td>'
-                . '<td class="cdr-cell">' . $this->cdrLinks($item['cdrs'], 'system') . '</td>'
+                . '<td class="cdr-cell">' . $this->cdrLinks($cdrs, 'system') . '</td>'
                 . '</tr>';
         }
 
@@ -1191,13 +1197,13 @@ final class DecisionThresholdService
         $base = $context === 'annex'
             ? '../../../../system/organization/04-RACI-Authority/authority-matrix.html'
             : 'authority-matrix.html';
-        // For the in-document quick-lookup (system context) each CDR <a> carries
-        // id="cdr-X" so that inbound deep-links (#cdr-A2 etc.) anchor here —
-        // the standalone register §4 was retired and merged into this row.
-        return implode(', ', array_map(static function (string $cdr) use ($base, $context): string {
+        // The id="cdr-X" anchor lives on the row <tr> (see
+        // authorityQuickLookupBlock) so the CDR-cell <a> carries href only —
+        // avoiding duplicate-id HTML and keeping check_raci_integrity (which
+        // scans for <tr id="cdr-XX">) happy.
+        return implode(', ', array_map(static function (string $cdr) use ($base): string {
             $esc = htmlspecialchars($cdr, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-            $idAttr = $context === 'system' ? ' id="cdr-' . $esc . '"' : '';
-            return '<a' . $idAttr . ' href="' . $base . '#cdr-' . $esc . '">' . $esc . '</a>';
+            return '<a href="' . $base . '#cdr-' . $esc . '">' . $esc . '</a>';
         }, $cdrs));
     }
 
