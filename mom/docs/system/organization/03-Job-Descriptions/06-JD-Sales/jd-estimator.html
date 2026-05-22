@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>JD-EST - Nhân viên báo giá | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap (vi) — Khởi tạo đầu trang kiểm soát tài liệu: tự tính đường dẫn tuyệt đối từ location.pathname
@@ -22,10 +21,16 @@
   js.defer = true;
   js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
   document.head.appendChild(js);
+  /* JD KPI-scorecard renderer — hydrates the KPI section from the
+   * KPI Authority registry (jd_kpi_scorecards). */
+  var jdsc = document.createElement('script');
+  jdsc.defer = true;
+  jdsc.src = appBase + '/scripts/portal/13-jd-scorecard-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(jdsc);
 })();
 </script>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
-<link href="../../../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../../../assets/style.css" rel="stylesheet">
 </head>
 <body>
 <div class="container">
@@ -41,7 +46,7 @@
 <div class="jd-purpose"><p>JD này xác định phạm vi, quyền hạn, đầu ra bắt buộc, điểm kết thúc trách nhiệm và cơ chế bàn giao của Nhân viên báo giá (EST). Tài liệu được dùng làm căn cứ cho tuyển dụng, đào tạo tại chỗ theo công việc (OJT), đánh giá năng lực, chỉ số đánh giá hiệu quả công việc (KPI), lương thưởng và phối hợp liên phòng ban. Khi áp dụng phải đọc cùng ma trận trách nhiệm thực hiện – chịu trách nhiệm phê duyệt – tham vấn – thông báo (RACI), ma trận thẩm quyền, ma trận người thay thế và các SOP/WI/ANNEX đang hiệu lực.</p></div>
 <div class="note-blue" style="margin:12px 0">
 <b>🗺️ Hệ thống tám cổng kiểm soát (G0→G7):</b> EST tham gia từ cổng RFQ / hợp đồng đến bàn giao đơn hàng; trọng tâm là khóa giả định kỹ thuật, chi phí, thời gian dẫn, rủi ro và điều kiện thương mại trước khi công ty cam kết với khách hàng.
- <br/>→ Xem <a href="../../../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a> để đối chiếu ma trận vai trò theo từng cổng.
+ <br>→ Xem <a href="../../../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a> để đối chiếu ma trận vai trò theo từng cổng.
 </div>
 <h2 class="h2">1. Thông tin vị trí</h2>
 <div class="table-card">
@@ -49,7 +54,7 @@
 <tr><th>Mã vị trí</th><td>JD-EST</td></tr>
 <tr><th>Mã vai trò dùng trong SOP/RACI</th><td>EST – Nhân viên báo giá</td></tr>
 <tr><th>Chức danh theo tài liệu</th><td>Nhân viên báo giá</td></tr>
-<tr><th>Bộ phận</th><td>Phòng Kinh doanh và Dịch vụ khách hàng (<span class="entity-code dept-code">D-SCS</span>)</td></tr>
+<tr><th>Bộ phận</th><td>Phòng Kinh doanh và Dịch vụ khách hàng (<a class="entity-link dept-link" href="../../02-Department-Handbooks/dept-sales-and-customer-service-handbook.html" title="Sales and Customer Service Department (Phòng Kinh doanh và Dịch vụ khách hàng)"><span class="entity-code dept-code">D-SCS</span></a>)</td></tr>
 <tr><th>Cấp vai trò</th><td>Nhân viên chuyên môn</td></tr>
 <tr><th>Nhóm vai trò</th><td>Ước tính chi phí, định giá, phân tích RFQ và bàn giao báo giá</td></tr>
 <tr><th>Báo cáo trực tiếp cho</th><td><a class="entity-link role-link" href="../01-JD-Executive/jd-chief-executive-officer.html" title="Tổng Giám đốc (CEO)"><span class="entity-code role-code">CEO</span></a> – Tổng Giám đốc hoặc người được Tổng Giám đốc phân công</td></tr>
