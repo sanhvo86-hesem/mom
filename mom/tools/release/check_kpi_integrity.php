@@ -371,6 +371,37 @@ foreach ([
     }
 }
 
+// ── P0.11 — JD KPI scorecards: weighted, valid, sum to 100 ──────────────────
+// jd_kpi_scorecards is the SSOT for the per-role weighted KPI scorecard. Every
+// role's weights must sum to 100 and every kpi_code must be a governed metric.
+$scorecards = $registry['jd_kpi_scorecards']['roles'] ?? null;
+if (is_array($scorecards)) {
+    foreach ($scorecards as $roleCode => $card) {
+        if (!is_array($card)) {
+            continue;
+        }
+        $items = is_array($card['scorecard'] ?? null) ? $card['scorecard'] : [];
+        if ($items === []) {
+            continue; // a Wave-2 role not yet populated — not a blocker
+        }
+        $sum = 0;
+        foreach ($items as $it) {
+            $kc = strtoupper(trim((string) ($it['kpi_code'] ?? '')));
+            $w  = (int) ($it['weight'] ?? 0);
+            $sum += $w;
+            if ($kc === '' || !isset($knownCodes[$kc])) {
+                $p0[] = "JD scorecard $roleCode: kpi_code '$kc' is not a governed metric.";
+            }
+            if ($w <= 0) {
+                $p0[] = "JD scorecard $roleCode: kpi_code '$kc' has a non-positive weight.";
+            }
+        }
+        if ($sum !== 100) {
+            $p0[] = "JD scorecard $roleCode: weights sum to $sum, must be 100.";
+        }
+    }
+}
+
 // ── Report ───────────────────────────────────────────────────────────────────
 $byStatus = ['runtime_calculated' => 0, 'staged_data_contract' => 0, 'manual' => 0, 'retired' => 0];
 foreach ($governance as $row) {

@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
   "version": "2026-05-21",
-  "schema_version": 13,
+  "schema_version": 14,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. Existing ANNEX-122 KPIs are retained, legacy metric aliases are mapped to canonical codes, and proposed CNC operating metrics are staged without granting automatic runtime authority.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -4699,6 +4699,562 @@
       "vi": "Tính liên tục kinh doanh",
       "en": "Business Continuity",
       "gate": "ALL"
+    }
+  },
+  "jd_kpi_scorecards": {
+    "description": "Thẻ điểm KPI có trọng số cho từng chức danh (JD). Tổng trọng số mỗi vai trò = 100. Wave 1: 17 vai trò quản lý/chuyên viên có mã trong registry. Wave 2: 22 JD cấp vận hành (cần KPI chuyên biệt vị trí).",
+    "roles": {
+      "CEO": {
+        "role_code": "CEO",
+        "jd_title_vi": "Tổng Giám đốc",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "OTD",
+            "weight": 20,
+            "rationale": "Giao hàng đúng hạn — cam kết khách hàng cấp công ty."
+          },
+          {
+            "kpi_code": "GROSS_MARGIN_JOB_FAMILY",
+            "weight": 20,
+            "rationale": "Biên lợi nhuận — sức khoẻ tài chính doanh nghiệp."
+          },
+          {
+            "kpi_code": "COMPLAINT_RATE",
+            "weight": 15,
+            "rationale": "Chất lượng thoát ra khách — uy tín thương hiệu."
+          },
+          {
+            "kpi_code": "FINAL_RELEASE_RFT",
+            "weight": 15,
+            "rationale": "Kỷ luật phát hành cuối — chất lượng hệ thống."
+          },
+          {
+            "kpi_code": "RECORDABLE_INCIDENT_RATE",
+            "weight": 15,
+            "rationale": "An toàn lao động — trách nhiệm cao nhất của lãnh đạo."
+          },
+          {
+            "kpi_code": "BCP_READINESS",
+            "weight": 15,
+            "rationale": "Tính liên tục kinh doanh — năng lực chống đứt gãy."
+          }
+        ]
+      },
+      "PD": {
+        "role_code": "PD",
+        "jd_title_vi": "Giám đốc sản xuất",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "OTD",
+            "weight": 25,
+            "rationale": "Đầu ra giao hàng — kết quả chính của khối sản xuất."
+          },
+          {
+            "kpi_code": "PLAN_ADHERENCE",
+            "weight": 25,
+            "rationale": "Bám kế hoạch — năng lực điều hành sản xuất ổn định."
+          },
+          {
+            "kpi_code": "WIP_AGING",
+            "weight": 15,
+            "rationale": "Tuổi tồn WIP — kiểm soát dòng chảy, không ùn tắc."
+          },
+          {
+            "kpi_code": "SCHEDULE_RECOVERY_EFFECTIVENESS",
+            "weight": 10,
+            "rationale": "Hiệu quả khôi phục khi lệch tiến độ."
+          },
+          {
+            "kpi_code": "FPY",
+            "weight": 15,
+            "rationale": "Hiệu suất đạt ngay lần đầu — chất lượng trong sản xuất."
+          },
+          {
+            "kpi_code": "RECORDABLE_INCIDENT_RATE",
+            "weight": 10,
+            "rationale": "An toàn xưởng — tuân thủ EHS trong khối SX."
+          }
+        ]
+      },
+      "CS": {
+        "role_code": "CS",
+        "jd_title_vi": "Nhân viên dịch vụ khách hàng",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "RFQ_TURNAROUND_TIME",
+            "weight": 20,
+            "rationale": "Tốc độ phản hồi RFQ — ấn tượng đầu với khách."
+          },
+          {
+            "kpi_code": "ORDER_REVIEW_RFT",
+            "weight": 25,
+            "rationale": "Soát xét đơn đúng lần đầu — tuân thủ quy trình nhận đơn."
+          },
+          {
+            "kpi_code": "CUSTOMER_COMM_CLOSURE_OT",
+            "weight": 20,
+            "rationale": "Đóng trao đổi khách đúng hạn — kỷ luật chăm sóc."
+          },
+          {
+            "kpi_code": "COMPLAINT_RATE",
+            "weight": 20,
+            "rationale": "Xử lý khiếu nại — hiệu quả giữ quan hệ khách."
+          },
+          {
+            "kpi_code": "OTD",
+            "weight": 15,
+            "rationale": "Giao đúng hạn cho khách phụ trách — cam kết dịch vụ."
+          }
+        ]
+      },
+      "EST": {
+        "role_code": "EST",
+        "jd_title_vi": "Nhân viên báo giá",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "QUOTE_HIT_RATE",
+            "weight": 40,
+            "rationale": "Tỷ lệ trúng báo giá — hiệu quả cốt lõi của định giá."
+          },
+          {
+            "kpi_code": "RFQ_TURNAROUND_TIME",
+            "weight": 35,
+            "rationale": "Tốc độ ra báo giá — năng suất xử lý RFQ."
+          },
+          {
+            "kpi_code": "GROSS_MARGIN_JOB_FAMILY",
+            "weight": 25,
+            "rationale": "Biên lợi nhuận đơn trúng — chất lượng định giá, không phá giá."
+          }
+        ]
+      },
+      "QA": {
+        "role_code": "QA",
+        "jd_title_vi": "Trưởng bộ phận đảm bảo chất lượng",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "FINAL_RELEASE_RFT",
+            "weight": 18,
+            "rationale": "Phát hành cuối đúng lần đầu — kết quả chất lượng đầu ra."
+          },
+          {
+            "kpi_code": "COMPLAINT_RATE",
+            "weight": 17,
+            "rationale": "Lỗi thoát ra khách — thước đo cuối của hệ chất lượng."
+          },
+          {
+            "kpi_code": "FAI_FIRST_PASS",
+            "weight": 15,
+            "rationale": "Chấp nhận FAI lần đầu — chặn lỗi từ gốc."
+          },
+          {
+            "kpi_code": "CAPA_EFFECTIVENESS",
+            "weight": 15,
+            "rationale": "Hiệu lực CAPA — hệ khắc phục có thực chất."
+          },
+          {
+            "kpi_code": "NCR_CLOSURE_AGING",
+            "weight": 13,
+            "rationale": "Tuổi tồn NCR — kỷ luật đóng vòng lặp chất lượng."
+          },
+          {
+            "kpi_code": "IN_PROCESS_REJECT_RATE",
+            "weight": 12,
+            "rationale": "Tỷ lệ loại trong quá trình — kiểm soát chất lượng chuyền."
+          },
+          {
+            "kpi_code": "COPQ",
+            "weight": 10,
+            "rationale": "Chi phí chất lượng kém — hiệu quả kinh tế của QA."
+          }
+        ]
+      },
+      "QC": {
+        "role_code": "QC",
+        "jd_title_vi": "Nhân viên QC / lập trình viên - vận hành CMM",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "FAI_FIRST_PASS",
+            "weight": 35,
+            "rationale": "Chấp nhận mẫu đầu/FAI — kết quả kiểm tra cốt lõi."
+          },
+          {
+            "kpi_code": "FINAL_RELEASE_RFT",
+            "weight": 30,
+            "rationale": "Phát hành cuối đúng lần đầu — chất lượng kiểm cuối."
+          },
+          {
+            "kpi_code": "CAL_COMPLIANCE",
+            "weight": 20,
+            "rationale": "Tuân thủ hiệu chuẩn thiết bị đo — điều kiện đo tin cậy."
+          },
+          {
+            "kpi_code": "IN_PROCESS_REJECT_RATE",
+            "weight": 15,
+            "rationale": "Phát hiện lỗi trong quá trình — kiểm soát IPQC."
+          }
+        ]
+      },
+      "QMS": {
+        "role_code": "QMS",
+        "jd_title_vi": "Kỹ sư hệ thống QMS",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "NCR_CLOSURE_AGING",
+            "weight": 25,
+            "rationale": "Tuổi tồn NCR — kỷ luật vận hành hệ NCR."
+          },
+          {
+            "kpi_code": "CAPA_EFFECTIVENESS",
+            "weight": 25,
+            "rationale": "Hiệu lực CAPA — chất lượng hệ khắc phục phòng ngừa."
+          },
+          {
+            "kpi_code": "REPEAT_NCR_RATE",
+            "weight": 20,
+            "rationale": "NCR tái diễn — bằng chứng hệ QMS thực sự chặn lỗi."
+          },
+          {
+            "kpi_code": "CAL_COMPLIANCE",
+            "weight": 15,
+            "rationale": "Tuân thủ hiệu chuẩn — duy trì hệ đo lường."
+          },
+          {
+            "kpi_code": "BCP_READINESS",
+            "weight": 15,
+            "rationale": "Sẵn sàng liên tục kinh doanh — QMS giữ hệ thống bền."
+          }
+        ]
+      },
+      "MCS": {
+        "role_code": "MCS",
+        "jd_title_vi": "Chuyên viên đo lường và hiệu chuẩn",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "CAL_COMPLIANCE",
+            "weight": 50,
+            "rationale": "Tuân thủ hiệu chuẩn — nhiệm vụ cốt lõi của chuyên viên."
+          },
+          {
+            "kpi_code": "FAI_FIRST_PASS",
+            "weight": 25,
+            "rationale": "FAI đạt lần đầu — đo lường tốt thì FAI mới tin cậy."
+          },
+          {
+            "kpi_code": "IN_PROCESS_REJECT_RATE",
+            "weight": 25,
+            "rationale": "Loại trong quá trình — thiết bị đo lệch sẽ lộ ở đây."
+          }
+        ]
+      },
+      "FIN": {
+        "role_code": "FIN",
+        "jd_title_vi": "Quản lý tài chính",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "GROSS_MARGIN_JOB_FAMILY",
+            "weight": 25,
+            "rationale": "Biên lợi nhuận — kết quả tài chính trọng yếu."
+          },
+          {
+            "kpi_code": "DSO",
+            "weight": 25,
+            "rationale": "Số ngày thu tiền — hiệu quả quản trị dòng tiền."
+          },
+          {
+            "kpi_code": "INVOICE_RFT",
+            "weight": 20,
+            "rationale": "Hóa đơn đúng lần đầu — kỷ luật quy trình hóa đơn."
+          },
+          {
+            "kpi_code": "MONTH_END_CLOSE_OT",
+            "weight": 15,
+            "rationale": "Đóng sổ đúng hạn — kỷ luật chốt số kế toán."
+          },
+          {
+            "kpi_code": "SHIP_READY_TO_INVOICE_LT",
+            "weight": 15,
+            "rationale": "Thời gian giao→hóa đơn — tốc độ chuyển doanh thu."
+          }
+        ]
+      },
+      "EHS": {
+        "role_code": "EHS",
+        "jd_title_vi": "Chuyên viên EHS",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "RECORDABLE_INCIDENT_RATE",
+            "weight": 35,
+            "rationale": "Tỷ lệ tai nạn — kết quả an toàn cốt lõi."
+          },
+          {
+            "kpi_code": "INCIDENT_ACTION_CLOSURE_AGING",
+            "weight": 25,
+            "rationale": "Đóng hành động sự cố — kỷ luật xử lý đến nơi."
+          },
+          {
+            "kpi_code": "SAFETY_ONBOARDING_COMPLIANCE",
+            "weight": 25,
+            "rationale": "Đào tạo an toàn hội nhập — phòng ngừa từ đầu vào."
+          },
+          {
+            "kpi_code": "FOD_LINE_CLEARANCE_COMPLIANCE",
+            "weight": 15,
+            "rationale": "Kỷ luật vệ sinh/FOD — an toàn & sạch hiện trường."
+          }
+        ]
+      },
+      "ENGM": {
+        "role_code": "ENGM",
+        "jd_title_vi": "Trưởng nhóm / quản lý kỹ thuật",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "ENGINEERING_RELEASE_RFT",
+            "weight": 30,
+            "rationale": "Phát hành kỹ thuật đúng lần đầu — chất lượng thiết kế."
+          },
+          {
+            "kpi_code": "ENGINEERING_RELEASE_ON_TIME",
+            "weight": 25,
+            "rationale": "Phát hành đúng hạn — không chặn dòng sản xuất."
+          },
+          {
+            "kpi_code": "ECN_LEAD_TIME",
+            "weight": 20,
+            "rationale": "Thời gian xử lý ECN — tốc độ đáp ứng thay đổi."
+          },
+          {
+            "kpi_code": "ECO_CLOSURE_AGING",
+            "weight": 15,
+            "rationale": "Tuổi tồn ECO — kỷ luật đóng thay đổi đến nơi."
+          },
+          {
+            "kpi_code": "CONTROL_PLAN_PFMEA_APPROVAL",
+            "weight": 10,
+            "rationale": "Duyệt Control Plan/PFMEA trước baseline — tuân thủ cổng."
+          }
+        ]
+      },
+      "PPL": {
+        "role_code": "PPL",
+        "jd_title_vi": "Điều độ sản xuất",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "PLAN_ADHERENCE",
+            "weight": 25,
+            "rationale": "Bám kế hoạch — kết quả cốt lõi của điều độ."
+          },
+          {
+            "kpi_code": "WIP_AGING",
+            "weight": 20,
+            "rationale": "Tuổi tồn WIP — điều độ giữ dòng chảy không ùn."
+          },
+          {
+            "kpi_code": "SCHEDULE_RECOVERY_EFFECTIVENESS",
+            "weight": 15,
+            "rationale": "Hiệu quả khôi phục lịch khi lệch."
+          },
+          {
+            "kpi_code": "BOTTLENECK_BUFFER_STATUS",
+            "weight": 15,
+            "rationale": "Trạng thái đệm nút thắt — điều độ theo TOC."
+          },
+          {
+            "kpi_code": "THROUGHPUT_PER_CONSTRAINT_HOUR",
+            "weight": 15,
+            "rationale": "Thông lượng/giờ nút thắt — tối ưu nguồn lực hạn chế."
+          },
+          {
+            "kpi_code": "MATERIAL_AVAILABILITY_PLAN",
+            "weight": 10,
+            "rationale": "Vật tư sẵn sàng cho kế hoạch — điều kiện thả lệnh."
+          }
+        ]
+      },
+      "WKM": {
+        "role_code": "WKM",
+        "jd_title_vi": "Quản lý phân xưởng CNC",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "OEE",
+            "weight": 22,
+            "rationale": "Hiệu suất thiết bị tổng thể — năng suất xưởng."
+          },
+          {
+            "kpi_code": "SETUP_FIRST_PASS",
+            "weight": 18,
+            "rationale": "Cài đặt đạt lần đầu — kỷ luật chuẩn bị máy."
+          },
+          {
+            "kpi_code": "IN_PROCESS_REJECT_RATE",
+            "weight": 18,
+            "rationale": "Tỷ lệ loại trong quá trình — chất lượng gia công."
+          },
+          {
+            "kpi_code": "CHANGEOVER_TIME",
+            "weight": 14,
+            "rationale": "Thời gian đổi mẫu — linh hoạt chuyền."
+          },
+          {
+            "kpi_code": "FOD_LINE_CLEARANCE_COMPLIANCE",
+            "weight": 14,
+            "rationale": "Kỷ luật FOD/dọn chuyền — tuân thủ quy trình xưởng."
+          },
+          {
+            "kpi_code": "MTBF",
+            "weight": 14,
+            "rationale": "Thời gian giữa hai lần hỏng — độ tin cậy thiết bị."
+          }
+        ]
+      },
+      "SL": {
+        "role_code": "SL",
+        "jd_title_vi": "Trưởng ca",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "FOD_LINE_CLEARANCE_COMPLIANCE",
+            "weight": 30,
+            "rationale": "Kỷ luật dọn chuyền/FOD trong ca — trách nhiệm trực tiếp."
+          },
+          {
+            "kpi_code": "SETUP_FIRST_PASS",
+            "weight": 25,
+            "rationale": "Cài đặt đạt lần đầu trong ca — chuẩn bị máy đúng."
+          },
+          {
+            "kpi_code": "IN_PROCESS_REJECT_RATE",
+            "weight": 25,
+            "rationale": "Loại trong quá trình ca — chất lượng giám sát ca."
+          },
+          {
+            "kpi_code": "PLAN_ADHERENCE",
+            "weight": 20,
+            "rationale": "Bám kế hoạch ca — hoàn thành sản lượng giao."
+          }
+        ]
+      },
+      "SCM": {
+        "role_code": "SCM",
+        "jd_title_vi": "Quản lý chuỗi cung ứng",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "SUPPLIER_OTD",
+            "weight": 22,
+            "rationale": "Giao hàng đúng hạn của NCC — hiệu quả quản trị cung ứng."
+          },
+          {
+            "kpi_code": "MATERIAL_AVAILABILITY_PLAN",
+            "weight": 22,
+            "rationale": "Vật tư sẵn sàng cho kế hoạch — không để dừng vì thiếu."
+          },
+          {
+            "kpi_code": "INVENTORY_ACCURACY",
+            "weight": 16,
+            "rationale": "Độ chính xác tồn kho — kỷ luật quản lý kho."
+          },
+          {
+            "kpi_code": "IQC_PASS_RATE",
+            "weight": 15,
+            "rationale": "Tỷ lệ IQC đạt — chất lượng đầu vào do chọn NCC."
+          },
+          {
+            "kpi_code": "SUPPLIER_READINESS",
+            "weight": 15,
+            "rationale": "Mức sẵn sàng NCC — năng lực phát triển nhà cung cấp."
+          },
+          {
+            "kpi_code": "TRACEABILITY_COMPLETENESS",
+            "weight": 10,
+            "rationale": "Hồ sơ truy xuất đầy đủ — tuân thủ truy xuất nguồn gốc."
+          }
+        ]
+      },
+      "HR": {
+        "role_code": "HR",
+        "jd_title_vi": "Quản lý nhân sự",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "TRAINING_COMP",
+            "weight": 25,
+            "rationale": "Hoàn thành đào tạo đúng hạn — kết quả phát triển năng lực."
+          },
+          {
+            "kpi_code": "CRITICAL_ROLE_CERT_COVERAGE",
+            "weight": 22,
+            "rationale": "Phủ chứng nhận vai trò trọng yếu — năng lực thực."
+          },
+          {
+            "kpi_code": "CRITICAL_ROLE_BACKUP_COVERAGE",
+            "weight": 22,
+            "rationale": "Phủ người dự phòng — chống đứt gãy nhân sự."
+          },
+          {
+            "kpi_code": "SAFETY_ONBOARDING_COMPLIANCE",
+            "weight": 16,
+            "rationale": "Onboarding an toàn — tuân thủ đầu vào nhân sự."
+          },
+          {
+            "kpi_code": "BCP_READINESS",
+            "weight": 15,
+            "rationale": "Sẵn sàng liên tục — phần nhân sự của BCP."
+          }
+        ]
+      },
+      "ITA": {
+        "role_code": "ITA",
+        "jd_title_vi": "Quản trị viên CNTT",
+        "jd_file": "mom/docs/system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html",
+        "wave": 1,
+        "scorecard": [
+          {
+            "kpi_code": "CRITICAL_SYSTEM_AVAILABILITY",
+            "weight": 35,
+            "rationale": "Sẵn sàng hệ thống trọng yếu — kết quả vận hành CNTT."
+          },
+          {
+            "kpi_code": "SERVICE_TICKET_SLA",
+            "weight": 30,
+            "rationale": "Đóng phiếu dịch vụ trong SLA — chất lượng hỗ trợ."
+          },
+          {
+            "kpi_code": "MASTER_DATA_EXCEPTION_AGING",
+            "weight": 35,
+            "rationale": "Tuổi tồn ngoại lệ dữ liệu gốc — kỷ luật quản trị dữ liệu."
+          }
+        ]
+      }
     }
   }
 }

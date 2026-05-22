@@ -142,6 +142,7 @@ final class KpiRegistryAdminService
             'proposed_operating_metrics'=> $proposed,
             'dashboard_core_kpis'       => $seed['dashboard_core_kpis'] ?? [],
             'process_catalog'   => $seed['process_catalog'] ?? new \stdClass(),
+            'jd_kpi_scorecards' => $seed['jd_kpi_scorecards'] ?? new \stdClass(),
             'library'           => $library,
             'facets'            => $this->buildFacets($library, $seed),
             'stats'             => $this->computeStats($governance),

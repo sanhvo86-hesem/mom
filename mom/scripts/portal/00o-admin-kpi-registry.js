@@ -443,7 +443,32 @@ function _renderLibrary(){
   var grid = rows.map(_renderLibCard).join('');
   if(!grid) grid = '<div class="hm-empty">' + _t('Không có KPI khớp bộ lọc.', 'No KPI matches the filter.') + '</div>';
 
-  return nav + filterBar + resultHead + '<div class="kc-lib-grid">' + grid + '</div>';
+  return nav + filterBar + _renderScorecard() + resultHead +
+    '<div class="kc-lib-grid">' + grid + '</div>';
+}
+
+/* Per-JD weighted KPI scorecard — shown when the JD filter selects a role
+   that has a scorecard in jd_kpi_scorecards. Weights sum to 100. */
+function _renderScorecard(){
+  var f = _state.filters;
+  var roles = ((_state.config || {}).jd_kpi_scorecards || {}).roles || {};
+  var role = (f.jd && roles[f.jd]) ? roles[f.jd] : null;
+  var items = role && Array.isArray(role.scorecard) ? role.scorecard : [];
+  if(!items.length) return '';
+  var rows = items.map(function(it){
+    return '<div class="kc-sc-row">' +
+      '<span class="kc-code">' + _esc(it.kpi_code) + '</span>' +
+      '<span class="kc-sc-bar"><span class="kc-sc-fill" style="width:' +
+        (parseInt(it.weight,10) || 0) + '%"></span></span>' +
+      '<span class="kc-sc-w">' + _esc(it.weight) + '%</span>' +
+      '<span class="kc-mini kc-sc-why">' + _esc(it.rationale || '') + '</span>' +
+    '</div>';
+  }).join('');
+  return '<div class="kc-scorecard"><div class="kc-sc-head">🎯 ' +
+    _t('Thẻ điểm KPI — ', 'KPI scorecard — ') + _esc(role.jd_title_vi || f.jd) +
+    ' <span class="kc-mini">(' + _esc(f.jd) + ' · ' +
+    _t('tổng trọng số 100%', 'weights total 100%') + ')</span></div>' +
+    rows + '</div>';
 }
 
 /* ── Add-KPI form ──────────────────────────────────────────────────── */
@@ -938,6 +963,16 @@ function _styleBlock(){
   '.kc-counter-head{font-size:11px;font-weight:700;color:var(--text-2,#55617a);' +
     'text-transform:uppercase;letter-spacing:.3px}' +
   '.kc-counter-id{display:flex;align-items:center;gap:8px;flex-wrap:wrap}' +
+  /* per-JD weighted KPI scorecard */
+  '.kc-scorecard{border:1px solid var(--accent,#2563eb);border-radius:10px;' +
+    'background:var(--accent-soft,#e7f0ff);padding:12px;display:flex;flex-direction:column;gap:6px}' +
+  '.kc-sc-head{font-size:13px;font-weight:700;color:var(--text-1,#1a2233)}' +
+  '.kc-sc-row{display:flex;align-items:center;gap:8px}' +
+  '.kc-sc-bar{flex:0 0 120px;height:10px;border-radius:999px;background:var(--surface,#fff);' +
+    'overflow:hidden;border:1px solid var(--border,#d7deea)}' +
+  '.kc-sc-fill{display:block;height:100%;background:var(--accent,#2563eb)}' +
+  '.kc-sc-w{flex:0 0 40px;font-size:12px;font-weight:700;color:var(--accent,#2563eb);text-align:right}' +
+  '.kc-sc-why{flex:1}' +
   '</style>';
 }
 
