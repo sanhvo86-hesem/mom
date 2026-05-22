@@ -462,7 +462,7 @@ function scan_extract_code(string $fn): string {
   if (preg_match('/^(sop-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(frm-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(wi-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
-  if (preg_match('/^(annex-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
+  if (preg_match('/^(annex-\d{3}[a-z]?)/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(ref-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(jd-[a-z-]+)/i', $stem, $m)) return strtoupper(substr($m[1], 0, 30));
   if (preg_match('/^(dept-[a-z-]+)/i', $stem, $m)) return strtoupper(substr($m[1], 0, 30));
@@ -2568,7 +2568,7 @@ function portal_extract_doc_code(string $filename): string {
   if (preg_match('/^(sop-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(frm-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(wi-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
-  if (preg_match('/^(annex-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
+  if (preg_match('/^(annex-\d{3}[a-z]?)/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(ref-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(jd-[a-z-]+)/i', $stem, $m)) return strtoupper(substr($m[1], 0, 30));
   if (preg_match('/^(dept-[a-z-]+)/i', $stem, $m)) return strtoupper(substr($m[1], 0, 30));
@@ -19095,7 +19095,7 @@ if ($username === '') {
       if (preg_match('/^(sop-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
       if (preg_match('/^(frm-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
       if (preg_match('/^(wi-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
-      if (preg_match('/^(annex-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
+      if (preg_match('/^(annex-\d{3}[a-z]?)/i', $stem, $m)) return strtoupper($m[1]);
       if (preg_match('/^(ref-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
       // V9 org patterns: jd-xxx, dept-xxx, raci-xxx, authority-xxx
       if (preg_match('/^(jd-[a-z-]+)/i', $stem, $m)) return strtoupper(substr($m[1], 0, 30));
