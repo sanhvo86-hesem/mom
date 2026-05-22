@@ -90,7 +90,7 @@
       dept:   { vi: 'Phòng Kỹ thuật',  en: 'Engineering'       },
       desc:   { vi: 'DFM, phát hành gói baseline (BOM, route, bản vẽ) — song song với G2',
                 en: 'DFM review, baseline package release (BOM, route, drawings) — parallel with G2' },
-      docs:   ['SOP-301','SOP-303','FRM-301','FRM-302','FRM-303','FRM-305','FRM-306'],
+      docs:   ['SOP-301','SOP-303','FRM-301','FRM-302','FRM-303','FRM-305','FRM-306','FRM-312','FRM-313','FRM-132','FRM-133'],
       parallel: 'G2',
       col: 2
     },
@@ -102,7 +102,7 @@
       dept:   { vi: 'Mua hàng + QA',   en: 'Purchasing + QA'     },
       desc:   { vi: 'Kiểm tra nguyên vật liệu đầu vào, truy xuất — song song với G1',
                 en: 'Incoming material QC, traceability — parallel with G1' },
-      docs:   ['SOP-401','SOP-402','WI-701','FRM-411','FRM-413','FRM-701'],
+      docs:   ['SOP-401','SOP-402','WI-701','FRM-411','FRM-413','FRM-414','FRM-701'],
       parallel: 'G1',
       col: 3
     },
@@ -114,7 +114,7 @@
       dept:   { vi: 'Hoạch định + Sản xuất', en: 'Planning + Production' },
       desc:   { vi: 'Lập lịch, điều độ & lắp đặt setup — chỉ mở sau khi G1 và G2 hoàn tất',
                 en: 'Scheduling & setup execution — opens only after both G1 and G2 complete' },
-      docs:   ['SOP-501','SOP-504','WI-517','WI-518','WI-519','FRM-501','FRM-502','FRM-504','FRM-511','FRM-518','FRM-519'],
+      docs:   ['SOP-501','SOP-504','WI-517','WI-518','WI-519','FRM-501','FRM-502','FRM-504','FRM-511','FRM-515','FRM-518','FRM-519','FRM-526'],
       col: 4
     },
     {
@@ -125,7 +125,7 @@
       dept:   { vi: 'QA / QC',           en: 'QA / QC'               },
       desc:   { vi: 'Kiểm tra & phê duyệt chi tiết đầu tiên trước sản xuất hàng loạt',
                 en: 'First article inspection & approval before production run' },
-      docs:   ['SOP-302','WI-302','FRM-305','FRM-311'],
+      docs:   ['SOP-302','WI-302','FRM-133','FRM-311','FRM-312'],
       col: 5
     },
     {
@@ -136,7 +136,7 @@
       dept:   { vi: 'QA / QC + Sản xuất', en: 'QA / QC + Production' },
       desc:   { vi: 'Kiểm soát chất lượng liên tục trong quá trình gia công CNC',
                 en: 'Continuous quality control during CNC machining process' },
-      docs:   ['SOP-502','SOP-505','SOP-603','SOP-604','SOP-606','WI-601','WI-603','WI-604','WI-606','FRM-513','FRM-621','FRM-631','FRM-651'],
+      docs:   ['SOP-502','SOP-505','SOP-606','WI-601','WI-606','WI-703','FRM-515','FRM-622','FRM-623','FRM-624','FRM-625','FRM-651','FRM-655','FRM-656'],
       col: 1
     },
     {
@@ -147,7 +147,7 @@
       dept:   { vi: 'QA / QC',           en: 'QA / QC'               },
       desc:   { vi: 'Kiểm tra xuất xưởng (OQC), phát hành CoC & chốt chất lượng trước giao hàng',
                 en: 'Outgoing quality control (OQC), CoC issuance & sign-off before shipment' },
-      docs:   ['SOP-605','SOP-603','WI-603','WI-605','FRM-641','FRM-642'],
+      docs:   ['SOP-603','SOP-604','SOP-605','WI-603','WI-604','WI-605','FRM-621','FRM-631','FRM-641','FRM-642','FRM-643'],
       col: 6
     },
     {

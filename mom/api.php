@@ -2484,14 +2484,18 @@ function module_access_save_config(string $file, array $config): array {
 
 function doc_vis_gates_default_docs(): array {
   return [
-    'G0' => ['SOP-201','SOP-202','SOP-203','WI-201','FRM-201','FRM-202','FRM-203','FRM-204','ANNEX-201'],
-    'G1' => ['SOP-301','SOP-303','FRM-301','FRM-302','FRM-303','FRM-305','FRM-306','FRM-312','FRM-313','ANNEX-301','ANNEX-302'],
-    'G2' => ['SOP-401','SOP-402','FRM-401','FRM-402','FRM-403','FRM-405','FRM-408','FRM-409','FRM-411','FRM-413','FRM-414','FRM-701','ANNEX-401','ANNEX-402','ANNEX-403'],
-    'G3' => ['SOP-501','SOP-503','SOP-504','WI-517','WI-518','WI-519','FRM-501','FRM-502','FRM-504','FRM-511','FRM-513','FRM-515','FRM-519','FRM-521','FRM-523','FRM-526','FRM-527','FRM-313','ANNEX-501','ANNEX-502','ANNEX-503'],
-    'G4' => ['SOP-302','SOP-601','SOP-602','WI-302','WI-602','FRM-205','FRM-305','FRM-311','FRM-312','FRM-601','FRM-602','FRM-611','FRM-612','FRM-613','ANNEX-602','ANNEX-604'],
-    'G5' => ['SOP-502','SOP-503','SOP-505','SOP-606','WI-501','WI-604','WI-606','WI-703','FRM-511','FRM-512','FRM-515','FRM-526','FRM-527','FRM-621','FRM-622','FRM-623','FRM-624','FRM-625','FRM-631','FRM-651','FRM-655','FRM-656','FRM-703','ANNEX-601','ANNEX-507'],
-    'G6' => ['SOP-603','SOP-604','SOP-605','WI-603','WI-605','FRM-206','FRM-603','FRM-621','FRM-641','FRM-642','FRM-643','ANNEX-601','ANNEX-603','ANNEX-606'],
-    'G7' => ['SOP-701','SOP-702','SOP-703','SOP-803','WI-206','WI-701','WI-703','WI-714','FRM-702','FRM-704','FRM-706','FRM-707','FRM-708','FRM-712','FRM-703','FRM-821','ANNEX-701','ANNEX-702'],
+    // Curated per QC-stage discipline: each gate lists the SOP(s) its role
+    // executes, the WI operators follow, and the records produced AT that
+    // gate. In-process inspection (FRM-622/623/624/625) lives on G5 IPQC;
+    // lot-acceptance AQL + SPC (FRM-621/631) live on G6 OQC.
+    'G0' => ['SOP-201','WI-201','FRM-201','FRM-202','FRM-204'],
+    'G1' => ['SOP-301','SOP-303','FRM-301','FRM-302','FRM-303','FRM-305','FRM-306','FRM-312','FRM-313','FRM-132','FRM-133'],
+    'G2' => ['SOP-401','SOP-402','WI-701','FRM-411','FRM-413','FRM-414','FRM-701'],
+    'G3' => ['SOP-501','SOP-504','WI-517','WI-518','WI-519','FRM-501','FRM-502','FRM-504','FRM-511','FRM-515','FRM-518','FRM-519','FRM-526'],
+    'G4' => ['SOP-302','WI-302','FRM-133','FRM-311','FRM-312'],
+    'G5' => ['SOP-502','SOP-505','SOP-606','WI-601','WI-606','WI-703','FRM-515','FRM-622','FRM-623','FRM-624','FRM-625','FRM-651','FRM-655','FRM-656'],
+    'G6' => ['SOP-603','SOP-604','SOP-605','WI-603','WI-604','WI-605','FRM-621','FRM-631','FRM-641','FRM-642','FRM-643'],
+    'G7' => ['SOP-701','SOP-803','WI-206','FRM-206','FRM-702','FRM-704','FRM-706','FRM-707','FRM-821'],
   ];
 }
 
