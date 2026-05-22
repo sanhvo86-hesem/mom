@@ -45,9 +45,13 @@ var _state = {
   config:null,
   /* overrides keyed by section then code */
   overrides:{ governance:{}, gate:{}, proposed:{} },
-  /* Console-added KPI drafts + retired codes, keyed by library group */
-  added:{ governance:[], gate:[], proposed:[] },
+  /* Console-added KPIs already persisted in the overlay (re-sent verbatim
+     on every save) + new drafts created this session, keyed by group. */
+  addedSeed:{ governance:[], gate:[], proposed:[] },
+  addedDraft:{ governance:[], gate:[], proposed:[] },
+  /* retired codes (editable) + the loaded baseline for the dirty check */
   retired:{ governance:[], gate:[], proposed:[] },
+  retiredBaseline:{ governance:[], gate:[], proposed:[] },
   /* add-KPI form draft — null when the form is closed */
   addForm:null,
   reason:'', activeGroup:'library',
@@ -61,6 +65,42 @@ function _newAddForm(){
     process:'unclassified', category:'internal', owner_role:'', counter_metric:'',
     cadence:'monthly', direction:'higher_is_better', unit:'percent',
     green_point:'', yellow_point:'', target:'', purpose:'' };
+}
+/* Deep-clone a {governance,gate,proposed} group map. */
+function _cloneGroups(src){
+  src = src || {};
+  return {
+    governance:(src.governance || []).slice(),
+    gate:(src.gate || []).slice(),
+    proposed:(src.proposed || []).slice()
+  };
+}
+/* Seed the add/retire working state from a freshly loaded config. */
+function _seedAddRetireState(cfg){
+  cfg = cfg || {};
+  _state.addedSeed       = _cloneGroups(cfg.overlay_added);
+  _state.addedDraft      = { governance:[], gate:[], proposed:[] };
+  _state.retired         = _cloneGroups(cfg.overlay_retired);
+  _state.retiredBaseline = _cloneGroups(cfg.overlay_retired);
+  _state.addForm = null;
+}
+/* Merge persisted + draft added KPIs for the save payload. */
+function _addedPayload(){
+  var s = _state.addedSeed, d = _state.addedDraft;
+  return {
+    governance:(s.governance || []).concat(d.governance || []),
+    gate:(s.gate || []).concat(d.gate || []),
+    proposed:(s.proposed || []).concat(d.proposed || [])
+  };
+}
+/* Has the retired set diverged from the loaded baseline? */
+function _retiredChanged(){
+  var norm = function(m){
+    return ['governance','gate','proposed'].map(function(g){
+      return (m[g] || []).map(String).sort().join(',');
+    }).join('|');
+  };
+  return norm(_state.retired) !== norm(_state.retiredBaseline);
 }
 
 /* Group key → section, for jumping from a library row to its editor. */
@@ -96,9 +136,7 @@ function _load(){
       if(!data || data.ok === false) throw new Error((data && (data.message || data.error)) || 'load_failed');
       _state.config = data.config || {};
       _state.overrides = { governance:{}, gate:{}, proposed:{} };
-      _state.added = { governance:[], gate:[], proposed:[] };
-      _state.retired = { governance:[], gate:[], proposed:[] };
-      _state.addForm = null;
+      _seedAddRetireState(_state.config);
       _state.reason = '';
     })
     .catch(function(err){
@@ -120,7 +158,7 @@ function _save(){
     governance_overrides: _state.overrides.governance || {},
     gate_overrides:       _state.overrides.gate || {},
     proposed_overrides:   _state.overrides.proposed || {},
-    added_kpis:           _state.added || {},
+    added_kpis:           _addedPayload(),
     retired_codes:        _state.retired || {},
     reason: _state.reason || ''
   }, 'POST', 90000)
@@ -128,9 +166,7 @@ function _save(){
       if(!data || data.ok === false) throw new Error((data && (data.message || data.error)) || 'save_failed');
       _state.config = data.config || {};
       _state.overrides = { governance:{}, gate:{}, proposed:{} };
-      _state.added = { governance:[], gate:[], proposed:[] };
-      _state.retired = { governance:[], gate:[], proposed:[] };
-      _state.addForm = null;
+      _seedAddRetireState(_state.config);
       _state.reason = '';
       var nAdd = (data.added_count || 0), nRet = (data.retired_count || 0);
       _state.message = _t('Đã lưu và đồng bộ ANNEX-122.', 'Saved and synced ANNEX-122.')
@@ -159,15 +195,13 @@ function _sectionMetrics(section){
   return _kpis();
 }
 function _dirty(){
-  var o = _state.overrides, a = _state.added, r = _state.retired;
-  return Object.keys(o.governance||{}).length
-       + Object.keys(o.gate||{}).length
-       + Object.keys(o.proposed||{}).length
-       + (a.governance||[]).length + (a.gate||[]).length + (a.proposed||[]).length
-       + (r.governance||[]).length + (r.gate||[]).length + (r.proposed||[]).length > 0;
+  var o = _state.overrides, d = _state.addedDraft;
+  var n = Object.keys(o.governance||{}).length
+        + Object.keys(o.gate||{}).length
+        + Object.keys(o.proposed||{}).length
+        + (d.governance||[]).length + (d.gate||[]).length + (d.proposed||[]).length;
+  return n > 0 || _retiredChanged();
 }
-/* group key (governance/gate/proposed) ↔ section name used by overrides. */
-function _groupOfLib(group){ return group; }
 
 /* Effective value of an editable field: override wins over config. */
 function _val(metric, section, field){
@@ -222,8 +256,8 @@ function _ragBands(t){
 function _setReason(value){ _state.reason = value; }
 function _reset(){
   _state.overrides = { governance:{}, gate:{}, proposed:{} };
-  _state.added = { governance:[], gate:[], proposed:[] };
-  _state.retired = { governance:[], gate:[], proposed:[] };
+  _state.addedDraft = { governance:[], gate:[], proposed:[] };
+  _state.retired = _cloneGroups(_state.retiredBaseline);
   _state.addForm = null;
   _state.reason = '';
   _state.error = ''; _state.message = _t('Đã hoàn tác các thay đổi chưa lưu.', 'Reverted unsaved changes.');
@@ -340,11 +374,12 @@ function _renderOverview(){
 }
 
 /* ── KPI Library — classified, multi-filter browse view ────────────── */
-/* Draft (unsaved) Console-added KPIs mapped to the library row shape. */
+/* Draft (unsaved this session) Console-added KPIs in library row shape.
+   Persisted Console-added KPIs already arrive inside config.library. */
 function _draftLibRows(){
   var out = [];
   ['governance','gate','proposed'].forEach(function(grp){
-    (_state.added[grp] || []).forEach(function(r, idx){
+    (_state.addedDraft[grp] || []).forEach(function(r, idx){
       out.push({
         canonical_code:r.canonical_code, name:r.name, name_vi:r.name_vi,
         group:grp, tier:r.tier, process:r.process, category:r.category,
@@ -361,9 +396,10 @@ function _libRows(){
   var base = (_state.config && Array.isArray(_state.config.library)) ? _state.config.library : [];
   return base.concat(_draftLibRows());
 }
-/* A row is retired when the registry marks it OR a draft retire is pending. */
+/* A row is retired iff its code is in the live retired set. The set is
+   seeded from the overlay on load, so it reflects persisted retirements
+   and any unsaved retire/restore toggles. */
 function _isRetired(r){
-  if(r.retired === true) return true;
   var list = _state.retired[r.group] || [];
   return list.indexOf(String(r.canonical_code).toUpperCase()) >= 0;
 }
@@ -905,8 +941,8 @@ function _addSubmit(){
     owner_role:a.owner_role || '', counter_metric:a.counter_metric || '',
     cadence:a.cadence || 'monthly', purpose:a.purpose || '', thresholds:thr
   };
-  if(!_state.added[a.group]) _state.added[a.group] = [];
-  _state.added[a.group].push(row);
+  if(!_state.addedDraft[a.group]) _state.addedDraft[a.group] = [];
+  _state.addedDraft[a.group].push(row);
   _state.addForm = null;
   _state.error = '';
   _state.message = _t('Đã thêm KPI nháp: ', 'Draft KPI added: ') + code + ' — ' +
@@ -945,7 +981,7 @@ window._kpiRestore   = function(group, code){
   _render();
 };
 window._kpiDropDraft = function(group, idx){
-  var list = _state.added[group] || [];
+  var list = _state.addedDraft[group] || [];
   if(idx >= 0 && idx < list.length) list.splice(idx, 1);
   _render();
 };

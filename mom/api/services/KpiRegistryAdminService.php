@@ -103,6 +103,29 @@ final class KpiRegistryAdminService
         // Console can browse and filter across all groups.
         $library = $this->buildLibrary($governance, $gate, $proposed);
 
+        // Console-added KPIs + retired codes already in the overlay. The
+        // Console must re-send these on every save (the overlay's add/retire
+        // maps are replaced wholesale), so they round-trip here.
+        $emptyGroups = ['governance' => [], 'gate' => [], 'proposed' => []];
+        $overlayAdded   = $emptyGroups;
+        $overlayRetired = $emptyGroups;
+        if (is_array($overlay)) {
+            foreach (array_keys($emptyGroups) as $g) {
+                if (is_array($overlay['added_kpis'][$g] ?? null)) {
+                    $overlayAdded[$g] = array_values(array_filter(
+                        $overlay['added_kpis'][$g],
+                        'is_array',
+                    ));
+                }
+                if (is_array($overlay['retired_codes'][$g] ?? null)) {
+                    $overlayRetired[$g] = array_values(array_map(
+                        'strval',
+                        $overlay['retired_codes'][$g],
+                    ));
+                }
+            }
+        }
+
         return [
             'registry_id'       => $seed['registry_id'] ?? null,
             'registry_version'  => $seed['version'] ?? null,
@@ -122,6 +145,8 @@ final class KpiRegistryAdminService
             'library'           => $library,
             'facets'            => $this->buildFacets($library, $seed),
             'stats'             => $this->computeStats($governance),
+            'overlay_added'     => $overlayAdded,
+            'overlay_retired'   => $overlayRetired,
         ];
     }
 
