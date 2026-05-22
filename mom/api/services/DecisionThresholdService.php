@@ -143,6 +143,18 @@ final class DecisionThresholdService
             ];
         }
 
+        // Sort by first CDR (letter, number) so the §2 table reads A1→F6 in
+        // canonical order regardless of defaultItems() insertion order.
+        uasort($items, static function (array $a, array $b): int {
+            $ca = (string)($a['cdrs'][0] ?? '');
+            $cb = (string)($b['cdrs'][0] ?? '');
+            preg_match('/^([A-Z])(\d+)/', $ca, $ma);
+            preg_match('/^([A-Z])(\d+)/', $cb, $mb);
+            $la = $ma[1] ?? 'Z'; $na = (int)($ma[2] ?? 0);
+            $lb = $mb[1] ?? 'Z'; $nb = (int)($mb[2] ?? 0);
+            return $la === $lb ? $na <=> $nb : strcmp($la, $lb);
+        });
+
         return [
             'schema_version' => '1.0',
             'final_authority_role' => 'CEO',
@@ -231,10 +243,10 @@ final class DecisionThresholdService
                 'key' => 'customer_change',
                 'label' => 'Yêu cầu thay đổi khách hàng',
                 'decision' => 'Phê duyệt yêu cầu thay đổi của khách hàng ảnh hưởng giá / lịch / phạm vi',
-                'condition' => 'CCR làm đổi giá, lịch, phạm vi, yêu cầu kỹ thuật hoặc cổng G0 đến G7',
+                'condition' => 'CCR làm đổi giá, lịch, phạm vi, yêu cầu kỹ thuật hoặc cổng G0–G7',
                 'l1' => 'CS + PPL xử lý CCR tác động ≤ 1 ngày giao hoặc 2% giá trị.',
                 'l2' => 'ENGM + QA + PD rà soát CCR tác động ≤ 3 ngày giao hoặc 5% giá trị.',
-                'l3' => 'CEO phê duyệt CCR vượt ngưỡng L2, vào G5-G7 hoặc ảnh hưởng cam kết khách.',
+                'l3' => 'CEO phê duyệt CCR vượt ngưỡng L2, rơi vào G5–G7 hoặc ảnh hưởng cam kết khách.',
                 'r' => 'CS',
                 'evidence' => 'FRM-212 · SOP-201',
                 'escalation' => 'CCR muộn sau FAI, CoC, chặn giao hàng hoặc đổi điều kiện chất lượng → CEO + QA.',
@@ -504,7 +516,7 @@ final class DecisionThresholdService
                 'key' => 'stop_ship',
                 'label' => 'Dỡ chặn giao hàng',
                 'decision' => 'Dỡ lệnh chặn giao hàng sau khi rủi ro được kiểm soát',
-                'condition' => 'Stop-ship nội bộ hoặc do khách hàng cần quyết định gỡ chặn',
+                'condition' => 'Lệnh chặn giao hàng nội bộ hoặc do khách hàng cần quyết định gỡ chặn',
                 'l1' => 'QA xác nhận nguyên nhân chặn, phạm vi ảnh hưởng và bằng chứng kiểm cuối.',
                 'l2' => 'QA + CEO đồng ký nếu lot đã sẵn sàng giao và không còn rủi ro mở.',
                 'l3' => 'CEO quyết định cuối khi có áp lực giao hàng, khiếu nại hoặc rủi ro danh tiếng.',
@@ -707,6 +719,71 @@ final class DecisionThresholdService
                 'evidence' => 'FRM-124 · FRM-121 · SOP-102',
                 'escalation' => 'Thiên tai làm gián đoạn nguồn cung hoặc cam kết giao hàng → CEO + CS + SCM',
                 'cdrs' => ['F6'],
+            ],
+            [
+                'key' => 'customer_change_request_late',
+                'label' => 'CCR muộn (sau xác nhận đơn)',
+                'decision' => 'Phê duyệt yêu cầu thay đổi muộn của khách hàng phát sinh sau khi xác nhận đơn, trong giai đoạn sản xuất hoặc giao hàng',
+                'condition' => 'CCR làm đổi giá, lịch, phạm vi, yêu cầu kỹ thuật hoặc cổng G0–G7',
+                'l1' => 'CS + PPL xử lý CCR tác động ≤ 1 ngày giao hoặc 2% giá trị.',
+                'l2' => 'ENGM + QA + PD rà soát CCR tác động ≤ 3 ngày giao hoặc 5% giá trị.',
+                'l3' => 'CEO phê duyệt CCR vượt ngưỡng L2, rơi vào G5–G7 hoặc ảnh hưởng cam kết khách.',
+                'r' => 'CS',
+                'evidence' => 'FRM-212 · SOP-201',
+                'escalation' => 'CCR muộn sau FAI, CoC, chặn giao hàng hoặc đổi điều kiện chất lượng → CEO + QA.',
+                'cdrs' => ['A7'],
+            ],
+            [
+                'key' => 'control_plan_pfmea',
+                'label' => 'Control Plan & PFMEA',
+                'decision' => 'Phê duyệt Control Plan và PFMEA của chi tiết trước khi phát hành gói nền',
+                'condition' => 'Chi tiết mới, hoặc thay đổi đặc tính trọng yếu (CTQ), vật liệu, nguyên công hoặc hệ thống đo',
+                'l1' => 'QA + ENGM duyệt khi không phát sinh CTQ mới và không đổi nguyên công trọng yếu.',
+                'l2' => 'QA + PD duyệt khi có CTQ mới hoặc thay đổi nguyên công trọng yếu.',
+                'l3' => 'QA + CEO duyệt khi khách hàng yêu cầu phê duyệt PFMEA/Control Plan hoặc thuộc chương trình PPAP.',
+                'r' => 'QE',
+                'evidence' => 'FRM-303 · SOP-103',
+                'escalation' => 'Phát hiện CTQ chưa được kiểm soát sau khi vào sản xuất → mở NCR và rà soát lại PFMEA/Control Plan.',
+                'cdrs' => ['B8'],
+            ],
+            [
+                'key' => 'incoming_material_qc',
+                'label' => 'Nghiệm thu vật tư mua vào',
+                'decision' => 'Nghiệm thu hoặc loại vật tư mua vào: kiểm tra ngoại quan/kích thước, đối chiếu chứng chỉ vật liệu và lô nhiệt, sàng lọc nguy cơ hàng giả',
+                'condition' => 'Mỗi lô vật tư hoặc bán thành phẩm nhận vào kho trước khi cấp cho sản xuất',
+                'l1' => 'QCL nghiệm thu khi chứng chỉ đầy đủ, truy xuất rõ ràng và đạt kiểm mẫu.',
+                'l2' => 'QA + ENGM xử lý khi sai lệch nhỏ hoặc thiếu mục chứng chỉ không trọng yếu, cần đánh giá kỹ thuật.',
+                'l3' => 'QA + CEO + khách hàng (nếu vật tư do khách chỉ định) khi nghi hàng giả, thiếu truy xuất hoặc sai vật liệu.',
+                'r' => 'QCL',
+                'evidence' => 'SOP-402',
+                'escalation' => 'Xác nhận hàng giả hoặc vật tư không truy xuất được → cách ly, mở NCR, thông báo nhà cung cấp và khách hàng liên quan.',
+                'cdrs' => ['D10'],
+            ],
+            [
+                'key' => 'quality_escape_notice',
+                'label' => 'Thông báo thoát lỗi tới khách',
+                'decision' => 'Thông báo khách hàng về sản phẩm không phù hợp đã hoặc có thể đã giao (thoát lỗi chất lượng, khoanh vùng phạm vi)',
+                'condition' => 'Phát hiện lỗi sau khi sản phẩm rời xưởng, hoặc nghi ngờ lô đã giao chứa đặc tính không đạt',
+                'l1' => 'QA + CS thông báo khi đã khoanh vùng, sản phẩm chưa rời kho khách và không có rủi ro hiện trường.',
+                'l2' => 'QA + CEO phê duyệt nội dung thông báo khi sản phẩm đã ở khách hàng.',
+                'l3' => 'CEO + khách hàng thống nhất hành động khoanh vùng khi có rủi ro an toàn, lắp ghép hoặc pháp lý.',
+                'r' => 'QCL',
+                'evidence' => 'FRM-211 · SOP-202',
+                'escalation' => 'Khách hàng yêu cầu sắp xếp lại lô, thu hồi hoặc 8D chính thức → mở CAPA và leo thang CEO.',
+                'cdrs' => ['D11'],
+            ],
+            [
+                'key' => 'fai_fair_ppap_submission',
+                'label' => 'Nộp FAI/FAIR/PPAP cho khách',
+                'decision' => 'Nộp hồ sơ FAI/FAIR/PPAP cho khách hàng và xin phê duyệt trước khi sản xuất loạt',
+                'condition' => 'Chi tiết mới, thay đổi kỹ thuật, đổi nguồn vật tư hoặc khi hợp đồng/khách hàng yêu cầu FAIR/PPAP',
+                'l1' => 'QA duyệt nộp khi FAI nội bộ đạt và khách không yêu cầu phê duyệt trước.',
+                'l2' => 'QA + CS nộp hồ sơ và theo dõi phê duyệt khi khách hàng yêu cầu phê duyệt FAIR/PPAP trước loạt.',
+                'l3' => 'CEO + khách hàng quyết định khi hồ sơ bị từ chối hoặc cần điều kiện sản xuất có bảo lưu.',
+                'r' => 'QCL',
+                'evidence' => 'FRM-311 · SOP-302',
+                'escalation' => 'Khách hàng từ chối FAIR/PPAP → giữ sản xuất loạt, mở NCR và rà soát gói kỹ thuật.',
+                'cdrs' => ['D12'],
             ]
         ];
     }
@@ -872,6 +949,24 @@ final class DecisionThresholdService
         $decision = $this->normaliseThresholdDisplayLine((string)($item['decision'] ?? ''));
         if ($decision !== '') {
             $html .= '<span class="decision-summary">' . $this->linkText($decision, $context) . '</span>';
+        }
+
+        $condition = $this->normaliseThresholdDisplayLine((string)($item['condition'] ?? ''));
+        if ($condition !== '') {
+            $html .= '<div class="decision-condition"><span class="meta-label">Áp dụng khi:</span> '
+                . $this->linkText($condition, $context) . '</div>';
+        }
+
+        $r = $this->normaliseThresholdDisplayLine((string)($item['r'] ?? ''));
+        if ($r !== '') {
+            $html .= '<div class="decision-meta-row"><span class="meta-label">Người ký chính:</span> '
+                . $this->linkText($r, $context) . '</div>';
+        }
+
+        $evidence = $this->normaliseThresholdDisplayLine((string)($item['evidence'] ?? ''));
+        if ($evidence !== '') {
+            $html .= '<div class="decision-meta-row"><span class="meta-label">Hồ sơ:</span> '
+                . $this->linkText($evidence, $context) . '</div>';
         }
 
         return $html . '</div>';
@@ -1096,7 +1191,14 @@ final class DecisionThresholdService
         $base = $context === 'annex'
             ? '../../../../system/organization/04-RACI-Authority/authority-matrix.html'
             : 'authority-matrix.html';
-        return implode(', ', array_map(static fn(string $cdr): string => '<a href="' . $base . '#cdr-' . htmlspecialchars($cdr, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '">' . htmlspecialchars($cdr, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a>', $cdrs));
+        // For the in-document quick-lookup (system context) each CDR <a> carries
+        // id="cdr-X" so that inbound deep-links (#cdr-A2 etc.) anchor here —
+        // the standalone register §4 was retired and merged into this row.
+        return implode(', ', array_map(static function (string $cdr) use ($base, $context): string {
+            $esc = htmlspecialchars($cdr, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $idAttr = $context === 'system' ? ' id="cdr-' . $esc . '"' : '';
+            return '<a' . $idAttr . ' href="' . $base . '#cdr-' . $esc . '">' . $esc . '</a>';
+        }, $cdrs));
     }
 
     /**
