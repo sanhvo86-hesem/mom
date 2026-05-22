@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
   "version": "2026-05-21",
-  "schema_version": 9,
+  "schema_version": 10,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. Existing ANNEX-122 KPIs are retained, legacy metric aliases are mapped to canonical codes, and proposed CNC operating metrics are staged without granting automatic runtime authority.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -149,7 +149,13 @@
       "counter_metric": "COMPLAINT_RATE",
       "reward_eligible": true,
       "calculation_status": "runtime_calculated",
-      "status": "retained"
+      "status": "retained",
+      "process": "delivery",
+      "category": "customer",
+      "applicable_jds": [
+        "PD",
+        "CS"
+      ]
     },
     {
       "no": 2,
@@ -202,7 +208,13 @@
       "counter_metric": "CUSTOMER_ESCAPE_NOTIFICATION_LT",
       "reward_eligible": true,
       "calculation_status": "runtime_calculated",
-      "status": "retained"
+      "status": "retained",
+      "process": "quality_system",
+      "category": "customer",
+      "applicable_jds": [
+        "QA",
+        "CS"
+      ]
     },
     {
       "no": 3,
@@ -252,7 +264,13 @@
       "counter_metric": "SHIP_PACKET_COMPLETENESS",
       "reward_eligible": true,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "quality_assurance",
+      "category": "internal",
+      "applicable_jds": [
+        "QA",
+        "QC"
+      ]
     },
     {
       "no": 4,
@@ -304,7 +322,12 @@
       "counter_metric": "COPQ",
       "reward_eligible": true,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "finance",
+      "category": "financial",
+      "applicable_jds": [
+        "FIN"
+      ]
     },
     {
       "no": 5,
@@ -355,7 +378,12 @@
       "counter_metric": "SAFETY_ONBOARDING_COMPLIANCE",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "ehs",
+      "category": "safety",
+      "applicable_jds": [
+        "EHS"
+      ]
     },
     {
       "no": 6,
@@ -405,7 +433,13 @@
       "counter_metric": "CRITICAL_ROLE_BACKUP_COVERAGE",
       "reward_eligible": false,
       "calculation_status": "manual",
-      "status": "retained"
+      "status": "retained",
+      "process": "continuity",
+      "category": "system",
+      "applicable_jds": [
+        "QMS",
+        "HR"
+      ]
     },
     {
       "no": 7,
@@ -455,7 +489,13 @@
       "counter_metric": "ORDER_REVIEW_RFT",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "commercial",
+      "category": "customer",
+      "applicable_jds": [
+        "CS",
+        "EST"
+      ]
     },
     {
       "no": 8,
@@ -504,7 +544,13 @@
       "counter_metric": "ENGINEERING_RELEASE_RFT",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "commercial",
+      "category": "customer",
+      "applicable_jds": [
+        "CS",
+        "QA"
+      ]
     },
     {
       "no": 9,
@@ -554,7 +600,13 @@
       "counter_metric": "SCHEDULE_RECOVERY_EFFECTIVENESS",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
-      "status": "retained"
+      "status": "retained",
+      "process": "planning",
+      "category": "internal",
+      "applicable_jds": [
+        "PPL",
+        "PD"
+      ]
     },
     {
       "no": 10,
@@ -604,7 +656,13 @@
       "counter_metric": "SETUP_FIRST_PASS",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "quality_assurance",
+      "category": "internal",
+      "applicable_jds": [
+        "QA",
+        "QC"
+      ]
     },
     {
       "no": 11,
@@ -653,7 +711,13 @@
       "counter_metric": "THROUGHPUT_PER_CONSTRAINT_HOUR",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
-      "status": "retained"
+      "status": "retained",
+      "process": "planning",
+      "category": "internal",
+      "applicable_jds": [
+        "PPL",
+        "PD"
+      ]
     },
     {
       "no": 12,
@@ -703,7 +767,12 @@
       "counter_metric": "IQC_PASS_RATE",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
-      "status": "retained"
+      "status": "retained",
+      "process": "procurement",
+      "category": "supplier",
+      "applicable_jds": [
+        "SCM"
+      ]
     },
     {
       "no": 13,
@@ -753,7 +822,13 @@
       "counter_metric": "INVOICE_RFT",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "delivery",
+      "category": "financial",
+      "applicable_jds": [
+        "FIN",
+        "CS"
+      ]
     },
     {
       "no": 14,
@@ -803,7 +878,12 @@
       "counter_metric": "CUSTOMER_COMM_CLOSURE_OT",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
-      "status": "retained"
+      "status": "retained",
+      "process": "finance",
+      "category": "financial",
+      "applicable_jds": [
+        "FIN"
+      ]
     },
     {
       "no": 15,
@@ -853,7 +933,13 @@
       "counter_metric": "PLAN_ADHERENCE",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "planning",
+      "category": "internal",
+      "applicable_jds": [
+        "PD",
+        "PPL"
+      ]
     },
     {
       "no": 16,
@@ -902,7 +988,13 @@
       "counter_metric": "IN_PROCESS_REJECT_RATE",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "machining",
+      "category": "internal",
+      "applicable_jds": [
+        "WKM",
+        "SL"
+      ]
     },
     {
       "no": 17,
@@ -951,7 +1043,12 @@
       "counter_metric": "ECO_CLOSURE_AGING",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "engineering",
+      "category": "internal",
+      "applicable_jds": [
+        "ENGM"
+      ]
     },
     {
       "no": 18,
@@ -1000,7 +1097,12 @@
       "counter_metric": "ECN_LEAD_TIME",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
-      "status": "retained"
+      "status": "retained",
+      "process": "engineering",
+      "category": "internal",
+      "applicable_jds": [
+        "ENGM"
+      ]
     },
     {
       "no": 19,
@@ -1049,7 +1151,13 @@
       "counter_metric": "REPEAT_NCR_RATE",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
-      "status": "retained"
+      "status": "retained",
+      "process": "quality_system",
+      "category": "internal",
+      "applicable_jds": [
+        "QA",
+        "QMS"
+      ]
     },
     {
       "no": 20,
@@ -1100,7 +1208,13 @@
       "counter_metric": "SPC_SIGNAL_REACTION_TIME",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
-      "status": "retained"
+      "status": "retained",
+      "process": "quality_system",
+      "category": "internal",
+      "applicable_jds": [
+        "QA",
+        "QC"
+      ]
     },
     {
       "no": 21,
@@ -1149,7 +1263,12 @@
       "counter_metric": "INVENTORY_ACCURACY",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
-      "status": "retained"
+      "status": "retained",
+      "process": "procurement",
+      "category": "supplier",
+      "applicable_jds": [
+        "SCM"
+      ]
     },
     {
       "no": 22,
@@ -1198,7 +1317,12 @@
       "counter_metric": "MATERIAL_AVAILABILITY_PLAN",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
-      "status": "retained"
+      "status": "retained",
+      "process": "procurement",
+      "category": "internal",
+      "applicable_jds": [
+        "SCM"
+      ]
     },
     {
       "no": 23,
@@ -1249,7 +1373,13 @@
       "counter_metric": "GROSS_MARGIN_JOB_FAMILY",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "commercial",
+      "category": "customer",
+      "applicable_jds": [
+        "CS",
+        "EST"
+      ]
     },
     {
       "no": 24,
@@ -1299,7 +1429,12 @@
       "counter_metric": "DSO",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "commercial",
+      "category": "customer",
+      "applicable_jds": [
+        "CS"
+      ]
     },
     {
       "no": 25,
@@ -1348,7 +1483,12 @@
       "counter_metric": "SHIP_READY_TO_INVOICE_LT",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
-      "status": "retained"
+      "status": "retained",
+      "process": "finance",
+      "category": "financial",
+      "applicable_jds": [
+        "FIN"
+      ]
     },
     {
       "no": 26,
@@ -1398,7 +1538,12 @@
       "counter_metric": "MASTER_DATA_EXCEPTION_AGING",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "finance",
+      "category": "financial",
+      "applicable_jds": [
+        "FIN"
+      ]
     },
     {
       "no": 27,
@@ -1447,7 +1592,12 @@
       "counter_metric": "CRITICAL_ROLE_CERT_COVERAGE",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
-      "status": "retained"
+      "status": "retained",
+      "process": "human_resources",
+      "category": "internal",
+      "applicable_jds": [
+        "HR"
+      ]
     },
     {
       "no": 28,
@@ -1498,7 +1648,12 @@
       "counter_metric": "TRAINING_COMP",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "human_resources",
+      "category": "internal",
+      "applicable_jds": [
+        "HR"
+      ]
     },
     {
       "no": 29,
@@ -1547,7 +1702,12 @@
       "counter_metric": "RECORDABLE_INCIDENT_RATE",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
-      "status": "retained"
+      "status": "retained",
+      "process": "ehs",
+      "category": "safety",
+      "applicable_jds": [
+        "EHS"
+      ]
     },
     {
       "no": 30,
@@ -1597,7 +1757,13 @@
       "counter_metric": "FOD_LINE_CLEARANCE_COMPLIANCE",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "ehs",
+      "category": "safety",
+      "applicable_jds": [
+        "EHS",
+        "HR"
+      ]
     },
     {
       "no": 31,
@@ -1647,7 +1813,12 @@
       "counter_metric": "CRITICAL_SYSTEM_AVAILABILITY",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "it_systems",
+      "category": "system",
+      "applicable_jds": [
+        "ITA"
+      ]
     },
     {
       "no": 32,
@@ -1696,7 +1867,12 @@
       "counter_metric": "SERVICE_TICKET_SLA",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "it_systems",
+      "category": "system",
+      "applicable_jds": [
+        "ITA"
+      ]
     },
     {
       "no": 33,
@@ -1746,7 +1922,13 @@
       "counter_metric": "TRACEABILITY_DRILL_TIME",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
-      "status": "retained"
+      "status": "retained",
+      "process": "it_systems",
+      "category": "system",
+      "applicable_jds": [
+        "ITA",
+        "SCM"
+      ]
     }
   ],
   "proposed_operating_metrics": [
@@ -1766,7 +1948,13 @@
         "basis": "Ngưỡng đề xuất cho metric OEE_BOTTLENECK; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": "CONSTRAINT_LOST_HOURS",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "process": "machining",
+      "category": "internal",
+      "owner_role": "WKM",
+      "applicable_jds": [
+        "WKM"
+      ]
     },
     {
       "canonical_code": "BOTTLENECK_BUFFER_STATUS",
@@ -1784,7 +1972,13 @@
         "basis": "Ngưỡng đề xuất cho metric BOTTLENECK_BUFFER_STATUS; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": "WIP_BEFORE_CONSTRAINT",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "process": "planning",
+      "category": "internal",
+      "owner_role": "PPL",
+      "applicable_jds": [
+        "PPL"
+      ]
     },
     {
       "canonical_code": "THROUGHPUT_PER_CONSTRAINT_HOUR",
@@ -1803,7 +1997,13 @@
         "calibration_pending": true
       },
       "counter_metric": "OEE_BOTTLENECK",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "process": "planning",
+      "category": "internal",
+      "owner_role": "PPL",
+      "applicable_jds": [
+        "PPL"
+      ]
     },
     {
       "canonical_code": "CONSTRAINT_LOST_HOURS",
@@ -1821,7 +2021,13 @@
         "basis": "Ngưỡng đề xuất cho metric CONSTRAINT_LOST_HOURS; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": "THROUGHPUT_PER_CONSTRAINT_HOUR",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "process": "machining",
+      "category": "internal",
+      "owner_role": "WKM",
+      "applicable_jds": [
+        "WKM"
+      ]
     },
     {
       "canonical_code": "WIP_BEFORE_CONSTRAINT",
@@ -1840,7 +2046,13 @@
         "calibration_pending": true
       },
       "counter_metric": "BOTTLENECK_BUFFER_STATUS",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "process": "planning",
+      "category": "internal",
+      "owner_role": "PPL",
+      "applicable_jds": [
+        "PPL"
+      ]
     },
     {
       "canonical_code": "SETUP_FIRST_PASS",
@@ -1858,7 +2070,13 @@
         "basis": "Ngưỡng đề xuất cho metric SETUP_FIRST_PASS; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": "CHANGEOVER_TIME",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "process": "machining",
+      "category": "internal",
+      "owner_role": "WKM",
+      "applicable_jds": [
+        "WKM"
+      ]
     },
     {
       "canonical_code": "FAI_FIRST_PASS",
@@ -1876,7 +2094,13 @@
         "basis": "Ngưỡng đề xuất cho metric FAI_FIRST_PASS; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": "SETUP_FIRST_PASS",
-      "calculation_status": "retained_from_annex122"
+      "calculation_status": "retained_from_annex122",
+      "process": "quality_assurance",
+      "category": "internal",
+      "owner_role": "QA",
+      "applicable_jds": [
+        "QA"
+      ]
     },
     {
       "canonical_code": "IN_PROCESS_REJECT_RATE",
@@ -1894,7 +2118,13 @@
         "basis": "Ngưỡng đề xuất cho metric IN_PROCESS_REJECT_RATE; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": "FPY",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "process": "quality_assurance",
+      "category": "internal",
+      "owner_role": "QA",
+      "applicable_jds": [
+        "QA"
+      ]
     },
     {
       "canonical_code": "REPEAT_NCR_RATE",
@@ -1912,7 +2142,13 @@
         "basis": "Ngưỡng đề xuất cho metric REPEAT_NCR_RATE; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": "CAPA_EFFECTIVENESS",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "process": "quality_system",
+      "category": "internal",
+      "owner_role": "QA",
+      "applicable_jds": [
+        "QA"
+      ]
     },
     {
       "canonical_code": "CAPA_EFFECTIVENESS",
@@ -1930,7 +2166,13 @@
         "basis": "Ngưỡng đề xuất cho metric CAPA_EFFECTIVENESS; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": "REPEAT_NCR_RATE",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "process": "quality_system",
+      "category": "internal",
+      "owner_role": "QA",
+      "applicable_jds": [
+        "QA"
+      ]
     },
     {
       "canonical_code": "SUPPLIER_READINESS",
@@ -1948,7 +2190,13 @@
         "basis": "Ngưỡng đề xuất cho metric SUPPLIER_READINESS; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": "IQC_PASS_RATE",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "process": "procurement",
+      "category": "supplier",
+      "owner_role": "SCM",
+      "applicable_jds": [
+        "SCM"
+      ]
     },
     {
       "canonical_code": "CRITICAL_ROLE_CERT_COVERAGE",
@@ -1966,7 +2214,13 @@
         "basis": "Ngưỡng đề xuất cho metric CRITICAL_ROLE_CERT_COVERAGE; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": "TRAINING_COMP",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "process": "human_resources",
+      "category": "internal",
+      "owner_role": "HR",
+      "applicable_jds": [
+        "HR"
+      ]
     },
     {
       "canonical_code": "CYCLE_TIME_VARIANCE",
@@ -1984,7 +2238,13 @@
         "basis": "Ngưỡng đề xuất cho metric CYCLE_TIME_VARIANCE; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": "FAI_CYCLE_TIME",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "process": "machining",
+      "category": "internal",
+      "owner_role": "WKM",
+      "applicable_jds": [
+        "WKM"
+      ]
     },
     {
       "canonical_code": "MTBF",
@@ -2003,7 +2263,13 @@
         "calibration_pending": true
       },
       "counter_metric": "MTTR",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "process": "maintenance",
+      "category": "internal",
+      "owner_role": "WKM",
+      "applicable_jds": [
+        "WKM"
+      ]
     },
     {
       "canonical_code": "MTTR",
@@ -2021,7 +2287,13 @@
         "basis": "Ngưỡng đề xuất cho metric MTTR; hiệu chỉnh khi có dữ liệu thật."
       },
       "counter_metric": "MTBF",
-      "calculation_status": "staged_data_contract"
+      "calculation_status": "staged_data_contract",
+      "process": "maintenance",
+      "category": "internal",
+      "owner_role": "WKM",
+      "applicable_jds": [
+        "WKM"
+      ]
     }
   ],
   "dashboard_core_kpis": [
@@ -2126,7 +2398,12 @@
       "cadence": "per-event",
       "data_source": "Epicor Quote",
       "calculation_status": "staged_data_contract",
-      "counter_metric": "ORDER_REVIEW_RFT"
+      "counter_metric": "ORDER_REVIEW_RFT",
+      "process": "commercial",
+      "category": "customer",
+      "applicable_jds": [
+        "CS"
+      ]
     },
     {
       "local_id": "KPI-G0-02",
@@ -2144,7 +2421,12 @@
       "cadence": "monthly",
       "data_source": "FRM-202",
       "calculation_status": "staged_data_contract",
-      "counter_metric": "ENGINEERING_RELEASE_RFT"
+      "counter_metric": "ENGINEERING_RELEASE_RFT",
+      "process": "commercial",
+      "category": "customer",
+      "applicable_jds": [
+        "CS"
+      ]
     },
     {
       "local_id": "KPI-G1-01",
@@ -2170,7 +2452,12 @@
         "target": 95.0,
         "basis": "Phát hành kỹ thuật đúng lần đầu chuẩn ≥95%."
       },
-      "counter_metric": "ENGINEERING_RELEASE_ON_TIME"
+      "counter_metric": "ENGINEERING_RELEASE_ON_TIME",
+      "process": "engineering",
+      "category": "internal",
+      "applicable_jds": [
+        "ENGM"
+      ]
     },
     {
       "local_id": "KPI-G1-02",
@@ -2195,7 +2482,12 @@
         "target": 48.0,
         "basis": "ECO xử lý ≤48 giờ; >96 giờ là tồn đọng kỹ thuật."
       },
-      "counter_metric": "ECO_CLOSURE_AGING"
+      "counter_metric": "ECO_CLOSURE_AGING",
+      "process": "engineering",
+      "category": "internal",
+      "applicable_jds": [
+        "ENGM"
+      ]
     },
     {
       "local_id": "KPI-G1-03",
@@ -2220,7 +2512,12 @@
         "target": 100.0,
         "basis": "Control Plan + PFMEA duyệt trước phát hành — chuẩn 100%."
       },
-      "counter_metric": "FINAL_RELEASE_RFT"
+      "counter_metric": "FINAL_RELEASE_RFT",
+      "process": "engineering",
+      "category": "internal",
+      "applicable_jds": [
+        "QA"
+      ]
     },
     {
       "local_id": "KPI-G2-01",
@@ -2245,7 +2542,12 @@
         "target": 99.0,
         "basis": "IQC pass rate ≥99% trước khi nhập kho."
       },
-      "counter_metric": "SUPPLIER_OTD"
+      "counter_metric": "SUPPLIER_OTD",
+      "process": "procurement",
+      "category": "supplier",
+      "applicable_jds": [
+        "QA"
+      ]
     },
     {
       "local_id": "KPI-G2-02",
@@ -2270,7 +2572,12 @@
         "target": 100.0,
         "basis": "Truy xuất nguồn gốc lô nhập đầy đủ — chuẩn 100%."
       },
-      "counter_metric": "TRACEABILITY_DRILL_TIME"
+      "counter_metric": "TRACEABILITY_DRILL_TIME",
+      "process": "procurement",
+      "category": "supplier",
+      "applicable_jds": [
+        "SCM"
+      ]
     },
     {
       "local_id": "KPI-G3-01",
@@ -2296,7 +2603,12 @@
         "target": 95.0,
         "basis": "Cài đặt đạt ngay lần đầu chuẩn ≥95%."
       },
-      "counter_metric": "CHANGEOVER_TIME"
+      "counter_metric": "CHANGEOVER_TIME",
+      "process": "machining",
+      "category": "internal",
+      "applicable_jds": [
+        "WKM"
+      ]
     },
     {
       "local_id": "KPI-G3-02",
@@ -2321,7 +2633,12 @@
         "target": 30.0,
         "basis": "Thời gian chuyển công đoạn theo chuẩn SMED ≤30 phút."
       },
-      "counter_metric": "CYCLE_TIME_VARIANCE"
+      "counter_metric": "CYCLE_TIME_VARIANCE",
+      "process": "machining",
+      "category": "internal",
+      "applicable_jds": [
+        "WKM"
+      ]
     },
     {
       "local_id": "KPI-G4-01",
@@ -2339,7 +2656,12 @@
       "cadence": "monthly",
       "data_source": "FRM-311",
       "calculation_status": "staged_data_contract",
-      "counter_metric": "SETUP_FIRST_PASS"
+      "counter_metric": "SETUP_FIRST_PASS",
+      "process": "quality_assurance",
+      "category": "internal",
+      "applicable_jds": [
+        "QA"
+      ]
     },
     {
       "local_id": "KPI-G4-02",
@@ -2365,7 +2687,12 @@
         "target": 2.0,
         "basis": "Chu kỳ kiểm FAI ≤2 giờ."
       },
-      "counter_metric": "FAI_FIRST_PASS"
+      "counter_metric": "FAI_FIRST_PASS",
+      "process": "quality_assurance",
+      "category": "internal",
+      "applicable_jds": [
+        "QA"
+      ]
     },
     {
       "local_id": "KPI-G5-01",
@@ -2390,7 +2717,12 @@
         "target": 1.0,
         "basis": "Tỷ lệ loại trong quá trình ≤1%."
       },
-      "counter_metric": "FPY"
+      "counter_metric": "FPY",
+      "process": "quality_assurance",
+      "category": "internal",
+      "applicable_jds": [
+        "WKM"
+      ]
     },
     {
       "local_id": "KPI-G5-02",
@@ -2416,7 +2748,12 @@
         "target": 15.0,
         "basis": "Phản ứng tín hiệu SPC ≤15 phút."
       },
-      "counter_metric": "WIP_AGING"
+      "counter_metric": "WIP_AGING",
+      "process": "quality_assurance",
+      "category": "internal",
+      "applicable_jds": [
+        "WKM"
+      ]
     },
     {
       "local_id": "KPI-G6-01",
@@ -2441,7 +2778,12 @@
         "target": 100.0,
         "basis": "Gói phát hành/CoC đầy đủ — chuẩn 100%."
       },
-      "counter_metric": "OTD"
+      "counter_metric": "OTD",
+      "process": "quality_assurance",
+      "category": "internal",
+      "applicable_jds": [
+        "QA"
+      ]
     },
     {
       "local_id": "KPI-G6-02",
@@ -2466,7 +2808,12 @@
         "target": 60.0,
         "basis": "Truy xuất ngược một lô ≤60 giây khi diễn tập."
       },
-      "counter_metric": "TRACEABILITY_COMPLETENESS"
+      "counter_metric": "TRACEABILITY_COMPLETENESS",
+      "process": "quality_system",
+      "category": "internal",
+      "applicable_jds": [
+        "QA"
+      ]
     },
     {
       "local_id": "KPI-G7-01",
@@ -2483,7 +2830,12 @@
       "cadence": "monthly",
       "data_source": "Epicor Ship",
       "calculation_status": "runtime_calculated",
-      "counter_metric": "COMPLAINT_RATE"
+      "counter_metric": "COMPLAINT_RATE",
+      "process": "delivery",
+      "category": "customer",
+      "applicable_jds": [
+        "SCM"
+      ]
     },
     {
       "local_id": "KPI-G7-02",
@@ -2500,7 +2852,12 @@
       "cadence": "per-event",
       "data_source": "Epicor AR",
       "calculation_status": "staged_data_contract",
-      "counter_metric": "INVOICE_RFT"
+      "counter_metric": "INVOICE_RFT",
+      "process": "delivery",
+      "category": "financial",
+      "applicable_jds": [
+        "FIN"
+      ]
     },
     {
       "local_id": "KPI-G7-03",
@@ -2525,7 +2882,12 @@
         "target": 24.0,
         "basis": "Thông báo khách ≤24 giờ kể từ khi phát hiện sản phẩm không phù hợp."
       },
-      "counter_metric": "CUSTOMER_COMM_CLOSURE_OT"
+      "counter_metric": "CUSTOMER_COMM_CLOSURE_OT",
+      "process": "quality_system",
+      "category": "customer",
+      "applicable_jds": [
+        "QA"
+      ]
     },
     {
       "local_id": "KPI-ALL-01",
@@ -2552,7 +2914,12 @@
         "target": 2.0,
         "basis": "Chi phí chất lượng kém ≤2% doanh thu."
       },
-      "counter_metric": "REPEAT_NCR_RATE"
+      "counter_metric": "REPEAT_NCR_RATE",
+      "process": "quality_system",
+      "category": "financial",
+      "applicable_jds": [
+        "QA"
+      ]
     },
     {
       "local_id": "KPI-ALL-02",
@@ -2578,7 +2945,12 @@
         "target": 98.0,
         "basis": "Hiệu suất đạt ngay lần đầu ≥98%."
       },
-      "counter_metric": "COPQ"
+      "counter_metric": "COPQ",
+      "process": "quality_assurance",
+      "category": "internal",
+      "applicable_jds": [
+        "QA"
+      ]
     },
     {
       "local_id": "KPI-ALL-03",
@@ -2604,7 +2976,12 @@
         "target": 85.0,
         "basis": "OEE ≥85% — chuẩn world-class."
       },
-      "counter_metric": "OEE_BOTTLENECK"
+      "counter_metric": "OEE_BOTTLENECK",
+      "process": "machining",
+      "category": "internal",
+      "applicable_jds": [
+        "WKM"
+      ]
     }
   ],
   "document_audit": {
@@ -3837,5 +4214,77 @@
     "rag_logic_higher_is_better": "GREEN if value>=green_point; YELLOW if value>=yellow_point; else RED",
     "rag_logic_lower_is_better": "GREEN if value<=green_point; YELLOW if value<=yellow_point; else RED",
     "note": "All threshold bounds are numeric so RAG status, gap (value-target), achievement (value/target), scorecard score and trend roll-up are computed arithmetically. Display strings are derived, never stored."
+  },
+  "process_catalog": {
+    "commercial": {
+      "vi": "Thương mại & Báo giá",
+      "en": "Commercial & Quoting",
+      "gate": "G0"
+    },
+    "engineering": {
+      "vi": "Kỹ thuật & Quản lý thay đổi",
+      "en": "Engineering & Change",
+      "gate": "G1"
+    },
+    "planning": {
+      "vi": "Lập kế hoạch & Điều độ",
+      "en": "Planning & Dispatch",
+      "gate": "G2-G3"
+    },
+    "procurement": {
+      "vi": "Mua hàng & Nhà cung cấp",
+      "en": "Procurement & Supplier",
+      "gate": "G2"
+    },
+    "machining": {
+      "vi": "Gia công & Sản xuất",
+      "en": "Machining & Production",
+      "gate": "G3"
+    },
+    "quality_assurance": {
+      "vi": "Đảm bảo chất lượng (FAI/IPQC/OQC)",
+      "en": "Quality Assurance",
+      "gate": "G4-G6"
+    },
+    "delivery": {
+      "vi": "Giao hàng & Hóa đơn",
+      "en": "Delivery & Invoicing",
+      "gate": "G7"
+    },
+    "quality_system": {
+      "vi": "Hệ thống chất lượng (NCR/CAPA/Hiệu chuẩn)",
+      "en": "Quality System",
+      "gate": "ALL"
+    },
+    "maintenance": {
+      "vi": "Bảo trì thiết bị",
+      "en": "Equipment Maintenance",
+      "gate": "ALL"
+    },
+    "human_resources": {
+      "vi": "Nhân sự & Năng lực",
+      "en": "HR & Competence",
+      "gate": "ALL"
+    },
+    "ehs": {
+      "vi": "An toàn & Môi trường",
+      "en": "EHS",
+      "gate": "ALL"
+    },
+    "it_systems": {
+      "vi": "CNTT & Dữ liệu",
+      "en": "IT & Data",
+      "gate": "ALL"
+    },
+    "finance": {
+      "vi": "Tài chính",
+      "en": "Finance",
+      "gate": "ALL"
+    },
+    "continuity": {
+      "vi": "Tính liên tục kinh doanh",
+      "en": "Business Continuity",
+      "gate": "ALL"
+    }
   }
 }

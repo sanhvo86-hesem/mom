@@ -341,6 +341,33 @@ foreach ([
     }
 }
 
+// ── P0.10 — every metric is classified (process + category) ─────────────────
+// The KPI Library filters on process and category, so both must be set on
+// every governed metric.
+$processCatalog = is_array($registry['process_catalog'] ?? null) ? $registry['process_catalog'] : [];
+foreach ([
+    'governance' => $governance,
+    'gate'       => $gateMetrics,
+    'proposed'   => $proposed,
+] as $label => $set) {
+    foreach ($set as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $rc = (string) ($row['canonical_code'] ?? '?');
+        $process = (string) ($row['process'] ?? '');
+        $category = (string) ($row['category'] ?? '');
+        if ($process === '') {
+            $p0[] = "$label $rc: missing 'process' classification.";
+        } elseif ($processCatalog !== [] && !isset($processCatalog[$process])) {
+            $p0[] = "$label $rc: process '$process' is not in process_catalog.";
+        }
+        if ($category === '') {
+            $p0[] = "$label $rc: missing 'category' classification.";
+        }
+    }
+}
+
 // ── Report ───────────────────────────────────────────────────────────────────
 $byStatus = ['runtime_calculated' => 0, 'staged_data_contract' => 0, 'manual' => 0, 'retired' => 0];
 foreach ($governance as $row) {

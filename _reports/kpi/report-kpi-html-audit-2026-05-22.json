@@ -1,17 +1,17 @@
 {
-    "generated_at": "2026-05-22T02:18:00+00:00",
+    "generated_at": "2026-05-22T02:28:15+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-21",
     "summary": {
         "html_file_count": 870,
         "files_with_kpi": 686,
-        "kpi_occurrences": 4209,
+        "kpi_occurrences": 4217,
         "unique_coded_kpi_ids": 85,
         "unique_likely_operational_kpi_ids": 48,
         "unique_canonical_metric_codes_seen": 42,
         "unique_legacy_alias_codes_seen": 4,
-        "kpi_row_candidates": 3665
+        "kpi_row_candidates": 3667
     },
     "registry_counts": {
         "runtime_calculated_metrics": 28,
@@ -216,8 +216,8 @@
         "annex_references": {
             "html_files": 76,
             "files_with_kpi": 59,
-            "kpi_occurrences": 626,
-            "kpi_row_candidates": 487,
+            "kpi_occurrences": 634,
+            "kpi_row_candidates": 489,
             "coded_kpi_ids": [
                 "KPI-01",
                 "KPI-01OTDOTD",
@@ -603,8 +603,8 @@
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
             "bucket": "annex_references",
             "title": "KPI System Matrix and Document Usage",
-            "kpi_occurrences": 166,
-            "kpi_row_candidates": 60,
+            "kpi_occurrences": 174,
+            "kpi_row_candidates": 62,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-AND-ESCALATION",
@@ -1803,8 +1803,8 @@
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
             "bucket": "annex_references",
             "title": "KPI System Matrix and Document Usage",
-            "kpi_occurrences": 166,
-            "kpi_row_candidates": 60,
+            "kpi_occurrences": 174,
+            "kpi_row_candidates": 62,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-AND-ESCALATION",

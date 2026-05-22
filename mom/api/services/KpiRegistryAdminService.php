@@ -99,6 +99,10 @@ final class KpiRegistryAdminService
             }
         }
 
+        // KPI Library — every metric flattened with its classification so the
+        // Console can browse and filter across all groups.
+        $library = $this->buildLibrary($governance, $gate, $proposed);
+
         return [
             'registry_id'       => $seed['registry_id'] ?? null,
             'registry_version'  => $seed['version'] ?? null,
@@ -114,6 +118,9 @@ final class KpiRegistryAdminService
             'gate_control_metrics'      => $gate,
             'proposed_operating_metrics'=> $proposed,
             'dashboard_core_kpis'       => $seed['dashboard_core_kpis'] ?? [],
+            'process_catalog'   => $seed['process_catalog'] ?? new \stdClass(),
+            'library'           => $library,
+            'facets'            => $this->buildFacets($library, $seed),
             'stats'             => $this->computeStats($governance),
         ];
     }
@@ -298,6 +305,109 @@ final class KpiRegistryAdminService
                 }
             }
         }
+    }
+
+    // ── KPI Library ──────────────────────────────────────────────────────
+
+    /**
+     * Flatten every governed metric into one library list, each row tagged
+     * with its group, process, category and JD roles for cross-group
+     * browsing and filtering.
+     *
+     * @param array<int, array<string, mixed>> $governance
+     * @param array<int, array<string, mixed>> $gate
+     * @param array<int, array<string, mixed>> $proposed
+     * @return array<int, array<string, mixed>>
+     */
+    private function buildLibrary(array $governance, array $gate, array $proposed): array
+    {
+        $lib = [];
+        $push = function (array $row, string $group) use (&$lib): void {
+            $t = is_array($row['thresholds'] ?? null) ? $row['thresholds'] : [];
+            $lib[] = [
+                'canonical_code'     => (string) ($row['canonical_code'] ?? ''),
+                'local_id'           => $row['local_id'] ?? null,
+                'name'               => $row['name'] ?? '',
+                'name_vi'            => $row['name_vi'] ?? '',
+                'group'              => $group,
+                'tier'               => $row['tier'] ?? null,
+                'process'            => (string) ($row['process'] ?? 'unclassified'),
+                'category'           => (string) ($row['category'] ?? 'internal'),
+                'gate'               => $row['gate'] ?? null,
+                'layer'              => $row['layer'] ?? null,
+                'calculation_status' => (string) ($row['calculation_status'] ?? ($row['status'] ?? '')),
+                'owner_role'         => $row['owner_role'] ?? null,
+                'applicable_jds'     => is_array($row['applicable_jds'] ?? null) ? $row['applicable_jds'] : [],
+                'counter_metric'     => $row['counter_metric'] ?? null,
+                'purpose'            => $row['purpose'] ?? '',
+                'thresholds'         => $t,
+                'reward_eligible'    => (bool) ($row['reward_eligible'] ?? false),
+            ];
+        };
+        foreach ($governance as $r) {
+            if (is_array($r)) {
+                $push($r, 'governance');
+            }
+        }
+        foreach ($gate as $r) {
+            if (is_array($r)) {
+                $push($r, 'gate');
+            }
+        }
+        foreach ($proposed as $r) {
+            if (is_array($r)) {
+                $push($r, 'proposed');
+            }
+        }
+        return $lib;
+    }
+
+    /**
+     * Filter facets for the KPI Library — the distinct values, with counts,
+     * the Console renders as filter chips.
+     *
+     * @param array<int, array<string, mixed>> $library
+     * @param array<string, mixed>             $seed
+     * @return array<string, mixed>
+     */
+    private function buildFacets(array $library, array $seed): array
+    {
+        $count = static function (string $field) use ($library): array {
+            $out = [];
+            foreach ($library as $row) {
+                $v = $row[$field] ?? null;
+                $values = is_array($v) ? $v : [$v];
+                foreach ($values as $item) {
+                    $item = (string) $item;
+                    if ($item === '') {
+                        continue;
+                    }
+                    $out[$item] = ($out[$item] ?? 0) + 1;
+                }
+            }
+            ksort($out);
+            return $out;
+        };
+        $procCatalog = is_array($seed['process_catalog'] ?? null) ? $seed['process_catalog'] : [];
+        $processFacet = [];
+        foreach ($count('process') as $key => $n) {
+            $meta = is_array($procCatalog[$key] ?? null) ? $procCatalog[$key] : [];
+            $processFacet[] = [
+                'key'   => $key,
+                'label' => (string) ($meta['vi'] ?? $key),
+                'gate'  => $meta['gate'] ?? null,
+                'count' => $n,
+            ];
+        }
+        return [
+            'process'            => $processFacet,
+            'category'           => $count('category'),
+            'group'              => $count('group'),
+            'tier'               => $count('tier'),
+            'calculation_status' => $count('calculation_status'),
+            'applicable_jds'     => $count('applicable_jds'),
+            'total'              => count($library),
+        ];
     }
 
     // ── Validation ───────────────────────────────────────────────────────

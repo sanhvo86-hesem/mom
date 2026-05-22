@@ -45,7 +45,18 @@ var _state = {
   config:null,
   /* overrides keyed by section then code */
   overrides:{ governance:{}, gate:{}, proposed:{} },
-  reason:'', activeGroup:'overview'
+  reason:'', activeGroup:'overview',
+  /* KPI Library filters */
+  filters:{ process:'', category:'', group:'', jd:'', status:'', search:'' }
+};
+
+/* Group key → section, for jumping from a library row to its editor. */
+var _GROUP_OF_SECTION = { governance:'company', gate:'gate', proposed:'proposed' };
+
+/* Category display labels. */
+var CATEGORY_VI = {
+  internal:'Nội bộ', supplier:'Nhà cung cấp', customer:'Khách hàng',
+  safety:'An toàn', financial:'Tài chính', system:'Hệ thống'
 };
 
 window._renderAdminKpiRegistry = function(el, langCode){
@@ -217,7 +228,9 @@ function _render(){
     return;
   }
   var group = _state.activeGroup;
-  var body = (group === 'overview') ? _renderOverview() : _renderGroup(group);
+  var body = (group === 'overview') ? _renderOverview()
+           : (group === 'library')  ? _renderLibrary()
+           : _renderGroup(group);
 
   el.innerHTML =
 '<section class="kpi-console">' + _styleBlock() +
@@ -283,8 +296,127 @@ function _renderOverview(){
       : _esc(_t('Chưa có overlay runtime', 'No runtime overlay'))) +
     '</p>';
 
-  return '<div class="kc-stats">' + statHtml + '</div>' + meta +
+  var libCount = (cfg.library || []).length;
+  var libBtn = '<button class="kc-lib-cta" type="button" onclick="_kpiGo(\'library\')">' +
+    '<span class="kc-lib-cta-ico">📚</span>' +
+    '<span class="kc-lib-cta-txt"><b>' + _t('Thư viện KPI', 'KPI Library') + '</b>' +
+    '<span>' + _t('Tra cứu & lọc ' + libCount + ' KPI theo quá trình, phân loại, JD, trạng thái',
+                   'Browse & filter ' + libCount + ' KPIs by process, category, JD, status') + '</span></span>' +
+    '<span class="kc-lib-cta-go">→</span></button>';
+
+  return '<div class="kc-stats">' + statHtml + '</div>' + meta + libBtn +
          '<div class="kc-tiles">' + tiles + '</div>';
+}
+
+/* ── KPI Library — classified, multi-filter browse view ────────────── */
+function _libRows(){
+  return (_state.config && Array.isArray(_state.config.library)) ? _state.config.library : [];
+}
+function _setFilter(key, value){ _state.filters[key] = value; _render(); }
+
+function _filteredLib(){
+  var f = _state.filters;
+  var q = (f.search || '').trim().toLowerCase();
+  return _libRows().filter(function(r){
+    if(f.process  && r.process  !== f.process)  return false;
+    if(f.category && r.category !== f.category) return false;
+    if(f.group    && r.group    !== f.group)    return false;
+    if(f.status   && r.calculation_status !== f.status) return false;
+    if(f.jd && (r.applicable_jds || []).indexOf(f.jd) < 0) return false;
+    if(q){
+      var hay = (r.canonical_code + ' ' + (r.name_vi||'') + ' ' + (r.name||'')).toLowerCase();
+      if(hay.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+}
+
+function _selOptions(pairs, selected){
+  return pairs.map(function(p){
+    return '<option value="' + _esc(p[0]) + '"' + (p[0] === selected ? ' selected' : '') +
+      '>' + _esc(p[1]) + '</option>';
+  }).join('');
+}
+
+function _renderLibrary(){
+  var cfg = _state.config || {};
+  var f = _state.filters;
+  var facets = cfg.facets || {};
+  var nav = '<div class="kc-nav"><button class="kc-btn" type="button" onclick="_kpiGo(\'overview\')">‹ ' +
+    _t('Tổng quan', 'Overview') + '</button><span class="kc-nav-title">📚 ' +
+    _t('Thư viện KPI', 'KPI Library') + '</span></div>';
+
+  /* filter option lists */
+  var procOpts = [['', _t('— Mọi quá trình —', '— All processes —')]];
+  (facets.process || []).forEach(function(p){
+    procOpts.push([p.key, p.label + ' (' + p.count + ')']);
+  });
+  var catOpts = [['', _t('— Mọi phân loại —', '— All categories —')]];
+  Object.keys(facets.category || {}).forEach(function(k){
+    catOpts.push([k, (CATEGORY_VI[k] || k) + ' (' + facets.category[k] + ')']);
+  });
+  var grpOpts = [['', _t('— Mọi nhóm —', '— All groups —')],
+    ['governance', _t('Governance', 'Governance')], ['gate', 'Gate'], ['proposed', _t('Đề xuất', 'Proposed')]];
+  var jdOpts = [['', _t('— Mọi JD / vai trò —', '— All JDs / roles —')]];
+  Object.keys(facets.applicable_jds || {}).forEach(function(k){
+    jdOpts.push([k, k + ' (' + facets.applicable_jds[k] + ')']);
+  });
+  var stOpts = [['', _t('— Mọi trạng thái —', '— All statuses —')],
+    ['runtime_calculated', _t('Tính runtime', 'Runtime')],
+    ['staged_data_contract', _t('Chờ data contract', 'Staged')],
+    ['manual', _t('Nhập tay', 'Manual')]];
+
+  var filterBar =
+    '<div class="kc-filterbar">' +
+      '<input class="kc-search" type="search" placeholder="' +
+        _t('Tìm mã hoặc tên KPI...', 'Search KPI code or name...') + '" value="' + _esc(f.search) +
+        '" oninput="_kpiSetFilter(\'search\',this.value)">' +
+      '<select class="kc-input" onchange="_kpiSetFilter(\'process\',this.value)">' + _selOptions(procOpts, f.process) + '</select>' +
+      '<select class="kc-input" onchange="_kpiSetFilter(\'category\',this.value)">' + _selOptions(catOpts, f.category) + '</select>' +
+      '<select class="kc-input" onchange="_kpiSetFilter(\'group\',this.value)">' + _selOptions(grpOpts, f.group) + '</select>' +
+      '<select class="kc-input" onchange="_kpiSetFilter(\'jd\',this.value)">' + _selOptions(jdOpts, f.jd) + '</select>' +
+      '<select class="kc-input" onchange="_kpiSetFilter(\'status\',this.value)">' + _selOptions(stOpts, f.status) + '</select>' +
+      '<button class="kc-btn" type="button" onclick="_kpiClearFilters()">' + _t('Xóa lọc', 'Clear') + '</button>' +
+    '</div>';
+
+  var rows = _filteredLib();
+  var resultHead = '<div class="kc-result-head">' +
+    '<b>' + rows.length + '</b> / ' + _libRows().length + ' ' + _t('KPI khớp bộ lọc', 'KPIs match the filter') +
+    '</div>';
+
+  var grid = rows.map(_renderLibCard).join('');
+  if(!grid) grid = '<div class="hm-empty">' + _t('Không có KPI khớp bộ lọc.', 'No KPI matches the filter.') + '</div>';
+
+  return nav + filterBar + resultHead + '<div class="kc-lib-grid">' + grid + '</div>';
+}
+
+function _renderLibCard(r){
+  var c = function(s){ return _esc(s == null ? '' : s); };
+  var b = _ragBands(r.thresholds || {});
+  var procLabel = r.process;
+  var facets = (_state.config || {}).facets || {};
+  (facets.process || []).forEach(function(p){ if(p.key === r.process) procLabel = p.label; });
+  var groupKey = _GROUP_OF_SECTION[r.group] || 'overview';
+  return '<button class="kc-lib-card" type="button" onclick="_kpiGo(\'' + groupKey + '\')">' +
+    '<div class="kc-lib-card-top">' +
+      '<span class="kc-code">' + c(r.canonical_code) + '</span>' +
+      _calcBadge(r.calculation_status) +
+    '</div>' +
+    '<div class="kc-lib-card-name">' + c(r.name_vi || r.name) + '</div>' +
+    '<div class="kc-lib-tags">' +
+      '<span class="kc-chip kc-chip-proc">' + c(procLabel) + '</span>' +
+      '<span class="kc-chip kc-chip-cat kc-cat-' + c(r.category) + '">' + c(CATEGORY_VI[r.category] || r.category) + '</span>' +
+      '<span class="kc-chip">' + c(r.group) + '</span>' +
+      (r.gate ? '<span class="kc-chip">' + c(r.gate) + '</span>' : '') +
+    '</div>' +
+    (b ? '<div class="kc-rag"><span class="kc-badge kc-badge-ok">' + _esc(b.green) + '</span>' +
+         '<span class="kc-badge kc-badge-staged">' + _esc(b.yellow) + '</span>' +
+         '<span class="kc-badge kc-badge-bad">' + _esc(b.red) + '</span></div>' : '') +
+    '<div class="kc-lib-foot">' +
+      '<span class="kc-mini">JD: ' + c((r.applicable_jds || []).join(', ') || '—') + '</span>' +
+      '<span class="kc-mini">↔ ' + c(r.counter_metric || '—') + '</span>' +
+    '</div>' +
+  '</button>';
 }
 
 function _renderGroup(key){
@@ -493,6 +625,40 @@ function _styleBlock(){
     'color:var(--text-2,#55617a);font-size:11px;text-transform:uppercase}' +
   '.kc-table td{padding:8px 10px;border-top:1px solid var(--border,#d7deea);vertical-align:top}' +
   '.kc-mini{font-size:11px;color:var(--text-3,#7a869a)}' +
+  /* ── KPI Library ── */
+  '.kc-lib-cta{display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;' +
+    'border:1px solid var(--accent,#2563eb);border-radius:12px;padding:14px 18px;' +
+    'background:var(--accent-soft,#e7f0ff)}' +
+  '.kc-lib-cta-ico{font-size:26px}' +
+  '.kc-lib-cta-txt{display:flex;flex-direction:column;gap:2px;flex:1}' +
+  '.kc-lib-cta-txt b{font-size:15px;color:var(--text-1,#1a2233)}' +
+  '.kc-lib-cta-txt span{font-size:12px;color:var(--text-2,#55617a)}' +
+  '.kc-lib-cta-go{font-size:22px;color:var(--accent,#2563eb)}' +
+  '.kc-filterbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;' +
+    'border:1px solid var(--border,#d7deea);border-radius:10px;padding:10px;' +
+    'background:var(--surface-2,#f8fafc)}' +
+  '.kc-search{flex:1;min-width:180px;border:1px solid var(--border,#d7deea);border-radius:7px;' +
+    'padding:7px 10px;font-size:13px;background:var(--surface,#fff);color:var(--text-1,#1a2233)}' +
+  '.kc-filterbar .kc-input{width:auto;min-width:150px;flex:0 0 auto}' +
+  '.kc-result-head{font-size:13px;color:var(--text-2,#55617a);padding:2px 2px}' +
+  '.kc-result-head b{color:var(--accent,#2563eb);font-size:15px}' +
+  '.kc-lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}' +
+  '.kc-lib-card{text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:7px;' +
+    'border:1px solid var(--border,#d7deea);border-radius:10px;padding:12px;background:var(--surface,#fff)}' +
+  '.kc-lib-card:hover{border-color:var(--accent,#2563eb);box-shadow:0 1px 6px rgba(0,0,0,.08)}' +
+  '.kc-lib-card-top{display:flex;justify-content:space-between;align-items:center;gap:8px}' +
+  '.kc-lib-card-name{font-size:13px;font-weight:600;color:var(--text-1,#1a2233)}' +
+  '.kc-lib-tags{display:flex;gap:4px;flex-wrap:wrap}' +
+  '.kc-chip{font-size:10px;border-radius:999px;padding:2px 8px;' +
+    'background:var(--surface-2,#f1f3f7);color:var(--text-2,#55617a)}' +
+  '.kc-chip-proc{background:var(--accent-soft,#e7f0ff);color:var(--accent,#2563eb)}' +
+  '.kc-cat-supplier{background:#fff4e6;color:#d9480f}' +
+  '.kc-cat-customer{background:#e7f5ff;color:#1971c2}' +
+  '.kc-cat-safety{background:#fff5f5;color:#c92a2a}' +
+  '.kc-cat-financial{background:#ebfbee;color:#2b8a3e}' +
+  '.kc-cat-system{background:#f3f0ff;color:#5f3dc4}' +
+  '.kc-lib-foot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;' +
+    'border-top:1px solid var(--border,#d7deea);padding-top:6px}' +
   '</style>';
 }
 
@@ -504,5 +670,10 @@ window._kpiGo        = function(g){ _go(g); };
 window._kpiSetReason = function(v){ _setReason(v); };
 window._kpiSetField  = function(section, code, field, value){ _setField(section, code, field, value); };
 window._kpiSetThreshold = function(section, code, key, value){ _setThreshold(section, code, key, value); };
+window._kpiSetFilter = function(key, value){ _setFilter(key, value); };
+window._kpiClearFilters = function(){
+  _state.filters = { process:'', category:'', group:'', jd:'', status:'', search:'' };
+  _render();
+};
 
 })();
