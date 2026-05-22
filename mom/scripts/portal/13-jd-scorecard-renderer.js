@@ -68,13 +68,18 @@ function _injectStyle() {
   if (document.getElementById('jd-scorecard-style')) return;
   var css =
     '.jd-scorecard-note{font-size:13px;color:#55617a;margin:0 0 8px}' +
+    '.jd-scorecard table{table-layout:fixed;width:100%}' +
+    '.jd-scorecard td,.jd-scorecard th{vertical-align:top;overflow-wrap:break-word;' +
+      'word-break:break-word}' +
     '.jd-scorecard .jd-sc-kpi{font-weight:600}' +
-    '.jd-scorecard .jd-sc-code{font-family:monospace;font-size:11px;background:#f1f3f7;' +
-      'padding:1px 6px;border-radius:5px}' +
-    '.jd-sc-wbar{display:inline-block;height:9px;border-radius:999px;background:#e7f0ff;' +
-      'width:90px;vertical-align:middle;overflow:hidden;border:1px solid #d7deea}' +
+    '.jd-scorecard .jd-sc-code{display:inline-block;font-family:monospace;font-size:10px;' +
+      'background:#f1f3f7;padding:1px 5px;border-radius:5px;overflow-wrap:anywhere}' +
+    /* weight cell: % above, full-width thin bar below — no column collision */
+    '.jd-sc-wt{display:flex;flex-direction:column;gap:4px;align-items:flex-start}' +
+    '.jd-sc-w{font-weight:700;color:#2563eb;font-size:14px;line-height:1}' +
+    '.jd-sc-wbar{display:block;width:100%;height:8px;border-radius:999px;background:#e7f0ff;' +
+      'overflow:hidden;border:1px solid #d7deea}' +
     '.jd-sc-wfill{display:block;height:100%;background:#2563eb}' +
-    '.jd-sc-w{font-weight:700;color:#2563eb;margin-left:6px}' +
     '.jd-sc-g{color:#2b8a3e}.jd-sc-y{color:#e67700}.jd-sc-r{color:#c92a2a}' +
     '.jd-sc-sym{cursor:help}';
   var st = document.createElement('style');
@@ -100,8 +105,9 @@ function _render(role) {
       '<td><span class="jd-sc-kpi">' + _esc(it.name_vi || it.kpi_code) + '</span><br>' +
         '<span class="jd-sc-code">' + _esc(it.kpi_code) + '</span> ' +
         '<span class="jd-sc-sym" title="' + _esc(sym[1]) + '">' + sym[0] + '</span></td>' +
-      '<td class="nowrap"><span class="jd-sc-wbar"><span class="jd-sc-wfill" style="width:' +
-        w + '%"></span></span><span class="jd-sc-w">' + w + '%</span></td>' +
+      '<td><div class="jd-sc-wt"><span class="jd-sc-w">' + w + '%</span>' +
+        '<span class="jd-sc-wbar"><span class="jd-sc-wfill" style="width:' + w + '%"></span>' +
+        '</span></div></td>' +
       '<td>' + band + '</td>' +
       '<td><span class="jd-sc-code">' + _esc(it.counter_code || '—') + '</span></td>' +
       '<td>' + _esc(it.rationale || '') + '</td>' +
@@ -112,6 +118,8 @@ function _render(role) {
       'KPI Authority (tổng trọng số ' + total + '%). Mỗi KPI có ngưỡng G/Y/R và ' +
       'counter-metric chống gaming riêng.</p>' +
     '<div class="table-card jd-scorecard"><table class="table">' +
+      '<colgroup><col style="width:30%"><col style="width:11%"><col style="width:19%">' +
+      '<col style="width:19%"><col style="width:21%"></colgroup>' +
       '<thead><tr><th>KPI trọng yếu</th><th>Trọng số</th><th>Ngưỡng G/Y/R</th>' +
       '<th>Counter-metric</th><th>Vì sao đo vị trí này</th></tr></thead>' +
       '<tbody>' + rows + '</tbody></table></div>';
