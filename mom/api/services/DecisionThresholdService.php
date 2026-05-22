@@ -32,7 +32,7 @@ final class DecisionThresholdService
     /** @var array<string, string> */
     private const SYSTEM_DOC_LINKS = [
         'ANNEX-120' => 'authority-matrix.html',
-        'ANNEX-121' => '../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html',
+        'ANNEX-121' => 'raci-master-matrix.html',
         'ANNEX-123' => '../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html',
         'FRM-202'   => '../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx',
         'FRM-212'   => '../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx',
@@ -47,7 +47,7 @@ final class DecisionThresholdService
     /** @var array<string, string> */
     private const ANNEX_DOC_LINKS = [
         'ANNEX-120' => '../../../../system/organization/04-RACI-Authority/authority-matrix.html',
-        'ANNEX-121' => 'annex-121-raci-master-matrix.html',
+        'ANNEX-121' => '../../../../system/organization/04-RACI-Authority/raci-master-matrix.html',
         'ANNEX-123' => 'annex-123-deputy-backup-matrix.html',
         'FRM-202'   => '../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx',
         'FRM-212'   => '../../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx',
@@ -725,10 +725,6 @@ final class DecisionThresholdService
                 'doc_code' => 'RACI-MASTER-MATRIX',
                 'path' => 'mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html',
             ],
-            [
-                'doc_code' => 'ANNEX-121',
-                'path' => 'mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html',
-            ],
         ];
     }
 
@@ -748,11 +744,6 @@ final class DecisionThresholdService
             'RACI-MASTER-MATRIX',
             'mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html',
             fn(string $html): string => $this->updateRaciMasterHtml($html)
-        );
-        $results[] = $this->updateDocument(
-            'ANNEX-121',
-            'mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html',
-            fn(string $html): string => $this->updateAnnex121Html($html)
         );
 
         return $results;
@@ -805,11 +796,6 @@ final class DecisionThresholdService
             $html
         );
         $html = $this->removeFinanceDeputyAuthority($html);
-        foreach ($this->items($config) as $item) {
-            foreach ($item['cdrs'] as $cdr) {
-                $html = $this->replaceCdrRow($html, (string)$cdr, $item);
-            }
-        }
 
         return $html;
     }
@@ -825,177 +811,6 @@ final class DecisionThresholdService
         );
     }
 
-    private function updateAnnex121Html(string $html): string
-    {
-        $html = $this->normaliseAnnexRoleWrapping($html);
-        $html = $this->removeFinanceFromAnnex121Intro($html);
-        $html = $this->replaceAnnex121FinanceColumnWithCeo($html);
-
-        $html = $this->replaceAnnex121RaciRow(
-            $html,
-            'A2',
-            'G0',
-            'Phê duyệt báo giá theo bậc giá trị',
-            [
-                'CS' => 'R',
-                'EST' => 'R',
-                'ENG' => 'C',
-                'PPL' => '',
-                'WKM' => '',
-                'QA' => '',
-                'SCM' => '',
-                'CEO' => 'A',
-                'HRIT' => '',
-            ],
-            '<a href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>'
-        );
-        $html = $this->replaceAnnex121RaciRow(
-            $html,
-            'A3',
-            'G0',
-            'Phê duyệt chiết khấu / điều kiện thương mại ngoại lệ',
-            [
-                'CS' => 'C',
-                'EST' => 'R',
-                'ENG' => '',
-                'PPL' => '',
-                'WKM' => '',
-                'QA' => '',
-                'SCM' => '',
-                'CEO' => 'A',
-                'HRIT' => '',
-            ],
-            '<a href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>'
-        );
-        $html = $this->replaceAnnex121RaciRow(
-            $html,
-            'A4',
-            'G0',
-            'Phê duyệt điều kiện thanh toán ngoại lệ',
-            [
-                'CS' => 'R',
-                'EST' => 'C',
-                'ENG' => '',
-                'PPL' => '',
-                'WKM' => '',
-                'QA' => '',
-                'SCM' => '',
-                'CEO' => 'A',
-                'HRIT' => '',
-            ],
-            '<a href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>'
-        );
-        $html = $this->replaceAnnex121RaciRow(
-            $html,
-            'A5',
-            'G0',
-            'Chấp thuận đơn hàng và xem xét hợp đồng',
-            [
-                'CS' => 'R',
-                'EST' => 'R',
-                'ENG' => 'C',
-                'PPL' => 'C',
-                'WKM' => '',
-                'QA' => 'C',
-                'SCM' => 'C',
-                'CEO' => 'A',
-                'HRIT' => '',
-            ],
-            '<a href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>'
-        );
-        $html = $this->replaceAnnex121RaciRow(
-            $html,
-            'A6',
-            'G0',
-            'Phê duyệt yêu cầu thay đổi của khách hàng (CCR) ảnh hưởng giá / lịch / phạm vi',
-            [
-                'CS' => 'R',
-                'EST' => 'R',
-                'ENG' => 'C',
-                'PPL' => 'C',
-                'WKM' => '',
-                'QA' => 'C',
-                'SCM' => '',
-                'CEO' => 'A',
-                'HRIT' => '',
-            ],
-            '<a href="../../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx">FRM-212</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>'
-        );
-        $html = $this->replaceAnnex121RaciRow(
-            $html,
-            'E1',
-            'G2',
-            'Phê duyệt PO theo bậc giá trị',
-            [
-                'CS' => '',
-                'EST' => '',
-                'ENG' => '',
-                'PPL' => 'I',
-                'WKM' => '',
-                'QA' => '',
-                'SCM' => 'R',
-                'CEO' => 'A',
-                'HRIT' => '',
-            ],
-            '<a href="../../../../forms/frm-400-quality/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>'
-        );
-        $html = $this->replaceAnnex121RaciRow(
-            $html,
-            'E2',
-            'G2',
-            'Phê duyệt nhà cung cấp mới (qualify)',
-            [
-                'CS' => '',
-                'EST' => '',
-                'ENG' => '',
-                'PPL' => '',
-                'WKM' => '',
-                'QA' => 'R',
-                'SCM' => 'R',
-                'CEO' => 'A',
-                'HRIT' => '',
-            ],
-            '<a href="../../../../forms/frm-400-quality/FRM-402_Supplier_Evaluation_Form.xlsx">FRM-402</a> · <a href="../../../../forms/frm-400-quality/FRM-409_Supplier_Audit_Checklist.xlsx">FRM-409</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>'
-        );
-        $html = $this->replaceAnnex121RaciRow(
-            $html,
-            'E5',
-            'G2',
-            'Phê duyệt đơn mua khẩn / vật tư khẩn',
-            [
-                'CS' => '',
-                'EST' => '',
-                'ENG' => '',
-                'PPL' => 'C',
-                'WKM' => '',
-                'QA' => 'I',
-                'SCM' => 'R',
-                'CEO' => 'A',
-                'HRIT' => '',
-            ],
-            '<a href="../../../../forms/frm-400-quality/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>'
-        );
-        $html = $this->replaceAnnex121RaciRow(
-            $html,
-            'E5',
-            'G3',
-            'Phê duyệt đơn mua khẩn / vật tư khẩn',
-            [
-                'CS' => '',
-                'EST' => '',
-                'ENG' => '',
-                'PPL' => 'C',
-                'WKM' => 'R',
-                'QA' => '',
-                'SCM' => 'R',
-                'CEO' => 'A',
-                'HRIT' => '',
-            ],
-            '<a href="../../../../forms/frm-400-quality/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>'
-        );
-
-        return $html;
-    }
 
     private function removeFinanceDeputyAuthority(string $html): string
     {
@@ -1015,140 +830,12 @@ final class DecisionThresholdService
         return $html;
     }
 
-    private function removeFinanceFromAnnex121Intro(string $html): string
-    {
-        $html = $this->replaceDirectorLabelWithCeo($html);
-        $html = preg_replace(
-            '/<span class="inline-tag"><span class="role-cluster"><span class="role-code"><a class="entity-link role-link" href="\.\.\/\.\.\/\.\.\/\.\.\/system\/organization\/03-Job-Descriptions\/07-JD-Finance\/jd-finance-manager\.html">FIN<\/a><\/span><\/span><\/span>/',
-            '',
-            $html
-        ) ?? $html;
 
-        $html = str_replace(
-            '<tr><td>C phải tham vấn trước khi chốt</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a>, <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>, <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a>, <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a> hoặc <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> được ghi C phải được hỏi trước khi quyết định ảnh hưởng kỹ thuật, chất lượng, vật tư, tiền hoặc khách hàng.</td><td>Chỉ gửi thông báo sau khi đã quyết định.</td></tr>',
-            '<tr><td>C phải tham vấn trước khi chốt</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a>, <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a>, <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> hoặc <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> được ghi C phải được hỏi trước khi chốt kỹ thuật, chất lượng, vật tư hoặc cam kết khách hàng. Quyết định ảnh hưởng giá, dòng tiền hoặc vượt ngưỡng phải đưa <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> chốt cuối theo <a href="../../../../system/organization/04-RACI-Authority/authority-matrix.html">ANNEX-120</a>.</td><td>Chỉ gửi thông báo sau khi đã quyết định.</td></tr>',
-            $html
-        );
 
-        $html = str_replace(
-            '<tr><td>Rà soát KPI cycle và input Management Review</td><td><span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html">QMS</a></span></td><td><span class="role-code"><a class="entity-link bundle-link" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-owners">FUNC_OWNERS</a></span></td><td><span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></span> / <span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a></span></td><td><a href="annex-122-kpi-cascade-dictionary.html">ANNEX-122</a> · <a href="../../../sops/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html">SOP-102</a></td></tr>',
-            '<tr><td>Rà soát chu kỳ KPI và đầu vào xem xét của lãnh đạo</td><td><span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html">QMS</a></span></td><td><span class="role-code"><a class="entity-link bundle-link" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-owners">FUNC_OWNERS</a></span></td><td><span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></span></td><td><a href="annex-122-kpi-cascade-dictionary.html">ANNEX-122</a> · <a href="../../../sops/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html">SOP-102</a></td></tr>',
-            $html
-        );
 
-        $html = $this->removeFinanceRoleLinks($html);
 
-        return $html;
-    }
 
-    private function replaceDirectorLabelWithCeo(string $html): string
-    {
-        return str_replace(
-            '<span class="inline-tag">Tổng Giám đốc</span>',
-            '<span class="inline-tag"><span class="role-cluster"><span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></span></span></span>',
-            $html
-        );
-    }
 
-    private function removeFinanceRoleLinks(string $html): string
-    {
-        $patterns = [
-            '/\s*\/\s*<a class="entity-link role-link" href="\.\.\/\.\.\/\.\.\/\.\.\/system\/organization\/03-Job-Descriptions\/07-JD-Finance\/jd-finance-manager\.html">FIN<\/a>/',
-            '/\s*\/\s*<span class="role-code"><a class="entity-link role-link" href="\.\.\/\.\.\/\.\.\/\.\.\/system\/organization\/03-Job-Descriptions\/07-JD-Finance\/jd-finance-manager\.html">FIN<\/a><\/span>/',
-        ];
-        foreach ($patterns as $pattern) {
-            $html = preg_replace($pattern, '', $html) ?? $html;
-        }
-
-        return $html;
-    }
-
-    private function normaliseAnnexRoleWrapping(string $html): string
-    {
-        $html = str_replace(
-            'table { max-width: 100%; table-layout: auto; }',
-            'table { max-width: 100%; table-layout: fixed; }',
-            $html
-        );
-        $html = str_replace(
-            'td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }',
-            'td, th { max-width: 420px; overflow-wrap: anywhere; word-wrap: break-word; }',
-            $html
-        );
-        $html = str_replace(
-            '.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;white-space:nowrap}',
-            '.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;display:inline-block;box-sizing:border-box;max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:break-word;line-height:1.35;vertical-align:middle;text-align:center}',
-            $html
-        );
-        $html = str_replace(
-            '.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;display:inline-block;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.35;vertical-align:middle}',
-            '.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;display:inline-block;box-sizing:border-box;max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:break-word;line-height:1.35;vertical-align:middle;text-align:center}',
-            $html
-        );
-        if (strpos($html, '.role-code a,.role-code .entity-link,.role-code .role-link,.role-code .bundle-link') === false) {
-            $html = str_replace(
-                '.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;display:inline-block;box-sizing:border-box;max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:break-word;line-height:1.35;vertical-align:middle;text-align:center}',
-                '.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;display:inline-block;box-sizing:border-box;max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:break-word;line-height:1.35;vertical-align:middle;text-align:center}' . "\n" .
-                '.role-code a,.role-code .entity-link,.role-code .role-link,.role-code .bundle-link{display:inline;max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:break-word}',
-                $html
-            );
-        }
-
-        return $html;
-    }
-
-    private function replaceAnnex121FinanceColumnWithCeo(string $html): string
-    {
-        return str_replace(
-            '<th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a></th>',
-            '<th><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></th>',
-            $html
-        );
-    }
-
-    /**
-     * @param array{CS: string, EST: string, ENG: string, PPL: string, WKM: string, QA: string, SCM: string, CEO: string, HRIT: string} $cells
-     */
-    private function replaceAnnex121RaciRow(
-        string $html,
-        string $cdr,
-        string $gate,
-        string $activityHtml,
-        array $cells,
-        string $evidenceHtml
-    ): string {
-        $row = '<tr>' . "\n"
-            . '  <td><a href="annex-121-raci-master-matrix.html#r5gate">' . $this->e($gate) . '</a></td><td><a href="../../../../system/organization/04-RACI-Authority/authority-matrix.html#cdr-' . $this->e($cdr) . '">' . $this->e($cdr) . '</a></td><td>' . $activityHtml . '</td>' . "\n"
-            . '  ' . $this->raciCell($cells['CS']) . "\n"
-            . '  ' . $this->raciCell($cells['EST']) . "\n"
-            . '  ' . $this->raciCell($cells['ENG']) . "\n"
-            . '  ' . $this->raciCell($cells['PPL']) . "\n"
-            . '  ' . $this->raciCell($cells['WKM']) . "\n"
-            . '  ' . $this->raciCell($cells['QA']) . "\n"
-            . '  ' . $this->raciCell($cells['SCM']) . "\n"
-            . '  ' . $this->raciCell($cells['CEO']) . "\n"
-            . '  ' . $this->raciCell($cells['HRIT']) . "\n"
-            . '  <td>' . $evidenceHtml . '</td>' . "\n"
-            . '</tr>';
-
-        $pattern = '/<tr>\s*<td><a href="annex-121-raci-master-matrix\.html#r5gate">' . preg_quote($gate, '/') . '<\/a><\/td><td><a href="../../../../system/organization/04-RACI-Authority/authority-matrix\.html#cdr-' . preg_quote($cdr, '/') . '">' . preg_quote($cdr, '/') . '<\/a><\/td>.*?<\/tr>/s';
-        $next = preg_replace($pattern, $row, $html, 1, $count);
-        if ($count !== 1 || $next === null) {
-            throw new RuntimeException('decision_threshold_annex121_row_not_found:' . $gate . ':' . $cdr);
-        }
-
-        return $next;
-    }
-
-    private function raciCell(string $value): string
-    {
-        $value = strtoupper(trim($value));
-        if (!in_array($value, ['A', 'R', 'C', 'I'], true)) {
-            return '<td></td>';
-        }
-
-        return '<td class="raci-cell raci-' . $value . '">' . $value . '</td>';
-    }
 
     /**
      * @param array<string, mixed> $config
@@ -1257,7 +944,7 @@ final class DecisionThresholdService
 
     private function raciGateQuickTableBlock(): string
     {
-        $annex121 = '../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html';
+        $raciMaster = 'raci-master-matrix.html';
         $rows = [
             ['G0', 'RFQ, báo giá, điều kiện thương mại, chấp thuận đơn hàng và CCR sớm.', $this->roleList(['EST', 'CEO'], 'system')],
             ['G1', '<a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html">DFM</a>, phát hành kỹ thuật, ECO, thay thế và thu hồi gói kỹ thuật.', $this->roleList(['ENGM', 'QA'], 'system')],
@@ -1271,7 +958,7 @@ final class DecisionThresholdService
 
         $htmlRows = [];
         foreach ($rows as $row) {
-            $htmlRows[] = '<tr><td><a href="' . $annex121 . '#r5gate">' . $row[0] . '</a></td><td>' . $row[1] . '</td><td>' . $row[2] . '</td><td><a href="' . $annex121 . '">ANNEX-121</a> mục 5</td></tr>';
+            $htmlRows[] = '<tr><td><a href="' . $raciMaster . '#r5gate">' . $row[0] . '</a></td><td>' . $row[1] . '</td><td>' . $row[2] . '</td><td><a href="' . $raciMaster . '">RACI-MASTER-MATRIX</a> mục 5</td></tr>';
         }
 
         return '<div class="table-card"><table class="table">' . "\n"
@@ -1281,45 +968,6 @@ final class DecisionThresholdService
             . implode("\n", $htmlRows) . "\n"
             . '</tbody>' . "\n"
             . '</table></div>';
-    }
-
-    /**
-     * @param array<string, mixed> $item
-     */
-    private function replaceCdrRow(string $html, string $cdr, array $item): string
-    {
-        $row = '<tr id="cdr-' . $this->e($cdr) . '">' . "\n"
-            . '  <td><a href="authority-matrix.html#cdr-' . $this->e($cdr) . '">' . $this->e($cdr) . '</a></td>' . "\n"
-            . '  <td>' . $this->e($this->cdrDecisionLabel($cdr, $item)) . '</td>' . "\n"
-            . '  <td>' . $this->linkText($item['condition'], 'system') . '</td>' . "\n"
-            . '  <td>' . $this->linkText($item['l1'], 'system') . '</td>' . "\n"
-            . '  <td>' . $this->linkText($item['l2'], 'system') . '</td>' . "\n"
-            . '  <td>' . $this->linkText($item['l3'], 'system') . '</td>' . "\n"
-            . '  <td><span class="role-code">' . $this->linkText($item['r'], 'system') . '</span></td>' . "\n"
-            . '  <td>' . $this->linkText($item['evidence'], 'system') . '</td>' . "\n"
-            . '  <td>' . $this->linkText($item['escalation'], 'system') . '</td>' . "\n"
-            . '</tr>';
-
-        $pattern = '/<tr id="cdr-' . preg_quote($cdr, '/') . '">.*?<\/tr>/s';
-        $next = preg_replace($pattern, $row, $html, 1, $count);
-        if ($count !== 1 || $next === null) {
-            throw new RuntimeException('decision_threshold_cdr_row_not_found:' . $cdr);
-        }
-        return $next;
-    }
-
-    /**
-     * @param array<string, mixed> $item
-     */
-    private function cdrDecisionLabel(string $cdr, array $item): string
-    {
-        if ($cdr === 'E3') {
-            return 'Phê duyệt điều kiện kỹ thuật cho gia công ngoài';
-        }
-        if ($cdr === 'E4') {
-            return 'Xác nhận chất lượng đầu vào sau gia công ngoài';
-        }
-        return (string)$item['decision'];
     }
 
     private function replaceManagedBlock(string $html, string $key, string $block, string $fallbackPattern): string

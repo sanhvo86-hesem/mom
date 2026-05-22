@@ -8,7 +8,7 @@
  * Single-source-of-truth model — NOTHING is duplicated:
  *   - RACI (A/R/C/I per CDR/gate) is read live from RACI-MASTER-MATRIX §5 gate matrix.
  *   - Authority thresholds (L1/L2/L3 + escalation) are read live from the
- *     ANNEX-120 decision register.
+ *     AUTHORITY-MATRIX decision register.
  * Both are fetched and parsed in the browser at open time, so the panel can
  * never drift from the SSOT — it IS the SSOT, projected.
  *
@@ -112,7 +112,7 @@ function _parseGateMatrix(doc){
     return out;
 }
 
-/* ── Parse ANNEX-120 decision register: cdr -> thresholds ───────────────── */
+/* ── Parse AUTHORITY-MATRIX decision register: cdr -> thresholds ───────────────── */
 function _parseThresholds(doc){
     var map = {};
     var trs = doc.querySelectorAll('tr[id^="cdr-"]');
