@@ -135,8 +135,12 @@ if ($gateTable === null) {
     $ths = $gateTable->getElementsByTagName('thead')->item(0)
                      ->getElementsByTagName('tr')->item(0)
                      ->getElementsByTagName('th');
-    if ($ths->length !== 16) {
-        $p0[] = "RACI-MASTER-MATRIX: gate matrix header has {$ths->length} columns, expected 16.";
+    // Layout since 2026-05-23 consolidation: G and CDR are stacked vertically
+    // inside a single cell (div.gc-stack containing two <a> elements: gate on
+    // top, CDR below). So the matrix now has 15 cells per row (was 16): the
+    // combined G/CDR cell, activity, 12 role cells, FRM/SOP.
+    if ($ths->length !== 15) {
+        $p0[] = "RACI-MASTER-MATRIX: gate matrix header has {$ths->length} columns, expected 15.";
     }
     $rowCount = 0;
     foreach ($gateTable->getElementsByTagName('tbody')->item(0)
@@ -144,20 +148,22 @@ if ($gateTable === null) {
         $tds = tdChildren($tr);
         if (count($tds) === 0) { continue; }
         $rowCount++;
-        $gate = cellText($tds[0]);
-        $cdr  = cellText($tds[1]);
+        // Extract gate and CDR from the two <a> elements inside the combined cell.
+        $anchors = $tds[0]->getElementsByTagName('a');
+        $gate = $anchors->length > 0 ? trim($anchors->item(0)->textContent) : '';
+        $cdr  = $anchors->length > 1 ? trim($anchors->item(1)->textContent) : '';
         $label = "$gate/$cdr";
         if (rowStray($tr)) {
             $p0[] = "RACI-MASTER-MATRIX row $label: stray content outside a <td> (malformed row).";
         }
-        if (count($tds) !== 16) {
-            $p0[] = "RACI-MASTER-MATRIX row $label: ".count($tds)." cells, expected 16.";
+        if (count($tds) !== 15) {
+            $p0[] = "RACI-MASTER-MATRIX row $label: ".count($tds)." cells, expected 15.";
             continue;
         }
         $aRoles = $rRoles = [];
-        for ($i = 3; $i <= 14; $i++) {
+        for ($i = 2; $i <= 13; $i++) {
             $v = strtoupper(cellText($tds[$i]));
-            $role = $GLOBALS['ROLE_COLS'][$i - 3];
+            $role = $GLOBALS['ROLE_COLS'][$i - 2];
             if (!in_array($v, ['A','R','C','I',''], true)) {
                 $p0[] = "RACI-MASTER-MATRIX row $label: invalid letter '".cellText($tds[$i])."' in '$role'.";
             }

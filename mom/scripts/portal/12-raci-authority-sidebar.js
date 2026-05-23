@@ -95,18 +95,23 @@ function _parseGateMatrix(doc){
     var out = [];
     for (var r = 0; r < rows.length; r++) {
         var tds = rows[r].children;
-        if (tds.length !== 16) continue;
+        // Layout since 2026-05-23: G and CDR are stacked inside one cell
+        // (div.gc-stack with two <a> elements). Row now has 15 cells.
+        if (tds.length !== 15) continue;
         var roles = {};
         for (var c = 0; c < ROLE_COLS.length; c++) {
-            var v = (tds[c + 3].textContent || '').trim().toUpperCase();
+            var v = (tds[c + 2].textContent || '').trim().toUpperCase();
             if (v === 'A' || v === 'R' || v === 'C' || v === 'I') roles[ROLE_COLS[c]] = v;
         }
+        var anchors = tds[0].getElementsByTagName('a');
+        var gateText = anchors.length > 0 ? (anchors[0].textContent || '').trim() : '';
+        var cdrText  = anchors.length > 1 ? (anchors[1].textContent || '').trim() : '';
         out.push({
-            gate: (tds[0].textContent || '').trim(),
-            cdr: (tds[1].textContent || '').trim(),
-            activity: (tds[2].textContent || '').trim(),
+            gate: gateText,
+            cdr: cdrText,
+            activity: (tds[1].textContent || '').trim(),
             roles: roles,
-            evidence: (tds[14].textContent || '').trim().toUpperCase()
+            evidence: (tds[13].textContent || '').trim().toUpperCase()
         });
     }
     return out;

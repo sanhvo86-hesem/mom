@@ -502,10 +502,13 @@ final class RaciMatrixService
      */
     private function buildGateBlock(array $rows): string
     {
+        // Since the 2026-05-23 consolidation the matrix uses a single
+        // combined G/CDR cell (stacked vertically inside .gc-stack), so the
+        // generated row has 15 cells: G+CDR | activity | 12 roles | FRM/SOP.
         $out = [];
         foreach ($rows as $row) {
-            $cells  = '<td>' . $row['gate_html'] . '</td>';
-            $cells .= '<td>' . $row['cdr_html'] . '</td>';
+            $cells  = '<td><div class="gc-stack">' . $row['gate_html']
+                    . '<hr>' . $row['cdr_html'] . '</div></td>';
             $cells .= '<td>' . $row['activity_html'] . '</td>';
             foreach (self::ROLES as $role) {
                 $cells .= $this->raciCell((string)($row['roles'][$role] ?? ''));
