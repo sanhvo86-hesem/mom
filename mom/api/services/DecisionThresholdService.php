@@ -930,18 +930,6 @@ final class DecisionThresholdService
         return $html;
     }
 
-    private function updateRaciMasterHtml(string $html): string
-    {
-        $quickTable = $this->raciGateQuickTableBlock();
-        return $this->replaceManagedBlock(
-            $html,
-            'RACI-GATE-AUTHORITY-SUMMARY',
-            $quickTable,
-            '/<div class="table-card"><table class="table">\s*<colgroup><col style="width:12%".*?<\/table><\/div>/s'
-        );
-    }
-
-
     private function removeFinanceDeputyAuthority(string $html): string
     {
         $ceoRow = '<tr><td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></td><td>L1: <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a>; L2: hội đồng <a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-func-heads">FUNC_HEADS</a> do <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> chỉ định trước</td><td>≥ 24 giờ + xác nhận đa số <a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-func-heads">FUNC_HEADS</a>.</td><td><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html#d4">ANNEX-123 d4</a></td></tr>';
@@ -1096,33 +1084,6 @@ final class DecisionThresholdService
         return trim($text);
     }
 
-    private function raciGateQuickTableBlock(): string
-    {
-        $raciMaster = 'raci-master-matrix.html';
-        $rows = [
-            ['G0', 'RFQ, báo giá, điều kiện thương mại, chấp thuận đơn hàng và CCR sớm.', $this->roleList(['EST', 'CEO'], 'system')],
-            ['G1', '<a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html">DFM</a>, phát hành kỹ thuật, ECO, thay thế và thu hồi gói kỹ thuật.', $this->roleList(['ENGM', 'QA'], 'system')],
-            ['G2', 'Phát hành kế hoạch, PO, nhà cung cấp mới và vật tư khẩn trước khi đưa lệnh xuống xưởng.', $this->roleList(['PPL', 'SCM', 'CEO'], 'system')],
-            ['G3', 'Điều phối trong ngày, đổi cài đặt máy, chuyển việc, tăng ca, khôi phục sau va chạm, điều phối gia công ngoài và phát hành <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html">CAM</a>/NC.', $this->roleList(['PD', 'WKM', 'SCM', 'ENGM'], 'system')],
-            ['G4', 'Nhả mẫu đầu tiên đạt hoặc xử lý mẫu đầu tiên không đạt; không chạy loạt nếu bằng chứng FAI chưa được quyết định.', $this->roleList(['QA'], 'system')],
-            ['G5', 'NCR, quyết định xử lý, đóng CAPA, nhả giữ hàng, loại bỏ, SCAR và chấp thuận nhượng bộ.', $this->roleList(['QA', 'CEO', 'SCM'], 'system')],
-            ['G6', 'Phát hành CoC, ký kiểm cuối và bằng chứng sẵn sàng giao hàng.', $this->roleList(['QA'], 'system')],
-            ['G7', 'Chặn giao hàng, dỡ chặn giao hàng, khiếu nại/RMA và CCR muộn sau khi giao hoặc sát giao.', $this->roleList(['QA', 'CEO', 'CS'], 'system')],
-        ];
-
-        $htmlRows = [];
-        foreach ($rows as $row) {
-            $htmlRows[] = '<tr><td><a href="' . $raciMaster . '#r5gate">' . $row[0] . '</a></td><td>' . $row[1] . '</td><td>' . $row[2] . '</td><td><a href="' . $raciMaster . '">RACI-MASTER-MATRIX</a> mục 5</td></tr>';
-        }
-
-        return '<div class="table-card"><table class="table">' . "\n"
-            . '<colgroup><col style="width:12%"/><col style="width:48%"/><col style="width:20%"/><col style="width:20%"/></colgroup>' . "\n"
-            . '<thead><tr><th>Cổng</th><th>Tóm tắt bàn giao</th><th>Người A thường gặp</th><th>Chi tiết</th></tr></thead>' . "\n"
-            . '<tbody>' . "\n"
-            . implode("\n", $htmlRows) . "\n"
-            . '</tbody>' . "\n"
-            . '</table></div>';
-    }
 
     private function replaceManagedBlock(string $html, string $key, string $block, string $fallbackPattern): string
     {
@@ -1232,14 +1193,6 @@ final class DecisionThresholdService
         }
 
         return $escaped;
-    }
-
-    /**
-     * @param array<int, string> $roles
-     */
-    private function roleList(array $roles, string $context): string
-    {
-        return implode(' / ', array_map(fn(string $role): string => $this->linkText($role, $context), $roles));
     }
 
     /**
