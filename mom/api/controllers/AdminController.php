@@ -1180,8 +1180,8 @@ class AdminController extends BaseController
 
     /**
      * GET admin_kpi_registry_get — Load the governed KPI catalog for the
-     * KPI Admin Console (33 governance KPIs + gate / proposed / dashboard
-     * metrics, with coverage statistics).
+     * KPI Admin Console (official, operating, gate, JD, data-contract,
+     * counter, retired and integrity views with coverage statistics).
      *
      * @return never
      */
@@ -1261,6 +1261,7 @@ class AdminController extends BaseController
                 || str_starts_with($msg, 'kpi_registry_invalid_cadence')
                 || str_starts_with($msg, 'kpi_registry_threshold_order')
                 || str_starts_with($msg, 'kpi_registry_added_missing_code')
+                || str_starts_with($msg, 'kpi_registry_added_missing_contract')
                 || str_starts_with($msg, 'kpi_registry_added_code_conflict')
                 || str_starts_with($msg, 'kpi_registry_missing_code')) {
                 $this->error('kpi_registry_invalid', 422, 'Vi phạm quy tắc KPI: ' . $msg);

@@ -178,6 +178,8 @@ final class KpiEngine
     public const CONSOLE_EDITABLE_FIELDS = [
         'thresholds', 'owner_role', 'data_stewardship_role', 'cadence',
         'decision_action', 'action_reference', 'counter_metric',
+        'data_contract_gap', 'target_graduation_condition',
+        'evidence_source', 'blocking_conditions',
     ];
 
     /** Metric codes for all supported KPIs. */
@@ -546,6 +548,10 @@ final class KpiEngine
                 'decision_action' => $this->stringField($row, 'decision_action'),
                 'action_reference' => $this->stringField($row, 'action_reference'),
                 'attribution_rule' => $this->stringField($row, 'attribution_rule'),
+                'data_contract_gap' => $this->stringField($row, 'data_contract_gap'),
+                'target_graduation_condition' => $this->stringField($row, 'target_graduation_condition'),
+                'evidence_source' => $this->stringField($row, 'evidence_source'),
+                'blocking_conditions' => $this->arrayField($row, 'blocking_conditions'),
                 'registry_counter_metric' => is_array($row['counter_metric'] ?? null)
                     ? $row['counter_metric'] : null,
                 'reward_eligible' => $row['reward_eligible'] ?? null,
@@ -559,8 +565,20 @@ final class KpiEngine
             }
             $this->upsertCatalogMetric($catalog, $code, 'proposed_operating_metrics', [
                 'name' => $this->stringField($row, 'name'),
+                'name_vi' => $this->stringField($row, 'name_vi'),
                 'layer' => $this->stringField($row, 'layer'),
                 'registry_status' => $this->stringField($row, 'status'),
+                'registry_calculation_status' => $this->stringField($row, 'calculation_status'),
+                'thresholds' => is_array($row['thresholds'] ?? null) ? $row['thresholds'] : null,
+                'owner_role' => $this->stringField($row, 'owner_role'),
+                'cadence' => $this->stringField($row, 'cadence'),
+                'decision_action' => $this->stringField($row, 'decision_action'),
+                'data_contract_gap' => $this->stringField($row, 'data_contract_gap'),
+                'target_graduation_condition' => $this->stringField($row, 'target_graduation_condition'),
+                'evidence_source' => $this->stringField($row, 'evidence_source'),
+                'blocking_conditions' => $this->arrayField($row, 'blocking_conditions'),
+                'registry_counter_metric' => is_array($row['counter_metric'] ?? null)
+                    ? $row['counter_metric'] : null,
             ], $aliases);
         }
 
@@ -593,17 +611,39 @@ final class KpiEngine
                 'gate' => $this->stringField($row, 'gate'),
                 'linked_cdr' => is_array($row['linked_cdr'] ?? null) ? $row['linked_cdr'] : null,
                 'gate_pass_condition' => $this->stringField($row, 'gate_pass_condition'),
+                'registry_calculation_status' => $this->stringField($row, 'calculation_status'),
+                'thresholds' => is_array($row['thresholds'] ?? null) ? $row['thresholds'] : null,
+                'owner_role' => $this->stringField($row, 'owner_role'),
+                'cadence' => $this->stringField($row, 'cadence'),
+                'data_contract_gap' => $this->stringField($row, 'data_contract_gap'),
+                'target_graduation_condition' => $this->stringField($row, 'target_graduation_condition'),
+                'evidence_source' => $this->stringField($row, 'evidence_source'),
+                'blocking_conditions' => $this->arrayField($row, 'blocking_conditions'),
+                'registry_counter_metric' => is_array($row['counter_metric'] ?? null)
+                    ? $row['counter_metric'] : null,
             ], $aliases);
         }
 
         $this->enrichCatalogGovernance($catalog, $registry);
         ksort($catalog);
+        $jdScorecards = $this->jdScorecards();
+        $gateCoverage = $this->gateCoverage($registry);
+        $integrityStatus = $this->catalogIntegrityStatus($registry, $catalog);
 
         return [
             'registry_id' => is_string($registry['registry_id'] ?? null) ? $registry['registry_id'] : null,
             'registry_version' => is_string($registry['version'] ?? null) ? $registry['version'] : null,
+            'schema_version' => $this->registrySchemaVersion(),
             'registry_schema_version' => $this->registrySchemaVersion(),
             'authority_rule' => is_string($registry['authority_rule'] ?? null) ? $registry['authority_rule'] : null,
+            'metric_types' => [
+                'kpi',
+                'operating_metric',
+                'gate_control_metric',
+                'role_performance_measure',
+                'health_indicator',
+                'counter_metric',
+            ],
             'counts' => [
                 'runtime_calculated_metrics' => count(self::ALL_METRICS),
                 'known_metric_codes' => count($catalog),
@@ -625,6 +665,9 @@ final class KpiEngine
             'scorecard_operating_model' => is_array($registry['scorecard_operating_model'] ?? null) ? $registry['scorecard_operating_model'] : [],
             'document_audit' => is_array($registry['document_audit'] ?? null) ? $registry['document_audit'] : [],
             'performance_governance_audit' => is_array($registry['performance_governance_audit'] ?? null) ? $registry['performance_governance_audit'] : [],
+            'jd_scorecards' => $jdScorecards,
+            'gate_coverage' => $gateCoverage,
+            'integrity_status' => $integrityStatus,
             'metrics' => array_values($catalog),
         ];
     }
@@ -799,6 +842,10 @@ final class KpiEngine
                     'tier'               => (string) ($row['tier'] ?? ''),
                     'counter_code'       => is_array($cm)
                         ? (string) ($cm['code'] ?? '') : '',
+                    'metric_type'        => (string) ($row['metric_type'] ?? ''),
+                    'evidence_source'    => (string) ($row['evidence_source'] ?? ''),
+                    'blocking_conditions'=> is_array($row['blocking_conditions'] ?? null)
+                        ? $row['blocking_conditions'] : [],
                 ];
             }
         }
@@ -807,28 +854,54 @@ final class KpiEngine
             if (!is_array($card)) {
                 continue;
             }
+            $rawActive = is_array($card['active_scorecard'] ?? null)
+                ? $card['active_scorecard']
+                : (is_array($card['scorecard'] ?? null) ? $card['scorecard'] : []);
             $items = [];
-            foreach (($card['scorecard'] ?? []) as $it) {
+            foreach ($rawActive as $it) {
                 if (!is_array($it)) {
                     continue;
                 }
                 $code = strtoupper(trim((string) ($it['kpi_code'] ?? '')));
                 $m = $meta[$code] ?? [];
+                $calcStatus = (string) ($m['calculation_status'] ?? '');
+                $defaultScoreStatus = in_array($calcStatus, ['staged_data_contract', 'data_contract_required'], true)
+                    ? 'candidate_data_contract'
+                    : 'active_runtime_or_manual';
                 $items[] = [
                     'kpi_code'           => $code,
+                    'mapped_canonical_metric' => (string) ($it['mapped_canonical_metric'] ?? $code),
+                    'measure_type'       => (string) ($it['measure_type'] ?? ($m['metric_type'] ?? 'role_performance_measure')),
                     'weight'             => (int) ($it['weight'] ?? 0),
                     'rationale'          => (string) ($it['rationale'] ?? ''),
                     'name_vi'            => $m['name_vi'] ?? '',
                     'thresholds'         => $m['thresholds'] ?? null,
-                    'calculation_status' => $m['calculation_status'] ?? '',
+                    'calculation_status' => $calcStatus,
                     'counter_code'       => $m['counter_code'] ?? '',
+                    'scorecard_scoring_status' => (string) ($it['scorecard_scoring_status'] ?? $defaultScoreStatus),
+                    'scorecard_contributes_to_reward' => (bool) ($it['scorecard_contributes_to_reward'] ?? false),
+                    'evidence_source'    => (string) ($it['evidence_source'] ?? ($m['evidence_source'] ?? '')),
+                    'controllability_scope' => (string) ($it['controllability_scope'] ?? ''),
+                    'blocking_conditions'=> is_array($it['blocking_conditions'] ?? null)
+                        ? $it['blocking_conditions'] : ($m['blocking_conditions'] ?? []),
                 ];
             }
+            $candidateBank = is_array($card['candidate_bank'] ?? null) ? $card['candidate_bank'] : [];
+            $optionalRotate = is_array($card['optional_rotate'] ?? null) ? $card['optional_rotate'] : [];
+            $doNotUse = is_array($card['do_not_use'] ?? null) ? $card['do_not_use'] : [];
             $out[strtoupper((string) $roleCode)] = [
-                'role_code'   => (string) ($card['role_code'] ?? $roleCode),
+                'role_code' => (string) ($card['role_code'] ?? $roleCode),
                 'jd_title_vi' => (string) ($card['jd_title_vi'] ?? ''),
-                'jd_file'     => (string) ($card['jd_file'] ?? ''),
-                'scorecard'   => $items,
+                'jd_file' => (string) ($card['jd_file'] ?? ''),
+                'model' => is_array($card['active_scorecard'] ?? null) ? 'active_candidate' : 'legacy_scorecard_projection',
+                'recommended_active_count' => (int) ($card['recommended_active_count'] ?? count($items)),
+                'active_measure_count' => count($items),
+                'active_scorecard' => $items,
+                'scorecard' => $items,
+                'candidate_bank' => $candidateBank,
+                'optional_rotate' => $optionalRotate,
+                'do_not_use' => $doNotUse,
+                'fairness_notes' => is_array($card['fairness_notes'] ?? null) ? $card['fairness_notes'] : [],
             ];
         }
         return ['roles' => $out];
@@ -2755,6 +2828,30 @@ final class KpiEngine
             'data_contract_approval_id' => $this->nullableStringField($override, 'data_contract_approval_id'),
             'evidence_manifest_id' => $this->nullableStringField($override, 'evidence_manifest_id'),
         ];
+        $metric['data_contract_status'] = $runtimeCalculated
+            ? 'approved_runtime'
+            : match ($calculationStatus) {
+                'manual', 'manual_governed' => 'manual_governed',
+                'retired' => 'retired',
+                default => 'staged_data_contract',
+            };
+        $metric['runtime_endpoint'] = $runtimeCalculated ? "GET /api/kpi/{$code}" : null;
+        $metric['input_endpoint'] = "POST /api/kpi/{$code}/input";
+        $metric['data_contract_gap'] = $this->overrideOrDefault(
+            $override,
+            'data_contract_gap',
+            (string) ($metric['data_contract_gap'] ?? ''),
+        );
+        $metric['target_graduation_condition'] = $this->overrideOrDefault(
+            $override,
+            'target_graduation_condition',
+            (string) ($metric['target_graduation_condition'] ?? ''),
+        );
+        $metric['evidence_source'] = $this->overrideOrDefault(
+            $override,
+            'evidence_source',
+            (string) ($metric['evidence_source'] ?? ''),
+        );
     }
 
     /**
@@ -2796,7 +2893,9 @@ final class KpiEngine
         $metric['quantitative_thresholds'] = $this->arrayField($override, 'quantitative_thresholds');
         $metric['rating_criteria'] = $this->overrideOrDefault($override, 'rating_criteria', '');
         $metric['reward_rule'] = $rewardRule;
-        $metric['blocking_conditions'] = $this->stringListFromValue($override['blocking_conditions'] ?? []);
+        $metric['blocking_conditions'] = $this->stringListFromValue(
+            $override['blocking_conditions'] ?? ($metric['blocking_conditions'] ?? []),
+        );
         $metric['scorecard_scoring_status'] = $scorecardApplicable
             ? $this->overrideOrDefault($override, 'scorecard_scoring_status', 'candidate_data_contract')
             : 'not_applicable';
@@ -2821,6 +2920,201 @@ final class KpiEngine
                 ? 'eligible_after_hr_qms_ceo_calibration_and_blocker_check'
                 : (string) $metric['scorecard_scoring_status'];
         }
+    }
+
+    /**
+     * @param array<string, mixed> $registry
+     * @return array<string, mixed>
+     */
+    private function gateCoverage(array $registry): array
+    {
+        $byGate = [];
+        $missingCdr = [];
+        $total = 0;
+        $withCdr = 0;
+
+        foreach ($this->registryRows($registry, 'gate_control_metrics') as $row) {
+            $code = $this->codeField($row, 'canonical_code');
+            if ($code === '') {
+                continue;
+            }
+            $gate = $this->stringField($row, 'gate');
+            if ($gate === '') {
+                $gate = 'unassigned';
+            }
+            $cdr = $this->stringListFromValue($row['linked_cdr'] ?? []);
+            $total++;
+            if ($cdr !== []) {
+                $withCdr++;
+            } else {
+                $missingCdr[] = $code;
+            }
+            $byGate[$gate] ??= [
+                'gate' => $gate,
+                'count' => 0,
+                'with_cdr' => 0,
+                'metrics' => [],
+            ];
+            $byGate[$gate]['count']++;
+            if ($cdr !== []) {
+                $byGate[$gate]['with_cdr']++;
+            }
+            $byGate[$gate]['metrics'][] = [
+                'canonical_code' => $code,
+                'linked_cdr' => $cdr,
+                'gate_pass_condition' => $this->stringField($row, 'gate_pass_condition'),
+                'calculation_status' => $this->stringField($row, 'calculation_status'),
+                'owner_role' => $this->stringField($row, 'owner_role'),
+                'data_contract_gap' => $this->stringField($row, 'data_contract_gap'),
+            ];
+        }
+
+        ksort($byGate);
+        sort($missingCdr);
+
+        return [
+            'total_gate_metrics' => $total,
+            'with_linked_cdr' => $withCdr,
+            'coverage_pct' => $total > 0 ? round($withCdr / $total * 100, 1) : 0.0,
+            'missing_cdr_codes' => $missingCdr,
+            'by_gate' => array_values($byGate),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed>               $registry
+     * @param array<string, array<string, mixed>> $catalog
+     * @return array<string, mixed>
+     */
+    private function catalogIntegrityStatus(array $registry, array $catalog): array
+    {
+        $findings = [];
+        $statusCounts = [];
+        $typeCounts = [];
+
+        foreach ($catalog as $code => $metric) {
+            $status = (string) ($metric['calculation_status'] ?? 'unknown');
+            $type = (string) ($metric['metric_type'] ?? 'unknown');
+            $statusCounts[$status] = ($statusCounts[$status] ?? 0) + 1;
+            $typeCounts[$type] = ($typeCounts[$type] ?? 0) + 1;
+
+            $isStaged = in_array($status, ['staged_data_contract', 'data_contract_required'], true);
+            $reward = ($metric['reward_eligible'] ?? false) === true
+                || ($metric['scorecard_contributes_to_reward'] ?? false) === true;
+            if ($isStaged && $reward) {
+                $findings[] = [
+                    'priority' => 'P0',
+                    'code' => 'STAGED_REWARD_METRIC',
+                    'metric_code' => (string) $code,
+                    'message' => 'Staged/data-contract metric is still marked reward or scorecard-contributing.',
+                ];
+            }
+            if (($metric['is_official_kpi'] ?? false) === true
+                && ($metric['counter_metric'] ?? null) === null) {
+                $findings[] = [
+                    'priority' => 'P1',
+                    'code' => 'OFFICIAL_KPI_WITHOUT_COUNTER',
+                    'metric_code' => (string) $code,
+                    'message' => 'Official KPI has no counter-metric guardrail.',
+                ];
+            }
+        }
+
+        foreach (['annex122_governance_kpis', 'gate_control_metrics', 'proposed_operating_metrics'] as $section) {
+            $seen = [];
+            foreach ($this->registryRows($registry, $section) as $row) {
+                $code = $this->codeField($row, 'canonical_code');
+                if ($code === '') {
+                    continue;
+                }
+                if (isset($seen[$code])) {
+                    $findings[] = [
+                        'priority' => 'P1',
+                        'code' => 'DUPLICATE_CANONICAL_CODE_IN_SECTION',
+                        'metric_code' => $code,
+                        'section' => $section,
+                        'message' => 'Duplicate canonical code within the same registry section.',
+                    ];
+                }
+                $seen[$code] = true;
+            }
+        }
+
+        foreach ($this->registryRows($registry, 'gate_control_metrics') as $row) {
+            $code = $this->codeField($row, 'canonical_code');
+            if ($code !== '' && $this->stringListFromValue($row['linked_cdr'] ?? []) === []) {
+                $findings[] = [
+                    'priority' => 'P1',
+                    'code' => 'GATE_METRIC_WITHOUT_CDR',
+                    'metric_code' => $code,
+                    'message' => 'Gate control metric has no linked CDR evidence anchor.',
+                ];
+            }
+        }
+
+        $roles = $registry['jd_kpi_scorecards']['roles'] ?? [];
+        if (is_array($roles)) {
+            foreach ($roles as $roleCode => $role) {
+                if (!is_array($role)) {
+                    continue;
+                }
+                $items = is_array($role['active_scorecard'] ?? null)
+                    ? $role['active_scorecard']
+                    : (is_array($role['scorecard'] ?? null) ? $role['scorecard'] : []);
+                if ($items === []) {
+                    continue;
+                }
+                $weightTotal = 0;
+                foreach ($items as $item) {
+                    if (is_array($item)) {
+                        $weightTotal += (int) ($item['weight'] ?? 0);
+                    }
+                }
+                if ($weightTotal !== 100) {
+                    $findings[] = [
+                        'priority' => 'P1',
+                        'code' => 'JD_ACTIVE_WEIGHT_NOT_100',
+                        'role_code' => strtoupper((string) $roleCode),
+                        'message' => 'JD active scorecard weight total is not 100.',
+                    ];
+                }
+                if (count($items) > 6) {
+                    $findings[] = [
+                        'priority' => 'P2',
+                        'code' => 'JD_ACTIVE_SET_TOO_LARGE',
+                        'role_code' => strtoupper((string) $roleCode),
+                        'message' => 'JD active scorecard may be too broad for practical coaching.',
+                    ];
+                }
+            }
+        }
+
+        $priorityRank = ['P0' => 0, 'P1' => 1, 'P2' => 2, 'P3' => 3];
+        usort($findings, static function (array $a, array $b) use ($priorityRank): int {
+            return ($priorityRank[$a['priority'] ?? 'P3'] ?? 3) <=> ($priorityRank[$b['priority'] ?? 'P3'] ?? 3);
+        });
+
+        $overall = 'PASS';
+        foreach ($findings as $finding) {
+            if (($finding['priority'] ?? '') === 'P0') {
+                $overall = 'FAIL';
+                break;
+            }
+            if (($finding['priority'] ?? '') === 'P1') {
+                $overall = 'WARN';
+            }
+        }
+
+        ksort($statusCounts);
+        ksort($typeCounts);
+
+        return [
+            'status' => $overall,
+            'finding_count' => count($findings),
+            'status_counts' => $statusCounts,
+            'metric_type_counts' => $typeCounts,
+            'findings' => array_slice($findings, 0, 200),
+        ];
     }
 
     /**

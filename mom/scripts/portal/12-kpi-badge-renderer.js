@@ -80,13 +80,19 @@ function _injectStyle() {
   var css =
     /* the G/Y/R box sits on its own line; the Căn cứ note drops below it */
     '.kpi-rag-badge{display:flex;flex-direction:column;gap:3px;align-items:flex-start;' +
-      'width:fit-content;border:1px dashed #2b8a3e;border-radius:8px;' +
-      'padding:5px 7px;background:#ebfbee;margin-bottom:4px}' +
-    '.kpi-rag-badge[data-kpi-rag-state="unlinked"]{border-color:#e67700;background:#fff9db}' +
+      'width:fit-content;border:1px dashed var(--success);border-radius:8px;' +
+      'padding:5px 7px;background:var(--success-soft);margin-bottom:4px}' +
+    '.kpi-rag-badge[data-kpi-rag-state="unlinked"]{border-color:var(--warning);background:var(--warning-soft)}' +
     '.kpi-rag-badge .kpi-good,.kpi-rag-badge .kpi-warn,.kpi-rag-badge .kpi-bad{' +
       'padding:1px 5px;border-radius:4px;white-space:nowrap}' +
-    '.kpi-rag-mark{font-size:9px;font-weight:700;letter-spacing:.2px;color:#2b8a3e;margin-top:1px}' +
-    '.kpi-rag-mark--off{color:#e67700}';
+    '.kpi-rag-mark{font-size:9px;font-weight:700;letter-spacing:.2px;color:var(--success);margin-top:1px}' +
+    '.kpi-rag-mark--off{color:var(--warning)}' +
+    '.kpi-calc-sym{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;' +
+      'border-radius:999px;font-size:12px}' +
+    '.kpi-calc-runtime{background:var(--success-soft);color:var(--success)}' +
+    '.kpi-calc-manual{background:var(--accent-soft);color:var(--accent)}' +
+    '.kpi-calc-staged{background:var(--warning-soft);color:var(--warning)}' +
+    '.kpi-calc-retired{background:var(--danger-soft);color:var(--danger)}';
   var st = document.createElement('style');
   st.id = 'kpi-rag-badge-style';
   st.textContent = css;

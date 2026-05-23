@@ -38,6 +38,7 @@ var _state = {
   addForm:null,
   /* the one library card expanded into its inline editor: "group:CODE" */
   expandedCode:'',
+  activeView:'overview',
   reason:'',
   /* KPI Library filters (the only view; group + tier are filter chips) */
   filters:{ process:'', category:'', group:'', tier:'', jd:'', status:'', search:'', retired:'' }
@@ -49,7 +50,9 @@ function _newAddForm(){
     process:'unclassified', category:'internal', owner_role:'',
     counter_metric:{ name_vi:'', name:'', intent:'' },
     cadence:'monthly', direction:'higher_is_better', unit:'percent',
-    green_point:'', yellow_point:'', target:'', purpose:'' };
+    green_point:'', yellow_point:'', target:'', purpose:'',
+    decision_action:'', data_contract_gap:'', target_graduation_condition:'',
+    evidence_source:'', blocking_conditions:'' };
 }
 /* Deep-clone a {governance,gate,proposed} group map. */
 function _cloneGroups(src){
@@ -292,16 +295,16 @@ function _render(){
     el.innerHTML = '<div class="hm-empty">' + _t('Đang tải Console KPI...', 'Loading KPI console...') + '</div>';
     return;
   }
-  var body = _renderLibrary();
+  var body = _renderActiveView();
 
   el.innerHTML =
 '<section class="kpi-console">' + _styleBlock() +
   '<header class="kc-head">' +
     '<div class="kc-head-titles">' +
       '<span class="kc-eyebrow">' + _t('Quản trị điều hành', 'Operations governance') + '</span>' +
-      '<h2>' + _t('Console KPI — Thư viện', 'KPI Console — Library') + '</h2>' +
+      '<h2>' + _t('Console KPI — Governance', 'KPI Console — Governance') + '</h2>' +
       '<p>' + _t('Thư viện KPI thực chiến: lọc, mở thẻ để biên tập ngưỡng / owner / nhịp / counter-metric. Lưu ghi overlay runtime và tái tạo §4/§5/§6 trong ANNEX-122.',
-                 'The operating-KPI library: filter, open a card to edit thresholds / owner / cadence / counter-metric. Saving writes the runtime overlay and regenerates ANNEX-122 §4/§5/§6.') + '</p>' +
+                 'The operating-KPI governance console: structured tabs, no raw JSON editing, with runtime/manual/staged/retired labels and ANNEX-122 sync.') + '</p>' +
     '</div>' +
     '<div class="kc-actions">' +
       '<button class="kc-btn" type="button" onclick="_kpiReload()">' + _t('Tải lại', 'Reload') + '</button>' +
@@ -316,9 +319,192 @@ function _render(){
     '<textarea class="kc-reason" oninput="_kpiSetReason(this.value)" placeholder="' +
       _t('Ví dụ: siết ngưỡng đỏ OTD theo cam kết khách hàng mới...', 'Example: tighten OTD red threshold per new customer commitment...') +
       '">' + _esc(_state.reason || '') + '</textarea></div>' +
+  _renderTabs() +
   body +
 '</section>';
   _syncStatus();
+}
+
+var _viewDefs = [
+  ['overview', 'Tổng quan', 'Overview'],
+  ['official', 'Official KPI', 'Official KPI'],
+  ['operating', 'Operating', 'Operating'],
+  ['gate', 'Gate G0-G7', 'Gate G0-G7'],
+  ['jd', 'JD', 'JD'],
+  ['data', 'Data Contracts', 'Data Contracts'],
+  ['counter', 'Counter/Blockers', 'Counter/Blockers'],
+  ['retired', 'Retired/Aliases', 'Retired/Aliases'],
+  ['audit', 'Audit/Drift', 'Audit/Drift']
+];
+
+function _renderTabs(){
+  return '<nav class="kc-tabs" aria-label="KPI console sections">' +
+    _viewDefs.map(function(v){
+      var active = _state.activeView === v[0];
+      var label = _t(v[1], v[2]);
+      return '<button class="kc-tab' + (active ? ' is-active' : '') + '" type="button" onclick="_kpiSetView(\'' +
+        _esc(v[0]) + '\')" aria-pressed="' + (active ? 'true' : 'false') + '">' + _esc(label) + '</button>';
+    }).join('') + '</nav>';
+}
+
+function _viewRows(key){
+  var cfg = _state.config || {};
+  var views = cfg.admin_views || {};
+  if(Array.isArray(views[key])) return views[key];
+  if(Array.isArray(cfg[key])) return cfg[key];
+  return [];
+}
+
+function _renderActiveView(){
+  if(_state.addForm) return _renderAddForm();
+  if(_state.activeView === 'overview') return _renderOverview();
+  if(_state.activeView === 'official')
+    return _metricPanel(_t('Official KPI Scorecard', 'Official KPI Scorecard'), _viewRows('official_kpis'), true);
+  if(_state.activeView === 'operating')
+    return _metricPanel(_t('Operating Metrics', 'Operating Metrics'), _viewRows('operating_metrics'), true);
+  if(_state.activeView === 'gate')
+    return _renderGateCoverage() + _metricPanel(_t('Gate Control Metrics', 'Gate Control Metrics'), _viewRows('gate_control_metrics'), true);
+  if(_state.activeView === 'jd') return _renderJdScorecards();
+  if(_state.activeView === 'data') return _renderDataContracts();
+  if(_state.activeView === 'counter') return _renderCounterBlockers();
+  if(_state.activeView === 'retired')
+    return _metricPanel(_t('Retired / Aliases', 'Retired / Aliases'), _viewRows('retired_metrics'), false);
+  if(_state.activeView === 'audit') return _renderAuditDrift();
+  return _renderOverview();
+}
+
+function _renderOverview(){
+  var cfg = _state.config || {};
+  var views = cfg.admin_views || {};
+  var counts = views.counts || {};
+  var integrity = views.integrity_status || cfg.integrity_status || {};
+  var gate = views.gate_coverage || cfg.gate_coverage || {};
+  var boxes = [
+    [_t('Tổng metric', 'Total metrics'), counts.total_metrics || ((_state.config || {}).library || []).length],
+    [_t('Official active', 'Official active'), counts.official_active || 0],
+    [_t('Staged', 'Staged'), counts.staged || 0],
+    [_t('Counter', 'Counter'), counts.counter_metrics || 0],
+    [_t('JD scorecard', 'JD scorecard'), counts.role_scorecards || 0],
+    [_t('Gate CDR', 'Gate CDR'), (gate.with_linked_cdr || 0) + '/' + (gate.total_gate_metrics || 0)]
+  ];
+  var status = String(integrity.status || 'PASS');
+  var html = '<section class="kc-panel"><div class="kc-panel-head"><h3>' +
+    _t('Tổng quan kiểm soát KPI', 'KPI control overview') + '</h3><span class="kc-integrity kc-integrity-' +
+    _esc(status.toLowerCase()) + '">' + _esc(status) + '</span></div>' +
+    '<div class="kc-summary-grid">' + boxes.map(function(b){
+      return '<div class="kc-summary"><span>' + _esc(b[0]) + '</span><b>' + _esc(b[1]) + '</b></div>';
+    }).join('') + '</div>' +
+    '<div class="kc-metric-split"><div>' + _summaryList(_t('Theo trạng thái', 'By status'), counts.by_calculation_status || {}) +
+    '</div><div>' + _summaryList(_t('Theo loại metric', 'By metric type'), counts.by_metric_type || {}) + '</div></div>';
+  var findings = integrity.findings || [];
+  if(findings.length){
+    html += '<div class="kc-finding-list"><h4>' + _t('Integrity findings', 'Integrity findings') + '</h4>' +
+      findings.slice(0, 8).map(_findingRow).join('') + '</div>';
+  }
+  html += '</section>';
+  return html;
+}
+
+function _summaryList(title, map){
+  var keys = Object.keys(map || {});
+  if(!keys.length) return '<div class="kc-mini">' + _esc(title) + ': —</div>';
+  return '<h4>' + _esc(title) + '</h4><div class="kc-pill-list">' + keys.map(function(k){
+    return '<span class="kc-pill">' + _esc(k) + ' <b>' + _esc(map[k]) + '</b></span>';
+  }).join('') + '</div>';
+}
+
+function _metricPanel(title, rows, editable){
+  rows = rows || [];
+  var nav = '<div class="kc-nav"><span class="kc-nav-title">' + _esc(title) + '</span><span class="kc-nav-spacer"></span>' +
+    (editable ? '<button class="kc-btn primary" type="button" onclick="_kpiAddOpen()">+ ' +
+      _t('Đề xuất metric', 'Propose metric') + '</button>' : '') + '</div>';
+  if(!rows.length) return nav + '<div class="hm-empty">' + _t('Chưa có dữ liệu cho view này.', 'No data for this view yet.') + '</div>';
+  return nav + '<div class="kc-lib-grid">' + rows.map(_renderLibCard).join('') + '</div>';
+}
+
+function _renderGateCoverage(){
+  var cov = (_state.config && (_state.config.gate_coverage || ((_state.config.admin_views || {}).gate_coverage))) || {};
+  var gates = cov.by_gate || [];
+  if(!gates.length) return '';
+  return '<section class="kc-panel"><div class="kc-panel-head"><h3>Gate G0-G7</h3><span class="kc-mini">' +
+    _esc(cov.coverage_pct || 0) + '% CDR</span></div><div class="kc-gate-grid">' +
+    gates.map(function(g){
+      return '<div class="kc-gate"><b>' + _esc(g.gate) + '</b><span>' + _esc(g.with_cdr || 0) + '/' +
+        _esc(g.count || 0) + ' CDR</span><div class="kc-mini">' +
+        (g.metrics || []).slice(0, 4).map(function(m){ return _esc(m.canonical_code); }).join(', ') +
+        '</div></div>';
+    }).join('') + '</div></section>';
+}
+
+function _renderJdScorecards(){
+  var roles = _viewRows('role_scorecards');
+  if(!roles.length){
+    var legacy = ((_state.config || {}).jd_kpi_scorecards || {}).roles || {};
+    roles = Object.keys(legacy).map(function(k){
+      var role = legacy[k] || {};
+      var items = role.active_scorecard || role.scorecard || [];
+      var total = items.reduce(function(sum, it){ return sum + (parseInt(it.weight,10) || 0); }, 0);
+      return { role_code:k, jd_title_vi:role.jd_title_vi || '', active_measure_count:items.length,
+        active_weight_total:total, candidate_count:(role.candidate_bank || []).length,
+        optional_count:(role.optional_rotate || []).length, do_not_use_count:(role.do_not_use || []).length };
+    });
+  }
+  return '<section class="kc-panel"><div class="kc-panel-head"><h3>JD Scorecards</h3><span class="kc-mini">' +
+    _esc(roles.length) + ' roles</span></div>' +
+    _simpleTable(['Role','JD','Active','Weight','Candidate','Optional','Do not use'], roles.map(function(r){
+      return [r.role_code, r.jd_title_vi || '', r.active_measure_count || 0,
+        (r.active_weight_total == null ? '—' : r.active_weight_total + '%'),
+        r.candidate_count || 0, r.optional_count || 0, r.do_not_use_count || 0];
+    })) + '</section>';
+}
+
+function _renderDataContracts(){
+  var rows = _viewRows('data_contracts');
+  return '<section class="kc-panel"><div class="kc-panel-head"><h3>Data Contracts</h3><span class="kc-mini">' +
+    _esc(rows.length) + ' metrics</span></div>' +
+    _simpleTable(['Code','Status','Gap','Graduation','Input','Runtime'], rows.map(function(r){
+      return [r.canonical_code, r.calculation_status || r.data_contract_status,
+        r.data_contract_gap || '—', r.target_graduation_condition || '—',
+        r.input_endpoint || '—', r.runtime_endpoint || '—'];
+    })) + '</section>';
+}
+
+function _renderCounterBlockers(){
+  var rows = _viewRows('counter_metrics');
+  return '<section class="kc-panel"><div class="kc-panel-head"><h3>Counter / Blockers</h3><span class="kc-mini">' +
+    _esc(rows.length) + ' counters</span></div>' +
+    _simpleTable(['Parent','Counter','Intent','Parent status','Reward'], rows.map(function(r){
+      return [r.parent_code, r.counter_code, r.intent || r.name_vi || '—',
+        r.parent_status || '—', r.parent_reward_eligible ? 'yes' : 'no'];
+    })) + '</section>';
+}
+
+function _renderAuditDrift(){
+  var views = ((_state.config || {}).admin_views || {});
+  var integrity = views.integrity_status || (_state.config || {}).integrity_status || {};
+  var findings = integrity.findings || [];
+  var rows = findings.map(function(f){
+    return [f.priority || '', f.code || '', f.metric_code || f.role_code || '', f.message || ''];
+  });
+  return '<section class="kc-panel"><div class="kc-panel-head"><h3>Audit / Drift</h3><span class="kc-integrity kc-integrity-' +
+    _esc(String(integrity.status || 'pass').toLowerCase()) + '">' + _esc(integrity.status || 'PASS') +
+    '</span></div>' + (rows.length ? _simpleTable(['P','Finding','Object','Message'], rows)
+      : '<div class="hm-empty">' + _t('Không có finding integrity đang hiển thị.', 'No integrity finding to show.') + '</div>') +
+    '</section>';
+}
+
+function _findingRow(f){
+  return '<div class="kc-finding"><b>' + _esc(f.priority || '') + '</b><span>' +
+    _esc(f.code || '') + '</span><small>' + _esc(f.metric_code || f.role_code || '') +
+    '</small><p>' + _esc(f.message || '') + '</p></div>';
+}
+
+function _simpleTable(headers, rows){
+  return '<div class="kc-table-wrap"><table class="kc-table"><thead><tr>' +
+    headers.map(function(h){ return '<th>' + _esc(h) + '</th>'; }).join('') +
+    '</tr></thead><tbody>' + (rows || []).map(function(row){
+      return '<tr>' + row.map(function(cell){ return '<td>' + _esc(cell == null ? '' : cell) + '</td>'; }).join('') + '</tr>';
+    }).join('') + '</tbody></table></div>';
 }
 
 /* ── KPI Library — the single console view ─────────────────────────── */
@@ -331,10 +517,13 @@ function _draftLibRows(){
       out.push({
         canonical_code:r.canonical_code, name:r.name, name_vi:r.name_vi,
         group:grp, tier:r.tier, process:r.process, category:r.category,
-        gate:null, calculation_status:'manual', owner_role:r.owner_role,
+        gate:null, calculation_status:'staged_data_contract', owner_role:r.owner_role,
         applicable_jds:r.owner_role ? [r.owner_role] : [],
         counter_metric:r.counter_metric, thresholds:r.thresholds || {},
-        retired:false, origin:'console_added', _draft:true, _draftIdx:idx
+        data_contract_gap:r.data_contract_gap || '',
+        target_graduation_condition:r.target_graduation_condition || '',
+        evidence_source:r.evidence_source || '',
+        retired:false, origin:'console_proposed', _draft:true, _draftIdx:idx
       });
     });
   });
@@ -389,7 +578,7 @@ function _renderLibrary(){
     '<span class="kc-nav-title">📚 ' + _t('Thư viện KPI', 'KPI Library') + '</span>' +
     '<span class="kc-nav-spacer"></span>' +
     '<button class="kc-btn primary" type="button" onclick="_kpiAddOpen()">+ ' +
-      _t('Thêm KPI', 'Add KPI') + '</button></div>';
+      _t('Đề xuất metric', 'Propose metric') + '</button></div>';
 
   if(_state.addForm) return nav + _renderAddForm();
 
@@ -415,6 +604,7 @@ function _renderLibrary(){
   var stOpts = [['', _t('— Mọi trạng thái —', '— All statuses —')],
     ['runtime_calculated', _t('Tính runtime', 'Runtime')],
     ['staged_data_contract', _t('Chờ data contract', 'Staged')],
+    ['manual_governed', _t('Nhập tay có kiểm soát', 'Manual governed')],
     ['manual', _t('Nhập tay', 'Manual')]];
   var nRetired = (facets.retired || 0);
   var retOpts = [['', _t('— Đang dùng & ngừng dùng —', '— Active & retired —')],
@@ -454,7 +644,8 @@ function _renderScorecard(){
   var f = _state.filters;
   var roles = ((_state.config || {}).jd_kpi_scorecards || {}).roles || {};
   var role = (f.jd && roles[f.jd]) ? roles[f.jd] : null;
-  var items = role && Array.isArray(role.scorecard) ? role.scorecard : [];
+  var items = role && Array.isArray(role.active_scorecard) ? role.active_scorecard :
+    (role && Array.isArray(role.scorecard) ? role.scorecard : []);
   if(!items.length) return '';
   var rows = items.map(function(it){
     return '<div class="kc-sc-row">' +
@@ -503,9 +694,9 @@ function _renderAddForm(){
   });
 
   function row(label, control){ return _field(label, control); }
-  var html = '<div class="kc-addform"><h3>+ ' + _t('Thêm KPI mới', 'Add a new KPI') + '</h3>' +
-    '<p class="kc-mini">' + _t('KPI mới mặc định ở trạng thái nhập tay — nạp số qua endpoint nhập liệu. Lưu để ghi vào overlay runtime.',
-      'A new KPI defaults to manual status — feed it via the data-input endpoint. Save writes it to the runtime overlay.') + '</p>' +
+  var html = '<div class="kc-addform"><h3>+ ' + _t('Đề xuất metric mới', 'Propose a new metric') + '</h3>' +
+    '<p class="kc-mini">' + _t('Metric mới luôn ở trạng thái staged data contract. Console không được tạo runtime, công thức, hoặc scoring chính thức.',
+      'New metrics always stay staged data contract. The console cannot create runtime logic, formula truth, or official scoring.') + '</p>' +
     '<div class="kc-grid">' +
     row(_t('Nhóm', 'Group'),
       '<select class="kc-input" onchange="_kpiAddField(\'group\',this.value)">' + _selOptions(grpOpts, a.group) + '</select>') +
@@ -549,7 +740,17 @@ function _renderAddForm(){
     _field(_t('Counter-metric — ý nghĩa chống gaming', 'Counter-metric — anti-gaming intent'),
       '<textarea class="kc-input kc-ta" oninput="_kpiAddCounter(\'intent\',this.value)">' + _esc(a.counter_metric.intent) + '</textarea>') +
     _field(_t('Mục đích / cách dùng', 'Purpose / usage'),
-      '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'purpose\',this.value)">' + _esc(a.purpose) + '</textarea>');
+      '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'purpose\',this.value)">' + _esc(a.purpose) + '</textarea>') +
+    _field(_t('Data-contract gap bắt buộc', 'Required data-contract gap'),
+      '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'data_contract_gap\',this.value)">' + _esc(a.data_contract_gap) + '</textarea>') +
+    _field(_t('Điều kiện graduation bắt buộc', 'Required graduation condition'),
+      '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'target_graduation_condition\',this.value)">' + _esc(a.target_graduation_condition) + '</textarea>') +
+    _field(_t('Nguồn evidence dự kiến', 'Expected evidence source'),
+      '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'evidence_source\',this.value)">' + _esc(a.evidence_source) + '</textarea>') +
+    _field(_t('Quyết định khi lệch ngưỡng', 'Decision on threshold breach'),
+      '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'decision_action\',this.value)">' + _esc(a.decision_action) + '</textarea>') +
+    _field(_t('Blocking conditions (mỗi dòng một điều kiện)', 'Blocking conditions (one per line)'),
+      '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'blocking_conditions\',this.value)">' + _esc(a.blocking_conditions) + '</textarea>');
 
   var b = _ragBands({ green_point:parseFloat(a.green_point), yellow_point:parseFloat(a.yellow_point),
     direction:a.direction, unit:a.unit });
@@ -561,9 +762,9 @@ function _renderAddForm(){
   html += '<div class="kc-addform-actions">' +
     '<button class="kc-btn" type="button" onclick="_kpiAddClose()">' + _t('Hủy', 'Cancel') + '</button>' +
     '<button class="kc-btn primary" type="button" onclick="_kpiAddSubmit()">' +
-      _t('Thêm vào danh sách lưu', 'Add to save list') + '</button></div>' +
-    '<p class="kc-mini">' + _t('KPI sẽ được ghi khi bấm “Lưu & đồng bộ tài liệu”.',
-      'The KPI is persisted when you click “Save & sync documents”.') + '</p></div>';
+      _t('Thêm proposal vào danh sách lưu', 'Add proposal to save list') + '</button></div>' +
+    '<p class="kc-mini">' + _t('Proposal sẽ được ghi khi bấm “Lưu & đồng bộ tài liệu”; vẫn không được score cho tới khi có data contract/runtime hợp lệ.',
+      'The proposal is persisted when you click “Save & sync documents”; it is still not scored until a governed data contract/runtime path exists.') + '</p></div>';
   return html;
 }
 
@@ -671,9 +872,9 @@ function _calcBadge(status){
     return '<span class="kc-stat-sym kc-sym-ok" title="' +
       _t('Tính runtime — số tính tự động từ hệ thống', 'Runtime — computed automatically') +
       '">⚙</span>';
-  if(status === 'manual')
+  if(status === 'manual' || status === 'manual_governed')
     return '<span class="kc-stat-sym kc-sym-manual" title="' +
-      _t('Nhập tay — nạp số qua endpoint nhập liệu', 'Manual — fed via the data-input endpoint') +
+      _t('Nhập tay có kiểm soát — nạp số qua endpoint nhập liệu', 'Manual governed — fed via the data-input endpoint') +
       '">✎</span>';
   if(status === 'retired')
     return '<span class="kc-stat-sym kc-sym-bad" title="' +
@@ -712,6 +913,19 @@ function _renderEditCard(m, section, inline){
   if(status === 'staged_data_contract'){
     html += '<div class="kc-warn">' + _t('KPI chưa có hợp đồng dữ liệu — nhập số qua endpoint nhập liệu.',
       'KPI has no data contract — feed it via the data-input endpoint.') + '</div>';
+  }
+  if(status === 'staged_data_contract' || status === 'manual' || status === 'manual_governed'){
+    html += '<div class="kc-data-contract">' +
+      _field(_t('Data-contract gap', 'Data-contract gap'),
+        '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'data_contract_gap\',this.value)">' +
+        c(_val(m,section,'data_contract_gap')) + '</textarea>') +
+      _field(_t('Điều kiện graduation', 'Graduation condition'),
+        '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'target_graduation_condition\',this.value)">' +
+        c(_val(m,section,'target_graduation_condition')) + '</textarea>') +
+      _field(_t('Nguồn evidence', 'Evidence source'),
+        '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'evidence_source\',this.value)">' +
+        c(_val(m,section,'evidence_source')) + '</textarea>') +
+    '</div>';
   }
   html += _ragPreview(m, section);
 
@@ -829,150 +1043,177 @@ function _refreshRag(section, code){
 /* ── Styles — Graphics Authority tokens only ──────────────────────── */
 function _styleBlock(){
   return '<style>' +
-  '.kpi-console{display:flex;flex-direction:column;gap:14px;color:var(--text-1,#1a2233)}' +
+  '.kpi-console{display:flex;flex-direction:column;gap:14px;color:var(--text-1)}' +
   '.kc-head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}' +
-  '.kc-eyebrow{font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--text-3,#7a869a)}' +
-  '.kc-head h2{margin:4px 0;font-size:20px;color:var(--text-1,#1a2233)}' +
-  '.kc-head p{margin:0;font-size:13px;color:var(--text-2,#55617a);max-width:60ch}' +
+  '.kc-eyebrow{font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--text-3)}' +
+  '.kc-head h2{margin:4px 0;font-size:20px;color:var(--text-1)}' +
+  '.kc-head p{margin:0;font-size:13px;color:var(--text-2);max-width:60ch}' +
   '.kc-actions{display:flex;gap:8px;flex-wrap:wrap}' +
-  '.kc-btn{border:1px solid var(--border,#d7deea);background:var(--surface,#fff);color:var(--text-1,#1a2233);' +
+  '.kc-btn{border:1px solid var(--border);background:var(--surface);color:var(--text-1);' +
     'border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer}' +
-  '.kc-btn.primary{background:var(--accent,#2563eb);border-color:var(--accent,#2563eb);color:#fff}' +
+  '.kc-btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}' +
   '.kc-btn[disabled]{opacity:.5;cursor:not-allowed}' +
   '.kc-alert{border-radius:8px;padding:9px 12px;font-size:13px}' +
-  '.kc-alert.error{background:var(--danger-soft,#fff5f5);color:var(--danger,#c92a2a);border:1px solid var(--danger,#c92a2a)}' +
-  '.kc-alert.ok{background:var(--success-soft,#ebfbee);color:var(--success,#2b8a3e);border:1px solid var(--success,#2b8a3e)}' +
-  '.kc-field label{display:block;font-size:12px;color:var(--text-3,#7a869a);margin-bottom:4px}' +
-  '.kc-reason{width:100%;min-height:48px;border:1px solid var(--border,#d7deea);border-radius:8px;' +
-    'padding:8px;font-size:13px;background:var(--surface,#fff);color:var(--text-1,#1a2233)}' +
+  '.kc-alert.error{background:var(--danger-soft);color:var(--danger);border:1px solid var(--danger)}' +
+  '.kc-alert.ok{background:var(--success-soft);color:var(--success);border:1px solid var(--success)}' +
+  '.kc-field label{display:block;font-size:12px;color:var(--text-3);margin-bottom:4px}' +
+  '.kc-reason{width:100%;min-height:48px;border:1px solid var(--border);border-radius:8px;' +
+    'padding:8px;font-size:13px;background:var(--surface);color:var(--text-1)}' +
+  '.kc-tabs{display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--border);padding-bottom:6px}' +
+  '.kc-tab{border:1px solid var(--border);background:var(--surface);color:var(--text-2);' +
+    'border-radius:8px;padding:7px 10px;font-size:12px;white-space:nowrap;cursor:pointer}' +
+  '.kc-tab.is-active{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}' +
+  '.kc-panel{border:1px solid var(--border);border-radius:10px;background:var(--surface);' +
+    'padding:14px;display:flex;flex-direction:column;gap:12px}' +
+  '.kc-panel-head{display:flex;justify-content:space-between;gap:12px;align-items:center}' +
+  '.kc-panel h3,.kc-panel h4{margin:0;color:var(--text-1)}' +
+  '.kc-summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}' +
+  '.kc-summary{border:1px solid var(--border);background:var(--surface-2);border-radius:8px;' +
+    'padding:10px;display:flex;flex-direction:column;gap:4px}' +
+  '.kc-summary span{font-size:11px;color:var(--text-2)}.kc-summary b{font-size:20px;color:var(--accent)}' +
+  '.kc-metric-split{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}' +
+  '.kc-pill-list{display:flex;gap:6px;flex-wrap:wrap}.kc-pill{font-size:11px;border-radius:999px;padding:3px 8px;' +
+    'background:var(--surface-2);color:var(--text-2)}' +
+  '.kc-integrity{font-size:11px;font-weight:700;border-radius:999px;padding:4px 9px}' +
+  '.kc-integrity-pass{background:var(--success-soft);color:var(--success)}' +
+  '.kc-integrity-warn{background:var(--warning-soft);color:var(--warning)}' +
+  '.kc-integrity-fail{background:var(--danger-soft);color:var(--danger)}' +
+  '.kc-finding-list{display:flex;flex-direction:column;gap:8px}.kc-finding{border:1px solid var(--border);' +
+    'border-radius:8px;padding:8px;background:var(--surface-2);display:grid;grid-template-columns:auto auto 1fr;gap:6px}' +
+  '.kc-finding p{grid-column:1/-1;margin:0;font-size:12px;color:var(--text-2)}' +
+  '.kc-gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}' +
+  '.kc-gate{border:1px solid var(--border);background:var(--surface-2);border-radius:8px;padding:9px;' +
+    'display:flex;flex-direction:column;gap:3px}' +
+  '.kc-data-contract{border:1px solid var(--warning);border-radius:8px;padding:8px;' +
+    'background:var(--warning-soft);display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}' +
   '.kc-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}' +
-  '.kc-stat{border:1px solid var(--border,#d7deea);border-radius:10px;background:var(--surface-2,#f8fafc);' +
+  '.kc-stat{border:1px solid var(--border);border-radius:10px;background:var(--surface-2);' +
     'padding:14px;display:flex;flex-direction:column;gap:4px}' +
-  '.kc-stat-v{font-size:22px;font-weight:700;color:var(--accent,#2563eb)}' +
-  '.kc-stat-l{font-size:12px;color:var(--text-2,#55617a)}' +
-  '.kc-meta{font-size:12px;color:var(--text-3,#7a869a);margin:0}' +
+  '.kc-stat-v{font-size:22px;font-weight:700;color:var(--accent)}' +
+  '.kc-stat-l{font-size:12px;color:var(--text-2)}' +
+  '.kc-meta{font-size:12px;color:var(--text-3);margin:0}' +
   '.kc-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}' +
-  '.kc-tile{text-align:left;border:1px solid var(--border,#d7deea);border-radius:10px;' +
-    'background:var(--surface,#fff);padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:6px}' +
+  '.kc-tile{text-align:left;border:1px solid var(--border);border-radius:10px;' +
+    'background:var(--surface);padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:6px}' +
   '.kc-tile-top{display:flex;justify-content:space-between;align-items:center}' +
-  '.kc-tile-name{font-weight:700;font-size:14px;color:var(--text-1,#1a2233)}' +
-  '.kc-tile-count{font-size:18px;font-weight:700;color:var(--accent,#2563eb)}' +
-  '.kc-tile-desc{font-size:12px;color:var(--text-2,#55617a)}' +
+  '.kc-tile-name{font-weight:700;font-size:14px;color:var(--text-1)}' +
+  '.kc-tile-count{font-size:18px;font-weight:700;color:var(--accent)}' +
+  '.kc-tile-desc{font-size:12px;color:var(--text-2)}' +
   '.kc-tag{align-self:flex-start;font-size:10px;font-weight:700;border-radius:999px;padding:2px 8px}' +
-  '.kc-tag-edit{background:var(--accent-soft,#e7f0ff);color:var(--accent,#2563eb)}' +
-  '.kc-tag-ro{background:var(--surface-2,#f1f3f7);color:var(--text-3,#7a869a)}' +
+  '.kc-tag-edit{background:var(--accent-soft);color:var(--accent)}' +
+  '.kc-tag-ro{background:var(--surface-2);color:var(--text-3)}' +
   '.kc-nav{display:flex;align-items:center;gap:10px}' +
   '.kc-nav-title{font-weight:700;font-size:15px}' +
   '.kc-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}' +
-  '.kc-card{border:1px solid var(--border,#d7deea);border-radius:10px;background:var(--surface,#fff);' +
+  '.kc-card{border:1px solid var(--border);border-radius:10px;background:var(--surface);' +
     'padding:13px;display:flex;flex-direction:column;gap:8px}' +
-  '.kc-card--dirty{border-color:var(--accent,#2563eb);box-shadow:inset 3px 0 0 var(--accent,#2563eb)}' +
+  '.kc-card--dirty{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}' +
   '.kc-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}' +
-  '.kc-code{font-family:var(--mono,monospace);font-size:11px;background:var(--surface-2,#f1f3f7);' +
+  '.kc-code{font-family:var(--mono,monospace);font-size:11px;background:var(--surface-2);' +
     'padding:2px 6px;border-radius:5px}' +
   '.kc-card-name{font-size:13px;font-weight:600}' +
   '.kc-badge{font-size:10px;font-weight:700;border-radius:999px;padding:2px 8px;white-space:nowrap}' +
-  '.kc-badge-ok{background:var(--success-soft,#ebfbee);color:var(--success,#2b8a3e)}' +
-  '.kc-badge-staged{background:var(--warning-soft,#fff9db);color:var(--warning,#e67700)}' +
-  '.kc-badge-manual{background:var(--accent-soft,#eef2ff);color:var(--accent,#3730a3)}' +
-  '.kc-badge-bad{background:var(--danger-soft,#fff5f5);color:var(--danger,#c92a2a)}' +
+  '.kc-badge-ok{background:var(--success-soft);color:var(--success)}' +
+  '.kc-badge-staged{background:var(--warning-soft);color:var(--warning)}' +
+  '.kc-badge-manual{background:var(--accent-soft);color:var(--accent)}' +
+  '.kc-badge-bad{background:var(--danger-soft);color:var(--danger)}' +
   '.kc-rag{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 4px;align-items:center}' +
-  '.kc-rag--linked{border:1px dashed var(--success,#2b8a3e);border-radius:8px;' +
-    'padding:5px 8px;background:var(--success-soft,#ebfbee)}' +
-  '.kc-rag--unlinked{font-size:11px;color:var(--text-3,#7a869a);' +
-    'border:1px dashed var(--border,#d7deea);border-radius:8px;padding:5px 8px}' +
-  '.kc-rag-mark{font-size:10px;font-weight:700;color:var(--success,#2b8a3e);' +
+  '.kc-rag--linked{border:1px dashed var(--success);border-radius:8px;' +
+    'padding:5px 8px;background:var(--success-soft)}' +
+  '.kc-rag--unlinked{font-size:11px;color:var(--text-3);' +
+    'border:1px dashed var(--border);border-radius:8px;padding:5px 8px}' +
+  '.kc-rag-mark{font-size:10px;font-weight:700;color:var(--success);' +
     'margin-left:2px;letter-spacing:.2px}' +
-  '.kc-warn{font-size:11px;color:var(--warning,#e67700);background:var(--warning-soft,#fff9db);' +
+  '.kc-warn{font-size:11px;color:var(--warning);background:var(--warning-soft);' +
     'border-radius:6px;padding:5px 8px}' +
   '.kc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}' +
   '.kc-f{display:flex;flex-direction:column;gap:3px}' +
-  '.kc-f label{font-size:11px;color:var(--text-3,#7a869a)}' +
-  '.kc-input{border:1px solid var(--border,#d7deea);border-radius:6px;padding:6px 8px;font-size:12px;' +
-    'background:var(--surface,#fff);color:var(--text-1,#1a2233);width:100%}' +
+  '.kc-f label{font-size:11px;color:var(--text-3)}' +
+  '.kc-input{border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:12px;' +
+    'background:var(--surface);color:var(--text-1);width:100%}' +
   '.kc-ta{min-height:54px;resize:vertical;font-family:inherit}' +
-  '.kc-table-wrap{overflow-x:auto;border:1px solid var(--border,#d7deea);border-radius:10px}' +
+  '.kc-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}' +
   '.kc-table{width:100%;border-collapse:collapse;font-size:12px}' +
-  '.kc-table th{text-align:left;padding:8px 10px;background:var(--surface-2,#f1f3f7);' +
-    'color:var(--text-2,#55617a);font-size:11px;text-transform:uppercase}' +
-  '.kc-table td{padding:8px 10px;border-top:1px solid var(--border,#d7deea);vertical-align:top}' +
-  '.kc-mini{font-size:11px;color:var(--text-3,#7a869a)}' +
+  '.kc-table th{text-align:left;padding:8px 10px;background:var(--surface-2);' +
+    'color:var(--text-2);font-size:11px;text-transform:uppercase}' +
+  '.kc-table td{padding:8px 10px;border-top:1px solid var(--border);vertical-align:top}' +
+  '.kc-mini{font-size:11px;color:var(--text-3)}' +
   /* ── KPI Library ── */
   '.kc-lib-cta{display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;' +
-    'border:1px solid var(--accent,#2563eb);border-radius:12px;padding:14px 18px;' +
-    'background:var(--accent-soft,#e7f0ff)}' +
+    'border:1px solid var(--accent);border-radius:12px;padding:14px 18px;' +
+    'background:var(--accent-soft)}' +
   '.kc-lib-cta-ico{font-size:26px}' +
   '.kc-lib-cta-txt{display:flex;flex-direction:column;gap:2px;flex:1}' +
-  '.kc-lib-cta-txt b{font-size:15px;color:var(--text-1,#1a2233)}' +
-  '.kc-lib-cta-txt span{font-size:12px;color:var(--text-2,#55617a)}' +
-  '.kc-lib-cta-go{font-size:22px;color:var(--accent,#2563eb)}' +
+  '.kc-lib-cta-txt b{font-size:15px;color:var(--text-1)}' +
+  '.kc-lib-cta-txt span{font-size:12px;color:var(--text-2)}' +
+  '.kc-lib-cta-go{font-size:22px;color:var(--accent)}' +
   '.kc-filterbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;' +
-    'border:1px solid var(--border,#d7deea);border-radius:10px;padding:10px;' +
-    'background:var(--surface-2,#f8fafc)}' +
-  '.kc-search{flex:1;min-width:180px;border:1px solid var(--border,#d7deea);border-radius:7px;' +
-    'padding:7px 10px;font-size:13px;background:var(--surface,#fff);color:var(--text-1,#1a2233)}' +
+    'border:1px solid var(--border);border-radius:10px;padding:10px;' +
+    'background:var(--surface-2)}' +
+  '.kc-search{flex:1;min-width:180px;border:1px solid var(--border);border-radius:7px;' +
+    'padding:7px 10px;font-size:13px;background:var(--surface);color:var(--text-1)}' +
   '.kc-filterbar .kc-input{width:auto;min-width:150px;flex:0 0 auto}' +
-  '.kc-result-head{font-size:13px;color:var(--text-2,#55617a);padding:2px 2px}' +
-  '.kc-result-head b{color:var(--accent,#2563eb);font-size:15px}' +
+  '.kc-result-head{font-size:13px;color:var(--text-2);padding:2px 2px}' +
+  '.kc-result-head b{color:var(--accent);font-size:15px}' +
   '.kc-lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}' +
   '.kc-lib-card{text-align:left;display:flex;flex-direction:column;gap:7px;' +
-    'border:1px solid var(--border,#d7deea);border-radius:10px;padding:12px;background:var(--surface,#fff)}' +
+    'border:1px solid var(--border);border-radius:10px;padding:12px;background:var(--surface)}' +
   '.kc-lib-card[role=button]{cursor:pointer}' +
-  '.kc-lib-card[role=button]:hover{border-color:var(--accent,#2563eb);box-shadow:0 1px 6px rgba(0,0,0,.08)}' +
-  '.kc-lib-card--retired{opacity:.62;background:var(--surface-2,#f8fafc)}' +
-  '.kc-lib-card--draft{border-color:var(--accent,#2563eb);border-style:dashed}' +
+  '.kc-lib-card[role=button]:hover{border-color:var(--accent);box-shadow:var(--shadow-sm)}' +
+  '.kc-lib-card--retired{opacity:.62;background:var(--surface-2)}' +
+  '.kc-lib-card--draft{border-color:var(--accent);border-style:dashed}' +
   '.kc-lib-card-top{display:flex;justify-content:space-between;align-items:center;gap:8px}' +
-  '.kc-lib-card-name{font-size:13px;font-weight:600;color:var(--text-1,#1a2233)}' +
+  '.kc-lib-card-name{font-size:13px;font-weight:600;color:var(--text-1)}' +
   '.kc-lib-tags{display:flex;gap:4px;flex-wrap:wrap}' +
   '.kc-chip{font-size:10px;border-radius:999px;padding:2px 8px;' +
-    'background:var(--surface-2,#f1f3f7);color:var(--text-2,#55617a)}' +
-  '.kc-chip-proc{background:var(--accent-soft,#e7f0ff);color:var(--accent,#2563eb)}' +
-  '.kc-cat-supplier{background:#fff4e6;color:#d9480f}' +
-  '.kc-cat-customer{background:#e7f5ff;color:#1971c2}' +
-  '.kc-cat-safety{background:#fff5f5;color:#c92a2a}' +
-  '.kc-cat-financial{background:#ebfbee;color:#2b8a3e}' +
-  '.kc-cat-system{background:#f3f0ff;color:#5f3dc4}' +
+    'background:var(--surface-2);color:var(--text-2)}' +
+  '.kc-chip-proc{background:var(--accent-soft);color:var(--accent)}' +
+  '.kc-cat-supplier{background:var(--warning-soft);color:var(--warning)}' +
+  '.kc-cat-customer{background:var(--info-soft);color:var(--info)}' +
+  '.kc-cat-safety{background:var(--danger-soft);color:var(--danger)}' +
+  '.kc-cat-financial{background:var(--success-soft);color:var(--success)}' +
+  '.kc-cat-system{background:var(--accent-soft);color:var(--accent)}' +
   '.kc-lib-foot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;' +
-    'border-top:1px solid var(--border,#d7deea);padding-top:6px}' +
+    'border-top:1px solid var(--border);padding-top:6px}' +
   '.kc-lib-act{display:flex;justify-content:flex-end}' +
   '.kc-act{font-size:11px;font-weight:600;border-radius:6px;padding:4px 10px;cursor:pointer;' +
-    'border:1px solid var(--border,#d7deea);background:var(--surface,#fff)}' +
-  '.kc-act-del{color:var(--danger,#c92a2a);border-color:var(--danger,#c92a2a)}' +
-  '.kc-act-restore{color:var(--success,#2b8a3e);border-color:var(--success,#2b8a3e)}' +
+    'border:1px solid var(--border);background:var(--surface)}' +
+  '.kc-act-del{color:var(--danger);border-color:var(--danger)}' +
+  '.kc-act-restore{color:var(--success);border-color:var(--success)}' +
   '.kc-nav-spacer{flex:1}' +
-  '.kc-addform{border:1px solid var(--accent,#2563eb);border-radius:12px;padding:16px;' +
-    'background:var(--surface,#fff);display:flex;flex-direction:column;gap:10px}' +
-  '.kc-addform h3{margin:0;font-size:16px;color:var(--text-1,#1a2233)}' +
+  '.kc-addform{border:1px solid var(--accent);border-radius:12px;padding:16px;' +
+    'background:var(--surface);display:flex;flex-direction:column;gap:10px}' +
+  '.kc-addform h3{margin:0;font-size:16px;color:var(--text-1)}' +
   '.kc-addform-actions{display:flex;gap:8px;justify-content:flex-end}' +
   /* ── library-only console: status symbols, expandable cards ── */
   '.kc-stat-sym{font-size:14px;line-height:1;cursor:help;border-radius:999px;' +
     'width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center}' +
-  '.kc-sym-ok{background:var(--success-soft,#ebfbee);color:var(--success,#2b8a3e)}' +
-  '.kc-sym-manual{background:var(--accent-soft,#eef2ff);color:var(--accent,#3730a3)}' +
-  '.kc-sym-staged{background:var(--warning-soft,#fff9db);color:var(--warning,#e67700)}' +
-  '.kc-sym-bad{background:var(--danger-soft,#fff5f5);color:var(--danger,#c92a2a)}' +
+  '.kc-sym-ok{background:var(--success-soft);color:var(--success)}' +
+  '.kc-sym-manual{background:var(--accent-soft);color:var(--accent)}' +
+  '.kc-sym-staged{background:var(--warning-soft);color:var(--warning)}' +
+  '.kc-sym-bad{background:var(--danger-soft);color:var(--danger)}' +
   '.kc-lib-status{display:inline-flex;align-items:center;gap:4px}' +
-  '.kc-caret{font-size:11px;color:var(--text-3,#7a869a)}' +
+  '.kc-caret{font-size:11px;color:var(--text-3)}' +
   '.kc-lib-card-main{display:flex;flex-direction:column;gap:7px}' +
   '.kc-lib-card-main[role=button]{cursor:pointer}' +
-  '.kc-lib-card--expanded{grid-column:1/-1;border-color:var(--accent,#2563eb);' +
-    'box-shadow:0 1px 8px rgba(37,99,235,.14)}' +
-  '.kc-lib-editor{margin-top:8px;border-top:1px solid var(--border,#d7deea);padding-top:8px}' +
+  '.kc-lib-card--expanded{grid-column:1/-1;border-color:var(--accent);' +
+    'box-shadow:var(--shadow-md)}' +
+  '.kc-lib-editor{margin-top:8px;border-top:1px solid var(--border);padding-top:8px}' +
   '.kc-card--inline{border:0;padding:0;gap:8px}' +
-  '.kc-counter-edit{border:1px solid var(--border,#d7deea);border-radius:8px;' +
-    'padding:8px 10px;display:flex;flex-direction:column;gap:6px;background:var(--surface-2,#f8fafc)}' +
-  '.kc-counter-head{font-size:11px;font-weight:700;color:var(--text-2,#55617a);' +
+  '.kc-counter-edit{border:1px solid var(--border);border-radius:8px;' +
+    'padding:8px 10px;display:flex;flex-direction:column;gap:6px;background:var(--surface-2)}' +
+  '.kc-counter-head{font-size:11px;font-weight:700;color:var(--text-2);' +
     'text-transform:uppercase;letter-spacing:.3px}' +
   '.kc-counter-id{display:flex;align-items:center;gap:8px;flex-wrap:wrap}' +
   /* per-JD weighted KPI scorecard */
-  '.kc-scorecard{border:1px solid var(--accent,#2563eb);border-radius:10px;' +
-    'background:var(--accent-soft,#e7f0ff);padding:12px;display:flex;flex-direction:column;gap:6px}' +
-  '.kc-sc-head{font-size:13px;font-weight:700;color:var(--text-1,#1a2233)}' +
+  '.kc-scorecard{border:1px solid var(--accent);border-radius:10px;' +
+    'background:var(--accent-soft);padding:12px;display:flex;flex-direction:column;gap:6px}' +
+  '.kc-sc-head{font-size:13px;font-weight:700;color:var(--text-1)}' +
   '.kc-sc-row{display:flex;align-items:center;gap:8px}' +
-  '.kc-sc-bar{flex:0 0 120px;height:10px;border-radius:999px;background:var(--surface,#fff);' +
-    'overflow:hidden;border:1px solid var(--border,#d7deea)}' +
-  '.kc-sc-fill{display:block;height:100%;background:var(--accent,#2563eb)}' +
-  '.kc-sc-w{flex:0 0 40px;font-size:12px;font-weight:700;color:var(--accent,#2563eb);text-align:right}' +
+  '.kc-sc-bar{flex:0 0 120px;height:10px;border-radius:999px;background:var(--surface);' +
+    'overflow:hidden;border:1px solid var(--border)}' +
+  '.kc-sc-fill{display:block;height:100%;background:var(--accent)}' +
+  '.kc-sc-w{flex:0 0 40px;font-size:12px;font-weight:700;color:var(--accent);text-align:right}' +
   '.kc-sc-why{flex:1}' +
   '</style>';
 }
@@ -1010,6 +1251,11 @@ function _addSubmit(){
       'lower_is_better: green point must be ≤ yellow point.');
     _render(); return;
   }
+  if(!String(a.data_contract_gap || '').trim() || !String(a.target_graduation_condition || '').trim()){
+    _state.error = _t('Cần nhập data-contract gap và điều kiện graduation cho metric staged.',
+      'Data-contract gap and graduation condition are required for a staged metric.');
+    _render(); return;
+  }
   var thr = { direction:a.direction, unit:a.unit, green_point:gp, yellow_point:yp };
   var tgt = parseFloat(a.target);
   if(!isNaN(tgt)) thr.target = tgt;
@@ -1022,13 +1268,18 @@ function _addSubmit(){
     tier:(a.group === 'governance') ? (a.tier || 'department') : '',
     process:a.process || 'unclassified', category:a.category || 'internal',
     owner_role:a.owner_role || '', counter_metric:counter,
-    cadence:a.cadence || 'monthly', purpose:a.purpose || '', thresholds:thr
+    cadence:a.cadence || 'monthly', purpose:a.purpose || '', thresholds:thr,
+    decision_action:a.decision_action || '',
+    data_contract_gap:a.data_contract_gap || '',
+    target_graduation_condition:a.target_graduation_condition || '',
+    evidence_source:a.evidence_source || '',
+    blocking_conditions:String(a.blocking_conditions || '').split(/\n+/).map(function(x){ return x.trim(); }).filter(Boolean)
   };
   if(!_state.addedDraft[a.group]) _state.addedDraft[a.group] = [];
   _state.addedDraft[a.group].push(row);
   _state.addForm = null;
   _state.error = '';
-  _state.message = _t('Đã thêm KPI nháp: ', 'Draft KPI added: ') + code + ' — ' +
+  _state.message = _t('Đã thêm proposal metric: ', 'Draft metric proposal added: ') + code + ' — ' +
     _t('bấm “Lưu & đồng bộ tài liệu” để ghi.', 'click “Save & sync documents” to persist.');
   _render();
 }
@@ -1042,6 +1293,12 @@ window._kpiSetField  = function(section, code, field, value){ _setField(section,
 window._kpiSetThreshold = function(section, code, key, value){ _setThreshold(section, code, key, value); };
 window._kpiSetCounter = function(section, code, key, value){ _setCounter(section, code, key, value); };
 window._kpiSetFilter = function(key, value){ _setFilter(key, value); };
+window._kpiSetView = function(view){
+  _state.activeView = view || 'overview';
+  _state.addForm = null;
+  _state.expandedCode = '';
+  _render();
+};
 window._kpiClearFilters = function(){
   _state.filters = { process:'', category:'', group:'', tier:'', jd:'', status:'', search:'', retired:'' };
   _render();
