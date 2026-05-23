@@ -57,7 +57,7 @@ async function startNewRevision(code){
   }
 // Decide target revision at the start (so Draft/InReview/Approve all use the SAME revision)
   const st = getDocState(doc.code) || {};
-  const baseRev = String(st.revision || doc.rev || '0');
+  const baseRev = String((typeof getDocRevision==='function' ? getDocRevision(doc) : '') || st.released_revision || st.revision || doc.rev || '0');
   const hasRelease = (st.has_release === false) ? false : true; // default true if unknown
   let updateType = 'minor';
 
@@ -183,7 +183,10 @@ function showFilteredDocs(filter){
     list=VDOCS;
     title=lang==='en'?'All Documents':'Tất cả tài liệu';
   } else if(filter==='approved'){
-    list=VDOCS.filter(function(d){return getDocStatus(d)==='approved';});
+    list=VDOCS.filter(function(d){
+      var status = getDocStatus(d);
+      return (typeof isDocRevisionSourceStatus==='function' && isDocRevisionSourceStatus(status)) || status==='approved';
+    });
     title=lang==='en'?'Approved Documents':'Tài liệu đã duyệt';
   } else if(filter==='draft'){
     list=VDOCS.filter(function(d){return getDocStatus(d)==='draft';});

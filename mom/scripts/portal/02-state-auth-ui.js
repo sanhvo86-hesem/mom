@@ -3767,8 +3767,8 @@ function buildDocHeaderActions(doc){
       `;
     }
 
-    // Approved: allow creating a new revision
-    if(status==='approved'){
+    // Approved/released controlled documents stay read-only, but editors can start a new draft revision.
+    if((typeof isDocRevisionSourceStatus==='function' && isDocRevisionSourceStatus(status)) || status==='approved'){
       const canCreateRevision = ROLES[currentUser.role] && ROLES[currentUser.role].canEditDocs;
       if(canCreateRevision){
         return renderDocHeaderButton(T('new_revision'), 'revision', 'neutral', `startNewRevision('${doc.code}')`);
@@ -4136,7 +4136,10 @@ function renderDashboard(){
       && state.lastEdit.by===currentUser.name
       && docHasWorkingVersion(d.code);
   });
-  const approvedCount = VDOCS.filter(d=>getDocStatus(d)==='approved').length;
+  const approvedCount = VDOCS.filter(d=>{
+    const status = getDocStatus(d);
+    return (typeof isDocRevisionSourceStatus==='function' && isDocRevisionSourceStatus(status)) || status==='approved';
+  }).length;
   const draftCount = VDOCS.filter(d=>getDocStatus(d)==='draft').length;
   const reviewCount = pendingDocs.length;
 
