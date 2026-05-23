@@ -1,8 +1,8 @@
 {
-    "generated_at": "2026-05-23T16:29:37+00:00",
+    "generated_at": "2026-05-23T16:47:15+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
-    "registry_version": "2026-05-21",
+    "registry_version": "2026-05-23",
     "method": {
         "detection": "Registry canonical codes, legacy aliases, KPI-* local IDs, and Cxx-Mx competency role measures are detected in visible HTML text. Table rows are used to extract target/threshold snippets.",
         "interpretation": "The matrix separates official KPI, gate/control metric, operating metric, role performance measure, and health indicator. It flags context mismatch rather than mechanically rewriting every KPI word.",
@@ -16,9 +16,9 @@
     "summary": {
         "html_file_count": 481,
         "documents_with_metric_usage": 128,
-        "registry_metric_count": 132,
+        "registry_metric_count": 170,
         "metric_codes_seen": 142,
-        "executive_scorecard_metrics_seen": 15,
+        "executive_scorecard_metrics_seen": 7,
         "role_measure_codes_seen": 95,
         "findings_total": 5,
         "p1_findings": 0,
@@ -45,7 +45,7 @@
                 "KPI-G7-01"
             ],
             "backend_status": "runtime_calculated",
-            "scorecard_weight_pct": 11,
+            "scorecard_weight_pct": 18,
             "scorecard_target": 95,
             "scorecard_unit": "percent",
             "scorecard_scoring_status": "active_runtime",
@@ -1104,7 +1104,7 @@
                 "KPI-ALL-02"
             ],
             "backend_status": "runtime_calculated",
-            "scorecard_weight_pct": 9,
+            "scorecard_weight_pct": 14,
             "scorecard_target": 98,
             "scorecard_unit": "percent",
             "scorecard_scoring_status": "active_runtime",
@@ -1544,7 +1544,7 @@
                 "KPI-ALL-01"
             ],
             "backend_status": "runtime_calculated",
-            "scorecard_weight_pct": 7,
+            "scorecard_weight_pct": 14,
             "scorecard_target": 2,
             "scorecard_unit": "percent_of_sales",
             "scorecard_scoring_status": "manual_governed",
@@ -2183,29 +2183,21 @@
         {
             "code": "CAPA_EFFECTIVENESS",
             "display_name": "CAPA effectiveness after verification window",
-            "classification": "executive_scorecard_kpi",
+            "classification": "operating_metric",
             "registry_sources": [
-                "proposed_operating_metrics",
-                "scorecard_operating_model",
-                "scorecard_evidence_contracts",
-                "metric_governance_overrides"
+                "proposed_operating_metrics"
             ],
             "aliases": [],
             "local_ids": [],
             "backend_status": "staged_data_contract",
-            "scorecard_weight_pct": 7,
-            "scorecard_target": 90,
-            "scorecard_unit": "percent",
-            "scorecard_scoring_status": "candidate_data_contract",
-            "scorecard_contributes_to_reward": false,
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
             "statistical_plan_status": "candidate_data_contract_required_before_payout",
-            "expected_thresholds": {
-                "stretch_min": 95,
-                "green_min": 90,
-                "yellow_min": 80,
-                "red_below": 80
-            },
-            "expected_target_text": "≥90%",
+            "expected_thresholds": null,
+            "expected_target_text": null,
             "total_occurrences": 12,
             "documents_count": 10,
             "target_values_seen": [],
@@ -2353,7 +2345,7 @@
                 }
             ],
             "finding_codes": [],
-            "target_consistency": "registered_target_not_repeated_in_docs",
+            "target_consistency": "no_registered_target_no_local_target",
             "name_consistency": "canonical_or_mapped_name"
         },
         {
@@ -2525,13 +2517,13 @@
             "local_ids": [
                 "KPI-03"
             ],
-            "backend_status": "widget_only",
-            "scorecard_weight_pct": 6,
+            "backend_status": "runtime_calculated",
+            "scorecard_weight_pct": 12,
             "scorecard_target": 5,
             "scorecard_unit": "aged_wip_percent",
             "scorecard_scoring_status": "candidate_data_contract",
             "scorecard_contributes_to_reward": false,
-            "statistical_plan_status": "candidate_data_contract_required_before_payout",
+            "statistical_plan_status": "runtime_calculated_with_registry_contract",
             "expected_thresholds": {
                 "stretch_max": 2,
                 "green_max": 5,
@@ -2679,7 +2671,7 @@
             ],
             "local_ids": [],
             "backend_status": "runtime_calculated",
-            "scorecard_weight_pct": 8,
+            "scorecard_weight_pct": 14,
             "scorecard_target": 1,
             "scorecard_unit": "complaints_per_100_shipments",
             "scorecard_scoring_status": "manual_governed",
@@ -2776,25 +2768,33 @@
         {
             "code": "PLAN_ADHERENCE",
             "display_name": "Dispatch/Plan Adherence",
-            "classification": "governance_kpi",
+            "classification": "executive_scorecard_kpi",
             "registry_sources": [
                 "runtime_calculated_metrics",
                 "annex122_governance_kpis",
-                "dashboard_core_kpis"
+                "dashboard_core_kpis",
+                "scorecard_operating_model",
+                "scorecard_evidence_contracts",
+                "metric_governance_overrides"
             ],
             "aliases": [],
             "local_ids": [
                 "KPI-04"
             ],
             "backend_status": "staged_data_contract",
-            "scorecard_weight_pct": null,
-            "scorecard_target": null,
-            "scorecard_unit": null,
-            "scorecard_scoring_status": null,
-            "scorecard_contributes_to_reward": null,
-            "statistical_plan_status": "candidate_data_contract_required_before_payout",
-            "expected_thresholds": null,
-            "expected_target_text": null,
+            "scorecard_weight_pct": 14,
+            "scorecard_target": 90,
+            "scorecard_unit": "percent",
+            "scorecard_scoring_status": "active_runtime",
+            "scorecard_contributes_to_reward": true,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract",
+            "expected_thresholds": {
+                "stretch_min": 90,
+                "green_min": 90,
+                "yellow_min": 80,
+                "red_below": 80
+            },
+            "expected_target_text": "≥90%",
             "total_occurrences": 11,
             "documents_count": 5,
             "target_values_seen": [],
@@ -2872,7 +2872,7 @@
                 }
             ],
             "finding_codes": [],
-            "target_consistency": "no_registered_target_no_local_target",
+            "target_consistency": "registered_target_not_repeated_in_docs",
             "name_consistency": "canonical_or_mapped_name"
         },
         {
@@ -2957,15 +2957,12 @@
         {
             "code": "FAI_FIRST_PASS",
             "display_name": "FAI/first-piece first-pass acceptance",
-            "classification": "executive_scorecard_kpi",
+            "classification": "operating_metric",
             "registry_sources": [
                 "legacy_aliases",
                 "annex122_governance_kpis",
                 "gate_control_metrics",
-                "proposed_operating_metrics",
-                "scorecard_operating_model",
-                "scorecard_evidence_contracts",
-                "metric_governance_overrides"
+                "proposed_operating_metrics"
             ],
             "aliases": [
                 "FAI_FIRST_PASS_RATE"
@@ -2974,19 +2971,14 @@
                 "KPI-G4-01"
             ],
             "backend_status": "retained_from_annex122",
-            "scorecard_weight_pct": 7,
-            "scorecard_target": 98,
-            "scorecard_unit": "percent",
-            "scorecard_scoring_status": "candidate_data_contract",
-            "scorecard_contributes_to_reward": false,
-            "statistical_plan_status": "candidate_data_contract_required_before_payout",
-            "expected_thresholds": {
-                "stretch_min": 99,
-                "green_min": 98,
-                "yellow_min": 95,
-                "red_below": 95
-            },
-            "expected_target_text": "≥98%",
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
+            "statistical_plan_status": "not_declared_or_informational",
+            "expected_thresholds": null,
+            "expected_target_text": null,
             "total_occurrences": 6,
             "documents_count": 3,
             "target_values_seen": [],
@@ -3035,35 +3027,27 @@
                 }
             ],
             "finding_codes": [],
-            "target_consistency": "registered_target_not_repeated_in_docs",
+            "target_consistency": "no_registered_target_no_local_target",
             "name_consistency": "canonical_or_mapped_name"
         },
         {
             "code": "OEE_BOTTLENECK",
             "display_name": "OEE at current constraint resource",
-            "classification": "executive_scorecard_kpi",
+            "classification": "operating_metric",
             "registry_sources": [
-                "proposed_operating_metrics",
-                "scorecard_operating_model",
-                "scorecard_evidence_contracts",
-                "metric_governance_overrides"
+                "proposed_operating_metrics"
             ],
             "aliases": [],
             "local_ids": [],
             "backend_status": "staged_data_contract",
-            "scorecard_weight_pct": 8,
-            "scorecard_target": 80,
-            "scorecard_unit": "percent",
-            "scorecard_scoring_status": "candidate_data_contract",
-            "scorecard_contributes_to_reward": false,
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
             "statistical_plan_status": "candidate_data_contract_required_before_payout",
-            "expected_thresholds": {
-                "stretch_min": 85,
-                "green_min": 80,
-                "yellow_min": 70,
-                "red_below": 70
-            },
-            "expected_target_text": "≥80%",
+            "expected_thresholds": null,
+            "expected_target_text": null,
             "total_occurrences": 6,
             "documents_count": 3,
             "target_values_seen": [],
@@ -3114,35 +3098,27 @@
                 }
             ],
             "finding_codes": [],
-            "target_consistency": "registered_target_not_repeated_in_docs",
+            "target_consistency": "no_registered_target_no_local_target",
             "name_consistency": "canonical_or_mapped_name"
         },
         {
             "code": "THROUGHPUT_PER_CONSTRAINT_HOUR",
             "display_name": "Revenue/throughput per constraint hour",
-            "classification": "executive_scorecard_kpi",
+            "classification": "operating_metric",
             "registry_sources": [
-                "proposed_operating_metrics",
-                "scorecard_operating_model",
-                "scorecard_evidence_contracts",
-                "metric_governance_overrides"
+                "proposed_operating_metrics"
             ],
             "aliases": [],
             "local_ids": [],
             "backend_status": "staged_data_contract",
-            "scorecard_weight_pct": 8,
-            "scorecard_target": 1.1,
-            "scorecard_unit": "baseline_index",
-            "scorecard_scoring_status": "candidate_data_contract",
-            "scorecard_contributes_to_reward": false,
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
             "statistical_plan_status": "candidate_data_contract_required_before_payout",
-            "expected_thresholds": {
-                "stretch_min": 1.2,
-                "green_min": 1.1,
-                "yellow_min": 1,
-                "red_below": 1
-            },
-            "expected_target_text": "≥1.1 baseline_index",
+            "expected_thresholds": null,
+            "expected_target_text": null,
             "total_occurrences": 4,
             "documents_count": 3,
             "target_values_seen": [],
@@ -3191,7 +3167,7 @@
                 }
             ],
             "finding_codes": [],
-            "target_consistency": "registered_target_not_repeated_in_docs",
+            "target_consistency": "no_registered_target_no_local_target",
             "name_consistency": "canonical_or_mapped_name"
         },
         {
@@ -6146,14 +6122,11 @@
         {
             "code": "SETUP_FIRST_PASS",
             "display_name": "Setup ready-to-run first-pass acceptance",
-            "classification": "executive_scorecard_kpi",
+            "classification": "operating_metric",
             "registry_sources": [
                 "legacy_aliases",
                 "gate_control_metrics",
-                "proposed_operating_metrics",
-                "scorecard_operating_model",
-                "scorecard_evidence_contracts",
-                "metric_governance_overrides"
+                "proposed_operating_metrics"
             ],
             "aliases": [
                 "SETUP_FIRST_PASS_SUCCESS"
@@ -6162,19 +6135,14 @@
                 "KPI-G3-01"
             ],
             "backend_status": "staged_data_contract",
-            "scorecard_weight_pct": 6,
-            "scorecard_target": 95,
-            "scorecard_unit": "percent",
-            "scorecard_scoring_status": "candidate_data_contract",
-            "scorecard_contributes_to_reward": false,
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
             "statistical_plan_status": "candidate_data_contract_required_before_payout",
-            "expected_thresholds": {
-                "stretch_min": 98,
-                "green_min": 95,
-                "yellow_min": 90,
-                "red_below": 90
-            },
-            "expected_target_text": "≥95%",
+            "expected_thresholds": null,
+            "expected_target_text": null,
             "total_occurrences": 3,
             "documents_count": 2,
             "target_values_seen": [],
@@ -6209,7 +6177,7 @@
                 }
             ],
             "finding_codes": [],
-            "target_consistency": "registered_target_not_repeated_in_docs",
+            "target_consistency": "no_registered_target_no_local_target",
             "name_consistency": "canonical_or_mapped_name"
         },
         {
@@ -6449,14 +6417,11 @@
         {
             "code": "REPEAT_NCR_RATE",
             "display_name": "Repeat NCR rate",
-            "classification": "executive_scorecard_kpi",
+            "classification": "operating_metric",
             "registry_sources": [
                 "legacy_aliases",
                 "dashboard_core_kpis",
-                "proposed_operating_metrics",
-                "scorecard_operating_model",
-                "scorecard_evidence_contracts",
-                "metric_governance_overrides"
+                "proposed_operating_metrics"
             ],
             "aliases": [
                 "REPEAT_NCR"
@@ -6465,19 +6430,14 @@
                 "KPI-07"
             ],
             "backend_status": "staged_data_contract",
-            "scorecard_weight_pct": 6,
-            "scorecard_target": 5,
-            "scorecard_unit": "percent",
-            "scorecard_scoring_status": "candidate_data_contract",
-            "scorecard_contributes_to_reward": false,
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
             "statistical_plan_status": "candidate_data_contract_required_before_payout",
-            "expected_thresholds": {
-                "stretch_max": 2,
-                "green_max": 5,
-                "yellow_max": 10,
-                "red_above": 10
-            },
-            "expected_target_text": "≤5%",
+            "expected_thresholds": null,
+            "expected_target_text": null,
             "total_occurrences": 2,
             "documents_count": 2,
             "target_values_seen": [],
@@ -6512,35 +6472,27 @@
                 }
             ],
             "finding_codes": [],
-            "target_consistency": "registered_target_not_repeated_in_docs",
+            "target_consistency": "no_registered_target_no_local_target",
             "name_consistency": "canonical_or_mapped_name"
         },
         {
             "code": "SUPPLIER_READINESS",
             "display_name": "Supplier readiness composite from OTD and incoming quality",
-            "classification": "executive_scorecard_kpi",
+            "classification": "operating_metric",
             "registry_sources": [
-                "proposed_operating_metrics",
-                "scorecard_operating_model",
-                "scorecard_evidence_contracts",
-                "metric_governance_overrides"
+                "proposed_operating_metrics"
             ],
             "aliases": [],
             "local_ids": [],
             "backend_status": "staged_data_contract",
-            "scorecard_weight_pct": 5,
-            "scorecard_target": 90,
-            "scorecard_unit": "composite_score",
-            "scorecard_scoring_status": "candidate_data_contract",
-            "scorecard_contributes_to_reward": false,
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
             "statistical_plan_status": "candidate_data_contract_required_before_payout",
-            "expected_thresholds": {
-                "stretch_min": 95,
-                "green_min": 90,
-                "yellow_min": 80,
-                "red_below": 80
-            },
-            "expected_target_text": "≥90 composite_score",
+            "expected_thresholds": null,
+            "expected_target_text": null,
             "total_occurrences": 2,
             "documents_count": 2,
             "target_values_seen": [],
@@ -6575,7 +6527,7 @@
                 }
             ],
             "finding_codes": [],
-            "target_consistency": "registered_target_not_repeated_in_docs",
+            "target_consistency": "no_registered_target_no_local_target",
             "name_consistency": "canonical_or_mapped_name"
         },
         {
@@ -6934,22 +6886,30 @@
         {
             "code": "MATERIAL_AVAILABILITY_PLAN",
             "display_name": "Material Availability for Plan",
-            "classification": "governance_kpi",
+            "classification": "executive_scorecard_kpi",
             "registry_sources": [
                 "runtime_calculated_metrics",
-                "annex122_governance_kpis"
+                "annex122_governance_kpis",
+                "scorecard_operating_model",
+                "scorecard_evidence_contracts",
+                "metric_governance_overrides"
             ],
             "aliases": [],
             "local_ids": [],
             "backend_status": "runtime_calculated",
-            "scorecard_weight_pct": null,
-            "scorecard_target": null,
-            "scorecard_unit": null,
-            "scorecard_scoring_status": null,
-            "scorecard_contributes_to_reward": null,
+            "scorecard_weight_pct": 14,
+            "scorecard_target": 95,
+            "scorecard_unit": "percent",
+            "scorecard_scoring_status": "active_runtime",
+            "scorecard_contributes_to_reward": true,
             "statistical_plan_status": "runtime_calculated_with_registry_contract",
-            "expected_thresholds": null,
-            "expected_target_text": null,
+            "expected_thresholds": {
+                "stretch_min": 95,
+                "green_min": 95,
+                "yellow_min": 85,
+                "red_below": 85
+            },
+            "expected_target_text": "≥95%",
             "total_occurrences": 2,
             "documents_count": 1,
             "target_values_seen": [],
@@ -6970,16 +6930,17 @@
                 }
             ],
             "finding_codes": [],
-            "target_consistency": "no_registered_target_no_local_target",
+            "target_consistency": "registered_target_not_repeated_in_docs",
             "name_consistency": "canonical_or_mapped_name"
         },
         {
             "code": "PROMISE_DATE_RISK",
-            "display_name": "Promise-Date Risk",
-            "classification": "local_or_unmapped_metric",
+            "display_name": "Promise Date Risk",
+            "classification": "operating_metric",
             "registry_sources": [
                 "legacy_aliases",
-                "dashboard_core_kpis"
+                "dashboard_core_kpis",
+                "proposed_operating_metrics"
             ],
             "aliases": [
                 "PROMISE_RISK",
@@ -6988,13 +6949,13 @@
             "local_ids": [
                 "KPI-02"
             ],
-            "backend_status": "staged_data_contract",
+            "backend_status": "manual_governed",
             "scorecard_weight_pct": null,
             "scorecard_target": null,
             "scorecard_unit": null,
             "scorecard_scoring_status": null,
             "scorecard_contributes_to_reward": null,
-            "statistical_plan_status": "candidate_data_contract_required_before_payout",
+            "statistical_plan_status": "not_declared_or_informational",
             "expected_thresholds": null,
             "expected_target_text": null,
             "total_occurrences": 2,
@@ -7018,7 +6979,7 @@
             ],
             "finding_codes": [],
             "target_consistency": "no_registered_target_no_local_target",
-            "name_consistency": "unmapped_or_local_name"
+            "name_consistency": "canonical_or_mapped_name"
         },
         {
             "code": "QC_HOLD_SLA",
@@ -7069,28 +7030,21 @@
         {
             "code": "RECORDABLE_INCIDENT_RATE",
             "display_name": "Recordable Incident / LTI Rate",
-            "classification": "safety_gate",
+            "classification": "governance_kpi",
             "registry_sources": [
-                "annex122_governance_kpis",
-                "scorecard_operating_model",
-                "scorecard_evidence_contracts",
-                "metric_governance_overrides"
+                "annex122_governance_kpis"
             ],
             "aliases": [],
             "local_ids": [],
             "backend_status": "not_declared",
-            "scorecard_weight_pct": 0,
-            "scorecard_target": 0,
-            "scorecard_unit": "count",
-            "scorecard_scoring_status": "gate_only",
-            "scorecard_contributes_to_reward": false,
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
             "statistical_plan_status": "not_declared_or_informational",
-            "expected_thresholds": {
-                "green_max": 0,
-                "yellow_condition": "0 recordable incidents but high-potential near-miss action overdue",
-                "red_above": 0
-            },
-            "expected_target_text": "≤0 count",
+            "expected_thresholds": null,
+            "expected_target_text": null,
             "total_occurrences": 2,
             "documents_count": 1,
             "target_values_seen": [],
@@ -7111,7 +7065,7 @@
                 }
             ],
             "finding_codes": [],
-            "target_consistency": "registered_target_not_repeated_in_docs",
+            "target_consistency": "no_registered_target_no_local_target",
             "name_consistency": "canonical_or_mapped_name"
         },
         {
@@ -9532,29 +9486,21 @@
         {
             "code": "CRITICAL_ROLE_CERT_COVERAGE",
             "display_name": "Critical role certification coverage",
-            "classification": "executive_scorecard_kpi",
+            "classification": "operating_metric",
             "registry_sources": [
-                "proposed_operating_metrics",
-                "scorecard_operating_model",
-                "scorecard_evidence_contracts",
-                "metric_governance_overrides"
+                "proposed_operating_metrics"
             ],
             "aliases": [],
             "local_ids": [],
             "backend_status": "staged_data_contract",
-            "scorecard_weight_pct": 4,
-            "scorecard_target": 95,
-            "scorecard_unit": "percent",
-            "scorecard_scoring_status": "candidate_data_contract",
-            "scorecard_contributes_to_reward": false,
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
             "statistical_plan_status": "candidate_data_contract_required_before_payout",
-            "expected_thresholds": {
-                "stretch_min": 100,
-                "green_min": 95,
-                "yellow_min": 85,
-                "red_below": 85
-            },
-            "expected_target_text": "≥95%",
+            "expected_thresholds": null,
+            "expected_target_text": null,
             "total_occurrences": 1,
             "documents_count": 1,
             "target_values_seen": [],
@@ -9575,7 +9521,7 @@
                 }
             ],
             "finding_codes": [],
-            "target_consistency": "registered_target_not_repeated_in_docs",
+            "target_consistency": "no_registered_target_no_local_target",
             "name_consistency": "canonical_or_mapped_name"
         },
         {
@@ -9708,29 +9654,21 @@
         {
             "code": "GROSS_MARGIN_JOB_FAMILY",
             "display_name": "Gross Margin by Job / Product Family",
-            "classification": "executive_scorecard_kpi",
+            "classification": "governance_kpi",
             "registry_sources": [
-                "annex122_governance_kpis",
-                "scorecard_operating_model",
-                "scorecard_evidence_contracts",
-                "metric_governance_overrides"
+                "annex122_governance_kpis"
             ],
             "aliases": [],
             "local_ids": [],
             "backend_status": "not_declared",
-            "scorecard_weight_pct": 8,
-            "scorecard_target": 28,
-            "scorecard_unit": "percent",
-            "scorecard_scoring_status": "candidate_data_contract",
-            "scorecard_contributes_to_reward": false,
-            "statistical_plan_status": "candidate_data_contract_required_before_payout",
-            "expected_thresholds": {
-                "stretch_min": 35,
-                "green_min": 28,
-                "yellow_min": 22,
-                "red_below": 22
-            },
-            "expected_target_text": "≥28%",
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
+            "statistical_plan_status": "not_declared_or_informational",
+            "expected_thresholds": null,
+            "expected_target_text": null,
             "total_occurrences": 1,
             "documents_count": 1,
             "target_values_seen": [],
@@ -9751,7 +9689,7 @@
                 }
             ],
             "finding_codes": [],
-            "target_consistency": "registered_target_not_repeated_in_docs",
+            "target_consistency": "no_registered_target_no_local_target",
             "name_consistency": "canonical_or_mapped_name"
         },
         {
@@ -10187,6 +10125,1953 @@
             "finding_codes": [],
             "target_consistency": "no_registered_target_no_local_target",
             "name_consistency": "canonical_or_mapped_name"
+        }
+    ],
+    "registry_inventory": [
+        {
+            "code": "COMPLAINT_RATE",
+            "display_name": "Customer Quality Escape / Complaint Rate",
+            "classification": "executive_scorecard_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "legacy_aliases",
+                "annex122_governance_kpis",
+                "scorecard_operating_model",
+                "scorecard_evidence_contracts",
+                "metric_governance_overrides"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": "≤1 complaints_per_100_shipments",
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "COPQ",
+            "display_name": "Cost of Poor Quality",
+            "classification": "executive_scorecard_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "gate_control_metrics",
+                "scorecard_operating_model",
+                "scorecard_evidence_contracts",
+                "metric_governance_overrides"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": "≤2 percent_of_sales",
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "FPY",
+            "display_name": "First Pass Yield",
+            "classification": "executive_scorecard_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "dashboard_core_kpis",
+                "gate_control_metrics",
+                "scorecard_operating_model",
+                "scorecard_evidence_contracts",
+                "metric_governance_overrides"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": "≥98%",
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "MATERIAL_AVAILABILITY_PLAN",
+            "display_name": "Material Availability for Plan",
+            "classification": "executive_scorecard_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "annex122_governance_kpis",
+                "scorecard_operating_model",
+                "scorecard_evidence_contracts",
+                "metric_governance_overrides"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": "≥95%",
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "OTD",
+            "display_name": "On-Time Delivery (gate view)",
+            "classification": "executive_scorecard_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "annex122_governance_kpis",
+                "dashboard_core_kpis",
+                "gate_control_metrics",
+                "scorecard_operating_model",
+                "scorecard_evidence_contracts",
+                "metric_governance_overrides"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": "≥95%",
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "PLAN_ADHERENCE",
+            "display_name": "Dispatch/Plan Adherence",
+            "classification": "executive_scorecard_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "annex122_governance_kpis",
+                "dashboard_core_kpis",
+                "scorecard_operating_model",
+                "scorecard_evidence_contracts",
+                "metric_governance_overrides"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": "≥90%",
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "WIP_AGING",
+            "display_name": "WIP Aging",
+            "classification": "executive_scorecard_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "annex122_governance_kpis",
+                "dashboard_core_kpis",
+                "scorecard_operating_model",
+                "scorecard_evidence_contracts",
+                "metric_governance_overrides"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": "≤5 aged_wip_percent",
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "CHANGEOVER_TIME",
+            "display_name": "Changeover Time",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "CONTROL_PLAN_PFMEA_APPROVAL",
+            "display_name": "Control Plan / PFMEA Approval Before Baseline",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "CUSTOMER_ESCAPE_NOTIFICATION_LT",
+            "display_name": "Customer Escape Notification Lead Time",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "ECN_LEAD_TIME",
+            "display_name": "ECN Lead Time",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "ENGINEERING_RELEASE_RFT",
+            "display_name": "Engineering First-Time-Right",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "FAI_CYCLE_TIME",
+            "display_name": "FAI Cycle Time",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "IQC_PASS_RATE",
+            "display_name": "IQC Pass Rate",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "OEE",
+            "display_name": "Overall Equipment Effectiveness",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "gate_control_metrics"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "ORDER_REVIEW_RFT",
+            "display_name": "Contract Review FTR",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "annex122_governance_kpis",
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "RFQ_TURNAROUND_TIME",
+            "display_name": "RFQ Turnaround Time",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "annex122_governance_kpis",
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "SHIP_PACKET_COMPLETENESS",
+            "display_name": "Release Package Completeness",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "legacy_aliases",
+                "dashboard_core_kpis",
+                "gate_control_metrics"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "SHIP_READY_TO_INVOICE_LT",
+            "display_name": "Ship-to-Invoice Turnaround",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "annex122_governance_kpis",
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "SPC_SIGNAL_REACTION_TIME",
+            "display_name": "SPC Signal Reaction Time",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "TRACEABILITY_COMPLETENESS",
+            "display_name": "Traceability Completeness",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "TRACEABILITY_DRILL_TIME",
+            "display_name": "Traceability Drill Time",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "BCP_READINESS",
+            "display_name": "Business Continuity Readiness",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "CAL_COMPLIANCE",
+            "display_name": "Calibration / Metrology Readiness",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "legacy_aliases",
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "CRITICAL_ROLE_BACKUP_COVERAGE",
+            "display_name": "Certified Role Backup Coverage",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "CRITICAL_SYSTEM_AVAILABILITY",
+            "display_name": "Critical System Availability / Readiness",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "CUSTOMER_COMM_CLOSURE_OT",
+            "display_name": "Customer Communication Closure On Time",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "DSO",
+            "display_name": "AR Collection Lead Time / DSO",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "ECO_CLOSURE_AGING",
+            "display_name": "ECO Closure Aging",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "ENGINEERING_RELEASE_ON_TIME",
+            "display_name": "Engineering Release On Time",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "FINAL_RELEASE_RFT",
+            "display_name": "Final Release Right-First-Time",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "FOD_LINE_CLEARANCE_COMPLIANCE",
+            "display_name": "FOD / Line Clearance / Release Discipline",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "GROSS_MARGIN_JOB_FAMILY",
+            "display_name": "Gross Margin by Job / Product Family",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "INCIDENT_ACTION_CLOSURE_AGING",
+            "display_name": "Incident Action Closure Aging",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "INVENTORY_ACCURACY",
+            "display_name": "Inventory Accuracy",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "legacy_aliases",
+                "annex122_governance_kpis",
+                "dashboard_core_kpis"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "INVOICE_RFT",
+            "display_name": "Invoice Right-First-Time",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "MASTER_DATA_EXCEPTION_AGING",
+            "display_name": "Master Data / Transaction Exception Aging",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "MONTH_END_CLOSE_OT",
+            "display_name": "Month-End Close On Time",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "NCR_CLOSURE_AGING",
+            "display_name": "NCR Closure Aging",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "QUOTE_HIT_RATE",
+            "display_name": "Quote Hit Rate vs Qualified RFQ",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "RECORDABLE_INCIDENT_RATE",
+            "display_name": "Recordable Incident / LTI Rate",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "SAFETY_ONBOARDING_COMPLIANCE",
+            "display_name": "Safety Onboarding Training Compliance",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "SCHEDULE_RECOVERY_EFFECTIVENESS",
+            "display_name": "Production Schedule Adherence / Recovery Effectiveness",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "SERVICE_TICKET_SLA",
+            "display_name": "Service Ticket Closure Within SLA",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "SUPPLIER_OTD",
+            "display_name": "PO/Processor On-Time",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "annex122_governance_kpis",
+                "dashboard_core_kpis"
+            ],
+            "backend_status": "runtime_calculated_partial",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "TRAINING_COMP",
+            "display_name": "Training Completion On Time",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "legacy_aliases",
+                "annex122_governance_kpis"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "CAPA_CLOSURE",
+            "display_name": "CAPA_CLOSURE",
+            "classification": "local_or_unmapped_metric",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "legacy_aliases"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "DOWNTIME_IMPACT",
+            "display_name": "Downtime Impact",
+            "classification": "local_or_unmapped_metric",
+            "registry_sources": [
+                "legacy_aliases",
+                "dashboard_core_kpis"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "DPMO",
+            "display_name": "DPMO",
+            "classification": "local_or_unmapped_metric",
+            "registry_sources": [
+                "runtime_calculated_metrics"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "INV_TURNS",
+            "display_name": "INV_TURNS",
+            "classification": "local_or_unmapped_metric",
+            "registry_sources": [
+                "runtime_calculated_metrics"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "LABOR_EFF",
+            "display_name": "LABOR_EFF",
+            "classification": "local_or_unmapped_metric",
+            "registry_sources": [
+                "runtime_calculated_metrics"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "MACHINE_UTIL",
+            "display_name": "MACHINE_UTIL",
+            "classification": "local_or_unmapped_metric",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "legacy_aliases"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "NCR_RATE",
+            "display_name": "NCR_RATE",
+            "classification": "local_or_unmapped_metric",
+            "registry_sources": [
+                "runtime_calculated_metrics"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "PUT_THRU",
+            "display_name": "PUT_THRU",
+            "classification": "local_or_unmapped_metric",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "legacy_aliases"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "QC_HOLD_SLA",
+            "display_name": "QC Hold SLA",
+            "classification": "local_or_unmapped_metric",
+            "registry_sources": [
+                "legacy_aliases",
+                "dashboard_core_kpis"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "REWORK_RATE",
+            "display_name": "REWORK_RATE",
+            "classification": "local_or_unmapped_metric",
+            "registry_sources": [
+                "runtime_calculated_metrics"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "SCRAP_RATE",
+            "display_name": "SCRAP_RATE",
+            "classification": "local_or_unmapped_metric",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "legacy_aliases"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "SETUP_RATIO",
+            "display_name": "SETUP_RATIO",
+            "classification": "local_or_unmapped_metric",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "legacy_aliases"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "SUPPLIER_QUAL",
+            "display_name": "SUPPLIER_QUAL",
+            "classification": "local_or_unmapped_metric",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "legacy_aliases"
+            ],
+            "backend_status": "runtime_calculated",
+            "expected_target_text": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract"
+        },
+        {
+            "code": "TIME_ENTRY_COMPLIANCE",
+            "display_name": "Time Entry Compliance",
+            "classification": "local_or_unmapped_metric",
+            "registry_sources": [
+                "legacy_aliases",
+                "dashboard_core_kpis"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "ACCESS_REVIEW_COMPLETION",
+            "display_name": "Access Review Completion",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "AR_DISPUTE_AGING",
+            "display_name": "Ar Dispute Aging",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "AUDIT_FINDING_AGING",
+            "display_name": "Audit Finding Aging",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "BOTTLENECK_BUFFER_STATUS",
+            "display_name": "Constraint buffer red/yellow/green status",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "CAPA_EFFECTIVENESS",
+            "display_name": "CAPA effectiveness after verification window",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "CMM_PROGRAM_VALIDATION",
+            "display_name": "Cmm Program Validation",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "COMPLAINT_LOG_ON_TIME",
+            "display_name": "Complaint Log On Time",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "CONSTRAINT_LOST_HOURS",
+            "display_name": "Lost available hours at constraint",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "CRITICAL_ROLE_CERT_COVERAGE",
+            "display_name": "Critical role certification coverage",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "CYCLE_TIME_VARIANCE",
+            "display_name": "Actual cycle time variance vs standard",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "legacy_aliases",
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "DEFECT_PARETO_ACTION_CLOSURE",
+            "display_name": "Defect Pareto Action Closure",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "DFM_FEASIBILITY_RFT",
+            "display_name": "Dfm Feasibility Rft",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "DOCUMENT_CHANGE_RFT",
+            "display_name": "Document Change Rft",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "EHS_RISK_ASSESSMENT_REVIEW",
+            "display_name": "Ehs Risk Assessment Review",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "ENGINEERING_BLOCKER_CLOSURE_OT",
+            "display_name": "Engineering Blocker Closure Ot",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "ENGINEERING_CAUSED_NCR",
+            "display_name": "Engineering Caused Ncr",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "ERP_RELEASE_RFT",
+            "display_name": "Erp Release Rft",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "FAI_FIRST_PASS",
+            "display_name": "FAI/first-piece first-pass acceptance",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "legacy_aliases",
+                "annex122_governance_kpis",
+                "gate_control_metrics",
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "retained_from_annex122",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "HOSHIN_RESOURCE_DECISION_LT",
+            "display_name": "Hoshin Resource Decision Lt",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "INSPECTION_PLAN_ADHERENCE",
+            "display_name": "Inspection Plan Adherence",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "INSPECTION_QUEUE_AGING",
+            "display_name": "Inspection Queue Aging",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "INSPECTION_RFT",
+            "display_name": "Inspection Rft",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "IN_PROCESS_REJECT_RATE",
+            "display_name": "In-process reject rate",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "legacy_aliases",
+                "gate_control_metrics",
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "JOB_COST_ACCURACY",
+            "display_name": "Job Cost Accuracy",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "KPI_RED_ACTION_CLOSURE",
+            "display_name": "Kpi Red Action Closure",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "KPI_REGISTRY_DRIFT_COUNT",
+            "display_name": "Kpi Registry Drift Count",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "MRP_EXCEPTION_AGING",
+            "display_name": "Mrp Exception Aging",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "MSA_READINESS",
+            "display_name": "Msa Readiness",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "MTBF",
+            "display_name": "Mean time between failures",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "MTTR",
+            "display_name": "Mean time to repair",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "NCR_CAPTURE_COMPLETENESS",
+            "display_name": "Ncr Capture Completeness",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "NEAR_MISS_REPORTING_QUALITY",
+            "display_name": "Near Miss Reporting Quality",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "OEE_BOTTLENECK",
+            "display_name": "OEE at current constraint resource",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "OJT_VERIFICATION_PASS_RATE",
+            "display_name": "Ojt Verification Pass Rate",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "PACKAGING_LABEL_COC_RFT",
+            "display_name": "Packaging Label Coc Rft",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "PLAN_ADHERENCE_WITH_APPROVED_RESEQUENCE",
+            "display_name": "Plan Adherence With Approved Resequence",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_AP_PAYMENT_OT",
+            "display_name": "Supplier payment on-time",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_AREA_5S_FOD_SCORE",
+            "display_name": "Workstation 5S / FOD score",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_AUDIT_FINDING_CLOSURE",
+            "display_name": "Audit finding closure on-time",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_AUDIT_FINDING_EFFECTIVENESS",
+            "display_name": "Audit finding effectiveness",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_AUDIT_PLAN_COMPLIANCE",
+            "display_name": "Internal audit plan compliance",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_BACKUP_SUCCESS_RATE",
+            "display_name": "System backup success rate",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_CAM_COLLISION_INCIDENTS",
+            "display_name": "Missed collision / gouge incidents",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_CAM_PROGRAM_FPY",
+            "display_name": "NC program first-pass rate",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_CAM_PROGRAM_ON_TIME",
+            "display_name": "NC program release on-time",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_CAM_PROVEOUT_TIME",
+            "display_name": "Program prove-out time variance",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_CLEANLINESS_COMPLIANCE",
+            "display_name": "Part cleanliness process compliance",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_CUSTOMS_CLEARANCE_OT",
+            "display_name": "Customs clearance on-time",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_CYCLE_COUNT_COMPLIANCE",
+            "display_name": "Cycle-count schedule compliance",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_DEBURR_ESCAPE_RATE",
+            "display_name": "Deburr burr-escape rate",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_DEBURR_OUTPUT_ADHERENCE",
+            "display_name": "Deburr output adherence",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_DFM_ISSUE_CATCH_RATE",
+            "display_name": "DFM issue catch rate",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_DFM_REVIEW_ON_TIME",
+            "display_name": "DFM review on-time completion",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_EXCESS_INVENTORY",
+            "display_name": "Excess / obsolete inventory ratio",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_EXPORT_DOC_ACCURACY",
+            "display_name": "Export / import document accuracy",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_GL_RECONCILIATION_OT",
+            "display_name": "GL reconciliation on-time",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_GOODS_RECEIPT_OT",
+            "display_name": "Goods receipt on-time posting",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_IE_IMPROVEMENT_DELIVERY",
+            "display_name": "Improvement project delivery",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_INSPECTION_ESCAPE_RATE",
+            "display_name": "Inspection escape rate",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_INSPECTION_THROUGHPUT",
+            "display_name": "Inspection team throughput",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_MAINT_RESPONSE_TIME",
+            "display_name": "Maintenance request response time",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_NCR_INVESTIGATION_QUALITY",
+            "display_name": "NCR root-cause investigation quality",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_OP_MACHINE_UPTIME",
+            "display_name": "Tended-machine running ratio",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_OP_OUTPUT_ADHERENCE",
+            "display_name": "Operator output adherence",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_OP_PART_ACCEPT",
+            "display_name": "Operator part acceptance rate",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_PACKAGING_DEFECT_RATE",
+            "display_name": "Packaging & labelling defect rate",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_PACKAGING_OUTPUT_OT",
+            "display_name": "Packaging & dispatch on-time",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_PAYMENT_ACCURACY",
+            "display_name": "Payment & reconciliation accuracy",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_PAYROLL_ACCURACY",
+            "display_name": "Payroll accuracy",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_PAYROLL_OT",
+            "display_name": "Payroll on-time payment",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_PICK_ACCURACY",
+            "display_name": "Order picking accuracy",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_PM_BREAKDOWN_RATIO",
+            "display_name": "Preventive vs breakdown maintenance ratio",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_PM_SCHEDULE_COMPLIANCE",
+            "display_name": "Preventive-maintenance schedule compliance",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_PO_CYCLE_TIME",
+            "display_name": "Purchase-order cycle time",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_PPAP_SUBMISSION_OT",
+            "display_name": "PPAP / FAI submission on-time",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_PROCESS_VALIDATION_OT",
+            "display_name": "Process validation on-time",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_PURCHASE_PRICE_VARIANCE",
+            "display_name": "Purchase price variance",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_ROUTING_ACCURACY",
+            "display_name": "Process routing accuracy",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_SAFETY_PPE_COMPLIANCE",
+            "display_name": "Personal safety & PPE compliance",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_SELF_INSPECTION_COMPLIANCE",
+            "display_name": "In-process self-inspection compliance",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_SETUP_DOC_QUALITY",
+            "display_name": "Setup & first-article document quality",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_SETUP_SHEET_COMPLIANCE",
+            "display_name": "Setup-sheet & parameter compliance",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_SETUP_TIME_VARIANCE",
+            "display_name": "Setup time variance vs standard",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_SHIPMENT_DELAY_RATE",
+            "display_name": "XNK-caused shipment delay rate",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_STD_TIME_ACCURACY",
+            "display_name": "Standard-time accuracy",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_STOCKOUT_RATE",
+            "display_name": "Material stockout rate",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_SYSTEM_PATCH_COMPLIANCE",
+            "display_name": "System patch / update compliance",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_TEAM_BACKLOG_AGING",
+            "display_name": "Team queue backlog aging",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_TOOL_AVAILABILITY",
+            "display_name": "Tooling availability rate",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_TOOL_INVENTORY_ACCURACY",
+            "display_name": "Tool-crib inventory accuracy",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_TOOL_LIFE_ADHERENCE",
+            "display_name": "Tool-life change adherence",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "POS_TOOL_PRESET_ACCURACY",
+            "display_name": "Tool preset accuracy",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "PROMISE_DATE_RISK",
+            "display_name": "Promise Date Risk",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "legacy_aliases",
+                "dashboard_core_kpis",
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "QUOTE_MARGIN_ACCURACY",
+            "display_name": "Quote Margin Accuracy",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "QUOTE_PACKAGE_RFT",
+            "display_name": "Quote Package Rft",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "REPEAT_NCR_RATE",
+            "display_name": "Repeat NCR rate",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "legacy_aliases",
+                "dashboard_core_kpis",
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "RFQ_COMPLETENESS_RFT",
+            "display_name": "Rfq Completeness Rft",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "RFQ_TURNAROUND_TIME_FOR_COMPLETE_RFQ",
+            "display_name": "Rfq Turnaround Time For Complete Rfq",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "ROUTING_BOM_CHANGE_RFT",
+            "display_name": "Routing Bom Change Rft",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "SETUP_FIRST_PASS",
+            "display_name": "Setup ready-to-run first-pass acceptance",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "legacy_aliases",
+                "gate_control_metrics",
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "SHIFT_HANDOVER_RFT",
+            "display_name": "Shift Handover Rft",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "SHORTAGE_RECOVERY_OT",
+            "display_name": "Shortage Recovery Ot",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "SUPPLIER_READINESS",
+            "display_name": "Supplier readiness composite from OTD and incoming quality",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "THROUGHPUT_PER_CONSTRAINT_HOUR",
+            "display_name": "Revenue/throughput per constraint hour",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "TIMESHEET_EXCEPTION_AGING",
+            "display_name": "Timesheet Exception Aging",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "TOOL_FIXTURE_READY_TO_PLAN",
+            "display_name": "Tool Fixture Ready To Plan",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "TRAINING_MATRIX_FRESHNESS",
+            "display_name": "Training Matrix Freshness",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "TRAINING_RECORD_INTEGRITY",
+            "display_name": "Training Record Integrity",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "TRANSACTION_SYNC_RELIABILITY",
+            "display_name": "Transaction Sync Reliability",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "WIP_BEFORE_CONSTRAINT",
+            "display_name": "Released WIP before constraint",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "staged_data_contract",
+            "expected_target_text": null,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout"
         }
     ],
     "document_usage_matrix": [
@@ -12598,7 +14483,7 @@
                 {
                     "code": "PLAN_ADHERENCE",
                     "display_name": "Dispatch/Plan Adherence",
-                    "classification": "governance_kpi",
+                    "classification": "executive_scorecard_kpi",
                     "occurrences": 5,
                     "matched_terms": [
                         "PLAN ADHERENCE",
@@ -12614,7 +14499,7 @@
                 {
                     "code": "FAI_FIRST_PASS",
                     "display_name": "FAI/first-piece first-pass acceptance",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 4,
                     "matched_terms": [
                         "FAI_FIRST_PASS"
@@ -12707,7 +14592,7 @@
                 {
                     "code": "MATERIAL_AVAILABILITY_PLAN",
                     "display_name": "Material Availability for Plan",
-                    "classification": "governance_kpi",
+                    "classification": "executive_scorecard_kpi",
                     "occurrences": 2,
                     "matched_terms": [
                         "MATERIAL_AVAILABILITY_PLAN"
@@ -12722,7 +14607,7 @@
                 {
                     "code": "RECORDABLE_INCIDENT_RATE",
                     "display_name": "Recordable Incident / LTI Rate",
-                    "classification": "safety_gate",
+                    "classification": "governance_kpi",
                     "occurrences": 2,
                     "matched_terms": [
                         "RECORDABLE_INCIDENT_RATE"
@@ -12768,7 +14653,7 @@
                 {
                     "code": "CAPA_EFFECTIVENESS",
                     "display_name": "CAPA effectiveness after verification window",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "CAPA_EFFECTIVENESS"
@@ -12843,7 +14728,7 @@
                 {
                     "code": "GROSS_MARGIN_JOB_FAMILY",
                     "display_name": "Gross Margin by Job / Product Family",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "governance_kpi",
                     "occurrences": 1,
                     "matched_terms": [
                         "GROSS_MARGIN_JOB_FAMILY"
@@ -12963,7 +14848,7 @@
                 {
                     "code": "SUPPLIER_READINESS",
                     "display_name": "Supplier readiness composite from OTD and incoming quality",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "SUPPLIER READINESS"
@@ -13034,7 +14919,7 @@
                 {
                     "code": "SETUP_FIRST_PASS",
                     "display_name": "Setup ready-to-run first-pass acceptance",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 2,
                     "matched_terms": [
                         "SETUP_FIRST_PASS"
@@ -13049,7 +14934,7 @@
                 {
                     "code": "THROUGHPUT_PER_CONSTRAINT_HOUR",
                     "display_name": "Revenue/throughput per constraint hour",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 2,
                     "matched_terms": [
                         "THROUGHPUT_PER_CONSTRAINT_HOUR"
@@ -13064,7 +14949,7 @@
                 {
                     "code": "CAPA_EFFECTIVENESS",
                     "display_name": "CAPA effectiveness after verification window",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "CAPA_EFFECTIVENESS"
@@ -13124,7 +15009,7 @@
                 {
                     "code": "FAI_FIRST_PASS",
                     "display_name": "FAI/first-piece first-pass acceptance",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "FAI_FIRST_PASS"
@@ -13169,7 +15054,7 @@
                 {
                     "code": "OEE_BOTTLENECK",
                     "display_name": "OEE at current constraint resource",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "OEE_BOTTLENECK"
@@ -13184,7 +15069,7 @@
                 {
                     "code": "REPEAT_NCR_RATE",
                     "display_name": "Repeat NCR rate",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "REPEAT_NCR_RATE"
@@ -13429,7 +15314,7 @@
                 {
                     "code": "CAPA_EFFECTIVENESS",
                     "display_name": "CAPA effectiveness after verification window",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 2,
                     "matched_terms": [
                         "CAPA EFFECTIVENESS",
@@ -13445,7 +15330,7 @@
                 {
                     "code": "OEE_BOTTLENECK",
                     "display_name": "OEE at current constraint resource",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 2,
                     "matched_terms": [
                         "OEE BOTTLENECK",
@@ -13492,7 +15377,7 @@
                 {
                     "code": "CRITICAL_ROLE_CERT_COVERAGE",
                     "display_name": "Critical role certification coverage",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "CRITICAL_ROLE_CERT_COVERAGE"
@@ -13507,7 +15392,7 @@
                 {
                     "code": "FAI_FIRST_PASS",
                     "display_name": "FAI/first-piece first-pass acceptance",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "FAI_FIRST_PASS"
@@ -13567,7 +15452,7 @@
                 {
                     "code": "PLAN_ADHERENCE",
                     "display_name": "Dispatch/Plan Adherence",
-                    "classification": "governance_kpi",
+                    "classification": "executive_scorecard_kpi",
                     "occurrences": 1,
                     "matched_terms": [
                         "PLAN_ADHERENCE"
@@ -13582,7 +15467,7 @@
                 {
                     "code": "REPEAT_NCR_RATE",
                     "display_name": "Repeat NCR rate",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "REPEAT_NCR_RATE"
@@ -13597,7 +15482,7 @@
                 {
                     "code": "SETUP_FIRST_PASS",
                     "display_name": "Setup ready-to-run first-pass acceptance",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "SETUP_FIRST_PASS"
@@ -13612,7 +15497,7 @@
                 {
                     "code": "THROUGHPUT_PER_CONSTRAINT_HOUR",
                     "display_name": "Revenue/throughput per constraint hour",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "THROUGHPUT_PER_CONSTRAINT_HOUR"
@@ -13722,7 +15607,7 @@
                 {
                     "code": "OEE_BOTTLENECK",
                     "display_name": "OEE at current constraint resource",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 3,
                     "matched_terms": [
                         "OEE BOTTLENECK",
@@ -13783,7 +15668,7 @@
                 {
                     "code": "CAPA_EFFECTIVENESS",
                     "display_name": "CAPA effectiveness after verification window",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "CAPA EFFECTIVENESS"
@@ -13828,7 +15713,7 @@
                 {
                     "code": "SUPPLIER_READINESS",
                     "display_name": "Supplier readiness composite from OTD and incoming quality",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "SUPPLIER READINESS"
@@ -13843,7 +15728,7 @@
                 {
                     "code": "THROUGHPUT_PER_CONSTRAINT_HOUR",
                     "display_name": "Revenue/throughput per constraint hour",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "THROUGHPUT PER CONSTRAINT HOUR"
@@ -14170,7 +16055,7 @@
                 {
                     "code": "CAPA_EFFECTIVENESS",
                     "display_name": "CAPA effectiveness after verification window",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 2,
                     "matched_terms": [
                         "CAPA EFFECTIVENESS"
@@ -14881,7 +16766,7 @@
                 {
                     "code": "PLAN_ADHERENCE",
                     "display_name": "Dispatch/Plan Adherence",
-                    "classification": "governance_kpi",
+                    "classification": "executive_scorecard_kpi",
                     "occurrences": 2,
                     "matched_terms": [
                         "KPI-04"
@@ -14936,7 +16821,7 @@
                 {
                     "code": "PLAN_ADHERENCE",
                     "display_name": "Dispatch/Plan Adherence",
-                    "classification": "governance_kpi",
+                    "classification": "executive_scorecard_kpi",
                     "occurrences": 2,
                     "matched_terms": [
                         "KPI-04"
@@ -14950,8 +16835,8 @@
                 },
                 {
                     "code": "PROMISE_DATE_RISK",
-                    "display_name": "Promise-Date Risk",
-                    "classification": "local_or_unmapped_metric",
+                    "display_name": "Promise Date Risk",
+                    "classification": "operating_metric",
                     "occurrences": 2,
                     "matched_terms": [
                         "KPI-02"
@@ -15439,7 +17324,7 @@
                 {
                     "code": "PLAN_ADHERENCE",
                     "display_name": "Dispatch/Plan Adherence",
-                    "classification": "governance_kpi",
+                    "classification": "executive_scorecard_kpi",
                     "occurrences": 1,
                     "matched_terms": [
                         "PLAN ADHERENCE"
@@ -16283,7 +18168,7 @@
                 {
                     "code": "CAPA_EFFECTIVENESS",
                     "display_name": "CAPA effectiveness after verification window",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "CAPA EFFECTIVENESS"
@@ -16973,7 +18858,7 @@
                 {
                     "code": "CAPA_EFFECTIVENESS",
                     "display_name": "CAPA effectiveness after verification window",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "CAPA EFFECTIVENESS"
@@ -17013,7 +18898,7 @@
                 {
                     "code": "CAPA_EFFECTIVENESS",
                     "display_name": "CAPA effectiveness after verification window",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "CAPA EFFECTIVENESS"
@@ -17053,7 +18938,7 @@
                 {
                     "code": "CAPA_EFFECTIVENESS",
                     "display_name": "CAPA effectiveness after verification window",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "CAPA EFFECTIVENESS"
@@ -17303,7 +19188,7 @@
                 {
                     "code": "CAPA_EFFECTIVENESS",
                     "display_name": "CAPA effectiveness after verification window",
-                    "classification": "executive_scorecard_kpi",
+                    "classification": "operating_metric",
                     "occurrences": 1,
                     "matched_terms": [
                         "CAPA-EFFECTIVENESS"

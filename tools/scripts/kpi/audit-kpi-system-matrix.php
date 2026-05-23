@@ -171,6 +171,23 @@ $summary = [
     'p3_findings' => count(array_filter($findings, static fn(array $row): bool => $row['priority'] === 3)),
 ];
 
+$registryInventory = [];
+foreach ($catalog['metrics'] as $code => $metric) {
+    if (($metric['registry_sources'] ?? []) === []) {
+        continue;
+    }
+    $registryInventory[] = [
+        'code' => $code,
+        'display_name' => $metric['display_name'] ?? $code,
+        'classification' => $metric['classification'] ?? 'local_or_unmapped_metric',
+        'registry_sources' => $metric['registry_sources'] ?? [],
+        'backend_status' => $metric['backend_status'] ?? 'not_declared',
+        'expected_target_text' => expectedTargetText($metric),
+        'statistical_plan_status' => statisticalPlanStatus($metric),
+    ];
+}
+usort($registryInventory, static fn(array $a, array $b): int => [$a['classification'], $a['code']] <=> [$b['classification'], $b['code']]);
+
 $report = [
     'generated_at' => gmdate('c'),
     'scanned_root' => 'mom/docs',
@@ -188,6 +205,7 @@ $report = [
     ],
     'summary' => $summary,
     'metric_usage_matrix' => array_values($metricUsage),
+    'registry_inventory' => $registryInventory,
     'document_usage_matrix' => $documentRows,
     'findings' => $findings,
 ];
@@ -1025,6 +1043,14 @@ function renderMarkdownReport(array $report): string
         $lines[] = '| `' . (string) $row['code'] . '` | ' . (string) $row['classification'] . ' | ' . (string) $row['documents_count'] . ' | ' . (string) $row['total_occurrences'] . ' | ' . pipeSafe((string) ($row['expected_target_text'] ?? '')) . ' | ' . pipeSafe((string) $row['statistical_plan_status']) . ' | ' . pipeSafe((string) $row['target_consistency']) . ' | ' . pipeSafe((string) $row['name_consistency']) . ' |';
     }
     $lines[] = '';
+    $lines[] = '## Registry Inventory';
+    $lines[] = '';
+    $lines[] = '| Code | Class | Registry sources | Backend/statistical plan | Target |';
+    $lines[] = '|---|---|---|---|---|';
+    foreach ($report['registry_inventory'] as $row) {
+        $lines[] = '| `' . (string) $row['code'] . '` | ' . (string) $row['classification'] . ' | ' . pipeSafe(implode(', ', $row['registry_sources'] ?? [])) . ' | ' . pipeSafe((string) ($row['backend_status'] ?? '')) . ' / ' . pipeSafe((string) ($row['statistical_plan_status'] ?? '')) . ' | ' . pipeSafe((string) ($row['expected_target_text'] ?? '')) . ' |';
+    }
+    $lines[] = '';
     $lines[] = '## Benchmark Rule';
     $lines[] = '';
     $lines[] = '- NIST Baldrige: KPI must support review, decision, improvement, and strategic objectives.';
@@ -1061,6 +1087,17 @@ function renderAnnexHtml(array $report): string
             . '<td>' . h((string) $row['statistical_plan_status']) . '<br><span class="muted">' . h((string) ($row['scorecard_scoring_status'] ?? '')) . '</span></td>'
             . '<td>' . h((string) $row['target_consistency']) . '<br><span class="muted">' . h((string) $row['name_consistency']) . '</span></td>'
             . '<td><details><summary>Documents</summary><ul class="doc-list">' . $docsHtml . '</ul></details></td>'
+            . '</tr>';
+    }
+
+    $registryRows = '';
+    foreach ($report['registry_inventory'] as $row) {
+        $registryRows .= '<tr>'
+            . '<td><span class="code">' . h((string) $row['code']) . '</span><br><span class="muted">' . h((string) $row['display_name']) . '</span></td>'
+            . '<td>' . h((string) $row['classification']) . '</td>'
+            . '<td>' . h(implode(', ', $row['registry_sources'] ?? [])) . '</td>'
+            . '<td>' . h((string) ($row['backend_status'] ?? '')) . '<br><span class="muted">' . h((string) ($row['statistical_plan_status'] ?? '')) . '</span></td>'
+            . '<td>' . h((string) ($row['expected_target_text'] ?? '')) . '</td>'
             . '</tr>';
     }
 
@@ -1126,6 +1163,9 @@ td,th{vertical-align:top}
 <h2>3. Ma trận KPI/metric toàn hệ thống</h2>
 <p class="muted">Bảng này được sinh từ <span class="code">tools/scripts/kpi/audit-kpi-system-matrix.php</span>. Cột Documents mở ra danh sách link tài liệu và số lần sử dụng trong từng tài liệu.</p>
 <div class="table-card"><table class="table"><thead><tr><th>Metric</th><th>Phân loại</th><th>Docs</th><th>Uses</th><th>Target/ngưỡng</th><th>Data/stat plan</th><th>Consistency</th><th>Documents</th></tr></thead><tbody>' . $metricRows . '</tbody></table></div>
+<h2>4. Registry inventory</h2>
+<p class="muted">Bảng này liệt kê toàn bộ metric có nguồn trong registry, kể cả code chưa xuất hiện trong tài liệu được quét. Usage matrix ở mục 3 vẫn giữ đúng số lần xuất hiện thực tế.</p>
+<div class="table-card"><table class="table"><thead><tr><th>Metric</th><th>Phân loại</th><th>Registry sources</th><th>Backend/stat plan</th><th>Target/ngưỡng</th></tr></thead><tbody>' . $registryRows . '</tbody></table></div>
 </div></div></div>
 <div class="no-screen print-disclaimer">Bản in không có đóng dấu kiểm soát phiên bản thì không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>

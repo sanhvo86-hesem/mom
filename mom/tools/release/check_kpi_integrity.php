@@ -477,25 +477,39 @@ foreach ([
     }
 }
 
-// ── P0.11 — JD KPI scorecards: weighted, valid, sum to 100 ──────────────────
-// jd_kpi_scorecards is the SSOT for the per-role weighted KPI scorecard. Every
-// role's weights must sum to 100 and every kpi_code must be a governed metric.
+// ── P0.11 — JD KPI scorecards: active/candidate model, governed, weighted ───
+// jd_kpi_scorecards is the SSOT for per-role measures. Under the Track 4 model
+// the active set is role-fit, not fixed-count. Every active measure still needs
+// a governed metric code and the active weights must sum to 100.
 $scorecardRoot = $registry['jd_kpi_scorecards'] ?? null;
 $scorecards = is_array($scorecardRoot) ? ($scorecardRoot['roles'] ?? null) : null;
 if (is_array($scorecards)) {
     $model = is_array($scorecardRoot) ? trim((string) ($scorecardRoot['model'] ?? '')) : '';
-    if ($model !== 'active_candidate_role_scorecard') {
+    $isActiveCandidateModel = $model === 'active_candidate_role_scorecard';
+    if (!$isActiveCandidateModel) {
         $p1[] = "JD scorecards: registry still uses legacy weighted scorecard model; Track 4 target is active_candidate_role_scorecard with no fixed count.";
     }
     foreach ($scorecards as $roleCode => $card) {
         if (!is_array($card)) {
             continue;
         }
-        $items = is_array($card['scorecard'] ?? null) ? $card['scorecard'] : [];
+        $items = is_array($card['active_scorecard'] ?? null)
+            ? $card['active_scorecard']
+            : (is_array($card['scorecard'] ?? null) ? $card['scorecard'] : []);
         if ($items === []) {
             continue; // a Wave-2 role not yet populated — not a blocker
         }
-        if (count($items) === 5) {
+        $recommended = (int) ($card['recommended_active_count'] ?? 0);
+        if ($isActiveCandidateModel) {
+            $candidateBank = is_array($card['candidate_bank'] ?? null) ? $card['candidate_bank'] : [];
+            if ($candidateBank === []) {
+                $p1[] = "JD scorecard $roleCode: active_candidate model has no candidate_bank for rotation/backlog governance.";
+            }
+            if ($recommended > 0 && count($items) > $recommended) {
+                $p1[] = "JD scorecard $roleCode: active scorecard has " . count($items)
+                    . " items, above recommended_active_count=$recommended.";
+            }
+        } elseif (count($items) === 5) {
             $p1[] = "JD scorecard $roleCode: active scorecard has exactly 5 items; verify this is role-fit and not a fixed-count assumption.";
         }
         if (count($items) > 6) {
@@ -503,7 +517,7 @@ if (is_array($scorecards)) {
         }
         $sum = 0;
         foreach ($items as $it) {
-            $kc = strtoupper(trim((string) ($it['kpi_code'] ?? '')));
+            $kc = strtoupper(trim((string) ($it['kpi_code'] ?? ($it['mapped_canonical_metric'] ?? ''))));
             $w  = (int) ($it['weight'] ?? 0);
             $sum += $w;
             if ($kc === '' || !isset($knownCodes[$kc])) {

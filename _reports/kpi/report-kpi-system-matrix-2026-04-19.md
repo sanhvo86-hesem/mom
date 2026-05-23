@@ -1,6 +1,6 @@
 # KPI System Matrix Audit
 
-Generated: 2026-05-23T16:29:37+00:00
+Generated: 2026-05-23T16:47:15+00:00
 
 ## Summary
 
@@ -8,9 +8,9 @@ Generated: 2026-05-23T16:29:37+00:00
 |---|---:|
 | `html_file_count` | 481 |
 | `documents_with_metric_usage` | 128 |
-| `registry_metric_count` | 132 |
+| `registry_metric_count` | 170 |
 | `metric_codes_seen` | 142 |
-| `executive_scorecard_metrics_seen` | 15 |
+| `executive_scorecard_metrics_seen` | 7 |
 | `role_measure_codes_seen` | 95 |
 | `findings_total` | 5 |
 | `p1_findings` | 0 |
@@ -40,15 +40,15 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 | `FPY` | executive_scorecard_kpi | 28 | 40 | ≥98% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
 | `COPQ` | executive_scorecard_kpi | 21 | 32 | ≤2 percent_of_sales | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
 | `OEE` | gate_control_metric | 20 | 42 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `CAPA_EFFECTIVENESS` | executive_scorecard_kpi | 10 | 12 | ≥90% | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
+| `CAPA_EFFECTIVENESS` | operating_metric | 10 | 12 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `MTTR` | operating_metric | 9 | 13 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `WIP_AGING` | executive_scorecard_kpi | 8 | 11 | ≤5 aged_wip_percent | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
+| `WIP_AGING` | executive_scorecard_kpi | 8 | 11 | ≤5 aged_wip_percent | runtime_calculated_with_registry_contract | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
 | `COMPLAINT_RATE` | executive_scorecard_kpi | 5 | 26 | ≤1 complaints_per_100_shipments | runtime_calculated_with_registry_contract | registered_target_not_repeated_in_docs | legacy_alias_seen |
-| `PLAN_ADHERENCE` | governance_kpi | 5 | 11 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `PLAN_ADHERENCE` | executive_scorecard_kpi | 5 | 11 | ≥90% | runtime_calculated_with_registry_contract | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
 | `C18-M1` | role_performance_measure | 3 | 8 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
-| `FAI_FIRST_PASS` | executive_scorecard_kpi | 3 | 6 | ≥98% | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
-| `OEE_BOTTLENECK` | executive_scorecard_kpi | 3 | 6 | ≥80% | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
-| `THROUGHPUT_PER_CONSTRAINT_HOUR` | executive_scorecard_kpi | 3 | 4 | ≥1.1 baseline_index | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
+| `FAI_FIRST_PASS` | operating_metric | 3 | 6 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `OEE_BOTTLENECK` | operating_metric | 3 | 6 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `THROUGHPUT_PER_CONSTRAINT_HOUR` | operating_metric | 3 | 4 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `C01-M2` | role_performance_measure | 2 | 7 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C01-M5` | role_performance_measure | 2 | 7 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C02-M2` | role_performance_measure | 2 | 7 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
@@ -96,13 +96,13 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 | `C16-M5` | role_performance_measure | 2 | 3 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C18-M4` | role_performance_measure | 2 | 3 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C18-M5` | role_performance_measure | 2 | 3 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
-| `SETUP_FIRST_PASS` | executive_scorecard_kpi | 2 | 3 | ≥95% | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
+| `SETUP_FIRST_PASS` | operating_metric | 2 | 3 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `C12-M2` | role_performance_measure | 2 | 2 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `CONSTRAINT_LOST_HOURS` | operating_metric | 2 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `MTBF` | operating_metric | 2 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `PUT_THRU` | local_or_unmapped_metric | 2 | 2 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | unmapped_or_local_name |
-| `REPEAT_NCR_RATE` | executive_scorecard_kpi | 2 | 2 | ≤5% | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
-| `SUPPLIER_READINESS` | executive_scorecard_kpi | 2 | 2 | ≥90 composite_score | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
+| `REPEAT_NCR_RATE` | operating_metric | 2 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `SUPPLIER_READINESS` | operating_metric | 2 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `DSO` | governance_kpi | 1 | 6 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `INVOICE_RFT` | governance_kpi | 1 | 4 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `SETUP_RATIO` | local_or_unmapped_metric | 1 | 4 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | legacy_alias_seen |
@@ -111,10 +111,10 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 | `CRITICAL_ROLE_BACKUP_COVERAGE` | governance_kpi | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CRITICAL_SYSTEM_AVAILABILITY` | governance_kpi | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `DOWNTIME_IMPACT` | local_or_unmapped_metric | 1 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | legacy_alias_seen |
-| `MATERIAL_AVAILABILITY_PLAN` | governance_kpi | 1 | 2 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `PROMISE_DATE_RISK` | local_or_unmapped_metric | 1 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | unmapped_or_local_name |
+| `MATERIAL_AVAILABILITY_PLAN` | executive_scorecard_kpi | 1 | 2 | ≥95% | runtime_calculated_with_registry_contract | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
+| `PROMISE_DATE_RISK` | operating_metric | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `QC_HOLD_SLA` | local_or_unmapped_metric | 1 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | unmapped_or_local_name |
-| `RECORDABLE_INCIDENT_RATE` | safety_gate | 1 | 2 | ≤0 count | not_declared_or_informational | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
+| `RECORDABLE_INCIDENT_RATE` | governance_kpi | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `SUPPLIER_OTD` | governance_kpi | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `BCP_READINESS` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `C01-M1` | role_performance_measure | 1 | 1 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
@@ -163,11 +163,11 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 | `C17-M5` | role_performance_measure | 1 | 1 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C19-M1` | role_performance_measure | 1 | 1 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C19-M4` | role_performance_measure | 1 | 1 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
-| `CRITICAL_ROLE_CERT_COVERAGE` | executive_scorecard_kpi | 1 | 1 | ≥95% | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
+| `CRITICAL_ROLE_CERT_COVERAGE` | operating_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CYCLE_TIME_VARIANCE` | operating_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `ENGINEERING_RELEASE_ON_TIME` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `FINAL_RELEASE_RFT` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `GROSS_MARGIN_JOB_FAMILY` | executive_scorecard_kpi | 1 | 1 | ≥28% | candidate_data_contract_required_before_payout | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
+| `GROSS_MARGIN_JOB_FAMILY` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `INCIDENT_ACTION_CLOSURE_AGING` | governance_kpi | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `IN_PROCESS_REJECT_RATE` | operating_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `ORDER_REVIEW_RFT` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
@@ -178,6 +178,181 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 | `SHIP_PACKET_COMPLETENESS` | gate_control_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `SHIP_READY_TO_INVOICE_LT` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `WIP_BEFORE_CONSTRAINT` | operating_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+
+## Registry Inventory
+
+| Code | Class | Registry sources | Backend/statistical plan | Target |
+|---|---|---|---|---|
+| `COMPLAINT_RATE` | executive_scorecard_kpi | runtime_calculated_metrics, legacy_aliases, annex122_governance_kpis, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides | runtime_calculated / runtime_calculated_with_registry_contract | ≤1 complaints_per_100_shipments |
+| `COPQ` | executive_scorecard_kpi | runtime_calculated_metrics, gate_control_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides | runtime_calculated / runtime_calculated_with_registry_contract | ≤2 percent_of_sales |
+| `FPY` | executive_scorecard_kpi | runtime_calculated_metrics, dashboard_core_kpis, gate_control_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides | runtime_calculated / runtime_calculated_with_registry_contract | ≥98% |
+| `MATERIAL_AVAILABILITY_PLAN` | executive_scorecard_kpi | runtime_calculated_metrics, annex122_governance_kpis, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides | runtime_calculated / runtime_calculated_with_registry_contract | ≥95% |
+| `OTD` | executive_scorecard_kpi | runtime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis, gate_control_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides | runtime_calculated / runtime_calculated_with_registry_contract | ≥95% |
+| `PLAN_ADHERENCE` | executive_scorecard_kpi | runtime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides | staged_data_contract / runtime_calculated_with_registry_contract | ≥90% |
+| `WIP_AGING` | executive_scorecard_kpi | runtime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides | runtime_calculated / runtime_calculated_with_registry_contract | ≤5 aged_wip_percent |
+| `CHANGEOVER_TIME` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `CONTROL_PLAN_PFMEA_APPROVAL` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `CUSTOMER_ESCAPE_NOTIFICATION_LT` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `ECN_LEAD_TIME` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `ENGINEERING_RELEASE_RFT` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `FAI_CYCLE_TIME` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `IQC_PASS_RATE` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `OEE` | gate_control_metric | runtime_calculated_metrics, gate_control_metrics | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `ORDER_REVIEW_RFT` | gate_control_metric | annex122_governance_kpis, gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `RFQ_TURNAROUND_TIME` | gate_control_metric | annex122_governance_kpis, gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `SHIP_PACKET_COMPLETENESS` | gate_control_metric | legacy_aliases, dashboard_core_kpis, gate_control_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `SHIP_READY_TO_INVOICE_LT` | gate_control_metric | annex122_governance_kpis, gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `SPC_SIGNAL_REACTION_TIME` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `TRACEABILITY_COMPLETENESS` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `TRACEABILITY_DRILL_TIME` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `BCP_READINESS` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `CAL_COMPLIANCE` | governance_kpi | runtime_calculated_metrics, legacy_aliases, annex122_governance_kpis | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `CRITICAL_ROLE_BACKUP_COVERAGE` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `CRITICAL_SYSTEM_AVAILABILITY` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `CUSTOMER_COMM_CLOSURE_OT` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `DSO` | governance_kpi | runtime_calculated_metrics, annex122_governance_kpis | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `ECO_CLOSURE_AGING` | governance_kpi | runtime_calculated_metrics, annex122_governance_kpis | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `ENGINEERING_RELEASE_ON_TIME` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `FINAL_RELEASE_RFT` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `FOD_LINE_CLEARANCE_COMPLIANCE` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `GROSS_MARGIN_JOB_FAMILY` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `INCIDENT_ACTION_CLOSURE_AGING` | governance_kpi | runtime_calculated_metrics, annex122_governance_kpis | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `INVENTORY_ACCURACY` | governance_kpi | runtime_calculated_metrics, legacy_aliases, annex122_governance_kpis, dashboard_core_kpis | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `INVOICE_RFT` | governance_kpi | runtime_calculated_metrics, annex122_governance_kpis | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `MASTER_DATA_EXCEPTION_AGING` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `MONTH_END_CLOSE_OT` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `NCR_CLOSURE_AGING` | governance_kpi | runtime_calculated_metrics, annex122_governance_kpis | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `QUOTE_HIT_RATE` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `RECORDABLE_INCIDENT_RATE` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `SAFETY_ONBOARDING_COMPLIANCE` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `SCHEDULE_RECOVERY_EFFECTIVENESS` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `SERVICE_TICKET_SLA` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `SUPPLIER_OTD` | governance_kpi | runtime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis | runtime_calculated_partial / not_declared_or_informational |  |
+| `TRAINING_COMP` | governance_kpi | runtime_calculated_metrics, legacy_aliases, annex122_governance_kpis | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `CAPA_CLOSURE` | local_or_unmapped_metric | runtime_calculated_metrics, legacy_aliases | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `DOWNTIME_IMPACT` | local_or_unmapped_metric | legacy_aliases, dashboard_core_kpis | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `DPMO` | local_or_unmapped_metric | runtime_calculated_metrics | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `INV_TURNS` | local_or_unmapped_metric | runtime_calculated_metrics | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `LABOR_EFF` | local_or_unmapped_metric | runtime_calculated_metrics | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `MACHINE_UTIL` | local_or_unmapped_metric | runtime_calculated_metrics, legacy_aliases | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `NCR_RATE` | local_or_unmapped_metric | runtime_calculated_metrics | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `PUT_THRU` | local_or_unmapped_metric | runtime_calculated_metrics, legacy_aliases | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `QC_HOLD_SLA` | local_or_unmapped_metric | legacy_aliases, dashboard_core_kpis | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `REWORK_RATE` | local_or_unmapped_metric | runtime_calculated_metrics | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `SCRAP_RATE` | local_or_unmapped_metric | runtime_calculated_metrics, legacy_aliases | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `SETUP_RATIO` | local_or_unmapped_metric | runtime_calculated_metrics, legacy_aliases | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `SUPPLIER_QUAL` | local_or_unmapped_metric | runtime_calculated_metrics, legacy_aliases | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `TIME_ENTRY_COMPLIANCE` | local_or_unmapped_metric | legacy_aliases, dashboard_core_kpis | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `ACCESS_REVIEW_COMPLETION` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `AR_DISPUTE_AGING` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `AUDIT_FINDING_AGING` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `BOTTLENECK_BUFFER_STATUS` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `CAPA_EFFECTIVENESS` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `CMM_PROGRAM_VALIDATION` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `COMPLAINT_LOG_ON_TIME` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `CONSTRAINT_LOST_HOURS` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `CRITICAL_ROLE_CERT_COVERAGE` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `CYCLE_TIME_VARIANCE` | operating_metric | legacy_aliases, proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `DEFECT_PARETO_ACTION_CLOSURE` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `DFM_FEASIBILITY_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `DOCUMENT_CHANGE_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `EHS_RISK_ASSESSMENT_REVIEW` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `ENGINEERING_BLOCKER_CLOSURE_OT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `ENGINEERING_CAUSED_NCR` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `ERP_RELEASE_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `FAI_FIRST_PASS` | operating_metric | legacy_aliases, annex122_governance_kpis, gate_control_metrics, proposed_operating_metrics | retained_from_annex122 / not_declared_or_informational |  |
+| `HOSHIN_RESOURCE_DECISION_LT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `INSPECTION_PLAN_ADHERENCE` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `INSPECTION_QUEUE_AGING` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `INSPECTION_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `IN_PROCESS_REJECT_RATE` | operating_metric | legacy_aliases, gate_control_metrics, proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `JOB_COST_ACCURACY` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `KPI_RED_ACTION_CLOSURE` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `KPI_REGISTRY_DRIFT_COUNT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `MRP_EXCEPTION_AGING` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `MSA_READINESS` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `MTBF` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `MTTR` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `NCR_CAPTURE_COMPLETENESS` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `NEAR_MISS_REPORTING_QUALITY` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `OEE_BOTTLENECK` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `OJT_VERIFICATION_PASS_RATE` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `PACKAGING_LABEL_COC_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `PLAN_ADHERENCE_WITH_APPROVED_RESEQUENCE` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `POS_AP_PAYMENT_OT` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_AREA_5S_FOD_SCORE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_AUDIT_FINDING_CLOSURE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_AUDIT_FINDING_EFFECTIVENESS` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_AUDIT_PLAN_COMPLIANCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_BACKUP_SUCCESS_RATE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_CAM_COLLISION_INCIDENTS` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_CAM_PROGRAM_FPY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_CAM_PROGRAM_ON_TIME` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_CAM_PROVEOUT_TIME` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_CLEANLINESS_COMPLIANCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_CUSTOMS_CLEARANCE_OT` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_CYCLE_COUNT_COMPLIANCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_DEBURR_ESCAPE_RATE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_DEBURR_OUTPUT_ADHERENCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_DFM_ISSUE_CATCH_RATE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_DFM_REVIEW_ON_TIME` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_EXCESS_INVENTORY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_EXPORT_DOC_ACCURACY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_GL_RECONCILIATION_OT` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_GOODS_RECEIPT_OT` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_IE_IMPROVEMENT_DELIVERY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_INSPECTION_ESCAPE_RATE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_INSPECTION_THROUGHPUT` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_MAINT_RESPONSE_TIME` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_NCR_INVESTIGATION_QUALITY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_OP_MACHINE_UPTIME` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_OP_OUTPUT_ADHERENCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_OP_PART_ACCEPT` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_PACKAGING_DEFECT_RATE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_PACKAGING_OUTPUT_OT` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_PAYMENT_ACCURACY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_PAYROLL_ACCURACY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_PAYROLL_OT` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_PICK_ACCURACY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_PM_BREAKDOWN_RATIO` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_PM_SCHEDULE_COMPLIANCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_PO_CYCLE_TIME` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_PPAP_SUBMISSION_OT` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_PROCESS_VALIDATION_OT` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_PURCHASE_PRICE_VARIANCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_ROUTING_ACCURACY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_SAFETY_PPE_COMPLIANCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_SELF_INSPECTION_COMPLIANCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_SETUP_DOC_QUALITY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_SETUP_SHEET_COMPLIANCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_SETUP_TIME_VARIANCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_SHIPMENT_DELAY_RATE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_STD_TIME_ACCURACY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_STOCKOUT_RATE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_SYSTEM_PATCH_COMPLIANCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_TEAM_BACKLOG_AGING` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_TOOL_AVAILABILITY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_TOOL_INVENTORY_ACCURACY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_TOOL_LIFE_ADHERENCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `POS_TOOL_PRESET_ACCURACY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `PROMISE_DATE_RISK` | operating_metric | legacy_aliases, dashboard_core_kpis, proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `QUOTE_MARGIN_ACCURACY` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `QUOTE_PACKAGE_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `REPEAT_NCR_RATE` | operating_metric | legacy_aliases, dashboard_core_kpis, proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `RFQ_COMPLETENESS_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `RFQ_TURNAROUND_TIME_FOR_COMPLETE_RFQ` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `ROUTING_BOM_CHANGE_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `SETUP_FIRST_PASS` | operating_metric | legacy_aliases, gate_control_metrics, proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `SHIFT_HANDOVER_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `SHORTAGE_RECOVERY_OT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `SUPPLIER_READINESS` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `THROUGHPUT_PER_CONSTRAINT_HOUR` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `TIMESHEET_EXCEPTION_AGING` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `TOOL_FIXTURE_READY_TO_PLAN` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `TRAINING_MATRIX_FRESHNESS` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `TRAINING_RECORD_INTEGRITY` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `TRANSACTION_SYNC_RELIABILITY` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `WIP_BEFORE_CONSTRAINT` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
 
 ## Benchmark Rule
 

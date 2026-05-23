@@ -46,18 +46,24 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $method->invoke($engine, 'OEE_BOTTLENECK');
     }
 
-    public function testExecutiveScorecardKeepsProposedCncConstraintMetricsOutsideRuntimeAutoRegistration(): void
+    public function testExecutiveScorecardKeepsOnlyLeanRuntimeCoreInCompanyScorecard(): void
     {
         $registry = $this->readRegistry();
         $scorecard = $registry['executive_scorecard'] ?? [];
 
-        $this->assertContains('OTD', $scorecard);
-        $this->assertContains('FPY', $scorecard);
-        $this->assertContains('COMPLAINT_RATE', $scorecard);
-        $this->assertContains('GROSS_MARGIN_JOB_FAMILY', $scorecard);
-        $this->assertContains('OEE_BOTTLENECK', $scorecard);
-        $this->assertContains('THROUGHPUT_PER_CONSTRAINT_HOUR', $scorecard);
-        $this->assertContains('SUPPLIER_READINESS', $scorecard);
+        $this->assertSame([
+            'OTD',
+            'COMPLAINT_RATE',
+            'FPY',
+            'COPQ',
+            'PLAN_ADHERENCE',
+            'WIP_AGING',
+            'MATERIAL_AVAILABILITY_PLAN',
+        ], $scorecard);
+        $this->assertNotContains('GROSS_MARGIN_JOB_FAMILY', $scorecard);
+        $this->assertNotContains('OEE_BOTTLENECK', $scorecard);
+        $this->assertNotContains('THROUGHPUT_PER_CONSTRAINT_HOUR', $scorecard);
+        $this->assertNotContains('SUPPLIER_READINESS', $scorecard);
         $this->assertNotContains('IN_PROCESS_REJECT_RATE', $scorecard);
         $this->assertNotContains('SUPPLIER_OTD', $scorecard);
         $this->assertNotContains('SUPPLIER_QUAL', $scorecard);
@@ -72,7 +78,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertSame(28, $catalog['counts']['runtime_calculated_metrics'] ?? null);
         $this->assertSame(12, $catalog['counts']['dashboard_core_kpis'] ?? null);
         $this->assertSame(21, $catalog['counts']['gate_control_metrics'] ?? null);
-        $this->assertSame(71, $catalog['counts']['proposed_operating_metrics'] ?? null);
+        $this->assertSame(110, $catalog['counts']['proposed_operating_metrics'] ?? null);
         $this->assertNotEmpty($catalog['data_contract_required_fields'] ?? []);
         $this->assertContains('canonical_code', $catalog['data_contract_required_fields'] ?? []);
         $this->assertContains('metric_type', $catalog['data_contract_required_fields'] ?? []);
@@ -92,7 +98,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
             $catalog['performance_governance_audit']['audit_report'] ?? null,
         );
         $this->assertContains('metric_type', $catalog['metric_governance_schema']['required_catalog_fields'] ?? []);
-        $this->assertSame('CNC-EXEC-BSC-15-2026', $catalog['scorecard_operating_model']['model_id'] ?? null);
+        $this->assertSame('CNC-EXEC-BSC-LEAN-7-2026', $catalog['scorecard_operating_model']['model_id'] ?? null);
 
         $metricsByCode = [];
         foreach (($catalog['metrics'] ?? []) as $metric) {
@@ -117,7 +123,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertSame('runtime_calculated', $metricsByCode['OTD']['backend_status'] ?? null);
         $this->assertTrue($metricsByCode['OTD']['is_official_kpi'] ?? false);
         $this->assertSame('company_scorecard', $metricsByCode['OTD']['evaluation_use'] ?? null);
-        $this->assertSame(11.0, $metricsByCode['OTD']['scorecard_weight_pct'] ?? null);
+        $this->assertSame(18.0, $metricsByCode['OTD']['scorecard_weight_pct'] ?? null);
         $this->assertSame('percent', $metricsByCode['OTD']['scorecard_unit'] ?? null);
         $this->assertSame(95.0, $metricsByCode['OTD']['scorecard_target'] ?? null);
         $this->assertTrue($metricsByCode['OTD']['scorecard_higher_is_better'] ?? false);
@@ -132,19 +138,20 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertContains('gate_control', $metricsByCode['OTD']['usage_types'] ?? []);
         $this->assertSame(false, $metricsByCode['OEE_BOTTLENECK']['runtime_calculated'] ?? null);
         $this->assertSame('staged_data_contract', $metricsByCode['OEE_BOTTLENECK']['calculation_status'] ?? null);
-        $this->assertSame(8.0, $metricsByCode['OEE_BOTTLENECK']['scorecard_weight_pct'] ?? null);
-        $this->assertSame('candidate_data_contract', $metricsByCode['OEE_BOTTLENECK']['scorecard_scoring_status'] ?? null);
+        $this->assertNull($metricsByCode['OEE_BOTTLENECK']['scorecard_weight_pct'] ?? null);
+        $this->assertSame('not_applicable', $metricsByCode['OEE_BOTTLENECK']['scorecard_scoring_status'] ?? null);
         $this->assertFalse($metricsByCode['OEE_BOTTLENECK']['scorecard_contributes_to_reward'] ?? true);
         $this->assertSame('gate_control_metric', $metricsByCode['SPC_SIGNAL_REACTION_TIME']['metric_type'] ?? null);
         $this->assertFalse($metricsByCode['SPC_SIGNAL_REACTION_TIME']['is_official_kpi'] ?? true);
         $this->assertFalse($metricsByCode['SPC_SIGNAL_REACTION_TIME']['scorecard_applicable'] ?? true);
         $this->assertSame('not_applicable', $metricsByCode['SPC_SIGNAL_REACTION_TIME']['scorecard_scoring_status'] ?? null);
-        $this->assertSame('company_scorecard', $metricsByCode['SUPPLIER_READINESS']['evaluation_use'] ?? null);
-        $this->assertSame(5.0, $metricsByCode['SUPPLIER_READINESS']['scorecard_weight_pct'] ?? null);
-        $this->assertSame(0.0, $metricsByCode['RECORDABLE_INCIDENT_RATE']['scorecard_weight_pct'] ?? null);
-        $this->assertSame('gate_only', $metricsByCode['RECORDABLE_INCIDENT_RATE']['scorecard_scoring_status'] ?? null);
+        $this->assertNotSame('company_scorecard', $metricsByCode['SUPPLIER_READINESS']['evaluation_use'] ?? null);
+        $this->assertNull($metricsByCode['SUPPLIER_READINESS']['scorecard_weight_pct'] ?? null);
+        $this->assertNull($metricsByCode['RECORDABLE_INCIDENT_RATE']['scorecard_weight_pct'] ?? null);
+        $this->assertSame('not_applicable', $metricsByCode['RECORDABLE_INCIDENT_RATE']['scorecard_scoring_status'] ?? null);
         $this->assertFalse($metricsByCode['RECORDABLE_INCIDENT_RATE']['scorecard_contributes_to_reward'] ?? true);
-        $this->assertContains('recordable_incident', $metricsByCode['RECORDABLE_INCIDENT_RATE']['blocking_conditions'] ?? []);
+        $this->assertSame(14.0, $metricsByCode['PLAN_ADHERENCE']['scorecard_weight_pct'] ?? null);
+        $this->assertSame(14.0, $metricsByCode['MATERIAL_AVAILABILITY_PLAN']['scorecard_weight_pct'] ?? null);
         $this->assertContains('gate_control_metrics', $metricsByCode['FPY']['sources'] ?? []);
         $this->assertContains('KPI-05', $metricsByCode['FPY']['local_ids'] ?? []);
         $this->assertContains('KPI-ALL-02', $metricsByCode['FPY']['local_ids'] ?? []);
@@ -157,7 +164,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $items = $registry['scorecard_operating_model']['executive_scorecard_items'] ?? [];
         $this->assertIsArray($scorecard);
         $this->assertIsArray($items);
-        $this->assertSame(15, count($items));
+        $this->assertSame(7, count($items));
 
         $itemsByCode = [];
         $weightTotal = 0.0;
@@ -218,7 +225,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
             $metricsByCode[(string) ($metric['canonical_code'] ?? '')] = $metric;
         }
 
-        $this->assertCount(15, $scorecardCodes);
+        $this->assertCount(7, $scorecardCodes);
         foreach ($scorecardCodes as $code) {
             $this->assertIsString($code);
             $metric = $metricsByCode[$code] ?? null;
@@ -242,7 +249,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         }
     }
 
-    public function testExecutiveDashboardUsesGovernedFifteenKpiScorecard(): void
+    public function testExecutiveDashboardUsesGovernedLeanKpiScorecard(): void
     {
         $registry = $this->readRegistry();
         $expectedCodes = array_values(array_map('strval', $registry['executive_scorecard'] ?? []));
@@ -259,7 +266,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertArrayNotHasKey('CAPA_CLOSURE', $payload['kpis'] ?? []);
         $this->assertArrayNotHasKey('PUT_THRU', $payload['kpis'] ?? []);
         $this->assertSame(
-            'CNC-EXEC-BSC-15-2026',
+            'CNC-EXEC-BSC-LEAN-7-2026',
             $payload['kpis']['OTD']['scorecard']['model_id'] ?? null,
         );
     }
@@ -277,8 +284,8 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertTrue($staged['known_metric']);
         $this->assertFalse($staged['runtime_calculated']);
         $this->assertSame('staged_data_contract', $staged['backend_status']);
-        $this->assertSame('kpi', $staged['metric_type']);
-        $this->assertSame('company_scorecard', $staged['evaluation_use']);
+        $this->assertSame('operating_metric', $staged['metric_type']);
+        $this->assertNotSame('company_scorecard', $staged['evaluation_use']);
 
         $unknown = $engine->describeMetricSupport('NOT_A_KPI');
         $this->assertFalse($unknown['known_metric']);

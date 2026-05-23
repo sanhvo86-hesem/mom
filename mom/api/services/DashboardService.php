@@ -137,6 +137,7 @@ final class DashboardService
         if (!is_array($items)) {
             return $scorecard;
         }
+        $scorecardModelId = (string) ($catalog['scorecard_operating_model']['model_id'] ?? '');
 
         foreach ($items as $item) {
             if (!is_array($item)) {
@@ -146,13 +147,15 @@ final class DashboardService
             if ($code === '') {
                 continue;
             }
-            $scorecard[$code] = $metricsByCode[$code] ?? [
+            $metric = $metricsByCode[$code] ?? [
                 'canonical_code' => $code,
                 'runtime_calculated' => false,
                 'backend_status' => 'data_contract_required',
                 'scorecard_scoring_status' => 'candidate_data_contract',
                 'scorecard_contributes_to_reward' => false,
             ];
+            $metric['scorecard_model_id'] = $scorecardModelId;
+            $scorecard[$code] = $metric;
         }
 
         return $scorecard;
@@ -166,7 +169,7 @@ final class DashboardService
     private function withScorecardGovernance(array $payload, array $metric): array
     {
         $payload['scorecard'] = [
-            'model_id' => 'CNC-EXEC-BSC-15-2026',
+            'model_id' => $metric['scorecard_model_id'] ?? null,
             'weight_pct' => $metric['scorecard_weight_pct'] ?? null,
             'unit' => $metric['scorecard_unit'] ?? $metric['unit'] ?? null,
             'target' => $metric['scorecard_target'] ?? $metric['target'] ?? null,
