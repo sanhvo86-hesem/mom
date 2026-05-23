@@ -289,6 +289,14 @@ function statusColor(status){
   };
   return map[status]||'var(--gray-400,#94a3b8)';
 }
+/* Extract the hex fallback from a CSS variable string such as
+ * "var(--green-light,#16a34a)" so it can be used as a safe hex alpha
+ * suffix (e.g. "#16a34a15" is valid CSS; "var(...)15" is not). */
+function statusColorHex(status){
+  const c = statusColor(status);
+  const m = c.match(/,\s*(#[0-9a-fA-F]{3,8})\s*\)/);
+  return m ? m[1] : c;
+}
 
 // ═══════════════════════════════════════════════════
 // PROFESSIONAL DOCUMENT EDITOR

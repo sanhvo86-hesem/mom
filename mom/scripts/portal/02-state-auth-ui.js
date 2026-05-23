@@ -3888,9 +3888,9 @@ function updateDocViewerHeader(doc){
   headerEl.innerHTML = `
     <div class="dv-top">
       <div class="dv-title-area">
-        <div class="dv-code" style="color:${cat.color}">${displayCode} <span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;background:${statusColor(status)}18;color:${statusColor(status)}">${statusLabel(status)}</span></div>
-	        <div class="dv-name">${displayTitle}</div>
-	        ${displayDesc ? `<div class="dv-desc">${displayDesc}</div>` : ''}
+        <div class="dv-code" style="color:${cat.color}">${displayCode} <span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;background:${statusColorHex(status)}18;color:${statusColor(status)}">${statusLabel(status)}</span></div>
+	        <div class="dv-name">${escapeHtml(displayTitle)}</div>
+	        ${displayDesc ? `<div class="dv-desc">${escapeHtml(displayDesc)}</div>` : ''}
 	      </div>
 	    </div>
     <div class="dv-meta${docHeaderMetaCollapsed ? ' is-collapsed' : ''}">
@@ -4486,11 +4486,11 @@ function renderDocFileList(docs){
         <div class="fm-file-icon" style="border-color:${cat?cat.color:'var(--purple-light,#a5b4fc)'}">${getDocIcon(doc.code)}</div>
         <div class="fm-file-name">
           <span style="color:${cat?cat.color:'var(--gray-500,#64748b)'}">${doc.code}</span>
-          <small>${displayTitle}</small>
-          ${displayDesc?`<small class="fm-doc-desc">${displayDesc}</small>`:''}
+          <small>${escapeHtml(displayTitle)}</small>
+          ${displayDesc?`<small class="fm-doc-desc">${escapeHtml(displayDesc)}</small>`:''}
         </div>
         <div class="fm-file-rev">v${getDocRevision(doc)}</div>
-        <div class="fm-file-status"><span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;background:${statusColor(getDocStatus(doc))}15;color:${statusColor(getDocStatus(doc))}">${statusLabel(getDocStatus(doc))}</span></div>
+        <div class="fm-file-status"><span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;background:${statusColorHex(getDocStatus(doc))}15;color:${statusColor(getDocStatus(doc))}">${statusLabel(getDocStatus(doc))}</span></div>
         <div class="fm-file-access">${locked?'<span style="color:var(--red)">🔒</span>':'<span style="color:var(--green)">✓</span>'}</div>
         ${folderEditMode&&canCreateNewDoc()?`<div class="fm-file-del"><button class="fm-del-btn-row" onclick="event.stopPropagation();confirmDeleteDoc('${escapeHtml(doc.code)}','${escapeHtml(displayTitle)}')" title="${lang==='en'?'Delete':'Xóa'}">🗑️</button></div>`:''}
       </div>`;
