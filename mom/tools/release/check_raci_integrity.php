@@ -192,7 +192,11 @@ foreach ($doc->getElementsByTagName('table') as $tbl) {
     }
 }
 if ($supTable === null) {
-    $p1[] = "RACI-MASTER-MATRIX: support-function supplement table not found.";
+    // The MNT/FIN support-function supplement was retired in the 2026-05-23
+    // consolidation: FIN is now folded into the CEO column (CEO consults FIN
+    // before signing commercial decisions) and MNT into the WKM/PD column
+    // (workshop covers the maintenance work). The note in §3 of
+    // RACI-MASTER-MATRIX preserves the operational meaning. No warning.
 } else {
     $n = 0;
     foreach ($supTable->getElementsByTagName('tbody')->item(0)
