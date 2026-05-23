@@ -2785,6 +2785,7 @@ const I = {
   wf_pending:{vi:'Chờ duyệt',en:'Pending Approval'},
   wf_approved:{vi:'Đã duyệt',en:'Approved'},
   wf_initial:{vi:'Phát hành lần đầu',en:'Initial Release'},
+  wf_released:{vi:'Đã phát hành',en:'Released'},
   wf_obsolete:{vi:'Lỗi thời',en:'Obsolete'},
   wf_edit:{vi:'✏️ Chỉnh sửa',en:'✏️ Edit'},
   wf_save_draft:{vi:'💾 Lưu nháp',en:'💾 Save Draft'},

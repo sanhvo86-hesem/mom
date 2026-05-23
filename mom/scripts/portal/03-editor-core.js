@@ -1,8 +1,8 @@
 ﻿// DOCUMENT WORKFLOW & EDITING ENGINE
 // ═══════════════════════════════════════════════════
 
-// States: draft | in_review | pending_approval | approved | obsolete
-// Workflow: draft → in_review → approved (version bump) OR → draft (rejected)
+// States: draft | in_review | pending_approval | approved | released | superseded | obsolete
+// Workflow: draft -> in_review -> approved/released (version bump) OR -> draft (rejected)
 
 let editingDoc = null;  // currently editing doc code
 let currentDoc = null;  // currently viewing doc code
@@ -14,6 +14,30 @@ let originalHtml = '';   // snapshot before edit
 // (BODY innerHTML) captured at save/submit time so the server export can keep
 // those updates too.
 let edCleanShellHtml = null;
+
+const DOC_WORKFLOW_REVISION_SOURCE_STATUSES = ['approved', 'released', 'effective', 'initial_release'];
+const DOC_WORKFLOW_EDIT_LOCKED_STATUSES = [
+  'approved',
+  'released',
+  'effective',
+  'initial_release',
+  'in_review',
+  'pending_approval',
+  'superseded',
+  'obsolete'
+];
+
+function normalizeDocWorkflowStatus(status){
+  return String(status == null ? '' : status).trim().toLowerCase();
+}
+
+function isDocRevisionSourceStatus(status){
+  return DOC_WORKFLOW_REVISION_SOURCE_STATUSES.indexOf(normalizeDocWorkflowStatus(status)) >= 0;
+}
+
+function isDocEditLockedStatus(status){
+  return DOC_WORKFLOW_EDIT_LOCKED_STATUSES.indexOf(normalizeDocWorkflowStatus(status)) >= 0;
+}
 
 function getDocState(code){
   try{
@@ -188,13 +212,12 @@ function now(){return new Date().toISOString().slice(0,16).replace('T',' ');}
 
 // Who can do what
 function canEdit(doc){
-  if(!currentUser || !canAccessDoc(doc.code)) return false;
+  if(!doc || !currentUser || !canAccessDoc(doc.code)) return false;
   const r=ROLES[currentUser.role];
   if(!r) return false;
-  const state=getDocState(doc.code);
-  const status=state?state.status:'draft';
-  if(status==='approved'||status==='in_review'||status==='pending_approval') return false;
-  return r.canEditDocs === true;
+  const status=getDocStatus(doc);
+  if(isDocEditLockedStatus(status)) return false;
+  return status==='draft' && r.canEditDocs === true;
 }
 function canReview(doc){
   if(!currentUser) return false;
@@ -223,7 +246,7 @@ function getDocCurrentReleasedEntry(doc){
   const versions=(typeof getDocVersions==='function') ? (getDocVersions(doc.code)||[]) : [];
   if(!Array.isArray(versions) || versions.length===0) return null;
   return versions.find(v=>v && v.is_current)
-    || versions.find(v=>v && (v.status==='approved' || v.status==='initial_release'))
+    || versions.find(v=>v && isDocRevisionSourceStatus(v.status))
     || null;
 }
 
@@ -245,11 +268,12 @@ function getDocRevision(doc){
 }
 
 function getDocStatus(doc){
+  if(!doc) return 'draft';
   const state=getDocState(doc.code);
-  if(state) return state.status;
+  if(state && state.status) return normalizeDocWorkflowStatus(state.status) || 'draft';
   // Fall through to DCC overlay data loaded from dcc_document_header
-  if(doc.__dccStatus) return doc.__dccStatus;
-  return doc.status || 'draft';
+  if(doc.__dccStatus) return normalizeDocWorkflowStatus(doc.__dccStatus) || 'draft';
+  return normalizeDocWorkflowStatus(doc.status || 'draft') || 'draft';
 }
 
 function statusLabel(status){
@@ -264,6 +288,7 @@ function statusLabel(status){
     pending_approval:T('wf_pending'),
     approved:T('wf_approved'),
     initial_release:(lang==='en'?'Initial Release':'Phát hành lần đầu'),
+    released:T('wf_released'),
     effective:(lang==='en'?'Effective':'Có hiệu lực'),
     superseded:(lang==='en'?'Superseded':'Đã thay thế'),
     obsolete:T('wf_obsolete')
@@ -283,6 +308,7 @@ function statusColor(status){
     pending_approval:'var(--purple,#8b5cf6)',
     approved:'var(--green-light,#16a34a)',
     initial_release:'var(--green-light,#16a34a)',
+    released:'var(--green-light,#16a34a)',
     effective:'var(--green-light,#16a34a)',
     superseded:'var(--amber-dark,#f59e0b)',
     obsolete:'var(--gray-400,#94a3b8)'
