@@ -50,10 +50,10 @@ td,th { word-wrap:break-word; overflow-wrap:break-word; }
 </div>
 
 <div class="hero">
-<p>Tài liệu này chỉ giữ 7 nhóm có vai trò thật trong CDR và các phụ lục thẩm quyền. Mã nhóm không tạo quyền mới, không thay người ký, không thay JD và không được dùng để làm mờ trách nhiệm cá nhân khi đã có mã vai trò cụ thể.</p>
+<p>Tài liệu này khóa nghĩa cho đúng 7 mã nhóm vai trò/phòng ban đang dùng trong CDR và các phụ lục thẩm quyền. Mã nhóm không tạo quyền hạn mới, không thay người ký, không thay JD và không được dùng để làm mờ trách nhiệm cá nhân khi tài liệu đã xác định được mã vai trò cụ thể.</p>
 </div>
 
-<div class="note"><b>Quy tắc bắt buộc:</b><br>Nếu tài liệu xác định được người giữ quyền, người phê duyệt, người giữ/nhả sản phẩm, người ký xác nhận hoặc người chịu trách nhiệm cuối cùng thì phải dùng mã vai trò hoặc mã phòng ban đúng cấp. Chỉ dùng 7 mã nhóm dưới đây khi trách nhiệm thật sự thuộc về một lớp vai trò/phòng ban lặp lại, đã được công bố và có liên kết truy vết tại trang này.</div>
+<div class="note"><b>Quy tắc bắt buộc:</b><br>Khi tài liệu đã chỉ ra được người giữ quyền — người phê duyệt, người tạm giữ/nhả sản phẩm, người ký xác nhận hoặc người chịu trách nhiệm cuối cùng — thì phải dùng mã vai trò hoặc mã phòng ban đúng cấp; không thay bằng mã nhóm. 7 mã nhóm liệt kê dưới đây chỉ dùng khi trách nhiệm thực sự thuộc về một lớp vai trò/phòng ban lặp lại, đã được công bố và có truy vết tại trang này.</div>
 
 <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid">
 <a class="entity-link bundle-link" href="#bundle-top-mgmt">TOP_MGMT - Ban lãnh đạo</a>
@@ -65,7 +65,8 @@ td,th { word-wrap:break-word; overflow-wrap:break-word; }
 <a class="entity-link bundle-link" href="#bundle-support-enablement">SUPPORT_ENABLEMENT - Nhóm chức năng hỗ trợ nền tảng</a>
 </div></div>
 
-<h2 class="h2">1. Danh mục nhóm được công bố</h2>
+<h2 class="h2">1. Danh mục 7 nhóm được công bố</h2>
+<p>Bảng dưới là từ điển khóa nghĩa cho 7 mã nhóm hiện hành. Đọc theo cột: <b>Trường hợp sử dụng</b> cho biết khi nào được dùng mã nhóm; <b>Không được dùng để thay thế</b> chặn các sai lệch điển hình (dùng mã nhóm để né một vai trò ký cuối cụ thể); cột <b>Dùng ở CDR</b> liệt kê các mã quyết định kiểm soát đang gọi mã nhóm đó để truy vết ngược về <a href="authority-matrix.html">ANNEX-120</a>.</p>
 <div class="table-card"><table class="table bundle-registry-table">
 <colgroup><col style="width:15%"><col style="width:18%"><col style="width:12%"><col style="width:20%"><col style="width:18%"><col style="width:17%"></colgroup>
 <thead><tr><th>Mã nhóm</th><th>Tên gọi chuẩn</th><th>Loại nhóm</th><th>Trường hợp sử dụng</th><th>Không được dùng để thay thế</th><th>Dùng ở CDR</th></tr></thead>
@@ -129,43 +130,44 @@ td,th { word-wrap:break-word; overflow-wrap:break-word; }
 </tbody>
 </table></div>
 
-<h2 class="h2">2. Nguyên tắc đọc và áp dụng mã nhóm</h2>
+<h2 class="h2">2. Nguyên tắc dùng mã nhóm</h2>
+<p>Mã nhóm là lớp gom các vai trò/phòng ban đã được công bố thành cụm phối hợp, giúp người đọc nhận diện nhanh phạm vi liên đới. Bản thân mã nhóm <b>không sinh ra JD mới, phòng ban mới hoặc quyền hạn mới</b>; do đó cần áp dụng theo bốn nguyên tắc dưới đây để không làm mất truy vết trách nhiệm.</p>
 <ul class="tight">
-<li>Mã nhóm không tạo ra JD mới, phòng ban mới hoặc quyền hạn mới. Mã nhóm chỉ gom các vai trò/phòng ban đã công bố để người đọc hiểu nhanh phạm vi phối hợp.</li>
-<li>Quyền phê duyệt, tạm giữ, cho phép tiếp tục, ký xác nhận, mở/đóng cổng, xử lý ngoại lệ và quyết định cuối cùng phải truy vết về mã vai trò cụ thể khi có thể xác định được người giữ quyền.</li>
-<li>Mã phòng ban chỉ dùng cho phạm vi chức năng, luồng bàn giao, yêu cầu đầu vào/đầu ra hoặc trách nhiệm tập thể ở cấp phòng ban; không dùng để thay người phê duyệt cá nhân.</li>
-<li>Mọi mã nhóm xuất hiện độc lập trong nội dung hiển thị phải dẫn về tài liệu này để bảo đảm truy vết, kiểm soát thay đổi và nhất quán thuật ngữ.</li>
+<li><b>Ưu tiên mã vai trò cá nhân khi xác định được người giữ quyền.</b> Mọi quyết định phê duyệt, tạm giữ, cho phép tiếp tục, ký xác nhận, mở/đóng cổng kiểm soát và xử lý ngoại lệ phải gắn với mã vai trò cụ thể. Mã nhóm chỉ dùng khi trách nhiệm thực sự thuộc về một lớp vai trò lặp lại — không có một người duy nhất đứng tên.</li>
+<li><b>Phân biệt mã nhóm và mã phòng ban.</b> Mã phòng ban dùng cho phạm vi chức năng, luồng bàn giao, yêu cầu đầu vào/đầu ra hoặc trách nhiệm tập thể ở cấp phòng; không thay thế người phê duyệt cá nhân.</li>
+<li><b>Mọi xuất hiện độc lập của mã nhóm phải dẫn về trang này.</b> Điều này bảo đảm truy vết, kiểm soát thay đổi và nhất quán thuật ngữ giữa các tài liệu đang gọi mã nhóm đó.</li>
+<li><b>Mở rộng danh mục theo quy trình.</b> Nếu thực tế phát sinh nhu cầu vượt 7 nhóm hiện hành, phải mở yêu cầu cập nhật cấu trúc vai trò qua QMS; tuyệt đối không tự tạo nhóm mới trong từng SOP/WI/ANNEX riêng lẻ.</li>
 </ul>
 
-<h2 class="h2">3. Liên kết với chuỗi đơn hàng CNC</h2>
-<p>Chuỗi đơn hàng CNC chi tiết không lặp lại tại trang mã nhóm. Đọc RACI theo cổng kiểm soát tại <a href="raci-master-matrix.html#r5gate">RACI-MASTER-MATRIX mục 5</a>; trang này chỉ khóa nghĩa 7 mã nhóm còn được phép dùng.</p>
-
-<h2 class="h2">4. Liên kết với yêu cầu ISO và kiểm soát tài liệu</h2>
+<h3 class="h3" style="margin-top:14px">Định tuyến tra cứu chuẩn</h3>
 <ul class="tight">
-<li>Tài liệu này hỗ trợ kiểm soát vai trò, trách nhiệm và quyền hạn theo ISO 9001:2015/Amd 1:2024, đặc biệt cho trách nhiệm lãnh đạo, thông tin dạng văn bản, kiểm soát vận hành, thông qua sản phẩm, xử lý đầu ra không phù hợp, xem xét của lãnh đạo và cải tiến.</li>
-<li>Trong mọi SOP/WI/ANNEX/JD/RACI, mã nhóm chỉ được dùng khi giúp làm rõ phạm vi phối hợp; không được làm yếu bằng chứng trách nhiệm, bằng chứng phê duyệt hoặc dấu vết bàn giao.</li>
-<li>Khi thành phần của một mã nhóm thay đổi, phải cập nhật đồng bộ JD, sổ tay phòng ban, từ điển thuật ngữ, trang HTML này và các tài liệu đang gọi mã nhóm đó.</li>
+<li>Cần giải thích nghĩa và phạm vi của một mã nhóm → mở trang này, mục §1.</li>
+<li>Cần mã vai trò cá nhân → mở JD tương ứng trong thư mục <code>03-Job-Descriptions</code>.</li>
+<li>Cần ngưỡng quyết định và người ký cuối theo mã CDR → mở <a href="authority-matrix.html">authority-matrix.html (ANNEX-120)</a>.</li>
+<li>Cần RACI theo cổng kiểm soát của chuỗi đơn hàng CNC → mở <a href="raci-master-matrix.html#r5gate">raci-master-matrix.html mục 5</a>.</li>
 </ul>
+<p class="mini-note" style="margin-top:8px"><b>Lưu ý quan trọng:</b> Không lặp lại bảng mã vai trò dài trong ANNEX-120 hoặc các trang tra nhanh thẩm quyền. Người đọc tại xưởng chỉ cần biết <i>ai quyết định</i> và <i>dừng ở đâu</i>, không cần đọc lại toàn bộ danh mục vai trò.</p>
 
-<h2 class="h2">5. Khi nào không được lặp bảng mã vai trò</h2>
-<ul class="tight">
-<li>Không đặt bảng mã vai trò dài trong <a href="authority-matrix.html">ANNEX-120</a> hoặc trang tra nhanh thẩm quyền. Người đọc ở xưởng cần biết ai được quyết định và dừng ở đâu, không cần đọc lại toàn bộ danh mục vai trò.</li>
-<li>Khi cần giải thích mã nhóm, dẫn về trang này. Khi cần mã vai trò cá nhân, dẫn về JD tương ứng. Khi cần quyền ký cuối, dẫn về <a href="authority-matrix.html">ANNEX-120</a> theo mã CDR.</li>
-<li>Nếu tài liệu cần nhiều hơn 7 nhóm hiện hành, phải mở yêu cầu cập nhật cấu trúc vai trò; không tự tạo nhóm mới trong từng SOP/WI/ANNEX.</li>
-</ul>
-
-<h2 class="h2" id="s6">6. Bản đồ gộp mã chức danh chi tiết về cột RACI</h2>
-<p>Bảng RACI theo cổng tại <a href="raci-master-matrix.html#r5gate">RACI-MASTER-MATRIX mục 5</a> dùng 11 cột vai trò lõi. <a href="authority-matrix.html">ANNEX-120</a>, các SOP và JD lại dùng mã chức danh chi tiết hơn. Bảng dưới khóa cách <b>gộp mã chi tiết về đúng cột RACI</b> để đối chiếu chéo không bị hiểu là sai lệch. Đây là bản đồ thuật ngữ chính thức; công cụ kiểm tra tính toàn vẹn RACI dùng đúng bản đồ này.</p>
+<h2 class="h2" id="s6">3. Bản đồ gộp mã chức danh chi tiết về cột RACI</h2>
+<p>Bảng RACI theo cổng tại <a href="raci-master-matrix.html#r5gate">raci-master-matrix.html mục 5</a> chỉ dùng 11 cột vai trò lõi để giữ ma trận đọc được trên một trang. Ngược lại, <a href="authority-matrix.html">ANNEX-120</a>, các SOP và bản mô tả công việc (JD) dùng mã chức danh chi tiết hơn nhằm khóa thẩm quyền tới từng vị trí. Bảng dưới đây khóa cách <b>gộp các mã chi tiết về đúng cột RACI lõi</b>, để đối chiếu chéo giữa các tài liệu không bị hiểu là sai lệch. Công cụ tự động kiểm tra tính toàn vẹn RACI cũng dùng đúng bản đồ này.</p>
 <div class="table-card"><table class="table"><colgroup><col style="width:18%"><col style="width:52%"><col style="width:30%"></colgroup>
-<thead><tr><th>Cột RACI lõi (RACI-MASTER-MATRIX)</th><th>Mã chức danh chi tiết được gộp</th><th>Ghi chú</th></tr></thead>
+<thead><tr><th>Cột RACI lõi (RACI-MASTER-MATRIX)</th><th>Mã chức danh chi tiết được gộp về cột lõi</th><th>Ghi chú vận hành</th></tr></thead>
 <tbody>
-<tr><td><b>ENG</b></td><td>ENGM (trưởng/quản lý kỹ thuật), PE (kỹ sư quy trình), CAM (lập trình CAM/NC), DFM (kỹ sư DFM)</td><td>Chức năng kỹ thuật; cột ENG là tổng hợp.</td></tr>
-<tr><td><b>WKM</b></td><td>SL (trưởng ca), SET (kỹ thuật viên thiết lập máy), OPR (vận hành CNC)</td><td>Tuyến thực thi tại xưởng do WKM điều hành.</td></tr>
-<tr><td><b>QA</b></td><td>QCL (tổ trưởng QC), QC (nhân viên QC/CMM), QE (kỹ sư chất lượng), QMS (kỹ sư hệ thống QMS)</td><td>Chức năng chất lượng; cột QA là tổng hợp.</td></tr>
-<tr><td><b>SCM</b></td><td>BUY (nhân viên mua hàng), XNK (xuất nhập khẩu)</td><td>Chức năng chuỗi cung ứng.</td></tr>
-<tr><td><b>HR/IT</b></td><td>ITA (quản trị CNTT), ESA (quản trị hệ thống Epicor)</td><td>Cột gộp HR và IT; EHS đã tách thành cột riêng tại RACI-MASTER-MATRIX.</td></tr>
-<tr><td><b>PD</b></td><td>PPL và WKM báo cáo lên PD; PIE (kỹ sư sản xuất/công nghiệp) thuộc tuyến sản xuất</td><td>PPL và WKM vẫn là cột RACI riêng vì giữ thẩm quyền cổng độc lập.</td></tr>
+<tr><td><b>ENG</b></td><td>ENGM (trưởng/quản lý kỹ thuật), PE (kỹ sư quy trình), CAM (lập trình CAM/NC), DFM (kỹ sư DFM).</td><td>Cột ENG là tổng hợp toàn bộ chức năng kỹ thuật.</td></tr>
+<tr><td><b>WKM</b></td><td>SL (trưởng ca), SET (kỹ thuật viên thiết lập máy), OPR (vận hành CNC).</td><td>Tuyến thực thi tại xưởng do WKM điều hành trực tiếp.</td></tr>
+<tr><td><b>QA</b></td><td>QCL (tổ trưởng QC), QC (nhân viên QC/CMM), QE (kỹ sư chất lượng), QMS (kỹ sư hệ thống QMS).</td><td>Cột QA là tổng hợp toàn bộ chức năng chất lượng.</td></tr>
+<tr><td><b>SCM</b></td><td>BUY (nhân viên mua hàng), XNK (nhân viên xuất nhập khẩu).</td><td>Cột SCM gom toàn bộ tuyến chuỗi cung ứng.</td></tr>
+<tr><td><b>HR/IT</b></td><td>ITA (quản trị CNTT), ESA (quản trị hệ thống Epicor).</td><td>Cột HR/IT là cột gộp; EHS đã được tách thành cột riêng trong RACI-MASTER-MATRIX.</td></tr>
+<tr><td><b>PD</b></td><td>PPL và WKM báo cáo lên PD; PIE (kỹ sư sản xuất/công nghiệp) thuộc tuyến sản xuất.</td><td>PPL và WKM giữ cột RACI riêng vì có thẩm quyền cổng độc lập, không gộp ngược về PD.</td></tr>
 </tbody></table></div>
+
+<h2 class="h2">4. Liên kết kiểm soát tài liệu và yêu cầu ISO</h2>
+<p>Tài liệu này hỗ trợ kiểm soát vai trò, trách nhiệm và quyền hạn theo <b>ISO 9001:2015/Amd 1:2024</b> ở các điều khoản: 5.3 (vai trò, trách nhiệm và quyền hạn), 7.5 (thông tin dạng văn bản), 8.1 (hoạch định và kiểm soát vận hành), 8.6 (thông qua sản phẩm và dịch vụ), 8.7 (xử lý đầu ra không phù hợp), 9.3 (xem xét của lãnh đạo) và 10.2 (sự không phù hợp và hành động khắc phục).</p>
+<ul class="tight">
+<li>Trong mọi SOP/WI/ANNEX/JD/RACI, mã nhóm chỉ được dùng khi <i>làm rõ thêm</i> phạm vi phối hợp; không được dùng theo cách làm yếu bằng chứng trách nhiệm, bằng chứng phê duyệt hoặc dấu vết bàn giao.</li>
+<li>Khi thành phần của một mã nhóm thay đổi (thêm/bớt vai trò, đổi mã JD), phải cập nhật đồng bộ trong cùng một lần phát hành: JD liên quan, sổ tay phòng ban, từ điển thuật ngữ, trang HTML này và mọi tài liệu đang gọi mã nhóm đó.</li>
+<li>Chuỗi đơn hàng CNC chi tiết không lặp lại tại trang này; đọc RACI theo cổng kiểm soát tại <a href="raci-master-matrix.html#r5gate">raci-master-matrix.html mục 5</a>.</li>
+</ul>
 </div>
 </div>
 </div>
