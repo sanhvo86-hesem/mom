@@ -159,8 +159,10 @@ jobs:
         # Runs unconditionally — KPI changes are often doc-only changesets that
         # the classify job marks frontend-only. Validates ANNEX-122 ↔ registry
         # code parity, required KPI fields, runtime_calculated wiring to
-        # KpiEngine, reward⇒counter-metric, alias targets, and gate linked_cdr
-        # against ANNEX-121. P0 findings block the deploy.
+        # KpiEngine getCalculator(), reward⇒counter/blocker, staged≠reward,
+        # alias targets, G0-G7 gate coverage, gate linked_cdr against
+        # ANNEX-121, KPI routes, and structured Admin Console editing. P0
+        # findings block the deploy.
         run: php mom/tools/release/check_kpi_integrity.php
 
       - name: Migration drift check (offline)

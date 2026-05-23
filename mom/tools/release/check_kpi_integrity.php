@@ -7,11 +7,11 @@ declare(strict_types=1);
  * KPI Integrity Checker
  * ────────────────────────────────────────────────────────────────────────────
  * kpi-authority-registry.json is the SSOT for the operating KPI system. Its
- * 33 governance KPIs are rendered into ANNEX-122 (§4/§5/§6 marker regions),
- * computed by KpiEngine, surfaced on the dashboard, and aggregated into the
- * ANNEX-128 system matrix. A change to one surface that misses another
- * silently drifts the KPI system. This guard catches that drift before deploy
- * — the KPI-side counterpart of check_raci_integrity.php.
+ * governed metrics are rendered into ANNEX-122 (§4/§5/§6 marker regions),
+ * computed by KpiEngine where runtime-approved, surfaced on the dashboard,
+ * and aggregated into the ANNEX-128 system matrix. A change to one surface
+ * that misses another silently drifts the KPI system. This guard catches that
+ * drift before deploy — the KPI-side counterpart of check_raci_integrity.php.
  *
  * P0 findings (block deploy)
  * ──────────────────────────
@@ -20,23 +20,29 @@ declare(strict_types=1);
  *      (green_point + yellow_point, ordered by direction) / owner_role /
  *      data_source / calculation_status / decision_action.
  *   3. calculation_status=runtime_calculated but the code is absent from
- *      registry.runtime_calculated_metrics or from KpiEngine.php.
+ *      registry.runtime_calculated_metrics or from KpiEngine getCalculator().
  *   4. Duplicate canonical_code among governance KPIs.
  *   5. A legacy alias maps to a code that is not a known metric.
- *   6. A gate metric linked_cdr references a CDR absent from RACI-MASTER-MATRIX.
+ *   6. A gate metric linked_cdr references a CDR absent from RACI-MASTER-MATRIX,
+ *      a gate metric misses gate/CDR/pass-condition metadata, or a G0-G7 gate
+ *      has no metric.
  *   8. A gate / proposed metric is missing a counter-metric, or its
  *      thresholds (where present) are non-numeric or wrongly ordered.
- *   9. A counter-metric code is reused by two KPIs in the same group —
- *      every KPI must have its own counter-metric.
- *   7. A governance KPI is missing a counter_metric, or its counter is not a
- *      known code / is the KPI itself.
+ *   9. A counter-metric is a borrowed KPI code instead of a dedicated
+ *      anti-gaming definition.
+ *   7. A governance KPI is missing a counter_metric, a reward KPI lacks
+ *      blocking_conditions, or a staged KPI is reward eligible.
+ *  10. Admin/API surfaces drift: required KPI action routes missing or Admin
+ *      Console exposes raw JSON editing.
  *
  * P1 findings (warn, do not block)
  * ────────────────────────────────
- *   - A staged_data_contract KPI sits in the executive scorecard.
+ *   - A staged_data_contract KPI sits in the executive scorecard but is not
+ *     marked reward eligible.
  *   - A lag KPI has no paired_metric (lead pairing missing).
  *   - A percent-unit KPI has min_sample 0 (small-lot noise unguarded).
  *   - A dashboard primary_endpoint is outside the /api/kpi/ namespace.
+ *   - JD scorecard registry still uses the legacy fixed weighted model.
  *   - A governance KPI code is not enumerated in ANNEX-128. ANNEX-128 is a
  *     document-usage matrix (only lists codes referenced in scanned docs),
  *     so this is advisory — re-run audit-kpi-system-matrix.php to confirm.
@@ -45,12 +51,18 @@ declare(strict_types=1);
  */
 
 $base       = dirname(__DIR__, 2);                // -> repo .../mom
-$registryFp = $base . '/data/registry/kpi-authority-registry.json';
+$envPath = static function (string $name, string $default): string {
+    $value = getenv($name);
+    return is_string($value) && trim($value) !== '' ? $value : $default;
+};
+$registryFp = $envPath('KPI_INTEGRITY_REGISTRY', $base . '/data/registry/kpi-authority-registry.json');
 $annexDir   = $base . '/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control';
-$annex122Fp = $annexDir . '/annex-122-kpi-cascade-dictionary.html';
-$annex121Fp = $base . '/docs/system/organization/04-RACI-Authority/raci-master-matrix.html';
-$annex128Fp = $annexDir . '/annex-128-kpi-system-matrix-and-document-usage.html';
-$engineFp   = $base . '/api/services/KpiEngine.php';
+$annex122Fp = $envPath('KPI_INTEGRITY_ANNEX122', $annexDir . '/annex-122-kpi-cascade-dictionary.html');
+$annex121Fp = $envPath('KPI_INTEGRITY_CDR_MATRIX', $base . '/docs/system/organization/04-RACI-Authority/raci-master-matrix.html');
+$annex128Fp = $envPath('KPI_INTEGRITY_ANNEX128', $annexDir . '/annex-128-kpi-system-matrix-and-document-usage.html');
+$engineFp   = $envPath('KPI_INTEGRITY_ENGINE', $base . '/api/services/KpiEngine.php');
+$routesFp   = $envPath('KPI_INTEGRITY_ROUTES', $base . '/api/routes/core-routes.php');
+$adminJsFp  = $envPath('KPI_INTEGRITY_ADMIN_JS', $base . '/scripts/portal/00o-admin-kpi-registry.js');
 
 $p0 = [];
 $p1 = [];
@@ -62,6 +74,45 @@ function readText(string $path): string
         exit(2);
     }
     return (string) file_get_contents($path);
+}
+
+function metricCode(array $row): string
+{
+    return strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+}
+
+function metricStatus(array $row): string
+{
+    return trim((string) ($row['calculation_status'] ?? ''));
+}
+
+function isPercentMetric(array $row): bool
+{
+    $unit = strtolower(trim((string) ($row['formula']['unit'] ?? $row['thresholds']['unit'] ?? '')));
+    return in_array($unit, ['%', 'percent', 'percentage'], true);
+}
+
+function extractEngineCalculatorCodes(string $engineSrc): array
+{
+    preg_match_all("/public const (METRIC_[A-Z0-9_]+)\\s*=\\s*'([A-Z0-9_]+)'/", $engineSrc, $constMatches, PREG_SET_ORDER);
+    $constants = [];
+    foreach ($constMatches as $match) {
+        $constants[$match[1]] = $match[2];
+    }
+
+    $calculatorBody = '';
+    if (preg_match('/private function getCalculator\\(.*?return match \\(\\$metricCode\\) \\{(.*?)default =>/s', $engineSrc, $match)) {
+        $calculatorBody = $match[1];
+    }
+
+    preg_match_all('/self::(METRIC_[A-Z0-9_]+)/', $calculatorBody, $calculatorMatches);
+    $codes = [];
+    foreach ($calculatorMatches[1] ?? [] as $constName) {
+        if (isset($constants[$constName])) {
+            $codes[$constants[$constName]] = true;
+        }
+    }
+    return $codes;
 }
 
 $registry = json_decode(readText($registryFp), true);
@@ -83,6 +134,8 @@ $proposed = is_array($registry['proposed_operating_metrics'] ?? null)
     ? $registry['proposed_operating_metrics'] : [];
 $scorecard = array_map('strtoupper', array_map('strval',
     is_array($registry['executive_scorecard'] ?? null) ? $registry['executive_scorecard'] : []));
+$engineSrc = readText($engineFp);
+$engineCalculatorCodes = extractEngineCalculatorCodes($engineSrc);
 
 // ── Build the known-code universe ────────────────────────────────────────────
 $knownCodes = [];
@@ -122,6 +175,7 @@ foreach ($governance as $row) {
         continue;
     }
     $code = strtoupper(trim((string) ($row['canonical_code'] ?? 'UNKNOWN')));
+    $status = metricStatus($row);
     foreach (['formula', 'data_source'] as $field) {
         if (!is_array($row[$field] ?? null) || $row[$field] === []) {
             $p0[] = "Registry $code: missing or empty '$field'.";
@@ -152,11 +206,21 @@ foreach ($governance as $row) {
     }
 
     // ── P0.3 — runtime_calculated must be wired to the engine ────────────────
-    if (($row['calculation_status'] ?? '') === 'runtime_calculated') {
+    if (!in_array($status, ['runtime_calculated', 'manual', 'manual_governed', 'staged_data_contract', 'retired'], true)) {
+        $p0[] = "Registry $code: unknown calculation_status '$status'.";
+    }
+    if ($status === 'runtime_calculated') {
         if (!in_array($code, array_map('strtoupper', $runtimeList), true)) {
             $p0[] = "Registry $code: calculation_status=runtime_calculated but "
                 . "code is not listed in runtime_calculated_metrics.";
         }
+        if (!isset($engineCalculatorCodes[$code])) {
+            $p0[] = "Registry $code: calculation_status=runtime_calculated but "
+                . "KpiEngine::getCalculator() does not wire a calculator.";
+        }
+    }
+    if (($row['reward_eligible'] ?? false) === true && $status === 'staged_data_contract') {
+        $p0[] = "Registry $code: staged_data_contract must not be reward_eligible.";
     }
 
     // ── P0.7 — every governance KPI must have a dedicated counter-metric ─────
@@ -174,6 +238,12 @@ foreach ($governance as $row) {
         $p0[] = "Registry $code: counter_metric.code '{$counter['code']}' must be "
             . "the KPI code + '-CTR'.";
     }
+    if (($row['reward_eligible'] ?? false) === true) {
+        $blockers = $row['blocking_conditions'] ?? null;
+        if (!is_array($blockers) || $blockers === []) {
+            $p0[] = "Registry $code: reward_eligible=true requires blocking_conditions.";
+        }
+    }
 
     // ── P1 — lag without lead pairing ────────────────────────────────────────
     if (($row['lead_or_lag'] ?? '') === 'lag'
@@ -181,20 +251,27 @@ foreach ($governance as $row) {
         $p1[] = "Registry $code: lag KPI has no paired_metric (lead pairing missing).";
     }
     // ── P1 — percent KPI without a minimum sample ────────────────────────────
-    $unit = (string) (($row['formula']['unit'] ?? ''));
     $minSample = (int) (($row['formula']['min_sample'] ?? 0));
-    if ($unit === '%' && $minSample === 0) {
+    if (isPercentMetric($row) && $minSample === 0) {
         $p1[] = "Registry $code: percent-unit KPI has min_sample 0 (small-lot noise unguarded).";
+    }
+    if ($status === 'manual') {
+        $p1[] = "Registry $code: calculation_status uses legacy 'manual'; prefer manual_governed in the next schema update.";
     }
 }
 
-// ── P0.3 — every runtime metric must appear in KpiEngine ─────────────────────
-$engineSrc = readText($engineFp);
+// ── P0.3 — every runtime metric must be wired in KpiEngine ───────────────────
 foreach ($runtimeList as $rc) {
     $rc = strtoupper(trim($rc));
-    if ($rc !== '' && strpos($engineSrc, "'" . $rc . "'") === false) {
+    if ($rc !== '' && !isset($engineCalculatorCodes[$rc])) {
         $p0[] = "runtime_calculated_metrics lists '$rc' but it does not appear "
-            . "in KpiEngine.php (no calculator wired).";
+            . "in KpiEngine::getCalculator() (no calculator wired).";
+    }
+}
+foreach (array_keys($engineCalculatorCodes) as $engineCode) {
+    if (!in_array($engineCode, array_map('strtoupper', $runtimeList), true)) {
+        $p0[] = "KpiEngine::getCalculator() supports '$engineCode' but "
+            . "runtime_calculated_metrics does not list it.";
     }
 }
 
@@ -244,16 +321,34 @@ foreach ($aliases as $alias => $target) {
 $annex121 = readText($annex121Fp);
 preg_match_all('/\b([A-F][0-9]{1,2})\b/', $annex121, $cm);
 $cdrCodes = array_unique($cm[1] ?? []);
+$gateCoverage = array_fill_keys(['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'], 0);
 foreach ($gateMetrics as $g) {
     if (!is_array($g)) {
         continue;
     }
     $local = (string) ($g['local_id'] ?? $g['canonical_code'] ?? '?');
+    $gate = strtoupper(trim((string) ($g['gate'] ?? '')));
+    if ($gate === '' || ($gate !== 'ALL' && !isset($gateCoverage[$gate]))) {
+        $p0[] = "Gate metric $local: missing or invalid gate value.";
+    } elseif (isset($gateCoverage[$gate])) {
+        $gateCoverage[$gate]++;
+    }
+    if (!is_array($g['linked_cdr'] ?? null) || $g['linked_cdr'] === []) {
+        $p0[] = "Gate metric $local: missing linked_cdr.";
+    }
+    if (trim((string) ($g['gate_pass_condition'] ?? '')) === '') {
+        $p0[] = "Gate metric $local: missing gate_pass_condition.";
+    }
     foreach ((array) ($g['linked_cdr'] ?? []) as $cdr) {
         $cdr = strtoupper(trim((string) $cdr));
         if ($cdr !== '' && !in_array($cdr, $cdrCodes, true)) {
             $p0[] = "Gate metric $local: linked_cdr '$cdr' does not exist in RACI-MASTER-MATRIX.";
         }
+    }
+}
+foreach ($gateCoverage as $gate => $count) {
+    if ($count === 0) {
+        $p0[] = "Gate coverage: $gate has zero gate_control_metrics.";
     }
 }
 
@@ -266,6 +361,17 @@ foreach (['gate_control_metrics' => $gateMetrics, 'proposed_operating_metrics' =
             continue;
         }
         $rc = strtoupper(trim((string) ($row['canonical_code'] ?? '?')));
+        $status = metricStatus($row);
+        if ($status !== '' && !in_array($status, ['runtime_calculated', 'manual', 'manual_governed', 'staged_data_contract', 'retired'], true)) {
+            $p0[] = "$label $rc: unknown calculation_status '$status'.";
+        }
+        if ($status === 'runtime_calculated' && !isset($engineCalculatorCodes[$rc])) {
+            $p0[] = "$label $rc: calculation_status=runtime_calculated but "
+                . "KpiEngine::getCalculator() does not wire a calculator.";
+        }
+        if (($row['reward_eligible'] ?? false) === true && $status === 'staged_data_contract') {
+            $p0[] = "$label $rc: staged_data_contract must not be reward_eligible.";
+        }
         $counter = $row['counter_metric'] ?? null;
         if (!is_array($counter) || trim((string) ($counter['name_vi'] ?? '')) === ''
             || trim((string) ($counter['intent'] ?? '')) === ''
@@ -374,8 +480,13 @@ foreach ([
 // ── P0.11 — JD KPI scorecards: weighted, valid, sum to 100 ──────────────────
 // jd_kpi_scorecards is the SSOT for the per-role weighted KPI scorecard. Every
 // role's weights must sum to 100 and every kpi_code must be a governed metric.
-$scorecards = $registry['jd_kpi_scorecards']['roles'] ?? null;
+$scorecardRoot = $registry['jd_kpi_scorecards'] ?? null;
+$scorecards = is_array($scorecardRoot) ? ($scorecardRoot['roles'] ?? null) : null;
 if (is_array($scorecards)) {
+    $model = is_array($scorecardRoot) ? trim((string) ($scorecardRoot['model'] ?? '')) : '';
+    if ($model !== 'active_candidate_role_scorecard') {
+        $p1[] = "JD scorecards: registry still uses legacy weighted scorecard model; Track 4 target is active_candidate_role_scorecard with no fixed count.";
+    }
     foreach ($scorecards as $roleCode => $card) {
         if (!is_array($card)) {
             continue;
@@ -383,6 +494,12 @@ if (is_array($scorecards)) {
         $items = is_array($card['scorecard'] ?? null) ? $card['scorecard'] : [];
         if ($items === []) {
             continue; // a Wave-2 role not yet populated — not a blocker
+        }
+        if (count($items) === 5) {
+            $p1[] = "JD scorecard $roleCode: active scorecard has exactly 5 items; verify this is role-fit and not a fixed-count assumption.";
+        }
+        if (count($items) > 6) {
+            $p1[] = "JD scorecard $roleCode: active scorecard has " . count($items) . " items; exceeds the recommended maximum without Track 4 rationale.";
         }
         $sum = 0;
         foreach ($items as $it) {
@@ -402,24 +519,96 @@ if (is_array($scorecards)) {
     }
 }
 
+// ── P0.12 — KPI API/Admin surfaces stay structured and complete ─────────────
+$routesSrc = readText($routesFp);
+foreach ([
+    'admin_kpi_registry_get',
+    'admin_kpi_registry_save',
+    'kpi_catalog',
+    'kpi_get',
+    'kpi_trend',
+    'kpi_alerts',
+    'kpi_threshold_badges',
+    'kpi_jd_scorecards',
+    'kpi_input_save',
+    'kpi_input_list',
+] as $routeKey) {
+    if (!str_contains($routesSrc, "'" . $routeKey . "'") && !str_contains($routesSrc, '"' . $routeKey . '"')) {
+        $p0[] = "Routes: missing KPI action route '$routeKey'.";
+    }
+}
+
+if (preg_match('/CONSOLE_EDITABLE_FIELDS\\s*=\\s*\\[(.*?)\\];/s', $engineSrc, $editableMatch)) {
+    $forbiddenEditable = ['canonical_code', 'formula', 'data_source', 'calculation_status', 'metric_type'];
+    foreach ($forbiddenEditable as $field) {
+        if (preg_match("/['\"]" . preg_quote($field, '/') . "['\"]/", $editableMatch[1])) {
+            $p0[] = "Admin Console: forbidden structural field '$field' is listed in CONSOLE_EDITABLE_FIELDS.";
+        }
+    }
+}
+
+$adminJs = readText($adminJsFp);
+if (preg_match('/JSON\\.(parse|stringify)|kc-json|<textarea[^>]+json/i', $adminJs)) {
+    $p0[] = "Admin Console: raw JSON editing pattern detected in normal KPI Console path.";
+}
+
 // ── Report ───────────────────────────────────────────────────────────────────
-$byStatus = ['runtime_calculated' => 0, 'staged_data_contract' => 0, 'manual' => 0, 'retired' => 0];
+$statusKeys = ['runtime_calculated', 'staged_data_contract', 'manual', 'manual_governed', 'retired'];
+$byStatus = array_fill_keys($statusKeys, 0);
 foreach ($governance as $row) {
     $s = is_array($row) ? (string) ($row['calculation_status'] ?? '') : '';
     if (isset($byStatus[$s])) {
         $byStatus[$s]++;
     }
 }
+$allByStatus = array_fill_keys($statusKeys, 0);
+foreach ([$governance, $gateMetrics, $proposed] as $set) {
+    foreach ($set as $row) {
+        $s = is_array($row) ? (string) ($row['calculation_status'] ?? $row['status'] ?? '') : '';
+        if (isset($allByStatus[$s])) {
+            $allByStatus[$s]++;
+        }
+    }
+}
+$officialActive = count(array_filter($scorecard, static fn(string $code): bool => $code !== ''));
+$jdRolesWithActive = 0;
+if (is_array($scorecards)) {
+    foreach ($scorecards as $card) {
+        if (!is_array($card)) {
+            continue;
+        }
+        $items = is_array($card['scorecard'] ?? null) ? $card['scorecard'] : [];
+        if ($items !== []) {
+            $jdRolesWithActive++;
+        }
+    }
+}
 
 echo "KPI integrity check\n";
+echo "  registry: " . (string) ($registry['version'] ?? 'unknown')
+    . " · schema_version " . (int) ($registry['schema_version'] ?? 0) . "\n";
 echo "  governance KPIs: " . count($govCodes)
     . " (runtime {$byStatus['runtime_calculated']}"
     . " · staged {$byStatus['staged_data_contract']}"
     . " · manual {$byStatus['manual']}"
+    . " · manual_governed {$byStatus['manual_governed']}"
     . " · retired {$byStatus['retired']})\n";
 echo "  runtime_calculated_metrics: " . count($runtimeList)
     . " · gate metrics: " . count($gateMetrics)
     . " · legacy aliases: " . count($aliases) . "\n\n";
+echo "  all metric statuses: runtime {$allByStatus['runtime_calculated']}"
+    . " · staged {$allByStatus['staged_data_contract']}"
+    . " · manual {$allByStatus['manual']}"
+    . " · manual_governed {$allByStatus['manual_governed']}"
+    . " · retired {$allByStatus['retired']}\n";
+echo "  official active scorecard items: {$officialActive}\n";
+echo "  gate coverage: ";
+$coverageParts = [];
+foreach ($gateCoverage as $gate => $count) {
+    $coverageParts[] = "$gate=$count";
+}
+echo implode(' · ', $coverageParts) . "\n";
+echo "  JD roles with active scorecards: {$jdRolesWithActive}\n\n";
 
 foreach ($p1 as $w) {
     echo "  WARN (P1): $w\n";

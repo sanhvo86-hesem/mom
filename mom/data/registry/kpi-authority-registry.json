@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
   "version": "2026-05-21",
-  "schema_version": 16,
+  "schema_version": 17,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. Existing ANNEX-122 KPIs are retained, legacy metric aliases are mapped to canonical codes, and proposed CNC operating metrics are staged without granting automatic runtime authority.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -154,6 +154,12 @@
         "intent": "Bắt việc ép OTD bằng cách giao gấp tốn chi phí hoặc giao thiếu số lượng."
       },
       "reward_eligible": true,
+      "blocking_conditions": [
+        "safety_red",
+        "customer_escape_open",
+        "data_integrity_red",
+        "gate_bypass_open"
+      ],
       "calculation_status": "runtime_calculated",
       "status": "retained",
       "process": "delivery",
@@ -219,6 +225,12 @@
         "intent": "Bắt việc làm đẹp số khiếu nại bằng cách giấu hoặc trì hoãn mở NCR."
       },
       "reward_eligible": true,
+      "blocking_conditions": [
+        "customer_containment_open",
+        "ncr_suppression_evidence",
+        "data_integrity_red",
+        "gate_bypass_open"
+      ],
       "calculation_status": "runtime_calculated",
       "status": "retained",
       "process": "quality_system",
@@ -280,7 +292,7 @@
         "name": "Post-release defect escape rate",
         "intent": "Bắt việc duyệt phát hành dễ dãi để đạt RFT, lỗi lọt ra sau phát hành."
       },
-      "reward_eligible": true,
+      "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained",
       "process": "quality_assurance",
@@ -344,7 +356,7 @@
         "name": "Unallocated hidden job cost",
         "intent": "Bắt việc thổi biên lợi nhuận bằng cách không tính chi phí làm lại / bảo hành."
       },
-      "reward_eligible": true,
+      "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained",
       "process": "finance",
@@ -2334,7 +2346,7 @@
         "name": "Post-FAI production defect leakage",
         "intent": "Bắt việc nới tiêu chí FAI để đạt lần đầu, lỗi xuất hiện khi vào loạt."
       },
-      "calculation_status": "retained_from_annex122",
+      "calculation_status": "staged_data_contract",
       "process": "quality_assurance",
       "category": "internal",
       "owner_role": "QA",
