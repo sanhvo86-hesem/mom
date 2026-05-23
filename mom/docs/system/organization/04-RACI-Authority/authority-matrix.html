@@ -165,8 +165,8 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
  </div>
  </div>
  
-<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#s1">1. Mục đích và phạm vi áp dụng</a><a href="#s2">2. Tám nguyên tắc cốt lõi</a><a href="#s3">3. Tra cứu thẩm quyền</a><a href="#s4">4. Xử lý tình huống tại xưởng</a><a href="#s5">5. Ủy quyền tạm thời và phó</a><a href="#s6">6. Quyền hệ thống, phân tách nhiệm vụ (SoD) và dấu vết kiểm toán</a><a href="#s7">7. Cập nhật ma trận</a></div></div>
-<h2 class="h2" id="s1">1. Mục đích và phạm vi áp dụng</h2>
+<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#s1">1. Mục đích, phạm vi áp dụng và hiệu lực</a><a href="#s2">2. Mười nguyên tắc cốt lõi</a><a href="#s3">3. Định nghĩa và thuật ngữ</a><a href="#s4">4. Tra cứu thẩm quyền</a><a href="#s5">5. Xử lý tình huống tại xưởng</a><a href="#s6">6. Ủy quyền tạm thời và phó</a><a href="#s7">7. Quyền hệ thống, phân tách nhiệm vụ (SoD) và dấu vết kiểm toán</a><a href="#s8">8. Vi phạm và chế tài</a><a href="#s9">9. Cập nhật ma trận</a><a href="#s10">10. Phản hồi và đề xuất sửa đổi</a></div></div>
+<h2 class="h2" id="s1">1. Mục đích, phạm vi áp dụng và hiệu lực</h2>
 <p>Tài liệu này quy định người chịu trách nhiệm cho mỗi quyết định ảnh hưởng tới chất lượng, tiến độ, an toàn, doanh thu, chi phí, tuân thủ khách hàng và tính toàn vẹn dữ liệu. Năm vai dưới đây xuất hiện xuyên suốt mọi bảng tra của tài liệu — học thuộc trước khi đọc tiếp.</p>
 <div class="legend-row">
  <div class="legend-item"><div class="legend-swatch cell-a">A</div><b>quyết định cuối</b> — người duy nhất chịu trách nhiệm phê duyệt hoặc dừng tại điểm kiểm soát.</div>
@@ -176,23 +176,63 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
  <div class="legend-item"><div class="legend-swatch cell-i">I</div><b>nhận thông tin</b> — phải nhận cập nhật để đồng bộ lệnh, hồ sơ, ca hoặc hệ thống.</div>
 </div>
 <p>Mọi thao tác làm đổi trạng thái lệnh sản xuất, đổi cổng kiểm soát, phát hành hoặc giữ hàng, đổi nguồn lực, đổi dữ liệu gốc nhạy cảm, đổi dòng tiền hoặc kích hoạt chế độ gián đoạn / khôi phục đều phải bám tài liệu này.</p>
-<p class="note"><b>Cách dùng tài liệu này.</b> Mọi mã chức danh, mã nhóm, mã CDR và tên tài liệu trong trang đều bấm được — người vận hành mở thẳng <a href="#cdr-A2">A2</a>, <a href="#cdr-C6">C6</a>, <a href="#cdr-D7">D7</a>… để xem ngưỡng cụ thể, hoặc xem toàn bộ trong <a href="#s3">mục 3</a>. Khi <a href="#s2">tám nguyên tắc cốt lõi</a> còn đúng, ma trận còn hiệu lực. Khi nghi ngờ, đối chiếu mã CDR trước khi quyết định — không tự suy diễn; nếu chưa có CDR cho tình huống, dừng và leo thang <a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-top-mgmt">TOP_MGMT</a> để bổ sung mã trước khi xử lý.</p>
-<h2 class="h2" id="s2">2. Tám nguyên tắc cốt lõi</h2>
-<p>Tám nguyên tắc dưới đây là khung cứng. Khi nghi ngờ ở bất kỳ tình huống nào, quay lại bảng này trước khi quyết định.</p>
+<p class="note"><b>Cách dùng tài liệu này.</b> Mọi mã chức danh, mã nhóm, mã CDR và tên tài liệu trong trang đều bấm được — người vận hành mở thẳng <a href="#cdr-A2">A2</a>, <a href="#cdr-C6">C6</a>, <a href="#cdr-D7">D7</a>… để xem ngưỡng cụ thể, hoặc xem toàn bộ trong <a href="#s4">mục 4</a>. Khi <a href="#s2">mười nguyên tắc cốt lõi</a> còn đúng, ma trận còn hiệu lực. Khi nghi ngờ, đối chiếu mã CDR trước khi quyết định — không tự suy diễn; nếu chưa có CDR cho tình huống, dừng và leo thang <a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-top-mgmt">TOP_MGMT</a> để bổ sung mã trước khi xử lý.</p>
+<h3>1.1 Hiệu lực, quyền sở hữu và chính sách phiên bản</h3>
 <div class="table-card"><table class="table">
-<colgroup><col style="width:5%"/><col style="width:30%"/><col style="width:65%"/></colgroup>
+<colgroup><col style="width:24%"/><col style="width:76%"/></colgroup>
+<tbody>
+<tr><td><b>Tính ràng buộc</b></td><td>Tài liệu này là quy định bắt buộc với toàn bộ nhân sự HESEM, bao gồm vai trò chính, phó, người tạm quyền, nhà thầu phụ và bên thứ ba tham gia luồng quyết định. Không có lựa chọn áp dụng hay không. Ký kết hợp đồng lao động hoặc hợp đồng dịch vụ với HESEM bao hàm cam kết tuân thủ tài liệu này.</td></tr>
+<tr><td><b>Quan hệ với JD và SOP</b></td><td>Khi mâu thuẫn giữa tài liệu này và JD hoặc SOP, ma trận thẩm quyền giữ quyền ưu tiên. JD và SOP phải được sửa đồng bộ trong vòng 5 ngày làm việc kể từ khi phát hiện mâu thuẫn (theo <a href="#s9">mục 9</a>).</td></tr>
+<tr><td><b>Người sở hữu</b></td><td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA Manager</a> (Phòng Đảm bảo chất lượng).</td></tr>
+<tr><td><b>Người phê duyệt phát hành</b></td><td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> — chỉ CEO mới được ký phát hành phiên bản mới. Phó CEO không được phê duyệt thay.</td></tr>
+<tr><td><b>Chu kỳ rà soát tối thiểu</b></td><td>12 tháng kể từ ngày hiệu lực hiện tại. Rà soát ngay khi có một trong các kích hoạt cập nhật ở <a href="#s9">mục 9</a>, không chờ đến chu kỳ.</td></tr>
+<tr><td><b>Chính sách phiên bản</b></td><td>Tăng <i>minor</i> (V1.0 → V1.1) khi sửa ngưỡng, lời văn, ghi chú, hoặc thêm/bớt CDR đã thuộc cùng nhóm. Tăng <i>major</i> (V1.x → V2.0) khi tái cấu trúc mục, thay đổi nguyên tắc cốt lõi, hoặc đổi cơ chế kích hoạt CDR.</td></tr>
+<tr><td><b>Truyền thông thay đổi</b></td><td>Mỗi phát hành phải có thông báo gửi toàn bộ vai trò A và R có ảnh hưởng, kèm bảng tóm tắt thay đổi (changelog) trong vòng 24 giờ làm việc kể từ khi ký phát hành. Khi phát hành major, tổ chức buổi đào tạo lại trong 30 ngày.</td></tr>
+<tr><td><b>Ngôn ngữ chính thức</b></td><td>Tiếng Việt. Bản dịch sang ngôn ngữ khác (nếu có) chỉ có giá trị tham khảo; bản tiếng Việt giữ quyền ưu tiên khi có khác biệt.</td></tr>
+</tbody></table></div>
+<h2 class="h2" id="s2">2. Mười nguyên tắc cốt lõi</h2>
+<p>Mười nguyên tắc dưới đây là khung cứng. Khi nghi ngờ ở bất kỳ tình huống nào, quay lại bảng này trước khi quyết định.</p>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:5%"/><col style="width:28%"/><col style="width:67%"/></colgroup>
 <thead><tr><th>#</th><th>Nguyên tắc</th><th>Cách áp dụng tại xưởng và điều cấm</th></tr></thead>
 <tbody>
 <tr><td>1</td><td><b>Một quyết định — một người ký cuối.</b></td><td>Người A là duy nhất. Khi lệnh sản xuất, nhả giữ, mẫu đầu tiên, nhả giao hàng hay đổi chương trình có hai chữ ký cuối mà không rõ ai chịu trách nhiệm: dừng ở cổng hiện tại và leo thang theo mã CDR. <b>Không</b> dùng cuộc họp, nhóm chung hay tin nhắn tập thể để che người A.</td></tr>
 <tr><td>2</td><td><b>Bằng chứng đi trước chữ ký.</b></td><td>Người A chỉ ký khi gói bằng chứng đủ: bản vẽ và phiên bản đang dùng, quy trình công nghệ, chương trình NC / CAM, đồ gá, dụng cụ đo còn hiệu lực, kết quả kiểm và hồ sơ truy xuất. <b>Không</b> ký trước rồi bổ sung hồ sơ sau — kể cả khi khách bán dẫn (Lam Research, Applied Materials …) yêu cầu gấp.</td></tr>
 <tr><td>3</td><td><b>Người xác minh độc lập với người đề xuất.</b></td><td>Người V phải khác người P. Người gom hồ sơ hoặc hưởng lợi trực tiếp từ quyết định không được làm V duy nhất cho cùng giao dịch. <b>Không</b> tự xác minh cho hồ sơ do chính mình lập.</td></tr>
 <tr><td>4</td><td><b>Quyền dừng rộng hơn quyền phát hành.</b></td><td>Bất kỳ ai phát hiện rủi ro an toàn, sai phiên bản, sai vật tư, thiếu chứng nhận, thiếu bằng chứng hoặc nghi thoát lỗi đều có trách nhiệm dừng và cách ly ngay. Nhưng phát hành hoặc nhả giữ phải quay lại đúng người A theo mã CDR. <b>Không</b> dùng quyền dừng để tự nhả; <b>không</b> dùng áp lực giao hàng để bỏ qua quyền dừng.</td></tr>
-<tr><td>5</td><td><b>Thẩm quyền đi cùng phạm vi.</b></td><td>Mỗi mã CDR khoanh vùng riêng. Quyền duyệt tăng ca không gồm quyền chấp nhận rủi ro kỹ thuật. Quyền khởi động lại máy không gồm quyền phát hành sản phẩm. <b>Không</b> viện dẫn vai R hoặc chữ ký cũ ở CDR khác để mở rộng quyền sang quyết định hiện tại.</td></tr>
+<tr><td>5</td><td><b>Thẩm quyền đi cùng phạm vi.</b></td><td>Mỗi mã CDR khoanh vùng riêng. Quyền duyệt tăng ca không gồm quyền chấp nhận rủi ro kỹ thuật. Quyền khởi động lại máy không gồm quyền phát hành sản phẩm. <b>Không</b> viện dẫn vai R hoặc chữ ký cũ ở CDR khác để mở rộng quyền sang quyết định hiện tại. <b>Không</b> tách giao dịch để né ngưỡng — khi một giao dịch chạm nhiều ngưỡng, dùng cấp cao nhất.</td></tr>
 <tr><td>6</td><td><b>Chất lượng có quyền giữ hàng cao hơn tiến độ.</b></td><td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html">QCL</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html">QC</a> được giữ lô hoặc chặn giao hàng khi nghi sai phiên bản, sai đặc tính trọng yếu, sai dụng cụ đo, thiếu FAI, thiếu CoC, thiếu truy xuất hoặc có rủi ro sạch / FOD. <b>Không</b> dùng áp lực giao hàng để vượt quyền giữ hoặc bỏ qua kiểm lại.</td></tr>
 <tr><td>7</td><td><b>Kỹ thuật khóa thay đổi quy trình.</b></td><td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html">PE</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html">CAM</a> phải xác nhận trước mọi thay đổi chương trình, dao, đồ gá, đường chạy dao, bù trừ, máy thay thế, chuyển công đoạn hoặc đặc tính trọng yếu. <b>Không</b> để thợ vận hành, tổ trưởng ca hay kế hoạch tự đổi phương pháp ngoài gói đã phát hành.</td></tr>
 <tr><td>8</td><td><b>Quyền hệ thống không tự sinh thẩm quyền kinh doanh.</b></td><td>Email duyệt, tin nhắn duyệt, chữ ký Epicor hay dấu ký tay chỉ là phương tiện ghi nhận. Khi thẩm quyền kinh doanh không có trong tài liệu này, các phương tiện đó không hợp lệ. <b>Không</b> dùng chữ ký hệ thống thay cho quyết định CDR; <b>không</b> dùng phó để bỏ chữ ký <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> bắt buộc.</td></tr>
+<tr><td>9</td><td><b>Mọi quyết định phải có dấu vết bất biến.</b></td><td>Người A ghi nhận quyết định vào hồ sơ chuẩn (FRM tương ứng + chữ ký + thời điểm + bằng chứng dẫn chiếu) trong tối đa 24 giờ làm việc kể từ thời điểm quyết. Hồ sơ phải bất biến — chỉ được ghi đính kèm (addendum), không sửa bản gốc. Thời gian lưu trữ tối thiểu xem <a href="#s7">mục 7</a>. <b>Không</b> ra quyết định bằng miệng, chat ephemeral hoặc cuộc gọi không ghi âm cho các CDR cấp L2 trở lên.</td></tr>
+<tr><td>10</td><td><b>Khai báo xung đột lợi ích trước khi quyết định.</b></td><td>Người A và người V phải khai báo nếu có quan hệ thân thuộc, lợi ích tài chính, hoặc cam kết khác với bên liên quan (khách, nhà cung cấp, đối tác). Khi có xung đột, A / V phải rút (recuse) và chuyển cho phó hợp lệ theo <a href="#s6">mục 6</a> — ghi rõ lý do rút vào hồ sơ. <b>Không</b> tự quyết khi có xung đột; <b>không</b> che giấu xung đột để giữ quyền ký.</td></tr>
 </tbody></table></div>
-<h2 class="h2" id="s3">3. Tra cứu thẩm quyền</h2>
+<h2 class="h2" id="s3">3. Định nghĩa và thuật ngữ</h2>
+<p>Mọi thuật ngữ dùng trong tài liệu này có nghĩa cố định theo bảng dưới. Khi đọc một CDR và chưa rõ, tra ở đây trước; <b>không</b> tự suy diễn nghĩa khác.</p>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:22%"/><col style="width:78%"/></colgroup>
+<thead><tr><th>Thuật ngữ</th><th>Định nghĩa cố định trong tài liệu này</th></tr></thead>
+<tbody>
+<tr><td><b>Ngày làm việc</b></td><td>Một ngày từ 08:00 đến 17:00 giờ Việt Nam (GMT+7), Thứ Hai đến Thứ Sáu, trừ ngày lễ chính thức của Việt Nam và ngày HESEM thông báo nghỉ. "≤ X giờ trong ca" tính theo giờ liên tục từ thời điểm sự kiện. "≤ X ngày làm việc" đếm theo ngày làm việc kế tiếp đầy đủ, không tính ngày sự kiện xảy ra.</td></tr>
+<tr><td><b>Ca sản xuất</b></td><td>Khoảng làm việc liên tục 8 giờ theo lịch ca xưởng (ca 1, ca 2, ca 3). Tính từ giờ vào ca tới giờ ra ca của cùng nhóm.</td></tr>
+<tr><td><b>Lô</b> (lot)</td><td>Tập hợp chi tiết sản xuất, kiểm tra hoặc giao hàng cùng thời điểm, từ cùng lệnh sản xuất, được nhận diện bằng mã lô duy nhất. Khi một lệnh sản xuất chia làm nhiều phần giao, mỗi phần là một lô riêng.</td></tr>
+<tr><td><b>Chi tiết</b></td><td>Một sản phẩm hoàn chỉnh hoặc bán thành phẩm có mã chi tiết riêng. Khi đếm "≤ X chi tiết" trong các CDR D-series, tính theo số đơn vị vật lý đo lường được, không tính theo bộ hoặc cụm.</td></tr>
+<tr><td><b>Khách bán dẫn</b></td><td>Khách thuộc chuỗi cung ứng thiết bị hoặc linh kiện bán dẫn (semiconductor). HESEM xác định khách bán dẫn theo loại sản phẩm họ sản xuất, không theo quốc gia trụ sở. Danh sách do <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> duy trì và cập nhật hàng quý; ví dụ điển hình: Lam Research, Applied Materials, ASML, KLA, Tokyo Electron và các nhà cung cấp cấp 1 của họ.</td></tr>
+<tr><td><b>Đặc tính trọng yếu (CTQ — Critical to Quality)</b></td><td>Đặc tính sản phẩm hoặc quá trình mà sai lệch sẽ ảnh hưởng trực tiếp tới chức năng, an toàn hoặc khả năng lắp ráp tại khách. CTQ được xác định bằng văn bản trong gói nền kỹ thuật (<a href="#cdr-B2">B2</a>) hoặc Control Plan (<a href="#cdr-B8">B8</a>). Khi nghi ngờ, mặc định coi là CTQ cho tới khi <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> xác nhận ngược lại bằng văn bản.</td></tr>
+<tr><td><b>FOD</b> (Foreign Object Debris)</td><td>Vật chất ngoại lai — mảnh kim loại, dầu, bụi, sợi, dấu vân tay … — có thể bám trên bề mặt chi tiết và ảnh hưởng chức năng tại khách. Đặc biệt nghiêm trọng với chi tiết bán dẫn: bất kỳ FOD nào trên bề mặt chân không hoặc bề mặt làm việc đều phải mở NCR (<a href="#cdr-D3">D3</a>).</td></tr>
+<tr><td><b>FAI / FAIR / PPAP</b></td><td>FAI = First Article Inspection (kiểm mẫu đầu tiên, AS9102). FAIR = FAI Report (hồ sơ FAI gửi khách). PPAP = Production Part Approval Process (AIAG). HESEM dùng FAIR cho khách aerospace / semi nếu khách yêu cầu; PPAP khi khách thuộc chuỗi cung ứng auto hoặc có yêu cầu cụ thể bằng văn bản.</td></tr>
+<tr><td><b>Cổng kiểm soát G0 → G7</b></td><td>Tám điểm dừng bắt buộc trong vòng đời một đơn hàng từ RFQ tới giao hàng. Định nghĩa và RACI chi tiết tại <a href="raci-master-matrix.html#r5gate">RACI-MASTER-MATRIX §3</a>. Khi văn bản viết "≥ G2", nghĩa là đã hoàn tất phát hành kế hoạch (G2) và đang ở G3 hoặc cao hơn.</td></tr>
+<tr><td><b>Người A / R / V / C / I</b></td><td>Xem chú giải <a href="#s1">mục 1</a>. Mỗi CDR chỉ có duy nhất một người A. Người R có thể nhiều — ai thực hiện, gom hồ sơ. Người V kiểm tra điều kiện độc lập với P. C / I không quyết định.</td></tr>
+<tr><td><b>Phó / phó tạm thời / ủy quyền tạm thời</b></td><td>Người đăng ký sẵn trong <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a> để giữ quyền A khi vai trò gốc vắng. Phạm vi quyền phó <b>luôn hẹp hơn hoặc bằng</b> phạm vi vai trò gốc, không bao giờ rộng hơn. Chi tiết kích hoạt xem <a href="#s6">mục 6</a>.</td></tr>
+<tr><td><b>Ngưỡng L1 / L2 / L3</b></td><td>Mức giá trị hoặc quy mô của quyết định, xác định cấp phê duyệt. Khi một giao dịch chạm nhiều ngưỡng cùng lúc (ví dụ vừa vượt VND vừa đổi ngày giao), <b>luôn dùng cấp phê duyệt cao nhất</b> (nguyên tắc 5). Tách giao dịch để né ngưỡng là vi phạm cấp 2 ở <a href="#s8">mục 8</a>.</td></tr>
+<tr><td><b>HOLD / chặn giao hàng / nhả giữ hàng</b></td><td>HOLD = trạng thái không cho lô tiếp tục đi qua cổng kiểm soát hoặc rời nhà máy. "Chặn giao hàng" = lệnh HOLD áp lên lô đã sẵn sàng giao. "Nhả giữ hàng" = dỡ HOLD sau khi bằng chứng đủ. Quyền HOLD rộng hơn quyền nhả (nguyên tắc 4). Mọi HOLD phải ghi vào <a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a>.</td></tr>
+<tr><td><b>Concession</b></td><td>Văn bản từ khách chấp thuận dùng, lắp hoặc giao sản phẩm có sai lệch đặc tính. Khác với <i>sai lệch nội bộ</i> (<a href="#cdr-B7">B7</a>) — concession bắt buộc có chữ ký khách. Khác với <i>thoát lỗi</i> (<a href="#cdr-D11">D11</a>) — concession xảy ra trước khi giao; thoát lỗi xảy ra sau khi giao.</td></tr>
+<tr><td><b>Khẩn cấp</b></td><td>Tình huống có ít nhất một trong: (1) rủi ro an toàn tức thì; (2) lệnh sản xuất ngừng máy &gt; 2 giờ; (3) khách bán dẫn yêu cầu giao hoặc thay đổi với thông báo &lt; 24 giờ; (4) sự cố hệ thống ảnh hưởng ≥ 1 dây chuyền. Trạng thái khẩn cấp kích hoạt CDR F-series; phải có hồ sơ kích hoạt và đóng trạng thái khi sự kiện đóng.</td></tr>
+<tr><td><b>TOP_MGMT / FUNC_OWNERS / FUNC_HEADS / DIRECT_LINE_MGRS</b></td><td>Bốn nhóm vai trò dùng để leo thang. Định nghĩa cụ thể tại <a href="role-and-department-bundles.html">ROLE-AND-DEPARTMENT-BUNDLES</a>. TOP_MGMT thường gồm CEO + các trưởng chức năng cốt lõi (QA, PD, ENGM, SCM, CS).</td></tr>
+<tr><td><b>Quyết định "treo"</b></td><td>Quyết định đã mở (có CDR, có yêu cầu) nhưng chưa có ai ký trong thời gian SLA ở <a href="#s4">mục 4</a>. Quyết định treo tự động leo lên cấp tiếp theo; không có khái niệm "chờ vô thời hạn".</td></tr>
+</tbody></table></div>
+<h2 class="h2" id="s4">4. Tra cứu thẩm quyền</h2>
+<p>Mục này có hai bảng tra: bảng <b>quyết định</b> (51 mã CDR — sổ đăng ký gốc) và bảng <b>người vắng — ai làm thay</b>. Tra cứu RACI theo cổng G0–G7 nằm ở <a href="raci-master-matrix.html#r5gate">RACI-MASTER-MATRIX §3</a>.</p>
 <p>Mục này có hai bảng tra: bảng <b>quyết định</b> (47 mã CDR — sổ đăng ký gốc) và bảng <b>người vắng — ai làm thay</b>. Tra cứu RACI theo cổng G0–G7 nằm ở <a href="raci-master-matrix.html#r5gate">RACI-MASTER-MATRIX</a>.</p>
 <p class="note"><b>Cách dùng link:</b> mọi mã chức danh, mã nhóm, mã CDR và tài liệu trong trang này đều phải bấm được. Người vận hành có thể mở trực tiếp <a href="authority-matrix.html#cdr-A2">A2</a>, <a href="authority-matrix.html#cdr-C6">C6</a>, <a href="authority-matrix.html#cdr-D7">D7</a> hoặc mở tài liệu này để đối chiếu toàn bộ ngưỡng thẩm quyền.</p>
 
@@ -274,21 +314,33 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <div class="card tight gate-crosswalk">
 <p><b>Lưu ý.</b> Ma trận RACI chi tiết theo cổng <a href="raci-master-matrix.html#r5gate">G0–G7</a> được quản lý trong <a href="raci-master-matrix.html">RACI-MASTER-MATRIX</a>. Tài liệu này chỉ giữ mã CDR, ngưỡng L1/L2/L3 và hồ sơ tối thiểu — khi cần cấu hình luồng công việc, đối chiếu cả hai.</p>
 </div>
-<h2 class="h2" id="s4">4. Xử lý tình huống tại xưởng</h2>
+<h3>4.1 Thời gian phản hồi mặc định theo cấp ngưỡng</h3>
+<p>Khi một CDR không nêu rõ thời gian phản hồi, áp dụng bảng mặc định dưới đây. Quá thời gian, tự động leo lên cấp tiếp theo; người mở CDR phải ghi giờ kích hoạt vào hồ sơ.</p>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:12%"/><col style="width:32%"/><col style="width:32%"/><col style="width:24%"/></colgroup>
+<thead><tr><th>Cấp</th><th>Thời gian xử lý mặc định</th><th>Khi quá thời gian</th><th>Áp dụng với</th></tr></thead>
+<tbody>
+<tr><td>L1</td><td>4 giờ trong ca sản xuất, hoặc 8 giờ làm việc với quyết định văn phòng.</td><td>Tự động leo lên L2 và ghi vào hồ sơ; người L1 phải nêu lý do treo trong nhật ký bàn giao.</td><td>Tất cả CDR có L1.</td></tr>
+<tr><td>L2</td><td>24 giờ làm việc kể từ khi nhận từ L1.</td><td>Tự động leo lên L3; <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> và người sở hữu CDR phải được thông báo trong vòng 4 giờ làm việc.</td><td>Tất cả CDR có L2.</td></tr>
+<tr><td>L3</td><td>72 giờ làm việc kể từ khi nhận từ L2.</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> triệu họp khẩn với chức năng liên quan trong vòng 24 giờ làm việc; mở sự kiện vào sổ rủi ro.</td><td>Tất cả CDR có L3 hoặc đẩy lên CEO.</td></tr>
+<tr><td>Leo thang</td><td>Áp dụng theo trường "Leo thang nếu" của CDR — luôn ưu tiên trên thời gian mặc định.</td><td>Khi điều kiện leo thang chạm, bỏ qua ngưỡng thời gian — kích hoạt ngay.</td><td>Khi điều kiện leo thang đặc tả.</td></tr>
+</tbody></table></div>
+<p class="note"><b>Ngoại lệ.</b> CDR F-series (khẩn cấp) có thời gian chặn riêng — ví dụ <a href="#cdr-F2">F2</a> (≤ 2 giờ / 8 giờ), <a href="#cdr-F4">F4</a> (kích hoạt ngay khi có nguy cơ an toàn). Trong tình huống khẩn cấp, luôn theo thời gian của CDR cụ thể.</p>
+<h2 class="h2" id="s5">5. Xử lý tình huống tại xưởng</h2>
 <p>Sáu tình huống dưới đây bao quát phần lớn lần dừng tay ở xưởng. Khi gặp, làm theo cột giữa, mở tài liệu ở cột phải — không xử lý theo cảm tính.</p>
 <div class="table-card"><table class="table">
 <colgroup><col style="width:28%"/><col style="width:48%"/><col style="width:24%"/></colgroup>
 <thead><tr><th>Khi bạn gặp</th><th>Việc làm ngay</th><th>Mở tiếp</th></tr></thead>
 <tbody>
-<tr><td>Không biết ai được ký</td><td>Dừng quyết định, tra mã CDR trong bảng tra ở <a href="#s3">mục 3</a>. Không hỏi miệng rồi ký thay.</td><td><a href="#s3">Mục 3 — Tra cứu</a></td></tr>
+<tr><td>Không biết ai được ký</td><td>Dừng quyết định, tra mã CDR trong bảng tra ở <a href="#s4">mục 4</a>. Không hỏi miệng rồi ký thay.</td><td><a href="#s4">Mục 4 — Tra cứu</a></td></tr>
 <tr><td>Không biết ai phải làm</td><td>Tra RACI theo cổng <a href="raci-master-matrix.html#r5gate">G0 → G7</a>. Người A có trách nhiệm kéo R / C / I vào đúng thời điểm.</td><td><a href="raci-master-matrix.html">RACI-MASTER-MATRIX</a></td></tr>
-<tr><td>Người giữ quyền vắng</td><td>Kích hoạt phó theo ngưỡng ở <a href="#s5">mục 5</a>. Ghi thời điểm, phạm vi và những việc <i>không</i> được chuyển giao.</td><td><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></td></tr>
+<tr><td>Người giữ quyền vắng</td><td>Kích hoạt phó theo ngưỡng ở <a href="#s6">mục 6</a>. Ghi thời điểm, phạm vi và những việc <i>không</i> được chuyển giao.</td><td><a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></td></tr>
 <tr><td>Chất lượng và tiến độ mâu thuẫn</td><td>Ưu tiên giữ bằng chứng chất lượng (nguyên tắc 6). <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> có quyền giữ hàng đến khi có quyết định đúng CDR.</td><td><a href="#cdr-D1">D1</a> / <a href="#cdr-D2">D2</a> / <a href="#cdr-D3">D3</a> / <a href="#cdr-D4">D4</a> / <a href="#cdr-D6">D6</a> / <a href="#cdr-D7">D7</a> / <a href="#cdr-D8">D8</a></td></tr>
-<tr><td>Khách bán dẫn yêu cầu đổi muộn</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> mở CCR. <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> và <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> xác định ảnh hưởng trước khi hứa ngày giao, xin nhượng bộ hoặc trả lời khách.</td><td><a href="#cdr-A6">A6</a> / <a href="#cdr-A7">A7</a> / <a href="#cdr-B7">B7</a> / <a href="#cdr-D7">D7</a></td></tr>
+<tr><td>Khách bán dẫn yêu cầu đổi muộn</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> mở CCR. <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> và <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> xác định ảnh hưởng trước khi hứa ngày giao, xin nhượng bộ hoặc trả lời khách.</td><td><a href="#cdr-A6">A6</a> / <a href="#cdr-A7">A7</a> / <a href="#cdr-B7">B7</a> / <a href="#cdr-D7">D7</a> / <a href="#cdr-D13">D13</a></td></tr>
 <tr><td>ERP, bảng điều khiển hoặc hồ sơ điện tử không khớp thực tế</td><td>Lấy giao dịch gốc và hồ sơ kiểm soát làm nguồn thẩm quyền. Không dùng ảnh chụp màn hình hoặc dashboard để thay phê duyệt.</td><td><a href="../../../operations/sops/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> / <a href="../../../operations/sops/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td></tr>
 </tbody></table></div>
 
-<h3>Sổ tình huống vận hành — tra cứu CDR theo sự cố</h3>
+<h3>5.1 Sổ tình huống vận hành — tra cứu CDR theo sự cố</h3>
 <p>14 tình huống thường gặp ở xưởng CNC. Mỗi dòng đã chỉ rõ CDR phải mở, người ký, hồ sơ và điều kiện leo thang. Khi tình huống chưa có trong bảng, dừng và leo thang theo ghi chú phía dưới.</p>
 <div class="table-card"><table class="table scenario-table">
 <colgroup>
@@ -328,22 +380,53 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <div class="req"><span class="req-tag shall">QUY TẮC</span><div>Bảng này chỉ định điểm vào xử lý. CDR trong <a href="">ANNEX-120</a> giữ quyền quyết định; <a href="raci-master-matrix.html">RACI-MASTER-MATRIX</a> giữ trách nhiệm phối hợp.</div></div>
 <div class="req"><span class="req-tag shall">QUY TẮC</span><div>Tình huống chưa có CDR: dừng suy diễn, leo thang <a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-top-mgmt">TOP_MGMT</a> để bổ sung CDR trước khi xử lý vượt quyền.</div></div>
 
-<h3>Tự kiểm trước khi ký hoặc cho chạy tiếp</h3>
+<h3>5.2 Khi hai thẩm quyền mâu thuẫn — quy tắc phân giải</h3>
+<p>Khi hai người tự nhận là A cho cùng quyết định, hoặc hai vai trò có quyền chồng lấn, áp dụng bảng dưới. Quyết định nhanh, ghi vào hồ sơ, không để "treo".</p>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:30%"/><col style="width:42%"/><col style="width:28%"/></colgroup>
+<thead><tr><th>Tình huống mâu thuẫn</th><th>Người thắng và lý do</th><th>Ghi nhận</th></tr></thead>
+<tbody>
+<tr><td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> giữ hàng, <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> hoặc <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> muốn giao</td><td>QA thắng (nguyên tắc 6 — quyền giữ cao hơn tiến độ). CEO không tự dỡ; CEO chỉ ký sau khi QA xác nhận đạt theo <a href="#cdr-D7">D7</a>.</td><td><a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> ghi "QA hold chưa nhả"; phải có bằng chứng kiểm cuối trước khi mở lại.</td></tr>
+<tr><td><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> muốn ECO, QA muốn giữ Control Plan hiện hữu</td><td>QA thắng (nguyên tắc 6). ECO phải có <a href="#cdr-B8">B8</a> Control Plan cập nhật trước khi áp dụng; ENGM không vượt qua được QA cho điểm CTQ.</td><td><a href="../../../forms/frm-100-sales/FRM-102_Document_Change_Request.xlsx">FRM-102</a> + <a href="../../../forms/frm-100-sales/FRM-162_Change_Impact_Matrix.xlsx">FRM-162</a> + <a href="../../../forms/frm-300-technical/FRM-303_DFM_Review_Checklist.xlsx">FRM-303</a> đồng bộ.</td></tr>
+<tr><td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> mua khẩn theo <a href="#cdr-E5">E5</a>, QA chưa qualify nhà cung cấp theo <a href="#cdr-E2">E2</a></td><td>QA thắng nếu lô có CTQ; mua khẩn chỉ được phép khi QA + CEO cùng ký, theo E5 mở rộng.</td><td><a href="../../../forms/frm-400-quality/FRM-406_SCAR.xlsx">FRM-406</a> ghi rủi ro chấp nhận; qualify trong 30 ngày làm việc.</td></tr>
+<tr><td>Phó tạm thời muốn vượt phạm vi vai trò gốc (vượt L1 / L2 / L3)</td><td>Phó không thắng (<a href="#s6">mục 6</a>). Phải chờ vai trò gốc về hoặc leo thang theo <a href="#cdr-F3">F3</a> để kích hoạt phó cấp cao hơn.</td><td>Ghi nhật ký từ chối tại <a href="../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a>.</td></tr>
+<tr><td>Hai người cùng tự nhận là A cho một quyết định</td><td>Không ai thắng. Dừng quyết định, tra mã CDR ở <a href="#s4">mục 4</a>. Nếu CDR chỉ định rõ — bên đó thắng. Nếu CDR không rõ — leo thang TOP_MGMT.</td><td>Mở phiếu đề xuất sửa ma trận theo <a href="#s10">mục 10</a> nếu mơ hồ hệ thống.</td></tr>
+</tbody></table></div>
+
+<h3>5.3 Đảo ngược một quyết định đã ký</h3>
+<p>Khi phát hiện một quyết định đã ký không đúng — sai bằng chứng, vượt phạm vi, có xung đột lợi ích chưa khai báo, hoặc do hiểu sai dữ liệu — áp dụng quy trình đảo ngược sau. Không tự sửa hồ sơ gốc; chỉ ghi đính kèm.</p>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:7%"/><col style="width:32%"/><col style="width:61%"/></colgroup>
+<thead><tr><th>Bước</th><th>Hành động</th><th>Điều kiện và hồ sơ</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Tạm dừng thực thi</td><td>Người phát hiện sai sót có quyền tạm dừng (nguyên tắc 4). Mở <a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> hoặc nhật ký HOLD; ghi rõ lý do.</td></tr>
+<tr><td>2</td><td>Mở phiếu đảo ngược quyết định</td><td>Tạm thời dùng <a href="../../../forms/frm-100-sales/FRM-102_Document_Change_Request.xlsx">FRM-102</a> với thẻ "REVERSAL". Nêu: quyết định ban đầu (mã CDR, ngày, người ký), lý do đảo ngược, bằng chứng mới, tác động tới các lô / quyết định kế tiếp.</td></tr>
+<tr><td>3</td><td>Cấp phê duyệt đảo ngược</td><td>Cùng cấp với quyết định gốc <b>hoặc</b> cao hơn. Người A gốc phải được tham vấn — trừ khi có xung đột lợi ích đã khai báo. Khi quyết định gốc là CEO, đảo ngược cần CEO + bằng chứng độc lập từ QA hoặc audit nội bộ.</td></tr>
+<tr><td>4</td><td>Xác định tác động lan tỏa</td><td>Liệt kê các CDR, lô, hồ sơ đã dựa trên quyết định gốc. Mỗi cái cần hành động riêng: thu hồi, kiểm lại, thông báo khách (<a href="#cdr-D11">D11</a>), mở NCR (<a href="#cdr-D3">D3</a>) hoặc concession (<a href="#cdr-D13">D13</a>) tùy phạm vi.</td></tr>
+<tr><td>5</td><td>Đóng và truyền thông</td><td>Ghi vào sổ rủi ro. Thông báo các bên I của CDR gốc trong 24 giờ làm việc. Nếu đảo ngược ảnh hưởng khách hàng — <a href="#cdr-F5">F5</a> hoặc <a href="#cdr-D11">D11</a> kích hoạt song song.</td></tr>
+</tbody></table></div>
+
+<h3>5.4 Vắng đôi — cả vai trò gốc và phó L1 đều không có</h3>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Khi vai trò gốc và phó L1 đều vắng đồng thời cho một CDR có L2 hoặc L3 đang chờ: kích hoạt <a href="#cdr-F3">F3</a> để chuyển sang phó L2 (<a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-direct-line-mgrs">DIRECT_LINE_MGRS</a>); nếu phó L2 cũng vắng, leo thang <a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-top-mgmt">TOP_MGMT</a> trong 1 giờ làm việc. <b>Không</b> để quyết định "treo" vô hạn — quyết định treo của một CDR có thể chặn cả luồng sản xuất xuôi.</div></div>
+
+<h3>5.5 Tự kiểm trước khi ký hoặc cho chạy tiếp</h3>
 <div class="table-card"><table class="table">
 <colgroup><col style="width:6%"/><col style="width:64%"/><col style="width:30%"/></colgroup>
 <thead><tr><th>#</th><th>Câu hỏi</th><th>Nếu câu trả lời là "không"</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Đúng bản vẽ, phiên bản, yêu cầu khách hàng và đặc tính trọng yếu chưa?</td><td>Giữ ở <a href="raci-master-matrix.html#r5gate">G0 / G1 / G3</a>; không phát hành xuống xưởng.</td></tr>
 <tr><td>2</td><td>Chương trình <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html">CAM</a> / NC, đồ gá, dao, bù trừ, máy và vật liệu có khớp gói đã phát hành không?</td><td>Dừng cài đặt máy hoặc chạy loạt; gọi <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html">CAM</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a>.</td></tr>
-<tr><td>3</td><td>Dụng cụ đo, chương trình CMM, chuẩn kiểm và người kiểm còn hiệu lực năng lực không?</td><td>Không ghi nhận kết quả kiểm; giữ FAI / kiểm cuối.</td></tr>
+<tr><td>3</td><td>Dụng cụ đo, chương trình CMM, chuẩn kiểm và người kiểm còn hiệu lực năng lực không?</td><td>Không ghi nhận kết quả kiểm; giữ FAI / kiểm cuối; mở <a href="#cdr-D14">D14</a> nếu nghi MSA fail.</td></tr>
 <tr><td>4</td><td>FAI hoặc kiểm trong quá trình đã đạt đúng điều kiện trước khi chạy loạt chưa?</td><td>Không chạy loạt; mở <a href="#cdr-D1">D1</a> hoặc <a href="#cdr-D2">D2</a>.</td></tr>
 <tr><td>5</td><td>Lô, serial, vật liệu, chứng chỉ, CoC và gói hồ sơ có truy xuất được từ khách hàng tới thành phẩm không?</td><td>Giữ hàng; mở hành động truy xuất hồ sơ.</td></tr>
 <tr><td>6</td><td>Có rủi ro FOD, sạch bề mặt, đóng gói, bảo vệ ren / bề mặt hoặc nhiễm bẩn ảnh hưởng ứng dụng bán dẫn không?</td><td>Dừng ở công đoạn sạch / đóng gói; gọi <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> / <a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html">WKM</a>.</td></tr>
-<tr><td>7</td><td>Ngoại lệ khách hàng, nhượng bộ, đổi ngày giao hoặc đổi phạm vi đã có người A đúng CDR chưa?</td><td>Không hứa với khách; không giao hàng.</td></tr>
+<tr><td>7</td><td>Ngoại lệ khách hàng, nhượng bộ, đổi ngày giao hoặc đổi phạm vi đã có người A đúng CDR chưa?</td><td>Không hứa với khách; không giao hàng. Mở <a href="#cdr-D13">D13</a> nếu cần concession.</td></tr>
 <tr><td>8</td><td>Nếu người giữ quyền vắng, phó đã được kích hoạt đúng phạm vi và có nhật ký chưa? Nếu việc này thất bại trước khách bán dẫn (Lam Research / Applied Materials), hồ sơ có chứng minh được ai quyết định và dựa trên bằng chứng nào không?</td><td>Chờ người có thẩm quyền hoặc kích hoạt phó theo <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a>; bổ sung gói bằng chứng trước khi tiếp tục.</td></tr>
+<tr><td>9</td><td>Có xung đột lợi ích nào (quan hệ thân thuộc với khách / nhà cung cấp, lợi ích tài chính, cam kết bên ngoài) ảnh hưởng tới quyết định không?</td><td>Khai báo và rút (nguyên tắc 10). Chuyển cho phó hợp lệ; không tự ký.</td></tr>
 </tbody></table></div>
-<h2 class="h2" id="s5">5. Ủy quyền tạm thời và phó</h2>
+<h2 class="h2" id="s6">6. Ủy quyền tạm thời và phó</h2>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Phó được tự kích hoạt khi vai trò gốc vắng ≥ 4 giờ trong ca hoặc ≥ 24 giờ hành chính, có xác nhận của <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> hoặc trưởng chức năng liên quan, và bằng chứng không phản hồi đủ hai kênh (gọi + tin nhắn nội bộ). Mọi kích hoạt phải ghi nhật ký vào <a href="../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> hoặc kênh tương đương, dẫn về <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html#d4">ANNEX-123 d4</a>. <span class="iso-clause">§5.3 / §7.5</span></div></div>
+
 <div class="table-card"><table class="table">
 <colgroup><col style="width:22%"/><col style="width:46%"/><col style="width:32%"/></colgroup>
 <thead><tr><th>Tình huống</th><th>Cách dùng phó / ủy quyền tạm thời</th><th>Không được chuyển giao</th></tr></thead>
@@ -354,7 +437,33 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><td>Thiếu người, không có phó hợp lệ</td><td>Phải dừng, giữ việc hoặc xếp lại lịch. Không đôn tạm người chưa có JD, năng lực, SoD và phê duyệt phó đã đăng ký trong <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a>.</td><td>Phát hành chất lượng, phê duyệt thanh toán, truy cập khẩn cấp đặc quyền, phát hành kỹ thuật hoặc quyết định xử lý NCR cho người chưa được đăng ký phó.</td></tr>
 <tr><td>Chặn giao hàng / dỡ chặn</td><td>Lệnh chặn giao hàng chỉ được dỡ khi <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> cùng ký vào <a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a>, kèm bằng chứng kiểm cuối ≥ 100% đặc tính nghi ngờ; tối thiểu 10 mẫu đại diện khi lấy mẫu (mã <a href="#cdr-D7">D7</a>). <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> chỉ ký sau khi <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> xác nhận đạt — không được tự dỡ.</td><td>Không ủy quyền dỡ chặn giao hàng cho ai khác. Không thay chữ ký <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> bằng email / tin nhắn. Không mở lại lô giao hàng khi <a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> hoặc bằng chứng CoC còn thiếu.</td></tr>
 </tbody></table></div>
-<h2 class="h2" id="s6">6. Quyền hệ thống, phân tách nhiệm vụ (SoD) và dấu vết kiểm toán</h2>
+
+<h3>6.1 Quy tắc phụ về phó</h3>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:28%"/><col style="width:72%"/></colgroup>
+<tbody>
+<tr><td><b>Phó của phó</b></td><td>Khi cả phó L1 vắng, kích hoạt phó L2 đã đăng ký trong <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a>. Phạm vi quyền của phó L2 luôn hẹp hơn hoặc bằng phó L1. Khi cả ba (gốc + L1 + L2) vắng → áp dụng quy trình "vắng đôi" ở <a href="#s5">§5.4</a>.</td></tr>
+<tr><td><b>Đồng thời làm phó cho nhiều vai</b></td><td>Một người có thể đăng ký làm phó cho nhiều vai trò khác nhau, nhưng <b>không</b> được giữ cùng lúc hai phó-quyền có rủi ro SoD (ví dụ vừa làm phó <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> vừa làm phó <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a> trong cùng giờ). <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a> đánh dấu các cặp xung đột; HR rà soát quý.</td></tr>
+<tr><td><b>Kết thúc phó quyền</b></td><td>Phó quyền tự hết khi (1) vai trò gốc trở lại và xác nhận tiếp nhận, (2) sự kiện đóng (cho phó khẩn cấp), hoặc (3) hết thời hạn đăng ký phó. Người kích hoạt phải ghi thời điểm trả quyền vào <a href="../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a>. Không có khái niệm "phó vô thời hạn".</td></tr>
+<tr><td><b>Khuyết vĩnh viễn</b></td><td>Khi vai trò gốc nghỉ việc hoặc chuyển vĩnh viễn khỏi vai trò: phó tạm thời vô hiệu ngay. <a class="entity-link role-link" href="../03-Job-Descriptions/08-JD-HR/jd-hr-manager.html">HR</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> cập nhật ma trận trong 24 giờ làm việc theo <a href="#s9">mục 9</a>; người thay thế phải đăng ký phó mới trong 5 ngày làm việc.</td></tr>
+</tbody></table></div>
+
+<h3>6.2 Một CDR kích hoạt CDR khác — bản đồ liên động</h3>
+<p>Nhiều quyết định không độc lập. Khi mở một CDR, người A có trách nhiệm kiểm tra các CDR liên động và kích hoạt đồng bộ nếu cần.</p>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:14%"/><col style="width:38%"/><col style="width:48%"/></colgroup>
+<thead><tr><th>CDR gốc</th><th>Thường kéo theo</th><th>Điều kiện kích hoạt</th></tr></thead>
+<tbody>
+<tr><td><a href="#cdr-D3">D3</a> Mở NCR</td><td><a href="#cdr-D4">D4</a> xử lý NCR; <a href="#cdr-D6">D6</a> nhả giữ; có thể <a href="#cdr-D11">D11</a> thoát lỗi nếu lô đã giao</td><td>Lô đã có thành phẩm rời xưởng — D11 bắt buộc trong 24 giờ làm việc. Trong dung sai — chỉ D6.</td></tr>
+<tr><td><a href="#cdr-D7">D7</a> Dỡ chặn giao hàng</td><td><a href="#cdr-D8">D8</a> CoC phát hành; có thể <a href="#cdr-D13">D13</a> concession nếu khách yêu cầu</td><td>Dỡ chặn không ngụ ý CoC mới — D8 vẫn phải ký riêng. Concession kích hoạt khi khách yêu cầu chấp thuận dùng lô có sai lệch.</td></tr>
+<tr><td><a href="#cdr-B3">B3</a> ECO</td><td><a href="#cdr-B5">B5</a> CAM / NC release; có thể <a href="#cdr-B8">B8</a> Control Plan; có thể <a href="#cdr-D1">D1</a> re-FAI</td><td>ECO ảnh hưởng chương trình → B5. Ảnh hưởng CTQ → B8. Ảnh hưởng form / fit / function hoặc đổi nguồn → D1 (theo AS9102 §5.4).</td></tr>
+<tr><td><a href="#cdr-A6">A6</a> CCR sớm / <a href="#cdr-A7">A7</a> CCR muộn</td><td><a href="#cdr-B3">B3</a> ECO nếu đổi bản vẽ; <a href="#cdr-C3">C3</a> phá băng lịch nếu đổi ngày giao; <a href="#cdr-A2">A2</a> báo giá lại nếu đổi giá</td><td>CCR là điểm vào chung — nhưng tác động kỹ thuật / lịch / giá phải mở CDR tương ứng để có hồ sơ riêng.</td></tr>
+<tr><td><a href="#cdr-D14">D14</a> Thu hồi lô do MSA fail</td><td><a href="#cdr-D3">D3</a> mở NCR cho từng lô nghi vấn; <a href="#cdr-D11">D11</a> thoát lỗi nếu lô đã giao; <a href="#cdr-D5">D5</a> CAPA hệ thống đo</td><td>Tự động kích hoạt nếu phạm vi thu hồi &gt; 1 lô.</td></tr>
+<tr><td><a href="#cdr-F4">F4</a> Sự cố EHS</td><td><a href="#cdr-C7">C7</a> phục hồi sau dừng máy; có thể <a href="#cdr-D3">D3</a> nếu sản phẩm bị ảnh hưởng</td><td>Sự cố EHS gần khu sản xuất — bắt buộc kiểm sản phẩm liên quan trước khi nhả giao.</td></tr>
+<tr><td><a href="#cdr-A8">A8</a> Khách hủy đơn sau phát hành</td><td><a href="#cdr-C7">C7</a> phục hồi tiến độ cho lô khác; có thể <a href="#cdr-D9">D9</a> phế phẩm với WIP không thu hồi được</td><td>Sau hủy đơn, WIP và vật tư đã cut phải được quyết định: trữ kho / chuyển đơn khác / loại bỏ.</td></tr>
+<tr><td><a href="#cdr-F7">F7</a> Audit khách</td><td>Có thể <a href="#cdr-D11">D11</a> nếu khách phát hiện thoát lỗi tại chỗ; có thể <a href="#cdr-D5">D5</a> CAPA cho NC phát hiện trong audit</td><td>Khi khách audit phát hiện NC, response plan 24 giờ làm việc theo F7 L3.</td></tr>
+</tbody></table></div>
+<h2 class="h2" id="s7">7. Quyền hệ thống, phân tách nhiệm vụ (SoD) và dấu vết kiểm toán</h2>
 <p>Quyền cấu hình trên Epicor, M365 và mạng nội bộ <b>không tự sinh thẩm quyền kinh doanh</b> (nguyên tắc 8). Phân quyền hệ thống phải phản ánh đúng ma trận trong tài liệu này, không ngược lại.</p>
 <div class="table-card"><table class="table">
 <colgroup><col style="width:22%"/><col style="width:48%"/><col style="width:30%"/></colgroup>
@@ -366,7 +475,48 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><td>Thiết kế luồng công việc</td><td>Luồng công việc điện tử phải thể hiện đúng các bước P / V / A / C / I trong tài liệu này. Không đơn giản hóa luồng đến mức bỏ qua bước xác minh hoặc tham vấn bắt buộc.</td><td><a href="raci-master-matrix.html">RACI-MASTER-MATRIX</a>, <a href="../../../operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115</a></td></tr>
 <tr><td>Dấu vết kiểm toán</td><td>Mọi thao tác ghi đè, mở lại giao dịch đã đóng, ghi ngược sổ hoặc sửa chữa thủ công đều phải có lý do rõ ràng và ghi rõ người thực hiện.</td><td><a href="../../../operations/sops/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>, <a href="../../../operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a>, <a download="" href="../../../forms/frm-100-sales/FRM-181_Business_Disruption_Event_Log.xlsx">FRM-181</a></td></tr>
 </tbody></table></div>
-<h2 class="h2" id="s7">7. Cập nhật ma trận</h2>
+
+<h3>7.1 Danh sách quyền hệ thống nhạy cảm — bắt buộc rà SoD trước khi cấp</h3>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:32%"/><col style="width:48%"/><col style="width:20%"/></colgroup>
+<thead><tr><th>Quyền hệ thống</th><th>Lý do nhạy cảm</th><th>Phê duyệt</th></tr></thead>
+<tbody>
+<tr><td>Sửa giao dịch ERP đã đóng</td><td>Bypass dấu vết kiểm toán; có thể che giấu sai sót hoặc gian lận.</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html">ESA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></td></tr>
+<tr><td>Tạo / sửa nhà cung cấp trong master data</td><td>Có thể tạo nhà cung cấp ma để rút tiền.</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html">ESA</a></td></tr>
+<tr><td>Tạo / sửa danh mục giá khách hàng</td><td>Có thể đổi điều kiện thương mại không qua <a href="#cdr-A2">A2</a> / <a href="#cdr-A3">A3</a>.</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></td></tr>
+<tr><td>Phê duyệt thanh toán &gt; ngưỡng L2</td><td>Dòng tiền lớn không qua kiểm soát.</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> (không có phó)</td></tr>
+<tr><td>Truy cập dữ liệu khách bán dẫn (NDA)</td><td>Vi phạm NDA = pháp lý + mất nguồn khách.</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html">QMS</a> + người được nêu tên trong NDA</td></tr>
+<tr><td>Export hoặc gửi dữ liệu sản xuất ra ngoài HESEM</td><td>Có thể rò rỉ IP của khách hoặc HESEM.</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html">QMS</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></td></tr>
+<tr><td>Cài đặt phần mềm trên máy CNC / CMM</td><td>Rủi ro malware, cấu hình sai làm hỏng máy hoặc kết quả đo.</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html">ESA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a></td></tr>
+<tr><td>Quyền admin Active Directory / M365</td><td>Tương đương quyền tuyệt đối: có thể tạo tài khoản, mở quyền cho người khác.</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-it-admin.html">ITA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html">ESA</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>; rà SoD mỗi quý</td></tr>
+</tbody></table></div>
+
+<h3>7.2 Lưu trữ và rà soát dấu vết</h3>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:32%"/><col style="width:22%"/><col style="width:46%"/></colgroup>
+<thead><tr><th>Loại hồ sơ</th><th>Thời gian lưu tối thiểu</th><th>Lý do</th></tr></thead>
+<tbody>
+<tr><td>Quyết định CDR (mọi cấp) — FRM tương ứng</td><td>7 năm</td><td>ISO 9001 §7.5.3 và chuẩn nội bộ HESEM.</td></tr>
+<tr><td>Hồ sơ FAI / FAIR / PPAP</td><td>Tuổi đời sản phẩm + 7 năm</td><td>AS9100 §8.5.5; AIAG PPAP.</td></tr>
+<tr><td>Hợp đồng khách bán dẫn + concession</td><td>10 năm</td><td>Yêu cầu khách bán dẫn (Lam Research, AMAT) và luật dân sự Việt Nam.</td></tr>
+<tr><td>Hồ sơ EHS và sự cố lao động</td><td>30 năm</td><td>Luật ATVSLĐ Việt Nam.</td></tr>
+<tr><td>Nhật ký truy cập hệ thống (Epicor, M365, mạng nội bộ)</td><td>3 năm</td><td>ISO 27001 / chuẩn nội bộ HESEM.</td></tr>
+<tr><td>Nhật ký phó / ủy quyền tạm thời (FRM-504)</td><td>5 năm</td><td>Đối chiếu khi audit nội bộ và khách.</td></tr>
+<tr><td>Hồ sơ đào tạo, năng lực và FAI người kiểm</td><td>Thời gian làm việc + 5 năm sau khi nghỉ</td><td>Luật lao động Việt Nam; ISO 9001 §7.2.</td></tr>
+</tbody></table></div>
+<p class="note"><b>Bất biến.</b> Quyền sửa hoặc xóa hồ sơ thuộc các loại trên là <b>không có</b>, kể cả CEO. Khi phát hiện sai sót, ghi đính kèm bản đính chính (addendum); không sửa bản gốc. Vi phạm bị xử lý theo <a href="#s8">mục 8</a>.</p>
+<h2 class="h2" id="s8">8. Vi phạm và chế tài</h2>
+<p>Tài liệu này là quy định bắt buộc. Vi phạm — bao gồm ký vượt thẩm quyền, bỏ qua nguyên tắc, che giấu xung đột lợi ích, hoặc cản trở dấu vết — bị xử lý theo cấp độ dưới đây. Mọi cấp độ đều phải được ghi nhận thành văn bản và lưu hồ sơ nhân sự.</p>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:18%"/><col style="width:40%"/><col style="width:42%"/></colgroup>
+<thead><tr><th>Cấp độ vi phạm</th><th>Ví dụ điển hình</th><th>Chế tài</th></tr></thead>
+<tbody>
+<tr><td><b>Cấp 1 — Sai sót quy trình</b></td><td>Quên ghi nhật ký phó kịp thời; ký bằng email nhưng có bằng chứng đầy đủ; trễ thời gian phản hồi L1 không có lý do chính đáng.</td><td>Nhắc nhở bằng văn bản từ trưởng phòng. Đào tạo lại trong 14 ngày làm việc. Lặp lại trong 3 tháng → cấp 2.</td></tr>
+<tr><td><b>Cấp 2 — Vi phạm có chủ đích</b></td><td>Ký quyết định vượt cấp ngưỡng L1 / L2 / L3 dù biết phải leo thang; dùng phó để vượt phạm vi vai trò gốc; ký xác minh cho hồ sơ do chính mình lập; tách giao dịch để né ngưỡng.</td><td>Cảnh cáo bằng văn bản từ CEO. Thu hồi quyền A trong 90 ngày. Rà soát toàn bộ quyết định đã ký trong 6 tháng qua. Có thể trừ lương thưởng theo chính sách HR.</td></tr>
+<tr><td><b>Cấp 3 — Vi phạm nghiêm trọng</b></td><td>Che giấu xung đột lợi ích; ký giả thay người khác; sửa hoặc xóa hồ sơ quyết định; phát tán dữ liệu khách trái phép; bypass kiểm soát chất lượng dẫn đến giao hàng lỗi tới khách bán dẫn.</td><td>Chấm dứt hợp đồng lao động. Báo cáo khách hàng bị ảnh hưởng (nếu có). Xem xét trách nhiệm pháp lý cá nhân theo luật Việt Nam. Mở internal audit toàn diện.</td></tr>
+</tbody></table></div>
+<p class="note"><b>Phát hiện vi phạm.</b> Bất kỳ nhân viên nào phát hiện vi phạm có quyền và <b>nghĩa vụ</b> báo cáo. Kênh báo cáo: trưởng phòng trực tiếp; nếu trưởng phòng là người vi phạm — báo cáo CEO; nếu CEO là người vi phạm — báo cáo <a class="entity-link role-link" href="../03-Job-Descriptions/08-JD-HR/jd-hr-manager.html">HR Manager</a> + Chủ tịch HĐQT. Người báo cáo được bảo vệ theo chính sách whistleblower của HESEM — không bị trả đũa dưới bất kỳ hình thức nào.</p>
+<h2 class="h2" id="s9">9. Cập nhật ma trận</h2>
 <p>Ma trận này phải được rà soát khi gặp một trong các kích hoạt sau. Quy tắc bắt buộc: <b>khi sửa bất kỳ thẩm quyền nào, phải rà soát đồng thời JD, RACI, phân quyền hệ thống, luồng phê duyệt, KPI liên quan và ma trận phó</b> để không tạo lỗ hổng kiểm soát.</p>
 <div class="table-card"><table class="table">
 <colgroup><col style="width:24%"/><col style="width:36%"/><col style="width:40%"/></colgroup>
@@ -375,9 +525,22 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><td>Thay đổi tổ chức hoặc bổ sung vai trò</td><td>Bổ sung quản lý mới, tái cơ cấu nhóm, chuyển một chức năng ra gia công ngoài, đổi tuyến báo cáo.</td><td>JD, sơ đồ tổ chức, RACI, ma trận phó, bản đồ truy cập.</td></tr>
 <tr><td>Thay đổi SOP / WI / cổng kiểm soát vận hành</td><td>Thêm cổng kiểm soát chất lượng mới, đổi luồng phê duyệt gia công, điều chỉnh logic dự phòng, chuyển biểu mẫu sang luồng điện tử.</td><td>Ma trận thẩm quyền, RACI, nguồn dữ liệu KPI, truy cập.</td></tr>
 <tr><td>Phát hiện lỗ hổng kiểm soát</td><td>Phát hiện tự phê duyệt, bỏ qua xác minh, phát hành sai thẩm quyền, hoặc phân quyền hệ thống vượt thẩm quyền kinh doanh.</td><td>Ma trận thẩm quyền, bản đồ vai trò CNTT, gói hồ sơ đóng, chương trình đào tạo.</td></tr>
-<tr><td>Triển khai hệ thống hoặc mô-đun mới</td><td>Triển khai giao diện ERP mới, kết nối cổng ngân hàng mới, đưa vào sử dụng quy trình tự động hóa mới.</td><td>Ma trận thẩm quyền, rà soát SoD, dự phòng, bằng chứng quy tắc.</td></tr><tr><td>Nhân sự giữ quyền A nghỉ việc hoặc chuyển vai trò</td><td>Người giữ chữ A của một CDR nghỉ việc, được điều chuyển khỏi vai trò gốc, hoặc bị tạm đình chỉ.</td><td>JD mới cho người thay; ma trận thẩm quyền (CDR liên quan); ANNEX-123 (đăng ký phó mới); phân quyền hệ thống. Phó tạm thời cũ vô hiệu ngay khi vai trò gốc trống vĩnh viễn; cập nhật phải hoàn tất trong 24 giờ làm việc.</td></tr>
+<tr><td>Triển khai hệ thống hoặc mô-đun mới</td><td>Triển khai giao diện ERP mới, kết nối cổng ngân hàng mới, đưa vào sử dụng quy trình tự động hóa mới.</td><td>Ma trận thẩm quyền, rà soát SoD, dự phòng, bằng chứng quy tắc.</td></tr>
+<tr><td>Nhân sự giữ quyền A nghỉ việc hoặc chuyển vai trò</td><td>Người giữ chữ A của một CDR nghỉ việc, được điều chuyển khỏi vai trò gốc, hoặc bị tạm đình chỉ.</td><td>JD mới cho người thay; ma trận thẩm quyền (CDR liên quan); <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a> (đăng ký phó mới); phân quyền hệ thống. Phó tạm thời cũ vô hiệu ngay khi vai trò gốc trống vĩnh viễn; cập nhật phải hoàn tất trong 24 giờ làm việc.</td></tr>
 </tbody></table></div>
-<div class="footer-note">Tài liệu này phải được đọc cùng <a href="raci-master-matrix.html">RACI-MASTER-MATRIX</a>, <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html">ANNEX-122</a> và <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a>. Khi quyết định thực tế khác với ma trận, chuẩn cần sửa là tài liệu hoặc luồng công việc — không phải "lách" bằng thói quen vận hành.</div>
+<h2 class="h2" id="s10">10. Phản hồi và đề xuất sửa đổi</h2>
+<p>Ma trận này được rà soát định kỳ và khi có kích hoạt ở <a href="#s9">mục 9</a>. Ngoài chu kỳ định kỳ, mọi vai trò có quyền đề xuất sửa đổi theo kênh dưới. Tài liệu này là tài liệu sống — phản hồi xây dựng được khuyến khích.</p>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:24%"/><col style="width:40%"/><col style="width:36%"/></colgroup>
+<thead><tr><th>Loại đề xuất</th><th>Cách gửi</th><th>Thời gian phản hồi</th></tr></thead>
+<tbody>
+<tr><td>Sửa lỗi văn bản hoặc liên kết hỏng</td><td>Gửi trực tiếp cho QA Manager (người sở hữu tài liệu) qua email, dẫn chiếu mục / dòng cụ thể.</td><td>QA xác nhận trong 5 ngày làm việc; sửa và phát hành minor trong 14 ngày.</td></tr>
+<tr><td>Đề xuất sửa ngưỡng L1 / L2 / L3 của một CDR</td><td>Mở <a href="../../../forms/frm-100-sales/FRM-102_Document_Change_Request.xlsx">FRM-102</a> với thẻ "AUTH-THRESHOLD-CHANGE". Nêu: CDR đề xuất sửa, giá trị mới, lý do, dữ liệu hỗ trợ (ví dụ: 10 lần xử lý gần đây cho thấy mức hiện tại không hợp lý).</td><td>QA + chức năng liên quan rà soát trong 14 ngày làm việc. CEO phê duyệt; phát hành minor.</td></tr>
+<tr><td>Đề xuất thêm CDR mới (tình huống chưa có)</td><td>Mở <a href="../../../forms/frm-100-sales/FRM-102_Document_Change_Request.xlsx">FRM-102</a> với thẻ "AUTH-NEW-CDR" và soạn dự thảo: điều kiện, L1 / L2 / L3, người ký, hồ sơ, leo thang. Tham khảo mẫu các CDR hiện có.</td><td>QA + chức năng liên quan rà soát trong 21 ngày làm việc. CEO phê duyệt phát hành major; truyền thông toàn nhà máy theo <a href="#s1">§1.1</a>.</td></tr>
+<tr><td>Đề xuất bỏ một CDR (không còn áp dụng)</td><td>Mở <a href="../../../forms/frm-100-sales/FRM-102_Document_Change_Request.xlsx">FRM-102</a> với thẻ "AUTH-DEPRECATE". Liệt kê: CDR đề nghị bỏ, lý do, dữ liệu (ví dụ: 0 lần dùng trong 24 tháng), CDR thay thế (nếu có).</td><td>QA + audit nội bộ rà soát; CEO duyệt; phát hành major.</td></tr>
+<tr><td>Báo lỗ hổng kiểm soát khẩn cấp</td><td>Liên hệ trực tiếp QA Manager + CEO bất kỳ giờ nào (gồm cả ngoài giờ làm việc). Khẩn cấp = lỗ hổng có thể bị khai thác trong 7 ngày tới.</td><td>Phản hồi trong 24 giờ làm việc. Biện pháp tạm thời (FRM-413 hoặc lệnh chặn) áp dụng ngay; phát hành sửa chính thức trong 30 ngày.</td></tr>
+</tbody></table></div>
+<p class="note">Người đề xuất sửa đổi luôn được ghi nhận trong nhật ký phiên bản và được phản hồi kết quả bằng văn bản, kể cả khi đề xuất bị từ chối. Quan điểm khác biệt phải có lý do được ghi rõ — không từ chối ngầm.</p>
 </div>
 </div>
 </div>
