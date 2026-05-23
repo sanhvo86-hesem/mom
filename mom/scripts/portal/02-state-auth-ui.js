@@ -9778,6 +9778,17 @@ var _dvGatesDirty     = false;
 var _dvGatesHydrated  = false;
 var _dvGatesLoadProm  = null;
 var _dvSelGate        = 'G0';
+var _dvDocSearchState = {
+  locale: '',
+  query: '',
+  rows: [],
+  loaded: false,
+  loading: false,
+  error: '',
+  source: '',
+  promise: null
+};
+var _dvDocSearchTimer = null;
 
 function _dvGatesMeta() {
   return [
@@ -9806,6 +9817,321 @@ function _dvDefaults() {
     G6:['SOP-603','SOP-604','SOP-605','WI-603','WI-605','FRM-206','FRM-621','FRM-641','FRM-642','FRM-643','ANNEX-601','ANNEX-603','ANNEX-606'],
     G7:['SOP-701','SOP-702','SOP-703','SOP-803','WI-206','WI-701','WI-714','FRM-702','FRM-704','FRM-706','FRM-707','FRM-708','FRM-712','FRM-821','ANNEX-701','ANNEX-702'],
   };
+}
+
+function _dvActiveLocale() {
+  return lang === 'en' ? 'en' : 'vi';
+}
+
+function _dvCleanDocCode(value) {
+  return String(value || '').trim().toUpperCase().replace(/\s+/g, '');
+}
+
+function _dvValidDocCode(code) {
+  return /^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$/.test(String(code || ''));
+}
+
+function _dvNormalizeSearchText(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, ' ')
+    .trim();
+}
+
+function _dvExtractDccRows(body) {
+  if (!body) return [];
+  if (body.data && Array.isArray(body.data.items)) return body.data.items;
+  if (Array.isArray(body.items)) return body.items;
+  if (Array.isArray(body.headers)) return body.headers;
+  if (body.data && Array.isArray(body.data)) return body.data;
+  return Array.isArray(body) ? body : [];
+}
+
+function _dvDocTitle(row) {
+  return String((row && (row.title || row.subtitle || row.filename || row.filesystem_path)) || '').trim();
+}
+
+function _dvDocSubtitle(row) {
+  return String((row && (row.subtitle || '')) || '').trim();
+}
+
+function _dvDocSearchText(row) {
+  if (!row) return '';
+  return [
+    row.doc_code,
+    row.code,
+    row.title,
+    row.subtitle,
+    row.doc_type,
+    row.owner_role_code,
+    row.filename,
+    row.filesystem_path
+  ].join(' ');
+}
+
+function _dvFallbackDocumentRows() {
+  const docs = (typeof DOCS !== 'undefined' && Array.isArray(DOCS)) ? DOCS : [];
+  const rows = [];
+  const seen = {};
+  docs.forEach(function(d) {
+    if (!d) return;
+    const code = _dvCleanDocCode((typeof getDocDisplayCode === 'function') ? getDocDisplayCode(d) : d.code);
+    if (!code || seen[code]) return;
+    seen[code] = true;
+    rows.push({
+      doc_code: code,
+      title: (typeof getDocDisplayTitle === 'function') ? getDocDisplayTitle(d) : (d.title || code),
+      subtitle: (typeof getDocDisplayDescription === 'function') ? getDocDisplayDescription(d) : (d.desc || ''),
+      doc_type: String(d.cat || code.split('-')[0] || '').toUpperCase(),
+      revision: d.__dccRevision || d.rev || '',
+      status: d.__dccStatus || d.status || '',
+      filesystem_path: d.path || ''
+    });
+  });
+  return rows;
+}
+
+async function _dvLoadDocumentIndex(force) {
+  const locale = _dvActiveLocale();
+  if (_dvDocSearchState.locale !== locale) {
+    _dvDocSearchState.loaded = false;
+    _dvDocSearchState.rows = [];
+  }
+  if (
+    !force &&
+    _dvDocSearchState.loaded &&
+    _dvDocSearchState.locale === locale &&
+    Array.isArray(_dvDocSearchState.rows)
+  ) {
+    return _dvDocSearchState.rows;
+  }
+  if (_dvDocSearchState.loading && _dvDocSearchState.promise) {
+    return _dvDocSearchState.promise;
+  }
+
+  _dvDocSearchState.locale = locale;
+  _dvDocSearchState.loading = true;
+  _dvDocSearchState.error = '';
+  _dvDocSearchState.source = 'dcc';
+  _dvRenderDocSuggestions();
+
+  _dvDocSearchState.promise = (async function() {
+    try {
+      const pageSize = 250;
+      const rows = [];
+      for (let offset = 0; ; offset += pageSize) {
+        const url = '/api/v1/dcc/documents?limit=' + pageSize
+          + '&offset=' + offset
+          + '&locale=' + encodeURIComponent(locale);
+        const res = await fetch(url, {
+          credentials: 'same-origin',
+          headers: {'Accept': 'application/json'},
+          cache: 'no-store'
+        });
+        if (!res.ok) throw new Error('dcc_document_list_http_' + res.status);
+        const body = await res.json().catch(function() { return null; });
+        const pageRows = _dvExtractDccRows(body);
+        rows.push.apply(rows, pageRows);
+        if (pageRows.length < pageSize) break;
+      }
+      _dvDocSearchState.rows = rows;
+      _dvDocSearchState.source = 'dcc';
+    } catch (e) {
+      const fallbackRows = _dvFallbackDocumentRows();
+      _dvDocSearchState.rows = fallbackRows;
+      _dvDocSearchState.source = fallbackRows.length ? 'fallback' : 'none';
+      _dvDocSearchState.error = (e && e.message) || 'dcc_document_list_unavailable';
+    } finally {
+      _dvDocSearchState.loaded = true;
+      _dvDocSearchState.loading = false;
+      _dvDocSearchState.promise = null;
+      _dvRenderDocSuggestions();
+    }
+    return _dvDocSearchState.rows;
+  })();
+
+  return _dvDocSearchState.promise;
+}
+
+function _dvIsSubsequence(needle, haystack) {
+  if (!needle || !haystack) return false;
+  let j = 0;
+  for (let i = 0; i < haystack.length && j < needle.length; i++) {
+    if (haystack[i] === needle[j]) j++;
+  }
+  return j === needle.length;
+}
+
+function _dvDocScore(row, rawQuery) {
+  const q = _dvNormalizeSearchText(rawQuery);
+  if (!q) return 0;
+  const code = _dvCleanDocCode(row.doc_code || row.code);
+  const codeNorm = _dvNormalizeSearchText(code);
+  const titleNorm = _dvNormalizeSearchText(_dvDocTitle(row));
+  const subtitleNorm = _dvNormalizeSearchText(_dvDocSubtitle(row));
+  const allNorm = _dvNormalizeSearchText(_dvDocSearchText(row));
+  const compactQuery = q.replace(/\s+/g, '');
+  const compactCode = codeNorm.replace(/\s+/g, '');
+  let score = 0;
+
+  if (compactCode === compactQuery) score += 1000;
+  else if (compactCode.startsWith(compactQuery)) score += 850;
+  else if (compactCode.includes(compactQuery)) score += 700;
+  else if (_dvIsSubsequence(compactQuery, compactCode)) score += 140;
+
+  if (titleNorm === q) score += 650;
+  else if (titleNorm.startsWith(q)) score += 520;
+  else if (titleNorm.includes(q)) score += 380;
+
+  if (subtitleNorm === q) score += 560;
+  else if (subtitleNorm.startsWith(q)) score += 420;
+  else if (subtitleNorm.includes(q)) score += 300;
+
+  if (allNorm.includes(q)) score += 180;
+  q.split(/\s+/).filter(Boolean).forEach(function(term) {
+    if (codeNorm.includes(term)) score += 110;
+    else if (titleNorm.includes(term)) score += 80;
+    else if (subtitleNorm.includes(term)) score += 70;
+    else if (allNorm.includes(term)) score += 40;
+  });
+  return score;
+}
+
+function _dvRankDocumentsForQuery(query) {
+  const rows = Array.isArray(_dvDocSearchState.rows) ? _dvDocSearchState.rows : [];
+  const ranked = [];
+  const seen = {};
+  rows.forEach(function(row) {
+    const code = _dvCleanDocCode(row && (row.doc_code || row.code));
+    if (!code || seen[code]) return;
+    const score = _dvDocScore(row, query);
+    if (score <= 0) return;
+    seen[code] = true;
+    ranked.push({row: row, code: code, score: score});
+  });
+  ranked.sort(function(a, b) {
+    if (b.score !== a.score) return b.score - a.score;
+    return a.code.localeCompare(b.code);
+  });
+  return ranked;
+}
+
+function _dvSuggestionMeta(row) {
+  const parts = [];
+  if (row && row.doc_type) parts.push(String(row.doc_type).toUpperCase());
+  if (row && row.revision) parts.push('Rev ' + String(row.revision));
+  if (row && row.status) parts.push(String(row.status));
+  return parts.join(' · ');
+}
+
+function _dvRenderDocSuggestions() {
+  const box = document.getElementById('dv-suggestions');
+  if (!box) return;
+  const query = String(_dvDocSearchState.query || '').trim();
+  if (!query) {
+    box.hidden = true;
+    box.innerHTML = '';
+    return;
+  }
+
+  box.hidden = false;
+  if (_dvDocSearchState.loading && !_dvDocSearchState.loaded) {
+    box.innerHTML = '<div class="dv-suggest-note">'
+      + (lang === 'en' ? 'Loading document list…' : 'Đang tải danh sách tài liệu…')
+      + '</div>';
+    return;
+  }
+
+  const draft = _dvGatesDraft || _dvDefaults();
+  const gateDocs = (draft[_dvSelGate] || []).map(function(c) { return _dvCleanDocCode(c); });
+  const suggestions = _dvRankDocumentsForQuery(query).slice(0, 10);
+  if (suggestions.length === 0) {
+    box.innerHTML = '<div class="dv-suggest-note">'
+      + (lang === 'en'
+        ? 'No close document match found.'
+        : 'Chưa tìm thấy tài liệu gần giống.')
+      + '</div>';
+    return;
+  }
+
+  box.innerHTML = suggestions.map(function(item) {
+    const row = item.row || {};
+    const code = item.code;
+    const cat = code.split('-')[0] || '';
+    const title = _dvDocTitle(row) || code;
+    const subtitle = _dvDocSubtitle(row);
+    const meta = _dvSuggestionMeta(row);
+    const already = gateDocs.indexOf(code) >= 0;
+    const disabled = already ? ' disabled' : '';
+    const action = already
+      ? (lang === 'en' ? 'Already in gate' : 'Đã có trong cổng')
+      : (lang === 'en' ? 'Add' : 'Thêm');
+    return '<button type="button" class="dv-suggest-item" onclick="dvAddDocFromSearch(\'' + escapeHtml(_dvSelGate) + '\',\'' + escapeHtml(code) + '\')"'
+      + disabled + '>'
+      + '<span class="dv-suggest-code"><b>' + escapeHtml(cat) + '</b>' + escapeHtml(code) + '</span>'
+      + '<span class="dv-suggest-text"><strong>' + escapeHtml(title) + '</strong>'
+      + (subtitle && subtitle !== title ? '<small>' + escapeHtml(subtitle) + '</small>' : '')
+      + (meta ? '<em>' + escapeHtml(meta) + '</em>' : '')
+      + '</span>'
+      + '<span class="dv-suggest-action">' + escapeHtml(action) + '</span>'
+      + '</button>';
+  }).join('');
+}
+
+function dvHandleDocSearchInput(value) {
+  _dvDocSearchState.query = String(value || '').trim();
+  if (_dvDocSearchTimer) clearTimeout(_dvDocSearchTimer);
+  _dvRenderDocSuggestions();
+  if (!_dvDocSearchState.query) return;
+  _dvDocSearchTimer = setTimeout(function() {
+    _dvLoadDocumentIndex(false).then(function() {
+      _dvRenderDocSuggestions();
+    });
+  }, 160);
+}
+
+function dvAddDocCode(gateId, rawCode) {
+  const code = _dvCleanDocCode(rawCode);
+  if (!code || !_dvValidDocCode(code)) {
+    showToast(lang==='en' ? 'Enter a valid document code (e.g. SOP-201)' : 'Nhập mã tài liệu hợp lệ (VD: SOP-201)');
+    return false;
+  }
+  const draft = _dvGatesDraft || _dvDefaults();
+  const docs  = (draft[gateId] || []).map(_dvCleanDocCode);
+  if (docs.indexOf(code) >= 0) {
+    showToast(lang==='en' ? code + ' already in gate' : code + ' đã có trong cổng này');
+    return false;
+  }
+  docs.push(code);
+  _dvGatesDraft = Object.assign({}, draft, {[gateId]: docs});
+  _dvGatesDirty = true;
+  return true;
+}
+
+function dvAddDocFromSearch(gateId, code) {
+  if (!dvAddDocCode(gateId, code)) return;
+  _dvDocSearchState.query = '';
+  renderAdminDocVisualizer();
+}
+
+function dvAddFirstDocSuggestion(gateId) {
+  const suggestions = _dvRankDocumentsForQuery(_dvDocSearchState.query);
+  const draft = _dvGatesDraft || _dvDefaults();
+  const gateDocs = (draft[gateId] || []).map(function(c) { return _dvCleanDocCode(c); });
+  const first = suggestions.find(function(item) { return gateDocs.indexOf(item.code) < 0; });
+  if (first) {
+    dvAddDocFromSearch(gateId, first.code);
+    return;
+  }
+  if (_dvDocSearchState.query && !_dvDocSearchState.loaded) {
+    _dvLoadDocumentIndex(false).then(function() {
+      dvAddFirstDocSuggestion(gateId);
+    });
+    return;
+  }
+  dvAddDoc(gateId);
 }
 
 function loadDvGatesConfig() {
@@ -9843,20 +10169,8 @@ async function saveDocVisualizerGatesConfig() {
 function dvAddDoc(gateId) {
   const inp = document.getElementById('dv-add-inp');
   if (!inp) return;
-  const code = inp.value.trim().toUpperCase();
-  if (!code || !/^[A-Z]+-\d+/.test(code)) {
-    showToast(lang==='en' ? 'Enter a valid code (e.g. SOP-201)' : 'Nhập mã hợp lệ (VD: SOP-201)');
-    return;
-  }
-  const draft = _dvGatesDraft || _dvDefaults();
-  const docs  = (draft[gateId] || []).slice();
-  if (docs.indexOf(code) >= 0) {
-    showToast(lang==='en' ? code + ' already in gate' : code + ' đã có trong cổng này');
-    inp.value = ''; return;
-  }
-  docs.push(code);
-  _dvGatesDraft = Object.assign({}, draft, {[gateId]: docs});
-  _dvGatesDirty = true;
+  if (!dvAddDocCode(gateId, inp.value)) return;
+  _dvDocSearchState.query = '';
   inp.value = '';
   renderAdminDocVisualizer();
 }
@@ -9923,9 +10237,23 @@ function renderAdminDocVisualizer() {
       '.dv-chip-code{padding:3px 7px;font-family:monospace;font-size:11px;font-weight:600;color:var(--cc);background:color-mix(in srgb,var(--cc) 8%,#fff)}',
       '.dv-chip-rm{padding:2px 6px;background:transparent;border:none;border-left:1px solid color-mix(in srgb,var(--cc) 20%,transparent);cursor:pointer;color:var(--text-tertiary,#94a3b8);font-size:12px;line-height:1;transition:color .12s,background .12s}',
       '.dv-chip-rm:hover{background:color-mix(in srgb,var(--cc) 14%,transparent);color:var(--cc)}',
-      '.dv-add-row{display:flex;gap:7px;align-items:center;padding-top:10px;border-top:1px solid var(--border,#e2e8f0);flex-wrap:wrap}',
+      '.dv-add-block{padding-top:10px;border-top:1px solid var(--border,#e2e8f0)}',
+      '.dv-add-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}',
       '.dv-code-inp{flex:1;min-width:140px;padding:6px 10px;border:1.5px solid var(--border,#e2e8f0);border-radius:7px;font-size:13px;font-family:monospace;outline:none;background:var(--bg-surface,#fff);color:var(--text-primary,#1e293b)}',
       '.dv-code-inp:focus{border-color:var(--brand-primary,#1565c0)}',
+      '.dv-suggestions{margin-top:8px;display:flex;flex-direction:column;gap:4px;max-height:210px;overflow:auto}',
+      '.dv-suggest-note{font-size:12px;color:var(--text-secondary,#64748b);padding:8px 10px;border:1px dashed var(--border,#e2e8f0);border-radius:7px;background:var(--bg-surface-alt,#f8fafc)}',
+      '.dv-suggest-item{display:grid;grid-template-columns:minmax(104px,auto) 1fr auto;gap:9px;align-items:center;width:100%;padding:7px 9px;border:1px solid var(--border,#e2e8f0);border-radius:7px;background:var(--bg-surface,#fff);cursor:pointer;text-align:left}',
+      '.dv-suggest-item:hover{border-color:var(--brand-primary,#1565c0);background:var(--bg-hover,#f8fafc)}',
+      '.dv-suggest-item:disabled{cursor:not-allowed;opacity:.68;background:var(--bg-surface-alt,#f8fafc)}',
+      '.dv-suggest-code{display:inline-flex;align-items:center;gap:5px;font-family:monospace;font-size:11px;font-weight:700;color:var(--brand-primary,#1565c0);white-space:nowrap}',
+      '.dv-suggest-code b{font-family:inherit;font-size:9px;color:var(--brand-on-primary,#fff);background:var(--brand-primary,#1565c0);border-radius:4px;padding:2px 4px}',
+      '.dv-suggest-text{min-width:0;display:flex;flex-direction:column;gap:1px}',
+      '.dv-suggest-text strong{font-size:12px;color:var(--text-primary,#1e293b);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.dv-suggest-text small{font-size:11px;color:var(--text-secondary,#64748b);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.dv-suggest-text em{font-style:normal;font-size:10px;color:var(--text-tertiary,#94a3b8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.dv-suggest-action{font-size:11px;font-weight:700;color:var(--brand-primary,#1565c0);white-space:nowrap}',
+      '@media(max-width:720px){.dv-suggest-item{grid-template-columns:1fr}.dv-suggest-action{display:none}.dv-suggest-text strong,.dv-suggest-text small,.dv-suggest-text em{white-space:normal}}',
     ].join('\n');
     document.head.appendChild(s);
   }
@@ -9974,16 +10302,22 @@ function renderAdminDocVisualizer() {
       <span class="dv-cnt-label">${selDocs.length} ${lang==='en'?'docs':'tài liệu'}</span>
     </div>
     <div class="dv-chips">${chipsHtml}${emptyNote}</div>
-    <div class="dv-add-row">
-      <input id="dv-add-inp" class="dv-code-inp" type="text"
-        placeholder="${lang==='en'?'Code, e.g. SOP-201':'Mã, VD: SOP-201'}"
-        onkeydown="if(event.key==='Enter')dvAddDoc('${escapeHtml(sel.id)}')">
-      <button class="btn-admin primary" onclick="dvAddDoc('${escapeHtml(sel.id)}')" style="white-space:nowrap">
-        + ${lang==='en'?'Add':'Thêm'}
-      </button>
-      <button class="btn-admin secondary" onclick="dvResetGate('${escapeHtml(sel.id)}')" style="white-space:nowrap">
-        ↩ ${lang==='en'?'Reset to defaults':'Khôi phục mặc định'}
-      </button>
+    <div class="dv-add-block">
+      <div class="dv-add-row">
+        <input id="dv-add-inp" class="dv-code-inp" type="text" autocomplete="off"
+          placeholder="${lang==='en'?'Search code or title, e.g. SOP-201':'Tìm mã hoặc tên tài liệu, VD: SOP-201'}"
+          value="${escapeHtml(_dvDocSearchState.query || '')}"
+          oninput="dvHandleDocSearchInput(this.value)"
+          onfocus="dvHandleDocSearchInput(this.value)"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();dvAddFirstDocSuggestion('${escapeHtml(sel.id)}')}">
+        <button class="btn-admin primary" onclick="dvAddDoc('${escapeHtml(sel.id)}')" style="white-space:nowrap">
+          + ${lang==='en'?'Add':'Thêm'}
+        </button>
+        <button class="btn-admin secondary" onclick="dvResetGate('${escapeHtml(sel.id)}')" style="white-space:nowrap">
+          ↩ ${lang==='en'?'Reset to defaults':'Khôi phục mặc định'}
+        </button>
+      </div>
+      <div id="dv-suggestions" class="dv-suggestions" hidden></div>
     </div>`;
 
   const saveBar = _dvGatesDirty ? `
@@ -10016,6 +10350,7 @@ function renderAdminDocVisualizer() {
       </div>
       ${saveBar}
     </div>`;
+  _dvRenderDocSuggestions();
 }
 
 function renderAdminAppearance(){
