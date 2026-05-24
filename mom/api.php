@@ -15001,9 +15001,15 @@ function git_command(array $args, string $repoDir, ?int &$exitCode = null): stri
 }
 
 function split_nonempty_lines(string $text): array {
+  // Note: we DO NOT trim individual lines. Callers like
+  // git_status_entry_path() rely on leading whitespace in `git status
+  // --porcelain` output ("XY␣PATH" where X may be a literal space for
+  // unstaged-only modifications). Stripping that space caused the
+  // status renderer to over-strip the path by 1 char (e.g. `mom/portal.html`
+  // → `om/portal.html`) — bug observed 2026-05-24 by VC audit.
   $lines = preg_split("/\r\n|\n|\r/", trim($text));
   if (!is_array($lines)) return [];
-  return array_values(array_filter(array_map('trim', $lines), static fn($line) => $line !== ''));
+  return array_values(array_filter($lines, static fn($line) => trim($line) !== ''));
 }
 
 function git_status_entry_path(string $line): string {

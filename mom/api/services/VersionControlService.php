@@ -49,6 +49,11 @@ final class VersionControlService
             ? $syncStatus['config_files']
             : [];
 
+        // DataSyncStatusService emits rows with `private_present` (the VPS
+        // /var/www/data-private mirror) and `in_sync_with_mirror` as the
+        // canonical drift flag. Prior code looked up `mirror_present` and
+        // `drift` which never exist — missing_mirror was always == total,
+        // drift_count was always 0. Bug observed 2026-05-24 by VC audit.
         $driftCount = 0;
         $missingMirror = 0;
         $missingSite = 0;
@@ -59,14 +64,17 @@ final class VersionControlService
             }
             $totalFiles++;
             $sitePresent = !empty($row['site_present']);
-            $mirrorPresent = !empty($row['mirror_present']);
+            $mirrorPresent = !empty($row['private_present']);
             if (!$sitePresent) {
                 $missingSite++;
             }
             if (!$mirrorPresent) {
                 $missingMirror++;
             }
-            if ($sitePresent && $mirrorPresent && !empty($row['drift'])) {
+            // in_sync_with_mirror is true when both sides hold the same
+            // sha256. When EITHER side is missing the flag is also false,
+            // so we only count "drift" when both sides exist AND differ.
+            if ($sitePresent && $mirrorPresent && empty($row['in_sync_with_mirror'])) {
                 $driftCount++;
             }
         }

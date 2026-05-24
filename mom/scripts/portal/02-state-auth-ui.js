@@ -10062,7 +10062,7 @@ function renderAdminVCOverview_DEPRECATED_PHA2(){
           '<th style="text-align:left">'+escapeHtml(lang==='en'?'Revision':'Phiên bản')+'</th>'+
           '<th style="text-align:left">'+escapeHtml(lang==='en'?'Transition':'Chuyển trạng thái')+'</th>'+
           '<th style="text-align:left">'+escapeHtml(lang==='en'?'Actor':'Người làm')+'</th>'+
-          '<th style="text-align:left">'+escapeHtml(lang==='en'?'When (UTC)':'Lúc (UTC)')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'When':'Lúc')+'</th>'+
           '<th style="text-align:left">'+escapeHtml(lang==='en'?'Open':'Mở')+'</th>'+
         '</tr></thead>'+
         '<tbody>'+recentRows+'</tbody>'+
@@ -10187,7 +10187,7 @@ function renderAdminVCTimeline(){
     '<div style="overflow-x:auto;margin-top:8px">'+
       '<table class="admin-sync-simple-table" style="width:100%;border-collapse:collapse;font-size:12px">'+
         '<thead><tr>'+
-          '<th style="text-align:left">'+escapeHtml(lang==='en'?'When (UTC)':'Lúc (UTC)')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'When':'Lúc')+'</th>'+
           '<th style="text-align:left">'+escapeHtml(lang==='en'?'Type':'Loại')+'</th>'+
           '<th style="text-align:left">'+escapeHtml(lang==='en'?'Actor':'Người làm')+'</th>'+
           '<th style="text-align:left">'+escapeHtml(lang==='en'?'Summary':'Tóm tắt')+'</th>'+
@@ -10507,7 +10507,7 @@ function renderAdminVCDocHistory(){
             '<th style="text-align:left">'+escapeHtml(lang==='en'?'Status transition':'Chuyển trạng thái')+'</th>'+
             '<th style="text-align:left">'+escapeHtml(lang==='en'?'Actor':'Người làm')+'</th>'+
             '<th style="text-align:left">'+escapeHtml(lang==='en'?'Role':'Vai trò')+'</th>'+
-            '<th style="text-align:left">'+escapeHtml(lang==='en'?'When (UTC)':'Lúc (UTC)')+'</th>'+
+            '<th style="text-align:left">'+escapeHtml(lang==='en'?'When':'Lúc')+'</th>'+
             '<th style="text-align:left">'+escapeHtml(lang==='en'?'Note':'Ghi chú')+'</th>'+
           '</tr></thead><tbody>'+transitionRows+'</tbody></table></div>'+
         '<div class="admin-sync-callout-bar is-info" style="margin-top:14px">'+
@@ -10566,7 +10566,7 @@ function renderAdminVCAuditLog(){
       }).join('');
       body = '<div style="overflow-x:auto"><table class="admin-sync-simple-table" style="width:100%;border-collapse:collapse;font-size:11px">'+
         '<thead><tr>'+
-          '<th style="text-align:left">'+escapeHtml(lang==='en'?'When (UTC)':'Lúc (UTC)')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'When':'Lúc')+'</th>'+
           '<th style="text-align:left">'+escapeHtml(lang==='en'?'Event':'Sự kiện')+'</th>'+
           '<th style="text-align:left">'+escapeHtml(lang==='en'?'Actor':'Người làm')+'</th>'+
           '<th style="text-align:left">'+escapeHtml(lang==='en'?'Aggregate type':'Loại aggregate')+'</th>'+
@@ -10790,7 +10790,7 @@ function renderAdminVCStatus(){
         '<th style="text-align:left">'+escapeHtml(lang==='en'?'Revision':'Phiên bản')+'</th>'+
         '<th style="text-align:left">'+escapeHtml(lang==='en'?'Transition':'Chuyển trạng thái')+'</th>'+
         '<th style="text-align:left">'+escapeHtml(lang==='en'?'Actor':'Người làm')+'</th>'+
-        '<th style="text-align:left">'+escapeHtml(lang==='en'?'When (UTC)':'Lúc (UTC)')+'</th>'+
+        '<th style="text-align:left">'+escapeHtml(lang==='en'?'When':'Lúc')+'</th>'+
         '<th style="text-align:left">'+escapeHtml(lang==='en'?'Open':'Mở')+'</th>'+
       '</tr></thead>'+
       '<tbody>'+recentRows+'</tbody>'+

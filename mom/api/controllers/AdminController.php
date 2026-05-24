@@ -1624,7 +1624,10 @@ class AdminController extends BaseController
             ]);
         }
 
-        $cacheFile = $this->dataDir . '/cache/admin-gha-status.json';
+        // Cache key includes repo + workflow so changing GHA settings via
+        // admin UI doesn't return stale data for the old repo.
+        $cacheKey = substr(sha1($repo . '|' . $workflow), 0, 12);
+        $cacheFile = $this->dataDir . '/cache/admin-gha-status-' . $cacheKey . '.json';
         if (is_file($cacheFile)) {
             $age = time() - (int)filemtime($cacheFile);
             if ($age < 30) {
@@ -1639,12 +1642,16 @@ class AdminController extends BaseController
             }
         }
 
-        $url = 'https://api.github.com/repos/' . $repo . '/actions/workflows/' . $workflow . '/runs?per_page=5';
+        // per_page=3 keeps the response under ~30KB (the header pill only
+        // needs the latest run; the modal shows the next 2 for context).
+        // Observed 2026-05-24: per_page=5 returned 70KB+ and timed out at
+        // 8s mid-download. 20s budget covers slow GH API + payload TLS.
+        $url = 'https://api.github.com/repos/' . $repo . '/actions/workflows/' . $workflow . '/runs?per_page=3';
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CONNECTTIMEOUT => 4,
-            CURLOPT_TIMEOUT => 8,
+            CURLOPT_TIMEOUT => 20,
             CURLOPT_HTTPHEADER => [
                 'Accept: application/vnd.github+json',
                 'Authorization: Bearer ' . $pat,
@@ -1661,6 +1668,25 @@ class AdminController extends BaseController
         // resource destruction automatically.
 
         if ($http < 200 || $http >= 300 || !is_string($body)) {
+            // Stale cache fallback: if we have ANY previous successful
+            // response, return it with stale=true so the FE can show
+            // "GitHub tạm thời không phản hồi (dữ liệu cũ Xm)" instead of
+            // showing an empty run list. Empty runs makes operators think
+            // no deploy has run when really the API is unreachable.
+            if (is_file($cacheFile)) {
+                $staleAge = time() - (int)filemtime($cacheFile);
+                $cached = @file_get_contents($cacheFile);
+                if (is_string($cached)) {
+                    $decoded = json_decode($cached, true);
+                    if (is_array($decoded) && !empty($decoded['runs'])) {
+                        $decoded['stale'] = true;
+                        $decoded['stale_age_seconds'] = $staleAge;
+                        $decoded['stale_reason'] = 'GitHub API HTTP ' . $http
+                            . ($err !== '' ? ' — ' . $err : '');
+                        $this->success($decoded);
+                    }
+                }
+            }
             $this->success([
                 'status' => 'api_error',
                 'repo' => $repo,
