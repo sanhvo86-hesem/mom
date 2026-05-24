@@ -14950,7 +14950,16 @@ function shell_run(string $command, ?int &$exitCode = null): string {
   $code = 0;
   exec($command . ' 2>&1', $output, $code);
   $exitCode = $code;
-  return trim(implode("\n", $output));
+  // rtrim, NOT trim: `git status --porcelain` lines begin with " M PATH"
+  // (literal space in column 0 for unstaged-only modifications). trim()
+  // strips that leading space from the joined blob, which shifts the
+  // FIRST line's path parser by one byte (yields "om/foo.html" instead
+  // of "mom/foo.html"). Bug observed 2026-05-24 by VC audit. Trailing
+  // newline from exec() output still needs to go, so rtrim() is correct.
+  // Other callers (rev-parse, branch --show-current, …) produce
+  // single-line output with no leading whitespace, so rtrim is identical
+  // to trim for them.
+  return rtrim(implode("\n", $output));
 }
 
 function git_resolve_binary(): string {
