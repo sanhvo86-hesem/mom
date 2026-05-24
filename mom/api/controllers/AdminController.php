@@ -1926,8 +1926,11 @@ class AdminController extends BaseController
         }
 
         // ── Merge-sort by ts DESC, then cap at limit ──────────────────────
+        // ts is always a string per normalizer above (PHPStan correctly
+        // points out the ?? '' is redundant — keeping (string) cast for
+        // explicitness even though it's a no-op).
         usort($events, static function (array $a, array $b): int {
-            return strcmp((string)($b['ts'] ?? ''), (string)($a['ts'] ?? ''));
+            return strcmp((string)$b['ts'], (string)$a['ts']);
         });
         if (count($events) > $limit) {
             $events = array_slice($events, 0, $limit);
