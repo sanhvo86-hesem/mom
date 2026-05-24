@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-05-24T16:47:06+00:00",
+    "generated_at": "2026-05-24T17:25:32+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-24+p09",
@@ -3285,25 +3285,10 @@
             "statistical_plan_status": "candidate_data_contract_required_before_payout",
             "expected_thresholds": null,
             "expected_target_text": null,
-            "total_occurrences": 8,
+            "total_occurrences": 6,
             "documents_count": 4,
             "target_values_seen": [],
             "documents": [
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-129-bsc-kpi-operating-mechanism-assessment.html",
-                    "title": "ANNEX-129 - BSC and KPI Operating Mechanism Assessment | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 3,
-                    "matched_terms": [
-                        "OEE BOTTLENECK",
-                        "OEE_BOTTLENECK"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Context acceptable or informational."
-                    }
-                },
                 {
                     "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-126-hoshin-strategy-deployment-and-catchball.html",
                     "title": "ANNEX-126 - Hoshin Strategy Deployment and Catchball | HESEM MOM",
@@ -3345,6 +3330,20 @@
                     "context_fit": {
                         "status": "ok",
                         "reason": "Authority or scorecard document."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-129-bsc-kpi-operating-mechanism-assessment.html",
+                    "title": "ANNEX-129 - BSC and KPI Operating Mechanism Assessment | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "OEE_BOTTLENECK"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
                     }
                 }
             ],
@@ -3729,15 +3728,15 @@
             "statistical_plan_status": "candidate_data_contract_required_before_payout",
             "expected_thresholds": null,
             "expected_target_text": null,
-            "total_occurrences": 4,
+            "total_occurrences": 5,
             "documents_count": 4,
             "target_values_seen": [],
             "documents": [
                 {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html",
+                    "title": "ANNEX-125 - CNC Performance Operating System | HESEM MOM",
                     "bucket": "annex_references",
-                    "occurrences": 1,
+                    "occurrences": 2,
                     "matched_terms": [
                         "SUPPLIER READINESS"
                     ],
@@ -3748,8 +3747,8 @@
                     }
                 },
                 {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html",
-                    "title": "ANNEX-125 - CNC Performance Operating System | HESEM MOM",
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
                     "bucket": "annex_references",
                     "occurrences": 1,
                     "matched_terms": [
@@ -4090,6 +4089,79 @@
             "name_consistency": "canonical_or_mapped_name"
         },
         {
+            "code": "NCR_3D_RESPONSE_SLA",
+            "display_name": "NCR 3D Response SLA (≤1 working day)",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "dashboard_core_kpis",
+                "proposed_operating_metrics"
+            ],
+            "aliases": [],
+            "local_ids": [
+                "BSC-DRV-07"
+            ],
+            "backend_status": "runtime_calculated",
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract",
+            "expected_thresholds": null,
+            "expected_target_text": null,
+            "total_occurrences": 4,
+            "documents_count": 3,
+            "target_values_seen": [],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html",
+                    "title": "ANNEX-125 - CNC Performance Operating System | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "NCR_3D_RESPONSE_SLA"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "NCR_3D_RESPONSE_SLA"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-127-kpi-authority-registry-and-operational-metrics.html",
+                    "title": "ANNEX-127 - KPI Authority Registry and Operational Metrics | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "NCR_3D_RESPONSE_SLA"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "no_registered_target_no_local_target",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
             "code": "THROUGHPUT_PER_CONSTRAINT_HOUR",
             "display_name": "Revenue/throughput per constraint hour",
             "classification": "operating_metric",
@@ -4362,79 +4434,6 @@
                     "occurrences": 1,
                     "matched_terms": [
                         "GAGE_VALID_FOR_RELEASE"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                }
-            ],
-            "finding_codes": [],
-            "target_consistency": "no_registered_target_no_local_target",
-            "name_consistency": "canonical_or_mapped_name"
-        },
-        {
-            "code": "NCR_3D_RESPONSE_SLA",
-            "display_name": "NCR 3D Response SLA (≤1 working day)",
-            "classification": "operating_metric",
-            "registry_sources": [
-                "runtime_calculated_metrics",
-                "dashboard_core_kpis",
-                "proposed_operating_metrics"
-            ],
-            "aliases": [],
-            "local_ids": [
-                "BSC-DRV-07"
-            ],
-            "backend_status": "runtime_calculated",
-            "scorecard_weight_pct": null,
-            "scorecard_target": null,
-            "scorecard_unit": null,
-            "scorecard_scoring_status": null,
-            "scorecard_contributes_to_reward": null,
-            "statistical_plan_status": "runtime_calculated_with_registry_contract",
-            "expected_thresholds": null,
-            "expected_target_text": null,
-            "total_occurrences": 3,
-            "documents_count": 3,
-            "target_values_seen": [],
-            "documents": [
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "NCR_3D_RESPONSE_SLA"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html",
-                    "title": "ANNEX-125 - CNC Performance Operating System | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "NCR_3D_RESPONSE_SLA"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-127-kpi-authority-registry-and-operational-metrics.html",
-                    "title": "ANNEX-127 - KPI Authority Registry and Operational Metrics | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "NCR_3D_RESPONSE_SLA"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -7898,6 +7897,63 @@
             "name_consistency": "canonical_or_mapped_name"
         },
         {
+            "code": "CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED",
+            "display_name": "Customer Requirement Profile Assigned",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "aliases": [],
+            "local_ids": [
+                "KPI-LAM-G1-01"
+            ],
+            "backend_status": "not_declared",
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout",
+            "expected_thresholds": null,
+            "expected_target_text": null,
+            "total_occurrences": 2,
+            "documents_count": 2,
+            "target_values_seen": [],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html",
+                    "title": "ANNEX-125 - CNC Performance Operating System | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "no_registered_target_no_local_target",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
             "code": "GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT",
             "display_name": "Gage Valid for In-Process Measurement",
             "classification": "gate_control_metric",
@@ -8355,6 +8411,63 @@
                     "occurrences": 1,
                     "matched_terms": [
                         "SETUP_FIRST_PASS"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "no_registered_target_no_local_target",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
+            "code": "SPECIAL_RELEASE_COMPLIANCE",
+            "display_name": "Written Special Release Before Delivery",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "aliases": [],
+            "local_ids": [
+                "KPI-LAM-G7-01"
+            ],
+            "backend_status": "not_declared",
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout",
+            "expected_thresholds": null,
+            "expected_target_text": null,
+            "total_occurrences": 2,
+            "documents_count": 2,
+            "target_values_seen": [],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "SPECIAL_RELEASE_COMPLIANCE"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html",
+                    "title": "ANNEX-125 - CNC Performance Operating System | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "SPECIAL_RELEASE_COMPLIANCE"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -11511,49 +11624,6 @@
             "name_consistency": "canonical_or_mapped_name"
         },
         {
-            "code": "CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED",
-            "display_name": "Customer Requirement Profile Assigned",
-            "classification": "gate_control_metric",
-            "registry_sources": [
-                "gate_control_metrics"
-            ],
-            "aliases": [],
-            "local_ids": [
-                "KPI-LAM-G1-01"
-            ],
-            "backend_status": "not_declared",
-            "scorecard_weight_pct": null,
-            "scorecard_target": null,
-            "scorecard_unit": null,
-            "scorecard_scoring_status": null,
-            "scorecard_contributes_to_reward": null,
-            "statistical_plan_status": "gate_hold_release_evidence_not_payout",
-            "expected_thresholds": null,
-            "expected_target_text": null,
-            "total_occurrences": 1,
-            "documents_count": 1,
-            "target_values_seen": [],
-            "documents": [
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                }
-            ],
-            "finding_codes": [],
-            "target_consistency": "no_registered_target_no_local_target",
-            "name_consistency": "canonical_or_mapped_name"
-        },
-        {
             "code": "CYCLE_TIME_VARIANCE",
             "display_name": "Actual cycle time variance vs standard",
             "classification": "operating_metric",
@@ -12355,49 +12425,6 @@
                     "occurrences": 1,
                     "matched_terms": [
                         "SHIP_READY_TO_INVOICE_LT"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                }
-            ],
-            "finding_codes": [],
-            "target_consistency": "no_registered_target_no_local_target",
-            "name_consistency": "canonical_or_mapped_name"
-        },
-        {
-            "code": "SPECIAL_RELEASE_COMPLIANCE",
-            "display_name": "Written Special Release Before Delivery",
-            "classification": "gate_control_metric",
-            "registry_sources": [
-                "gate_control_metrics"
-            ],
-            "aliases": [],
-            "local_ids": [
-                "KPI-LAM-G7-01"
-            ],
-            "backend_status": "not_declared",
-            "scorecard_weight_pct": null,
-            "scorecard_target": null,
-            "scorecard_unit": null,
-            "scorecard_scoring_status": null,
-            "scorecard_contributes_to_reward": null,
-            "statistical_plan_status": "gate_hold_release_evidence_not_payout",
-            "expected_thresholds": null,
-            "expected_target_text": null,
-            "total_occurrences": 1,
-            "documents_count": 1,
-            "target_values_seen": [],
-            "documents": [
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "SPECIAL_RELEASE_COMPLIANCE"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -18844,8 +18871,8 @@
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html",
             "title": "ANNEX-125 - CNC Performance Operating System | HESEM MOM",
             "bucket": "annex_references",
-            "metrics_count": 27,
-            "total_metric_occurrences": 28,
+            "metrics_count": 29,
+            "total_metric_occurrences": 32,
             "metrics": [
                 {
                     "code": "CMM_QUEUE_AGING",
@@ -18854,6 +18881,36 @@
                     "occurrences": 2,
                     "matched_terms": [
                         "CMM_QUEUE_AGING"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    },
+                    "row_snippets": []
+                },
+                {
+                    "code": "NCR_3D_RESPONSE_SLA",
+                    "display_name": "NCR 3D Response SLA (≤1 working day)",
+                    "classification": "operating_metric",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "NCR_3D_RESPONSE_SLA"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    },
+                    "row_snippets": []
+                },
+                {
+                    "code": "SUPPLIER_READINESS",
+                    "display_name": "Supplier readiness composite from OTD and incoming quality",
+                    "classification": "operating_metric",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "SUPPLIER READINESS"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -18893,7 +18950,7 @@
                     "row_snippets": [
                         {
                             "row_index": 12,
-                            "snippet": "CHECK_DIM_REPORT_ON_SHIP, GAGE_VALID_FOR_RELEASE, NCR_3D_RESPONSE_SLA, NCR_8D_UPDATE_SLA LAM/customer hard evidence, gage validity và 8D timing. Có thể cap/block recognition trong scope liên quan, không cộng điểm scorecard."
+                            "snippet": "CHECK_DIM_REPORT_ON_SHIP, GAGE_VALID_FOR_RELEASE, NCR_3D_RESPONSE_SLA, NCR_8D_UPDATE_SLA Bằng chứng cứng LAM/customer: CDR theo lô giao, thiết bị đo còn hiệu lực, 3D/8D đúng SLA. Có thể cap/block recognition trong phạm vi liên quan, không cộng điểm scorecard."
                         }
                     ]
                 },
@@ -18987,9 +19044,24 @@
                     "row_snippets": [
                         {
                             "row_index": 10,
-                            "snippet": "CURRENT_CONSTRAINT_RESOURCE, OEE_BOTTLENECK, BOTTLENECK_BUFFER_STATUS, CONSTRAINT_LOST_HOURS, CONSTRAINT_STARVED_TIME, CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS TOC daily/weekly bảo vệ ràng buộc thật: máy/cell, CMM, setup, CAM, QC/final inspection, deburr/cleaning/packing, supplier/material hoặc outsource. Không biến t"
+                            "snippet": "CURRENT_CONSTRAINT_RESOURCE, OEE_BOTTLENECK, BOTTLENECK_BUFFER_STATUS, CONSTRAINT_LOST_HOURS, CONSTRAINT_STARVED_TIME, CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS TOC daily/weekly bảo vệ điểm thắt cổ chai thật: máy/cell, CMM, setup, CAM, QC/final inspection, deburr/cleaning/packing, supplier/material hoặc outsource. Khôn"
                         }
                     ]
+                },
+                {
+                    "code": "CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED",
+                    "display_name": "Customer Requirement Profile Assigned",
+                    "classification": "gate_control_metric",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    },
+                    "row_snippets": []
                 },
                 {
                     "code": "FAI_FIRST_PASS",
@@ -19007,7 +19079,7 @@
                     "row_snippets": [
                         {
                             "row_index": 11,
-                            "snippet": "FAI_FIRST_PASS, FINAL_RELEASE_RFT, CMM_QUEUE_AGING, FAI_QUEUE_AGING, FINAL_INSPECTION_QUEUE_AGING, QC_HOLD_SLA, INSPECTION_PLAN_ADHERENCE Zero-defect, CMM/QC queue, FAI/final queue, QC hold và release RFT. Hiển thị để hành động; manual/staged metric không cộng điểm và không được dùng để bypass gate."
+                            "snippet": "FAI_FIRST_PASS, FINAL_RELEASE_RFT, CMM_QUEUE_AGING, FAI_QUEUE_AGING, FINAL_INSPECTION_QUEUE_AGING, QC_HOLD_SLA, INSPECTION_PLAN_ADHERENCE Zero-defect, hàng đợi CMM/QC, FAI đạt ngay lần đầu, final release đúng ngay lần đầu, QC hold và tuân thủ kế hoạch kiểm tra. Hiển thị để hành động; manual/staged metric không cộng điể"
                         }
                     ]
                 },
@@ -19077,7 +19149,7 @@
                     "row_snippets": [
                         {
                             "row_index": 4,
-                            "snippet": "FPY 14% active_runtime ≥98%; yellow 95-97.99%; red <95% QA/OPS; first-pass inspection population Inspection bypass or customer escape blocks recognition."
+                            "snippet": "FPY 14% active_runtime ≥98%; yellow 95-97.99%; red <95% QA/OPS; tập lô kiểm đạt ngay lần đầu Inspection bypass or customer escape blocks recognition."
                         }
                     ]
                 },
@@ -19112,7 +19184,7 @@
                     "row_snippets": [
                         {
                             "row_index": 14,
-                            "snippet": "IPQC_CHARACTERISTIC_COMPLETENESS, SPC_SIGNAL_REACTION_TIME, CMM_QUEUE_AGING, NCR_CONTAINMENT_ON_TIME, GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT G5 IPQC/SPC/CMM/containment/gage evidence cho zero-defect. Giữ công đoạn hoặc escalation; không payout từ gate metric, không tô xanh nếu evidence thiếu."
+                            "snippet": "IPQC_CHARACTERISTIC_COMPLETENESS, SPC_SIGNAL_REACTION_TIME, CMM_QUEUE_AGING, NCR_CONTAINMENT_ON_TIME, GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT G5: bằng chứng IPQC/SPC/CMM/containment/gage cho zero-defect. Giữ công đoạn hoặc escalation; không payout từ metric cổng kiểm soát, không tô xanh nếu bằng chứng thiếu."
                         }
                     ]
                 },
@@ -19162,24 +19234,9 @@
                     "row_snippets": [
                         {
                             "row_index": 13,
-                            "snippet": "MATERIAL_CERT_VERIFICATION_COMPLETENESS, IQC_RELEASE_ON_TIME, LAM_MATERIAL_KIT_READY_TO_PLAN, TRACEABILITY_LABEL_VERIFIED, SPECIAL_PROCESS_REQUIREMENT_CLEAR, SUBTIER_REQUIREMENT_FLOWDOWN G3 material/IQC/cert/traceability/special-process readiness cho LAM/SEMSYSCO. Gate blocker/hold-release; staged hoặc manual-governed "
+                            "snippet": "MATERIAL_CERT_VERIFICATION_COMPLETENESS, IQC_RELEASE_ON_TIME, LAM_MATERIAL_KIT_READY_TO_PLAN, TRACEABILITY_LABEL_VERIFIED, SPECIAL_PROCESS_REQUIREMENT_CLEAR, SUBTIER_REQUIREMENT_FLOWDOWN G3: mức sẵn sàng material/IQC/cert/traceability/special-process cho LAM/SEMSYSCO. Cổng kiểm soát chặn/hold-release; staged hoặc manua"
                         }
                     ]
-                },
-                {
-                    "code": "NCR_3D_RESPONSE_SLA",
-                    "display_name": "NCR 3D Response SLA (≤1 working day)",
-                    "classification": "operating_metric",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "NCR_3D_RESPONSE_SLA"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    },
-                    "row_snippets": []
                 },
                 {
                     "code": "NCR_CONTAINMENT_ON_TIME",
@@ -19281,12 +19338,12 @@
                     "row_snippets": []
                 },
                 {
-                    "code": "SUPPLIER_READINESS",
-                    "display_name": "Supplier readiness composite from OTD and incoming quality",
-                    "classification": "operating_metric",
+                    "code": "SPECIAL_RELEASE_COMPLIANCE",
+                    "display_name": "Written Special Release Before Delivery",
+                    "classification": "gate_control_metric",
                     "occurrences": 1,
                     "matched_terms": [
-                        "SUPPLIER READINESS"
+                        "SPECIAL_RELEASE_COMPLIANCE"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -19330,7 +19387,7 @@
             "title": "ANNEX-129 - BSC and KPI Operating Mechanism Assessment | HESEM MOM",
             "bucket": "annex_references",
             "metrics_count": 19,
-            "total_metric_occurrences": 28,
+            "total_metric_occurrences": 26,
             "metrics": [
                 {
                     "code": "OEE",
@@ -19339,22 +19396,6 @@
                     "occurrences": 4,
                     "matched_terms": [
                         "OEE"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Context acceptable or informational."
-                    },
-                    "row_snippets": []
-                },
-                {
-                    "code": "OEE_BOTTLENECK",
-                    "display_name": "OEE at current constraint resource",
-                    "classification": "operating_metric",
-                    "occurrences": 3,
-                    "matched_terms": [
-                        "OEE BOTTLENECK",
-                        "OEE_BOTTLENECK"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -19536,6 +19577,21 @@
                     "occurrences": 1,
                     "matched_terms": [
                         "MATERIAL_AVAILABILITY_PLAN"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    },
+                    "row_snippets": []
+                },
+                {
+                    "code": "OEE_BOTTLENECK",
+                    "display_name": "OEE at current constraint resource",
+                    "classification": "operating_metric",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "OEE_BOTTLENECK"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -20121,7 +20177,7 @@
                     "row_snippets": [
                         {
                             "row_index": 38,
-                            "snippet": "WIP aging đỏ Gỡ blocker theo job/operation cụ thể, không đẩy thêm WIP vào hàng đợi đang nghẽn khi chưa đủ material/program/gage/fixture. PPL / WKM WIP snapshot, blocker owner, thời hạn đóng và bằng chứng cập nhật điều phối."
+                            "snippet": "WIP aging đỏ Gỡ blocker theo job/operation cụ thể, không đẩy thêm WIP vào hàng đợi đang nghẽn khi chưa đủ material/program/gage/fixture. PPL / WKM WIP snapshot, người phụ trách blocker, thời hạn đóng và bằng chứng cập nhật điều phối."
                         }
                     ]
                 },

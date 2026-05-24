@@ -1024,8 +1024,8 @@ function renderMarkdownReport(array $report): string
     $lines[] = '';
     $lines[] = '## Operating Conclusion';
     $lines[] = '';
-    $lines[] = 'The KPI estate is broad but usable if the company keeps one authority rule: official KPI must be registry-approved and tied to evaluation, evidence, rating, and consequence. Training and shopfloor documents should use role measures, gate control metrics, or operating metrics unless they explicitly map to the registry.';
-    $lines[] = 'Change-control rule: every KPI/metric creation, rename, target/threshold change, score weight change, owner change, backend formula change, or document-placement change must update the authority registry, ANNEX-128 matrix, and all related SOP/WI/ANNEX/JD/training documents in the same controlled change.';
+    $lines[] = 'Bức tranh KPI rộng nhưng vẫn kiểm soát được nếu giữ một luật thẩm quyền: KPI chính thức phải được registry phê duyệt và gắn với đánh giá, bằng chứng, phương pháp xếp hạng và hệ quả quản trị. Tài liệu đào tạo và hiện trường nên dùng role measure, metric cổng kiểm soát hoặc operating metric trừ khi đã map rõ về registry.';
+    $lines[] = 'Luật change-control: mọi lần tạo KPI/metric, đổi tên, đổi target/ngưỡng, đổi trọng số, đổi chủ KPI, đổi công thức/backend hoặc đổi vị trí sử dụng trong tài liệu phải cập nhật đồng thời KPI Authority Registry, ANNEX-128 matrix và tất cả SOP/WI/ANNEX/JD/training liên quan trong cùng controlled change.';
     $lines[] = '';
     $lines[] = '## Priority Findings';
     $lines[] = '';
@@ -1139,12 +1139,12 @@ td,th{vertical-align:top}
 <div class="form-header">
 <div class="fh-left"><a class="brand-logo" href="../../../../../portal.html"><img alt="HESEM Logo" src="../../../../../assets/hesem-logo.svg"></a><div class="fh-company"><a href="../../../../../portal.html">HESEM ENGINEERING</a><span>Tài liệu vận hành • Annex</span></div></div>
 <div class="title"><strong class="doc-name">KPI System Matrix and Document Usage</strong><span class="sub-vn">Ma trận phân bổ KPI/metric theo tài liệu, số lần sử dụng, target, classification và data/evaluation status</span></div>
-<div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-128</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS / Analytics Owner</span></div></div>
+<div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-128</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS / Analytics</span></div></div>
 </div>
 <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng để xem một KPI/metric xuất hiện ở tài liệu nào, số lần dùng, target/ngưỡng nào đang ghi, trạng thái backend/data contract và liệu cách gọi là KPI có đúng authority hay chưa.</div>
 <h1>ANNEX-128 - KPI System Matrix and Document Usage</h1>
-<div class="callout danger"><b>Nguyên tắc khóa:</b> Không dùng để đánh giá thì không gọi KPI. Official KPI phải qua registry, có owner, target, evidence, rating method và consequence. Tài liệu hiện trường dùng Gate Control Metric hoặc Operating Metric; tài liệu đào tạo dùng Role Performance Measure.</div>
-<div class="callout danger"><b>Nguyên tắc change-control:</b> Khi thêm, đổi tên, đổi target/ngưỡng, đổi trọng số, đổi owner, đổi công thức/backend hoặc đổi vị trí sử dụng KPI/metric, phải cập nhật đồng thời registry KPI, ANNEX-128 matrix và tất cả SOP/WI/ANNEX/JD/training liên quan. Nếu matrix và tài liệu liên quan chưa cập nhật, thay đổi chưa được dùng cho dashboard, đánh giá, ghi nhận, thưởng, corrective action hoặc kỷ luật.</div>
+<div class="callout danger"><b>Nguyên tắc khóa:</b> Không dùng để đánh giá thì không gọi KPI. Official KPI phải qua registry, có chủ KPI, target, evidence, rating method và consequence. Tài liệu hiện trường dùng metric cổng kiểm soát hoặc operating metric; tài liệu đào tạo dùng role performance measure.</div>
+<div class="callout danger"><b>Nguyên tắc change-control:</b> Khi thêm, đổi tên, đổi target/ngưỡng, đổi trọng số, đổi chủ KPI, đổi công thức/backend hoặc đổi vị trí sử dụng KPI/metric, phải cập nhật đồng thời registry KPI, ANNEX-128 matrix và tất cả SOP/WI/ANNEX/JD/training liên quan. Nếu matrix và tài liệu liên quan chưa cập nhật, thay đổi chưa được dùng cho dashboard, đánh giá, ghi nhận, thưởng, corrective action hoặc kỷ luật.</div>
 <div class="card-grid">
 <div class="metric-card"><span class="muted">HTML quét</span><b>' . h((string) $summary['html_file_count']) . '</b></div>
 <div class="metric-card"><span class="muted">Tài liệu có metric</span><b>' . h((string) $summary['documents_with_metric_usage']) . '</b></div>

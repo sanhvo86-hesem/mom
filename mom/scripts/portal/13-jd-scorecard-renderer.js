@@ -148,34 +148,33 @@ function _render(role) {
       '<td><div class="jd-sc-wt"><span class="jd-sc-w">' + w + '%</span>' +
         '<span class="jd-sc-wbar"><span class="jd-sc-wfill" style="width:' + w + '%"></span>' +
         '</span><span class="jd-sc-tag">' + _esc(lifecycle) + '</span></div></td>' +
-      '<td><b>Evidence</b><br>' + _esc(evidence) +
+      '<td><b>Bằng chứng</b><br>' + _esc(evidence) +
         _textDetail('Target / checklist', target + (checklist ? ' | ' + checklist : '')) + '</td>' +
-      '<td><b>Control</b><br>' + _esc(control) +
-        _textDetail('Action when red', action) + _textDetail('Attribution', attr) + '</td>' +
+      '<td><b>Phạm vi kiểm soát</b><br>' + _esc(control) +
+        _textDetail('Hành động khi đỏ', action) + _textDetail('Quy tắc quy trách nhiệm', attr) + '</td>' +
       '<td><span class="jd-sc-code">' + _esc(it.counter_code || '—') + '</span><br>' +
         '<span class="jd-sc-muted">' + _esc(it.counter_status || '') + '</span>' +
-        _textDetail('Blockers', itemBlockers.join(', ')) + '</td>' +
+        _textDetail('Blocker', itemBlockers.join(', ')) + '</td>' +
     '</tr>';
   }).join('');
-  var warning = role.not_automatic_reward_or_discipline_warning ||
-    'Role scorecards are for coaching, OJT and calibrated review only; no automatic reward or discipline.';
+  var warning = 'Thẻ điểm vai trò chỉ dùng cho coaching, OJT, đánh giá năng lực và review đã hiệu chuẩn; không tự động tạo thưởng, payout hoặc kỷ luật.';
   var meta = '<div class="jd-scorecard-meta">' +
-    '<div><b>Candidate bank</b><br>' + _list(candidate) + '</div>' +
-    '<div><b>Optional rotate</b><br>' + _list(optional) + '</div>' +
-    '<div><b>Do not use</b><br>' + _list(doNotUse) + '</div>' +
-    '<div><b>Role blockers</b><br>' + _list(blockers) + '</div>' +
+    '<div><b>Nhóm candidate</b><br>' + _list(candidate) + '</div>' +
+    '<div><b>Nhóm xoay vòng tùy chọn</b><br>' + _list(optional) + '</div>' +
+    '<div><b>Không được dùng</b><br>' + _list(doNotUse) + '</div>' +
+    '<div><b>Blocker theo vai trò</b><br>' + _list(blockers) + '</div>' +
     '</div>';
-  return '<p class="jd-scorecard-note">Thẻ điểm KPI active cho chức danh ' +
+  return '<p class="jd-scorecard-note">Thẻ điểm KPI đang áp dụng cho chức danh ' +
       '<b>' + _esc(role.jd_title_vi || role.role_code) + '</b> — đồng bộ trực tiếp từ ' +
-      'KPI Authority (active ' + _esc(role.active_measure_count || items.length) + '/' +
+      'KPI Authority (đang áp dụng ' + _esc(role.active_measure_count || items.length) + '/' +
       _esc(role.recommended_active_count || items.length) + ', tổng trọng số ' + total + '%).</p>' +
     '<div class="jd-scorecard-warning">' + _esc(warning) + '</div>' +
     meta +
     '<div class="table-card jd-scorecard"><table class="table">' +
       '<colgroup><col style="width:24%"><col style="width:10%"><col style="width:23%">' +
       '<col style="width:27%"><col style="width:16%"></colgroup>' +
-      '<thead><tr><th>Active role measure</th><th>Weight / lifecycle</th><th>Evidence / target</th>' +
-      '<th>Controllability / action</th><th>Counter / blocker</th></tr></thead>' +
+      '<thead><tr><th>Role measure đang áp dụng</th><th>Trọng số / lifecycle</th><th>Bằng chứng / target</th>' +
+      '<th>Phạm vi kiểm soát / hành động</th><th>Counter / blocker</th></tr></thead>' +
       '<tbody>' + rows + '</tbody></table></div>';
 }
 
