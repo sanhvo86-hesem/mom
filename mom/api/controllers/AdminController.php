@@ -1137,6 +1137,219 @@ class AdminController extends BaseController
     }
 
     /**
+     * GET admin_version_control_unified_timeline — Pha 3 of the admin VC
+     * v2 redesign. Merges three previously-separate streams into a single
+     * chronological feed so an operator can answer "what changed in the
+     * last hour / who did it / can I roll it back" without context-switching
+     * between Snapshots, Doc history, and Audit log tabs.
+     *
+     * Sources merged (best-effort fan-out — a partial failure on one
+     * source returns the other two with a warning, never a hard 500):
+     *   1. audit_events            (via DataAccessAdapter::getAuditLog)
+     *   2. data-sync snapshots     (via DataSyncMutationService::listSnapshots)
+     *   3. dcc_document_body rows  (via VersionControlService::listDocsWithHistory
+     *                                — we use the rolled-up doc list because
+     *                                pulling every revision body is O(N) per
+     *                                doc and not worth it for a feed view)
+     *
+     * Output envelope per row:
+     *   {
+     *     id:         "<source>:<key>"          (stable, unique)
+     *     ts:         ISO 8601 UTC              (canonical sort key)
+     *     type:       "audit" | "snapshot" | "doc_revision"
+     *     source:     <table or store name>
+     *     actor:      <username or party id>    (best-effort)
+     *     summary:    <short human label>
+     *     key:        <aggregate identifier>
+     *     payload:    <original row, sanitised>
+     *     restorable: bool                       (snapshots only, today)
+     *   }
+     *
+     * Query params:
+     *   limit       — total rows returned post-merge (1..500, default 100)
+     *   types       — comma list filter, e.g. "audit,snapshot"
+     *                 (subset of audit|snapshot|doc_revision; default = all)
+     *   actor       — substring match on actor (case-insensitive)
+     *   search      — substring match on summary or key
+     *   since       — ISO date or datetime; drops rows older than this
+     */
+    public function versionControlUnifiedTimeline(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        $limit = max(1, min(500, (int)($this->query('limit', '100') ?? '100')));
+        $typesRaw = trim((string)($this->query('types', '') ?? ''));
+        $typesAllowed = ['audit', 'snapshot', 'doc_revision'];
+        $types = $typesRaw === ''
+            ? $typesAllowed
+            : array_values(array_intersect($typesAllowed, array_filter(array_map('trim', explode(',', strtolower($typesRaw))))));
+        if ($types === []) $types = $typesAllowed;
+
+        $actorFilter = strtolower(trim((string)($this->query('actor', '') ?? '')));
+        $searchFilter = strtolower(trim((string)($this->query('search', '') ?? '')));
+        $sinceFilter = trim((string)($this->query('since', '') ?? ''));
+        if ($sinceFilter !== '') {
+            // Accept YYYY-MM-DD or full ISO; normalise to YYYY-MM-DDTHH:MM:SSZ.
+            $ts = strtotime($sinceFilter);
+            $sinceFilter = $ts ? gmdate('Y-m-d\TH:i:s\Z', $ts) : '';
+        }
+
+        $events = [];
+        $warnings = [];
+
+        // ── Source 1: audit_events ────────────────────────────────────────
+        if (in_array('audit', $types, true)) {
+            try {
+                // Pull a generous slice from audit and apply the substring
+                // filters in PHP after merge — passing actor_name to
+                // getAuditLog uses an exact match which would drop "sanh.vo"
+                // when the user typed "sanh". since/from is safe to push
+                // down because the DB-side comparison is a range, not exact.
+                $filters = ['limit' => max($limit, 200)];
+                if ($sinceFilter !== '') $filters['from'] = $sinceFilter;
+                $filters['exclude_aggregate_types'] = ['runtime_read_model', 'connector_feed', 'runtime_shadow'];
+                $auditRows = $this->data->getAuditLog($filters);
+                foreach ((is_array($auditRows) ? $auditRows : []) as $row) {
+                    if (!is_array($row)) continue;
+                    $eventType = (string)($row['event_type'] ?? $row['action'] ?? 'audit_event');
+                    $aggType = (string)($row['aggregate_type'] ?? '');
+                    $aggId = (string)($row['aggregate_id'] ?? '');
+                    $actor = (string)($row['actor_name'] ?? $row['user'] ?? '');
+                    $ts = (string)($row['recorded_at'] ?? $row['timestamp'] ?? '');
+                    $id = 'audit:' . ($row['id'] ?? md5($ts . '|' . $eventType . '|' . $actor));
+                    $events[] = [
+                        'id' => $id,
+                        'ts' => $ts,
+                        'type' => 'audit',
+                        'source' => 'audit_events',
+                        'actor' => $actor,
+                        'summary' => $eventType . ($aggType !== '' ? ' · ' . $aggType : '') . ($aggId !== '' ? '#' . substr($aggId, 0, 12) : ''),
+                        'key' => $eventType,
+                        'payload' => [
+                            'event_type' => $eventType,
+                            'aggregate_type' => $aggType,
+                            'aggregate_id' => $aggId,
+                            'ip_address' => (string)($row['ip_address'] ?? $row['ip'] ?? ''),
+                            'payload' => is_array($row['payload'] ?? null) ? $row['payload'] : [],
+                            'metadata' => is_array($row['metadata'] ?? null) ? $row['metadata'] : [],
+                        ],
+                        'restorable' => false,
+                    ];
+                }
+            } catch (Throwable $e) {
+                $warnings[] = ['source' => 'audit_events', 'error' => $e->getMessage()];
+            }
+        }
+
+        // ── Source 2: data-sync snapshots ─────────────────────────────────
+        if (in_array('snapshot', $types, true)) {
+            try {
+                $snapshots = $this->dataSyncMutator()->listSnapshots(min(60, $limit));
+                foreach ((is_array($snapshots) ? $snapshots : []) as $snap) {
+                    if (!is_array($snap)) continue;
+                    $sid = (string)($snap['id'] ?? '');
+                    $ts = (string)($snap['captured_at'] ?? '');
+                    $actor = (string)($snap['actor'] ?? '');
+                    $reason = trim((string)($snap['reason'] ?? ''));
+                    $changeRef = trim((string)($snap['change_ref'] ?? ''));
+                    $subset = (string)($snap['subset'] ?? 'config');
+                    $fileCount = (int)($snap['file_count'] ?? 0);
+                    $events[] = [
+                        'id' => 'snapshot:' . $sid,
+                        'ts' => $ts,
+                        'type' => 'snapshot',
+                        'source' => 'data_snapshots',
+                        'actor' => $actor,
+                        'summary' => 'Snapshot ' . $sid . ($fileCount > 0 ? ' (' . $fileCount . ' files)' : '') . ($reason !== '' ? ' — ' . $reason : ''),
+                        'key' => $sid,
+                        'payload' => [
+                            'snapshot_id' => $sid,
+                            'subset' => $subset,
+                            'change_ref' => $changeRef,
+                            'reason' => $reason,
+                            'file_count' => $fileCount,
+                        ],
+                        'restorable' => true,
+                    ];
+                }
+            } catch (Throwable $e) {
+                $warnings[] = ['source' => 'data_snapshots', 'error' => $e->getMessage()];
+            }
+        }
+
+        // ── Source 3: dcc document revisions ──────────────────────────────
+        if (in_array('doc_revision', $types, true)) {
+            try {
+                // listDocsWithHistory returns docs with last_recorded_at;
+                // we collapse each doc into one timeline row using its
+                // most-recent header status as the summary.
+                $payload = $this->versionControlService()->listDocsWithHistory(min(200, $limit), '');
+                $docs = is_array($payload['docs'] ?? null) ? $payload['docs'] : [];
+                foreach ($docs as $doc) {
+                    if (!is_array($doc)) continue;
+                    $code = (string)($doc['doc_code'] ?? '');
+                    if ($code === '') continue;
+                    $ts = (string)($doc['last_recorded_at'] ?? '');
+                    $rev = (string)($doc['header_revision'] ?? $doc['latest_revision'] ?? '');
+                    $status = (string)($doc['header_status'] ?? '');
+                    $rowCount = (int)($doc['history_rows'] ?? 0);
+                    $events[] = [
+                        'id' => 'doc:' . $code . ':' . $rev,
+                        'ts' => $ts,
+                        'type' => 'doc_revision',
+                        'source' => 'dcc_document_body',
+                        'actor' => '', // doc list doesn't carry actor; per-revision drawer does
+                        'summary' => strtoupper($code) . ' rev ' . $rev . ($status !== '' ? ' — ' . $status : '') . ' (' . $rowCount . ' revs)',
+                        'key' => $code,
+                        'payload' => [
+                            'doc_code' => $code,
+                            'doc_type' => (string)($doc['doc_type'] ?? ''),
+                            'revision' => $rev,
+                            'status' => $status,
+                            'history_rows' => $rowCount,
+                        ],
+                        'restorable' => false,
+                    ];
+                }
+            } catch (Throwable $e) {
+                $warnings[] = ['source' => 'dcc_document_body', 'error' => $e->getMessage()];
+            }
+        }
+
+        // ── Apply remaining client-side filters ───────────────────────────
+        if ($actorFilter !== '') {
+            $events = array_values(array_filter($events, static fn(array $e) =>
+                $e['actor'] !== '' && strpos(strtolower($e['actor']), $actorFilter) !== false));
+        }
+        if ($searchFilter !== '') {
+            $events = array_values(array_filter($events, static fn(array $e) =>
+                strpos(strtolower($e['summary']), $searchFilter) !== false
+                || strpos(strtolower($e['key']), $searchFilter) !== false));
+        }
+        if ($sinceFilter !== '') {
+            $events = array_values(array_filter($events, static fn(array $e) =>
+                $e['ts'] !== '' && strcmp($e['ts'], $sinceFilter) >= 0));
+        }
+
+        // ── Merge-sort by ts DESC, then cap at limit ──────────────────────
+        usort($events, static function (array $a, array $b): int {
+            return strcmp((string)($b['ts'] ?? ''), (string)($a['ts'] ?? ''));
+        });
+        if (count($events) > $limit) {
+            $events = array_slice($events, 0, $limit);
+        }
+
+        $this->success([
+            'events' => $events,
+            'count' => count($events),
+            'limit' => $limit,
+            'types_requested' => $types,
+            'warnings' => $warnings,
+        ]);
+    }
+
+    /**
      * Return the list of role slugs held by a user record. Mirrors the
      * lookups in other admin endpoints — pulls .role, .roles[], and
      * .role_list[] as a tolerant union so a user record produced by any

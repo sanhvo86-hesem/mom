@@ -103,6 +103,7 @@ return static function (Router $router, string $dataDir): void {
         'admin_version_control_overview'         => [AdminController::class, 'versionControlOverview'],
         'admin_version_control_doc_history_list' => [AdminController::class, 'versionControlDocHistoryList'],
         'admin_version_control_doc_revisions'    => [AdminController::class, 'versionControlDocRevisions'],
+        'admin_version_control_unified_timeline' => [AdminController::class, 'versionControlUnifiedTimeline'],
         'admin_clear_site_cache'           => [AdminController::class, 'clearCache'],
         'get_data_settings'                => [AdminController::class, 'getSettings'],
         'save_data_settings'               => [AdminController::class, 'saveSettings'],

@@ -8065,6 +8065,17 @@ let versionControlOverviewState  = {loading:false, loaded:false, error:'', data:
 let versionControlDocsState      = {loading:false, loaded:false, error:'', data:null, search:''};
 let versionControlDocDetailState = {loading:false, loaded:false, error:'', data:null, docCode:''};
 let versionControlAuditState     = {loading:false, loaded:false, error:'', data:null, limit:100};
+// Pha 3: unified timeline state. Replaces the 3 separate sub-tab states
+// for snapshots, doc history, and audit log (those tabs are removed in
+// the dispatcher; the underlying state vars stay alive for one release
+// cycle so the deprecated render functions can still reference them
+// without ReferenceErrors during the comment-out window).
+let versionControlTimelineState = {
+  loading:false, loaded:false, error:'',
+  data:null,                       // { events:[], count, warnings, limit }
+  filters: {types:'', actor:'', search:'', since:'', limit:100},
+  selectedId: ''                   // id of the timeline row selected for right-panel detail (TODO Pha 3.1)
+};
 // config_sync sub-tab: re-uses dataSyncStatusState (same data as Sync tab)
 // but has its own diff-viewer and editor modals stored in these locals:
 let vcConfigSyncDiffState  = {open:false, name:'', loading:false, site:null, mirror:null, error:''};
@@ -8096,11 +8107,12 @@ let _autoSyncRunning   = false;  // guard: prevent concurrent auto-sync calls
 
 function setVersionControlSubTab(id){
   if(typeof id !== 'string' || !id) return;
-  // Pha 2: normalise deprecated sub-tab ids to 'status'. Anything else
-  // that doesn't match the current tab list also falls through to 'status'
-  // so we never end up rendering a blank panel for a stale id.
-  const validTabs = ['status','config_sync','local_sync','snapshots','doc_history','audit'];
+  // Pha 2: normalise deprecated sub-tab ids to 'status'.
+  // Pha 3: snapshots/doc_history/audit collapse into 'timeline'. Anything
+  // else falls through to 'status' so a stale id never renders a blank.
+  const validTabs = ['status','config_sync','local_sync','timeline'];
   if(id === 'overview' || id === 'sync' || id === 'process') id = 'status';
+  if(id === 'snapshots' || id === 'doc_history' || id === 'audit') id = 'timeline';
   if(validTabs.indexOf(id) === -1) id = 'status';
   if(versionControlSubTab === id) return;
   versionControlSubTab = id;
@@ -8112,12 +8124,8 @@ function setVersionControlSubTab(id){
     // navigates between tabs.
     if(!versionControlOverviewState.loaded && !versionControlOverviewState.loading) loadVersionControlOverview({silent:true});
     if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading) loadGitRepoStatus({silent:true});
-  } else if(id === 'doc_history' && !versionControlDocsState.loaded && !versionControlDocsState.loading){
-    loadVersionControlDocs({silent:true});
-  } else if(id === 'audit' && !versionControlAuditState.loaded && !versionControlAuditState.loading){
-    loadVersionControlAudit({silent:true});
-  } else if(id === 'snapshots' && !dataSyncSnapshotsState.loaded && !dataSyncSnapshotsState.loading){
-    loadDataSyncSnapshots({silent:true});
+  } else if(id === 'timeline' && !versionControlTimelineState.loaded && !versionControlTimelineState.loading){
+    loadVersionControlTimeline({silent:true});
   } else if(id === 'config_sync'){
     if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading) loadDataSyncStatus({silent:true});
   } else if(id === 'local_sync'){
@@ -8222,6 +8230,49 @@ async function loadVersionControlAudit(options){
   } finally {
     if(currentPage === 'admin') renderAdmin();
   }
+}
+
+// ── Pha 3: Unified timeline loader ────────────────────────────────────────
+//
+// Backed by admin_version_control_unified_timeline. Pulls audit_events +
+// data-sync snapshots + dcc_document_body rows in one call, merge-sorted
+// by timestamp DESC. Supports filters: types (subset of audit/snapshot/
+// doc_revision), actor (substring), search (substring on summary or key),
+// since (ISO date), limit (1..500).
+async function loadVersionControlTimeline(options){
+  options = options || {};
+  const force = !!options.force;
+  if(versionControlTimelineState.loading && !force) return;
+  if(versionControlTimelineState.loaded && !force && !options.filterChange) return;
+  // Merge requested filter overrides onto current state — caller passes only
+  // the keys they want to change.
+  if(options.filters){
+    versionControlTimelineState.filters = Object.assign({}, versionControlTimelineState.filters, options.filters);
+  }
+  versionControlTimelineState = Object.assign({}, versionControlTimelineState, {loading:true, error:''});
+  if(!options.silent && currentPage === 'admin') renderAdmin();
+  try{
+    const f = versionControlTimelineState.filters || {};
+    const params = {};
+    if(f.types) params.types = String(f.types);
+    if(f.actor) params.actor = String(f.actor);
+    if(f.search) params.search = String(f.search);
+    if(f.since) params.since = String(f.since);
+    params.limit = Math.max(1, Math.min(500, Number(f.limit) || 100));
+    const res = await apiCall('admin_version_control_unified_timeline', params, 'GET');
+    if(res && res.ok){
+      versionControlTimelineState = Object.assign({}, versionControlTimelineState, {
+        loading:false, loaded:true, error:'',
+        data: { events: res.events || [], count: res.count || 0, warnings: res.warnings || [], limit: res.limit || params.limit }
+      });
+    }else{
+      const msg = (res && (res.error || res.detail)) || 'timeline_load_failed';
+      versionControlTimelineState = Object.assign({}, versionControlTimelineState, {loading:false, error:String(msg)});
+    }
+  }catch(e){
+    versionControlTimelineState = Object.assign({}, versionControlTimelineState, {loading:false, error:e.message || 'timeline_load_failed'});
+  }
+  if(currentPage === 'admin') renderAdmin();
 }
 
 // ── Auto-sync schedule helpers ────────────────────────────────────────────
@@ -9097,18 +9148,15 @@ function vcStatusPill(label, tone){
 }
 
 function renderVCSubTabNav(){
-  // Pha 2: 8 → 6 tabs.
-  // Removed: overview (→ folded into status), sync/git (→ folded into
-  // status), process/SOP (→ moved to docs/admin-vc-panel-sop.md, linked
-  // from status). Pha 3 will further merge snapshots+doc_history+audit
-  // into a single timeline tab; Pha 4 adds a Settings tab. Final IA = 4.
+  // Pha 3: 6 → 4 tabs.
+  // Removed in Pha 3: snapshots, doc_history, audit (all folded into the
+  // single Timeline tab). Final IA from this point is 4 tabs until Pha 4
+  // adds Settings → 5 tabs (status, sync, timeline, [sync helpers], settings).
   const tabs = [
     {id:'status',      en:'Status',             vi:'Trạng thái'},
     {id:'config_sync', en:'Config Sync',        vi:'Đồng bộ Config File'},
     {id:'local_sync',  en:'Local sync',         vi:'Đồng bộ local↔VPS'},
-    {id:'snapshots',   en:'Snapshots',          vi:'Snapshot & rollback'},
-    {id:'doc_history', en:'Doc history',        vi:'Lịch sử tài liệu'},
-    {id:'audit',       en:'Audit log',          vi:'Nhật ký kiểm toán'}
+    {id:'timeline',    en:'Timeline',           vi:'Timeline thay đổi'}
   ];
   const buttons = tabs.map(t => {
     const isActive = (versionControlSubTab === t.id);
@@ -9218,8 +9266,175 @@ function renderAdminVCOverview_DEPRECATED_PHA2(){
 }
 */
 
-// ── Sub-tab: Snapshots (with intro context) ──────────────────────────────
-function renderAdminVCSnapshots(){
+// ── Pha 3 Sub-tab: Unified timeline ──────────────────────────────────────
+//
+// Replaces three old tabs in one chronological feed:
+//   - snapshots   (data-sync snapshots)
+//   - doc_history (dcc_document_body rows)
+//   - audit       (audit_events rows)
+//
+// Mode-aware confirmations on restore actions are stubbed; full inline
+// restore + right-side detail panel land in Pha 3.1 (follow-up commit on
+// this branch). MVP rendering = filter chips on top + a table of events
+// sorted by timestamp DESC.
+function renderAdminVCTimeline(){
+  const state = versionControlTimelineState;
+  const f = state.filters || {};
+  const data = state.data || {};
+  const events = Array.isArray(data.events) ? data.events : [];
+
+  // Filter chips bar — single row, type toggles + actor + search + since.
+  const typeChip = (id, labelEn, labelVi) => {
+    const active = !f.types || f.types.split(',').includes(id);
+    const cls = active ? 'is-good' : '';
+    return '<button class="admin-sync-status-pill '+cls+'" '+
+      'style="cursor:pointer;border:none" '+
+      'onclick="adminVCTimelineToggleType(\''+id+'\')" '+
+      'title="'+escapeHtml(lang==='en'?'Toggle '+labelEn:'Bật/tắt '+labelVi)+'">'+
+      escapeHtml(lang==='en'?labelEn:labelVi)+'</button>';
+  };
+  const chipsHtml = '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px">'+
+    '<span style="color:var(--text-3);font-size:11px;text-transform:uppercase;font-weight:600;margin-right:4px">'+escapeHtml(lang==='en'?'Type':'Loại')+'</span>'+
+    typeChip('audit', 'Audit events', 'Sự kiện audit')+
+    typeChip('snapshot', 'Snapshots', 'Snapshot')+
+    typeChip('doc_revision', 'Doc revisions', 'Phiên bản TL')+
+    '<span style="margin:0 4px;color:var(--border)">|</span>'+
+    '<input type="search" id="vcTimelineActorInput" value="'+escapeHtml(f.actor||'')+'" '+
+      'placeholder="'+escapeHtml(lang==='en'?'Filter by actor':'Lọc theo người làm')+'" '+
+      'style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--bg-surface);color:var(--text-primary);width:140px" '+
+      'onkeydown="if(event.key===\'Enter\'){adminVCTimelineApplyFilter(\'actor\',this.value)}">'+
+    '<input type="search" id="vcTimelineSearchInput" value="'+escapeHtml(f.search||'')+'" '+
+      'placeholder="'+escapeHtml(lang==='en'?'Search summary':'Tìm trong tóm tắt')+'" '+
+      'style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--bg-surface);color:var(--text-primary);width:160px" '+
+      'onkeydown="if(event.key===\'Enter\'){adminVCTimelineApplyFilter(\'search\',this.value)}">'+
+    '<input type="date" id="vcTimelineSinceInput" value="'+escapeHtml((f.since||'').slice(0,10))+'" '+
+      'style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--bg-surface);color:var(--text-primary)" '+
+      'onchange="adminVCTimelineApplyFilter(\'since\',this.value)" '+
+      'title="'+escapeHtml(lang==='en'?'Events since this date':'Sự kiện từ ngày này')+'">'+
+    '<button class="admin-sync-mini" onclick="adminVCTimelineClearFilters()" '+
+      'title="'+escapeHtml(lang==='en'?'Clear all filters':'Xóa hết bộ lọc')+'">'+
+      escapeHtml(lang==='en'?'Clear':'Xóa lọc')+'</button>'+
+    '<button class="admin-sync-mini" onclick="loadVersionControlTimeline({force:true})" '+
+      'title="'+escapeHtml(lang==='en'?'Refresh timeline':'Làm mới timeline')+'">'+
+      escapeHtml(lang==='en'?'Refresh':'Làm mới')+'</button>'+
+  '</div>';
+
+  // Notice if loading / error / warnings.
+  let notice = '';
+  if(state.loading && !state.loaded){
+    notice = '<div class="admin-sync-callout-bar is-info" style="margin-bottom:8px">'+
+      escapeHtml(lang==='en'?'Loading unified timeline…':'Đang tải timeline thống nhất…')+'</div>';
+  } else if(state.error){
+    notice = '<div class="admin-sync-callout-bar is-error" style="margin-bottom:8px">'+
+      escapeHtml((lang==='en'?'Timeline load failed: ':'Lỗi tải timeline: ')+state.error)+
+      ' <button class="admin-sync-mini" style="margin-left:8px" onclick="loadVersionControlTimeline({force:true})">'+
+      escapeHtml(lang==='en'?'Retry':'Thử lại')+'</button></div>';
+  }
+  const warnings = Array.isArray(data.warnings) ? data.warnings : [];
+  if(warnings.length){
+    notice += '<div class="admin-sync-callout-bar is-warn" style="margin-bottom:8px">'+
+      escapeHtml(lang==='en'?'Partial result — some sources failed: ':'Một phần — vài nguồn lỗi: ')+
+      warnings.map(w => escapeHtml(w.source + ':' + (w.error||'').slice(0,60))).join(', ')+
+    '</div>';
+  }
+
+  // Timeline rows table — chronological feed.
+  // Restore action only renders for `restorable:true` rows (snapshots).
+  // Mode-aware: Op mode requires reason prompt (Pha 3.1); Dev mode = 1-click.
+  const isDev = vcIsDeveloperMode();
+  const typePill = (t) => {
+    const tone = t === 'audit' ? 'info' : t === 'snapshot' ? 'good' : 'warn';
+    const label = t === 'audit' ? (lang==='en'?'Audit':'Audit')
+                : t === 'snapshot' ? (lang==='en'?'Snapshot':'Snapshot')
+                : (lang==='en'?'Doc':'TL');
+    return vcStatusPill(label, tone);
+  };
+  const rowAction = (e) => {
+    if(!e.restorable) return '';
+    const label = isDev ? (lang==='en'?'Restore':'Khôi phục') : (lang==='en'?'Restore…':'Khôi phục…');
+    return '<button class="admin-sync-mini" '+
+      'onclick="adminVCTimelineRestore(\''+escapeHtml(e.id||'')+'\',\''+escapeHtml(e.key||'')+'\')" '+
+      'title="'+escapeHtml(lang==='en'?'Restore from this snapshot':'Khôi phục từ snapshot này')+'">'+
+      escapeHtml(label)+'</button>';
+  };
+  const rows = events.length ? events.map(e => '<tr>'+
+    '<td style="white-space:nowrap"><code style="font-size:11px">'+escapeHtml(vcFmtTime(e.ts||''))+'</code></td>'+
+    '<td>'+typePill(e.type||'audit')+'</td>'+
+    '<td><code style="font-size:11px">'+escapeHtml(e.actor||'--')+'</code></td>'+
+    '<td style="font-size:12px">'+escapeHtml(e.summary||'')+'</td>'+
+    '<td>'+rowAction(e)+'</td>'+
+  '</tr>').join('') : '<tr><td colspan="5" style="color:var(--text-3);padding:12px;text-align:center">'+
+    escapeHtml(lang==='en'?'No timeline events match the current filters.':'Không có sự kiện nào khớp với bộ lọc.')+
+    '</td></tr>';
+
+  const tableHtml = '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'+
+      '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'Unified change timeline':'Timeline thay đổi thống nhất')+
+        ' <span style="color:var(--text-3);font-size:11px;font-weight:400">('+
+        escapeHtml(String(events.length)+(lang==='en'?' rows':' dòng'))+
+        ')</span>'+
+      '</div>'+
+      '<div style="color:var(--text-3);font-size:11px">'+
+        escapeHtml(lang==='en'?'Merges audit_events + data-sync snapshots + doc revisions, sorted by time.':'Gộp audit_events + snapshot + phiên bản tài liệu, sắp theo thời gian.')+
+      '</div>'+
+    '</div>'+
+    '<div style="overflow-x:auto;margin-top:8px">'+
+      '<table class="admin-sync-simple-table" style="width:100%;border-collapse:collapse;font-size:12px">'+
+        '<thead><tr>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'When (UTC)':'Lúc (UTC)')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Type':'Loại')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Actor':'Người làm')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Summary':'Tóm tắt')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Action':'Hành động')+'</th>'+
+        '</tr></thead>'+
+        '<tbody>'+rows+'</tbody>'+
+      '</table>'+
+    '</div>'+
+  '</article>';
+
+  return '<section>'+chipsHtml+notice+tableHtml+'</section>';
+}
+
+// Filter helper handlers — called inline from chips/inputs.
+function adminVCTimelineToggleType(typeId){
+  const all = ['audit','snapshot','doc_revision'];
+  const cur = (versionControlTimelineState.filters.types || '').split(',').filter(Boolean);
+  const set = new Set(cur.length ? cur : all);
+  if(set.has(typeId)) set.delete(typeId); else set.add(typeId);
+  // If all selected, clear filter (default = all). If none, snap to single type.
+  const next = [...set];
+  const value = (next.length === all.length || next.length === 0) ? '' : next.join(',');
+  loadVersionControlTimeline({force:true, filterChange:true, filters:{types:value}});
+}
+function adminVCTimelineApplyFilter(key, value){
+  const patch = {}; patch[key] = String(value||'').trim();
+  loadVersionControlTimeline({force:true, filterChange:true, filters:patch});
+}
+function adminVCTimelineClearFilters(){
+  loadVersionControlTimeline({force:true, filterChange:true, filters:{types:'',actor:'',search:'',since:''}});
+}
+async function adminVCTimelineRestore(eventId, snapshotId){
+  // Mode-aware confirmation gate — Dev = 1 confirm, Op = reason prompt.
+  const isDev = vcIsDeveloperMode();
+  if(isDev){
+    if(!window.confirm(lang==='en'?'Restore snapshot '+snapshotId+'?':'Khôi phục snapshot '+snapshotId+'?')) return;
+    return adminDataSyncRestoreSnapshot({snapshot_id:snapshotId});
+  }
+  // Op mode: require reason
+  const reason = window.prompt(lang==='en'
+    ? 'Reason for restoring snapshot '+snapshotId+' (logged to audit_events + change_ref):'
+    : 'Lý do khôi phục snapshot '+snapshotId+' (sẽ ghi vào audit_events + change_ref):', '');
+  if(reason === null) return;
+  if(!reason || reason.trim().length < 4){
+    showToast(lang==='en'?'Reason ≥4 chars required in Operation mode.':'Operation mode bắt buộc lý do ≥4 ký tự.', 'error');
+    return;
+  }
+  return adminDataSyncRestoreSnapshot({snapshot_id:snapshotId, change_ref:'OP-RESTORE: '+reason.trim().slice(0,80)});
+}
+
+// ── Sub-tab: Snapshots (Pha 3 — deprecated, folded into Timeline) ─────────
+/*
+function renderAdminVCSnapshots_DEPRECATED_PHA3(){
   const intro = '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">'+
     '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'Snapshot system':'Hệ thống snapshot')+'</div>'+
     '<div class="admin-sync-callout-bar is-info">'+
@@ -9228,6 +9443,12 @@ function renderAdminVCSnapshots(){
       : 'Mỗi lần upload, giải quyết lệch hay khôi phục đều tạo snapshot trước khi ghi. VPS giữ tối đa 60 snapshot ở /var/www/data-private/.snapshots/. Hãy bấm Tạo snapshot trước các thao tác rủi ro.')+
     '</div></article>';
   return '<section>'+intro+renderAdminDataSyncSnapshotsCard()+'</section>';
+}
+*/
+function renderAdminVCSnapshots(){
+  // Pha 3 stub — kept so dispatcher fallback (unknown subtab id) never
+  // throws. Real users land on Timeline via the normalised subtab map.
+  return renderAdminVCTimeline();
 }
 
 // ── Sub-tab: Doc history ─────────────────────────────────────────────────
@@ -9793,6 +10014,9 @@ function renderAdminVersionControl(){
       loadGitRepoStatus({silent:true});
     }
   }
+  if(versionControlSubTab === 'timeline' && !versionControlTimelineState.loaded && !versionControlTimelineState.loading && !versionControlTimelineState.error){
+    loadVersionControlTimeline({silent:true});
+  }
   if(versionControlSubTab === 'config_sync' && !dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error){
     loadDataSyncStatus({silent:true});
   }
@@ -9823,10 +10047,11 @@ function renderAdminVersionControl(){
   switch(versionControlSubTab){
     case 'config_sync': body = renderAdminVCConfigSync();       break;
     case 'local_sync':  body = renderAdminVCLocalSync();        break;
-    case 'snapshots':   body = renderAdminVCSnapshots();        break;
-    case 'doc_history': body = renderAdminVCDocHistory();       break;
-    case 'audit':       body = renderAdminVCAuditLog();         break;
-    // Pha 2: removed cases overview/sync/process. Default = status.
+    case 'timeline':    body = renderAdminVCTimeline();         break;
+    // Pha 2 removed: overview, sync, process.
+    // Pha 3 removed: snapshots, doc_history, audit (folded into timeline).
+    // setVersionControlSubTab normalises any stale id to status/timeline
+    // before dispatch, so we never hit these dead branches in practice.
     case 'status':
     default:            body = renderAdminVCStatus();           break;
   }
@@ -9835,8 +10060,8 @@ function renderAdminVersionControl(){
     '<header style="margin-bottom:8px">'+
       '<div class="admin-sync-kicker">'+escapeHtml(lang==='en'?'Version control':'Điều khiển phiên bản')+'</div>'+
       '<h2 style="margin:4px 0 0 0">'+escapeHtml(lang==='en'
-        ? 'Release status, config sync, snapshots, doc history, audit'
-        : 'Trạng thái phát hành, đồng bộ config, snapshot, lịch sử tài liệu, audit')+'</h2>'+
+        ? 'Release status, config sync, unified change timeline'
+        : 'Trạng thái phát hành, đồng bộ config, timeline thay đổi thống nhất')+'</h2>'+
     '</header>'+
     renderAdminVCHeaderBar()+
     renderVCSubTabNav()+
