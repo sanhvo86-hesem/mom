@@ -8071,6 +8071,26 @@ let ghaWorkflowState = {
   data: null,  // { status, latest_status_pill, latest, runs }
   lastFetchedAt: 0  // client-side throttle: refetch at most once per 30s
 };
+
+// ─────────────────────────────────────────────────────────────────────────
+// VC Action Modal (replaces window.prompt/alert/confirm)
+//
+// User report 2026-05-24: every Pha 1/4/5 button uses window.prompt for
+// input. Native dialogs are blocked or auto-dismissed in many contexts
+// (Chrome automation, popup blockers, "Don't allow this site to create
+// dialogs"). Replacement: single reusable inline modal with proper
+// client-side validation + server-side error display + success result.
+// ─────────────────────────────────────────────────────────────────────────
+let adminVCActionModalState = {
+  open: false,
+  config: null,            // see openAdminVCActionModal
+  values: {},              // field name -> string
+  fieldErrors: {},         // field name -> error message
+  serverError: '',         // top-of-modal error from onSubmit
+  submitting: false,
+  result: null,            // { message, next_steps[] } after success
+};
+
 let versionControlOverviewState  = {loading:false, loaded:false, error:'', data:null};
 let versionControlDocsState      = {loading:false, loaded:false, error:'', data:null, search:''};
 let versionControlDocDetailState = {loading:false, loaded:false, error:'', data:null, docCode:''};
@@ -9009,34 +9029,66 @@ function vcCanDeploy(){
   return vcIsDeveloperMode() && !deployFreezeIsActive();
 }
 
-async function adminVCFreezeToggle(){
+function adminVCFreezeToggle(){
   if(!deployFreezeState.loaded){
     showToast(lang==='en'?'Freeze state not loaded yet.':'Chưa tải freeze state.', 'error');
     return;
   }
   const currentlyOn = deployFreezeIsActive();
+  const TICKET_REGEX = '^[A-Za-z0-9._:-]{4,80}$';
+  const ticketHelp = lang==='en' ? 'Allowed: letters, digits, . _ : - (4..80 chars)' : 'Cho phép: chữ, số, . _ : - (4..80 ký tự)';
   if(currentlyOn){
-    // Unfreeze flow — confirm + ticket
-    const ticket = window.prompt(lang==='en'
-      ? 'Unfreeze: enter the INC/ticket id that closed the freeze (≥4 chars):'
-      : 'Bỏ freeze: nhập INC/ticket id đóng freeze (≥4 ký tự):', (deployFreezeState.data?.ticket_id || ''));
-    if(ticket === null) return;
-    if(ticket.trim().length < 4){ showToast(lang==='en'?'Ticket ≥4 chars required.':'Ticket ≥4 ký tự.', 'error'); return; }
-    const reason = window.prompt(lang==='en'?'Unfreeze reason (≥4 chars):':'Lý do bỏ freeze (≥4 ký tự):', 'incident resolved');
-    if(reason === null) return;
-    if(reason.trim().length < 4){ showToast(lang==='en'?'Reason ≥4 chars required.':'Lý do ≥4 ký tự.', 'error'); return; }
-    return adminVCFreezeApply(false, reason.trim(), ticket.trim());
+    openAdminVCActionModal({
+      title: lang==='en' ? '⛔ Unfreeze deploys' : '⛔ Bỏ freeze deploy',
+      intro: lang==='en'
+        ? 'Currently frozen by '+(deployFreezeState.data?.set_by||'?')+' for ticket '+(deployFreezeState.data?.ticket_id||'?')+'.'
+        : 'Đang frozen bởi '+(deployFreezeState.data?.set_by||'?')+' cho ticket '+(deployFreezeState.data?.ticket_id||'?')+'.',
+      fields: [
+        { name: 'ticket_id', label: lang==='en'?'Ticket id (INC/CR closing this freeze)':'Ticket id (INC/CR đóng freeze)',
+          type: 'text', required: true, minLength: 4, maxLength: 80, regex: TICKET_REGEX, regexHelp: ticketHelp,
+          default: deployFreezeState.data?.ticket_id || '', placeholder: 'INC-2026-013' },
+        { name: 'reason', label: lang==='en'?'Reason':'Lý do', type: 'textarea', rows: 2,
+          required: true, minLength: 4, maxLength: 500,
+          default: lang==='en'?'incident resolved':'sự cố đã xử lý' }
+      ],
+      submitLabel: lang==='en'?'Unfreeze':'Bỏ freeze',
+      submitTone: 'good',
+      onSubmit: async (vals) => {
+        const res = await apiCall('admin_deploy_freeze_set', {enabled:false, reason:vals.reason.trim(), ticket_id:vals.ticket_id.trim()}, 'POST');
+        if(res && res.ok){
+          deployFreezeState = Object.assign({}, deployFreezeState, {loaded:true, error:'', data: res.freeze || null});
+          return { ok:true, message: lang==='en'?'Deploys unfrozen.':'Đã bỏ freeze.' };
+        }
+        return res || { ok:false, error:'unknown' };
+      }
+    });
+    return;
   }
-  // Freeze flow — strict
-  const ticket = window.prompt(lang==='en'
-    ? 'Freeze deploys: enter INC/ticket id (e.g. INC-2026-013, ≥4 chars):'
-    : 'Freeze deploy: nhập INC/ticket id (vd: INC-2026-013, ≥4 ký tự):', '');
-  if(ticket === null) return;
-  if(ticket.trim().length < 4){ showToast(lang==='en'?'Ticket ≥4 chars required.':'Ticket ≥4 ký tự.', 'error'); return; }
-  const reason = window.prompt(lang==='en'?'Reason for freeze (≥10 chars):':'Lý do freeze (≥10 ký tự):', '');
-  if(reason === null) return;
-  if(reason.trim().length < 10){ showToast(lang==='en'?'Reason ≥10 chars required.':'Lý do ≥10 ký tự.', 'error'); return; }
-  return adminVCFreezeApply(true, reason.trim(), ticket.trim());
+  // Freeze flow
+  openAdminVCActionModal({
+    title: lang==='en' ? '⛔ Freeze deploys (emergency)' : '⛔ Freeze deploy (khẩn cấp)',
+    intro: lang==='en'
+      ? 'Blocks Push & Deploy, CR approval, and batch sync with HTTP 423. Reads + CR submit still work.'
+      : 'Chặn Push & Deploy, duyệt CR, batch sync (HTTP 423). Reads + gửi CR vẫn chạy.',
+    fields: [
+      { name: 'ticket_id', label: lang==='en'?'INC / ticket id':'INC / ticket id',
+        type: 'text', required: true, minLength: 4, maxLength: 80, regex: TICKET_REGEX, regexHelp: ticketHelp,
+        placeholder: 'INC-2026-013' },
+      { name: 'reason', label: lang==='en'?'Reason (≥10 chars)':'Lý do (≥10 ký tự)', type: 'textarea', rows: 3,
+        required: true, minLength: 10, maxLength: 500,
+        placeholder: lang==='en'?'e.g. P1 outage in OrderModule — block deploys during MTTR':'vd: Sự cố P1 OrderModule — chặn deploy trong khi xử lý' }
+    ],
+    submitLabel: lang==='en'?'Freeze':'Freeze',
+    submitTone: 'error',
+    onSubmit: async (vals) => {
+      const res = await apiCall('admin_deploy_freeze_set', {enabled:true, reason:vals.reason.trim(), ticket_id:vals.ticket_id.trim()}, 'POST');
+      if(res && res.ok){
+        deployFreezeState = Object.assign({}, deployFreezeState, {loaded:true, error:'', data: res.freeze || null});
+        return { ok:true, message: lang==='en'?'Deploys frozen.':'Đã freeze deploy.' };
+      }
+      return res || { ok:false, error:'unknown' };
+    }
+  });
 }
 
 async function adminVCFreezeApply(enabled, reason, ticket){
@@ -9077,6 +9129,160 @@ function vcEffectiveMode(){
 // Convenience predicate for mode-gated button visibility.
 function vcIsDeveloperMode(){ return vcEffectiveMode() === 'developer'; }
 
+// ── VC action modal helpers ──────────────────────────────────────────────
+function openAdminVCActionModal(config){
+  const values = {};
+  (config.fields || []).forEach(f => {
+    values[f.name] = (f.default !== undefined && f.default !== null) ? String(f.default) : '';
+  });
+  adminVCActionModalState = {
+    open: true, config: config, values: values,
+    fieldErrors: {}, serverError: '', submitting: false, result: null,
+  };
+  renderAdmin();
+  setTimeout(() => {
+    const first = document.querySelector('.vc-modal-field input,.vc-modal-field textarea');
+    if(first) first.focus();
+  }, 50);
+}
+function closeAdminVCActionModal(){
+  adminVCActionModalState = Object.assign({}, adminVCActionModalState, {
+    open:false, config:null, values:{}, fieldErrors:{}, serverError:'', submitting:false, result:null
+  });
+  renderAdmin();
+}
+function adminVCModalSetValue(name, value){
+  adminVCActionModalState.values[name] = value;
+  if(adminVCActionModalState.fieldErrors[name]){
+    delete adminVCActionModalState.fieldErrors[name];
+    renderAdmin();
+  }
+}
+function _adminVCModalValidate(){
+  const s = adminVCActionModalState;
+  const errs = {};
+  (s.config?.fields || []).forEach(f => {
+    const v = String(s.values[f.name] || '').trim();
+    if(f.required && v === ''){ errs[f.name] = (lang==='en'?'Required':'Bắt buộc'); return; }
+    if(v && f.minLength && v.length < f.minLength){
+      errs[f.name] = (lang==='en'?'Min ':'Tối thiểu ')+f.minLength+(lang==='en'?' chars':' ký tự')+' (now '+v.length+')'; return;
+    }
+    if(v && f.maxLength && v.length > f.maxLength){
+      errs[f.name] = (lang==='en'?'Max ':'Tối đa ')+f.maxLength+(lang==='en'?' chars':' ký tự'); return;
+    }
+    if(v && f.regex){
+      try { if(!(new RegExp(f.regex)).test(v)) errs[f.name] = f.regexHelp || (lang==='en'?'Invalid format':'Sai định dạng'); } catch(_){}
+    }
+  });
+  adminVCActionModalState = Object.assign({}, adminVCActionModalState, {fieldErrors: errs});
+  return Object.keys(errs).length === 0;
+}
+async function submitAdminVCActionModal(){
+  const s = adminVCActionModalState;
+  if(!s.open || !s.config || s.submitting) return;
+  (s.config.fields || []).forEach(f => {
+    const el = document.querySelector('[data-vc-modal-field="'+f.name+'"]');
+    if(el) s.values[f.name] = el.value;
+  });
+  if(!_adminVCModalValidate()){ renderAdmin(); return; }
+  adminVCActionModalState = Object.assign({}, adminVCActionModalState, {submitting:true, serverError:''});
+  renderAdmin();
+  try{
+    const out = await s.config.onSubmit(Object.assign({}, s.values));
+    if(out && out.ok){
+      adminVCActionModalState = Object.assign({}, adminVCActionModalState, {
+        submitting: false,
+        result: {
+          message: out.message || (lang==='en'?'Done.':'Hoàn tất.'),
+          next_steps: Array.isArray(out.next_steps) ? out.next_steps : [],
+        },
+      });
+    } else {
+      const msg = (out && (out.detail || out.error)) || (lang==='en'?'Action failed':'Hành động thất bại');
+      adminVCActionModalState = Object.assign({}, adminVCActionModalState, {submitting:false, serverError:String(msg)});
+    }
+  }catch(e){
+    adminVCActionModalState = Object.assign({}, adminVCActionModalState, {submitting:false, serverError: e.message || 'unknown_error'});
+  }
+  renderAdmin();
+}
+function renderAdminVCActionModal(){
+  const s = adminVCActionModalState;
+  if(!s.open || !s.config) return '';
+  const cfg = s.config;
+  if(s.result){
+    const steps = (s.result.next_steps || []).map(line =>
+      '<li style="margin:6px 0;font-size:12px;color:var(--text-primary,#1e293b)">'+
+        escapeHtml(line).replace(/`([^`]+)`/g, '<code>$1</code>')+
+      '</li>'
+    ).join('');
+    return '<div class="vc-modal-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px">'+
+      '<div role="dialog" aria-modal="true" style="background:var(--bg-surface,#fff);border-radius:12px;max-width:640px;width:100%;max-height:85vh;overflow:auto;padding:24px;box-shadow:0 25px 60px rgba(0,0,0,.3)">'+
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">'+
+          '<h3 style="margin:0;color:var(--text-primary,#1e293b);font-size:18px">✓ '+escapeHtml(cfg.title || '')+'</h3>'+
+          '<button class="admin-sync-mini" onclick="closeAdminVCActionModal()" title="'+escapeHtml(lang==='en'?'Close':'Đóng')+'">×</button>'+
+        '</div>'+
+        '<div class="admin-sync-callout-bar is-good" style="margin:8px 0">'+escapeHtml(s.result.message)+'</div>'+
+        (steps ? '<div style="margin-top:12px"><div class="admin-sync-panel-title" style="font-size:13px;margin-bottom:6px">'+escapeHtml(lang==='en'?'Next steps':'Các bước tiếp theo')+'</div><ul style="padding-left:18px;margin:0">'+steps+'</ul></div>' : '')+
+        '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">'+
+          '<button class="admin-sync-mini" onclick="closeAdminVCActionModal()">'+escapeHtml(lang==='en'?'Close':'Đóng')+'</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }
+  const fieldHtml = (cfg.fields || []).map(f => {
+    const v = s.values[f.name] != null ? String(s.values[f.name]) : '';
+    const err = s.fieldErrors[f.name] || '';
+    const errCls = err ? 'border:1px solid var(--red,#dc2626);' : 'border:1px solid var(--border,#d7e3ef);';
+    const required = f.required ? ' <span style="color:var(--red,#dc2626)">*</span>' : '';
+    const help = f.regexHelp || '';
+    let input;
+    if(f.type === 'textarea'){
+      input = '<textarea data-vc-modal-field="'+escapeHtml(f.name)+'" rows="'+(f.rows||3)+'" '+
+        'oninput="adminVCModalSetValue(\''+escapeHtml(f.name)+'\',this.value)" '+
+        'placeholder="'+escapeHtml(f.placeholder||'')+'" '+
+        'style="width:100%;box-sizing:border-box;padding:8px 10px;border-radius:6px;'+errCls+'background:var(--bg-surface,#fff);color:var(--text-primary,#1e293b);font-size:13px;font-family:inherit;resize:vertical">'+escapeHtml(v)+'</textarea>';
+    } else {
+      input = '<input type="'+(f.type==='date'?'date':'text')+'" data-vc-modal-field="'+escapeHtml(f.name)+'" '+
+        'oninput="adminVCModalSetValue(\''+escapeHtml(f.name)+'\',this.value)" '+
+        'value="'+escapeHtml(v)+'" '+
+        'placeholder="'+escapeHtml(f.placeholder||'')+'" '+
+        'style="width:100%;box-sizing:border-box;padding:8px 10px;border-radius:6px;'+errCls+'background:var(--bg-surface,#fff);color:var(--text-primary,#1e293b);font-size:13px">';
+    }
+    return '<div class="vc-modal-field" style="margin-bottom:12px">'+
+      '<label style="display:block;font-size:12px;font-weight:600;color:var(--text-primary,#1e293b);margin-bottom:4px">'+escapeHtml(f.label)+required+'</label>'+
+      input+
+      (err ? '<div style="color:var(--red,#dc2626);font-size:11px;margin-top:4px">'+escapeHtml(err)+'</div>' : (help ? '<div style="color:var(--text-3,#64748b);font-size:11px;margin-top:4px">'+escapeHtml(help)+'</div>' : ''))+
+    '</div>';
+  }).join('');
+  const submitDisabled = s.submitting ? ' disabled aria-disabled="true"' : '';
+  const submitToneStyle = cfg.submitTone === 'error'
+    ? 'background:var(--red,#dc2626);color:#fff;border-color:var(--red,#dc2626)'
+    : cfg.submitTone === 'warn'
+      ? 'background:color-mix(in srgb,var(--amber,#d97706) 14%,var(--bg-surface,#fff));border-color:var(--amber,#d97706);color:var(--amber,#d97706)'
+      : 'background:var(--brand-2,#1565c0);color:#fff;border-color:var(--brand-2,#1565c0)';
+  return '<div class="vc-modal-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px" '+
+    'onclick="if(event.target===this)closeAdminVCActionModal()">'+
+    '<div role="dialog" aria-modal="true" style="background:var(--bg-surface,#fff);border-radius:12px;max-width:560px;width:100%;max-height:85vh;overflow:auto;padding:24px;box-shadow:0 25px 60px rgba(0,0,0,.3)">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">'+
+        '<h3 style="margin:0;color:var(--text-primary,#1e293b);font-size:18px">'+escapeHtml(cfg.title || '')+'</h3>'+
+        '<button class="admin-sync-mini" onclick="closeAdminVCActionModal()" title="'+escapeHtml(lang==='en'?'Cancel':'Hủy')+'">×</button>'+
+      '</div>'+
+      (cfg.intro ? '<div style="color:var(--text-3,#64748b);font-size:12px;margin-bottom:12px">'+escapeHtml(cfg.intro)+'</div>' : '')+
+      (s.serverError ? '<div class="admin-sync-callout-bar is-error" style="margin-bottom:12px"><strong>'+escapeHtml(lang==='en'?'Server error: ':'Lỗi server: ')+'</strong>'+escapeHtml(s.serverError)+'</div>' : '')+
+      '<form onsubmit="event.preventDefault();submitAdminVCActionModal();return false">'+
+        fieldHtml+
+        '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">'+
+          '<button type="button" class="admin-sync-mini" onclick="closeAdminVCActionModal()"'+(s.submitting?' disabled':'')+'>'+escapeHtml(cfg.cancelLabel || (lang==='en'?'Cancel':'Hủy'))+'</button>'+
+          '<button type="submit" class="admin-sync-mini" style="'+submitToneStyle+'"'+submitDisabled+'>'+
+            (s.submitting ? '⌛ ' : '')+escapeHtml(cfg.submitLabel || (lang==='en'?'Submit':'Lưu'))+
+          '</button>'+
+        '</div>'+
+      '</form>'+
+    '</div>'+
+  '</div>';
+}
+
 async function saveAdminVCMode(patch, reason){
   if(adminVCModeState.saving) return false;
   const r = String(reason || '').trim();
@@ -9112,10 +9318,10 @@ async function saveAdminVCMode(patch, reason){
   }
 }
 
-// Header-bar quick switcher — flips THIS user's effective mode by patching
-// their first role's override. If the user has no role overrides set, this
-// adds one for the first role they hold. Prompts for a 1-line audit reason.
-async function adminVCQuickSwitchMode(targetMode){
+// Header-bar quick switcher — opens an inline modal (replaces window.prompt
+// per the 2026-05-24 fix). The modal collects a mandatory audit reason and
+// then POSTs admin_vc_mode_set with the per-role override.
+function adminVCQuickSwitchMode(targetMode){
   const data = adminVCModeState && adminVCModeState.data;
   if(!data || !data.policy){
     showToast(lang==='en'?'VC mode policy not loaded.':'Chưa nạp VC mode policy.', 'error');
@@ -9126,31 +9332,48 @@ async function adminVCQuickSwitchMode(targetMode){
     showToast(lang==='en'?'Already in '+tm+' mode.':'Đang ở chế độ '+tm+' rồi.', 'info');
     return;
   }
-  // Block switch attempts that lock_on_production would reject anyway.
   if(tm === 'developer' && data.policy.runtime_is_production && data.policy.lock_on_production){
     showToast(lang==='en'
       ? 'Production runtime is locked to Operation mode. Disable lock_on_production first.'
-      : 'Production runtime đang khoá ở Operation. Tắt lock_on_production trước đã.', 'error');
+      : 'Production runtime đang khoá ở Operation. Tắt lock_on_production trước.', 'error');
     return;
   }
   const roles = Array.isArray(data.your_roles) ? data.your_roles : [];
   if(roles.length === 0){
-    showToast(lang==='en'?'No roles on your account — cannot set per-role override.':'Tài khoản bạn không có role — không thể đặt override.', 'error');
+    showToast(lang==='en'?'No roles on your account.':'Tài khoản không có role.', 'error');
     return;
   }
-  const reason = window.prompt(lang==='en'
-    ? 'Reason for switching to '+tm+' mode (logged to audit_events):'
-    : 'Lý do đổi sang chế độ '+tm+' (được ghi vào audit_events):', '');
-  if(reason === null) return;
-  // Merge override into existing role_overrides — keep other roles untouched.
-  const overridesRaw = data.policy.role_overrides;
-  const overrides = (overridesRaw && typeof overridesRaw === 'object' && !Array.isArray(overridesRaw))
-    ? Object.assign({}, overridesRaw)
-    : {};
-  // Set override for ALL roles the user holds, so the resolver returns the
-  // requested mode regardless of which role wins on the server side.
-  roles.forEach(r => { if(r) overrides[r] = tm; });
-  await saveAdminVCMode({role_overrides: overrides}, reason);
+  openAdminVCActionModal({
+    title: lang==='en' ? 'Switch to '+tm+' mode' : 'Đổi sang chế độ '+tm,
+    intro: lang==='en'
+      ? 'Override your role(s) ('+roles.join(', ')+') to '+tm+'. Logged to audit_events.'
+      : 'Override role của bạn ('+roles.join(', ')+') thành '+tm+'. Sẽ ghi vào audit_events.',
+    fields: [
+      { name: 'reason', label: lang==='en'?'Reason':'Lý do', type: 'textarea', rows: 3,
+        required: true, minLength: 4, maxLength: 500,
+        placeholder: lang==='en'?'Why is this change needed?':'Vì sao cần đổi chế độ?' }
+    ],
+    submitLabel: lang==='en' ? '→ '+tm : '→ '+tm,
+    submitTone: tm === 'developer' ? 'warn' : 'good',
+    onSubmit: async (vals) => {
+      const overridesRaw = data.policy.role_overrides;
+      const overrides = (overridesRaw && typeof overridesRaw === 'object' && !Array.isArray(overridesRaw))
+        ? Object.assign({}, overridesRaw) : {};
+      roles.forEach(r => { if(r) overrides[r] = tm; });
+      // saveAdminVCMode returns true on success but doesn't surface details;
+      // call apiCall directly so we can return the structured payload.
+      const res = await apiCall('admin_vc_mode_set', {role_overrides: overrides, reason: vals.reason.trim()}, 'POST');
+      if(res && res.ok){
+        // Sync state so header rerenders.
+        adminVCModeState = Object.assign({}, adminVCModeState, {
+          loading:false, loaded:true, error:'', saving:false,
+          data: { policy: res.policy || null, effective_mode: res.effective_mode || tm, your_roles: res.your_roles || roles }
+        });
+        return { ok: true, message: (lang==='en'?'Effective mode now: ':'Chế độ hiệu lực: ') + (res.effective_mode || tm) };
+      }
+      return res || { ok: false, error: 'unknown' };
+    }
+  });
 }
 
 // ── VC Header Bar ──────────────────────────────────────────────────────────
@@ -9576,91 +9799,86 @@ function renderAdminVCTimeline(){
 // CLAUDE.md governance. They record an audit row + return next_steps the
 // operator runs (git push / GHA / SSH).
 
-async function adminVCDeployTrigger(){
-  // Pha 5: freeze gate (client-side defence in depth with server-side 423).
+function adminVCDeployTrigger(){
   if(deployFreezeIsActive()){
     const f = deployFreezeState.data || {};
-    showToast(lang==='en'
-      ? 'Deploys frozen (ticket='+(f.ticket_id||'?')+'). Unfreeze first.'
-      : 'Deploy đang frozen (ticket='+(f.ticket_id||'?')+'). Bỏ freeze trước.', 'error');
+    showToast(lang==='en'?'Deploys frozen (ticket='+(f.ticket_id||'?')+').':'Deploy đang frozen (ticket='+(f.ticket_id||'?')+').', 'error');
     return;
   }
   if(vcEffectiveMode() !== 'developer'){
-    showToast(lang==='en'
-      ? 'Deploy trigger only available in Developer mode. Submit a change request instead.'
-      : 'Push & Deploy chỉ ở Developer mode. Dùng Gửi yêu cầu deploy thay thế.', 'error');
+    showToast(lang==='en'?'Push & Deploy is Dev-mode only.':'Push & Deploy chỉ ở Developer mode.', 'error');
     return;
   }
-  const reason = window.prompt(lang==='en'
-    ? 'Reason for this deploy (≥4 chars, logged to audit_events):'
-    : 'Lý do deploy (≥4 ký tự, ghi vào audit_events):', '');
-  if(reason === null) return;
-  if(reason.trim().length < 4){
-    showToast(lang==='en'?'Reason ≥4 chars required.':'Cần lý do ≥4 ký tự.', 'error');
-    return;
-  }
-  const sha = window.prompt(lang==='en'
-    ? 'Optional: target git SHA (7-40 hex chars). Leave blank for HEAD:'
-    : 'Tuỳ chọn: SHA git đích (7-40 hex). Trống = HEAD:', '');
-  if(sha === null) return;
-  try{
-    const res = await apiCall('admin_deploy_trigger', {
-      reason: reason.trim(),
-      target_sha: (sha || '').trim()
-    }, 'POST');
-    if(res && res.ok){
-      const steps = (res.next_steps || []).map(s => '• ' + s).join('\n');
-      window.alert((lang==='en'?'Deploy intent recorded.\nIntent ID: ':'Đã ghi nhận deploy.\nIntent ID: ')
-        + (res.intent_id || '?')
-        + '\nSHA: ' + (res.target_sha || 'HEAD')
-        + '\n\n' + (lang==='en'?'Next steps:':'Các bước tiếp theo:') + '\n' + steps);
-      showToast(lang==='en'?'Deploy intent recorded — see next steps.':'Đã ghi nhận deploy — xem next steps.', 'success');
-    }else{
-      const msg = (res && (res.detail || res.error)) || 'deploy_trigger_failed';
-      showToast((lang==='en'?'Deploy trigger failed: ':'Lỗi: ')+String(msg).slice(0,200), 'error');
+  openAdminVCActionModal({
+    title: lang==='en' ? '🚀 Push & Deploy' : '🚀 Push & Deploy',
+    intro: lang==='en'
+      ? 'Records a deploy intent in audit_events and returns next steps. Does not actually push code.'
+      : 'Ghi nhận ý định deploy vào audit_events và trả về các bước tiếp theo. Không tự push code.',
+    fields: [
+      { name: 'reason', label: lang==='en'?'Reason':'Lý do', type: 'textarea', rows: 2,
+        required: true, minLength: 4, maxLength: 500,
+        placeholder: lang==='en'?'Why deploy now?':'Vì sao deploy ngay?' },
+      { name: 'target_sha', label: lang==='en'?'Target git SHA (optional)':'SHA git đích (tuỳ chọn)',
+        type: 'text', required: false, regex: '^[a-fA-F0-9]{7,40}$',
+        regexHelp: lang==='en'?'Leave blank for HEAD. Hex 7..40 chars.':'Trống = HEAD. Hex 7..40 ký tự.',
+        placeholder: 'e.g. ab1234c or full 40-char SHA' }
+    ],
+    submitLabel: lang==='en'?'Record intent':'Ghi nhận',
+    submitTone: 'warn',
+    onSubmit: async (vals) => {
+      const res = await apiCall('admin_deploy_trigger', {
+        reason: vals.reason.trim(),
+        target_sha: (vals.target_sha || '').trim()
+      }, 'POST');
+      if(res && res.ok){
+        return {
+          ok: true,
+          message: (lang==='en'?'Deploy intent recorded. ID: ':'Đã ghi nhận. ID: ') + (res.intent_id||'?') + ' · SHA: ' + (res.target_sha||'HEAD'),
+          next_steps: res.next_steps || []
+        };
+      }
+      return res || { ok:false, error:'unknown' };
     }
-  }catch(e){
-    showToast((lang==='en'?'Deploy trigger error: ':'Lỗi: ')+e.message, 'error');
-  }
+  });
 }
 
-async function adminVCChangeRequestSubmit(){
-  const reason = window.prompt(lang==='en'
-    ? 'Reason for this change request (≥10 chars, logged for audit):'
-    : 'Lý do CR (≥10 ký tự, ghi vào audit):', '');
-  if(reason === null) return;
-  if(reason.trim().length < 10){
-    showToast(lang==='en'?'Reason ≥10 chars required in Operation mode.':'Operation mode cần lý do ≥10 ký tự.', 'error');
-    return;
-  }
-  const sha = window.prompt(lang==='en'
-    ? 'Optional: target git SHA. Leave blank for HEAD:'
-    : 'Tuỳ chọn: SHA git đích. Trống = HEAD:', '');
-  if(sha === null) return;
-  const cr = window.prompt(lang==='en'
-    ? 'Optional: existing change_ref (e.g. CR-2026-099). Leave blank to auto-generate:'
-    : 'Tuỳ chọn: change_ref đã có (e.g. CR-2026-099). Trống = tự sinh:', '');
-  if(cr === null) return;
-  try{
-    const res = await apiCall('admin_change_request_submit', {
-      reason: reason.trim(),
-      target_sha: (sha || '').trim(),
-      change_ref: (cr || '').trim()
-    }, 'POST');
-    if(res && res.ok){
-      const steps = (res.next_steps || []).map(s => '• ' + s).join('\n');
-      window.alert((lang==='en'?'Change request submitted.\nCR: ':'Đã gửi CR.\nCR: ')
-        + (res.change_ref || '?')
-        + '\n' + (lang==='en'?'Status: ':'Trạng thái: ') + (res.status || '?')
-        + '\n\n' + (lang==='en'?'Next steps:':'Các bước tiếp theo:') + '\n' + steps);
-      showToast(lang==='en'?'CR submitted — pending approval.':'Đã gửi CR — chờ duyệt.', 'success');
-    }else{
-      const msg = (res && (res.detail || res.error)) || 'cr_submit_failed';
-      showToast((lang==='en'?'CR submit failed: ':'Lỗi CR: ')+String(msg).slice(0,200), 'error');
+function adminVCChangeRequestSubmit(){
+  openAdminVCActionModal({
+    title: lang==='en' ? '📝 Submit deploy request' : '📝 Gửi yêu cầu deploy',
+    intro: lang==='en'
+      ? 'Creates a pending CR in audit_events. A different admin must approve it.'
+      : 'Tạo CR chờ duyệt trong audit_events. Một admin khác phải phê duyệt.',
+    fields: [
+      { name: 'reason', label: lang==='en'?'Reason (≥10 chars)':'Lý do (≥10 ký tự)', type: 'textarea', rows: 3,
+        required: true, minLength: 10, maxLength: 1000,
+        placeholder: lang==='en'?'Describe the change scope and why it is needed.':'Mô tả phạm vi thay đổi và vì sao cần thiết.' },
+      { name: 'target_sha', label: lang==='en'?'Target SHA (optional)':'SHA đích (tuỳ chọn)',
+        type: 'text', required: false, regex: '^[a-fA-F0-9]{7,40}$',
+        regexHelp: lang==='en'?'Hex 7..40 chars or blank for HEAD':'Hex 7..40 ký tự hoặc trống = HEAD',
+        placeholder: 'ab1234c' },
+      { name: 'change_ref', label: lang==='en'?'change_ref (optional — auto if blank)':'change_ref (tuỳ chọn — tự sinh nếu trống)',
+        type: 'text', required: false, regex: '^[A-Za-z0-9._:-]{3,80}$',
+        regexHelp: lang==='en'?'Allowed: letters, digits, . _ : - (3..80)':'Cho phép: chữ, số, . _ : - (3..80 ký tự)',
+        placeholder: 'CR-2026-099' }
+    ],
+    submitLabel: lang==='en'?'Submit CR':'Gửi CR',
+    submitTone: 'good',
+    onSubmit: async (vals) => {
+      const res = await apiCall('admin_change_request_submit', {
+        reason: vals.reason.trim(),
+        target_sha: (vals.target_sha||'').trim(),
+        change_ref: (vals.change_ref||'').trim()
+      }, 'POST');
+      if(res && res.ok){
+        return {
+          ok: true,
+          message: (lang==='en'?'CR submitted: ':'Đã gửi CR: ') + (res.change_ref||'?') + ' · ' + (lang==='en'?'Status: ':'Trạng thái: ') + (res.status||'?'),
+          next_steps: res.next_steps || []
+        };
+      }
+      return res || { ok:false, error:'unknown' };
     }
-  }catch(e){
-    showToast((lang==='en'?'CR submit error: ':'Lỗi CR: ')+e.message, 'error');
-  }
+  });
 }
 
 // Filter helper handlers — called inline from chips/inputs.
@@ -9681,23 +9899,31 @@ function adminVCTimelineApplyFilter(key, value){
 function adminVCTimelineClearFilters(){
   loadVersionControlTimeline({force:true, filterChange:true, filters:{types:'',actor:'',search:'',since:''}});
 }
-async function adminVCTimelineRestore(eventId, snapshotId){
-  // Mode-aware confirmation gate — Dev = 1 confirm, Op = reason prompt.
+function adminVCTimelineRestore(eventId, snapshotId){
   const isDev = vcIsDeveloperMode();
-  if(isDev){
-    if(!window.confirm(lang==='en'?'Restore snapshot '+snapshotId+'?':'Khôi phục snapshot '+snapshotId+'?')) return;
-    return adminDataSyncRestoreSnapshot({snapshot_id:snapshotId});
-  }
-  // Op mode: require reason
-  const reason = window.prompt(lang==='en'
-    ? 'Reason for restoring snapshot '+snapshotId+' (logged to audit_events + change_ref):'
-    : 'Lý do khôi phục snapshot '+snapshotId+' (sẽ ghi vào audit_events + change_ref):', '');
-  if(reason === null) return;
-  if(!reason || reason.trim().length < 4){
-    showToast(lang==='en'?'Reason ≥4 chars required in Operation mode.':'Operation mode bắt buộc lý do ≥4 ký tự.', 'error');
-    return;
-  }
-  return adminDataSyncRestoreSnapshot({snapshot_id:snapshotId, change_ref:'OP-RESTORE: '+reason.trim().slice(0,80)});
+  openAdminVCActionModal({
+    title: lang==='en' ? 'Restore snapshot '+snapshotId : 'Khôi phục snapshot '+snapshotId,
+    intro: isDev
+      ? (lang==='en'?'Developer mode — 1-click restore. Audited.':'Developer mode — 1 click khôi phục. Có audit.')
+      : (lang==='en'?'Operation mode — reason required. change_ref will be tagged OP-RESTORE.':'Operation mode — phải có lý do. change_ref sẽ gắn OP-RESTORE.'),
+    fields: isDev ? [] : [
+      { name: 'reason', label: lang==='en'?'Reason (≥4 chars)':'Lý do (≥4 ký tự)', type: 'textarea', rows: 2,
+        required: true, minLength: 4, maxLength: 200 }
+    ],
+    submitLabel: lang==='en'?'Restore':'Khôi phục',
+    submitTone: 'warn',
+    onSubmit: async (vals) => {
+      const body = { snapshot_id: snapshotId };
+      if(!isDev) body.change_ref = 'OP-RESTORE: ' + (vals.reason||'').trim().slice(0, 80);
+      // Reuse existing service helper (returns its own toast/state, but
+      // we want a uniform modal result, so call apiCall directly).
+      const res = await apiCall('admin_data_sync_restore_snapshot', body, 'POST');
+      if(res && res.ok){
+        return { ok:true, message: lang==='en'?'Snapshot restored.':'Đã khôi phục snapshot.' };
+      }
+      return res || { ok:false, error:'unknown' };
+    }
+  });
 }
 
 // ── Sub-tab: Snapshots (Pha 3 — deprecated, folded into Timeline) ─────────
@@ -10340,7 +10566,10 @@ function renderAdminVersionControl(){
     '</header>'+
     renderAdminVCHeaderBar()+
     renderVCSubTabNav()+
-    body;
+    body+
+    // Inline modal overlay (replaces window.prompt across all VC actions).
+    // Returns '' when no modal is open, so this is cheap when unused.
+    renderAdminVCActionModal();
 }
 
 function renderAdminInfrastructure(){
