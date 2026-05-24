@@ -7816,9 +7816,42 @@ launchctl load ~/Library/LaunchAgents/com.hesem.mom-sync.plist`)}</pre>`;
 
     </div>
 
-    ${renderAdminVCLocalPullCard()}
-    ${renderAdminVCLocalAgentCard()}
-    ${renderAdminVCSyncScheduleCard()}
+    ${(function(){
+      // User feedback 2026-05-24: viewing this tab on live VPS shows
+      // LaunchAgent + Chrome agent + auto-pull controls all greyed out
+      // with misleading messages ("Agent đã phản hồi nhưng cần token").
+      // Those controls only work when the portal is loaded FROM the user's
+      // laptop (where http://127.0.0.1:48735 actually reaches the local
+      // sync agent). On VPS localhost is the VPS itself — the controls are
+      // structurally inert. Show a single honest explainer instead of 3
+      // broken-looking cards.
+      const onProd = !!(adminVCModeState && adminVCModeState.data &&
+                        adminVCModeState.data.policy &&
+                        adminVCModeState.data.policy.runtime_is_production);
+      if(onProd){
+        return `
+          <article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px;border:1px dashed var(--border)">
+            <div class="admin-sync-panel-title">${lang==='en'?'Laptop-only controls (hidden on VPS)':'Điều khiển laptop (ẩn trên VPS)'}</div>
+            <div class="admin-sync-callout-bar is-info" style="margin-top:8px">
+              ${lang==='en'
+                ? 'These controls (Pull-from-VPS button, Auto-pull schedule, Local agent token, LaunchAgent installer) only work from a laptop browser where http://127.0.0.1:48735 reaches your local sync agent. On this VPS browser they would be inert and confusing, so they are hidden.'
+                : 'Các điều khiển này (nút Kéo từ VPS, lịch tự kéo, token agent local, cài LaunchAgent) chỉ hoạt động từ trình duyệt laptop nơi http://127.0.0.1:48735 trỏ đúng vào sync agent. Trên trình duyệt VPS chúng không hoạt động và gây hiểu lầm, nên đã ẩn đi.'}
+            </div>
+            <div style="color:var(--text-3);font-size:12px;margin-top:10px;line-height:1.6">
+              ${lang==='en'
+                ? '<strong>To configure laptop ↔ VPS sync:</strong> open the portal on your laptop (e.g. <code>http://127.0.0.1:8092/mom/portal.html</code> with a local <code>php -S</code> server pointed at this repo). Then come back to this same tab — the controls will appear and actually work.'
+                : '<strong>Để cấu hình sync laptop ↔ VPS:</strong> mở portal trên laptop (vd: <code>http://127.0.0.1:8092/mom/portal.html</code> với <code>php -S</code> chạy repo). Quay lại tab này, các điều khiển sẽ hiện và hoạt động thật.'}
+              <br><br>
+              ${lang==='en'
+                ? '<strong>What "Sync: HH:MM" on the header means here:</strong> the timestamp of the LAST laptop that ran <code>data-sync.sh</code> and posted its report to <code>/var/www/data-private/.local-sync-report.json</code>. This VPS only reads that report; it never initiates a pull on its own.'
+                : '<strong>"Sync: HH:MM" trên header nghĩa là gì:</strong> thời gian LAPTOP cuối cùng chạy <code>data-sync.sh</code> và post report về <code>/var/www/data-private/.local-sync-report.json</code>. VPS chỉ đọc report; KHÔNG bao giờ tự pull.'}
+            </div>
+          </article>
+        `;
+      }
+      // Laptop context — render the real controls.
+      return renderAdminVCLocalPullCard() + renderAdminVCLocalAgentCard() + renderAdminVCSyncScheduleCard();
+    })()}
 
     <article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">
       <div class="admin-sync-panel-title">${lang==='en'?'How the 3-tier sync works':'Cách "ống thông" 3 tầng hoạt động'}</div>
