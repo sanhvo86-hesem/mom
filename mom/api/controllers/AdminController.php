@@ -1021,6 +1021,141 @@ class AdminController extends BaseController
     }
 
     /**
+     * GET admin_vc_mode_get — Load the admin Version Control Developer/Operation
+     * mode policy plus the effective mode resolved for the calling user.
+     *
+     * Returns:
+     *   {
+     *     "policy": { "default", "role_overrides", "lock_on_production",
+     *                 "updated_at", "runtime_is_production" },
+     *     "effective_mode": "developer" | "operation",
+     *     "your_roles":     [<role>, ...]
+     *   }
+     *
+     * Any authenticated user may read this — the panel needs the effective
+     * mode to decide which buttons to render. Mutation is admin-only.
+     */
+    public function vcModeGet(): never
+    {
+        $me = $this->requireAuth();
+
+        $configFile = $this->confDir . '/module_access_config.json';
+        $config = module_access_load_config($configFile);
+        $roles = $this->rolesForUser($me);
+        $effective = admin_vc_mode_resolve_for_roles($config, $roles);
+
+        $this->success([
+            'policy' => admin_vc_mode_public_payload($config),
+            'effective_mode' => $effective,
+            'your_roles' => $roles,
+        ]);
+    }
+
+    /**
+     * POST admin_vc_mode_set — Update the admin VC mode policy.
+     *
+     * Body:
+     *   {
+     *     "default":             "developer" | "operation" (optional),
+     *     "role_overrides":      { "<role>": "developer"|"operation", ... } (optional),
+     *     "lock_on_production":  true | false (optional),
+     *     "reason":              "<short audit reason>" (REQUIRED — flows
+     *                            into the audit_events row so an auditor can
+     *                            see why the policy moved)
+     *   }
+     *
+     * Admin-only. Every change is audited with: old policy, new policy,
+     * resolved effective mode for the actor before/after, and the reason.
+     * Frontend ALWAYS prompts for `reason`; backend rejects empty strings
+     * so a future scripted caller can't bypass the audit trail.
+     */
+    public function vcModeSet(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body = $this->jsonBody();
+        $reason = trim((string)($body['reason'] ?? ''));
+        if ($reason === '' || mb_strlen($reason) < 4) {
+            $this->error('reason_required', 400, 'A reason of at least 4 characters is required for VC mode changes.');
+        }
+        if (mb_strlen($reason) > 500) {
+            $reason = mb_substr($reason, 0, 500);
+        }
+
+        $configFile = $this->confDir . '/module_access_config.json';
+        $current = module_access_load_config($configFile);
+        $oldPolicy = admin_vc_mode_normalize((array)($current['admin_vc_mode'] ?? []));
+        $roles = $this->rolesForUser($me);
+        $oldEffective = admin_vc_mode_resolve_for_roles($current, $roles);
+
+        // Merge: anything not provided in the request is carried over from
+        // the existing policy. This keeps the endpoint convenient for
+        // single-field updates (just flip default, just toggle lock) without
+        // forcing the UI to send the full document each time.
+        $merged = [
+            'default' => array_key_exists('default', $body)
+                ? $body['default']
+                : $oldPolicy['default'],
+            'role_overrides' => array_key_exists('role_overrides', $body)
+                ? $body['role_overrides']
+                : $oldPolicy['role_overrides'],
+            'lock_on_production' => array_key_exists('lock_on_production', $body)
+                ? $body['lock_on_production']
+                : $oldPolicy['lock_on_production'],
+        ];
+        $newPolicy = admin_vc_mode_normalize($merged);
+        $newPolicy['updated_at'] = now_iso();
+
+        // Persist by re-saving the full module_access config with the new
+        // vc_mode block merged in. module_access_save_config preserves the
+        // portal_modules + admin_tabs blocks from the on-disk file when not
+        // present in $config (it falls back to defaults if the key is
+        // missing); to avoid resetting access policy we pass them through.
+        $toSave = [
+            'portal_modules' => $current['portal_modules'],
+            'admin_tabs' => $current['admin_tabs'],
+            'admin_vc_mode' => $newPolicy,
+        ];
+        $saved = module_access_save_config($configFile, $toSave);
+        $newEffective = admin_vc_mode_resolve_for_roles($saved, $roles);
+
+        $this->auditLog('admin_vc_mode_set', [
+            'reason' => $reason,
+            'old_policy' => $oldPolicy,
+            'new_policy' => $newPolicy,
+            'old_effective_mode_for_actor' => $oldEffective,
+            'new_effective_mode_for_actor' => $newEffective,
+        ]);
+
+        $this->success([
+            'policy' => admin_vc_mode_public_payload($saved),
+            'effective_mode' => $newEffective,
+            'your_roles' => $roles,
+        ]);
+    }
+
+    /**
+     * Return the list of role slugs held by a user record. Mirrors the
+     * lookups in other admin endpoints — pulls .role, .roles[], and
+     * .role_list[] as a tolerant union so a user record produced by any
+     * historical writer still resolves correctly.
+     */
+    private function rolesForUser(array $user): array
+    {
+        $roles = [];
+        $push = function ($v) use (&$roles) {
+            $r = strtolower(trim((string)$v));
+            if ($r !== '' && !in_array($r, $roles, true)) $roles[] = $r;
+        };
+        if (isset($user['role'])) $push($user['role']);
+        foreach ((array)($user['roles'] ?? []) as $r) $push($r);
+        foreach ((array)($user['role_list'] ?? []) as $r) $push($r);
+        return $roles;
+    }
+
+    /**
      * GET admin_decision_thresholds_get — Load decision-threshold authority data.
      *
      * The persisted JSON is the admin-owned source for threshold wording.

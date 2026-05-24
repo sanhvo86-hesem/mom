@@ -110,6 +110,8 @@ return static function (Router $router, string $dataDir): void {
         'admin_portal_display_config_save' => [AdminController::class, 'savePortalConfig'],
         'module_access_get'                => [AdminController::class, 'getModuleAccessConfig'],
         'admin_module_access_save'         => [AdminController::class, 'saveModuleAccessConfig'],
+        'admin_vc_mode_get'                => [AdminController::class, 'vcModeGet'],
+        'admin_vc_mode_set'                => [AdminController::class, 'vcModeSet'],
         'admin_decision_thresholds_get'    => [AdminController::class, 'decisionThresholdsGet'],
         'admin_decision_thresholds_save'   => [AdminController::class, 'decisionThresholdsSave'],
         'admin_raci_matrix_get'            => [AdminController::class, 'raciMatrixGet'],

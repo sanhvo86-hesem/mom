@@ -8045,6 +8045,14 @@ function markUnsaved(){
 // in a single global so re-renders triggered by other panels don't reset it.
 
 let versionControlSubTab = 'overview';
+// VC Mode (Developer/Operation) — header bar reads `data.effective_mode` to
+// pick which CTAs to surface across all sub-tabs. `data.policy` carries the
+// full policy block for the Settings sub-tab editor. Mode is admin-scoped:
+// admin can read/write; non-admins get effective_mode only (server-resolved).
+let adminVCModeState = {
+  loading:false, loaded:false, error:'', saving:false,
+  data: null  // { policy, effective_mode, your_roles }
+};
 let versionControlOverviewState  = {loading:false, loaded:false, error:'', data:null};
 let versionControlDocsState      = {loading:false, loaded:false, error:'', data:null, search:''};
 let versionControlDocDetailState = {loading:false, loaded:false, error:'', data:null, docCode:''};
@@ -8831,6 +8839,231 @@ function vcFmtTime(iso){
   return gitRepoFormatTime(iso) || iso;
 }
 
+// ── VC Mode (Developer / Operation) ───────────────────────────────────────
+//
+// `loadAdminVCMode` populates adminVCModeState.data with:
+//   {
+//     policy:         { default, role_overrides, lock_on_production,
+//                       updated_at, runtime_is_production },
+//     effective_mode: 'developer' | 'operation',
+//     your_roles:     [<role>, ...]
+//   }
+// Header bar reads `effective_mode` to drive mode-aware button visibility.
+//
+// Auto-loads when the VC panel renders. Other admin tabs can also call
+// loadAdminVCMode() — it's cheap and idempotent.
+async function loadAdminVCMode({force=false, silent=false} = {}){
+  if(adminVCModeState.loading) return;
+  if(adminVCModeState.loaded && !force) return;
+  adminVCModeState = Object.assign({}, adminVCModeState, {loading:true, error:''});
+  if(!silent) renderAdmin();
+  try{
+    const res = await apiCall('admin_vc_mode_get', null, 'GET');
+    if(res && res.success){
+      adminVCModeState = Object.assign({}, adminVCModeState, {
+        loading:false, loaded:true, error:'',
+        data: { policy: res.policy || null, effective_mode: res.effective_mode || 'operation', your_roles: res.your_roles || [] }
+      });
+    }else{
+      const msg = (res && (res.error || res.detail)) || 'vc_mode_load_failed';
+      adminVCModeState = Object.assign({}, adminVCModeState, {loading:false, error:String(msg)});
+    }
+  }catch(e){
+    adminVCModeState = Object.assign({}, adminVCModeState, {loading:false, error:e.message || 'vc_mode_load_failed'});
+  }
+  if(currentPage === 'admin') renderAdmin();
+}
+
+// Effective mode helper for other render functions. Returns 'operation' when
+// unknown — fail-closed so a panel that forgets to load mode shows the
+// safe (manual-gate) CTAs by default.
+function vcEffectiveMode(){
+  const d = adminVCModeState && adminVCModeState.data;
+  if(!d || !d.effective_mode) return 'operation';
+  return d.effective_mode === 'developer' ? 'developer' : 'operation';
+}
+
+// Convenience predicate for mode-gated button visibility.
+function vcIsDeveloperMode(){ return vcEffectiveMode() === 'developer'; }
+
+async function saveAdminVCMode(patch, reason){
+  if(adminVCModeState.saving) return false;
+  const r = String(reason || '').trim();
+  if(r.length < 4){
+    showToast(lang==='en'?'Reason required (≥4 chars) for VC mode change.':'Cần nhập lý do (≥4 ký tự) khi đổi VC mode.', 'error');
+    return false;
+  }
+  adminVCModeState = Object.assign({}, adminVCModeState, {saving:true, error:''});
+  renderAdmin();
+  try{
+    const body = Object.assign({}, patch || {}, {reason: r});
+    const res = await apiCall('admin_vc_mode_set', body, 'POST');
+    if(res && res.success){
+      adminVCModeState = Object.assign({}, adminVCModeState, {
+        saving:false, loaded:true, error:'',
+        data: { policy: res.policy || null, effective_mode: res.effective_mode || 'operation', your_roles: res.your_roles || [] }
+      });
+      showToast(lang==='en'?'VC mode updated. Effective: '+res.effective_mode:'Đã cập nhật VC mode. Hiệu lực: '+res.effective_mode, 'success');
+      renderAdmin();
+      return true;
+    }
+    const msg = (res && (res.error || res.detail)) || 'vc_mode_save_failed';
+    adminVCModeState = Object.assign({}, adminVCModeState, {saving:false, error:String(msg)});
+    showToast((lang==='en'?'VC mode save failed: ':'Lỗi lưu VC mode: ')+String(msg).slice(0,180), 'error');
+    renderAdmin();
+    return false;
+  }catch(e){
+    adminVCModeState = Object.assign({}, adminVCModeState, {saving:false, error:e.message});
+    showToast((lang==='en'?'VC mode save error: ':'Lỗi VC mode: ')+e.message, 'error');
+    renderAdmin();
+    return false;
+  }
+}
+
+// Header-bar quick switcher — flips THIS user's effective mode by patching
+// their first role's override. If the user has no role overrides set, this
+// adds one for the first role they hold. Prompts for a 1-line audit reason.
+async function adminVCQuickSwitchMode(targetMode){
+  const data = adminVCModeState && adminVCModeState.data;
+  if(!data || !data.policy){
+    showToast(lang==='en'?'VC mode policy not loaded.':'Chưa nạp VC mode policy.', 'error');
+    return;
+  }
+  const tm = targetMode === 'developer' ? 'developer' : 'operation';
+  if(data.effective_mode === tm){
+    showToast(lang==='en'?'Already in '+tm+' mode.':'Đang ở chế độ '+tm+' rồi.', 'info');
+    return;
+  }
+  // Block switch attempts that lock_on_production would reject anyway.
+  if(tm === 'developer' && data.policy.runtime_is_production && data.policy.lock_on_production){
+    showToast(lang==='en'
+      ? 'Production runtime is locked to Operation mode. Disable lock_on_production first.'
+      : 'Production runtime đang khoá ở Operation. Tắt lock_on_production trước đã.', 'error');
+    return;
+  }
+  const roles = Array.isArray(data.your_roles) ? data.your_roles : [];
+  if(roles.length === 0){
+    showToast(lang==='en'?'No roles on your account — cannot set per-role override.':'Tài khoản bạn không có role — không thể đặt override.', 'error');
+    return;
+  }
+  const reason = window.prompt(lang==='en'
+    ? 'Reason for switching to '+tm+' mode (logged to audit_events):'
+    : 'Lý do đổi sang chế độ '+tm+' (được ghi vào audit_events):', '');
+  if(reason === null) return;
+  // Merge override into existing role_overrides — keep other roles untouched.
+  const overridesRaw = data.policy.role_overrides;
+  const overrides = (overridesRaw && typeof overridesRaw === 'object' && !Array.isArray(overridesRaw))
+    ? Object.assign({}, overridesRaw)
+    : {};
+  // Set override for ALL roles the user holds, so the resolver returns the
+  // requested mode regardless of which role wins on the server side.
+  roles.forEach(r => { if(r) overrides[r] = tm; });
+  await saveAdminVCMode({role_overrides: overrides}, reason);
+}
+
+// ── VC Header Bar ──────────────────────────────────────────────────────────
+//
+// Persistent header above the sub-tab nav. Always shows:
+//   - Current effective mode (pill, click to quick-switch)
+//   - Last sync timestamp + pill (reads localSyncReportState)
+//   - Last deploy SHA + pill (reads gitRepoStatusState)
+//   - (placeholder for Pha 5) Freeze deploys button
+//
+// Colors come from the same admin-sync-status-pill tone classes used by
+// every other pill in the panel — no hardcoded hex/px values (per ADR-0009
+// + Graphics Authority rules in CLAUDE.md).
+function renderAdminVCHeaderBar(){
+  const mState = adminVCModeState;
+  const mData = mState && mState.data;
+  const mode = vcEffectiveMode();
+  const modeLoaded = !!(mData && mData.policy);
+  const modeTone = mode === 'developer' ? 'warn' : 'good';
+  const modeLabel = mode === 'developer'
+    ? (lang==='en' ? 'Developer' : 'Developer')
+    : (lang==='en' ? 'Operation (ISO)' : 'Operation (ISO)');
+  const lockedOnProd = modeLoaded && mData.policy.lock_on_production && mData.policy.runtime_is_production;
+  const lockIcon = lockedOnProd ? ' 🔒' : '';
+
+  // Last sync: prefer the on-VPS report (most authoritative) and fall back
+  // to the laptop-side last-pull control state.
+  let syncLabel = lang==='en' ? 'Sync: unknown' : 'Sync: --';
+  let syncTone = 'info';
+  if(localSyncReportState && localSyncReportState.data && localSyncReportState.data.report){
+    const r = localSyncReportState.data.report;
+    const ts = r.ts || r.last_sync || r.timestamp;
+    if(ts){
+      syncLabel = (lang==='en' ? 'Sync: ' : 'Sync: ') + vcFmtTime(ts);
+      const drift = Number((dataSyncStatusState && dataSyncStatusState.data && dataSyncStatusState.data.summary && dataSyncStatusState.data.summary.drift_count) || 0);
+      syncTone = drift > 0 ? 'warn' : 'good';
+    }
+  }
+
+  // Last deploy: read git head + remote stack from gitRepoStatusState.
+  let deployLabel = lang==='en' ? 'Deploy: --' : 'Deploy: --';
+  let deployTone = 'info';
+  const gits = gitRepoStatusState && gitRepoStatusState.data;
+  if(gits && gits.head_commit){
+    const sha = (gits.head_commit.sha || '').slice(0, 8);
+    const ts = gits.head_commit.committed_at || gits.head_commit.authored_at;
+    deployLabel = (lang==='en' ? 'Deploy: ' : 'Deploy: ') + sha + (ts ? ' · '+vcFmtTime(ts) : '');
+    const behind = Number(gits.behind_count || 0);
+    const dirty = Number(gits.meaningful_dirty_count || 0);
+    deployTone = (behind > 0 || dirty > 0) ? 'warn' : 'good';
+  }
+
+  // Mode quick-switch menu: only render the toggle button when the user is
+  // an admin (server-side admin_vc_mode_set already gates this, but hiding
+  // the button avoids a confusing 401 path for non-admins). We approximate
+  // admin by checking adminVCModeState.data.policy existence — non-admins
+  // still get effective_mode but the saver returns 401.
+  const switchTarget = mode === 'developer' ? 'operation' : 'developer';
+  const switchLabel = switchTarget === 'developer'
+    ? (lang==='en' ? '→ Developer' : '→ Developer')
+    : (lang==='en' ? '→ Operation' : '→ Operation');
+  const switchDisabled = !modeLoaded || (mState && mState.saving) || lockedOnProd
+    ? ' disabled aria-disabled="true"'
+    : '';
+  const switchTitle = lockedOnProd
+    ? (lang==='en' ? 'Locked on production. Disable lock_on_production first.' : 'Đang khoá trên production. Tắt lock_on_production trước.')
+    : (lang==='en' ? 'Switch effective mode (audited)' : 'Đổi chế độ hiệu lực (sẽ ghi audit)');
+
+  // Loading / error inline notice (small, non-blocking).
+  let notice = '';
+  if(mState && mState.loading && !mState.loaded){
+    notice = '<span style="color:var(--text-3);font-size:11px">'+escapeHtml(lang==='en'?'loading mode…':'đang tải mode…')+'</span>';
+  } else if(mState && mState.error){
+    notice = '<span class="admin-sync-status-pill is-error" title="'+escapeHtml(String(mState.error))+'">'+escapeHtml(lang==='en'?'mode error':'lỗi mode')+'</span>';
+  }
+
+  // Layout: 1 row, 3 logical groups (mode | sync+deploy | actions).
+  // Uses --bg-surface / --border / --text-* tokens, no hardcoded colors.
+  return '<div class="admin-sync-cpanel-card" style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:8px 12px;margin-bottom:10px;background:var(--bg-surface,#fff);border:1px solid var(--border,#d7e3ef);border-radius:8px">'+
+    // Mode group
+    '<div style="display:flex;align-items:center;gap:6px">'+
+      '<span style="color:var(--text-3);font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase">'+escapeHtml(lang==='en'?'Mode':'Chế độ')+'</span>'+
+      vcStatusPill(modeLabel + lockIcon, modeTone)+
+    '</div>'+
+    '<span style="color:var(--border,#d7e3ef)">|</span>'+
+    // Status pills
+    '<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:200px">'+
+      vcStatusPill(syncLabel, syncTone)+
+      vcStatusPill(deployLabel, deployTone)+
+      notice+
+    '</div>'+
+    // Actions: mode switch + Freeze placeholder
+    '<div style="display:flex;align-items:center;gap:6px">'+
+      '<button class="admin-sync-mini" onclick="adminVCQuickSwitchMode(\''+switchTarget+'\')" title="'+switchTitle+'"'+switchDisabled+'>'+
+        escapeHtml(switchLabel)+
+      '</button>'+
+      // Pha 5 placeholder — wired in Pha 5, render as disabled stub now so
+      // operators see the affordance and don't ask "where is freeze".
+      '<button class="admin-sync-mini" disabled aria-disabled="true" title="'+escapeHtml(lang==='en'?'Available in Phase 5':'Có ở Pha 5')+'">'+
+        escapeHtml(lang==='en'?'⛔ Freeze (P5)':'⛔ Freeze (P5)')+
+      '</button>'+
+    '</div>'+
+  '</div>';
+}
+
 function vcStatusPill(label, tone){
   // tone: good | warn | error | info | neutral. Reuses admin-sync-callout-bar
   // tone classes so colors come from the Graphics Authority tokens already
@@ -9339,6 +9572,12 @@ function renderAdminVersionControl(){
     if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error) loadDataSyncStatus({silent:true});
     if(!syncScheduleState.loaded && !syncScheduleState.loading && !syncScheduleState.error) loadSyncSchedule({silent:true});
   }
+  // VC mode + the dependencies the header bar needs to populate sync/deploy
+  // pills are auto-loaded on first entry to the panel (any sub-tab).
+  if(!adminVCModeState.loaded && !adminVCModeState.loading && !adminVCModeState.error) loadAdminVCMode({silent:true});
+  if(!localSyncReportState.loaded && !localSyncReportState.loading && !localSyncReportState.error) loadLocalSyncReport({silent:true});
+  if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error) loadGitRepoStatus({silent:true});
+  if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error) loadDataSyncStatus({silent:true});
 
   let body;
   switch(versionControlSubTab){
@@ -9360,6 +9599,7 @@ function renderAdminVersionControl(){
         ? 'Local ↔ VPS sync, snapshots, doc history, audit, SOP'
         : 'Đồng bộ Local ↔ VPS, snapshot, lịch sử tài liệu, audit, quy trình')+'</h2>'+
     '</header>'+
+    renderAdminVCHeaderBar()+
     renderVCSubTabNav()+
     body;
 }

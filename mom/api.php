@@ -2453,6 +2453,7 @@ function module_access_load_config(string $file): array {
     $id = (string)$meta['id'];
     $config['admin_tabs'][$id] = module_access_normalize_policy((array)($raw['admin_tabs'][$id] ?? []), $meta);
   }
+  $config['admin_vc_mode'] = admin_vc_mode_normalize((array)($raw['admin_vc_mode'] ?? []));
 
   return $config;
 }
@@ -2468,9 +2469,24 @@ function module_access_save_config(string $file, array $config): array {
     $normalized['admin_tabs'][$id] = module_access_normalize_policy((array)($config['admin_tabs'][$id] ?? []), $meta);
   }
 
+  // Preserve admin_vc_mode block: callers of module_access_save_config (the
+  // module-access editor UI) do not send it, so we must merge the existing
+  // on-disk block forward. Otherwise saving the access matrix would silently
+  // reset the Developer/Operation mode policy on every admin_module_access_save.
+  $existingRaw = portal_system_config_shadow_read('module_access_config');
+  if (!is_array($existingRaw)) {
+    $existingRaw = read_json_file($file);
+    if (!is_array($existingRaw)) $existingRaw = [];
+  }
+  $vcModeIn = is_array($config['admin_vc_mode'] ?? null)
+    ? $config['admin_vc_mode']
+    : (is_array($existingRaw['admin_vc_mode'] ?? null) ? $existingRaw['admin_vc_mode'] : []);
+  $normalized['admin_vc_mode'] = admin_vc_mode_normalize($vcModeIn);
+
   $payload = [
     'portal_modules' => $normalized['portal_modules'],
     'admin_tabs' => $normalized['admin_tabs'],
+    'admin_vc_mode' => $normalized['admin_vc_mode'],
     'updated_at' => now_iso(),
   ];
 
@@ -2478,6 +2494,129 @@ function module_access_save_config(string $file, array $config): array {
   portal_system_config_shadow_write('module_access_config', $payload);
 
   return $normalized;
+}
+
+// ── Admin VC Mode (Developer / Operation) ────────────────────────────────────
+//
+// Two-mode policy for the admin Version Control panel. Stored alongside the
+// module-access matrix in module_access_config.json so a single config file
+// remains the SSOT for portal access policy.
+//
+// - default:           global default mode for users with no role override.
+//                      'operation' is the ISO-safe default (manual gates).
+// - role_overrides:    map of role -> 'developer'|'operation'. If a user has
+//                      multiple roles, 'developer' wins (most-permissive mode).
+// - lock_on_production: when true AND the runtime appears to be on the live
+//                      VPS (resolved by admin_vc_mode_runtime_is_production),
+//                      every user is forced to 'operation' regardless of
+//                      role overrides. Break-glass = flip this to false via
+//                      the admin endpoint (audited).
+
+function admin_vc_mode_defaults(): array {
+  return [
+    'default' => 'operation',
+    'role_overrides' => new stdClass(),
+    'lock_on_production' => true,
+    'updated_at' => null,
+  ];
+}
+
+function admin_vc_mode_normalize_value($value, string $fallback = 'operation'): string {
+  $v = strtolower(trim((string)$value));
+  return in_array($v, ['developer', 'operation'], true) ? $v : $fallback;
+}
+
+function admin_vc_mode_normalize(array $raw): array {
+  $defaults = admin_vc_mode_defaults();
+
+  $default = admin_vc_mode_normalize_value($raw['default'] ?? $defaults['default'], 'operation');
+
+  $overridesIn = $raw['role_overrides'] ?? [];
+  if (is_object($overridesIn)) $overridesIn = (array)$overridesIn;
+  if (!is_array($overridesIn)) $overridesIn = [];
+  $overrides = [];
+  foreach ($overridesIn as $role => $mode) {
+    $r = preg_replace('/[^a-z0-9_-]+/', '', strtolower(trim((string)$role)));
+    if ($r === '') continue;
+    $overrides[$r] = admin_vc_mode_normalize_value($mode, $default);
+  }
+  ksort($overrides);
+
+  $lock = array_key_exists('lock_on_production', $raw)
+    ? (bool)$raw['lock_on_production']
+    : $defaults['lock_on_production'];
+
+  $updatedAt = isset($raw['updated_at']) && is_string($raw['updated_at']) && $raw['updated_at'] !== ''
+    ? $raw['updated_at']
+    : null;
+
+  return [
+    'default' => $default,
+    'role_overrides' => $overrides === [] ? new stdClass() : $overrides,
+    'lock_on_production' => $lock,
+    'updated_at' => $updatedAt,
+  ];
+}
+
+/**
+ * Best-effort detection of the live production VPS, so lock_on_production
+ * can enforce 'operation' on the real site without affecting laptop dev runs.
+ * Recognises the canonical hostname and the standard deploy SITE_DIR.
+ */
+function admin_vc_mode_runtime_is_production(): bool {
+  // Explicit env wins (CI/staging override).
+  $envFlag = getenv('HESEM_VC_MODE_FORCE_PRODUCTION');
+  if ($envFlag !== false && $envFlag !== '') {
+    return in_array(strtolower(trim($envFlag)), ['1', 'true', 'yes', 'on'], true);
+  }
+  $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
+  if ($host !== '' && (str_contains($host, 'eqms.hesemeng.com') || str_contains($host, 'hesemeng.com'))) {
+    return true;
+  }
+  $docRoot = (string)($_SERVER['DOCUMENT_ROOT'] ?? '');
+  if (str_starts_with($docRoot, '/var/www/eqms.hesemeng.com') || str_starts_with($docRoot, '/var/www/data-private')) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Resolve effective mode for a user given the current vc_mode config and
+ * the list of roles the user holds. Returns 'developer' or 'operation'.
+ *
+ * Rule order:
+ *   1. If lock_on_production && we're on prod runtime -> 'operation' wins.
+ *   2. If any user role has an override of 'developer' -> 'developer'.
+ *   3. If any user role has an override of 'operation' -> 'operation'.
+ *   4. Fall back to the global default.
+ */
+function admin_vc_mode_resolve_for_roles(array $config, array $roles): string {
+  $cfg = admin_vc_mode_normalize((array)($config['admin_vc_mode'] ?? []));
+  if (!empty($cfg['lock_on_production']) && admin_vc_mode_runtime_is_production()) {
+    return 'operation';
+  }
+  $overrides = is_array($cfg['role_overrides']) ? $cfg['role_overrides'] : [];
+  $sawOperation = false;
+  foreach ($roles as $role) {
+    $r = strtolower(trim((string)$role));
+    if ($r === '') continue;
+    if (!array_key_exists($r, $overrides)) continue;
+    if ($overrides[$r] === 'developer') return 'developer';
+    if ($overrides[$r] === 'operation') $sawOperation = true;
+  }
+  if ($sawOperation) return 'operation';
+  return $cfg['default'];
+}
+
+function admin_vc_mode_public_payload(array $config): array {
+  $cfg = admin_vc_mode_normalize((array)($config['admin_vc_mode'] ?? []));
+  return [
+    'default' => $cfg['default'],
+    'role_overrides' => $cfg['role_overrides'],
+    'lock_on_production' => $cfg['lock_on_production'],
+    'updated_at' => $cfg['updated_at'],
+    'runtime_is_production' => admin_vc_mode_runtime_is_production(),
+  ];
 }
 
 // ── Doc Visualizer Gates Config ──────────────────────────────────────────────
@@ -2554,6 +2693,7 @@ function module_access_public_payload(array $config): array {
     $id = (string)$meta['id'];
     $normalized['admin_tabs'][$id] = module_access_normalize_policy((array)($config['admin_tabs'][$id] ?? []), $meta);
   }
+  $normalized['admin_vc_mode'] = admin_vc_mode_normalize((array)($config['admin_vc_mode'] ?? []));
   return $normalized;
 }
 
