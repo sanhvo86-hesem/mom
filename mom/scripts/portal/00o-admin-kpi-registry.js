@@ -545,6 +545,7 @@ function _setAlert(id, text){
 	  var btn = document.getElementById('kc-save-btn');
 	  if(btn) btn.disabled = _state.saving || !_dirty() || _consoleValidationErrors().length > 0;
 	  _syncAddStatus();
+	  _syncCustomerProfileStatus();
 	}
 
 /* ── Render ───────────────────────────────────────────────────────── */
@@ -850,6 +851,18 @@ function _renderCustomerProfileForm(){
     '<div class="kc-addform-actions"><button class="kc-btn" type="button" onclick="_kpiCustomerProfileClose()">' +
       _t('Hủy', 'Cancel') + '</button><button class="kc-btn primary" type="button" ' + (errors.length ? 'disabled' : '') +
       ' onclick="_kpiCustomerProfileSubmit()">' + _t('Thêm vào danh sách lưu', 'Add to save list') + '</button></div></section>';
+}
+function _syncCustomerProfileStatus(){
+  var form = document.querySelector('.kc-profile-form');
+  if(!form || !_state.customerProfileForm) return;
+  var errors = _customerProfileErrors(_state.customerProfileForm);
+  var alert = form.querySelector('.kc-alert.error');
+  if(alert){
+    alert.innerHTML = errors.map(_esc).join('<br>');
+    alert.hidden = errors.length === 0;
+  }
+  var submit = form.querySelector('button[onclick="_kpiCustomerProfileSubmit()"]');
+  if(submit) submit.disabled = errors.length > 0;
 }
 function _customerProfileSubmit(){
   var f = _state.customerProfileForm || {};
