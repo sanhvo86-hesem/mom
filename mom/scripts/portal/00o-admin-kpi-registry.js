@@ -348,7 +348,17 @@ function _setCounter(section, code, key, value){
 	  }
 	  if(subtype === 'spc_capability_metric' || scoring === 'spc_control_chart' || scoring === 'spec_limit_capability'){
 	    var minN = parseInt(row.sample_min_n_score || ((row.sample_policy || {}).min_n_score), 10);
+	    var internalN = parseInt(row.sample_internal_n || ((row.sample_policy || {}).internal_n), 10);
+	    var customerN = parseInt(row.sample_customer_grade_n || ((row.sample_policy || {}).customer_grade_n), 10);
+	    var stableRequired = !!(row.sample_stability_required || ((row.sample_policy || {}).stability_required));
+	    var gageRequired = !!(row.sample_gage_validity_required || ((row.sample_policy || {}).gage_validity_required));
 	    if(!minN || minN <= 0) e.push(_t('Cpk/SPC thiếu sample_policy.min_n_score.', 'Cpk/SPC missing sample_policy.min_n_score.'));
+	    if(minN && minN < 25) e.push(_t('Cpk/SPC min_n_score phải ≥ 25.', 'Cpk/SPC min_n_score must be at least 25.'));
+	    if(!internalN || internalN < 50) e.push(_t('Cpk/SPC internal_n phải ≥ 50.', 'Cpk/SPC internal_n must be at least 50.'));
+	    if(!customerN || customerN < 100) e.push(_t('Cpk/SPC customer_grade_n phải ≥ 100.', 'Cpk/SPC customer_grade_n must be at least 100.'));
+	    if(!stableRequired) e.push(_t('Cpk/SPC phải yêu cầu stability.', 'Cpk/SPC must require stability.'));
+	    if(!gageRequired) e.push(_t('Cpk/SPC phải yêu cầu gage validity.', 'Cpk/SPC must require gage validity.'));
+	    if(reward && reward !== 'not_rewardable') e.push(_t('Cpk/SPC staged/pilot không được rewardable.', 'Cpk/SPC staged/pilot cannot be rewardable.'));
 	  }
 	  if(subtype === 'composite_readiness_index' || scoring === 'composite_weighted_score'){
 	    var total = _componentWeightTotal(row.components || '');
@@ -473,8 +483,9 @@ var _viewDefs = [
   ['jd', 'JD', 'JD'],
   ['data', 'Data Contracts', 'Data Contracts'],
   ['counter', 'Counter/Blockers', 'Counter/Blockers'],
-  ['quality_escape', 'Quality Escape', 'Quality Escape'],
-  ['retired', 'Retired/Aliases', 'Retired/Aliases'],
+	  ['quality_escape', 'Quality Escape', 'Quality Escape'],
+	  ['ctq_capability', 'CTQ/Cpk', 'CTQ/Cpk'],
+	  ['retired', 'Retired/Aliases', 'Retired/Aliases'],
   ['profiles', 'Hồ sơ Khách', 'Customer Profiles'],
   ['audit', 'Audit/Drift', 'Audit/Drift']
 ];
@@ -509,8 +520,9 @@ function _renderActiveView(){
   if(_state.activeView === 'jd') return _renderJdScorecards();
   if(_state.activeView === 'data') return _renderDataContracts();
   if(_state.activeView === 'counter') return _renderCounterBlockers();
-  if(_state.activeView === 'quality_escape') return _renderQualityEscapeSeverity();
-  if(_state.activeView === 'retired')
+	  if(_state.activeView === 'quality_escape') return _renderQualityEscapeSeverity();
+	  if(_state.activeView === 'ctq_capability') return _renderCtqCapability();
+	  if(_state.activeView === 'retired')
     return _metricPanel(_t('Retired / Aliases', 'Retired / Aliases'), _viewRows('retired_metrics'), false);
   if(_state.activeView === 'profiles') return _renderCustomerProfiles();
   if(_state.activeView === 'audit') return _renderAuditDrift();
@@ -710,7 +722,7 @@ function _renderRegistryContracts(){
   return head + '<div class="kc-prof-grid">' + dashCard + inputCard + '</div>';
 }
 
-function _renderQualityEscapeSeverity(){
+	function _renderQualityEscapeSeverity(){
   var cfg = _state.config || {};
   var matrix = cfg.customer_ncr_severity_matrix || {};
   var dataContract = cfg.customer_ncr_data_contract || {};
@@ -769,7 +781,60 @@ function _renderQualityEscapeSeverity(){
       '<div class="kc-pill-list">' + dashFields + '</div>' +
       '<div class="kc-mini">' + _esc(dash.staged_render_rule || '') + '</div></details>' +
     '</section>';
-}
+	}
+
+	function _renderCtqCapability(){
+	  var cfg = _state.config || {};
+	  var policy = cfg.ctq_capability_policy || {};
+	  var chars = cfg.ctq_characteristics || {};
+	  var contract = cfg.ctq_data_contract || {};
+	  var sampleBands = policy.sample_bands || {};
+	  var metrics = (contract.metrics || []).map(function(code){
+	    var row = ((_state.config || {}).library || []).filter(function(r){
+	      return String(r.canonical_code).toUpperCase() === String(code).toUpperCase();
+	    })[0] || {};
+	    var status = row.calculation_status || row.status || 'staged_data_contract';
+	    var sp = row.sample_policy || {};
+	    return [
+	      code,
+	      status,
+	      row.metric_subtype || '—',
+	      sp.min_n_score || '—',
+	      sp.customer_grade_n || '—',
+	      (row.evidence_source || contract.status || '—')
+	    ];
+	  });
+	  var bandRows = Object.keys(sampleBands).map(function(k){
+	    var b = sampleBands[k] || {};
+	    return [
+	      k,
+	      (b.min_n == null ? '—' : b.min_n) + (b.max_n == null ? '+' : '-' + b.max_n),
+	      b.capability_status || '—',
+	      b.suppress_numeric_cpk ? 'hide Cpk' : 'show Cpk',
+	      b.forbid_green ? 'no green' : 'green allowed',
+	      b.customer_claim_allowed ? 'claim allowed' : 'no customer claim'
+	    ];
+	  });
+	  var reqFields = (chars.required_fields || []).map(function(f){ return '<span class="kc-pill">' + _esc(f) + '</span>'; }).join(' ');
+	  var contractFields = (contract.required_fields || []).map(function(f){
+	    return [f.field || '', f.source || '', f.reason || ''];
+	  });
+	  return '<section class="kc-panel"><div class="kc-panel-head"><h3>' +
+	    _t('CTQ / Cpk / SPC capability', 'CTQ / Cpk / SPC capability') +
+	    '</h3><span class="kc-pill kc-pill--accent">' + _esc(contract.status || 'staged_data_contract') + '</span></div>' +
+	    '<div class="kc-mini">' + _esc(policy.authority_rule || contract.authority_rule || '') + '</div>' +
+	    '<details open><summary>' + _t('Sample policy bands', 'Sample policy bands') + '</summary>' +
+	      (bandRows.length ? _simpleTable(['Band','n','Status','Numeric','Color','Customer'], bandRows) : '<div class="hm-empty">—</div>') + '</details>' +
+	    '<details open><summary>' + _t('Capability metrics', 'Capability metrics') + '</summary>' +
+	      (metrics.length ? _simpleTable(['Metric','Status','Subtype','min_n','customer_n','Evidence'], metrics) : '<div class="hm-empty">—</div>') + '</details>' +
+	    '<details><summary>' + _t('CTQ characteristic required fields', 'CTQ characteristic required fields') + '</summary>' +
+	      '<div class="kc-pill-list">' + reqFields + '</div><div class="kc-mini">' + _esc(chars.staged_gap || '') + '</div></details>' +
+	    '<details><summary>' + _t('Runtime data contract fields', 'Runtime data contract fields') + '</summary>' +
+	      (contractFields.length ? _simpleTable(['Field','Source','Reason'], contractFields) : '<div class="hm-empty">—</div>') + '</details>' +
+	    '<div class="kc-warn">' + _t('Cpk không được xanh khi n<25; provisional 25-49 không reward/claim; customer-grade chỉ khi n≥100 + stable + gage hợp lệ + revalidation sau thay đổi.',
+	      'Cpk cannot be green when n<25; 25-49 provisional is not reward/claim eligible; customer-grade requires n>=100 + stability + valid gage + post-change revalidation.') + '</div>' +
+	    '</section>';
+	}
 
 function _renderOverview(){
   var cfg = _state.config || {};
@@ -1137,6 +1202,12 @@ function _afSet(key, value){
 	    } else if(value === 'spc_capability_metric'){
 	      _state.addForm.measurement_data_type = 'spc_variable';
 	      _state.addForm.scoring_model_detail = 'spec_limit_capability';
+	      _state.addForm.sample_min_n_score = _state.addForm.sample_min_n_score || '25';
+	      _state.addForm.sample_provisional_n = _state.addForm.sample_provisional_n || '25';
+	      _state.addForm.sample_internal_n = _state.addForm.sample_internal_n || '50';
+	      _state.addForm.sample_customer_grade_n = _state.addForm.sample_customer_grade_n || '100';
+	      _state.addForm.sample_stability_required = true;
+	      _state.addForm.sample_gage_validity_required = true;
 		    }
 		    _render();
 		    return;

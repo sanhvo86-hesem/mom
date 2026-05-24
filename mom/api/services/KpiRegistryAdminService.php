@@ -230,6 +230,12 @@ final class KpiRegistryAdminService
                 ? $seed['bonus_simulation_model'] : new \stdClass(),
             'quality_escape_dashboard_contract' => is_array($seed['quality_escape_dashboard_contract'] ?? null)
                 ? $seed['quality_escape_dashboard_contract'] : new \stdClass(),
+            'ctq_characteristics' => is_array($seed['ctq_characteristics'] ?? null)
+                ? $seed['ctq_characteristics'] : new \stdClass(),
+            'ctq_capability_policy' => is_array($seed['ctq_capability_policy'] ?? null)
+                ? $seed['ctq_capability_policy'] : new \stdClass(),
+            'ctq_data_contract' => is_array($seed['ctq_data_contract'] ?? null)
+                ? $seed['ctq_data_contract'] : new \stdClass(),
             // P08 — dashboard render + manual input contracts are exposed to
             // the portal so dashboards and the manual-input form honor the
             // same governance rules (no staged value leak, reward gate on
@@ -712,6 +718,7 @@ final class KpiRegistryAdminService
                 || (int) $sample['min_n_score'] <= 0) {
                 throw new RuntimeException('kpi_registry_mco_sample_policy_missing:' . $code);
             }
+            $this->validateSpcCapabilityContract($row, $code, $sample);
         }
 
         if ($subtype === 'composite_readiness_index' || $scoring === 'composite_weighted_score') {
@@ -725,6 +732,52 @@ final class KpiRegistryAdminService
         }
 
         $this->validateScoringModelRequirements($row, $code, $scoring);
+    }
+
+    /**
+     * Prompt 06 capability enforcement. A Cpk/SPC metric may be staged, but it
+     * must not be born with a policy that can score/reward/customer-claim low-N
+     * or un-gaged data.
+     *
+     * @param array<string, mixed> $row
+     * @param array<string, mixed> $sample
+     */
+    private function validateSpcCapabilityContract(array $row, string $code, array $sample): void
+    {
+        $minN = (int) ($sample['min_n_score'] ?? 0);
+        $internalN = (int) ($sample['internal_n'] ?? 0);
+        $customerN = (int) ($sample['customer_grade_n'] ?? 0);
+        if ($minN < 25 || $internalN < 50 || $customerN < 100) {
+            throw new RuntimeException('kpi_registry_mco_capability_sample_thresholds_invalid:' . $code);
+        }
+        if (($sample['stability_required'] ?? null) !== true) {
+            throw new RuntimeException('kpi_registry_mco_capability_stability_required:' . $code);
+        }
+        if (($sample['gage_validity_required'] ?? null) !== true) {
+            throw new RuntimeException('kpi_registry_mco_capability_gage_validity_required:' . $code);
+        }
+        $rewardMode = strtolower(trim((string) ($row['reward_mode'] ?? '')));
+        $calcStatus = (string) ($row['calculation_status'] ?? '');
+        if ($calcStatus !== 'runtime_calculated' && $rewardMode !== '' && $rewardMode !== 'not_rewardable') {
+            throw new RuntimeException('kpi_registry_mco_capability_staged_not_rewardable:' . $code);
+        }
+        if (($row['reward_eligible'] ?? false) === true || ($row['scorecard_contributes_to_reward'] ?? false) === true) {
+            throw new RuntimeException('kpi_registry_mco_capability_no_direct_reward:' . $code);
+        }
+        if ($calcStatus === 'runtime_calculated') {
+            $dataSource = $row['data_source'] ?? null;
+            $hasCtqSpec = is_array($dataSource)
+                && (
+                    $this->hasText($dataSource, 'ctq_spec_contract')
+                    || $this->hasText($dataSource, 'ctq_spec_source')
+                    || $this->hasText($dataSource, 'spec_source')
+                );
+            if (!$hasCtqSpec) {
+                throw new RuntimeException('kpi_registry_mco_capability_runtime_missing_ctq_spec_source:' . $code);
+            }
+        } elseif (!$this->hasText($row, 'data_contract_gap')) {
+            throw new RuntimeException('kpi_registry_mco_capability_staged_gap_required:' . $code);
+        }
     }
 
     /**

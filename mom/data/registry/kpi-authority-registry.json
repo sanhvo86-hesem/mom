@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
-  "version": "2026-05-24+p05",
-  "schema_version": 22,
+  "version": "2026-05-24+p06",
+  "schema_version": 23,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. The executive scorecard is a lean runtime-backed core; role scorecards use active/candidate measures; proposed metrics remain non-reward until governed evidence and data contracts are approved.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -7585,6 +7585,344 @@
         ],
         "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05"
       }
+    },
+    {
+      "canonical_code": "CPK_PRODUCT_MIN_CTQ",
+      "name": "Minimum Product Cpk Across CTQs",
+      "name_vi": "Cpk nhỏ nhất theo CTQ sản phẩm",
+      "layer": "qms_mes_gate",
+      "status": "staged_data_contract",
+      "calculation_status": "staged_data_contract",
+      "process": "quality_assurance",
+      "category": "customer",
+      "owner_role": "QA",
+      "cadence": "per-event",
+      "metric_type": "operating_metric",
+      "metric_subtype": "spc_capability_metric",
+      "control_intent": "quality_at_source",
+      "measurement_data_type": "spc_variable",
+      "scoring_model_detail": "spec_limit_capability",
+      "evaluation_use": "process_control_review",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "ctq_capability_contract",
+        "lam_profile_gate"
+      ],
+      "usage_contexts": [
+        "process_control_review",
+        "gate_hold_release"
+      ],
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "cpk",
+        "green_point": 1.33,
+        "yellow_point": 1,
+        "target": 1.33,
+        "basis": "Numeric Cpk hidden when n<25; customer-grade claim only when n>=100, stable, gage-valid and post-change revalidated."
+      },
+      "counter_metric": {
+        "code": "CPK_PRODUCT_MIN_CTQ-CTR",
+        "endpoint": "POST /api/kpi/CPK_PRODUCT_MIN_CTQ-CTR/input",
+        "name_vi": "Số CTQ có Cpk xanh giả / thiếu sample",
+        "name": "Số CTQ có Cpk xanh giả / thiếu sample",
+        "intent": "Flags any CTQ shown as capable while sample policy, stability, spec, gage or change revalidation is missing."
+      },
+      "blocking_conditions": [
+        "ctq_sample_policy_insufficient",
+        "ctq_spec_missing_or_unapproved",
+        "invalid_gage_used_for_ctq_measurement",
+        "ctq_revalidation_overdue_after_change"
+      ],
+      "evidence_source": "ctq_characteristics contract + mes_inline_measurements/inspection_results/ipqc_inspection_results + calibration_records + SPC signal evidence",
+      "data_contract_gap": "Existing measurement tables contain values/spec fragments, but no approved CTQ characteristic master plus measurement-to-gage validity-at-measurement join exists yet. Staged: do not emit numeric Cpk.",
+      "target_graduation_condition": "Runtime calculator may turn on only after CTQ characteristic master, measurement samples, sample_window_id, part/revision, gage validity at measurement, SPC stability, and change revalidation are all queryable and covered by tests.",
+      "required_evidence": [
+        "ctq_spec_source",
+        "measurement_value_series",
+        "sample_n",
+        "gage_validity_at_measurement",
+        "stability_status",
+        "change_revalidation_status"
+      ],
+      "unit": "cpk",
+      "data_source": {
+        "ctq_spec_contract": "ctq_characteristics",
+        "measurement_sources": [
+          "mes_inline_measurements",
+          "inspection_results",
+          "ipqc_inspection_results"
+        ],
+        "gage_validity_source": "calibration_records + calibration_grr_studies",
+        "stability_source": "mes_spc_violations/mes_spc_control_limits",
+        "runtime_status": "staged_until_sources_joined"
+      },
+      "sample_policy": {
+        "min_n_score": 25,
+        "provisional_n": 25,
+        "internal_n": 50,
+        "customer_grade_n": 100,
+        "insufficient_max_n": 24,
+        "provisional_min_n": 25,
+        "provisional_max_n": 49,
+        "internal_min_n": 50,
+        "internal_max_n": 99,
+        "stability_required": true,
+        "gage_validity_required": true,
+        "suppress_numeric_below_min_n_score": true,
+        "reward_allowed_before_customer_grade": false,
+        "customer_claim_requires_customer_grade": true,
+        "change_revalidation_required": true
+      }
+    },
+    {
+      "canonical_code": "CPK_COVERAGE_RATE",
+      "name": "CTQ Capability Coverage Rate",
+      "name_vi": "Tỷ lệ CTQ đủ hợp đồng capability",
+      "layer": "qms_mes_gate",
+      "status": "staged_data_contract",
+      "calculation_status": "staged_data_contract",
+      "process": "quality_assurance",
+      "category": "customer",
+      "owner_role": "QA",
+      "cadence": "per-event",
+      "metric_type": "operating_metric",
+      "metric_subtype": "operating_metric",
+      "control_intent": "compliance_evidence",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "rag_3_band",
+      "evaluation_use": "process_control_review",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "ctq_capability_contract",
+        "lam_profile_gate"
+      ],
+      "usage_contexts": [
+        "process_control_review",
+        "gate_hold_release"
+      ],
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 80,
+        "target": 95,
+        "basis": "Share of active LAM CTQs with approved spec, sample policy, gage linkage, and stability contract."
+      },
+      "counter_metric": {
+        "code": "CPK_COVERAGE_RATE-CTR",
+        "endpoint": "POST /api/kpi/CPK_COVERAGE_RATE-CTR/input",
+        "name_vi": "Số CTQ bị claim capability nhưng thiếu coverage",
+        "name": "Số CTQ bị claim capability nhưng thiếu coverage",
+        "intent": "Flags customer-grade capability claims for CTQs not covered by the approved capability contract."
+      },
+      "blocking_conditions": [
+        "ctq_spec_missing_or_unapproved",
+        "ctq_sample_policy_insufficient"
+      ],
+      "evidence_source": "CTQ capability data contract evidence pack",
+      "data_contract_gap": "Need active CTQ master count and approved capability-ready CTQ count by part/revision/profile.",
+      "target_graduation_condition": "Graduate after ctq_characteristics and capability snapshot rows expose active_ctq_count and capability_ready_ctq_count by customer profile.",
+      "required_evidence": [
+        "ctq_spec_source",
+        "measurement_values",
+        "gage_validity_at_measurement",
+        "sample_window"
+      ]
+    },
+    {
+      "canonical_code": "CTQ_MEASUREMENT_COMPLETENESS",
+      "name": "CTQ Measurement Completeness",
+      "name_vi": "Mức hoàn tất đo CTQ",
+      "layer": "qms_mes_gate",
+      "status": "staged_data_contract",
+      "calculation_status": "staged_data_contract",
+      "process": "quality_assurance",
+      "category": "customer",
+      "owner_role": "QA",
+      "cadence": "per-event",
+      "metric_type": "operating_metric",
+      "metric_subtype": "operating_metric",
+      "control_intent": "quality_at_source",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "rag_3_band",
+      "evaluation_use": "process_control_review",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "ctq_capability_contract",
+        "lam_profile_gate"
+      ],
+      "usage_contexts": [
+        "process_control_review",
+        "gate_hold_release"
+      ],
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 95,
+        "target": 100,
+        "basis": "Every required CTQ in the control/inspection plan must have a measurement before downstream release."
+      },
+      "counter_metric": {
+        "code": "CTQ_MEASUREMENT_COMPLETENESS-CTR",
+        "endpoint": "POST /api/kpi/CTQ_MEASUREMENT_COMPLETENESS-CTR/input",
+        "name_vi": "Số CTQ bắt buộc thiếu kết quả đo",
+        "name": "Số CTQ bắt buộc thiếu kết quả đo",
+        "intent": "Flags skipped CTQ measurements hidden behind a passing lot/release."
+      },
+      "blocking_conditions": [
+        "ctq_measurement_missing"
+      ],
+      "evidence_source": "CTQ capability data contract evidence pack",
+      "data_contract_gap": "Need required CTQ list per part/revision/profile and measurement result completeness by operation/lot/shipment.",
+      "target_graduation_condition": "Graduate after required CTQ list joins measurement rows and release gate can prove 100% completion per lot.",
+      "required_evidence": [
+        "ctq_spec_source",
+        "measurement_values",
+        "gage_validity_at_measurement",
+        "sample_window"
+      ]
+    },
+    {
+      "canonical_code": "CTQ_SAMPLE_POLICY_STATUS",
+      "name": "CTQ Sample Policy Status",
+      "name_vi": "Trạng thái chính sách sample CTQ",
+      "layer": "qms_mes_gate",
+      "status": "staged_data_contract",
+      "calculation_status": "staged_data_contract",
+      "process": "quality_assurance",
+      "category": "internal",
+      "owner_role": "QA",
+      "cadence": "per-event",
+      "metric_type": "health_indicator",
+      "metric_subtype": "health_indicator",
+      "control_intent": "data_integrity",
+      "measurement_data_type": "evidence_completeness",
+      "scoring_model_detail": "evidence_completeness_score",
+      "evaluation_use": "process_control_review",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "ctq_capability_contract",
+        "lam_profile_gate"
+      ],
+      "usage_contexts": [
+        "process_control_review",
+        "gate_hold_release"
+      ],
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 90,
+        "target": 100,
+        "basis": "All CTQs must carry sample policy before capability is trusted."
+      },
+      "counter_metric": {
+        "code": "CTQ_SAMPLE_POLICY_STATUS-CTR",
+        "endpoint": "POST /api/kpi/CTQ_SAMPLE_POLICY_STATUS-CTR/input",
+        "name_vi": "Số CTQ thiếu hoặc sai sample policy",
+        "name": "Số CTQ thiếu hoặc sai sample policy",
+        "intent": "Flags CTQ rows whose sample policy would allow fake Cpk scoring."
+      },
+      "blocking_conditions": [
+        "ctq_sample_policy_insufficient"
+      ],
+      "evidence_source": "ctq_characteristics.sample_policy + ctq_capability_policy.sample_policy",
+      "data_contract_gap": "Need governed CTQ characteristic rows with sample_policy attached per part/revision/profile.",
+      "target_graduation_condition": "Graduate after every active CTQ characteristic validates sample_policy thresholds and capability dashboard consumes the policy directly.",
+      "required_evidence": [
+        "sample_policy.min_n_score",
+        "sample_policy.customer_grade_n",
+        "stability_required",
+        "gage_validity_required"
+      ]
+    },
+    {
+      "canonical_code": "POST_CHANGE_CPK_REVALIDATION",
+      "name": "Post-Change Cpk Revalidation",
+      "name_vi": "Tái xác nhận Cpk sau thay đổi",
+      "layer": "qms_mes_gate",
+      "status": "staged_data_contract",
+      "calculation_status": "staged_data_contract",
+      "process": "quality_assurance",
+      "category": "customer",
+      "owner_role": "QA",
+      "cadence": "per-event",
+      "metric_type": "gate_control_metric",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "gate_release_control",
+      "measurement_data_type": "binary_event",
+      "scoring_model_detail": "binary_pass_fail",
+      "evaluation_use": "gate_hold_release",
+      "reward_mode": "blocker_only",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "ctq_capability_contract",
+        "lam_profile_gate"
+      ],
+      "usage_contexts": [
+        "process_control_review",
+        "gate_hold_release"
+      ],
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 99,
+        "target": 100,
+        "basis": "One unrevalidated CTQ-impacting change blocks capability claim."
+      },
+      "counter_metric": {
+        "code": "POST_CHANGE_CPK_REVALIDATION-CTR",
+        "endpoint": "POST /api/kpi/POST_CHANGE_CPK_REVALIDATION-CTR/input",
+        "name_vi": "Số thay đổi CTQ chưa tái xác nhận Cpk",
+        "name": "Số thay đổi CTQ chưa tái xác nhận Cpk",
+        "intent": "Flags process/product changes that kept an old capability claim alive."
+      },
+      "blocking_conditions": [
+        "ctq_revalidation_overdue_after_change",
+        "unauthorized_process_or_product_change"
+      ],
+      "evidence_source": "change control / engineering change / FAI revalidation package + CTQ sample window approval",
+      "data_contract_gap": "Need change event to CTQ characteristic impact mapping and revalidation sample_window_id.",
+      "target_graduation_condition": "Graduate after change controls expose affected CTQs and approved post-change sample windows join capability snapshots.",
+      "required_evidence": [
+        "ctq_spec_source",
+        "measurement_values",
+        "gage_validity_at_measurement",
+        "sample_window"
+      ],
+      "gate": "G1",
+      "linked_cdr": [
+        "D1",
+        "D3"
+      ],
+      "gate_pass_condition": "Any product/process/gage/program/material/customer requirement change affecting a CTQ must restart the Cpk sample window and finish approved revalidation before customer-grade capability claim or shipment release.",
+      "hold_release_rule": "Hold customer-grade capability claim and affected release until post-change CTQ sample window is approved."
     }
   ],
   "dashboard_core_kpis": [
@@ -8507,7 +8845,7 @@
       "is_official_kpi": false,
       "reward_eligible": false,
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
-      "evidence_source": "FRM-631 SPC chart signal log with detection timestamp, reaction timestamp, and containment action",
+      "evidence_source": "FRM-631 SPC chart signal log + mes_spc_violations/eqms_spc_violation_acks contract with detection_at, reaction_at, containment_at and CTQ characteristic link",
       "data_stewardship_role": "WKM",
       "hold_release_rule": "Stop or hold process when SPC reaction exceeds 15 minutes; WKM/QA must verify containment before continuing production.",
       "decision_action": "Escalate to QA; force operator stop-the-line + supervisor intervene.",
@@ -8522,14 +8860,16 @@
         "spc_signal_reaction_late_or_unverified"
       ],
       "owner_alignment_note": "WKM owns immediate reaction; QA verifies that containment and D3/D4 disposition protect the customer.",
-      "data_contract_gap": "SPC signal detection/reaction timestamps are not normalized yet; evidence remains FRM-631/manual log until Prompt 06 capability module.",
-      "target_graduation_condition": "Graduate after SPC chart signal events expose detection_at, reaction_at, containment_at, characteristic, gage_id, job/operation, and active_profile_code.",
+      "data_contract_gap": "SPC signal detection/reaction timestamps are partially available in mes_spc_violations/eqms_spc_violation_acks but not normalized to CTQ capability sample windows; staged until Prompt 06 contract graduates.",
+      "target_graduation_condition": "Graduate after SPC signal events expose detection_at, reaction_at, containment_at, characteristic_id, gage_id, job/operation, active_profile_code, and sample_window_id.",
       "manual_input_form": "FRM-631 SPC chart signal log",
       "required_evidence": [
         "spc_signal_log",
+        "detection_timestamp",
         "reaction_timestamp",
         "containment_action",
-        "qa_verification"
+        "ctq_characteristic_id",
+        "sample_window_id"
       ]
     },
     {
@@ -9277,7 +9617,8 @@
         "basis": "LAM hợp đồng phổ biến yêu cầu CDR; 1 lô thiếu là 1 lần escape."
       },
       "blocking_conditions": [
-        "cdr_required_and_missing"
+        "cdr_required_and_missing",
+        "ctq_check_dimension_report_missing"
       ],
       "process": "quality_assurance",
       "category": "customer",
@@ -9302,11 +9643,21 @@
       "is_official_kpi": false,
       "reward_eligible": false,
       "decision_purpose": "Hold G6/G7 ship release when CDR required and missing.",
-      "evidence_source": "check_dimension_report PDF + shipment evidence pack",
+      "evidence_source": "check_dimension_report PDF + shipment evidence pack + CTQ characteristic/check_dim_number link",
       "data_stewardship_role": "QA",
       "hold_release_rule": "Hold ship release until CDR present + inspector signature; CPS verifies in packing line.",
       "lam_profile_link": "LAM_SEMSYSCO",
-      "decision_action": "Block CoC; QA produces final dim-check before shipment."
+      "decision_action": "Block CoC; QA produces final dim-check before shipment.",
+      "data_contract_gap": "Shipment CDR requirement flag and report evidence path are not fully normalized to CTQ characteristic_id/check_dim_number; staged until shipment evidence contract exposes the link.",
+      "target_graduation_condition": "Graduate after every LAM shipment with CDR requirement exposes report_file_path, characteristic/check_dim_number, inspector, signed_at, shipment_id, part_no and revision.",
+      "required_evidence": [
+        "check_dimension_report_link",
+        "shipment_id",
+        "part_no",
+        "revision",
+        "check_dim_number",
+        "inspector_signature"
+      ]
     },
     {
       "local_id": "KPI-LAM-G4-01",
@@ -10378,20 +10729,96 @@
         "basis": "Invalid gage invalidates in-process measurement and can create false SPC/IPQC pass evidence."
       },
       "blocking_conditions": [
-        "invalid_gage_used_for_ipqc_or_spc"
+        "invalid_gage_used_for_ipqc_or_spc",
+        "invalid_gage_used_for_ctq_measurement"
       ],
-      "evidence_source": "calibration_records, GRR/MSA status, gage_usage_log tied to IPQC/SPC result, suspect-gage hold record",
+      "evidence_source": "calibration_records, calibration_grr_studies, gage_usage_log, and CTQ/IPQC/SPC result link valid at measurement time",
       "hold_release_rule": "Block G5 measurement/release if the gage used for IPQC/SPC is expired, out-of-range, failed GRR, or not traceable to the result; remeasure with valid gage before release.",
       "decision_action": "Block IPQC/SPC result; MCS/QA revalidate gage and remeasure.",
-      "data_contract_gap": "IPQC result to gage_id and calibration validity-at-measurement is not yet fully wired to runtime calculation.",
-      "target_graduation_condition": "Graduate after every IPQC/SPC result carries gage_id and KpiEngine can verify calibration/GRR validity at measurement time.",
+      "data_contract_gap": "IPQC result to gage_id and calibration validity-at-measurement is not yet fully wired; GAGE_VALID_FOR_CTQ_MEASUREMENT is the Prompt 06 exact CTQ blocker contract.",
+      "target_graduation_condition": "Graduate after every IPQC/SPC/CTQ result carries gage_id and runtime can verify calibration/GRR validity at measurement time.",
       "manual_input_form": "FRM-601 calibration log + FRM-651 IPQC measurement evidence",
       "required_evidence": [
         "gage_id",
         "calibration_valid_at_measurement",
         "grr_or_msa_status",
-        "ipqc_result_link"
+        "ipqc_or_spc_result_link",
+        "ctq_characteristic_id"
       ]
+    },
+    {
+      "canonical_code": "GAGE_VALID_FOR_CTQ_MEASUREMENT",
+      "name": "Gage Valid for CTQ Measurement",
+      "name_vi": "Thiết bị đo hợp lệ cho phép đo CTQ",
+      "layer": "qms_mes_gate",
+      "status": "staged_data_contract",
+      "calculation_status": "staged_data_contract",
+      "process": "quality_assurance",
+      "category": "customer",
+      "owner_role": "MCS",
+      "cadence": "per-event",
+      "metric_type": "gate_control_metric",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "customer_specific_requirement",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "binary_pass_fail",
+      "evaluation_use": "gate_hold_release",
+      "reward_mode": "blocker_only",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "ctq_capability_contract",
+        "lam_profile_gate"
+      ],
+      "usage_contexts": [
+        "process_control_review",
+        "gate_hold_release"
+      ],
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 99.5,
+        "target": 100,
+        "basis": "A single invalid CTQ gage makes the capability/check-dim evidence invalid."
+      },
+      "counter_metric": {
+        "code": "GAGE_VALID_FOR_CTQ_MEASUREMENT-CTR",
+        "endpoint": "POST /api/kpi/GAGE_VALID_FOR_CTQ_MEASUREMENT-CTR/input",
+        "name_vi": "Số phép đo CTQ dùng gage không hợp lệ",
+        "name": "Số phép đo CTQ dùng gage không hợp lệ",
+        "intent": "Detects CTQ measurements accepted with expired, out-of-range, failed-GRR, or unlinked gage evidence."
+      },
+      "blocking_conditions": [
+        "invalid_gage_used_for_ctq_measurement",
+        "invalid_gage_used_for_ipqc_or_spc"
+      ],
+      "evidence_source": "mes_inline_measurements.gage_id + calibration_records.next_due/result + calibration_grr_studies + gage usage evidence",
+      "data_contract_gap": "mes_inline_measurements has gage_id, but not all IPQC/SPC/inspection sources expose gage validity-at-measurement consistently.",
+      "target_graduation_condition": "Graduate after every CTQ measurement source carries gage_id and a runtime query proves calibration/MSA validity at measured_at.",
+      "required_evidence": [
+        "gage_id",
+        "calibration_valid_at_measurement",
+        "grr_or_msa_status",
+        "ctq_measurement_link"
+      ],
+      "local_id": "KPI-LAM-G5-05",
+      "classification": "gate_metric_lam_profile",
+      "gate": "G5",
+      "linked_cdr": [
+        "D3",
+        "D14"
+      ],
+      "gate_pass_condition": "100% CTQ measurements used for Cpk/SPC/check-dim evidence carry gage_id and prove calibration/MSA validity at measurement time.",
+      "hold_release_rule": "Block CTQ capability status, CDR, and downstream release when any CTQ measurement uses expired/unsuitable/unlinked gage evidence.",
+      "data_stewardship_role": "QA",
+      "owner_alignment_note": "MCS owns gage status; QA owns CTQ measurement acceptance and LAM D3/D14 release decision.",
+      "data_source": "mes_inline_measurements.gage_id + calibration_records + calibration_grr_studies",
+      "manual_input_form": "FRM-601 calibration log + FRM-651 IPQC measurement evidence + CTQ capability review log",
+      "decision_action": "Block CTQ capability/measurement release; MCS validates gage and QA requires remeasurement before Cpk/CDR use."
     }
   ],
   "document_audit": {
@@ -10700,10 +11127,10 @@
       "retired"
     ],
     "sample_policy_levels": {
-      "insufficient": "n < 25 — display insufficient_data; do not score; do not display Cpk numerically",
-      "provisional": "25 <= n < 50 — score provisionally with a 'provisional' badge; not eligible for reward",
-      "internal": "50 <= n < 100 — internal scoring permitted; not yet customer-grade",
-      "customer_grade": "n >= 100 — full scoring + customer-facing capability claim permitted"
+      "insufficient": "n < 25 — display insufficient_data; do not score; do not display Cpk numerically; forbid green",
+      "provisional": "25 <= n < 50 — internal provisional only; no reward and no customer claim",
+      "internal": "50 <= n < 100 — internal capability only; no customer claim",
+      "customer_grade": "n >= 100 — customer-facing capability claim permitted only when stable, gage-valid, spec-present and change-revalidated"
     },
     "legacy_metric_type_map": {
       "kpi": "official_kpi",
@@ -10927,7 +11354,26 @@
           "attribution_rule"
         ]
       }
-    ]
+    ],
+    "sample_policy": {
+      "min_n_score": 25,
+      "provisional_n": 25,
+      "internal_n": 50,
+      "customer_grade_n": 100,
+      "insufficient_max_n": 24,
+      "provisional_min_n": 25,
+      "provisional_max_n": 49,
+      "internal_min_n": 50,
+      "internal_max_n": 99,
+      "stability_required": true,
+      "gage_validity_required": true,
+      "suppress_numeric_below_min_n_score": true,
+      "reward_allowed_before_customer_grade": false,
+      "customer_claim_requires_customer_grade": true,
+      "change_revalidation_required": true,
+      "policy_ref": "ctq_capability_policy.sample_policy",
+      "render_rule": "n<25 suppresses numeric Cpk and cannot render green; 25-49 provisional; 50-99 internal; n>=100 customer-grade only when stable and gage-valid."
+    }
   },
   "customer_requirement_profiles": {
     "schema_version": 1,
@@ -11025,7 +11471,12 @@
           "written_special_release_required_before_delivery": true,
           "special_release_load_carrier_marking_required": true,
           "rba_law_compliance_required": true,
-          "transparent_information_sharing_required": true
+          "transparent_information_sharing_required": true,
+          "ctq_master_required": true,
+          "ctq_sample_policy_required": true,
+          "cpk_revalidation_after_change_required": true,
+          "spc_reaction_plan_required": true,
+          "cpk_customer_claim_requires_customer_grade_sample": true
         },
         "linked_metrics": [
           "CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED",
@@ -11064,7 +11515,13 @@
           "DEFECTIVE_ORDER_RATE_M",
           "CUSTOMER_ESCAPE_DPPM_12M",
           "NO_LATE_NO_NCR_COUNTER",
-          "NO_CONTAINMENT_COUNTER"
+          "NO_CONTAINMENT_COUNTER",
+          "CPK_PRODUCT_MIN_CTQ",
+          "CPK_COVERAGE_RATE",
+          "CTQ_MEASUREMENT_COMPLETENESS",
+          "CTQ_SAMPLE_POLICY_STATUS",
+          "POST_CHANGE_CPK_REVALIDATION",
+          "GAGE_VALID_FOR_CTQ_MEASUREMENT"
         ],
         "activation_flow": [
           "1. customer master default profile suggestion (customers.profile_code) — never silent for LAM/SEMSYSCO",
@@ -11080,10 +11537,13 @@
           "G1": [
             "CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED",
             "CSR_ACKNOWLEDGEMENT_RATE",
-            "PROCESS_CHANGE_APPROVAL_RATE"
+            "PROCESS_CHANGE_APPROVAL_RATE",
+            "POST_CHANGE_CPK_REVALIDATION"
           ],
           "G2": [
-            "INSPECTION_PLAN_COMPLETENESS"
+            "INSPECTION_PLAN_COMPLETENESS",
+            "CTQ_MEASUREMENT_COMPLETENESS",
+            "CPK_COVERAGE_RATE"
           ],
           "G3": [
             "MATERIAL_CERT_VERIFICATION_COMPLETENESS",
@@ -11102,7 +11562,10 @@
             "SPC_SIGNAL_REACTION_TIME",
             "CMM_QUEUE_AGING",
             "NCR_CONTAINMENT_ON_TIME",
-            "GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT"
+            "GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT",
+            "GAGE_VALID_FOR_CTQ_MEASUREMENT",
+            "CTQ_SAMPLE_POLICY_STATUS",
+            "CPK_PRODUCT_MIN_CTQ"
           ],
           "G6": [
             "CHECK_DIM_REPORT_ON_SHIP",
@@ -11140,7 +11603,14 @@
           "complaint_received_detected_ncr_created_notification_timestamps",
           "3d_4d_8d_customer_response_timestamps",
           "customer_acceptance_or_closure_evidence",
-          "repeat_root_cause_family_review"
+          "repeat_root_cause_family_review",
+          "ctq_characteristic_master_or_approved_ctq_spec_contract",
+          "ctq_sample_policy_status_per_part_revision",
+          "ctq_measurement_value_series_with_sample_window",
+          "gage_validity_at_ctq_measurement_time",
+          "spc_stability_and_signal_reaction_log",
+          "post_change_cpk_revalidation_package",
+          "check_dimension_report_linked_to_ctq_when_required"
         ]
       }
     }
@@ -11811,7 +12281,12 @@
           "recurrence_after_capa",
           "unauthorized_process_or_product_change",
           "ship_deviation_without_special_release",
-          "expired_gage_used_for_release"
+          "expired_gage_used_for_release",
+          "ctq_spec_missing_or_unapproved",
+          "ctq_measurement_missing",
+          "ctq_check_dimension_report_missing",
+          "ctq_revalidation_overdue_after_change",
+          "cdr_required_and_missing"
         ],
         "source_domain": "QMS/MES gate evidence",
         "source_table_or_record": "FAI/first-piece gate; inspection result; setup checklist; CAPA verification evidence",
@@ -11830,7 +12305,11 @@
           "unapproved_quality_cost_adjustment",
           "copq_cost_bucket_not_approved",
           "evidence_tampering_or_signature_misuse",
-          "falsified_customer_quality_record"
+          "falsified_customer_quality_record",
+          "ctq_sample_policy_insufficient",
+          "invalid_gage_used_for_ctq_measurement",
+          "invalid_gage_used_for_ipqc_or_spc",
+          "spc_signal_reaction_late_or_unverified"
         ],
         "source_domain": "ERP/MOM/MES/EQMS audit and finance close",
         "source_table_or_record": "audit trail; promise-date approval; constraint register; OEE reason-code log; finance cost-bucket approval",
@@ -12104,7 +12583,8 @@
       "manual": "Card MAY display the latest manual_input.value but MUST tag it 'nhập tay có kiểm soát' with input_status badge. Pending-review inputs MUST NOT contribute to reward calculation.",
       "manual_governed": "Same as manual but counter_metric_status MUST be visible alongside the primary value.",
       "runtime_calculated": "Card displays the numeric value with the unit. If breakdown.insufficient_data=true the card MUST render grey + insufficient_data_reason and the numeric value MUST be hidden.",
-      "counter_metric_blocker": "If primary KPI is green/yellow but counter_metric is red OR counter_metric is missing/pending, the card MUST show a counter-metric blocker badge and recognition/reward is blocked."
+      "counter_metric_blocker": "If primary KPI is green/yellow but counter_metric is red OR counter_metric is missing/pending, the card MUST show a counter-metric blocker badge and recognition/reward is blocked.",
+      "spc_capability_metric": "Capability cards MUST consume ctq_capability_policy. n<25 renders grey insufficient_data and must hide numeric Cpk; 25-49 provisional cannot be green/reward/customer-claimed; 50-99 internal only; n>=100 may be customer-grade only when stable, gage-valid, spec-present, and post-change revalidated."
     },
     "card_classes": {
       "executive": {
@@ -12220,6 +12700,22 @@
           "gate_blocker"
         ],
         "staged_metric_policy": "Gate blockers do not add points. Open blocker status blocks recognition for the affected scope even when all scored_core metrics are green."
+      },
+      "capability": {
+        "audience": "QA / MCS / WKM CTQ capability review",
+        "metric_types_allowed": [
+          "operating_metric",
+          "gate_control_metric",
+          "health_indicator"
+        ],
+        "calculation_status_allowed": [
+          "runtime_calculated",
+          "manual_governed",
+          "staged_data_contract",
+          "data_contract_required"
+        ],
+        "staged_metric_policy": "Staged capability cards show policy/gap/evidence only. Numeric Cpk must be suppressed until runtime graduation and sample policy permits display.",
+        "required_policy_ref": "ctq_capability_policy"
       }
     }
   },
@@ -19135,5 +19631,363 @@
     ],
     "staged_render_rule": "Show missing evidence/staged contract state, not numeric score, when required timestamps or acceptance evidence are absent.",
     "reward_boundary": "Severity and hard-gate cards are not payout cards; they feed bonus_simulation_model only."
+  },
+  "ctq_capability_policy": {
+    "policy_id": "CTQ-CAPABILITY-POLICY-LAM-SEMSYSCO-2026-05",
+    "version": 1,
+    "introduced_at": "2026-05-24",
+    "authority_rule": "No Cpk/Cp/Ppk value may be rendered green, scored, rewarded, or customer-claimed unless CTQ spec, measurement value, sample size, stability, gage validity, part/revision link, and change revalidation are proven.",
+    "sample_policy": {
+      "min_n_score": 25,
+      "provisional_n": 25,
+      "internal_n": 50,
+      "customer_grade_n": 100,
+      "insufficient_max_n": 24,
+      "provisional_min_n": 25,
+      "provisional_max_n": 49,
+      "internal_min_n": 50,
+      "internal_max_n": 99,
+      "stability_required": true,
+      "gage_validity_required": true,
+      "suppress_numeric_below_min_n_score": true,
+      "reward_allowed_before_customer_grade": false,
+      "customer_claim_requires_customer_grade": true,
+      "change_revalidation_required": true
+    },
+    "sample_bands": {
+      "insufficient": {
+        "min_n": 0,
+        "max_n": 24,
+        "capability_status": "insufficient_data",
+        "suppress_numeric_cpk": true,
+        "score_allowed": false,
+        "forbid_green": true,
+        "reward_allowed": false,
+        "customer_claim_allowed": false
+      },
+      "provisional": {
+        "min_n": 25,
+        "max_n": 49,
+        "capability_status": "provisional_internal_only",
+        "suppress_numeric_cpk": false,
+        "score_allowed": false,
+        "forbid_green": true,
+        "reward_allowed": false,
+        "customer_claim_allowed": false
+      },
+      "internal": {
+        "min_n": 50,
+        "max_n": 99,
+        "capability_status": "internal_capability_only",
+        "suppress_numeric_cpk": false,
+        "score_allowed": true,
+        "forbid_green": false,
+        "reward_allowed": false,
+        "customer_claim_allowed": false
+      },
+      "customer_grade": {
+        "min_n": 100,
+        "capability_status": "customer_grade_when_stable_and_gage_valid",
+        "suppress_numeric_cpk": false,
+        "score_allowed": true,
+        "forbid_green": false,
+        "reward_allowed": false,
+        "customer_claim_allowed": true
+      }
+    },
+    "formulas": {
+      "two_sided": "Cpk = min((USL - mean) / (3 * sigma), (mean - LSL) / (3 * sigma))",
+      "upper_only": "Cpu = (USL - mean) / (3 * sigma); one-sided capability = Cpu",
+      "lower_only": "Cpl = (mean - LSL) / (3 * sigma); one-sided capability = Cpl",
+      "sigma_rule": "Use sample standard deviation over the approved CTQ sample window; zero/negative sigma is invalid and must not become infinity."
+    },
+    "stability_rule": "SPC stability must be proven before assigning internal/customer-grade capability status; active out-of-control signal downgrades to blocked_status regardless of Cpk value.",
+    "gage_rule": "Each measurement used in Cpk must carry gage_id and calibration/MSA validity at measurement time; invalid/unknown gage blocks the capability claim.",
+    "change_revalidation_rule": "Product revision, process route, CNC program, setup, gage method, material, or customer requirement change restarts the approved sample window and requires POST_CHANGE_CPK_REVALIDATION before any customer-grade claim.",
+    "render_rules": {
+      "insufficient": "Render grey insufficient_data badge; hide numeric Cpk; forbid green.",
+      "provisional": "Render provisional badge; numeric display allowed for internal review only; no reward or customer claim.",
+      "internal": "Render internal capability badge; no customer claim.",
+      "customer_grade": "Render customer-grade only when n>=100, stable=true, gage_valid=true, spec_present=true, and change_revalidated=true."
+    },
+    "runtime_graduation_required_fields": [
+      "characteristic_id",
+      "customer_profile",
+      "part_no",
+      "revision",
+      "feature_name",
+      "spec_type",
+      "lsl_or_usl_per_spec_type",
+      "target",
+      "unit",
+      "measurement_value",
+      "measured_at",
+      "gage_id",
+      "calibration_valid_at_measurement",
+      "sample_window_id",
+      "sample_n",
+      "stability_status",
+      "change_revalidation_status"
+    ]
+  },
+  "ctq_characteristics": {
+    "contract_id": "CTQ-CHARACTERISTIC-MASTER-CONTRACT-2026-05",
+    "status": "staged_registry_data_contract",
+    "authority_rule": "CTQ characteristic master is the governed spec source for capability. Existing inspection/SPC tables may supply evidence, but they do not become CTQ master authority until the fields below are normalized and approved.",
+    "required_fields": [
+      "characteristic_id",
+      "customer_profile",
+      "part_no",
+      "revision",
+      "feature_name",
+      "spec_type",
+      "lsl",
+      "usl",
+      "target",
+      "unit",
+      "gage_required",
+      "check_dimension_report_required",
+      "sample_policy"
+    ],
+    "field_specs": {
+      "characteristic_id": "Stable CTQ identifier; must map to inspection/measurement characteristic_id where runtime exists.",
+      "customer_profile": "LAM_SEMSYSCO or another approved customer profile code.",
+      "part_no": "Customer/HESEM part number under the approved revision.",
+      "revision": "Part/drawing revision; capability does not carry across revision without revalidation.",
+      "feature_name": "Drawing/balloon/CMM feature name.",
+      "spec_type": "two_sided | upper_only | lower_only; target_only_reference is not valid for Cpk.",
+      "lsl": "Required for two_sided/lower_only; nullable only for upper_only with staged gap.",
+      "usl": "Required for two_sided/upper_only; nullable only for lower_only with staged gap.",
+      "target": "Nominal/target value when supplied by drawing/control plan.",
+      "unit": "Measurement unit, matching measurement source unit.",
+      "gage_required": "Boolean; true for every Cpk/CTQ capability metric.",
+      "check_dimension_report_required": "Boolean; true when drawing/PO/customer profile marks CDR required.",
+      "sample_policy": "Reference to ctq_capability_policy.sample_policy."
+    },
+    "spec_type_enum": [
+      "two_sided",
+      "upper_only",
+      "lower_only"
+    ],
+    "source_of_truth_order": [
+      "control_plan_characteristics.special/ctq characteristics when released",
+      "inspection_plan + inspection_characteristic when CTQ/spec fields are released",
+      "customer drawing / PO / check-dimension marking captured as evidence until runtime CTQ master exists"
+    ],
+    "candidate_existing_tables": [
+      "control_plan_characteristics",
+      "inspection_plan",
+      "inspection_characteristic",
+      "inspection_results",
+      "mes_inline_measurements",
+      "mes_spc_control_limits",
+      "fai_characteristics"
+    ],
+    "staged_gap": "No single approved CTQ master table currently owns all Prompt 06 fields and customer-profile assignment; capability metrics remain staged until this contract graduates."
+  },
+  "ctq_data_contract": {
+    "contract_id": "CTQ-SPC-CAPABILITY-DATA-CONTRACT-2026-05",
+    "status": "staged_data_contract",
+    "authority_rule": "Runtime Cpk is forbidden unless every source below resolves for the same customer_profile + part_no + revision + characteristic_id + sample_window.",
+    "runtime_graduation_rule": "Only metrics with calculation_status=runtime_calculated may emit numeric Cpk, and only after CTQ spec, measurement values, gage validity, stability and change revalidation are proven by queryable fields.",
+    "required_sources": {
+      "ctq_spec_source": {
+        "candidate_tables": [
+          "ctq_characteristics_future",
+          "control_plan_characteristics",
+          "inspection_characteristic",
+          "inspection_results",
+          "mes_inline_measurements"
+        ],
+        "required_fields": [
+          "characteristic_id",
+          "customer_profile",
+          "part_no",
+          "revision",
+          "feature_name",
+          "spec_type",
+          "lsl",
+          "usl",
+          "target",
+          "unit"
+        ],
+        "gap": "inspection_results and mes_inline_measurements hold spec columns, but customer_profile + approved CTQ master authority is not normalized."
+      },
+      "measurement_values": {
+        "candidate_tables": [
+          "mes_inline_measurements",
+          "inspection_results",
+          "ipqc_inspection_results",
+          "spc_data"
+        ],
+        "required_fields": [
+          "characteristic_id",
+          "part_no",
+          "revision",
+          "measurement_value",
+          "measured_at",
+          "sample_window_id"
+        ],
+        "gap": "ipqc_inspection_results lacks gage_id and part/revision fields; spc_data has precomputed Cpk but no CTQ spec authority."
+      },
+      "gage_validity_at_measurement": {
+        "candidate_tables": [
+          "mes_inline_measurements.gage_id",
+          "calibration_records",
+          "calibration_grr_studies",
+          "tooling_calibration_links"
+        ],
+        "required_fields": [
+          "gage_id",
+          "calibration_result",
+          "next_due",
+          "grr_status",
+          "measured_at"
+        ],
+        "pass_condition": "calibration_result pass, measured_at <= next_due, GRR/MSA accepted, and gage range/method suitable for the CTQ."
+      },
+      "stability_signal": {
+        "candidate_tables": [
+          "mes_spc_violations",
+          "mes_spc_control_limits",
+          "spc_data"
+        ],
+        "required_fields": [
+          "characteristic_id",
+          "sample_window_id",
+          "stability_status",
+          "open_spc_signal_count",
+          "reaction_at"
+        ],
+        "pass_condition": "No open/unreacted SPC signal in the approved sample window."
+      },
+      "check_dimension_report": {
+        "evidence_path": "shipment evidence pack / check_dimension_report PDF / customer portal evidence reference",
+        "required_fields": [
+          "shipment_id",
+          "part_no",
+          "revision",
+          "characteristic_id",
+          "report_file_path",
+          "inspector_id",
+          "signed_at"
+        ],
+        "pass_condition": "CDR attached before shipment when drawing/PO/profile marks CDR required."
+      },
+      "change_revalidation": {
+        "candidate_tables": [
+          "plm_change_orders",
+          "eqms_change_controls",
+          "engineering_change_requests",
+          "fai_records"
+        ],
+        "required_fields": [
+          "change_id",
+          "affected_part_no",
+          "affected_revision",
+          "effective_at",
+          "ctq_characteristic_id",
+          "revalidation_sample_window_id",
+          "approved_at"
+        ],
+        "pass_condition": "Any approved product/process/gage/method change has a post-change capability sample window before customer-grade claim."
+      }
+    },
+    "required_fields": [
+      {
+        "field": "characteristic_id",
+        "source": "ctq_spec_source + measurement_values",
+        "reason": "join spec to measurements"
+      },
+      {
+        "field": "customer_profile",
+        "source": "customer_requirement_profile_assignment_event",
+        "reason": "LAM/Semsysco applicability"
+      },
+      {
+        "field": "part_no",
+        "source": "ctq_spec_source + measurement_values",
+        "reason": "part identity"
+      },
+      {
+        "field": "revision",
+        "source": "ctq_spec_source + measurement_values",
+        "reason": "revision-specific capability"
+      },
+      {
+        "field": "spec_type",
+        "source": "ctq_characteristics",
+        "reason": "two-sided vs one-sided formula"
+      },
+      {
+        "field": "lsl",
+        "source": "ctq_characteristics",
+        "reason": "required for two-sided/lower-only capability"
+      },
+      {
+        "field": "usl",
+        "source": "ctq_characteristics",
+        "reason": "required for two-sided/upper-only capability"
+      },
+      {
+        "field": "measurement_value",
+        "source": "mes_inline_measurements/inspection_results/ipqc_inspection_results",
+        "reason": "sample data"
+      },
+      {
+        "field": "measured_at",
+        "source": "measurement_values",
+        "reason": "sample window and calibration validity"
+      },
+      {
+        "field": "gage_id",
+        "source": "measurement_values",
+        "reason": "gage validity at measurement"
+      },
+      {
+        "field": "calibration_valid_at_measurement",
+        "source": "calibration_records + MSA/GRR",
+        "reason": "block invalid measurements"
+      },
+      {
+        "field": "sample_n",
+        "source": "sample window aggregation",
+        "reason": "sample policy enforcement"
+      },
+      {
+        "field": "stability_status",
+        "source": "SPC signal source",
+        "reason": "capability status requires stability"
+      },
+      {
+        "field": "check_dimension_report_link",
+        "source": "shipment evidence pack",
+        "reason": "CDR on ship gate"
+      },
+      {
+        "field": "change_revalidation_status",
+        "source": "change control + FAI/revalidation window",
+        "reason": "post-change Cpk reset"
+      }
+    ],
+    "runtime_blockers": [
+      "ctq_spec_missing_or_unapproved",
+      "ctq_measurement_missing",
+      "ctq_sample_policy_insufficient",
+      "invalid_gage_used_for_ctq_measurement",
+      "ctq_check_dimension_report_missing",
+      "ctq_revalidation_overdue_after_change",
+      "spc_signal_reaction_late_or_unverified"
+    ],
+    "metrics": [
+      "CPK_PRODUCT_MIN_CTQ",
+      "CPK_COVERAGE_RATE",
+      "CTQ_MEASUREMENT_COMPLETENESS",
+      "CTQ_SAMPLE_POLICY_STATUS",
+      "POST_CHANGE_CPK_REVALIDATION",
+      "CHECK_DIM_REPORT_ON_SHIP",
+      "GAGE_VALID_FOR_CTQ_MEASUREMENT",
+      "SPC_SIGNAL_REACTION_TIME"
+    ]
   }
 }

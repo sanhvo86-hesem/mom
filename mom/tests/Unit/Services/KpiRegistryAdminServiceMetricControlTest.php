@@ -33,6 +33,27 @@ final class KpiRegistryAdminServiceMetricControlTest extends TestCase
         $validator($row, true);
     }
 
+    public function testServiceAllowsStagedPilotCpkMetricWithStrictSamplePolicy(): void
+    {
+        $validator = $this->validator();
+
+        $validator($this->completeCpkMetricControlRow(), true);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testServiceRejectsCpkMetricWithoutGageValidityPolicy(): void
+    {
+        $validator = $this->validator();
+        $row = $this->completeCpkMetricControlRow();
+        $row['sample_policy']['gage_validity_required'] = false;
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('kpi_registry_mco_capability_gage_validity_required:TEST_CPK_SERVICE');
+
+        $validator($row, true);
+    }
+
     /**
      * @return callable(array<string, mixed>, bool): void
      */
@@ -87,5 +108,46 @@ final class KpiRegistryAdminServiceMetricControlTest extends TestCase
             ],
             'blocking_conditions' => ['service_test_blocker'],
         ], $overrides);
+    }
+
+    /**
+     * @param array<string, mixed> $overrides
+     * @return array<string, mixed>
+     */
+    private function completeCpkMetricControlRow(array $overrides = []): array
+    {
+        return array_merge($this->completeMetricControlRow([
+            'canonical_code' => 'TEST_CPK_SERVICE',
+            'name' => 'Test Cpk service metric',
+            'name_vi' => 'Metric kiểm thử Cpk',
+            'metric_subtype' => 'spc_capability_metric',
+            'control_intent' => 'quality_at_source',
+            'measurement_data_type' => 'spc_variable',
+            'scoring_model_detail' => 'spec_limit_capability',
+            'evaluation_use' => 'process_control_review',
+            'reward_mode' => 'not_rewardable',
+            'thresholds' => [
+                'direction' => 'higher_is_better',
+                'unit' => 'cpk',
+                'green_point' => 1.33,
+                'yellow_point' => 1.0,
+            ],
+            'counter_metric' => [
+                'name_vi' => 'Counter Cpk service test',
+                'intent' => 'Prevent Cpk policy drift from passing.',
+            ],
+            'blocking_conditions' => [
+                'ctq_sample_policy_insufficient',
+                'invalid_gage_used_for_ctq_measurement',
+            ],
+            'sample_policy' => [
+                'min_n_score' => 25,
+                'provisional_n' => 25,
+                'internal_n' => 50,
+                'customer_grade_n' => 100,
+                'stability_required' => true,
+                'gage_validity_required' => true,
+            ],
+        ]), $overrides);
     }
 }

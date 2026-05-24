@@ -172,6 +172,98 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
         );
     }
 
+    public function testRejectsRuntimeCpkWithoutCtqSpecSource(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'CPK_PRODUCT_MIN_CTQ', static function (array &$row): void {
+                    $row['calculation_status'] = 'runtime_calculated';
+                    $row['data_source'] = ['measurement_sources' => ['mes_inline_measurements']];
+                });
+            },
+            'Prompt 06 CPK_PRODUCT_MIN_CTQ: runtime Cpk metric requires CTQ spec source.',
+        );
+    }
+
+    public function testRejectsCpkRewardableBeforeCustomerGrade(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'CPK_PRODUCT_MIN_CTQ', static function (array &$row): void {
+                    $row['reward_mode'] = 'bonus_pool_candidate';
+                    $row['reward_eligible'] = true;
+                });
+            },
+            'Prompt 06 CPK_PRODUCT_MIN_CTQ: Cpk/SPC capability metrics must not be directly rewardable',
+        );
+    }
+
+    public function testRejectsCheckDimMetricMissingFromLamProfile(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $profile =& $registry['customer_requirement_profiles']['profiles']['LAM_SEMSYSCO'];
+                $profile['linked_metrics'] = array_values(array_filter(
+                    $profile['linked_metrics'],
+                    static fn(string $code): bool => $code !== 'CHECK_DIM_REPORT_ON_SHIP',
+                ));
+                $profile['gate_coverage']['G6'] = array_values(array_filter(
+                    $profile['gate_coverage']['G6'],
+                    static fn(string $code): bool => $code !== 'CHECK_DIM_REPORT_ON_SHIP',
+                ));
+            },
+            'Prompt 06 LAM_SEMSYSCO: CHECK_DIM_REPORT_ON_SHIP must be linked',
+        );
+    }
+
+    public function testRejectsCapabilityPolicyThatCanRenderGreenWithInsufficientSample(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['ctq_capability_policy']['sample_bands']['insufficient']['forbid_green'] = false;
+            },
+            'Prompt 06 ctq_capability_policy.sample_bands.insufficient must suppress numeric Cpk',
+        );
+    }
+
+    public function testRejectsCpkMetricWithoutSpecContractOrStagedGap(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['proposed_operating_metrics'][] = self::baseFakeMetric([
+                    'canonical_code' => 'FAKE_CPK_NO_SPEC_GAP_P06',
+                    'metric_subtype' => 'spc_capability_metric',
+                    'control_intent' => 'quality_at_source',
+                    'measurement_data_type' => 'spc_variable',
+                    'scoring_model_detail' => 'spec_limit_capability',
+                    'reward_mode' => 'not_rewardable',
+                    'data_contract_gap' => '',
+                    'sample_policy' => [
+                        'min_n_score' => 25,
+                        'provisional_n' => 25,
+                        'internal_n' => 50,
+                        'customer_grade_n' => 100,
+                        'stability_required' => true,
+                        'gage_validity_required' => true,
+                    ],
+                ]);
+            },
+            'Prompt 06 FAKE_CPK_NO_SPEC_GAP_P06: Cpk metric must declare CTQ spec source or staged data_contract_gap.',
+        );
+    }
+
+    public function testRejectsGageValidityBlockerMissingForCtqMeasurement(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'GAGE_VALID_FOR_CTQ_MEASUREMENT', static function (array &$row): void {
+                    $row['blocking_conditions'] = ['invalid_gage_used_for_ipqc_or_spc'];
+                });
+            },
+            'Prompt 06 GAGE_VALID_FOR_CTQ_MEASUREMENT: missing invalid_gage_used_for_ctq_measurement blocker.',
+        );
+    }
+
     /**
      * @param callable(array<string, mixed>): void $mutate
      */

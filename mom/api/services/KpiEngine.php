@@ -828,6 +828,9 @@ final class KpiEngine
             'customer_ncr_data_contract' => is_array($registry['customer_ncr_data_contract'] ?? null) ? $registry['customer_ncr_data_contract'] : [],
             'bonus_simulation_model' => is_array($registry['bonus_simulation_model'] ?? null) ? $registry['bonus_simulation_model'] : [],
             'quality_escape_dashboard_contract' => is_array($registry['quality_escape_dashboard_contract'] ?? null) ? $registry['quality_escape_dashboard_contract'] : [],
+            'ctq_characteristics' => is_array($registry['ctq_characteristics'] ?? null) ? $registry['ctq_characteristics'] : [],
+            'ctq_capability_policy' => is_array($registry['ctq_capability_policy'] ?? null) ? $registry['ctq_capability_policy'] : [],
+            'ctq_data_contract' => is_array($registry['ctq_data_contract'] ?? null) ? $registry['ctq_data_contract'] : [],
             'document_audit' => is_array($registry['document_audit'] ?? null) ? $registry['document_audit'] : [],
             'performance_governance_audit' => is_array($registry['performance_governance_audit'] ?? null) ? $registry['performance_governance_audit'] : [],
             'jd_scorecards' => $jdScorecards,
@@ -3625,13 +3628,33 @@ final class KpiEngine
 	            'evidence_status' => $evidenceStatus,
 	            'sample_policy' => $samplePolicy,
 	            'usage_contexts' => $usageContexts,
-	            'counter_metric_status' => [
-	                'status' => is_array($counterMetric) ? 'present' : 'missing',
-	                'code' => is_array($counterMetric) ? (string) ($counterMetric['code'] ?? '') : '',
-	                'intent' => is_array($counterMetric) ? (string) ($counterMetric['intent'] ?? '') : '',
-	            ],
-	        ];
-	    }
+            'counter_metric_status' => [
+                'status' => is_array($counterMetric) ? 'present' : 'missing',
+                'code' => is_array($counterMetric) ? (string) ($counterMetric['code'] ?? '') : '',
+                'intent' => is_array($counterMetric) ? (string) ($counterMetric['intent'] ?? '') : '',
+            ],
+        ];
+        if (($metric['metric_subtype'] ?? '') === 'spc_capability_metric'
+            || ($metric['scoring_model_detail'] ?? '') === 'spec_limit_capability') {
+            $metric['metric_control']['capability'] = [
+                'policy' => 'ctq_capability_policy',
+                'min_n_score' => is_array($samplePolicy) ? ($samplePolicy['min_n_score'] ?? null) : null,
+                'provisional_n' => is_array($samplePolicy) ? ($samplePolicy['provisional_n'] ?? null) : null,
+                'internal_n' => is_array($samplePolicy) ? ($samplePolicy['internal_n'] ?? null) : null,
+                'customer_grade_n' => is_array($samplePolicy) ? ($samplePolicy['customer_grade_n'] ?? null) : null,
+                'numeric_suppressed_below_min_n' => is_array($samplePolicy)
+                    ? (bool) ($samplePolicy['suppress_numeric_below_min_n_score'] ?? true)
+                    : true,
+                'stability_required' => is_array($samplePolicy)
+                    ? (bool) ($samplePolicy['stability_required'] ?? true)
+                    : true,
+                'gage_validity_required' => is_array($samplePolicy)
+                    ? (bool) ($samplePolicy['gage_validity_required'] ?? true)
+                    : true,
+                'customer_claim_rule' => 'n>=customer_grade_n and stable+gage-valid+spec-present+post-change-revalidated',
+            ];
+        }
+    }
 
 	    /**
 	     * @param array<string, mixed> $registry

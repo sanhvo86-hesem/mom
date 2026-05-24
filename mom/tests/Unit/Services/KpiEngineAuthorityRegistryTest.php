@@ -77,8 +77,16 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
 
         $this->assertSame(30, $catalog['counts']['runtime_calculated_metrics'] ?? null);
         $this->assertSame(18, $catalog['counts']['dashboard_core_kpis'] ?? null);
-        $this->assertSame(41, $catalog['counts']['gate_control_metrics'] ?? null);
-        $this->assertSame(129, $catalog['counts']['proposed_operating_metrics'] ?? null);
+        $this->assertSame(42, $catalog['counts']['gate_control_metrics'] ?? null);
+        $this->assertSame(134, $catalog['counts']['proposed_operating_metrics'] ?? null);
+        $this->assertSame(
+            'CTQ-CAPABILITY-POLICY-LAM-SEMSYSCO-2026-05',
+            $catalog['ctq_capability_policy']['policy_id'] ?? null,
+        );
+        $this->assertSame(
+            'CTQ-SPC-CAPABILITY-DATA-CONTRACT-2026-05',
+            $catalog['ctq_data_contract']['contract_id'] ?? null,
+        );
         $this->assertNotEmpty($catalog['data_contract_required_fields'] ?? []);
         $this->assertContains('canonical_code', $catalog['data_contract_required_fields'] ?? []);
         $this->assertContains('metric_type', $catalog['data_contract_required_fields'] ?? []);

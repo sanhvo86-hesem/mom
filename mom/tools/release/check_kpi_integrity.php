@@ -1737,6 +1737,227 @@ if (is_array($complaintRate)) {
     }
 }
 
+// ── P0.16 — Prompt 06 CTQ/Cpk/SPC capability guard ──────────────────────────
+// Cpk is dangerous when the system cannot prove CTQ spec, sample size, gage
+// validity-at-measurement, stability, and post-change revalidation. These rules
+// keep Prompt 06 metrics staged/data-contract-only until the runtime proof chain
+// exists.
+$p06RequiredMetricCodes = [
+    'CPK_PRODUCT_MIN_CTQ',
+    'CPK_COVERAGE_RATE',
+    'CTQ_MEASUREMENT_COMPLETENESS',
+    'CTQ_SAMPLE_POLICY_STATUS',
+    'POST_CHANGE_CPK_REVALIDATION',
+    'CHECK_DIM_REPORT_ON_SHIP',
+    'GAGE_VALID_FOR_CTQ_MEASUREMENT',
+    'SPC_SIGNAL_REACTION_TIME',
+];
+foreach ($p06RequiredMetricCodes as $code) {
+    if (!isset($rowsByCodeP05[$code])) {
+        $p0[] = "Prompt 06 required metric '$code' missing from KPI registry.";
+    }
+}
+
+$ctqCharacteristics = is_array($registry['ctq_characteristics'] ?? null)
+    ? $registry['ctq_characteristics'] : [];
+$ctqCapabilityPolicy = is_array($registry['ctq_capability_policy'] ?? null)
+    ? $registry['ctq_capability_policy'] : [];
+$ctqDataContract = is_array($registry['ctq_data_contract'] ?? null)
+    ? $registry['ctq_data_contract'] : [];
+if ($ctqCharacteristics === []) {
+    $p0[] = "Prompt 06 ctq_characteristics contract missing.";
+} else {
+    $requiredCtqFields = [
+        'characteristic_id', 'customer_profile', 'part_no', 'revision', 'feature_name',
+        'spec_type', 'lsl', 'usl', 'target', 'unit', 'gage_required',
+        'check_dimension_report_required', 'sample_policy',
+    ];
+    $declared = array_map('strval', is_array($ctqCharacteristics['required_fields'] ?? null)
+        ? $ctqCharacteristics['required_fields'] : []);
+    foreach ($requiredCtqFields as $field) {
+        if (!in_array($field, $declared, true)) {
+            $p0[] = "Prompt 06 ctq_characteristics.required_fields missing '$field'.";
+        }
+    }
+    $specTypes = array_map('strval', is_array($ctqCharacteristics['spec_type_enum'] ?? null)
+        ? $ctqCharacteristics['spec_type_enum'] : []);
+    foreach (['two_sided', 'upper_only', 'lower_only'] as $specType) {
+        if (!in_array($specType, $specTypes, true)) {
+            $p0[] = "Prompt 06 ctq_characteristics.spec_type_enum missing '$specType'.";
+        }
+    }
+}
+if ($ctqCapabilityPolicy === []) {
+    $p0[] = "Prompt 06 ctq_capability_policy missing.";
+} else {
+    $samplePolicy = is_array($ctqCapabilityPolicy['sample_policy'] ?? null)
+        ? $ctqCapabilityPolicy['sample_policy'] : [];
+    if ((int) ($samplePolicy['min_n_score'] ?? 0) < 25
+        || (int) ($samplePolicy['internal_n'] ?? 0) < 50
+        || (int) ($samplePolicy['customer_grade_n'] ?? 0) < 100) {
+        $p0[] = "Prompt 06 ctq_capability_policy.sample_policy must enforce n<25 insufficient, 50+ internal, 100+ customer-grade.";
+    }
+    foreach (['stability_required', 'gage_validity_required'] as $flag) {
+        if (($samplePolicy[$flag] ?? null) !== true) {
+            $p0[] = "Prompt 06 ctq_capability_policy.sample_policy.$flag MUST be true.";
+        }
+    }
+    $bands = is_array($ctqCapabilityPolicy['sample_bands'] ?? null)
+        ? $ctqCapabilityPolicy['sample_bands'] : [];
+    $insufficient = is_array($bands['insufficient'] ?? null) ? $bands['insufficient'] : [];
+    if (($insufficient['suppress_numeric_cpk'] ?? null) !== true
+        || ($insufficient['forbid_green'] ?? null) !== true
+        || ($insufficient['score_allowed'] ?? null) !== false
+        || ($insufficient['customer_claim_allowed'] ?? null) !== false) {
+        $p0[] = "Prompt 06 ctq_capability_policy.sample_bands.insufficient must suppress numeric Cpk, forbid green, forbid score and forbid customer claim.";
+    }
+    $provisional = is_array($bands['provisional'] ?? null) ? $bands['provisional'] : [];
+    if (($provisional['reward_allowed'] ?? null) !== false
+        || ($provisional['customer_claim_allowed'] ?? null) !== false) {
+        $p0[] = "Prompt 06 ctq_capability_policy.sample_bands.provisional must forbid reward and customer claim.";
+    }
+}
+if ($ctqDataContract === []) {
+    $p0[] = "Prompt 06 ctq_data_contract missing.";
+} else {
+    $requiredSources = is_array($ctqDataContract['required_sources'] ?? null)
+        ? $ctqDataContract['required_sources'] : [];
+    foreach (['ctq_spec_source', 'measurement_values', 'gage_validity_at_measurement', 'stability_signal', 'check_dimension_report', 'change_revalidation'] as $source) {
+        if (!is_array($requiredSources[$source] ?? null)) {
+            $p0[] = "Prompt 06 ctq_data_contract.required_sources missing '$source'.";
+        }
+    }
+    $contractFieldSet = [];
+    foreach ((array) ($ctqDataContract['required_fields'] ?? []) as $fieldSpec) {
+        if (is_array($fieldSpec)) {
+            $field = trim((string) ($fieldSpec['field'] ?? ''));
+            if ($field !== '') {
+                $contractFieldSet[$field] = true;
+            }
+        }
+    }
+    foreach (['characteristic_id', 'measurement_value', 'gage_id', 'calibration_valid_at_measurement', 'sample_n', 'stability_status', 'change_revalidation_status'] as $field) {
+        if (!isset($contractFieldSet[$field])) {
+            $p0[] = "Prompt 06 ctq_data_contract.required_fields missing '$field'.";
+        }
+    }
+}
+
+$capabilityRows = [];
+foreach ([$governance, $gateMetrics, $proposed] as $set) {
+    foreach ($set as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $subtype = (string) ($row['metric_subtype'] ?? '');
+        $scoring = (string) ($row['scoring_model_detail'] ?? '');
+        $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+        if ($subtype === 'spc_capability_metric' || in_array($scoring, ['spec_limit_capability', 'spc_control_chart'], true)) {
+            $capabilityRows[$code] = $row;
+        }
+    }
+}
+foreach ($capabilityRows as $code => $row) {
+    $sample = is_array($row['sample_policy'] ?? null) ? $row['sample_policy'] : [];
+    if ((int) ($sample['min_n_score'] ?? 0) < 25
+        || (int) ($sample['internal_n'] ?? 0) < 50
+        || (int) ($sample['customer_grade_n'] ?? 0) < 100) {
+        $p0[] = "Prompt 06 $code: Cpk/SPC sample_policy thresholds must enforce 25/50/100 sample bands.";
+    }
+    foreach (['stability_required', 'gage_validity_required'] as $flag) {
+        if (($sample[$flag] ?? null) !== true) {
+            $p0[] = "Prompt 06 $code: sample_policy.$flag MUST be true.";
+        }
+    }
+    $reward = strtolower(trim((string) ($row['reward_mode'] ?? '')));
+    if (($row['reward_eligible'] ?? false) === true
+        || ($row['scorecard_contributes_to_reward'] ?? false) === true
+        || in_array($reward, ['bonus_pool_candidate', 'team_reward_candidate', 'role_review_input'], true)) {
+        $p0[] = "Prompt 06 $code: Cpk/SPC capability metrics must not be directly rewardable while sample bands can be insufficient/provisional.";
+    }
+    $dataSource = $row['data_source'] ?? null;
+    $hasCtqSpec = is_array($dataSource)
+        && (
+            trim((string) ($dataSource['ctq_spec_contract'] ?? '')) !== ''
+            || trim((string) ($dataSource['ctq_spec_source'] ?? '')) !== ''
+            || trim((string) ($dataSource['spec_source'] ?? '')) !== ''
+        );
+    $hasGap = trim((string) ($row['data_contract_gap'] ?? '')) !== '';
+    if ((string) ($row['calculation_status'] ?? '') === 'runtime_calculated' && !$hasCtqSpec) {
+        $p0[] = "Prompt 06 $code: runtime Cpk metric requires CTQ spec source.";
+    }
+    if (!$hasCtqSpec && !$hasGap) {
+        $p0[] = "Prompt 06 $code: Cpk metric must declare CTQ spec source or staged data_contract_gap.";
+    }
+}
+
+$lamProfile = is_array($profiles['LAM_SEMSYSCO'] ?? null) ? $profiles['LAM_SEMSYSCO'] : [];
+$lamReq = is_array($lamProfile['quality_requirements'] ?? null) ? $lamProfile['quality_requirements'] : [];
+$lamLinked = array_map('strtoupper', array_map('strval', (array) ($lamProfile['linked_metrics'] ?? [])));
+$lamCoverage = is_array($lamProfile['gate_coverage'] ?? null) ? $lamProfile['gate_coverage'] : [];
+if (($lamReq['check_dimension_report_required_when_marked'] ?? false) === true) {
+    if (!in_array('CHECK_DIM_REPORT_ON_SHIP', $lamLinked, true)) {
+        $p0[] = "Prompt 06 LAM_SEMSYSCO: CHECK_DIM_REPORT_ON_SHIP must be linked when check-dimension report requirement is enabled.";
+    }
+    $g6 = array_map('strtoupper', array_map('strval', (array) ($lamCoverage['G6'] ?? [])));
+    if (!in_array('CHECK_DIM_REPORT_ON_SHIP', $g6, true)) {
+        $p0[] = "Prompt 06 LAM_SEMSYSCO: gate_coverage.G6 must include CHECK_DIM_REPORT_ON_SHIP.";
+    }
+}
+foreach (['CPK_PRODUCT_MIN_CTQ', 'CTQ_SAMPLE_POLICY_STATUS', 'GAGE_VALID_FOR_CTQ_MEASUREMENT'] as $code) {
+    if (!in_array($code, $lamLinked, true)) {
+        $p0[] = "Prompt 06 LAM_SEMSYSCO: linked_metrics missing '$code'.";
+    }
+}
+
+$ctqGage = $rowsByCodeP05['GAGE_VALID_FOR_CTQ_MEASUREMENT'] ?? null;
+if (is_array($ctqGage)) {
+    $blockers = array_map('strval', (array) ($ctqGage['blocking_conditions'] ?? []));
+    if (!in_array('invalid_gage_used_for_ctq_measurement', $blockers, true)) {
+        $p0[] = "Prompt 06 GAGE_VALID_FOR_CTQ_MEASUREMENT: missing invalid_gage_used_for_ctq_measurement blocker.";
+    }
+}
+$checkDim = $rowsByCodeP05['CHECK_DIM_REPORT_ON_SHIP'] ?? null;
+if (is_array($checkDim)) {
+    $required = strtolower((string) (($checkDim['evidence_source'] ?? '') . ' ' . ($checkDim['target_graduation_condition'] ?? '')));
+    foreach (['check_dimension_report', 'shipment', 'part_no', 'revision'] as $token) {
+        if (!str_contains($required, strtolower($token))) {
+            $p0[] = "Prompt 06 CHECK_DIM_REPORT_ON_SHIP: evidence path must mention $token.";
+        }
+    }
+}
+$spcReaction = $rowsByCodeP05['SPC_SIGNAL_REACTION_TIME'] ?? null;
+if (is_array($spcReaction)) {
+    $spcText = strtolower((string) (($spcReaction['evidence_source'] ?? '') . ' ' . ($spcReaction['target_graduation_condition'] ?? '')));
+    foreach (['detection', 'reaction', 'containment', 'characteristic'] as $token) {
+        if (!str_contains($spcText, $token)) {
+            $p0[] = "Prompt 06 SPC_SIGNAL_REACTION_TIME: evidence contract must include $token.";
+        }
+    }
+}
+foreach ([
+    'ctq_sample_policy_insufficient',
+    'ctq_spec_missing_or_unapproved',
+    'ctq_measurement_missing',
+    'invalid_gage_used_for_ctq_measurement',
+    'ctq_check_dimension_report_missing',
+    'ctq_revalidation_overdue_after_change',
+    'spc_signal_reaction_late_or_unverified',
+] as $conditionId) {
+    if (!isset($conditionIds[$conditionId])) {
+        $p0[] = "Prompt 06 blocking condition '$conditionId' missing from blocking_condition_registry.";
+    }
+}
+$dashboardContractP06 = is_array($registry['dashboard_render_contract'] ?? null)
+    ? $registry['dashboard_render_contract'] : [];
+$dashboardRenderRules = is_array($dashboardContractP06['render_rules'] ?? null) ? $dashboardContractP06['render_rules'] : [];
+$capabilityRender = strtolower((string) ($dashboardRenderRules['spc_capability_metric'] ?? ''));
+foreach (['n<25', 'hide', 'provisional', 'n>=100', 'gage'] as $token) {
+    if (!str_contains($capabilityRender, strtolower($token))) {
+        $p0[] = "Prompt 06 dashboard_render_contract.render_rules.spc_capability_metric must mention '$token'.";
+    }
+}
+
 // ── P0.8.1 — dashboard_render_contract present + shape complete ──────────────
 // P08 introduced dashboard_render_contract; every dashboard surface honors
 // the same governance fields per card. A missing or shape-broken contract
