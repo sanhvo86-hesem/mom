@@ -7906,7 +7906,11 @@ function renderAdminSyncConfigBadge(){
   </article>`;
 }
 
-function renderAdminSyncPanelV2(){
+// Pha 2: renderAdminSyncPanelV2 deprecated — its functionality folded into
+// renderAdminVCStatus (Release readiness card + git facts row). Body
+// preserved in comments for one release cycle so rollback is trivial.
+/*
+function renderAdminSyncPanelV2_DEPRECATED_PHA2(){
   const status = gitRepoStatusState.data && typeof gitRepoStatusState.data === 'object' ? gitRepoStatusState.data : null;
   const statusError = String(gitRepoStatusState.error || '').trim();
   const relativeState = gitRepoRelativeState(status);
@@ -8031,6 +8035,7 @@ function renderAdminSyncPanelV2(){
       </article>
     </section>`;
 }
+*/
 
 function markUnsaved(){
   adminUnsaved = true;
@@ -8044,7 +8049,10 @@ function markUnsaved(){
 // separate panes instead of one ever-scrolling wall. Sub-tab state is held
 // in a single global so re-renders triggered by other panels don't reset it.
 
-let versionControlSubTab = 'overview';
+// Pha 2: default sub-tab is 'status' (was 'overview'). Anyone resuming a
+// session whose URL/hash still says 'overview', 'sync', or 'process' is
+// normalised to 'status' by setVersionControlSubTab on first call.
+let versionControlSubTab = 'status';
 // VC Mode (Developer/Operation) — header bar reads `data.effective_mode` to
 // pick which CTAs to surface across all sub-tabs. `data.policy` carries the
 // full policy block for the Settings sub-tab editor. Mode is admin-scoped:
@@ -8088,20 +8096,28 @@ let _autoSyncRunning   = false;  // guard: prevent concurrent auto-sync calls
 
 function setVersionControlSubTab(id){
   if(typeof id !== 'string' || !id) return;
+  // Pha 2: normalise deprecated sub-tab ids to 'status'. Anything else
+  // that doesn't match the current tab list also falls through to 'status'
+  // so we never end up rendering a blank panel for a stale id.
+  const validTabs = ['status','config_sync','local_sync','snapshots','doc_history','audit'];
+  if(id === 'overview' || id === 'sync' || id === 'process') id = 'status';
+  if(validTabs.indexOf(id) === -1) id = 'status';
   if(versionControlSubTab === id) return;
   versionControlSubTab = id;
   // Lazy-load the data needed by the chosen sub-tab.
-  if(id === 'overview' && !versionControlOverviewState.loaded && !versionControlOverviewState.loading){
-    loadVersionControlOverview({silent:true});
+  if(id === 'status'){
+    // Status reads overview data + git status. Both auto-load on first
+    // entry to the VC panel too (see renderAdminVersionControl), but
+    // refreshing here on tab switch keeps the UI snappy if a user
+    // navigates between tabs.
+    if(!versionControlOverviewState.loaded && !versionControlOverviewState.loading) loadVersionControlOverview({silent:true});
+    if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading) loadGitRepoStatus({silent:true});
   } else if(id === 'doc_history' && !versionControlDocsState.loaded && !versionControlDocsState.loading){
     loadVersionControlDocs({silent:true});
   } else if(id === 'audit' && !versionControlAuditState.loaded && !versionControlAuditState.loading){
     loadVersionControlAudit({silent:true});
   } else if(id === 'snapshots' && !dataSyncSnapshotsState.loaded && !dataSyncSnapshotsState.loading){
     loadDataSyncSnapshots({silent:true});
-  } else if(id === 'sync'){
-    if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading) loadGitRepoStatus({silent:true});
-    if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading) loadDataSyncStatus({silent:true});
   } else if(id === 'config_sync'){
     if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading) loadDataSyncStatus({silent:true});
   } else if(id === 'local_sync'){
@@ -9076,15 +9092,18 @@ function vcStatusPill(label, tone){
 }
 
 function renderVCSubTabNav(){
+  // Pha 2: 8 → 6 tabs.
+  // Removed: overview (→ folded into status), sync/git (→ folded into
+  // status), process/SOP (→ moved to docs/admin-vc-panel-sop.md, linked
+  // from status). Pha 3 will further merge snapshots+doc_history+audit
+  // into a single timeline tab; Pha 4 adds a Settings tab. Final IA = 4.
   const tabs = [
-    {id:'overview',    en:'Overview',          vi:'Tổng quan'},
-    {id:'sync',        en:'Sync (Git)',         vi:'Đồng bộ Git'},
+    {id:'status',      en:'Status',             vi:'Trạng thái'},
     {id:'config_sync', en:'Config Sync',        vi:'Đồng bộ Config File'},
     {id:'local_sync',  en:'Local sync',         vi:'Đồng bộ local↔VPS'},
     {id:'snapshots',   en:'Snapshots',          vi:'Snapshot & rollback'},
     {id:'doc_history', en:'Doc history',        vi:'Lịch sử tài liệu'},
-    {id:'audit',       en:'Audit log',          vi:'Nhật ký kiểm toán'},
-    {id:'process',     en:'Process / SOP',      vi:'Quy trình SOP'}
+    {id:'audit',       en:'Audit log',          vi:'Nhật ký kiểm toán'}
   ];
   const buttons = tabs.map(t => {
     const isActive = (versionControlSubTab === t.id);
@@ -9100,8 +9119,12 @@ function renderVCSubTabNav(){
          'style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px 0">'+buttons+'</nav>';
 }
 
-// ── Sub-tab: Overview ─────────────────────────────────────────────────────
-function renderAdminVCOverview(){
+// ── Sub-tab: Overview (Pha 2 — deprecated; merged into renderAdminVCStatus) ──
+// Old function body kept as commented-out placeholder for one release cycle
+// so a rollback can resurrect it without spelunking through git history.
+// Remove entirely in the cleanup PR after the mega-PR ships.
+/*
+function renderAdminVCOverview_DEPRECATED_PHA2(){
   const state = versionControlOverviewState;
   if(state.loading && !state.data){
     return '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">'+
@@ -9188,6 +9211,7 @@ function renderAdminVCOverview(){
     '</article>'+
   '</section>';
 }
+*/
 
 // ── Sub-tab: Snapshots (with intro context) ──────────────────────────────
 function renderAdminVCSnapshots(){
@@ -9439,7 +9463,212 @@ function renderAdminVCAuditLog(){
 }
 
 // ── Sub-tab: Process / SOP ───────────────────────────────────────────────
-function renderAdminVCProcess(){
+// ── Sub-tab: Status (Pha 2 — merged Overview tiles + Git readiness) ──────
+//
+// Replaces three old tabs:
+//   - overview       (renderAdminVCOverview — tiles + recent revisions)
+//   - sync   (Git)   (renderAdminSyncPanelV2 — repo status read-only)
+//   - process (SOP)  (renderAdminVCProcess — static markdown; moved to
+//                     docs/admin-vc-panel-sop.md and linked from this tab)
+//
+// Status layout (top → bottom):
+//   1. Release readiness card (git readiness + mode-aware CTA placeholder)
+//   2. Four metric tiles (config drift / snapshots / docs / 7d changes)
+//   3. Recent revisions table (mirrors Overview)
+//   4. Quick links to SOP markdown + drill-into Config Sync / Doc history
+function renderAdminVCStatus(){
+  const oState = versionControlOverviewState;
+  const gState = gitRepoStatusState;
+  const isDev = vcIsDeveloperMode();
+
+  // ── A. Release readiness card (was: Sync (Git) tab) ────────────────────
+  const gitData = gState && gState.data ? gState.data : null;
+  const gitErr = String(gState && gState.error || '').trim();
+  const dirtyN = gitData ? Number(gitData.meaningful_dirty_count || 0) : 0;
+  const behindN = gitData ? Number(gitData.behind_count || 0) : 0;
+  const aheadN = gitData ? Number(gitData.ahead_count || 0) : 0;
+  const branch = String((gitData && gitData.branch) || 'main');
+  const headSha = (gitData && gitData.head_commit && gitData.head_commit.sha || '').slice(0, 12);
+  const remoteSha = (gitData && gitData.remote_head_commit && gitData.remote_head_commit.sha || '').slice(0, 12);
+
+  let readinessTone = 'good';
+  let readinessLabel = lang==='en' ? 'Ready to deploy' : 'Sẵn sàng deploy';
+  let readinessExpl = lang==='en'
+    ? 'Working tree clean, in sync with origin/' + branch + '.'
+    : 'Working tree sạch, đang khớp với origin/' + branch + '.';
+  if(gState && gState.loading && !gitData){
+    readinessTone = 'info';
+    readinessLabel = lang==='en' ? 'Loading…' : 'Đang tải…';
+    readinessExpl = '';
+  } else if(gitErr){
+    readinessTone = 'error';
+    readinessLabel = lang==='en' ? 'Status unavailable' : 'Không đọc được trạng thái';
+    readinessExpl = gitErr;
+  } else if(!gitData){
+    readinessTone = 'info';
+    readinessLabel = lang==='en' ? 'Status not loaded' : 'Chưa nạp trạng thái';
+    readinessExpl = '';
+  } else if(dirtyN > 0){
+    readinessTone = 'warn';
+    readinessLabel = lang==='en' ? 'VPS working tree dirty' : 'Working tree VPS đang bẩn';
+    readinessExpl = (lang==='en' ? dirtyN + ' file(s) modified on VPS. Resolve via SSH or rerun deploy.'
+                                 : dirtyN + ' file đã sửa trên VPS. SSH xử lý hoặc deploy lại.');
+  } else if(behindN > 0){
+    readinessTone = 'warn';
+    readinessLabel = lang==='en' ? 'Origin ahead' : 'Origin có commit mới';
+    readinessExpl = (lang==='en' ? behindN + ' commit(s) on origin/' + branch + ' not yet on VPS. Run deploy.'
+                                 : behindN + ' commit ở origin/' + branch + ' chưa lên VPS. Chạy deploy.');
+  } else if(aheadN > 0){
+    readinessTone = 'warn';
+    readinessLabel = lang==='en' ? 'VPS ahead of origin' : 'VPS đang trước origin';
+    readinessExpl = (lang==='en' ? aheadN + ' commit(s) on VPS not on origin/' + branch + '. Unusual — investigate.'
+                                 : aheadN + ' commit trên VPS chưa có ở origin/' + branch + '. Bất thường — kiểm tra.');
+  }
+
+  // Mode-aware CTA — Pha 4 wires these to real endpoints. For now they are
+  // disabled stubs that show the affordance + which mode owns each action.
+  const devCTA = '<button class="admin-sync-mini" disabled aria-disabled="true" title="'+
+    escapeHtml(lang==='en'?'Wired in Phase 4 (git push + GHA poll)':'Có ở Pha 4 (git push + theo dõi GHA)')+'">'+
+    escapeHtml(lang==='en'?'🚀 Push & Deploy (P4)':'🚀 Push & Deploy (P4)')+
+    '</button>';
+  const opCTA = '<button class="admin-sync-mini" disabled aria-disabled="true" title="'+
+    escapeHtml(lang==='en'?'Wired in Phase 4 (creates change_request row)':'Có ở Pha 4 (tạo change_request)')+'">'+
+    escapeHtml(lang==='en'?'📝 Submit deploy request (P4)':'📝 Gửi yêu cầu deploy (P4)')+
+    '</button>';
+  const modeCTA = isDev ? devCTA : opCTA;
+  const modeCTANote = isDev
+    ? (lang==='en'?'Developer mode — direct deploy authorised once Pha 4 lands.':'Developer mode — deploy thẳng sau khi Pha 4 hoàn tất.')
+    : (lang==='en'?'Operation mode — change request flow only.':'Operation mode — luồng change request bắt buộc.');
+
+  const readinessHtml =
+    '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">'+
+      '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:flex-start">'+
+        '<div>'+
+          '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'Release readiness':'Sẵn sàng phát hành')+'</div>'+
+          '<div style="margin-top:6px">'+vcStatusPill(readinessLabel, readinessTone)+'</div>'+
+          (readinessExpl ? '<div style="margin-top:6px;color:var(--text-3);font-size:12px">'+escapeHtml(readinessExpl)+'</div>' : '')+
+        '</div>'+
+        '<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">'+
+          modeCTA+
+          '<div style="color:var(--text-3);font-size:11px;max-width:260px;text-align:right">'+escapeHtml(modeCTANote)+'</div>'+
+          '<button class="admin-sync-mini" onclick="adminRefreshGitRepoStatus()">'+
+            escapeHtml(lang==='en'?'Refresh':'Làm mới')+
+          '</button>'+
+        '</div>'+
+      '</div>'+
+      // Compact git facts row — replaces the 2-column "Basic info / Remote state"
+      // grid from the old sync tab. Same data, ~70% less vertical space.
+      '<div class="admin-sync-meta-list" style="margin-top:10px">'+
+        '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Branch':'Nhánh')+'</div><div class="admin-sync-meta-value"><code>'+escapeHtml(branch)+'</code></div></div>'+
+        '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'HEAD on VPS':'HEAD trên VPS')+'</div><div class="admin-sync-meta-value"><code>'+escapeHtml(headSha || '--')+'</code></div></div>'+
+        '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'HEAD on origin':'HEAD trên origin')+'</div><div class="admin-sync-meta-value"><code>'+escapeHtml(remoteSha || '--')+'</code></div></div>'+
+        '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Counts':'Lệch số commit')+'</div><div class="admin-sync-meta-value">'+
+          escapeHtml((lang==='en'?'behind ':'sau ')+behindN+(lang==='en'?', ahead ':', trước ')+aheadN+(lang==='en'?', dirty ':', bẩn ')+dirtyN)+
+        '</div></div>'+
+      '</div>'+
+    '</article>';
+
+  // ── B. Four metric tiles (was: Overview top row) ───────────────────────
+  const data = oState && oState.data ? oState.data : {};
+  const drift = data.config_drift || {};
+  const snap = data.snapshots || {};
+  const act = data.doc_activity || {};
+  const driftTone = (Number(drift.drift_count||0) > 0) ? 'warn' : 'good';
+  const driftMsg = (Number(drift.drift_count||0) > 0)
+    ? (lang==='en'? Number(drift.drift_count)+' file(s) differ between site and mirror.'
+                  : Number(drift.drift_count)+' file đang lệch giữa site và mirror.')
+    : (lang==='en'? 'All '+Number(drift.total_files||0)+' runtime files match the mirror.'
+                  : 'Tất cả '+Number(drift.total_files||0)+' file runtime khớp mirror.');
+
+  const tile = (titleVi, titleEn, value, sub, tone, jump) => {
+    const cls = (tone==='warn'?'is-warn':tone==='error'?'is-error':tone==='good'?'is-good':'is-info');
+    const jumpAttr = jump ? ' style="cursor:pointer" onclick="setVersionControlSubTab(\''+jump+'\')" title="'+escapeHtml(lang==='en'?'Open '+jump:'Mở '+jump)+'"' : '';
+    return '<article class="admin-sync-cpanel-card"'+jumpAttr+'>'+
+      '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?titleEn:titleVi)+'</div>'+
+      '<div style="font-size:28px;font-weight:700;line-height:1.1;margin-top:6px">'+escapeHtml(String(value))+'</div>'+
+      (sub ? '<div class="admin-sync-callout-bar '+cls+'" style="margin-top:8px">'+escapeHtml(sub)+'</div>' : '')+
+    '</article>';
+  };
+
+  const tilesHtml = '<div class="admin-sync-cpanel-grid" style="margin-top:12px">'+
+    tile('Lệch cấu hình runtime','Runtime config drift', Number(drift.drift_count||0), driftMsg, driftTone, 'config_sync')+
+    tile('Snapshot đang giữ','Snapshots kept', Number(snap.total||0),
+      (lang==='en'?'Latest: ':'Mới nhất: ')+(snap.latest_at?vcFmtTime(snap.latest_at):'--'), 'info', 'snapshots')+
+    tile('Tài liệu có lịch sử','Docs with history', Number(act.distinct_docs||0),
+      (lang==='en'?'Total revisions: ':'Tổng số phiên bản: ')+Number(act.total_revisions||0), 'info', 'doc_history')+
+    tile('Thay đổi 7 ngày','Changes (7d)', Number(act.last_7d||0),
+      (lang==='en'?'Last 30d: ':'30 ngày qua: ')+Number(act.last_30d||0), 'info', 'audit')+
+    '</div>';
+
+  // ── C. Recent revisions table (was: Overview lower row) ─────────────────
+  const recent = Array.isArray(data.recent_doc_changes) ? data.recent_doc_changes : [];
+  const recentRows = recent.length ? recent.map(r => {
+    const tone = (r.to_status === 'released' || r.to_status === 'approved') ? 'good'
+              : (r.to_status === 'obsolete' || r.to_status === 'superseded') ? 'warn'
+              : 'info';
+    return '<tr>'+
+      '<td><code>'+escapeHtml(r.doc_code||'')+'</code></td>'+
+      '<td><code>'+escapeHtml(r.revision||'')+'</code></td>'+
+      '<td>'+vcStatusPill((r.from_status||'?')+' → '+(r.to_status||'?'), tone)+'</td>'+
+      '<td><code>'+escapeHtml(r.actor_party_id||'--')+'</code></td>'+
+      '<td>'+escapeHtml(vcFmtTime(r.recorded_at))+'</td>'+
+      '<td><button class="admin-sync-mini" onclick="setVersionControlSubTab(\'doc_history\');loadVersionControlDocDetail(\''+escapeHtml(r.doc_code||'')+'\')">'+
+        escapeHtml(lang==='en'?'Open':'Mở')+'</button></td>'+
+    '</tr>';
+  }).join('') : '<tr><td colspan="6" style="color:var(--text-3);padding:8px">'+
+    escapeHtml(lang==='en'?'No recent document revisions recorded.':'Chưa có thay đổi tài liệu gần đây.')+
+    '</td></tr>';
+
+  const recentTable = '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:12px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'+
+      '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'Recent document revisions':'Thay đổi tài liệu gần đây')+'</div>'+
+      '<button class="admin-sync-mini" onclick="loadVersionControlOverview({force:true})">'+
+        escapeHtml(lang==='en'?'Refresh':'Làm mới')+'</button>'+
+    '</div>'+
+    '<table class="admin-sync-simple-table" style="width:100%;border-collapse:collapse;font-size:12px;margin-top:8px">'+
+      '<thead><tr>'+
+        '<th style="text-align:left">'+escapeHtml(lang==='en'?'Doc code':'Mã tài liệu')+'</th>'+
+        '<th style="text-align:left">'+escapeHtml(lang==='en'?'Revision':'Phiên bản')+'</th>'+
+        '<th style="text-align:left">'+escapeHtml(lang==='en'?'Transition':'Chuyển trạng thái')+'</th>'+
+        '<th style="text-align:left">'+escapeHtml(lang==='en'?'Actor':'Người làm')+'</th>'+
+        '<th style="text-align:left">'+escapeHtml(lang==='en'?'When (UTC)':'Lúc (UTC)')+'</th>'+
+        '<th style="text-align:left">'+escapeHtml(lang==='en'?'Open':'Mở')+'</th>'+
+      '</tr></thead>'+
+      '<tbody>'+recentRows+'</tbody>'+
+    '</table>'+
+  '</article>';
+
+  // ── D. Quick links bar (SOP doc + drill-down shortcuts) ─────────────────
+  const sopHref = 'docs/admin-vc-panel-sop.md';
+  const linksHtml = '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:12px">'+
+    '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'Quick references':'Tham chiếu nhanh')+'</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">'+
+      '<a class="admin-sync-mini" href="'+escapeHtml(sopHref)+'" target="_blank" rel="noopener">'+
+        escapeHtml(lang==='en'?'📖 SOP — Local ↔ VPS workflow':'📖 SOP — Quy trình Local ↔ VPS')+
+      '</a>'+
+      '<button class="admin-sync-mini" onclick="setVersionControlSubTab(\'config_sync\')">'+
+        escapeHtml(lang==='en'?'Open Config Sync':'Mở Đồng bộ Config')+
+      '</button>'+
+      '<button class="admin-sync-mini" onclick="setVersionControlSubTab(\'local_sync\')">'+
+        escapeHtml(lang==='en'?'Open Local Sync':'Mở Đồng bộ Local')+
+      '</button>'+
+      '<button class="admin-sync-mini" onclick="setVersionControlSubTab(\'snapshots\')">'+
+        escapeHtml(lang==='en'?'Open Snapshots':'Mở Snapshot')+
+      '</button>'+
+      '<button class="admin-sync-mini" onclick="setVersionControlSubTab(\'audit\')">'+
+        escapeHtml(lang==='en'?'Open Audit log':'Mở Audit log')+
+      '</button>'+
+    '</div>'+
+  '</article>';
+
+  return '<section>'+readinessHtml+tilesHtml+recentTable+linksHtml+'</section>';
+}
+
+// Pha 2: renderAdminVCProcess deprecated — bilingual SOP content moved to
+// docs/admin-vc-panel-sop.md and linked from the Status tab's Quick
+// references section. Body preserved in comments for one release cycle.
+/*
+function renderAdminVCProcess_DEPRECATED_PHA2(){
   const en = '<h3 style="margin:0 0 6px 0">Local ↔ VPS workflow (SOP)</h3>'+
     '<p>Two write surfaces exist in this portal: <strong>code</strong> (Git deploy from a developer laptop) and <strong>content</strong> (HTML docs, users, options edited live in the portal). They write to the same filesystem on the VPS, so a deploy can clobber a fresh content edit if either side ignores the rules below.</p>'+
     '<h4>Golden rule</h4>'+
@@ -9539,6 +9768,7 @@ function renderAdminVCProcess(){
     '</article>'+
   '</section>';
 }
+*/
 
 // ── Dispatcher ────────────────────────────────────────────────────────────
 function renderAdminVersionControl(){
@@ -9546,12 +9776,17 @@ function renderAdminVersionControl(){
   if(!el) return;
 
   // Bootstrap state for the currently active sub-tab.
-  if(versionControlSubTab === 'overview' && !versionControlOverviewState.loaded && !versionControlOverviewState.loading && !versionControlOverviewState.error){
-    loadVersionControlOverview({silent:true});
-  }
-  if(versionControlSubTab === 'sync'){
-    if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error) loadGitRepoStatus({silent:true});
-    if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error) loadDataSyncStatus({silent:true});
+  if(versionControlSubTab === 'status'){
+    // Status tab pulls from overview endpoint + git status — header bar
+    // also reads both, so this is mostly redundant with the panel-level
+    // auto-load below, but keeps the sub-tab body responsive on direct
+    // navigation when the panel-level loaders already ran.
+    if(!versionControlOverviewState.loaded && !versionControlOverviewState.loading && !versionControlOverviewState.error){
+      loadVersionControlOverview({silent:true});
+    }
+    if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error){
+      loadGitRepoStatus({silent:true});
+    }
   }
   if(versionControlSubTab === 'config_sync' && !dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error){
     loadDataSyncStatus({silent:true});
@@ -9581,23 +9816,22 @@ function renderAdminVersionControl(){
 
   let body;
   switch(versionControlSubTab){
-    case 'sync':        body = renderAdminSyncPanelV2();        break;
     case 'config_sync': body = renderAdminVCConfigSync();       break;
     case 'local_sync':  body = renderAdminVCLocalSync();        break;
     case 'snapshots':   body = renderAdminVCSnapshots();        break;
     case 'doc_history': body = renderAdminVCDocHistory();       break;
     case 'audit':       body = renderAdminVCAuditLog();         break;
-    case 'process':     body = renderAdminVCProcess();          break;
-    case 'overview':
-    default:            body = renderAdminVCOverview();         break;
+    // Pha 2: removed cases overview/sync/process. Default = status.
+    case 'status':
+    default:            body = renderAdminVCStatus();           break;
   }
 
   el.innerHTML =
     '<header style="margin-bottom:8px">'+
       '<div class="admin-sync-kicker">'+escapeHtml(lang==='en'?'Version control':'Điều khiển phiên bản')+'</div>'+
       '<h2 style="margin:4px 0 0 0">'+escapeHtml(lang==='en'
-        ? 'Local ↔ VPS sync, snapshots, doc history, audit, SOP'
-        : 'Đồng bộ Local ↔ VPS, snapshot, lịch sử tài liệu, audit, quy trình')+'</h2>'+
+        ? 'Release status, config sync, snapshots, doc history, audit'
+        : 'Trạng thái phát hành, đồng bộ config, snapshot, lịch sử tài liệu, audit')+'</h2>'+
     '</header>'+
     renderAdminVCHeaderBar()+
     renderVCSubTabNav()+
