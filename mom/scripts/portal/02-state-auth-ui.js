@@ -9536,6 +9536,213 @@ function renderAdminVCFreezeBanner(){
   '</div>';
 }
 
+// VC Mode policy editor — surfaces lock_on_production toggle + role override
+// editor that previously had NO frontend. Without this card the → Developer
+// button on live VPS was permanently grey because lock_on_production=true
+// defaults forced operation mode regardless of role override, and there was
+// no way to flip the lock from the UI.
+function renderAdminVCModePolicyCard(){
+  const s = adminVCModeState;
+  if(!s.loaded || !s.data || !s.data.policy){
+    return '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:12px">'+
+      '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'VC mode policy':'Chính sách VC mode')+'</div>'+
+      '<div class="admin-sync-callout-bar is-info">'+escapeHtml(lang==='en'?'Loading mode policy…':'Đang tải policy…')+'</div>'+
+    '</article>';
+  }
+  const p = s.data.policy;
+  const isProd = !!p.runtime_is_production;
+  const lock = !!p.lock_on_production;
+  const overrides = p.role_overrides || {};
+  const overrideKeys = Object.keys(overrides);
+  const yourRoles = s.data.your_roles || [];
+
+  // Determine which row(s) of yours have an override set, and explain
+  // why effective mode is what it is.
+  const effExplain = (() => {
+    if(lock && isProd) return lang==='en'
+      ? 'Production lock forces operation regardless of role override. Disable the lock below to enable Developer mode here.'
+      : 'Production lock đang ép operation, bất kể role override. Tắt lock bên dưới để bật được Developer mode trên server này.';
+    const myDev = yourRoles.find(r => overrides[r] === 'developer');
+    if(myDev) return lang==='en'
+      ? 'Your role "'+myDev+'" has a developer override → effective developer.'
+      : 'Role "'+myDev+'" của bạn có override developer → hiệu lực developer.';
+    return lang==='en'
+      ? 'No developer override on your roles. Fall back to default = '+p.default+'.'
+      : 'Không có override developer cho role của bạn. Dùng default = '+p.default+'.';
+  })();
+
+  const lockTone = lock ? (isProd ? 'is-warn' : 'is-info') : 'is-good';
+  const lockLabel = lock
+    ? (lang==='en'?'Locked':'Đang khoá')
+    : (lang==='en'?'Unlocked':'Mở khoá');
+  const prodLabel = isProd
+    ? (lang==='en'?'Production runtime':'Runtime production')
+    : (lang==='en'?'Dev runtime':'Runtime dev');
+
+  const overrideRows = overrideKeys.length
+    ? '<table style="width:100%;font-size:12px;border-collapse:collapse;margin-top:6px">'+
+        '<thead><tr><th style="text-align:left">'+escapeHtml(lang==='en'?'Role':'Role')+'</th><th style="text-align:left">'+escapeHtml(lang==='en'?'Mode':'Chế độ')+'</th><th></th></tr></thead>'+
+        '<tbody>'+overrideKeys.map(r => '<tr>'+
+          '<td><code>'+escapeHtml(r)+'</code></td>'+
+          '<td>'+vcStatusPill(overrides[r], overrides[r]==='developer'?'warn':'good')+'</td>'+
+          '<td><button class="admin-sync-mini" onclick="adminVCRoleOverrideRemove(\''+escapeHtml(r)+'\')" title="'+escapeHtml(lang==='en'?'Remove override':'Xóa override')+'">×</button></td>'+
+        '</tr>').join('')+
+        '</tbody>'+
+      '</table>'
+    : '<div style="color:var(--text-3);font-size:12px;margin-top:4px">'+escapeHtml(lang==='en'?'(No role overrides set — falling back to default)':'(Chưa có override nào — dùng default)')+'</div>';
+
+  return '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:12px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap">'+
+      '<div>'+
+        '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'VC mode policy':'Chính sách VC mode')+'</div>'+
+        '<div style="color:var(--text-3);font-size:11px;margin-top:2px">'+escapeHtml(effExplain)+'</div>'+
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:6px">'+
+        vcStatusPill(prodLabel, isProd?'warn':'info')+
+        vcStatusPill(lockLabel, lock?'good':'warn')+
+      '</div>'+
+    '</div>'+
+
+    // Meta rows
+    '<div class="admin-sync-meta-list" style="margin-top:10px">'+
+      '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Default mode':'Chế độ mặc định')+'</div><div class="admin-sync-meta-value"><code>'+escapeHtml(p.default)+'</code></div></div>'+
+      '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Lock on production':'Khoá khi production')+'</div><div class="admin-sync-meta-value"><code>'+(lock?'true':'false')+'</code></div></div>'+
+      '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Runtime is production':'Runtime là production')+'</div><div class="admin-sync-meta-value"><code>'+(isProd?'true':'false')+'</code></div></div>'+
+      '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Your roles':'Role của bạn')+'</div><div class="admin-sync-meta-value">'+(yourRoles.map(r => '<code>'+escapeHtml(r)+'</code>').join(' ') || '<em>--</em>')+'</div></div>'+
+      '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Updated at':'Cập nhật')+'</div><div class="admin-sync-meta-value">'+escapeHtml(p.updated_at ? vcFmtTime(p.updated_at) : '--')+'</div></div>'+
+    '</div>'+
+
+    // Role overrides editor
+    '<div style="margin-top:12px">'+
+      '<div class="admin-sync-panel-title" style="font-size:13px">'+escapeHtml(lang==='en'?'Role overrides':'Role overrides')+'</div>'+
+      overrideRows+
+      '<div style="margin-top:6px"><button class="admin-sync-mini" onclick="adminVCRoleOverrideAdd()">'+
+        escapeHtml(lang==='en'?'+ Add override':'+ Thêm override')+'</button></div>'+
+    '</div>'+
+
+    // Lock toggle row
+    '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">'+
+      '<div style="flex:1">'+
+        '<div style="font-size:12px;font-weight:600">'+escapeHtml(lang==='en'?'Production safety lock':'Khoá an toàn production')+'</div>'+
+        '<div style="color:var(--text-3);font-size:11px;margin-top:2px">'+
+          escapeHtml(lang==='en'
+            ? 'When ON (default), production runtime forces operation mode regardless of any role override. Turn OFF only with a documented reason — this is the ISO §8.5.6 anchor.'
+            : 'Khi BẬT (mặc định), production runtime ép operation, bất kể role override. Tắt chỉ khi có lý do văn bản — đây là neo ISO §8.5.6.')+
+        '</div>'+
+      '</div>'+
+      '<button class="admin-sync-mini" style="'+(lock?'background:var(--red,#dc2626);color:#fff;border-color:var(--red,#dc2626)':'background:var(--brand-2,#1565c0);color:#fff;border-color:var(--brand-2,#1565c0)')+'" '+
+        'onclick="adminVCToggleProductionLock('+(lock?'false':'true')+')">'+
+        escapeHtml(lock ? (lang==='en'?'Unlock production':'Tắt khoá production') : (lang==='en'?'Re-lock production':'Bật lại khoá production'))+
+      '</button>'+
+    '</div>'+
+  '</article>';
+}
+
+// Toggle lock_on_production — destructive, requires confirmation modal with
+// reason. After successful flip, header → Developer button becomes clickable
+// (when also paired with a role override).
+function adminVCToggleProductionLock(newLockState){
+  const isUnlocking = newLockState === false;
+  openAdminVCActionModal({
+    title: isUnlocking
+      ? (lang==='en'?'Unlock production — DANGER':'Tắt khoá production — NGUY HIỂM')
+      : (lang==='en'?'Re-lock production':'Bật lại khoá production'),
+    intro: isUnlocking
+      ? (lang==='en'
+        ? 'Turning OFF lock_on_production lets role_overrides take effect on this server. Push & Deploy and CR auto-deploy become available. This is normally only done for break-glass scenarios. Log a CR ID so an auditor can trace why.'
+        : 'Tắt lock_on_production cho phép role_overrides có hiệu lực trên server này. Push & Deploy + auto-deploy CR sẽ chạy được. Bình thường chỉ tắt khi break-glass. Ghi CR ID để auditor truy vết được.')
+      : (lang==='en'?'Re-enabling the safety lock. Operation mode will be enforced again.':'Bật lại khoá an toàn. Operation mode sẽ được ép trở lại.'),
+    fields: [
+      { name: 'reason', label: lang==='en'?'Reason (≥10 chars)':'Lý do (≥10 ký tự)', type: 'textarea', rows: 3,
+        required: true, minLength: 10, maxLength: 500,
+        placeholder: isUnlocking
+          ? (lang==='en'?'e.g. CR-2026-099 — emergency hotfix needs direct deploy':'vd: CR-2026-099 — hotfix khẩn cấp cần deploy thẳng')
+          : (lang==='en'?'e.g. break-glass closed, restore safety lock':'vd: hết break-glass, khôi phục khoá an toàn') }
+    ],
+    submitLabel: isUnlocking
+      ? (lang==='en'?'Unlock production':'Tắt khoá')
+      : (lang==='en'?'Re-lock':'Bật lại khoá'),
+    submitTone: isUnlocking ? 'error' : 'good',
+    onSubmit: async (vals) => {
+      const res = await apiCall('admin_vc_mode_set', {lock_on_production: newLockState, reason: vals.reason.trim()}, 'POST');
+      if(res && res.ok){
+        adminVCModeState = Object.assign({}, adminVCModeState, {loaded:true, error:'', data:{policy:res.policy, effective_mode:res.effective_mode, your_roles:res.your_roles}});
+        return { ok: true, message: isUnlocking
+          ? (lang==='en'?'Production lock OFF. Role overrides now in effect.':'Đã tắt khoá production. Role override có hiệu lực.')
+          : (lang==='en'?'Production lock back ON. Operation enforced.':'Đã bật lại khoá production. Operation được ép.'),
+          next_steps: isUnlocking
+            ? [
+              (lang==='en'?'Now set a role override to "developer" if you want the → Developer button to enable for you.':'Bây giờ set role override sang "developer" nếu muốn nút → Developer kích hoạt.'),
+              (lang==='en'?'Remember to re-lock when the break-glass scenario closes.':'Nhớ bật lại khoá khi xong break-glass.'),
+            ] : []
+        };
+      }
+      return res || { ok:false, error:'unknown' };
+    }
+  });
+}
+
+function adminVCRoleOverrideRemove(roleSlug){
+  const data = adminVCModeState && adminVCModeState.data;
+  if(!data || !data.policy) return;
+  openAdminVCActionModal({
+    title: (lang==='en'?'Remove override for role "':'Xóa override role "')+roleSlug+'"',
+    intro: lang==='en'?'Role falls back to the default mode after removal.':'Sau khi xóa role sẽ rơi về default mode.',
+    fields: [
+      { name: 'reason', label: lang==='en'?'Reason':'Lý do', type: 'text',
+        required: true, minLength: 4, maxLength: 200,
+        placeholder: lang==='en'?'Why remove this override?':'Vì sao xóa override?' }
+    ],
+    submitLabel: lang==='en'?'Remove':'Xóa',
+    submitTone: 'warn',
+    onSubmit: async (vals) => {
+      const overrides = Object.assign({}, data.policy.role_overrides || {});
+      delete overrides[roleSlug];
+      const res = await apiCall('admin_vc_mode_set', {role_overrides: overrides, reason: vals.reason.trim()}, 'POST');
+      if(res && res.ok){
+        adminVCModeState = Object.assign({}, adminVCModeState, {loaded:true, error:'', data:{policy:res.policy, effective_mode:res.effective_mode, your_roles:res.your_roles}});
+        return { ok:true, message: (lang==='en'?'Removed override for ':'Đã xóa override cho ')+roleSlug };
+      }
+      return res || { ok:false, error:'unknown' };
+    }
+  });
+}
+
+function adminVCRoleOverrideAdd(){
+  const data = adminVCModeState && adminVCModeState.data;
+  if(!data || !data.policy) return;
+  openAdminVCActionModal({
+    title: lang==='en'?'Add role override':'Thêm role override',
+    intro: lang==='en'
+      ? 'Override a role slug to developer or operation. Effective mode is computed by union (developer wins across multi-role users).'
+      : 'Override role-slug sang developer hoặc operation. Hiệu lực tính theo union (developer thắng khi user có nhiều role).',
+    fields: [
+      { name: 'role', label: lang==='en'?'Role slug':'Role slug', type: 'text',
+        required: true, minLength: 2, maxLength: 40, regex: '^[a-z0-9_-]+$',
+        regexHelp: lang==='en'?'lowercase letters, digits, _ -':'chữ thường, số, _ -',
+        placeholder: 'ceo, it_admin, qa_manager, ...' },
+      { name: 'mode', label: lang==='en'?'Mode (developer|operation)':'Mode (developer|operation)', type: 'text',
+        required: true, regex: '^(developer|operation)$',
+        regexHelp: lang==='en'?'Must be exactly "developer" or "operation"':'Phải đúng "developer" hoặc "operation"',
+        default: 'developer' },
+      { name: 'reason', label: lang==='en'?'Reason':'Lý do', type: 'text',
+        required: true, minLength: 4, maxLength: 200 }
+    ],
+    submitLabel: lang==='en'?'Add override':'Thêm',
+    submitTone: 'good',
+    onSubmit: async (vals) => {
+      const overrides = Object.assign({}, data.policy.role_overrides || {});
+      overrides[vals.role.trim().toLowerCase()] = vals.mode.trim().toLowerCase();
+      const res = await apiCall('admin_vc_mode_set', {role_overrides: overrides, reason: vals.reason.trim()}, 'POST');
+      if(res && res.ok){
+        adminVCModeState = Object.assign({}, adminVCModeState, {loaded:true, error:'', data:{policy:res.policy, effective_mode:res.effective_mode, your_roles:res.your_roles}});
+        return { ok:true, message: (lang==='en'?'Override added: ':'Đã thêm override: ')+vals.role.trim()+' → '+vals.mode.trim() };
+      }
+      return res || { ok:false, error:'unknown' };
+    }
+  });
+}
+
 function vcStatusPill(label, tone){
   // tone: good | warn | error | info | neutral. Reuses admin-sync-callout-bar
   // tone classes so colors come from the Graphics Authority tokens already
@@ -10423,7 +10630,7 @@ function renderAdminVCStatus(){
     '</div>'+
   '</article>';
 
-  return '<section>'+readinessHtml+tilesHtml+recentTable+linksHtml+'</section>';
+  return '<section>'+readinessHtml+tilesHtml+recentTable+renderAdminVCModePolicyCard()+linksHtml+'</section>';
 }
 
 // Pha 2: renderAdminVCProcess deprecated — bilingual SOP content moved to
