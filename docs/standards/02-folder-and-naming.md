@@ -240,7 +240,7 @@ wi-901-performance-dashboard.html
 ```
 annex-101-role-based-access-map.html
 annex-110-dashboard-kpi-dictionary-and-data-model.html
-annex-120-authority-matrix.html
+authority-matrix.html
 annex-301-setup-sheet-and-tool-list-standard.html
 annex-401-supplier-risk-model-and-scorecard-method.html
 annex-501-dispatch-capacity-wip-rules.html

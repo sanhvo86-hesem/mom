@@ -31,8 +31,9 @@ final class DecisionThresholdService
 
     /** @var array<string, string> */
     private const SYSTEM_DOC_LINKS = [
-        'ANNEX-120' => 'authority-matrix.html',
-        'ANNEX-121' => 'raci-master-matrix.html',
+        'AUTHORITY-MATRIX' => 'authority-matrix.html',
+        'RACI-MASTER-MATRIX' => 'raci-master-matrix.html',
+        'ROLE-AND-DEPARTMENT-BUNDLES' => 'role-and-department-bundles.html',
         'ANNEX-123' => '../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html',
         'FRM-202'   => '../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx',
         'FRM-212'   => '../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx',
@@ -46,8 +47,9 @@ final class DecisionThresholdService
 
     /** @var array<string, string> */
     private const ANNEX_DOC_LINKS = [
-        'ANNEX-120' => '../../../../system/organization/04-RACI-Authority/authority-matrix.html',
-        'ANNEX-121' => '../../../../system/organization/04-RACI-Authority/raci-master-matrix.html',
+        'AUTHORITY-MATRIX' => '../../../../system/organization/04-RACI-Authority/authority-matrix.html',
+        'RACI-MASTER-MATRIX' => '../../../../system/organization/04-RACI-Authority/raci-master-matrix.html',
+        'ROLE-AND-DEPARTMENT-BUNDLES' => '../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html',
         'ANNEX-123' => 'annex-123-deputy-backup-matrix.html',
         'FRM-202'   => '../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx',
         'FRM-212'   => '../../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx',

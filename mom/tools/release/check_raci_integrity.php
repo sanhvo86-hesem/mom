@@ -8,7 +8,7 @@ declare(strict_types=1);
  * ────────────────────────────────────────────────────────────────────────────
  * RACI-MASTER-MATRIX (raci-master-matrix.html) is the single source of truth
  * (SSOT) for RACI across the QMS. Its G0→G7 gate matrix is hand-maintained and
- * referenced/duplicated by ANNEX-120, the 04-RACI-Authority summary pages, ~37
+ * referenced/duplicated by AUTHORITY-MATRIX, the 04-RACI-Authority summary pages, ~37
  * SOP "Vai trò & RACI" sections and ~39 JD "Giao diện — RACI" sections. Manual
  * editing of a wide table silently breaks RACI invariants. This script catches
  * those breaks before deploy.
@@ -20,7 +20,7 @@ declare(strict_types=1);
  *   2. Every data row has exactly one Accountable (A).
  *   3. Every data row has at least one Responsible (R).
  *   4. Every RACI cell holds only A / R / C / I (or blank).
- *   5. Every CDR code used in RACI-MASTER-MATRIX has an id="cdr-XX" anchor in ANNEX-120.
+ *   5. Every CDR code used in RACI-MASTER-MATRIX has an id="cdr-XX" anchor in AUTHORITY-MATRIX.
  *   6. In the §4 / §6 tables the Accountable (A) cell names exactly one
  *      role and is never a role bundle (a bundle cannot be Accountable).
  *
@@ -28,7 +28,7 @@ declare(strict_types=1);
  * ────────────────────────────────
  *   6. Support-function supplement uses only MNT / FIN role codes.
  *   7. Cross-check: the primary Responsible role recorded for each CDR in
- *      ANNEX-120 should appear as A or R for that CDR in RACI-MASTER-MATRIX (sub-roles
+ *      AUTHORITY-MATRIX should appear as A or R for that CDR in RACI-MASTER-MATRIX (sub-roles
  *      are alias-mapped to their column, e.g. PE/ENGM/CAM→ENG, BUY→SCM,
  *      ITA/ESA→HR/IT). No whitelist — every CDR must reconcile.
  *
@@ -36,7 +36,7 @@ declare(strict_types=1);
  */
 
 $base     = dirname(__DIR__, 2);                 // -> repo .../mom
-$annex121 = $base.'/docs/system/organization/04-RACI-Authority/raci-master-matrix.html';
+$raciMaster = $base.'/docs/system/organization/04-RACI-Authority/raci-master-matrix.html';
 // AUTHORITY-MATRIX (formerly ANNEX-120) — unified decision register with id="cdr-XX" anchors.
 $annex120 = $base.'/docs/system/organization/04-RACI-Authority/authority-matrix.html';
 
@@ -97,7 +97,7 @@ function findTableByHead(DOMDocument $doc, array $needles): ?DOMElement {
     return null;
 }
 
-/* ── ANNEX-120: CDR anchor set + primary R-role per CDR ────────────────────── */
+/* ── AUTHORITY-MATRIX: CDR anchor set + primary R-role per CDR ─────────────── */
 $doc120   = loadDoc($annex120);
 $cdrKnown = [];
 $cdr120R  = [];
@@ -112,11 +112,11 @@ foreach ($doc120->getElementsByTagName('tr') as $tr) {
     }
 }
 if (!$cdrKnown) {
-    $p0[] = "ANNEX-120: no id=\"cdr-XX\" anchors found.";
+    $p0[] = "AUTHORITY-MATRIX: no id=\"cdr-XX\" anchors found.";
 }
 
 /* ── RACI-MASTER-MATRIX G0→G7 gate matrix ───────────────────────────────────────────── */
-$doc = loadDoc($annex121);
+$doc = loadDoc($raciMaster);
 $gateTable = null;
 foreach ($doc->getElementsByTagName('table') as $tbl) {
     $theads = $tbl->getElementsByTagName('thead');
@@ -178,7 +178,7 @@ if ($gateTable === null) {
         }
         if ($cdr !== '') {
             if ($cdrKnown && !isset($cdrKnown[$cdr])) {
-                $p0[] = "RACI-MASTER-MATRIX row $label: CDR '$cdr' has no id=\"cdr-$cdr\" in ANNEX-120.";
+                $p0[] = "RACI-MASTER-MATRIX row $label: CDR '$cdr' has no id=\"cdr-$cdr\" in AUTHORITY-MATRIX.";
             }
             $gateRACI[$cdr][] = [$gate, $aRoles, $rRoles];
         }
@@ -256,7 +256,7 @@ foreach ([['§4 value-stream RACI', ['Hoạt động ngang','Bằng chứng'], 5
     echo "  $name: $rn rows\n";
 }
 
-/* ── Cross-check: ANNEX-120 primary R-role vs RACI-MASTER-MATRIX A∪R ───────────────── */
+/* ── Cross-check: AUTHORITY-MATRIX primary R-role vs RACI-MASTER-MATRIX A∪R ────────── */
 $xMiss = 0;
 foreach ($gateRACI as $cdr => $occurrences) {
     if (!isset($cdr120R[$cdr])) { continue; }
@@ -266,14 +266,14 @@ foreach ($gateRACI as $cdr => $occurrences) {
     foreach ($occurrences as [$gate, $aRoles, $rRoles]) {
         $present = array_merge($aRoles, $rRoles);
         if ($mapped !== '' && !in_array($mapped, $present, true)) {
-            $p1[] = "Cross-check $gate/$cdr: ANNEX-120 R-role '$r120' (→$mapped) "
+            $p1[] = "Cross-check $gate/$cdr: AUTHORITY-MATRIX R-role '$r120' (→$mapped) "
                   . "not found as A or R in RACI-MASTER-MATRIX [A=".implode(',',$aRoles)
                   . " R=".implode(',',$rRoles)."].";
             $xMiss++;
         }
     }
 }
-echo "  ANNEX-120↔121 cross-check: $xMiss advisory mismatch(es)\n";
+echo "  AUTHORITY-MATRIX↔RACI-MASTER-MATRIX cross-check: $xMiss advisory mismatch(es)\n";
 
 /* ── Report ────────────────────────────────────────────────────────────────── */
 echo "\n";

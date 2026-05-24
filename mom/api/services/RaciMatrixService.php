@@ -30,7 +30,7 @@ final class RaciMatrixService
 {
     private const CONFIG_RELATIVE_PATH    = 'config/raci_matrix.json';
     private const BOOTSTRAP_RELATIVE_PATH = 'config/raci_matrix.bootstrap.json';
-    private const ANNEX121_RELATIVE_PATH  =
+    private const RACI_MASTER_RELATIVE_PATH  =
         'mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html';
     private const GATE_REGION = 'RACI-GATE-MATRIX';
 
@@ -361,7 +361,7 @@ final class RaciMatrixService
     private function publishAll(array $config): array
     {
         $results = [];
-        $results[] = $this->publishAnnex121($config);
+        $results[] = $this->publishRaciMasterMatrix($config);
         foreach ($this->managedDocPaths() as $path) {
             $res = $this->publishManagedDoc($path, $config);
             if ($res !== null) {
@@ -375,12 +375,12 @@ final class RaciMatrixService
      * @param array<string, mixed> $config
      * @return array<string, string>
      */
-    private function publishAnnex121(array $config): array
+    private function publishRaciMasterMatrix(array $config): array
     {
-        $path = $this->rootDir . '/' . self::ANNEX121_RELATIVE_PATH;
+        $path = $this->rootDir . '/' . self::RACI_MASTER_RELATIVE_PATH;
         $html = @file_get_contents($path);
         if ($html === false) {
-            throw new RuntimeException('raci_matrix_annex121_not_readable');
+            throw new RuntimeException('raci_matrix_master_not_readable');
         }
         // Regenerate all four RACI-MASTER-MATRIX RACI regions in one read-modify-write.
         $updated = $html;
@@ -394,14 +394,14 @@ final class RaciMatrixService
             $this->buildSimpleBlock($config['support'] ?? []));
 
         if ($updated === $html) {
-            return ['doc_code' => 'RACI-MASTER-MATRIX', 'path' => self::ANNEX121_RELATIVE_PATH,
+            return ['doc_code' => 'RACI-MASTER-MATRIX', 'path' => self::RACI_MASTER_RELATIVE_PATH,
                     'previous_revision' => '', 'new_revision' => '', 'changed' => 'no'];
         }
         $rev = $this->bumpRevision($updated);
         if (@file_put_contents($path, $rev['html'], LOCK_EX) === false) {
-            throw new RuntimeException('raci_matrix_annex121_not_writable');
+            throw new RuntimeException('raci_matrix_master_not_writable');
         }
-        return ['doc_code' => 'RACI-MASTER-MATRIX', 'path' => self::ANNEX121_RELATIVE_PATH,
+        return ['doc_code' => 'RACI-MASTER-MATRIX', 'path' => self::RACI_MASTER_RELATIVE_PATH,
                 'previous_revision' => $rev['previous_revision'],
                 'new_revision' => $rev['new_revision'], 'changed' => 'yes'];
     }

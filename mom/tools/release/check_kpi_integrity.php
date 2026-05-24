@@ -94,7 +94,7 @@ $envPath = static function (string $name, string $default): string {
 $registryFp = $envPath('KPI_INTEGRITY_REGISTRY', $base . '/data/registry/kpi-authority-registry.json');
 $annexDir   = $base . '/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control';
 $annex122Fp = $envPath('KPI_INTEGRITY_ANNEX122', $annexDir . '/annex-122-kpi-cascade-dictionary.html');
-$annex121Fp = $envPath('KPI_INTEGRITY_CDR_MATRIX', $base . '/docs/system/organization/04-RACI-Authority/raci-master-matrix.html');
+$raciMasterFp = $envPath('KPI_INTEGRITY_CDR_MATRIX', $base . '/docs/system/organization/04-RACI-Authority/raci-master-matrix.html');
 $annex128Fp = $envPath('KPI_INTEGRITY_ANNEX128', $annexDir . '/annex-128-kpi-system-matrix-and-document-usage.html');
 $annex125Fp = $envPath('KPI_INTEGRITY_ANNEX125', $annexDir . '/annex-125-cnc-performance-operating-system.html');
 $annex129Fp = $envPath('KPI_INTEGRITY_ANNEX129', $annexDir . '/annex-129-bsc-kpi-operating-mechanism-assessment.html');
@@ -561,8 +561,8 @@ foreach ($aliases as $alias => $target) {
 }
 
 // ── P0.6 — gate linked_cdr must exist in RACI-MASTER-MATRIX ───────────────────────────
-$annex121 = readText($annex121Fp);
-preg_match_all('/\b([A-F][0-9]{1,2})\b/', $annex121, $cm);
+$raciMaster = readText($raciMasterFp);
+preg_match_all('/\b([A-F][0-9]{1,2})\b/', $raciMaster, $cm);
 $cdrCodes = array_unique($cm[1] ?? []);
 $gateCoverage = array_fill_keys(['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'], 0);
 foreach ($gateMetrics as $g) {
@@ -775,7 +775,7 @@ foreach ($gateMetrics as $g) {
 // if parsing yields nothing — never silent pass.
 $cdrAccountableMap = [];           // ['D11' => 'CS', ...]
 $raciParseWarning = null;
-$raciHtml = $annex121;             // already loaded as $annex121
+$raciHtml = $raciMaster;             // already loaded as RACI-MASTER-MATRIX
 if (preg_match('/<thead><tr>\s*<th><div class="gc-stack"><span>G<\/span><hr><span>CDR<\/span><\/div><\/th><th>Hoạt động<\/th>(.*?)<\/tr><\/thead>/s', $raciHtml, $headMatch)) {
     // Extract role codes in column order from anchor text.
     preg_match_all('/<th>\s*<a[^>]*>([A-Z]+)<\/a>\s*<\/th>/', $headMatch[1], $rh);
