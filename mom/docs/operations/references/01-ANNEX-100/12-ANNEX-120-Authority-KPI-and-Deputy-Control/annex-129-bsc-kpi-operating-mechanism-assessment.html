@@ -128,7 +128,7 @@ td,th{vertical-align:top}
 <tr><td>Theo sự kiện</td><td>Giữ lại / phát hành đúng gate.</td><td>Setup First-Pass, FAI First-Pass, ship packet completeness, truy xuất nguồn gốc completeness.</td><td>QA/QC/OPS gate.</td><td>Form, inspection record, release pack, signature.</td></tr>
 <tr><td>Theo ca/ngày</td><td>Phản ứng nhanh khi lệch.</td><td>In-process reject, thời gian dừng máy reason, WIP red queue, missing gage/fixture, action aging.</td><td>Tier 1/2 daily board.</td><td>Action log, MES/WIP snapshot, NCR/hold record.</td></tr>
 <tr><td>Theo tuần</td><td>Bảo vệ bottleneck và dòng chảy.</td><td>OEE bottleneck, constraint lost hours, buffer red/yellow/green, WIP before constraint.</td><td>TOC weekly review.</td><td>Constraint register, schedule, machine state, reason tree.</td></tr>
-<tr><td>Theo tháng</td><td>Điều hành BSC và nguồn lực.</td><td>OTD, FPY, COPQ, repeat NCR, CAPA effectiveness, supplier readiness, certification coverage.</td><td>Management scorecard review.</td><td>Scorecard snapshot, finance close, EQMS, HR/training record.</td></tr>
+<tr><td>Theo tháng</td><td>Điều hành BSC và nguồn lực.</td><td>7 scored core: OTD, COMPLAINT_RATE, FPY, COPQ, PLAN_ADHERENCE, WIP_AGING, MATERIAL_AVAILABILITY_PLAN; driver panel hiển thị-only cho FAI, final release, CMM/QC queue, constraint, LAM CDR/8D, IQC/material, role backup và supplier readiness.</td><td>Management scorecard review.</td><td>Scorecard snapshot, finance close, EQMS, HR/training record.</td></tr>
 <tr><td>Theo quý/năm</td><td>Điều chỉnh Hoshin và strategy.</td><td>Executive scorecard bundle, customer/supplier trend, strategic project progress.</td><td>Xem xét của lãnh đạo / Hoshin review.</td><td>X-Matrix, MR minutes, risk/opportunity log.</td></tr>
 </tbody>
 </table></div>
@@ -142,7 +142,7 @@ td,th{vertical-align:top}
 <div class="card"><h3>Vận hành nội bộ</h3><p>FPY, setup first-pass, FAI first-pass, OEE bottleneck, WIP aging và repeat NCR là driver quan trọng hơn OEE toàn xưởng chung chung.</p></div>
 <div class="card"><h3>Con người/hệ thống</h3><p>Critical-role certification, deputy coverage, toàn vẹn dữ liệu và safety gate bảo vệ năng lực vận hành dài hạn.</p></div>
 </div>
-<div class="callout warn"><b>Rule:</b> Scorecard lãnh đạo giữ 12-15 KPI. Mọi metric chi tiết hơn dùng ở TOC weekly, Lean daily hoặc QMS/MES gate, không đưa tất cả lên CEO dashboard.</div>
+<div class="callout warn"><b>Rule:</b> Scorecard lãnh đạo dùng <span class="code">CNC-EXEC-BSC-LEAN-7+DRIVERS-2026</span>: 7 scored core cộng điểm, strategic driver panel hiển thị-only, gate blocker chặn/cap recognition. Không đưa mọi metric chi tiết lên CEO dashboard như KPI điểm; metric TOC weekly, Lean daily hoặc QMS/MES gate chỉ được đưa vào driver panel khi có owner, evidence và nhãn không cộng điểm.</div>
 </div>
 
 <div class="section">
@@ -151,7 +151,7 @@ td,th{vertical-align:top}
 <thead><tr><th>Loại KPI</th><th>Ngưỡng thực chiến</th><th>Scoring</th><th>Rào chắn</th></tr></thead>
 <tbody>
 <tr><td>Outcome KPI</td><td>Xanh/vàng/đỏ theo target registry; cần trend và gap.</td><td>Stretch 110, green 100, yellow 50, red 0.</td><td>Không reward nếu counter-metric safety/quality/toàn vẹn dữ liệu đỏ.</td></tr>
-<tr><td>Driver KPI</td><td>Dùng leading threshold để can thiệp trước khi outcome đỏ.</td><td>Score được nếu data contract approved.</td><td>Không dùng payout nếu chỉ là candidate_data_contract.</td></tr>
+<tr><td>Driver KPI</td><td>Dùng leading threshold để can thiệp trước khi outcome đỏ.</td><td>Visible-only trong driver panel; chỉ thành scored core sau change control và pilot approval.</td><td>Không cộng điểm hoặc payout nếu chỉ là candidate_data_contract, manual_governed hoặc chưa có reward approval.</td></tr>
 <tr><td>Gate Control Metric</td><td>Pass/fail, overdue hoặc count theo gate.</td><td>Không cộng điểm; chỉ giữ lại / phát hành hoặc block reward.</td><td>Kỷ luật chỉ khi bypass/gian dối/tái phạm sau coaching.</td></tr>
 <tr><td>Role Performance Measure</td><td>Theo competency/JD/OJT level.</td><td>Dùng cho năng lực và phân quyền.</td><td>Không biến thành KPI công ty nếu chưa map registry.</td></tr>
 <tr><td>Health Indicator</td><td>Trend/awareness.</td><td>Không score.</td><td>Không reward, không discipline.</td></tr>

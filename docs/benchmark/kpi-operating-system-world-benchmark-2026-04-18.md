@@ -4,7 +4,7 @@
 
 Với công ty gia công cơ khí CNC, hệ KPI tốt nhất không phải là một danh sách KPI thật dài. Mô hình thực chiến nên là:
 
-1. 12-15 KPI cấp lãnh đạo để giữ hướng chiến lược.
+1. 7 scored core KPI cấp lãnh đạo cộng strategic driver panel để giữ hướng chiến lược nhưng không làm phình scorecard.
 2. 33 KPI governance để cascade theo doanh nghiệp, value stream và phòng ban.
 3. 60-75 operational metrics được kiểm soát bằng data contract.
 4. Role Performance Measures trong JD, không tính là KPI doanh nghiệp nếu chưa map registry.
@@ -32,9 +32,9 @@ Với công ty gia công cơ khí CNC, hệ KPI tốt nhất không phải là m
 
 ## Nhận Định Cho CNC
 
-KPI cấp lãnh đạo nên ít và có quyền quyết định rõ. Bộ tối ưu cho gia công CNC là 15 KPI: OTD, complaint rate, gross margin by job family, throughput per constraint hour, COPQ, FPY, OEE bottleneck, WIP aging, setup first-pass, FAI first-pass, repeat NCR, CAPA effectiveness, supplier readiness, critical-role certification coverage và recordable incident rate.
+KPI cấp lãnh đạo nên ít và có quyền quyết định rõ. Bản benchmark ban đầu đề xuất một scorecard 15 KPI; sau re-audit LAM ngày 2026-05-24, mô hình thực thi được chốt lại thành 7 scored core KPI cộng strategic driver panel. 7 scored core là OTD, complaint rate, FPY, COPQ, plan adherence, WIP aging và material availability plan. Các chỉ số như FAI first-pass, OEE bottleneck, constraint lost hours, supplier readiness, inspection queue aging, NCR SLA, IQC pass rate và critical-role backup coverage vẫn được hiển thị để điều hành/cap/block, nhưng không tự cộng điểm thưởng.
 
-Điểm chỉnh so với bộ trước là hạ `IN_PROCESS_REJECT_RATE` xuống Lean Daily / FPY drilldown, gộp `SUPPLIER_OTD` và `SUPPLIER_QUAL` thành `SUPPLIER_READINESS`, đồng thời đưa `GROSS_MARGIN_JOB_FAMILY` và `COMPLAINT_RATE` lên scorecard lãnh đạo. Cách này giảm thiên lệch vào chất lượng nội bộ và bổ sung trục tài chính/khách hàng đúng BSC.
+Điểm chỉnh so với bộ trước là hạ các driver chưa đủ fairness/data maturity xuống driver panel, giữ `COMPLAINT_RATE` trong scored core, đưa material/planning flow vào core vì tác động trực tiếp đến OTD, và yêu cầu LAM hard gate chặn phạm vi recognition liên quan. Cách này giảm thiên lệch vào danh sách KPI quá dài, giữ được BSC ở mức điều hành được và tránh việc chỉ số staged/candidate bị dùng như điểm thưởng.
 
 KPI cấp vận hành có thể nhiều hơn, nhưng phải chia lớp:
 
@@ -127,25 +127,19 @@ Nguyên tắc vận hành: metric nào không có ý đồ, động cơ hành vi
 
 ## Trọng Số, Đánh Giá Và Khen Thưởng
 
-Mô hình thực chiến cho HESEM là `CNC-EXEC-BSC-15-2026`: 15 KPI lãnh đạo, tổng trọng số 100%, review monthly/quarterly. Weight đề xuất:
+Mô hình thực chiến hiện hành cho HESEM là `CNC-EXEC-BSC-LEAN-7+DRIVERS-2026`: 7 scored core KPI lãnh đạo, tổng trọng số 100%, review monthly/quarterly, cộng strategic driver panel và gate blockers. Chỉ `scored_core` được cộng điểm; `strategic_driver_panel` và `gate_blockers` chỉ dùng để cảnh báo, cap, block, mở action plan hoặc escalation.
 
-| KPI | Weight |
+| Scored core KPI | Weight |
 |---|---:|
-| OTD | 11% |
-| COMPLAINT_RATE | 8% |
-| GROSS_MARGIN_JOB_FAMILY | 8% |
-| THROUGHPUT_PER_CONSTRAINT_HOUR | 8% |
-| COPQ | 7% |
-| FPY | 9% |
-| OEE_BOTTLENECK | 8% |
-| WIP_AGING | 6% |
-| SETUP_FIRST_PASS | 6% |
-| FAI_FIRST_PASS | 7% |
-| REPEAT_NCR_RATE | 6% |
-| CAPA_EFFECTIVENESS | 7% |
-| SUPPLIER_READINESS | 5% |
-| CRITICAL_ROLE_CERT_COVERAGE | 4% |
-| RECORDABLE_INCIDENT_RATE | 0% gate-only |
+| OTD | 18% |
+| COMPLAINT_RATE | 14% |
+| FPY | 14% |
+| COPQ | 14% |
+| PLAN_ADHERENCE | 14% |
+| WIP_AGING | 12% |
+| MATERIAL_AVAILABILITY_PLAN | 14% |
+
+Driver panel hiện hành gồm `FAI_FIRST_PASS`, `FINAL_RELEASE_RFT`, `INSPECTION_QUEUE_AGING`, `OEE_BOTTLENECK`, `CONSTRAINT_LOST_HOURS`, `CHECK_DIM_REPORT_ON_SHIP`, `NCR_3D_RESPONSE_SLA`, `NCR_8D_UPDATE_SLA`, `IQC_PASS_RATE`, `CRITICAL_ROLE_BACKUP_COVERAGE` và `SUPPLIER_READINESS`. Gate blockers hiện hành gồm serious safety/open action, customer escape without containment, verified data falsification, required gate bypass và open LAM hard gate.
 
 Rating dùng 5 trạng thái: stretch = 110% achievement, green = 100%, yellow = 50%, red = 0%, blocked = 0%. Tổng điểm = tổng `weight x achievement`. ≥90 là xanh, 75-89.99 là vàng, <75 là đỏ. Safety là gate-only, không là 3 điểm có thể đem ra trade-off.
 

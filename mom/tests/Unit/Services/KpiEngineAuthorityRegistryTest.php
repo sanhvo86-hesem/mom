@@ -76,9 +76,9 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $catalog = $engine->getMetricCatalog();
 
         $this->assertSame(30, $catalog['counts']['runtime_calculated_metrics'] ?? null);
-        $this->assertSame(12, $catalog['counts']['dashboard_core_kpis'] ?? null);
+        $this->assertSame(18, $catalog['counts']['dashboard_core_kpis'] ?? null);
         $this->assertSame(31, $catalog['counts']['gate_control_metrics'] ?? null);
-        $this->assertSame(120, $catalog['counts']['proposed_operating_metrics'] ?? null);
+        $this->assertSame(123, $catalog['counts']['proposed_operating_metrics'] ?? null);
         $this->assertNotEmpty($catalog['data_contract_required_fields'] ?? []);
         $this->assertContains('canonical_code', $catalog['data_contract_required_fields'] ?? []);
         $this->assertContains('metric_type', $catalog['data_contract_required_fields'] ?? []);
@@ -98,7 +98,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
             $catalog['performance_governance_audit']['audit_report'] ?? null,
         );
         $this->assertContains('metric_type', $catalog['metric_governance_schema']['required_catalog_fields'] ?? []);
-        $this->assertSame('CNC-EXEC-BSC-LEAN-7-2026', $catalog['scorecard_operating_model']['model_id'] ?? null);
+        $this->assertSame('CNC-EXEC-BSC-LEAN-7+DRIVERS-2026', $catalog['scorecard_operating_model']['model_id'] ?? null);
 
         $metricsByCode = [];
         foreach (($catalog['metrics'] ?? []) as $metric) {
@@ -153,7 +153,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertSame(14.0, $metricsByCode['PLAN_ADHERENCE']['scorecard_weight_pct'] ?? null);
         $this->assertSame(14.0, $metricsByCode['MATERIAL_AVAILABILITY_PLAN']['scorecard_weight_pct'] ?? null);
         $this->assertContains('gate_control_metrics', $metricsByCode['FPY']['sources'] ?? []);
-        $this->assertContains('KPI-05', $metricsByCode['FPY']['local_ids'] ?? []);
+        $this->assertContains('BSC-CORE-03', $metricsByCode['FPY']['local_ids'] ?? []);
         $this->assertContains('KPI-ALL-02', $metricsByCode['FPY']['local_ids'] ?? []);
     }
 
@@ -266,7 +266,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertArrayNotHasKey('CAPA_CLOSURE', $payload['kpis'] ?? []);
         $this->assertArrayNotHasKey('PUT_THRU', $payload['kpis'] ?? []);
         $this->assertSame(
-            'CNC-EXEC-BSC-LEAN-7-2026',
+            'CNC-EXEC-BSC-LEAN-7+DRIVERS-2026',
             $payload['kpis']['OTD']['scorecard']['model_id'] ?? null,
         );
     }

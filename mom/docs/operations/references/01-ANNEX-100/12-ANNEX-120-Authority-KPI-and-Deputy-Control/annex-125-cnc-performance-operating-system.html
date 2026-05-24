@@ -79,7 +79,7 @@
 </div>
 <div class="card">
 <h3>Layer 2 - BSC scorecard quý/tháng</h3>
-<p>Giữ BSC làm bản đồ kết quả theo các góc nhìn tài chính, khách hàng, vận hành, con người/hệ thống. KPI cấp lãnh đạo giới hạn 12-15 chỉ số để tránh dashboard nhiễu.</p>
+<p>Giữ BSC làm bản đồ kết quả theo các góc nhìn tài chính, khách hàng, vận hành, con người/hệ thống. KPI cấp lãnh đạo có 7 scored core; các chỉ số dẫn/driver nằm ở panel riêng để tránh dashboard nhiễu và tránh nhầm với KPI điểm.</p>
 <p><span class="tag">Cadence: tháng/quý</span><span class="tag">Owner: CEO/QMS/FIN</span><span class="tag">Evidence: scorecard snapshot</span></p>
 </div>
 <div class="card">
@@ -106,36 +106,37 @@
 </div>
 
 <div class="section">
-<h2>3. Scorecard lãnh đạo 15 KPI</h2>
-<p>Scorecard lãnh đạo phải nhỏ, đủ sắc và không thay thế từ điển KPI đầy đủ. Registry <span class="code">CNC-EXEC-BSC-15-2026</span> là nguồn chính thức; bảng này chỉ là bản tóm tắt vận hành. Weight tổng bằng 100%; safety là gate 0 điểm, không được bù bằng KPI khác. Metric <span class="code">candidate_data_contract</span> chưa dùng để payout cho đến khi có data contract/evidence manifest được duyệt.</p>
+<h2>3. Scorecard lãnh đạo 7 core + driver panel</h2>
+<p>Scorecard lãnh đạo dùng model <span class="code">CNC-EXEC-BSC-LEAN-7+DRIVERS-2026</span>. Chỉ 7 metric trong <span class="code">scored_core</span> được cộng điểm công ty. Strategic driver panel và gate blocker được hiển thị để lãnh đạo hành động, cap hoặc chặn recognition, nhưng không cộng điểm và không được dùng payout nếu chưa có data contract, change control và pilot approval.</p>
 <div class="table-card"><table class="table">
 <thead><tr><th>Canonical KPI</th><th>Weight</th><th>Scoring status</th><th>Target / ngưỡng</th><th>Evidence owner/source</th><th>Reward / blocker</th></tr></thead>
 <tbody>
-<tr><td><span class="code">OTD</span></td><td>11%</td><td>active_runtime</td><td>≥95%; yellow 90-94.99%; red &lt;90%</td><td>Supply Chain/OPS; shipment + approved promise date</td><td>Eligible only when complaint, FPY and ship packet are not red.</td></tr>
-<tr><td><span class="code">COMPLAINT_RATE</span></td><td>8%</td><td>manual_governed</td><td>≤1/100 shipments; red &gt;2 or major escape</td><td>QA/CS; EQMS complaint + bao vây evidence</td><td>Bao vây overdue or major escape blocks recognition.</td></tr>
-<tr><td><span class="code">GROSS_MARGIN_JOB_FAMILY</span></td><td>8%</td><td>candidate_data_contract</td><td>≥28%; yellow 22-27.99%; red &lt;22%</td><td>Finance/Sales; job-cost close package</td><td>Not payout-scored until finance data contract is approved.</td></tr>
-<tr><td><span class="code">THROUGHPUT_PER_CONSTRAINT_HOUR</span></td><td>8%</td><td>candidate_data_contract</td><td>≥1.10 baseline; red &lt;1.00</td><td>CEO/Planning/OPS; approved constraint register</td><td>Baseline or bottleneck change without approval blocks score.</td></tr>
-<tr><td><span class="code">COPQ</span></td><td>7%</td><td>manual_governed</td><td>≤2% sales; red &gt;4%</td><td>QA/Finance; COPQ cost buckets + sales close</td><td>Cost exclusion or repeat NCR red blocks recognition.</td></tr>
-<tr><td><span class="code">FPY</span></td><td>9%</td><td>active_runtime</td><td>≥98%; yellow 95-97.99%; red &lt;95%</td><td>QA/OPS; first-pass inspection population</td><td>Inspection bypass or customer escape blocks recognition.</td></tr>
-<tr><td><span class="code">OEE_BOTTLENECK</span></td><td>8%</td><td>candidate_data_contract</td><td>≥80%; yellow 70-79.99%; red &lt;70%</td><td>OPS/Maintenance; MES OEE + active constraint</td><td>Not payout-scored until constraint binding and reason-code contract are approved.</td></tr>
-<tr><td><span class="code">WIP_AGING</span></td><td>6%</td><td>candidate_data_contract</td><td>≤5% aged WIP; red &gt;10%</td><td>Planning/OPS; WIP movement + hold owner</td><td>Age reset without physical-progress evidence blocks score.</td></tr>
-<tr><td><span class="code">SETUP_FIRST_PASS</span></td><td>6%</td><td>candidate_data_contract</td><td>≥95%; yellow 90-94.99%; red &lt;90%</td><td>OPS/Engineering/QA; setup gate record</td><td>Hidden chạy kiểm chứng loop or missing setup record blocks score.</td></tr>
-<tr><td><span class="code">FAI_FIRST_PASS</span></td><td>7%</td><td>candidate_data_contract</td><td>≥98%; yellow 95-97.99%; red &lt;95%</td><td>QA/Engineering/OPS; FAI/mẫu đầu tiên gate</td><td>Release bypass, wrong revision or wrong gage blocks score.</td></tr>
-<tr><td><span class="code">REPEAT_NCR_RATE</span></td><td>6%</td><td>candidate_data_contract</td><td>≤5%; red &gt;10%</td><td>QA; NCR recurrence evidence</td><td>NCR suppression or repeat major escape blocks score.</td></tr>
-<tr><td><span class="code">CAPA_EFFECTIVENESS</span></td><td>7%</td><td>candidate_data_contract</td><td>≥90%; yellow 80-89.99%; red &lt;80%</td><td>QA; 30/60/90-day CAPA verification</td><td>Closure without effectiveness evidence cannot score.</td></tr>
-<tr><td><span class="code">SUPPLIER_READINESS</span></td><td>5%</td><td>candidate_data_contract</td><td>≥90 composite; red &lt;80</td><td>Supply Chain/QA; OTD, incoming quality, SCAR, ASL</td><td>Critical shortage, supplier escape or overdue SCAR blocks score.</td></tr>
-<tr><td><span class="code">CRITICAL_ROLE_CERT_COVERAGE</span></td><td>4%</td><td>candidate_data_contract</td><td>≥95%; yellow 85-94.99%; red &lt;85%</td><td>HR/Managers; OJT/certification evidence</td><td>Training completion without competence pass cannot score.</td></tr>
-<tr><td><span class="code">RECORDABLE_INCIDENT_RATE</span></td><td>0%</td><td>gate_only</td><td>0 recordable incident; &gt;0 is red</td><td>EHS/OPS; incident and action closure record</td><td>Safety is non-tradeable: open serious action blocks all monetary recognition.</td></tr>
+<tr><td><span class="code">OTD</span></td><td>18%</td><td>active_runtime</td><td>≥95%; yellow 90-94.99%; red &lt;90%</td><td>PD/CS; shipment + approved promise date</td><td>Eligible only when complaint, FPY and ship-packet blockers are clean.</td></tr>
+<tr><td><span class="code">COMPLAINT_RATE</span></td><td>14%</td><td>manual_governed</td><td>≤1/100 shipments or approved ppm contract; major escape is red</td><td>QA/CS; EQMS complaint + containment evidence</td><td>Containment overdue or major escape blocks recognition.</td></tr>
+<tr><td><span class="code">FPY</span></td><td>14%</td><td>active_runtime</td><td>≥98%; yellow 95-97.99%; red &lt;95%</td><td>QA/OPS; first-pass inspection population</td><td>Inspection bypass or customer escape blocks recognition.</td></tr>
+<tr><td><span class="code">COPQ</span></td><td>14%</td><td>manual_governed</td><td>≤2% sales; red &gt;4%</td><td>QA/Finance; COPQ cost buckets + sales close</td><td>Cost exclusion or repeat NCR red blocks recognition.</td></tr>
+<tr><td><span class="code">PLAN_ADHERENCE</span></td><td>14%</td><td>active_runtime</td><td>≥90%; red &lt;80%</td><td>PPL/PD; job_orders plan adherence evidence</td><td>Hot-job gaming or unapproved resequence blocks recognition.</td></tr>
+<tr><td><span class="code">WIP_AGING</span></td><td>12%</td><td>active_runtime</td><td>≤5% aged WIP; red &gt;10%</td><td>PPL/PD; job_orders age + hold owner evidence</td><td>Parking work outside released WIP or age reset without evidence blocks recognition.</td></tr>
+<tr><td><span class="code">MATERIAL_AVAILABILITY_PLAN</span></td><td>14%</td><td>active_runtime</td><td>≥95%; red &lt;85%</td><td>SCM/PPL; job_orders material readiness status</td><td>Phantom availability or critical shortage blocks recognition.</td></tr>
 </tbody>
 </table></div>
-<div class="callout"><b>Cách tính điểm:</b> stretch = 110% achievement, green = 100%, yellow = 50%, red/blocked = 0%. Tổng điểm công ty là tổng <span class="code">weight x achievement</span>. Bất kỳ KPI đỏ hiện tại sẽ cap company score ở yellow và chặn monetary recognition cho kỳ đó. Khen thưởng chỉ được xem xét sau calibration HR/QMS/CEO, mọi yellow có action plan đã đóng, và không có blocker safety, quality escape, toàn vẹn dữ liệu, audit-major overdue hoặc gate bypass.</div>
+<div class="table-card"><table class="table">
+<thead><tr><th>Strategic driver panel</th><th>Vai trò</th><th>Quy tắc</th></tr></thead>
+<tbody>
+<tr><td><span class="code">FAI_FIRST_PASS</span>, <span class="code">FINAL_RELEASE_RFT</span>, <span class="code">INSPECTION_QUEUE_AGING</span></td><td>Zero-defect, CMM/QC queue và release RFT.</td><td>Hiển thị để hành động; không cộng điểm khi còn staged/manual-governed.</td></tr>
+<tr><td><span class="code">OEE_BOTTLENECK</span>, <span class="code">CONSTRAINT_LOST_HOURS</span></td><td>TOC weekly bảo vệ điểm thắt cổ chai thật.</td><td>Không biến thành payout KPI cho toàn xưởng; chỉ dùng khi constraint register được duyệt.</td></tr>
+<tr><td><span class="code">CHECK_DIM_REPORT_ON_SHIP</span>, <span class="code">NCR_3D_RESPONSE_SLA</span>, <span class="code">NCR_8D_UPDATE_SLA</span></td><td>LAM/customer hard evidence và 8D timing.</td><td>Có thể cap/block recognition trong scope liên quan, không cộng điểm scorecard.</td></tr>
+<tr><td><span class="code">IQC_PASS_RATE</span>, <span class="code">CRITICAL_ROLE_BACKUP_COVERAGE</span>, <span class="code">SUPPLIER_READINESS</span></td><td>Material/IQC, capability và supplier readiness.</td><td>Dùng để quyết định nguồn lực; staged driver không được gọi là bonus KPI.</td></tr>
+</tbody>
+</table></div>
+<div class="callout"><b>Cách tính điểm:</b> stretch = 110% achievement, green = 100%, yellow = 50%, red/blocked = 0%. Tổng điểm công ty chỉ tính 7 <span class="code">scored_core</span> theo <span class="code">weight x achievement</span>. Driver panel không cộng điểm. Gate blocker về an toàn, customer escape, data integrity, required gate bypass hoặc LAM hard gate sẽ cap/chặn recognition dù điểm số xanh.</div>
 <div class="callout warn"><b>Rào chắn:</b> blocker chỉ dừng recognition và kích hoạt review/CAPA/resource escalation. Kỷ luật cá nhân chỉ theo ANNEX-127 khi có bằng chứng hành vi kiểm soát được như giả dữ liệu, bỏ gate bắt buộc, unsafe act hoặc tái phạm sau coaching.</div>
 </div>
 
 <div class="section">
 <h2>4. Cách dùng số KPI</h2>
 <div class="grid-3">
-<div class="card"><h3>CEO</h3><p>12-15 KPI. Chỉ dùng để ra quyết định nguồn lực, ưu tiên cải tiến và review Hoshin.</p></div>
+<div class="card"><h3>CEO</h3><p>7 metric có điểm + driver panel hiển thị-only. Chỉ dùng để ra quyết định nguồn lực, ưu tiên cải tiến và review Hoshin.</p></div>
 <div class="card"><h3>Quản lý</h3><p>25-45 KPI. Bao gồm toàn bộ KPI ANNEX-122 và KPI vận hành được phê duyệt theo registry.</p></div>
 <div class="card"><h3>Hiện trường</h3><p>50+ metric thao tác. Dùng cho ca/ngày, nhưng không phải metric nào cũng được nâng lên scorecard công ty.</p></div>
 </div>

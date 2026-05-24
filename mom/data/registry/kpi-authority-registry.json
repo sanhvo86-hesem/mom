@@ -117,7 +117,7 @@
         "green_point": 95,
         "yellow_point": 90,
         "target": 95,
-        "basis": "Benchmark giao hàng gia công CNC job-shop hàng đầu ≥98%; HESEM đặt green ≥95% theo scorecard CNC-EXEC-BSC-15-2026 và cam kết hợp đồng khách hàng phổ biến."
+        "basis": "Benchmark giao hàng gia công CNC job-shop hàng đầu ≥98%; HESEM đặt green ≥95% theo scorecard CNC-EXEC-BSC-LEAN-7+DRIVERS-2026 và cam kết hợp đồng khách hàng phổ biến."
       },
       "data_source": {
         "system": "MOM/ERP",
@@ -6705,92 +6705,356 @@
       ],
       "lam_profile_link": "LAM_SEMSYSCO",
       "evidence_source": "supplier_rba_self_assessment + audit_access_log"
+    },
+    {
+      "canonical_code": "QC_HOLD_SLA",
+      "name": "QC hold resolution SLA",
+      "name_vi": "Chuẩn thời gian xử lý giữ hàng QC",
+      "layer": "qms_mes_gate_event",
+      "status": "manual_governed",
+      "calculation_status": "manual_governed",
+      "metric_type": "gate_control_metric",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "gate_release_control",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "sla_aging_bucket",
+      "evaluation_use": "gate_hold_release",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "purpose": "Track whether quality holds are dispositioned within governed SLA so blocked jobs are escalated without converting the metric into an executive scorecard item.",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 85,
+        "target": 95,
+        "basis": "Legacy dashboard metric retained as a governed operating metric; thresholds require calibration by hold severity."
+      },
+      "counter_metric": {
+        "code": "QC_HOLD_SLA-CTR",
+        "endpoint": "POST /api/kpi/QC_HOLD_SLA-CTR/input",
+        "name_vi": "Hold đóng không có bằng chứng xử lý hoặc release đúng quyền",
+        "name": "Hold closed without disposition evidence",
+        "intent": "Prevent improving hold SLA by closing or bypassing holds without QA disposition and release authority."
+      },
+      "blocking_conditions": [
+        "hold_closed_without_disposition_evidence",
+        "required_quality_hold_bypassed"
+      ],
+      "process": "quality_assurance",
+      "category": "internal",
+      "owner_role": "QA",
+      "data_stewardship_role": "QMS",
+      "cadence": "daily_weekly",
+      "lead_or_lag": "lead",
+      "applicable_jds": [
+        "QA",
+        "QC",
+        "QCL"
+      ],
+      "evidence_source": "quality hold register + QA disposition record",
+      "origin": "prompt_02_legacy_alias_backcompat_2026_05_24"
+    },
+    {
+      "canonical_code": "DOWNTIME_IMPACT",
+      "name": "Downtime impact on committed delivery",
+      "name_vi": "Tác động dừng máy lên cam kết giao hàng",
+      "layer": "lean_daily_toc_weekly",
+      "status": "staged_data_contract",
+      "calculation_status": "staged_data_contract",
+      "metric_type": "operating_metric",
+      "metric_subtype": "operating_metric",
+      "control_intent": "flow_constraint",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "rag_3_band",
+      "evaluation_use": "daily_management",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "purpose": "Quantify downtime hours that materially threaten promised delivery so maintenance and production can prioritize recovery actions.",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 3,
+        "yellow_point": 8,
+        "target": 3,
+        "basis": "Legacy dashboard metric retained as an operating driver; requires approved machine-state, job, and reason-code contract before runtime calculation."
+      },
+      "counter_metric": {
+        "code": "DOWNTIME_IMPACT-CTR",
+        "endpoint": "POST /api/kpi/DOWNTIME_IMPACT-CTR/input",
+        "name_vi": "Giờ dừng bị phân loại sai hoặc bỏ reason code",
+        "name": "Misclassified or unreasoned downtime hours",
+        "intent": "Prevent reducing downtime impact by reclassifying downtime, omitting reason codes, or moving work outside the visible queue."
+      },
+      "blocking_conditions": [
+        "downtime_reason_code_missing",
+        "constraint_recovery_action_overdue"
+      ],
+      "process": "maintenance",
+      "category": "internal",
+      "owner_role": "MNT",
+      "data_stewardship_role": "OPS",
+      "cadence": "daily_weekly",
+      "lead_or_lag": "lead",
+      "paired_metric": "OTD",
+      "applicable_jds": [
+        "MNT",
+        "WKM",
+        "PD"
+      ],
+      "evidence_source": "machine state log + maintenance work order + job recovery plan",
+      "origin": "prompt_02_legacy_alias_backcompat_2026_05_24"
+    },
+    {
+      "canonical_code": "TIME_ENTRY_COMPLIANCE",
+      "name": "Labor time entry compliance",
+      "name_vi": "Tuân thủ ghi nhận giờ công theo lệnh/công đoạn",
+      "layer": "role_scorecard_manual_governance",
+      "status": "manual_governed",
+      "calculation_status": "manual_governed",
+      "metric_type": "role_performance_measure",
+      "metric_subtype": "role_performance_measure",
+      "control_intent": "data_integrity",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "rag_3_band",
+      "evaluation_use": "role_performance_review",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "purpose": "Track whether labor time is recorded on the correct job, operation, employee, and period so cost/capacity data stays trustworthy.",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98,
+        "yellow_point": 95,
+        "target": 98,
+        "basis": "Legacy dashboard metric retained as a role data-quality measure; not an executive scorecard KPI."
+      },
+      "counter_metric": {
+        "code": "TIME_ENTRY_COMPLIANCE-CTR",
+        "endpoint": "POST /api/kpi/TIME_ENTRY_COMPLIANCE-CTR/input",
+        "name_vi": "Ghi giờ lùi kỳ hoặc sai công đoạn để làm đẹp dữ liệu",
+        "name": "Backdated or misassigned labor entry count",
+        "intent": "Prevent compliance improvement by late batch entry, wrong operation assignment, or supervisor override without evidence."
+      },
+      "blocking_conditions": [
+        "labor_entry_backdated_without_approval",
+        "labor_entry_wrong_job_or_operation"
+      ],
+      "process": "machining",
+      "category": "internal",
+      "owner_role": "WKM",
+      "data_stewardship_role": "FIN",
+      "owner_alignment_note": "WKM owns shop-floor entry discipline; FIN stewards labor-cost data quality.",
+      "cadence": "daily_weekly",
+      "lead_or_lag": "lead",
+      "paired_metric": "TIMESHEET_EXCEPTION_AGING",
+      "applicable_jds": [
+        "WKM",
+        "PD",
+        "FIN"
+      ],
+      "evidence_source": "labor transaction log + supervisor correction approval",
+      "origin": "prompt_02_legacy_alias_backcompat_2026_05_24"
     }
   ],
   "dashboard_core_kpis": [
     {
-      "local_id": "KPI-01",
+      "local_id": "BSC-CORE-01",
       "canonical_code": "OTD",
-      "name": "OTD Release",
+      "name": "On-Time Delivery",
       "backend_status": "runtime_calculated",
-      "primary_endpoint": "GET /api/kpi/OTD"
+      "primary_endpoint": "GET /api/kpi/OTD",
+      "scorecard_role": "scored_core",
+      "dashboard_card_class": "executive",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": true
     },
     {
-      "local_id": "KPI-02",
-      "canonical_code": "PROMISE_DATE_RISK",
-      "name": "Promise-Date Risk",
-      "backend_status": "staged_data_contract",
-      "primary_endpoint": "GET /api/kpi/catalog"
+      "local_id": "BSC-CORE-02",
+      "canonical_code": "COMPLAINT_RATE",
+      "name": "Customer Complaint / Escape Rate",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/COMPLAINT_RATE",
+      "scorecard_role": "scored_core",
+      "dashboard_card_class": "executive",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": true
     },
     {
-      "local_id": "KPI-03",
-      "canonical_code": "WIP_AGING",
-      "name": "WIP Aging",
-      "backend_status": "runtime_calculated",
-      "primary_endpoint": "GET /api/kpi/WIP_AGING"
-    },
-    {
-      "local_id": "KPI-04",
-      "canonical_code": "PLAN_ADHERENCE",
-      "name": "Dispatch/Plan Adherence",
-      "backend_status": "staged_data_contract",
-      "primary_endpoint": "GET /api/kpi/catalog"
-    },
-    {
-      "local_id": "KPI-05",
+      "local_id": "BSC-CORE-03",
       "canonical_code": "FPY",
       "name": "First Pass Yield",
       "backend_status": "runtime_calculated",
-      "primary_endpoint": "GET /api/kpi/FPY"
+      "primary_endpoint": "GET /api/kpi/FPY",
+      "scorecard_role": "scored_core",
+      "dashboard_card_class": "executive",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": true
     },
     {
-      "local_id": "KPI-06",
-      "canonical_code": "QC_HOLD_SLA",
-      "name": "QC Hold SLA",
+      "local_id": "BSC-CORE-04",
+      "canonical_code": "COPQ",
+      "name": "Cost of Poor Quality",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/COPQ",
+      "scorecard_role": "scored_core",
+      "dashboard_card_class": "executive",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": true
+    },
+    {
+      "local_id": "BSC-CORE-05",
+      "canonical_code": "PLAN_ADHERENCE",
+      "name": "Plan Adherence / Dispatch Stability",
+      "backend_status": "runtime_calculated",
+      "primary_endpoint": "GET /api/kpi/PLAN_ADHERENCE",
+      "scorecard_role": "scored_core",
+      "dashboard_card_class": "executive",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": true
+    },
+    {
+      "local_id": "BSC-CORE-06",
+      "canonical_code": "WIP_AGING",
+      "name": "WIP Aging",
+      "backend_status": "runtime_calculated",
+      "primary_endpoint": "GET /api/kpi/WIP_AGING",
+      "scorecard_role": "scored_core",
+      "dashboard_card_class": "executive",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": true
+    },
+    {
+      "local_id": "BSC-CORE-07",
+      "canonical_code": "MATERIAL_AVAILABILITY_PLAN",
+      "name": "Material Availability for Plan",
+      "backend_status": "runtime_calculated",
+      "primary_endpoint": "GET /api/kpi/MATERIAL_AVAILABILITY_PLAN",
+      "scorecard_role": "scored_core",
+      "dashboard_card_class": "executive",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": true
+    },
+    {
+      "local_id": "BSC-DRV-01",
+      "canonical_code": "FAI_FIRST_PASS",
+      "name": "FAI / First-Piece First-Pass",
+      "backend_status": "runtime_calculated",
+      "primary_endpoint": "GET /api/kpi/FAI_FIRST_PASS",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "strategic_driver",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false
+    },
+    {
+      "local_id": "BSC-DRV-02",
+      "canonical_code": "FINAL_RELEASE_RFT",
+      "name": "Final Release Right-First-Time",
       "backend_status": "staged_data_contract",
-      "primary_endpoint": "GET /api/kpi/catalog"
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "strategic_driver",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false
     },
     {
-      "local_id": "KPI-07",
-      "canonical_code": "REPEAT_NCR_RATE",
-      "name": "Repeat NCR Rate",
+      "local_id": "BSC-DRV-03",
+      "canonical_code": "INSPECTION_QUEUE_AGING",
+      "name": "CMM / Inspection Queue Aging",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "strategic_driver",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false
+    },
+    {
+      "local_id": "BSC-DRV-04",
+      "canonical_code": "OEE_BOTTLENECK",
+      "name": "OEE at Current Constraint",
       "backend_status": "staged_data_contract",
-      "primary_endpoint": "GET /api/kpi/catalog"
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "strategic_driver",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false
     },
     {
-      "local_id": "KPI-08",
-      "canonical_code": "DOWNTIME_IMPACT",
-      "name": "Downtime Impact",
+      "local_id": "BSC-DRV-05",
+      "canonical_code": "CONSTRAINT_LOST_HOURS",
+      "name": "Constraint Lost Hours",
       "backend_status": "staged_data_contract",
-      "primary_endpoint": "GET /api/kpi/catalog"
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "strategic_driver",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false
     },
     {
-      "local_id": "KPI-09",
-      "canonical_code": "SHIP_PACKET_COMPLETENESS",
-      "name": "Ship Packet Completeness",
+      "local_id": "BSC-DRV-06",
+      "canonical_code": "CHECK_DIM_REPORT_ON_SHIP",
+      "name": "LAM Check-Dimension Report on Ship",
       "backend_status": "staged_data_contract",
-      "primary_endpoint": "GET /api/kpi/catalog"
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "strategic_driver",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false
     },
     {
-      "local_id": "KPI-10",
-      "canonical_code": "SUPPLIER_OTD",
-      "name": "PO/Processor On-Time",
-      "backend_status": "runtime_calculated_partial",
-      "primary_endpoint": "GET /api/kpi/SUPPLIER_OTD"
-    },
-    {
-      "local_id": "KPI-11",
-      "canonical_code": "INVENTORY_ACCURACY",
-      "name": "Inventory Accuracy",
+      "local_id": "BSC-DRV-07",
+      "canonical_code": "NCR_3D_RESPONSE_SLA",
+      "name": "Customer NCR 3D SLA",
       "backend_status": "staged_data_contract",
-      "primary_endpoint": "GET /api/kpi/catalog"
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "strategic_driver",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false
     },
     {
-      "local_id": "KPI-12",
-      "canonical_code": "TIME_ENTRY_COMPLIANCE",
-      "name": "Time Entry Compliance",
+      "local_id": "BSC-DRV-08",
+      "canonical_code": "NCR_8D_UPDATE_SLA",
+      "name": "Customer NCR 8D Update SLA",
       "backend_status": "staged_data_contract",
-      "primary_endpoint": "GET /api/kpi/catalog"
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "strategic_driver",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false
+    },
+    {
+      "local_id": "BSC-DRV-09",
+      "canonical_code": "IQC_PASS_RATE",
+      "name": "Material/Certificate/IQC Readiness",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "strategic_driver",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false
+    },
+    {
+      "local_id": "BSC-DRV-10",
+      "canonical_code": "CRITICAL_ROLE_BACKUP_COVERAGE",
+      "name": "Critical Role Backup Coverage",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "strategic_driver",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false
+    },
+    {
+      "local_id": "BSC-DRV-11",
+      "canonical_code": "SUPPLIER_READINESS",
+      "name": "Supplier Readiness Composite",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "strategic_driver",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false
     }
   ],
   "gate_control_metrics": [
@@ -9293,8 +9557,8 @@
     "controllability_scope": "Shared system outcome unless a documented event proves an individual's controllable behavior."
   },
   "scorecard_operating_model": {
-    "model_id": "CNC-EXEC-BSC-LEAN-7-2026",
-    "scope": "lean_executive_scorecard_core",
+    "model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+    "scope": "executive_scored_core_plus_driver_panel_and_gate_blockers",
     "cadence": "monthly scorecard, quarterly calibration, annual Hoshin refresh",
     "weight_total_pct": 100,
     "rating_scale": [
@@ -9398,7 +9662,13 @@
         "blocking_conditions": [
           "customer_escape_without_containment",
           "promise_date_changed_without_approval"
-        ]
+        ],
+        "scorecard_role": "scored_core",
+        "bsc_perspective": "customer",
+        "strategic_objective": "Protect customer promise reliability without bypassing quality gates.",
+        "lead_or_lag": "lag",
+        "initiative_link": "delivery_recovery_and_promise_date_control",
+        "review_forum": "monthly BSC; weekly delivery recovery when yellow/red"
       },
       {
         "canonical_code": "COMPLAINT_RATE",
@@ -9417,7 +9687,13 @@
         "blocking_conditions": [
           "major_customer_escape",
           "containment_overdue"
-        ]
+        ],
+        "scorecard_role": "scored_core",
+        "bsc_perspective": "customer",
+        "strategic_objective": "Expose customer escapes and force fast containment/CAPA.",
+        "lead_or_lag": "lag",
+        "initiative_link": "zero_defect_customer_escape_prevention",
+        "review_forum": "monthly BSC; event complaint review"
       },
       {
         "canonical_code": "FPY",
@@ -9436,7 +9712,13 @@
         "blocking_conditions": [
           "inspection_bypass",
           "customer_escape_without_containment"
-        ]
+        ],
+        "scorecard_role": "scored_core",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Increase right-first-time CNC flow before defects reach final release.",
+        "lead_or_lag": "lead",
+        "initiative_link": "first_pass_quality_and_process_stability",
+        "review_forum": "daily quality tier; monthly BSC"
       },
       {
         "canonical_code": "COPQ",
@@ -9455,7 +9737,13 @@
         "blocking_conditions": [
           "unapproved_quality_cost_adjustment",
           "repeat_ncr_red"
-        ]
+        ],
+        "scorecard_role": "scored_core",
+        "bsc_perspective": "financial",
+        "strategic_objective": "Reduce poor-quality cost while keeping prevention/appraisal investment visible.",
+        "lead_or_lag": "lag",
+        "initiative_link": "quality_cost_reduction_and_capa_effectiveness",
+        "review_forum": "monthly BSC; finance/QMS close review"
       },
       {
         "canonical_code": "PLAN_ADHERENCE",
@@ -9475,7 +9763,13 @@
           "required_gate_bypass",
           "verified_data_falsification",
           "open_red_quality_or_safety_counter_metric"
-        ]
+        ],
+        "scorecard_role": "scored_core",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Stabilize dispatch and expose re-sequencing before delivery misses occur.",
+        "lead_or_lag": "lead",
+        "initiative_link": "lean_daily_management_and_schedule_stability",
+        "review_forum": "daily tier; monthly BSC"
       },
       {
         "canonical_code": "WIP_AGING",
@@ -9494,7 +9788,13 @@
         "blocking_conditions": [
           "manual_age_reset_without_evidence",
           "unowned_red_wip"
-        ]
+        ],
+        "scorecard_role": "scored_core",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Expose stuck WIP and unblock the true constraint instead of releasing more work.",
+        "lead_or_lag": "lead",
+        "initiative_link": "toc_flow_control_and_queue_aging_reduction",
+        "review_forum": "weekly TOC review; monthly BSC"
       },
       {
         "canonical_code": "MATERIAL_AVAILABILITY_PLAN",
@@ -9514,10 +9814,254 @@
           "critical_material_shortage",
           "required_gate_bypass",
           "verified_data_falsification"
-        ]
+        ],
+        "scorecard_role": "scored_core",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Keep the approved plan executable with material and supplier readiness visible.",
+        "lead_or_lag": "lead",
+        "initiative_link": "material_readiness_and_supplier_recovery",
+        "review_forum": "daily plan readiness review; monthly BSC"
       }
     ],
-    "design_rule": "Keep the executive scorecard to a small runtime-backed core. Staged, local, and role-only measures remain candidate or operating metrics and do not enter reward scoring until the data contract is approved."
+    "design_rule": "Keep the executive scorecard to seven scored core metrics. Put valuable leading, gate, TOC, LAM and capability indicators into strategic_driver_panel or gate_blockers until their evidence contract is approved and change-controlled.",
+    "scored_core": [
+      "OTD",
+      "COMPLAINT_RATE",
+      "FPY",
+      "COPQ",
+      "PLAN_ADHERENCE",
+      "WIP_AGING",
+      "MATERIAL_AVAILABILITY_PLAN"
+    ],
+    "strategic_driver_panel": [
+      {
+        "canonical_code": "FAI_FIRST_PASS",
+        "display_name": "FAI / first-piece first-pass acceptance",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Prevent launch/setup defects before lot release.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "zero_defect_first_piece_release",
+        "review_forum": "G4 gate review; daily quality tier",
+        "scoring_policy": "visible_only_until_scorecard_promotion_approved",
+        "reward_policy": "does_not_add_points; can cap/block recognition when gate evidence is missing or red"
+      },
+      {
+        "canonical_code": "FINAL_RELEASE_RFT",
+        "display_name": "Final release right-first-time",
+        "bsc_perspective": "customer",
+        "strategic_objective": "Keep final release and ship evidence right the first time.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lag",
+        "initiative_link": "release_package_rft",
+        "review_forum": "G6 final release review; monthly quality review",
+        "scoring_policy": "visible_only_until_data_contract_approved",
+        "reward_policy": "does_not_add_points; red trend triggers QA containment and scorecard review"
+      },
+      {
+        "canonical_code": "INSPECTION_QUEUE_AGING",
+        "display_name": "CMM / inspection queue aging",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Prevent the CMM/QC queue from starving delivery flow or hiding WIP.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "cmm_queue_and_quality_flow_control",
+        "review_forum": "daily QC queue review; weekly TOC review",
+        "scoring_policy": "visible_only_manual_governed_driver",
+        "reward_policy": "does_not_add_points; forces queue owner action when aging is red"
+      },
+      {
+        "canonical_code": "OEE_BOTTLENECK",
+        "display_name": "OEE at current constraint resource",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Improve the real constraint without optimizing non-constraint utilization.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "toc_constraint_recovery",
+        "review_forum": "weekly TOC constraint review",
+        "scoring_policy": "visible_only_staged_data_contract",
+        "reward_policy": "does_not_add_points; cannot be used for payout until constraint binding and reason-code contract are approved"
+      },
+      {
+        "canonical_code": "CONSTRAINT_LOST_HOURS",
+        "display_name": "Lost available hours at constraint",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Recover lost hours at the true constraint with reason-coded action.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "constraint_lost_hour_reduction",
+        "review_forum": "weekly TOC constraint review",
+        "scoring_policy": "visible_only_staged_data_contract",
+        "reward_policy": "does_not_add_points; red trend forces resource/CAPA review"
+      },
+      {
+        "canonical_code": "CHECK_DIM_REPORT_ON_SHIP",
+        "display_name": "Check-dimension report attached to shipment",
+        "bsc_perspective": "risk_safety_compliance",
+        "strategic_objective": "Prevent LAM shipment release without required dimensional evidence.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "lam_cdr_ship_packet_control",
+        "review_forum": "G6/G7 ship release gate",
+        "scoring_policy": "visible_only_gate_driver",
+        "reward_policy": "does_not_add_points; hard blocker for LAM scope when required CDR is missing"
+      },
+      {
+        "canonical_code": "NCR_3D_RESPONSE_SLA",
+        "display_name": "Customer NCR 3D response SLA",
+        "bsc_perspective": "customer",
+        "strategic_objective": "Contain customer complaints quickly and protect 8D timing.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "customer_ncr_3d4d8d_sla",
+        "review_forum": "customer complaint event review; monthly BSC risk panel",
+        "scoring_policy": "visible_only_staged_data_contract",
+        "reward_policy": "does_not_add_points; overdue response blocks customer-quality recognition"
+      },
+      {
+        "canonical_code": "NCR_8D_UPDATE_SLA",
+        "display_name": "Customer NCR 8D update SLA",
+        "bsc_perspective": "customer",
+        "strategic_objective": "Keep corrective action updates current until customer acceptance.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "customer_ncr_3d4d8d_sla",
+        "review_forum": "customer complaint event review; monthly BSC risk panel",
+        "scoring_policy": "visible_only_staged_data_contract",
+        "reward_policy": "does_not_add_points; stale 8D blocks customer-quality recognition"
+      },
+      {
+        "canonical_code": "IQC_PASS_RATE",
+        "display_name": "Material/certificate/IQC readiness",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Protect the plan from supplier quality and certificate readiness failures.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "material_cert_iqc_readiness",
+        "review_forum": "daily plan readiness; supplier quality review",
+        "scoring_policy": "visible_only_gate_driver",
+        "reward_policy": "does_not_add_points; IQC/cert red blocks affected jobs from being counted as ready"
+      },
+      {
+        "canonical_code": "CRITICAL_ROLE_BACKUP_COVERAGE",
+        "display_name": "Critical role backup coverage",
+        "bsc_perspective": "learning_growth_capability",
+        "strategic_objective": "Keep certified backup coverage for critical roles and avoid single-person dependency.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "critical_role_certification_and_deputy_coverage",
+        "review_forum": "monthly capability review; management review",
+        "scoring_policy": "visible_only_manual_governed_driver",
+        "reward_policy": "does_not_add_points; red coverage triggers training/deputy action"
+      },
+      {
+        "canonical_code": "SUPPLIER_READINESS",
+        "display_name": "Supplier readiness composite",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Expose supplier delivery/quality readiness before material availability fails.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "supplier_readiness_and_scar_recovery",
+        "review_forum": "supplier quality review; monthly BSC risk panel",
+        "scoring_policy": "visible_only_staged_data_contract",
+        "reward_policy": "does_not_add_points; critical shortage or supplier escape can cap/block recognition"
+      }
+    ],
+    "gate_blockers": [
+      {
+        "blocker_code": "SAFETY_OR_SERIOUS_NEAR_MISS_OPEN_ACTION",
+        "label": "Safety and serious near-miss open action",
+        "bsc_perspective": "risk_safety_compliance",
+        "scorecard_role": "gate_blocker",
+        "strategic_objective": "preserve non-tradeable safety and EHS action closure",
+        "lead_or_lag": "lag_gate",
+        "initiative_link": "EHS corrective-action and serious-near-miss closure",
+        "linked_metrics": [
+          "RECORDABLE_INCIDENT_RATE",
+          "INCIDENT_ACTION_CLOSURE_AGING"
+        ],
+        "effect": "blocks monetary/team recognition until containment and action closure are verified",
+        "review_forum": "EHS event review; monthly management review"
+      },
+      {
+        "blocker_code": "CUSTOMER_ESCAPE_WITHOUT_CONTAINMENT",
+        "label": "Customer escape without containment or 3D/8D discipline",
+        "bsc_perspective": "customer",
+        "scorecard_role": "gate_blocker",
+        "strategic_objective": "protect customer trust by enforcing containment before recognition",
+        "lead_or_lag": "lag_gate",
+        "initiative_link": "customer containment and 3D/8D discipline",
+        "linked_metrics": [
+          "COMPLAINT_RATE",
+          "NCR_3D_RESPONSE_SLA",
+          "NCR_8D_UPDATE_SLA"
+        ],
+        "effect": "blocks delivery/quality recognition for the affected scope until containment and customer communication are current",
+        "review_forum": "customer complaint event review"
+      },
+      {
+        "blocker_code": "VERIFIED_DATA_FALSIFICATION",
+        "label": "Verified KPI, gate, or evidence falsification",
+        "bsc_perspective": "risk_safety_compliance",
+        "scorecard_role": "gate_blocker",
+        "strategic_objective": "protect audit integrity and prevent reward from false evidence",
+        "lead_or_lag": "lag_gate",
+        "initiative_link": "data-integrity audit and e-signature evidence controls",
+        "linked_metrics": [
+          "DATA_INTEGRITY_BLOCKER"
+        ],
+        "effect": "blocks recognition and triggers audit/e-signature evidence review regardless of numeric result",
+        "review_forum": "QMS/data-integrity review"
+      },
+      {
+        "blocker_code": "REQUIRED_GATE_BYPASS",
+        "label": "Required MOM/MES/QMS gate bypass",
+        "bsc_perspective": "risk_safety_compliance",
+        "scorecard_role": "gate_blocker",
+        "strategic_objective": "protect mandatory production and quality gates from bypass",
+        "lead_or_lag": "lag_gate",
+        "initiative_link": "MOM/MES/QMS gate discipline and hold-release controls",
+        "linked_metrics": [
+          "FAI_FIRST_PASS",
+          "IN_PROCESS_REJECT_RATE",
+          "SHIP_PACKET_COMPLETENESS"
+        ],
+        "effect": "blocks recognition for affected scope and forces hold/release escalation",
+        "review_forum": "G0-G7 gate review"
+      },
+      {
+        "blocker_code": "LAM_HARD_GATE_OPEN",
+        "label": "LAM/SEMSYSCO hard gate open",
+        "bsc_perspective": "customer",
+        "scorecard_role": "gate_blocker",
+        "strategic_objective": "protect LAM release evidence before scope-specific recognition",
+        "lead_or_lag": "lead_gate",
+        "initiative_link": "LAM G6/G7 check-dimension and special-release governance",
+        "linked_metrics": [
+          "CHECK_DIM_REPORT_ON_SHIP",
+          "GAGE_VALID_FOR_RELEASE",
+          "SPECIAL_RELEASE_COMPLIANCE"
+        ],
+        "effect": "blocks LAM-scope recognition until the hard gate evidence is complete and approved",
+        "review_forum": "LAM G6/G7 release review"
+      }
+    ],
+    "rule": "Only scored_core contributes to the company score. Strategic_driver_panel and gate_blockers guide action and can cap/block recognition, but do not add points unless promoted by approved data contract, registry change control, and post-pilot calibration.",
+    "pilot_reward_rule": "During the 90-day pilot the model is simulation/calibration only. No monetary payout is authorized by this registry until BSC drift, LAM gates, Cpk/CTQ, customer NCR severity, and data evidence are proven and explicitly approved.",
+    "scorecard_layers": [
+      {
+        "layer": "scored_core",
+        "meaning": "Seven small evidence-backed executive metrics; weights sum to 100 and drive the management score."
+      },
+      {
+        "layer": "strategic_driver_panel",
+        "meaning": "Visible leading/diagnostic metrics for action. They do not add score points while staged or manual-governed, but may cap/block recognition through the rule field."
+      },
+      {
+        "layer": "gate_blockers",
+        "meaning": "Safety, customer escape, data integrity, gate bypass, and LAM hard gates override score arithmetic."
+      }
+    ]
   },
   "scorecard_evidence_contracts": {
     "OTD": {
@@ -9581,16 +10125,16 @@
       "lineage_rule": "manual override, stale evidence, or unapproved source change blocks scorecard recognition"
     },
     "WIP_AGING": {
-      "scorecard_scoring_status": "candidate_data_contract",
-      "scorecard_contributes_to_reward": false,
-      "data_contract_approval_id": null,
+      "scorecard_scoring_status": "active_runtime",
+      "scorecard_contributes_to_reward": true,
+      "data_contract_approval_id": "KPI-DC-WIP_AGING-001",
       "evidence_manifest_id": "KPI-EV-WIP-001",
-      "source_system": "MES/WIP movement and hold-owner evidence",
-      "source_table_or_record": "job_orders projection; operation movement events; hold reason and owner log",
-      "authority_service_path": "Lean Daily Management WIP aging data contract",
-      "evidence_record": "released WIP age, hold reason, owner, physical-progress event and age-reset evidence",
-      "freshness_rule": "daily tier review and weekly constraint review",
-      "lineage_rule": "manual age reset without physical progress blocks scorecard use"
+      "source_system": "MOM job-order execution and WIP age projection",
+      "source_table_or_record": "job_orders; operation movement and hold-owner evidence when available",
+      "authority_service_path": "KpiEngine::calcWipAging",
+      "evidence_record": "open job_orders in released/active/on_hold status, created_at age, hold reason and owner when available",
+      "freshness_rule": "daily tier review and monthly BSC close",
+      "lineage_rule": "manual age reset or un-released backlog parking blocks scorecard recognition"
     },
     "MATERIAL_AVAILABILITY_PLAN": {
       "scorecard_scoring_status": "active_runtime",
@@ -9833,13 +10377,13 @@
       "decision_purpose": "Set recovery priorities and prevent WIP growth before the constraint.",
       "accountable_owner": "Planning Manager / Production Director",
       "review_cadence": "daily tier and weekly TOC",
-      "review_forum": "Lean Daily Management and constraint review",
+      "review_forum": "weekly TOC review and monthly BSC",
       "counter_metric": [
         "OTD",
         "WIP_BEFORE_CONSTRAINT",
         "PLAN_ADHERENCE"
       ],
-      "data_confidence_level": "widget_only",
+      "data_confidence_level": "runtime_calculated",
       "drilldown_dimensions": [
         "work_center",
         "hold_reason",
@@ -9925,7 +10469,10 @@
       "counter_metric_status",
       "trend",
       "evidence_source_or_link",
-      "last_calculated_or_input_time"
+      "last_calculated_or_input_time",
+      "scorecard_role",
+      "bsc_perspective",
+      "review_forum"
     ],
     "render_rules": {
       "staged_data_contract": "Card MUST display 'chưa đủ data contract' badge + data_contract_gap text; numeric value field is SUPPRESSED (never render staged metric value as a real number). Only the badge, the data contract gap and the input endpoint are shown.",
@@ -9947,7 +10494,11 @@
           "manual",
           "manual_governed"
         ],
-        "staged_metric_policy": "Executive deck must NOT contain a staged_data_contract metric as a scoreable card. Staged candidates are visible only in the data-contract backlog card class."
+        "staged_metric_policy": "Executive scored cards are only scored_core metrics from CNC-EXEC-BSC-LEAN-7+DRIVERS-2026. Strategic drivers and gate blockers may be visible on the leadership page but must render as visible-only/cap/block cards and must not add points.",
+        "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+        "scorecard_role_allowed": [
+          "scored_core"
+        ]
       },
       "daily_ops": {
         "audience": "Tier-1 / Tier-2 floor + cell meeting",
@@ -10005,6 +10556,46 @@
           "data_contract_required"
         ],
         "staged_metric_policy": "All cards are staged by definition. Each card MUST show data_contract_gap + target_graduation_condition + owner + estimated_data_ready_date if known."
+      },
+      "strategic_driver": {
+        "audience": "Tier-3 management / CEO driver panel",
+        "metric_types_allowed": [
+          "kpi",
+          "operating_metric",
+          "gate_control_metric",
+          "health_indicator",
+          "role_performance_measure"
+        ],
+        "calculation_status_allowed": [
+          "runtime_calculated",
+          "manual",
+          "manual_governed",
+          "staged_data_contract",
+          "data_contract_required"
+        ],
+        "scorecard_role_allowed": [
+          "strategic_driver"
+        ],
+        "staged_metric_policy": "Strategic drivers are visible for action and escalation only. They never add score points while staged/manual-governed; red/missing evidence may cap or block recognition under scorecard_operating_model.rule."
+      },
+      "gate_blocker": {
+        "audience": "Tier-3 management / QMS gate blocker review",
+        "metric_types_allowed": [
+          "gate_control_metric",
+          "counter_metric",
+          "health_indicator",
+          "kpi"
+        ],
+        "calculation_status_allowed": [
+          "runtime_calculated",
+          "manual_governed",
+          "staged_data_contract",
+          "data_contract_required"
+        ],
+        "scorecard_role_allowed": [
+          "gate_blocker"
+        ],
+        "staged_metric_policy": "Gate blockers do not add points. Open blocker status blocks recognition for the affected scope even when all scored_core metrics are green."
       }
     }
   },

@@ -98,7 +98,7 @@ td,th{vertical-align:top}
 <div class="table-card"><table class="table">
 <thead><tr><th>Layer</th><th>KPI/metric bổ sung</th><th>Trạng thái</th><th>Điều kiện nâng cấp</th></tr></thead>
 <tbody>
-<tr><td>Executive BSC</td><td>OEE_BOTTLENECK, WIP_AGING, SETUP_FIRST_PASS, FAI_FIRST_PASS, COPQ, REPEAT_NCR_RATE, CAPA_EFFECTIVENESS</td><td>Scorecard controlled</td><td>Có owner, target, monthly review và evidence.</td></tr>
+<tr><td>Executive BSC</td><td>7 scored core: OTD, COMPLAINT_RATE, FPY, COPQ, PLAN_ADHERENCE, WIP_AGING, MATERIAL_AVAILABILITY_PLAN. Driver panel: FAI_FIRST_PASS, FINAL_RELEASE_RFT, INSPECTION_QUEUE_AGING, OEE_BOTTLENECK, CONSTRAINT_LOST_HOURS, CHECK_DIM_REPORT_ON_SHIP, NCR_3D_RESPONSE_SLA, NCR_8D_UPDATE_SLA, IQC_PASS_RATE, CRITICAL_ROLE_BACKUP_COVERAGE, SUPPLIER_READINESS.</td><td>Scorecard controlled</td><td>Chỉ scored core cộng điểm. Driver panel hiển thị để hành động/cap/block, không payout khi chưa có data contract và pilot approval.</td></tr>
 <tr><td>TOC weekly</td><td>BOTTLENECK_BUFFER_STATUS, THROUGHPUT_PER_CONSTRAINT_HOUR, CONSTRAINT_LOST_HOURS, WIP_BEFORE_CONSTRAINT</td><td>Staged data contract</td><td>Có constraint register, machine/job context và buffer rule.</td></tr>
 <tr><td>Lean daily</td><td>IN_PROCESS_REJECT_RATE, CYCLE_TIME_VARIANCE, MTBF, MTTR, thời gian dừng máy reason pareto</td><td>Staged data contract</td><td>Có hiện trường source, reason code và action log.</td></tr>
 <tr><td>QMS/MES event</td><td>FAI_FIRST_PASS, SETUP_FIRST_PASS, CAPA_EFFECTIVENESS, gate tính đầy đủ bằng chứng</td><td>Evidence controlled</td><td>Có form/gate record và quyền QA/QMS rõ.</td></tr>
@@ -203,7 +203,7 @@ td,th{vertical-align:top}
 </table></div>
 
 <h3>7.5 Trọng số, ngưỡng định lượng và reward gate</h3>
-<p>Scorecard lãnh đạo dùng model <span class="code">CNC-EXEC-BSC-15-2026</span>. Tổng weight bằng 100%, trong đó safety là gate 0 điểm và không thể bù bằng KPI khác. Mỗi KPI có target, ngưỡng xanh/vàng/đỏ, criteria đánh giá, reward rule, blocking conditions và scoring status trong registry. Tài liệu khác chỉ được tham chiếu, không tự tạo trọng số riêng.</p>
+<p>Scorecard lãnh đạo dùng model <span class="code">CNC-EXEC-BSC-LEAN-7+DRIVERS-2026</span>. Tổng weight của 7 <span class="code">scored_core</span> bằng 100%. Strategic driver panel và gate blocker có thể hiển thị trên dashboard lãnh đạo để hướng hành động, cap hoặc chặn recognition, nhưng không cộng điểm và không payout khi chưa được nâng cấp bằng data contract, change control và pilot approval. Mỗi scored core có target, ngưỡng xanh/vàng/đỏ, criteria đánh giá, reward rule, blocking conditions và scoring status trong registry. Tài liệu khác chỉ được tham chiếu, không tự tạo trọng số riêng.</p>
 <div class="table-card"><table class="table">
 <thead><tr><th>Thành phần</th><th>Quy tắc</th><th>Ý nghĩa thực chiến</th></tr></thead>
 <tbody>
@@ -220,7 +220,7 @@ td,th{vertical-align:top}
 <div class="section">
 <h2>8. Quy tắc dashboard</h2>
 <ul class="tight">
-<li>Dashboard lãnh đạo không vượt 15 KPI nếu CEO chưa phê duyệt mở rộng.</li>
+<li>Dashboard lãnh đạo chỉ có 7 scored core cộng điểm. Driver panel được hiển thị riêng và phải gắn nhãn visible-only/cap/block; CEO không được tự mở rộng thành KPI điểm nếu chưa có data contract và change control.</li>
 <li>Dashboard quản lý có thể dùng toàn bộ ANNEX-122 và KPI staged đã có data contract.</li>
 <li>Metric hiện trường được phép nhiều hơn, nhưng phải ghi rõ là metric thao tác, không phải KPI công ty.</li>
 <li>Khi mã seed, dashboard hoặc báo cáo cũ dùng alias, hệ thống phải map về mã chuẩn trước khi lưu snapshot mới.</li>
