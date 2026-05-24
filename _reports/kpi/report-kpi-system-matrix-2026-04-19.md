@@ -1,6 +1,6 @@
 # KPI System Matrix Audit
 
-Generated: 2026-05-23T16:47:15+00:00
+Generated: 2026-05-24T00:21:15+00:00
 
 ## Summary
 
@@ -36,13 +36,13 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 
 | Code | Class | Docs | Uses | Target | Backend/statistical plan | Target consistency | Name consistency |
 |---|---|---:|---:|---|---|---|---|
-| `OTD` | executive_scorecard_kpi | 72 | 196 | ≥95% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
+| `OTD` | executive_scorecard_kpi | 73 | 197 | ≥95% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
 | `FPY` | executive_scorecard_kpi | 28 | 40 | ≥98% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
 | `COPQ` | executive_scorecard_kpi | 21 | 32 | ≤2 percent_of_sales | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
 | `OEE` | gate_control_metric | 20 | 42 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CAPA_EFFECTIVENESS` | operating_metric | 10 | 12 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `MTTR` | operating_metric | 9 | 13 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `WIP_AGING` | executive_scorecard_kpi | 8 | 11 | ≤5 aged_wip_percent | runtime_calculated_with_registry_contract | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
+| `WIP_AGING` | executive_scorecard_kpi | 9 | 12 | ≤5 aged_wip_percent | runtime_calculated_with_registry_contract | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
 | `COMPLAINT_RATE` | executive_scorecard_kpi | 5 | 26 | ≤1 complaints_per_100_shipments | runtime_calculated_with_registry_contract | registered_target_not_repeated_in_docs | legacy_alias_seen |
 | `PLAN_ADHERENCE` | executive_scorecard_kpi | 5 | 11 | ≥90% | runtime_calculated_with_registry_contract | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
 | `C18-M1` | role_performance_measure | 3 | 8 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |

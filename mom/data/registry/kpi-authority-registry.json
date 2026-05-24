@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
   "version": "2026-05-23",
-  "schema_version": 18,
+  "schema_version": 19,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. The executive scorecard is a lean runtime-backed core; role scorecards use active/candidate measures; proposed metrics remain non-reward until governed evidence and data contracts are approved.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -6251,7 +6251,23 @@
       "category": "customer",
       "applicable_jds": [
         "CS"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "Epicor Quote record, RFQ completeness checklist, timestamped CS response log",
+      "data_stewardship_role": "CS",
+      "hold_release_rule": "Hold G0 quote release when complete RFQ response exceeds 4 working hours or RFQ evidence is incomplete; CS must open recovery action before quote handoff."
     },
     {
       "local_id": "KPI-G0-02",
@@ -6280,7 +6296,23 @@
       "category": "customer",
       "applicable_jds": [
         "CS"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "FRM-202 contract review record with approved customer requirement traceability",
+      "data_stewardship_role": "CS",
+      "hold_release_rule": "Hold order acceptance when contract review is not right-first-time or A2/A5 evidence is missing; CS resolves with EST/QA before G1 handoff."
     },
     {
       "local_id": "KPI-G1-01",
@@ -6317,7 +6349,23 @@
       "category": "internal",
       "applicable_jds": [
         "ENGM"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "FRM-306 engineering release pack, revision log, DFM/CAM/routing approval evidence",
+      "data_stewardship_role": "ENGM",
+      "hold_release_rule": "Hold baseline release when engineering package must be reopened or B1/B2 approval evidence is missing; ENGM chairs containment before production planning."
     },
     {
       "local_id": "KPI-G1-02",
@@ -6353,7 +6401,23 @@
       "category": "internal",
       "applicable_jds": [
         "ENGM"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "Epicor ECO/ECN record with submission, approval, implementation, and closure timestamps",
+      "data_stewardship_role": "ENGM",
+      "hold_release_rule": "Hold affected revision release when ECO exceeds 48 hours or impact assessment is incomplete; ENGM escalates to PD/QA for priority decision."
     },
     {
       "local_id": "KPI-G1-03",
@@ -6389,7 +6453,23 @@
       "category": "internal",
       "applicable_jds": [
         "QA"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "Control Plan, PFMEA, and job_orders.control_plan_id approval evidence linked to baseline release",
+      "data_stewardship_role": "QA",
+      "hold_release_rule": "No G1 release when Control Plan/PFMEA is absent or unapproved; QA blocks baseline until B8 evidence is complete."
     },
     {
       "local_id": "KPI-G2-01",
@@ -6425,7 +6505,23 @@
       "category": "supplier",
       "applicable_jds": [
         "QA"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "FRM-701 receiving/IQC record with lot, certificate, disposition, and inspector signature",
+      "data_stewardship_role": "QA",
+      "hold_release_rule": "Hold G2 material readiness when IQC lot is rejected, open, or lacks D10 evidence; QA/SCM decide quarantine, concession, or replacement."
     },
     {
       "local_id": "KPI-G2-02",
@@ -6461,7 +6557,23 @@
       "category": "supplier",
       "applicable_jds": [
         "SCM"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "Epicor receipt, lot trace, mill certificate, CoC, and material certificate match evidence",
+      "data_stewardship_role": "SCM",
+      "hold_release_rule": "Hold material issue to production when certificate/lot trace is incomplete; SCM resolves before G3 setup release."
     },
     {
       "local_id": "KPI-G3-01",
@@ -6498,7 +6610,23 @@
       "category": "internal",
       "applicable_jds": [
         "WKM"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "FRM-511 setup readiness, dry-run/pilot result, fixture/gage readiness, and first setup approval",
+      "data_stewardship_role": "WKM",
+      "hold_release_rule": "Hold production run when setup does not pass first attempt or B5/B6 evidence is incomplete; WKM/QA review before releasing lot."
     },
     {
       "local_id": "KPI-G3-02",
@@ -6534,7 +6662,23 @@
       "category": "internal",
       "applicable_jds": [
         "WKM"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "Time Entry setup/changeover record with SMED reason codes and work-center timestamp",
+      "data_stewardship_role": "WKM",
+      "hold_release_rule": "Escalate G3 when changeover exceeds standard or lacks reason code; WKM protects constraint resources and updates recovery action."
     },
     {
       "local_id": "KPI-G4-01",
@@ -6563,7 +6707,23 @@
       "category": "internal",
       "applicable_jds": [
         "QA"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "FRM-311 FAI/first-piece inspection record, inspection result, attempt number, and QA approval",
+      "data_stewardship_role": "QA",
+      "hold_release_rule": "No G4 lot release when FAI fails first pass or D1/D2 evidence is incomplete; QA holds production and opens NCR/rework decision."
     },
     {
       "local_id": "KPI-G4-02",
@@ -6600,7 +6760,23 @@
       "category": "internal",
       "applicable_jds": [
         "QA"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "FRM-311 FAI start/finish timestamp, PPAP/customer submission log, and CMM/gage queue evidence",
+      "data_stewardship_role": "QA",
+      "hold_release_rule": "Escalate when FAI cycle exceeds 2 hours or PPAP package is late; QA/QCL assigns recovery before production release."
     },
     {
       "local_id": "KPI-G5-01",
@@ -6636,7 +6812,23 @@
       "category": "internal",
       "applicable_jds": [
         "WKM"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "FRM-651 IPQC/NCR record with defect quantity, operation, containment, and disposition",
+      "data_stewardship_role": "WKM",
+      "hold_release_rule": "Hold affected operation when reject rate exceeds 1% or D3 evidence is missing; WKM opens containment and QA decides NCR/CAPA path."
     },
     {
       "local_id": "KPI-G5-02",
@@ -6673,7 +6865,23 @@
       "category": "internal",
       "applicable_jds": [
         "WKM"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "FRM-631 SPC chart signal log with detection timestamp, reaction timestamp, and containment action",
+      "data_stewardship_role": "WKM",
+      "hold_release_rule": "Stop or hold process when SPC reaction exceeds 15 minutes; WKM/QA must verify containment before continuing production."
     },
     {
       "local_id": "KPI-G6-01",
@@ -6709,7 +6917,23 @@
       "category": "internal",
       "applicable_jds": [
         "QA"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "FRM-642 final release/ship packet checklist, CoC, label, traceability, and QA signoff",
+      "data_stewardship_role": "QA",
+      "hold_release_rule": "No G6 final release when ship packet is incomplete; QA blocks shipment until D8 evidence is complete."
     },
     {
       "local_id": "KPI-G6-02",
@@ -6745,7 +6969,23 @@
       "category": "internal",
       "applicable_jds": [
         "QA"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "Traceability drill log with sampled lot, reverse lookup timestamps, evidence links, and QA witness",
+      "data_stewardship_role": "QA",
+      "hold_release_rule": "Escalate management review when drill exceeds 60 seconds or cannot prove traceability; QA/QMS opens corrective action."
     },
     {
       "local_id": "KPI-G7-01",
@@ -6773,7 +7013,23 @@
       "category": "customer",
       "applicable_jds": [
         "SCM"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "Epicor Ship record, approved promise date, PackID, release status, and customer delivery evidence",
+      "data_stewardship_role": "SCM",
+      "hold_release_rule": "Escalate G7 recovery when shipment risks missing approved promise date; SCM/PD decide recovery, partial shipment, or customer communication."
     },
     {
       "local_id": "KPI-G7-02",
@@ -6801,7 +7057,23 @@
       "category": "financial",
       "applicable_jds": [
         "FIN"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "Epicor AR invoice request, ship release timestamp, invoice creation timestamp, and APAR/FIN review evidence",
+      "data_stewardship_role": "FIN",
+      "hold_release_rule": "Escalate billing handoff when ship-to-invoice exceeds 24 hours or D8 pack is mismatched; FIN closes discrepancy before invoice release."
     },
     {
       "local_id": "KPI-G7-03",
@@ -6837,7 +7109,23 @@
       "category": "customer",
       "applicable_jds": [
         "QA"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "Customer complaint/escape log, notification timestamp, containment record, and customer communication evidence",
+      "data_stewardship_role": "QA",
+      "hold_release_rule": "Block reward and open containment when customer escape notification exceeds 24 hours; QA/CS must notify customer and record action."
     },
     {
       "local_id": "KPI-ALL-01",
@@ -6875,7 +7163,23 @@
       "category": "financial",
       "applicable_jds": [
         "QA"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "guardrail",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "Epicor cost buckets, NCR/CAPA/rework/scrap records, finance close evidence, and COPQ worksheet",
+      "data_stewardship_role": "FIN",
+      "hold_release_rule": "Escalate monthly QMS/finance review when COPQ exceeds 2% revenue or cost evidence is incomplete; QA/FIN assign CAPA or cost model correction."
     },
     {
       "local_id": "KPI-ALL-02",
@@ -6912,7 +7216,23 @@
       "category": "internal",
       "applicable_jds": [
         "QA"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "guardrail",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "FRM-651 first-pass inspection population, rework/reinspection flags, FAI/IPQC records, and NCR links",
+      "data_stewardship_role": "QA",
+      "hold_release_rule": "Escalate quality-at-source review when FPY falls below 98% or inspection bypass is suspected; QA/WKM contain affected product before release."
     },
     {
       "local_id": "KPI-ALL-03",
@@ -6949,7 +7269,23 @@
       "category": "internal",
       "applicable_jds": [
         "WKM"
-      ]
+      ],
+      "metric_type": "gate_control_metric",
+      "usage_types": [
+        "gate_control",
+        "tier_meeting",
+        "annex122_gate_table"
+      ],
+      "result_type": "guardrail",
+      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
+      "evidence_source": "Epicor MES machine state, production count, planned time, downtime reason tree, and work-center context",
+      "data_stewardship_role": "WKM",
+      "hold_release_rule": "Escalate TOC review when OEE loss hits constraint or lacks reason code; WKM/MNT protect constraint and update recovery action."
     }
   ],
   "document_audit": {

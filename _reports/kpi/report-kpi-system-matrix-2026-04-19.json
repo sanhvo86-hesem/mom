@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-05-23T16:47:15+00:00",
+    "generated_at": "2026-05-24T00:21:15+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-23",
@@ -58,8 +58,8 @@
                 "red_below": 90
             },
             "expected_target_text": "≥95%",
-            "total_occurrences": 196,
-            "documents_count": 72,
+            "total_occurrences": 197,
+            "documents_count": 73,
             "target_values_seen": [
                 "<90%",
                 "red <90%",
@@ -791,6 +791,20 @@
                     "path": "mom/docs/operations/sops/01-SOP-100/sop-103-risk-opportunity-fmea-and-control-plan.html",
                     "title": "SOP-103 - Risk Opportunity FMEA and Kế hoạch kiểm soát | HESEM MOM",
                     "bucket": "sops",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "OTD"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html",
+                    "title": "WI-202 - Điều hành hằng ngày, họp tầng, KPI và leo thang xử lý | HESEM MOM",
+                    "bucket": "work_instructions",
                     "occurrences": 1,
                     "matched_terms": [
                         "OTD"
@@ -2531,8 +2545,8 @@
                 "red_above": 10
             },
             "expected_target_text": "≤5 aged_wip_percent",
-            "total_occurrences": 11,
-            "documents_count": 8,
+            "total_occurrences": 12,
+            "documents_count": 9,
             "target_values_seen": [],
             "documents": [
                 {
@@ -2638,6 +2652,20 @@
                     "path": "mom/docs/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html",
                     "title": "SOP-501 - Production Planning Scheduling and Dispatch Control | HESEM MOM",
                     "bucket": "sops",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "WIP AGING"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html",
+                    "title": "WI-202 - Điều hành hằng ngày, họp tầng, KPI và leo thang xử lý | HESEM MOM",
+                    "bucket": "work_instructions",
                     "occurrences": 1,
                     "matched_terms": [
                         "WIP AGING"
@@ -17909,6 +17937,71 @@
             "findings": []
         },
         {
+            "path": "mom/docs/operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html",
+            "title": "WI-202 - Điều hành hằng ngày, họp tầng, KPI và leo thang xử lý | HESEM MOM",
+            "bucket": "work_instructions",
+            "metrics_count": 3,
+            "total_metric_occurrences": 3,
+            "metrics": [
+                {
+                    "code": "MTTR",
+                    "display_name": "Mean time to repair",
+                    "classification": "operating_metric",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "MTTR"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    },
+                    "row_snippets": []
+                },
+                {
+                    "code": "OTD",
+                    "display_name": "On-Time Delivery (gate view)",
+                    "classification": "executive_scorecard_kpi",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "OTD"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    },
+                    "row_snippets": [
+                        {
+                            "row_index": 30,
+                            "snippet": "OTD risk Mở recovery review, xác định job/operation chặn, chọn phương án phục hồi hoặc báo khách khi không thể giữ cam kết. PPL / PD / SCM Recovery action, revised dispatch list, customer communication khi có."
+                        }
+                    ]
+                },
+                {
+                    "code": "WIP_AGING",
+                    "display_name": "WIP Aging",
+                    "classification": "executive_scorecard_kpi",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "WIP AGING"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    },
+                    "row_snippets": [
+                        {
+                            "row_index": 33,
+                            "snippet": "WIP aging đỏ Gỡ blocker theo job/operation cụ thể, không đẩy thêm WIP vào hàng đợi đang nghẽn khi chưa đủ material/program/gage/fixture. PPL / WKM WIP snapshot, blocker owner, thời hạn đóng và bằng chứng cập nhật điều phối."
+                        }
+                    ]
+                }
+            ],
+            "findings": []
+        },
+        {
             "path": "mom/docs/training/competency/02-Levels/06-C06-Problem-Solving-RCA/C06-L2.html",
             "title": "C06-L2 | HESEM MOM",
             "bucket": "training",
@@ -19095,7 +19188,7 @@
                     },
                     "row_snippets": [
                         {
-                            "row_index": 13,
+                            "row_index": 20,
                             "snippet": "KPI-05 FPY FPY Đánh giá khả năng làm đúng ngay từ lần đầu Số lô đạt lần đầu / tổng lô vào công đoạn kiểm Tái kiểm tra cùng lỗi không được tính là đạt mới M365 NCR/Hold + Epicor tham chiếu QA Tuần JobNum, PartNum, Rev, NCR ID"
                         }
                     ]
@@ -19332,31 +19425,6 @@
             "path": "mom/docs/operations/sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html",
             "title": "SOP-605 - Kiểm tra cuối, CoC và phát hành lô giao | HESEM MOM",
             "bucket": "sops",
-            "metrics_count": 1,
-            "total_metric_occurrences": 1,
-            "metrics": [
-                {
-                    "code": "MTTR",
-                    "display_name": "Mean time to repair",
-                    "classification": "operating_metric",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "MTTR"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Context acceptable or informational."
-                    },
-                    "row_snippets": []
-                }
-            ],
-            "findings": []
-        },
-        {
-            "path": "mom/docs/operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html",
-            "title": "WI-202 - Điều hành hằng ngày, họp tầng, KPI và leo thang xử lý | HESEM MOM",
-            "bucket": "work_instructions",
             "metrics_count": 1,
             "total_metric_occurrences": 1,
             "metrics": [
