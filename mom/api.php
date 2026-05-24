@@ -15007,7 +15007,12 @@ function split_nonempty_lines(string $text): array {
   // unstaged-only modifications). Stripping that space caused the
   // status renderer to over-strip the path by 1 char (e.g. `mom/portal.html`
   // → `om/portal.html`) — bug observed 2026-05-24 by VC audit.
-  $lines = preg_split("/\r\n|\n|\r/", trim($text));
+  //
+  // We rtrim() the whole text (drop trailing blank lines from git's
+  // newline-terminated output) but never ltrim() — that would strip
+  // the leading space of the FIRST porcelain line and reintroduce the
+  // same off-by-one bug the per-line fix solved.
+  $lines = preg_split("/\r\n|\n|\r/", rtrim($text));
   if (!is_array($lines)) return [];
   return array_values(array_filter($lines, static fn($line) => trim($line) !== ''));
 }
