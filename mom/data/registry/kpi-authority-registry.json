@@ -6512,7 +6512,16 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "Epicor Quote record, RFQ completeness checklist, timestamped CS response log",
       "data_stewardship_role": "CS",
-      "hold_release_rule": "Hold G0 quote release when complete RFQ response exceeds 4 working hours or RFQ evidence is incomplete; CS must open recovery action before quote handoff."
+      "hold_release_rule": "Hold G0 quote release when complete RFQ response exceeds 4 working hours or RFQ evidence is incomplete; CS must open recovery action before quote handoff.",
+      "decision_action": "Hold G0 quote handoff; CS escalates to CS-Lead nếu vượt 4h.",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hour",
+        "green_point": 4,
+        "yellow_point": 8,
+        "target": 4,
+        "basis": "Gate G0 — CDR A1: RFQ response ≤ 4 working hours; >8h drift makes gate fail and blocks quote handoff."
+      }
     },
     {
       "local_id": "KPI-G0-02",
@@ -6557,7 +6566,16 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "FRM-202 contract review record with approved customer requirement traceability",
       "data_stewardship_role": "CS",
-      "hold_release_rule": "Hold order acceptance when contract review is not right-first-time or A2/A5 evidence is missing; CS resolves with EST/QA before G1 handoff."
+      "hold_release_rule": "Hold order acceptance when contract review is not right-first-time or A2/A5 evidence is missing; CS resolves with EST/QA before G1 handoff.",
+      "decision_action": "Hold order acceptance; CS + EST + QA recheck before G1 handoff.",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 90,
+        "target": 95,
+        "basis": "Gate G0 — CDR A2/A5: ≥95% orders right-first-time at contract review; <90% blocks acceptance gate."
+      }
     },
     {
       "local_id": "KPI-G1-01",
@@ -6610,7 +6628,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "FRM-306 engineering release pack, revision log, DFM/CAM/routing approval evidence",
       "data_stewardship_role": "ENGM",
-      "hold_release_rule": "Hold baseline release when engineering package must be reopened or B1/B2 approval evidence is missing; ENGM chairs containment before production planning."
+      "hold_release_rule": "Hold baseline release when engineering package must be reopened or B1/B2 approval evidence is missing; ENGM chairs containment before production planning.",
+      "decision_action": "Hold engineering release; ENGM gates revised baseline before G2."
     },
     {
       "local_id": "KPI-G1-02",
@@ -6662,7 +6681,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "Epicor ECO/ECN record with submission, approval, implementation, and closure timestamps",
       "data_stewardship_role": "ENGM",
-      "hold_release_rule": "Hold affected revision release when ECO exceeds 48 hours or impact assessment is incomplete; ENGM escalates to PD/QA for priority decision."
+      "hold_release_rule": "Hold affected revision release when ECO exceeds 48 hours or impact assessment is incomplete; ENGM escalates to PD/QA for priority decision.",
+      "decision_action": "Escalate stale ECN; ENGM + PD reprioritize hoặc cap WIP exposure."
     },
     {
       "local_id": "KPI-G1-03",
@@ -6714,7 +6734,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "Control Plan, PFMEA, and job_orders.control_plan_id approval evidence linked to baseline release",
       "data_stewardship_role": "QA",
-      "hold_release_rule": "No G1 release when Control Plan/PFMEA is absent or unapproved; QA blocks baseline until B8 evidence is complete."
+      "hold_release_rule": "No G1 release when Control Plan/PFMEA is absent or unapproved; QA blocks baseline until B8 evidence is complete.",
+      "decision_action": "Block G2 advance; QA + ENGM force PFMEA / control-plan signoff."
     },
     {
       "local_id": "KPI-G2-01",
@@ -6766,7 +6787,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "FRM-701 receiving/IQC record with lot, certificate, disposition, and inspector signature",
       "data_stewardship_role": "QA",
-      "hold_release_rule": "Hold G2 material readiness when IQC lot is rejected, open, or lacks D10 evidence; QA/SCM decide quarantine, concession, or replacement."
+      "hold_release_rule": "Hold G2 material readiness when IQC lot is rejected, open, or lacks D10 evidence; QA/SCM decide quarantine, concession, or replacement.",
+      "decision_action": "Hold material release; QA reject / SCAR theo D10; SCM open SCAR/quarantine."
     },
     {
       "local_id": "KPI-G2-02",
@@ -6818,7 +6840,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "Epicor receipt, lot trace, mill certificate, CoC, and material certificate match evidence",
       "data_stewardship_role": "SCM",
-      "hold_release_rule": "Hold material issue to production when certificate/lot trace is incomplete; SCM resolves before G3 setup release."
+      "hold_release_rule": "Hold material issue to production when certificate/lot trace is incomplete; SCM resolves before G3 setup release.",
+      "decision_action": "Hold kit release; SCM force mill-cert / batch trace completion."
     },
     {
       "local_id": "KPI-G3-01",
@@ -6871,7 +6894,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "FRM-511 setup readiness, dry-run/pilot result, fixture/gage readiness, and first setup approval",
       "data_stewardship_role": "WKM",
-      "hold_release_rule": "Hold production run when setup does not pass first attempt or B5/B6 evidence is incomplete; WKM/QA review before releasing lot."
+      "hold_release_rule": "Hold production run when setup does not pass first attempt or B5/B6 evidence is incomplete; WKM/QA review before releasing lot.",
+      "decision_action": "Hold setup acceptance; WKM rework setup before lot start."
     },
     {
       "local_id": "KPI-G3-02",
@@ -6923,7 +6947,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "Time Entry setup/changeover record with SMED reason codes and work-center timestamp",
       "data_stewardship_role": "WKM",
-      "hold_release_rule": "Escalate G3 when changeover exceeds standard or lacks reason code; WKM protects constraint resources and updates recovery action."
+      "hold_release_rule": "Escalate G3 when changeover exceeds standard or lacks reason code; WKM protects constraint resources and updates recovery action.",
+      "decision_action": "Escalate slow changeover; WKM root-cause + reset standard work."
     },
     {
       "local_id": "KPI-G4-01",
@@ -6968,7 +6993,16 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "FRM-311 FAI/first-piece inspection record, inspection result, attempt number, and QA approval",
       "data_stewardship_role": "QA",
-      "hold_release_rule": "No G4 lot release when FAI fails first pass or D1/D2 evidence is incomplete; QA holds production and opens NCR/rework decision."
+      "hold_release_rule": "No G4 lot release when FAI fails first pass or D1/D2 evidence is incomplete; QA holds production and opens NCR/rework decision.",
+      "decision_action": "No lot release; QA holds production, opens NCR/rework decision (CDR D1/D2).",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98,
+        "yellow_point": 90,
+        "target": 98,
+        "basis": "Gate G4 — CDR D1/D2: ≥98% FAI first-pass before lot release; <90% blocks production and forces NCR/rework decision."
+      }
     },
     {
       "local_id": "KPI-G4-02",
@@ -7021,7 +7055,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "FRM-311 FAI start/finish timestamp, PPAP/customer submission log, and CMM/gage queue evidence",
       "data_stewardship_role": "QA",
-      "hold_release_rule": "Escalate when FAI cycle exceeds 2 hours or PPAP package is late; QA/QCL assigns recovery before production release."
+      "hold_release_rule": "Escalate when FAI cycle exceeds 2 hours or PPAP package is late; QA/QCL assigns recovery before production release.",
+      "decision_action": "Escalate FAI delay; QA + PD reschedule downstream slot."
     },
     {
       "local_id": "KPI-G5-01",
@@ -7073,7 +7108,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "FRM-651 IPQC/NCR record with defect quantity, operation, containment, and disposition",
       "data_stewardship_role": "WKM",
-      "hold_release_rule": "Hold affected operation when reject rate exceeds 1% or D3 evidence is missing; WKM opens containment and QA decides NCR/CAPA path."
+      "hold_release_rule": "Hold affected operation when reject rate exceeds 1% or D3 evidence is missing; WKM opens containment and QA decides NCR/CAPA path.",
+      "decision_action": "Hold production line; WKM + QA stop-the-line + IPQC reaction."
     },
     {
       "local_id": "KPI-G5-02",
@@ -7126,7 +7162,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "FRM-631 SPC chart signal log with detection timestamp, reaction timestamp, and containment action",
       "data_stewardship_role": "WKM",
-      "hold_release_rule": "Stop or hold process when SPC reaction exceeds 15 minutes; WKM/QA must verify containment before continuing production."
+      "hold_release_rule": "Stop or hold process when SPC reaction exceeds 15 minutes; WKM/QA must verify containment before continuing production.",
+      "decision_action": "Escalate to QA; force operator stop-the-line + supervisor intervene."
     },
     {
       "local_id": "KPI-G6-01",
@@ -7178,7 +7215,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "FRM-642 final release/ship packet checklist, CoC, label, traceability, and QA signoff",
       "data_stewardship_role": "QA",
-      "hold_release_rule": "No G6 final release when ship packet is incomplete; QA blocks shipment until D8 evidence is complete."
+      "hold_release_rule": "No G6 final release when ship packet is incomplete; QA blocks shipment until D8 evidence is complete.",
+      "decision_action": "Block shipment; QA forces packet completion before CoC release."
     },
     {
       "local_id": "KPI-G6-02",
@@ -7230,7 +7268,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "Traceability drill log with sampled lot, reverse lookup timestamps, evidence links, and QA witness",
       "data_stewardship_role": "QA",
-      "hold_release_rule": "Escalate management review when drill exceeds 60 seconds or cannot prove traceability; QA/QMS opens corrective action."
+      "hold_release_rule": "Escalate management review when drill exceeds 60 seconds or cannot prove traceability; QA/QMS opens corrective action.",
+      "decision_action": "Escalate drill failure; QA + SCM corrective trace + re-drill."
     },
     {
       "local_id": "KPI-G7-01",
@@ -7274,7 +7313,16 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "Epicor Ship record, approved promise date, PackID, release status, and customer delivery evidence",
       "data_stewardship_role": "SCM",
-      "hold_release_rule": "Escalate G7 recovery when shipment risks missing approved promise date; SCM/PD decide recovery, partial shipment, or customer communication."
+      "hold_release_rule": "Escalate G7 recovery when shipment risks missing approved promise date; SCM/PD decide recovery, partial shipment, or customer communication.",
+      "decision_action": "Escalate delivery risk; SCM + PD recovery; CS notifies customer per D7.",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 90,
+        "target": 95,
+        "basis": "Gate G7 — CDR D7: ≥95% shipments meet promise date; <90% triggers SCM/PD recovery and customer communication."
+      }
     },
     {
       "local_id": "KPI-G7-02",
@@ -7318,7 +7366,16 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "Epicor AR invoice request, ship release timestamp, invoice creation timestamp, and APAR/FIN review evidence",
       "data_stewardship_role": "FIN",
-      "hold_release_rule": "Escalate billing handoff when ship-to-invoice exceeds 24 hours or D8 pack is mismatched; FIN closes discrepancy before invoice release."
+      "hold_release_rule": "Escalate billing handoff when ship-to-invoice exceeds 24 hours or D8 pack is mismatched; FIN closes discrepancy before invoice release.",
+      "decision_action": "Escalate billing delay; FIN closes discrepancy before invoice release.",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hour",
+        "green_point": 24,
+        "yellow_point": 48,
+        "target": 24,
+        "basis": "Gate G7 — CDR D8: ≤24h ship-to-invoice; >48h forces FIN to close discrepancy before invoice release."
+      }
     },
     {
       "local_id": "KPI-G7-03",
@@ -7370,7 +7427,35 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "Customer complaint/escape log, notification timestamp, containment record, and customer communication evidence",
       "data_stewardship_role": "QA",
-      "hold_release_rule": "Block reward and open containment when customer escape notification exceeds 24 hours; QA/CS must notify customer and record action."
+      "hold_release_rule": "Block reward and open containment when customer escape notification exceeds 24 hours; QA/CS must notify customer and record action.",
+      "decision_action": "Notify customer immediately + open containment; QA escalates CEO if >24h or containment incomplete.",
+      "start_clock_at": "detection_time",
+      "start_clock_basis": "Đồng hồ bắt đầu tại thời điểm QA xác nhận sản phẩm không phù hợp ĐÃ giao hoặc CÓ THỂ đã giao (detection_time), KHÔNG phải tại NCR creation hoặc customer reply. Mọi chậm trễ giữa detection_time và customer notification phải có justification trong FRM-211.",
+      "containment_required": true,
+      "containment_basis": "Notification phải đính kèm containment evidence: scope lô bị ảnh hưởng, hold/recall decision, traceability list. Notify-without-containment = premature, đếm vào counter.",
+      "escalation": {
+        "owner_primary": "QA",
+        "immediate_to": [
+          "QA",
+          "CEO"
+        ],
+        "channels": [
+          "P0 hotline",
+          "Epicor P0 ticket",
+          "customer hotline + email cc CEO"
+        ],
+        "sla_hours": 24,
+        "sla_basis": "RACI §8.1 P0 escalation — CDR D11 sự cố P0."
+      },
+      "additional_counter_metrics": [
+        {
+          "code": "CUSTOMER_ESCAPE_NOTIFICATION_LT-CTR2",
+          "endpoint": "POST /api/kpi/CUSTOMER_ESCAPE_NOTIFICATION_LT-CTR2/input",
+          "name_vi": "Tỷ lệ escape phát hiện muộn / bị suppress khỏi sổ thông báo",
+          "name": "Late or suppressed escape logging rate",
+          "intent": "Bắt việc giữ con số notification_LT đẹp bằng cách ghi nhận escape muộn hoặc không ghi vào sổ thông báo khách (detection_time bị đẩy lùi)."
+        }
+      ]
     },
     {
       "local_id": "KPI-ALL-01",
@@ -7424,7 +7509,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "Epicor cost buckets, NCR/CAPA/rework/scrap records, finance close evidence, and COPQ worksheet",
       "data_stewardship_role": "FIN",
-      "hold_release_rule": "Escalate monthly QMS/finance review when COPQ exceeds 2% revenue or cost evidence is incomplete; QA/FIN assign CAPA or cost model correction."
+      "hold_release_rule": "Escalate monthly QMS/finance review when COPQ exceeds 2% revenue or cost evidence is incomplete; QA/FIN assign CAPA or cost model correction.",
+      "decision_action": "Escalate COPQ spike; QA + PD open CAPA, finance freezes overrun."
     },
     {
       "local_id": "KPI-ALL-02",
@@ -7477,7 +7563,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "FRM-651 first-pass inspection population, rework/reinspection flags, FAI/IPQC records, and NCR links",
       "data_stewardship_role": "QA",
-      "hold_release_rule": "Escalate quality-at-source review when FPY falls below 98% or inspection bypass is suspected; QA/WKM contain affected product before release."
+      "hold_release_rule": "Escalate quality-at-source review when FPY falls below 98% or inspection bypass is suspected; QA/WKM contain affected product before release.",
+      "decision_action": "Escalate FPY drop; QA + WKM open SPC / NCR review; PD adjusts release rules."
     },
     {
       "local_id": "KPI-ALL-03",
@@ -7530,7 +7617,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "Epicor MES machine state, production count, planned time, downtime reason tree, and work-center context",
       "data_stewardship_role": "WKM",
-      "hold_release_rule": "Escalate TOC review when OEE loss hits constraint or lacks reason code; WKM/MNT protect constraint and update recovery action."
+      "hold_release_rule": "Escalate TOC review when OEE loss hits constraint or lacks reason code; WKM/MNT protect constraint and update recovery action.",
+      "decision_action": "Escalate OEE drop; WKM + ENG-EQ open downtime / changeover Pareto."
     },
     {
       "local_id": "KPI-LAM-G1-01",
@@ -7539,7 +7627,10 @@
       "name_vi": "Mỗi đơn hàng có hồ sơ yêu cầu khách hàng được gán",
       "classification": "gate_metric_lam_profile",
       "gate": "G1",
-      "linked_cdr": ["A2", "A5"],
+      "linked_cdr": [
+        "A2",
+        "A5"
+      ],
       "gate_pass_condition": "100% đơn hàng có active_profile_code đã gán + actor + acked_at trước khi release G1; khách LAM/SEMSYSCO không được rơi vào default ngầm.",
       "target": "100%",
       "owner_role": "CS",
@@ -7553,11 +7644,22 @@
         "name": "Silent-default LAM/SEMSYSCO orders",
         "intent": "Bắt việc bỏ qua bước gán profile cho khách bán dẫn → áp sai bộ yêu cầu chất lượng."
       },
-      "thresholds": {"direction": "higher_is_better", "unit": "percent", "green_point": 100, "yellow_point": 99, "target": 100, "basis": "LAM_SEMSYSCO profile bắt buộc explicit; silent_default_forbidden=true."},
-      "blocking_conditions": ["lam_semsysco_silent_default_detected"],
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 99,
+        "target": 100,
+        "basis": "LAM_SEMSYSCO profile bắt buộc explicit; silent_default_forbidden=true."
+      },
+      "blocking_conditions": [
+        "lam_semsysco_silent_default_detected"
+      ],
       "process": "commercial",
       "category": "customer",
-      "applicable_jds": ["CS"],
+      "applicable_jds": [
+        "CS"
+      ],
       "metric_type": "gate_control_metric",
       "metric_subtype": "gate_control_metric",
       "control_intent": "customer_specific_requirement",
@@ -7566,7 +7668,10 @@
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
       "lifecycle_status": "pilot",
-      "usage_types": ["gate_control", "lam_profile_assignment"],
+      "usage_types": [
+        "gate_control",
+        "lam_profile_assignment"
+      ],
       "result_type": "gate",
       "is_official_kpi": false,
       "reward_eligible": false,
@@ -7574,7 +7679,8 @@
       "evidence_source": "customer_requirement_profile_assignment_event log + signed CS acknowledgement",
       "data_stewardship_role": "CS",
       "hold_release_rule": "Hold G1 release if any LAM/SEMSYSCO order lacks active_profile_code or actor signature; CS must complete assignment before order release.",
-      "lam_profile_link": "LAM_SEMSYSCO"
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "decision_action": "Block G1 release; CS re-assigns profile theo CDR A2/A5 trước khi engineering nhận."
     },
     {
       "local_id": "KPI-LAM-G1-02",
@@ -7583,7 +7689,9 @@
       "name_vi": "Tỷ lệ xác nhận yêu cầu riêng của khách trước khi release đơn",
       "classification": "gate_metric_lam_profile",
       "gate": "G1",
-      "linked_cdr": ["A2"],
+      "linked_cdr": [
+        "A2"
+      ],
       "gate_pass_condition": "100% LAM/SEMSYSCO orders có CSR revision hiện hành được ack (signature + date) trước G1 release.",
       "target": "100%",
       "owner_role": "QA",
@@ -7597,11 +7705,23 @@
         "name": "CSR-acknowledgement-skip count",
         "intent": "Bắt việc release đơn khi CSR revision mới chưa được ack — rủi ro non-compliance ở G7."
       },
-      "thresholds": {"direction": "higher_is_better", "unit": "percent", "green_point": 100, "yellow_point": 98, "target": 100, "basis": "LAM yêu cầu CSR ack explicit; mọi miss đều mở rủi ro escape."},
-      "blocking_conditions": ["csr_revision_unacked"],
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 98,
+        "target": 100,
+        "basis": "LAM yêu cầu CSR ack explicit; mọi miss đều mở rủi ro escape."
+      },
+      "blocking_conditions": [
+        "csr_revision_unacked"
+      ],
       "process": "commercial",
       "category": "customer",
-      "applicable_jds": ["CS", "QA"],
+      "applicable_jds": [
+        "CS",
+        "QA"
+      ],
       "metric_type": "gate_control_metric",
       "metric_subtype": "gate_control_metric",
       "control_intent": "customer_specific_requirement",
@@ -7610,7 +7730,10 @@
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
       "lifecycle_status": "pilot",
-      "usage_types": ["gate_control", "lam_profile_csr"],
+      "usage_types": [
+        "gate_control",
+        "lam_profile_csr"
+      ],
       "result_type": "gate",
       "is_official_kpi": false,
       "reward_eligible": false,
@@ -7618,7 +7741,8 @@
       "evidence_source": "csr_acknowledgement_log + signed CSR letter PDF on shared evidence storage",
       "data_stewardship_role": "QA",
       "hold_release_rule": "Hold G1 release until CSR ack present and current revision; QA + CS co-sign.",
-      "lam_profile_link": "LAM_SEMSYSCO"
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "decision_action": "Hold customer reply gate; CS + QA confirm CSR acknowledgement before G1."
     },
     {
       "local_id": "KPI-LAM-G0-01",
@@ -7627,7 +7751,9 @@
       "name_vi": "Mức đầy đủ của nghiên cứu khả thi RFQ",
       "classification": "gate_metric_lam_profile",
       "gate": "G0",
-      "linked_cdr": ["A1"],
+      "linked_cdr": [
+        "A1"
+      ],
       "gate_pass_condition": "≥98% RFQ feasibility checklist (manufacturability, material, tolerance, law, processability, sub-supplier) hoàn tất trước khi báo giá đi.",
       "target": "≥ 98%",
       "owner_role": "EST",
@@ -7641,11 +7767,23 @@
         "name": "Post-quote feasibility rework count",
         "intent": "Bắt việc chốt RFQ nhanh mà bỏ feasibility — lộ ra ở khâu DFM hoặc FAI."
       },
-      "thresholds": {"direction": "higher_is_better", "unit": "percent", "green_point": 98, "yellow_point": 90, "target": 98, "basis": "LAM/SEMSYSCO feasibility là tiền đề zero-defect; below 90% là tín hiệu commercial chạy ẩu."},
-      "blocking_conditions": ["feasibility_checklist_missing"],
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98,
+        "yellow_point": 90,
+        "target": 98,
+        "basis": "LAM/SEMSYSCO feasibility là tiền đề zero-defect; below 90% là tín hiệu commercial chạy ẩu."
+      },
+      "blocking_conditions": [
+        "feasibility_checklist_missing"
+      ],
       "process": "commercial",
       "category": "customer",
-      "applicable_jds": ["EST", "DFM"],
+      "applicable_jds": [
+        "EST",
+        "DFM"
+      ],
       "metric_type": "gate_control_metric",
       "metric_subtype": "gate_control_metric",
       "control_intent": "customer_specific_requirement",
@@ -7654,7 +7792,10 @@
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
       "lifecycle_status": "pilot",
-      "usage_types": ["gate_control", "lam_profile_feasibility"],
+      "usage_types": [
+        "gate_control",
+        "lam_profile_feasibility"
+      ],
       "result_type": "gate",
       "is_official_kpi": false,
       "reward_eligible": false,
@@ -7662,7 +7803,8 @@
       "evidence_source": "rfq_feasibility_checklist signed by EST + DFM",
       "data_stewardship_role": "EST",
       "hold_release_rule": "Hold quote release until checklist complete; EST owns; DFM reviews critical items.",
-      "lam_profile_link": "LAM_SEMSYSCO"
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "decision_action": "Block quote handoff; EST + ENGM complete feasibility study trước báo giá."
     },
     {
       "local_id": "KPI-LAM-G2-01",
@@ -7671,7 +7813,9 @@
       "name_vi": "Mức đầy đủ của kế hoạch kiểm tra",
       "classification": "gate_metric_lam_profile",
       "gate": "G2",
-      "linked_cdr": ["B8"],
+      "linked_cdr": [
+        "B8"
+      ],
       "gate_pass_condition": "100% sản phẩm có inspection plan tài liệu hóa: đặc tính, thiết bị, thông số, sampling, người duyệt.",
       "target": "100%",
       "owner_role": "QA",
@@ -7685,11 +7829,23 @@
         "name": "CTQ-missing inspection-plan release count",
         "intent": "Bắt việc release lô khi plan thiếu đặc tính trọng yếu."
       },
-      "thresholds": {"direction": "higher_is_better", "unit": "percent", "green_point": 100, "yellow_point": 98, "target": 100, "basis": "LAM yêu cầu plan đầy đủ trước G2 — thiếu = gate fail."},
-      "blocking_conditions": ["inspection_plan_missing_or_incomplete"],
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 98,
+        "target": 100,
+        "basis": "LAM yêu cầu plan đầy đủ trước G2 — thiếu = gate fail."
+      },
+      "blocking_conditions": [
+        "inspection_plan_missing_or_incomplete"
+      ],
       "process": "quality_assurance",
       "category": "internal",
-      "applicable_jds": ["QA", "QE"],
+      "applicable_jds": [
+        "QA",
+        "QE"
+      ],
       "metric_type": "gate_control_metric",
       "metric_subtype": "gate_control_metric",
       "control_intent": "quality_at_source",
@@ -7698,7 +7854,10 @@
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
       "lifecycle_status": "pilot",
-      "usage_types": ["gate_control", "lam_profile_inspection_plan"],
+      "usage_types": [
+        "gate_control",
+        "lam_profile_inspection_plan"
+      ],
       "result_type": "gate",
       "is_official_kpi": false,
       "reward_eligible": false,
@@ -7706,7 +7865,8 @@
       "evidence_source": "inspection_plan with QA signature + revision history",
       "data_stewardship_role": "QA",
       "hold_release_rule": "Hold G2 until plan complete; QA approves; QE drafts.",
-      "lam_profile_link": "LAM_SEMSYSCO"
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "decision_action": "Block G2 release; QA forces inspection-plan completion before material call-off."
     },
     {
       "local_id": "KPI-LAM-G6-01",
@@ -7715,7 +7875,9 @@
       "name_vi": "Báo cáo kiểm thông số kích thước đính kèm lô hàng",
       "classification": "gate_metric_lam_profile",
       "gate": "G6",
-      "linked_cdr": ["D8"],
+      "linked_cdr": [
+        "D8"
+      ],
       "gate_pass_condition": "100% lô hàng yêu cầu CDR (đánh dấu trên drawing/PO) có CDR đính kèm trước ship: part_name, part_number, serial nếu có, qty kiểm, check_dim_number, thiết bị dùng, tolerance, giá trị đo, ngày kiểm, người kiểm.",
       "target": "100%",
       "owner_role": "QA",
@@ -7729,11 +7891,24 @@
         "name": "CDR-missing customer-detected count",
         "intent": "Bắt việc giao lô khi CDR bị bỏ sót, khách trả lại."
       },
-      "thresholds": {"direction": "higher_is_better", "unit": "percent", "green_point": 100, "yellow_point": 99, "target": 100, "basis": "LAM hợp đồng phổ biến yêu cầu CDR; 1 lô thiếu là 1 lần escape."},
-      "blocking_conditions": ["cdr_required_and_missing"],
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 99,
+        "target": 100,
+        "basis": "LAM hợp đồng phổ biến yêu cầu CDR; 1 lô thiếu là 1 lần escape."
+      },
+      "blocking_conditions": [
+        "cdr_required_and_missing"
+      ],
       "process": "quality_assurance",
       "category": "customer",
-      "applicable_jds": ["QA", "QC", "CPS"],
+      "applicable_jds": [
+        "QA",
+        "QC",
+        "CPS"
+      ],
       "metric_type": "gate_control_metric",
       "metric_subtype": "gate_control_metric",
       "control_intent": "customer_specific_requirement",
@@ -7742,7 +7917,10 @@
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
       "lifecycle_status": "pilot",
-      "usage_types": ["gate_control", "lam_profile_cdr"],
+      "usage_types": [
+        "gate_control",
+        "lam_profile_cdr"
+      ],
       "result_type": "gate",
       "is_official_kpi": false,
       "reward_eligible": false,
@@ -7750,7 +7928,8 @@
       "evidence_source": "check_dimension_report PDF + shipment evidence pack",
       "data_stewardship_role": "QA",
       "hold_release_rule": "Hold ship release until CDR present + inspector signature; CPS verifies in packing line.",
-      "lam_profile_link": "LAM_SEMSYSCO"
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "decision_action": "Block CoC; QA produces final dim-check before shipment."
     },
     {
       "local_id": "KPI-LAM-G4-01",
@@ -7759,7 +7938,10 @@
       "name_vi": "Thiết bị đo hợp lệ khi dùng phát hành",
       "classification": "gate_metric_lam_profile",
       "gate": "G4",
-      "linked_cdr": ["D1", "D8"],
+      "linked_cdr": [
+        "D1",
+        "D8"
+      ],
       "gate_pass_condition": "100% phát hành kiểm tra dùng gage còn hiệu chuẩn / đúng phạm vi / có status mark / không hết hạn / không hỏng. Vi phạm = release invalid + CAPA + thông báo khách (nếu LAM).",
       "target": "100%",
       "owner_role": "MCS",
@@ -7773,11 +7955,24 @@
         "name": "Expired-or-unsuitable gage release count",
         "intent": "Bắt việc release với gage không hợp lệ — release coi như invalid."
       },
-      "thresholds": {"direction": "higher_is_better", "unit": "percent", "green_point": 100, "yellow_point": 99.5, "target": 100, "basis": "LAM zero-tolerance đối với expired gauge; 1 lần = 1 CAPA + thông báo."},
-      "blocking_conditions": ["expired_gage_used", "uncalibrated_gage_used"],
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 99.5,
+        "target": 100,
+        "basis": "LAM zero-tolerance đối với expired gauge; 1 lần = 1 CAPA + thông báo."
+      },
+      "blocking_conditions": [
+        "expired_gage_used",
+        "uncalibrated_gage_used"
+      ],
       "process": "quality_assurance",
       "category": "internal",
-      "applicable_jds": ["MCS", "QC"],
+      "applicable_jds": [
+        "MCS",
+        "QC"
+      ],
       "metric_type": "gate_control_metric",
       "metric_subtype": "gate_control_metric",
       "control_intent": "data_integrity",
@@ -7786,7 +7981,10 @@
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
       "lifecycle_status": "pilot",
-      "usage_types": ["gate_control", "lam_profile_gage"],
+      "usage_types": [
+        "gate_control",
+        "lam_profile_gage"
+      ],
       "result_type": "gate",
       "is_official_kpi": false,
       "reward_eligible": false,
@@ -7794,7 +7992,8 @@
       "evidence_source": "calibration_records (last cal date) + gage_usage_log linked to inspection event",
       "data_stewardship_role": "MCS",
       "hold_release_rule": "Block release if gage status invalid; pull and re-measure with valid gage; LAM customers notified per profile.",
-      "lam_profile_link": "LAM_SEMSYSCO"
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "decision_action": "Block FAI signoff; MCS revalidates gage hoặc swap before FAI release."
     },
     {
       "local_id": "KPI-LAM-G1-03",
@@ -7803,7 +8002,9 @@
       "name_vi": "Tỷ lệ thay đổi quá trình được duyệt trước khi áp dụng",
       "classification": "gate_metric_lam_profile",
       "gate": "G1",
-      "linked_cdr": ["B3"],
+      "linked_cdr": [
+        "B3"
+      ],
       "gate_pass_condition": "100% product/process change đối với LAM PN có change-approval letter + báo cáo khách (PPAP-like) TRƯỚC khi chạy lô đầu tiên.",
       "target": "100%",
       "owner_role": "ENGM",
@@ -7817,11 +8018,23 @@
         "name": "Unapproved LAM-PN process-change count",
         "intent": "Bắt việc tự ý đổi quy trình mà chưa có duyệt → vi phạm hợp đồng + rủi ro recall."
       },
-      "thresholds": {"direction": "higher_is_better", "unit": "percent", "green_point": 100, "yellow_point": 100, "target": 100, "basis": "LAM/SEMSYSCO zero-tolerance: 1 unapproved change = recall risk + corrective."},
-      "blocking_conditions": ["unapproved_change_applied_to_lam_pn"],
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 100,
+        "target": 100,
+        "basis": "LAM/SEMSYSCO zero-tolerance: 1 unapproved change = recall risk + corrective."
+      },
+      "blocking_conditions": [
+        "unapproved_change_applied_to_lam_pn"
+      ],
       "process": "engineering",
       "category": "customer",
-      "applicable_jds": ["ENGM", "QA"],
+      "applicable_jds": [
+        "ENGM",
+        "QA"
+      ],
       "metric_type": "gate_control_metric",
       "metric_subtype": "gate_control_metric",
       "control_intent": "customer_specific_requirement",
@@ -7830,7 +8043,10 @@
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
       "lifecycle_status": "pilot",
-      "usage_types": ["gate_control", "lam_profile_change_approval"],
+      "usage_types": [
+        "gate_control",
+        "lam_profile_change_approval"
+      ],
       "result_type": "gate",
       "is_official_kpi": false,
       "reward_eligible": false,
@@ -7838,7 +8054,8 @@
       "evidence_source": "customer_approval_letter PDF linked from process_change_request",
       "data_stewardship_role": "ENGM",
       "hold_release_rule": "Hold G1 production release if change exists without approval letter; ENGM + QA co-sign.",
-      "lam_profile_link": "LAM_SEMSYSCO"
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "decision_action": "Hold ECO release; ENGM forces approval evidence trước khi vào sản xuất."
     },
     {
       "local_id": "KPI-LAM-G7-01",
@@ -7847,7 +8064,9 @@
       "name_vi": "Phát hành đặc cách có văn bản trước khi giao",
       "classification": "gate_metric_lam_profile",
       "gate": "G7",
-      "linked_cdr": ["D11"],
+      "linked_cdr": [
+        "D11"
+      ],
       "gate_pass_condition": "100% lô giao có deviation/non-conformance phải có written special release letter từ khách TRƯỚC khi ship. Verbal acceptance = invalid.",
       "target": "100%",
       "owner_role": "QA",
@@ -7861,11 +8080,23 @@
         "name": "Deviated-ship without written release count",
         "intent": "Bắt việc giao lô lệch quy cách dựa trên ack miệng — khách có thể từ chối, mở complaint."
       },
-      "thresholds": {"direction": "higher_is_better", "unit": "percent", "green_point": 100, "yellow_point": 100, "target": 100, "basis": "LAM/SEMSYSCO yêu cầu written; 1 lần thiếu = hold + escalate."},
-      "blocking_conditions": ["deviation_present_without_special_release"],
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 100,
+        "target": 100,
+        "basis": "LAM/SEMSYSCO yêu cầu written; 1 lần thiếu = hold + escalate."
+      },
+      "blocking_conditions": [
+        "deviation_present_without_special_release"
+      ],
       "process": "quality_assurance",
       "category": "customer",
-      "applicable_jds": ["QA", "CS"],
+      "applicable_jds": [
+        "QA",
+        "CS"
+      ],
       "metric_type": "gate_control_metric",
       "metric_subtype": "gate_control_metric",
       "control_intent": "customer_specific_requirement",
@@ -7874,7 +8105,10 @@
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
       "lifecycle_status": "pilot",
-      "usage_types": ["gate_control", "lam_profile_special_release"],
+      "usage_types": [
+        "gate_control",
+        "lam_profile_special_release"
+      ],
       "result_type": "gate",
       "is_official_kpi": false,
       "reward_eligible": false,
@@ -7882,7 +8116,8 @@
       "evidence_source": "special_release_letter PDF + customer countersignature",
       "data_stewardship_role": "QA",
       "hold_release_rule": "Hold G7 ship release until written letter present; CS coordinates with customer; QA validates content matches deviation.",
-      "lam_profile_link": "LAM_SEMSYSCO"
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "decision_action": "Block special-release shipment; QA + CS validate full evidence per CDR D11."
     },
     {
       "local_id": "KPI-LAM-G7-02",
@@ -7891,7 +8126,9 @@
       "name_vi": "Đánh dấu thùng/đóng gói khi giao theo special release",
       "classification": "gate_metric_lam_profile",
       "gate": "G7",
-      "linked_cdr": ["D11"],
+      "linked_cdr": [
+        "D11"
+      ],
       "gate_pass_condition": "100% lô giao theo special release có marking phụ trên load carrier (per LAM spec).",
       "target": "100%",
       "owner_role": "CPS",
@@ -7905,11 +8142,23 @@
         "name": "Special-release ship without extra marking count",
         "intent": "Bắt việc giao đặc cách mà thiếu marking — khách không nhận diện được lô đặc biệt khi nhập kho."
       },
-      "thresholds": {"direction": "higher_is_better", "unit": "percent", "green_point": 100, "yellow_point": 99, "target": 100, "basis": "Marking phụ là evidence khách yêu cầu; thiếu = vi phạm clause hợp đồng."},
-      "blocking_conditions": ["special_release_without_marking"],
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 99,
+        "target": 100,
+        "basis": "Marking phụ là evidence khách yêu cầu; thiếu = vi phạm clause hợp đồng."
+      },
+      "blocking_conditions": [
+        "special_release_without_marking"
+      ],
       "process": "delivery",
       "category": "customer",
-      "applicable_jds": ["CPS", "QA"],
+      "applicable_jds": [
+        "CPS",
+        "QA"
+      ],
       "metric_type": "gate_control_metric",
       "metric_subtype": "gate_control_metric",
       "control_intent": "customer_specific_requirement",
@@ -7918,7 +8167,10 @@
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
       "lifecycle_status": "pilot",
-      "usage_types": ["gate_control", "lam_profile_special_release_marking"],
+      "usage_types": [
+        "gate_control",
+        "lam_profile_special_release_marking"
+      ],
       "result_type": "gate",
       "is_official_kpi": false,
       "reward_eligible": false,
@@ -7926,7 +8178,8 @@
       "evidence_source": "shipment_marking_evidence photos + CPS sign-off",
       "data_stewardship_role": "CPS",
       "hold_release_rule": "Hold ship release until photo evidence shows marking on every load carrier; CPS attests.",
-      "lam_profile_link": "LAM_SEMSYSCO"
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "decision_action": "Block shipment label; CPS re-marks special release per customer spec."
     },
     {
       "local_id": "KPI-LAM-G7-03",
@@ -7935,7 +8188,9 @@
       "name_vi": "Thời gian thông báo khi gage do khách cấp bị hỏng / không phù hợp",
       "classification": "gate_metric_lam_profile",
       "gate": "G7",
-      "linked_cdr": ["D11"],
+      "linked_cdr": [
+        "D11"
+      ],
       "gate_pass_condition": "Thông báo khách ≤ 24 giờ kể từ khi phát hiện gage SEMSYSCO/LAM cấp bị hỏng hoặc không phù hợp; có incident record + email khách.",
       "target": "≤ 24h",
       "owner_role": "QA",
@@ -7949,11 +8204,23 @@
         "name": "Suppressed customer-gage incident count",
         "intent": "Bắt việc che giấu sự cố gage để tránh hậu quả — khách yêu cầu transparency."
       },
-      "thresholds": {"direction": "lower_is_better", "unit": "hours", "green_point": 24, "yellow_point": 48, "target": 24, "basis": "LAM clause: gage incident notification within 24h."},
-      "blocking_conditions": ["customer_gage_incident_unreported"],
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hours",
+        "green_point": 24,
+        "yellow_point": 48,
+        "target": 24,
+        "basis": "LAM clause: gage incident notification within 24h."
+      },
+      "blocking_conditions": [
+        "customer_gage_incident_unreported"
+      ],
       "process": "quality_assurance",
       "category": "customer",
-      "applicable_jds": ["QA", "MCS"],
+      "applicable_jds": [
+        "QA",
+        "MCS"
+      ],
       "metric_type": "gate_control_metric",
       "metric_subtype": "gate_control_metric",
       "control_intent": "customer_specific_requirement",
@@ -7962,7 +8229,10 @@
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
       "lifecycle_status": "pilot",
-      "usage_types": ["gate_control", "lam_profile_gage_incident"],
+      "usage_types": [
+        "gate_control",
+        "lam_profile_gage_incident"
+      ],
       "result_type": "gate",
       "is_official_kpi": false,
       "reward_eligible": false,
@@ -7970,7 +8240,8 @@
       "evidence_source": "customer_gage_incident_log + outbound email evidence",
       "data_stewardship_role": "QA",
       "hold_release_rule": "Open incident, notify within 24h, retain gage in protective state pending customer instruction; further use of suspect gage blocked.",
-      "lam_profile_link": "LAM_SEMSYSCO"
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "decision_action": "Notify customer immediately on gage damage; QA + CS escalate per D11."
     }
   ],
   "document_audit": {

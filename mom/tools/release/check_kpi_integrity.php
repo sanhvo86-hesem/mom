@@ -352,6 +352,161 @@ foreach ($gateCoverage as $gate => $count) {
     }
 }
 
+// ── P0.6.1 — every gate metric must declare a decision_action ───────────────
+// (P06 hardening) hold_release_rule narrates the policy; decision_action is a
+// short, copy-paste imperative the gate owner can act on. Both must exist —
+// running a gate by narrative only allows "feel" pass/fail.
+foreach ($gateMetrics as $g) {
+    if (!is_array($g)) {
+        continue;
+    }
+    $local = (string) ($g['local_id'] ?? $g['canonical_code'] ?? '?');
+    if (trim((string) ($g['decision_action'] ?? '')) === '') {
+        $p0[] = "Gate metric $local: missing 'decision_action' (short hold/release/escalation phrase distinct from hold_release_rule).";
+    }
+    if (trim((string) ($g['hold_release_rule'] ?? '')) === ''
+        && trim((string) ($g['decision_action'] ?? '')) === '') {
+        $p0[] = "Gate metric $local: missing both decision_action and hold_release_rule — no hold/release policy at all.";
+    }
+}
+
+// ── P0.6.2 — every gate metric must have numeric thresholds ─────────────────
+// (P06 hardening) gate_pass_condition text often hides the threshold inside
+// Vietnamese prose. Numeric thresholds.{green_point,yellow_point,direction}
+// is the machine-readable pass rule the dashboard / RAG roll-up consumes.
+$gateThresholdSkip = []; // future-proof: codes legitimately without numeric thresholds
+foreach ($gateMetrics as $g) {
+    if (!is_array($g)) {
+        continue;
+    }
+    $local = (string) ($g['local_id'] ?? $g['canonical_code'] ?? '?');
+    $code = strtoupper(trim((string) ($g['canonical_code'] ?? '')));
+    if (in_array($code, $gateThresholdSkip, true)) {
+        continue;
+    }
+    $t = $g['thresholds'] ?? null;
+    if (!is_array($t)
+        || !is_numeric($t['green_point'] ?? null)
+        || !is_numeric($t['yellow_point'] ?? null)
+        || trim((string) ($t['direction'] ?? '')) === '') {
+        $p0[] = "Gate metric $local: thresholds.{green_point,yellow_point,direction} required (numeric pass rule, not prose).";
+    }
+}
+
+// ── P0.6.3 — every gate metric must have owner + evidence ───────────────────
+// (P06 hardening) — overlap with §10 process/category, but explicit per
+// spec §9: gate metric missing owner/evidence/counter is a P0.
+foreach ($gateMetrics as $g) {
+    if (!is_array($g)) {
+        continue;
+    }
+    $local = (string) ($g['local_id'] ?? $g['canonical_code'] ?? '?');
+    if (trim((string) ($g['owner_role'] ?? '')) === '') {
+        $p0[] = "Gate metric $local: missing 'owner_role'.";
+    }
+    // evidence_source OR evidence (legacy) accepted.
+    $ev = trim((string) ($g['evidence_source'] ?? $g['evidence'] ?? ''));
+    if ($ev === '') {
+        $p0[] = "Gate metric $local: missing evidence (evidence_source or evidence).";
+    }
+}
+
+// ── P0.6.4 — CUSTOMER_ESCAPE_NOTIFICATION_LT customer-escape spec ──────────
+// (P06 hardening per spec §8) start_clock_at must be detection_time (not
+// NCR creation), containment_required must be true, and the metric must
+// own at least one additional counter (late/suppressed logging) on top of
+// the singular counter_metric (premature notification).
+foreach ($gateMetrics as $g) {
+    if (!is_array($g)) {
+        continue;
+    }
+    $code = strtoupper(trim((string) ($g['canonical_code'] ?? '')));
+    if ($code !== 'CUSTOMER_ESCAPE_NOTIFICATION_LT') {
+        continue;
+    }
+    $local = (string) ($g['local_id'] ?? $code);
+    if (strtolower(trim((string) ($g['start_clock_at'] ?? ''))) !== 'detection_time') {
+        $p0[] = "Gate metric $local: CUSTOMER_ESCAPE_NOTIFICATION_LT.start_clock_at must be 'detection_time' (spec §8 — clock starts at QA detection, not NCR creation).";
+    }
+    if (($g['containment_required'] ?? null) !== true) {
+        $p0[] = "Gate metric $local: CUSTOMER_ESCAPE_NOTIFICATION_LT.containment_required must be true (notify-without-containment is premature).";
+    }
+    $extra = $g['additional_counter_metrics'] ?? null;
+    if (!is_array($extra) || $extra === []) {
+        $p0[] = "Gate metric $local: CUSTOMER_ESCAPE_NOTIFICATION_LT must declare additional_counter_metrics (late/suppressed escape logging — dual counter per spec §8).";
+    } else {
+        foreach ($extra as $idx => $cm) {
+            if (!is_array($cm)
+                || trim((string) ($cm['code'] ?? '')) === ''
+                || trim((string) ($cm['endpoint'] ?? '')) === ''
+                || trim((string) ($cm['name_vi'] ?? '')) === ''
+                || trim((string) ($cm['intent'] ?? '')) === '') {
+                $p0[] = "Gate metric $local: additional_counter_metrics[$idx] must have code+endpoint+name_vi+intent.";
+            }
+        }
+    }
+    $esc = $g['escalation'] ?? null;
+    if (!is_array($esc)
+        || !in_array('QA', (array) ($esc['immediate_to'] ?? []), true)
+        || !in_array('CEO', (array) ($esc['immediate_to'] ?? []), true)) {
+        $p0[] = "Gate metric $local: CUSTOMER_ESCAPE_NOTIFICATION_LT.escalation.immediate_to must include both QA and CEO (spec §8).";
+    }
+}
+
+// ── P1 — gate metric staged for a critical CDR without manual fallback ──────
+// (P06 hardening per spec §9) — critical CDRs need a manual evidence path so
+// a gate is never blocked waiting for the data contract to ship. Critical
+// list anchored on RACI §8.1 P0/P1: D1, D2, D7, D8, D11, D12. A staged
+// gate metric on these CDRs without manual_input_form / evidence_form
+// (or any explicit manual fallback marker) is a P1 warning.
+$criticalCdrs = ['D1', 'D2', 'D7', 'D8', 'D11', 'D12'];
+foreach ($gateMetrics as $g) {
+    if (!is_array($g)) {
+        continue;
+    }
+    $local = (string) ($g['local_id'] ?? $g['canonical_code'] ?? '?');
+    $status = metricStatus($g);
+    if ($status !== 'staged_data_contract') {
+        continue;
+    }
+    $cdrs = array_map('strtoupper', array_map('strval', (array) ($g['linked_cdr'] ?? [])));
+    $isCritical = array_intersect($cdrs, $criticalCdrs) !== [];
+    if (!$isCritical) {
+        continue;
+    }
+    $hasFallback = !empty($g['manual_input_form'])
+        || !empty($g['manual_fallback'])
+        || !empty($g['evidence_form'])
+        // evidence_source string that names an FRM-* form is treated as fallback.
+        || (is_string($g['evidence_source'] ?? null) && preg_match('/FRM-\d/i', (string) $g['evidence_source']));
+    if (!$hasFallback) {
+        $p1[] = "Gate metric $local: staged_data_contract on critical CDR (" . implode(',', array_intersect($cdrs, $criticalCdrs)) . ") with no manual_input_form / evidence_form / FRM evidence fallback.";
+    }
+}
+
+// ── P1 — gate metric owner ≠ CDR-A owner without justification ──────────────
+// (P06 hardening per spec §5) — when the gate metric's owner_role disagrees
+// with the CDR's accountable role, the registry must surface a justification
+// (data_stewardship_role explanation or an owner_alignment_note). Without
+// either, governance is unclear at audit time. Heuristic: a known
+// owner_role vs CDR-A mismatch table; for now flag only when explicit
+// 'owner_alignment_note' is absent AND data_stewardship_role differs from
+// owner_role with no rationale.
+foreach ($gateMetrics as $g) {
+    if (!is_array($g)) {
+        continue;
+    }
+    $local = (string) ($g['local_id'] ?? $g['canonical_code'] ?? '?');
+    $owner = strtoupper(trim((string) ($g['owner_role'] ?? '')));
+    $steward = strtoupper(trim((string) ($g['data_stewardship_role'] ?? '')));
+    if ($owner === '' || $steward === '' || $owner === $steward) {
+        continue;
+    }
+    if (trim((string) ($g['owner_alignment_note'] ?? '')) === '') {
+        $p1[] = "Gate metric $local: owner_role ($owner) ≠ data_stewardship_role ($steward) and no owner_alignment_note explains the split.";
+    }
+}
+
 // ── P0.8 — gate + proposed metrics uniform: counter-metric + numeric ─────────
 // thresholds, identical to governance KPIs (no metric is left without an
 // anti-gaming counter; thresholds, where present, are numeric and ordered).
