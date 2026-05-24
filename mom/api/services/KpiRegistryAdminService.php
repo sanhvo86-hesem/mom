@@ -1991,9 +1991,11 @@ final class KpiRegistryAdminService
         ));
         $target = (string) ($g['target'] ?? ($g['thresholds']['target'] ?? ''));
         $cadence = (string) (self::CADENCE_VI[$g['cadence'] ?? ''] ?? ($g['cadence'] ?? ''));
-        $evidence = $e($g['data_source'] ?? '');
-        if (trim((string) ($g['evidence_source'] ?? '')) !== '') {
-            $evidence .= '<br><span class="mini-note">' . $e($g['evidence_source']) . '</span>';
+        $dataSource = $g['data_source'] ?? '';
+        $evidence = $this->renderDataSourceSummary($dataSource);
+        $evidenceSource = trim((string) ($g['evidence_source'] ?? ''));
+        if ($evidenceSource !== '' && $evidenceSource !== $this->dataSourceEvidenceText($dataSource)) {
+            $evidence .= '<br><span class="mini-note">' . $e($evidenceSource) . '</span>';
         }
         $evidence .= '<br>' . $this->calcStatusSymbol((string) ($g['calculation_status'] ?? ''));
 
@@ -2020,7 +2022,6 @@ final class KpiRegistryAdminService
         $e = fn(mixed $v): string => $this->esc((string) ($v ?? ''));
         $f  = is_array($k['formula'] ?? null) ? $k['formula'] : [];
         $t  = is_array($k['thresholds'] ?? null) ? $k['thresholds'] : [];
-        $ds = is_array($k['data_source'] ?? null) ? $k['data_source'] : [];
         $code = (string) ($k['canonical_code'] ?? '');
 
         $dir = ($f['direction'] ?? '') === 'lower_is_better' ? 'thấp hơn là tốt' : 'cao hơn là tốt';
@@ -2054,9 +2055,7 @@ final class KpiRegistryAdminService
             $owner .= '<br><span class="mini-note">Xác nhận dữ liệu: ' . $this->roleLink($steward) . '</span>';
         }
 
-        $tables = is_array($ds['tables'] ?? null) ? implode(', ', $ds['tables']) : '';
-        $src = '<b>' . $e($ds['system'] ?? '') . '</b> · ' . $e($tables)
-            . '<br><span class="mini-note">' . $e($ds['evidence'] ?? '') . '</span>';
+        $src = $this->renderDataSourceSummary($k['data_source'] ?? []);
 
         $calcStatus = (string) ($k['calculation_status'] ?? '');
         $calcBadge = $this->calcStatusSymbol($calcStatus);
@@ -2102,6 +2101,47 @@ final class KpiRegistryAdminService
             . '<td>' . $formula . '</td><td>' . $thresholds . '</td>'
             . '<td>' . $owner . '</td><td>' . $src . '</td><td>' . $cadenceCell . '</td>'
             . '<td>' . $decision . '</td></tr>';
+    }
+
+    private function renderDataSourceSummary(mixed $source): string
+    {
+        if (is_array($source)) {
+            $system = trim((string) ($source['system'] ?? ''));
+            $tables = is_array($source['tables'] ?? null)
+                ? implode(', ', array_map('strval', $source['tables']))
+                : trim((string) ($source['tables'] ?? ''));
+            $columns = is_array($source['columns'] ?? null)
+                ? implode(', ', array_map('strval', $source['columns']))
+                : trim((string) ($source['columns'] ?? ''));
+            $evidence = trim((string) ($source['evidence'] ?? $source['contract'] ?? ''));
+
+            $summary = $system !== '' ? '<b>' . $this->esc($system) . '</b>' : '';
+            if ($tables !== '') {
+                $summary .= ($summary !== '' ? ' · ' : '') . $this->esc($tables);
+            }
+            if ($columns !== '') {
+                $summary .= '<br><span class="mini-note">Columns: ' . $this->esc($columns) . '</span>';
+            }
+            if ($evidence !== '') {
+                $summary .= '<br><span class="mini-note">' . $this->esc($evidence) . '</span>';
+            }
+
+            return $summary !== '' ? $summary : '<span class="mini-note">No data source declared</span>';
+        }
+
+        $value = trim((string) ($source ?? ''));
+        return $value !== ''
+            ? $this->esc($value)
+            : '<span class="mini-note">No data source declared</span>';
+    }
+
+    private function dataSourceEvidenceText(mixed $source): string
+    {
+        if (!is_array($source)) {
+            return '';
+        }
+
+        return trim((string) ($source['evidence'] ?? $source['contract'] ?? ''));
     }
 
     /**

@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
-  "version": "2026-05-24+p06",
-  "schema_version": 23,
+  "version": "2026-05-24+p07",
+  "schema_version": 24,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. The executive scorecard is a lean runtime-backed core; role scorecards use active/candidate measures; proposed metrics remain non-reward until governed evidence and data contracts are approved.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -46,7 +46,12 @@
     "INVOICE_RFT",
     "INCIDENT_ACTION_CLOSURE_AGING",
     "FAI_FIRST_PASS",
-    "IN_PROCESS_REJECT_RATE"
+    "IN_PROCESS_REJECT_RATE",
+    "SHIP_PACKET_COMPLETENESS",
+    "NCR_3D_RESPONSE_SLA",
+    "NCR_4D_PRELIMINARY_SLA",
+    "NCR_8D_UPDATE_SLA",
+    "CUSTOMER_ACCEPTED_8D_CLOSURE_RATE"
   ],
   "legacy_aliases": {
     "SCRAP": "SCRAP_RATE",
@@ -292,16 +297,21 @@
         "basis": "Right-first-time phát hành cuối chuẩn ngành ≥98%; dưới 95% là tín hiệu cổng phát hành yếu. Căn cứ AIAG APQP + ANNEX-129 §7 outcome KPI."
       },
       "data_source": {
-        "system": "EQMS",
+        "system": "Manual-governed final release log",
         "tables": [
-          "inspection_results",
-          "trusted_release_records"
+          "kpi_manual_inputs",
+          "mes_trusted_release_record"
         ],
         "columns": [
-          "release_decision",
-          "reopened_at"
+          "metric_code",
+          "value",
+          "input_status",
+          "evidence_reference",
+          "release_decision_code",
+          "packet_state",
+          "blocker_count"
         ],
-        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+        "evidence": "Runtime release packets exist, but reopened-release RFT semantics require governed QA verification until reopen lineage is normalized."
       },
       "owner_role": "QA",
       "data_stewardship_role": "QC",
@@ -319,7 +329,7 @@
         "intent": "Bắt việc duyệt phát hành dễ dãi để đạt RFT, lỗi lọt ra sau phát hành."
       },
       "reward_eligible": false,
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "manual_governed",
       "status": "retained",
       "process": "quality_assurance",
       "category": "internal",
@@ -327,7 +337,30 @@
         "QA",
         "QC"
       ],
-      "reward_mode": "not_rewardable"
+      "reward_mode": "not_rewardable",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/FINAL_RELEASE_RFT",
+      "lifecycle_status": "manual_governed",
+      "manual_input_contract": {
+        "form": "FRM-642 final release review log",
+        "fields": [
+          "period_start",
+          "period_end",
+          "released_lot_count",
+          "right_first_time_lot_count",
+          "reopened_release_count",
+          "evidence_reference"
+        ],
+        "verification": "QA enters monthly release counts; independent QA lead verifies release log and reopened-release evidence before dashboard value can count.",
+        "reward_gate": "Only verified kpi_manual_inputs rows may render as governed value; reward remains disabled."
+      },
+      "evidence_source": "Runtime release packets exist, but reopened-release RFT semantics require governed QA verification until reopen lineage is normalized.",
+      "target_graduation_condition": "Graduate to runtime only after the evidence join is normalized, migration-backed, and KpiEngine calculator is tested against empty and low-sample periods.",
+      "scorecard_contributes_to_reward": false,
+      "control_intent": "quality_at_source",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "rag_3_band",
+      "evaluation_use": "management_review"
     },
     {
       "no": 4,
@@ -6349,7 +6382,7 @@
       "category": "customer",
       "owner_role": "QA",
       "cadence": "per-event",
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "thresholds": {
         "direction": "lower_is_better",
         "unit": "hours",
@@ -6375,28 +6408,32 @@
       "scoring_model_detail": "sla_aging_bucket",
       "evaluation_use": "daily_management",
       "reward_mode": "not_rewardable",
-      "lifecycle_status": "pilot",
+      "lifecycle_status": "active_runtime",
       "applicable_jds": [
         "QA",
         "CS"
       ],
       "lam_profile_link": "LAM_SEMSYSCO",
-      "evidence_source": "ncr_response_log + customer email timestamps",
+      "evidence_source": "KpiEngine::calcNcr3dResponseSla uses migration 198 eqms_complaints.received_at/d3_sent_at. Missing d3_sent_at ages as open SLA, not green.",
       "paired_metric": "NO_CONTAINMENT_COUNTER",
-      "data_contract_gap": "Needs governed received_at, containment_started_at and d3_sent_at timestamps with customer/email evidence.",
-      "target_graduation_condition": "90 days of LAM complaints have complete received_at, containment_started_at, d3_sent_at and customer evidence with no late/missing NCR exceptions.",
+      "target_graduation_condition": "Runtime in Prompt 07 from eqms_complaints.received_at/d3_sent_at; 90-day pilot calibration still required before reward or customer-grade claim.",
       "data_source": {
         "system": "EQMS",
         "tables": [
-          "eqms_complaints",
-          "capa_8d_steps"
+          "eqms_complaints"
         ],
         "columns": [
           "received_at",
+          "received_date",
           "containment_started_at",
-          "d3_sent_at"
+          "d3_sent_at",
+          "created_at",
+          "status",
+          "severity",
+          "customer_name"
         ],
-        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05"
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05",
+        "evidence": "KpiEngine::calcNcr3dResponseSla uses migration 198 eqms_complaints.received_at/d3_sent_at. Missing d3_sent_at ages as open SLA, not green."
       },
       "required_evidence": [
         "complaint_received_at",
@@ -6424,7 +6461,9 @@
       "hold_release_rule": "Late 3D for LAM complaint blocks bonus simulation and customer-risk sign-off until escalated and contained.",
       "action_when_red": "Escalate to QA/CS owner, verify containment, notify customer and document recovery plan.",
       "reward_eligible": false,
-      "scorecard_contributes_to_reward": false
+      "scorecard_contributes_to_reward": false,
+      "backend_status": "runtime_calculated",
+      "primary_endpoint": "GET /api/kpi/NCR_3D_RESPONSE_SLA"
     },
     {
       "canonical_code": "NCR_4D_PRELIMINARY_SLA",
@@ -6434,7 +6473,7 @@
       "category": "customer",
       "owner_role": "QA",
       "cadence": "per-event",
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "thresholds": {
         "direction": "lower_is_better",
         "unit": "hours",
@@ -6460,26 +6499,30 @@
       "scoring_model_detail": "sla_aging_bucket",
       "evaluation_use": "daily_management",
       "reward_mode": "not_rewardable",
-      "lifecycle_status": "pilot",
+      "lifecycle_status": "active_runtime",
       "applicable_jds": [
         "QA"
       ],
       "lam_profile_link": "LAM_SEMSYSCO",
-      "evidence_source": "ncr_response_log",
+      "evidence_source": "KpiEngine::calcNcr4dPreliminarySla uses migration 198 eqms_complaints.received_at/d4_sent_at. Missing d4_sent_at ages as open SLA, not green.",
       "paired_metric": "CUSTOMER_NCR_SEVERITY_SCORE",
-      "data_contract_gap": "Needs governed received_at and d4_sent_at timestamps with preliminary root-cause response evidence.",
-      "target_graduation_condition": "90 days of LAM complaints have complete 4D preliminary timestamps, root-cause evidence and customer communication evidence.",
+      "target_graduation_condition": "Runtime in Prompt 07 from eqms_complaints.received_at/d4_sent_at; 90-day pilot calibration still required before reward or customer-grade claim.",
       "data_source": {
         "system": "EQMS",
         "tables": [
-          "eqms_complaints",
-          "capa_8d_steps"
+          "eqms_complaints"
         ],
         "columns": [
           "received_at",
-          "d4_sent_at"
+          "received_date",
+          "d4_sent_at",
+          "created_at",
+          "status",
+          "severity",
+          "customer_name"
         ],
-        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05"
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05",
+        "evidence": "KpiEngine::calcNcr4dPreliminarySla uses migration 198 eqms_complaints.received_at/d4_sent_at. Missing d4_sent_at ages as open SLA, not green."
       },
       "required_evidence": [
         "complaint_received_at",
@@ -6507,7 +6550,9 @@
       "hold_release_rule": "Late 4D for LAM complaint blocks simulation until recovery plan is accepted.",
       "action_when_red": "Escalate preliminary root-cause response and document customer recovery commitment.",
       "reward_eligible": false,
-      "scorecard_contributes_to_reward": false
+      "scorecard_contributes_to_reward": false,
+      "backend_status": "runtime_calculated",
+      "primary_endpoint": "GET /api/kpi/NCR_4D_PRELIMINARY_SLA"
     },
     {
       "canonical_code": "NCR_8D_UPDATE_SLA",
@@ -6517,7 +6562,7 @@
       "category": "customer",
       "owner_role": "QA",
       "cadence": "per-event",
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "thresholds": {
         "direction": "lower_is_better",
         "unit": "hours",
@@ -6543,29 +6588,32 @@
       "scoring_model_detail": "sla_aging_bucket",
       "evaluation_use": "daily_management",
       "reward_mode": "not_rewardable",
-      "lifecycle_status": "pilot",
+      "lifecycle_status": "active_runtime",
       "applicable_jds": [
         "QA",
         "QE"
       ],
       "lam_profile_link": "LAM_SEMSYSCO",
-      "evidence_source": "8d_report_history with progress update timestamps",
+      "evidence_source": "KpiEngine::calcNcr8dUpdateSla uses migration 198 eqms_complaints.received_at/d8_updated_at. Missing d8_updated_at ages as open SLA, not green.",
       "paired_metric": "CUSTOMER_ACCEPTED_8D_CLOSURE_RATE",
-      "data_contract_gap": "Needs governed received_at, d8_updated_at, progress update and CAPA effectiveness timestamps.",
-      "target_graduation_condition": "90 days of LAM complaints have complete updated 8D/progress evidence and CAPA effectiveness verification lineage.",
+      "target_graduation_condition": "Runtime in Prompt 07 from eqms_complaints.received_at/d8_updated_at; 90-day pilot calibration still required before reward or customer-grade claim.",
       "data_source": {
         "system": "EQMS",
         "tables": [
-          "eqms_complaints",
-          "capa_8d_steps",
-          "capa_effectiveness_checks"
+          "eqms_complaints"
         ],
         "columns": [
           "received_at",
+          "received_date",
           "d8_updated_at",
-          "corrective_action_effective_at"
+          "corrective_action_effective_at",
+          "created_at",
+          "status",
+          "severity",
+          "customer_name"
         ],
-        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05"
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05",
+        "evidence": "KpiEngine::calcNcr8dUpdateSla uses migration 198 eqms_complaints.received_at/d8_updated_at. Missing d8_updated_at ages as open SLA, not green."
       },
       "required_evidence": [
         "complaint_received_at",
@@ -6593,7 +6641,9 @@
       "hold_release_rule": "Late/stale 8D blocks simulation until customer update and recovery plan are documented.",
       "action_when_red": "Escalate stale 8D, update customer and verify CAPA effectiveness path.",
       "reward_eligible": false,
-      "scorecard_contributes_to_reward": false
+      "scorecard_contributes_to_reward": false,
+      "backend_status": "runtime_calculated",
+      "primary_endpoint": "GET /api/kpi/NCR_8D_UPDATE_SLA"
     },
     {
       "canonical_code": "CUSTOMER_ACCEPTED_8D_CLOSURE_RATE",
@@ -6603,7 +6653,7 @@
       "category": "customer",
       "owner_role": "QA",
       "cadence": "monthly",
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "percent",
@@ -6629,27 +6679,32 @@
       "scoring_model_detail": "rag_3_band",
       "evaluation_use": "management_review",
       "reward_mode": "not_rewardable",
-      "lifecycle_status": "pilot",
+      "lifecycle_status": "active_runtime",
       "applicable_jds": [
         "QA"
       ],
       "lam_profile_link": "LAM_SEMSYSCO",
-      "evidence_source": "8d_closure_log + customer acceptance email",
+      "evidence_source": "KpiEngine::calcCustomerAccepted8dClosureRate computes accepted closures from eqms_complaints.customer_acceptance_at over closed complaints.",
       "paired_metric": "CUSTOMER_NCR_SEVERITY_SCORE",
-      "data_contract_gap": "Needs governed customer_acceptance_at and customer closure evidence; self-closure without customer acceptance remains blocked.",
-      "target_graduation_condition": "90 days of customer complaint closures have customer acceptance/closure timestamp or approved no-response closure rationale.",
+      "target_graduation_condition": "Runtime in Prompt 07 from eqms_complaints.customer_acceptance_at/closed_at; self-closure without customer acceptance remains a blocker.",
       "data_source": {
         "system": "EQMS",
         "tables": [
-          "eqms_complaints",
-          "capa_8d_steps"
+          "eqms_complaints"
         ],
         "columns": [
           "customer_acceptance_at",
           "closed_at",
-          "d8_updated_at"
+          "d8_updated_at",
+          "received_at",
+          "received_date",
+          "created_at",
+          "status",
+          "severity",
+          "customer_name"
         ],
-        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05"
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05",
+        "evidence": "KpiEngine::calcCustomerAccepted8dClosureRate computes accepted closures from eqms_complaints.customer_acceptance_at over closed complaints."
       },
       "required_evidence": [
         "customer_acceptance_at",
@@ -6676,7 +6731,9 @@
       "hold_release_rule": "Self-closed 8D without customer acceptance blocks simulation until customer acceptance or QMS-approved rationale is recorded.",
       "action_when_red": "Reopen customer closure path and obtain acceptance evidence.",
       "reward_eligible": false,
-      "scorecard_contributes_to_reward": false
+      "scorecard_contributes_to_reward": false,
+      "backend_status": "runtime_calculated",
+      "primary_endpoint": "GET /api/kpi/CUSTOMER_ACCEPTED_8D_CLOSURE_RATE"
     },
     {
       "canonical_code": "TRAINING_AS_CAPA_COUNTER",
@@ -7923,6 +7980,133 @@
       ],
       "gate_pass_condition": "Any product/process/gage/program/material/customer requirement change affecting a CTQ must restart the Cpk sample window and finish approved revalidation before customer-grade capability claim or shipment release.",
       "hold_release_rule": "Hold customer-grade capability claim and affected release until post-change CTQ sample window is approved."
+    },
+    {
+      "canonical_code": "FAI_QUEUE_AGING",
+      "name": "FAI Queue Aging",
+      "name_vi": "Tuổi hàng chờ FAI",
+      "process": "quality_assurance",
+      "category": "flow",
+      "owner_role": "QA",
+      "data_stewardship_role": "QC",
+      "cadence": "daily",
+      "calculation_status": "staged_data_contract",
+      "metric_type": "operating_metric",
+      "metric_subtype": "operating_metric",
+      "control_intent": "wip_queue_control",
+      "measurement_data_type": "aging_days",
+      "scoring_model_detail": "sla_aging_bucket",
+      "evaluation_use": "daily_management",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hours",
+        "green_point": 4,
+        "yellow_point": 8,
+        "target": 4,
+        "basis": "FAI queue must be visible as a release constraint; staged until queue timestamps are normalized."
+      },
+      "counter_metric": {
+        "code": "FAI_QUEUE_AGING-CTR",
+        "endpoint": "POST /api/kpi/FAI_QUEUE_AGING-CTR/input",
+        "name_vi": "Số lô bỏ qua FAI hoặc đo tạm để giảm queue",
+        "name": "Unauthorized FAI bypass count",
+        "intent": "Bắt việc làm đẹp queue bằng cách bỏ qua FAI/first-piece control."
+      },
+      "blocking_conditions": [
+        "fai_queue_overdue_without_escalation"
+      ],
+      "data_source": {
+        "system": "EQMS/MES staged contract",
+        "tables": [
+          "fai_records",
+          "ipqc_inspections",
+          "kpi_manual_inputs"
+        ],
+        "columns": [
+          "created_at",
+          "queued_at",
+          "started_at",
+          "completed_at",
+          "evidence_reference"
+        ],
+        "evidence": "No normalized FAI queue event table yet; use manual-governed pilot evidence until queue events exist."
+      },
+      "evidence_source": "FAI queue board + first-piece/FAI assignment log + escalation evidence",
+      "data_contract_gap": "No normalized FAI queue event table with queued_at, started_at, completed_at, job/operation, customer profile and release linkage.",
+      "target_graduation_condition": "Graduate after FAI queue events are migration-backed and KpiEngine can calculate oldest/average queue age by customer, part, revision and work center.",
+      "action_when_red": "Escalate FAI queue to QA/QC/PPL and protect release from bypass.",
+      "usage_contexts": [
+        "daily_management",
+        "flow_constraint",
+        "lam_pilot_backlog"
+      ],
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false
+    },
+    {
+      "canonical_code": "FINAL_INSPECTION_QUEUE_AGING",
+      "name": "Final Inspection Queue Aging",
+      "name_vi": "Tuổi hàng chờ kiểm cuối",
+      "process": "quality_assurance",
+      "category": "flow",
+      "owner_role": "QA",
+      "data_stewardship_role": "QC",
+      "cadence": "daily",
+      "calculation_status": "staged_data_contract",
+      "metric_type": "operating_metric",
+      "metric_subtype": "operating_metric",
+      "control_intent": "wip_queue_control",
+      "measurement_data_type": "aging_days",
+      "scoring_model_detail": "sla_aging_bucket",
+      "evaluation_use": "daily_management",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hours",
+        "green_point": 4,
+        "yellow_point": 8,
+        "target": 4,
+        "basis": "Final inspection queue protects OTD without bypassing release evidence; staged until queue timestamps are normalized."
+      },
+      "counter_metric": {
+        "code": "FINAL_INSPECTION_QUEUE_AGING-CTR",
+        "endpoint": "POST /api/kpi/FINAL_INSPECTION_QUEUE_AGING-CTR/input",
+        "name_vi": "Số lô được ship/release khi kiểm cuối chưa xong",
+        "name": "Final inspection bypass count",
+        "intent": "Bắt việc giảm queue bằng cách đẩy hàng qua release khi chưa có kiểm cuối."
+      },
+      "blocking_conditions": [
+        "final_inspection_queue_overdue_without_escalation"
+      ],
+      "data_source": {
+        "system": "EQMS/MES staged contract",
+        "tables": [
+          "oqc_inspections",
+          "shipment_releases",
+          "kpi_manual_inputs"
+        ],
+        "columns": [
+          "created_at",
+          "inspection_status",
+          "shipment_status",
+          "evidence_reference"
+        ],
+        "evidence": "No normalized final-inspection queue table yet; use staged backlog until queue events exist."
+      },
+      "evidence_source": "final inspection assignment log + release hold record + escalation evidence",
+      "data_contract_gap": "No normalized final-inspection queue event table with queued_at, started_at, completed_at, job/lot, customer profile and release linkage.",
+      "target_graduation_condition": "Graduate after final inspection queue events are migration-backed and KpiEngine can calculate oldest/average queue age by customer, part, revision and release gate.",
+      "action_when_red": "Escalate final inspection queue to QA/QC/PPL and block release bypass.",
+      "usage_contexts": [
+        "daily_management",
+        "flow_constraint",
+        "lam_pilot_backlog"
+      ],
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false
     }
   ],
   "dashboard_core_kpis": [
@@ -8018,12 +8202,53 @@
       "local_id": "BSC-DRV-02",
       "canonical_code": "FINAL_RELEASE_RFT",
       "name": "Final Release Right-First-Time",
-      "backend_status": "staged_data_contract",
-      "primary_endpoint": "GET /api/kpi/catalog",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/FINAL_RELEASE_RFT",
       "scorecard_role": "strategic_driver",
       "dashboard_card_class": "strategic_driver",
       "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
-      "scoreable": false
+      "scoreable": false,
+      "calculation_status": "manual_governed",
+      "lifecycle_status": "manual_governed",
+      "manual_input_contract": {
+        "form": "FRM-642 final release review log",
+        "fields": [
+          "period_start",
+          "period_end",
+          "released_lot_count",
+          "right_first_time_lot_count",
+          "reopened_release_count",
+          "evidence_reference"
+        ],
+        "verification": "QA enters monthly release counts; independent QA lead verifies release log and reopened-release evidence before dashboard value can count.",
+        "reward_gate": "Only verified kpi_manual_inputs rows may render as governed value; reward remains disabled."
+      },
+      "data_source": {
+        "system": "Manual-governed final release log",
+        "tables": [
+          "kpi_manual_inputs",
+          "mes_trusted_release_record"
+        ],
+        "columns": [
+          "metric_code",
+          "value",
+          "input_status",
+          "evidence_reference",
+          "release_decision_code",
+          "packet_state",
+          "blocker_count"
+        ],
+        "evidence": "Runtime release packets exist, but reopened-release RFT semantics require governed QA verification until reopen lineage is normalized."
+      },
+      "evidence_source": "Runtime release packets exist, but reopened-release RFT semantics require governed QA verification until reopen lineage is normalized.",
+      "target_graduation_condition": "Graduate to runtime only after the evidence join is normalized, migration-backed, and KpiEngine calculator is tested against empty and low-sample periods.",
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "reward_mode": "not_rewardable",
+      "control_intent": "quality_at_source",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "rag_3_band",
+      "evaluation_use": "management_review"
     },
     {
       "local_id": "BSC-DRV-03",
@@ -8062,34 +8287,124 @@
       "local_id": "BSC-DRV-06",
       "canonical_code": "CHECK_DIM_REPORT_ON_SHIP",
       "name": "LAM Check-Dimension Report on Ship",
-      "backend_status": "staged_data_contract",
-      "primary_endpoint": "GET /api/kpi/catalog",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/CHECK_DIM_REPORT_ON_SHIP",
       "scorecard_role": "strategic_driver",
       "dashboard_card_class": "strategic_driver",
       "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
-      "scoreable": false
+      "scoreable": false,
+      "calculation_status": "manual_governed",
+      "lifecycle_status": "manual_governed",
+      "manual_input_contract": {
+        "form": "FRM-642 ship packet checklist + check-dimension report attachment",
+        "fields": [
+          "period_start",
+          "period_end",
+          "cdr_required_shipments",
+          "cdr_attached_shipments",
+          "evidence_reference"
+        ],
+        "verification": "QA/CPS maker-checker verification required; pending input blocks ship evidence recognition.",
+        "reward_gate": "Gate blocker only; verified manual evidence never creates direct reward."
+      },
+      "data_source": {
+        "system": "Manual-governed shipment evidence pack",
+        "tables": [
+          "kpi_manual_inputs",
+          "shipments",
+          "eqms_evidence_record"
+        ],
+        "columns": [
+          "metric_code",
+          "value",
+          "input_status",
+          "evidence_reference",
+          "shipment_id",
+          "packet_payload"
+        ],
+        "evidence": "check_dimension_report PDF and shipment evidence pack manually verified through kpi_manual_inputs until shipment CDR requirement and report artifact are normalized."
+      },
+      "evidence_source": "check_dimension_report PDF + shipment evidence pack + CTQ characteristic/check_dim_number link; manual-governed verification keeps shipment, part_no, revision, check_dim_number and inspector signature visible until the runtime CDR join is normalized.",
+      "target_graduation_condition": "Graduate to runtime only after the evidence join is normalized, migration-backed, and KpiEngine calculator is tested against empty and low-sample periods.",
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "reward_mode": "not_rewardable",
+      "control_intent": "quality_at_source",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "rag_3_band",
+      "evaluation_use": "management_review"
     },
     {
       "local_id": "BSC-DRV-07",
       "canonical_code": "NCR_3D_RESPONSE_SLA",
       "name": "Customer NCR 3D SLA",
-      "backend_status": "staged_data_contract",
-      "primary_endpoint": "GET /api/kpi/catalog",
+      "backend_status": "runtime_calculated",
+      "primary_endpoint": "GET /api/kpi/NCR_3D_RESPONSE_SLA",
       "scorecard_role": "strategic_driver",
       "dashboard_card_class": "strategic_driver",
       "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
-      "scoreable": false
+      "scoreable": false,
+      "calculation_status": "runtime_calculated",
+      "lifecycle_status": "active_runtime",
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "eqms_complaints"
+        ],
+        "columns": [
+          "received_at",
+          "received_date",
+          "containment_started_at",
+          "d3_sent_at",
+          "created_at",
+          "status",
+          "severity",
+          "customer_name"
+        ],
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05",
+        "evidence": "KpiEngine::calcNcr3dResponseSla uses migration 198 eqms_complaints.received_at/d3_sent_at. Missing d3_sent_at ages as open SLA, not green."
+      },
+      "evidence_source": "KpiEngine::calcNcr3dResponseSla uses migration 198 eqms_complaints.received_at/d3_sent_at. Missing d3_sent_at ages as open SLA, not green.",
+      "target_graduation_condition": "Runtime in Prompt 07 from eqms_complaints.received_at/d3_sent_at; 90-day pilot calibration still required before reward or customer-grade claim.",
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "reward_mode": "not_rewardable"
     },
     {
       "local_id": "BSC-DRV-08",
       "canonical_code": "NCR_8D_UPDATE_SLA",
       "name": "Customer NCR 8D Update SLA",
-      "backend_status": "staged_data_contract",
-      "primary_endpoint": "GET /api/kpi/catalog",
+      "backend_status": "runtime_calculated",
+      "primary_endpoint": "GET /api/kpi/NCR_8D_UPDATE_SLA",
       "scorecard_role": "strategic_driver",
       "dashboard_card_class": "strategic_driver",
       "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
-      "scoreable": false
+      "scoreable": false,
+      "calculation_status": "runtime_calculated",
+      "lifecycle_status": "active_runtime",
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "eqms_complaints"
+        ],
+        "columns": [
+          "received_at",
+          "received_date",
+          "d8_updated_at",
+          "corrective_action_effective_at",
+          "created_at",
+          "status",
+          "severity",
+          "customer_name"
+        ],
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05",
+        "evidence": "KpiEngine::calcNcr8dUpdateSla uses migration 198 eqms_complaints.received_at/d8_updated_at. Missing d8_updated_at ages as open SLA, not green."
+      },
+      "evidence_source": "KpiEngine::calcNcr8dUpdateSla uses migration 198 eqms_complaints.received_at/d8_updated_at. Missing d8_updated_at ages as open SLA, not green.",
+      "target_graduation_condition": "Runtime in Prompt 07 from eqms_complaints.received_at/d8_updated_at; 90-day pilot calibration still required before reward or customer-grade claim.",
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "reward_mode": "not_rewardable"
     },
     {
       "local_id": "BSC-DRV-09",
@@ -8885,8 +9200,23 @@
       "target": "100%",
       "owner_role": "QA",
       "cadence": "per-event",
-      "data_source": "FRM-642",
-      "calculation_status": "staged_data_contract",
+      "data_source": {
+        "system": "MOM order/shipping release",
+        "tables": [
+          "shipment_releases"
+        ],
+        "columns": [
+          "packlist_status",
+          "coc_status",
+          "coa_status",
+          "customs_status",
+          "planned_ship_date",
+          "actual_ship_date",
+          "updated_at"
+        ],
+        "evidence": "KpiEngine::calcShipPacketCompleteness computes completion from shipment_releases document statuses; missing statuses are data-quality flags."
+      },
+      "calculation_status": "runtime_calculated",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "percent",
@@ -8914,17 +9244,49 @@
         "annex122_gate_table"
       ],
       "result_type": "gate",
-      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "evaluation_use": "gate_hold_release",
       "scorecard_scoring_status": "gate_only",
       "scorecard_contributes_to_reward": false,
       "is_official_kpi": false,
       "reward_eligible": false,
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
-      "evidence_source": "FRM-642 final release/ship packet checklist, CoC, label, traceability, and QA signoff",
+      "evidence_source": "KpiEngine::calcShipPacketCompleteness computes completion from shipment_releases document statuses; missing statuses are data-quality flags.",
       "data_stewardship_role": "QA",
       "hold_release_rule": "No G6 final release when ship packet is incomplete; QA blocks shipment until D8 evidence is complete.",
       "decision_action": "Block shipment; QA forces packet completion before CoC release.",
-      "reward_mode": "blocker_only"
+      "reward_mode": "blocker_only",
+      "backend_status": "runtime_calculated",
+      "primary_endpoint": "GET /api/kpi/SHIP_PACKET_COMPLETENESS",
+      "lifecycle_status": "active_runtime",
+      "target_graduation_condition": "Runtime in Prompt 07 from shipment_releases document-status columns; LAM CDR-specific ship evidence remains covered by CHECK_DIM_REPORT_ON_SHIP.",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "gate_release_control",
+      "measurement_data_type": "evidence_completeness",
+      "scoring_model_detail": "binary_pass_fail",
+      "usage_contexts": [
+        "gate_hold_release",
+        "ship_packet_release",
+        "annex122_gate_table"
+      ],
+      "role_assignments": [
+        {
+          "role_code": "QA",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "owns final release packet completeness and CoC evidence"
+        },
+        {
+          "role_code": "CPS",
+          "assignment_type": "contributor",
+          "controllability_scope": "verifies packing-line document presence before shipment"
+        }
+      ],
+      "required_evidence": [
+        "packlist_status",
+        "coc_status",
+        "coa_status",
+        "customs_status_or_not_required",
+        "shipment_release_id"
+      ]
     },
     {
       "local_id": "KPI-G6-02",
@@ -9599,8 +9961,24 @@
       "target": "100%",
       "owner_role": "QA",
       "cadence": "per-event",
-      "data_source": "check_dimension_report + shipments.cdr_required_flag",
-      "calculation_status": "staged_data_contract",
+      "data_source": {
+        "system": "Manual-governed shipment evidence pack",
+        "tables": [
+          "kpi_manual_inputs",
+          "shipments",
+          "eqms_evidence_record"
+        ],
+        "columns": [
+          "metric_code",
+          "value",
+          "input_status",
+          "evidence_reference",
+          "shipment_id",
+          "packet_payload"
+        ],
+        "evidence": "check_dimension_report PDF and shipment evidence pack manually verified through kpi_manual_inputs until shipment CDR requirement and report artifact are normalized."
+      },
+      "calculation_status": "manual_governed",
       "counter_metric": {
         "code": "CHECK_DIM_REPORT_ON_SHIP-CTR",
         "endpoint": "POST /api/kpi/CHECK_DIM_REPORT_ON_SHIP-CTR/input",
@@ -9634,7 +10012,7 @@
       "scoring_model_detail": "binary_pass_fail",
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
-      "lifecycle_status": "pilot",
+      "lifecycle_status": "manual_governed",
       "usage_types": [
         "gate_control",
         "lam_profile_cdr"
@@ -9643,7 +10021,7 @@
       "is_official_kpi": false,
       "reward_eligible": false,
       "decision_purpose": "Hold G6/G7 ship release when CDR required and missing.",
-      "evidence_source": "check_dimension_report PDF + shipment evidence pack + CTQ characteristic/check_dim_number link",
+      "evidence_source": "check_dimension_report PDF + shipment evidence pack + CTQ characteristic/check_dim_number link; manual-governed verification keeps shipment, part_no, revision, check_dim_number and inspector signature visible until the runtime CDR join is normalized.",
       "data_stewardship_role": "QA",
       "hold_release_rule": "Hold ship release until CDR present + inspector signature; CPS verifies in packing line.",
       "lam_profile_link": "LAM_SEMSYSCO",
@@ -9657,7 +10035,22 @@
         "revision",
         "check_dim_number",
         "inspector_signature"
-      ]
+      ],
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/CHECK_DIM_REPORT_ON_SHIP",
+      "manual_input_contract": {
+        "form": "FRM-642 ship packet checklist + check-dimension report attachment",
+        "fields": [
+          "period_start",
+          "period_end",
+          "cdr_required_shipments",
+          "cdr_attached_shipments",
+          "evidence_reference"
+        ],
+        "verification": "QA/CPS maker-checker verification required; pending input blocks ship evidence recognition.",
+        "reward_gate": "Gate blocker only; verified manual evidence never creates direct reward."
+      },
+      "scorecard_contributes_to_reward": false
     },
     {
       "local_id": "KPI-LAM-G4-01",
@@ -9674,8 +10067,25 @@
       "target": "100%",
       "owner_role": "MCS",
       "cadence": "per-event",
-      "data_source": "calibration_records + gage_usage_log",
-      "calculation_status": "staged_data_contract",
+      "data_source": {
+        "system": "Manual-governed gage release evidence",
+        "tables": [
+          "kpi_manual_inputs",
+          "calibration_records",
+          "eqms_calibration_records"
+        ],
+        "columns": [
+          "metric_code",
+          "value",
+          "input_status",
+          "evidence_reference",
+          "equipment_id",
+          "calibration_due_date",
+          "status"
+        ],
+        "evidence": "Gage validity is verified manually until a gage_usage_log joins inspection/release events to calibration validity-at-measurement."
+      },
+      "calculation_status": "manual_governed",
       "counter_metric": {
         "code": "GAGE_VALID_FOR_RELEASE-CTR",
         "endpoint": "POST /api/kpi/GAGE_VALID_FOR_RELEASE-CTR/input",
@@ -9708,7 +10118,7 @@
       "scoring_model_detail": "binary_pass_fail",
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
-      "lifecycle_status": "pilot",
+      "lifecycle_status": "manual_governed",
       "usage_types": [
         "gate_control",
         "lam_profile_gage"
@@ -9717,11 +10127,27 @@
       "is_official_kpi": false,
       "reward_eligible": false,
       "decision_purpose": "Invalidate release decisions made with non-conforming gage; mandate CAPA.",
-      "evidence_source": "calibration_records (last cal date) + gage_usage_log linked to inspection event",
+      "evidence_source": "Gage validity is verified manually until a gage_usage_log joins inspection/release events to calibration validity-at-measurement.",
       "data_stewardship_role": "MCS",
       "hold_release_rule": "Block release if gage status invalid; pull and re-measure with valid gage; LAM customers notified per profile.",
       "lam_profile_link": "LAM_SEMSYSCO",
-      "decision_action": "Block FAI signoff; MCS revalidates gage hoặc swap before FAI release."
+      "decision_action": "Block FAI signoff; MCS revalidates gage hoặc swap before FAI release.",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/GAGE_VALID_FOR_RELEASE",
+      "manual_input_contract": {
+        "form": "FRM-610 gage release validity log",
+        "fields": [
+          "period_start",
+          "period_end",
+          "release_measurement_count",
+          "valid_gage_release_count",
+          "evidence_reference"
+        ],
+        "verification": "MCS enters gage validity sample, QA verifies calibration and release linkage.",
+        "reward_gate": "Gate blocker only; invalid gage remains a hard blocker."
+      },
+      "target_graduation_condition": "Graduate to runtime only after the evidence join is normalized, migration-backed, and KpiEngine calculator is tested against empty and low-sample periods.",
+      "scorecard_contributes_to_reward": false
     },
     {
       "local_id": "KPI-LAM-G1-03",
@@ -9737,8 +10163,24 @@
       "target": "100%",
       "owner_role": "ENGM",
       "cadence": "per-event",
-      "data_source": "process_change_request + customer_approval_letter",
-      "calculation_status": "staged_data_contract",
+      "data_source": {
+        "system": "Manual-governed customer change approval log",
+        "tables": [
+          "kpi_manual_inputs",
+          "eqms_change_controls",
+          "eqms_engineering_changes"
+        ],
+        "columns": [
+          "metric_code",
+          "value",
+          "input_status",
+          "evidence_reference",
+          "status",
+          "effective_date"
+        ],
+        "evidence": "Customer approval letter and implementation-before-approval linkage are verified manually until LAM PN change lineage is normalized."
+      },
+      "calculation_status": "manual_governed",
       "counter_metric": {
         "code": "PROCESS_CHANGE_APPROVAL_RATE-CTR",
         "endpoint": "POST /api/kpi/PROCESS_CHANGE_APPROVAL_RATE-CTR/input",
@@ -9770,7 +10212,7 @@
       "scoring_model_detail": "binary_pass_fail",
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
-      "lifecycle_status": "pilot",
+      "lifecycle_status": "manual_governed",
       "usage_types": [
         "gate_control",
         "lam_profile_change_approval"
@@ -9779,11 +10221,27 @@
       "is_official_kpi": false,
       "reward_eligible": false,
       "decision_purpose": "Hard-block any LAM-PN production using unapproved process change.",
-      "evidence_source": "customer_approval_letter PDF linked from process_change_request",
+      "evidence_source": "Customer approval letter and implementation-before-approval linkage are verified manually until LAM PN change lineage is normalized.",
       "data_stewardship_role": "ENGM",
       "hold_release_rule": "Hold G1 production release if change exists without approval letter; ENGM + QA co-sign.",
       "lam_profile_link": "LAM_SEMSYSCO",
-      "decision_action": "Hold ECO release; ENGM forces approval evidence trước khi vào sản xuất."
+      "decision_action": "Hold ECO release; ENGM forces approval evidence trước khi vào sản xuất.",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/PROCESS_CHANGE_APPROVAL_RATE",
+      "manual_input_contract": {
+        "form": "FRM-721 LAM process-change approval log",
+        "fields": [
+          "period_start",
+          "period_end",
+          "lam_change_count",
+          "approved_before_implementation_count",
+          "evidence_reference"
+        ],
+        "verification": "ENGM enters, QA/CS verifies customer approval letter before value is accepted.",
+        "reward_gate": "Gate blocker only; unapproved change blocks LAM release."
+      },
+      "target_graduation_condition": "Graduate to runtime only after the evidence join is normalized, migration-backed, and KpiEngine calculator is tested against empty and low-sample periods.",
+      "scorecard_contributes_to_reward": false
     },
     {
       "local_id": "KPI-LAM-G7-01",
@@ -9799,8 +10257,24 @@
       "target": "100%",
       "owner_role": "QA",
       "cadence": "per-event",
-      "data_source": "special_release_letter + shipments.deviation_flag",
-      "calculation_status": "staged_data_contract",
+      "data_source": {
+        "system": "Manual-governed special-release register",
+        "tables": [
+          "kpi_manual_inputs",
+          "eqms_concession_records",
+          "shipment_releases"
+        ],
+        "columns": [
+          "metric_code",
+          "value",
+          "input_status",
+          "evidence_reference",
+          "approval_status",
+          "shipment_status"
+        ],
+        "evidence": "Written release letter and deviated-shipment linkage are verified manually until concession-to-shipment join is normalized."
+      },
+      "calculation_status": "manual_governed",
       "counter_metric": {
         "code": "SPECIAL_RELEASE_COMPLIANCE-CTR",
         "endpoint": "POST /api/kpi/SPECIAL_RELEASE_COMPLIANCE-CTR/input",
@@ -9832,7 +10306,7 @@
       "scoring_model_detail": "binary_pass_fail",
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
-      "lifecycle_status": "pilot",
+      "lifecycle_status": "manual_governed",
       "usage_types": [
         "gate_control",
         "lam_profile_special_release"
@@ -9841,11 +10315,27 @@
       "is_official_kpi": false,
       "reward_eligible": false,
       "decision_purpose": "Hard-block delivery of deviated lots without written customer release.",
-      "evidence_source": "special_release_letter PDF + customer countersignature",
+      "evidence_source": "Written release letter and deviated-shipment linkage are verified manually until concession-to-shipment join is normalized.",
       "data_stewardship_role": "QA",
       "hold_release_rule": "Hold G7 ship release until written letter present; CS coordinates with customer; QA validates content matches deviation.",
       "lam_profile_link": "LAM_SEMSYSCO",
-      "decision_action": "Block special-release shipment; QA + CS validate full evidence per CDR D11."
+      "decision_action": "Block special-release shipment; QA + CS validate full evidence per CDR D11.",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/SPECIAL_RELEASE_COMPLIANCE",
+      "manual_input_contract": {
+        "form": "FRM-724 written special-release register",
+        "fields": [
+          "period_start",
+          "period_end",
+          "deviated_shipments",
+          "written_release_before_ship_count",
+          "evidence_reference"
+        ],
+        "verification": "QA enters; CS/QA verifies customer countersignature before G7 release evidence is accepted.",
+        "reward_gate": "Gate blocker only; no monetary reward."
+      },
+      "target_graduation_condition": "Graduate to runtime only after the evidence join is normalized, migration-backed, and KpiEngine calculator is tested against empty and low-sample periods.",
+      "scorecard_contributes_to_reward": false
     },
     {
       "local_id": "KPI-LAM-G7-02",
@@ -9976,7 +10466,7 @@
       "classification": "gate_metric_lam_profile",
       "target": "100%",
       "cadence": "per-event",
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "manual_governed",
       "counter_metric": {
         "code": "MATERIAL_CERT_VERIFICATION_COMPLETENESS-CTR",
         "endpoint": "POST /api/kpi/MATERIAL_CERT_VERIFICATION_COMPLETENESS-CTR/input",
@@ -9998,7 +10488,7 @@
       "scoring_model_detail": "binary_pass_fail",
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
-      "lifecycle_status": "pilot",
+      "lifecycle_status": "manual_governed",
       "usage_types": [
         "gate_control",
         "lam_profile_gate",
@@ -10023,7 +10513,24 @@
       "gate_pass_condition": "100% vật tư LAM/SEMSYSCO cấp vào kế hoạch sản xuất có chứng chỉ vật tư đối chiếu đúng heat/lot/spec trước khi kit release (CDR D10).",
       "owner_role": "SCM",
       "owner_alignment_note": "SCM owns material release readiness; QA remains accountable for D10 technical acceptance and cert conformance evidence.",
-      "data_source": "trace_material_certificates + incoming_inspections + supplier cert PDF",
+      "data_source": {
+        "system": "Manual-governed material cert verification",
+        "tables": [
+          "kpi_manual_inputs",
+          "trace_material_certificates",
+          "incoming_inspections"
+        ],
+        "columns": [
+          "metric_code",
+          "value",
+          "input_status",
+          "evidence_reference",
+          "lot_number",
+          "certificate_number",
+          "inspection_status"
+        ],
+        "evidence": "Cert/heat/lot/spec match is manually verified until lot/job kit joins are normalized."
+      },
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "percent",
@@ -10035,7 +10542,7 @@
       "blocking_conditions": [
         "lam_material_cert_missing_or_mismatched"
       ],
-      "evidence_source": "trace_material_certificates record, supplier certificate PDF, incoming inspection acceptance note, heat/lot/spec match evidence",
+      "evidence_source": "Cert/heat/lot/spec match is manually verified until lot/job kit joins are normalized.",
       "hold_release_rule": "Hold G3 material kit release when any LAM material certificate is missing, mismatched, expired, or not tied to the lot; SCM resolves and QA verifies before plan release.",
       "decision_action": "Hold material kit; SCM + QA reconcile certificate before G3 release.",
       "data_contract_gap": "No certified runtime join yet across trace_material_certificates, incoming_inspections, purchase receipt, and job kit release event.",
@@ -10046,13 +10553,27 @@
         "heat_lot_match",
         "incoming_inspection_acceptance",
         "job_kit_link"
-      ]
+      ],
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/MATERIAL_CERT_VERIFICATION_COMPLETENESS",
+      "manual_input_contract": {
+        "form": "FRM-402 material certificate verification checklist",
+        "fields": [
+          "period_start",
+          "period_end",
+          "lam_material_lot_count",
+          "cert_verified_lot_count",
+          "evidence_reference"
+        ],
+        "verification": "SCM enters lot/cert evidence; QA verifies heat/lot/spec match before G3 release.",
+        "reward_gate": "Gate blocker only; missing cert blocks G3."
+      }
     },
     {
       "classification": "gate_metric_lam_profile",
       "target": "100%",
       "cadence": "per-event",
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "manual_governed",
       "counter_metric": {
         "code": "IQC_RELEASE_ON_TIME-CTR",
         "endpoint": "POST /api/kpi/IQC_RELEASE_ON_TIME-CTR/input",
@@ -10074,7 +10595,7 @@
       "scoring_model_detail": "binary_pass_fail",
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
-      "lifecycle_status": "pilot",
+      "lifecycle_status": "manual_governed",
       "usage_types": [
         "gate_control",
         "lam_profile_gate",
@@ -10099,7 +10620,24 @@
       "gate_pass_condition": "100% lô vật tư LAM cần IQC được nghiệm thu, disposition và nhả kho trước thời điểm kit theo kế hoạch; quá hạn hoặc chưa disposition thì G3 không pass (CDR D10).",
       "owner_role": "QA",
       "owner_alignment_note": "QA owns D10 IQC acceptance; SCM provides receipt/need-date and material movement evidence.",
-      "data_source": "incoming_inspections + incoming_inspection_results + supplier_asn_lines + kit need-date",
+      "data_source": {
+        "system": "Manual-governed IQC release log",
+        "tables": [
+          "kpi_manual_inputs",
+          "incoming_inspections",
+          "incoming_inspection_results"
+        ],
+        "columns": [
+          "metric_code",
+          "value",
+          "input_status",
+          "evidence_reference",
+          "inspection_status",
+          "pass_fail",
+          "updated_at"
+        ],
+        "evidence": "IQC disposition and kit need-date are manually verified until receipt/kit/job profile join is normalized."
+      },
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "percent",
@@ -10111,7 +10649,7 @@
       "blocking_conditions": [
         "lam_iqc_not_released_before_kit"
       ],
-      "evidence_source": "incoming_inspections disposition, incoming_inspection_results acceptance, supplier ASN/receipt timestamp, kit need-date log",
+      "evidence_source": "IQC disposition and kit need-date are manually verified until receipt/kit/job profile join is normalized.",
       "hold_release_rule": "Hold G3 plan release when IQC disposition is open, rejected, or later than the kit need-date; QA closes disposition before SCM releases material.",
       "decision_action": "Hold material-to-plan release; QA closes IQC or SCM replans shortage.",
       "data_contract_gap": "Need governed linkage between receipt/ASN line, IQC inspection disposition, job kit demand, and active LAM profile.",
@@ -10122,13 +10660,27 @@
         "receipt_or_asn_line",
         "kit_need_date",
         "active_profile_code"
-      ]
+      ],
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/IQC_RELEASE_ON_TIME",
+      "manual_input_contract": {
+        "form": "FRM-701 IQC release and material disposition log",
+        "fields": [
+          "period_start",
+          "period_end",
+          "lam_iqc_lot_count",
+          "released_before_kit_need_count",
+          "evidence_reference"
+        ],
+        "verification": "QA enters disposition evidence; SCM verifies receipt/kit need-date linkage.",
+        "reward_gate": "Gate blocker only; open IQC blocks material release."
+      }
     },
     {
       "classification": "gate_metric_lam_profile",
       "target": "100%",
       "cadence": "per-event",
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "manual_governed",
       "counter_metric": {
         "code": "LAM_MATERIAL_KIT_READY_TO_PLAN-CTR",
         "endpoint": "POST /api/kpi/LAM_MATERIAL_KIT_READY_TO_PLAN-CTR/input",
@@ -10150,7 +10702,7 @@
       "scoring_model_detail": "binary_pass_fail",
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
-      "lifecycle_status": "pilot",
+      "lifecycle_status": "manual_governed",
       "usage_types": [
         "gate_control",
         "lam_profile_gate",
@@ -10177,7 +10729,23 @@
       "gate_pass_condition": "100% kit LAM có đủ vật tư, cert, IQC disposition và trace lot trước khi chốt dispatch/plan trong ngày; thiếu bất kỳ thành phần nào thì G3 không pass.",
       "owner_role": "PPL",
       "owner_alignment_note": "PPL owns plan release; SCM owns material readiness evidence and QA owns D10 acceptance when quality evidence is involved.",
-      "data_source": "MATERIAL_AVAILABILITY_PLAN runtime read model + material reservation + cert/IQC/trace evidence",
+      "data_source": {
+        "system": "Manual-governed LAM kit readiness log",
+        "tables": [
+          "kpi_manual_inputs",
+          "aps_material_availability",
+          "job_orders"
+        ],
+        "columns": [
+          "metric_code",
+          "value",
+          "input_status",
+          "evidence_reference",
+          "job_order_id",
+          "customer_id"
+        ],
+        "evidence": "LAM kit readiness is manual-governed until material availability joins cert/IQC/trace and active customer profile."
+      },
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "percent",
@@ -10189,7 +10757,7 @@
       "blocking_conditions": [
         "lam_kit_not_ready_at_plan_release"
       ],
-      "evidence_source": "material reservation snapshot, IQC disposition, material cert verification, trace lot label, active LAM profile on job_order",
+      "evidence_source": "LAM kit readiness is manual-governed until material availability joins cert/IQC/trace and active customer profile.",
       "hold_release_rule": "Hold G3 dispatch when LAM kit readiness is below 100%; PPL either replans or SCM/QA close the missing material evidence before release.",
       "decision_action": "Hold dispatch; PPL replans or SCM/QA close kit evidence gap.",
       "data_contract_gap": "Runtime MATERIAL_AVAILABILITY_PLAN does not yet include LAM-specific cert/IQC/trace completeness in the denominator.",
@@ -10202,13 +10770,27 @@
         "iqc_disposition",
         "trace_lot_label",
         "dispatch_release_record"
-      ]
+      ],
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/LAM_MATERIAL_KIT_READY_TO_PLAN",
+      "manual_input_contract": {
+        "form": "FRM-502 daily dispatch list with LAM material readiness attachment",
+        "fields": [
+          "period_start",
+          "period_end",
+          "lam_dispatch_order_count",
+          "kit_ready_before_plan_count",
+          "evidence_reference"
+        ],
+        "verification": "PPL enters readiness, SCM/QA verify cert/IQC/trace attachments before plan-release value is accepted.",
+        "reward_gate": "Gate blocker only; no reward while manually governed."
+      }
     },
     {
       "classification": "gate_metric_lam_profile",
       "target": "100%",
       "cadence": "per-event",
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "manual_governed",
       "counter_metric": {
         "code": "TRACEABILITY_LABEL_VERIFIED-CTR",
         "endpoint": "POST /api/kpi/TRACEABILITY_LABEL_VERIFIED-CTR/input",
@@ -10230,7 +10812,7 @@
       "scoring_model_detail": "binary_pass_fail",
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
-      "lifecycle_status": "pilot",
+      "lifecycle_status": "manual_governed",
       "usage_types": [
         "gate_control",
         "lam_profile_gate",
@@ -10256,7 +10838,24 @@
       "gate_pass_condition": "100% lô LAM có nhãn traceability đúng part/revision/lot/heat trước khi chuyển sang sản xuất hoặc đóng gói; label mismatch giữ lô tại gate.",
       "owner_role": "QA",
       "owner_alignment_note": "QA owns traceability acceptance; WKM verifies physical label at the work-transfer point.",
-      "data_source": "trace_label_print_jobs + trace_lot_attributes + job traveler scan evidence",
+      "data_source": {
+        "system": "Manual-governed trace-label verification log",
+        "tables": [
+          "kpi_manual_inputs",
+          "trace_label_print_jobs",
+          "trace_lot_attributes"
+        ],
+        "columns": [
+          "metric_code",
+          "value",
+          "input_status",
+          "evidence_reference",
+          "lot_number",
+          "attribute_name",
+          "printed_at"
+        ],
+        "evidence": "Physical label verification remains manual-governed until scan/pass-fail event is normalized."
+      },
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "percent",
@@ -10268,7 +10867,7 @@
       "blocking_conditions": [
         "traceability_label_missing_or_mismatched"
       ],
-      "evidence_source": "trace_label_print_jobs record, traveler barcode scan, part/revision/lot/heat verification checklist",
+      "evidence_source": "Physical label verification remains manual-governed until scan/pass-fail event is normalized.",
       "hold_release_rule": "Hold G3 work transfer when label is missing, stale revision, wrong lot/heat, or not scanned by the verifier; QA/WKM must re-label and re-verify.",
       "decision_action": "Hold work transfer; QA/WKM re-label and verify trace link.",
       "data_contract_gap": "Trace label print jobs exist but no governed pass/fail verification event is wired to LAM gate release.",
@@ -10279,7 +10878,21 @@
         "traveler_scan",
         "part_revision_lot_heat_match",
         "verifier_signature"
-      ]
+      ],
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/TRACEABILITY_LABEL_VERIFIED",
+      "manual_input_contract": {
+        "form": "FRM-733 traveler scan and trace-label verification log",
+        "fields": [
+          "period_start",
+          "period_end",
+          "lam_transfer_lot_count",
+          "verified_label_count",
+          "evidence_reference"
+        ],
+        "verification": "WKM/QC enters scan evidence; QA verifies label/lot/heat/revision match before transfer release.",
+        "reward_gate": "Gate blocker only; label mismatch blocks transfer."
+      }
     },
     {
       "classification": "gate_metric_lam_profile",
@@ -10515,7 +11128,7 @@
       "classification": "gate_metric_lam_profile",
       "target": "≤ 4h",
       "cadence": "per-event",
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "manual_governed",
       "counter_metric": {
         "code": "CMM_QUEUE_AGING-CTR",
         "endpoint": "POST /api/kpi/CMM_QUEUE_AGING-CTR/input",
@@ -10537,7 +11150,7 @@
       "scoring_model_detail": "sla_aging_bucket",
       "evaluation_use": "gate_hold_release",
       "reward_mode": "blocker_only",
-      "lifecycle_status": "pilot",
+      "lifecycle_status": "manual_governed",
       "usage_types": [
         "gate_control",
         "lam_profile_gate",
@@ -10564,7 +11177,23 @@
       "gate_pass_condition": "Không có lô LAM/CTQ chờ CMM quá 4 giờ làm việc trước FAI/IPQC/final release; quá hạn phải escalation để bảo vệ OTD và chất lượng.",
       "owner_role": "QA",
       "owner_alignment_note": "QA owns release risk; QC/CMM owns queue timestamp evidence and measurement execution.",
-      "data_source": "CMM queue log, inspection assignment, FAI/IPQC/final release hold record",
+      "data_source": {
+        "system": "Manual-governed CMM queue log",
+        "tables": [
+          "kpi_manual_inputs",
+          "ipqc_inspections"
+        ],
+        "columns": [
+          "metric_code",
+          "value",
+          "input_status",
+          "evidence_reference",
+          "queued_at",
+          "started_at",
+          "completed_at"
+        ],
+        "evidence": "IPQC queue timestamps exist, but CMM-specific queue and release linkage remain manual-governed."
+      },
       "thresholds": {
         "direction": "lower_is_better",
         "unit": "hour",
@@ -10576,7 +11205,7 @@
       "blocking_conditions": [
         "lam_cmm_queue_overdue_without_escalation"
       ],
-      "evidence_source": "CMM queue entry timestamp, inspection assignment, priority/escalation log, release hold record",
+      "evidence_source": "IPQC queue timestamps exist, but CMM-specific queue and release linkage remain manual-governed.",
       "hold_release_rule": "Escalate and hold affected release when LAM CMM queue exceeds 4 working hours without approved recovery; QA/QC/PPL prioritize constraint recovery.",
       "decision_action": "Escalate CMM queue; QA/QC/PPL recover before release bypass.",
       "data_contract_gap": "No normalized CMM queue table yet; current evidence is inspection assignment and manual queue log.",
@@ -10587,7 +11216,22 @@
         "inspection_assignment",
         "release_hold_link",
         "recovery_action"
-      ]
+      ],
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/CMM_QUEUE_AGING",
+      "manual_input_contract": {
+        "form": "CMM queue and inspection assignment log",
+        "fields": [
+          "period_start",
+          "period_end",
+          "lam_cmm_queue_count",
+          "queue_over_4h_count",
+          "oldest_queue_age_hours",
+          "evidence_reference"
+        ],
+        "verification": "QC/CMM enters queue log; QA/PPL verifies release hold and recovery action.",
+        "reward_gate": "Gate blocker only; pending manual input never contributes to reward."
+      }
     },
     {
       "classification": "gate_metric_lam_profile",
@@ -11938,8 +12582,51 @@
         "lead_or_lag": "lag",
         "initiative_link": "release_package_rft",
         "review_forum": "G6 final release review; monthly quality review",
-        "scoring_policy": "visible_only_until_data_contract_approved",
-        "reward_policy": "does_not_add_points; red trend triggers QA containment and scorecard review"
+        "scoring_policy": "visible_only_manual_governed_driver",
+        "reward_policy": "does_not_add_points; red trend triggers QA containment and scorecard review; manual-governed value requires verified input and does not add score points",
+        "calculation_status": "manual_governed",
+        "backend_status": "manual_governed",
+        "primary_endpoint": "GET /api/kpi/FINAL_RELEASE_RFT",
+        "lifecycle_status": "manual_governed",
+        "manual_input_contract": {
+          "form": "FRM-642 final release review log",
+          "fields": [
+            "period_start",
+            "period_end",
+            "released_lot_count",
+            "right_first_time_lot_count",
+            "reopened_release_count",
+            "evidence_reference"
+          ],
+          "verification": "QA enters monthly release counts; independent QA lead verifies release log and reopened-release evidence before dashboard value can count.",
+          "reward_gate": "Only verified kpi_manual_inputs rows may render as governed value; reward remains disabled."
+        },
+        "data_source": {
+          "system": "Manual-governed final release log",
+          "tables": [
+            "kpi_manual_inputs",
+            "mes_trusted_release_record"
+          ],
+          "columns": [
+            "metric_code",
+            "value",
+            "input_status",
+            "evidence_reference",
+            "release_decision_code",
+            "packet_state",
+            "blocker_count"
+          ],
+          "evidence": "Runtime release packets exist, but reopened-release RFT semantics require governed QA verification until reopen lineage is normalized."
+        },
+        "evidence_source": "Runtime release packets exist, but reopened-release RFT semantics require governed QA verification until reopen lineage is normalized.",
+        "target_graduation_condition": "Graduate to runtime only after the evidence join is normalized, migration-backed, and KpiEngine calculator is tested against empty and low-sample periods.",
+        "reward_eligible": false,
+        "scorecard_contributes_to_reward": false,
+        "reward_mode": "not_rewardable",
+        "control_intent": "quality_at_source",
+        "measurement_data_type": "percent_ratio",
+        "scoring_model_detail": "rag_3_band",
+        "evaluation_use": "management_review"
       },
       {
         "canonical_code": "INSPECTION_QUEUE_AGING",
@@ -11986,8 +12673,50 @@
         "lead_or_lag": "lead",
         "initiative_link": "lam_cdr_ship_packet_control",
         "review_forum": "G6/G7 ship release gate",
-        "scoring_policy": "visible_only_gate_driver",
-        "reward_policy": "does_not_add_points; hard blocker for LAM scope when required CDR is missing"
+        "scoring_policy": "visible_only_manual_governed_driver",
+        "reward_policy": "does_not_add_points; hard blocker for LAM scope when required CDR is missing; manual-governed value requires verified input and does not add score points",
+        "calculation_status": "manual_governed",
+        "backend_status": "manual_governed",
+        "primary_endpoint": "GET /api/kpi/CHECK_DIM_REPORT_ON_SHIP",
+        "lifecycle_status": "manual_governed",
+        "manual_input_contract": {
+          "form": "FRM-642 ship packet checklist + check-dimension report attachment",
+          "fields": [
+            "period_start",
+            "period_end",
+            "cdr_required_shipments",
+            "cdr_attached_shipments",
+            "evidence_reference"
+          ],
+          "verification": "QA/CPS maker-checker verification required; pending input blocks ship evidence recognition.",
+          "reward_gate": "Gate blocker only; verified manual evidence never creates direct reward."
+        },
+        "data_source": {
+          "system": "Manual-governed shipment evidence pack",
+          "tables": [
+            "kpi_manual_inputs",
+            "shipments",
+            "eqms_evidence_record"
+          ],
+          "columns": [
+            "metric_code",
+            "value",
+            "input_status",
+            "evidence_reference",
+            "shipment_id",
+            "packet_payload"
+          ],
+          "evidence": "check_dimension_report PDF and shipment evidence pack manually verified through kpi_manual_inputs until shipment CDR requirement and report artifact are normalized."
+        },
+        "evidence_source": "check_dimension_report PDF + shipment evidence pack + CTQ characteristic/check_dim_number link; manual-governed verification keeps shipment, part_no, revision, check_dim_number and inspector signature visible until the runtime CDR join is normalized.",
+        "target_graduation_condition": "Graduate to runtime only after the evidence join is normalized, migration-backed, and KpiEngine calculator is tested against empty and low-sample periods.",
+        "reward_eligible": false,
+        "scorecard_contributes_to_reward": false,
+        "reward_mode": "not_rewardable",
+        "control_intent": "quality_at_source",
+        "measurement_data_type": "percent_ratio",
+        "scoring_model_detail": "rag_3_band",
+        "evaluation_use": "management_review"
       },
       {
         "canonical_code": "NCR_3D_RESPONSE_SLA",
@@ -11998,8 +12727,35 @@
         "lead_or_lag": "lead",
         "initiative_link": "customer_ncr_3d4d8d_sla",
         "review_forum": "customer complaint event review; monthly BSC risk panel",
-        "scoring_policy": "visible_only_staged_data_contract",
-        "reward_policy": "does_not_add_points; overdue response blocks customer-quality recognition"
+        "scoring_policy": "visible_only_runtime_driver",
+        "reward_policy": "does_not_add_points; overdue response blocks customer-quality recognition; runtime value is pilot evidence only and does not add score points",
+        "calculation_status": "runtime_calculated",
+        "backend_status": "runtime_calculated",
+        "primary_endpoint": "GET /api/kpi/NCR_3D_RESPONSE_SLA",
+        "lifecycle_status": "active_runtime",
+        "data_source": {
+          "system": "EQMS",
+          "tables": [
+            "eqms_complaints"
+          ],
+          "columns": [
+            "received_at",
+            "received_date",
+            "containment_started_at",
+            "d3_sent_at",
+            "created_at",
+            "status",
+            "severity",
+            "customer_name"
+          ],
+          "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05",
+          "evidence": "KpiEngine::calcNcr3dResponseSla uses migration 198 eqms_complaints.received_at/d3_sent_at. Missing d3_sent_at ages as open SLA, not green."
+        },
+        "evidence_source": "KpiEngine::calcNcr3dResponseSla uses migration 198 eqms_complaints.received_at/d3_sent_at. Missing d3_sent_at ages as open SLA, not green.",
+        "target_graduation_condition": "Runtime in Prompt 07 from eqms_complaints.received_at/d3_sent_at; 90-day pilot calibration still required before reward or customer-grade claim.",
+        "reward_eligible": false,
+        "scorecard_contributes_to_reward": false,
+        "reward_mode": "not_rewardable"
       },
       {
         "canonical_code": "NCR_8D_UPDATE_SLA",
@@ -12010,8 +12766,35 @@
         "lead_or_lag": "lead",
         "initiative_link": "customer_ncr_3d4d8d_sla",
         "review_forum": "customer complaint event review; monthly BSC risk panel",
-        "scoring_policy": "visible_only_staged_data_contract",
-        "reward_policy": "does_not_add_points; stale 8D blocks customer-quality recognition"
+        "scoring_policy": "visible_only_runtime_driver",
+        "reward_policy": "does_not_add_points; stale 8D blocks customer-quality recognition; runtime value is pilot evidence only and does not add score points",
+        "calculation_status": "runtime_calculated",
+        "backend_status": "runtime_calculated",
+        "primary_endpoint": "GET /api/kpi/NCR_8D_UPDATE_SLA",
+        "lifecycle_status": "active_runtime",
+        "data_source": {
+          "system": "EQMS",
+          "tables": [
+            "eqms_complaints"
+          ],
+          "columns": [
+            "received_at",
+            "received_date",
+            "d8_updated_at",
+            "corrective_action_effective_at",
+            "created_at",
+            "status",
+            "severity",
+            "customer_name"
+          ],
+          "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05",
+          "evidence": "KpiEngine::calcNcr8dUpdateSla uses migration 198 eqms_complaints.received_at/d8_updated_at. Missing d8_updated_at ages as open SLA, not green."
+        },
+        "evidence_source": "KpiEngine::calcNcr8dUpdateSla uses migration 198 eqms_complaints.received_at/d8_updated_at. Missing d8_updated_at ages as open SLA, not green.",
+        "target_graduation_condition": "Runtime in Prompt 07 from eqms_complaints.received_at/d8_updated_at; 90-day pilot calibration still required before reward or customer-grade claim.",
+        "reward_eligible": false,
+        "scorecard_contributes_to_reward": false,
+        "reward_mode": "not_rewardable"
       },
       {
         "canonical_code": "IQC_PASS_RATE",
@@ -19509,7 +20292,13 @@
         "evidence": "controlled root-cause taxonomy / CAPA family"
       }
     ],
-    "staged_until": "All required timestamps, customer acceptance evidence and denominator joins are populated with actor/audit evidence for 90 days."
+    "staged_until": "Customer NCR severity/bonus simulation remains pilot-only; the four SLA/closure metrics above are runtime-calculated from eqms_complaints timestamp fields and still require 90-day calibration before reward or customer-grade claims.",
+    "runtime_graduated_metrics": [
+      "NCR_3D_RESPONSE_SLA",
+      "NCR_4D_PRELIMINARY_SLA",
+      "NCR_8D_UPDATE_SLA",
+      "CUSTOMER_ACCEPTED_8D_CLOSURE_RATE"
+    ]
   },
   "bonus_simulation_model": {
     "model_id": "BSC-BONUS-SIMULATION-CUSTOMER-NCR-2026-05",
@@ -19601,7 +20390,11 @@
     "contract_id": "QUALITY-ESCAPE-SEVERITY-DASHBOARD-2026-05",
     "source_endpoints": [
       "GET /api/eqms/complaints/metrics",
-      "GET /api/kpi/catalog"
+      "GET /api/kpi/catalog",
+      "GET /api/kpi/NCR_3D_RESPONSE_SLA",
+      "GET /api/kpi/NCR_4D_PRELIMINARY_SLA",
+      "GET /api/kpi/NCR_8D_UPDATE_SLA",
+      "GET /api/kpi/CUSTOMER_ACCEPTED_8D_CLOSURE_RATE"
     ],
     "row_fields": [
       "complaint_id",
@@ -19989,5 +20782,37 @@
       "GAGE_VALID_FOR_CTQ_MEASUREMENT",
       "SPC_SIGNAL_REACTION_TIME"
     ]
+  },
+  "data_contract_runtime_graduation": {
+    "step_id": "07_DATA_CONTRACT_RUNTIME_AND_MANUAL_GOVERNED_GRADUATION",
+    "effective_date": "2026-05-24",
+    "runtime_graduated": [
+      "SHIP_PACKET_COMPLETENESS",
+      "NCR_3D_RESPONSE_SLA",
+      "NCR_4D_PRELIMINARY_SLA",
+      "NCR_8D_UPDATE_SLA",
+      "CUSTOMER_ACCEPTED_8D_CLOSURE_RATE"
+    ],
+    "manual_governed": [
+      "FINAL_RELEASE_RFT",
+      "CHECK_DIM_REPORT_ON_SHIP",
+      "GAGE_VALID_FOR_RELEASE",
+      "PROCESS_CHANGE_APPROVAL_RATE",
+      "SPECIAL_RELEASE_COMPLIANCE",
+      "MATERIAL_CERT_VERIFICATION_COMPLETENESS",
+      "IQC_RELEASE_ON_TIME",
+      "LAM_MATERIAL_KIT_READY_TO_PLAN",
+      "TRACEABILITY_LABEL_VERIFIED",
+      "CMM_QUEUE_AGING"
+    ],
+    "runtime_forbidden_until_contract": [
+      "CPK_PRODUCT_MIN_CTQ",
+      "CPK_COVERAGE_RATE",
+      "CTQ_MEASUREMENT_COMPLETENESS",
+      "CTQ_SAMPLE_POLICY_STATUS",
+      "POST_CHANGE_CPK_REVALIDATION",
+      "GAGE_VALID_FOR_CTQ_MEASUREMENT"
+    ],
+    "rule": "Runtime requires verified source tables, KpiEngine calculator, empty-period handling, sample_size/numerator/denominator, data quality flags and catalog support. Manual-governed values require kpi_manual_inputs verification and never directly drive reward."
   }
 }

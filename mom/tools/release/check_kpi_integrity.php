@@ -56,6 +56,9 @@ declare(strict_types=1);
  *  16. P0.7.7 (P07 fair-reward) performance_governance_policy.discipline_scope
  *      .whitelist token does not match any blocking_condition_registry
  *      condition_id — discipline must cite a registered condition.
+ *  17. Prompt 07 runtime/manual graduation drift: runtime-graduated LAM
+ *      metrics must have calculator + source-table/column contract, while
+ *      manual-governed rows need maker/checker manual_input_contract.
  *
  * P1 findings (warn, do not block)
  * ────────────────────────────────
@@ -1955,6 +1958,131 @@ $capabilityRender = strtolower((string) ($dashboardRenderRules['spc_capability_m
 foreach (['n<25', 'hide', 'provisional', 'n>=100', 'gage'] as $token) {
     if (!str_contains($capabilityRender, strtolower($token))) {
         $p0[] = "Prompt 06 dashboard_render_contract.render_rules.spc_capability_metric must mention '$token'.";
+    }
+}
+
+// ── P0.17 — Prompt 07 runtime/manual-governed graduation contracts ─────────
+// Prompt 07 graduates only the LAM practical metrics with proven source
+// tables/columns. A row marked runtime without calculator/source proof is fake
+// runtime; a manual-governed row without a manual_input_contract can leak
+// unverified numbers into dashboards.
+$dashboardByCodeP07 = [];
+foreach ($dashboard as $row) {
+    if (!is_array($row)) {
+        continue;
+    }
+    $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+    if ($code !== '') {
+        $dashboardByCodeP07[$code] = $row;
+    }
+}
+$p07RuntimeContracts = [
+    'SHIP_PACKET_COMPLETENESS' => [
+        'tables' => ['shipment_releases'],
+        'columns' => ['packlist_status', 'coc_status', 'coa_status', 'customs_status'],
+    ],
+    'NCR_3D_RESPONSE_SLA' => [
+        'tables' => ['eqms_complaints'],
+        'columns' => ['received_at', 'd3_sent_at'],
+    ],
+    'NCR_4D_PRELIMINARY_SLA' => [
+        'tables' => ['eqms_complaints'],
+        'columns' => ['received_at', 'd4_sent_at'],
+    ],
+    'NCR_8D_UPDATE_SLA' => [
+        'tables' => ['eqms_complaints'],
+        'columns' => ['received_at', 'd8_updated_at'],
+    ],
+    'CUSTOMER_ACCEPTED_8D_CLOSURE_RATE' => [
+        'tables' => ['eqms_complaints'],
+        'columns' => ['customer_acceptance_at', 'closed_at'],
+    ],
+];
+foreach ($p07RuntimeContracts as $code => $contract) {
+    $row = $metricIndex[$code] ?? null;
+    if (!is_array($row)) {
+        $p0[] = "Prompt 07 $code: graduated runtime metric missing from registry metric index.";
+        continue;
+    }
+    if (!in_array($code, array_map('strtoupper', $runtimeList), true)) {
+        $p0[] = "Prompt 07 $code: must be listed in runtime_calculated_metrics.";
+    }
+    if (!isset($engineCalculatorCodes[$code])) {
+        $p0[] = "Prompt 07 $code: KpiEngine::getCalculator() must wire a calculator.";
+    }
+    if ((string) ($row['calculation_status'] ?? '') !== 'runtime_calculated') {
+        $p0[] = "Prompt 07 $code: calculation_status must be runtime_calculated.";
+    }
+    if (trim((string) ($row['data_contract_gap'] ?? '')) !== '') {
+        $p0[] = "Prompt 07 $code: runtime metric must not retain data_contract_gap.";
+    }
+    $sourceText = strtolower((string) json_encode($row['data_source'] ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    foreach ((array) ($contract['tables'] ?? []) as $token) {
+        if (!str_contains($sourceText, strtolower((string) $token))) {
+            $p0[] = "Prompt 07 $code: runtime data_source must mention table '$token'.";
+        }
+    }
+    foreach ((array) ($contract['columns'] ?? []) as $token) {
+        if (!str_contains($sourceText, strtolower((string) $token))) {
+            $p0[] = "Prompt 07 $code: runtime data_source must mention column '$token'.";
+        }
+    }
+    if (isset($dashboardByCodeP07[$code])) {
+        $dash = $dashboardByCodeP07[$code];
+        if ((string) ($dash['backend_status'] ?? '') !== 'runtime_calculated') {
+            $p0[] = "Prompt 07 dashboard $code: backend_status must be runtime_calculated.";
+        }
+        if ((string) ($dash['primary_endpoint'] ?? '') !== "GET /api/kpi/$code") {
+            $p0[] = "Prompt 07 dashboard $code: primary_endpoint must be GET /api/kpi/$code.";
+        }
+    }
+}
+
+$p07ManualGoverned = [
+    'FINAL_RELEASE_RFT',
+    'CHECK_DIM_REPORT_ON_SHIP',
+    'GAGE_VALID_FOR_RELEASE',
+    'PROCESS_CHANGE_APPROVAL_RATE',
+    'SPECIAL_RELEASE_COMPLIANCE',
+    'MATERIAL_CERT_VERIFICATION_COMPLETENESS',
+    'IQC_RELEASE_ON_TIME',
+    'LAM_MATERIAL_KIT_READY_TO_PLAN',
+    'TRACEABILITY_LABEL_VERIFIED',
+    'CMM_QUEUE_AGING',
+];
+foreach ($p07ManualGoverned as $code) {
+    $row = $metricIndex[$code] ?? null;
+    if (!is_array($row)) {
+        $p0[] = "Prompt 07 $code: manual-governed metric missing from registry metric index.";
+        continue;
+    }
+    if ((string) ($row['calculation_status'] ?? '') !== 'manual_governed') {
+        $p0[] = "Prompt 07 $code: calculation_status must be manual_governed until runtime evidence join exists.";
+    }
+    if (in_array($code, array_map('strtoupper', $runtimeList), true) || isset($engineCalculatorCodes[$code])) {
+        $p0[] = "Prompt 07 $code: manual-governed metric must not be listed as runtime or wired to KpiEngine.";
+    }
+    $manual = $row['manual_input_contract'] ?? null;
+    if (!is_array($manual) || trim((string) ($manual['verification'] ?? '')) === '') {
+        $p0[] = "Prompt 07 $code: manual_governed metric requires manual_input_contract.verification.";
+    }
+    if (($row['reward_eligible'] ?? false) === true || ($row['scorecard_contributes_to_reward'] ?? false) === true) {
+        $p0[] = "Prompt 07 $code: manual_governed metric must not be rewardable or scorecard-reward contributing.";
+    }
+}
+
+foreach (['FAI_QUEUE_AGING', 'FINAL_INSPECTION_QUEUE_AGING'] as $code) {
+    $row = $metricIndex[$code] ?? null;
+    if (!is_array($row)) {
+        $p0[] = "Prompt 07 $code: staged backlog row missing.";
+        continue;
+    }
+    if ((string) ($row['calculation_status'] ?? '') !== 'staged_data_contract') {
+        $p0[] = "Prompt 07 $code: must remain staged_data_contract until queue event table exists.";
+    }
+    if (trim((string) ($row['data_contract_gap'] ?? '')) === ''
+        || trim((string) ($row['target_graduation_condition'] ?? '')) === '') {
+        $p0[] = "Prompt 07 $code: staged backlog metric requires data_contract_gap and target_graduation_condition.";
     }
 }
 

@@ -264,6 +264,48 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
         );
     }
 
+    public function testRejectsPrompt07RuntimeMetricStillCarryingStagedGap(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'NCR_3D_RESPONSE_SLA', static function (array &$row): void {
+                    $row['data_contract_gap'] = 'fake stale gap after runtime graduation';
+                });
+            },
+            'Prompt 07 NCR_3D_RESPONSE_SLA: runtime metric must not retain data_contract_gap.',
+        );
+    }
+
+    public function testRejectsPrompt07ManualGovernedMetricWithoutVerificationContract(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'CHECK_DIM_REPORT_ON_SHIP', static function (array &$row): void {
+                    unset($row['manual_input_contract']['verification']);
+                });
+            },
+            'Prompt 07 CHECK_DIM_REPORT_ON_SHIP: manual_governed metric requires manual_input_contract.verification.',
+        );
+    }
+
+    public function testRejectsPrompt07DashboardRuntimeMetricStillStaged(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                foreach ($registry['dashboard_core_kpis'] as &$row) {
+                    if (is_array($row) && ($row['canonical_code'] ?? '') === 'NCR_8D_UPDATE_SLA') {
+                        $row['backend_status'] = 'staged_data_contract';
+                        unset($row);
+                        return;
+                    }
+                }
+                unset($row);
+                self::fail('Dashboard row NCR_8D_UPDATE_SLA not found.');
+            },
+            'Prompt 07 dashboard NCR_8D_UPDATE_SLA: backend_status must be runtime_calculated.',
+        );
+    }
+
     /**
      * @param callable(array<string, mixed>): void $mutate
      */

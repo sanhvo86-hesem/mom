@@ -235,6 +235,13 @@ final class KpiEngine
     public const METRIC_FAI_FIRST_PASS         = 'FAI_FIRST_PASS';
     public const METRIC_IN_PROCESS_REJECT_RATE = 'IN_PROCESS_REJECT_RATE';
 
+    /** LAM practical metrics graduated to runtime calculation in Prompt 07. */
+    public const METRIC_SHIP_PACKET_COMPLETENESS = 'SHIP_PACKET_COMPLETENESS';
+    public const METRIC_NCR_3D_RESPONSE_SLA = 'NCR_3D_RESPONSE_SLA';
+    public const METRIC_NCR_4D_PRELIMINARY_SLA = 'NCR_4D_PRELIMINARY_SLA';
+    public const METRIC_NCR_8D_UPDATE_SLA = 'NCR_8D_UPDATE_SLA';
+    public const METRIC_CUSTOMER_ACCEPTED_8D_CLOSURE_RATE = 'CUSTOMER_ACCEPTED_8D_CLOSURE_RATE';
+
     /** Age thresholds (days) past which an open item counts as aged. */
     private const AGE_DAYS_WIP             = 21;
     private const AGE_DAYS_NCR             = 30;
@@ -273,6 +280,11 @@ final class KpiEngine
         self::METRIC_INCIDENT_ACTION_CLOSURE_AGING,
         self::METRIC_FAI_FIRST_PASS,
         self::METRIC_IN_PROCESS_REJECT_RATE,
+        self::METRIC_SHIP_PACKET_COMPLETENESS,
+        self::METRIC_NCR_3D_RESPONSE_SLA,
+        self::METRIC_NCR_4D_PRELIMINARY_SLA,
+        self::METRIC_NCR_8D_UPDATE_SLA,
+        self::METRIC_CUSTOMER_ACCEPTED_8D_CLOSURE_RATE,
     ];
 
     /** Default target values per metric. */
@@ -307,6 +319,11 @@ final class KpiEngine
         self::METRIC_INCIDENT_ACTION_CLOSURE_AGING => 10.0,
         self::METRIC_FAI_FIRST_PASS         => 95.0,    // ≥ 95% (registry green_point)
         self::METRIC_IN_PROCESS_REJECT_RATE => 1.0,     // ≤ 1% (registry target)
+        self::METRIC_SHIP_PACKET_COMPLETENESS => 100.0,
+        self::METRIC_NCR_3D_RESPONSE_SLA => 8.0,
+        self::METRIC_NCR_4D_PRELIMINARY_SLA => 16.0,
+        self::METRIC_NCR_8D_UPDATE_SLA => 80.0,
+        self::METRIC_CUSTOMER_ACCEPTED_8D_CLOSURE_RATE => 95.0,
     ];
 
     /** Units per metric. */
@@ -341,6 +358,11 @@ final class KpiEngine
         self::METRIC_INCIDENT_ACTION_CLOSURE_AGING => '%',
         self::METRIC_FAI_FIRST_PASS         => '%',
         self::METRIC_IN_PROCESS_REJECT_RATE => '%',
+        self::METRIC_SHIP_PACKET_COMPLETENESS => '%',
+        self::METRIC_NCR_3D_RESPONSE_SLA => 'hours',
+        self::METRIC_NCR_4D_PRELIMINARY_SLA => 'hours',
+        self::METRIC_NCR_8D_UPDATE_SLA => 'hours',
+        self::METRIC_CUSTOMER_ACCEPTED_8D_CLOSURE_RATE => '%',
     ];
 
     /** Metrics where lower is better (invert RAG logic). */
@@ -358,6 +380,9 @@ final class KpiEngine
         self::METRIC_DSO,
         self::METRIC_INCIDENT_ACTION_CLOSURE_AGING,
         self::METRIC_IN_PROCESS_REJECT_RATE,
+        self::METRIC_NCR_3D_RESPONSE_SLA,
+        self::METRIC_NCR_4D_PRELIMINARY_SLA,
+        self::METRIC_NCR_8D_UPDATE_SLA,
     ];
 
     private Connection $db;
@@ -2505,6 +2530,355 @@ final class KpiEngine
         ];
     }
 
+    /**
+     * Ship packet completeness = release packages with all required shipment
+     * document statuses complete / all shipment release packages in period.
+     */
+    private function calcShipPacketCompleteness(DateRange $period, array $filters): array
+    {
+        $params = [':s' => $period->start, ':e' => $period->end];
+        $completeStatuses = "('complete','completed','approved','released','ready','done','verified')";
+        $customsCompleteStatuses = "('not_required','not required','complete','completed','approved','released','ready','done','verified')";
+
+        $row = $this->db->queryOne(
+            "WITH scoped AS (
+                SELECT shipment_status, packlist_status, coc_status, coa_status, customs_status
+                FROM shipment_releases
+                WHERE COALESCE(actual_ship_date, planned_ship_date, updated_at::date, created_at::date)
+                    BETWEEN (:s)::date AND (:e)::date
+             )
+             SELECT
+                COUNT(*) AS total,
+                COUNT(*) FILTER (
+                    WHERE lower(COALESCE(packlist_status, '')) IN {$completeStatuses}
+                      AND lower(COALESCE(coc_status, '')) IN {$completeStatuses}
+                      AND lower(COALESCE(coa_status, '')) IN {$completeStatuses}
+                      AND lower(COALESCE(customs_status, 'not_required')) IN {$customsCompleteStatuses}
+                ) AS complete,
+                COUNT(*) FILTER (
+                    WHERE COALESCE(packlist_status, '') = ''
+                       OR COALESCE(coc_status, '') = ''
+                       OR COALESCE(coa_status, '') = ''
+                       OR COALESCE(customs_status, '') = ''
+                ) AS missing_status
+             FROM scoped",
+            $params,
+        );
+
+        $total = (int) ($row['total'] ?? 0);
+        $complete = (int) ($row['complete'] ?? 0);
+        $missingStatus = (int) ($row['missing_status'] ?? 0);
+
+        if ($total === 0) {
+            return [
+                'value' => 0.0,
+                'sample_size' => 0,
+                'numerator' => 0,
+                'denominator' => 0,
+                'empty_result' => true,
+                'data_source' => 'shipment_releases',
+                'breakdown' => [],
+                'data_quality_flags' => ['no_shipment_release_rows_in_period'],
+            ];
+        }
+
+        $breakdown = ['by_shipment_status' => [], 'document_gap' => []];
+        try {
+            $rows = $this->db->query(
+                "SELECT COALESCE(shipment_status, '(unknown)') AS key,
+                        COUNT(*) AS count,
+                        COUNT(*) FILTER (
+                            WHERE lower(COALESCE(packlist_status, '')) IN {$completeStatuses}
+                              AND lower(COALESCE(coc_status, '')) IN {$completeStatuses}
+                              AND lower(COALESCE(coa_status, '')) IN {$completeStatuses}
+                              AND lower(COALESCE(customs_status, 'not_required')) IN {$customsCompleteStatuses}
+                        ) AS complete
+                 FROM shipment_releases
+                 WHERE COALESCE(actual_ship_date, planned_ship_date, updated_at::date, created_at::date)
+                    BETWEEN (:s)::date AND (:e)::date
+                 GROUP BY shipment_status
+                 ORDER BY count DESC",
+                $params,
+            );
+            foreach ($rows as $r) {
+                $count = (int) ($r['count'] ?? 0);
+                $completeForStatus = (int) ($r['complete'] ?? 0);
+                $breakdown['by_shipment_status'][] = [
+                    'key' => (string) ($r['key'] ?? '(unknown)'),
+                    'count' => $count,
+                    'complete' => $completeForStatus,
+                    'value' => $count > 0 ? round(($completeForStatus / $count) * 100, 2) : 0.0,
+                ];
+            }
+
+            $gapRow = $this->db->queryOne(
+                "SELECT
+                    COUNT(*) FILTER (WHERE lower(COALESCE(packlist_status, '')) NOT IN {$completeStatuses}) AS packlist_gap,
+                    COUNT(*) FILTER (WHERE lower(COALESCE(coc_status, '')) NOT IN {$completeStatuses}) AS coc_gap,
+                    COUNT(*) FILTER (WHERE lower(COALESCE(coa_status, '')) NOT IN {$completeStatuses}) AS coa_gap,
+                    COUNT(*) FILTER (WHERE lower(COALESCE(customs_status, 'not_required')) NOT IN {$customsCompleteStatuses}) AS customs_gap
+                 FROM shipment_releases
+                 WHERE COALESCE(actual_ship_date, planned_ship_date, updated_at::date, created_at::date)
+                    BETWEEN (:s)::date AND (:e)::date",
+                $params,
+            );
+            $breakdown['document_gap'] = [
+                'packlist_gap' => (int) ($gapRow['packlist_gap'] ?? 0),
+                'coc_gap' => (int) ($gapRow['coc_gap'] ?? 0),
+                'coa_gap' => (int) ($gapRow['coa_gap'] ?? 0),
+                'customs_gap' => (int) ($gapRow['customs_gap'] ?? 0),
+            ];
+        } catch (\Throwable) {
+            // best-effort breakdown only; primary value remains authoritative.
+        }
+
+        $flags = [];
+        if ($missingStatus > 0) {
+            $flags[] = "shipment_release_missing_document_status_count={$missingStatus}";
+        }
+
+        return [
+            'value' => round(($complete / $total) * 100, 2),
+            'sample_size' => $total,
+            'numerator' => $complete,
+            'denominator' => $total,
+            'empty_result' => false,
+            'data_source' => 'shipment_releases',
+            'breakdown' => $breakdown,
+            'data_quality_flags' => $flags,
+        ];
+    }
+
+    private function calcNcr3dResponseSla(DateRange $period, array $filters): array
+    {
+        return $this->calcCustomerNcrSlaHours($period, 'd3_sent_at', 8.0, 'NCR_3D_RESPONSE_SLA');
+    }
+
+    private function calcNcr4dPreliminarySla(DateRange $period, array $filters): array
+    {
+        return $this->calcCustomerNcrSlaHours($period, 'd4_sent_at', 16.0, 'NCR_4D_PRELIMINARY_SLA');
+    }
+
+    private function calcNcr8dUpdateSla(DateRange $period, array $filters): array
+    {
+        return $this->calcCustomerNcrSlaHours($period, 'd8_updated_at', 80.0, 'NCR_8D_UPDATE_SLA');
+    }
+
+    /**
+     * Return worst customer-NCR response age in hours. Missing response
+     * timestamps use open age from received_at, so incomplete evidence cannot
+     * render green simply because completed records were fast.
+     */
+    private function calcCustomerNcrSlaHours(
+        DateRange $period,
+        string $responseColumn,
+        float $targetHours,
+        string $metricCode
+    ): array {
+        $allowedColumns = ['d3_sent_at', 'd4_sent_at', 'd8_updated_at'];
+        if (!in_array($responseColumn, $allowedColumns, true)) {
+            throw new RuntimeException("Unsupported customer NCR SLA column: {$responseColumn}");
+        }
+
+        $params = [':s' => $period->start, ':e' => $period->end, ':h' => $targetHours];
+        $responseExpr = "c.{$responseColumn}";
+        $receivedExpr = "COALESCE(c.received_at, c.received_date::timestamptz, c.created_at)";
+        $ageExpr = "EXTRACT(EPOCH FROM (COALESCE({$responseExpr}, now()) - {$receivedExpr})) / 3600.0";
+
+        $row = $this->db->queryOne(
+            "WITH scoped AS (
+                SELECT c.complaint_id, c.complaint_number, c.customer_name, c.severity, c.status,
+                       {$receivedExpr} AS received_ts,
+                       {$responseExpr} AS response_ts,
+                       {$ageExpr} AS age_hours
+                FROM eqms_complaints c
+                WHERE {$receivedExpr} BETWEEN (:s || ' 00:00:00')::timestamptz
+                    AND (:e || ' 23:59:59')::timestamptz
+             )
+             SELECT
+                COUNT(*) AS total,
+                COUNT(*) FILTER (WHERE response_ts IS NOT NULL AND age_hours <= :h) AS on_time,
+                COUNT(*) FILTER (WHERE response_ts IS NOT NULL AND age_hours > :h) AS late,
+                COUNT(*) FILTER (WHERE response_ts IS NULL) AS missing_response,
+                COALESCE(MAX(age_hours), 0) AS max_hours,
+                COALESCE(AVG(age_hours), 0) AS avg_hours
+             FROM scoped",
+            $params,
+        );
+
+        $total = (int) ($row['total'] ?? 0);
+        $onTime = (int) ($row['on_time'] ?? 0);
+        $late = (int) ($row['late'] ?? 0);
+        $missing = (int) ($row['missing_response'] ?? 0);
+        $maxHours = (float) ($row['max_hours'] ?? 0.0);
+        $avgHours = (float) ($row['avg_hours'] ?? 0.0);
+
+        if ($total === 0) {
+            return [
+                'value' => 0.0,
+                'sample_size' => 0,
+                'numerator' => 0,
+                'denominator' => 0,
+                'empty_result' => true,
+                'data_source' => 'eqms_complaints',
+                'breakdown' => [],
+                'data_quality_flags' => ["no_{$metricCode}_complaints_in_period"],
+            ];
+        }
+
+        $breakdown = [
+            'on_time' => $onTime,
+            'late' => $late,
+            'missing_response' => $missing,
+            'average_hours' => round($avgHours, 2),
+            'by_severity' => [],
+            'by_status' => [],
+        ];
+        try {
+            foreach ([
+                'by_severity' => 'severity',
+                'by_status' => 'status',
+            ] as $key => $column) {
+                $rows = $this->db->query(
+                    "WITH scoped AS (
+                        SELECT COALESCE({$column}, '(unknown)') AS key,
+                               {$responseExpr} AS response_ts,
+                               {$ageExpr} AS age_hours
+                        FROM eqms_complaints c
+                        WHERE {$receivedExpr} BETWEEN (:s || ' 00:00:00')::timestamptz
+                            AND (:e || ' 23:59:59')::timestamptz
+                     )
+                     SELECT key, COUNT(*) AS count,
+                            COUNT(*) FILTER (WHERE response_ts IS NOT NULL AND age_hours <= :h) AS on_time,
+                            COUNT(*) FILTER (WHERE response_ts IS NULL OR age_hours > :h) AS overdue
+                     FROM scoped
+                     GROUP BY key
+                     ORDER BY overdue DESC, count DESC
+                     LIMIT 10",
+                    $params,
+                );
+                foreach ($rows as $r) {
+                    $breakdown[$key][] = [
+                        'key' => (string) ($r['key'] ?? '(unknown)'),
+                        'count' => (int) ($r['count'] ?? 0),
+                        'on_time' => (int) ($r['on_time'] ?? 0),
+                        'overdue' => (int) ($r['overdue'] ?? 0),
+                    ];
+                }
+            }
+        } catch (\Throwable) {
+            // best-effort breakdown only.
+        }
+
+        $flags = [];
+        if ($missing > 0) {
+            $flags[] = "{$metricCode}_missing_response_timestamp_count={$missing}";
+        }
+        if ($late > 0) {
+            $flags[] = "{$metricCode}_late_response_count={$late}";
+        }
+
+        return [
+            'value' => round($maxHours, 2),
+            'sample_size' => $total,
+            'numerator' => $onTime,
+            'denominator' => $total,
+            'empty_result' => false,
+            'data_source' => 'eqms_complaints',
+            'breakdown' => $breakdown,
+            'data_quality_flags' => $flags,
+        ];
+    }
+
+    private function calcCustomerAccepted8dClosureRate(DateRange $period, array $filters): array
+    {
+        $params = [':s' => $period->start, ':e' => $period->end];
+        $closedExpr = "COALESCE(closed_at, customer_acceptance_at, d8_updated_at, received_at, received_date::timestamptz, created_at)";
+
+        $row = $this->db->queryOne(
+            "WITH scoped AS (
+                SELECT customer_acceptance_at, status, severity, customer_name
+                FROM eqms_complaints
+                WHERE (closed_at IS NOT NULL OR lower(status) = 'closed')
+                  AND {$closedExpr} BETWEEN (:s || ' 00:00:00')::timestamptz
+                    AND (:e || ' 23:59:59')::timestamptz
+             )
+             SELECT
+                COUNT(*) AS total,
+                COUNT(*) FILTER (WHERE customer_acceptance_at IS NOT NULL) AS accepted,
+                COUNT(*) FILTER (WHERE customer_acceptance_at IS NULL) AS missing_acceptance
+             FROM scoped",
+            $params,
+        );
+
+        $total = (int) ($row['total'] ?? 0);
+        $accepted = (int) ($row['accepted'] ?? 0);
+        $missing = (int) ($row['missing_acceptance'] ?? 0);
+
+        if ($total === 0) {
+            return [
+                'value' => 0.0,
+                'sample_size' => 0,
+                'numerator' => 0,
+                'denominator' => 0,
+                'empty_result' => true,
+                'data_source' => 'eqms_complaints',
+                'breakdown' => [],
+                'data_quality_flags' => ['no_closed_customer_8d_complaints_in_period'],
+            ];
+        }
+
+        $breakdown = ['missing_acceptance' => $missing, 'by_severity' => [], 'by_status' => []];
+        try {
+            foreach ([
+                'by_severity' => 'severity',
+                'by_status' => 'status',
+            ] as $key => $column) {
+                $rows = $this->db->query(
+                    "WITH scoped AS (
+                        SELECT COALESCE({$column}, '(unknown)') AS key, customer_acceptance_at
+                        FROM eqms_complaints
+                        WHERE (closed_at IS NOT NULL OR lower(status) = 'closed')
+                          AND {$closedExpr} BETWEEN (:s || ' 00:00:00')::timestamptz
+                            AND (:e || ' 23:59:59')::timestamptz
+                     )
+                     SELECT key, COUNT(*) AS count,
+                            COUNT(*) FILTER (WHERE customer_acceptance_at IS NOT NULL) AS accepted
+                     FROM scoped
+                     GROUP BY key
+                     ORDER BY count DESC
+                     LIMIT 10",
+                    $params,
+                );
+                foreach ($rows as $r) {
+                    $count = (int) ($r['count'] ?? 0);
+                    $acceptedForGroup = (int) ($r['accepted'] ?? 0);
+                    $breakdown[$key][] = [
+                        'key' => (string) ($r['key'] ?? '(unknown)'),
+                        'count' => $count,
+                        'accepted' => $acceptedForGroup,
+                        'value' => $count > 0 ? round(($acceptedForGroup / $count) * 100, 2) : 0.0,
+                    ];
+                }
+            }
+        } catch (\Throwable) {
+            // best-effort breakdown only.
+        }
+
+        return [
+            'value' => round(($accepted / $total) * 100, 2),
+            'sample_size' => $total,
+            'numerator' => $accepted,
+            'denominator' => $total,
+            'empty_result' => false,
+            'data_source' => 'eqms_complaints',
+            'breakdown' => $breakdown,
+            'data_quality_flags' => $missing > 0
+                ? ["customer_accepted_8d_missing_acceptance_count={$missing}"]
+                : [],
+        ];
+    }
+
     // ── Internal Helpers ────────────────────────────────────────────────────
 
     /**
@@ -2548,6 +2922,11 @@ final class KpiEngine
             self::METRIC_INCIDENT_ACTION_CLOSURE_AGING => $this->calcIncidentActionClosureAging(...),
             self::METRIC_FAI_FIRST_PASS         => $this->calcFaiFirstPass(...),
             self::METRIC_IN_PROCESS_REJECT_RATE => $this->calcInProcessRejectRate(...),
+            self::METRIC_SHIP_PACKET_COMPLETENESS => $this->calcShipPacketCompleteness(...),
+            self::METRIC_NCR_3D_RESPONSE_SLA => $this->calcNcr3dResponseSla(...),
+            self::METRIC_NCR_4D_PRELIMINARY_SLA => $this->calcNcr4dPreliminarySla(...),
+            self::METRIC_NCR_8D_UPDATE_SLA => $this->calcNcr8dUpdateSla(...),
+            self::METRIC_CUSTOMER_ACCEPTED_8D_CLOSURE_RATE => $this->calcCustomerAccepted8dClosureRate(...),
             default => throw new RuntimeException("Unknown metric: {$metricCode}"),
         };
     }

@@ -75,10 +75,10 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $engine = $this->newEngineWithoutConstructor();
         $catalog = $engine->getMetricCatalog();
 
-        $this->assertSame(30, $catalog['counts']['runtime_calculated_metrics'] ?? null);
+        $this->assertSame(35, $catalog['counts']['runtime_calculated_metrics'] ?? null);
         $this->assertSame(18, $catalog['counts']['dashboard_core_kpis'] ?? null);
         $this->assertSame(42, $catalog['counts']['gate_control_metrics'] ?? null);
-        $this->assertSame(134, $catalog['counts']['proposed_operating_metrics'] ?? null);
+        $this->assertSame(136, $catalog['counts']['proposed_operating_metrics'] ?? null);
         $this->assertSame(
             'CTQ-CAPABILITY-POLICY-LAM-SEMSYSCO-2026-05',
             $catalog['ctq_capability_policy']['policy_id'] ?? null,
@@ -157,6 +157,15 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertFalse($metricsByCode['SPC_SIGNAL_REACTION_TIME']['is_official_kpi'] ?? true);
         $this->assertFalse($metricsByCode['SPC_SIGNAL_REACTION_TIME']['scorecard_applicable'] ?? true);
         $this->assertSame('not_applicable', $metricsByCode['SPC_SIGNAL_REACTION_TIME']['scorecard_scoring_status'] ?? null);
+        $this->assertSame('runtime_calculated', $metricsByCode['SHIP_PACKET_COMPLETENESS']['calculation_status'] ?? null);
+        $this->assertSame('runtime_calculated', $metricsByCode['NCR_3D_RESPONSE_SLA']['calculation_status'] ?? null);
+        $this->assertSame('runtime_calculated', $metricsByCode['NCR_4D_PRELIMINARY_SLA']['calculation_status'] ?? null);
+        $this->assertSame('runtime_calculated', $metricsByCode['NCR_8D_UPDATE_SLA']['calculation_status'] ?? null);
+        $this->assertSame('runtime_calculated', $metricsByCode['CUSTOMER_ACCEPTED_8D_CLOSURE_RATE']['calculation_status'] ?? null);
+        $this->assertSame('manual_governed', $metricsByCode['FINAL_RELEASE_RFT']['calculation_status'] ?? null);
+        $this->assertSame('manual_governed', $metricsByCode['CHECK_DIM_REPORT_ON_SHIP']['calculation_status'] ?? null);
+        $this->assertSame('staged_data_contract', $metricsByCode['FAI_QUEUE_AGING']['calculation_status'] ?? null);
+        $this->assertSame('staged_data_contract', $metricsByCode['FINAL_INSPECTION_QUEUE_AGING']['calculation_status'] ?? null);
         $this->assertNotSame('company_scorecard', $metricsByCode['SUPPLIER_READINESS']['evaluation_use'] ?? null);
         $this->assertNull($metricsByCode['SUPPLIER_READINESS']['scorecard_weight_pct'] ?? null);
         $this->assertNull($metricsByCode['RECORDABLE_INCIDENT_RATE']['scorecard_weight_pct'] ?? null);
