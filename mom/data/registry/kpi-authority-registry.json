@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
-  "version": "2026-05-24+p07",
-  "schema_version": 24,
+  "version": "2026-05-24+p08",
+  "schema_version": 25,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. The executive scorecard is a lean runtime-backed core; role scorecards use active/candidate measures; proposed metrics remain non-reward until governed evidence and data contracts are approved.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -1471,11 +1471,11 @@
       "layer": "lean_daily",
       "purpose": "Đo mức sẵn sàng vật tư cho lịch đã khoá để quyết định đẩy nhanh tiến độ hoặc đổi nguồn.",
       "formula": {
-        "numerator": "Số lệnh sản xuất trong lịch có đủ vật tư sẵn sàng trước freeze",
+        "numerator": "Số lệnh trong lịch đã khoá có material status ready và không có blocker cert/CoC, IQC, traceability, special process, kit, tool/fixture/gage trước constraint",
         "denominator": "Tổng số lệnh sản xuất trong lịch đã khoá",
         "unit": "percent",
         "rounding": "round to 2 decimals",
-        "exclusions": "none",
+        "exclusions": "none; approved customer change/resequence is handled by PLAN_ADHERENCE, not by hiding material blockers",
         "direction": "higher_is_better",
         "min_sample": 10
       },
@@ -1488,30 +1488,46 @@
         "basis": "Sẵn sàng vật tư cho lịch đã khoá nên ≥95%; dưới 85% gây dừng chuyền. Căn cứ thực tiễn MRP/Lean."
       },
       "data_source": {
-        "system": "MOM",
+        "system": "MOM + governed LAM readiness evidence",
         "tables": [
-          "job_orders"
+          "job_orders",
+          "kpi_manual_inputs"
         ],
         "columns": [
           "start_date_planned",
-          "material_readiness_status"
+          "material_readiness_status",
+          "metadata.material_cert_blocked",
+          "metadata.mill_cert_coc_verified",
+          "metadata.iqc_blocked",
+          "metadata.iqc_released",
+          "metadata.traceability_blocked",
+          "metadata.traceability_label_verified",
+          "metadata.special_process_blocked",
+          "metadata.special_process_clear",
+          "metadata.kit_ready_before_constraint",
+          "metadata.tooling_available",
+          "metadata.fixture_available",
+          "metadata.gage_ready",
+          "metric_code",
+          "input_status",
+          "evidence_reference"
         ],
-        "evidence": "KpiEngine::calcMaterialAvailabilityPlan — job_orders.material_readiness_status cho lệnh trong lịch."
+        "evidence": "KpiEngine::calcMaterialAvailabilityPlan counts a job ready only when material_readiness_status is ready and job_orders.metadata does not declare cert/CoC, IQC, traceability, special-process, kit, tooling, fixture or gage blockers. Linked LAM gate metrics remain manual-governed blockers until normalized runtime joins exist."
       },
       "owner_role": "SCM",
       "data_stewardship_role": "SCM",
       "cadence": "daily",
       "lead_or_lag": "lead",
       "paired_metric": "PLAN_ADHERENCE",
-      "decision_action": "Đỏ: đẩy nhanh tiến độ hoặc quyết định đổi nguồn; SCM xử lý trong ngày.",
+      "decision_action": "Đỏ hoặc blocker: SCM/PPL/QA mở recovery trong ngày; không release job vào constraint nếu material, cert/CoC, IQC, traceability, special process, kit hoặc tool/fixture/gage chưa clear.",
       "action_reference": "WI-202 T1/T2 + đẩy nhanh tiến độ mua; CDR cổng G2.",
       "attribution_rule": "Thiếu vật tư do nhà cung cấp trễ liên kết SUPPLIER_OTD; SCM chịu phần lập kế hoạch mua.",
       "counter_metric": {
         "code": "MATERIAL_AVAILABILITY_PLAN-CTR",
         "endpoint": "POST /api/kpi/MATERIAL_AVAILABILITY_PLAN-CTR/input",
-        "name_vi": "Số lệnh sản xuất phải dừng do thiếu vật tư đã khai sẵn sàng",
-        "name": "Phantom-availability stoppage count",
-        "intent": "Bắt việc khai vật tư sẵn sàng ảo, thiếu hụt lộ ra khi lệnh vào sản xuất."
+        "name_vi": "Số lệnh khai sẵn sàng vật tư nhưng bị chặn bởi cert/IQC/traceability/kit/gage",
+        "name": "Material-ready jobs blocked by cert/IQC/traceability/kit/gage",
+        "intent": "Bắt việc khai material ready khi vẫn còn cert/CoC, IQC, traceability, kit, special process hoặc tool/fixture/gage blocker."
       },
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
@@ -1526,6 +1542,94 @@
         "supplier_delay_verified",
         "force_majeure_or_utility_outage",
         "customer_change_after_baseline_lock"
+      ],
+      "metric_type": "kpi",
+      "metric_subtype": "composite_readiness_index",
+      "control_intent": "material_supplier_readiness",
+      "measurement_data_type": "composite_index",
+      "scoring_model_detail": "composite_weighted_score",
+      "evaluation_use": "company_scorecard",
+      "lifecycle_status": "active_runtime",
+      "usage_contexts": [
+        "company_scorecard",
+        "daily_management",
+        "flow_constraint",
+        "material_readiness_gate"
+      ],
+      "components": [
+        {
+          "code": "physical_material_available",
+          "weight_pct": 30,
+          "source": "job_orders.material_readiness_status",
+          "required_for_green": true
+        },
+        {
+          "code": "mill_cert_coc_verified",
+          "weight_pct": 15,
+          "source": "job_orders.metadata.mill_cert_coc_verified + MATERIAL_CERT_VERIFICATION_COMPLETENESS",
+          "required_for_green": true
+        },
+        {
+          "code": "iqc_released",
+          "weight_pct": 15,
+          "source": "job_orders.metadata.iqc_released + IQC_RELEASE_ON_TIME",
+          "required_for_green": true
+        },
+        {
+          "code": "traceability_label_verified",
+          "weight_pct": 15,
+          "source": "job_orders.metadata.traceability_label_verified + TRACEABILITY_LABEL_VERIFIED",
+          "required_for_green": true
+        },
+        {
+          "code": "special_process_clear",
+          "weight_pct": 10,
+          "source": "job_orders.metadata.special_process_clear + SPECIAL_PROCESS_REQUIREMENT_CLEAR",
+          "required_for_green": true
+        },
+        {
+          "code": "kit_ready_before_constraint",
+          "weight_pct": 10,
+          "source": "job_orders.metadata.kit_ready_before_constraint + LAM_MATERIAL_KIT_READY_TO_PLAN",
+          "required_for_green": true
+        },
+        {
+          "code": "tool_fixture_gage_ready",
+          "weight_pct": 5,
+          "source": "job_orders.metadata.tooling_available/fixture_available/gage_ready + gage release gates",
+          "required_for_green": true
+        }
+      ],
+      "readiness_block_rule": "Do not render green when any scheduled job has an explicit cert/CoC, IQC, traceability, special-process, kit, tool, fixture, or gage blocker. Missing normalized evidence is shown as data-quality context; manual-governed LAM gate blockers can cap recognition even when the runtime ratio is numerically green.",
+      "action_when_red": "Freeze release to the affected constraint, assign owner/due for each readiness blocker, and escalate supplier/IQC/QA/gage recovery in T1/T2.",
+      "role_assignments": [
+        {
+          "role": "SCM",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "supplier/material readiness and certified evidence before plan freeze",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "PPL",
+          "assignment_type": "process_owner",
+          "controllability_scope": "release only jobs that are ready before the current constraint",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "QA",
+          "assignment_type": "gate_approver",
+          "controllability_scope": "cert/IQC/traceability/special-process evidence acceptance",
+          "active_or_candidate": "active"
+        }
+      ],
+      "blocking_conditions": [
+        "critical_material_shortage",
+        "lam_material_cert_missing_or_mismatched",
+        "lam_iqc_not_released_before_kit",
+        "traceability_label_missing_or_mismatched",
+        "special_process_requirement_unclear",
+        "lam_kit_not_ready_at_plan_release",
+        "tool_fixture_gage_not_ready_for_constraint"
       ]
     },
     {
@@ -2293,17 +2397,17 @@
     {
       "canonical_code": "OEE_BOTTLENECK",
       "name": "OEE at current constraint resource",
-      "layer": "toc_weekly",
+      "layer": "lean_daily_toc_weekly",
       "status": "staged_data_contract",
-      "name_vi": "OEE tại nguồn lực điểm thắt cổ chai",
-      "purpose": "Đo hiệu suất thiết bị tại điểm thắt cổ chai để quyết định gỡ nút thắt theo TOC.",
+      "name_vi": "OEE tại nguồn lực ràng buộc hiện tại",
+      "purpose": "Đo OEE tại ràng buộc thật đã được duyệt, không phải OEE trung bình toàn xưởng.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "percent",
         "green_point": 85,
         "yellow_point": 70,
         "target": 85,
-        "basis": "Ngưỡng đề xuất cho metric OEE_BOTTLENECK; hiệu chỉnh khi có dữ liệu thật."
+        "basis": "Only meaningful after current constraint resource is approved; staged until constraint register exists."
       },
       "counter_metric": {
         "code": "OEE_BOTTLENECK-CTR",
@@ -2318,22 +2422,95 @@
       "owner_role": "WKM",
       "applicable_jds": [
         "WKM"
+      ],
+      "metric_type": "operating_metric",
+      "metric_subtype": "operating_metric",
+      "control_intent": "flow_constraint",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "rag_3_band",
+      "evaluation_use": "daily_management",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "proposed_operating",
+        "dashboard_core",
+        "strategic_driver_panel",
+        "tier_meeting"
+      ],
+      "usage_contexts": [
+        "daily_management",
+        "flow_constraint",
+        "strategic_driver_panel",
+        "tier_board"
+      ],
+      "data_source": {
+        "system": "Lean daily management + MOM/MES staged TOC contract",
+        "tables": [
+          "mes_oee_snapshots",
+          "mes_dispatch_queue",
+          "job_orders",
+          "kpi_manual_inputs"
+        ],
+        "columns": [
+          "equipment_id",
+          "metadata.constraint_resource_id",
+          "metadata.constraint_resource_type",
+          "downtime_minutes",
+          "queue_status",
+          "material_available",
+          "tooling_available",
+          "fixture_available",
+          "all_constraints_met",
+          "evidence_reference"
+        ],
+        "evidence": "Staged until a normalized constraint register/event stream records current constraint, effective dates, queue/buffer state, lost hours and blocker reason codes."
+      },
+      "evidence_source": "Current constraint register, dispatch queue, OEE downtime reason codes and tier action log; staged until normalized constraint events exist.",
+      "data_contract_gap": "No normalized constraint register/event stream yet covers resource_type, resource_id, effective_from/to, buffer state, lost hours, starvation, idle/non-constraint conflict and reason-code ownership.",
+      "target_graduation_condition": "Graduate after migration-backed constraint_resource_events and constraint_loss_events join MOM dispatch/OEE/queue data and KpiEngine calculates by resource type without assuming machine is always the bottleneck.",
+      "role_assignments": [
+        {
+          "role": "PPL",
+          "assignment_type": "process_owner",
+          "controllability_scope": "identify and protect the current constraint and release only ready work",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "WKM",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "recover lost constraint time and reason-code floor blockers",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "QA",
+          "assignment_type": "contributor",
+          "controllability_scope": "clear CMM/QC/release blockers when quality flow is the constraint",
+          "active_or_candidate": "active"
+        }
+      ],
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "decision_action": "Nếu đỏ: ưu tiên khôi phục constraint bằng setup/tool/fixture/gage/CMM/material/QA action trước local utilization.",
+      "action_when_red": "Open lost-hour recovery action with reason code, owner and due time before the next tier review.",
+      "blocking_conditions": [
+        "bottleneck_oee_missing_reason_codes",
+        "constraint_baseline_changed_without_approval"
       ]
     },
     {
       "canonical_code": "BOTTLENECK_BUFFER_STATUS",
       "name": "Constraint buffer red/yellow/green status",
-      "layer": "toc_weekly",
+      "layer": "lean_daily_toc_weekly",
       "status": "staged_data_contract",
-      "name_vi": "Trạng thái đệm điểm thắt cổ chai",
-      "purpose": "Đo mức đệm trước điểm thắt cổ chai để quyết định nạp/giữ WIP.",
+      "name_vi": "Trạng thái đệm trước ràng buộc hiện tại",
+      "purpose": "Hiển thị ràng buộc có đủ job thật sự ready hay đang sắp đói việc.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "percent",
         "green_point": 80,
         "yellow_point": 50,
         "target": 80,
-        "basis": "Ngưỡng đề xuất cho metric BOTTLENECK_BUFFER_STATUS; hiệu chỉnh khi có dữ liệu thật."
+        "basis": "Buffer counts only jobs ready across material, cert/IQC/traceability, setup, tool, fixture, gage and QA gate."
       },
       "counter_metric": {
         "code": "BOTTLENECK_BUFFER_STATUS-CTR",
@@ -2348,6 +2525,79 @@
       "owner_role": "PPL",
       "applicable_jds": [
         "PPL"
+      ],
+      "metric_type": "operating_metric",
+      "metric_subtype": "operating_metric",
+      "control_intent": "flow_constraint",
+      "measurement_data_type": "queue_wip",
+      "scoring_model_detail": "rag_3_band",
+      "evaluation_use": "daily_management",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "proposed_operating",
+        "dashboard_core",
+        "strategic_driver_panel",
+        "tier_meeting"
+      ],
+      "usage_contexts": [
+        "daily_management",
+        "flow_constraint",
+        "strategic_driver_panel",
+        "tier_board"
+      ],
+      "data_source": {
+        "system": "Lean daily management + MOM/MES staged TOC contract",
+        "tables": [
+          "mes_oee_snapshots",
+          "mes_dispatch_queue",
+          "job_orders",
+          "kpi_manual_inputs"
+        ],
+        "columns": [
+          "equipment_id",
+          "metadata.constraint_resource_id",
+          "metadata.constraint_resource_type",
+          "downtime_minutes",
+          "queue_status",
+          "material_available",
+          "tooling_available",
+          "fixture_available",
+          "all_constraints_met",
+          "evidence_reference"
+        ],
+        "evidence": "Staged until a normalized constraint register/event stream records current constraint, effective dates, queue/buffer state, lost hours and blocker reason codes."
+      },
+      "evidence_source": "Current constraint register, dispatch queue, OEE downtime reason codes and tier action log; staged until normalized constraint events exist.",
+      "data_contract_gap": "No normalized constraint register/event stream yet covers resource_type, resource_id, effective_from/to, buffer state, lost hours, starvation, idle/non-constraint conflict and reason-code ownership.",
+      "target_graduation_condition": "Graduate after migration-backed constraint_resource_events and constraint_loss_events join MOM dispatch/OEE/queue data and KpiEngine calculates by resource type without assuming machine is always the bottleneck.",
+      "role_assignments": [
+        {
+          "role": "PPL",
+          "assignment_type": "process_owner",
+          "controllability_scope": "identify and protect the current constraint and release only ready work",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "WKM",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "recover lost constraint time and reason-code floor blockers",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "QA",
+          "assignment_type": "contributor",
+          "controllability_scope": "clear CMM/QC/release blockers when quality flow is the constraint",
+          "active_or_candidate": "active"
+        }
+      ],
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "decision_action": "Nếu buffer vàng/đỏ: clear blocker cho job trước constraint; không release thêm WIP chưa ready.",
+      "action_when_red": "Assign same-shift owner/due for material, program, setup, gage, CMM or QA blocker starving the constraint.",
+      "blocking_conditions": [
+        "constraint_starved_due_to_readiness_blocker",
+        "critical_material_shortage"
       ]
     },
     {
@@ -2383,18 +2633,18 @@
     },
     {
       "canonical_code": "CONSTRAINT_LOST_HOURS",
-      "name": "Lost available hours at constraint",
-      "layer": "toc_weekly",
+      "name": "Lost available hours at current constraint",
+      "layer": "lean_daily_toc_weekly",
       "status": "staged_data_contract",
-      "name_vi": "Giờ mất tại điểm thắt cổ chai",
-      "purpose": "Đo giờ khả dụng bị mất tại điểm thắt cổ chai để quyết định hành động khôi phục.",
+      "name_vi": "Giờ khả dụng bị mất tại ràng buộc hiện tại",
+      "purpose": "Đo giờ constraint mất vì blocker controllable hoặc readiness/gate không xong.",
       "thresholds": {
         "direction": "lower_is_better",
         "unit": "hour",
         "green_point": 4,
         "yellow_point": 12,
         "target": 4,
-        "basis": "Ngưỡng đề xuất cho metric CONSTRAINT_LOST_HOURS; hiệu chỉnh khi có dữ liệu thật."
+        "basis": "Lost hours at true constraint are direct throughput risk and must be reason-coded."
       },
       "counter_metric": {
         "code": "CONSTRAINT_LOST_HOURS-CTR",
@@ -2409,6 +2659,79 @@
       "owner_role": "WKM",
       "applicable_jds": [
         "WKM"
+      ],
+      "metric_type": "operating_metric",
+      "metric_subtype": "operating_metric",
+      "control_intent": "flow_constraint",
+      "measurement_data_type": "time_duration",
+      "scoring_model_detail": "rag_3_band",
+      "evaluation_use": "daily_management",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "proposed_operating",
+        "dashboard_core",
+        "strategic_driver_panel",
+        "tier_meeting"
+      ],
+      "usage_contexts": [
+        "daily_management",
+        "flow_constraint",
+        "strategic_driver_panel",
+        "tier_board"
+      ],
+      "data_source": {
+        "system": "Lean daily management + MOM/MES staged TOC contract",
+        "tables": [
+          "mes_oee_snapshots",
+          "mes_dispatch_queue",
+          "job_orders",
+          "kpi_manual_inputs"
+        ],
+        "columns": [
+          "equipment_id",
+          "metadata.constraint_resource_id",
+          "metadata.constraint_resource_type",
+          "downtime_minutes",
+          "queue_status",
+          "material_available",
+          "tooling_available",
+          "fixture_available",
+          "all_constraints_met",
+          "evidence_reference"
+        ],
+        "evidence": "Staged until a normalized constraint register/event stream records current constraint, effective dates, queue/buffer state, lost hours and blocker reason codes."
+      },
+      "evidence_source": "Current constraint register, dispatch queue, OEE downtime reason codes and tier action log; staged until normalized constraint events exist.",
+      "data_contract_gap": "No normalized constraint register/event stream yet covers resource_type, resource_id, effective_from/to, buffer state, lost hours, starvation, idle/non-constraint conflict and reason-code ownership.",
+      "target_graduation_condition": "Graduate after migration-backed constraint_resource_events and constraint_loss_events join MOM dispatch/OEE/queue data and KpiEngine calculates by resource type without assuming machine is always the bottleneck.",
+      "role_assignments": [
+        {
+          "role": "PPL",
+          "assignment_type": "process_owner",
+          "controllability_scope": "identify and protect the current constraint and release only ready work",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "WKM",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "recover lost constraint time and reason-code floor blockers",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "QA",
+          "assignment_type": "contributor",
+          "controllability_scope": "clear CMM/QC/release blockers when quality flow is the constraint",
+          "active_or_candidate": "active"
+        }
+      ],
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "decision_action": "Nếu đỏ: mở recovery action theo reason code; PD/PPL/WKM quyết định nguồn lực ngay trong tuần hoặc trong ngày nếu ảnh hưởng OTD.",
+      "action_when_red": "Recover constraint hours before improving non-constraint utilization.",
+      "blocking_conditions": [
+        "missing_downtime_reason_codes",
+        "constraint_baseline_changed_without_approval"
       ]
     },
     {
@@ -5326,7 +5649,80 @@
       "applicable_jds": [
         "QCL"
       ],
-      "origin": "track_04_active_candidate_role_scorecard_2026_05_23"
+      "origin": "track_04_active_candidate_role_scorecard_2026_05_23",
+      "metric_subtype": "role_performance_measure",
+      "control_intent": "gate_release_control",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "rag_3_band",
+      "evaluation_use": "role_performance_review",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "manual_governed",
+      "usage_contexts": [
+        "daily_management",
+        "gate_hold_release",
+        "cmm_qc_queue",
+        "role_scorecard"
+      ],
+      "usage_types": [
+        "dashboard_core",
+        "role_scorecard",
+        "tier_meeting"
+      ],
+      "data_source": {
+        "system": "Manual-governed inspection plan execution evidence",
+        "tables": [
+          "kpi_manual_inputs",
+          "inspection_plans",
+          "ipqc_inspections",
+          "oqc_inspections"
+        ],
+        "columns": [
+          "metric_code",
+          "value",
+          "input_status",
+          "evidence_reference",
+          "inspection_plan_id",
+          "inspection_status",
+          "result",
+          "created_at"
+        ],
+        "evidence": "Manual-governed until required inspection-plan operations and actual inspection execution can be reconciled by job, operation, part revision and customer profile."
+      },
+      "data_contract_gap": "Inspection plan requirement-to-execution reconciliation is not normalized across FAI/IPQC/OQC and customer-profile release gates.",
+      "target_graduation_condition": "Graduate after inspection_plan_requirements join FAI/IPQC/OQC execution events and KpiEngine proves required characteristic completion by job/operation/revision.",
+      "manual_input_contract": {
+        "form": "Inspection plan execution audit log",
+        "fields": [
+          "period_start",
+          "period_end",
+          "required_inspection_step_count",
+          "completed_as_planned_count",
+          "bypass_or_deviation_count",
+          "evidence_reference"
+        ],
+        "verification": "QCL enters execution audit; QA verifies any bypass/deviation approval before role review use.",
+        "reward_gate": "Manual-governed role review input only; no reward contribution while manual."
+      },
+      "controllability_scope": "QCL controls inspection execution discipline and evidence escalation; Engineering/QA own plan content and release authority.",
+      "action_when_red": "Stop unapproved sampling/bypass, assign QA/QCL owner for missing inspection-plan evidence, and protect affected release gate.",
+      "role_assignments": [
+        {
+          "role": "QCL",
+          "assignment_type": "role_measure_active",
+          "controllability_scope": "inspection execution discipline and queue evidence",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "QA",
+          "assignment_type": "gate_approver",
+          "controllability_scope": "approval of inspection plan deviations or release holds",
+          "active_or_candidate": "active"
+        }
+      ],
+      "blocking_conditions": [
+        "inspection_plan_bypass_or_unapproved_sampling",
+        "required_gate_bypass"
+      ]
     },
     {
       "canonical_code": "INSPECTION_QUEUE_AGING",
@@ -6999,7 +7395,74 @@
         "QCL"
       ],
       "evidence_source": "quality hold register + QA disposition record",
-      "origin": "prompt_02_legacy_alias_backcompat_2026_05_24"
+      "origin": "prompt_02_legacy_alias_backcompat_2026_05_24",
+      "data_source": {
+        "system": "Manual-governed QC hold register",
+        "tables": [
+          "kpi_manual_inputs",
+          "quality_holds",
+          "ncr_records"
+        ],
+        "columns": [
+          "metric_code",
+          "value",
+          "input_status",
+          "evidence_reference",
+          "hold_id",
+          "severity",
+          "opened_at",
+          "released_at",
+          "disposition_authority"
+        ],
+        "evidence": "Manual-governed until QC hold events expose opened/released timestamps, severity SLA, release authority and disposition evidence."
+      },
+      "data_contract_gap": "QC hold events are not yet normalized with severity SLA, disposition authority and release evidence across all hold sources.",
+      "target_graduation_condition": "Graduate after quality_holds migration and KpiEngine calculator prove open/closed hold SLA by severity, owner and release authority.",
+      "usage_contexts": [
+        "daily_management",
+        "gate_hold_release",
+        "cmm_qc_queue",
+        "tier_board"
+      ],
+      "usage_types": [
+        "dashboard_core",
+        "gate_control",
+        "tier_meeting"
+      ],
+      "action_when_red": "Keep hold active, escalate QA disposition owner and due time, and block release bypass until evidence is verified.",
+      "manual_input_contract": {
+        "form": "QC hold register and disposition log",
+        "fields": [
+          "period_start",
+          "period_end",
+          "hold_count",
+          "holds_resolved_within_sla",
+          "overdue_hold_count",
+          "evidence_reference"
+        ],
+        "verification": "QC enters hold SLA counts; QA verifies disposition evidence and release authority before the value can render as governed.",
+        "reward_gate": "Gate blocker only; pending manual input never contributes to reward."
+      },
+      "role_assignments": [
+        {
+          "role": "QA",
+          "assignment_type": "gate_approver",
+          "controllability_scope": "hold disposition and release authority",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "QC",
+          "assignment_type": "data_steward",
+          "controllability_scope": "hold timestamp and status evidence",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "PPL",
+          "assignment_type": "contributor",
+          "controllability_scope": "dispatch recovery for holds threatening OTD",
+          "active_or_candidate": "active"
+        }
+      ]
     },
     {
       "canonical_code": "DOWNTIME_IMPACT",
@@ -8040,10 +8503,37 @@
       "usage_contexts": [
         "daily_management",
         "flow_constraint",
-        "lam_pilot_backlog"
+        "lam_pilot_backlog",
+        "cmm_qc_queue",
+        "tier_board"
       ],
       "reward_eligible": false,
-      "scorecard_contributes_to_reward": false
+      "scorecard_contributes_to_reward": false,
+      "usage_types": [
+        "dashboard_core",
+        "strategic_driver_panel",
+        "tier_meeting"
+      ],
+      "role_assignments": [
+        {
+          "role": "QA",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "quality release queue recovery and bypass prevention",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "QC",
+          "assignment_type": "data_steward",
+          "controllability_scope": "queue timestamps and inspection assignment evidence",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "PPL",
+          "assignment_type": "contributor",
+          "controllability_scope": "dispatch recovery when queue threatens OTD",
+          "active_or_candidate": "active"
+        }
+      ]
     },
     {
       "canonical_code": "FINAL_INSPECTION_QUEUE_AGING",
@@ -8103,10 +8593,324 @@
       "usage_contexts": [
         "daily_management",
         "flow_constraint",
-        "lam_pilot_backlog"
+        "lam_pilot_backlog",
+        "cmm_qc_queue",
+        "tier_board"
       ],
       "reward_eligible": false,
-      "scorecard_contributes_to_reward": false
+      "scorecard_contributes_to_reward": false,
+      "usage_types": [
+        "dashboard_core",
+        "strategic_driver_panel",
+        "tier_meeting"
+      ],
+      "role_assignments": [
+        {
+          "role": "QA",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "quality release queue recovery and bypass prevention",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "QC",
+          "assignment_type": "data_steward",
+          "controllability_scope": "queue timestamps and inspection assignment evidence",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "PPL",
+          "assignment_type": "contributor",
+          "controllability_scope": "dispatch recovery when queue threatens OTD",
+          "active_or_candidate": "active"
+        }
+      ]
+    },
+    {
+      "canonical_code": "CURRENT_CONSTRAINT_RESOURCE",
+      "layer": "lean_daily_toc_weekly",
+      "status": "staged_data_contract",
+      "calculation_status": "staged_data_contract",
+      "metric_type": "health_indicator",
+      "metric_subtype": "health_indicator",
+      "control_intent": "flow_constraint",
+      "measurement_data_type": "binary_event",
+      "scoring_model_detail": "none_monitor_only",
+      "evaluation_use": "daily_management",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "proposed_operating",
+        "dashboard_core",
+        "strategic_driver_panel",
+        "tier_meeting"
+      ],
+      "usage_contexts": [
+        "daily_management",
+        "flow_constraint",
+        "strategic_driver_panel",
+        "tier_board"
+      ],
+      "data_source": {
+        "system": "Lean daily management + MOM/MES staged TOC contract",
+        "tables": [
+          "mes_oee_snapshots",
+          "mes_dispatch_queue",
+          "job_orders",
+          "kpi_manual_inputs"
+        ],
+        "columns": [
+          "equipment_id",
+          "metadata.constraint_resource_id",
+          "metadata.constraint_resource_type",
+          "downtime_minutes",
+          "queue_status",
+          "material_available",
+          "tooling_available",
+          "fixture_available",
+          "all_constraints_met",
+          "evidence_reference"
+        ],
+        "evidence": "Staged until a normalized constraint register/event stream records current constraint, effective dates, queue/buffer state, lost hours and blocker reason codes."
+      },
+      "evidence_source": "Current constraint register, dispatch queue, OEE downtime reason codes and tier action log; staged until normalized constraint events exist.",
+      "data_contract_gap": "No normalized constraint register/event stream yet covers resource_type, resource_id, effective_from/to, buffer state, lost hours, starvation, idle/non-constraint conflict and reason-code ownership.",
+      "target_graduation_condition": "Graduate after migration-backed constraint_resource_events and constraint_loss_events join MOM dispatch/OEE/queue data and KpiEngine calculates by resource type without assuming machine is always the bottleneck.",
+      "role_assignments": [
+        {
+          "role": "PPL",
+          "assignment_type": "process_owner",
+          "controllability_scope": "identify and protect the current constraint and release only ready work",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "WKM",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "recover lost constraint time and reason-code floor blockers",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "QA",
+          "assignment_type": "contributor",
+          "controllability_scope": "clear CMM/QC/release blockers when quality flow is the constraint",
+          "active_or_candidate": "active"
+        }
+      ],
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "name": "Current constraint resource",
+      "name_vi": "Nguồn lực ràng buộc hiện tại",
+      "purpose": "Buộc daily/tier board nêu rõ ràng buộc hiện tại là máy/cell, CMM, setup, CAM, QC/final inspection, deburr/cleaning/packing, supplier/material hoặc outsource/special process.",
+      "counter_metric": {
+        "code": "CURRENT_CONSTRAINT_RESOURCE-CTR",
+        "endpoint": "POST /api/kpi/CURRENT_CONSTRAINT_RESOURCE-CTR/input",
+        "name_vi": "Số ngày board không có constraint hiện tại được duyệt",
+        "name": "Days without approved current constraint",
+        "intent": "Bắt việc điều hành theo cảm tính hoặc giả định máy luôn là bottleneck."
+      },
+      "decision_action": "Nếu chưa định danh constraint: PPL/PD chốt trong T1/T2 trước khi ra quyết định release/hot-job.",
+      "action_when_red": "Declare resource_type/resource_id/effective_from/evidence and assign owner for the active constraint before release decisions.",
+      "blocking_conditions": [
+        "constraint_baseline_changed_without_approval"
+      ],
+      "process": "planning",
+      "category": "internal"
+    },
+    {
+      "canonical_code": "CONSTRAINT_STARVED_TIME",
+      "layer": "lean_daily_toc_weekly",
+      "status": "staged_data_contract",
+      "calculation_status": "staged_data_contract",
+      "metric_type": "operating_metric",
+      "metric_subtype": "operating_metric",
+      "control_intent": "flow_constraint",
+      "measurement_data_type": "time_duration",
+      "scoring_model_detail": "rag_3_band",
+      "evaluation_use": "daily_management",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "proposed_operating",
+        "dashboard_core",
+        "strategic_driver_panel",
+        "tier_meeting"
+      ],
+      "usage_contexts": [
+        "daily_management",
+        "flow_constraint",
+        "strategic_driver_panel",
+        "tier_board"
+      ],
+      "data_source": {
+        "system": "Lean daily management + MOM/MES staged TOC contract",
+        "tables": [
+          "mes_oee_snapshots",
+          "mes_dispatch_queue",
+          "job_orders",
+          "kpi_manual_inputs"
+        ],
+        "columns": [
+          "equipment_id",
+          "metadata.constraint_resource_id",
+          "metadata.constraint_resource_type",
+          "downtime_minutes",
+          "queue_status",
+          "material_available",
+          "tooling_available",
+          "fixture_available",
+          "all_constraints_met",
+          "evidence_reference"
+        ],
+        "evidence": "Staged until a normalized constraint register/event stream records current constraint, effective dates, queue/buffer state, lost hours and blocker reason codes."
+      },
+      "evidence_source": "Current constraint register, dispatch queue, OEE downtime reason codes and tier action log; staged until normalized constraint events exist.",
+      "data_contract_gap": "No normalized constraint register/event stream yet covers resource_type, resource_id, effective_from/to, buffer state, lost hours, starvation, idle/non-constraint conflict and reason-code ownership.",
+      "target_graduation_condition": "Graduate after migration-backed constraint_resource_events and constraint_loss_events join MOM dispatch/OEE/queue data and KpiEngine calculates by resource type without assuming machine is always the bottleneck.",
+      "role_assignments": [
+        {
+          "role": "PPL",
+          "assignment_type": "process_owner",
+          "controllability_scope": "identify and protect the current constraint and release only ready work",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "WKM",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "recover lost constraint time and reason-code floor blockers",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "QA",
+          "assignment_type": "contributor",
+          "controllability_scope": "clear CMM/QC/release blockers when quality flow is the constraint",
+          "active_or_candidate": "active"
+        }
+      ],
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "name": "Constraint starved time",
+      "name_vi": "Thời gian ràng buộc đói việc ready",
+      "purpose": "Đo thời gian ràng buộc không có job thật sự ready vì material/cert/IQC/setup/gage/CMM/QA blocker.",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hour",
+        "green_point": 0.5,
+        "yellow_point": 2,
+        "target": 0.5,
+        "basis": "Any avoidable starvation at the true constraint is visible daily."
+      },
+      "counter_metric": {
+        "code": "CONSTRAINT_STARVED_TIME-CTR",
+        "endpoint": "POST /api/kpi/CONSTRAINT_STARVED_TIME-CTR/input",
+        "name_vi": "Số giờ starvation bị đổi nhãn thành chờ kế hoạch chung",
+        "name": "Misclassified constraint starvation hours",
+        "intent": "Bắt việc che blocker readiness bằng nhãn downtime/idle chung."
+      },
+      "decision_action": "Nếu vàng/đỏ: clear blocker trước constraint; SCM/QA/WKM/PPL nhận owner cụ thể trong ca.",
+      "action_when_red": "Escalate readiness blocker and resequence only with approved evidence.",
+      "blocking_conditions": [
+        "constraint_starved_due_to_readiness_blocker",
+        "critical_material_shortage"
+      ],
+      "process": "planning",
+      "category": "internal"
+    },
+    {
+      "canonical_code": "CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS",
+      "layer": "lean_daily_toc_weekly",
+      "status": "staged_data_contract",
+      "calculation_status": "staged_data_contract",
+      "metric_type": "operating_metric",
+      "metric_subtype": "operating_metric",
+      "control_intent": "flow_constraint",
+      "measurement_data_type": "time_duration",
+      "scoring_model_detail": "rag_3_band",
+      "evaluation_use": "daily_management",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "proposed_operating",
+        "dashboard_core",
+        "strategic_driver_panel",
+        "tier_meeting"
+      ],
+      "usage_contexts": [
+        "daily_management",
+        "flow_constraint",
+        "strategic_driver_panel",
+        "tier_board"
+      ],
+      "data_source": {
+        "system": "Lean daily management + MOM/MES staged TOC contract",
+        "tables": [
+          "mes_oee_snapshots",
+          "mes_dispatch_queue",
+          "job_orders",
+          "kpi_manual_inputs"
+        ],
+        "columns": [
+          "equipment_id",
+          "metadata.constraint_resource_id",
+          "metadata.constraint_resource_type",
+          "downtime_minutes",
+          "queue_status",
+          "material_available",
+          "tooling_available",
+          "fixture_available",
+          "all_constraints_met",
+          "evidence_reference"
+        ],
+        "evidence": "Staged until a normalized constraint register/event stream records current constraint, effective dates, queue/buffer state, lost hours and blocker reason codes."
+      },
+      "evidence_source": "Current constraint register, dispatch queue, OEE downtime reason codes and tier action log; staged until normalized constraint events exist.",
+      "data_contract_gap": "No normalized constraint register/event stream yet covers resource_type, resource_id, effective_from/to, buffer state, lost hours, starvation, idle/non-constraint conflict and reason-code ownership.",
+      "target_graduation_condition": "Graduate after migration-backed constraint_resource_events and constraint_loss_events join MOM dispatch/OEE/queue data and KpiEngine calculates by resource type without assuming machine is always the bottleneck.",
+      "role_assignments": [
+        {
+          "role": "PPL",
+          "assignment_type": "process_owner",
+          "controllability_scope": "identify and protect the current constraint and release only ready work",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "WKM",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "recover lost constraint time and reason-code floor blockers",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "QA",
+          "assignment_type": "contributor",
+          "controllability_scope": "clear CMM/QC/release blockers when quality flow is the constraint",
+          "active_or_candidate": "active"
+        }
+      ],
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "name": "Constraint idle while non-constraints run",
+      "name_vi": "Ràng buộc idle trong khi nguồn lực không phải ràng buộc vẫn chạy",
+      "purpose": "Chặn tối ưu cục bộ: máy/cell khác chạy đẹp trong khi ràng buộc thật đang idle hoặc bị đói.",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hour",
+        "green_point": 0.5,
+        "yellow_point": 2,
+        "target": 0.5,
+        "basis": "Non-constraint utilization cannot be optimized while the active constraint is idle."
+      },
+      "counter_metric": {
+        "code": "CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS-CTR",
+        "endpoint": "POST /api/kpi/CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS-CTR/input",
+        "name_vi": "Số lần tăng utilization nguồn lực phụ khi ràng buộc đang idle",
+        "name": "Local utilization while constraint idle count",
+        "intent": "Bắt việc làm đẹp utilization không phải constraint làm xấu throughput tổng."
+      },
+      "decision_action": "Nếu phát sinh: dừng local optimization, chuyển người/tool/gage/CMM/material sang constraint hoặc ghi lý do không thể chuyển.",
+      "action_when_red": "Assign same-shift decision to protect constraint before releasing more work to non-constraints.",
+      "blocking_conditions": [
+        "constraint_idle_while_non_constraint_runs"
+      ],
+      "process": "planning",
+      "category": "internal"
     }
   ],
   "dashboard_core_kpis": [
@@ -8438,6 +9242,202 @@
       "dashboard_card_class": "strategic_driver",
       "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
       "scoreable": false
+    },
+    {
+      "local_id": "BSC-P08-19",
+      "canonical_code": "CURRENT_CONSTRAINT_RESOURCE",
+      "name": "Current Constraint Resource",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "daily_ops",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false,
+      "owner_action_due_required": true,
+      "cause_breakdown_required": true,
+      "staged_flag_required": true
+    },
+    {
+      "local_id": "BSC-P08-20",
+      "canonical_code": "BOTTLENECK_BUFFER_STATUS",
+      "name": "Constraint Buffer Status",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "daily_ops",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false,
+      "owner_action_due_required": true,
+      "cause_breakdown_required": true,
+      "staged_flag_required": true
+    },
+    {
+      "local_id": "BSC-P08-21",
+      "canonical_code": "CONSTRAINT_STARVED_TIME",
+      "name": "Constraint Starved Time",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "daily_ops",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false,
+      "owner_action_due_required": true,
+      "cause_breakdown_required": true,
+      "staged_flag_required": true
+    },
+    {
+      "local_id": "BSC-P08-22",
+      "canonical_code": "CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS",
+      "name": "Constraint Idle While Non-Constraints Run",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "daily_ops",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false,
+      "owner_action_due_required": true,
+      "cause_breakdown_required": true,
+      "staged_flag_required": true
+    },
+    {
+      "local_id": "BSC-P08-23",
+      "canonical_code": "CMM_QUEUE_AGING",
+      "name": "CMM Queue Aging",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/CMM_QUEUE_AGING",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "daily_ops",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false,
+      "owner_action_due_required": true,
+      "cause_breakdown_required": true,
+      "staged_flag_required": false
+    },
+    {
+      "local_id": "BSC-P08-24",
+      "canonical_code": "FAI_QUEUE_AGING",
+      "name": "FAI Queue Aging",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "daily_ops",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false,
+      "owner_action_due_required": true,
+      "cause_breakdown_required": true,
+      "staged_flag_required": true
+    },
+    {
+      "local_id": "BSC-P08-25",
+      "canonical_code": "FINAL_INSPECTION_QUEUE_AGING",
+      "name": "Final Inspection Queue Aging",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "daily_ops",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false,
+      "owner_action_due_required": true,
+      "cause_breakdown_required": true,
+      "staged_flag_required": true
+    },
+    {
+      "local_id": "BSC-P08-26",
+      "canonical_code": "QC_HOLD_SLA",
+      "name": "QC Hold Resolution SLA",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/QC_HOLD_SLA",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "gate_blocker",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false,
+      "owner_action_due_required": true,
+      "cause_breakdown_required": true,
+      "staged_flag_required": false
+    },
+    {
+      "local_id": "BSC-P08-27",
+      "canonical_code": "INSPECTION_PLAN_ADHERENCE",
+      "name": "Inspection Plan Adherence",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/INSPECTION_PLAN_ADHERENCE",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "role",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false,
+      "owner_action_due_required": true,
+      "cause_breakdown_required": true,
+      "staged_flag_required": false
+    },
+    {
+      "local_id": "BSC-P08-28",
+      "canonical_code": "MATERIAL_CERT_VERIFICATION_COMPLETENESS",
+      "name": "Material Cert/CoC Verification",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/MATERIAL_CERT_VERIFICATION_COMPLETENESS",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "gate_blocker",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false,
+      "owner_action_due_required": true,
+      "cause_breakdown_required": true,
+      "staged_flag_required": false
+    },
+    {
+      "local_id": "BSC-P08-29",
+      "canonical_code": "IQC_RELEASE_ON_TIME",
+      "name": "IQC Release On Time",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/IQC_RELEASE_ON_TIME",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "gate_blocker",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false,
+      "owner_action_due_required": true,
+      "cause_breakdown_required": true,
+      "staged_flag_required": false
+    },
+    {
+      "local_id": "BSC-P08-30",
+      "canonical_code": "LAM_MATERIAL_KIT_READY_TO_PLAN",
+      "name": "LAM Material Kit Ready To Plan",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/LAM_MATERIAL_KIT_READY_TO_PLAN",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "gate_blocker",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false,
+      "owner_action_due_required": true,
+      "cause_breakdown_required": true,
+      "staged_flag_required": false
+    },
+    {
+      "local_id": "BSC-P08-31",
+      "canonical_code": "TRACEABILITY_LABEL_VERIFIED",
+      "name": "Traceability Label Verified",
+      "backend_status": "manual_governed",
+      "primary_endpoint": "GET /api/kpi/TRACEABILITY_LABEL_VERIFIED",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "gate_blocker",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false,
+      "owner_action_due_required": true,
+      "cause_breakdown_required": true,
+      "staged_flag_required": false
+    },
+    {
+      "local_id": "BSC-P08-32",
+      "canonical_code": "SPECIAL_PROCESS_REQUIREMENT_CLEAR",
+      "name": "Special Process Requirement Clear",
+      "backend_status": "staged_data_contract",
+      "primary_endpoint": "GET /api/kpi/catalog",
+      "scorecard_role": "strategic_driver",
+      "dashboard_card_class": "gate_blocker",
+      "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
+      "scoreable": false,
+      "owner_action_due_required": true,
+      "cause_breakdown_required": true,
+      "staged_flag_required": true
     }
   ],
   "gate_control_metrics": [
@@ -11145,7 +12145,7 @@
       ],
       "metric_type": "gate_control_metric",
       "metric_subtype": "gate_control_metric",
-      "control_intent": "customer_specific_requirement",
+      "control_intent": "wip_queue_control",
       "measurement_data_type": "time_duration",
       "scoring_model_detail": "sla_aging_bucket",
       "evaluation_use": "gate_hold_release",
@@ -11154,7 +12154,9 @@
       "usage_types": [
         "gate_control",
         "lam_profile_gate",
-        "annex122_gate_table"
+        "annex122_gate_table",
+        "dashboard_core",
+        "tier_meeting"
       ],
       "result_type": "gate",
       "scorecard_scoring_status": "gate_only",
@@ -11207,7 +12209,7 @@
       ],
       "evidence_source": "IPQC queue timestamps exist, but CMM-specific queue and release linkage remain manual-governed.",
       "hold_release_rule": "Escalate and hold affected release when LAM CMM queue exceeds 4 working hours without approved recovery; QA/QC/PPL prioritize constraint recovery.",
-      "decision_action": "Escalate CMM queue; QA/QC/PPL recover before release bypass.",
+      "decision_action": "Nếu quá 4 giờ: QA/QC/PPL ưu tiên CMM slot, giữ release bypass và gán recovery owner trong T1/T2.",
       "data_contract_gap": "No normalized CMM queue table yet; current evidence is inspection assignment and manual queue log.",
       "target_graduation_condition": "Graduate after CMM queue events record queued_at, started_at, completed_at, job/operation, customer profile, and release linkage.",
       "manual_input_form": "CMM queue and inspection assignment log",
@@ -11231,7 +12233,34 @@
         ],
         "verification": "QC/CMM enters queue log; QA/PPL verifies release hold and recovery action.",
         "reward_gate": "Gate blocker only; pending manual input never contributes to reward."
-      }
+      },
+      "usage_contexts": [
+        "daily_management",
+        "flow_constraint",
+        "cmm_qc_queue",
+        "lam_profile_gate"
+      ],
+      "action_when_red": "Escalate oldest CMM queue item with job, operation, owner, due time and approved measurement/release decision.",
+      "role_assignments": [
+        {
+          "role": "QA",
+          "assignment_type": "gate_approver",
+          "controllability_scope": "CMM queue escalation and release-risk decision",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "QC",
+          "assignment_type": "data_steward",
+          "controllability_scope": "CMM queued/started/completed evidence and queue age log",
+          "active_or_candidate": "active"
+        },
+        {
+          "role": "PPL",
+          "assignment_type": "process_owner",
+          "controllability_scope": "dispatch recovery when CMM queue threatens OTD",
+          "active_or_candidate": "active"
+        }
+      ]
     },
     {
       "classification": "gate_metric_lam_profile",
@@ -12362,7 +13391,12 @@
         "ship_deviation_without_special_release",
         "expired_gage_used_for_release",
         "falsified_customer_quality_record",
-        "repeat_same_root_cause_escape"
+        "repeat_same_root_cause_escape",
+        "lam_material_cert_missing_or_mismatched",
+        "lam_iqc_not_released_before_kit",
+        "traceability_label_missing_or_mismatched",
+        "lam_kit_not_ready_at_plan_release",
+        "tool_fixture_gage_not_ready_for_constraint"
       ],
       "calibration_rule": "Final recognition and reward decisions require HR/QMS/CEO calibration. KPI output is an input, not an automatic payout or discipline engine.",
       "customer_ncr_bonus_simulation": {
@@ -12535,19 +13569,25 @@
           "yellow_min": 85,
           "red_below": 85
         },
-        "rating_criteria": "Score MATERIAL_AVAILABILITY_PLAN from the approved registry formula and governed evidence source only.",
-        "reward_rule": "Eligible only when MATERIAL_AVAILABILITY_PLAN-CTR is not red and no blocking condition is open.",
+        "rating_criteria": "Score only jobs that are physically material-ready and have no explicit cert/CoC, IQC, traceability, special-process, kit, tool, fixture or gage blocker before the active constraint.",
+        "reward_rule": "Eligible only when MATERIAL_AVAILABILITY_PLAN-CTR and linked LAM material/cert/IQC/traceability/kit/gage blockers are clean; manual-governed blockers may cap recognition even if the runtime ratio is green.",
         "blocking_conditions": [
           "critical_material_shortage",
           "required_gate_bypass",
-          "verified_data_falsification"
+          "verified_data_falsification",
+          "lam_material_cert_missing_or_mismatched",
+          "lam_iqc_not_released_before_kit",
+          "traceability_label_missing_or_mismatched",
+          "special_process_requirement_unclear",
+          "lam_kit_not_ready_at_plan_release",
+          "tool_fixture_gage_not_ready_for_constraint"
         ],
         "scorecard_role": "scored_core",
         "bsc_perspective": "internal_process_flow",
-        "strategic_objective": "Keep the approved plan executable with material and supplier readiness visible.",
+        "strategic_objective": "Keep the approved plan executable at the true constraint with material, cert, IQC, traceability, kit and gage readiness visible.",
         "lead_or_lag": "lead",
         "initiative_link": "material_readiness_and_supplier_recovery",
-        "review_forum": "daily plan readiness review; monthly BSC"
+        "review_forum": "daily plan/constraint readiness review; monthly BSC"
       }
     ],
     "design_rule": "Keep the executive scorecard to seven scored core metrics. Put valuable leading, gate, TOC, LAM and capability indicators into strategic_driver_panel or gate_blockers until their evidence contract is approved and change-controlled.",
@@ -12831,6 +13871,174 @@
         "review_forum": "supplier quality review; monthly BSC risk panel",
         "scoring_policy": "visible_only_staged_data_contract",
         "reward_policy": "does_not_add_points; critical shortage or supplier escape can cap/block recognition"
+      },
+      {
+        "canonical_code": "CURRENT_CONSTRAINT_RESOURCE",
+        "display_name": "Current constraint resource",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Make the real current constraint explicit before release, hot-job and recovery decisions.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "lean_toc_cmm_material_readiness",
+        "review_forum": "daily tier; weekly TOC review",
+        "scoring_policy": "visible_only_no_score_points",
+        "reward_policy": "does_not_add_points; staged/manual-governed values are visible only for action and may cap/block recognition when evidence is red"
+      },
+      {
+        "canonical_code": "BOTTLENECK_BUFFER_STATUS",
+        "display_name": "Constraint buffer status",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Protect the constraint with only truly ready WIP.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "lean_toc_cmm_material_readiness",
+        "review_forum": "daily tier; weekly TOC review",
+        "scoring_policy": "visible_only_no_score_points",
+        "reward_policy": "does_not_add_points; staged/manual-governed values are visible only for action and may cap/block recognition when evidence is red"
+      },
+      {
+        "canonical_code": "CONSTRAINT_STARVED_TIME",
+        "display_name": "Constraint starved time",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Expose material/setup/gage/CMM/QA blockers starving the constraint.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "lean_toc_cmm_material_readiness",
+        "review_forum": "daily tier; weekly TOC review",
+        "scoring_policy": "visible_only_no_score_points",
+        "reward_policy": "does_not_add_points; staged/manual-governed values are visible only for action and may cap/block recognition when evidence is red"
+      },
+      {
+        "canonical_code": "CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS",
+        "display_name": "Constraint idle while non-constraints run",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Prevent local utilization gains while the real constraint is idle.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "lean_toc_cmm_material_readiness",
+        "review_forum": "daily tier; weekly TOC review",
+        "scoring_policy": "visible_only_no_score_points",
+        "reward_policy": "does_not_add_points; staged/manual-governed values are visible only for action and may cap/block recognition when evidence is red"
+      },
+      {
+        "canonical_code": "CMM_QUEUE_AGING",
+        "display_name": "CMM queue aging",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Prevent CMM queue from becoming the hidden delivery/quality bottleneck.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "lean_toc_cmm_material_readiness",
+        "review_forum": "daily QC queue review; weekly TOC review",
+        "scoring_policy": "visible_only_no_score_points",
+        "reward_policy": "does_not_add_points; staged/manual-governed values are visible only for action and may cap/block recognition when evidence is red"
+      },
+      {
+        "canonical_code": "FAI_QUEUE_AGING",
+        "display_name": "FAI queue aging",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Expose first-article queue before setup/launch stalls delivery.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "lean_toc_cmm_material_readiness",
+        "review_forum": "daily tier; weekly TOC review",
+        "scoring_policy": "visible_only_no_score_points",
+        "reward_policy": "does_not_add_points; staged/manual-governed values are visible only for action and may cap/block recognition when evidence is red"
+      },
+      {
+        "canonical_code": "FINAL_INSPECTION_QUEUE_AGING",
+        "display_name": "Final inspection queue aging",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Expose final inspection queue before ship release or OTD fails.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "lean_toc_cmm_material_readiness",
+        "review_forum": "daily tier; weekly TOC review",
+        "scoring_policy": "visible_only_no_score_points",
+        "reward_policy": "does_not_add_points; staged/manual-governed values are visible only for action and may cap/block recognition when evidence is red"
+      },
+      {
+        "canonical_code": "QC_HOLD_SLA",
+        "display_name": "QC hold resolution SLA",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Keep quality holds visible with release authority and due date.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "lean_toc_cmm_material_readiness",
+        "review_forum": "daily tier; weekly TOC review",
+        "scoring_policy": "visible_only_no_score_points",
+        "reward_policy": "does_not_add_points; staged/manual-governed values are visible only for action and may cap/block recognition when evidence is red"
+      },
+      {
+        "canonical_code": "INSPECTION_PLAN_ADHERENCE",
+        "display_name": "Inspection plan adherence",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Prevent unapproved inspection-plan bypass during recovery.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "lean_toc_cmm_material_readiness",
+        "review_forum": "daily tier; weekly TOC review",
+        "scoring_policy": "visible_only_no_score_points",
+        "reward_policy": "does_not_add_points; staged/manual-governed values are visible only for action and may cap/block recognition when evidence is red"
+      },
+      {
+        "canonical_code": "MATERIAL_CERT_VERIFICATION_COMPLETENESS",
+        "display_name": "Material cert/CoC verification",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Block material green status when cert/CoC evidence is missing.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "lean_toc_cmm_material_readiness",
+        "review_forum": "daily tier; weekly TOC review",
+        "scoring_policy": "visible_only_no_score_points",
+        "reward_policy": "does_not_add_points; staged/manual-governed values are visible only for action and may cap/block recognition when evidence is red"
+      },
+      {
+        "canonical_code": "IQC_RELEASE_ON_TIME",
+        "display_name": "IQC released before kit",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Block constraint release until incoming quality release is clear.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "lean_toc_cmm_material_readiness",
+        "review_forum": "daily tier; weekly TOC review",
+        "scoring_policy": "visible_only_no_score_points",
+        "reward_policy": "does_not_add_points; staged/manual-governed values are visible only for action and may cap/block recognition when evidence is red"
+      },
+      {
+        "canonical_code": "LAM_MATERIAL_KIT_READY_TO_PLAN",
+        "display_name": "LAM material kit ready to plan",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Keep LAM kit readiness visible before constraint release.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "lean_toc_cmm_material_readiness",
+        "review_forum": "daily tier; weekly TOC review",
+        "scoring_policy": "visible_only_no_score_points",
+        "reward_policy": "does_not_add_points; staged/manual-governed values are visible only for action and may cap/block recognition when evidence is red"
+      },
+      {
+        "canonical_code": "TRACEABILITY_LABEL_VERIFIED",
+        "display_name": "Traceability label verified",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Prevent LAM flow when lot/heat/revision traceability is unverified.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "lean_toc_cmm_material_readiness",
+        "review_forum": "daily tier; weekly TOC review",
+        "scoring_policy": "visible_only_no_score_points",
+        "reward_policy": "does_not_add_points; staged/manual-governed values are visible only for action and may cap/block recognition when evidence is red"
+      },
+      {
+        "canonical_code": "SPECIAL_PROCESS_REQUIREMENT_CLEAR",
+        "display_name": "Special process requirement clear",
+        "bsc_perspective": "internal_process_flow",
+        "strategic_objective": "Prevent dispatch/outsource when coating or special-process requirements are unclear.",
+        "scorecard_role": "strategic_driver",
+        "lead_or_lag": "lead",
+        "initiative_link": "lean_toc_cmm_material_readiness",
+        "review_forum": "daily tier; weekly TOC review",
+        "scoring_policy": "visible_only_no_score_points",
+        "reward_policy": "does_not_add_points; staged/manual-governed values are visible only for action and may cap/block recognition when evidence is red"
       }
     ],
     "gate_blockers": [
@@ -13008,11 +14216,11 @@
       "data_contract_approval_id": "KPI-DC-MATERIAL_AVAILABILITY_PLAN-001",
       "evidence_manifest_id": "KPI-EV-MATERIAL_AVAILABILITY_PLAN-001",
       "source_system": "MOM",
-      "source_table_or_record": "job_orders",
-      "authority_service_path": "KpiEngine::calculateMaterialAvailabilityPlan or approved registry calculation bridge",
-      "evidence_record": "KpiEngine::calcMaterialAvailabilityPlan — job_orders.material_readiness_status cho lệnh trong lịch.",
+      "source_table_or_record": "job_orders.material_readiness_status + job_orders.metadata readiness blocker flags + governed LAM manual input gates",
+      "authority_service_path": "KpiEngine::calcMaterialAvailabilityPlan with Prompt 08 composite blocker suppression",
+      "evidence_record": "planned job readiness snapshot with cert/CoC, IQC, traceability label, special process, kit-before-constraint, tool, fixture and gage status",
       "freshness_rule": "daily close before scorecard review",
-      "lineage_rule": "manual override, stale evidence, or unapproved source change blocks scorecard recognition"
+      "lineage_rule": "Explicit blocker flag or open LAM G3/G5 readiness gate blocks green recognition even when physical material is available"
     }
   },
   "blocking_condition_registry": {
@@ -13105,7 +14313,21 @@
           "unowned_red_wip",
           "ncr_suppression",
           "critical_role_no_backup",
-          "unauthorized_work_performed"
+          "unauthorized_work_performed",
+          "lam_material_cert_missing_or_mismatched",
+          "lam_iqc_not_released_before_kit",
+          "traceability_label_missing_or_mismatched",
+          "special_process_requirement_unclear",
+          "lam_kit_not_ready_at_plan_release",
+          "tool_fixture_gage_not_ready_for_constraint",
+          "constraint_starved_due_to_readiness_blocker",
+          "constraint_idle_while_non_constraint_runs",
+          "lam_cmm_queue_overdue_without_escalation",
+          "fai_queue_overdue_without_escalation",
+          "final_inspection_queue_overdue_without_escalation",
+          "hold_closed_without_disposition_evidence",
+          "required_quality_hold_bypassed",
+          "inspection_plan_bypass_or_unapproved_sampling"
         ],
         "source_domain": "Planning / supplier readiness / training authority",
         "source_table_or_record": "material shortage log; WIP hold owner; NCR classification; training authorization record",
@@ -13282,10 +14504,10 @@
       "evaluation_use": "company_scorecard",
       "evaluation_scope": "company",
       "result_type": "outcome",
-      "strategic_intent": "Govern Material Availability for Plan as part of the lean executive operating scorecard.",
-      "motive": "Drive stable daily management without expanding the scorecard beyond the runtime-backed core.",
-      "expected_result": "Improve Material Availability for Plan with clean evidence and no counter-metric breach.",
-      "decision_purpose": "Đỏ: đẩy nhanh tiến độ hoặc quyết định đổi nguồn; SCM xử lý trong ngày.",
+      "strategic_intent": "Keep the approved plan executable at the true constraint, not merely stocked on paper.",
+      "motive": "Expose material, cert/CoC, IQC, traceability, special-process, kit and gage blockers before they starve the constraint or force OTD recovery.",
+      "expected_result": "Higher executable plan readiness with fewer late releases, CMM/QA holds and phantom-availability stoppages.",
+      "decision_purpose": "Release only constraint-ready jobs; escalate supplier/IQC/QA/gage blockers with owner and due date in daily management.",
       "accountable_owner": "SCM",
       "review_cadence": "daily",
       "review_forum": "monthly BSC and tier-management review",
@@ -13294,11 +14516,18 @@
       ],
       "data_confidence_level": "runtime_calculated",
       "drilldown_dimensions": [
-        "owner_role",
-        "process",
-        "work_center",
-        "period"
-      ]
+        "constraint_resource",
+        "job_number",
+        "customer_profile",
+        "supplier",
+        "readiness_component",
+        "blocker_owner"
+      ],
+      "source_system": "MOM job_orders plus governed LAM readiness gates",
+      "source_table_or_record": "job_orders.material_readiness_status; job_orders.metadata readiness blocker flags; kpi_manual_inputs for LAM readiness gates",
+      "evidence_record": "planned job readiness snapshot and verified LAM material/cert/IQC/traceability evidence",
+      "authority_service_path": "KpiEngine::calcMaterialAvailabilityPlan",
+      "lineage_rule": "Explicit readiness blocker prevents green status; manual-governed LAM blocker caps recognition until verified closed"
     }
   },
   "data_contract_required_fields": [
@@ -13358,7 +14587,11 @@
       "last_calculated_or_input_time",
       "scorecard_role",
       "bsc_perspective",
-      "review_forum"
+      "review_forum",
+      "staged_flag",
+      "owner_action_due_date",
+      "cause_breakdown",
+      "driver_panel_role"
     ],
     "render_rules": {
       "staged_data_contract": "Card MUST display 'chưa đủ data contract' badge + data_contract_gap text; numeric value field is SUPPRESSED (never render staged metric value as a real number). Only the badge, the data contract gap and the input endpoint are shown.",
@@ -13367,7 +14600,8 @@
       "manual_governed": "Same as manual but counter_metric_status MUST be visible alongside the primary value.",
       "runtime_calculated": "Card displays the numeric value with the unit. If breakdown.insufficient_data=true the card MUST render grey + insufficient_data_reason and the numeric value MUST be hidden.",
       "counter_metric_blocker": "If primary KPI is green/yellow but counter_metric is red OR counter_metric is missing/pending, the card MUST show a counter-metric blocker badge and recognition/reward is blocked.",
-      "spc_capability_metric": "Capability cards MUST consume ctq_capability_policy. n<25 renders grey insufficient_data and must hide numeric Cpk; 25-49 provisional cannot be green/reward/customer-claimed; 50-99 internal only; n>=100 may be customer-grade only when stable, gage-valid, spec-present, and post-change revalidated."
+      "spc_capability_metric": "Capability cards MUST consume ctq_capability_policy. n<25 renders grey insufficient_data and must hide numeric Cpk; 25-49 provisional cannot be green/reward/customer-claimed; 50-99 internal only; n>=100 may be customer-grade only when stable, gage-valid, spec-present, and post-change revalidated.",
+      "lean_flow_daily_tier": "Lean/TOC cards MUST show current constraint, blocker cause breakdown, owner/action due date, staged/manual flag and counter-metric status; staged constraint metrics render status/gap/action only, never a numeric value."
     },
     "card_classes": {
       "executive": {
@@ -13402,7 +14636,34 @@
           "manual_governed",
           "staged_data_contract"
         ],
-        "staged_metric_policy": "Staged metric is shown ONLY as a watch-item with the badge, never with a number."
+        "staged_metric_policy": "Staged metric is shown ONLY as a watch-item with badge, owner/action due date, blocker cause breakdown and data-contract gap; numeric value remains suppressed.",
+        "required_prompt08_signals": [
+          "OTD",
+          "PLAN_ADHERENCE",
+          "WIP_AGING",
+          "PROMISE_DATE_RISK",
+          "CURRENT_CONSTRAINT_RESOURCE",
+          "CONSTRAINT_LOST_HOURS",
+          "BOTTLENECK_BUFFER_STATUS",
+          "CONSTRAINT_STARVED_TIME",
+          "CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS",
+          "CMM_QUEUE_AGING",
+          "FAI_QUEUE_AGING",
+          "FINAL_INSPECTION_QUEUE_AGING",
+          "QC_HOLD_SLA",
+          "INSPECTION_PLAN_ADHERENCE",
+          "MATERIAL_AVAILABILITY_PLAN",
+          "MATERIAL_CERT_VERIFICATION_COMPLETENESS",
+          "IQC_RELEASE_ON_TIME",
+          "TRACEABILITY_LABEL_VERIFIED",
+          "LAM_MATERIAL_KIT_READY_TO_PLAN",
+          "SPECIAL_PROCESS_REQUIREMENT_CLEAR",
+          "FAI_FIRST_PASS",
+          "SETUP_FIRST_PASS",
+          "CHECK_DIM_REPORT_ON_SHIP",
+          "NCR_3D_RESPONSE_SLA",
+          "NCR_8D_UPDATE_SLA"
+        ]
       },
       "gate": {
         "audience": "CDR + gate-pass meeting",
@@ -20814,5 +22075,155 @@
       "GAGE_VALID_FOR_CTQ_MEASUREMENT"
     ],
     "rule": "Runtime requires verified source tables, KpiEngine calculator, empty-period handling, sample_size/numerator/denominator, data quality flags and catalog support. Manual-governed values require kpi_manual_inputs verification and never directly drive reward."
+  },
+  "lean_flow_operating_model": {
+    "model_id": "LEAN-TOC-CMM-MATERIAL-READINESS-2026-05",
+    "introduced_by_prompt": "Prompt 08 - Lean flow, TOC, CMM queue and material readiness hardening",
+    "purpose": "Expose true constraint, queue and readiness blockers before OTD fails; avoid assuming machine utilization is the bottleneck.",
+    "constraint_resource_types": [
+      {
+        "type": "cnc_machine",
+        "label": "CNC machine"
+      },
+      {
+        "type": "cnc_cell",
+        "label": "CNC cell or work-center family"
+      },
+      {
+        "type": "cmm",
+        "label": "CMM / measurement capacity"
+      },
+      {
+        "type": "setup",
+        "label": "setup team / setup artifact"
+      },
+      {
+        "type": "cam",
+        "label": "CAM/programming release"
+      },
+      {
+        "type": "qc_final_inspection",
+        "label": "QC/final inspection/release"
+      },
+      {
+        "type": "deburr_cleaning_packing",
+        "label": "deburr, cleaning or packing"
+      },
+      {
+        "type": "supplier_material",
+        "label": "supplier/material/cert/IQC readiness"
+      },
+      {
+        "type": "special_process_outsource",
+        "label": "special process or outsource capacity"
+      }
+    ],
+    "required_constraint_metrics": [
+      "CURRENT_CONSTRAINT_RESOURCE",
+      "CONSTRAINT_LOST_HOURS",
+      "OEE_BOTTLENECK",
+      "BOTTLENECK_BUFFER_STATUS",
+      "CONSTRAINT_STARVED_TIME",
+      "CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS"
+    ],
+    "cmm_qc_queue_metrics": [
+      "CMM_QUEUE_AGING",
+      "FAI_QUEUE_AGING",
+      "FINAL_INSPECTION_QUEUE_AGING",
+      "QC_HOLD_SLA",
+      "INSPECTION_PLAN_ADHERENCE"
+    ],
+    "material_readiness_components": [
+      {
+        "component": "physical_material_available",
+        "linked_metric": "MATERIAL_AVAILABILITY_PLAN",
+        "green_gate": "material_readiness_status ready/available/complete/ok/cleared"
+      },
+      {
+        "component": "mill_cert_coc_verified",
+        "linked_metric": "MATERIAL_CERT_VERIFICATION_COMPLETENESS",
+        "green_gate": "no cert/CoC blocker and verified evidence when LAM applies"
+      },
+      {
+        "component": "iqc_released",
+        "linked_metric": "IQC_RELEASE_ON_TIME",
+        "green_gate": "IQC release before kit/release to constraint"
+      },
+      {
+        "component": "traceability_label_verified",
+        "linked_metric": "TRACEABILITY_LABEL_VERIFIED",
+        "green_gate": "lot/heat/revision trace label verified"
+      },
+      {
+        "component": "special_process_clear",
+        "linked_metric": "SPECIAL_PROCESS_REQUIREMENT_CLEAR",
+        "green_gate": "special process/coating/outsource requirements clear before dispatch"
+      },
+      {
+        "component": "kit_ready_before_constraint",
+        "linked_metric": "LAM_MATERIAL_KIT_READY_TO_PLAN",
+        "green_gate": "kit complete before constraint release"
+      },
+      {
+        "component": "tool_fixture_gage_ready",
+        "linked_metric": "GAGE_VALID_FOR_RELEASE",
+        "green_gate": "tooling, fixture and gage ready for constraint job"
+      }
+    ],
+    "daily_board_required_signals": [
+      "OTD",
+      "PLAN_ADHERENCE",
+      "WIP_AGING",
+      "PROMISE_DATE_RISK",
+      "CURRENT_CONSTRAINT_RESOURCE",
+      "CONSTRAINT_LOST_HOURS",
+      "BOTTLENECK_BUFFER_STATUS",
+      "CONSTRAINT_STARVED_TIME",
+      "CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS",
+      "CMM_QUEUE_AGING",
+      "FAI_QUEUE_AGING",
+      "FINAL_INSPECTION_QUEUE_AGING",
+      "QC_HOLD_SLA",
+      "INSPECTION_PLAN_ADHERENCE",
+      "MATERIAL_AVAILABILITY_PLAN",
+      "MATERIAL_CERT_VERIFICATION_COMPLETENESS",
+      "IQC_RELEASE_ON_TIME",
+      "TRACEABILITY_LABEL_VERIFIED",
+      "LAM_MATERIAL_KIT_READY_TO_PLAN",
+      "SPECIAL_PROCESS_REQUIREMENT_CLEAR",
+      "FAI_FIRST_PASS",
+      "SETUP_FIRST_PASS",
+      "CHECK_DIM_REPORT_ON_SHIP",
+      "NCR_3D_RESPONSE_SLA",
+      "NCR_8D_UPDATE_SLA"
+    ],
+    "dashboard_rules": {
+      "staged_flags_required": true,
+      "owner_due_required": true,
+      "cause_breakdown_required": true,
+      "rule": "Dashboard must show scored core, strategic driver panel, daily/tier metrics, staged/manual flags, owner/action due date, cause breakdown, evidence status and counter-metric status."
+    },
+    "scenario_checkpoints": [
+      {
+        "scenario": "CMM bottleneck",
+        "visible_metric": "CMM_QUEUE_AGING",
+        "expected_response": "CMM/QC queue appears as current constraint or queue blocker with owner/due action."
+      },
+      {
+        "scenario": "material available but cert missing",
+        "visible_metric": "MATERIAL_AVAILABILITY_PLAN",
+        "expected_response": "Readiness cannot render green when cert/CoC blocker is explicit."
+      },
+      {
+        "scenario": "approved hot-job resequence",
+        "visible_metric": "PLAN_ADHERENCE",
+        "expected_response": "Approved resequence is excluded by job_orders.metadata.approved_resequence."
+      },
+      {
+        "scenario": "machine OEE green but constraint idle",
+        "visible_metric": "CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS",
+        "expected_response": "Counter flags local optimization while true constraint is idle."
+      }
+    ]
   }
 }

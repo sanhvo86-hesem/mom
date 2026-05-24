@@ -76,9 +76,9 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $catalog = $engine->getMetricCatalog();
 
         $this->assertSame(35, $catalog['counts']['runtime_calculated_metrics'] ?? null);
-        $this->assertSame(18, $catalog['counts']['dashboard_core_kpis'] ?? null);
+        $this->assertSame(32, $catalog['counts']['dashboard_core_kpis'] ?? null);
         $this->assertSame(42, $catalog['counts']['gate_control_metrics'] ?? null);
-        $this->assertSame(136, $catalog['counts']['proposed_operating_metrics'] ?? null);
+        $this->assertSame(139, $catalog['counts']['proposed_operating_metrics'] ?? null);
         $this->assertSame(
             'CTQ-CAPABILITY-POLICY-LAM-SEMSYSCO-2026-05',
             $catalog['ctq_capability_policy']['policy_id'] ?? null,
@@ -107,6 +107,14 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         );
         $this->assertContains('metric_type', $catalog['metric_governance_schema']['required_catalog_fields'] ?? []);
         $this->assertSame('CNC-EXEC-BSC-LEAN-7+DRIVERS-2026', $catalog['scorecard_operating_model']['model_id'] ?? null);
+        $this->assertSame(
+            'KPI-DASHBOARD-RENDER-CONTRACT-1',
+            $catalog['dashboard_render_contract']['contract_id'] ?? null,
+        );
+        $this->assertSame(
+            'LEAN-TOC-CMM-MATERIAL-READINESS-2026-05',
+            $catalog['lean_flow_operating_model']['model_id'] ?? null,
+        );
         $this->assertSame(true, $catalog['bonus_simulation_model']['simulation_only'] ?? null);
         $this->assertArrayHasKey('critical', $catalog['customer_ncr_severity_matrix'] ?? []);
         $this->assertNotEmpty($catalog['customer_ncr_data_contract']['required_fields'] ?? []);
@@ -164,8 +172,14 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertSame('runtime_calculated', $metricsByCode['CUSTOMER_ACCEPTED_8D_CLOSURE_RATE']['calculation_status'] ?? null);
         $this->assertSame('manual_governed', $metricsByCode['FINAL_RELEASE_RFT']['calculation_status'] ?? null);
         $this->assertSame('manual_governed', $metricsByCode['CHECK_DIM_REPORT_ON_SHIP']['calculation_status'] ?? null);
+        $this->assertSame('staged_data_contract', $metricsByCode['CURRENT_CONSTRAINT_RESOURCE']['calculation_status'] ?? null);
+        $this->assertSame('staged_data_contract', $metricsByCode['CONSTRAINT_STARVED_TIME']['calculation_status'] ?? null);
+        $this->assertSame('staged_data_contract', $metricsByCode['CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS']['calculation_status'] ?? null);
+        $this->assertFalse($metricsByCode['CURRENT_CONSTRAINT_RESOURCE']['scorecard_contributes_to_reward'] ?? true);
+        $this->assertContains('flow_constraint', $metricsByCode['CONSTRAINT_STARVED_TIME']['metric_control']['usage_contexts'] ?? []);
         $this->assertSame('staged_data_contract', $metricsByCode['FAI_QUEUE_AGING']['calculation_status'] ?? null);
         $this->assertSame('staged_data_contract', $metricsByCode['FINAL_INSPECTION_QUEUE_AGING']['calculation_status'] ?? null);
+        $this->assertSame('composite_readiness_index', $metricsByCode['MATERIAL_AVAILABILITY_PLAN']['metric_control']['type']['metric_subtype'] ?? null);
         $this->assertNotSame('company_scorecard', $metricsByCode['SUPPLIER_READINESS']['evaluation_use'] ?? null);
         $this->assertNull($metricsByCode['SUPPLIER_READINESS']['scorecard_weight_pct'] ?? null);
         $this->assertNull($metricsByCode['RECORDABLE_INCIDENT_RATE']['scorecard_weight_pct'] ?? null);

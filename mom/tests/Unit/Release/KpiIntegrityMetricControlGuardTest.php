@@ -306,6 +306,60 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
         );
     }
 
+    public function testRejectsPrompt08MissingConstraintMetric(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::removeMetric($registry, 'CURRENT_CONSTRAINT_RESOURCE');
+                $registry['dashboard_core_kpis'] = array_values(array_filter(
+                    $registry['dashboard_core_kpis'],
+                    static fn(array $row): bool => ($row['canonical_code'] ?? '') !== 'CURRENT_CONSTRAINT_RESOURCE',
+                ));
+            },
+            "Prompt 08 required constraint metric 'CURRENT_CONSTRAINT_RESOURCE' missing.",
+        );
+    }
+
+    public function testRejectsPrompt08MaterialReadinessMissingCertComponent(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'MATERIAL_AVAILABILITY_PLAN', static function (array &$row): void {
+                    $row['components'] = array_values(array_filter(
+                        $row['components'] ?? [],
+                        static fn(array $component): bool => ($component['code'] ?? '') !== 'mill_cert_coc_verified',
+                    ));
+                });
+            },
+            "Prompt 08 MATERIAL_AVAILABILITY_PLAN: missing readiness component 'mill_cert_coc_verified'.",
+        );
+    }
+
+    public function testRejectsPrompt08ConstraintMetricMadeRewardable(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'CONSTRAINT_LOST_HOURS', static function (array &$row): void {
+                    $row['reward_eligible'] = true;
+                    $row['reward_mode'] = 'bonus_pool_candidate';
+                });
+            },
+            'Prompt 08 CONSTRAINT_LOST_HOURS: constraint metric must not be rewardable or scorecard contributing.',
+        );
+    }
+
+    public function testRejectsPrompt08QueueMetricWithoutDailyManagementContext(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'CMM_QUEUE_AGING', static function (array &$row): void {
+                    $row['usage_contexts'] = ['lam_profile_gate'];
+                });
+            },
+            'Prompt 08 CMM_QUEUE_AGING: queue metric must include daily_management or flow_constraint usage_context.',
+        );
+    }
+
     /**
      * @param callable(array<string, mixed>): void $mutate
      */

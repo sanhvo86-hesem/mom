@@ -849,6 +849,8 @@ final class KpiEngine
             'metric_governance_schema' => is_array($registry['metric_governance_schema'] ?? null) ? $registry['metric_governance_schema'] : [],
             'metric_governance_defaults' => is_array($registry['metric_governance_defaults'] ?? null) ? $registry['metric_governance_defaults'] : [],
             'scorecard_operating_model' => is_array($registry['scorecard_operating_model'] ?? null) ? $registry['scorecard_operating_model'] : [],
+            'dashboard_render_contract' => is_array($registry['dashboard_render_contract'] ?? null) ? $registry['dashboard_render_contract'] : [],
+            'lean_flow_operating_model' => is_array($registry['lean_flow_operating_model'] ?? null) ? $registry['lean_flow_operating_model'] : [],
             'customer_ncr_severity_matrix' => is_array($registry['customer_ncr_severity_matrix'] ?? null) ? $registry['customer_ncr_severity_matrix'] : [],
             'customer_ncr_data_contract' => is_array($registry['customer_ncr_data_contract'] ?? null) ? $registry['customer_ncr_data_contract'] : [],
             'bonus_simulation_model' => is_array($registry['bonus_simulation_model'] ?? null) ? $registry['bonus_simulation_model'] : [],
@@ -2113,32 +2115,144 @@ final class KpiEngine
     }
 
     /**
-     * Material Availability for Plan = Planned jobs with material ready /
-     * Jobs planned to start in the period x 100.
+     * Material Availability for Plan = planned jobs that are physically ready
+     * and not blocked by declared cert/IQC/traceability/kit/tool/gage metadata
+     * / jobs planned to start in the period x 100.
      */
     private function calcMaterialAvailabilityPlan(DateRange $period, array $filters): array
     {
         $row = $this->db->queryOne(
-            "SELECT
+            "WITH planned AS (
+                SELECT
+                    COALESCE(metadata, '{}'::jsonb) AS meta,
+                    LOWER(COALESCE(material_readiness_status, '')) IN
+                        ('ready', 'available', 'complete', 'ok', 'cleared') AS physical_ready,
+                    (
+                        LOWER(COALESCE(metadata->>'material_cert_blocked', '')) IN
+                            ('true', 'yes', '1', 'blocked', 'missing', 'mismatch', 'not_verified', 'failed')
+                        OR LOWER(COALESCE(metadata->>'mill_cert_coc_verified', '')) IN
+                            ('false', 'no', '0', 'blocked', 'missing', 'mismatch', 'not_verified', 'failed')
+                        OR LOWER(COALESCE(metadata->>'coc_verified', '')) IN
+                            ('false', 'no', '0', 'blocked', 'missing', 'mismatch', 'not_verified', 'failed')
+                    ) AS cert_coc_blocked,
+                    (
+                        LOWER(COALESCE(metadata->>'iqc_blocked', '')) IN
+                            ('true', 'yes', '1', 'blocked', 'hold', 'rejected', 'failed')
+                        OR LOWER(COALESCE(metadata->>'iqc_released', '')) IN
+                            ('false', 'no', '0', 'blocked', 'hold', 'pending', 'rejected', 'failed')
+                    ) AS iqc_blocked,
+                    (
+                        LOWER(COALESCE(metadata->>'traceability_blocked', '')) IN
+                            ('true', 'yes', '1', 'blocked', 'missing', 'mismatch', 'failed')
+                        OR LOWER(COALESCE(metadata->>'traceability_label_verified', '')) IN
+                            ('false', 'no', '0', 'blocked', 'missing', 'mismatch', 'failed')
+                    ) AS traceability_blocked,
+                    (
+                        LOWER(COALESCE(metadata->>'special_process_blocked', '')) IN
+                            ('true', 'yes', '1', 'blocked', 'missing', 'unclear', 'failed')
+                        OR LOWER(COALESCE(metadata->>'special_process_clear', '')) IN
+                            ('false', 'no', '0', 'blocked', 'missing', 'unclear', 'failed')
+                    ) AS special_process_blocked,
+                    (
+                        LOWER(COALESCE(metadata->>'kit_ready_before_constraint', '')) IN
+                            ('false', 'no', '0', 'blocked', 'missing', 'not_ready', 'failed')
+                    ) AS kit_blocked,
+                    (
+                        LOWER(COALESCE(metadata->>'tool_fixture_gage_blocked', '')) IN
+                            ('true', 'yes', '1', 'blocked', 'missing', 'failed')
+                        OR LOWER(COALESCE(metadata->>'tooling_available', '')) IN
+                            ('false', 'no', '0', 'blocked', 'missing', 'not_ready', 'failed')
+                        OR LOWER(COALESCE(metadata->>'fixture_available', '')) IN
+                            ('false', 'no', '0', 'blocked', 'missing', 'not_ready', 'failed')
+                        OR LOWER(COALESCE(metadata->>'gage_ready', '')) IN
+                            ('false', 'no', '0', 'blocked', 'missing', 'not_ready', 'failed')
+                    ) AS tool_fixture_gage_blocked
+                FROM job_orders
+                WHERE start_date_planned BETWEEN :s AND :e
+            )
+            SELECT
                 COUNT(*) AS total,
+                COUNT(*) FILTER (WHERE physical_ready) AS material_status_ready,
                 COUNT(*) FILTER (
-                    WHERE LOWER(COALESCE(material_readiness_status, '')) IN
-                          ('ready', 'available', 'complete', 'ok', 'cleared')
-                ) AS ready
-             FROM job_orders
-             WHERE start_date_planned BETWEEN :s AND :e",
+                    WHERE physical_ready
+                      AND NOT (
+                        cert_coc_blocked OR iqc_blocked OR traceability_blocked
+                        OR special_process_blocked OR kit_blocked OR tool_fixture_gage_blocked
+                      )
+                ) AS ready,
+                COUNT(*) FILTER (WHERE NOT physical_ready) AS material_status_not_ready,
+                COUNT(*) FILTER (WHERE cert_coc_blocked) AS cert_coc_blocked,
+                COUNT(*) FILTER (WHERE iqc_blocked) AS iqc_blocked,
+                COUNT(*) FILTER (WHERE traceability_blocked) AS traceability_blocked,
+                COUNT(*) FILTER (WHERE special_process_blocked) AS special_process_blocked,
+                COUNT(*) FILTER (WHERE kit_blocked) AS kit_blocked,
+                COUNT(*) FILTER (WHERE tool_fixture_gage_blocked) AS tool_fixture_gage_blocked,
+                COUNT(*) FILTER (
+                    WHERE cert_coc_blocked OR iqc_blocked OR traceability_blocked
+                       OR special_process_blocked OR kit_blocked OR tool_fixture_gage_blocked
+                ) AS readiness_blocked_jobs,
+                COUNT(*) FILTER (
+                    WHERE (meta ? 'material_cert_blocked')
+                       OR (meta ? 'mill_cert_coc_verified')
+                       OR (meta ? 'coc_verified')
+                       OR (meta ? 'iqc_blocked')
+                       OR (meta ? 'iqc_released')
+                       OR (meta ? 'traceability_blocked')
+                       OR (meta ? 'traceability_label_verified')
+                       OR (meta ? 'special_process_blocked')
+                       OR (meta ? 'special_process_clear')
+                       OR (meta ? 'kit_ready_before_constraint')
+                       OR (meta ? 'tool_fixture_gage_blocked')
+                       OR (meta ? 'tooling_available')
+                       OR (meta ? 'fixture_available')
+                       OR (meta ? 'gage_ready')
+                ) AS readiness_metadata_declared
+             FROM planned",
             [':s' => $period->start, ':e' => $period->end],
         );
 
         $total = (int) ($row['total'] ?? 0);
         $ready = (int) ($row['ready'] ?? 0);
-        $pct   = $total > 0 ? ($ready / $total) * 100 : 0.0;
+        $materialStatusReady = (int) ($row['material_status_ready'] ?? 0);
+        $metadataDeclared = (int) ($row['readiness_metadata_declared'] ?? 0);
+        $pct = $total > 0 ? ($ready / $total) * 100 : 0.0;
+
+        $componentBlockers = [
+            'material_status_not_ready' => (int) ($row['material_status_not_ready'] ?? 0),
+            'cert_coc_blocked' => (int) ($row['cert_coc_blocked'] ?? 0),
+            'iqc_blocked' => (int) ($row['iqc_blocked'] ?? 0),
+            'traceability_blocked' => (int) ($row['traceability_blocked'] ?? 0),
+            'special_process_blocked' => (int) ($row['special_process_blocked'] ?? 0),
+            'kit_blocked' => (int) ($row['kit_blocked'] ?? 0),
+            'tool_fixture_gage_blocked' => (int) ($row['tool_fixture_gage_blocked'] ?? 0),
+        ];
+        $dataQualityFlags = [];
+        foreach ($componentBlockers as $key => $count) {
+            if ($count > 0) {
+                $dataQualityFlags[] = "material_readiness_{$key}_count={$count}";
+            }
+        }
+        if ($total > 0 && $metadataDeclared < $total) {
+            $dataQualityFlags[] = 'material_readiness_component_metadata_missing_count=' . ($total - $metadataDeclared);
+        }
 
         return [
-            'value'        => round($pct, 2),
-            'sample_size'  => $total,
+            'value' => round($pct, 2),
+            'sample_size' => $total,
+            'numerator' => $ready,
+            'denominator' => $total,
             'jobs_planned' => $total,
             'material_ready' => $ready,
+            'physical_material_ready' => $materialStatusReady,
+            'readiness_blocked_jobs' => (int) ($row['readiness_blocked_jobs'] ?? 0),
+            'readiness_metadata_declared' => $metadataDeclared,
+            'data_source' => 'job_orders.material_readiness_status+metadata_readiness_blockers',
+            'empty_result' => $total === 0,
+            'breakdown' => [
+                'component_blockers' => $componentBlockers,
+                'metadata_component_coverage_pct' => $total > 0 ? round(($metadataDeclared / $total) * 100, 2) : 0.0,
+            ],
+            'data_quality_flags' => $dataQualityFlags,
         ];
     }
 

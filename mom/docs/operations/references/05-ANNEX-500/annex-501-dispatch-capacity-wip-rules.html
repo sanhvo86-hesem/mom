@@ -97,21 +97,31 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>Review cadence</td><td>Tối thiểu hằng tuần; hằng ngày nếu buffer đỏ hoặc có P0/P1.</td><td>PD / PPL</td></tr>
 </tbody></table></div>
 
-<h3>1A.2 Drum-buffer-rope rule</h3>
+<h3>1A.2 Metric bắt buộc cho Lean/TOC</h3>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Metric</th><th>Ý nghĩa điều hành</th><th>Quy tắc quyết định</th></tr></thead><tbody>
+<tr><td><span class="code">CURRENT_CONSTRAINT_RESOURCE</span></td><td>Nguồn lực đang giới hạn throughput: máy/cell, CMM, setup, CAM, QC/final inspection, deburr/cleaning/packing, supplier/material hoặc outsource.</td><td>Không được ra quyết định release/hot-job nếu constraint hiện tại chưa có type, ID, owner và evidence trong register.</td></tr>
+<tr><td><span class="code">BOTTLENECK_BUFFER_STATUS</span></td><td>Buffer trước constraint chỉ tính job thật sự ready.</td><td>Không tô xanh khi job còn thiếu material, cert/CoC, IQC, traceability, special process, kit, setup, tool, fixture, gage, FAI hoặc QA release.</td></tr>
+<tr><td><span class="code">CONSTRAINT_LOST_HOURS</span>, <span class="code">CONSTRAINT_STARVED_TIME</span></td><td>Giờ constraint mất hoặc đói việc vì blocker.</td><td>Gán owner/due theo cause breakdown trong cùng ca; ưu tiên clear blocker cho constraint trước khi tăng WIP ở chỗ khác.</td></tr>
+<tr><td><span class="code">CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS</span></td><td>Phát hiện tối ưu cục bộ khi nguồn lực phụ vẫn chạy trong lúc constraint idle.</td><td>Dừng local optimization, chuyển người/tool/gage/CMM/material sang constraint hoặc ghi rõ lý do không thể chuyển.</td></tr>
+<tr><td><span class="code">CMM_QUEUE_AGING</span>, <span class="code">FAI_QUEUE_AGING</span>, <span class="code">FINAL_INSPECTION_QUEUE_AGING</span>, <span class="code">QC_HOLD_SLA</span>, <span class="code">INSPECTION_PLAN_ADHERENCE</span></td><td>Queue chất lượng có thể là constraint thật.</td><td>Hiển thị queue age, oldest job, owner, due và release condition; không bypass FAI/CMM/final inspection để làm đẹp OTD.</td></tr>
+<tr><td><span class="code">MATERIAL_AVAILABILITY_PLAN</span></td><td>Readiness composite cho physical material, cert/CoC, IQC, traceability, special process, kit trước constraint và tool/fixture/gage.</td><td>Material status không được xanh nếu cert/IQC/traceability/kit/gage blocker còn mở.</td></tr>
+</tbody></table></div>
+
+<h3>1A.3 Drum-buffer-rope rule</h3>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thành phần TOC</th><th>Áp dụng trong CNC</th><th>Rule điều hành</th></tr></thead><tbody>
 <tr><td>Drum</td><td>Ràng buộc hiện tại: máy, CMM, setup team, fixture, gage, quy trình đặc biệt hoặc QA release.</td><td>Lịch của drum quyết định nhịp release. Không tối ưu máy không phải ràng buộc nếu làm tăng WIP trước drum.</td></tr>
 <tr><td>Buffer</td><td>Job ready trước drum, đã đủ material, program, setup/fixture/gage, FAI/QA condition.</td><td>Buffer phải bảo đảm drum không đói việc, nhưng chỉ tính job thật sự ready.</td></tr>
 <tr><td>Rope</td><td>Rule release job từ upstream vào hệ.</td><td>Chỉ release job mới khi phù hợp nhịp drum và không phá WIP cap trước ràng buộc.</td></tr>
 </tbody></table></div>
 
-<h3>1A.3 Buffer đỏ/vàng/xanh</h3>
+<h3>1A.4 Buffer đỏ/vàng/xanh</h3>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Màu</th><th>Điều kiện</th><th>Hành động bắt buộc</th></tr></thead><tbody>
 <tr><td><span class="badge-green">Xanh</span></td><td>Drum có buffer ready đủ cho nhịp cam kết; không có blocker nghiêm trọng.</td><td>Giữ lịch, không đổi ưu tiên nếu không có P0/P1 được duyệt.</td></tr>
 <tr><td><span class="badge-amber">Vàng</span></td><td>Buffer giảm, có rủi ro thiếu job ready trong 1-2 ca hoặc có blocker material/setup/gage/CMM.</td><td>Mở action trong ngày, ưu tiên clear blocker trước khi nhận thêm WIP.</td></tr>
 <tr><td><span class="badge-red">Đỏ</span></td><td>Drum đang đói việc, sắp đói việc, hoặc lost constraint hours đã phát sinh.</td><td>Escalate T1/T2; ưu tiên setup, fixture, gage, CMM, material và QA release cho drum. Không cấp thêm job chưa ready vào queue.</td></tr>
 </tbody></table></div>
 
-<h3>1A.4 Ưu tiên tài nguyên cho bottleneck</h3>
+<h3>1A.5 Ưu tiên tài nguyên cho bottleneck</h3>
 <ul class="tight">
 <li>Setup technician, fixture, special jaw, holder và tool preset phải ưu tiên cho job nằm trong drum plan.</li>
 <li>Gage, CMM program, CMM slot và QC inspector phải ưu tiên cho mẫu đầu tiên/FAI của job tại ràng buộc.</li>

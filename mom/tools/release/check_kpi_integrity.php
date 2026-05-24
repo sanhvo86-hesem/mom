@@ -59,6 +59,9 @@ declare(strict_types=1);
  *  17. Prompt 07 runtime/manual graduation drift: runtime-graduated LAM
  *      metrics must have calculator + source-table/column contract, while
  *      manual-governed rows need maker/checker manual_input_contract.
+ *  18. Prompt 08 Lean/TOC flow drift: constraint, CMM/QC queue and material
+ *      readiness metrics must remain visible, non-reward fake-runtime-proof
+ *      drivers with declared data gaps, dashboard cards and blocker contracts.
  *
  * P1 findings (warn, do not block)
  * ────────────────────────────────
@@ -2083,6 +2086,170 @@ foreach (['FAI_QUEUE_AGING', 'FINAL_INSPECTION_QUEUE_AGING'] as $code) {
     if (trim((string) ($row['data_contract_gap'] ?? '')) === ''
         || trim((string) ($row['target_graduation_condition'] ?? '')) === '') {
         $p0[] = "Prompt 07 $code: staged backlog metric requires data_contract_gap and target_graduation_condition.";
+    }
+}
+
+// ── P0.18 — Prompt 08 Lean/TOC, CMM/QC queue and readiness contracts ────────
+// Prompt 08 makes flow constraints and material readiness visible before OTD
+// fails. These metrics are intentionally drivers/blockers, not bonus shortcuts
+// and not fake runtime. The guard preserves the model: any future edit that
+// removes the current-constraint signal, strips queue context, weakens material
+// readiness blockers, or puts staged constraint metrics into reward must block.
+$dashboardByCodeP08 = [];
+foreach ($dashboard as $row) {
+    if (!is_array($row)) {
+        continue;
+    }
+    $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+    if ($code !== '') {
+        $dashboardByCodeP08[$code] = $row;
+    }
+}
+$driverCodesP08 = [];
+$scorecardModelP08 = is_array($registry['scorecard_operating_model'] ?? null)
+    ? $registry['scorecard_operating_model'] : [];
+foreach ((array) ($scorecardModelP08['strategic_driver_panel'] ?? []) as $row) {
+    if (!is_array($row)) {
+        continue;
+    }
+    $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+    if ($code !== '') {
+        $driverCodesP08[$code] = true;
+    }
+}
+$leanFlow = is_array($registry['lean_flow_operating_model'] ?? null)
+    ? $registry['lean_flow_operating_model'] : [];
+if ($leanFlow === []) {
+    $p0[] = "Prompt 08: missing lean_flow_operating_model.";
+} else {
+    $types = [];
+    foreach ((array) ($leanFlow['constraint_resource_types'] ?? []) as $row) {
+        if (is_array($row)) {
+            $type = strtolower(trim((string) ($row['type'] ?? '')));
+            if ($type !== '') {
+                $types[$type] = true;
+            }
+        } elseif (is_string($row)) {
+            $types[strtolower(trim($row))] = true;
+        }
+    }
+    foreach (['cnc_machine', 'cnc_cell', 'cmm', 'setup', 'cam',
+              'qc_final_inspection', 'deburr_cleaning_packing', 'supplier_material'] as $requiredType) {
+        if (!isset($types[$requiredType])) {
+            $p0[] = "Prompt 08 lean_flow_operating_model: missing constraint_resource_type '$requiredType'.";
+        }
+    }
+}
+
+$p08ConstraintMetrics = [
+    'CURRENT_CONSTRAINT_RESOURCE',
+    'CONSTRAINT_LOST_HOURS',
+    'OEE_BOTTLENECK',
+    'BOTTLENECK_BUFFER_STATUS',
+    'CONSTRAINT_STARVED_TIME',
+    'CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS',
+];
+foreach ($p08ConstraintMetrics as $code) {
+    $row = $metricIndex[$code] ?? null;
+    if (!is_array($row)) {
+        $p0[] = "Prompt 08 required constraint metric '$code' missing.";
+        continue;
+    }
+    if (in_array($code, array_map('strtoupper', $runtimeList), true) || isset($engineCalculatorCodes[$code])) {
+        $p0[] = "Prompt 08 $code: constraint driver must not be runtime_calculated until constraint event contract exists.";
+    }
+    if ((bool) ($row['reward_eligible'] ?? false)
+        || (bool) ($row['scorecard_contributes_to_reward'] ?? false)
+        || in_array((string) ($row['reward_mode'] ?? ''), ['bonus_pool_candidate', 'team_reward_candidate', 'role_review_input'], true)) {
+        $p0[] = "Prompt 08 $code: constraint metric must not be rewardable or scorecard contributing.";
+    }
+    if (trim((string) ($row['data_contract_gap'] ?? '')) === ''
+        || trim((string) ($row['target_graduation_condition'] ?? '')) === '') {
+        $p0[] = "Prompt 08 $code: constraint metric requires data_contract_gap and target_graduation_condition.";
+    }
+    if (!isset($dashboardByCodeP08[$code])) {
+        $p0[] = "Prompt 08 dashboard: constraint metric '$code' missing from dashboard_core_kpis.";
+    } elseif ((bool) ($dashboardByCodeP08[$code]['scoreable'] ?? false)) {
+        $p0[] = "Prompt 08 dashboard $code: constraint driver must be scoreable=false.";
+    }
+    if (!isset($driverCodesP08[$code])) {
+        $p0[] = "Prompt 08 scorecard_operating_model: constraint metric '$code' missing from strategic_driver_panel.";
+    }
+}
+
+$p08QueueMetrics = [
+    'CMM_QUEUE_AGING',
+    'FAI_QUEUE_AGING',
+    'FINAL_INSPECTION_QUEUE_AGING',
+    'QC_HOLD_SLA',
+    'INSPECTION_PLAN_ADHERENCE',
+];
+foreach ($p08QueueMetrics as $code) {
+    $row = $metricIndex[$code] ?? null;
+    if (!is_array($row)) {
+        $p0[] = "Prompt 08 required CMM/QC queue metric '$code' missing.";
+        continue;
+    }
+    $contexts = array_map('strval', is_array($row['usage_contexts'] ?? null) ? $row['usage_contexts'] : []);
+    if (!in_array('daily_management', $contexts, true) && !in_array('flow_constraint', $contexts, true)) {
+        $p0[] = "Prompt 08 $code: queue metric must include daily_management or flow_constraint usage_context.";
+    }
+    if ((bool) ($row['reward_eligible'] ?? false)
+        || (bool) ($row['scorecard_contributes_to_reward'] ?? false)
+        || in_array((string) ($row['reward_mode'] ?? ''), ['bonus_pool_candidate', 'team_reward_candidate', 'role_review_input'], true)) {
+        $p0[] = "Prompt 08 $code: CMM/QC queue metric must not be rewardable or scorecard contributing.";
+    }
+    if (!isset($dashboardByCodeP08[$code])) {
+        $p0[] = "Prompt 08 dashboard: queue metric '$code' missing from dashboard_core_kpis.";
+    }
+    if (!isset($driverCodesP08[$code])) {
+        $p0[] = "Prompt 08 scorecard_operating_model: queue metric '$code' missing from strategic_driver_panel.";
+    }
+}
+
+$materialPlanP08 = $metricIndex['MATERIAL_AVAILABILITY_PLAN'] ?? null;
+if (!is_array($materialPlanP08)) {
+    $p0[] = "Prompt 08 MATERIAL_AVAILABILITY_PLAN: missing from registry metric index.";
+} else {
+    $componentCodes = [];
+    $weightTotal = 0.0;
+    foreach ((array) ($materialPlanP08['components'] ?? []) as $component) {
+        if (!is_array($component)) {
+            continue;
+        }
+        $componentCode = trim((string) ($component['code'] ?? ''));
+        if ($componentCode !== '') {
+            $componentCodes[$componentCode] = true;
+        }
+        if (is_numeric($component['weight_pct'] ?? null)) {
+            $weightTotal += (float) $component['weight_pct'];
+        }
+    }
+    foreach (['physical_material_available', 'mill_cert_coc_verified', 'iqc_released',
+              'traceability_label_verified', 'special_process_clear',
+              'kit_ready_before_constraint', 'tool_fixture_gage_ready'] as $componentCode) {
+        if (!isset($componentCodes[$componentCode])) {
+            $p0[] = "Prompt 08 MATERIAL_AVAILABILITY_PLAN: missing readiness component '$componentCode'.";
+        }
+    }
+    if (abs($weightTotal - 100.0) > 0.01) {
+        $p0[] = "Prompt 08 MATERIAL_AVAILABILITY_PLAN: readiness component weights must sum to 100 (got $weightTotal).";
+    }
+    $sourceText = strtolower((string) json_encode($materialPlanP08['data_source'] ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    foreach (['metadata.material_cert_blocked', 'metadata.iqc_released', 'metadata.traceability_label_verified',
+              'metadata.special_process_clear', 'metadata.kit_ready_before_constraint', 'metadata.gage_ready'] as $token) {
+        if (!str_contains($sourceText, strtolower($token))) {
+            $p0[] = "Prompt 08 MATERIAL_AVAILABILITY_PLAN: data_source must mention '$token'.";
+        }
+    }
+    $blockers = array_map('strval', is_array($materialPlanP08['blocking_conditions'] ?? null)
+        ? $materialPlanP08['blocking_conditions'] : []);
+    foreach (['lam_material_cert_missing_or_mismatched', 'lam_iqc_not_released_before_kit',
+              'traceability_label_missing_or_mismatched', 'lam_kit_not_ready_at_plan_release',
+              'tool_fixture_gage_not_ready_for_constraint'] as $blocker) {
+        if (!in_array($blocker, $blockers, true)) {
+            $p0[] = "Prompt 08 MATERIAL_AVAILABILITY_PLAN: missing readiness blocker '$blocker'.";
+        }
     }
 }
 
