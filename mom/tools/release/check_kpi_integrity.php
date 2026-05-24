@@ -566,6 +566,119 @@ if (preg_match('/JSON\\.(parse|stringify)|kc-json|<textarea[^>]+json/i', $adminJ
     $p0[] = "Admin Console: raw JSON editing pattern detected in normal KPI Console path.";
 }
 
+// ── P0.13 — MCS-EXT-1 extension consistency ────────────────────────────────
+// When extension fields are present on a metric, they must reference values
+// declared in registry.metric_control_schema_extension. Legacy metrics with
+// no extension fields are unaffected (backward-compat: empty == not adopted).
+$mcsExt = is_array($registry['metric_control_schema_extension'] ?? null)
+    ? $registry['metric_control_schema_extension'] : [];
+if ($mcsExt !== []) {
+    $allowedSubtype  = (array) ($mcsExt['metric_subtypes'] ?? []);
+    $allowedIntent   = (array) ($mcsExt['control_intent'] ?? []);
+    $allowedMeasure  = (array) ($mcsExt['measurement_data_type'] ?? []);
+    $allowedScoring  = (array) ($mcsExt['scoring_model'] ?? []);
+    $allowedEvalUse  = (array) ($mcsExt['evaluation_use'] ?? []);
+    $allowedReward   = (array) ($mcsExt['reward_mode'] ?? []);
+    $allowedLifecyc  = (array) ($mcsExt['lifecycle_status'] ?? []);
+    $scoringBySub    = is_array($mcsExt['scoring_model_by_metric_subtype'] ?? null)
+        ? $mcsExt['scoring_model_by_metric_subtype'] : [];
+    $rewardRequireRt = ['team_reward_candidate', 'role_review_input', 'bonus_pool_candidate'];
+
+    // Build code universe so paired_metric references can be validated.
+    $allCodes = [];
+    foreach ([$governance, $gateMetrics, $proposed] as $set) {
+        foreach ($set as $row) {
+            $c = is_array($row) ? (string) ($row['canonical_code'] ?? '') : '';
+            if ($c !== '') {
+                $allCodes[strtoupper($c)] = true;
+            }
+        }
+    }
+    foreach ((array) $runtimeList as $c) {
+        $allCodes[strtoupper((string) $c)] = true;
+    }
+
+    $checkMcs = static function (array $row, string $label) use (
+        $allowedSubtype, $allowedIntent, $allowedMeasure, $allowedScoring,
+        $allowedEvalUse, $allowedReward, $allowedLifecyc, $scoringBySub,
+        $rewardRequireRt, $allCodes, &$p0, &$p1
+    ): void {
+        $rc      = (string) ($row['canonical_code'] ?? '');
+        $subtype = (string) ($row['metric_subtype'] ?? '');
+        $intent  = (string) ($row['control_intent'] ?? '');
+        $measure = (string) ($row['measurement_data_type'] ?? '');
+        $scoring = (string) ($row['scoring_model_detail'] ?? '');
+        $evalUse = (string) ($row['evaluation_use'] ?? '');
+        $reward  = (string) ($row['reward_mode'] ?? '');
+        $lifecyc = (string) ($row['lifecycle_status'] ?? '');
+        $paired  = (string) ($row['paired_metric'] ?? '');
+        $calcSt  = (string) ($row['calculation_status'] ?? '');
+        $sample  = $row['sample_policy'] ?? null;
+
+        if ($subtype !== '' && !in_array($subtype, $allowedSubtype, true)) {
+            $p0[] = "$label $rc: metric_subtype '$subtype' not in MCS-EXT-1 metric_subtypes.";
+        }
+        if ($intent !== '' && !in_array($intent, $allowedIntent, true)) {
+            $p0[] = "$label $rc: control_intent '$intent' not in MCS-EXT-1 control_intent.";
+        }
+        if ($measure !== '' && !in_array($measure, $allowedMeasure, true)) {
+            $p0[] = "$label $rc: measurement_data_type '$measure' not in MCS-EXT-1.";
+        }
+        if ($scoring !== '' && !in_array($scoring, $allowedScoring, true)) {
+            $p0[] = "$label $rc: scoring_model_detail '$scoring' not in MCS-EXT-1 scoring_model.";
+        }
+        if ($evalUse !== '' && !in_array($evalUse, $allowedEvalUse, true)) {
+            $p0[] = "$label $rc: evaluation_use '$evalUse' not in MCS-EXT-1.";
+        }
+        if ($reward !== '' && !in_array($reward, $allowedReward, true)) {
+            $p0[] = "$label $rc: reward_mode '$reward' not in MCS-EXT-1.";
+        }
+        if ($lifecyc !== '' && !in_array($lifecyc, $allowedLifecyc, true)) {
+            $p0[] = "$label $rc: lifecycle_status '$lifecyc' not in MCS-EXT-1.";
+        }
+        // subtype → scoring compatibility (when both set)
+        if ($subtype !== '' && $scoring !== '' && isset($scoringBySub[$subtype])
+            && !in_array($scoring, $scoringBySub[$subtype], true)) {
+            $p0[] = "$label $rc: scoring_model_detail '$scoring' incompatible with metric_subtype '$subtype'. Allowed: "
+                . implode(', ', $scoringBySub[$subtype]) . '.';
+        }
+        // reward_mode (runtime-only) gate — parallels existing P0.7.
+        if ($reward !== '' && in_array($reward, $rewardRequireRt, true) && $calcSt !== '' && $calcSt !== 'runtime_calculated') {
+            $p0[] = "$label $rc: reward_mode '$reward' requires calculation_status=runtime_calculated (got '$calcSt').";
+        }
+        // spc_capability_metric requires sample_policy.
+        if ($subtype === 'spc_capability_metric') {
+            if (!is_array($sample) || !isset($sample['min_n_score']) || !is_numeric($sample['min_n_score'])) {
+                $p0[] = "$label $rc: spc_capability_metric requires sample_policy.min_n_score (numeric).";
+            }
+        }
+        // paired_metric must resolve.
+        if ($paired !== '' && !isset($allCodes[strtoupper($paired)])) {
+            $p1[] = "$label $rc: paired_metric '$paired' does not resolve to any known canonical_code.";
+        }
+        // P1 — subtype set but control_intent missing: weak governance.
+        if ($subtype !== '' && $intent === '') {
+            $p1[] = "$label $rc: metric_subtype is set but control_intent is empty.";
+        }
+    };
+
+    foreach ($governance as $row) {
+        if (is_array($row)) {
+            $checkMcs($row, 'Registry');
+        }
+    }
+    foreach ($gateMetrics as $row) {
+        if (is_array($row)) {
+            $checkMcs($row, 'Gate');
+        }
+    }
+    foreach ($proposed as $row) {
+        if (is_array($row)) {
+            $checkMcs($row, 'Proposed');
+        }
+    }
+}
+
 // ── Report ───────────────────────────────────────────────────────────────────
 $statusKeys = ['runtime_calculated', 'staged_data_contract', 'manual', 'manual_governed', 'retired'];
 $byStatus = array_fill_keys($statusKeys, 0);

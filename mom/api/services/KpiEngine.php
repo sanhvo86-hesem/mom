@@ -174,12 +174,29 @@ final class KpiEngine
      */
     private const KPI_AUTHORITY_REGISTRY_RUNTIME_PATH = __DIR__ . '/../../data/registry/kpi-authority-registry.runtime.json';
 
-    /** Governance KPI fields the Console may override at runtime. */
+    /**
+     * Governance KPI fields the Console may override at runtime.
+     *
+     * The first block is the legacy editable set (Pha 1 + Track 4). The second
+     * block (MCS-EXT-1, introduced 2026-05-24) carries Metric Control Schema
+     * extension attributes — all OPTIONAL per metric, validated against
+     * registry.metric_control_schema_extension enums when present.
+     *
+     * Forbidden structural fields (canonical_code, formula, data_source,
+     * calculation_status, metric_type) are NEVER in this list — they are
+     * structural SSOT and enforced by check_kpi_integrity.php P0.12.
+     */
     public const CONSOLE_EDITABLE_FIELDS = [
+        // Legacy editable fields (Pha 1 + Track 4):
         'thresholds', 'owner_role', 'data_stewardship_role', 'cadence',
         'decision_action', 'action_reference', 'counter_metric',
         'data_contract_gap', 'target_graduation_condition',
         'evidence_source', 'blocking_conditions',
+        // MCS-EXT-1 extension fields (optional, enum-validated):
+        'metric_subtype', 'control_intent', 'measurement_data_type',
+        'scoring_model_detail', 'evaluation_use', 'reward_mode',
+        'paired_metric', 'attribution_rule', 'lifecycle_status',
+        'sample_policy', 'usage_contexts', 'role_assignments',
     ];
 
     /** Metric codes for all supported KPIs. */
@@ -555,6 +572,18 @@ final class KpiEngine
                 'registry_counter_metric' => is_array($row['counter_metric'] ?? null)
                     ? $row['counter_metric'] : null,
                 'reward_eligible' => $row['reward_eligible'] ?? null,
+                // MCS-EXT-1 passthrough — null/empty when metric not enriched yet.
+                'metric_subtype' => $this->stringField($row, 'metric_subtype'),
+                'control_intent' => $this->stringField($row, 'control_intent'),
+                'measurement_data_type' => $this->stringField($row, 'measurement_data_type'),
+                'scoring_model_detail' => $this->stringField($row, 'scoring_model_detail'),
+                'evaluation_use' => $this->stringField($row, 'evaluation_use'),
+                'reward_mode' => $this->stringField($row, 'reward_mode'),
+                'lifecycle_status' => $this->stringField($row, 'lifecycle_status'),
+                'sample_policy' => is_array($row['sample_policy'] ?? null) ? $row['sample_policy'] : null,
+                'usage_contexts' => $this->arrayField($row, 'usage_contexts'),
+                'role_assignments' => is_array($row['role_assignments'] ?? null)
+                    ? $row['role_assignments'] : [],
             ], $aliases);
         }
 
@@ -579,6 +608,20 @@ final class KpiEngine
                 'blocking_conditions' => $this->arrayField($row, 'blocking_conditions'),
                 'registry_counter_metric' => is_array($row['counter_metric'] ?? null)
                     ? $row['counter_metric'] : null,
+                // MCS-EXT-1 passthrough — null/empty when metric not enriched yet.
+                'metric_subtype' => $this->stringField($row, 'metric_subtype'),
+                'control_intent' => $this->stringField($row, 'control_intent'),
+                'measurement_data_type' => $this->stringField($row, 'measurement_data_type'),
+                'scoring_model_detail' => $this->stringField($row, 'scoring_model_detail'),
+                'evaluation_use' => $this->stringField($row, 'evaluation_use'),
+                'reward_mode' => $this->stringField($row, 'reward_mode'),
+                'lifecycle_status' => $this->stringField($row, 'lifecycle_status'),
+                'sample_policy' => is_array($row['sample_policy'] ?? null) ? $row['sample_policy'] : null,
+                'usage_contexts' => $this->arrayField($row, 'usage_contexts'),
+                'role_assignments' => is_array($row['role_assignments'] ?? null)
+                    ? $row['role_assignments'] : [],
+                'paired_metric' => $this->stringField($row, 'paired_metric'),
+                'attribution_rule' => $this->stringField($row, 'attribution_rule'),
             ], $aliases);
         }
 
@@ -621,6 +664,20 @@ final class KpiEngine
                 'blocking_conditions' => $this->arrayField($row, 'blocking_conditions'),
                 'registry_counter_metric' => is_array($row['counter_metric'] ?? null)
                     ? $row['counter_metric'] : null,
+                // MCS-EXT-1 passthrough for gate metrics.
+                'metric_subtype' => $this->stringField($row, 'metric_subtype'),
+                'control_intent' => $this->stringField($row, 'control_intent'),
+                'measurement_data_type' => $this->stringField($row, 'measurement_data_type'),
+                'scoring_model_detail' => $this->stringField($row, 'scoring_model_detail'),
+                'evaluation_use' => $this->stringField($row, 'evaluation_use'),
+                'reward_mode' => $this->stringField($row, 'reward_mode'),
+                'lifecycle_status' => $this->stringField($row, 'lifecycle_status'),
+                'sample_policy' => is_array($row['sample_policy'] ?? null) ? $row['sample_policy'] : null,
+                'usage_contexts' => $this->arrayField($row, 'usage_contexts'),
+                'role_assignments' => is_array($row['role_assignments'] ?? null)
+                    ? $row['role_assignments'] : [],
+                'paired_metric' => $this->stringField($row, 'paired_metric'),
+                'attribution_rule' => $this->stringField($row, 'attribution_rule'),
             ], $aliases);
         }
 

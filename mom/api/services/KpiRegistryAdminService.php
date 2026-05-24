@@ -60,6 +60,72 @@ final class KpiRegistryAdminService
     ];
     private const VALID_CADENCE = ['per-event', 'daily', 'weekly', 'monthly'];
 
+    /**
+     * MCS-EXT-1 — Metric Control Schema extension allowed values.
+     * Mirrored from registry.metric_control_schema_extension.* so the service
+     * can validate without re-reading the seed on every call. Kept in sync by
+     * check_kpi_integrity.php P0 rule "extension_enum_sync".
+     */
+    private const EXT_METRIC_SUBTYPES = [
+        'official_kpi', 'operating_metric', 'gate_control_metric',
+        'role_performance_measure', 'health_indicator', 'counter_metric',
+        'blocker_metric', 'supplier_scorecard_metric', 'okr_key_result',
+        'spc_capability_metric', 'composite_readiness_index',
+    ];
+    private const EXT_CONTROL_INTENT = [
+        'delivery_reliability', 'customer_quality_escape', 'quality_at_source',
+        'flow_constraint', 'wip_queue_control', 'gate_release_control',
+        'material_supplier_readiness', 'cost_margin_control',
+        'safety_risk_control', 'people_competency', 'data_integrity',
+        'compliance_evidence', 'continuous_improvement',
+        'anti_gaming_guardrail', 'customer_specific_requirement',
+    ];
+    private const EXT_MEASUREMENT_DATA_TYPE = [
+        'percent_ratio', 'count', 'time_duration', 'aging_days', 'money_cost',
+        'queue_wip', 'binary_event', 'rubric_score', 'spc_variable',
+        'attribute_defect', 'composite_index', 'risk_score',
+        'evidence_completeness',
+    ];
+    private const EXT_SCORING_MODEL = [
+        'none_monitor_only', 'binary_pass_fail', 'rag_3_band',
+        'rag_5_band_stretch', 'sla_aging_bucket', 'escalation_ladder',
+        'baseline_improvement', 'trend_direction', 'spc_control_chart',
+        'spec_limit_capability', 'risk_matrix', 'composite_weighted_score',
+        'event_severity_score', 'pareto_loss_bucket', 'blocker_only',
+        'evidence_completeness_score',
+    ];
+    private const EXT_EVALUATION_USE = [
+        'none', 'daily_management', 'gate_hold_release',
+        'hold_release_only_not_reward_or_discipline',
+        'management_review', 'company_scorecard', 'department_scorecard',
+        'role_performance_review', 'supplier_scorecard',
+        'competency_certification', 'process_control_review',
+        'improvement_project',
+    ];
+    private const EXT_REWARD_MODE = [
+        'not_rewardable', 'recognition_only', 'team_reward_candidate',
+        'role_review_input', 'bonus_pool_candidate', 'supplier_consequence',
+        'certification_gate', 'blocker_only',
+    ];
+    private const EXT_ASSIGNMENT_TYPE = [
+        'accountable_owner', 'process_owner', 'data_steward', 'contributor',
+        'gate_approver', 'observer', 'role_measure_active',
+        'role_measure_candidate', 'counter_owner', 'blocker_owner',
+    ];
+    private const EXT_LIFECYCLE_STATUS = [
+        'draft', 'proposed', 'pilot', 'active', 'active_runtime',
+        'manual_governed', 'frozen', 'deprecated', 'retired',
+    ];
+    private const EXT_ROWS_ACTIVE_OR_CANDIDATE = ['active', 'candidate'];
+
+    /**
+     * Reward modes that imply runtime score participation. When set, the
+     * metric MUST be runtime_calculated (mirrors existing P0.7 reward gate).
+     */
+    private const REWARD_MODES_REQUIRE_RUNTIME = [
+        'team_reward_candidate', 'role_review_input', 'bonus_pool_candidate',
+    ];
+
     private string $rootDir;
     private string $dataDir;
 
@@ -137,6 +203,10 @@ final class KpiRegistryAdminService
             'editable_fields'   => KpiEngine::CONSOLE_EDITABLE_FIELDS,
             'role_codes'        => array_keys(self::ROLE_LINKS),
             'cadence_options'   => self::VALID_CADENCE,
+            'metric_governance_schema' => is_array($seed['metric_governance_schema'] ?? null)
+                ? $seed['metric_governance_schema'] : new \stdClass(),
+            'metric_control_schema_extension' => is_array($seed['metric_control_schema_extension'] ?? null)
+                ? $seed['metric_control_schema_extension'] : new \stdClass(),
             'all_metric_codes'  => array_keys($allCodes),
             'governance_kpis'   => $governance,
             'gate_control_metrics'      => $gate,
@@ -535,6 +605,20 @@ final class KpiRegistryAdminService
                 'reward_eligible'    => (bool) ($row['reward_eligible'] ?? false),
                 'retired'            => (bool) ($row['retired'] ?? false),
                 'origin'             => (string) ($row['origin'] ?? 'seed'),
+                // MCS-EXT-1 passthrough (all optional — empty string when absent
+                // so the Console can detect "unset" without checking key presence).
+                'metric_subtype'        => (string) ($row['metric_subtype'] ?? ''),
+                'control_intent'        => (string) ($row['control_intent'] ?? ''),
+                'measurement_data_type' => (string) ($row['measurement_data_type'] ?? ''),
+                'scoring_model_detail'  => (string) ($row['scoring_model_detail'] ?? ''),
+                'evaluation_use'        => (string) ($row['evaluation_use'] ?? ''),
+                'reward_mode'           => (string) ($row['reward_mode'] ?? ''),
+                'paired_metric'         => (string) ($row['paired_metric'] ?? ''),
+                'attribution_rule'      => (string) ($row['attribution_rule'] ?? ''),
+                'lifecycle_status'      => (string) ($row['lifecycle_status'] ?? ''),
+                'sample_policy'         => is_array($row['sample_policy'] ?? null) ? $row['sample_policy'] : null,
+                'usage_contexts'        => is_array($row['usage_contexts'] ?? null) ? $row['usage_contexts'] : [],
+                'role_assignments'      => is_array($row['role_assignments'] ?? null) ? $row['role_assignments'] : [],
             ];
         };
         foreach ($governance as $r) {
@@ -612,6 +696,14 @@ final class KpiRegistryAdminService
             'retired'            => $retiredCount,
             'console_added'      => $addedCount,
             'total'              => count($library),
+            // MCS-EXT-1 filter facets.
+            'metric_subtype'        => $count('metric_subtype'),
+            'control_intent'        => $count('control_intent'),
+            'measurement_data_type' => $count('measurement_data_type'),
+            'scoring_model_detail'  => $count('scoring_model_detail'),
+            'evaluation_use'        => $count('evaluation_use'),
+            'reward_mode'           => $count('reward_mode'),
+            'lifecycle_status'      => $count('lifecycle_status'),
         ];
     }
 
@@ -914,11 +1006,182 @@ final class KpiRegistryAdminService
             if ($cadence !== '' && !in_array($cadence, self::VALID_CADENCE, true)) {
                 throw new RuntimeException('kpi_registry_invalid_cadence:' . $code);
             }
+
+            // MCS-EXT-1 cross-field guardrails (only when extension fields present).
+            $rewardMode = $this->sanitizeEnum($row['reward_mode'] ?? '', self::EXT_REWARD_MODE);
+            if ($rewardMode !== '' && in_array($rewardMode, self::REWARD_MODES_REQUIRE_RUNTIME, true)) {
+                $calcStatus = (string) ($row['calculation_status'] ?? '');
+                if ($calcStatus !== '' && $calcStatus !== 'runtime_calculated') {
+                    throw new RuntimeException(
+                        'kpi_registry_reward_mode_requires_runtime:' . $code
+                        . ' (reward_mode=' . $rewardMode . ' but calculation_status=' . $calcStatus . ')'
+                    );
+                }
+            }
+            // metric_subtype + scoring_model_detail compatibility (loose check —
+            // CI guard does the full table; here we only catch obvious mis-pairings).
+            $subtype = $this->sanitizeEnum($row['metric_subtype'] ?? '', self::EXT_METRIC_SUBTYPES);
+            $scoring = $this->sanitizeEnum($row['scoring_model_detail'] ?? '', self::EXT_SCORING_MODEL);
+            if ($subtype === 'spc_capability_metric' && $scoring !== '' &&
+                !in_array($scoring, ['spec_limit_capability', 'spc_control_chart'], true)) {
+                throw new RuntimeException(
+                    'kpi_registry_scoring_subtype_mismatch:' . $code
+                    . ' (spc_capability_metric requires spec_limit_capability or spc_control_chart, got ' . $scoring . ')'
+                );
+            }
+            if ($subtype === 'gate_control_metric' && $scoring !== '' &&
+                !in_array($scoring, ['binary_pass_fail', 'sla_aging_bucket', 'blocker_only'], true)) {
+                throw new RuntimeException(
+                    'kpi_registry_scoring_subtype_mismatch:' . $code
+                    . ' (gate_control_metric scoring must be binary_pass_fail/sla_aging_bucket/blocker_only, got ' . $scoring . ')'
+                );
+            }
+            // spc_capability_metric requires sample_policy with min_n_score.
+            if ($subtype === 'spc_capability_metric') {
+                $sp = $row['sample_policy'] ?? null;
+                if (!is_array($sp) || !isset($sp['min_n_score']) || !is_numeric($sp['min_n_score'])) {
+                    throw new RuntimeException(
+                        'kpi_registry_sample_policy_missing:' . $code
+                        . ' (spc_capability_metric requires sample_policy.min_n_score)'
+                    );
+                }
+            }
         }
+    }
+
+    /**
+     * Coerce an incoming value to one of the allowed enum values; return ''
+     * (empty) when invalid or empty — caller decides whether to drop.
+     */
+    private function sanitizeEnum(mixed $value, array $allowed): string
+    {
+        if (!is_string($value) && !is_int($value)) {
+            return '';
+        }
+        $v = strtolower(trim((string) $value));
+        return in_array($v, $allowed, true) ? $v : '';
+    }
+
+    /**
+     * MCS-EXT-1 sample_policy shape:
+     * {min_n_score:int, provisional_n:int, internal_n:int, customer_grade_n:int,
+     *  stability_required:bool, gage_validity_required:bool}
+     */
+    private function sanitizeSamplePolicy(mixed $value): ?array
+    {
+        if (!is_array($value)) {
+            return null;
+        }
+        $out = [];
+        // n values clamped to >=0; negative would defeat the n >= min_n_score
+        // gate and force everything to score, bypassing the sample-policy intent.
+        foreach (['min_n_score', 'provisional_n', 'internal_n', 'customer_grade_n'] as $k) {
+            if (isset($value[$k]) && is_numeric($value[$k])) {
+                $out[$k] = max(0, (int) $value[$k]);
+            }
+        }
+        foreach (['stability_required', 'gage_validity_required'] as $k) {
+            if (isset($value[$k])) {
+                $out[$k] = (bool) $value[$k];
+            }
+        }
+        return $out === [] ? null : $out;
+    }
+
+    /**
+     * MCS-EXT-1 role_assignments shape (array of objects):
+     * [{role, assignment_type, weight_pct, active_or_candidate, controllability_scope}]
+     */
+    private function sanitizeRoleAssignments(mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+        $out = [];
+        foreach ($value as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $role = $this->plainText((string) ($row['role'] ?? ''));
+            if ($role === '') {
+                continue;
+            }
+            $assignment = $this->sanitizeEnum($row['assignment_type'] ?? '', self::EXT_ASSIGNMENT_TYPE);
+            $aoc = $this->sanitizeEnum($row['active_or_candidate'] ?? '', self::EXT_ROWS_ACTIVE_OR_CANDIDATE);
+            $entry = ['role' => strtoupper($role)];
+            if ($assignment !== '') {
+                $entry['assignment_type'] = $assignment;
+            }
+            if (isset($row['weight_pct']) && is_numeric($row['weight_pct'])) {
+                $entry['weight_pct'] = (float) $row['weight_pct'];
+            }
+            if ($aoc !== '') {
+                $entry['active_or_candidate'] = $aoc;
+            }
+            $ctrl = $this->plainText((string) ($row['controllability_scope'] ?? ''));
+            if ($ctrl !== '') {
+                $entry['controllability_scope'] = $ctrl;
+            }
+            $out[] = $entry;
+        }
+        return $out;
     }
 
     private function sanitizeField(string $field, mixed $value): mixed
     {
+        // MCS-EXT-1 extension fields — enum-validated, free-text-fenced.
+        if ($field === 'metric_subtype') {
+            return $this->sanitizeEnum($value, self::EXT_METRIC_SUBTYPES);
+        }
+        if ($field === 'control_intent') {
+            return $this->sanitizeEnum($value, self::EXT_CONTROL_INTENT);
+        }
+        if ($field === 'measurement_data_type') {
+            return $this->sanitizeEnum($value, self::EXT_MEASUREMENT_DATA_TYPE);
+        }
+        if ($field === 'scoring_model_detail') {
+            return $this->sanitizeEnum($value, self::EXT_SCORING_MODEL);
+        }
+        if ($field === 'evaluation_use') {
+            return $this->sanitizeEnum($value, self::EXT_EVALUATION_USE);
+        }
+        if ($field === 'reward_mode') {
+            return $this->sanitizeEnum($value, self::EXT_REWARD_MODE);
+        }
+        if ($field === 'lifecycle_status') {
+            return $this->sanitizeEnum($value, self::EXT_LIFECYCLE_STATUS);
+        }
+        if ($field === 'paired_metric') {
+            // Reference to another canonical_code (validated by CI guard).
+            $v = $this->plainText((string) $value);
+            return $v === '' ? '' : strtoupper($v);
+        }
+        if ($field === 'attribution_rule') {
+            return $this->plainText((string) $value);
+        }
+        if ($field === 'sample_policy') {
+            return $this->sanitizeSamplePolicy($value);
+        }
+        if ($field === 'usage_contexts') {
+            if (is_string($value)) {
+                $value = preg_split('/\R+/', $value) ?: [];
+            }
+            if (!is_array($value)) {
+                return [];
+            }
+            $out = [];
+            foreach ($value as $item) {
+                $text = $this->plainText((string) $item);
+                if ($text !== '') {
+                    $out[] = $text;
+                }
+            }
+            return array_values(array_unique($out));
+        }
+        if ($field === 'role_assignments') {
+            return $this->sanitizeRoleAssignments($value);
+        }
+        // Legacy fields.
         if ($field === 'thresholds') {
             $out = [];
             if (is_array($value)) {
