@@ -2453,6 +2453,8 @@ function module_access_load_config(string $file): array {
     $id = (string)$meta['id'];
     $config['admin_tabs'][$id] = module_access_normalize_policy((array)($raw['admin_tabs'][$id] ?? []), $meta);
   }
+  $config['admin_vc_mode'] = admin_vc_mode_normalize((array)($raw['admin_vc_mode'] ?? []));
+  $config['deploy_freeze'] = deploy_freeze_normalize((array)($raw['deploy_freeze'] ?? []));
 
   return $config;
 }
@@ -2468,9 +2470,32 @@ function module_access_save_config(string $file, array $config): array {
     $normalized['admin_tabs'][$id] = module_access_normalize_policy((array)($config['admin_tabs'][$id] ?? []), $meta);
   }
 
+  // Preserve admin_vc_mode block: callers of module_access_save_config (the
+  // module-access editor UI) do not send it, so we must merge the existing
+  // on-disk block forward. Otherwise saving the access matrix would silently
+  // reset the Developer/Operation mode policy on every admin_module_access_save.
+  $existingRaw = portal_system_config_shadow_read('module_access_config');
+  if (!is_array($existingRaw)) {
+    $existingRaw = read_json_file($file);
+    if (!is_array($existingRaw)) $existingRaw = [];
+  }
+  $vcModeIn = is_array($config['admin_vc_mode'] ?? null)
+    ? $config['admin_vc_mode']
+    : (is_array($existingRaw['admin_vc_mode'] ?? null) ? $existingRaw['admin_vc_mode'] : []);
+  $normalized['admin_vc_mode'] = admin_vc_mode_normalize($vcModeIn);
+
+  // Same merge-forward for deploy_freeze (Pha 5) — callers of the module
+  // access editor never send it, so we must carry the existing block.
+  $freezeIn = is_array($config['deploy_freeze'] ?? null)
+    ? $config['deploy_freeze']
+    : (is_array($existingRaw['deploy_freeze'] ?? null) ? $existingRaw['deploy_freeze'] : []);
+  $normalized['deploy_freeze'] = deploy_freeze_normalize($freezeIn);
+
   $payload = [
     'portal_modules' => $normalized['portal_modules'],
     'admin_tabs' => $normalized['admin_tabs'],
+    'admin_vc_mode' => $normalized['admin_vc_mode'],
+    'deploy_freeze' => $normalized['deploy_freeze'],
     'updated_at' => now_iso(),
   ];
 
@@ -2478,6 +2503,236 @@ function module_access_save_config(string $file, array $config): array {
   portal_system_config_shadow_write('module_access_config', $payload);
 
   return $normalized;
+}
+
+// ── Admin VC Mode (Developer / Operation) ────────────────────────────────────
+//
+// Two-mode policy for the admin Version Control panel. Stored alongside the
+// module-access matrix in module_access_config.json so a single config file
+// remains the SSOT for portal access policy.
+//
+// - default:           global default mode for users with no role override.
+//                      'operation' is the ISO-safe default (manual gates).
+// - role_overrides:    map of role -> 'developer'|'operation'. If a user has
+//                      multiple roles, 'developer' wins (most-permissive mode).
+// - lock_on_production: when true AND the runtime appears to be on the live
+//                      VPS (resolved by admin_vc_mode_runtime_is_production),
+//                      every user is forced to 'operation' regardless of
+//                      role overrides. Break-glass = flip this to false via
+//                      the admin endpoint (audited).
+
+function admin_vc_mode_defaults(): array {
+  return [
+    'default' => 'operation',
+    'role_overrides' => new stdClass(),
+    'lock_on_production' => true,
+    'updated_at' => null,
+  ];
+}
+
+function admin_vc_mode_normalize_value($value, string $fallback = 'operation'): string {
+  // Defensive: refuse non-scalar (arrays/objects) before the (string) cast
+  // to avoid PHP's "Array to string conversion" warning when on-disk
+  // state is corrupt. Caught by Pha 5 scenario test S6.
+  if (!is_scalar($value) && $value !== null) return $fallback;
+  $v = strtolower(trim((string)($value ?? '')));
+  return in_array($v, ['developer', 'operation'], true) ? $v : $fallback;
+}
+
+function admin_vc_mode_normalize(array $raw): array {
+  $defaults = admin_vc_mode_defaults();
+
+  $default = admin_vc_mode_normalize_value($raw['default'] ?? $defaults['default'], 'operation');
+
+  $overridesIn = $raw['role_overrides'] ?? [];
+  if (is_object($overridesIn)) $overridesIn = (array)$overridesIn;
+  if (!is_array($overridesIn)) $overridesIn = [];
+  $overrides = [];
+  foreach ($overridesIn as $role => $mode) {
+    $r = preg_replace('/[^a-z0-9_-]+/', '', strtolower(trim((string)$role)));
+    if ($r === '') continue;
+    $overrides[$r] = admin_vc_mode_normalize_value($mode, $default);
+  }
+  ksort($overrides);
+
+  $lock = array_key_exists('lock_on_production', $raw)
+    ? (bool)$raw['lock_on_production']
+    : $defaults['lock_on_production'];
+
+  $updatedAt = isset($raw['updated_at']) && is_string($raw['updated_at']) && $raw['updated_at'] !== ''
+    ? $raw['updated_at']
+    : null;
+
+  return [
+    'default' => $default,
+    'role_overrides' => $overrides === [] ? new stdClass() : $overrides,
+    'lock_on_production' => $lock,
+    'updated_at' => $updatedAt,
+  ];
+}
+
+/**
+ * Best-effort detection of the live production VPS, so lock_on_production
+ * can enforce 'operation' on the real site without affecting laptop dev runs.
+ * Recognises the canonical hostname and the standard deploy SITE_DIR.
+ */
+function admin_vc_mode_runtime_is_production(): bool {
+  // Explicit env wins (CI/staging override).
+  $envFlag = getenv('HESEM_VC_MODE_FORCE_PRODUCTION');
+  if ($envFlag !== false && $envFlag !== '') {
+    return in_array(strtolower(trim($envFlag)), ['1', 'true', 'yes', 'on'], true);
+  }
+  $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
+  if ($host !== '' && (str_contains($host, 'eqms.hesemeng.com') || str_contains($host, 'hesemeng.com'))) {
+    return true;
+  }
+  $docRoot = (string)($_SERVER['DOCUMENT_ROOT'] ?? '');
+  if (str_starts_with($docRoot, '/var/www/eqms.hesemeng.com') || str_starts_with($docRoot, '/var/www/data-private')) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Resolve effective mode for a user given the current vc_mode config and
+ * the list of roles the user holds. Returns 'developer' or 'operation'.
+ *
+ * Rule order:
+ *   1. If lock_on_production && we're on prod runtime -> 'operation' wins.
+ *   2. If any user role has an override of 'developer' -> 'developer'.
+ *   3. If any user role has an override of 'operation' -> 'operation'.
+ *   4. Fall back to the global default.
+ */
+function admin_vc_mode_resolve_for_roles(array $config, array $roles): string {
+  $cfg = admin_vc_mode_normalize((array)($config['admin_vc_mode'] ?? []));
+  if (!empty($cfg['lock_on_production']) && admin_vc_mode_runtime_is_production()) {
+    return 'operation';
+  }
+  $overrides = is_array($cfg['role_overrides']) ? $cfg['role_overrides'] : [];
+  $sawOperation = false;
+  foreach ($roles as $role) {
+    $r = strtolower(trim((string)$role));
+    if ($r === '') continue;
+    if (!array_key_exists($r, $overrides)) continue;
+    if ($overrides[$r] === 'developer') return 'developer';
+    if ($overrides[$r] === 'operation') $sawOperation = true;
+  }
+  if ($sawOperation) return 'operation';
+  return $cfg['default'];
+}
+
+// ── Deploy Freeze (Pha 5) ────────────────────────────────────────────────────
+//
+// Emergency switch that blocks mutations on the deploy + sync surfaces while
+// turned on. Used during cycle counts, ISO audits, or incident response. The
+// FE renders a red banner across the VC panel when active and refuses to
+// surface the Push & Deploy / Resolve drift CTAs.
+//
+// Stored alongside admin_vc_mode in module_access_config.json (single SSOT
+// for portal access policy).
+//
+// Schema:
+//   { enabled, reason, ticket_id, set_by, set_at, expires_at?, updated_at }
+//
+// Lock semantics: when enabled, deploy_freeze_is_active() returns true and
+// the following endpoints refuse with 423 (Locked):
+//   - admin_deploy_trigger
+//   - admin_change_request_approve (the auto-deploy step)
+//   - admin_data_sync_batch_resolve
+//   - admin_data_sync_resolve_drift
+// All other reads + audit endpoints stay fully functional so the operator
+// can still observe state and resolve the underlying incident.
+
+function deploy_freeze_defaults(): array {
+  return [
+    'enabled' => false,
+    'reason' => '',
+    'ticket_id' => '',
+    'set_by' => '',
+    'set_at' => null,
+    'expires_at' => null,
+    'updated_at' => null,
+  ];
+}
+
+function deploy_freeze_normalize(array $raw): array {
+  $defaults = deploy_freeze_defaults();
+  // Defensive scalar coercion — corrupted on-disk state (someone editing
+  // module_access_config.json by hand and writing an array where a string
+  // is expected) used to crash with "Array to string conversion" before
+  // S6 scenario testing surfaced this. is_scalar guards every (string)
+  // cast so the loader is fully fail-soft on bad input shapes.
+  $scalar = static fn($v) => (is_scalar($v) || $v === null) ? (string)($v ?? '') : '';
+
+  $enabled = array_key_exists('enabled', $raw) && is_scalar($raw['enabled']) ? (bool)$raw['enabled'] : $defaults['enabled'];
+  $reason = trim($scalar($raw['reason'] ?? ''));
+  if (mb_strlen($reason) > 500) $reason = mb_substr($reason, 0, 500);
+  $ticket = trim($scalar($raw['ticket_id'] ?? ''));
+  if (mb_strlen($ticket) > 80) $ticket = mb_substr($ticket, 0, 80);
+  $setBy = trim($scalar($raw['set_by'] ?? ''));
+  if (mb_strlen($setBy) > 80) $setBy = mb_substr($setBy, 0, 80);
+  $setAt = isset($raw['set_at']) && is_string($raw['set_at']) && $raw['set_at'] !== '' ? $raw['set_at'] : null;
+  $exp = isset($raw['expires_at']) && is_string($raw['expires_at']) && $raw['expires_at'] !== '' ? $raw['expires_at'] : null;
+  $updatedAt = isset($raw['updated_at']) && is_string($raw['updated_at']) && $raw['updated_at'] !== '' ? $raw['updated_at'] : null;
+  return [
+    'enabled' => $enabled,
+    'reason' => $reason,
+    'ticket_id' => $ticket,
+    'set_by' => $setBy,
+    'set_at' => $setAt,
+    'expires_at' => $exp,
+    'updated_at' => $updatedAt,
+  ];
+}
+
+/**
+ * Returns true if a deploy freeze is currently active (enabled and not
+ * past expiry). Used as a gate by every mutation endpoint on the
+ * deploy/sync surface — see AdminController.php gate at the top of
+ * deployTrigger / changeRequestApprove / dataSyncBatchResolve / etc.
+ */
+function deploy_freeze_is_active(?array $config = null): bool {
+  if ($config === null) {
+    global $CONF_DIR;
+    $confDir = $CONF_DIR ?? (defined('CONF_DIR') ? CONF_DIR : (__DIR__ . '/data/config'));
+    $config = module_access_load_config($confDir . '/module_access_config.json');
+  }
+  $f = deploy_freeze_normalize((array)($config['deploy_freeze'] ?? []));
+  if (!$f['enabled']) return false;
+  if ($f['expires_at']) {
+    $exp = strtotime((string)$f['expires_at']);
+    if ($exp !== false && $exp < time()) {
+      // Lazy auto-expire on read — caller doesn't need to write back; next
+      // explicit set will overwrite the row. Safe to treat as inactive.
+      return false;
+    }
+  }
+  return true;
+}
+
+function deploy_freeze_public_payload(array $config): array {
+  $f = deploy_freeze_normalize((array)($config['deploy_freeze'] ?? []));
+  return [
+    'enabled' => $f['enabled'],
+    'reason' => $f['reason'],
+    'ticket_id' => $f['ticket_id'],
+    'set_by' => $f['set_by'],
+    'set_at' => $f['set_at'],
+    'expires_at' => $f['expires_at'],
+    'updated_at' => $f['updated_at'],
+    'is_active' => deploy_freeze_is_active($config),
+  ];
+}
+
+function admin_vc_mode_public_payload(array $config): array {
+  $cfg = admin_vc_mode_normalize((array)($config['admin_vc_mode'] ?? []));
+  return [
+    'default' => $cfg['default'],
+    'role_overrides' => $cfg['role_overrides'],
+    'lock_on_production' => $cfg['lock_on_production'],
+    'updated_at' => $cfg['updated_at'],
+    'runtime_is_production' => admin_vc_mode_runtime_is_production(),
+  ];
 }
 
 // ── Doc Visualizer Gates Config ──────────────────────────────────────────────
@@ -2554,6 +2809,8 @@ function module_access_public_payload(array $config): array {
     $id = (string)$meta['id'];
     $normalized['admin_tabs'][$id] = module_access_normalize_policy((array)($config['admin_tabs'][$id] ?? []), $meta);
   }
+  $normalized['admin_vc_mode'] = admin_vc_mode_normalize((array)($config['admin_vc_mode'] ?? []));
+  $normalized['deploy_freeze'] = deploy_freeze_normalize((array)($config['deploy_freeze'] ?? []));
   return $normalized;
 }
 

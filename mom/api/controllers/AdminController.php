@@ -255,6 +255,13 @@ class AdminController extends BaseController
         $this->requireCsrf();
         $this->requireAdmin($me);
 
+        // Pha 5 freeze gate.
+        $cfg = module_access_load_config($this->confDir . '/module_access_config.json');
+        if (deploy_freeze_is_active($cfg)) {
+            $f = deploy_freeze_normalize((array)($cfg['deploy_freeze'] ?? []));
+            $this->error('deploy_frozen', 423, 'Config drift resolution is frozen (ticket=' . ($f['ticket_id'] ?: 'unknown') . ').');
+        }
+
         $body = $this->jsonBody();
         $file = (string)($body['file'] ?? '');
         $direction = (string)($body['direction'] ?? '');
@@ -373,6 +380,14 @@ class AdminController extends BaseController
         $me = $this->requireAuth();
         $this->requireCsrf();
         $this->requireAdmin($me);
+
+        // Pha 5 freeze gate. Batch resolve is the highest-blast-radius
+        // mutation on the sync surface, so it must respect the freeze.
+        $cfg = module_access_load_config($this->confDir . '/module_access_config.json');
+        if (deploy_freeze_is_active($cfg)) {
+            $f = deploy_freeze_normalize((array)($cfg['deploy_freeze'] ?? []));
+            $this->error('deploy_frozen', 423, 'Batch config sync is frozen (ticket=' . ($f['ticket_id'] ?: 'unknown') . ').');
+        }
 
         $body      = $this->jsonBody();
         $direction = (string)($body['direction'] ?? '');
@@ -1018,6 +1033,935 @@ class AdminController extends BaseController
 
         $this->auditLog('admin_module_access_save');
         $this->success(['config' => module_access_public_payload($saved)]);
+    }
+
+    /**
+     * GET admin_vc_mode_get — Load the admin Version Control Developer/Operation
+     * mode policy plus the effective mode resolved for the calling user.
+     *
+     * Returns:
+     *   {
+     *     "policy": { "default", "role_overrides", "lock_on_production",
+     *                 "updated_at", "runtime_is_production" },
+     *     "effective_mode": "developer" | "operation",
+     *     "your_roles":     [<role>, ...]
+     *   }
+     *
+     * Any authenticated user may read this — the panel needs the effective
+     * mode to decide which buttons to render. Mutation is admin-only.
+     */
+    public function vcModeGet(): never
+    {
+        $me = $this->requireAuth();
+
+        $configFile = $this->confDir . '/module_access_config.json';
+        $config = module_access_load_config($configFile);
+        $roles = $this->rolesForUser($me);
+        $effective = admin_vc_mode_resolve_for_roles($config, $roles);
+
+        $this->success([
+            'policy' => admin_vc_mode_public_payload($config),
+            'effective_mode' => $effective,
+            'your_roles' => $roles,
+        ]);
+    }
+
+    /**
+     * POST admin_vc_mode_set — Update the admin VC mode policy.
+     *
+     * Body:
+     *   {
+     *     "default":             "developer" | "operation" (optional),
+     *     "role_overrides":      { "<role>": "developer"|"operation", ... } (optional),
+     *     "lock_on_production":  true | false (optional),
+     *     "reason":              "<short audit reason>" (REQUIRED — flows
+     *                            into the audit_events row so an auditor can
+     *                            see why the policy moved)
+     *   }
+     *
+     * Admin-only. Every change is audited with: old policy, new policy,
+     * resolved effective mode for the actor before/after, and the reason.
+     * Frontend ALWAYS prompts for `reason`; backend rejects empty strings
+     * so a future scripted caller can't bypass the audit trail.
+     */
+    public function vcModeSet(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body = $this->jsonBody();
+        $reason = trim((string)($body['reason'] ?? ''));
+        if ($reason === '' || mb_strlen($reason) < 4) {
+            $this->error('reason_required', 400, 'A reason of at least 4 characters is required for VC mode changes.');
+        }
+        if (mb_strlen($reason) > 500) {
+            $reason = mb_substr($reason, 0, 500);
+        }
+
+        $configFile = $this->confDir . '/module_access_config.json';
+        $current = module_access_load_config($configFile);
+        $oldPolicy = admin_vc_mode_normalize((array)($current['admin_vc_mode'] ?? []));
+        $roles = $this->rolesForUser($me);
+        $oldEffective = admin_vc_mode_resolve_for_roles($current, $roles);
+
+        // Merge: anything not provided in the request is carried over from
+        // the existing policy. This keeps the endpoint convenient for
+        // single-field updates (just flip default, just toggle lock) without
+        // forcing the UI to send the full document each time.
+        $merged = [
+            'default' => array_key_exists('default', $body)
+                ? $body['default']
+                : $oldPolicy['default'],
+            'role_overrides' => array_key_exists('role_overrides', $body)
+                ? $body['role_overrides']
+                : $oldPolicy['role_overrides'],
+            'lock_on_production' => array_key_exists('lock_on_production', $body)
+                ? $body['lock_on_production']
+                : $oldPolicy['lock_on_production'],
+        ];
+        $newPolicy = admin_vc_mode_normalize($merged);
+        $newPolicy['updated_at'] = now_iso();
+
+        // Persist by re-saving the full module_access config with the new
+        // vc_mode block merged in. module_access_save_config preserves the
+        // portal_modules + admin_tabs blocks from the on-disk file when not
+        // present in $config (it falls back to defaults if the key is
+        // missing); to avoid resetting access policy we pass them through.
+        $toSave = [
+            'portal_modules' => $current['portal_modules'],
+            'admin_tabs' => $current['admin_tabs'],
+            'admin_vc_mode' => $newPolicy,
+        ];
+        $saved = module_access_save_config($configFile, $toSave);
+        $newEffective = admin_vc_mode_resolve_for_roles($saved, $roles);
+
+        $this->auditLog('admin_vc_mode_set', [
+            'reason' => $reason,
+            'old_policy' => $oldPolicy,
+            'new_policy' => $newPolicy,
+            'old_effective_mode_for_actor' => $oldEffective,
+            'new_effective_mode_for_actor' => $newEffective,
+        ]);
+
+        $this->success([
+            'policy' => admin_vc_mode_public_payload($saved),
+            'effective_mode' => $newEffective,
+            'your_roles' => $roles,
+        ]);
+    }
+
+    /**
+     * POST admin_deploy_trigger — Pha 4 (Developer mode only).
+     *
+     * Records a deploy intent in audit_events. Does NOT actually push code
+     * or run the deploy script — that would violate the CLAUDE.md
+     * governance rule that PHP-FPM never mutates the git working tree on
+     * the VPS. Instead it returns "next steps" so the operator can either
+     *   (a) push from their developer laptop, OR
+     *   (b) trigger the GitHub Actions workflow manually
+     * and the audit row preserves the intent + actor + sha + reason for
+     * ISO §8.5.6 traceability.
+     *
+     * Body:
+     *   { target_sha?:   <git sha to deploy (default = current HEAD on VPS)>
+     *     reason:        <required, ≥4 chars> }
+     *
+     * Enforcement (defence in depth):
+     *   1. Admin role + CSRF
+     *   2. Effective VC mode MUST be 'developer' (fails 409 in Op mode).
+     *      Production lock_on_production=true means this is unreachable
+     *      on the live VPS regardless of role overrides — by design.
+     *
+     * Output:
+     *   { ok, intent_id, target_sha, gha_workflow_url, next_steps:[...] }
+     */
+    public function deployTrigger(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $configFile = $this->confDir . '/module_access_config.json';
+        $config = module_access_load_config($configFile);
+        // Pha 5 freeze gate. 423 Locked is the canonical HTTP status for
+        // "the resource is intentionally unavailable" — the FE pill maps it
+        // to the red banner without an extra round-trip.
+        if (deploy_freeze_is_active($config)) {
+            $f = deploy_freeze_normalize((array)($config['deploy_freeze'] ?? []));
+            $this->error('deploy_frozen', 423, 'Deploys are currently frozen by ' . ($f['set_by'] ?: 'admin') . ' (ticket=' . ($f['ticket_id'] ?: 'unknown') . '). Reason: ' . ($f['reason'] ?: 'unspecified'));
+        }
+        $roles = $this->rolesForUser($me);
+        $effectiveMode = admin_vc_mode_resolve_for_roles($config, $roles);
+        if ($effectiveMode !== 'developer') {
+            $this->error('mode_not_developer', 409, 'Effective VC mode is "' . $effectiveMode . '". Use admin_change_request_submit instead, or switch to Developer mode (requires lock_on_production=false on this runtime).');
+        }
+
+        $body = $this->jsonBody();
+        $reason = trim((string)($body['reason'] ?? ''));
+        if ($reason === '' || mb_strlen($reason) < 4) {
+            $this->error('reason_required', 400, 'A reason of at least 4 characters is required.');
+        }
+        if (mb_strlen($reason) > 500) $reason = mb_substr($reason, 0, 500);
+
+        $targetSha = trim((string)($body['target_sha'] ?? ''));
+        if ($targetSha !== '' && !preg_match('/^[a-f0-9]{7,40}$/i', $targetSha)) {
+            $this->error('invalid_sha', 400, 'target_sha must be a hex git SHA (7..40 chars) or empty for HEAD.');
+        }
+
+        $intentId = 'DEPLOY-' . date('YmdHis') . '-' . substr(bin2hex(random_bytes(3)), 0, 6);
+        $ghaWorkflowUrl = 'https://github.com/sanhvo86-hesem/mom/actions/workflows/deploy.yml';
+
+        $this->auditLog('admin_deploy_trigger_intent', [
+            'intent_id' => $intentId,
+            'target_sha' => $targetSha,
+            'reason' => $reason,
+            'effective_mode' => $effectiveMode,
+            'gha_workflow_url' => $ghaWorkflowUrl,
+        ]);
+
+        $this->success([
+            'intent_id' => $intentId,
+            'target_sha' => $targetSha !== '' ? $targetSha : 'HEAD',
+            'gha_workflow_url' => $ghaWorkflowUrl,
+            'next_steps' => [
+                'Push your local branch to origin/main (if not already there): git push origin main',
+                'Trigger or watch the GitHub Actions workflow at: ' . $ghaWorkflowUrl,
+                'Or run manually on VPS: ssh eqms \'sudo -n bash /var/www/eqms.hesemeng.com/tools/vps-setup/scripts/deploy.sh\'',
+                'Audit row recorded with intent_id=' . $intentId,
+            ],
+            'message' => 'Deploy intent recorded. Run one of the next_steps to perform the actual deploy.',
+        ]);
+    }
+
+    /**
+     * POST admin_change_request_submit — Pha 4 (Operation mode flow).
+     *
+     * Creates a deploy change request in audit_events. The request stays
+     * pending until an admin with separation-of-duties (different actor
+     * than the submitter) calls admin_change_request_approve.
+     *
+     * Body:
+     *   { target_sha?, reason (required, ≥10 chars for Op),
+     *     change_ref? (CR ticket id; auto-generated if absent),
+     *     approver_hint? (optional username/role to notify; not enforced server-side) }
+     *
+     * Allowed in BOTH modes (so an admin in Dev can also use it for
+     * audit-friendly deploys) but enforced via change_ref / approval.
+     */
+    public function changeRequestSubmit(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body = $this->jsonBody();
+        $reason = trim((string)($body['reason'] ?? ''));
+        if ($reason === '' || mb_strlen($reason) < 10) {
+            $this->error('reason_required', 400, 'Operation mode requires a reason of at least 10 characters.');
+        }
+        if (mb_strlen($reason) > 1000) $reason = mb_substr($reason, 0, 1000);
+
+        $targetSha = trim((string)($body['target_sha'] ?? ''));
+        if ($targetSha !== '' && !preg_match('/^[a-f0-9]{7,40}$/i', $targetSha)) {
+            $this->error('invalid_sha', 400, 'target_sha must be a hex git SHA (7..40 chars) or empty for HEAD.');
+        }
+
+        $changeRef = trim((string)($body['change_ref'] ?? ''));
+        if ($changeRef === '') {
+            $changeRef = 'CR-' . date('YmdHis') . '-' . substr(bin2hex(random_bytes(3)), 0, 6);
+        }
+        if (!preg_match('/^[A-Za-z0-9._:-]{3,80}$/', $changeRef)) {
+            $this->error('invalid_change_ref', 400, 'change_ref must match [A-Za-z0-9._:-]{3,80}.');
+        }
+
+        $approverHint = trim((string)($body['approver_hint'] ?? ''));
+        if (mb_strlen($approverHint) > 120) $approverHint = mb_substr($approverHint, 0, 120);
+
+        $this->auditLog('admin_change_request_submit', [
+            'change_ref' => $changeRef,
+            'target_sha' => $targetSha,
+            'reason' => $reason,
+            'approver_hint' => $approverHint,
+            'submitted_by' => (string)($me['username'] ?? 'unknown'),
+            'status' => 'pending_approval',
+        ]);
+
+        $this->success([
+            'change_ref' => $changeRef,
+            'target_sha' => $targetSha !== '' ? $targetSha : 'HEAD',
+            'status' => 'pending_approval',
+            'submitted_by' => (string)($me['username'] ?? 'unknown'),
+            'approver_hint' => $approverHint,
+            'next_steps' => [
+                'Pending until an admin (different from the submitter) approves via admin_change_request_approve.',
+                'Search the timeline for change_ref=' . $changeRef . ' to find the approval row.',
+            ],
+            'message' => 'Change request ' . $changeRef . ' submitted and pending approval.',
+        ]);
+    }
+
+    /**
+     * POST admin_change_request_approve — Pha 4.
+     *
+     * Approver decision on a previously-submitted CR. Enforces
+     * separation-of-duties: the approver MUST be a different actor than
+     * the original submitter. (Tightening to a dedicated 'cr_approver'
+     * role is a follow-up — admin_roles() is the gate today.)
+     *
+     * Body: { change_ref, decision: 'approve'|'reject', reason }
+     *
+     * Does NOT actually run the deploy on approve — same governance
+     * reason as deployTrigger. Returns next_steps + records audit row.
+     */
+    public function changeRequestApprove(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        // Pha 5 freeze gate. Note: rejection is fine even on 'reject'
+        // decisions during freeze — an explicit unfreeze is required first
+        // so the audit trail clearly separates the incident close from CR
+        // dispositions made afterwards.
+        $configFile = $this->confDir . '/module_access_config.json';
+        $config = module_access_load_config($configFile);
+        if (deploy_freeze_is_active($config)) {
+            $f = deploy_freeze_normalize((array)($config['deploy_freeze'] ?? []));
+            $this->error('deploy_frozen', 423, 'CR approvals are currently frozen (ticket=' . ($f['ticket_id'] ?: 'unknown') . '). Unfreeze first or wait for expiry.');
+        }
+
+        $body = $this->jsonBody();
+        $changeRef = trim((string)($body['change_ref'] ?? ''));
+        if (!preg_match('/^[A-Za-z0-9._:-]{3,80}$/', $changeRef)) {
+            $this->error('invalid_change_ref', 400, 'change_ref required and must match [A-Za-z0-9._:-]{3,80}.');
+        }
+        $decision = strtolower(trim((string)($body['decision'] ?? '')));
+        if (!in_array($decision, ['approve', 'reject'], true)) {
+            $this->error('invalid_decision', 400, 'decision must be "approve" or "reject".');
+        }
+        $reason = trim((string)($body['reason'] ?? ''));
+        if ($reason === '' || mb_strlen($reason) < 4) {
+            $this->error('reason_required', 400, 'A reason of at least 4 characters is required.');
+        }
+        if (mb_strlen($reason) > 1000) $reason = mb_substr($reason, 0, 1000);
+
+        // Look up the most-recent matching submit audit row to enforce
+        // separation-of-duties + prevent double-approval.
+        try {
+            $existing = $this->data->getAuditLog([
+                'event_type' => 'admin_change_request_submit',
+                'search' => $changeRef,
+                'limit' => 50,
+            ]);
+        } catch (Throwable $e) {
+            $this->error('audit_lookup_failed', 500, $e->getMessage());
+        }
+        $submitRow = null;
+        foreach ((is_array($existing) ? $existing : []) as $row) {
+            if (!is_array($row)) continue;
+            // BaseController->auditLog wraps the context inside payload.context,
+            // so the change_ref we passed lives at payload.context.change_ref
+            // rather than payload.change_ref. Read through the wrapper.
+            $payload = is_array($row['payload'] ?? null) ? $row['payload'] : [];
+            $ctx = is_array($payload['context'] ?? null) ? $payload['context'] : $payload;
+            if (($ctx['change_ref'] ?? '') === $changeRef) { $submitRow = $row; break; }
+        }
+        if ($submitRow === null) {
+            $this->error('change_ref_not_found', 404, 'No submit row found for change_ref=' . $changeRef);
+        }
+        $submitter = (string)($submitRow['actor_name'] ?? $submitRow['user'] ?? '');
+        $approver = (string)($me['username'] ?? '');
+        if ($submitter !== '' && $approver !== '' && strcasecmp($submitter, $approver) === 0) {
+            $this->error('self_approval_forbidden', 403, 'You submitted ' . $changeRef . '. A different admin must approve it (separation of duties).');
+        }
+
+        // Block double-approve / approve-after-reject by scanning for an
+        // existing approve row on the same CR.
+        try {
+            $prior = $this->data->getAuditLog([
+                'event_type' => 'admin_change_request_approve',
+                'search' => $changeRef,
+                'limit' => 20,
+            ]);
+        } catch (Throwable $e) {
+            $prior = [];
+        }
+        foreach ((is_array($prior) ? $prior : []) as $row) {
+            $payload = is_array($row['payload'] ?? null) ? $row['payload'] : [];
+            $ctx = is_array($payload['context'] ?? null) ? $payload['context'] : $payload;
+            if (($ctx['change_ref'] ?? '') === $changeRef) {
+                $this->error('already_decided', 409, 'change_ref=' . $changeRef . ' already has a decision in audit_events.');
+            }
+        }
+
+        $this->auditLog('admin_change_request_approve', [
+            'change_ref' => $changeRef,
+            'decision' => $decision,
+            'reason' => $reason,
+            'submitter' => $submitter,
+            'approver' => $approver,
+            'submit_recorded_at' => (string)($submitRow['recorded_at'] ?? ''),
+        ]);
+
+        $nextSteps = $decision === 'approve'
+            ? [
+                'Approval recorded. Run the deploy from the developer laptop or via GHA.',
+                'Pass --change-ref ' . $changeRef . ' to data-push.sh if a config sync is part of this CR.',
+              ]
+            : [
+                'Rejection recorded. No further action needed.',
+                'Submitter should address the reason and submit a new CR if appropriate.',
+              ];
+
+        $this->success([
+            'change_ref' => $changeRef,
+            'decision' => $decision,
+            'submitter' => $submitter,
+            'approver' => $approver,
+            'next_steps' => $nextSteps,
+        ]);
+    }
+
+    /**
+     * GET admin_change_request_list — Pha 4 helper.
+     *
+     * Returns the most-recent N change requests with their resolved status
+     * by joining submit + approve rows in audit_events. Drives the
+     * "Pending change requests" section in Status tab (Op mode).
+     */
+    public function changeRequestList(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        $limit = max(1, min(200, (int)($this->query('limit', '50') ?? '50')));
+        try {
+            $submits = $this->data->getAuditLog([
+                'event_type' => 'admin_change_request_submit',
+                'limit' => $limit * 2,
+            ]);
+            $approves = $this->data->getAuditLog([
+                'event_type' => 'admin_change_request_approve',
+                'limit' => $limit * 2,
+            ]);
+        } catch (Throwable $e) {
+            $this->error('change_request_list_failed', 500, $e->getMessage());
+        }
+
+        // BaseController->auditLog wraps the context under payload.context.
+        // Helper to dereference once + read field defensively.
+        $ctxOf = static function (array $row): array {
+            $p = is_array($row['payload'] ?? null) ? $row['payload'] : [];
+            return is_array($p['context'] ?? null) ? $p['context'] : $p;
+        };
+
+        $approvalsByCr = [];
+        foreach ((is_array($approves) ? $approves : []) as $row) {
+            $ctx = $ctxOf($row);
+            $cr = (string)($ctx['change_ref'] ?? '');
+            if ($cr === '') continue;
+            $approvalsByCr[$cr] = [
+                'decision' => (string)($ctx['decision'] ?? ''),
+                'approver' => (string)($ctx['approver'] ?? ''),
+                'reason' => (string)($ctx['reason'] ?? ''),
+                'recorded_at' => (string)($row['recorded_at'] ?? ''),
+            ];
+        }
+
+        $crs = [];
+        foreach ((is_array($submits) ? $submits : []) as $row) {
+            $ctx = $ctxOf($row);
+            $cr = (string)($ctx['change_ref'] ?? '');
+            if ($cr === '' || isset($crs[$cr])) continue; // dedupe — latest submit wins (already sorted DESC by getAuditLog)
+            $approval = $approvalsByCr[$cr] ?? null;
+            $status = $approval === null
+                ? 'pending_approval'
+                : ($approval['decision'] === 'approve' ? 'approved' : 'rejected');
+            $crs[$cr] = [
+                'change_ref' => $cr,
+                'status' => $status,
+                'submitter' => (string)($row['actor_name'] ?? ''),
+                'submitted_at' => (string)($row['recorded_at'] ?? ''),
+                'target_sha' => (string)($ctx['target_sha'] ?? ''),
+                'reason' => (string)($ctx['reason'] ?? ''),
+                'approver_hint' => (string)($ctx['approver_hint'] ?? ''),
+                'approval' => $approval,
+            ];
+            if (count($crs) >= $limit) break;
+        }
+
+        $this->success([
+            'change_requests' => array_values($crs),
+            'count' => count($crs),
+            'pending_count' => count(array_filter($crs, static fn($c) => $c['status'] === 'pending_approval')),
+            'limit' => $limit,
+        ]);
+    }
+
+    /**
+     * GET admin_deploy_freeze_get — Pha 5.
+     * Returns current deploy-freeze status. Any authenticated user may read
+     * (the header banner needs the value to render).
+     */
+    public function deployFreezeGet(): never
+    {
+        $this->requireAuth();
+        $configFile = $this->confDir . '/module_access_config.json';
+        $config = module_access_load_config($configFile);
+        $this->success(['freeze' => deploy_freeze_public_payload($config)]);
+    }
+
+    /**
+     * POST admin_deploy_freeze_set — Pha 5 emergency switch.
+     *
+     * Body:
+     *   { enabled: bool,
+     *     reason: string (required when enabling, ≥10 chars),
+     *     ticket_id: string (required when enabling, ≥4 chars; e.g. INC-2026-013),
+     *     expires_at?: ISO timestamp (optional auto-expire) }
+     *
+     * Enforcement:
+     *   - Admin role + CSRF
+     *   - Disable (enabled=false) only requires reason (any length ≥4) and
+     *     ticket_id (the INC ref that closed the freeze, can match the
+     *     enable ticket or a new "resolved" one).
+     */
+    public function deployFreezeSet(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body = $this->jsonBody();
+        $enabled = (bool)($body['enabled'] ?? false);
+        $reason = trim((string)($body['reason'] ?? ''));
+        $ticket = trim((string)($body['ticket_id'] ?? ''));
+        $expiresAt = trim((string)($body['expires_at'] ?? ''));
+
+        $minReason = $enabled ? 10 : 4;
+        if ($reason === '' || mb_strlen($reason) < $minReason) {
+            $this->error('reason_required', 400, 'Reason must be ≥' . $minReason . ' characters.');
+        }
+        if (mb_strlen($reason) > 500) $reason = mb_substr($reason, 0, 500);
+
+        if ($ticket === '' || !preg_match('/^[A-Za-z0-9._:-]{4,80}$/', $ticket)) {
+            $this->error('ticket_required', 400, 'ticket_id must match [A-Za-z0-9._:-]{4,80}.');
+        }
+
+        if ($expiresAt !== '') {
+            $ts = strtotime($expiresAt);
+            if ($ts === false) $this->error('invalid_expires_at', 400, 'expires_at must be a valid ISO timestamp.');
+            if ($ts < time()) $this->error('expires_at_past', 400, 'expires_at must be in the future.');
+            $expiresAt = gmdate('Y-m-d\TH:i:s\Z', $ts);
+        }
+
+        $configFile = $this->confDir . '/module_access_config.json';
+        $current = module_access_load_config($configFile);
+        $oldFreeze = deploy_freeze_normalize((array)($current['deploy_freeze'] ?? []));
+
+        $newFreeze = [
+            'enabled' => $enabled,
+            'reason' => $reason,
+            'ticket_id' => $ticket,
+            'set_by' => (string)($me['username'] ?? 'unknown'),
+            'set_at' => $enabled ? now_iso() : ($oldFreeze['set_at'] ?? null),
+            'expires_at' => $enabled ? ($expiresAt !== '' ? $expiresAt : null) : null,
+            'updated_at' => now_iso(),
+        ];
+
+        $toSave = [
+            'portal_modules' => $current['portal_modules'],
+            'admin_tabs' => $current['admin_tabs'],
+            'admin_vc_mode' => $current['admin_vc_mode'],
+            'deploy_freeze' => $newFreeze,
+        ];
+        $saved = module_access_save_config($configFile, $toSave);
+
+        $this->auditLog('admin_deploy_freeze_set', [
+            'enabled' => $enabled ? '1' : '0',
+            'reason' => $reason,
+            'ticket_id' => $ticket,
+            'expires_at' => $expiresAt,
+            'old_enabled' => $oldFreeze['enabled'] ? '1' : '0',
+            'old_ticket_id' => $oldFreeze['ticket_id'],
+        ]);
+
+        $this->success(['freeze' => deploy_freeze_public_payload($saved)]);
+    }
+
+    /**
+     * GET admin_gha_workflow_status — Pha 5.
+     *
+     * Polls GitHub for the last N runs of .github/workflows/deploy.yml so the
+     * admin header bar can show "Deploy: ✓ <sha> 2m ago" without the
+     * operator having to open GitHub.
+     *
+     * Requires GITHUB_PAT env var with `actions:read` scope on the repo.
+     * When unset, returns status=not_configured with instructions — never a
+     * hard 500 (the panel still works without it; just no GHA pill).
+     *
+     * Result is cached for 30 seconds in mom/data/cache/ to stay under
+     * GitHub's API rate limit when multiple admins poll concurrently.
+     */
+    public function ghaWorkflowStatus(): never
+    {
+        $this->requireAuth();
+
+        $repo = getenv('GITHUB_REPO') ?: 'sanhvo86-hesem/mom';
+        $workflow = getenv('GITHUB_WORKFLOW_FILE') ?: 'deploy.yml';
+        $pat = (string)(getenv('GITHUB_PAT') ?: '');
+
+        if ($pat === '') {
+            $this->success([
+                'status' => 'not_configured',
+                'repo' => $repo,
+                'workflow' => $workflow,
+                'runs' => [],
+                'message' => 'GITHUB_PAT env var not set. Add it to .env or the FPM pool config to enable GHA status polling.',
+            ]);
+        }
+
+        $cacheFile = $this->dataDir . '/cache/admin-gha-status.json';
+        if (is_file($cacheFile)) {
+            $age = time() - (int)filemtime($cacheFile);
+            if ($age < 30) {
+                $cached = @file_get_contents($cacheFile);
+                if (is_string($cached)) {
+                    $decoded = json_decode($cached, true);
+                    if (is_array($decoded)) {
+                        $decoded['cached_age_seconds'] = $age;
+                        $this->success($decoded);
+                    }
+                }
+            }
+        }
+
+        $url = 'https://api.github.com/repos/' . $repo . '/actions/workflows/' . $workflow . '/runs?per_page=5';
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 4,
+            CURLOPT_TIMEOUT => 8,
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/vnd.github+json',
+                'Authorization: Bearer ' . $pat,
+                'X-GitHub-Api-Version: 2022-11-28',
+                'User-Agent: HESEM-MOM-Admin/1.0',
+            ],
+        ]);
+        $body = curl_exec($ch);
+        $http = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err = curl_error($ch);
+        curl_close($ch);
+
+        if ($http < 200 || $http >= 300 || !is_string($body)) {
+            $this->success([
+                'status' => 'api_error',
+                'repo' => $repo,
+                'workflow' => $workflow,
+                'http_code' => $http,
+                'curl_error' => $err,
+                'runs' => [],
+                'message' => 'GitHub API returned HTTP ' . $http . ($err !== '' ? ' (' . $err . ')' : ''),
+            ]);
+        }
+        $decoded = json_decode($body, true);
+        $runsRaw = is_array($decoded['workflow_runs'] ?? null) ? $decoded['workflow_runs'] : [];
+
+        $runs = [];
+        foreach ($runsRaw as $r) {
+            if (!is_array($r)) continue;
+            $runs[] = [
+                'id' => (int)($r['id'] ?? 0),
+                'run_number' => (int)($r['run_number'] ?? 0),
+                'status' => (string)($r['status'] ?? ''),                 // queued/in_progress/completed
+                'conclusion' => (string)($r['conclusion'] ?? ''),         // success/failure/cancelled/skipped
+                'head_sha' => substr((string)($r['head_sha'] ?? ''), 0, 12),
+                'head_branch' => (string)($r['head_branch'] ?? ''),
+                'event' => (string)($r['event'] ?? ''),
+                'actor' => (string)($r['triggering_actor']['login'] ?? $r['actor']['login'] ?? ''),
+                'created_at' => (string)($r['created_at'] ?? ''),
+                'updated_at' => (string)($r['updated_at'] ?? ''),
+                'html_url' => (string)($r['html_url'] ?? ''),
+            ];
+        }
+
+        $latest = $runs[0] ?? null;
+        $statusPill = 'unknown';
+        if ($latest) {
+            if ($latest['status'] !== 'completed') {
+                $statusPill = $latest['status']; // queued, in_progress
+            } else {
+                $statusPill = $latest['conclusion']; // success, failure, cancelled, skipped
+            }
+        }
+
+        $payload = [
+            'status' => 'ok',
+            'repo' => $repo,
+            'workflow' => $workflow,
+            'latest_status_pill' => $statusPill,
+            'latest' => $latest,
+            'runs' => $runs,
+            'fetched_at' => now_iso(),
+        ];
+
+        // Best-effort cache; ignore failures (cache miss is fine).
+        @mkdir(dirname($cacheFile), 0775, true);
+        @file_put_contents($cacheFile, json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+
+        $this->success($payload);
+    }
+
+    /**
+     * GET admin_version_control_unified_timeline — Pha 3 of the admin VC
+     * v2 redesign. Merges three previously-separate streams into a single
+     * chronological feed so an operator can answer "what changed in the
+     * last hour / who did it / can I roll it back" without context-switching
+     * between Snapshots, Doc history, and Audit log tabs.
+     *
+     * Sources merged (best-effort fan-out — a partial failure on one
+     * source returns the other two with a warning, never a hard 500):
+     *   1. audit_events            (via DataAccessAdapter::getAuditLog)
+     *   2. data-sync snapshots     (via DataSyncMutationService::listSnapshots)
+     *   3. dcc_document_body rows  (via VersionControlService::listDocsWithHistory
+     *                                — we use the rolled-up doc list because
+     *                                pulling every revision body is O(N) per
+     *                                doc and not worth it for a feed view)
+     *
+     * Output envelope per row:
+     *   {
+     *     id:         "<source>:<key>"          (stable, unique)
+     *     ts:         ISO 8601 UTC              (canonical sort key)
+     *     type:       "audit" | "snapshot" | "doc_revision"
+     *     source:     <table or store name>
+     *     actor:      <username or party id>    (best-effort)
+     *     summary:    <short human label>
+     *     key:        <aggregate identifier>
+     *     payload:    <original row, sanitised>
+     *     restorable: bool                       (snapshots only, today)
+     *   }
+     *
+     * Query params:
+     *   limit       — total rows returned post-merge (1..500, default 100)
+     *   types       — comma list filter, e.g. "audit,snapshot"
+     *                 (subset of audit|snapshot|doc_revision; default = all)
+     *   actor       — substring match on actor (case-insensitive)
+     *   search      — substring match on summary or key
+     *   since       — ISO date or datetime; drops rows older than this
+     */
+    public function versionControlUnifiedTimeline(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        $limit = max(1, min(500, (int)($this->query('limit', '100') ?? '100')));
+        $typesRaw = trim((string)($this->query('types', '') ?? ''));
+        $typesAllowed = ['audit', 'snapshot', 'doc_revision'];
+        $types = $typesRaw === ''
+            ? $typesAllowed
+            : array_values(array_intersect($typesAllowed, array_filter(array_map('trim', explode(',', strtolower($typesRaw))))));
+        if ($types === []) $types = $typesAllowed;
+
+        $actorFilter = strtolower(trim((string)($this->query('actor', '') ?? '')));
+        $searchFilter = strtolower(trim((string)($this->query('search', '') ?? '')));
+        $sinceFilter = trim((string)($this->query('since', '') ?? ''));
+        if ($sinceFilter !== '') {
+            // Accept YYYY-MM-DD or full ISO; normalise to YYYY-MM-DDTHH:MM:SSZ.
+            $ts = strtotime($sinceFilter);
+            $sinceFilter = $ts ? gmdate('Y-m-d\TH:i:s\Z', $ts) : '';
+        }
+
+        $events = [];
+        $warnings = [];
+
+        // ── Source 1: audit_events ────────────────────────────────────────
+        if (in_array('audit', $types, true)) {
+            try {
+                // Pull a generous slice from audit and apply the substring
+                // filters in PHP after merge — passing actor_name to
+                // getAuditLog uses an exact match which would drop "sanh.vo"
+                // when the user typed "sanh". since/from is safe to push
+                // down because the DB-side comparison is a range, not exact.
+                $filters = ['limit' => max($limit, 200)];
+                if ($sinceFilter !== '') $filters['from'] = $sinceFilter;
+                $filters['exclude_aggregate_types'] = ['runtime_read_model', 'connector_feed', 'runtime_shadow'];
+                $auditRows = $this->data->getAuditLog($filters);
+                foreach ((is_array($auditRows) ? $auditRows : []) as $row) {
+                    if (!is_array($row)) continue;
+                    $eventType = (string)($row['event_type'] ?? $row['action'] ?? 'audit_event');
+                    $aggType = (string)($row['aggregate_type'] ?? '');
+                    $aggId = (string)($row['aggregate_id'] ?? '');
+                    $actor = (string)($row['actor_name'] ?? $row['user'] ?? '');
+                    $ts = (string)($row['recorded_at'] ?? $row['timestamp'] ?? '');
+                    $id = 'audit:' . ($row['id'] ?? md5($ts . '|' . $eventType . '|' . $actor));
+                    // Pull the wrapped context payload (BaseController->auditLog
+                    // wraps everything under payload.context). If it exists and
+                    // contains a change_ref / intent_id / similar identifier,
+                    // suffix it into the summary so the substring search picks
+                    // it up — without this, a user searching the timeline for
+                    // a CR id wouldn't find the audit row it lives in.
+                    $rawPayload = is_array($row['payload'] ?? null) ? $row['payload'] : [];
+                    $ctx = is_array($rawPayload['context'] ?? null) ? $rawPayload['context'] : $rawPayload;
+                    $idHint = '';
+                    foreach (['change_ref', 'intent_id', 'cr_id', 'snapshot_id', 'doc_code'] as $hintKey) {
+                        if (!empty($ctx[$hintKey]) && is_scalar($ctx[$hintKey])) {
+                            $idHint = ' [' . (string)$ctx[$hintKey] . ']';
+                            break;
+                        }
+                    }
+                    $events[] = [
+                        'id' => $id,
+                        'ts' => $ts,
+                        'type' => 'audit',
+                        'source' => 'audit_events',
+                        'actor' => $actor,
+                        'summary' => $eventType . ($aggType !== '' ? ' · ' . $aggType : '') . ($aggId !== '' ? '#' . substr($aggId, 0, 12) : '') . $idHint,
+                        'key' => $eventType . ($idHint !== '' ? trim($idHint, ' []') : ''),
+                        'payload' => [
+                            'event_type' => $eventType,
+                            'aggregate_type' => $aggType,
+                            'aggregate_id' => $aggId,
+                            'ip_address' => (string)($row['ip_address'] ?? $row['ip'] ?? ''),
+                            'payload' => is_array($row['payload'] ?? null) ? $row['payload'] : [],
+                            'metadata' => is_array($row['metadata'] ?? null) ? $row['metadata'] : [],
+                        ],
+                        'restorable' => false,
+                    ];
+                }
+            } catch (Throwable $e) {
+                $warnings[] = ['source' => 'audit_events', 'error' => $e->getMessage()];
+            }
+        }
+
+        // ── Source 2: data-sync snapshots ─────────────────────────────────
+        if (in_array('snapshot', $types, true)) {
+            try {
+                $snapshots = $this->dataSyncMutator()->listSnapshots(min(60, $limit));
+                foreach ((is_array($snapshots) ? $snapshots : []) as $snap) {
+                    if (!is_array($snap)) continue;
+                    $sid = (string)($snap['id'] ?? '');
+                    $ts = (string)($snap['captured_at'] ?? '');
+                    $actor = (string)($snap['actor'] ?? '');
+                    $reason = trim((string)($snap['reason'] ?? ''));
+                    $changeRef = trim((string)($snap['change_ref'] ?? ''));
+                    $subset = (string)($snap['subset'] ?? 'config');
+                    $fileCount = (int)($snap['file_count'] ?? 0);
+                    $events[] = [
+                        'id' => 'snapshot:' . $sid,
+                        'ts' => $ts,
+                        'type' => 'snapshot',
+                        'source' => 'data_snapshots',
+                        'actor' => $actor,
+                        'summary' => 'Snapshot ' . $sid . ($fileCount > 0 ? ' (' . $fileCount . ' files)' : '') . ($reason !== '' ? ' — ' . $reason : ''),
+                        'key' => $sid,
+                        'payload' => [
+                            'snapshot_id' => $sid,
+                            'subset' => $subset,
+                            'change_ref' => $changeRef,
+                            'reason' => $reason,
+                            'file_count' => $fileCount,
+                        ],
+                        'restorable' => true,
+                    ];
+                }
+            } catch (Throwable $e) {
+                $warnings[] = ['source' => 'data_snapshots', 'error' => $e->getMessage()];
+            }
+        }
+
+        // ── Source 3: dcc document revisions ──────────────────────────────
+        if (in_array('doc_revision', $types, true)) {
+            try {
+                // listDocsWithHistory returns docs with last_recorded_at;
+                // we collapse each doc into one timeline row using its
+                // most-recent header status as the summary.
+                $payload = $this->versionControlService()->listDocsWithHistory(min(200, $limit), '');
+                $docs = is_array($payload['docs'] ?? null) ? $payload['docs'] : [];
+                foreach ($docs as $doc) {
+                    if (!is_array($doc)) continue;
+                    $code = (string)($doc['doc_code'] ?? '');
+                    if ($code === '') continue;
+                    $ts = (string)($doc['last_recorded_at'] ?? '');
+                    $rev = (string)($doc['header_revision'] ?? $doc['latest_revision'] ?? '');
+                    $status = (string)($doc['header_status'] ?? '');
+                    $rowCount = (int)($doc['history_rows'] ?? 0);
+                    $events[] = [
+                        'id' => 'doc:' . $code . ':' . $rev,
+                        'ts' => $ts,
+                        'type' => 'doc_revision',
+                        'source' => 'dcc_document_body',
+                        'actor' => '', // doc list doesn't carry actor; per-revision drawer does
+                        'summary' => strtoupper($code) . ' rev ' . $rev . ($status !== '' ? ' — ' . $status : '') . ' (' . $rowCount . ' revs)',
+                        'key' => $code,
+                        'payload' => [
+                            'doc_code' => $code,
+                            'doc_type' => (string)($doc['doc_type'] ?? ''),
+                            'revision' => $rev,
+                            'status' => $status,
+                            'history_rows' => $rowCount,
+                        ],
+                        'restorable' => false,
+                    ];
+                }
+            } catch (Throwable $e) {
+                $warnings[] = ['source' => 'dcc_document_body', 'error' => $e->getMessage()];
+            }
+        }
+
+        // ── Apply remaining client-side filters ───────────────────────────
+        if ($actorFilter !== '') {
+            $events = array_values(array_filter($events, static fn(array $e) =>
+                $e['actor'] !== '' && strpos(strtolower($e['actor']), $actorFilter) !== false));
+        }
+        if ($searchFilter !== '') {
+            $events = array_values(array_filter($events, static fn(array $e) =>
+                strpos(strtolower($e['summary']), $searchFilter) !== false
+                || strpos(strtolower($e['key']), $searchFilter) !== false));
+        }
+        if ($sinceFilter !== '') {
+            $events = array_values(array_filter($events, static fn(array $e) =>
+                $e['ts'] !== '' && strcmp($e['ts'], $sinceFilter) >= 0));
+        }
+
+        // ── Merge-sort by ts DESC, then cap at limit ──────────────────────
+        // ts is always a string per normalizer above (PHPStan correctly
+        // points out the ?? '' is redundant — keeping (string) cast for
+        // explicitness even though it's a no-op).
+        usort($events, static function (array $a, array $b): int {
+            return strcmp((string)$b['ts'], (string)$a['ts']);
+        });
+        if (count($events) > $limit) {
+            $events = array_slice($events, 0, $limit);
+        }
+
+        $this->success([
+            'events' => $events,
+            'count' => count($events),
+            'limit' => $limit,
+            'types_requested' => $types,
+            'warnings' => $warnings,
+        ]);
+    }
+
+    /**
+     * Return the list of role slugs held by a user record. Mirrors the
+     * lookups in other admin endpoints — pulls .role, .roles[], and
+     * .role_list[] as a tolerant union so a user record produced by any
+     * historical writer still resolves correctly.
+     */
+    private function rolesForUser(array $user): array
+    {
+        $roles = [];
+        $push = function ($v) use (&$roles) {
+            $r = strtolower(trim((string)$v));
+            if ($r !== '' && !in_array($r, $roles, true)) $roles[] = $r;
+        };
+        if (isset($user['role'])) $push($user['role']);
+        foreach ((array)($user['roles'] ?? []) as $r) $push($r);
+        foreach ((array)($user['role_list'] ?? []) as $r) $push($r);
+        return $roles;
     }
 
     /**

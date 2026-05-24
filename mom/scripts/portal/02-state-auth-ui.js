@@ -7906,7 +7906,11 @@ function renderAdminSyncConfigBadge(){
   </article>`;
 }
 
-function renderAdminSyncPanelV2(){
+// Pha 2: renderAdminSyncPanelV2 deprecated — its functionality folded into
+// renderAdminVCStatus (Release readiness card + git facts row). Body
+// preserved in comments for one release cycle so rollback is trivial.
+/*
+function renderAdminSyncPanelV2_DEPRECATED_PHA2(){
   const status = gitRepoStatusState.data && typeof gitRepoStatusState.data === 'object' ? gitRepoStatusState.data : null;
   const statusError = String(gitRepoStatusState.error || '').trim();
   const relativeState = gitRepoRelativeState(status);
@@ -8031,6 +8035,7 @@ function renderAdminSyncPanelV2(){
       </article>
     </section>`;
 }
+*/
 
 function markUnsaved(){
   adminUnsaved = true;
@@ -8044,11 +8049,63 @@ function markUnsaved(){
 // separate panes instead of one ever-scrolling wall. Sub-tab state is held
 // in a single global so re-renders triggered by other panels don't reset it.
 
-let versionControlSubTab = 'overview';
+// Pha 2: default sub-tab is 'status' (was 'overview'). Anyone resuming a
+// session whose URL/hash still says 'overview', 'sync', or 'process' is
+// normalised to 'status' by setVersionControlSubTab on first call.
+let versionControlSubTab = 'status';
+// VC Mode (Developer/Operation) — header bar reads `data.effective_mode` to
+// pick which CTAs to surface across all sub-tabs. `data.policy` carries the
+// full policy block for the Settings sub-tab editor. Mode is admin-scoped:
+// admin can read/write; non-admins get effective_mode only (server-resolved).
+let adminVCModeState = {
+  loading:false, loaded:false, error:'', saving:false,
+  data: null  // { policy, effective_mode, your_roles }
+};
+// Pha 5: deploy freeze + GHA workflow status — both populate the header bar.
+let deployFreezeState = {
+  loading:false, loaded:false, error:'', saving:false,
+  data: null  // { enabled, reason, ticket_id, set_by, set_at, expires_at, is_active }
+};
+let ghaWorkflowState = {
+  loading:false, loaded:false, error:'',
+  data: null,  // { status, latest_status_pill, latest, runs }
+  lastFetchedAt: 0  // client-side throttle: refetch at most once per 30s
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// VC Action Modal (replaces window.prompt/alert/confirm)
+//
+// User report 2026-05-24: every Pha 1/4/5 button uses window.prompt for
+// input. Native dialogs are blocked or auto-dismissed in many contexts
+// (Chrome automation, popup blockers, "Don't allow this site to create
+// dialogs"). Replacement: single reusable inline modal with proper
+// client-side validation + server-side error display + success result.
+// ─────────────────────────────────────────────────────────────────────────
+let adminVCActionModalState = {
+  open: false,
+  config: null,            // see openAdminVCActionModal
+  values: {},              // field name -> string
+  fieldErrors: {},         // field name -> error message
+  serverError: '',         // top-of-modal error from onSubmit
+  submitting: false,
+  result: null,            // { message, next_steps[] } after success
+};
+
 let versionControlOverviewState  = {loading:false, loaded:false, error:'', data:null};
 let versionControlDocsState      = {loading:false, loaded:false, error:'', data:null, search:''};
 let versionControlDocDetailState = {loading:false, loaded:false, error:'', data:null, docCode:''};
 let versionControlAuditState     = {loading:false, loaded:false, error:'', data:null, limit:100};
+// Pha 3: unified timeline state. Replaces the 3 separate sub-tab states
+// for snapshots, doc history, and audit log (those tabs are removed in
+// the dispatcher; the underlying state vars stay alive for one release
+// cycle so the deprecated render functions can still reference them
+// without ReferenceErrors during the comment-out window).
+let versionControlTimelineState = {
+  loading:false, loaded:false, error:'',
+  data:null,                       // { events:[], count, warnings, limit }
+  filters: {types:'', actor:'', search:'', since:'', limit:100},
+  selectedId: ''                   // id of the timeline row selected for right-panel detail (TODO Pha 3.1)
+};
 // config_sync sub-tab: re-uses dataSyncStatusState (same data as Sync tab)
 // but has its own diff-viewer and editor modals stored in these locals:
 let vcConfigSyncDiffState  = {open:false, name:'', loading:false, site:null, mirror:null, error:''};
@@ -8080,20 +8137,25 @@ let _autoSyncRunning   = false;  // guard: prevent concurrent auto-sync calls
 
 function setVersionControlSubTab(id){
   if(typeof id !== 'string' || !id) return;
+  // Pha 2: normalise deprecated sub-tab ids to 'status'.
+  // Pha 3: snapshots/doc_history/audit collapse into 'timeline'. Anything
+  // else falls through to 'status' so a stale id never renders a blank.
+  const validTabs = ['status','config_sync','local_sync','timeline'];
+  if(id === 'overview' || id === 'sync' || id === 'process') id = 'status';
+  if(id === 'snapshots' || id === 'doc_history' || id === 'audit') id = 'timeline';
+  if(validTabs.indexOf(id) === -1) id = 'status';
   if(versionControlSubTab === id) return;
   versionControlSubTab = id;
   // Lazy-load the data needed by the chosen sub-tab.
-  if(id === 'overview' && !versionControlOverviewState.loaded && !versionControlOverviewState.loading){
-    loadVersionControlOverview({silent:true});
-  } else if(id === 'doc_history' && !versionControlDocsState.loaded && !versionControlDocsState.loading){
-    loadVersionControlDocs({silent:true});
-  } else if(id === 'audit' && !versionControlAuditState.loaded && !versionControlAuditState.loading){
-    loadVersionControlAudit({silent:true});
-  } else if(id === 'snapshots' && !dataSyncSnapshotsState.loaded && !dataSyncSnapshotsState.loading){
-    loadDataSyncSnapshots({silent:true});
-  } else if(id === 'sync'){
+  if(id === 'status'){
+    // Status reads overview data + git status. Both auto-load on first
+    // entry to the VC panel too (see renderAdminVersionControl), but
+    // refreshing here on tab switch keeps the UI snappy if a user
+    // navigates between tabs.
+    if(!versionControlOverviewState.loaded && !versionControlOverviewState.loading) loadVersionControlOverview({silent:true});
     if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading) loadGitRepoStatus({silent:true});
-    if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading) loadDataSyncStatus({silent:true});
+  } else if(id === 'timeline' && !versionControlTimelineState.loaded && !versionControlTimelineState.loading){
+    loadVersionControlTimeline({silent:true});
   } else if(id === 'config_sync'){
     if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading) loadDataSyncStatus({silent:true});
   } else if(id === 'local_sync'){
@@ -8198,6 +8260,49 @@ async function loadVersionControlAudit(options){
   } finally {
     if(currentPage === 'admin') renderAdmin();
   }
+}
+
+// ── Pha 3: Unified timeline loader ────────────────────────────────────────
+//
+// Backed by admin_version_control_unified_timeline. Pulls audit_events +
+// data-sync snapshots + dcc_document_body rows in one call, merge-sorted
+// by timestamp DESC. Supports filters: types (subset of audit/snapshot/
+// doc_revision), actor (substring), search (substring on summary or key),
+// since (ISO date), limit (1..500).
+async function loadVersionControlTimeline(options){
+  options = options || {};
+  const force = !!options.force;
+  if(versionControlTimelineState.loading && !force) return;
+  if(versionControlTimelineState.loaded && !force && !options.filterChange) return;
+  // Merge requested filter overrides onto current state — caller passes only
+  // the keys they want to change.
+  if(options.filters){
+    versionControlTimelineState.filters = Object.assign({}, versionControlTimelineState.filters, options.filters);
+  }
+  versionControlTimelineState = Object.assign({}, versionControlTimelineState, {loading:true, error:''});
+  if(!options.silent && currentPage === 'admin') renderAdmin();
+  try{
+    const f = versionControlTimelineState.filters || {};
+    const params = {};
+    if(f.types) params.types = String(f.types);
+    if(f.actor) params.actor = String(f.actor);
+    if(f.search) params.search = String(f.search);
+    if(f.since) params.since = String(f.since);
+    params.limit = Math.max(1, Math.min(500, Number(f.limit) || 100));
+    const res = await apiCall('admin_version_control_unified_timeline', params, 'GET');
+    if(res && res.ok){
+      versionControlTimelineState = Object.assign({}, versionControlTimelineState, {
+        loading:false, loaded:true, error:'',
+        data: { events: res.events || [], count: res.count || 0, warnings: res.warnings || [], limit: res.limit || params.limit }
+      });
+    }else{
+      const msg = (res && (res.error || res.detail)) || 'timeline_load_failed';
+      versionControlTimelineState = Object.assign({}, versionControlTimelineState, {loading:false, error:String(msg)});
+    }
+  }catch(e){
+    versionControlTimelineState = Object.assign({}, versionControlTimelineState, {loading:false, error:e.message || 'timeline_load_failed'});
+  }
+  if(currentPage === 'admin') renderAdmin();
 }
 
 // ── Auto-sync schedule helpers ────────────────────────────────────────────
@@ -8831,6 +8936,603 @@ function vcFmtTime(iso){
   return gitRepoFormatTime(iso) || iso;
 }
 
+// ── VC Mode (Developer / Operation) ───────────────────────────────────────
+//
+// `loadAdminVCMode` populates adminVCModeState.data with:
+//   {
+//     policy:         { default, role_overrides, lock_on_production,
+//                       updated_at, runtime_is_production },
+//     effective_mode: 'developer' | 'operation',
+//     your_roles:     [<role>, ...]
+//   }
+// Header bar reads `effective_mode` to drive mode-aware button visibility.
+//
+// Auto-loads when the VC panel renders. Other admin tabs can also call
+// loadAdminVCMode() — it's cheap and idempotent.
+async function loadAdminVCMode({force=false, silent=false} = {}){
+  if(adminVCModeState.loading) return;
+  if(adminVCModeState.loaded && !force) return;
+  adminVCModeState = Object.assign({}, adminVCModeState, {loading:true, error:''});
+  if(!silent) renderAdmin();
+  try{
+    const res = await apiCall('admin_vc_mode_get', null, 'GET');
+    // Pha 1 bugfix: BaseController->success() emits {ok:true,...}, not
+    // {success:true}. The first verification pass showed "lỗi mode" pill
+    // even though effective_mode was correctly returned — caused by the
+    // loader thinking the call had failed and falling to the error branch.
+    if(res && res.ok){
+      adminVCModeState = Object.assign({}, adminVCModeState, {
+        loading:false, loaded:true, error:'',
+        data: { policy: res.policy || null, effective_mode: res.effective_mode || 'operation', your_roles: res.your_roles || [] }
+      });
+    }else{
+      const msg = (res && (res.error || res.detail)) || 'vc_mode_load_failed';
+      adminVCModeState = Object.assign({}, adminVCModeState, {loading:false, error:String(msg)});
+    }
+  }catch(e){
+    adminVCModeState = Object.assign({}, adminVCModeState, {loading:false, error:e.message || 'vc_mode_load_failed'});
+  }
+  if(currentPage === 'admin') renderAdmin();
+}
+
+// ── Pha 5: deploy freeze + GHA loaders ───────────────────────────────────
+
+async function loadDeployFreeze({force=false, silent=false} = {}){
+  if(deployFreezeState.loading) return;
+  if(deployFreezeState.loaded && !force) return;
+  deployFreezeState = Object.assign({}, deployFreezeState, {loading:true, error:''});
+  if(!silent) renderAdmin();
+  try{
+    const res = await apiCall('admin_deploy_freeze_get', null, 'GET');
+    if(res && res.ok){
+      deployFreezeState = Object.assign({}, deployFreezeState, {loading:false, loaded:true, error:'', data:res.freeze || null});
+    }else{
+      const msg = (res && (res.error || res.detail)) || 'freeze_load_failed';
+      deployFreezeState = Object.assign({}, deployFreezeState, {loading:false, error:String(msg)});
+    }
+  }catch(e){
+    deployFreezeState = Object.assign({}, deployFreezeState, {loading:false, error:e.message || 'freeze_load_failed'});
+  }
+  if(currentPage === 'admin') renderAdmin();
+}
+
+async function loadGhaWorkflow({force=false, silent=false} = {}){
+  if(ghaWorkflowState.loading) return;
+  // Client-side 30s throttle: don't re-hit the server faster than the
+  // server-side cache TTL — saves a round trip when the panel re-renders.
+  const ageMs = Date.now() - (ghaWorkflowState.lastFetchedAt || 0);
+  if(ghaWorkflowState.loaded && !force && ageMs < 30000) return;
+  ghaWorkflowState = Object.assign({}, ghaWorkflowState, {loading:true, error:''});
+  if(!silent) renderAdmin();
+  try{
+    const res = await apiCall('admin_gha_workflow_status', null, 'GET');
+    if(res && res.ok){
+      ghaWorkflowState = Object.assign({}, ghaWorkflowState, {loading:false, loaded:true, error:'', data:res, lastFetchedAt:Date.now()});
+    }else{
+      const msg = (res && (res.error || res.detail)) || 'gha_load_failed';
+      ghaWorkflowState = Object.assign({}, ghaWorkflowState, {loading:false, error:String(msg)});
+    }
+  }catch(e){
+    ghaWorkflowState = Object.assign({}, ghaWorkflowState, {loading:false, error:e.message || 'gha_load_failed'});
+  }
+  if(currentPage === 'admin') renderAdmin();
+}
+
+function deployFreezeIsActive(){
+  return !!(deployFreezeState.data && deployFreezeState.data.is_active);
+}
+
+// Mode + freeze are independent gates — operators can deploy in Dev mode
+// only when freeze is OFF. Helper used by render fns to short-circuit
+// button enablement without re-deriving the rule each time.
+function vcCanDeploy(){
+  return vcIsDeveloperMode() && !deployFreezeIsActive();
+}
+
+function adminVCFreezeToggle(){
+  if(!deployFreezeState.loaded){
+    showToast(lang==='en'?'Freeze state not loaded yet.':'Chưa tải freeze state.', 'error');
+    return;
+  }
+  const currentlyOn = deployFreezeIsActive();
+  const TICKET_REGEX = '^[A-Za-z0-9._:-]{4,80}$';
+  const ticketHelp = lang==='en' ? 'Allowed: letters, digits, . _ : - (4..80 chars)' : 'Cho phép: chữ, số, . _ : - (4..80 ký tự)';
+  if(currentlyOn){
+    openAdminVCActionModal({
+      title: lang==='en' ? '⛔ Unfreeze deploys' : '⛔ Bỏ freeze deploy',
+      intro: lang==='en'
+        ? 'Currently frozen by '+(deployFreezeState.data?.set_by||'?')+' for ticket '+(deployFreezeState.data?.ticket_id||'?')+'.'
+        : 'Đang frozen bởi '+(deployFreezeState.data?.set_by||'?')+' cho ticket '+(deployFreezeState.data?.ticket_id||'?')+'.',
+      fields: [
+        { name: 'ticket_id', label: lang==='en'?'Ticket id (INC/CR closing this freeze)':'Ticket id (INC/CR đóng freeze)',
+          type: 'text', required: true, minLength: 4, maxLength: 80, regex: TICKET_REGEX, regexHelp: ticketHelp,
+          default: deployFreezeState.data?.ticket_id || '', placeholder: 'INC-2026-013' },
+        { name: 'reason', label: lang==='en'?'Reason':'Lý do', type: 'textarea', rows: 2,
+          required: true, minLength: 4, maxLength: 500,
+          default: lang==='en'?'incident resolved':'sự cố đã xử lý' }
+      ],
+      submitLabel: lang==='en'?'Unfreeze':'Bỏ freeze',
+      submitTone: 'good',
+      onSubmit: async (vals) => {
+        const res = await apiCall('admin_deploy_freeze_set', {enabled:false, reason:vals.reason.trim(), ticket_id:vals.ticket_id.trim()}, 'POST');
+        if(res && res.ok){
+          deployFreezeState = Object.assign({}, deployFreezeState, {loaded:true, error:'', data: res.freeze || null});
+          return { ok:true, message: lang==='en'?'Deploys unfrozen.':'Đã bỏ freeze.' };
+        }
+        return res || { ok:false, error:'unknown' };
+      }
+    });
+    return;
+  }
+  // Freeze flow
+  openAdminVCActionModal({
+    title: lang==='en' ? '⛔ Freeze deploys (emergency)' : '⛔ Freeze deploy (khẩn cấp)',
+    intro: lang==='en'
+      ? 'Blocks Push & Deploy, CR approval, and batch sync with HTTP 423. Reads + CR submit still work.'
+      : 'Chặn Push & Deploy, duyệt CR, batch sync (HTTP 423). Reads + gửi CR vẫn chạy.',
+    fields: [
+      { name: 'ticket_id', label: lang==='en'?'INC / ticket id':'INC / ticket id',
+        type: 'text', required: true, minLength: 4, maxLength: 80, regex: TICKET_REGEX, regexHelp: ticketHelp,
+        placeholder: 'INC-2026-013' },
+      { name: 'reason', label: lang==='en'?'Reason (≥10 chars)':'Lý do (≥10 ký tự)', type: 'textarea', rows: 3,
+        required: true, minLength: 10, maxLength: 500,
+        placeholder: lang==='en'?'e.g. P1 outage in OrderModule — block deploys during MTTR':'vd: Sự cố P1 OrderModule — chặn deploy trong khi xử lý' }
+    ],
+    submitLabel: lang==='en'?'Freeze':'Freeze',
+    submitTone: 'error',
+    onSubmit: async (vals) => {
+      const res = await apiCall('admin_deploy_freeze_set', {enabled:true, reason:vals.reason.trim(), ticket_id:vals.ticket_id.trim()}, 'POST');
+      if(res && res.ok){
+        deployFreezeState = Object.assign({}, deployFreezeState, {loaded:true, error:'', data: res.freeze || null});
+        return { ok:true, message: lang==='en'?'Deploys frozen.':'Đã freeze deploy.' };
+      }
+      return res || { ok:false, error:'unknown' };
+    }
+  });
+}
+
+async function adminVCFreezeApply(enabled, reason, ticket){
+  deployFreezeState = Object.assign({}, deployFreezeState, {saving:true, error:''});
+  renderAdmin();
+  try{
+    const res = await apiCall('admin_deploy_freeze_set', {enabled, reason, ticket_id: ticket}, 'POST');
+    if(res && res.ok){
+      deployFreezeState = Object.assign({}, deployFreezeState, {saving:false, loaded:true, error:'', data:res.freeze || null});
+      showToast(enabled
+        ? (lang==='en'?'Deploys frozen.':'Đã freeze deploy.')
+        : (lang==='en'?'Deploys unfrozen.':'Đã bỏ freeze.'), 'success');
+      renderAdmin();
+      return true;
+    }
+    const msg = (res && (res.error || res.detail)) || 'freeze_save_failed';
+    deployFreezeState = Object.assign({}, deployFreezeState, {saving:false, error:String(msg)});
+    showToast((lang==='en'?'Freeze failed: ':'Lỗi freeze: ')+String(msg).slice(0,200), 'error');
+    renderAdmin();
+    return false;
+  }catch(e){
+    deployFreezeState = Object.assign({}, deployFreezeState, {saving:false, error:e.message});
+    showToast((lang==='en'?'Freeze error: ':'Lỗi: ')+e.message, 'error');
+    renderAdmin();
+    return false;
+  }
+}
+
+// Effective mode helper for other render functions. Returns 'operation' when
+// unknown — fail-closed so a panel that forgets to load mode shows the
+// safe (manual-gate) CTAs by default.
+function vcEffectiveMode(){
+  const d = adminVCModeState && adminVCModeState.data;
+  if(!d || !d.effective_mode) return 'operation';
+  return d.effective_mode === 'developer' ? 'developer' : 'operation';
+}
+
+// Convenience predicate for mode-gated button visibility.
+function vcIsDeveloperMode(){ return vcEffectiveMode() === 'developer'; }
+
+// ── VC action modal helpers ──────────────────────────────────────────────
+function openAdminVCActionModal(config){
+  const values = {};
+  (config.fields || []).forEach(f => {
+    values[f.name] = (f.default !== undefined && f.default !== null) ? String(f.default) : '';
+  });
+  adminVCActionModalState = {
+    open: true, config: config, values: values,
+    fieldErrors: {}, serverError: '', submitting: false, result: null,
+  };
+  renderAdmin();
+  setTimeout(() => {
+    const first = document.querySelector('.vc-modal-field input,.vc-modal-field textarea');
+    if(first) first.focus();
+  }, 50);
+}
+function closeAdminVCActionModal(){
+  adminVCActionModalState = Object.assign({}, adminVCActionModalState, {
+    open:false, config:null, values:{}, fieldErrors:{}, serverError:'', submitting:false, result:null
+  });
+  renderAdmin();
+}
+function adminVCModalSetValue(name, value){
+  adminVCActionModalState.values[name] = value;
+  if(adminVCActionModalState.fieldErrors[name]){
+    delete adminVCActionModalState.fieldErrors[name];
+    renderAdmin();
+  }
+}
+function _adminVCModalValidate(){
+  const s = adminVCActionModalState;
+  const errs = {};
+  (s.config?.fields || []).forEach(f => {
+    const v = String(s.values[f.name] || '').trim();
+    if(f.required && v === ''){ errs[f.name] = (lang==='en'?'Required':'Bắt buộc'); return; }
+    if(v && f.minLength && v.length < f.minLength){
+      errs[f.name] = (lang==='en'?'Min ':'Tối thiểu ')+f.minLength+(lang==='en'?' chars':' ký tự')+' (now '+v.length+')'; return;
+    }
+    if(v && f.maxLength && v.length > f.maxLength){
+      errs[f.name] = (lang==='en'?'Max ':'Tối đa ')+f.maxLength+(lang==='en'?' chars':' ký tự'); return;
+    }
+    if(v && f.regex){
+      try { if(!(new RegExp(f.regex)).test(v)) errs[f.name] = f.regexHelp || (lang==='en'?'Invalid format':'Sai định dạng'); } catch(_){}
+    }
+  });
+  adminVCActionModalState = Object.assign({}, adminVCActionModalState, {fieldErrors: errs});
+  return Object.keys(errs).length === 0;
+}
+async function submitAdminVCActionModal(){
+  const s = adminVCActionModalState;
+  if(!s.open || !s.config || s.submitting) return;
+  (s.config.fields || []).forEach(f => {
+    const el = document.querySelector('[data-vc-modal-field="'+f.name+'"]');
+    if(el) s.values[f.name] = el.value;
+  });
+  if(!_adminVCModalValidate()){ renderAdmin(); return; }
+  adminVCActionModalState = Object.assign({}, adminVCActionModalState, {submitting:true, serverError:''});
+  renderAdmin();
+  try{
+    const out = await s.config.onSubmit(Object.assign({}, s.values));
+    if(out && out.ok){
+      adminVCActionModalState = Object.assign({}, adminVCActionModalState, {
+        submitting: false,
+        result: {
+          message: out.message || (lang==='en'?'Done.':'Hoàn tất.'),
+          next_steps: Array.isArray(out.next_steps) ? out.next_steps : [],
+        },
+      });
+    } else {
+      const msg = (out && (out.detail || out.error)) || (lang==='en'?'Action failed':'Hành động thất bại');
+      adminVCActionModalState = Object.assign({}, adminVCActionModalState, {submitting:false, serverError:String(msg)});
+    }
+  }catch(e){
+    adminVCActionModalState = Object.assign({}, adminVCActionModalState, {submitting:false, serverError: e.message || 'unknown_error'});
+  }
+  renderAdmin();
+}
+function renderAdminVCActionModal(){
+  const s = adminVCActionModalState;
+  if(!s.open || !s.config) return '';
+  const cfg = s.config;
+  if(s.result){
+    const steps = (s.result.next_steps || []).map(line =>
+      '<li style="margin:6px 0;font-size:12px;color:var(--text-primary,#1e293b)">'+
+        escapeHtml(line).replace(/`([^`]+)`/g, '<code>$1</code>')+
+      '</li>'
+    ).join('');
+    return '<div class="vc-modal-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px">'+
+      '<div role="dialog" aria-modal="true" style="background:var(--bg-surface,#fff);border-radius:12px;max-width:640px;width:100%;max-height:85vh;overflow:auto;padding:24px;box-shadow:0 25px 60px rgba(0,0,0,.3)">'+
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">'+
+          '<h3 style="margin:0;color:var(--text-primary,#1e293b);font-size:18px">✓ '+escapeHtml(cfg.title || '')+'</h3>'+
+          '<button class="admin-sync-mini" onclick="closeAdminVCActionModal()" title="'+escapeHtml(lang==='en'?'Close':'Đóng')+'">×</button>'+
+        '</div>'+
+        '<div class="admin-sync-callout-bar is-good" style="margin:8px 0">'+escapeHtml(s.result.message)+'</div>'+
+        (steps ? '<div style="margin-top:12px"><div class="admin-sync-panel-title" style="font-size:13px;margin-bottom:6px">'+escapeHtml(lang==='en'?'Next steps':'Các bước tiếp theo')+'</div><ul style="padding-left:18px;margin:0">'+steps+'</ul></div>' : '')+
+        '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">'+
+          '<button class="admin-sync-mini" onclick="closeAdminVCActionModal()">'+escapeHtml(lang==='en'?'Close':'Đóng')+'</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }
+  const fieldHtml = (cfg.fields || []).map(f => {
+    const v = s.values[f.name] != null ? String(s.values[f.name]) : '';
+    const err = s.fieldErrors[f.name] || '';
+    const errCls = err ? 'border:1px solid var(--red,#dc2626);' : 'border:1px solid var(--border,#d7e3ef);';
+    const required = f.required ? ' <span style="color:var(--red,#dc2626)">*</span>' : '';
+    const help = f.regexHelp || '';
+    let input;
+    if(f.type === 'textarea'){
+      input = '<textarea data-vc-modal-field="'+escapeHtml(f.name)+'" rows="'+(f.rows||3)+'" '+
+        'oninput="adminVCModalSetValue(\''+escapeHtml(f.name)+'\',this.value)" '+
+        'placeholder="'+escapeHtml(f.placeholder||'')+'" '+
+        'style="width:100%;box-sizing:border-box;padding:8px 10px;border-radius:6px;'+errCls+'background:var(--bg-surface,#fff);color:var(--text-primary,#1e293b);font-size:13px;font-family:inherit;resize:vertical">'+escapeHtml(v)+'</textarea>';
+    } else {
+      input = '<input type="'+(f.type==='date'?'date':'text')+'" data-vc-modal-field="'+escapeHtml(f.name)+'" '+
+        'oninput="adminVCModalSetValue(\''+escapeHtml(f.name)+'\',this.value)" '+
+        'value="'+escapeHtml(v)+'" '+
+        'placeholder="'+escapeHtml(f.placeholder||'')+'" '+
+        'style="width:100%;box-sizing:border-box;padding:8px 10px;border-radius:6px;'+errCls+'background:var(--bg-surface,#fff);color:var(--text-primary,#1e293b);font-size:13px">';
+    }
+    return '<div class="vc-modal-field" style="margin-bottom:12px">'+
+      '<label style="display:block;font-size:12px;font-weight:600;color:var(--text-primary,#1e293b);margin-bottom:4px">'+escapeHtml(f.label)+required+'</label>'+
+      input+
+      (err ? '<div style="color:var(--red,#dc2626);font-size:11px;margin-top:4px">'+escapeHtml(err)+'</div>' : (help ? '<div style="color:var(--text-3,#64748b);font-size:11px;margin-top:4px">'+escapeHtml(help)+'</div>' : ''))+
+    '</div>';
+  }).join('');
+  const submitDisabled = s.submitting ? ' disabled aria-disabled="true"' : '';
+  const submitToneStyle = cfg.submitTone === 'error'
+    ? 'background:var(--red,#dc2626);color:#fff;border-color:var(--red,#dc2626)'
+    : cfg.submitTone === 'warn'
+      ? 'background:color-mix(in srgb,var(--amber,#d97706) 14%,var(--bg-surface,#fff));border-color:var(--amber,#d97706);color:var(--amber,#d97706)'
+      : 'background:var(--brand-2,#1565c0);color:#fff;border-color:var(--brand-2,#1565c0)';
+  return '<div class="vc-modal-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px" '+
+    'onclick="if(event.target===this)closeAdminVCActionModal()">'+
+    '<div role="dialog" aria-modal="true" style="background:var(--bg-surface,#fff);border-radius:12px;max-width:560px;width:100%;max-height:85vh;overflow:auto;padding:24px;box-shadow:0 25px 60px rgba(0,0,0,.3)">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">'+
+        '<h3 style="margin:0;color:var(--text-primary,#1e293b);font-size:18px">'+escapeHtml(cfg.title || '')+'</h3>'+
+        '<button class="admin-sync-mini" onclick="closeAdminVCActionModal()" title="'+escapeHtml(lang==='en'?'Cancel':'Hủy')+'">×</button>'+
+      '</div>'+
+      (cfg.intro ? '<div style="color:var(--text-3,#64748b);font-size:12px;margin-bottom:12px">'+escapeHtml(cfg.intro)+'</div>' : '')+
+      (s.serverError ? '<div class="admin-sync-callout-bar is-error" style="margin-bottom:12px"><strong>'+escapeHtml(lang==='en'?'Server error: ':'Lỗi server: ')+'</strong>'+escapeHtml(s.serverError)+'</div>' : '')+
+      '<form onsubmit="event.preventDefault();submitAdminVCActionModal();return false">'+
+        fieldHtml+
+        '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">'+
+          '<button type="button" class="admin-sync-mini" onclick="closeAdminVCActionModal()"'+(s.submitting?' disabled':'')+'>'+escapeHtml(cfg.cancelLabel || (lang==='en'?'Cancel':'Hủy'))+'</button>'+
+          '<button type="submit" class="admin-sync-mini" style="'+submitToneStyle+'"'+submitDisabled+'>'+
+            (s.submitting ? '⌛ ' : '')+escapeHtml(cfg.submitLabel || (lang==='en'?'Submit':'Lưu'))+
+          '</button>'+
+        '</div>'+
+      '</form>'+
+    '</div>'+
+  '</div>';
+}
+
+async function saveAdminVCMode(patch, reason){
+  if(adminVCModeState.saving) return false;
+  const r = String(reason || '').trim();
+  if(r.length < 4){
+    showToast(lang==='en'?'Reason required (≥4 chars) for VC mode change.':'Cần nhập lý do (≥4 ký tự) khi đổi VC mode.', 'error');
+    return false;
+  }
+  adminVCModeState = Object.assign({}, adminVCModeState, {saving:true, error:''});
+  renderAdmin();
+  try{
+    const body = Object.assign({}, patch || {}, {reason: r});
+    const res = await apiCall('admin_vc_mode_set', body, 'POST');
+    // Same {ok:true} convention as the GET endpoint (see loadAdminVCMode).
+    if(res && res.ok){
+      adminVCModeState = Object.assign({}, adminVCModeState, {
+        saving:false, loaded:true, error:'',
+        data: { policy: res.policy || null, effective_mode: res.effective_mode || 'operation', your_roles: res.your_roles || [] }
+      });
+      showToast(lang==='en'?'VC mode updated. Effective: '+res.effective_mode:'Đã cập nhật VC mode. Hiệu lực: '+res.effective_mode, 'success');
+      renderAdmin();
+      return true;
+    }
+    const msg = (res && (res.error || res.detail)) || 'vc_mode_save_failed';
+    adminVCModeState = Object.assign({}, adminVCModeState, {saving:false, error:String(msg)});
+    showToast((lang==='en'?'VC mode save failed: ':'Lỗi lưu VC mode: ')+String(msg).slice(0,180), 'error');
+    renderAdmin();
+    return false;
+  }catch(e){
+    adminVCModeState = Object.assign({}, adminVCModeState, {saving:false, error:e.message});
+    showToast((lang==='en'?'VC mode save error: ':'Lỗi VC mode: ')+e.message, 'error');
+    renderAdmin();
+    return false;
+  }
+}
+
+// Header-bar quick switcher — opens an inline modal (replaces window.prompt
+// per the 2026-05-24 fix). The modal collects a mandatory audit reason and
+// then POSTs admin_vc_mode_set with the per-role override.
+function adminVCQuickSwitchMode(targetMode){
+  const data = adminVCModeState && adminVCModeState.data;
+  if(!data || !data.policy){
+    showToast(lang==='en'?'VC mode policy not loaded.':'Chưa nạp VC mode policy.', 'error');
+    return;
+  }
+  const tm = targetMode === 'developer' ? 'developer' : 'operation';
+  if(data.effective_mode === tm){
+    showToast(lang==='en'?'Already in '+tm+' mode.':'Đang ở chế độ '+tm+' rồi.', 'info');
+    return;
+  }
+  if(tm === 'developer' && data.policy.runtime_is_production && data.policy.lock_on_production){
+    showToast(lang==='en'
+      ? 'Production runtime is locked to Operation mode. Disable lock_on_production first.'
+      : 'Production runtime đang khoá ở Operation. Tắt lock_on_production trước.', 'error');
+    return;
+  }
+  const roles = Array.isArray(data.your_roles) ? data.your_roles : [];
+  if(roles.length === 0){
+    showToast(lang==='en'?'No roles on your account.':'Tài khoản không có role.', 'error');
+    return;
+  }
+  openAdminVCActionModal({
+    title: lang==='en' ? 'Switch to '+tm+' mode' : 'Đổi sang chế độ '+tm,
+    intro: lang==='en'
+      ? 'Override your role(s) ('+roles.join(', ')+') to '+tm+'. Logged to audit_events.'
+      : 'Override role của bạn ('+roles.join(', ')+') thành '+tm+'. Sẽ ghi vào audit_events.',
+    fields: [
+      { name: 'reason', label: lang==='en'?'Reason':'Lý do', type: 'textarea', rows: 3,
+        required: true, minLength: 4, maxLength: 500,
+        placeholder: lang==='en'?'Why is this change needed?':'Vì sao cần đổi chế độ?' }
+    ],
+    submitLabel: lang==='en' ? '→ '+tm : '→ '+tm,
+    submitTone: tm === 'developer' ? 'warn' : 'good',
+    onSubmit: async (vals) => {
+      const overridesRaw = data.policy.role_overrides;
+      const overrides = (overridesRaw && typeof overridesRaw === 'object' && !Array.isArray(overridesRaw))
+        ? Object.assign({}, overridesRaw) : {};
+      roles.forEach(r => { if(r) overrides[r] = tm; });
+      // saveAdminVCMode returns true on success but doesn't surface details;
+      // call apiCall directly so we can return the structured payload.
+      const res = await apiCall('admin_vc_mode_set', {role_overrides: overrides, reason: vals.reason.trim()}, 'POST');
+      if(res && res.ok){
+        // Sync state so header rerenders.
+        adminVCModeState = Object.assign({}, adminVCModeState, {
+          loading:false, loaded:true, error:'', saving:false,
+          data: { policy: res.policy || null, effective_mode: res.effective_mode || tm, your_roles: res.your_roles || roles }
+        });
+        return { ok: true, message: (lang==='en'?'Effective mode now: ':'Chế độ hiệu lực: ') + (res.effective_mode || tm) };
+      }
+      return res || { ok: false, error: 'unknown' };
+    }
+  });
+}
+
+// ── VC Header Bar ──────────────────────────────────────────────────────────
+//
+// Persistent header above the sub-tab nav. Always shows:
+//   - Current effective mode (pill, click to quick-switch)
+//   - Last sync timestamp + pill (reads localSyncReportState)
+//   - Last deploy SHA + pill (reads gitRepoStatusState)
+//   - (placeholder for Pha 5) Freeze deploys button
+//
+// Colors come from the same admin-sync-status-pill tone classes used by
+// every other pill in the panel — no hardcoded hex/px values (per ADR-0009
+// + Graphics Authority rules in CLAUDE.md).
+function renderAdminVCHeaderBar(){
+  const mState = adminVCModeState;
+  const mData = mState && mState.data;
+  const mode = vcEffectiveMode();
+  const modeLoaded = !!(mData && mData.policy);
+  const modeTone = mode === 'developer' ? 'warn' : 'good';
+  const modeLabel = mode === 'developer'
+    ? (lang==='en' ? 'Developer' : 'Developer')
+    : (lang==='en' ? 'Operation (ISO)' : 'Operation (ISO)');
+  const lockedOnProd = modeLoaded && mData.policy.lock_on_production && mData.policy.runtime_is_production;
+  const lockIcon = lockedOnProd ? ' 🔒' : '';
+
+  // Last sync: prefer the on-VPS report (most authoritative) and fall back
+  // to the laptop-side last-pull control state.
+  let syncLabel = lang==='en' ? 'Sync: unknown' : 'Sync: --';
+  let syncTone = 'info';
+  if(localSyncReportState && localSyncReportState.data && localSyncReportState.data.report){
+    const r = localSyncReportState.data.report;
+    const ts = r.ts || r.last_sync || r.timestamp;
+    if(ts){
+      syncLabel = (lang==='en' ? 'Sync: ' : 'Sync: ') + vcFmtTime(ts);
+      const drift = Number((dataSyncStatusState && dataSyncStatusState.data && dataSyncStatusState.data.summary && dataSyncStatusState.data.summary.drift_count) || 0);
+      syncTone = drift > 0 ? 'warn' : 'good';
+    }
+  }
+
+  // Last deploy: prefer GHA workflow status (Pha 5 — authoritative for what
+  // actually shipped via the pipeline). Fall back to VPS git head if GHA
+  // is not_configured / api_error / still loading.
+  let deployLabel = lang==='en' ? 'Deploy: --' : 'Deploy: --';
+  let deployTone = 'info';
+  const gha = ghaWorkflowState && ghaWorkflowState.data;
+  if(gha && gha.status === 'ok' && gha.latest){
+    const pill = gha.latest_status_pill || 'unknown';
+    const sha = (gha.latest.head_sha || '').slice(0, 8);
+    const ts = gha.latest.updated_at || gha.latest.created_at;
+    deployLabel = 'Deploy: ' + sha + ' · ' + pill + (ts ? ' · '+vcFmtTime(ts) : '');
+    deployTone = (pill === 'success') ? 'good'
+              : (pill === 'failure' || pill === 'cancelled') ? 'error'
+              : (pill === 'in_progress' || pill === 'queued') ? 'warn'
+              : 'info';
+  } else if(gha && gha.status && gha.status !== 'ok'){
+    // not_configured / api_error — render as neutral with the status word.
+    deployLabel = 'Deploy: ' + (gha.status === 'not_configured' ? (lang==='en'?'GHA not configured':'GHA chưa cấu hình') : gha.status);
+    deployTone = 'info';
+  } else {
+    const gits = gitRepoStatusState && gitRepoStatusState.data;
+    if(gits && gits.head_commit){
+      const sha = (gits.head_commit.sha || '').slice(0, 8);
+      const ts = gits.head_commit.committed_at || gits.head_commit.authored_at;
+      deployLabel = (lang==='en' ? 'Deploy: ' : 'Deploy: ') + sha + (ts ? ' · '+vcFmtTime(ts) : '');
+      const behind = Number(gits.behind_count || 0);
+      const dirty = Number(gits.meaningful_dirty_count || 0);
+      deployTone = (behind > 0 || dirty > 0) ? 'warn' : 'good';
+    }
+  }
+
+  // Mode quick-switch menu: only render the toggle button when the user is
+  // an admin (server-side admin_vc_mode_set already gates this, but hiding
+  // the button avoids a confusing 401 path for non-admins). We approximate
+  // admin by checking adminVCModeState.data.policy existence — non-admins
+  // still get effective_mode but the saver returns 401.
+  const switchTarget = mode === 'developer' ? 'operation' : 'developer';
+  const switchLabel = switchTarget === 'developer'
+    ? (lang==='en' ? '→ Developer' : '→ Developer')
+    : (lang==='en' ? '→ Operation' : '→ Operation');
+  const switchDisabled = !modeLoaded || (mState && mState.saving) || lockedOnProd
+    ? ' disabled aria-disabled="true"'
+    : '';
+  const switchTitle = lockedOnProd
+    ? (lang==='en' ? 'Locked on production. Disable lock_on_production first.' : 'Đang khoá trên production. Tắt lock_on_production trước.')
+    : (lang==='en' ? 'Switch effective mode (audited)' : 'Đổi chế độ hiệu lực (sẽ ghi audit)');
+
+  // Loading / error inline notice (small, non-blocking).
+  let notice = '';
+  if(mState && mState.loading && !mState.loaded){
+    notice = '<span style="color:var(--text-3);font-size:11px">'+escapeHtml(lang==='en'?'loading mode…':'đang tải mode…')+'</span>';
+  } else if(mState && mState.error){
+    notice = '<span class="admin-sync-status-pill is-error" title="'+escapeHtml(String(mState.error))+'">'+escapeHtml(lang==='en'?'mode error':'lỗi mode')+'</span>';
+  }
+
+  // Layout: 1 row, 3 logical groups (mode | sync+deploy | actions).
+  // Uses --bg-surface / --border / --text-* tokens, no hardcoded colors.
+  return '<div class="admin-sync-cpanel-card" style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:8px 12px;margin-bottom:10px;background:var(--bg-surface,#fff);border:1px solid var(--border,#d7e3ef);border-radius:8px">'+
+    // Mode group
+    '<div style="display:flex;align-items:center;gap:6px">'+
+      '<span style="color:var(--text-3);font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase">'+escapeHtml(lang==='en'?'Mode':'Chế độ')+'</span>'+
+      vcStatusPill(modeLabel + lockIcon, modeTone)+
+    '</div>'+
+    '<span style="color:var(--border,#d7e3ef)">|</span>'+
+    // Status pills
+    '<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:200px">'+
+      vcStatusPill(syncLabel, syncTone)+
+      vcStatusPill(deployLabel, deployTone)+
+      notice+
+    '</div>'+
+    // Actions: mode switch + Freeze toggle (Pha 5 — now live)
+    '<div style="display:flex;align-items:center;gap:6px">'+
+      '<button class="admin-sync-mini" onclick="adminVCQuickSwitchMode(\''+switchTarget+'\')" title="'+switchTitle+'"'+switchDisabled+'>'+
+        escapeHtml(switchLabel)+
+      '</button>'+
+      renderAdminVCFreezeButton()+
+    '</div>'+
+  '</div>'+
+  // Pha 5: red banner across panel when freeze is active.
+  renderAdminVCFreezeBanner();
+}
+
+// Pha 5 — header freeze button + banner
+function renderAdminVCFreezeButton(){
+  const s = deployFreezeState;
+  const isActive = deployFreezeIsActive();
+  if(s.loading && !s.loaded){
+    return '<button class="admin-sync-mini" disabled style="opacity:.6">'+escapeHtml('⛔ ...')+'</button>';
+  }
+  const label = isActive
+    ? (lang==='en'?'⛔ Unfreeze':'⛔ Bỏ freeze')
+    : (lang==='en'?'⛔ Freeze':'⛔ Freeze');
+  const cls = isActive ? ' style="background:color-mix(in srgb,var(--red,#dc2626) 20%,var(--bg-surface,#fff));border-color:var(--red,#dc2626);color:var(--red,#dc2626)"' : '';
+  const dis = (s && s.saving) ? ' disabled aria-disabled="true"' : '';
+  const title = isActive
+    ? (lang==='en'?'Currently FROZEN. Click to unfreeze (audited).':'Đang FROZEN. Bấm để bỏ freeze (có audit).')
+    : (lang==='en'?'Freeze all deploys (audited; blocks Push & Deploy + Sync).':'Freeze tất cả deploy (có audit; chặn Push & Deploy + Sync).');
+  return '<button class="admin-sync-mini" onclick="adminVCFreezeToggle()" title="'+escapeHtml(title)+'"'+cls+dis+'>'+escapeHtml(label)+'</button>';
+}
+
+function renderAdminVCFreezeBanner(){
+  if(!deployFreezeIsActive()) return '';
+  const f = deployFreezeState.data || {};
+  return '<div class="admin-sync-callout-bar is-error" '+
+    'style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;border:2px solid var(--red,#dc2626)">'+
+    '<div>'+
+      '<strong>'+escapeHtml(lang==='en'?'⛔ DEPLOYS FROZEN':'⛔ DEPLOY ĐANG FROZEN')+'</strong>'+
+      ' · '+escapeHtml(lang==='en'?'ticket=':'ticket=')+'<code>'+escapeHtml(f.ticket_id||'?')+'</code>'+
+      ' · '+escapeHtml(lang==='en'?'by ':'bởi ')+'<code>'+escapeHtml(f.set_by||'?')+'</code>'+
+      ' · '+escapeHtml(lang==='en'?'reason: ':'lý do: ')+escapeHtml(f.reason||'?')+
+      (f.expires_at ? ' · '+escapeHtml(lang==='en'?'expires ':'hết hạn ')+escapeHtml(vcFmtTime(f.expires_at)) : '')+
+    '</div>'+
+    '<div style="color:var(--text-3);font-size:11px">'+
+      escapeHtml(lang==='en'
+        ? 'Push & Deploy, CR approval, and batch sync are rejected with HTTP 423 until unfrozen.'
+        : 'Push & Deploy, duyệt CR, batch sync đều bị từ chối HTTP 423 cho đến khi bỏ freeze.')+
+    '</div>'+
+  '</div>';
+}
+
 function vcStatusPill(label, tone){
   // tone: good | warn | error | info | neutral. Reuses admin-sync-callout-bar
   // tone classes so colors come from the Graphics Authority tokens already
@@ -8843,15 +9545,15 @@ function vcStatusPill(label, tone){
 }
 
 function renderVCSubTabNav(){
+  // Pha 3: 6 → 4 tabs.
+  // Removed in Pha 3: snapshots, doc_history, audit (all folded into the
+  // single Timeline tab). Final IA from this point is 4 tabs until Pha 4
+  // adds Settings → 5 tabs (status, sync, timeline, [sync helpers], settings).
   const tabs = [
-    {id:'overview',    en:'Overview',          vi:'Tổng quan'},
-    {id:'sync',        en:'Sync (Git)',         vi:'Đồng bộ Git'},
+    {id:'status',      en:'Status',             vi:'Trạng thái'},
     {id:'config_sync', en:'Config Sync',        vi:'Đồng bộ Config File'},
     {id:'local_sync',  en:'Local sync',         vi:'Đồng bộ local↔VPS'},
-    {id:'snapshots',   en:'Snapshots',          vi:'Snapshot & rollback'},
-    {id:'doc_history', en:'Doc history',        vi:'Lịch sử tài liệu'},
-    {id:'audit',       en:'Audit log',          vi:'Nhật ký kiểm toán'},
-    {id:'process',     en:'Process / SOP',      vi:'Quy trình SOP'}
+    {id:'timeline',    en:'Timeline',           vi:'Timeline thay đổi'}
   ];
   const buttons = tabs.map(t => {
     const isActive = (versionControlSubTab === t.id);
@@ -8867,8 +9569,12 @@ function renderVCSubTabNav(){
          'style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px 0">'+buttons+'</nav>';
 }
 
-// ── Sub-tab: Overview ─────────────────────────────────────────────────────
-function renderAdminVCOverview(){
+// ── Sub-tab: Overview (Pha 2 — deprecated; merged into renderAdminVCStatus) ──
+// Old function body kept as commented-out placeholder for one release cycle
+// so a rollback can resurrect it without spelunking through git history.
+// Remove entirely in the cleanup PR after the mega-PR ships.
+/*
+function renderAdminVCOverview_DEPRECATED_PHA2(){
   const state = versionControlOverviewState;
   if(state.loading && !state.data){
     return '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">'+
@@ -8955,9 +9661,274 @@ function renderAdminVCOverview(){
     '</article>'+
   '</section>';
 }
+*/
 
-// ── Sub-tab: Snapshots (with intro context) ──────────────────────────────
-function renderAdminVCSnapshots(){
+// ── Pha 3 Sub-tab: Unified timeline ──────────────────────────────────────
+//
+// Replaces three old tabs in one chronological feed:
+//   - snapshots   (data-sync snapshots)
+//   - doc_history (dcc_document_body rows)
+//   - audit       (audit_events rows)
+//
+// Mode-aware confirmations on restore actions are stubbed; full inline
+// restore + right-side detail panel land in Pha 3.1 (follow-up commit on
+// this branch). MVP rendering = filter chips on top + a table of events
+// sorted by timestamp DESC.
+function renderAdminVCTimeline(){
+  const state = versionControlTimelineState;
+  const f = state.filters || {};
+  const data = state.data || {};
+  const events = Array.isArray(data.events) ? data.events : [];
+
+  // Filter chips bar — single row, type toggles + actor + search + since.
+  const typeChip = (id, labelEn, labelVi) => {
+    const active = !f.types || f.types.split(',').includes(id);
+    const cls = active ? 'is-good' : '';
+    return '<button class="admin-sync-status-pill '+cls+'" '+
+      'style="cursor:pointer;border:none" '+
+      'onclick="adminVCTimelineToggleType(\''+id+'\')" '+
+      'title="'+escapeHtml(lang==='en'?'Toggle '+labelEn:'Bật/tắt '+labelVi)+'">'+
+      escapeHtml(lang==='en'?labelEn:labelVi)+'</button>';
+  };
+  const chipsHtml = '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px">'+
+    '<span style="color:var(--text-3);font-size:11px;text-transform:uppercase;font-weight:600;margin-right:4px">'+escapeHtml(lang==='en'?'Type':'Loại')+'</span>'+
+    typeChip('audit', 'Audit events', 'Sự kiện audit')+
+    typeChip('snapshot', 'Snapshots', 'Snapshot')+
+    typeChip('doc_revision', 'Doc revisions', 'Phiên bản TL')+
+    '<span style="margin:0 4px;color:var(--border)">|</span>'+
+    '<input type="search" id="vcTimelineActorInput" value="'+escapeHtml(f.actor||'')+'" '+
+      'placeholder="'+escapeHtml(lang==='en'?'Filter by actor':'Lọc theo người làm')+'" '+
+      'style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--bg-surface);color:var(--text-primary);width:140px" '+
+      'onkeydown="if(event.key===\'Enter\'){adminVCTimelineApplyFilter(\'actor\',this.value)}">'+
+    '<input type="search" id="vcTimelineSearchInput" value="'+escapeHtml(f.search||'')+'" '+
+      'placeholder="'+escapeHtml(lang==='en'?'Search summary':'Tìm trong tóm tắt')+'" '+
+      'style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--bg-surface);color:var(--text-primary);width:160px" '+
+      'onkeydown="if(event.key===\'Enter\'){adminVCTimelineApplyFilter(\'search\',this.value)}">'+
+    '<input type="date" id="vcTimelineSinceInput" value="'+escapeHtml((f.since||'').slice(0,10))+'" '+
+      'style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--bg-surface);color:var(--text-primary)" '+
+      'onchange="adminVCTimelineApplyFilter(\'since\',this.value)" '+
+      'title="'+escapeHtml(lang==='en'?'Events since this date':'Sự kiện từ ngày này')+'">'+
+    '<button class="admin-sync-mini" onclick="adminVCTimelineClearFilters()" '+
+      'title="'+escapeHtml(lang==='en'?'Clear all filters':'Xóa hết bộ lọc')+'">'+
+      escapeHtml(lang==='en'?'Clear':'Xóa lọc')+'</button>'+
+    '<button class="admin-sync-mini" onclick="loadVersionControlTimeline({force:true})" '+
+      'title="'+escapeHtml(lang==='en'?'Refresh timeline':'Làm mới timeline')+'">'+
+      escapeHtml(lang==='en'?'Refresh':'Làm mới')+'</button>'+
+  '</div>';
+
+  // Notice if loading / error / warnings.
+  let notice = '';
+  if(state.loading && !state.loaded){
+    notice = '<div class="admin-sync-callout-bar is-info" style="margin-bottom:8px">'+
+      escapeHtml(lang==='en'?'Loading unified timeline…':'Đang tải timeline thống nhất…')+'</div>';
+  } else if(state.error){
+    notice = '<div class="admin-sync-callout-bar is-error" style="margin-bottom:8px">'+
+      escapeHtml((lang==='en'?'Timeline load failed: ':'Lỗi tải timeline: ')+state.error)+
+      ' <button class="admin-sync-mini" style="margin-left:8px" onclick="loadVersionControlTimeline({force:true})">'+
+      escapeHtml(lang==='en'?'Retry':'Thử lại')+'</button></div>';
+  }
+  const warnings = Array.isArray(data.warnings) ? data.warnings : [];
+  if(warnings.length){
+    notice += '<div class="admin-sync-callout-bar is-warn" style="margin-bottom:8px">'+
+      escapeHtml(lang==='en'?'Partial result — some sources failed: ':'Một phần — vài nguồn lỗi: ')+
+      warnings.map(w => escapeHtml(w.source + ':' + (w.error||'').slice(0,60))).join(', ')+
+    '</div>';
+  }
+
+  // Timeline rows table — chronological feed.
+  // Restore action only renders for `restorable:true` rows (snapshots).
+  // Mode-aware: Op mode requires reason prompt (Pha 3.1); Dev mode = 1-click.
+  const isDev = vcIsDeveloperMode();
+  const typePill = (t) => {
+    const tone = t === 'audit' ? 'info' : t === 'snapshot' ? 'good' : 'warn';
+    const label = t === 'audit' ? (lang==='en'?'Audit':'Audit')
+                : t === 'snapshot' ? (lang==='en'?'Snapshot':'Snapshot')
+                : (lang==='en'?'Doc':'TL');
+    return vcStatusPill(label, tone);
+  };
+  const rowAction = (e) => {
+    if(!e.restorable) return '';
+    const label = isDev ? (lang==='en'?'Restore':'Khôi phục') : (lang==='en'?'Restore…':'Khôi phục…');
+    return '<button class="admin-sync-mini" '+
+      'onclick="adminVCTimelineRestore(\''+escapeHtml(e.id||'')+'\',\''+escapeHtml(e.key||'')+'\')" '+
+      'title="'+escapeHtml(lang==='en'?'Restore from this snapshot':'Khôi phục từ snapshot này')+'">'+
+      escapeHtml(label)+'</button>';
+  };
+  const rows = events.length ? events.map(e => '<tr>'+
+    '<td style="white-space:nowrap"><code style="font-size:11px">'+escapeHtml(vcFmtTime(e.ts||''))+'</code></td>'+
+    '<td>'+typePill(e.type||'audit')+'</td>'+
+    '<td><code style="font-size:11px">'+escapeHtml(e.actor||'--')+'</code></td>'+
+    '<td style="font-size:12px">'+escapeHtml(e.summary||'')+'</td>'+
+    '<td>'+rowAction(e)+'</td>'+
+  '</tr>').join('') : '<tr><td colspan="5" style="color:var(--text-3);padding:12px;text-align:center">'+
+    escapeHtml(lang==='en'?'No timeline events match the current filters.':'Không có sự kiện nào khớp với bộ lọc.')+
+    '</td></tr>';
+
+  const tableHtml = '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'+
+      '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'Unified change timeline':'Timeline thay đổi thống nhất')+
+        ' <span style="color:var(--text-3);font-size:11px;font-weight:400">('+
+        escapeHtml(String(events.length)+(lang==='en'?' rows':' dòng'))+
+        ')</span>'+
+      '</div>'+
+      '<div style="color:var(--text-3);font-size:11px">'+
+        escapeHtml(lang==='en'?'Merges audit_events + data-sync snapshots + doc revisions, sorted by time.':'Gộp audit_events + snapshot + phiên bản tài liệu, sắp theo thời gian.')+
+      '</div>'+
+    '</div>'+
+    '<div style="overflow-x:auto;margin-top:8px">'+
+      '<table class="admin-sync-simple-table" style="width:100%;border-collapse:collapse;font-size:12px">'+
+        '<thead><tr>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'When (UTC)':'Lúc (UTC)')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Type':'Loại')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Actor':'Người làm')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Summary':'Tóm tắt')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Action':'Hành động')+'</th>'+
+        '</tr></thead>'+
+        '<tbody>'+rows+'</tbody>'+
+      '</table>'+
+    '</div>'+
+  '</article>';
+
+  return '<section>'+chipsHtml+notice+tableHtml+'</section>';
+}
+
+// ── Pha 4 button handlers ────────────────────────────────────────────────
+//
+// Both handlers POST to backend endpoints that intentionally do NOT mutate
+// the git working tree or trigger the deploy script — that would violate
+// CLAUDE.md governance. They record an audit row + return next_steps the
+// operator runs (git push / GHA / SSH).
+
+function adminVCDeployTrigger(){
+  if(deployFreezeIsActive()){
+    const f = deployFreezeState.data || {};
+    showToast(lang==='en'?'Deploys frozen (ticket='+(f.ticket_id||'?')+').':'Deploy đang frozen (ticket='+(f.ticket_id||'?')+').', 'error');
+    return;
+  }
+  if(vcEffectiveMode() !== 'developer'){
+    showToast(lang==='en'?'Push & Deploy is Dev-mode only.':'Push & Deploy chỉ ở Developer mode.', 'error');
+    return;
+  }
+  openAdminVCActionModal({
+    title: lang==='en' ? '🚀 Push & Deploy' : '🚀 Push & Deploy',
+    intro: lang==='en'
+      ? 'Records a deploy intent in audit_events and returns next steps. Does not actually push code.'
+      : 'Ghi nhận ý định deploy vào audit_events và trả về các bước tiếp theo. Không tự push code.',
+    fields: [
+      { name: 'reason', label: lang==='en'?'Reason':'Lý do', type: 'textarea', rows: 2,
+        required: true, minLength: 4, maxLength: 500,
+        placeholder: lang==='en'?'Why deploy now?':'Vì sao deploy ngay?' },
+      { name: 'target_sha', label: lang==='en'?'Target git SHA (optional)':'SHA git đích (tuỳ chọn)',
+        type: 'text', required: false, regex: '^[a-fA-F0-9]{7,40}$',
+        regexHelp: lang==='en'?'Leave blank for HEAD. Hex 7..40 chars.':'Trống = HEAD. Hex 7..40 ký tự.',
+        placeholder: 'e.g. ab1234c or full 40-char SHA' }
+    ],
+    submitLabel: lang==='en'?'Record intent':'Ghi nhận',
+    submitTone: 'warn',
+    onSubmit: async (vals) => {
+      const res = await apiCall('admin_deploy_trigger', {
+        reason: vals.reason.trim(),
+        target_sha: (vals.target_sha || '').trim()
+      }, 'POST');
+      if(res && res.ok){
+        return {
+          ok: true,
+          message: (lang==='en'?'Deploy intent recorded. ID: ':'Đã ghi nhận. ID: ') + (res.intent_id||'?') + ' · SHA: ' + (res.target_sha||'HEAD'),
+          next_steps: res.next_steps || []
+        };
+      }
+      return res || { ok:false, error:'unknown' };
+    }
+  });
+}
+
+function adminVCChangeRequestSubmit(){
+  openAdminVCActionModal({
+    title: lang==='en' ? '📝 Submit deploy request' : '📝 Gửi yêu cầu deploy',
+    intro: lang==='en'
+      ? 'Creates a pending CR in audit_events. A different admin must approve it.'
+      : 'Tạo CR chờ duyệt trong audit_events. Một admin khác phải phê duyệt.',
+    fields: [
+      { name: 'reason', label: lang==='en'?'Reason (≥10 chars)':'Lý do (≥10 ký tự)', type: 'textarea', rows: 3,
+        required: true, minLength: 10, maxLength: 1000,
+        placeholder: lang==='en'?'Describe the change scope and why it is needed.':'Mô tả phạm vi thay đổi và vì sao cần thiết.' },
+      { name: 'target_sha', label: lang==='en'?'Target SHA (optional)':'SHA đích (tuỳ chọn)',
+        type: 'text', required: false, regex: '^[a-fA-F0-9]{7,40}$',
+        regexHelp: lang==='en'?'Hex 7..40 chars or blank for HEAD':'Hex 7..40 ký tự hoặc trống = HEAD',
+        placeholder: 'ab1234c' },
+      { name: 'change_ref', label: lang==='en'?'change_ref (optional — auto if blank)':'change_ref (tuỳ chọn — tự sinh nếu trống)',
+        type: 'text', required: false, regex: '^[A-Za-z0-9._:-]{3,80}$',
+        regexHelp: lang==='en'?'Allowed: letters, digits, . _ : - (3..80)':'Cho phép: chữ, số, . _ : - (3..80 ký tự)',
+        placeholder: 'CR-2026-099' }
+    ],
+    submitLabel: lang==='en'?'Submit CR':'Gửi CR',
+    submitTone: 'good',
+    onSubmit: async (vals) => {
+      const res = await apiCall('admin_change_request_submit', {
+        reason: vals.reason.trim(),
+        target_sha: (vals.target_sha||'').trim(),
+        change_ref: (vals.change_ref||'').trim()
+      }, 'POST');
+      if(res && res.ok){
+        return {
+          ok: true,
+          message: (lang==='en'?'CR submitted: ':'Đã gửi CR: ') + (res.change_ref||'?') + ' · ' + (lang==='en'?'Status: ':'Trạng thái: ') + (res.status||'?'),
+          next_steps: res.next_steps || []
+        };
+      }
+      return res || { ok:false, error:'unknown' };
+    }
+  });
+}
+
+// Filter helper handlers — called inline from chips/inputs.
+function adminVCTimelineToggleType(typeId){
+  const all = ['audit','snapshot','doc_revision'];
+  const cur = (versionControlTimelineState.filters.types || '').split(',').filter(Boolean);
+  const set = new Set(cur.length ? cur : all);
+  if(set.has(typeId)) set.delete(typeId); else set.add(typeId);
+  // If all selected, clear filter (default = all). If none, snap to single type.
+  const next = [...set];
+  const value = (next.length === all.length || next.length === 0) ? '' : next.join(',');
+  loadVersionControlTimeline({force:true, filterChange:true, filters:{types:value}});
+}
+function adminVCTimelineApplyFilter(key, value){
+  const patch = {}; patch[key] = String(value||'').trim();
+  loadVersionControlTimeline({force:true, filterChange:true, filters:patch});
+}
+function adminVCTimelineClearFilters(){
+  loadVersionControlTimeline({force:true, filterChange:true, filters:{types:'',actor:'',search:'',since:''}});
+}
+function adminVCTimelineRestore(eventId, snapshotId){
+  const isDev = vcIsDeveloperMode();
+  openAdminVCActionModal({
+    title: lang==='en' ? 'Restore snapshot '+snapshotId : 'Khôi phục snapshot '+snapshotId,
+    intro: isDev
+      ? (lang==='en'?'Developer mode — 1-click restore. Audited.':'Developer mode — 1 click khôi phục. Có audit.')
+      : (lang==='en'?'Operation mode — reason required. change_ref will be tagged OP-RESTORE.':'Operation mode — phải có lý do. change_ref sẽ gắn OP-RESTORE.'),
+    fields: isDev ? [] : [
+      { name: 'reason', label: lang==='en'?'Reason (≥4 chars)':'Lý do (≥4 ký tự)', type: 'textarea', rows: 2,
+        required: true, minLength: 4, maxLength: 200 }
+    ],
+    submitLabel: lang==='en'?'Restore':'Khôi phục',
+    submitTone: 'warn',
+    onSubmit: async (vals) => {
+      const body = { snapshot_id: snapshotId };
+      if(!isDev) body.change_ref = 'OP-RESTORE: ' + (vals.reason||'').trim().slice(0, 80);
+      // Reuse existing service helper (returns its own toast/state, but
+      // we want a uniform modal result, so call apiCall directly).
+      const res = await apiCall('admin_data_sync_restore_snapshot', body, 'POST');
+      if(res && res.ok){
+        return { ok:true, message: lang==='en'?'Snapshot restored.':'Đã khôi phục snapshot.' };
+      }
+      return res || { ok:false, error:'unknown' };
+    }
+  });
+}
+
+// ── Sub-tab: Snapshots (Pha 3 — deprecated, folded into Timeline) ─────────
+/*
+function renderAdminVCSnapshots_DEPRECATED_PHA3(){
   const intro = '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">'+
     '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'Snapshot system':'Hệ thống snapshot')+'</div>'+
     '<div class="admin-sync-callout-bar is-info">'+
@@ -8966,6 +9937,12 @@ function renderAdminVCSnapshots(){
       : 'Mỗi lần upload, giải quyết lệch hay khôi phục đều tạo snapshot trước khi ghi. VPS giữ tối đa 60 snapshot ở /var/www/data-private/.snapshots/. Hãy bấm Tạo snapshot trước các thao tác rủi ro.')+
     '</div></article>';
   return '<section>'+intro+renderAdminDataSyncSnapshotsCard()+'</section>';
+}
+*/
+function renderAdminVCSnapshots(){
+  // Pha 3 stub — kept so dispatcher fallback (unknown subtab id) never
+  // throws. Real users land on Timeline via the normalised subtab map.
+  return renderAdminVCTimeline();
 }
 
 // ── Sub-tab: Doc history ─────────────────────────────────────────────────
@@ -9206,7 +10183,217 @@ function renderAdminVCAuditLog(){
 }
 
 // ── Sub-tab: Process / SOP ───────────────────────────────────────────────
-function renderAdminVCProcess(){
+// ── Sub-tab: Status (Pha 2 — merged Overview tiles + Git readiness) ──────
+//
+// Replaces three old tabs:
+//   - overview       (renderAdminVCOverview — tiles + recent revisions)
+//   - sync   (Git)   (renderAdminSyncPanelV2 — repo status read-only)
+//   - process (SOP)  (renderAdminVCProcess — static markdown; moved to
+//                     docs/admin-vc-panel-sop.md and linked from this tab)
+//
+// Status layout (top → bottom):
+//   1. Release readiness card (git readiness + mode-aware CTA placeholder)
+//   2. Four metric tiles (config drift / snapshots / docs / 7d changes)
+//   3. Recent revisions table (mirrors Overview)
+//   4. Quick links to SOP markdown + drill-into Config Sync / Doc history
+function renderAdminVCStatus(){
+  const oState = versionControlOverviewState;
+  const gState = gitRepoStatusState;
+  const isDev = vcIsDeveloperMode();
+
+  // ── A. Release readiness card (was: Sync (Git) tab) ────────────────────
+  const gitData = gState && gState.data ? gState.data : null;
+  const gitErr = String(gState && gState.error || '').trim();
+  const dirtyN = gitData ? Number(gitData.meaningful_dirty_count || 0) : 0;
+  const behindN = gitData ? Number(gitData.behind_count || 0) : 0;
+  const aheadN = gitData ? Number(gitData.ahead_count || 0) : 0;
+  const branch = String((gitData && gitData.branch) || 'main');
+  const headSha = (gitData && gitData.head_commit && gitData.head_commit.sha || '').slice(0, 12);
+  const remoteSha = (gitData && gitData.remote_head_commit && gitData.remote_head_commit.sha || '').slice(0, 12);
+
+  let readinessTone = 'good';
+  let readinessLabel = lang==='en' ? 'Ready to deploy' : 'Sẵn sàng deploy';
+  let readinessExpl = lang==='en'
+    ? 'Working tree clean, in sync with origin/' + branch + '.'
+    : 'Working tree sạch, đang khớp với origin/' + branch + '.';
+  if(gState && gState.loading && !gitData){
+    readinessTone = 'info';
+    readinessLabel = lang==='en' ? 'Loading…' : 'Đang tải…';
+    readinessExpl = '';
+  } else if(gitErr){
+    readinessTone = 'error';
+    readinessLabel = lang==='en' ? 'Status unavailable' : 'Không đọc được trạng thái';
+    readinessExpl = gitErr;
+  } else if(!gitData){
+    readinessTone = 'info';
+    readinessLabel = lang==='en' ? 'Status not loaded' : 'Chưa nạp trạng thái';
+    readinessExpl = '';
+  } else if(dirtyN > 0){
+    readinessTone = 'warn';
+    readinessLabel = lang==='en' ? 'VPS working tree dirty' : 'Working tree VPS đang bẩn';
+    readinessExpl = (lang==='en' ? dirtyN + ' file(s) modified on VPS. Resolve via SSH or rerun deploy.'
+                                 : dirtyN + ' file đã sửa trên VPS. SSH xử lý hoặc deploy lại.');
+  } else if(behindN > 0){
+    readinessTone = 'warn';
+    readinessLabel = lang==='en' ? 'Origin ahead' : 'Origin có commit mới';
+    readinessExpl = (lang==='en' ? behindN + ' commit(s) on origin/' + branch + ' not yet on VPS. Run deploy.'
+                                 : behindN + ' commit ở origin/' + branch + ' chưa lên VPS. Chạy deploy.');
+  } else if(aheadN > 0){
+    readinessTone = 'warn';
+    readinessLabel = lang==='en' ? 'VPS ahead of origin' : 'VPS đang trước origin';
+    readinessExpl = (lang==='en' ? aheadN + ' commit(s) on VPS not on origin/' + branch + '. Unusual — investigate.'
+                                 : aheadN + ' commit trên VPS chưa có ở origin/' + branch + '. Bất thường — kiểm tra.');
+  }
+
+  // Mode-aware CTA — Pha 4 wires these to real endpoints.
+  // Dev: admin_deploy_trigger (records intent + returns GHA url).
+  // Op:  admin_change_request_submit (creates pending CR awaiting approval).
+  // Both: BE never actually pushes code — UI prints the next_steps[] payload
+  // so the operator runs the deploy where appropriate (GHA / SSH / laptop).
+  const devCTA = '<button class="admin-sync-mini" '+
+    'onclick="adminVCDeployTrigger()" '+
+    'title="'+escapeHtml(lang==='en'?'Record a deploy intent (audited) and show next steps':'Ghi nhận ý định deploy (có audit) và hiện next steps')+'">'+
+    escapeHtml(lang==='en'?'🚀 Push & Deploy':'🚀 Push & Deploy')+
+    '</button>';
+  const opCTA = '<button class="admin-sync-mini" '+
+    'onclick="adminVCChangeRequestSubmit()" '+
+    'title="'+escapeHtml(lang==='en'?'Submit a deploy change request — pending approval':'Gửi yêu cầu deploy — chờ duyệt')+'">'+
+    escapeHtml(lang==='en'?'📝 Submit deploy request':'📝 Gửi yêu cầu deploy')+
+    '</button>';
+  const modeCTA = isDev ? devCTA : opCTA;
+  const modeCTANote = isDev
+    ? (lang==='en'?'Developer mode — direct deploy (audited).':'Developer mode — deploy trực tiếp (có audit).')
+    : (lang==='en'?'Operation mode — change request flow with approver.':'Operation mode — luồng CR có người duyệt.');
+
+  const readinessHtml =
+    '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">'+
+      '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:flex-start">'+
+        '<div>'+
+          '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'Release readiness':'Sẵn sàng phát hành')+'</div>'+
+          '<div style="margin-top:6px">'+vcStatusPill(readinessLabel, readinessTone)+'</div>'+
+          (readinessExpl ? '<div style="margin-top:6px;color:var(--text-3);font-size:12px">'+escapeHtml(readinessExpl)+'</div>' : '')+
+        '</div>'+
+        '<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">'+
+          modeCTA+
+          '<div style="color:var(--text-3);font-size:11px;max-width:260px;text-align:right">'+escapeHtml(modeCTANote)+'</div>'+
+          '<button class="admin-sync-mini" onclick="adminRefreshGitRepoStatus()">'+
+            escapeHtml(lang==='en'?'Refresh':'Làm mới')+
+          '</button>'+
+        '</div>'+
+      '</div>'+
+      // Compact git facts row — replaces the 2-column "Basic info / Remote state"
+      // grid from the old sync tab. Same data, ~70% less vertical space.
+      '<div class="admin-sync-meta-list" style="margin-top:10px">'+
+        '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Branch':'Nhánh')+'</div><div class="admin-sync-meta-value"><code>'+escapeHtml(branch)+'</code></div></div>'+
+        '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'HEAD on VPS':'HEAD trên VPS')+'</div><div class="admin-sync-meta-value"><code>'+escapeHtml(headSha || '--')+'</code></div></div>'+
+        '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'HEAD on origin':'HEAD trên origin')+'</div><div class="admin-sync-meta-value"><code>'+escapeHtml(remoteSha || '--')+'</code></div></div>'+
+        '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Counts':'Lệch số commit')+'</div><div class="admin-sync-meta-value">'+
+          escapeHtml((lang==='en'?'behind ':'sau ')+behindN+(lang==='en'?', ahead ':', trước ')+aheadN+(lang==='en'?', dirty ':', bẩn ')+dirtyN)+
+        '</div></div>'+
+      '</div>'+
+    '</article>';
+
+  // ── B. Four metric tiles (was: Overview top row) ───────────────────────
+  const data = oState && oState.data ? oState.data : {};
+  const drift = data.config_drift || {};
+  const snap = data.snapshots || {};
+  const act = data.doc_activity || {};
+  const driftTone = (Number(drift.drift_count||0) > 0) ? 'warn' : 'good';
+  const driftMsg = (Number(drift.drift_count||0) > 0)
+    ? (lang==='en'? Number(drift.drift_count)+' file(s) differ between site and mirror.'
+                  : Number(drift.drift_count)+' file đang lệch giữa site và mirror.')
+    : (lang==='en'? 'All '+Number(drift.total_files||0)+' runtime files match the mirror.'
+                  : 'Tất cả '+Number(drift.total_files||0)+' file runtime khớp mirror.');
+
+  const tile = (titleVi, titleEn, value, sub, tone, jump) => {
+    const cls = (tone==='warn'?'is-warn':tone==='error'?'is-error':tone==='good'?'is-good':'is-info');
+    const jumpAttr = jump ? ' style="cursor:pointer" onclick="setVersionControlSubTab(\''+jump+'\')" title="'+escapeHtml(lang==='en'?'Open '+jump:'Mở '+jump)+'"' : '';
+    return '<article class="admin-sync-cpanel-card"'+jumpAttr+'>'+
+      '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?titleEn:titleVi)+'</div>'+
+      '<div style="font-size:28px;font-weight:700;line-height:1.1;margin-top:6px">'+escapeHtml(String(value))+'</div>'+
+      (sub ? '<div class="admin-sync-callout-bar '+cls+'" style="margin-top:8px">'+escapeHtml(sub)+'</div>' : '')+
+    '</article>';
+  };
+
+  const tilesHtml = '<div class="admin-sync-cpanel-grid" style="margin-top:12px">'+
+    tile('Lệch cấu hình runtime','Runtime config drift', Number(drift.drift_count||0), driftMsg, driftTone, 'config_sync')+
+    tile('Snapshot đang giữ','Snapshots kept', Number(snap.total||0),
+      (lang==='en'?'Latest: ':'Mới nhất: ')+(snap.latest_at?vcFmtTime(snap.latest_at):'--'), 'info', 'snapshots')+
+    tile('Tài liệu có lịch sử','Docs with history', Number(act.distinct_docs||0),
+      (lang==='en'?'Total revisions: ':'Tổng số phiên bản: ')+Number(act.total_revisions||0), 'info', 'doc_history')+
+    tile('Thay đổi 7 ngày','Changes (7d)', Number(act.last_7d||0),
+      (lang==='en'?'Last 30d: ':'30 ngày qua: ')+Number(act.last_30d||0), 'info', 'audit')+
+    '</div>';
+
+  // ── C. Recent revisions table (was: Overview lower row) ─────────────────
+  const recent = Array.isArray(data.recent_doc_changes) ? data.recent_doc_changes : [];
+  const recentRows = recent.length ? recent.map(r => {
+    const tone = (r.to_status === 'released' || r.to_status === 'approved') ? 'good'
+              : (r.to_status === 'obsolete' || r.to_status === 'superseded') ? 'warn'
+              : 'info';
+    return '<tr>'+
+      '<td><code>'+escapeHtml(r.doc_code||'')+'</code></td>'+
+      '<td><code>'+escapeHtml(r.revision||'')+'</code></td>'+
+      '<td>'+vcStatusPill((r.from_status||'?')+' → '+(r.to_status||'?'), tone)+'</td>'+
+      '<td><code>'+escapeHtml(r.actor_party_id||'--')+'</code></td>'+
+      '<td>'+escapeHtml(vcFmtTime(r.recorded_at))+'</td>'+
+      '<td><button class="admin-sync-mini" onclick="setVersionControlSubTab(\'doc_history\');loadVersionControlDocDetail(\''+escapeHtml(r.doc_code||'')+'\')">'+
+        escapeHtml(lang==='en'?'Open':'Mở')+'</button></td>'+
+    '</tr>';
+  }).join('') : '<tr><td colspan="6" style="color:var(--text-3);padding:8px">'+
+    escapeHtml(lang==='en'?'No recent document revisions recorded.':'Chưa có thay đổi tài liệu gần đây.')+
+    '</td></tr>';
+
+  const recentTable = '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:12px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'+
+      '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'Recent document revisions':'Thay đổi tài liệu gần đây')+'</div>'+
+      '<button class="admin-sync-mini" onclick="loadVersionControlOverview({force:true})">'+
+        escapeHtml(lang==='en'?'Refresh':'Làm mới')+'</button>'+
+    '</div>'+
+    '<table class="admin-sync-simple-table" style="width:100%;border-collapse:collapse;font-size:12px;margin-top:8px">'+
+      '<thead><tr>'+
+        '<th style="text-align:left">'+escapeHtml(lang==='en'?'Doc code':'Mã tài liệu')+'</th>'+
+        '<th style="text-align:left">'+escapeHtml(lang==='en'?'Revision':'Phiên bản')+'</th>'+
+        '<th style="text-align:left">'+escapeHtml(lang==='en'?'Transition':'Chuyển trạng thái')+'</th>'+
+        '<th style="text-align:left">'+escapeHtml(lang==='en'?'Actor':'Người làm')+'</th>'+
+        '<th style="text-align:left">'+escapeHtml(lang==='en'?'When (UTC)':'Lúc (UTC)')+'</th>'+
+        '<th style="text-align:left">'+escapeHtml(lang==='en'?'Open':'Mở')+'</th>'+
+      '</tr></thead>'+
+      '<tbody>'+recentRows+'</tbody>'+
+    '</table>'+
+  '</article>';
+
+  // ── D. Quick links bar (SOP doc + drill-down shortcuts) ─────────────────
+  const sopHref = 'docs/admin-vc-panel-sop.md';
+  const linksHtml = '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:12px">'+
+    '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'Quick references':'Tham chiếu nhanh')+'</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">'+
+      '<a class="admin-sync-mini" href="'+escapeHtml(sopHref)+'" target="_blank" rel="noopener">'+
+        escapeHtml(lang==='en'?'📖 SOP — Local ↔ VPS workflow':'📖 SOP — Quy trình Local ↔ VPS')+
+      '</a>'+
+      '<button class="admin-sync-mini" onclick="setVersionControlSubTab(\'config_sync\')">'+
+        escapeHtml(lang==='en'?'Open Config Sync':'Mở Đồng bộ Config')+
+      '</button>'+
+      '<button class="admin-sync-mini" onclick="setVersionControlSubTab(\'local_sync\')">'+
+        escapeHtml(lang==='en'?'Open Local Sync':'Mở Đồng bộ Local')+
+      '</button>'+
+      '<button class="admin-sync-mini" onclick="setVersionControlSubTab(\'snapshots\')">'+
+        escapeHtml(lang==='en'?'Open Snapshots':'Mở Snapshot')+
+      '</button>'+
+      '<button class="admin-sync-mini" onclick="setVersionControlSubTab(\'audit\')">'+
+        escapeHtml(lang==='en'?'Open Audit log':'Mở Audit log')+
+      '</button>'+
+    '</div>'+
+  '</article>';
+
+  return '<section>'+readinessHtml+tilesHtml+recentTable+linksHtml+'</section>';
+}
+
+// Pha 2: renderAdminVCProcess deprecated — bilingual SOP content moved to
+// docs/admin-vc-panel-sop.md and linked from the Status tab's Quick
+// references section. Body preserved in comments for one release cycle.
+/*
+function renderAdminVCProcess_DEPRECATED_PHA2(){
   const en = '<h3 style="margin:0 0 6px 0">Local ↔ VPS workflow (SOP)</h3>'+
     '<p>Two write surfaces exist in this portal: <strong>code</strong> (Git deploy from a developer laptop) and <strong>content</strong> (HTML docs, users, options edited live in the portal). They write to the same filesystem on the VPS, so a deploy can clobber a fresh content edit if either side ignores the rules below.</p>'+
     '<h4>Golden rule</h4>'+
@@ -9306,6 +10493,7 @@ function renderAdminVCProcess(){
     '</article>'+
   '</section>';
 }
+*/
 
 // ── Dispatcher ────────────────────────────────────────────────────────────
 function renderAdminVersionControl(){
@@ -9313,12 +10501,20 @@ function renderAdminVersionControl(){
   if(!el) return;
 
   // Bootstrap state for the currently active sub-tab.
-  if(versionControlSubTab === 'overview' && !versionControlOverviewState.loaded && !versionControlOverviewState.loading && !versionControlOverviewState.error){
-    loadVersionControlOverview({silent:true});
+  if(versionControlSubTab === 'status'){
+    // Status tab pulls from overview endpoint + git status — header bar
+    // also reads both, so this is mostly redundant with the panel-level
+    // auto-load below, but keeps the sub-tab body responsive on direct
+    // navigation when the panel-level loaders already ran.
+    if(!versionControlOverviewState.loaded && !versionControlOverviewState.loading && !versionControlOverviewState.error){
+      loadVersionControlOverview({silent:true});
+    }
+    if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error){
+      loadGitRepoStatus({silent:true});
+    }
   }
-  if(versionControlSubTab === 'sync'){
-    if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error) loadGitRepoStatus({silent:true});
-    if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error) loadDataSyncStatus({silent:true});
+  if(versionControlSubTab === 'timeline' && !versionControlTimelineState.loaded && !versionControlTimelineState.loading && !versionControlTimelineState.error){
+    loadVersionControlTimeline({silent:true});
   }
   if(versionControlSubTab === 'config_sync' && !dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error){
     loadDataSyncStatus({silent:true});
@@ -9339,29 +10535,41 @@ function renderAdminVersionControl(){
     if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error) loadDataSyncStatus({silent:true});
     if(!syncScheduleState.loaded && !syncScheduleState.loading && !syncScheduleState.error) loadSyncSchedule({silent:true});
   }
+  // VC mode + the dependencies the header bar needs to populate sync/deploy
+  // pills are auto-loaded on first entry to the panel (any sub-tab).
+  if(!adminVCModeState.loaded && !adminVCModeState.loading && !adminVCModeState.error) loadAdminVCMode({silent:true});
+  if(!deployFreezeState.loaded && !deployFreezeState.loading && !deployFreezeState.error) loadDeployFreeze({silent:true});
+  if(!ghaWorkflowState.loaded && !ghaWorkflowState.loading && !ghaWorkflowState.error) loadGhaWorkflow({silent:true});
+  if(!localSyncReportState.loaded && !localSyncReportState.loading && !localSyncReportState.error) loadLocalSyncReport({silent:true});
+  if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error) loadGitRepoStatus({silent:true});
+  if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error) loadDataSyncStatus({silent:true});
 
   let body;
   switch(versionControlSubTab){
-    case 'sync':        body = renderAdminSyncPanelV2();        break;
     case 'config_sync': body = renderAdminVCConfigSync();       break;
     case 'local_sync':  body = renderAdminVCLocalSync();        break;
-    case 'snapshots':   body = renderAdminVCSnapshots();        break;
-    case 'doc_history': body = renderAdminVCDocHistory();       break;
-    case 'audit':       body = renderAdminVCAuditLog();         break;
-    case 'process':     body = renderAdminVCProcess();          break;
-    case 'overview':
-    default:            body = renderAdminVCOverview();         break;
+    case 'timeline':    body = renderAdminVCTimeline();         break;
+    // Pha 2 removed: overview, sync, process.
+    // Pha 3 removed: snapshots, doc_history, audit (folded into timeline).
+    // setVersionControlSubTab normalises any stale id to status/timeline
+    // before dispatch, so we never hit these dead branches in practice.
+    case 'status':
+    default:            body = renderAdminVCStatus();           break;
   }
 
   el.innerHTML =
     '<header style="margin-bottom:8px">'+
       '<div class="admin-sync-kicker">'+escapeHtml(lang==='en'?'Version control':'Điều khiển phiên bản')+'</div>'+
       '<h2 style="margin:4px 0 0 0">'+escapeHtml(lang==='en'
-        ? 'Local ↔ VPS sync, snapshots, doc history, audit, SOP'
-        : 'Đồng bộ Local ↔ VPS, snapshot, lịch sử tài liệu, audit, quy trình')+'</h2>'+
+        ? 'Release status, config sync, unified change timeline'
+        : 'Trạng thái phát hành, đồng bộ config, timeline thay đổi thống nhất')+'</h2>'+
     '</header>'+
+    renderAdminVCHeaderBar()+
     renderVCSubTabNav()+
-    body;
+    body+
+    // Inline modal overlay (replaces window.prompt across all VC actions).
+    // Returns '' when no modal is open, so this is cheap when unused.
+    renderAdminVCActionModal();
 }
 
 function renderAdminInfrastructure(){
