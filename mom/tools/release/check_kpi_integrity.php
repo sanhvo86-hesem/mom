@@ -1115,9 +1115,18 @@ if ($mcsExt !== []) {
     $allowedEvalUse  = (array) ($mcsExt['evaluation_use'] ?? []);
     $allowedReward   = (array) ($mcsExt['reward_mode'] ?? []);
     $allowedLifecyc  = (array) ($mcsExt['lifecycle_status'] ?? []);
-    $scoringBySub    = is_array($mcsExt['scoring_model_by_metric_subtype'] ?? null)
-        ? $mcsExt['scoring_model_by_metric_subtype'] : [];
-    $rewardRequireRt = ['team_reward_candidate', 'role_review_input', 'bonus_pool_candidate'];
+	    $scoringBySub    = is_array($mcsExt['scoring_model_by_metric_subtype'] ?? null)
+	        ? $mcsExt['scoring_model_by_metric_subtype'] : [];
+	    $rewardRequireRt = ['team_reward_candidate', 'role_review_input', 'bonus_pool_candidate'];
+	    $dashboardByCode = [];
+	    foreach ($dashboard as $row) {
+	        if (is_array($row)) {
+	            $c = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+	            if ($c !== '') {
+	                $dashboardByCode[$c] = $row;
+	            }
+	        }
+	    }
 
     // Build code universe so paired_metric references can be validated.
     $allCodes = [];
@@ -1129,15 +1138,75 @@ if ($mcsExt !== []) {
             }
         }
     }
-    foreach ((array) $runtimeList as $c) {
-        $allCodes[strtoupper((string) $c)] = true;
-    }
+	    foreach ((array) $runtimeList as $c) {
+	        $allCodes[strtoupper((string) $c)] = true;
+	    }
 
-    $checkMcs = static function (array $row, string $label) use (
-        $allowedSubtype, $allowedIntent, $allowedMeasure, $allowedScoring,
-        $allowedEvalUse, $allowedReward, $allowedLifecyc, $scoringBySub,
-        $rewardRequireRt, $allCodes, &$p0, &$p1
-    ): void {
+	    $hasText = static function (array $row, string $field): bool {
+	        return trim((string) ($row[$field] ?? '')) !== '';
+	    };
+	    $hasNonEmptyList = static function (mixed $value): bool {
+	        if (!is_array($value)) {
+	            return false;
+	        }
+	        foreach ($value as $item) {
+	            if (is_array($item)) {
+	                return true;
+	            }
+	            if (trim((string) $item) !== '') {
+	                return true;
+	            }
+	        }
+	        return false;
+	    };
+	    $hasCounterIntent = static function (array $row): bool {
+	        $counter = $row['counter_metric'] ?? null;
+	        return is_array($counter) && trim((string) ($counter['intent'] ?? '')) !== '';
+	    };
+	    $roleAssignmentsCarryControllability = static function (mixed $value): bool {
+	        if (!is_array($value)) {
+	            return false;
+	        }
+	        foreach ($value as $row) {
+	            if (is_array($row) && trim((string) ($row['controllability_scope'] ?? '')) !== '') {
+	                return true;
+	            }
+	        }
+	        return false;
+	    };
+	    $componentWeightTotal = static function (mixed $value): ?float {
+	        if (!is_array($value) || $value === []) {
+	            return null;
+	        }
+	        $total = 0.0;
+	        $hasWeight = false;
+	        foreach ($value as $row) {
+	            if (is_array($row) && isset($row['weight_pct']) && is_numeric($row['weight_pct'])) {
+	                $total += (float) $row['weight_pct'];
+	                $hasWeight = true;
+	            }
+	        }
+	        return $hasWeight ? $total : null;
+	    };
+	    $scorecardScored = static function (array $row) use ($dashboardByCode): bool {
+	        $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+	        $dashboardRow = $dashboardByCode[$code] ?? [];
+	        return (bool) ($row['reward_eligible'] ?? false)
+	            || (bool) ($row['scorecard_contributes_to_reward'] ?? false)
+	            || (string) ($row['scorecard_role'] ?? '') === 'scored_core'
+	            || (is_array($dashboardRow) && (
+	                (string) ($dashboardRow['scorecard_role'] ?? '') === 'scored_core'
+	                || (bool) ($dashboardRow['scoreable'] ?? false)
+	            ));
+	    };
+
+	    $checkMcs = static function (array $row, string $label) use (
+	        $allowedSubtype, $allowedIntent, $allowedMeasure, $allowedScoring,
+	        $allowedEvalUse, $allowedReward, $allowedLifecyc, $scoringBySub,
+	        $rewardRequireRt, $allCodes, $hasText, $hasNonEmptyList,
+	        $hasCounterIntent, $roleAssignmentsCarryControllability,
+	        $componentWeightTotal, $scorecardScored, &$p0, &$p1
+	    ): void {
         $rc      = (string) ($row['canonical_code'] ?? '');
         $subtype = (string) ($row['metric_subtype'] ?? '');
         $intent  = (string) ($row['control_intent'] ?? '');
@@ -1181,21 +1250,112 @@ if ($mcsExt !== []) {
         if ($reward !== '' && in_array($reward, $rewardRequireRt, true) && $calcSt !== '' && $calcSt !== 'runtime_calculated') {
             $p0[] = "$label $rc: reward_mode '$reward' requires calculation_status=runtime_calculated (got '$calcSt').";
         }
-        // spc_capability_metric requires sample_policy.
-        if ($subtype === 'spc_capability_metric') {
-            if (!is_array($sample) || !isset($sample['min_n_score']) || !is_numeric($sample['min_n_score'])) {
-                $p0[] = "$label $rc: spc_capability_metric requires sample_policy.min_n_score (numeric).";
-            }
-        }
-        // paired_metric must resolve.
-        if ($paired !== '' && !isset($allCodes[strtoupper($paired)])) {
-            $p1[] = "$label $rc: paired_metric '$paired' does not resolve to any known canonical_code.";
-        }
-        // P1 — subtype set but control_intent missing: weak governance.
-        if ($subtype !== '' && $intent === '') {
-            $p1[] = "$label $rc: metric_subtype is set but control_intent is empty.";
-        }
-    };
+	        if ($subtype !== '' && $intent === '') {
+	            $p0[] = "$label $rc: metric_subtype is set but control_intent is empty.";
+	        }
+	        if ($subtype === 'health_indicator') {
+	            if ($reward !== '' && $reward !== 'not_rewardable') {
+	                $p0[] = "$label $rc: health_indicator cannot use reward_mode '$reward'.";
+	            }
+	            if ($scorecardScored($row)) {
+	                $p0[] = "$label $rc: health_indicator cannot be rewardable or scorecard-scored.";
+	            }
+	        }
+	        if ($subtype === 'gate_control_metric') {
+	            if (!$hasText($row, 'gate')) {
+	                $p0[] = "$label $rc: gate_control_metric requires gate.";
+	            }
+	            if (!$hasNonEmptyList($row['linked_cdr'] ?? null)) {
+	                $p0[] = "$label $rc: gate_control_metric requires linked_cdr.";
+	            }
+	            foreach (['gate_pass_condition', 'hold_release_rule', 'evidence_source'] as $field) {
+	                if (!$hasText($row, $field)) {
+	                    $p0[] = "$label $rc: gate_control_metric requires $field.";
+	                }
+	            }
+	            if ($reward !== '' && !in_array($reward, ['blocker_only', 'not_rewardable'], true)) {
+	                $p0[] = "$label $rc: gate_control_metric reward_mode '$reward' must be blocker_only or not_rewardable.";
+	            }
+	        }
+	        if ($subtype === 'role_performance_measure') {
+	            if (!$hasNonEmptyList($row['role_assignments'] ?? null) && !$hasText($row, 'owner_role')) {
+	                $p0[] = "$label $rc: role_performance_measure requires role_assignments or owner_role.";
+	            }
+	            if (!$hasText($row, 'controllability_scope')
+	                && !$roleAssignmentsCarryControllability($row['role_assignments'] ?? null)) {
+	                $p0[] = "$label $rc: role_performance_measure requires controllability_scope.";
+	            }
+	            if (!$hasText($row, 'action_when_red') && !$hasText($row, 'decision_action')) {
+	                $p0[] = "$label $rc: role_performance_measure requires action_when_red or decision_action.";
+	            }
+	        }
+	        if ($subtype === 'counter_metric'
+	            && !$hasCounterIntent($row)
+	            && !$hasText($row, 'paired_metric')
+	            && !$hasText($row, 'parent_metric')) {
+	            $p0[] = "$label $rc: counter_metric requires parent metric reference or anti-gaming intent.";
+	        }
+	        if ($intent === 'customer_specific_requirement'
+	            && !$hasText($row, 'lam_profile_link')
+	            && !$hasText($row, 'customer_profile_link')
+	            && !$hasText($row, 'applicability_rule')
+	            && !$hasText($row, 'data_contract_gap')) {
+	            $p0[] = "$label $rc: customer_specific_requirement requires customer/profile applicability or staged data-contract gap.";
+	        }
+	        if ($subtype === 'spc_capability_metric' || in_array($scoring, ['spc_control_chart', 'spec_limit_capability'], true)) {
+	            if (!is_array($sample) || !isset($sample['min_n_score']) || !is_numeric($sample['min_n_score'])) {
+	                $p0[] = "$label $rc: spc_capability_metric requires sample_policy.min_n_score (numeric).";
+	            }
+	        }
+	        if ($subtype === 'composite_readiness_index' || $scoring === 'composite_weighted_score') {
+	            $weightTotal = $componentWeightTotal($row['components'] ?? null);
+	            if ($weightTotal !== null && abs($weightTotal - 100.0) > 0.01) {
+	                $p0[] = "$label $rc: composite_weighted_score component weights must sum to 100 (got $weightTotal).";
+	            }
+	            if ($weightTotal === null && !$hasText($row, 'data_contract_gap')) {
+	                $p0[] = "$label $rc: composite_weighted_score requires components or staged data_contract_gap.";
+	            }
+	        }
+	        if ($scoring === 'rag_3_band') {
+	            $t = is_array($row['thresholds'] ?? null) ? $row['thresholds'] : [];
+	            if (!is_numeric($t['green_point'] ?? null) || !is_numeric($t['yellow_point'] ?? null)) {
+	                $p0[] = "$label $rc: rag_3_band requires numeric thresholds.green_point and thresholds.yellow_point.";
+	            }
+	        }
+	        if ($scoring === 'rag_5_band_stretch') {
+	            $t = is_array($row['thresholds'] ?? null) ? $row['thresholds'] : [];
+	            foreach (['stretch_point', 'green_point', 'yellow_point', 'red_point', 'blocked_condition'] as $field) {
+	                if (!isset($t[$field]) && !$hasText($row, $field)) {
+	                    $p0[] = "$label $rc: rag_5_band_stretch requires $field.";
+	                }
+	            }
+	        }
+	        if ($scoring === 'binary_pass_fail') {
+	            $t = is_array($row['thresholds'] ?? null) ? $row['thresholds'] : [];
+	            if (!$hasText($row, 'gate_pass_condition') && !isset($t['pass_condition']) && !isset($t['fail_condition'])) {
+	                $p0[] = "$label $rc: binary_pass_fail requires gate_pass_condition or pass/fail thresholds.";
+	            }
+	        }
+	        if ($scoring === 'blocker_only'
+	            && !$hasNonEmptyList($row['blocking_conditions'] ?? null)
+	            && !$hasText($row, 'hold_release_rule')) {
+	            $p0[] = "$label $rc: blocker_only requires blocking_conditions or hold_release_rule.";
+	        }
+	        if ($scoring === 'evidence_completeness_score'
+	            && !$hasText($row, 'evidence_source')
+	            && !$hasNonEmptyList($row['required_evidence'] ?? null)) {
+	            $p0[] = "$label $rc: evidence_completeness_score requires evidence_source or required_evidence.";
+	        }
+	        if ($scoring === 'event_severity_score'
+	            && !$hasNonEmptyList($row['blocking_conditions'] ?? null)
+	            && !$hasCounterIntent($row)) {
+	            $p0[] = "$label $rc: event_severity_score requires severity/blocking conditions or counter_metric.intent.";
+	        }
+	        // paired_metric must resolve.
+	        if ($paired !== '' && !isset($allCodes[strtoupper($paired)])) {
+	            $p1[] = "$label $rc: paired_metric '$paired' does not resolve to any known canonical_code.";
+	        }
+	    };
 
     foreach ($governance as $row) {
         if (is_array($row)) {

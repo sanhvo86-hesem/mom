@@ -2381,6 +2381,7 @@ class AdminController extends BaseController
                 || str_starts_with($msg, 'kpi_registry_added_missing_code')
                 || str_starts_with($msg, 'kpi_registry_added_missing_contract')
                 || str_starts_with($msg, 'kpi_registry_added_code_conflict')
+                || str_starts_with($msg, 'kpi_registry_mco_')
                 || str_starts_with($msg, 'kpi_registry_missing_code')) {
                 $this->error('kpi_registry_invalid', 422, 'Vi phạm quy tắc KPI: ' . $msg);
             }

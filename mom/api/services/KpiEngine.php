@@ -661,11 +661,18 @@ final class KpiEngine
                 'lifecycle_status' => $this->stringField($row, 'lifecycle_status'),
                 'sample_policy' => is_array($row['sample_policy'] ?? null) ? $row['sample_policy'] : null,
                 'usage_contexts' => $this->arrayField($row, 'usage_contexts'),
-                'role_assignments' => is_array($row['role_assignments'] ?? null)
-                    ? $row['role_assignments'] : [],
-                'lam_profile_link' => $this->stringField($row, 'lam_profile_link'),
-            ], $aliases);
-        }
+	                'role_assignments' => is_array($row['role_assignments'] ?? null)
+	                    ? $row['role_assignments'] : [],
+	                'lam_profile_link' => $this->stringField($row, 'lam_profile_link'),
+	                'customer_profile_link' => $this->stringField($row, 'customer_profile_link'),
+	                'applicability_rule' => $this->stringField($row, 'applicability_rule'),
+	                'hold_release_rule' => $this->stringField($row, 'hold_release_rule'),
+	                'controllability_scope' => $this->stringField($row, 'controllability_scope'),
+	                'action_when_red' => $this->stringField($row, 'action_when_red'),
+	                'components' => is_array($row['components'] ?? null) ? $row['components'] : [],
+	                'required_evidence' => $this->arrayField($row, 'required_evidence'),
+	            ], $aliases);
+	        }
 
         foreach ($this->registryRows($registry, 'proposed_operating_metrics') as $row) {
             $code = $this->codeField($row, 'canonical_code');
@@ -698,13 +705,23 @@ final class KpiEngine
                 'lifecycle_status' => $this->stringField($row, 'lifecycle_status'),
                 'sample_policy' => is_array($row['sample_policy'] ?? null) ? $row['sample_policy'] : null,
                 'usage_contexts' => $this->arrayField($row, 'usage_contexts'),
-                'role_assignments' => is_array($row['role_assignments'] ?? null)
-                    ? $row['role_assignments'] : [],
-                'lam_profile_link' => $this->stringField($row, 'lam_profile_link'),
-                'paired_metric' => $this->stringField($row, 'paired_metric'),
-                'attribution_rule' => $this->stringField($row, 'attribution_rule'),
-            ], $aliases);
-        }
+	                'role_assignments' => is_array($row['role_assignments'] ?? null)
+	                    ? $row['role_assignments'] : [],
+	                'lam_profile_link' => $this->stringField($row, 'lam_profile_link'),
+	                'customer_profile_link' => $this->stringField($row, 'customer_profile_link'),
+	                'applicability_rule' => $this->stringField($row, 'applicability_rule'),
+	                'paired_metric' => $this->stringField($row, 'paired_metric'),
+	                'attribution_rule' => $this->stringField($row, 'attribution_rule'),
+	                'gate' => $this->stringField($row, 'gate'),
+	                'linked_cdr' => is_array($row['linked_cdr'] ?? null) ? $row['linked_cdr'] : null,
+	                'gate_pass_condition' => $this->stringField($row, 'gate_pass_condition'),
+	                'hold_release_rule' => $this->stringField($row, 'hold_release_rule'),
+	                'controllability_scope' => $this->stringField($row, 'controllability_scope'),
+	                'action_when_red' => $this->stringField($row, 'action_when_red'),
+	                'components' => is_array($row['components'] ?? null) ? $row['components'] : [],
+	                'required_evidence' => $this->arrayField($row, 'required_evidence'),
+	            ], $aliases);
+	        }
 
         foreach ($this->registryStringList($registry, 'executive_scorecard') as $code) {
             $this->upsertCatalogMetric($catalog, $code, 'executive_scorecard', [], $aliases);
@@ -755,13 +772,18 @@ final class KpiEngine
                 'lifecycle_status' => $this->stringField($row, 'lifecycle_status'),
                 'sample_policy' => is_array($row['sample_policy'] ?? null) ? $row['sample_policy'] : null,
                 'usage_contexts' => $this->arrayField($row, 'usage_contexts'),
-                'role_assignments' => is_array($row['role_assignments'] ?? null)
-                    ? $row['role_assignments'] : [],
-                'lam_profile_link' => $this->stringField($row, 'lam_profile_link'),
-                'paired_metric' => $this->stringField($row, 'paired_metric'),
-                'attribution_rule' => $this->stringField($row, 'attribution_rule'),
-            ], $aliases);
-        }
+	                'role_assignments' => is_array($row['role_assignments'] ?? null)
+	                    ? $row['role_assignments'] : [],
+	                'lam_profile_link' => $this->stringField($row, 'lam_profile_link'),
+	                'customer_profile_link' => $this->stringField($row, 'customer_profile_link'),
+	                'applicability_rule' => $this->stringField($row, 'applicability_rule'),
+	                'paired_metric' => $this->stringField($row, 'paired_metric'),
+	                'attribution_rule' => $this->stringField($row, 'attribution_rule'),
+	                'hold_release_rule' => $this->stringField($row, 'hold_release_rule'),
+	                'components' => is_array($row['components'] ?? null) ? $row['components'] : [],
+	                'required_evidence' => $this->arrayField($row, 'required_evidence'),
+	            ], $aliases);
+	        }
 
         $this->enrichCatalogGovernance($catalog, $registry);
         ksort($catalog);
@@ -3076,12 +3098,13 @@ final class KpiEngine
                 $defaults,
             );
             $this->applyGovernanceLists($metric, $override);
-            $this->applyDataContract($metric, $override, $calculationStatus);
-            $this->applyConsequence($metric, $override, $metricType, $defaults);
-            $this->applyScorecardRules($metric, $override);
-        }
-        unset($metric);
-    }
+	            $this->applyDataContract($metric, $override, $calculationStatus);
+	            $this->applyConsequence($metric, $override, $metricType, $defaults);
+	            $this->applyScorecardRules($metric, $override);
+	            $this->applyMetricControlSummary($metric);
+	        }
+	        unset($metric);
+	    }
 
     /**
      * @param array<string, mixed> $registry
@@ -3464,8 +3487,8 @@ final class KpiEngine
      * @param array<string, mixed> $metric
      * @param array<string, mixed> $override
      */
-    private function applyScorecardRules(array &$metric, array $override): void
-    {
+	    private function applyScorecardRules(array &$metric, array $override): void
+	    {
         $weight = $override['scorecard_weight_pct'] ?? null;
         $scorecardApplicable = is_int($weight) || is_float($weight);
         $rewardRule = $this->overrideOrDefault($override, 'reward_rule', '');
@@ -3497,19 +3520,118 @@ final class KpiEngine
         if ($metric['reward_rule'] === '' && ($metric['metric_type'] ?? null) === 'kpi') {
             $metric['reward_rule'] = 'Eligible only through balanced scorecard calibration with safety, quality, delivery and data-integrity blockers cleared.';
         }
-        if ($metric['reward_rule'] !== '' && is_array($metric['consequence'] ?? null)) {
-            $metric['consequence']['recognition_rule'] = $metric['reward_rule'];
-            $metric['consequence']['recognition_applicable'] = $metric['scorecard_contributes_to_reward'];
-            $metric['consequence']['calibration_input_only'] = !$metric['scorecard_contributes_to_reward'];
-            $metric['consequence']['monetary_recognition_status'] = $metric['scorecard_contributes_to_reward']
-                ? 'eligible_after_hr_qms_ceo_calibration_and_blocker_check'
-                : (string) $metric['scorecard_scoring_status'];
-        }
-    }
+	        if ($metric['reward_rule'] !== '' && is_array($metric['consequence'] ?? null)) {
+	            $metric['consequence']['recognition_rule'] = $metric['reward_rule'];
+	            $metric['consequence']['recognition_applicable'] = $metric['scorecard_contributes_to_reward'];
+	            $metric['consequence']['calibration_input_only'] = !$metric['scorecard_contributes_to_reward'];
+	            $metric['consequence']['monetary_recognition_status'] = $metric['scorecard_contributes_to_reward']
+	                ? 'eligible_after_hr_qms_ceo_calibration_and_blocker_check'
+	                : (string) $metric['scorecard_scoring_status'];
+	        }
+	    }
 
-    /**
-     * @param array<string, mixed> $registry
-     * @return array<string, mixed>
+	    /**
+	     * @param array<string, mixed> $metric
+	     */
+	    private function applyMetricControlSummary(array &$metric): void
+	    {
+	        $status = (string) ($metric['calculation_status'] ?? 'data_contract_required');
+	        $staged = in_array($status, ['staged_data_contract', 'data_contract_required'], true);
+	        $counterMetric = $metric['counter_metric'] ?? null;
+	        $blocking = $this->stringListFromValue($metric['blocking_conditions'] ?? []);
+	        $samplePolicy = is_array($metric['sample_policy'] ?? null) ? $metric['sample_policy'] : null;
+	        $roleAssignments = is_array($metric['role_assignments'] ?? null) ? $metric['role_assignments'] : [];
+	        $usageContexts = $this->stringListFromValue($metric['usage_contexts'] ?? []);
+	        if ($usageContexts === [] && (string) ($metric['evaluation_use'] ?? '') !== '') {
+	            $usageContexts = [(string) $metric['evaluation_use']];
+	        }
+
+	        $evidenceSource = (string) ($metric['evidence_source'] ?? '');
+	        $dataContractGap = (string) ($metric['data_contract_gap'] ?? '');
+	        $evidenceStatus = match ((string) ($metric['data_contract_status'] ?? '')) {
+	            'approved_runtime' => 'approved_runtime',
+	            'manual_governed' => $evidenceSource !== '' ? 'manual_governed_with_evidence' : 'manual_governed_missing_evidence',
+	            'retired' => 'retired',
+	            default => $dataContractGap !== '' ? 'staged_gap_declared' : ($evidenceSource !== '' ? 'evidence_declared' : 'missing_evidence'),
+	        };
+
+	        $assignmentRoles = [];
+	        $assignmentTypes = [];
+	        $activeAssignments = 0;
+	        $candidateAssignments = 0;
+	        foreach ($roleAssignments as $assignment) {
+	            if (!is_array($assignment)) {
+	                continue;
+	            }
+	            $role = trim((string) ($assignment['role'] ?? ''));
+	            if ($role !== '') {
+	                $assignmentRoles[] = strtoupper($role);
+	            }
+	            $type = trim((string) ($assignment['assignment_type'] ?? ''));
+	            if ($type !== '') {
+	                $assignmentTypes[] = $type;
+	            }
+	            if (($assignment['active_or_candidate'] ?? '') === 'active') {
+	                $activeAssignments++;
+	            } elseif (($assignment['active_or_candidate'] ?? '') === 'candidate') {
+	                $candidateAssignments++;
+	            }
+	        }
+
+	        $metric['metric_control'] = [
+	            'type' => [
+	                'metric_type' => (string) ($metric['metric_type'] ?? ''),
+	                'metric_subtype' => (string) ($metric['metric_subtype'] ?? ''),
+	                'control_intent' => (string) ($metric['control_intent'] ?? ''),
+	                'measurement_data_type' => (string) ($metric['measurement_data_type'] ?? ''),
+	            ],
+	            'scoring' => [
+	                'scoring_model_detail' => (string) ($metric['scoring_model_detail'] ?? ''),
+	                'scorecard_applicable' => (bool) ($metric['scorecard_applicable'] ?? false),
+	                'scorecard_scoring_status' => (string) ($metric['scorecard_scoring_status'] ?? 'not_applicable'),
+	            ],
+	            'evaluation' => [
+	                'evaluation_use' => (string) ($metric['evaluation_use'] ?? ''),
+	                'evaluation_scope' => (string) ($metric['evaluation_scope'] ?? ''),
+	            ],
+	            'reward' => [
+	                'reward_mode' => (string) ($metric['reward_mode'] ?? ''),
+	                'reward_eligible' => (bool) ($metric['reward_eligible'] ?? false),
+	                'scorecard_contributes_to_reward' => (bool) ($metric['scorecard_contributes_to_reward'] ?? false),
+	            ],
+	            'lifecycle' => [
+	                'lifecycle_status' => (string) ($metric['lifecycle_status'] ?? ''),
+	                'calculation_status' => $status,
+	                'data_contract_status' => (string) ($metric['data_contract_status'] ?? ''),
+	            ],
+	            'staged_value_suppression' => [
+	                'suppressed' => $staged,
+	                'reason' => $staged
+	                    ? 'No runtime/manual-governed score; dashboard consumers must suppress numeric value display.'
+	                    : '',
+	            ],
+	            'role_assignment_summary' => [
+	                'count' => count($roleAssignments),
+	                'roles' => array_values(array_unique($assignmentRoles)),
+	                'assignment_types' => array_values(array_unique($assignmentTypes)),
+	                'active_count' => $activeAssignments,
+	                'candidate_count' => $candidateAssignments,
+	            ],
+	            'blockers' => $blocking,
+	            'evidence_status' => $evidenceStatus,
+	            'sample_policy' => $samplePolicy,
+	            'usage_contexts' => $usageContexts,
+	            'counter_metric_status' => [
+	                'status' => is_array($counterMetric) ? 'present' : 'missing',
+	                'code' => is_array($counterMetric) ? (string) ($counterMetric['code'] ?? '') : '',
+	                'intent' => is_array($counterMetric) ? (string) ($counterMetric['intent'] ?? '') : '',
+	            ],
+	        ];
+	    }
+
+	    /**
+	     * @param array<string, mixed> $registry
+	     * @return array<string, mixed>
      */
     private function gateCoverage(array $registry): array
     {

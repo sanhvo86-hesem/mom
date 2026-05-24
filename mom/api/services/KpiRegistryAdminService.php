@@ -94,6 +94,19 @@ final class KpiRegistryAdminService
         'event_severity_score', 'pareto_loss_bucket', 'blocker_only',
         'evidence_completeness_score',
     ];
+    private const EXT_SCORING_BY_SUBTYPE = [
+        'official_kpi' => ['rag_3_band', 'rag_5_band_stretch', 'composite_weighted_score'],
+        'operating_metric' => ['rag_3_band', 'trend_direction', 'sla_aging_bucket'],
+        'gate_control_metric' => ['binary_pass_fail', 'sla_aging_bucket', 'blocker_only'],
+        'role_performance_measure' => ['rag_3_band', 'rubric_score', 'trend_direction'],
+        'health_indicator' => ['none_monitor_only', 'trend_direction', 'evidence_completeness_score'],
+        'counter_metric' => ['blocker_only', 'event_severity_score'],
+        'blocker_metric' => ['blocker_only'],
+        'supplier_scorecard_metric' => ['composite_weighted_score', 'rag_3_band', 'evidence_completeness_score'],
+        'okr_key_result' => ['baseline_improvement', 'trend_direction'],
+        'spc_capability_metric' => ['spec_limit_capability', 'spc_control_chart'],
+        'composite_readiness_index' => ['composite_weighted_score'],
+    ];
     private const EXT_EVALUATION_USE = [
         'none', 'daily_management', 'gate_hold_release',
         'hold_release_only_not_reward_or_discipline',
@@ -336,6 +349,7 @@ final class KpiRegistryAdminService
                 $addedCodes[$cc] = true;
                 $added[] = $row;
             }
+            $this->validateMetricControlRows($added, $section, true);
             $addedAll[$group] = $added;
 
             // Retired codes — only seed or just-added codes may be retired.
@@ -376,6 +390,7 @@ final class KpiRegistryAdminService
             } else {
                 $this->validateMetricThresholds($live, $section);
             }
+            $this->validateMetricControlRows($live, $section, false);
 
             $overlay[$key] = $overrides;
             $totalOverrides += count($overrides);
@@ -544,6 +559,299 @@ final class KpiRegistryAdminService
                 }
             }
         }
+    }
+
+    /**
+     * Metric Control Object enforcement. Legacy rows that carry no structural
+     * MCS fields stay compatible; Console-added rows must be born complete.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     */
+    private function validateMetricControlRows(array $rows, string $section, bool $requireComplete): void
+    {
+        foreach ($rows as $row) {
+            $this->validateMetricControlObject($row, $section, $requireComplete);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function validateMetricControlObject(array $row, string $section, bool $requireComplete): void
+    {
+        $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+        if ($code === '') {
+            $code = '(missing-code)';
+        }
+
+        $subtype = $this->sanitizeEnum($row['metric_subtype'] ?? '', self::EXT_METRIC_SUBTYPES);
+        $intent = $this->sanitizeEnum($row['control_intent'] ?? '', self::EXT_CONTROL_INTENT);
+        $measure = $this->sanitizeEnum($row['measurement_data_type'] ?? '', self::EXT_MEASUREMENT_DATA_TYPE);
+        $scoring = $this->sanitizeEnum($row['scoring_model_detail'] ?? '', self::EXT_SCORING_MODEL);
+        $evalUse = $this->sanitizeEnum($row['evaluation_use'] ?? '', self::EXT_EVALUATION_USE);
+        $rewardMode = $this->sanitizeEnum($row['reward_mode'] ?? '', self::EXT_REWARD_MODE);
+        $lifecycle = $this->sanitizeEnum($row['lifecycle_status'] ?? '', self::EXT_LIFECYCLE_STATUS);
+        $calcStatus = trim((string) ($row['calculation_status'] ?? ''));
+
+        $adopted = $requireComplete || $this->hasMetricControlAdoption($row);
+
+        if ($rewardMode !== '' && in_array($rewardMode, self::REWARD_MODES_REQUIRE_RUNTIME, true)
+            && $calcStatus !== '' && $calcStatus !== 'runtime_calculated') {
+            throw new RuntimeException(
+                'kpi_registry_mco_reward_requires_runtime:' . $code
+                . ' (reward_mode=' . $rewardMode . ' but calculation_status=' . $calcStatus . ')'
+            );
+        }
+
+        if (!$adopted) {
+            return;
+        }
+
+        $this->requireMcoField($subtype, 'metric_subtype', $code);
+        $this->requireMcoField($intent, 'control_intent', $code);
+        $this->requireMcoField($measure, 'measurement_data_type', $code);
+        $this->requireMcoField($scoring, 'scoring_model_detail', $code);
+        $this->requireMcoField($evalUse, 'evaluation_use', $code);
+        $this->requireMcoField($rewardMode, 'reward_mode', $code);
+        $this->requireMcoField($lifecycle, 'lifecycle_status', $code);
+
+        if ($subtype !== '' && $scoring !== '' && isset(self::EXT_SCORING_BY_SUBTYPE[$subtype])
+            && !in_array($scoring, self::EXT_SCORING_BY_SUBTYPE[$subtype], true)) {
+            throw new RuntimeException(
+                'kpi_registry_mco_scoring_subtype_mismatch:' . $code
+                . ' (scoring_model_detail=' . $scoring . ', metric_subtype=' . $subtype . ')'
+            );
+        }
+
+        if ($requireComplete) {
+            if (!$this->hasText($row, 'owner_role')) {
+                throw new RuntimeException('kpi_registry_mco_missing_owner_role:' . $code);
+            }
+            if (!$this->hasText($row, 'evidence_source')) {
+                throw new RuntimeException('kpi_registry_mco_missing_evidence_source:' . $code);
+            }
+            if (!$this->hasText($row, 'data_contract_gap') || !$this->hasText($row, 'target_graduation_condition')) {
+                throw new RuntimeException('kpi_registry_mco_missing_staged_contract:' . $code);
+            }
+            if (!in_array($subtype, ['health_indicator', 'counter_metric', 'blocker_metric'], true)
+                && !$this->hasCounterIntent($row)) {
+                throw new RuntimeException('kpi_registry_mco_missing_counter_metric:' . $code);
+            }
+            if ($subtype !== 'health_indicator' && !$this->hasNonEmptyList($row['blocking_conditions'] ?? null)) {
+                throw new RuntimeException('kpi_registry_mco_missing_blocking_conditions:' . $code);
+            }
+        }
+
+        if ($subtype === 'health_indicator') {
+            if ($rewardMode !== '' && $rewardMode !== 'not_rewardable') {
+                throw new RuntimeException('kpi_registry_mco_health_rewardable:' . $code);
+            }
+            if (($row['reward_eligible'] ?? false) === true
+                || ($row['scorecard_contributes_to_reward'] ?? false) === true
+                || (string) ($row['scorecard_role'] ?? '') === 'scored_core') {
+                throw new RuntimeException('kpi_registry_mco_health_scored_core:' . $code);
+            }
+        }
+
+        if ($subtype === 'gate_control_metric') {
+            foreach (['gate', 'gate_pass_condition', 'hold_release_rule', 'evidence_source'] as $field) {
+                if (!$this->hasText($row, $field)) {
+                    throw new RuntimeException('kpi_registry_mco_gate_missing_' . $field . ':' . $code);
+                }
+            }
+            if (!$this->hasNonEmptyList($row['linked_cdr'] ?? null)) {
+                throw new RuntimeException('kpi_registry_mco_gate_missing_linked_cdr:' . $code);
+            }
+            if (!in_array($rewardMode, ['blocker_only', 'not_rewardable'], true)) {
+                throw new RuntimeException('kpi_registry_mco_gate_invalid_reward_mode:' . $code);
+            }
+        }
+
+        if ($subtype === 'role_performance_measure') {
+            if (!$this->hasNonEmptyList($row['role_assignments'] ?? null) && !$this->hasText($row, 'owner_role')) {
+                throw new RuntimeException('kpi_registry_mco_role_missing_assignment:' . $code);
+            }
+            if (!$this->hasText($row, 'controllability_scope')
+                && !$this->roleAssignmentsCarryControllability($row['role_assignments'] ?? null)) {
+                throw new RuntimeException('kpi_registry_mco_role_missing_controllability:' . $code);
+            }
+            if (!$this->hasText($row, 'action_when_red') && !$this->hasText($row, 'decision_action')) {
+                throw new RuntimeException('kpi_registry_mco_role_missing_action_when_red:' . $code);
+            }
+        }
+
+        if ($subtype === 'counter_metric' && !$this->hasCounterIntent($row)
+            && !$this->hasText($row, 'paired_metric') && !$this->hasText($row, 'parent_metric')) {
+            throw new RuntimeException('kpi_registry_mco_counter_missing_parent_or_intent:' . $code);
+        }
+
+        if ($intent === 'customer_specific_requirement'
+            && !$this->hasText($row, 'lam_profile_link')
+            && !$this->hasText($row, 'customer_profile_link')
+            && !$this->hasText($row, 'applicability_rule')
+            && !$this->hasText($row, 'data_contract_gap')) {
+            throw new RuntimeException('kpi_registry_mco_customer_specific_missing_profile:' . $code);
+        }
+
+        if ($subtype === 'spc_capability_metric' || in_array($scoring, ['spc_control_chart', 'spec_limit_capability'], true)) {
+            $sample = $row['sample_policy'] ?? null;
+            if (!is_array($sample) || !isset($sample['min_n_score']) || !is_numeric($sample['min_n_score'])
+                || (int) $sample['min_n_score'] <= 0) {
+                throw new RuntimeException('kpi_registry_mco_sample_policy_missing:' . $code);
+            }
+        }
+
+        if ($subtype === 'composite_readiness_index' || $scoring === 'composite_weighted_score') {
+            $weightTotal = $this->componentWeightTotal($row['components'] ?? null);
+            if ($weightTotal !== null && abs($weightTotal - 100.0) > 0.01) {
+                throw new RuntimeException('kpi_registry_mco_composite_weights_not_100:' . $code);
+            }
+            if ($weightTotal === null && !$this->hasText($row, 'data_contract_gap')) {
+                throw new RuntimeException('kpi_registry_mco_composite_weights_missing:' . $code);
+            }
+        }
+
+        $this->validateScoringModelRequirements($row, $code, $scoring);
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function validateScoringModelRequirements(array $row, string $code, string $scoring): void
+    {
+        if ($scoring === 'rag_3_band') {
+            $t = is_array($row['thresholds'] ?? null) ? $row['thresholds'] : [];
+            if (!is_numeric($t['green_point'] ?? null) || !is_numeric($t['yellow_point'] ?? null)) {
+                throw new RuntimeException('kpi_registry_mco_scoring_rag_3_band_missing_thresholds:' . $code);
+            }
+        }
+
+        if ($scoring === 'rag_5_band_stretch') {
+            $t = is_array($row['thresholds'] ?? null) ? $row['thresholds'] : [];
+            foreach (['stretch_point', 'green_point', 'yellow_point', 'red_point', 'blocked_condition'] as $key) {
+                if (!isset($t[$key]) && !$this->hasText($row, $key)) {
+                    throw new RuntimeException('kpi_registry_mco_scoring_rag_5_band_missing_' . $key . ':' . $code);
+                }
+            }
+        }
+
+        if ($scoring === 'binary_pass_fail'
+            && !$this->hasText($row, 'gate_pass_condition')
+            && !isset($row['thresholds']['pass_condition'])
+            && !isset($row['thresholds']['fail_condition'])) {
+            throw new RuntimeException('kpi_registry_mco_scoring_binary_missing_pass_fail:' . $code);
+        }
+
+        if ($scoring === 'blocker_only'
+            && !$this->hasNonEmptyList($row['blocking_conditions'] ?? null)
+            && !$this->hasText($row, 'hold_release_rule')) {
+            throw new RuntimeException('kpi_registry_mco_scoring_blocker_missing_conditions:' . $code);
+        }
+
+        if ($scoring === 'evidence_completeness_score'
+            && !$this->hasText($row, 'evidence_source')
+            && !$this->hasNonEmptyList($row['required_evidence'] ?? null)) {
+            throw new RuntimeException('kpi_registry_mco_scoring_evidence_missing_source:' . $code);
+        }
+
+        if ($scoring === 'event_severity_score'
+            && !$this->hasNonEmptyList($row['blocking_conditions'] ?? null)
+            && !$this->hasCounterIntent($row)) {
+            throw new RuntimeException('kpi_registry_mco_scoring_event_severity_missing_matrix:' . $code);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function hasMetricControlAdoption(array $row): bool
+    {
+        foreach ([
+            'metric_subtype', 'control_intent', 'measurement_data_type',
+            'scoring_model_detail', 'evaluation_use', 'lifecycle_status',
+            'sample_policy', 'usage_contexts', 'role_assignments',
+        ] as $field) {
+            $value = $row[$field] ?? null;
+            if (is_string($value) && trim($value) !== '') {
+                return true;
+            }
+            if (is_array($value) && $value !== []) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function requireMcoField(string $value, string $field, string $code): void
+    {
+        if ($value === '') {
+            throw new RuntimeException('kpi_registry_mco_missing_' . $field . ':' . $code);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function hasText(array $row, string $field): bool
+    {
+        return trim((string) ($row[$field] ?? '')) !== '';
+    }
+
+    private function hasNonEmptyList(mixed $value): bool
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+        foreach ($value as $item) {
+            if (is_array($item)) {
+                return true;
+            }
+            if (trim((string) $item) !== '') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function hasCounterIntent(array $row): bool
+    {
+        $counter = $row['counter_metric'] ?? null;
+        if (is_array($counter) && trim((string) ($counter['intent'] ?? '')) !== '') {
+            return true;
+        }
+        return $this->hasText($row, 'anti_gaming_intent');
+    }
+
+    private function roleAssignmentsCarryControllability(mixed $value): bool
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+        foreach ($value as $row) {
+            if (is_array($row) && trim((string) ($row['controllability_scope'] ?? '')) !== '') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function componentWeightTotal(mixed $value): ?float
+    {
+        if (!is_array($value) || $value === []) {
+            return null;
+        }
+        $total = 0.0;
+        $hasWeight = false;
+        foreach ($value as $row) {
+            if (is_array($row) && isset($row['weight_pct']) && is_numeric($row['weight_pct'])) {
+                $total += (float) $row['weight_pct'];
+                $hasWeight = true;
+            }
+        }
+        return $hasWeight ? $total : null;
     }
 
     // ── KPI Library ──────────────────────────────────────────────────────
@@ -1139,6 +1447,75 @@ final class KpiRegistryAdminService
         return $out;
     }
 
+    /**
+     * @return list<string>
+     */
+    private function sanitizeStringList(mixed $value): array
+    {
+        if (is_string($value)) {
+            $value = preg_split('/\R|,/', $value) ?: [];
+        }
+        if (!is_array($value)) {
+            return [];
+        }
+        $out = [];
+        foreach ($value as $item) {
+            $text = $this->plainText((string) $item);
+            if ($text !== '') {
+                $out[] = $text;
+            }
+        }
+        return array_values(array_unique($out));
+    }
+
+    /**
+     * Accept either [{code/name, weight_pct}] or newline "CODE|weight" rows.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function sanitizeComponents(mixed $value): array
+    {
+        if (is_string($value)) {
+            $rows = [];
+            foreach (preg_split('/\R+/', $value) ?: [] as $line) {
+                $line = trim((string) $line);
+                if ($line === '') {
+                    continue;
+                }
+                $parts = array_map('trim', explode('|', $line));
+                $rows[] = [
+                    'code' => $parts[0] ?? '',
+                    'weight_pct' => $parts[1] ?? null,
+                    'name' => $parts[2] ?? '',
+                ];
+            }
+            $value = $rows;
+        }
+        if (!is_array($value)) {
+            return [];
+        }
+        $out = [];
+        foreach ($value as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $entry = [];
+            foreach (['code', 'name', 'intent'] as $field) {
+                $text = $this->plainText((string) ($row[$field] ?? ''));
+                if ($text !== '') {
+                    $entry[$field] = $field === 'code' ? strtoupper($text) : $text;
+                }
+            }
+            if (isset($row['weight_pct']) && is_numeric($row['weight_pct'])) {
+                $entry['weight_pct'] = (float) $row['weight_pct'];
+            }
+            if ($entry !== []) {
+                $out[] = $entry;
+            }
+        }
+        return $out;
+    }
+
     private function sanitizeField(string $field, mixed $value): mixed
     {
         // MCS-EXT-1 extension fields — enum-validated, free-text-fenced.
@@ -1175,20 +1552,7 @@ final class KpiRegistryAdminService
             return $this->sanitizeSamplePolicy($value);
         }
         if ($field === 'usage_contexts') {
-            if (is_string($value)) {
-                $value = preg_split('/\R+/', $value) ?: [];
-            }
-            if (!is_array($value)) {
-                return [];
-            }
-            $out = [];
-            foreach ($value as $item) {
-                $text = $this->plainText((string) $item);
-                if ($text !== '') {
-                    $out[] = $text;
-                }
-            }
-            return array_values(array_unique($out));
+            return $this->sanitizeStringList($value);
         }
         if ($field === 'role_assignments') {
             return $this->sanitizeRoleAssignments($value);
@@ -1216,20 +1580,7 @@ final class KpiRegistryAdminService
             return $this->sanitizeCounterMetric($value);
         }
         if ($field === 'blocking_conditions') {
-            if (is_string($value)) {
-                $value = preg_split('/\R+/', $value) ?: [];
-            }
-            if (!is_array($value)) {
-                return [];
-            }
-            $out = [];
-            foreach ($value as $item) {
-                $text = $this->plainText((string) $item);
-                if ($text !== '') {
-                    $out[] = $text;
-                }
-            }
-            return array_values(array_unique($out));
+            return $this->sanitizeStringList($value);
         }
         return $this->plainText((string) $value);
     }
@@ -1320,7 +1671,18 @@ final class KpiRegistryAdminService
         }
         $blocking = $this->sanitizeField('blocking_conditions', $patch['blocking_conditions'] ?? []);
 
-        return [
+        $roleAssignments = $this->sanitizeRoleAssignments($patch['role_assignments'] ?? []);
+        if ($roleAssignments === [] && $owner !== '') {
+            $roleAssignments[] = [
+                'role' => strtoupper($owner),
+                'assignment_type' => $this->sanitizeEnum($patch['assignment_type'] ?? 'accountable_owner', self::EXT_ASSIGNMENT_TYPE) ?: 'accountable_owner',
+                'weight_pct' => 100.0,
+                'active_or_candidate' => 'candidate',
+                'controllability_scope' => $this->plainText((string) ($patch['controllability_scope'] ?? 'Staged proposal; controllability must be confirmed before active use.')),
+            ];
+        }
+
+        $row = [
             'canonical_code'     => $code,
             'local_id'           => null,
             'name'               => $this->plainText((string) ($patch['name'] ?? '')),
@@ -1346,6 +1708,54 @@ final class KpiRegistryAdminService
             'reward_eligible'    => false,
             'origin'             => 'console_proposed',
         ];
+
+        foreach ([
+            'metric_subtype', 'control_intent', 'measurement_data_type',
+            'scoring_model_detail', 'evaluation_use', 'reward_mode',
+            'paired_metric', 'attribution_rule', 'lifecycle_status',
+        ] as $field) {
+            if (array_key_exists($field, $patch)) {
+                $value = $this->sanitizeField($field, $patch[$field]);
+                if ($value !== '' && $value !== null) {
+                    $row[$field] = $value;
+                }
+            }
+        }
+        $samplePolicy = $this->sanitizeField('sample_policy', $patch['sample_policy'] ?? null);
+        if (is_array($samplePolicy) && $samplePolicy !== []) {
+            $row['sample_policy'] = $samplePolicy;
+        }
+        $usageContexts = $this->sanitizeStringList($patch['usage_contexts'] ?? []);
+        if ($usageContexts !== []) {
+            $row['usage_contexts'] = $usageContexts;
+        }
+        if ($roleAssignments !== []) {
+            $row['role_assignments'] = $roleAssignments;
+        }
+        foreach ([
+            'gate', 'gate_pass_condition', 'hold_release_rule',
+            'lam_profile_link', 'customer_profile_link', 'applicability_rule',
+            'controllability_scope', 'action_when_red',
+        ] as $field) {
+            $value = $this->plainText((string) ($patch[$field] ?? ''));
+            if ($value !== '') {
+                $row[$field] = $value;
+            }
+        }
+        $linkedCdr = $this->sanitizeStringList($patch['linked_cdr'] ?? []);
+        if ($linkedCdr !== []) {
+            $row['linked_cdr'] = $linkedCdr;
+        }
+        $components = $this->sanitizeComponents($patch['components'] ?? []);
+        if ($components !== []) {
+            $row['components'] = $components;
+        }
+        $requiredEvidence = $this->sanitizeStringList($patch['required_evidence'] ?? []);
+        if ($requiredEvidence !== []) {
+            $row['required_evidence'] = $requiredEvidence;
+        }
+
+        return $row;
     }
 
     // ── Statistics ───────────────────────────────────────────────────────

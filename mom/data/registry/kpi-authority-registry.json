@@ -6721,6 +6721,12 @@
       "evaluation_use": "gate_hold_release",
       "reward_mode": "not_rewardable",
       "lifecycle_status": "pilot",
+      "gate": "G6",
+      "linked_cdr": [
+        "D8"
+      ],
+      "gate_pass_condition": "100% QC holds that block shipment or process continuation have QA disposition evidence, release authority, and no overdue severity-based SLA breach.",
+      "hold_release_rule": "Hold remains active until QA disposition evidence and release authority are recorded; overdue or bypassed holds escalate to CDR D8 before release.",
       "purpose": "Track whether quality holds are dispositioned within governed SLA so blocked jobs are escalated without converting the metric into an executive scorecard item.",
       "thresholds": {
         "direction": "higher_is_better",
@@ -6820,6 +6826,17 @@
       "evaluation_use": "role_performance_review",
       "reward_mode": "not_rewardable",
       "lifecycle_status": "pilot",
+      "role_assignments": [
+        {
+          "role": "WKM",
+          "assignment_type": "role_measure_candidate",
+          "weight_pct": 100,
+          "active_or_candidate": "candidate",
+          "controllability_scope": "WKM controls shop-floor discipline for timely labor entry, while FIN remains data steward for labor-cost accuracy; uncontrollable ERP outages are excluded before role review."
+        }
+      ],
+      "controllability_scope": "WKM controls shop-floor discipline for timely labor entry, while FIN remains data steward for labor-cost accuracy; uncontrollable ERP outages are excluded before role review.",
+      "action_when_red": "Open supervisor correction review, lock backdated entry without approval, retrain the responsible cell, and escalate repeated data-integrity failures to WKM/FIN governance.",
       "purpose": "Track whether labor time is recorded on the correct job, operation, employee, and period so cost/capacity data stays trustworthy.",
       "thresholds": {
         "direction": "higher_is_better",

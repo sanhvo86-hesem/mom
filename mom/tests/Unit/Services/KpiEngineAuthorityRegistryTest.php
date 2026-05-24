@@ -117,6 +117,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
             $this->assertArrayHasKey('rating_criteria', $metric, (string) ($metric['canonical_code'] ?? 'unknown'));
             $this->assertArrayHasKey('reward_rule', $metric, (string) ($metric['canonical_code'] ?? 'unknown'));
             $this->assertArrayHasKey('blocking_conditions', $metric, (string) ($metric['canonical_code'] ?? 'unknown'));
+            $this->assertIsArray($metric['metric_control'] ?? null, (string) ($metric['canonical_code'] ?? 'unknown'));
             $metricsByCode[$metric['canonical_code']] = $metric;
         }
 
@@ -155,6 +156,11 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertContains('gate_control_metrics', $metricsByCode['FPY']['sources'] ?? []);
         $this->assertContains('BSC-CORE-03', $metricsByCode['FPY']['local_ids'] ?? []);
         $this->assertContains('KPI-ALL-02', $metricsByCode['FPY']['local_ids'] ?? []);
+        $lamGateControl = $metricsByCode['CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED']['metric_control'] ?? [];
+        $this->assertSame('gate_control_metric', $lamGateControl['type']['metric_subtype'] ?? null);
+        $this->assertSame('blocker_only', $lamGateControl['reward']['reward_mode'] ?? null);
+        $this->assertTrue($lamGateControl['staged_value_suppression']['suppressed'] ?? false);
+        $this->assertSame('present', $lamGateControl['counter_metric_status']['status'] ?? null);
     }
 
     public function testExecutiveScorecardWeightsAndQuantitativeRulesAreComplete(): void
