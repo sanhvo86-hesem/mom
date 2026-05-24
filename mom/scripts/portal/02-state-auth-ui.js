@@ -9433,10 +9433,13 @@ function renderAdminVCHeaderBar(){
     deployLabel = 'Deploy: ' + (gha.status === 'not_configured' ? (lang==='en'?'GHA not configured':'GHA chưa cấu hình') : gha.status);
     deployTone = 'info';
   } else {
+    // Live VPS bug fix: API returns head.hash / head.short_hash, not
+    // head_commit.sha. Earlier code based on a wrong-key assumption made
+    // the Deploy pill always say "Deploy: --" even when git_status loaded.
     const gits = gitRepoStatusState && gitRepoStatusState.data;
-    if(gits && gits.head_commit){
-      const sha = (gits.head_commit.sha || '').slice(0, 8);
-      const ts = gits.head_commit.committed_at || gits.head_commit.authored_at;
+    if(gits && gits.head){
+      const sha = String(gits.head.short_hash || gits.head.hash || '').slice(0, 8);
+      const ts = gits.head.committed_at || gits.head.authored_at;
       deployLabel = (lang==='en' ? 'Deploy: ' : 'Deploy: ') + sha + (ts ? ' · '+vcFmtTime(ts) : '');
       const behind = Number(gits.behind_count || 0);
       const dirty = Number(gits.meaningful_dirty_count || 0);
@@ -9615,7 +9618,10 @@ function renderAdminVCOverview_DEPRECATED_PHA2(){
       '<td>'+vcStatusPill((r.from_status||'?')+' → '+(r.to_status||'?'), tone)+'</td>'+
       '<td><code>'+escapeHtml(r.actor_party_id||'--')+'</code></td>'+
       '<td>'+escapeHtml(vcFmtTime(r.recorded_at))+'</td>'+
-      '<td><button class="admin-sync-mini" onclick="setVersionControlSubTab(\'doc_history\');loadVersionControlDocDetail(\''+escapeHtml(r.doc_code||'')+'\')">'+
+      // Live-VPS fix: doc_history subtab removed in Pha 3 (folded into
+      // timeline). Open Timeline pre-filtered by doc_revision + search on
+      // the doc code instead so the user sees the row immediately.
+      '<td><button class="admin-sync-mini" onclick="setVersionControlSubTab(\'timeline\');loadVersionControlTimeline({force:true,filterChange:true,filters:{types:\'doc_revision\',actor:\'\',search:\''+escapeHtml((r.doc_code||'').toUpperCase())+'\',since:\'\'}})">'+
         escapeHtml(lang==='en'?'Open':'Mở')+'</button></td>'+
     '</tr>';
   }).join('') : '<tr><td colspan="6" style="color:var(--text-3);padding:8px">'+
@@ -10208,8 +10214,10 @@ function renderAdminVCStatus(){
   const behindN = gitData ? Number(gitData.behind_count || 0) : 0;
   const aheadN = gitData ? Number(gitData.ahead_count || 0) : 0;
   const branch = String((gitData && gitData.branch) || 'main');
-  const headSha = (gitData && gitData.head_commit && gitData.head_commit.sha || '').slice(0, 12);
-  const remoteSha = (gitData && gitData.remote_head_commit && gitData.remote_head_commit.sha || '').slice(0, 12);
+  // Live VPS bug fix: API returns head.hash + head.short_hash, not
+  // head_commit.sha. Was rendering "--" even when data was loaded.
+  const headSha = String(gitData?.head?.short_hash || gitData?.head?.hash || '').slice(0, 12);
+  const remoteSha = String(gitData?.remote_head?.short_hash || gitData?.remote_head?.hash || '').slice(0, 12);
 
   let readinessTone = 'good';
   let readinessLabel = lang==='en' ? 'Ready to deploy' : 'Sẵn sàng deploy';
@@ -10305,9 +10313,26 @@ function renderAdminVCStatus(){
     : (lang==='en'? 'All '+Number(drift.total_files||0)+' runtime files match the mirror.'
                   : 'Tất cả '+Number(drift.total_files||0)+' file runtime khớp mirror.');
 
+  // Tile click handler — accepts either a plain subtab id (config_sync /
+  // local_sync) or a {subtab, filter} object. Object form pre-filters the
+  // timeline by type so clicking "Snapshot đang giữ" lands on a snapshot-
+  // only view instead of the mixed feed (live VPS bug: tiles were dumping
+  // user into unfiltered timeline with 100 mixed rows; user had to manually
+  // toggle the chip).
   const tile = (titleVi, titleEn, value, sub, tone, jump) => {
     const cls = (tone==='warn'?'is-warn':tone==='error'?'is-error':tone==='good'?'is-good':'is-info');
-    const jumpAttr = jump ? ' style="cursor:pointer" onclick="setVersionControlSubTab(\''+jump+'\')" title="'+escapeHtml(lang==='en'?'Open '+jump:'Mở '+jump)+'"' : '';
+    let jumpAttr = '';
+    if(jump){
+      if(typeof jump === 'string'){
+        jumpAttr = ' style="cursor:pointer" onclick="setVersionControlSubTab(\''+jump+'\')" title="'+escapeHtml(lang==='en'?'Open '+jump:'Mở '+jump)+'"';
+      } else if(jump && jump.subtab){
+        const filterArg = jump.filter ? JSON.stringify(jump.filter).replace(/"/g, '&quot;') : '';
+        const inner = filterArg
+          ? "setVersionControlSubTab('"+jump.subtab+"');loadVersionControlTimeline({force:true,filterChange:true,filters:"+filterArg+"})"
+          : "setVersionControlSubTab('"+jump.subtab+"')";
+        jumpAttr = ' style="cursor:pointer" onclick="'+inner+'" title="'+escapeHtml(lang==='en'?'Open '+jump.subtab:'Mở '+jump.subtab)+'"';
+      }
+    }
     return '<article class="admin-sync-cpanel-card"'+jumpAttr+'>'+
       '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?titleEn:titleVi)+'</div>'+
       '<div style="font-size:28px;font-weight:700;line-height:1.1;margin-top:6px">'+escapeHtml(String(value))+'</div>'+
@@ -10318,11 +10343,14 @@ function renderAdminVCStatus(){
   const tilesHtml = '<div class="admin-sync-cpanel-grid" style="margin-top:12px">'+
     tile('Lệch cấu hình runtime','Runtime config drift', Number(drift.drift_count||0), driftMsg, driftTone, 'config_sync')+
     tile('Snapshot đang giữ','Snapshots kept', Number(snap.total||0),
-      (lang==='en'?'Latest: ':'Mới nhất: ')+(snap.latest_at?vcFmtTime(snap.latest_at):'--'), 'info', 'snapshots')+
+      (lang==='en'?'Latest: ':'Mới nhất: ')+(snap.latest_at?vcFmtTime(snap.latest_at):'--'), 'info',
+      {subtab:'timeline', filter:{types:'snapshot', actor:'', search:'', since:''}})+
     tile('Tài liệu có lịch sử','Docs with history', Number(act.distinct_docs||0),
-      (lang==='en'?'Total revisions: ':'Tổng số phiên bản: ')+Number(act.total_revisions||0), 'info', 'doc_history')+
+      (lang==='en'?'Total revisions: ':'Tổng số phiên bản: ')+Number(act.total_revisions||0), 'info',
+      {subtab:'timeline', filter:{types:'doc_revision', actor:'', search:'', since:''}})+
     tile('Thay đổi 7 ngày','Changes (7d)', Number(act.last_7d||0),
-      (lang==='en'?'Last 30d: ':'30 ngày qua: ')+Number(act.last_30d||0), 'info', 'audit')+
+      (lang==='en'?'Last 30d: ':'30 ngày qua: ')+Number(act.last_30d||0), 'info',
+      {subtab:'timeline', filter:{types:'audit', actor:'', search:'', since:''}})+
     '</div>';
 
   // ── C. Recent revisions table (was: Overview lower row) ─────────────────
@@ -10337,7 +10365,10 @@ function renderAdminVCStatus(){
       '<td>'+vcStatusPill((r.from_status||'?')+' → '+(r.to_status||'?'), tone)+'</td>'+
       '<td><code>'+escapeHtml(r.actor_party_id||'--')+'</code></td>'+
       '<td>'+escapeHtml(vcFmtTime(r.recorded_at))+'</td>'+
-      '<td><button class="admin-sync-mini" onclick="setVersionControlSubTab(\'doc_history\');loadVersionControlDocDetail(\''+escapeHtml(r.doc_code||'')+'\')">'+
+      // Live-VPS fix: doc_history subtab removed in Pha 3 (folded into
+      // timeline). Open Timeline pre-filtered by doc_revision + search on
+      // the doc code instead so the user sees the row immediately.
+      '<td><button class="admin-sync-mini" onclick="setVersionControlSubTab(\'timeline\');loadVersionControlTimeline({force:true,filterChange:true,filters:{types:\'doc_revision\',actor:\'\',search:\''+escapeHtml((r.doc_code||'').toUpperCase())+'\',since:\'\'}})">'+
         escapeHtml(lang==='en'?'Open':'Mở')+'</button></td>'+
     '</tr>';
   }).join('') : '<tr><td colspan="6" style="color:var(--text-3);padding:8px">'+
@@ -10377,11 +10408,17 @@ function renderAdminVCStatus(){
       '<button class="admin-sync-mini" onclick="setVersionControlSubTab(\'local_sync\')">'+
         escapeHtml(lang==='en'?'Open Local Sync':'Mở Đồng bộ Local')+
       '</button>'+
-      '<button class="admin-sync-mini" onclick="setVersionControlSubTab(\'snapshots\')">'+
+      // Live-VPS fix: deprecated subtab ids redirected to plain timeline.
+      // Pre-filter timeline by type instead so the user lands on the right
+      // slice (snapshots-only, audit-only, doc-only).
+      '<button class="admin-sync-mini" onclick="setVersionControlSubTab(\'timeline\');loadVersionControlTimeline({force:true,filterChange:true,filters:{types:\'snapshot\',actor:\'\',search:\'\',since:\'\'}})">'+
         escapeHtml(lang==='en'?'Open Snapshots':'Mở Snapshot')+
       '</button>'+
-      '<button class="admin-sync-mini" onclick="setVersionControlSubTab(\'audit\')">'+
+      '<button class="admin-sync-mini" onclick="setVersionControlSubTab(\'timeline\');loadVersionControlTimeline({force:true,filterChange:true,filters:{types:\'audit\',actor:\'\',search:\'\',since:\'\'}})">'+
         escapeHtml(lang==='en'?'Open Audit log':'Mở Audit log')+
+      '</button>'+
+      '<button class="admin-sync-mini" onclick="setVersionControlSubTab(\'timeline\');loadVersionControlTimeline({force:true,filterChange:true,filters:{types:\'doc_revision\',actor:\'\',search:\'\',since:\'\'}})">'+
+        escapeHtml(lang==='en'?'Open Doc history':'Mở Lịch sử tài liệu')+
       '</button>'+
     '</div>'+
   '</article>';
