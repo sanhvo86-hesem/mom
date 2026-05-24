@@ -65,6 +65,32 @@ function writePortalViewState(state){
   }catch(e){}
 }
 
+function portalRouteFromHash(){
+  try{
+    const raw = decodeURIComponent(String(window.location.hash || '').replace(/^#\/?/, '')).trim();
+    if(!raw) return null;
+    const parts = raw.split('/').map(p => String(p || '').trim()).filter(Boolean);
+    if(parts[0] !== 'admin') return null;
+    const tabSlug = String(parts[1] || '').replace(/-/g, '_');
+    const tabAliases = {
+      kpi:'kpi_registry',
+      kpi_registry:'kpi_registry',
+      kpi_console:'kpi_registry',
+      raci:'raci_matrix',
+      raci_matrix:'raci_matrix',
+      schema:'metadata_studio',
+      data_schema:'metadata_studio',
+      metadata_studio:'metadata_studio',
+      vps:'infrastructure',
+      infrastructure:'infrastructure',
+      version_control:'version_control'
+    };
+    return { page:'admin', adminTab: tabAliases[tabSlug] || tabSlug || 'users' };
+  }catch(e){
+    return null;
+  }
+}
+
 function persistPortalViewState(reason='update'){
   try{
     const viewer = document.getElementById('doc-viewer');
@@ -92,6 +118,15 @@ function persistPortalViewState(reason='update'){
 }
 
 async function restorePortalViewAfterBoot(){
+  const hashRoute = portalRouteFromHash();
+  if(hashRoute && hashRoute.page === 'admin'){
+    if(canUserAccessModule('admin')){
+      adminTab = canUserAccessAdminTab(hashRoute.adminTab) ? hashRoute.adminTab : firstAccessibleAdminTab();
+      navigateTo('admin', undefined, true);
+      return true;
+    }
+  }
+
   const state = readPortalViewState();
   if(!state){
     navigateTo('dashboard');

@@ -188,6 +188,7 @@ final class KpiEngine
      */
     public const CONSOLE_EDITABLE_FIELDS = [
         // Legacy editable fields (Pha 1 + Track 4):
+        'name', 'name_vi', 'tier', 'process', 'category', 'purpose',
         'thresholds', 'owner_role', 'data_stewardship_role', 'cadence',
         'decision_action', 'action_reference', 'counter_metric',
         'data_contract_gap', 'target_graduation_condition',
@@ -197,6 +198,10 @@ final class KpiEngine
         'scoring_model_detail', 'evaluation_use', 'reward_mode',
         'paired_metric', 'attribution_rule', 'lifecycle_status',
         'sample_policy', 'usage_contexts', 'role_assignments',
+        'gate', 'linked_cdr', 'gate_pass_condition', 'hold_release_rule',
+        'lam_profile_link', 'customer_profile_link', 'applicability_rule',
+        'controllability_scope', 'action_when_red', 'components',
+        'required_evidence',
     ];
 
     /** Metric codes for all supported KPIs. */
@@ -3424,6 +3429,16 @@ final class KpiEngine
             return; // stale overlay — seed advanced past it
         }
 
+        if (is_array($overlay['customer_requirement_profiles'] ?? null)) {
+            $registry['customer_requirement_profiles'] = $this->mergeCustomerRequirementProfiles(
+                is_array($registry['customer_requirement_profiles'] ?? null)
+                    ? $registry['customer_requirement_profiles'] : [],
+                $overlay['customer_requirement_profiles'],
+            );
+            $registry['runtime_overlay_applied'] = true;
+            $registry['runtime_overlay_updated_at'] = (string) ($overlay['updated_at'] ?? '');
+        }
+
         // Each registry section the Console can edit has its own override map
         // plus optional Console-added KPIs and a retired-code list.
         $sections = [
@@ -3494,6 +3509,35 @@ final class KpiEngine
             $registry['runtime_overlay_applied'] = true;
             $registry['runtime_overlay_updated_at'] = (string) ($overlay['updated_at'] ?? '');
         }
+    }
+
+    /**
+     * Customer requirement profiles are a governed registry object, but the
+     * Admin Console may append/maintain profile rows in the runtime overlay so
+     * new customers do not require a code deploy. Seed keys remain the base
+     * authority; overlay keys patch/append profile entries under the same
+     * schema-version gate as metric edits.
+     *
+     * @param array<string, mixed> $seedRoot
+     * @param array<string, mixed> $overlayRoot
+     * @return array<string, mixed>
+     */
+    private function mergeCustomerRequirementProfiles(array $seedRoot, array $overlayRoot): array
+    {
+        $merged = $seedRoot;
+        foreach (['schema_version', 'introduced_at', 'rule', 'default_profile_code'] as $field) {
+            if (array_key_exists($field, $overlayRoot)) {
+                $merged[$field] = $overlayRoot[$field];
+            }
+        }
+        $profiles = is_array($merged['profiles'] ?? null) ? $merged['profiles'] : [];
+        foreach (($overlayRoot['profiles'] ?? []) as $code => $profile) {
+            if (is_array($profile)) {
+                $profiles[(string) $code] = $profile;
+            }
+        }
+        $merged['profiles'] = $profiles;
+        return $merged;
     }
 
     /**

@@ -36,6 +36,9 @@ var _state = {
   retiredBaseline:{ governance:[], gate:[], proposed:[] },
   /* add-KPI form draft — null when the form is closed */
   addForm:null,
+  customerProfiles:null,
+  customerProfilesBaseline:'',
+  customerProfileForm:null,
   /* the one library card expanded into its inline editor: "group:CODE" */
   expandedCode:'',
   activeView:'overview',
@@ -81,6 +84,9 @@ function _seedAddRetireState(cfg){
   _state.retired         = _cloneGroups(cfg.overlay_retired);
   _state.retiredBaseline = _cloneGroups(cfg.overlay_retired);
   _state.addForm = null;
+  _state.customerProfiles = _cloneObj(cfg.customer_requirement_profiles || {});
+  _state.customerProfilesBaseline = _stableJson(_state.customerProfiles);
+  _state.customerProfileForm = null;
 }
 /* Merge persisted + draft added KPIs for the save payload. */
 function _addedPayload(){
@@ -125,6 +131,24 @@ function _esc(value){
   return String(value == null ? '' : value)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+function _cloneObj(value){
+  if(Array.isArray(value)) return value.map(_cloneObj);
+  if(value && typeof value === 'object'){
+    var out = {};
+    Object.keys(value).forEach(function(k){ out[k] = _cloneObj(value[k]); });
+    return out;
+  }
+  return value;
+}
+function _stableJson(value){
+  if(Array.isArray(value)) return '[' + value.map(_stableJson).join(',') + ']';
+  if(value && typeof value === 'object'){
+    return '{' + Object.keys(value).sort().map(function(k){
+      return String(k) + ':' + _stableJson(value[k]);
+    }).join(',') + '}';
+  }
+  return String(value == null ? '' : value);
 }
 
 /* ── Data load / save ─────────────────────────────────────────────── */
@@ -176,6 +200,7 @@ function _save(){
     proposed_overrides:   _state.overrides.proposed || {},
     added_kpis:           _addedPayload(),
     retired_codes:        _state.retired || {},
+    customer_requirement_profiles: _profilesChanged() ? (_state.customerProfiles || {}) : null,
     reason: _state.reason || ''
   }, 'POST', 90000)
     .then(function(data){
@@ -184,10 +209,11 @@ function _save(){
       _state.overrides = { governance:{}, gate:{}, proposed:{} };
       _seedAddRetireState(_state.config);
       _state.reason = '';
-      var nAdd = (data.added_count || 0), nRet = (data.retired_count || 0);
+      var nAdd = (data.added_count || 0), nRet = (data.retired_count || 0), nProf = (data.profile_count || 0);
       _state.message = _t('Đã lưu và đồng bộ ANNEX-122.', 'Saved and synced ANNEX-122.')
         + (nAdd ? ' +' + nAdd + ' ' + _t('KPI mới', 'new KPI') : '')
         + (nRet ? ' · ' + nRet + ' ' + _t('KPI ngừng dùng', 'retired') : '')
+        + (nProf ? ' · ' + nProf + ' ' + _t('hồ sơ khách', 'customer profiles') : '')
         + (data.annex122_updated ? '' : ' ' + _t('(ANNEX-122 không đổi)', '(ANNEX-122 unchanged)'));
     })
     .catch(function(err){
@@ -213,7 +239,10 @@ function _dirty(){
         + Object.keys(o.gate||{}).length
         + Object.keys(o.proposed||{}).length
         + (d.governance||[]).length + (d.gate||[]).length + (d.proposed||[]).length;
-  return n > 0 || _retiredChanged();
+  return n > 0 || _retiredChanged() || _profilesChanged();
+}
+function _profilesChanged(){
+  return _stableJson(_state.customerProfiles || {}) !== (_state.customerProfilesBaseline || '');
 }
 
 /* Effective value of an editable field: override wins over config. */
@@ -275,6 +304,49 @@ function _setCounter(section, code, key, value){
   var cur = existing || Object.assign({}, base);
   cur[key] = value;
   _setField(section, code, 'counter_metric', cur);
+}
+function _sampleVal(m, section, key){
+  var sample = _val(m, section, 'sample_policy') || m.sample_policy || {};
+  return sample && sample[key] != null ? sample[key] : '';
+}
+function _setSample(section, code, key, value){
+  var metric = null, list = _sectionMetrics(section);
+  for(var i=0;i<list.length;i++){ if(list[i].canonical_code===code){ metric=list[i]; break; } }
+  if(!metric) return;
+  var sec = _state.overrides[section] || {};
+  var cur = (sec[code] && sec[code].sample_policy && typeof sec[code].sample_policy === 'object')
+    ? sec[code].sample_policy : Object.assign({}, metric.sample_policy || {});
+  if(key === 'stability_required' || key === 'gage_validity_required'){
+    cur[key] = !!value;
+  } else {
+    var n = parseInt(value, 10);
+    cur[key] = isNaN(n) ? value : n;
+  }
+  _setField(section, code, 'sample_policy', cur);
+}
+function _listText(value){
+  if(Array.isArray(value)) return value.join('\n');
+  return value == null ? '' : String(value);
+}
+function _componentsText(value){
+  if(Array.isArray(value)){
+    return value.map(function(row){
+      if(!row || typeof row !== 'object') return '';
+      return [row.code || '', row.weight_pct == null ? '' : row.weight_pct, row.name || row.intent || ''].join('|');
+    }).filter(Boolean).join('\n');
+  }
+  return value == null ? '' : String(value);
+}
+function _profileCodes(){
+  var root = _state.customerProfiles || ((_state.config || {}).customer_requirement_profiles || {});
+  return Object.keys((root && root.profiles) || {}).sort();
+}
+function _profileOptions(selected){
+  var opts = ['<option value=""' + (!selected ? ' selected' : '') + '>—</option>'];
+  _profileCodes().forEach(function(code){
+    opts.push('<option value="' + _esc(code) + '"' + (code === selected ? ' selected' : '') + '>' + _esc(code) + '</option>');
+  });
+  return opts.join('');
 }
 
 /* Derive (green,yellow,red) display bands from numeric thresholds — mirrors
@@ -452,6 +524,9 @@ function _reset(){
   _state.addedDraft = { governance:[], gate:[], proposed:[] };
   _state.retired = _cloneGroups(_state.retiredBaseline);
   _state.addForm = null;
+  _state.customerProfiles = _cloneObj((_state.config || {}).customer_requirement_profiles || {});
+  _state.customerProfilesBaseline = _stableJson(_state.customerProfiles);
+  _state.customerProfileForm = null;
   _state.reason = '';
   _state.error = ''; _state.message = _t('Đã hoàn tác các thay đổi chưa lưu.', 'Reverted unsaved changes.');
   _render();
@@ -571,12 +646,9 @@ function _renderActiveView(){
    evidence_pack_required checklist, and unresolved-metric validation findings. */
 function _renderCustomerProfiles(){
   var cfg = _state.config || {};
-  var profilesRoot = cfg.customer_requirement_profiles || {};
+  var profilesRoot = _state.customerProfiles || cfg.customer_requirement_profiles || {};
   var profiles = profilesRoot.profiles || {};
   var keys = Object.keys(profiles);
-  if(!keys.length){
-    return '<div class="hm-empty">' + _t('Chưa có hồ sơ khách hàng nào được khai báo.', 'No customer requirement profiles declared.') + '</div>';
-  }
   // Build a code lookup for linked-metric validity badges.
   var libCodes = {};
   ((_state.config || {}).library || []).forEach(function(r){
@@ -584,8 +656,16 @@ function _renderCustomerProfiles(){
   });
 
   var head = '<div class="kc-eyebrow">' + _t('Hồ sơ yêu cầu khách hàng', 'Customer Requirement Profiles') + '</div>' +
-    '<h3>' + _t('Hồ sơ Khách hàng (Customer Profiles)', 'Customer Profiles') + '</h3>' +
-    '<p class="kc-mini">' + _esc(profilesRoot.rule || '') + '</p>';
+    '<div class="kc-nav"><span class="kc-nav-title">' +
+      _t('Hồ sơ Khách hàng (Customer Profiles)', 'Customer Profiles') + '</span>' +
+      '<span class="kc-nav-spacer"></span><button class="kc-btn primary" type="button" onclick="_kpiCustomerProfileOpen()">+ ' +
+      _t('Thêm hồ sơ khách hàng', 'Add customer profile') + '</button></div>' +
+    '<p class="kc-mini">' + _esc(profilesRoot.rule || '') + '</p>' +
+    (_state.customerProfileForm ? _renderCustomerProfileForm() : '');
+
+  if(!keys.length){
+    return head + '<div class="hm-empty">' + _t('Chưa có hồ sơ khách hàng nào được khai báo.', 'No customer requirement profiles declared.') + '</div>';
+  }
 
   var cards = keys.map(function(code){
     var p = profiles[code] || {};
@@ -663,6 +743,145 @@ function _renderCustomerProfiles(){
 
   return head + '<div class="kc-prof-grid">' + cards + '</div>' +
     _renderRegistryContracts();
+}
+
+function _newCustomerProfileForm(){
+  return {
+    profile_code:'',
+    profile_name:'',
+    profile_name_vi:'',
+    status:'active',
+    customer_codes:'',
+    default_for_unassigned:false,
+    silent_default_forbidden:false,
+    assignment_event_required:false,
+    quality_requirements:'iso9001_qms_required=true\ninspection_plan_required=true\nmeasuring_equipment_calibration_required=true',
+    linked_metrics:'',
+    gate_coverage:'',
+    evidence_pack_required:''
+  };
+}
+function _knownMetricCodes(){
+  var out = {};
+  ((_state.config || {}).all_metric_codes || []).forEach(function(c){ out[String(c).toUpperCase()] = true; });
+  _libRows().forEach(function(r){ if(r.canonical_code) out[String(r.canonical_code).toUpperCase()] = true; });
+  return out;
+}
+function _parseValueToken(value){
+  var v = String(value == null ? '' : value).trim();
+  if(v === 'true') return true;
+  if(v === 'false') return false;
+  if(v !== '' && !isNaN(parseFloat(v)) && String(parseFloat(v)) === v) return parseFloat(v);
+  if(v.indexOf(',') >= 0) return _splitList(v);
+  return v;
+}
+function _parseKeyValues(text){
+  var out = {};
+  String(text || '').split(/\n+/).forEach(function(line){
+    line = line.trim();
+    if(!line) return;
+    var idx = line.indexOf('=');
+    var key = (idx >= 0 ? line.slice(0, idx) : line).trim().replace(/[^A-Za-z0-9_]/g, '');
+    if(!key) return;
+    out[key] = _parseValueToken(idx >= 0 ? line.slice(idx + 1) : 'true');
+  });
+  return out;
+}
+function _parseGateCoverage(text){
+  var out = {};
+  String(text || '').split(/\n+/).forEach(function(line){
+    line = line.trim();
+    if(!line) return;
+    var idx = line.indexOf(':');
+    var gate = (idx >= 0 ? line.slice(0, idx) : '').trim().toUpperCase();
+    if(!/^G[0-7]$/.test(gate)) return;
+    out[gate] = _splitList(line.slice(idx + 1));
+  });
+  return out;
+}
+function _customerProfileErrors(f){
+  var errors = [];
+  var code = String((f || {}).profile_code || '').trim().toUpperCase().replace(/[^A-Z0-9_]/g, '');
+  var root = _state.customerProfiles || {};
+  var profiles = root.profiles || {};
+  if(!code) errors.push(_t('Thiếu mã hồ sơ khách hàng.', 'Missing customer profile code.'));
+  if(code && profiles[code]) errors.push(_t('Mã hồ sơ đã tồn tại.', 'Profile code already exists.'));
+  if(!String(f.profile_name || f.profile_name_vi || '').trim()) errors.push(_t('Thiếu tên hồ sơ.', 'Missing profile name.'));
+  if(!_splitList(f.linked_metrics).length) errors.push(_t('Cần ít nhất một KPI linked_metrics.', 'At least one linked metric is required.'));
+  var known = _knownMetricCodes();
+  _splitList(f.linked_metrics).forEach(function(c){
+    if(!known[String(c).toUpperCase()]) errors.push(_t('linked_metric chưa tồn tại: ', 'Unknown linked_metric: ') + c);
+  });
+  return _uniqueMessages(errors);
+}
+function _renderCustomerProfileForm(){
+  var f = _state.customerProfileForm || _newCustomerProfileForm();
+  var errors = _customerProfileErrors(f);
+  return '<section class="kc-addform kc-profile-form"><h3>+ ' +
+    _t('Thêm hồ sơ khách hàng', 'Add customer profile') + '</h3>' +
+    '<div class="kc-alert error" ' + (errors.length ? '' : 'hidden') + '>' +
+      errors.map(_esc).join('<br>') + '</div>' +
+    '<div class="kc-warn">' +
+      _t('Hồ sơ khách hàng được lưu vào runtime overlay của KPI registry; metric liên kết phải resolve về canonical_code, không nhập JSON thô.',
+        'Customer profiles are saved to the KPI registry runtime overlay; linked metrics must resolve to canonical_code, no raw JSON editing.') +
+    '</div>' +
+    '<section class="kc-mco-section"><div class="kc-mco-title"><b>1</b><span>' +
+      _t('Định danh khách hàng', 'Customer identity') + '</span></div><div class="kc-grid">' +
+      _field('profile_code', '<input class="kc-input" type="text" value="' + _esc(f.profile_code) + '" placeholder="ACME_AEROSPACE" oninput="_kpiCustomerProfileField(\'profile_code\',this.value)">') +
+      _field(_t('Tên VI', 'Name VI'), '<input class="kc-input" type="text" value="' + _esc(f.profile_name_vi) + '" oninput="_kpiCustomerProfileField(\'profile_name_vi\',this.value)">') +
+      _field(_t('Tên EN', 'Name EN'), '<input class="kc-input" type="text" value="' + _esc(f.profile_name) + '" oninput="_kpiCustomerProfileField(\'profile_name\',this.value)">') +
+      _field('status', '<select class="kc-input" onchange="_kpiCustomerProfileField(\'status\',this.value)">' +
+        _selOptions([['active','active'],['pilot','pilot'],['draft','draft'],['retired','retired']], f.status) + '</select>') +
+      '</div></section>' +
+    '<section class="kc-mco-section"><div class="kc-mco-title"><b>2</b><span>' +
+      _t('Áp dụng & chống default ngầm', 'Applicability and defaulting') + '</span></div><div class="kc-grid">' +
+      _field('customer_codes', '<input class="kc-input" type="text" value="' + _esc(f.customer_codes) + '" placeholder="ACME, ACME-SG" oninput="_kpiCustomerProfileField(\'customer_codes\',this.value)">') +
+      _field('default_for_unassigned', '<label class="kc-check"><input type="checkbox" ' + (f.default_for_unassigned ? 'checked' : '') + ' onchange="_kpiCustomerProfileField(\'default_for_unassigned\',this.checked)"> default</label>') +
+      _field('silent_default_forbidden', '<label class="kc-check"><input type="checkbox" ' + (f.silent_default_forbidden ? 'checked' : '') + ' onchange="_kpiCustomerProfileField(\'silent_default_forbidden\',this.checked)"> no silent default</label>') +
+      _field('assignment_event_required', '<label class="kc-check"><input type="checkbox" ' + (f.assignment_event_required ? 'checked' : '') + ' onchange="_kpiCustomerProfileField(\'assignment_event_required\',this.checked)"> assignment event</label>') +
+      '</div></section>' +
+    '<section class="kc-mco-section"><div class="kc-mco-title"><b>3</b><span>' +
+      _t('Yêu cầu chất lượng & KPI liên kết', 'Quality requirements and linked KPIs') + '</span></div>' +
+      _field('quality_requirements (key=value)', '<textarea class="kc-input kc-ta" rows="5" oninput="_kpiCustomerProfileField(\'quality_requirements\',this.value)">' + _esc(f.quality_requirements) + '</textarea>') +
+      _field('linked_metrics', '<textarea class="kc-input kc-ta" rows="4" placeholder="OTD, COMPLAINT_RATE" oninput="_kpiCustomerProfileField(\'linked_metrics\',this.value)">' + _esc(f.linked_metrics) + '</textarea>') +
+      _field('gate_coverage (G1: CODE, CODE)', '<textarea class="kc-input kc-ta" rows="4" oninput="_kpiCustomerProfileField(\'gate_coverage\',this.value)">' + _esc(f.gate_coverage) + '</textarea>') +
+      _field('evidence_pack_required', '<textarea class="kc-input kc-ta" rows="3" oninput="_kpiCustomerProfileField(\'evidence_pack_required\',this.value)">' + _esc(f.evidence_pack_required) + '</textarea>') +
+    '</section>' +
+    '<div class="kc-addform-actions"><button class="kc-btn" type="button" onclick="_kpiCustomerProfileClose()">' +
+      _t('Hủy', 'Cancel') + '</button><button class="kc-btn primary" type="button" ' + (errors.length ? 'disabled' : '') +
+      ' onclick="_kpiCustomerProfileSubmit()">' + _t('Thêm vào danh sách lưu', 'Add to save list') + '</button></div></section>';
+}
+function _customerProfileSubmit(){
+  var f = _state.customerProfileForm || {};
+  var errors = _customerProfileErrors(f);
+  if(errors.length){ _state.error = errors.join(' | '); _syncStatus(); return; }
+  var code = String(f.profile_code || '').trim().toUpperCase().replace(/[^A-Z0-9_]/g, '');
+  var root = _state.customerProfiles || {};
+  if(!root.profiles) root.profiles = {};
+  root.profiles[code] = {
+    profile_name:f.profile_name || f.profile_name_vi || code,
+    profile_name_vi:f.profile_name_vi || f.profile_name || code,
+    status:f.status || 'active',
+    applies_when:{
+      customer_codes:_splitList(f.customer_codes),
+      manual_profile_assignment_allowed:true,
+      order_or_po_override_allowed:true,
+      default_for_unassigned:!!f.default_for_unassigned,
+      silent_default_forbidden:!!f.silent_default_forbidden,
+      assignment_event_required:!!f.assignment_event_required
+    },
+    quality_requirements:_parseKeyValues(f.quality_requirements),
+    linked_metrics:_splitList(f.linked_metrics)
+  };
+  var gateCov = _parseGateCoverage(f.gate_coverage);
+  if(Object.keys(gateCov).length) root.profiles[code].gate_coverage = gateCov;
+  var ev = _splitList(f.evidence_pack_required);
+  if(ev.length) root.profiles[code].evidence_pack_required = ev;
+  _state.customerProfiles = root;
+  _state.customerProfileForm = null;
+  _state.message = _t('Đã thêm hồ sơ khách hàng: ', 'Customer profile staged: ') + code;
+  _state.error = '';
+  _render();
 }
 
 /* P10 — Render dashboard_render_contract + manual_input_contract as
@@ -1622,6 +1841,7 @@ function _calcBadge(status){
    data steward, cadence, decision and action; gate metrics expose owner
    and cadence. Structural fields (formula, gate, linked_cdr) are read-only. */
 function _renderEditCard(m, section, inline){
+  return _renderUnifiedMcoEditCard(m, section, inline);
   var code = m.canonical_code;
   var c = function(s){ return _esc(s == null ? '' : s); };
   var sec = _state.overrides[section] || {};
@@ -1757,6 +1977,128 @@ function _renderEditCard(m, section, inline){
   // Collapsed by default — admin opens it explicitly to enrich a metric.
   html += _renderMcsExtBlock(m, section, code);
 
+  return html + '</article>';
+}
+
+function _renderUnifiedMcoEditCard(m, section, inline){
+  var code = String(m.canonical_code || '');
+  var c = function(s){ return _esc(s == null ? '' : s); };
+  var sec = _state.overrides[section] || {};
+  var dirty = !!sec[code];
+  var ext = (_state.config || {}).metric_control_schema_extension || {};
+  var status = m.calculation_status || (m.status === 'retained_from_annex122' ? 'staged_data_contract' : m.status);
+  var subtype = _val(m, section, 'metric_subtype') || m.metric_subtype || '';
+  var scoring = _val(m, section, 'scoring_model_detail') || m.scoring_model_detail || '';
+  var scoringOpts = ext.scoring_model || [];
+  if(subtype && ext.scoring_model_by_metric_subtype && ext.scoring_model_by_metric_subtype[subtype]){
+    scoringOpts = ext.scoring_model_by_metric_subtype[subtype];
+  }
+  var enumSel = function(field, current, options){
+    var opts = ['<option value="">— ' + _t('chọn', 'select') + ' —</option>'];
+    (options || []).forEach(function(opt){
+      opts.push('<option value="' + _esc(opt) + '"' + (opt === current ? ' selected' : '') + '>' + _esc(opt) + '</option>');
+    });
+    return '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'' + field + '\',this.value)">' + opts.join('') + '</select>';
+  };
+  var sectionHtml = function(no, title, body, help){
+    return '<section class="kc-mco-section"><div class="kc-mco-title"><b>' + no + '</b><span>' +
+      _esc(title) + '</span></div>' + (help ? '<p class="kc-mco-help">' + _esc(help) + '</p>' : '') + body + '</section>';
+  };
+  var grpOpts = [['governance', _t('Governance', 'Governance')], ['gate', 'Gate'], ['proposed', _t('Đề xuất', 'Proposed')]];
+  var tierOpts = [['company', _t('Cấp công ty', 'Company')], ['value_stream', 'Value-stream'], ['department', _t('Phòng ban', 'Department')], ['', '—']];
+  var dirOpts = [['higher_is_better', _t('Cao hơn là tốt', 'Higher is better')], ['lower_is_better', _t('Thấp hơn là tốt', 'Lower is better')]];
+  var unitOpts = [['percent','%'],['ppm','ppm'],['day',_t('ngày','day')],['rate','rate'],['ratio','ratio'],['count',_t('đếm','count')],['vnd','VND ₫']];
+  var catOpts = Object.keys(CATEGORY_VI).map(function(k){ return [k, CATEGORY_VI[k]]; });
+  var procOpts = [['unclassified', _t('— Chưa phân loại —', '— Unclassified —')]];
+  ((_state.config || {}).facets && (_state.config || {}).facets.process || []).forEach(function(p){ procOpts.push([p.key, p.label]); });
+  var pcat = (_state.config || {}).process_catalog || {};
+  Object.keys(pcat).forEach(function(k){ if(!procOpts.some(function(o){ return o[0] === k; })) procOpts.push([k, (pcat[k] && pcat[k].vi) || k]); });
+  var b = _ragBands(_val(m, section, 'thresholds') || m.thresholds || {});
+  var sampleGrid = '<div class="kc-grid">' +
+    _field('min_n_score', '<input class="kc-input" type="number" min="0" value="' + c(_sampleVal(m,section,'min_n_score')) + '" oninput="_kpiSetSample(\'' + section + '\',\'' + c(code) + '\',\'min_n_score\',this.value)">') +
+    _field('provisional_n', '<input class="kc-input" type="number" min="0" value="' + c(_sampleVal(m,section,'provisional_n')) + '" oninput="_kpiSetSample(\'' + section + '\',\'' + c(code) + '\',\'provisional_n\',this.value)">') +
+    _field('internal_n', '<input class="kc-input" type="number" min="0" value="' + c(_sampleVal(m,section,'internal_n')) + '" oninput="_kpiSetSample(\'' + section + '\',\'' + c(code) + '\',\'internal_n\',this.value)">') +
+    _field('customer_grade_n', '<input class="kc-input" type="number" min="0" value="' + c(_sampleVal(m,section,'customer_grade_n')) + '" oninput="_kpiSetSample(\'' + section + '\',\'' + c(code) + '\',\'customer_grade_n\',this.value)">') +
+    _field('stability_required', '<label class="kc-check"><input type="checkbox" ' + (_sampleVal(m,section,'stability_required') ? 'checked' : '') + ' onchange="_kpiSetSample(\'' + section + '\',\'' + c(code) + '\',\'stability_required\',this.checked)"> stable</label>') +
+    _field('gage_validity_required', '<label class="kc-check"><input type="checkbox" ' + (_sampleVal(m,section,'gage_validity_required') ? 'checked' : '') + ' onchange="_kpiSetSample(\'' + section + '\',\'' + c(code) + '\',\'gage_validity_required\',this.checked)"> gage valid</label>') +
+    '</div>';
+
+  var html = '<article class="kc-card kc-card--mco' + (dirty ? ' kc-card--dirty' : '') +
+    (inline ? ' kc-card--inline' : '') + '" data-kpi-code="' + c(code) + '">';
+  html += '<div class="kc-card-head"><div><span class="kc-code">' + c(code) + '</span> ' +
+    '<span class="kc-card-name">' + c(_val(m,section,'name_vi') || _val(m,section,'name') || code) + '</span></div>' +
+    _calcBadge(status) + '</div>';
+  html += '<div class="kc-warn kc-card-note">' +
+    _t('Editor này dùng cùng 8 section với luồng tạo KPI mới; mọi field lưu qua runtime overlay và backend allowlist, không hardcode trong JS.',
+      'This editor uses the same 8 sections as new KPI creation; fields save through the runtime overlay and backend allowlist, not JS hardcode.') +
+    '</div>';
+  html += sectionHtml('1', _t('Intent', 'Intent'),
+    '<div class="kc-grid">' +
+    _field(_t('Nhóm', 'Group'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'group\',this.value)" disabled>' + _selOptions(grpOpts, section) + '</select>') +
+    _field(_t('Cấp', 'Tier'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'tier\',this.value)">' + _selOptions(tierOpts, _val(m,section,'tier') || '') + '</select>') +
+    _field(_t('Mã KPI', 'KPI code'), '<input class="kc-input" type="text" disabled value="' + c(code) + '">') +
+    _field(_t('Tên VI', 'Name VI'), '<input class="kc-input" type="text" value="' + c(_val(m,section,'name_vi')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'name_vi\',this.value)">') +
+    _field(_t('Tên EN', 'Name EN'), '<input class="kc-input" type="text" value="' + c(_val(m,section,'name')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'name\',this.value)">') +
+    _field(_t('Quá trình', 'Process'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'process\',this.value)">' + _selOptions(procOpts, _val(m,section,'process') || 'unclassified') + '</select>') +
+    _field(_t('Phân loại', 'Category'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'category\',this.value)">' + _selOptions(catOpts, _val(m,section,'category') || 'internal') + '</select>') +
+    _field('control_intent', enumSel('control_intent', _val(m,section,'control_intent') || '', ext.control_intent)) +
+    '</div>');
+  html += sectionHtml('2', _t('Subtype', 'Subtype'),
+    '<div class="kc-grid">' +
+    _field('metric_subtype', enumSel('metric_subtype', subtype, ext.metric_subtypes)) +
+    _field(_t('Owner', 'Owner'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'owner_role\',this.value)">' + _roleOptions(_val(m,section,'owner_role')) + '</select>') +
+    _field(_t('Nhịp', 'Cadence'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'cadence\',this.value)">' + _cadenceOptions(_val(m,section,'cadence')) + '</select>') +
+    '</div>');
+  html += sectionHtml('3', _t('Measurement', 'Measurement'),
+    '<div class="kc-grid">' +
+    _field('measurement_data_type', enumSel('measurement_data_type', _val(m,section,'measurement_data_type') || '', ext.measurement_data_type)) +
+    _field(_t('Chiều', 'Direction'), '<select class="kc-input" onchange="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'direction\',this.value)">' + _selOptions(dirOpts, _threshold(m,section,'direction') || 'higher_is_better') + '</select>') +
+    _field(_t('Đơn vị', 'Unit'), '<select class="kc-input" onchange="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'unit\',this.value)">' + _selOptions(unitOpts, _threshold(m,section,'unit') || 'percent') + '</select>') +
+    _field('green_point', '<input class="kc-input" type="number" step="any" value="' + c(_threshold(m,section,'green_point')) + '" oninput="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'green_point\',this.value)">') +
+    _field('yellow_point', '<input class="kc-input" type="number" step="any" value="' + c(_threshold(m,section,'yellow_point')) + '" oninput="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'yellow_point\',this.value)">') +
+    _field('target', '<input class="kc-input" type="number" step="any" value="' + c(_threshold(m,section,'target')) + '" oninput="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'target\',this.value)">') +
+    '</div>' + (b ? '<div class="kc-rag"><span class="kc-badge kc-badge-ok">' + _esc(b.green) + '</span><span class="kc-badge kc-badge-staged">' + _esc(b.yellow) + '</span><span class="kc-badge kc-badge-bad">' + _esc(b.red) + '</span></div>' : ''));
+  html += sectionHtml('4', _t('Scoring', 'Scoring'),
+    '<div class="kc-grid">' +
+    _field('scoring_model_detail', enumSel('scoring_model_detail', scoring, scoringOpts)) +
+    _field('gate_pass_condition', '<input class="kc-input" type="text" value="' + c(_val(m,section,'gate_pass_condition')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'gate_pass_condition\',this.value)">') +
+    '</div>' + sampleGrid +
+    _field(_t('Composite components (CODE|weight|name)', 'Composite components (CODE|weight|name)'),
+      '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'components\',this.value)">' + c(_componentsText(_val(m,section,'components') || m.components || [])) + '</textarea>'));
+  html += sectionHtml('5', _t('Data / Evidence', 'Data / Evidence'),
+    _field('data_contract_gap', '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'data_contract_gap\',this.value)">' + c(_val(m,section,'data_contract_gap')) + '</textarea>') +
+    _field('target_graduation_condition', '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'target_graduation_condition\',this.value)">' + c(_val(m,section,'target_graduation_condition')) + '</textarea>') +
+    _field('evidence_source', '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'evidence_source\',this.value)">' + c(_val(m,section,'evidence_source')) + '</textarea>') +
+    _field('required_evidence', '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'required_evidence\',this.value)">' + c(_listText(_val(m,section,'required_evidence') || m.required_evidence || [])) + '</textarea>') +
+    '<div class="kc-grid">' +
+    _field('lam_profile_link', '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'lam_profile_link\',this.value)">' + _profileOptions(_val(m,section,'lam_profile_link') || '') + '</select>') +
+    _field('customer_profile_link', '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'customer_profile_link\',this.value)">' + _profileOptions(_val(m,section,'customer_profile_link') || '') + '</select>') +
+    _field('applicability_rule', '<input class="kc-input" type="text" value="' + c(_val(m,section,'applicability_rule')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'applicability_rule\',this.value)">') +
+    '</div>');
+  html += sectionHtml('6', _t('Evaluation / Reward', 'Evaluation / Reward'),
+    '<div class="kc-grid">' +
+    _field('evaluation_use', enumSel('evaluation_use', _val(m,section,'evaluation_use') || '', ext.evaluation_use)) +
+    _field('reward_mode', enumSel('reward_mode', _val(m,section,'reward_mode') || '', ext.reward_mode)) +
+    _field('lifecycle_status', enumSel('lifecycle_status', _val(m,section,'lifecycle_status') || '', ext.lifecycle_status)) +
+    _field('usage_contexts', '<input class="kc-input" type="text" value="' + c(_listText(_val(m,section,'usage_contexts') || m.usage_contexts || [])) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'usage_contexts\',this.value)">') +
+    '</div>');
+  html += sectionHtml('7', _t('Role Assignments', 'Role Assignments'),
+    '<div class="kc-grid">' +
+    _field('data_stewardship_role', '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'data_stewardship_role\',this.value)">' + _roleOptions(_val(m,section,'data_stewardship_role')) + '</select>') +
+    _field('controllability_scope', '<input class="kc-input" type="text" value="' + c(_val(m,section,'controllability_scope')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'controllability_scope\',this.value)">') +
+    _field('action_when_red', '<input class="kc-input" type="text" value="' + c(_val(m,section,'action_when_red')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'action_when_red\',this.value)">') +
+    '</div>');
+  html += sectionHtml('8', _t('Counter / Blocker / Lifecycle', 'Counter / Blocker / Lifecycle'),
+    '<div class="kc-grid">' +
+    _field(_t('Counter name VI', 'Counter name VI'), '<input class="kc-input" type="text" value="' + c(_counterVal(m,section,'name_vi')) + '" oninput="_kpiSetCounter(\'' + section + '\',\'' + c(code) + '\',\'name_vi\',this.value)">') +
+    _field('paired_metric', '<input class="kc-input" type="text" value="' + c(_val(m,section,'paired_metric')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'paired_metric\',this.value)">') +
+    _field('gate', '<input class="kc-input" type="text" value="' + c(_val(m,section,'gate')) + '" placeholder="G1" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'gate\',this.value)">') +
+    _field('linked_cdr', '<input class="kc-input" type="text" value="' + c(_listText(_val(m,section,'linked_cdr') || m.linked_cdr || [])) + '" placeholder="A2, D8" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'linked_cdr\',this.value)">') +
+    '</div>' +
+    _field(_t('Counter anti-gaming intent', 'Counter anti-gaming intent'), '<textarea class="kc-input kc-ta" oninput="_kpiSetCounter(\'' + section + '\',\'' + c(code) + '\',\'intent\',this.value)">' + c(_counterVal(m,section,'intent')) + '</textarea>') +
+    _field('blocking_conditions', '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'blocking_conditions\',this.value)">' + c(_listText(_val(m,section,'blocking_conditions') || m.blocking_conditions || [])) + '</textarea>') +
+    _field('hold_release_rule', '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'hold_release_rule\',this.value)">' + c(_val(m,section,'hold_release_rule')) + '</textarea>') +
+    _field('attribution_rule', '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'attribution_rule\',this.value)">' + c(_val(m,section,'attribution_rule')) + '</textarea>'));
   return html + '</article>';
 }
 
@@ -2254,10 +2596,12 @@ window._kpiSetReason = function(v){ _setReason(v); };
 window._kpiSetField  = function(section, code, field, value){ _setField(section, code, field, value); };
 window._kpiSetThreshold = function(section, code, key, value){ _setThreshold(section, code, key, value); };
 window._kpiSetCounter = function(section, code, key, value){ _setCounter(section, code, key, value); };
+window._kpiSetSample = function(section, code, key, value){ _setSample(section, code, key, value); };
 window._kpiSetFilter = function(key, value){ _setFilter(key, value); };
 window._kpiSetView = function(view){
   _state.activeView = view || 'overview';
   _state.addForm = null;
+  _state.customerProfileForm = null;
   _state.expandedCode = '';
   _render();
 };
@@ -2282,6 +2626,14 @@ window._kpiAddField  = function(key, value){ _afSet(key, value); };
 	  _syncAddStatus();
 	};
 window._kpiAddSubmit = function(){ _addSubmit(); };
+window._kpiCustomerProfileOpen = function(){ _state.customerProfileForm = _newCustomerProfileForm(); _state.error = ''; _state.message = ''; _render(); };
+window._kpiCustomerProfileClose = function(){ _state.customerProfileForm = null; _render(); };
+window._kpiCustomerProfileField = function(key, value){
+  if(!_state.customerProfileForm) return;
+  _state.customerProfileForm[key] = value;
+  _syncStatus();
+};
+window._kpiCustomerProfileSubmit = function(){ _customerProfileSubmit(); };
 window._kpiRetire    = function(group, code){
   code = String(code).toUpperCase();
   if(!_state.retired[group]) _state.retired[group] = [];

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MOM\Tests\Unit\Services;
 
 use MOM\Api\Services\KpiRegistryAdminService;
+use MOM\Services\KpiEngine;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -102,13 +103,117 @@ final class KpiRegistryAdminServiceMetricControlTest extends TestCase
         self::assertArrayHasKey('annex128_matrix', $config['admin_views']['integrity_panels'] ?? []);
     }
 
+    public function testConsoleEditableFieldsCoverUnifiedMetricControlEditor(): void
+    {
+        foreach ([
+            'name_vi',
+            'gate_pass_condition',
+            'linked_cdr',
+            'lam_profile_link',
+            'customer_profile_link',
+            'controllability_scope',
+            'components',
+            'required_evidence',
+        ] as $field) {
+            self::assertContains($field, KpiEngine::CONSOLE_EDITABLE_FIELDS);
+        }
+        foreach (['canonical_code', 'formula', 'data_source', 'calculation_status', 'metric_type'] as $field) {
+            self::assertNotContains($field, KpiEngine::CONSOLE_EDITABLE_FIELDS);
+        }
+    }
+
+    public function testCustomerRequirementProfileOverlaySanitizesAndValidates(): void
+    {
+        $service = $this->service();
+        $sanitize = \Closure::bind(
+            function (array $root): array {
+                return $this->sanitizeCustomerRequirementProfiles($root);
+            },
+            $service,
+            KpiRegistryAdminService::class,
+        );
+        $validate = \Closure::bind(
+            function (array $root, array $governance, array $gate, array $seed): void {
+                $this->validateCustomerRequirementProfiles($root, $governance, $gate, $seed);
+            },
+            $service,
+            KpiRegistryAdminService::class,
+        );
+
+        $clean = $sanitize([
+            'schema_version' => 1,
+            'rule' => 'service test profile rule',
+            'profiles' => [
+                'acme_semiconductor' => [
+                    'profile_name' => 'ACME Semiconductor',
+                    'profile_name_vi' => 'Khách ACME bán dẫn',
+                    'status' => 'active',
+                    'applies_when' => [
+                        'customer_codes' => 'ACME, ACME-SG',
+                        'silent_default_forbidden' => true,
+                    ],
+                    'quality_requirements' => [
+                        'ctq_master_required' => true,
+                        'record_retention_years' => 10,
+                    ],
+                    'linked_metrics' => ['OTD'],
+                ],
+            ],
+        ]);
+
+        self::assertArrayHasKey('ACME_SEMICONDUCTOR', $clean['profiles']);
+        self::assertSame(['ACME', 'ACME-SG'], $clean['profiles']['ACME_SEMICONDUCTOR']['applies_when']['customer_codes']);
+
+        $validate(
+            $clean,
+            [['canonical_code' => 'OTD']],
+            [],
+            ['proposed_operating_metrics' => [], 'runtime_calculated_metrics' => []],
+        );
+        $this->addToAssertionCount(1);
+    }
+
+    public function testCustomerRequirementProfileRejectsUnknownLinkedMetric(): void
+    {
+        $service = $this->service();
+        $sanitize = \Closure::bind(
+            function (array $root): array {
+                return $this->sanitizeCustomerRequirementProfiles($root);
+            },
+            $service,
+            KpiRegistryAdminService::class,
+        );
+        $validate = \Closure::bind(
+            function (array $root, array $governance, array $gate, array $seed): void {
+                $this->validateCustomerRequirementProfiles($root, $governance, $gate, $seed);
+            },
+            $service,
+            KpiRegistryAdminService::class,
+        );
+
+        $clean = $sanitize([
+            'profiles' => [
+                'ACME' => [
+                    'profile_name' => 'ACME',
+                    'applies_when' => ['customer_codes' => ['ACME']],
+                    'quality_requirements' => ['iso9001_qms_required' => true],
+                    'linked_metrics' => ['DOES_NOT_EXIST'],
+                ],
+            ],
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('kpi_registry_customer_profile_unknown_metric:ACME:DOES_NOT_EXIST');
+
+        $validate($clean, [], [], ['proposed_operating_metrics' => [], 'runtime_calculated_metrics' => []]);
+    }
+
     /**
      * @return callable(array<string, mixed>, bool): void
      */
     private function validator(): callable
     {
-        $repoRoot = dirname(__DIR__, 4);
-        $service = new KpiRegistryAdminService($repoRoot, $repoRoot . '/mom/data');
+        $service = $this->service();
 
         $validator = \Closure::bind(
             function (array $row, bool $requireComplete): void {
@@ -120,6 +225,12 @@ final class KpiRegistryAdminServiceMetricControlTest extends TestCase
         self::assertInstanceOf(\Closure::class, $validator);
 
         return $validator;
+    }
+
+    private function service(): KpiRegistryAdminService
+    {
+        $repoRoot = dirname(__DIR__, 4);
+        return new KpiRegistryAdminService($repoRoot, $repoRoot . '/mom/data');
     }
 
     /**

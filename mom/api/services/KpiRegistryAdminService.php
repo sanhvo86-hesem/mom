@@ -168,6 +168,9 @@ final class KpiRegistryAdminService
         $governance = $this->mergedGovernanceKpis($seed, $overlay);
         $gate       = $this->mergedSection($seed, $overlay, 'gate_control_metrics', 'gate_overrides');
         $proposed   = $this->mergedSection($seed, $overlay, 'proposed_operating_metrics', 'proposed_overrides');
+        $customerProfiles = $this->mergedCustomerRequirementProfiles($seed, $overlay);
+        $effectiveSeed = $seed;
+        $effectiveSeed['customer_requirement_profiles'] = $customerProfiles;
 
         // All metric codes — the Console counter-metric dropdown spans every
         // governed KPI so a counter can be picked across groups.
@@ -184,7 +187,7 @@ final class KpiRegistryAdminService
         // KPI Library — every metric flattened with its classification so the
         // Console can browse and filter across all groups.
         $library = $this->buildLibrary($governance, $gate, $proposed);
-        $views = $this->buildConsoleViews($library, $seed);
+        $views = $this->buildConsoleViews($library, $effectiveSeed);
 
         // Console-added KPIs + retired codes already in the overlay. The
         // Console must re-send these on every save (the overlay's add/retire
@@ -223,8 +226,8 @@ final class KpiRegistryAdminService
                 ? $seed['metric_governance_schema'] : new \stdClass(),
             'metric_control_schema_extension' => is_array($seed['metric_control_schema_extension'] ?? null)
                 ? $seed['metric_control_schema_extension'] : new \stdClass(),
-            'customer_requirement_profiles' => is_array($seed['customer_requirement_profiles'] ?? null)
-                ? $seed['customer_requirement_profiles'] : new \stdClass(),
+            'customer_requirement_profiles' => $customerProfiles !== []
+                ? $customerProfiles : new \stdClass(),
             'customer_ncr_severity_matrix' => is_array($seed['customer_ncr_severity_matrix'] ?? null)
                 ? $seed['customer_ncr_severity_matrix'] : new \stdClass(),
             'customer_ncr_data_contract' => is_array($seed['customer_ncr_data_contract'] ?? null)
@@ -317,6 +320,8 @@ final class KpiRegistryAdminService
 
         $rawAdded   = is_array($incoming['added_kpis'] ?? null) ? $incoming['added_kpis'] : [];
         $rawRetired = is_array($incoming['retired_codes'] ?? null) ? $incoming['retired_codes'] : [];
+        $rawProfiles = is_array($incoming['customer_requirement_profiles'] ?? null)
+            ? $incoming['customer_requirement_profiles'] : null;
 
         foreach (self::OVERRIDE_SECTIONS as $section => $key) {
             $group    = self::SECTION_GROUP[$section];
@@ -421,6 +426,13 @@ final class KpiRegistryAdminService
 
         $overlay['added_kpis']   = $addedAll;
         $overlay['retired_codes']= $retiredAll;
+        $profileCount = 0;
+        if ($rawProfiles !== null) {
+            $profiles = $this->sanitizeCustomerRequirementProfiles($rawProfiles);
+            $this->validateCustomerRequirementProfiles($profiles, $effectiveGovernance, $effectiveGate, $seed);
+            $overlay['customer_requirement_profiles'] = $profiles;
+            $profileCount = count((array) ($profiles['profiles'] ?? []));
+        }
 
         FileHelper::writeJson($this->overlayPath(), $overlay);
         $regenerated = $this->regenerateAnnex122($effectiveGovernance, $effectiveGate);
@@ -434,9 +446,43 @@ final class KpiRegistryAdminService
             'override_count'   => $totalOverrides,
             'added_count'      => $addedCount,
             'retired_count'    => $retiredCount,
+            'profile_count'    => $profileCount,
             'annex122_updated' => $regenerated,
             'config'           => $this->load(),
         ];
+    }
+
+    /**
+     * @param array<string, mixed>      $seed
+     * @param array<string, mixed>|null $overlay
+     * @return array<string, mixed>
+     */
+    private function mergedCustomerRequirementProfiles(array $seed, ?array $overlay): array
+    {
+        $root = is_array($seed['customer_requirement_profiles'] ?? null)
+            ? $seed['customer_requirement_profiles'] : [];
+        $seedSchema    = (int) ($seed['schema_version'] ?? 0);
+        $overlaySchema = is_array($overlay) ? (int) ($overlay['schema_version'] ?? 0) : 0;
+        if (!is_array($overlay) || ($seedSchema > 0 && $overlaySchema < $seedSchema)
+            || !is_array($overlay['customer_requirement_profiles'] ?? null)) {
+            return $root;
+        }
+        $patch = $overlay['customer_requirement_profiles'];
+        foreach (['schema_version', 'introduced_at', 'rule', 'default_profile_code'] as $field) {
+            if (array_key_exists($field, $patch)) {
+                $root[$field] = $field === 'schema_version'
+                    ? (int) $patch[$field]
+                    : (is_scalar($patch[$field]) ? (string) $patch[$field] : $patch[$field]);
+            }
+        }
+        $profiles = is_array($root['profiles'] ?? null) ? $root['profiles'] : [];
+        foreach (($patch['profiles'] ?? []) as $code => $profile) {
+            if (is_array($profile)) {
+                $profiles[(string) $code] = $profile;
+            }
+        }
+        $root['profiles'] = $profiles;
+        return $root;
     }
 
     /**
@@ -1056,6 +1102,13 @@ final class KpiRegistryAdminService
                 'role_assignments'      => is_array($row['role_assignments'] ?? null) ? $row['role_assignments'] : [],
                 // P03 — link a metric to a customer requirement profile (e.g. LAM_SEMSYSCO).
                 'lam_profile_link'      => (string) ($row['lam_profile_link'] ?? ''),
+                'customer_profile_link' => (string) ($row['customer_profile_link'] ?? ''),
+                'applicability_rule'    => (string) ($row['applicability_rule'] ?? ''),
+                'hold_release_rule'     => (string) ($row['hold_release_rule'] ?? ''),
+                'controllability_scope' => (string) ($row['controllability_scope'] ?? ''),
+                'action_when_red'       => (string) ($row['action_when_red'] ?? ''),
+                'components'            => is_array($row['components'] ?? null) ? $row['components'] : [],
+                'required_evidence'     => is_array($row['required_evidence'] ?? null) ? $row['required_evidence'] : [],
             ];
         };
         foreach ($governance as $r) {
@@ -1961,6 +2014,151 @@ final class KpiRegistryAdminService
     }
 
     /**
+     * @param array<string, mixed> $root
+     * @return array<string, mixed>
+     */
+    private function sanitizeCustomerRequirementProfiles(array $root): array
+    {
+        $out = [];
+        foreach (['schema_version', 'introduced_at', 'rule', 'default_profile_code'] as $field) {
+            if (array_key_exists($field, $root)) {
+                $out[$field] = $field === 'schema_version'
+                    ? (int) $root[$field]
+                    : $this->plainText((string) $root[$field]);
+            }
+        }
+        $profiles = [];
+        foreach (($root['profiles'] ?? []) as $code => $profile) {
+            if (!is_array($profile)) {
+                continue;
+            }
+            $profileCode = preg_replace('/[^A-Z0-9_]/', '', strtoupper((string) $code)) ?? '';
+            if ($profileCode === '') {
+                continue;
+            }
+            $applies = is_array($profile['applies_when'] ?? null) ? $profile['applies_when'] : [];
+            $cleanApplies = [
+                'customer_codes' => $this->sanitizeStringList($applies['customer_codes'] ?? []),
+                'manual_profile_assignment_allowed' => (bool) ($applies['manual_profile_assignment_allowed'] ?? true),
+                'order_or_po_override_allowed' => (bool) ($applies['order_or_po_override_allowed'] ?? true),
+                'default_for_unassigned' => (bool) ($applies['default_for_unassigned'] ?? false),
+            ];
+            foreach (['silent_default_forbidden', 'assignment_event_required'] as $flag) {
+                if (array_key_exists($flag, $applies)) {
+                    $cleanApplies[$flag] = (bool) $applies[$flag];
+                }
+            }
+            if (is_array($applies['assignment_event_contract'] ?? null)) {
+                $contract = $applies['assignment_event_contract'];
+                $cleanApplies['assignment_event_contract'] = [
+                    'event_name' => $this->plainText((string) ($contract['event_name'] ?? '')),
+                    'required_fields' => $this->sanitizeStringList($contract['required_fields'] ?? []),
+                    'g1_block_rule' => $this->plainText((string) ($contract['g1_block_rule'] ?? '')),
+                ];
+            }
+
+            $qreq = [];
+            if (is_array($profile['quality_requirements'] ?? null)) {
+                foreach ($profile['quality_requirements'] as $k => $v) {
+                    $key = preg_replace('/[^a-zA-Z0-9_]/', '', (string) $k) ?? '';
+                    if ($key === '') {
+                        continue;
+                    }
+                    if (is_bool($v) || is_int($v) || is_float($v) || is_string($v)) {
+                        $qreq[$key] = is_string($v) ? $this->plainText($v) : $v;
+                    } elseif (is_array($v)) {
+                        $qreq[$key] = $this->sanitizeStringList($v);
+                    }
+                }
+            }
+
+            $gateCoverage = [];
+            if (is_array($profile['gate_coverage'] ?? null)) {
+                foreach ($profile['gate_coverage'] as $gate => $codes) {
+                    $g = strtoupper(preg_replace('/[^G0-9]/', '', (string) $gate) ?? '');
+                    if ($g !== '') {
+                        $gateCoverage[$g] = $this->sanitizeStringList($codes);
+                    }
+                }
+            }
+
+            $profiles[$profileCode] = [
+                'profile_name' => $this->plainText((string) ($profile['profile_name'] ?? '')),
+                'profile_name_vi' => $this->plainText((string) ($profile['profile_name_vi'] ?? '')),
+                'status' => $this->plainText((string) ($profile['status'] ?? 'active')),
+                'applies_when' => $cleanApplies,
+                'quality_requirements' => $qreq,
+                'linked_metrics' => $this->sanitizeStringList($profile['linked_metrics'] ?? []),
+            ];
+            if ($gateCoverage !== []) {
+                $profiles[$profileCode]['gate_coverage'] = $gateCoverage;
+            }
+            $evidence = $this->sanitizeStringList($profile['evidence_pack_required'] ?? []);
+            if ($evidence !== []) {
+                $profiles[$profileCode]['evidence_pack_required'] = $evidence;
+            }
+            if (is_array($profile['activation_flow'] ?? null)) {
+                $profiles[$profileCode]['activation_flow'] = $this->sanitizeStringList($profile['activation_flow']);
+            }
+        }
+        $out['profiles'] = $profiles;
+        return $out;
+    }
+
+    /**
+     * @param array<string, mixed>          $root
+     * @param array<int, array<string,mixed>> $governance
+     * @param array<int, array<string,mixed>> $gate
+     * @param array<string, mixed>          $seed
+     */
+    private function validateCustomerRequirementProfiles(array $root, array $governance, array $gate, array $seed): void
+    {
+        $profiles = is_array($root['profiles'] ?? null) ? $root['profiles'] : [];
+        if ($profiles === []) {
+            throw new RuntimeException('kpi_registry_customer_profiles_empty');
+        }
+        $codes = [];
+        $collect = static function (array $rows) use (&$codes): void {
+            foreach ($rows as $row) {
+                if (is_array($row)) {
+                    $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+                    if ($code !== '') {
+                        $codes[$code] = true;
+                    }
+                }
+            }
+        };
+        $collect($governance);
+        $collect($gate);
+        $collect(is_array($seed['proposed_operating_metrics'] ?? null) ? $seed['proposed_operating_metrics'] : []);
+        foreach ((array) ($seed['runtime_calculated_metrics'] ?? []) as $code) {
+            $codes[strtoupper((string) $code)] = true;
+        }
+
+        foreach ($profiles as $code => $profile) {
+            if (!is_array($profile)) {
+                throw new RuntimeException('kpi_registry_customer_profile_not_object:' . $code);
+            }
+            if (trim((string) ($profile['profile_name'] ?? '')) === ''
+                && trim((string) ($profile['profile_name_vi'] ?? '')) === '') {
+                throw new RuntimeException('kpi_registry_customer_profile_missing_name:' . $code);
+            }
+            if (!is_array($profile['applies_when'] ?? null)) {
+                throw new RuntimeException('kpi_registry_customer_profile_missing_applies_when:' . $code);
+            }
+            if (!is_array($profile['quality_requirements'] ?? null)) {
+                throw new RuntimeException('kpi_registry_customer_profile_missing_quality_requirements:' . $code);
+            }
+            foreach ((array) ($profile['linked_metrics'] ?? []) as $linked) {
+                $linkedCode = strtoupper(trim((string) $linked));
+                if ($linkedCode !== '' && !isset($codes[$linkedCode])) {
+                    throw new RuntimeException('kpi_registry_customer_profile_unknown_metric:' . $code . ':' . $linkedCode);
+                }
+            }
+        }
+    }
+
+    /**
      * Accept either [{code/name, weight_pct}] or newline "CODE|weight" rows.
      *
      * @return list<array<string, mixed>>
@@ -2049,6 +2247,12 @@ final class KpiRegistryAdminService
         if ($field === 'role_assignments') {
             return $this->sanitizeRoleAssignments($value);
         }
+        if (in_array($field, ['linked_cdr', 'required_evidence'], true)) {
+            return $this->sanitizeStringList($value);
+        }
+        if ($field === 'components') {
+            return $this->sanitizeComponents($value);
+        }
         // Legacy fields.
         if ($field === 'thresholds') {
             $out = [];
@@ -2087,7 +2291,7 @@ final class KpiRegistryAdminService
             return null;
         }
         $out = [];
-        foreach (['name_vi', 'name', 'intent'] as $k) {
+        foreach (['name_vi', 'name', 'intent', 'intent_vi'] as $k) {
             if (isset($value[$k])) {
                 $out[$k] = $this->plainText((string) $value[$k]);
             }
