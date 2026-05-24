@@ -7427,6 +7427,8 @@
       "decision_purpose": "Prove gate pass/fail, trigger hold/release, and open escalation before downstream work continues.",
       "evidence_source": "Customer complaint/escape log, notification timestamp, containment record, and customer communication evidence",
       "data_stewardship_role": "QA",
+      "cdr_accountable_role": "CS",
+      "owner_alignment_note": "RACI D11 A=CS owns customer-facing message; QA owns detection clock + gate evidence + SLA enforcement; CEO escalation per spec §8",
       "hold_release_rule": "Block reward and open containment when customer escape notification exceeds 24 hours; QA/CS must notify customer and record action.",
       "decision_action": "Notify customer immediately + open containment; QA escalates CEO if >24h or containment incomplete.",
       "start_clock_at": "detection_time",
@@ -8241,6 +8243,7 @@
       "data_stewardship_role": "QA",
       "hold_release_rule": "Open incident, notify within 24h, retain gage in protective state pending customer instruction; further use of suspect gage blocked.",
       "lam_profile_link": "LAM_SEMSYSCO",
+      "cdr_review_note": "Currently linked D11 (quality escape). Consider re-binding to E7 (customer property exception). Defer per P06.1.",
       "decision_action": "Notify customer immediately on gage damage; QA + CS escalate per D11."
     }
   ],

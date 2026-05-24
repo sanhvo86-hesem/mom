@@ -453,6 +453,26 @@ foreach ($gateMetrics as $g) {
     }
 }
 
+// ── P0.6.5 — gate_control must link at least one metric to CDR D11 ──────────
+// (P06 hardening) Spec §8 requires customer-escape notification governance.
+// If no gate_control_metric references D11, the registry has shape-valid
+// CUSTOMER_ESCAPE_NOTIFICATION_LT entries but lost the CDR binding — gate
+// integrity dies silently. Defence-in-depth check that the binding survives.
+$hasD11 = false;
+foreach ($gateMetrics as $g) {
+    if (!is_array($g)) {
+        continue;
+    }
+    $cdrs = array_map('strtoupper', array_map('strval', (array) ($g['linked_cdr'] ?? [])));
+    if (in_array('D11', $cdrs, true)) {
+        $hasD11 = true;
+        break;
+    }
+}
+if (!$hasD11) {
+    $p0[] = "P0.6.5: no gate_control_metric links to CDR D11 (customer escape notification) — spec §8 binding lost.";
+}
+
 // ── P1 — gate metric staged for a critical CDR without manual fallback ──────
 // (P06 hardening per spec §9) — critical CDRs need a manual evidence path so
 // a gate is never blocked waiting for the data contract to ship. Critical
@@ -484,14 +504,11 @@ foreach ($gateMetrics as $g) {
     }
 }
 
-// ── P1 — gate metric owner ≠ CDR-A owner without justification ──────────────
-// (P06 hardening per spec §5) — when the gate metric's owner_role disagrees
-// with the CDR's accountable role, the registry must surface a justification
-// (data_stewardship_role explanation or an owner_alignment_note). Without
-// either, governance is unclear at audit time. Heuristic: a known
-// owner_role vs CDR-A mismatch table; for now flag only when explicit
-// 'owner_alignment_note' is absent AND data_stewardship_role differs from
-// owner_role with no rationale.
+// ── P1 — owner_vs_steward_split_without_note ────────────────────────────────
+// (P06 hardening) When owner_role and data_stewardship_role differ without
+// an owner_alignment_note, the data-decision split is undocumented. This is
+// the *steward* split rule; the *CDR accountability* split rule below is the
+// real spec §9 / §5 intent (owner vs CDR-A from RACI master matrix).
 foreach ($gateMetrics as $g) {
     if (!is_array($g)) {
         continue;
@@ -503,7 +520,93 @@ foreach ($gateMetrics as $g) {
         continue;
     }
     if (trim((string) ($g['owner_alignment_note'] ?? '')) === '') {
-        $p1[] = "Gate metric $local: owner_role ($owner) ≠ data_stewardship_role ($steward) and no owner_alignment_note explains the split.";
+        $p1[] = "Gate metric $local: owner_vs_steward_split_without_note — owner_role ($owner) ≠ data_stewardship_role ($steward) with no owner_alignment_note.";
+    }
+}
+
+// ── Parse RACI master matrix → CDR → A-role mapping ─────────────────────────
+// (P06 hardening per spec §9 / §5) — extract structured mapping from the HTML
+// table: column headers (line near "Hoạt động") give role-code order; each
+// gate row links a CDR via authority-matrix.html#cdr-XX. The row's first cell
+// with class raci-A names the accountable role. Falls back to advisory warning
+// if parsing yields nothing — never silent pass.
+$cdrAccountableMap = [];           // ['D11' => 'CS', ...]
+$raciParseWarning = null;
+$raciHtml = $annex121;             // already loaded as $annex121
+if (preg_match('/<thead><tr>\s*<th><div class="gc-stack"><span>G<\/span><hr><span>CDR<\/span><\/div><\/th><th>Hoạt động<\/th>(.*?)<\/tr><\/thead>/s', $raciHtml, $headMatch)) {
+    // Extract role codes in column order from anchor text.
+    preg_match_all('/<th>\s*<a[^>]*>([A-Z]+)<\/a>\s*<\/th>/', $headMatch[1], $rh);
+    $roleColumns = $rh[1] ?? [];
+    // Drop trailing "FRM / SOP" column if it slipped in (it has no anchor so it won't).
+    if ($roleColumns === []) {
+        $raciParseWarning = 'RACI parse: header row matched but no role columns extracted.';
+    } else {
+        // Iterate matrix rows.
+        preg_match_all('/<tr>\s*<td><div class="gc-stack">.*?<a href="authority-matrix\.html#cdr-([A-F][0-9]{1,2})">[A-F][0-9]{1,2}<\/a><\/div><\/td>(.*?)<\/tr>/s', $raciHtml, $rowMatches, PREG_SET_ORDER);
+        if ($rowMatches === []) {
+            $raciParseWarning = 'RACI parse: no CDR rows matched in master matrix table.';
+        }
+        foreach ($rowMatches as $row) {
+            $cdr = $row[1];
+            // Skip activity description cell, then iterate role cells.
+            // Match each <td> in order; column index 0 = activity, columns 1..N = roles.
+            preg_match_all('/<td(?:\s+class="raci-cell\s+raci-([ARCI])")?[^>]*>.*?<\/td>/s', $row[2], $cellMatches);
+            $cellClasses = $cellMatches[1] ?? [];
+            // First cell is "Hoạt động" (activity description) — no class.
+            // Subsequent cells correspond to $roleColumns in order, with a trailing FRM/SOP cell.
+            // So role cells = cellClasses[1..count($roleColumns)].
+            for ($i = 0; $i < count($roleColumns); $i++) {
+                $cellIdx = $i + 1; // skip activity column
+                $cls = $cellClasses[$cellIdx] ?? '';
+                if ($cls === 'A') {
+                    // First A found wins (CDR has exactly one A by RACI convention).
+                    if (!isset($cdrAccountableMap[$cdr])) {
+                        $cdrAccountableMap[$cdr] = $roleColumns[$i];
+                    }
+                    break;
+                }
+            }
+        }
+        if ($cdrAccountableMap === []) {
+            $raciParseWarning = 'RACI parse: rows matched but no A-role extracted from any row.';
+        }
+    }
+} else {
+    $raciParseWarning = 'RACI parse: header row pattern did not match raci-master-matrix.html.';
+}
+if ($raciParseWarning !== null) {
+    $p1[] = "$raciParseWarning Owner-vs-CDR-A guard fell back to advisory mode.";
+}
+
+// ── P1 — gate metric owner_role ≠ CDR-A (real spec §9 intent) ───────────────
+// (P06 hardening) For each gate metric, foreach linked_cdr extract A-role from
+// the parsed RACI matrix. If owner_role differs from cdr_accountable_role AND
+// the registry row has no owner_alignment_note explaining the split, P1 warn.
+// Prefer explicit 'cdr_accountable_role' field on the row when present
+// (overrides parsed map — useful when the row documents a deliberate choice).
+if ($cdrAccountableMap !== []) {
+    foreach ($gateMetrics as $g) {
+        if (!is_array($g)) {
+            continue;
+        }
+        $local = (string) ($g['local_id'] ?? $g['canonical_code'] ?? '?');
+        $owner = strtoupper(trim((string) ($g['owner_role'] ?? '')));
+        if ($owner === '') {
+            continue;
+        }
+        $hasNote = trim((string) ($g['owner_alignment_note'] ?? '')) !== '';
+        $explicitA = strtoupper(trim((string) ($g['cdr_accountable_role'] ?? '')));
+        $cdrs = array_map('strtoupper', array_map('strval', (array) ($g['linked_cdr'] ?? [])));
+        foreach ($cdrs as $cdr) {
+            $aRole = $explicitA !== '' ? $explicitA : strtoupper((string) ($cdrAccountableMap[$cdr] ?? ''));
+            if ($aRole === '' || $aRole === $owner) {
+                continue;
+            }
+            if (!$hasNote) {
+                $p1[] = "Gate metric $local: owner_role ($owner) ≠ CDR-A ($aRole for $cdr per RACI master matrix) and no owner_alignment_note explains the split.";
+                break; // one warning per metric is enough
+            }
+        }
     }
 }
 
