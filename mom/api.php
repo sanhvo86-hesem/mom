@@ -2454,6 +2454,7 @@ function module_access_load_config(string $file): array {
     $config['admin_tabs'][$id] = module_access_normalize_policy((array)($raw['admin_tabs'][$id] ?? []), $meta);
   }
   $config['admin_vc_mode'] = admin_vc_mode_normalize((array)($raw['admin_vc_mode'] ?? []));
+  $config['deploy_freeze'] = deploy_freeze_normalize((array)($raw['deploy_freeze'] ?? []));
 
   return $config;
 }
@@ -2483,10 +2484,18 @@ function module_access_save_config(string $file, array $config): array {
     : (is_array($existingRaw['admin_vc_mode'] ?? null) ? $existingRaw['admin_vc_mode'] : []);
   $normalized['admin_vc_mode'] = admin_vc_mode_normalize($vcModeIn);
 
+  // Same merge-forward for deploy_freeze (Pha 5) — callers of the module
+  // access editor never send it, so we must carry the existing block.
+  $freezeIn = is_array($config['deploy_freeze'] ?? null)
+    ? $config['deploy_freeze']
+    : (is_array($existingRaw['deploy_freeze'] ?? null) ? $existingRaw['deploy_freeze'] : []);
+  $normalized['deploy_freeze'] = deploy_freeze_normalize($freezeIn);
+
   $payload = [
     'portal_modules' => $normalized['portal_modules'],
     'admin_tabs' => $normalized['admin_tabs'],
     'admin_vc_mode' => $normalized['admin_vc_mode'],
+    'deploy_freeze' => $normalized['deploy_freeze'],
     'updated_at' => now_iso(),
   ];
 
@@ -2608,6 +2617,102 @@ function admin_vc_mode_resolve_for_roles(array $config, array $roles): string {
   return $cfg['default'];
 }
 
+// ── Deploy Freeze (Pha 5) ────────────────────────────────────────────────────
+//
+// Emergency switch that blocks mutations on the deploy + sync surfaces while
+// turned on. Used during cycle counts, ISO audits, or incident response. The
+// FE renders a red banner across the VC panel when active and refuses to
+// surface the Push & Deploy / Resolve drift CTAs.
+//
+// Stored alongside admin_vc_mode in module_access_config.json (single SSOT
+// for portal access policy).
+//
+// Schema:
+//   { enabled, reason, ticket_id, set_by, set_at, expires_at?, updated_at }
+//
+// Lock semantics: when enabled, deploy_freeze_is_active() returns true and
+// the following endpoints refuse with 423 (Locked):
+//   - admin_deploy_trigger
+//   - admin_change_request_approve (the auto-deploy step)
+//   - admin_data_sync_batch_resolve
+//   - admin_data_sync_resolve_drift
+// All other reads + audit endpoints stay fully functional so the operator
+// can still observe state and resolve the underlying incident.
+
+function deploy_freeze_defaults(): array {
+  return [
+    'enabled' => false,
+    'reason' => '',
+    'ticket_id' => '',
+    'set_by' => '',
+    'set_at' => null,
+    'expires_at' => null,
+    'updated_at' => null,
+  ];
+}
+
+function deploy_freeze_normalize(array $raw): array {
+  $defaults = deploy_freeze_defaults();
+  $enabled = array_key_exists('enabled', $raw) ? (bool)$raw['enabled'] : $defaults['enabled'];
+  $reason = trim((string)($raw['reason'] ?? ''));
+  if (mb_strlen($reason) > 500) $reason = mb_substr($reason, 0, 500);
+  $ticket = trim((string)($raw['ticket_id'] ?? ''));
+  if (mb_strlen($ticket) > 80) $ticket = mb_substr($ticket, 0, 80);
+  $setBy = trim((string)($raw['set_by'] ?? ''));
+  if (mb_strlen($setBy) > 80) $setBy = mb_substr($setBy, 0, 80);
+  $setAt = isset($raw['set_at']) && is_string($raw['set_at']) && $raw['set_at'] !== '' ? $raw['set_at'] : null;
+  $exp = isset($raw['expires_at']) && is_string($raw['expires_at']) && $raw['expires_at'] !== '' ? $raw['expires_at'] : null;
+  $updatedAt = isset($raw['updated_at']) && is_string($raw['updated_at']) && $raw['updated_at'] !== '' ? $raw['updated_at'] : null;
+  return [
+    'enabled' => $enabled,
+    'reason' => $reason,
+    'ticket_id' => $ticket,
+    'set_by' => $setBy,
+    'set_at' => $setAt,
+    'expires_at' => $exp,
+    'updated_at' => $updatedAt,
+  ];
+}
+
+/**
+ * Returns true if a deploy freeze is currently active (enabled and not
+ * past expiry). Used as a gate by every mutation endpoint on the
+ * deploy/sync surface — see AdminController.php gate at the top of
+ * deployTrigger / changeRequestApprove / dataSyncBatchResolve / etc.
+ */
+function deploy_freeze_is_active(?array $config = null): bool {
+  if ($config === null) {
+    global $CONF_DIR;
+    $confDir = $CONF_DIR ?? (defined('CONF_DIR') ? CONF_DIR : (__DIR__ . '/data/config'));
+    $config = module_access_load_config($confDir . '/module_access_config.json');
+  }
+  $f = deploy_freeze_normalize((array)($config['deploy_freeze'] ?? []));
+  if (!$f['enabled']) return false;
+  if ($f['expires_at']) {
+    $exp = strtotime((string)$f['expires_at']);
+    if ($exp !== false && $exp < time()) {
+      // Lazy auto-expire on read — caller doesn't need to write back; next
+      // explicit set will overwrite the row. Safe to treat as inactive.
+      return false;
+    }
+  }
+  return true;
+}
+
+function deploy_freeze_public_payload(array $config): array {
+  $f = deploy_freeze_normalize((array)($config['deploy_freeze'] ?? []));
+  return [
+    'enabled' => $f['enabled'],
+    'reason' => $f['reason'],
+    'ticket_id' => $f['ticket_id'],
+    'set_by' => $f['set_by'],
+    'set_at' => $f['set_at'],
+    'expires_at' => $f['expires_at'],
+    'updated_at' => $f['updated_at'],
+    'is_active' => deploy_freeze_is_active($config),
+  ];
+}
+
 function admin_vc_mode_public_payload(array $config): array {
   $cfg = admin_vc_mode_normalize((array)($config['admin_vc_mode'] ?? []));
   return [
@@ -2694,6 +2799,7 @@ function module_access_public_payload(array $config): array {
     $normalized['admin_tabs'][$id] = module_access_normalize_policy((array)($config['admin_tabs'][$id] ?? []), $meta);
   }
   $normalized['admin_vc_mode'] = admin_vc_mode_normalize((array)($config['admin_vc_mode'] ?? []));
+  $normalized['deploy_freeze'] = deploy_freeze_normalize((array)($config['deploy_freeze'] ?? []));
   return $normalized;
 }
 

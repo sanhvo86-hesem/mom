@@ -255,6 +255,13 @@ class AdminController extends BaseController
         $this->requireCsrf();
         $this->requireAdmin($me);
 
+        // Pha 5 freeze gate.
+        $cfg = module_access_load_config($this->confDir . '/module_access_config.json');
+        if (deploy_freeze_is_active($cfg)) {
+            $f = deploy_freeze_normalize((array)($cfg['deploy_freeze'] ?? []));
+            $this->error('deploy_frozen', 423, 'Config drift resolution is frozen (ticket=' . ($f['ticket_id'] ?: 'unknown') . ').');
+        }
+
         $body = $this->jsonBody();
         $file = (string)($body['file'] ?? '');
         $direction = (string)($body['direction'] ?? '');
@@ -373,6 +380,14 @@ class AdminController extends BaseController
         $me = $this->requireAuth();
         $this->requireCsrf();
         $this->requireAdmin($me);
+
+        // Pha 5 freeze gate. Batch resolve is the highest-blast-radius
+        // mutation on the sync surface, so it must respect the freeze.
+        $cfg = module_access_load_config($this->confDir . '/module_access_config.json');
+        if (deploy_freeze_is_active($cfg)) {
+            $f = deploy_freeze_normalize((array)($cfg['deploy_freeze'] ?? []));
+            $this->error('deploy_frozen', 423, 'Batch config sync is frozen (ticket=' . ($f['ticket_id'] ?: 'unknown') . ').');
+        }
 
         $body      = $this->jsonBody();
         $direction = (string)($body['direction'] ?? '');
@@ -1169,6 +1184,13 @@ class AdminController extends BaseController
 
         $configFile = $this->confDir . '/module_access_config.json';
         $config = module_access_load_config($configFile);
+        // Pha 5 freeze gate. 423 Locked is the canonical HTTP status for
+        // "the resource is intentionally unavailable" — the FE pill maps it
+        // to the red banner without an extra round-trip.
+        if (deploy_freeze_is_active($config)) {
+            $f = deploy_freeze_normalize((array)($config['deploy_freeze'] ?? []));
+            $this->error('deploy_frozen', 423, 'Deploys are currently frozen by ' . ($f['set_by'] ?: 'admin') . ' (ticket=' . ($f['ticket_id'] ?: 'unknown') . '). Reason: ' . ($f['reason'] ?: 'unspecified'));
+        }
         $roles = $this->rolesForUser($me);
         $effectiveMode = admin_vc_mode_resolve_for_roles($config, $roles);
         if ($effectiveMode !== 'developer') {
@@ -1297,6 +1319,17 @@ class AdminController extends BaseController
         $me = $this->requireAuth();
         $this->requireCsrf();
         $this->requireAdmin($me);
+
+        // Pha 5 freeze gate. Note: rejection is fine even on 'reject'
+        // decisions during freeze — an explicit unfreeze is required first
+        // so the audit trail clearly separates the incident close from CR
+        // dispositions made afterwards.
+        $configFile = $this->confDir . '/module_access_config.json';
+        $config = module_access_load_config($configFile);
+        if (deploy_freeze_is_active($config)) {
+            $f = deploy_freeze_normalize((array)($config['deploy_freeze'] ?? []));
+            $this->error('deploy_frozen', 423, 'CR approvals are currently frozen (ticket=' . ($f['ticket_id'] ?: 'unknown') . '). Unfreeze first or wait for expiry.');
+        }
 
         $body = $this->jsonBody();
         $changeRef = trim((string)($body['change_ref'] ?? ''));
@@ -1464,6 +1497,221 @@ class AdminController extends BaseController
             'pending_count' => count(array_filter($crs, static fn($c) => $c['status'] === 'pending_approval')),
             'limit' => $limit,
         ]);
+    }
+
+    /**
+     * GET admin_deploy_freeze_get — Pha 5.
+     * Returns current deploy-freeze status. Any authenticated user may read
+     * (the header banner needs the value to render).
+     */
+    public function deployFreezeGet(): never
+    {
+        $this->requireAuth();
+        $configFile = $this->confDir . '/module_access_config.json';
+        $config = module_access_load_config($configFile);
+        $this->success(['freeze' => deploy_freeze_public_payload($config)]);
+    }
+
+    /**
+     * POST admin_deploy_freeze_set — Pha 5 emergency switch.
+     *
+     * Body:
+     *   { enabled: bool,
+     *     reason: string (required when enabling, ≥10 chars),
+     *     ticket_id: string (required when enabling, ≥4 chars; e.g. INC-2026-013),
+     *     expires_at?: ISO timestamp (optional auto-expire) }
+     *
+     * Enforcement:
+     *   - Admin role + CSRF
+     *   - Disable (enabled=false) only requires reason (any length ≥4) and
+     *     ticket_id (the INC ref that closed the freeze, can match the
+     *     enable ticket or a new "resolved" one).
+     */
+    public function deployFreezeSet(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body = $this->jsonBody();
+        $enabled = (bool)($body['enabled'] ?? false);
+        $reason = trim((string)($body['reason'] ?? ''));
+        $ticket = trim((string)($body['ticket_id'] ?? ''));
+        $expiresAt = trim((string)($body['expires_at'] ?? ''));
+
+        $minReason = $enabled ? 10 : 4;
+        if ($reason === '' || mb_strlen($reason) < $minReason) {
+            $this->error('reason_required', 400, 'Reason must be ≥' . $minReason . ' characters.');
+        }
+        if (mb_strlen($reason) > 500) $reason = mb_substr($reason, 0, 500);
+
+        if ($ticket === '' || !preg_match('/^[A-Za-z0-9._:-]{4,80}$/', $ticket)) {
+            $this->error('ticket_required', 400, 'ticket_id must match [A-Za-z0-9._:-]{4,80}.');
+        }
+
+        if ($expiresAt !== '') {
+            $ts = strtotime($expiresAt);
+            if ($ts === false) $this->error('invalid_expires_at', 400, 'expires_at must be a valid ISO timestamp.');
+            if ($ts < time()) $this->error('expires_at_past', 400, 'expires_at must be in the future.');
+            $expiresAt = gmdate('Y-m-d\TH:i:s\Z', $ts);
+        }
+
+        $configFile = $this->confDir . '/module_access_config.json';
+        $current = module_access_load_config($configFile);
+        $oldFreeze = deploy_freeze_normalize((array)($current['deploy_freeze'] ?? []));
+
+        $newFreeze = [
+            'enabled' => $enabled,
+            'reason' => $reason,
+            'ticket_id' => $ticket,
+            'set_by' => (string)($me['username'] ?? 'unknown'),
+            'set_at' => $enabled ? now_iso() : ($oldFreeze['set_at'] ?? null),
+            'expires_at' => $enabled ? ($expiresAt !== '' ? $expiresAt : null) : null,
+            'updated_at' => now_iso(),
+        ];
+
+        $toSave = [
+            'portal_modules' => $current['portal_modules'],
+            'admin_tabs' => $current['admin_tabs'],
+            'admin_vc_mode' => $current['admin_vc_mode'],
+            'deploy_freeze' => $newFreeze,
+        ];
+        $saved = module_access_save_config($configFile, $toSave);
+
+        $this->auditLog('admin_deploy_freeze_set', [
+            'enabled' => $enabled ? '1' : '0',
+            'reason' => $reason,
+            'ticket_id' => $ticket,
+            'expires_at' => $expiresAt,
+            'old_enabled' => $oldFreeze['enabled'] ? '1' : '0',
+            'old_ticket_id' => $oldFreeze['ticket_id'],
+        ]);
+
+        $this->success(['freeze' => deploy_freeze_public_payload($saved)]);
+    }
+
+    /**
+     * GET admin_gha_workflow_status — Pha 5.
+     *
+     * Polls GitHub for the last N runs of .github/workflows/deploy.yml so the
+     * admin header bar can show "Deploy: ✓ <sha> 2m ago" without the
+     * operator having to open GitHub.
+     *
+     * Requires GITHUB_PAT env var with `actions:read` scope on the repo.
+     * When unset, returns status=not_configured with instructions — never a
+     * hard 500 (the panel still works without it; just no GHA pill).
+     *
+     * Result is cached for 30 seconds in mom/data/cache/ to stay under
+     * GitHub's API rate limit when multiple admins poll concurrently.
+     */
+    public function ghaWorkflowStatus(): never
+    {
+        $this->requireAuth();
+
+        $repo = getenv('GITHUB_REPO') ?: 'sanhvo86-hesem/mom';
+        $workflow = getenv('GITHUB_WORKFLOW_FILE') ?: 'deploy.yml';
+        $pat = (string)(getenv('GITHUB_PAT') ?: '');
+
+        if ($pat === '') {
+            $this->success([
+                'status' => 'not_configured',
+                'repo' => $repo,
+                'workflow' => $workflow,
+                'runs' => [],
+                'message' => 'GITHUB_PAT env var not set. Add it to .env or the FPM pool config to enable GHA status polling.',
+            ]);
+        }
+
+        $cacheFile = $this->dataDir . '/cache/admin-gha-status.json';
+        if (is_file($cacheFile)) {
+            $age = time() - (int)filemtime($cacheFile);
+            if ($age < 30) {
+                $cached = @file_get_contents($cacheFile);
+                if (is_string($cached)) {
+                    $decoded = json_decode($cached, true);
+                    if (is_array($decoded)) {
+                        $decoded['cached_age_seconds'] = $age;
+                        $this->success($decoded);
+                    }
+                }
+            }
+        }
+
+        $url = 'https://api.github.com/repos/' . $repo . '/actions/workflows/' . $workflow . '/runs?per_page=5';
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 4,
+            CURLOPT_TIMEOUT => 8,
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/vnd.github+json',
+                'Authorization: Bearer ' . $pat,
+                'X-GitHub-Api-Version: 2022-11-28',
+                'User-Agent: HESEM-MOM-Admin/1.0',
+            ],
+        ]);
+        $body = curl_exec($ch);
+        $http = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err = curl_error($ch);
+        curl_close($ch);
+
+        if ($http < 200 || $http >= 300 || !is_string($body)) {
+            $this->success([
+                'status' => 'api_error',
+                'repo' => $repo,
+                'workflow' => $workflow,
+                'http_code' => $http,
+                'curl_error' => $err,
+                'runs' => [],
+                'message' => 'GitHub API returned HTTP ' . $http . ($err !== '' ? ' (' . $err . ')' : ''),
+            ]);
+        }
+        $decoded = json_decode($body, true);
+        $runsRaw = is_array($decoded['workflow_runs'] ?? null) ? $decoded['workflow_runs'] : [];
+
+        $runs = [];
+        foreach ($runsRaw as $r) {
+            if (!is_array($r)) continue;
+            $runs[] = [
+                'id' => (int)($r['id'] ?? 0),
+                'run_number' => (int)($r['run_number'] ?? 0),
+                'status' => (string)($r['status'] ?? ''),                 // queued/in_progress/completed
+                'conclusion' => (string)($r['conclusion'] ?? ''),         // success/failure/cancelled/skipped
+                'head_sha' => substr((string)($r['head_sha'] ?? ''), 0, 12),
+                'head_branch' => (string)($r['head_branch'] ?? ''),
+                'event' => (string)($r['event'] ?? ''),
+                'actor' => (string)($r['triggering_actor']['login'] ?? $r['actor']['login'] ?? ''),
+                'created_at' => (string)($r['created_at'] ?? ''),
+                'updated_at' => (string)($r['updated_at'] ?? ''),
+                'html_url' => (string)($r['html_url'] ?? ''),
+            ];
+        }
+
+        $latest = $runs[0] ?? null;
+        $statusPill = 'unknown';
+        if ($latest) {
+            if ($latest['status'] !== 'completed') {
+                $statusPill = $latest['status']; // queued, in_progress
+            } else {
+                $statusPill = $latest['conclusion']; // success, failure, cancelled, skipped
+            }
+        }
+
+        $payload = [
+            'status' => 'ok',
+            'repo' => $repo,
+            'workflow' => $workflow,
+            'latest_status_pill' => $statusPill,
+            'latest' => $latest,
+            'runs' => $runs,
+            'fetched_at' => now_iso(),
+        ];
+
+        // Best-effort cache; ignore failures (cache miss is fine).
+        @mkdir(dirname($cacheFile), 0775, true);
+        @file_put_contents($cacheFile, json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+
+        $this->success($payload);
     }
 
     /**

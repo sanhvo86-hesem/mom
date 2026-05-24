@@ -8061,6 +8061,16 @@ let adminVCModeState = {
   loading:false, loaded:false, error:'', saving:false,
   data: null  // { policy, effective_mode, your_roles }
 };
+// Pha 5: deploy freeze + GHA workflow status — both populate the header bar.
+let deployFreezeState = {
+  loading:false, loaded:false, error:'', saving:false,
+  data: null  // { enabled, reason, ticket_id, set_by, set_at, expires_at, is_active }
+};
+let ghaWorkflowState = {
+  loading:false, loaded:false, error:'',
+  data: null,  // { status, latest_status_pill, latest, runs }
+  lastFetchedAt: 0  // client-side throttle: refetch at most once per 30s
+};
 let versionControlOverviewState  = {loading:false, loaded:false, error:'', data:null};
 let versionControlDocsState      = {loading:false, loaded:false, error:'', data:null, search:''};
 let versionControlDocDetailState = {loading:false, loaded:false, error:'', data:null, docCode:''};
@@ -8945,6 +8955,116 @@ async function loadAdminVCMode({force=false, silent=false} = {}){
   if(currentPage === 'admin') renderAdmin();
 }
 
+// ── Pha 5: deploy freeze + GHA loaders ───────────────────────────────────
+
+async function loadDeployFreeze({force=false, silent=false} = {}){
+  if(deployFreezeState.loading) return;
+  if(deployFreezeState.loaded && !force) return;
+  deployFreezeState = Object.assign({}, deployFreezeState, {loading:true, error:''});
+  if(!silent) renderAdmin();
+  try{
+    const res = await apiCall('admin_deploy_freeze_get', null, 'GET');
+    if(res && res.ok){
+      deployFreezeState = Object.assign({}, deployFreezeState, {loading:false, loaded:true, error:'', data:res.freeze || null});
+    }else{
+      const msg = (res && (res.error || res.detail)) || 'freeze_load_failed';
+      deployFreezeState = Object.assign({}, deployFreezeState, {loading:false, error:String(msg)});
+    }
+  }catch(e){
+    deployFreezeState = Object.assign({}, deployFreezeState, {loading:false, error:e.message || 'freeze_load_failed'});
+  }
+  if(currentPage === 'admin') renderAdmin();
+}
+
+async function loadGhaWorkflow({force=false, silent=false} = {}){
+  if(ghaWorkflowState.loading) return;
+  // Client-side 30s throttle: don't re-hit the server faster than the
+  // server-side cache TTL — saves a round trip when the panel re-renders.
+  const ageMs = Date.now() - (ghaWorkflowState.lastFetchedAt || 0);
+  if(ghaWorkflowState.loaded && !force && ageMs < 30000) return;
+  ghaWorkflowState = Object.assign({}, ghaWorkflowState, {loading:true, error:''});
+  if(!silent) renderAdmin();
+  try{
+    const res = await apiCall('admin_gha_workflow_status', null, 'GET');
+    if(res && res.ok){
+      ghaWorkflowState = Object.assign({}, ghaWorkflowState, {loading:false, loaded:true, error:'', data:res, lastFetchedAt:Date.now()});
+    }else{
+      const msg = (res && (res.error || res.detail)) || 'gha_load_failed';
+      ghaWorkflowState = Object.assign({}, ghaWorkflowState, {loading:false, error:String(msg)});
+    }
+  }catch(e){
+    ghaWorkflowState = Object.assign({}, ghaWorkflowState, {loading:false, error:e.message || 'gha_load_failed'});
+  }
+  if(currentPage === 'admin') renderAdmin();
+}
+
+function deployFreezeIsActive(){
+  return !!(deployFreezeState.data && deployFreezeState.data.is_active);
+}
+
+// Mode + freeze are independent gates — operators can deploy in Dev mode
+// only when freeze is OFF. Helper used by render fns to short-circuit
+// button enablement without re-deriving the rule each time.
+function vcCanDeploy(){
+  return vcIsDeveloperMode() && !deployFreezeIsActive();
+}
+
+async function adminVCFreezeToggle(){
+  if(!deployFreezeState.loaded){
+    showToast(lang==='en'?'Freeze state not loaded yet.':'Chưa tải freeze state.', 'error');
+    return;
+  }
+  const currentlyOn = deployFreezeIsActive();
+  if(currentlyOn){
+    // Unfreeze flow — confirm + ticket
+    const ticket = window.prompt(lang==='en'
+      ? 'Unfreeze: enter the INC/ticket id that closed the freeze (≥4 chars):'
+      : 'Bỏ freeze: nhập INC/ticket id đóng freeze (≥4 ký tự):', (deployFreezeState.data?.ticket_id || ''));
+    if(ticket === null) return;
+    if(ticket.trim().length < 4){ showToast(lang==='en'?'Ticket ≥4 chars required.':'Ticket ≥4 ký tự.', 'error'); return; }
+    const reason = window.prompt(lang==='en'?'Unfreeze reason (≥4 chars):':'Lý do bỏ freeze (≥4 ký tự):', 'incident resolved');
+    if(reason === null) return;
+    if(reason.trim().length < 4){ showToast(lang==='en'?'Reason ≥4 chars required.':'Lý do ≥4 ký tự.', 'error'); return; }
+    return adminVCFreezeApply(false, reason.trim(), ticket.trim());
+  }
+  // Freeze flow — strict
+  const ticket = window.prompt(lang==='en'
+    ? 'Freeze deploys: enter INC/ticket id (e.g. INC-2026-013, ≥4 chars):'
+    : 'Freeze deploy: nhập INC/ticket id (vd: INC-2026-013, ≥4 ký tự):', '');
+  if(ticket === null) return;
+  if(ticket.trim().length < 4){ showToast(lang==='en'?'Ticket ≥4 chars required.':'Ticket ≥4 ký tự.', 'error'); return; }
+  const reason = window.prompt(lang==='en'?'Reason for freeze (≥10 chars):':'Lý do freeze (≥10 ký tự):', '');
+  if(reason === null) return;
+  if(reason.trim().length < 10){ showToast(lang==='en'?'Reason ≥10 chars required.':'Lý do ≥10 ký tự.', 'error'); return; }
+  return adminVCFreezeApply(true, reason.trim(), ticket.trim());
+}
+
+async function adminVCFreezeApply(enabled, reason, ticket){
+  deployFreezeState = Object.assign({}, deployFreezeState, {saving:true, error:''});
+  renderAdmin();
+  try{
+    const res = await apiCall('admin_deploy_freeze_set', {enabled, reason, ticket_id: ticket}, 'POST');
+    if(res && res.ok){
+      deployFreezeState = Object.assign({}, deployFreezeState, {saving:false, loaded:true, error:'', data:res.freeze || null});
+      showToast(enabled
+        ? (lang==='en'?'Deploys frozen.':'Đã freeze deploy.')
+        : (lang==='en'?'Deploys unfrozen.':'Đã bỏ freeze.'), 'success');
+      renderAdmin();
+      return true;
+    }
+    const msg = (res && (res.error || res.detail)) || 'freeze_save_failed';
+    deployFreezeState = Object.assign({}, deployFreezeState, {saving:false, error:String(msg)});
+    showToast((lang==='en'?'Freeze failed: ':'Lỗi freeze: ')+String(msg).slice(0,200), 'error');
+    renderAdmin();
+    return false;
+  }catch(e){
+    deployFreezeState = Object.assign({}, deployFreezeState, {saving:false, error:e.message});
+    showToast((lang==='en'?'Freeze error: ':'Lỗi: ')+e.message, 'error');
+    renderAdmin();
+    return false;
+  }
+}
+
 // Effective mode helper for other render functions. Returns 'operation' when
 // unknown — fail-closed so a panel that forgets to load mode shows the
 // safe (manual-gate) CTAs by default.
@@ -9070,17 +9190,35 @@ function renderAdminVCHeaderBar(){
     }
   }
 
-  // Last deploy: read git head + remote stack from gitRepoStatusState.
+  // Last deploy: prefer GHA workflow status (Pha 5 — authoritative for what
+  // actually shipped via the pipeline). Fall back to VPS git head if GHA
+  // is not_configured / api_error / still loading.
   let deployLabel = lang==='en' ? 'Deploy: --' : 'Deploy: --';
   let deployTone = 'info';
-  const gits = gitRepoStatusState && gitRepoStatusState.data;
-  if(gits && gits.head_commit){
-    const sha = (gits.head_commit.sha || '').slice(0, 8);
-    const ts = gits.head_commit.committed_at || gits.head_commit.authored_at;
-    deployLabel = (lang==='en' ? 'Deploy: ' : 'Deploy: ') + sha + (ts ? ' · '+vcFmtTime(ts) : '');
-    const behind = Number(gits.behind_count || 0);
-    const dirty = Number(gits.meaningful_dirty_count || 0);
-    deployTone = (behind > 0 || dirty > 0) ? 'warn' : 'good';
+  const gha = ghaWorkflowState && ghaWorkflowState.data;
+  if(gha && gha.status === 'ok' && gha.latest){
+    const pill = gha.latest_status_pill || 'unknown';
+    const sha = (gha.latest.head_sha || '').slice(0, 8);
+    const ts = gha.latest.updated_at || gha.latest.created_at;
+    deployLabel = 'Deploy: ' + sha + ' · ' + pill + (ts ? ' · '+vcFmtTime(ts) : '');
+    deployTone = (pill === 'success') ? 'good'
+              : (pill === 'failure' || pill === 'cancelled') ? 'error'
+              : (pill === 'in_progress' || pill === 'queued') ? 'warn'
+              : 'info';
+  } else if(gha && gha.status && gha.status !== 'ok'){
+    // not_configured / api_error — render as neutral with the status word.
+    deployLabel = 'Deploy: ' + (gha.status === 'not_configured' ? (lang==='en'?'GHA not configured':'GHA chưa cấu hình') : gha.status);
+    deployTone = 'info';
+  } else {
+    const gits = gitRepoStatusState && gitRepoStatusState.data;
+    if(gits && gits.head_commit){
+      const sha = (gits.head_commit.sha || '').slice(0, 8);
+      const ts = gits.head_commit.committed_at || gits.head_commit.authored_at;
+      deployLabel = (lang==='en' ? 'Deploy: ' : 'Deploy: ') + sha + (ts ? ' · '+vcFmtTime(ts) : '');
+      const behind = Number(gits.behind_count || 0);
+      const dirty = Number(gits.meaningful_dirty_count || 0);
+      deployTone = (behind > 0 || dirty > 0) ? 'warn' : 'good';
+    }
   }
 
   // Mode quick-switch menu: only render the toggle button when the user is
@@ -9122,16 +9260,52 @@ function renderAdminVCHeaderBar(){
       vcStatusPill(deployLabel, deployTone)+
       notice+
     '</div>'+
-    // Actions: mode switch + Freeze placeholder
+    // Actions: mode switch + Freeze toggle (Pha 5 — now live)
     '<div style="display:flex;align-items:center;gap:6px">'+
       '<button class="admin-sync-mini" onclick="adminVCQuickSwitchMode(\''+switchTarget+'\')" title="'+switchTitle+'"'+switchDisabled+'>'+
         escapeHtml(switchLabel)+
       '</button>'+
-      // Pha 5 placeholder — wired in Pha 5, render as disabled stub now so
-      // operators see the affordance and don't ask "where is freeze".
-      '<button class="admin-sync-mini" disabled aria-disabled="true" title="'+escapeHtml(lang==='en'?'Available in Phase 5':'Có ở Pha 5')+'">'+
-        escapeHtml(lang==='en'?'⛔ Freeze (P5)':'⛔ Freeze (P5)')+
-      '</button>'+
+      renderAdminVCFreezeButton()+
+    '</div>'+
+  '</div>'+
+  // Pha 5: red banner across panel when freeze is active.
+  renderAdminVCFreezeBanner();
+}
+
+// Pha 5 — header freeze button + banner
+function renderAdminVCFreezeButton(){
+  const s = deployFreezeState;
+  const isActive = deployFreezeIsActive();
+  if(s.loading && !s.loaded){
+    return '<button class="admin-sync-mini" disabled style="opacity:.6">'+escapeHtml('⛔ ...')+'</button>';
+  }
+  const label = isActive
+    ? (lang==='en'?'⛔ Unfreeze':'⛔ Bỏ freeze')
+    : (lang==='en'?'⛔ Freeze':'⛔ Freeze');
+  const cls = isActive ? ' style="background:color-mix(in srgb,var(--red,#dc2626) 20%,var(--bg-surface,#fff));border-color:var(--red,#dc2626);color:var(--red,#dc2626)"' : '';
+  const dis = (s && s.saving) ? ' disabled aria-disabled="true"' : '';
+  const title = isActive
+    ? (lang==='en'?'Currently FROZEN. Click to unfreeze (audited).':'Đang FROZEN. Bấm để bỏ freeze (có audit).')
+    : (lang==='en'?'Freeze all deploys (audited; blocks Push & Deploy + Sync).':'Freeze tất cả deploy (có audit; chặn Push & Deploy + Sync).');
+  return '<button class="admin-sync-mini" onclick="adminVCFreezeToggle()" title="'+escapeHtml(title)+'"'+cls+dis+'>'+escapeHtml(label)+'</button>';
+}
+
+function renderAdminVCFreezeBanner(){
+  if(!deployFreezeIsActive()) return '';
+  const f = deployFreezeState.data || {};
+  return '<div class="admin-sync-callout-bar is-error" '+
+    'style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;border:2px solid var(--red,#dc2626)">'+
+    '<div>'+
+      '<strong>'+escapeHtml(lang==='en'?'⛔ DEPLOYS FROZEN':'⛔ DEPLOY ĐANG FROZEN')+'</strong>'+
+      ' · '+escapeHtml(lang==='en'?'ticket=':'ticket=')+'<code>'+escapeHtml(f.ticket_id||'?')+'</code>'+
+      ' · '+escapeHtml(lang==='en'?'by ':'bởi ')+'<code>'+escapeHtml(f.set_by||'?')+'</code>'+
+      ' · '+escapeHtml(lang==='en'?'reason: ':'lý do: ')+escapeHtml(f.reason||'?')+
+      (f.expires_at ? ' · '+escapeHtml(lang==='en'?'expires ':'hết hạn ')+escapeHtml(vcFmtTime(f.expires_at)) : '')+
+    '</div>'+
+    '<div style="color:var(--text-3);font-size:11px">'+
+      escapeHtml(lang==='en'
+        ? 'Push & Deploy, CR approval, and batch sync are rejected with HTTP 423 until unfrozen.'
+        : 'Push & Deploy, duyệt CR, batch sync đều bị từ chối HTTP 423 cho đến khi bỏ freeze.')+
     '</div>'+
   '</div>';
 }
@@ -9403,6 +9577,14 @@ function renderAdminVCTimeline(){
 // operator runs (git push / GHA / SSH).
 
 async function adminVCDeployTrigger(){
+  // Pha 5: freeze gate (client-side defence in depth with server-side 423).
+  if(deployFreezeIsActive()){
+    const f = deployFreezeState.data || {};
+    showToast(lang==='en'
+      ? 'Deploys frozen (ticket='+(f.ticket_id||'?')+'). Unfreeze first.'
+      : 'Deploy đang frozen (ticket='+(f.ticket_id||'?')+'). Bỏ freeze trước.', 'error');
+    return;
+  }
   if(vcEffectiveMode() !== 'developer'){
     showToast(lang==='en'
       ? 'Deploy trigger only available in Developer mode. Submit a change request instead.'
@@ -10130,6 +10312,8 @@ function renderAdminVersionControl(){
   // VC mode + the dependencies the header bar needs to populate sync/deploy
   // pills are auto-loaded on first entry to the panel (any sub-tab).
   if(!adminVCModeState.loaded && !adminVCModeState.loading && !adminVCModeState.error) loadAdminVCMode({silent:true});
+  if(!deployFreezeState.loaded && !deployFreezeState.loading && !deployFreezeState.error) loadDeployFreeze({silent:true});
+  if(!ghaWorkflowState.loaded && !ghaWorkflowState.loading && !ghaWorkflowState.error) loadGhaWorkflow({silent:true});
   if(!localSyncReportState.loaded && !localSyncReportState.loading && !localSyncReportState.error) loadLocalSyncReport({silent:true});
   if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error) loadGitRepoStatus({silent:true});
   if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error) loadDataSyncStatus({silent:true});
