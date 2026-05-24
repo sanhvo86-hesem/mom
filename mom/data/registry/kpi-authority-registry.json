@@ -4745,8 +4745,9 @@
         "code": "ACCESS_REVIEW_COMPLETION-CTR",
         "endpoint": "POST /api/kpi/ACCESS_REVIEW_COMPLETION-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ hoàn thành rà soát quyền truy cập đúng kỳ",
-        "name": "Access Review Completion counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Access review completion — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc cố tình bỏ kỳ rà soát quyền truy cập để khỏi đụng tới tài khoản cũ còn quyền cao."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -4784,8 +4785,9 @@
         "code": "AR_DISPUTE_AGING-CTR",
         "endpoint": "POST /api/kpi/AR_DISPUTE_AGING-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tuổi tồn tranh chấp công nợ phải thu chưa khép",
-        "name": "Ar Dispute Aging counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "AR dispute aging — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc trì hoãn ghi nhận tranh chấp công nợ để chỉ số tuổi nợ ngắn lại trên báo cáo."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -4823,8 +4825,9 @@
         "code": "AUDIT_FINDING_AGING-CTR",
         "endpoint": "POST /api/kpi/AUDIT_FINDING_AGING-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tuổi tồn phát hiện audit chưa khép hành động",
-        "name": "Audit Finding Aging counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Audit finding aging — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc đóng vội phát hiện audit chưa khắc phục thực sự để làm đẹp tuổi tồn finding."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -4862,8 +4865,9 @@
         "code": "CMM_PROGRAM_VALIDATION-CTR",
         "endpoint": "POST /api/kpi/CMM_PROGRAM_VALIDATION-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ chương trình CMM được nghiệm thu trước khi đo loạt",
-        "name": "Cmm Program Validation counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "CMM program validation — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc bỏ qua bước nghiệm thu chương trình CMM để chạy đo loạt gấp."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -4901,8 +4905,9 @@
         "code": "COMPLAINT_LOG_ON_TIME-CTR",
         "endpoint": "POST /api/kpi/COMPLAINT_LOG_ON_TIME-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ khiếu nại khách ghi nhận đúng thời hạn",
-        "name": "Complaint Log On Time counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Complaint log on-time — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc giữ khiếu nại khách hàng ngoài hệ thống cho qua hạn rồi mới nhập để khỏi rớt SLA."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -4940,8 +4945,9 @@
         "code": "DEFECT_PARETO_ACTION_CLOSURE-CTR",
         "endpoint": "POST /api/kpi/DEFECT_PARETO_ACTION_CLOSURE-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ khép hành động top Pareto lỗi đúng hạn",
-        "name": "Defect Pareto Action Closure counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Defect Pareto action closure — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc đánh dấu hoàn thành hành động Pareto khi chưa thật sự khắc phục cụm lỗi gốc."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -4979,8 +4985,9 @@
         "code": "DFM_FEASIBILITY_RFT-CTR",
         "endpoint": "POST /api/kpi/DFM_FEASIBILITY_RFT-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ DFM đạt ngay lần đầu khi soát khả thi sản xuất",
-        "name": "Dfm Feasibility Rft counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "DFM feasibility RFT — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc bỏ qua phản hồi DFM để đẩy báo giá nhanh — đẩy rủi ro sản xuất xuống xưởng."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5018,8 +5025,9 @@
         "code": "DOCUMENT_CHANGE_RFT-CTR",
         "endpoint": "POST /api/kpi/DOCUMENT_CHANGE_RFT-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ thay đổi tài liệu DCC đạt ngay lần đầu",
-        "name": "Document Change Rft counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Document change RFT — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc đẩy thay đổi tài liệu qua DCC khi còn sai sót để chạy đúng SLA phát hành."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5057,8 +5065,9 @@
         "code": "EHS_RISK_ASSESSMENT_REVIEW-CTR",
         "endpoint": "POST /api/kpi/EHS_RISK_ASSESSMENT_REVIEW-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ đánh giá rủi ro EHS được soát định kỳ",
-        "name": "Ehs Risk Assessment Review counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "EHS risk assessment review — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc copy nguyên đánh giá rủi ro EHS kỳ trước thay vì rà thực tế hiện trường."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5096,8 +5105,9 @@
         "code": "ENGINEERING_BLOCKER_CLOSURE_OT-CTR",
         "endpoint": "POST /api/kpi/ENGINEERING_BLOCKER_CLOSURE_OT-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ khép vướng kỹ thuật đúng cam kết",
-        "name": "Engineering Blocker Closure Ot counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Engineering blocker closure on-time — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc đóng blocker kỹ thuật bằng giải pháp tạm cho kịp KPI on-time, để vấn đề tái phát."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5135,8 +5145,9 @@
         "code": "ENGINEERING_CAUSED_NCR-CTR",
         "endpoint": "POST /api/kpi/ENGINEERING_CAUSED_NCR-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Số NCR có nguyên nhân gốc thuộc kỹ thuật",
-        "name": "Engineering Caused Ncr counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Engineering-caused NCR — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc gán nhầm NCR do lỗi thiết kế sang nguyên nhân sản xuất để bảo vệ chỉ số kỹ thuật."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5174,8 +5185,9 @@
         "code": "ERP_RELEASE_RFT-CTR",
         "endpoint": "POST /api/kpi/ERP_RELEASE_RFT-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ phát hành/đổi cấu hình ERP đạt ngay lần đầu",
-        "name": "Erp Release Rft counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "ERP release RFT — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc phát hành cấu hình ERP khi chưa qua kiểm thử đầy đủ để chạy lịch release."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5213,8 +5225,9 @@
         "code": "HOSHIN_RESOURCE_DECISION_LT-CTR",
         "endpoint": "POST /api/kpi/HOSHIN_RESOURCE_DECISION_LT-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Thời gian ra quyết định phân bổ nguồn lực Hoshin",
-        "name": "Hoshin Resource Decision Lt counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Hoshin resource decision lead time — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc kéo dài quyết định cấp nguồn lực Hoshin để né cam kết KPI sáng kiến."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5252,8 +5265,9 @@
         "code": "INSPECTION_PLAN_ADHERENCE-CTR",
         "endpoint": "POST /api/kpi/INSPECTION_PLAN_ADHERENCE-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Mức tuân thủ kế hoạch kiểm tra chất lượng",
-        "name": "Inspection Plan Adherence counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Inspection plan adherence — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc bỏ qua điểm kiểm trong plan để chạy nhanh loạt đo, đẩy rủi ro thoát lỗi xuống dưới."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5291,8 +5305,9 @@
         "code": "INSPECTION_QUEUE_AGING-CTR",
         "endpoint": "POST /api/kpi/INSPECTION_QUEUE_AGING-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tuổi tồn hàng chờ kiểm tra QC",
-        "name": "Inspection Queue Aging counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Inspection queue aging — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc xếp lại hàng đợi inspection ưu tiên lô dễ để giảm tuổi tồn trung bình giả tạo."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5331,8 +5346,9 @@
         "code": "INSPECTION_RFT-CTR",
         "endpoint": "POST /api/kpi/INSPECTION_RFT-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ kiểm tra đạt ngay lần đầu không phải kiểm lại",
-        "name": "Inspection Rft counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Inspection RFT — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc cho qua kiểm tra đầu tiên dù còn nghi ngờ để giữ chỉ số RFT, rồi sửa âm thầm sau."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5370,8 +5386,9 @@
         "code": "JOB_COST_ACCURACY-CTR",
         "endpoint": "POST /api/kpi/JOB_COST_ACCURACY-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Độ chính xác giá thành lệnh sản xuất khi đóng sổ",
-        "name": "Job Cost Accuracy counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Job cost accuracy — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc điều chỉnh giờ máy/giờ công sau khi đóng job để giá thành đẹp hơn kế hoạch."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5409,8 +5426,9 @@
         "code": "KPI_RED_ACTION_CLOSURE-CTR",
         "endpoint": "POST /api/kpi/KPI_RED_ACTION_CLOSURE-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ khép hành động xử lý KPI đỏ đúng cam kết",
-        "name": "Kpi Red Action Closure counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "KPI red action closure — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc khép hành động khắc phục KPI đỏ bằng giải thích không bằng chứng để rời khỏi vùng đỏ trên dashboard."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5448,8 +5466,9 @@
         "code": "KPI_REGISTRY_DRIFT_COUNT-CTR",
         "endpoint": "POST /api/kpi/KPI_REGISTRY_DRIFT_COUNT-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Số sai lệch giữa registry KPI và dữ liệu runtime",
-        "name": "Kpi Registry Drift Count counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "KPI registry drift count — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc sửa ngưỡng/owner trong registry ngoài quy trình change-control để KPI tự thoát vùng đỏ."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5487,8 +5506,9 @@
         "code": "MRP_EXCEPTION_AGING-CTR",
         "endpoint": "POST /api/kpi/MRP_EXCEPTION_AGING-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tuổi tồn cảnh báo ngoại lệ MRP chưa xử lý",
-        "name": "Mrp Exception Aging counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "MRP exception aging — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc đóng exception MRP bằng cách dời lệnh thay vì xử lý nguyên nhân thiếu hụt vật tư."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5526,8 +5546,9 @@
         "code": "MSA_READINESS-CTR",
         "endpoint": "POST /api/kpi/MSA_READINESS-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Mức sẵn sàng phân tích hệ thống đo (MSA/Gage R&R)",
-        "name": "Msa Readiness counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "MSA readiness — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc dùng dữ liệu đo không qua MSA/Gage R&R để gấp report kết quả."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5565,8 +5586,9 @@
         "code": "NCR_CAPTURE_COMPLETENESS-CTR",
         "endpoint": "POST /api/kpi/NCR_CAPTURE_COMPLETENESS-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Mức đầy đủ ghi nhận NCR so với phát hiện thực tế",
-        "name": "Ncr Capture Completeness counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "NCR capture completeness — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc bỏ ghi nhận lỗi nhỏ vào sổ NCR để chỉ số NCR/tháng nhìn đẹp hơn thực tế."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5604,8 +5626,9 @@
         "code": "NEAR_MISS_REPORTING_QUALITY-CTR",
         "endpoint": "POST /api/kpi/NEAR_MISS_REPORTING_QUALITY-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Chất lượng báo cáo suýt-tai-nạn EHS",
-        "name": "Near Miss Reporting Quality counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Near-miss reporting quality — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc viết sơ sài hoặc bỏ báo cáo suýt-tai-nạn để khỏi mở điều tra EHS."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5643,8 +5666,9 @@
         "code": "OJT_VERIFICATION_PASS_RATE-CTR",
         "endpoint": "POST /api/kpi/OJT_VERIFICATION_PASS_RATE-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ đạt khi xác minh thực hành đào tạo tại chỗ",
-        "name": "Ojt Verification Pass Rate counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "OJT verification pass rate — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc ký xác nhận OJT đạt mà không quan sát thực hành để giải phóng người vào vận hành."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5682,8 +5706,9 @@
         "code": "PACKAGING_LABEL_COC_RFT-CTR",
         "endpoint": "POST /api/kpi/PACKAGING_LABEL_COC_RFT-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ đóng gói — nhãn — CoC đạt ngay lần đầu",
-        "name": "Packaging Label Coc Rft counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Packaging label and CoC RFT — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc gửi gói nhãn/CoC còn lỗi cho kịp giao, dựa vào khách phản hồi mới sửa."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5707,7 +5732,7 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Tuân thủ kế hoạch tính đến sắp xếp lại có phê duyệt",
+      "name_vi": "Mức tuân thủ kế hoạch sau khi loại trừ sắp xếp lại có phê duyệt",
       "purpose": "Đo tuân thủ kế hoạch sau khi loại trừ sắp xếp lại có phê duyệt — chặn đổ lỗi cho PPL khi job re-sequence hợp lệ.",
       "thresholds": {
         "direction": "higher_is_better",
@@ -5720,9 +5745,10 @@
       "counter_metric": {
         "code": "PLAN_ADHERENCE_WITH_APPROVED_RESEQUENCE-CTR",
         "endpoint": "POST /api/kpi/PLAN_ADHERENCE_WITH_APPROVED_RESEQUENCE-CTR/input",
-        "name_vi": "Bằng chứng vi phạm bộ đếm — Tuân thủ kế hoạch tính đến sắp xếp lại có phê duyệt",
-        "name": "Plan Adherence With Approved Resequence counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Mức tuân thủ kế hoạch sau khi loại trừ sắp xếp lại có phê duyệt",
+        "name": "Plan adherence with approved resequence — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc tự ý sắp xếp lại kế hoạch sản xuất mà không có phê duyệt rồi báo là plan đã được điều chỉnh."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5762,8 +5788,9 @@
         "code": "PROMISE_DATE_RISK-CTR",
         "endpoint": "POST /api/kpi/PROMISE_DATE_RISK-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Mức rủi ro trễ ngày cam kết giao hàng",
-        "name": "Promise Date Risk counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Promise date risk — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc hứa ngày giao quá lạc quan để win order, đẩy rủi ro trượt deadline về sau."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5802,8 +5829,9 @@
         "code": "QUOTE_MARGIN_ACCURACY-CTR",
         "endpoint": "POST /api/kpi/QUOTE_MARGIN_ACCURACY-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Độ chính xác biên lợi nhuận giữa báo giá và thực tế",
-        "name": "Quote Margin Accuracy counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Quote margin accuracy — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc dùng giả định chi phí thấp giả tạo trong báo giá để chốt deal, làm margin thật bị âm sau khi sản xuất."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5841,8 +5869,9 @@
         "code": "QUOTE_PACKAGE_RFT-CTR",
         "endpoint": "POST /api/kpi/QUOTE_PACKAGE_RFT-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ gói báo giá đạt ngay lần đầu khi soát nội bộ",
-        "name": "Quote Package Rft counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Quote package RFT — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc gửi quote thiếu hoặc sai để khách kéo dài vòng làm rõ — che chỉ số phản hồi RFQ."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5880,8 +5909,9 @@
         "code": "RFQ_COMPLETENESS_RFT-CTR",
         "endpoint": "POST /api/kpi/RFQ_COMPLETENESS_RFT-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ RFQ đầu vào đầy đủ ngay lần đầu",
-        "name": "Rfq Completeness Rft counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "RFQ completeness RFT — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc đẩy RFQ thiếu thông tin qua quote để giảm thời gian xử lý hiển thị trên KPI."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5919,8 +5949,9 @@
         "code": "RFQ_TURNAROUND_TIME_FOR_COMPLETE_RFQ-CTR",
         "endpoint": "POST /api/kpi/RFQ_TURNAROUND_TIME_FOR_COMPLETE_RFQ-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Thời gian phản hồi RFQ tính từ khi RFQ đã đầy đủ",
-        "name": "Rfq Turnaround Time For Complete Rfq counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "RFQ turnaround time for complete RFQ — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc gắn cờ RFQ \"chưa đầy đủ\" để dừng đồng hồ SLA dù khách đã cung cấp đủ thông tin."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5958,8 +5989,9 @@
         "code": "ROUTING_BOM_CHANGE_RFT-CTR",
         "endpoint": "POST /api/kpi/ROUTING_BOM_CHANGE_RFT-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ thay đổi định mức/quy trình ERP đạt ngay lần đầu",
-        "name": "Routing Bom Change Rft counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Routing and BOM change RFT — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc phát hành thay đổi routing/BOM khi chưa rà tác động vật tư để chạy lịch ECN."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -5997,8 +6029,9 @@
         "code": "SHIFT_HANDOVER_RFT-CTR",
         "endpoint": "POST /api/kpi/SHIFT_HANDOVER_RFT-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ bàn giao ca đạt yêu cầu theo FRM-504",
-        "name": "Shift Handover Rft counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Shift handover RFT — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc ký bàn giao ca thiếu thông tin để rời ca đúng giờ, đẩy rủi ro sự cố sang ca sau."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -6036,8 +6069,9 @@
         "code": "SHORTAGE_RECOVERY_OT-CTR",
         "endpoint": "POST /api/kpi/SHORTAGE_RECOVERY_OT-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ phục hồi thiếu hụt vật tư đúng hạn",
-        "name": "Shortage Recovery Ot counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Shortage recovery on-time — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc đánh dấu shortage đã giải quyết khi chỉ là cam kết miệng từ NCC, chưa có ETA thực."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -6075,8 +6109,9 @@
         "code": "TIMESHEET_EXCEPTION_AGING-CTR",
         "endpoint": "POST /api/kpi/TIMESHEET_EXCEPTION_AGING-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tuổi tồn ngoại lệ chấm công chưa xử lý",
-        "name": "Timesheet Exception Aging counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Timesheet exception aging — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc trì hoãn xử lý timesheet exception để chỉ số tuổi tồn không tăng — che chi phí lao động chưa đúng."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -6114,8 +6149,9 @@
         "code": "TOOL_FIXTURE_READY_TO_PLAN-CTR",
         "endpoint": "POST /api/kpi/TOOL_FIXTURE_READY_TO_PLAN-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Mức sẵn sàng dụng cụ/đồ gá theo kế hoạch sản xuất",
-        "name": "Tool Fixture Ready To Plan counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Tool and fixture ready-to-plan — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc xác nhận tool/fixture sẵn sàng để planner xếp job dù dụng cụ vẫn còn bảo dưỡng."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -6153,8 +6189,9 @@
         "code": "TRAINING_MATRIX_FRESHNESS-CTR",
         "endpoint": "POST /api/kpi/TRAINING_MATRIX_FRESHNESS-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Mức cập nhật ma trận năng lực — đào tạo",
-        "name": "Training Matrix Freshness counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Training matrix freshness — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc gia hạn ma trận đào tạo không có bằng chứng đánh giá lại để giữ tỷ lệ \"current\" trên dashboard."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -6192,8 +6229,9 @@
         "code": "TRAINING_RECORD_INTEGRITY-CTR",
         "endpoint": "POST /api/kpi/TRAINING_RECORD_INTEGRITY-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Tính toàn vẹn hồ sơ đào tạo khi audit chéo",
-        "name": "Training Record Integrity counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Training record integrity — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc chỉnh hồi tố hồ sơ đào tạo sau sự cố để vai trò liên quan vẫn \"đủ năng lực\" trên giấy tờ."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
@@ -6231,8 +6269,9 @@
         "code": "TRANSACTION_SYNC_RELIABILITY-CTR",
         "endpoint": "POST /api/kpi/TRANSACTION_SYNC_RELIABILITY-CTR/input",
         "name_vi": "Bằng chứng vi phạm bộ đếm — Độ tin cậy đồng bộ giao dịch giữa các hệ thống",
-        "name": "Transaction Sync Reliability counter evidence breach",
-        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
+        "name": "Transaction sync reliability — anti-gaming counter",
+        "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification.",
+        "intent_vi": "Bắt việc tắt cảnh báo đồng bộ giao dịch giữa hệ thống để chạy hết ca thay vì xử lý lệch dữ liệu thật."
       },
       "reward_eligible": false,
       "calculation_authority": "manual_governed_role_evidence",
