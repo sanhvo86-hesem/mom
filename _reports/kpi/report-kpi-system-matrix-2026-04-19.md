@@ -1,12 +1,12 @@
 # KPI System Matrix Audit
 
-Generated: 2026-05-24T17:25:32+00:00
+Generated: 2026-05-24T18:30:38+00:00
 
 ## Summary
 
 | Item | Count |
 |---|---:|
-| `html_file_count` | 481 |
+| `html_file_count` | 482 |
 | `documents_with_metric_usage` | 128 |
 | `registry_metric_count` | 216 |
 | `metric_codes_seen` | 180 |

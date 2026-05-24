@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-05-24T17:25:32+00:00",
+    "generated_at": "2026-05-24T18:30:38+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-24+p09",
@@ -14,7 +14,7 @@
         ]
     },
     "summary": {
-        "html_file_count": 481,
+        "html_file_count": 482,
         "documents_with_metric_usage": 128,
         "registry_metric_count": 216,
         "metric_codes_seen": 180,
