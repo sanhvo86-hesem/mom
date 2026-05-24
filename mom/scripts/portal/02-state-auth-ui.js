@@ -1882,22 +1882,64 @@ function orgPositionDisplayLabel(position){
   return `${unitCode ? unitCode + ' — ' : ''}${title}${code && code !== title ? ' (' + code + ')' : ''}`;
 }
 
+function isLivePositionAssignmentRow(row, today){
+  if(!row) return false;
+  if(String(row.assignment_status || 'active') !== 'active') return false;
+  const effTo = String(row.effective_to || '').slice(0, 10);
+  return !effTo || effTo > today;
+}
+
+function assignmentRowIsPrimary(row){
+  return String((row && row.assignment_type) || '') === 'primary' || !!(row && row.is_primary === true);
+}
+
+function assignmentSourcePriority(row){
+  const source = String(row && row.source_system || '').trim();
+  if(source === 'AUTH_JSON') return 0;
+  if(source === 'ADMIN_USER_MODAL') return 1;
+  if(source === 'ADMIN_ORG_CONSOLE') return 2;
+  return 3;
+}
+
+function assignmentUpdatedAtScore(row){
+  const raw = String(row && (row.updated_at || row.created_at) || '');
+  const ts = Date.parse(raw);
+  return isFinite(ts) ? ts : 0;
+}
+
+function compareUserPositionAssignmentRows(a, b){
+  const ap = assignmentRowIsPrimary(a) ? 0 : 1;
+  const bp = assignmentRowIsPrimary(b) ? 0 : 1;
+  if(ap !== bp) return ap - bp;
+  const at = assignmentUpdatedAtScore(a);
+  const bt = assignmentUpdatedAtScore(b);
+  if(at !== bt) return bt - at;
+  const as = assignmentSourcePriority(a);
+  const bs = assignmentSourcePriority(b);
+  if(as !== bs) return as - bs;
+  return String(a && a.hcm_assignment_id || '').localeCompare(String(b && b.hcm_assignment_id || ''));
+}
+
 function userPositionAssignmentRows(user){
   const employeeId = adminUserEmployeeId(user);
   if(!employeeId) return [];
   const today = new Date().toISOString().slice(0, 10);
-  return (ADMIN_AUTH_STATE.org.assignments || [])
+  const byPosition = {};
+  (ADMIN_AUTH_STATE.org.assignments || [])
     .filter(row=>String(row.employee_id || '').trim() === employeeId)
-    .filter(row=>String(row.assignment_status || 'active') === 'active')
     // Soft-ended rows (assignment_status still 'active' but effective_to in
     // the past) come from the Xóa flow that has to dodge archive_only
     // governance. They must disappear from the user-edit modal entirely.
-    .filter(row=>{
-      const effTo = String(row.effective_to || '').slice(0, 10);
-      return !effTo || effTo > today;
-    })
-    .map(row=>Object.assign({_synthetic:false}, row))
-    .sort((a,b)=>{
+    .filter(row=>isLivePositionAssignmentRow(row, today))
+    .forEach(row=>{
+      const positionId = String(row.hcm_position_id || '').trim();
+      if(!positionId) return;
+      const normalized = Object.assign({_synthetic:false}, row);
+      if(!byPosition[positionId] || compareUserPositionAssignmentRows(normalized, byPosition[positionId]) < 0){
+        byPosition[positionId] = normalized;
+      }
+    });
+  return Object.keys(byPosition).map(positionId=>byPosition[positionId]).sort((a,b)=>{
     const ap = (String(a.assignment_type || '') === 'primary' || a.is_primary === true) ? 0 : 1;
     const bp = (String(b.assignment_type || '') === 'primary' || b.is_primary === true) ? 0 : 1;
     if(ap !== bp) return ap - bp;
