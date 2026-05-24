@@ -35,31 +35,43 @@ declare(strict_types=1);
  *  10. Admin/API surfaces drift: required KPI action routes missing or Admin
  *      Console exposes raw JSON editing.
  *  11. P0.7.1 (P07 fair-reward) reward_mode in (bonus_pool_candidate,
- *      team_reward_candidate, role_review_input) without a non-empty
- *      attribution_rule.
- *  12. P0.7.2 (P07 fair-reward) reward-eligible rate/percent metric without
- *      formula.min_sample >= 1.
- *  13. P0.7.3 (P07 fair-reward) JD scorecard weight sum outside [95,105]
- *      fairness band (strict ==100 already P0; this is a backstop).
- *  14. P0.7.4 (P07 fair-reward) JD scorecard item with staged/candidate
- *      scoring status AND scorecard_contributes_to_reward=true without an
- *      explicit manual_governed_override.
+ *      team_reward_candidate, role_review_input) without an
+ *      attribution_rule that has enough length and contains a breakdown
+ *      semantics token (split/attribute/owner/contributor/tách/phân/…).
+ *  12. P0.7.2 (P07 fair-reward) reward-eligible rate metric without
+ *      formula.min_sample >= 1. Rate metric = unit in %/percent/percentage/
+ *      ppm/dppm/rate/ratio/per_million/parts_per_million.
+ *  13. P0.7.4 (P07 fair-reward) JD scorecard item whose resolved canonical
+ *      metric is staged_data_contract AND the scorecard item carries
+ *      contributes_to_reward=true OR the metric scoring_status is
+ *      active_runtime — block before a non-runtime metric drives reward.
+ *  14. P0.7.5 (P07 fair-reward) governance metric with reward_mode in
+ *      (bonus_pool_candidate, team_reward_candidate, role_review_input)
+ *      without a non-empty exclude_conditions array — owner cannot
+ *      otherwise be protected from uncontrollable causes.
+ *  15. P0.7.6 (P07 fair-reward) JD scorecard item contributes_to_reward=true
+ *      that resolves to a metric whose reward_mode is not_rewardable or is
+ *      outside the reward-eligible set — closes the future loophole where
+ *      a role measure flips a metric to reward by side-channel.
+ *  16. P0.7.7 (P07 fair-reward) performance_governance_policy.discipline_scope
+ *      .whitelist token does not match any blocking_condition_registry
+ *      condition_id — discipline must cite a registered condition.
  *
  * P1 findings (warn, do not block)
  * ────────────────────────────────
  *   - A staged_data_contract KPI sits in the executive scorecard but is not
  *     marked reward eligible.
  *   - A lag KPI has no paired_metric (lead pairing missing).
- *   - A percent-unit KPI has min_sample 0 (small-lot noise unguarded).
+ *   - A rate-unit KPI has min_sample 0 (small-lot noise unguarded).
  *   - A dashboard primary_endpoint is outside the /api/kpi/ namespace.
  *   - JD scorecard registry still uses the legacy fixed weighted model.
  *   - A governance KPI code is not enumerated in ANNEX-128. ANNEX-128 is a
  *     document-usage matrix (only lists codes referenced in scanned docs),
  *     so this is advisory — re-run audit-kpi-system-matrix.php to confirm.
- *   - P1.P07 (fair-reward) JD scorecard exceeds 5 items (spec §4 cap).
- *   - P1.P07 (fair-reward) JD scorecard mixes a speed/throughput measure
- *     with a defect-rate measure where at least one side has no
- *     counter_code — risk of pulling the role in opposing directions.
+ *   - P1.P07 (fair-reward) JD scorecard mixes a measure whose registry
+ *     direction is lower_is_better with a measure whose direction is
+ *     higher_is_better and at least one side has no counter_code — risk of
+ *     pulling the role in opposing directions.
  *
  * Exit code: 0 = clean (warnings allowed), 1 = at least one P0 finding.
  */
@@ -100,10 +112,30 @@ function metricStatus(array $row): string
     return trim((string) ($row['calculation_status'] ?? ''));
 }
 
-function isPercentMetric(array $row): bool
+function isRateMetric(array $row): bool
 {
     $unit = strtolower(trim((string) ($row['formula']['unit'] ?? $row['thresholds']['unit'] ?? '')));
-    return in_array($unit, ['%', 'percent', 'percentage'], true);
+    // Rate-style units that all behave statistically like proportions /
+    // ratios — they share the small-N noise problem that the min_sample
+    // guardrail protects against. ppm/dppm/per_million are parts-per-million
+    // forms of percent; rate/ratio cover engineered ratios such as
+    // SETUP_RATIO. Extending to ppm catches the COMPLAINT_RATE class that
+    // previously bypassed the P0.7.2 sample-size guard.
+    return in_array($unit, [
+        '%', 'percent', 'percentage',
+        'ppm', 'dppm',
+        'rate', 'ratio',
+        'per_million', 'parts_per_million',
+    ], true);
+}
+
+/**
+ * Backward-compat alias kept for callers that imported the older name.
+ * @deprecated use isRateMetric()
+ */
+function isPercentMetric(array $row): bool
+{
+    return isRateMetric($row);
 }
 
 function extractEngineCalculatorCodes(string $engineSrc): array
@@ -163,6 +195,31 @@ foreach ([$governance, $gateMetrics, $dashboard, $proposed] as $set) {
         }
     }
 }
+
+// ── Build a metric-object index across all 4 sections ───────────────────────
+// Used by JD scorecard rules to resolve a kpi_code back to its registry row
+// (reward_mode, calculation_status, direction, etc.). First match wins —
+// canonical_code is unique across sections.
+$metricIndex = [];
+foreach ([$governance, $gateMetrics, $proposed, $dashboard] as $set) {
+    foreach ($set as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $rc = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+        if ($rc !== '' && !isset($metricIndex[$rc])) {
+            $metricIndex[$rc] = $row;
+        }
+    }
+}
+$resolveMetricDirection = static function (array $row): string {
+    // Prefer thresholds.direction (the runtime RAG rule axis); fall back to
+    // formula.direction for older rows. Empty when no direction is set.
+    $dir = strtolower(trim((string) ($row['thresholds']['direction']
+        ?? $row['formula']['direction']
+        ?? '')));
+    return $dir;
+};
 
 // ── P0.4 + governance code list ──────────────────────────────────────────────
 $govCodes = [];
@@ -259,35 +316,69 @@ foreach ($governance as $row) {
         }
     }
 
-    // ── P0.7.1 — reward-eligible metric MUST have non-empty attribution_rule ─
+    // ── P0.7.1 — reward-eligible metric MUST have a useful attribution_rule ─
     // (P07 hardening) Per performance_governance_policy.reward_rules rule 5,
     // any metric whose reward_mode allocates monetary or formal-review
     // recognition (bonus_pool_candidate / team_reward_candidate /
-    // role_review_input) MUST have an attribution_rule string so red
-    // outcomes can be split between owner action and contributor action
-    // before any reward conversation. Missing attribution = the metric will
-    // either punish owner-uncontrollable factors or game the bundle.
+    // role_review_input) MUST have an attribution_rule string that does
+    // actual splitting — i.e. is long enough to describe a breakdown AND
+    // contains at least one breakdown-semantics token. A one-word
+    // "applicable" string passed the old non-empty check but offered no
+    // real owner-vs-contributor split.
     $rewardModeP07     = strtolower(trim((string) ($row['reward_mode'] ?? '')));
     $rewardEligibleSet = ['bonus_pool_candidate', 'team_reward_candidate', 'role_review_input'];
+    $breakdownTokens   = ['tách', 'split', 'attribute', 'breakdown', 'owner', 'contributor', 'phân', 'do', 'gây', 'nguyên nhân'];
     if (in_array($rewardModeP07, $rewardEligibleSet, true)) {
         $attribution = trim((string) ($row['attribution_rule'] ?? ''));
         if ($attribution === '') {
             $p0[] = "P0.7.1 Registry $code: reward_mode '$rewardModeP07' requires "
                 . "non-empty attribution_rule (P07 reward-rules rule 5).";
+        } else {
+            $attrLowered  = mb_strtolower($attribution, 'UTF-8');
+            $hasBreakdown = false;
+            foreach ($breakdownTokens as $tok) {
+                if (mb_strpos($attrLowered, $tok) !== false) {
+                    $hasBreakdown = true;
+                    break;
+                }
+            }
+            if (mb_strlen($attribution, 'UTF-8') < 40 || !$hasBreakdown) {
+                $p0[] = "P0.7.1 Registry $code: attribution_rule too short or missing "
+                    . "breakdown semantics (need >=40 chars AND one of: "
+                    . implode(', ', $breakdownTokens) . ").";
+            }
         }
     }
 
     // ── P0.7.2 — reward-eligible rate metric MUST have min_sample ≥ 1 ──────
     // (P07 hardening) Per reward_rules rule 5 + anti-gaming risk register §2.3:
-    // a rate/percent KPI cannot drive bonus or role-review with zero or
-    // missing min_sample because small-N noise will swing the score.
-    if (in_array($rewardModeP07, $rewardEligibleSet, true) && isPercentMetric($row)) {
+    // a rate KPI (percent, ppm, dppm, ratio, …) cannot drive bonus or
+    // role-review with zero or missing min_sample because small-N noise
+    // will swing the score. isRateMetric() covers all rate-style units.
+    if (in_array($rewardModeP07, $rewardEligibleSet, true) && isRateMetric($row)) {
         $msRaw    = $row['formula']['min_sample'] ?? null;
         $msIsInt  = is_int($msRaw) || (is_string($msRaw) && ctype_digit($msRaw));
         $msIntVal = $msIsInt ? (int) $msRaw : 0;
         if (!$msIsInt || $msIntVal < 1) {
-            $p0[] = "P0.7.2 Registry $code: reward_mode '$rewardModeP07' on a percent/rate metric "
+            $p0[] = "P0.7.2 Registry $code: reward_mode '$rewardModeP07' on a rate-style metric "
                 . "requires formula.min_sample as integer >= 1 (got " . var_export($msRaw, true) . ").";
+        }
+    }
+
+    // ── P0.7.5 — reward-eligible metric MUST have non-empty exclude_conditions
+    // (P07 hardening) Per reward_rules rule 5(a)+(b) and
+    // attribution_rule_template.exclude_conditions_defaults — without an
+    // exclude_conditions array the owner has no documented escape from
+    // verifiable uncontrollable causes (force majeure, customer change after
+    // baseline lock, supplier delay with logged PO due-date change, …). The
+    // attribution_rule splits cause; exclude_conditions REMOVES cause from
+    // the score. Both are needed for a fair reward decision.
+    if (in_array($rewardModeP07, $rewardEligibleSet, true)) {
+        $excludeConditions = $row['exclude_conditions'] ?? null;
+        if (!is_array($excludeConditions) || $excludeConditions === []) {
+            $p0[] = "P0.7.5 Registry $code: reward_mode '$rewardModeP07' requires "
+                . "non-empty exclude_conditions array (defaults in "
+                . "performance_governance_policy.attribution_rule_template).";
         }
     }
 
@@ -296,10 +387,10 @@ foreach ($governance as $row) {
         && trim((string) ($row['paired_metric'] ?? '')) === '') {
         $p1[] = "Registry $code: lag KPI has no paired_metric (lead pairing missing).";
     }
-    // ── P1 — percent KPI without a minimum sample ────────────────────────────
+    // ── P1 — rate KPI without a minimum sample ───────────────────────────────
     $minSample = (int) (($row['formula']['min_sample'] ?? 0));
-    if (isPercentMetric($row) && $minSample === 0) {
-        $p1[] = "Registry $code: percent-unit KPI has min_sample 0 (small-lot noise unguarded).";
+    if (isRateMetric($row) && $minSample === 0) {
+        $p1[] = "Registry $code: rate-unit KPI has min_sample 0 (small-lot noise unguarded).";
     }
     if ($status === 'manual') {
         $p1[] = "Registry $code: calculation_status uses legacy 'manual'; prefer manual_governed in the next schema update.";
@@ -820,7 +911,15 @@ if (is_array($scorecards)) {
             $p1[] = "JD scorecard $roleCode: active scorecard has " . count($items) . " items; exceeds the recommended maximum without Track 4 rationale.";
         }
         $sum = 0;
-        $directionSet = [];   // P1.P07 direction-conflict tracker
+        $rewardEligibleModes = ['bonus_pool_candidate', 'team_reward_candidate', 'role_review_input'];
+        // P1.P07 direction-conflict tracker: per-direction list of items
+        // whose resolved metric direction is set. We use the registry's
+        // 'direction' field (lower_is_better / higher_is_better) — not a
+        // brittle name regex. SETUP_FIRST_PASS, for instance, is in fact a
+        // higher_is_better quality metric, not a speed metric, so the old
+        // name-based heuristic mis-classified it.
+        $itemsByDirection = ['lower_is_better' => [], 'higher_is_better' => []];
+
         foreach ($items as $it) {
             $kc = strtoupper(trim((string) ($it['kpi_code'] ?? ($it['mapped_canonical_metric'] ?? ''))));
             $w  = (int) ($it['weight'] ?? 0);
@@ -832,68 +931,109 @@ if (is_array($scorecards)) {
                 $p0[] = "JD scorecard $roleCode: kpi_code '$kc' has a non-positive weight.";
             }
 
-            // ── P0.7.4 — JD scorecard staged metric MUST NOT auto-reward ────
-            // (P07 hardening) per spec §5 + reward_rules rule 5(d) and the
-            // existing MCS-EXT-1 rule: a measure whose scorecard_scoring_status
-            // is staged_data_contract or candidate_data_contract MUST NOT have
-            // scorecard_contributes_to_reward=true unless it is also marked
-            // manual_governed (the only override path).
-            $ssStatus = strtolower(trim((string) ($it['scorecard_scoring_status'] ?? '')));
-            $stagedStatuses = ['staged_data_contract', 'candidate_data_contract'];
-            $contrib = ($it['scorecard_contributes_to_reward'] ?? false) === true;
-            if (in_array($ssStatus, $stagedStatuses, true) && $contrib) {
+            $resolvedMetric = $metricIndex[$kc] ?? null;
+
+            // ── P0.7.4 — JD scorecard item that contributes to reward MUST
+            // resolve to a runtime metric, not a staged data contract.
+            // (P07 hardening, rescoped) The earlier shape of this rule
+            // checked scorecard_contributes_to_reward against
+            // scorecard_scoring_status; in practice all 152 scorecard items
+            // carry contributes_to_reward=false today and that field never
+            // fired. The real risk per reward_rules rule 5(d) is that the
+            // resolved canonical metric is staged_data_contract AND either
+            // the scorecard item already flags itself reward-eligible OR
+            // the metric's own scoring_status is active_runtime (it is
+            // being driven into the reward pipeline). Either of those, with
+            // a staged metric, must block — only an explicit
+            // manual_governed_override unlocks it.
+            $contrib       = ($it['scorecard_contributes_to_reward'] ?? false) === true;
+            $itemScoringSt = strtolower(trim((string) ($it['scorecard_scoring_status'] ?? '')));
+            $metricCalcSt  = is_array($resolvedMetric)
+                ? strtolower(trim((string) ($resolvedMetric['calculation_status'] ?? '')))
+                : '';
+            if ($metricCalcSt === 'staged_data_contract'
+                && ($contrib || $itemScoringSt === 'active_runtime')) {
                 $hasManualOverride = ($it['manual_governed_override'] ?? false) === true
                     || strtolower(trim((string) ($it['override_status'] ?? ''))) === 'manual_governed';
                 if (!$hasManualOverride) {
-                    $p0[] = "P0.7.4 JD scorecard $roleCode item $kc: scorecard_scoring_status='$ssStatus' "
-                        . "cannot have scorecard_contributes_to_reward=true without manual_governed_override.";
+                    $p0[] = "P0.7.4 JD scorecard $roleCode item $kc: resolved metric is staged_data_contract "
+                        . "but scorecard item flags contributes_to_reward=" . ($contrib ? 'true' : 'false')
+                        . " / scorecard_scoring_status='$itemScoringSt' — needs manual_governed_override.";
+                }
+            }
+
+            // ── P0.7.6 — JD scorecard reward-eligible item must resolve to a
+            // metric whose reward_mode is itself reward-eligible. Future
+            // loophole guard: prevents an editor from flipping
+            // scorecard_contributes_to_reward=true on a metric whose own
+            // reward_mode is not_rewardable, blocker_only, recognition_only,
+            // certification_gate, etc. Today this fires 0 times (all
+            // contributes_to_reward are false) — by design, the rule is
+            // here so the day someone enables reward for a JD item, the
+            // guard catches it before deploy.
+            if ($contrib && is_array($resolvedMetric)) {
+                $metricRewardMode = strtolower(trim((string) ($resolvedMetric['reward_mode'] ?? '')));
+                if ($metricRewardMode === 'not_rewardable') {
+                    $p0[] = "P0.7.6 JD scorecard $roleCode item $kc: contributes_to_reward=true but "
+                        . "resolved metric reward_mode='not_rewardable'.";
+                } elseif ($metricRewardMode !== '' && !in_array($metricRewardMode, $rewardEligibleModes, true)
+                    && !in_array($metricRewardMode, ['blocker_only', 'recognition_only'], true)) {
+                    $p0[] = "P0.7.6 JD scorecard $roleCode item $kc: contributes_to_reward=true but "
+                        . "resolved metric reward_mode='$metricRewardMode' is outside the reward-eligible set "
+                        . "(" . implode(', ', $rewardEligibleModes) . ").";
+                } elseif ($metricRewardMode === '') {
+                    $p0[] = "P0.7.6 JD scorecard $roleCode item $kc: contributes_to_reward=true but "
+                        . "resolved metric has no reward_mode declared.";
+                }
+            }
+
+            // Collect direction for the P1 direction-conflict check below.
+            if (is_array($resolvedMetric)) {
+                $dir = $resolveMetricDirection($resolvedMetric);
+                if ($dir === 'lower_is_better' || $dir === 'higher_is_better') {
+                    $itemsByDirection[$dir][] = [
+                        'kpi_code'     => $kc,
+                        'counter_code' => trim((string) ($it['counter_code'] ?? '')),
+                    ];
                 }
             }
         }
         if ($sum !== 100) {
-            // ── P0.7.3 (relaxed tolerance) — already covered by strict ==100 ─
-            // The strict equality below is the hard rule; we keep both messages
-            // so that a future weight-sum tolerance migration can be staged.
+            // P0.7.3 was removed: it was nested inside this $sum !== 100
+            // branch with a [95,105] band, which the strict ==100 rule
+            // below already supersedes. Tolerance migration is a tracked
+            // follow-up in the P07 report; the strict rule stands alone.
             $p0[] = "JD scorecard $roleCode: weights sum to $sum, must be 100.";
-            if ($sum < 95 || $sum > 105) {
-                $p0[] = "P0.7.3 JD scorecard $roleCode: weights sum $sum is outside the [95,105] P07 fairness band.";
-            }
         }
 
-        // ── P1.P07 — too many items (>5 == above spec §4 recommendation) ────
-        if (count($items) > 5) {
-            $p1[] = "P1.P07 JD scorecard $roleCode: " . count($items) . " items exceeds the P07 spec §4 "
-                . "recommendation of 3-5 role-fit measures.";
-        }
+        // The pre-existing P1 above (count($items) > $recommended_active_count
+        // and count($items) > 6) already covers the "too many items" case.
+        // The earlier P1.P07 item-count rule duplicated that warning and
+        // has been removed.
 
-        // ── P1.P07 — direction conflict heuristic ───────────────────────────
-        // (P07 hardening) Spec §4 forbids measures that pull the same role in
-        // opposing directions (e.g. setup-time-down vs first-piece-quality-up
-        // without a counter-metric pairing). Heuristic: if the role mixes a
-        // throughput/speed metric (SETUP_*, OEE, MACHINE_UTIL, PUT_THRU,
-        // THROUGHPUT_*) with a defect-rate metric (SCRAP_RATE, REWORK_RATE,
-        // IN_PROCESS_REJECT_RATE, FAI_FIRST_PASS) AND has no explicit
-        // counter_code on either, flag as a P1 imbalance.
-        $speedRegex = '/^(SETUP_|OEE|MACHINE_UTIL|PUT_THRU|THROUGHPUT|CYCLE_TIME_VARIANCE|CHANGEOVER_TIME)/';
-        $qualityRegex = '/^(SCRAP_RATE|REWORK_RATE|IN_PROCESS_REJECT_RATE|FAI_FIRST_PASS|FPY|DPMO)$/';
-        $hasSpeed = false; $hasQuality = false;
-        $speedHasCounter = true; $qualityHasCounter = true;
-        foreach ($items as $it) {
-            $kc2 = strtoupper(trim((string) ($it['kpi_code'] ?? ($it['mapped_canonical_metric'] ?? ''))));
-            $cc2 = trim((string) ($it['counter_code'] ?? ''));
-            if (preg_match($speedRegex, $kc2)) {
-                $hasSpeed = true;
-                if ($cc2 === '') { $speedHasCounter = false; }
+        // ── P1.P07 — direction conflict via registry direction ─────────────
+        // (P07 hardening, rescoped) Spec §4 forbids measures that pull the
+        // role in opposing directions without a counter pairing. Detection:
+        // if the active list mixes at least one lower_is_better metric and
+        // at least one higher_is_better metric AND at least one side of the
+        // pairing has no counter_code, warn. This replaces the brittle name
+        // regex (which mis-classified SETUP_FIRST_PASS as "speed").
+        $hasLower  = !empty($itemsByDirection['lower_is_better']);
+        $hasHigher = !empty($itemsByDirection['higher_is_better']);
+        if ($hasLower && $hasHigher) {
+            $lowerHasCounter  = true;
+            $higherHasCounter = true;
+            foreach ($itemsByDirection['lower_is_better'] as $entry) {
+                if ($entry['counter_code'] === '') { $lowerHasCounter = false; }
             }
-            if (preg_match($qualityRegex, $kc2)) {
-                $hasQuality = true;
-                if ($cc2 === '') { $qualityHasCounter = false; }
+            foreach ($itemsByDirection['higher_is_better'] as $entry) {
+                if ($entry['counter_code'] === '') { $higherHasCounter = false; }
             }
-        }
-        if ($hasSpeed && $hasQuality && (!$speedHasCounter || !$qualityHasCounter)) {
-            $p1[] = "P1.P07 JD scorecard $roleCode: mixes a speed/throughput measure with a defect-rate measure "
-                . "and at least one side has no counter_code; verify the bundle does not pull the role in "
-                . "opposing directions (spec §4).";
+            if (!$lowerHasCounter || !$higherHasCounter) {
+                $p1[] = "P1.P07 JD scorecard $roleCode: mixes lower_is_better and higher_is_better "
+                    . "measures and at least one side has no counter_code; verify the bundle does not "
+                    . "pull the role in opposing directions (spec §4).";
+            }
         }
     }
 }
@@ -929,6 +1069,45 @@ if (preg_match('/CONSOLE_EDITABLE_FIELDS\\s*=\\s*\\[(.*?)\\];/s', $engineSrc, $e
 $adminJs = readText($adminJsFp);
 if (preg_match('/JSON\\.(parse|stringify)|kc-json|<textarea[^>]+json/i', $adminJs)) {
     $p0[] = "Admin Console: raw JSON editing pattern detected in normal KPI Console path.";
+}
+
+// ── P0.7.7 — discipline_scope.whitelist tokens must match condition_ids ────
+// (P07 hardening) performance_governance_policy.discipline_scope.whitelist
+// lists controllable behaviours that may justify discipline. Each token MUST
+// resolve to a blocking_condition_registry condition_id so any discipline
+// action can cite a registered evidence anchor (per
+// discipline_scope.evidence_requirement). A vocabulary mismatch silently
+// breaks the citation chain — the JD / policy still compiles but discipline
+// findings cannot link back to evidence.
+$performancePolicy = is_array($registry['performance_governance_policy'] ?? null)
+    ? $registry['performance_governance_policy'] : [];
+$blockingRegistry  = is_array($registry['blocking_condition_registry'] ?? null)
+    ? $registry['blocking_condition_registry'] : [];
+$disciplineScope   = is_array($performancePolicy['discipline_scope'] ?? null)
+    ? $performancePolicy['discipline_scope'] : [];
+$whitelist         = is_array($disciplineScope['whitelist'] ?? null)
+    ? $disciplineScope['whitelist'] : [];
+if ($whitelist !== []) {
+    $allConditionIds = [];
+    foreach ((array) ($blockingRegistry['groups'] ?? []) as $groupName => $group) {
+        if (!is_array($group)) {
+            continue;
+        }
+        foreach ((array) ($group['condition_ids'] ?? []) as $cid) {
+            $allConditionIds[(string) $cid] = $groupName;
+        }
+    }
+    foreach ($whitelist as $token) {
+        $token = (string) $token;
+        if ($token === '') {
+            continue;
+        }
+        if (!isset($allConditionIds[$token])) {
+            $p0[] = "P0.7.7 performance_governance_policy.discipline_scope.whitelist: token '$token' "
+                . "does not match any blocking_condition_registry.groups[*].condition_ids — "
+                . "discipline citation chain broken.";
+        }
+    }
 }
 
 // ── P0.13 — MCS-EXT-1 extension consistency ────────────────────────────────

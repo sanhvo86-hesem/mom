@@ -220,7 +220,7 @@
       "paired_metric": "FPY",
       "decision_action": "Đỏ: CEO/QA soát xét, mở bao vây trong 24h và thông báo khách nếu cần.",
       "action_reference": "SOP-902 xem xét của lãnh đạo + quy trình NCR/CAPA; CDR cổng G6.",
-      "attribution_rule": "Khiếu nại phải được ghi nhận đầy đủ — cấm nén số bằng cách không mở NCR; kiểm tra chéo qua data-integrity gate.",
+      "attribution_rule": "Đỏ phải tách theo nguyên nhân: lỗi sản xuất do D-PROD/WKM, lỗi thiết kế do D-ENG, lỗi đóng gói/giao hàng do D-WHS/CS; phần thuộc owner QA giới hạn ở vận hành cổng phát hành cuối. Khiếu nại phải được ghi nhận đầy đủ — cấm nén số bằng cách không mở NCR; kiểm tra chéo qua data-integrity gate.",
       "counter_metric": {
         "code": "COMPLAINT_RATE-CTR",
         "endpoint": "POST /api/kpi/COMPLAINT_RATE-CTR/input",
@@ -693,7 +693,13 @@
         "PPL",
         "PD"
       ],
-      "reward_mode": "role_review_input"
+      "reward_mode": "role_review_input",
+      "exclude_conditions": [
+        "customer_change_after_baseline_lock",
+        "approved_rush_order",
+        "supplier_delay_verified",
+        "engineering_change_post_release"
+      ]
     },
     {
       "no": 10,
@@ -758,7 +764,11 @@
         "QA",
         "QC"
       ],
-      "reward_mode": "role_review_input"
+      "reward_mode": "role_review_input",
+      "exclude_conditions": [
+        "customer_drawing_revision_post_quote",
+        "first_article_per_engineering_change"
+      ]
     },
     {
       "no": 11,
@@ -820,7 +830,12 @@
         "PPL",
         "PD"
       ],
-      "reward_mode": "role_review_input"
+      "reward_mode": "role_review_input",
+      "exclude_conditions": [
+        "customer_hold_verified",
+        "qa_hold_legitimate",
+        "engineering_block_open"
+      ]
     },
     {
       "no": 12,
@@ -882,7 +897,11 @@
       "applicable_jds": [
         "SCM"
       ],
-      "reward_mode": "role_review_input"
+      "reward_mode": "role_review_input",
+      "exclude_conditions": [
+        "force_majeure_or_utility_outage",
+        "customer_change_after_baseline_lock"
+      ]
     },
     {
       "no": 13,
@@ -1007,7 +1026,11 @@
       "applicable_jds": [
         "FIN"
       ],
-      "reward_mode": "role_review_input"
+      "reward_mode": "role_review_input",
+      "exclude_conditions": [
+        "customer_dispute_pending",
+        "credit_term_negotiated_extended"
+      ]
     },
     {
       "no": 15,
@@ -1254,7 +1277,11 @@
       "applicable_jds": [
         "ENGM"
       ],
-      "reward_mode": "role_review_input"
+      "reward_mode": "role_review_input",
+      "exclude_conditions": [
+        "customer_approval_pending",
+        "external_lab_test_pending"
+      ]
     },
     {
       "no": 19,
@@ -1316,7 +1343,11 @@
         "QA",
         "QMS"
       ],
-      "reward_mode": "role_review_input"
+      "reward_mode": "role_review_input",
+      "exclude_conditions": [
+        "customer_dispositioning_pending",
+        "external_test_pending"
+      ]
     },
     {
       "no": 20,
@@ -1380,7 +1411,11 @@
         "QA",
         "QC"
       ],
-      "reward_mode": "role_review_input"
+      "reward_mode": "role_review_input",
+      "exclude_conditions": [
+        "external_calibration_vendor_delay",
+        "equipment_quarantined_legitimate"
+      ]
     },
     {
       "no": 21,
@@ -1441,7 +1476,12 @@
       "applicable_jds": [
         "SCM"
       ],
-      "reward_mode": "role_review_input"
+      "reward_mode": "role_review_input",
+      "exclude_conditions": [
+        "supplier_delay_verified",
+        "force_majeure_or_utility_outage",
+        "customer_change_after_baseline_lock"
+      ]
     },
     {
       "no": 22,
@@ -1502,7 +1542,11 @@
       "applicable_jds": [
         "SCM"
       ],
-      "reward_mode": "role_review_input"
+      "reward_mode": "role_review_input",
+      "exclude_conditions": [
+        "physical_count_in_progress",
+        "system_migration_window"
+      ]
     },
     {
       "no": 23,
@@ -1689,7 +1733,11 @@
       "applicable_jds": [
         "FIN"
       ],
-      "reward_mode": "role_review_input"
+      "reward_mode": "role_review_input",
+      "exclude_conditions": [
+        "customer_dispute_pending",
+        "credit_term_negotiated_extended"
+      ]
     },
     {
       "no": 26,
@@ -1812,7 +1860,11 @@
       "applicable_jds": [
         "HR"
       ],
-      "reward_mode": "role_review_input"
+      "reward_mode": "role_review_input",
+      "exclude_conditions": [
+        "personal_leave_legitimate",
+        "training_resource_unavailable_external"
+      ]
     },
     {
       "no": 28,
@@ -1936,7 +1988,11 @@
       "applicable_jds": [
         "EHS"
       ],
-      "reward_mode": "role_review_input"
+      "reward_mode": "role_review_input",
+      "exclude_conditions": [
+        "legal_or_regulatory_review_pending",
+        "external_consultant_engagement"
+      ]
     },
     {
       "no": 30,
@@ -8600,8 +8656,8 @@
       "rule_id": "P07-DISCIPLINE-WHITELIST-V1",
       "rule": "Discipline (formal warning, monetary deduction, role removal, termination) is allowed ONLY for these verified controllable behaviours. Anything else routes to coaching/CAPA/resource review.",
       "whitelist": [
-        "data_falsification_verified",
-        "required_gate_bypass_verified",
+        "verified_data_falsification",
+        "required_gate_bypass",
         "unsafe_act_verified",
         "repeated_non_compliance_after_documented_coaching",
         "refusal_to_follow_released_procedure_verified",
@@ -9566,7 +9622,8 @@
           "bottleneck_oee_missing_reason_codes",
           "unapproved_cost_exclusion",
           "unapproved_quality_cost_adjustment",
-          "copq_cost_bucket_not_approved"
+          "copq_cost_bucket_not_approved",
+          "evidence_tampering_or_signature_misuse"
         ],
         "source_domain": "ERP/MOM/MES/EQMS audit and finance close",
         "source_table_or_record": "audit trail; promise-date approval; constraint register; OEE reason-code log; finance cost-bucket approval",
@@ -9589,7 +9646,9 @@
       "audit": {
         "condition_ids": [
           "major_audit_nonconformance_overdue",
-          "open_red_quality_or_safety_counter_metric"
+          "open_red_quality_or_safety_counter_metric",
+          "repeated_non_compliance_after_documented_coaching",
+          "refusal_to_follow_released_procedure_verified"
         ],
         "source_domain": "Audit risk / management review",
         "source_table_or_record": "audit nonconformance; counter-metric scorecard",
