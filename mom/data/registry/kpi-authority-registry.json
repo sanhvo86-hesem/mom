@@ -161,6 +161,16 @@
       "applicable_jds": [
         "PD",
         "CS"
+      ],
+      "reward_mode": "bonus_pool_candidate",
+      "exclude_conditions": [
+        "customer_change_after_baseline_lock",
+        "approved_rush_order",
+        "supplier_late_delivery_with_logged_PO_due_date_change",
+        "machine_random_failure_with_PM_within_window",
+        "engineering_defect_with_open_eco",
+        "qa_hold_valid_per_gate",
+        "force_majeure_or_utility_outage"
       ]
     },
     {
@@ -232,6 +242,16 @@
       "applicable_jds": [
         "QA",
         "CS"
+      ],
+      "reward_mode": "bonus_pool_candidate",
+      "exclude_conditions": [
+        "customer_change_after_baseline_lock",
+        "approved_rush_order",
+        "supplier_late_delivery_with_logged_PO_due_date_change",
+        "machine_random_failure_with_PM_within_window",
+        "engineering_defect_with_open_eco",
+        "qa_hold_valid_per_gate",
+        "force_majeure_or_utility_outage"
       ]
     },
     {
@@ -294,7 +314,8 @@
       "applicable_jds": [
         "QA",
         "QC"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 4,
@@ -357,7 +378,8 @@
       "category": "financial",
       "applicable_jds": [
         "FIN"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 5,
@@ -419,7 +441,8 @@
       "category": "safety",
       "applicable_jds": [
         "EHS"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 6,
@@ -481,7 +504,8 @@
       "applicable_jds": [
         "QMS",
         "HR"
-      ]
+      ],
+      "reward_mode": "recognition_only"
     },
     {
       "no": 7,
@@ -543,7 +567,8 @@
       "applicable_jds": [
         "CS",
         "EST"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 8,
@@ -604,7 +629,8 @@
       "applicable_jds": [
         "CS",
         "QA"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 9,
@@ -666,7 +692,8 @@
       "applicable_jds": [
         "PPL",
         "PD"
-      ]
+      ],
+      "reward_mode": "role_review_input"
     },
     {
       "no": 10,
@@ -730,7 +757,8 @@
       "applicable_jds": [
         "QA",
         "QC"
-      ]
+      ],
+      "reward_mode": "role_review_input"
     },
     {
       "no": 11,
@@ -791,7 +819,8 @@
       "applicable_jds": [
         "PPL",
         "PD"
-      ]
+      ],
+      "reward_mode": "role_review_input"
     },
     {
       "no": 12,
@@ -852,7 +881,8 @@
       "category": "supplier",
       "applicable_jds": [
         "SCM"
-      ]
+      ],
+      "reward_mode": "role_review_input"
     },
     {
       "no": 13,
@@ -914,7 +944,8 @@
       "applicable_jds": [
         "FIN",
         "CS"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 14,
@@ -975,7 +1006,8 @@
       "category": "financial",
       "applicable_jds": [
         "FIN"
-      ]
+      ],
+      "reward_mode": "role_review_input"
     },
     {
       "no": 15,
@@ -1037,7 +1069,8 @@
       "applicable_jds": [
         "PD",
         "PPL"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 16,
@@ -1098,7 +1131,8 @@
       "applicable_jds": [
         "WKM",
         "SL"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 17,
@@ -1158,7 +1192,8 @@
       "category": "internal",
       "applicable_jds": [
         "ENGM"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 18,
@@ -1218,7 +1253,8 @@
       "category": "internal",
       "applicable_jds": [
         "ENGM"
-      ]
+      ],
+      "reward_mode": "role_review_input"
     },
     {
       "no": 19,
@@ -1279,7 +1315,8 @@
       "applicable_jds": [
         "QA",
         "QMS"
-      ]
+      ],
+      "reward_mode": "role_review_input"
     },
     {
       "no": 20,
@@ -1342,7 +1379,8 @@
       "applicable_jds": [
         "QA",
         "QC"
-      ]
+      ],
+      "reward_mode": "role_review_input"
     },
     {
       "no": 21,
@@ -1402,7 +1440,8 @@
       "category": "supplier",
       "applicable_jds": [
         "SCM"
-      ]
+      ],
+      "reward_mode": "role_review_input"
     },
     {
       "no": 22,
@@ -1462,7 +1501,8 @@
       "category": "internal",
       "applicable_jds": [
         "SCM"
-      ]
+      ],
+      "reward_mode": "role_review_input"
     },
     {
       "no": 23,
@@ -1525,7 +1565,8 @@
       "applicable_jds": [
         "CS",
         "EST"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 24,
@@ -1586,7 +1627,8 @@
       "category": "customer",
       "applicable_jds": [
         "CS"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 25,
@@ -1646,7 +1688,8 @@
       "category": "financial",
       "applicable_jds": [
         "FIN"
-      ]
+      ],
+      "reward_mode": "role_review_input"
     },
     {
       "no": 26,
@@ -1707,7 +1750,8 @@
       "category": "financial",
       "applicable_jds": [
         "FIN"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 27,
@@ -1767,7 +1811,8 @@
       "category": "internal",
       "applicable_jds": [
         "HR"
-      ]
+      ],
+      "reward_mode": "role_review_input"
     },
     {
       "no": 28,
@@ -1829,7 +1874,8 @@
       "category": "internal",
       "applicable_jds": [
         "HR"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 29,
@@ -1889,7 +1935,8 @@
       "category": "safety",
       "applicable_jds": [
         "EHS"
-      ]
+      ],
+      "reward_mode": "role_review_input"
     },
     {
       "no": 30,
@@ -1951,7 +1998,8 @@
       "applicable_jds": [
         "EHS",
         "HR"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 31,
@@ -2012,7 +2060,8 @@
       "category": "system",
       "applicable_jds": [
         "ITA"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 32,
@@ -2072,7 +2121,8 @@
       "category": "system",
       "applicable_jds": [
         "ITA"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     },
     {
       "no": 33,
@@ -2134,7 +2184,8 @@
       "applicable_jds": [
         "ITA",
         "SCM"
-      ]
+      ],
+      "reward_mode": "not_rewardable"
     }
   ],
   "proposed_operating_metrics": [
@@ -6150,9 +6201,24 @@
       "owner_role": "ENGM",
       "cadence": "per-event",
       "calculation_status": "staged_data_contract",
-      "thresholds": {"direction": "lower_is_better", "unit": "hours", "green_point": 24, "yellow_point": 72, "target": 24, "basis": "LAM/SEMSYSCO yêu cầu thông báo immediate cho schedule deviation; <24h là chuẩn."},
-      "counter_metric": {"code": "PROJECT_PLAN_DEVIATION_COMMUNICATION_LT-CTR", "endpoint": "POST /api/kpi/PROJECT_PLAN_DEVIATION_COMMUNICATION_LT-CTR/input", "name_vi": "Số deviation bị im lặng đến khi khách phát hiện", "name": "Silent schedule-deviation count", "intent": "Bắt việc giấu lệch tiến độ."},
-      "blocking_conditions": ["unreported_schedule_deviation"],
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hours",
+        "green_point": 24,
+        "yellow_point": 72,
+        "target": 24,
+        "basis": "LAM/SEMSYSCO yêu cầu thông báo immediate cho schedule deviation; <24h là chuẩn."
+      },
+      "counter_metric": {
+        "code": "PROJECT_PLAN_DEVIATION_COMMUNICATION_LT-CTR",
+        "endpoint": "POST /api/kpi/PROJECT_PLAN_DEVIATION_COMMUNICATION_LT-CTR/input",
+        "name_vi": "Số deviation bị im lặng đến khi khách phát hiện",
+        "name": "Silent schedule-deviation count",
+        "intent": "Bắt việc giấu lệch tiến độ."
+      },
+      "blocking_conditions": [
+        "unreported_schedule_deviation"
+      ],
       "metric_type": "operating_metric",
       "metric_subtype": "operating_metric",
       "control_intent": "customer_specific_requirement",
@@ -6161,7 +6227,10 @@
       "evaluation_use": "daily_management",
       "reward_mode": "not_rewardable",
       "lifecycle_status": "pilot",
-      "applicable_jds": ["ENGM", "CS"],
+      "applicable_jds": [
+        "ENGM",
+        "CS"
+      ],
       "lam_profile_link": "LAM_SEMSYSCO",
       "evidence_source": "project_deviation_log + customer notification email"
     },
@@ -6174,9 +6243,24 @@
       "owner_role": "QA",
       "cadence": "per-event",
       "calculation_status": "staged_data_contract",
-      "thresholds": {"direction": "lower_is_better", "unit": "hours", "green_point": 8, "yellow_point": 16, "target": 8, "basis": "LAM/SEMSYSCO 8D timing: 3D within 1 working day = 8h."},
-      "counter_metric": {"code": "NCR_3D_RESPONSE_SLA-CTR", "endpoint": "POST /api/kpi/NCR_3D_RESPONSE_SLA-CTR/input", "name_vi": "Số complaint LAM trễ 3D", "name": "Late 3D LAM-complaint count", "intent": "Bắt việc trễ 3D — vi phạm hợp đồng."},
-      "blocking_conditions": ["3d_late_for_lam_complaint"],
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hours",
+        "green_point": 8,
+        "yellow_point": 16,
+        "target": 8,
+        "basis": "LAM/SEMSYSCO 8D timing: 3D within 1 working day = 8h."
+      },
+      "counter_metric": {
+        "code": "NCR_3D_RESPONSE_SLA-CTR",
+        "endpoint": "POST /api/kpi/NCR_3D_RESPONSE_SLA-CTR/input",
+        "name_vi": "Số complaint LAM trễ 3D",
+        "name": "Late 3D LAM-complaint count",
+        "intent": "Bắt việc trễ 3D — vi phạm hợp đồng."
+      },
+      "blocking_conditions": [
+        "3d_late_for_lam_complaint"
+      ],
       "metric_type": "operating_metric",
       "metric_subtype": "operating_metric",
       "control_intent": "customer_specific_requirement",
@@ -6185,7 +6269,10 @@
       "evaluation_use": "daily_management",
       "reward_mode": "not_rewardable",
       "lifecycle_status": "pilot",
-      "applicable_jds": ["QA", "CS"],
+      "applicable_jds": [
+        "QA",
+        "CS"
+      ],
       "lam_profile_link": "LAM_SEMSYSCO",
       "evidence_source": "ncr_response_log + customer email timestamps"
     },
@@ -6198,9 +6285,24 @@
       "owner_role": "QA",
       "cadence": "per-event",
       "calculation_status": "staged_data_contract",
-      "thresholds": {"direction": "lower_is_better", "unit": "hours", "green_point": 16, "yellow_point": 32, "target": 16, "basis": "LAM/SEMSYSCO 8D timing: 4D preliminary within 2 working days = 16h."},
-      "counter_metric": {"code": "NCR_4D_PRELIMINARY_SLA-CTR", "endpoint": "POST /api/kpi/NCR_4D_PRELIMINARY_SLA-CTR/input", "name_vi": "Số 4D nộp trễ", "name": "Late 4D preliminary count", "intent": "Bắt việc trễ 4D."},
-      "blocking_conditions": ["4d_late_for_lam_complaint"],
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hours",
+        "green_point": 16,
+        "yellow_point": 32,
+        "target": 16,
+        "basis": "LAM/SEMSYSCO 8D timing: 4D preliminary within 2 working days = 16h."
+      },
+      "counter_metric": {
+        "code": "NCR_4D_PRELIMINARY_SLA-CTR",
+        "endpoint": "POST /api/kpi/NCR_4D_PRELIMINARY_SLA-CTR/input",
+        "name_vi": "Số 4D nộp trễ",
+        "name": "Late 4D preliminary count",
+        "intent": "Bắt việc trễ 4D."
+      },
+      "blocking_conditions": [
+        "4d_late_for_lam_complaint"
+      ],
       "metric_type": "operating_metric",
       "metric_subtype": "operating_metric",
       "control_intent": "customer_specific_requirement",
@@ -6209,7 +6311,9 @@
       "evaluation_use": "daily_management",
       "reward_mode": "not_rewardable",
       "lifecycle_status": "pilot",
-      "applicable_jds": ["QA"],
+      "applicable_jds": [
+        "QA"
+      ],
       "lam_profile_link": "LAM_SEMSYSCO",
       "evidence_source": "ncr_response_log"
     },
@@ -6222,9 +6326,24 @@
       "owner_role": "QA",
       "cadence": "per-event",
       "calculation_status": "staged_data_contract",
-      "thresholds": {"direction": "lower_is_better", "unit": "hours", "green_point": 80, "yellow_point": 120, "target": 80, "basis": "LAM/SEMSYSCO: updated 8D within 10 working days; >1 month action requires monthly progress update."},
-      "counter_metric": {"code": "NCR_8D_UPDATE_SLA-CTR", "endpoint": "POST /api/kpi/NCR_8D_UPDATE_SLA-CTR/input", "name_vi": "Số 8D trễ hoặc không có progress update khi action >30d", "name": "Stale 8D / missing progress update count", "intent": "Bắt việc bỏ rơi CAPA."},
-      "blocking_conditions": ["8d_late_or_no_progress_update"],
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hours",
+        "green_point": 80,
+        "yellow_point": 120,
+        "target": 80,
+        "basis": "LAM/SEMSYSCO: updated 8D within 10 working days; >1 month action requires monthly progress update."
+      },
+      "counter_metric": {
+        "code": "NCR_8D_UPDATE_SLA-CTR",
+        "endpoint": "POST /api/kpi/NCR_8D_UPDATE_SLA-CTR/input",
+        "name_vi": "Số 8D trễ hoặc không có progress update khi action >30d",
+        "name": "Stale 8D / missing progress update count",
+        "intent": "Bắt việc bỏ rơi CAPA."
+      },
+      "blocking_conditions": [
+        "8d_late_or_no_progress_update"
+      ],
       "metric_type": "operating_metric",
       "metric_subtype": "operating_metric",
       "control_intent": "customer_specific_requirement",
@@ -6233,7 +6352,10 @@
       "evaluation_use": "daily_management",
       "reward_mode": "not_rewardable",
       "lifecycle_status": "pilot",
-      "applicable_jds": ["QA", "QE"],
+      "applicable_jds": [
+        "QA",
+        "QE"
+      ],
       "lam_profile_link": "LAM_SEMSYSCO",
       "evidence_source": "8d_report_history with progress update timestamps"
     },
@@ -6246,9 +6368,24 @@
       "owner_role": "QA",
       "cadence": "monthly",
       "calculation_status": "staged_data_contract",
-      "thresholds": {"direction": "higher_is_better", "unit": "percent", "green_point": 95, "yellow_point": 85, "target": 95, "basis": "Complaint chỉ đóng khi khách accept feedback/8D; tự đóng = false closure."},
-      "counter_metric": {"code": "CUSTOMER_ACCEPTED_8D_CLOSURE_RATE-CTR", "endpoint": "POST /api/kpi/CUSTOMER_ACCEPTED_8D_CLOSURE_RATE-CTR/input", "name_vi": "Số 8D self-closed không có khách ack", "name": "Self-closed 8D without customer ack count", "intent": "Bắt việc tự đóng để đẹp số."},
-      "blocking_conditions": ["8d_self_closed_without_customer_ack"],
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95,
+        "yellow_point": 85,
+        "target": 95,
+        "basis": "Complaint chỉ đóng khi khách accept feedback/8D; tự đóng = false closure."
+      },
+      "counter_metric": {
+        "code": "CUSTOMER_ACCEPTED_8D_CLOSURE_RATE-CTR",
+        "endpoint": "POST /api/kpi/CUSTOMER_ACCEPTED_8D_CLOSURE_RATE-CTR/input",
+        "name_vi": "Số 8D self-closed không có khách ack",
+        "name": "Self-closed 8D without customer ack count",
+        "intent": "Bắt việc tự đóng để đẹp số."
+      },
+      "blocking_conditions": [
+        "8d_self_closed_without_customer_ack"
+      ],
       "metric_type": "operating_metric",
       "metric_subtype": "operating_metric",
       "control_intent": "customer_specific_requirement",
@@ -6257,7 +6394,9 @@
       "evaluation_use": "management_review",
       "reward_mode": "not_rewardable",
       "lifecycle_status": "pilot",
-      "applicable_jds": ["QA"],
+      "applicable_jds": [
+        "QA"
+      ],
       "lam_profile_link": "LAM_SEMSYSCO",
       "evidence_source": "8d_closure_log + customer acceptance email"
     },
@@ -6270,9 +6409,24 @@
       "owner_role": "QA",
       "cadence": "monthly",
       "calculation_status": "manual_governed",
-      "thresholds": {"direction": "lower_is_better", "unit": "count", "green_point": 0, "yellow_point": 3, "target": 0, "basis": "CAPA dùng training-only là dấu hiệu RCA yếu; LAM khuyến cáo cần process/system action."},
-      "counter_metric": {"code": "TRAINING_AS_CAPA_COUNTER-RECUR", "endpoint": "POST /api/kpi/TRAINING_AS_CAPA_COUNTER-RECUR/input", "name_vi": "Số CAPA training-only tái phát trong 90 ngày", "name": "Recurrent training-only CAPA count (90d)", "intent": "Bắt việc đóng CAPA bằng đào tạo nhưng lỗi quay lại — chứng tỏ RCA yếu."},
-      "blocking_conditions": ["training_only_capa_for_lam_repeat"],
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "count",
+        "green_point": 0,
+        "yellow_point": 3,
+        "target": 0,
+        "basis": "CAPA dùng training-only là dấu hiệu RCA yếu; LAM khuyến cáo cần process/system action."
+      },
+      "counter_metric": {
+        "code": "TRAINING_AS_CAPA_COUNTER-RECUR",
+        "endpoint": "POST /api/kpi/TRAINING_AS_CAPA_COUNTER-RECUR/input",
+        "name_vi": "Số CAPA training-only tái phát trong 90 ngày",
+        "name": "Recurrent training-only CAPA count (90d)",
+        "intent": "Bắt việc đóng CAPA bằng đào tạo nhưng lỗi quay lại — chứng tỏ RCA yếu."
+      },
+      "blocking_conditions": [
+        "training_only_capa_for_lam_repeat"
+      ],
       "metric_type": "counter_metric",
       "metric_subtype": "counter_metric",
       "control_intent": "anti_gaming_guardrail",
@@ -6281,7 +6435,10 @@
       "evaluation_use": "management_review",
       "reward_mode": "blocker_only",
       "lifecycle_status": "pilot",
-      "applicable_jds": ["QA", "QE"],
+      "applicable_jds": [
+        "QA",
+        "QE"
+      ],
       "lam_profile_link": "LAM_SEMSYSCO",
       "paired_metric": "CAPA_CLOSURE",
       "evidence_source": "CAPA register with action_type tag"
@@ -6295,9 +6452,24 @@
       "owner_role": "QMS",
       "cadence": "monthly",
       "calculation_status": "manual_governed",
-      "thresholds": {"direction": "higher_is_better", "unit": "percent", "green_point": 100, "yellow_point": 99, "target": 100, "basis": "LAM/SEMSYSCO yêu cầu retention 10 năm cho process/quality relevant docs."},
-      "counter_metric": {"code": "DOC_RECORD_RETENTION_10Y-CTR", "endpoint": "POST /api/kpi/DOC_RECORD_RETENTION_10Y-CTR/input", "name_vi": "Số record bị xóa/huỷ trước 10 năm", "name": "Pre-10y record deletion count", "intent": "Bắt việc vi phạm retention."},
-      "blocking_conditions": ["pre_10y_deletion_event"],
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 99,
+        "target": 100,
+        "basis": "LAM/SEMSYSCO yêu cầu retention 10 năm cho process/quality relevant docs."
+      },
+      "counter_metric": {
+        "code": "DOC_RECORD_RETENTION_10Y-CTR",
+        "endpoint": "POST /api/kpi/DOC_RECORD_RETENTION_10Y-CTR/input",
+        "name_vi": "Số record bị xóa/huỷ trước 10 năm",
+        "name": "Pre-10y record deletion count",
+        "intent": "Bắt việc vi phạm retention."
+      },
+      "blocking_conditions": [
+        "pre_10y_deletion_event"
+      ],
       "metric_type": "health_indicator",
       "metric_subtype": "health_indicator",
       "control_intent": "compliance_evidence",
@@ -6306,7 +6478,10 @@
       "evaluation_use": "management_review",
       "reward_mode": "not_rewardable",
       "lifecycle_status": "pilot",
-      "applicable_jds": ["QMS", "ITA"],
+      "applicable_jds": [
+        "QMS",
+        "ITA"
+      ],
       "lam_profile_link": "LAM_SEMSYSCO",
       "evidence_source": "document_retention_audit + storage policy"
     },
@@ -6319,9 +6494,24 @@
       "owner_role": "SCM",
       "cadence": "monthly",
       "calculation_status": "manual_governed",
-      "thresholds": {"direction": "higher_is_better", "unit": "percent", "green_point": 100, "yellow_point": 95, "target": 100, "basis": "LAM/SEMSYSCO yêu cầu sub-tier nhận đầy đủ QA/legal/customer-specific requirements."},
-      "counter_metric": {"code": "SUBTIER_REQUIREMENT_FLOWDOWN-CTR", "endpoint": "POST /api/kpi/SUBTIER_REQUIREMENT_FLOWDOWN-CTR/input", "name_vi": "Số sub-tier không có flowdown attestation", "name": "Subtier without flowdown attestation count", "intent": "Bắt việc bỏ qua áp yêu cầu xuống NCC dưới."},
-      "blocking_conditions": ["subtier_without_flowdown_attestation"],
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 95,
+        "target": 100,
+        "basis": "LAM/SEMSYSCO yêu cầu sub-tier nhận đầy đủ QA/legal/customer-specific requirements."
+      },
+      "counter_metric": {
+        "code": "SUBTIER_REQUIREMENT_FLOWDOWN-CTR",
+        "endpoint": "POST /api/kpi/SUBTIER_REQUIREMENT_FLOWDOWN-CTR/input",
+        "name_vi": "Số sub-tier không có flowdown attestation",
+        "name": "Subtier without flowdown attestation count",
+        "intent": "Bắt việc bỏ qua áp yêu cầu xuống NCC dưới."
+      },
+      "blocking_conditions": [
+        "subtier_without_flowdown_attestation"
+      ],
       "metric_type": "operating_metric",
       "metric_subtype": "supplier_scorecard_metric",
       "control_intent": "customer_specific_requirement",
@@ -6330,7 +6520,10 @@
       "evaluation_use": "supplier_scorecard",
       "reward_mode": "supplier_consequence",
       "lifecycle_status": "pilot",
-      "applicable_jds": ["SCM", "QA"],
+      "applicable_jds": [
+        "SCM",
+        "QA"
+      ],
       "lam_profile_link": "LAM_SEMSYSCO",
       "evidence_source": "subtier_flowdown_attestation_register"
     },
@@ -6343,9 +6536,24 @@
       "owner_role": "QMS",
       "cadence": "monthly",
       "calculation_status": "manual_governed",
-      "thresholds": {"direction": "higher_is_better", "unit": "percent", "green_point": 100, "yellow_point": 80, "target": 100, "basis": "Plan phải cover facilities, supply, natural disasters, fire, utilities, labor, packaging, transport routes."},
-      "counter_metric": {"code": "CONTINGENCY_PLAN_READINESS_LAM-CTR", "endpoint": "POST /api/kpi/CONTINGENCY_PLAN_READINESS_LAM-CTR/input", "name_vi": "Số tháng plan không có drill / không cập nhật cho LAM", "name": "Stale/un-drilled LAM contingency-plan month count", "intent": "Bắt việc plan trên giấy nhưng không drill — không sẵn sàng khi xảy ra."},
-      "blocking_conditions": ["contingency_plan_missing_or_stale_for_lam"],
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 80,
+        "target": 100,
+        "basis": "Plan phải cover facilities, supply, natural disasters, fire, utilities, labor, packaging, transport routes."
+      },
+      "counter_metric": {
+        "code": "CONTINGENCY_PLAN_READINESS_LAM-CTR",
+        "endpoint": "POST /api/kpi/CONTINGENCY_PLAN_READINESS_LAM-CTR/input",
+        "name_vi": "Số tháng plan không có drill / không cập nhật cho LAM",
+        "name": "Stale/un-drilled LAM contingency-plan month count",
+        "intent": "Bắt việc plan trên giấy nhưng không drill — không sẵn sàng khi xảy ra."
+      },
+      "blocking_conditions": [
+        "contingency_plan_missing_or_stale_for_lam"
+      ],
       "metric_type": "health_indicator",
       "metric_subtype": "health_indicator",
       "control_intent": "compliance_evidence",
@@ -6354,7 +6562,10 @@
       "evaluation_use": "management_review",
       "reward_mode": "not_rewardable",
       "lifecycle_status": "pilot",
-      "applicable_jds": ["QMS", "EHS"],
+      "applicable_jds": [
+        "QMS",
+        "EHS"
+      ],
       "lam_profile_link": "LAM_SEMSYSCO",
       "evidence_source": "contingency_plan_doc + drill log"
     },
@@ -6367,9 +6578,24 @@
       "owner_role": "SCM",
       "cadence": "quarterly",
       "calculation_status": "manual_governed",
-      "thresholds": {"direction": "higher_is_better", "unit": "percent", "green_point": 100, "yellow_point": 90, "target": 100, "basis": "Lam Supplier Code yêu cầu RBA + transparent information sharing + audit access."},
-      "counter_metric": {"code": "SUPPLIER_RBA_COMPLIANCE_EVIDENCE-CTR", "endpoint": "POST /api/kpi/SUPPLIER_RBA_COMPLIANCE_EVIDENCE-CTR/input", "name_vi": "Số supplier thiếu RBA self-assessment hợp lệ", "name": "Supplier missing-RBA self-assessment count", "intent": "Bắt việc thiếu evidence Lam Supplier Code."},
-      "blocking_conditions": ["supplier_rba_evidence_missing"],
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 90,
+        "target": 100,
+        "basis": "Lam Supplier Code yêu cầu RBA + transparent information sharing + audit access."
+      },
+      "counter_metric": {
+        "code": "SUPPLIER_RBA_COMPLIANCE_EVIDENCE-CTR",
+        "endpoint": "POST /api/kpi/SUPPLIER_RBA_COMPLIANCE_EVIDENCE-CTR/input",
+        "name_vi": "Số supplier thiếu RBA self-assessment hợp lệ",
+        "name": "Supplier missing-RBA self-assessment count",
+        "intent": "Bắt việc thiếu evidence Lam Supplier Code."
+      },
+      "blocking_conditions": [
+        "supplier_rba_evidence_missing"
+      ],
       "metric_type": "health_indicator",
       "metric_subtype": "supplier_scorecard_metric",
       "control_intent": "compliance_evidence",
@@ -6378,7 +6604,10 @@
       "evaluation_use": "supplier_scorecard",
       "reward_mode": "supplier_consequence",
       "lifecycle_status": "pilot",
-      "applicable_jds": ["SCM", "QMS"],
+      "applicable_jds": [
+        "SCM",
+        "QMS"
+      ],
       "lam_profile_link": "LAM_SEMSYSCO",
       "evidence_source": "supplier_rba_self_assessment + audit_access_log"
     }
@@ -6521,7 +6750,8 @@
         "yellow_point": 8,
         "target": 4,
         "basis": "Gate G0 — CDR A1: RFQ response ≤ 4 working hours; >8h drift makes gate fail and blocks quote handoff."
-      }
+      },
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G0-02",
@@ -6575,7 +6805,8 @@
         "yellow_point": 90,
         "target": 95,
         "basis": "Gate G0 — CDR A2/A5: ≥95% orders right-first-time at contract review; <90% blocks acceptance gate."
-      }
+      },
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G1-01",
@@ -6629,7 +6860,8 @@
       "evidence_source": "FRM-306 engineering release pack, revision log, DFM/CAM/routing approval evidence",
       "data_stewardship_role": "ENGM",
       "hold_release_rule": "Hold baseline release when engineering package must be reopened or B1/B2 approval evidence is missing; ENGM chairs containment before production planning.",
-      "decision_action": "Hold engineering release; ENGM gates revised baseline before G2."
+      "decision_action": "Hold engineering release; ENGM gates revised baseline before G2.",
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G1-02",
@@ -6682,7 +6914,8 @@
       "evidence_source": "Epicor ECO/ECN record with submission, approval, implementation, and closure timestamps",
       "data_stewardship_role": "ENGM",
       "hold_release_rule": "Hold affected revision release when ECO exceeds 48 hours or impact assessment is incomplete; ENGM escalates to PD/QA for priority decision.",
-      "decision_action": "Escalate stale ECN; ENGM + PD reprioritize hoặc cap WIP exposure."
+      "decision_action": "Escalate stale ECN; ENGM + PD reprioritize hoặc cap WIP exposure.",
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G1-03",
@@ -6735,7 +6968,8 @@
       "evidence_source": "Control Plan, PFMEA, and job_orders.control_plan_id approval evidence linked to baseline release",
       "data_stewardship_role": "QA",
       "hold_release_rule": "No G1 release when Control Plan/PFMEA is absent or unapproved; QA blocks baseline until B8 evidence is complete.",
-      "decision_action": "Block G2 advance; QA + ENGM force PFMEA / control-plan signoff."
+      "decision_action": "Block G2 advance; QA + ENGM force PFMEA / control-plan signoff.",
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G2-01",
@@ -6788,7 +7022,8 @@
       "evidence_source": "FRM-701 receiving/IQC record with lot, certificate, disposition, and inspector signature",
       "data_stewardship_role": "QA",
       "hold_release_rule": "Hold G2 material readiness when IQC lot is rejected, open, or lacks D10 evidence; QA/SCM decide quarantine, concession, or replacement.",
-      "decision_action": "Hold material release; QA reject / SCAR theo D10; SCM open SCAR/quarantine."
+      "decision_action": "Hold material release; QA reject / SCAR theo D10; SCM open SCAR/quarantine.",
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G2-02",
@@ -6841,7 +7076,8 @@
       "evidence_source": "Epicor receipt, lot trace, mill certificate, CoC, and material certificate match evidence",
       "data_stewardship_role": "SCM",
       "hold_release_rule": "Hold material issue to production when certificate/lot trace is incomplete; SCM resolves before G3 setup release.",
-      "decision_action": "Hold kit release; SCM force mill-cert / batch trace completion."
+      "decision_action": "Hold kit release; SCM force mill-cert / batch trace completion.",
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G3-01",
@@ -6895,7 +7131,8 @@
       "evidence_source": "FRM-511 setup readiness, dry-run/pilot result, fixture/gage readiness, and first setup approval",
       "data_stewardship_role": "WKM",
       "hold_release_rule": "Hold production run when setup does not pass first attempt or B5/B6 evidence is incomplete; WKM/QA review before releasing lot.",
-      "decision_action": "Hold setup acceptance; WKM rework setup before lot start."
+      "decision_action": "Hold setup acceptance; WKM rework setup before lot start.",
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G3-02",
@@ -6948,7 +7185,8 @@
       "evidence_source": "Time Entry setup/changeover record with SMED reason codes and work-center timestamp",
       "data_stewardship_role": "WKM",
       "hold_release_rule": "Escalate G3 when changeover exceeds standard or lacks reason code; WKM protects constraint resources and updates recovery action.",
-      "decision_action": "Escalate slow changeover; WKM root-cause + reset standard work."
+      "decision_action": "Escalate slow changeover; WKM root-cause + reset standard work.",
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G4-01",
@@ -7002,7 +7240,8 @@
         "yellow_point": 90,
         "target": 98,
         "basis": "Gate G4 — CDR D1/D2: ≥98% FAI first-pass before lot release; <90% blocks production and forces NCR/rework decision."
-      }
+      },
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G4-02",
@@ -7056,7 +7295,8 @@
       "evidence_source": "FRM-311 FAI start/finish timestamp, PPAP/customer submission log, and CMM/gage queue evidence",
       "data_stewardship_role": "QA",
       "hold_release_rule": "Escalate when FAI cycle exceeds 2 hours or PPAP package is late; QA/QCL assigns recovery before production release.",
-      "decision_action": "Escalate FAI delay; QA + PD reschedule downstream slot."
+      "decision_action": "Escalate FAI delay; QA + PD reschedule downstream slot.",
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G5-01",
@@ -7109,7 +7349,8 @@
       "evidence_source": "FRM-651 IPQC/NCR record with defect quantity, operation, containment, and disposition",
       "data_stewardship_role": "WKM",
       "hold_release_rule": "Hold affected operation when reject rate exceeds 1% or D3 evidence is missing; WKM opens containment and QA decides NCR/CAPA path.",
-      "decision_action": "Hold production line; WKM + QA stop-the-line + IPQC reaction."
+      "decision_action": "Hold production line; WKM + QA stop-the-line + IPQC reaction.",
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G5-02",
@@ -7163,7 +7404,8 @@
       "evidence_source": "FRM-631 SPC chart signal log with detection timestamp, reaction timestamp, and containment action",
       "data_stewardship_role": "WKM",
       "hold_release_rule": "Stop or hold process when SPC reaction exceeds 15 minutes; WKM/QA must verify containment before continuing production.",
-      "decision_action": "Escalate to QA; force operator stop-the-line + supervisor intervene."
+      "decision_action": "Escalate to QA; force operator stop-the-line + supervisor intervene.",
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G6-01",
@@ -7216,7 +7458,8 @@
       "evidence_source": "FRM-642 final release/ship packet checklist, CoC, label, traceability, and QA signoff",
       "data_stewardship_role": "QA",
       "hold_release_rule": "No G6 final release when ship packet is incomplete; QA blocks shipment until D8 evidence is complete.",
-      "decision_action": "Block shipment; QA forces packet completion before CoC release."
+      "decision_action": "Block shipment; QA forces packet completion before CoC release.",
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G6-02",
@@ -7269,7 +7512,8 @@
       "evidence_source": "Traceability drill log with sampled lot, reverse lookup timestamps, evidence links, and QA witness",
       "data_stewardship_role": "QA",
       "hold_release_rule": "Escalate management review when drill exceeds 60 seconds or cannot prove traceability; QA/QMS opens corrective action.",
-      "decision_action": "Escalate drill failure; QA + SCM corrective trace + re-drill."
+      "decision_action": "Escalate drill failure; QA + SCM corrective trace + re-drill.",
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G7-01",
@@ -7322,7 +7566,8 @@
         "yellow_point": 90,
         "target": 95,
         "basis": "Gate G7 — CDR D7: ≥95% shipments meet promise date; <90% triggers SCM/PD recovery and customer communication."
-      }
+      },
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G7-02",
@@ -7375,7 +7620,8 @@
         "yellow_point": 48,
         "target": 24,
         "basis": "Gate G7 — CDR D8: ≤24h ship-to-invoice; >48h forces FIN to close discrepancy before invoice release."
-      }
+      },
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-G7-03",
@@ -7457,7 +7703,8 @@
           "name": "Late or suppressed escape logging rate",
           "intent": "Bắt việc giữ con số notification_LT đẹp bằng cách ghi nhận escape muộn hoặc không ghi vào sổ thông báo khách (detection_time bị đẩy lùi)."
         }
-      ]
+      ],
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-ALL-01",
@@ -7512,7 +7759,8 @@
       "evidence_source": "Epicor cost buckets, NCR/CAPA/rework/scrap records, finance close evidence, and COPQ worksheet",
       "data_stewardship_role": "FIN",
       "hold_release_rule": "Escalate monthly QMS/finance review when COPQ exceeds 2% revenue or cost evidence is incomplete; QA/FIN assign CAPA or cost model correction.",
-      "decision_action": "Escalate COPQ spike; QA + PD open CAPA, finance freezes overrun."
+      "decision_action": "Escalate COPQ spike; QA + PD open CAPA, finance freezes overrun.",
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-ALL-02",
@@ -7566,7 +7814,8 @@
       "evidence_source": "FRM-651 first-pass inspection population, rework/reinspection flags, FAI/IPQC records, and NCR links",
       "data_stewardship_role": "QA",
       "hold_release_rule": "Escalate quality-at-source review when FPY falls below 98% or inspection bypass is suspected; QA/WKM contain affected product before release.",
-      "decision_action": "Escalate FPY drop; QA + WKM open SPC / NCR review; PD adjusts release rules."
+      "decision_action": "Escalate FPY drop; QA + WKM open SPC / NCR review; PD adjusts release rules.",
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-ALL-03",
@@ -7620,7 +7869,8 @@
       "evidence_source": "Epicor MES machine state, production count, planned time, downtime reason tree, and work-center context",
       "data_stewardship_role": "WKM",
       "hold_release_rule": "Escalate TOC review when OEE loss hits constraint or lacks reason code; WKM/MNT protect constraint and update recovery action.",
-      "decision_action": "Escalate OEE drop; WKM + ENG-EQ open downtime / changeover Pareto."
+      "decision_action": "Escalate OEE drop; WKM + ENG-EQ open downtime / changeover Pareto.",
+      "reward_mode": "blocker_only"
     },
     {
       "local_id": "KPI-LAM-G1-01",
@@ -8312,7 +8562,53 @@
     "recognition_rule": "Recognition can be monetary or non-monetary, individual or team based, but must use a balanced bundle of controllable measures. Do not reward one metric alone when safety, quality, delivery, or data integrity is weak.",
     "corrective_action_rule": "Below-target performance triggers review, coaching, root cause, CAPA, resource escalation, training, or process redesign before any people discipline.",
     "discipline_guardrail": "Discipline is allowed only for verified controllable behavior: data falsification, bypassing a required gate, unsafe act, repeated non-compliance after coaching, or refusal to follow a released procedure. Do not punish an uncontrollable outcome caused by material shortage, customer change, machine failure, engineering defect, or management resource decision.",
-    "anti_gaming_guardrail": "Every KPI used for reward or discipline must have a counter-metric or gate: safety, quality escape, customer impact, evidence integrity, and supervisor/QA review."
+    "anti_gaming_guardrail": "Every KPI used for reward or discipline must have a counter-metric or gate: safety, quality escape, customer impact, evidence integrity, and supervisor/QA review.",
+    "reward_rules": {
+      "rule_id": "P07-REWARD-RULES-V1",
+      "source": "P07 fair-reward + ANNEX-127/-129; anti-gaming risk register §2.",
+      "rule_1_red_kpi_never_individual_punish": "A red KPI does NOT automatically trigger individual discipline. Red opens root cause, containment, CAPA/kaizen, training, and resource review before any people decision.",
+      "rule_2_red_triggers_improvement_loop": "Red MUST open a root-cause + containment + (CAPA or kaizen) + training-or-resource review record before any reward/discipline conversation about the period.",
+      "rule_3_recognition_requires_balanced_bundle": "Recognition (monetary or non-monetary) is decided on a balanced bundle of controllable measures, never a single KPI. A bundle MUST include at least one delivery, one quality, one safety/data-integrity counter, evaluated together.",
+      "rule_4_blockers_freeze_recognition": "Any open blocker — verified safety incident, customer escape without containment, data-integrity finding, verified gate bypass, audit major non-conformance — FREEZES all monetary recognition for the period regardless of green KPI scores. See blocking_condition_registry.",
+      "rule_5_reward_eligibility_requirements": "A metric can carry reward_mode ∈ (bonus_pool_candidate, team_reward_candidate, role_review_input) ONLY when ALL of: (a) owner controls majority of drivers OR attribution_rule splits cause fairly, (b) counter_metric exists, (c) evidence has audit trail, (d) calculation_status ≠ staged_data_contract, (e) min_sample is set if metric is a rate, (f) review/calibration cadence is defined.",
+      "rule_6_discipline_scope_whitelist": "Discipline is allowed ONLY for verified controllable behaviour listed in discipline_scope (data falsification, gate bypass, unsafe act, repeated non-compliance after coaching, refusal to follow released procedure). All other red outcomes route to coaching/CAPA/resource review."
+    },
+    "attribution_rule_template": {
+      "rule_id": "P07-ATTRIBUTION-TEMPLATE-V1",
+      "purpose": "Default attribution skeleton for any reward-eligible KPI; metric-level attribution_rule may override or refine. Owner-action and contributor-action MUST be separated before any reward/discipline conversation.",
+      "breakdown_axes": [
+        "customer_change_or_approved_rush",
+        "supplier_or_material_delay",
+        "engineering_package_defect_or_late_release",
+        "machine_unplanned_failure_vs_PM_miss",
+        "qa_hold_valid_vs_invalid",
+        "owner_controllable_execution",
+        "resource_shortage_management_decision"
+      ],
+      "owner_vs_contributor_rule": "If breakdown attributes >50% of the red period to a non-owner axis, the owner is NOT individually penalised; the contributor role takes recovery action and the management review records the resource decision.",
+      "exclude_conditions_defaults": [
+        "customer_change_after_baseline_lock",
+        "approved_rush_order",
+        "supplier_late_delivery_with_logged_PO_due_date_change",
+        "machine_random_failure_with_PM_within_window",
+        "engineering_defect_with_open_eco",
+        "qa_hold_valid_per_gate",
+        "force_majeure_or_utility_outage"
+      ]
+    },
+    "discipline_scope": {
+      "rule_id": "P07-DISCIPLINE-WHITELIST-V1",
+      "rule": "Discipline (formal warning, monetary deduction, role removal, termination) is allowed ONLY for these verified controllable behaviours. Anything else routes to coaching/CAPA/resource review.",
+      "whitelist": [
+        "data_falsification_verified",
+        "required_gate_bypass_verified",
+        "unsafe_act_verified",
+        "repeated_non_compliance_after_documented_coaching",
+        "refusal_to_follow_released_procedure_verified",
+        "evidence_tampering_or_signature_misuse"
+      ],
+      "evidence_requirement": "Discipline action MUST cite a specific blocker condition_id from blocking_condition_registry (gate_bypass / data_integrity / safety groups) plus a coaching or investigation record. No discipline on attribution-only outcome metrics."
+    }
   },
   "metric_governance_schema": {
     "rule": "Every catalog metric must expose intent, behavior motive, expected result, decision purpose, evaluation use, consequence guardrail, anti-gaming counter metric, and data-contract status. Official KPI means metric_type = kpi and evaluation_use is approved.",
@@ -8535,31 +8831,133 @@
       "retired": "retired"
     },
     "scoring_model_by_metric_subtype": {
-      "official_kpi": ["rag_3_band", "rag_5_band_stretch", "composite_weighted_score"],
-      "operating_metric": ["rag_3_band", "trend_direction", "sla_aging_bucket"],
-      "gate_control_metric": ["binary_pass_fail", "sla_aging_bucket", "blocker_only"],
-      "role_performance_measure": ["rag_3_band", "rubric_score", "trend_direction"],
-      "health_indicator": ["none_monitor_only", "trend_direction", "evidence_completeness_score"],
-      "counter_metric": ["blocker_only", "event_severity_score"],
-      "blocker_metric": ["blocker_only"],
-      "supplier_scorecard_metric": ["composite_weighted_score", "rag_3_band", "evidence_completeness_score"],
-      "okr_key_result": ["baseline_improvement", "trend_direction"],
-      "spc_capability_metric": ["spec_limit_capability", "spc_control_chart"],
-      "composite_readiness_index": ["composite_weighted_score"]
+      "official_kpi": [
+        "rag_3_band",
+        "rag_5_band_stretch",
+        "composite_weighted_score"
+      ],
+      "operating_metric": [
+        "rag_3_band",
+        "trend_direction",
+        "sla_aging_bucket"
+      ],
+      "gate_control_metric": [
+        "binary_pass_fail",
+        "sla_aging_bucket",
+        "blocker_only"
+      ],
+      "role_performance_measure": [
+        "rag_3_band",
+        "rubric_score",
+        "trend_direction"
+      ],
+      "health_indicator": [
+        "none_monitor_only",
+        "trend_direction",
+        "evidence_completeness_score"
+      ],
+      "counter_metric": [
+        "blocker_only",
+        "event_severity_score"
+      ],
+      "blocker_metric": [
+        "blocker_only"
+      ],
+      "supplier_scorecard_metric": [
+        "composite_weighted_score",
+        "rag_3_band",
+        "evidence_completeness_score"
+      ],
+      "okr_key_result": [
+        "baseline_improvement",
+        "trend_direction"
+      ],
+      "spc_capability_metric": [
+        "spec_limit_capability",
+        "spc_control_chart"
+      ],
+      "composite_readiness_index": [
+        "composite_weighted_score"
+      ]
     },
     "extension_field_specs": {
-      "metric_subtype": {"type": "enum", "ref": "metric_subtypes", "required_for_extension": true},
-      "control_intent": {"type": "enum", "ref": "control_intent", "required_for_extension": true},
-      "measurement_data_type": {"type": "enum", "ref": "measurement_data_type", "required_for_extension": false},
-      "scoring_model_detail": {"type": "enum", "ref": "scoring_model", "required_for_extension": false, "must_match_subtype": "scoring_model_by_metric_subtype"},
-      "evaluation_use": {"type": "enum", "ref": "evaluation_use", "required_for_extension": false},
-      "reward_mode": {"type": "enum", "ref": "reward_mode", "required_for_extension": false, "guardrail": "if reward_mode is bonus_pool_candidate or role_review_input or team_reward_candidate, calculation_status MUST be runtime_calculated"},
-      "paired_metric": {"type": "code_reference", "required_for_extension": false, "note": "must resolve to another metric canonical_code (any section)"},
-      "attribution_rule": {"type": "plain_text", "required_for_extension": false, "note": "free text describing how attribution is fair, e.g. 'rule:plan_adherence_breakdown_by_cause'"},
-      "lifecycle_status": {"type": "enum", "ref": "lifecycle_status", "required_for_extension": false, "default": "active_runtime"},
-      "sample_policy": {"type": "object", "shape": {"min_n_score": "integer", "provisional_n": "integer", "internal_n": "integer", "customer_grade_n": "integer", "stability_required": "boolean", "gage_validity_required": "boolean"}, "required_for_extension": false, "required_when": "metric_subtype in (spc_capability_metric)"},
-      "usage_contexts": {"type": "string_array", "required_for_extension": false, "items": "free text or enum from evaluation_use"},
-      "role_assignments": {"type": "object_array", "required_for_extension": false, "shape": {"role": "string", "assignment_type": "enum:assignment_type", "weight_pct": "number", "active_or_candidate": "enum:[active,candidate]", "controllability_scope": "plain_text"}}
+      "metric_subtype": {
+        "type": "enum",
+        "ref": "metric_subtypes",
+        "required_for_extension": true
+      },
+      "control_intent": {
+        "type": "enum",
+        "ref": "control_intent",
+        "required_for_extension": true
+      },
+      "measurement_data_type": {
+        "type": "enum",
+        "ref": "measurement_data_type",
+        "required_for_extension": false
+      },
+      "scoring_model_detail": {
+        "type": "enum",
+        "ref": "scoring_model",
+        "required_for_extension": false,
+        "must_match_subtype": "scoring_model_by_metric_subtype"
+      },
+      "evaluation_use": {
+        "type": "enum",
+        "ref": "evaluation_use",
+        "required_for_extension": false
+      },
+      "reward_mode": {
+        "type": "enum",
+        "ref": "reward_mode",
+        "required_for_extension": false,
+        "guardrail": "if reward_mode is bonus_pool_candidate or role_review_input or team_reward_candidate, calculation_status MUST be runtime_calculated"
+      },
+      "paired_metric": {
+        "type": "code_reference",
+        "required_for_extension": false,
+        "note": "must resolve to another metric canonical_code (any section)"
+      },
+      "attribution_rule": {
+        "type": "plain_text",
+        "required_for_extension": false,
+        "note": "free text describing how attribution is fair, e.g. 'rule:plan_adherence_breakdown_by_cause'"
+      },
+      "lifecycle_status": {
+        "type": "enum",
+        "ref": "lifecycle_status",
+        "required_for_extension": false,
+        "default": "active_runtime"
+      },
+      "sample_policy": {
+        "type": "object",
+        "shape": {
+          "min_n_score": "integer",
+          "provisional_n": "integer",
+          "internal_n": "integer",
+          "customer_grade_n": "integer",
+          "stability_required": "boolean",
+          "gage_validity_required": "boolean"
+        },
+        "required_for_extension": false,
+        "required_when": "metric_subtype in (spc_capability_metric)"
+      },
+      "usage_contexts": {
+        "type": "string_array",
+        "required_for_extension": false,
+        "items": "free text or enum from evaluation_use"
+      },
+      "role_assignments": {
+        "type": "object_array",
+        "required_for_extension": false,
+        "shape": {
+          "role": "string",
+          "assignment_type": "enum:assignment_type",
+          "weight_pct": "number",
+          "active_or_candidate": "enum:[active,candidate]",
+          "controllability_scope": "plain_text"
+        }
+      }
     },
     "ci_enforcement_summary": {
       "p0_extension_consistency": "When metric_subtype IS present, control_intent MUST be present. When scoring_model_detail IS present, it MUST be in scoring_model_by_metric_subtype[metric_subtype]. When sample_policy IS present, min_n_score MUST be numeric.",
@@ -8568,14 +8966,70 @@
       "p1_lifecycle_drift": "Warn when lifecycle_status disagrees with legacy_calculation_status_to_lifecycle_map[calculation_status]."
     },
     "wizard_steps": [
-      {"step": 1, "name": "problem_type", "field": "control_intent", "options_ref": "control_intent"},
-      {"step": 2, "name": "metric_subtype", "field": "metric_subtype", "options_ref": "metric_subtypes"},
-      {"step": 3, "name": "measurement_data_type", "field": "measurement_data_type", "options_ref": "measurement_data_type"},
-      {"step": 4, "name": "scoring_model", "field": "scoring_model_detail", "options_ref": "scoring_model", "dynamic_ref": "scoring_model_by_metric_subtype"},
-      {"step": 5, "name": "data_contract_evidence", "fields": ["calculation_status", "source_system", "data_contract_gap", "target_graduation_condition", "evidence_source", "owner_role", "data_stewardship_role"]},
-      {"step": 6, "name": "evaluation_reward_weight", "fields": ["evaluation_use", "reward_mode", "scorecard_weight_pct", "calibration_required"]},
-      {"step": 7, "name": "role_assignments", "field": "role_assignments"},
-      {"step": 8, "name": "counter_blocker_lifecycle", "fields": ["counter_metric", "blocking_conditions", "lifecycle_status", "paired_metric", "attribution_rule"]}
+      {
+        "step": 1,
+        "name": "problem_type",
+        "field": "control_intent",
+        "options_ref": "control_intent"
+      },
+      {
+        "step": 2,
+        "name": "metric_subtype",
+        "field": "metric_subtype",
+        "options_ref": "metric_subtypes"
+      },
+      {
+        "step": 3,
+        "name": "measurement_data_type",
+        "field": "measurement_data_type",
+        "options_ref": "measurement_data_type"
+      },
+      {
+        "step": 4,
+        "name": "scoring_model",
+        "field": "scoring_model_detail",
+        "options_ref": "scoring_model",
+        "dynamic_ref": "scoring_model_by_metric_subtype"
+      },
+      {
+        "step": 5,
+        "name": "data_contract_evidence",
+        "fields": [
+          "calculation_status",
+          "source_system",
+          "data_contract_gap",
+          "target_graduation_condition",
+          "evidence_source",
+          "owner_role",
+          "data_stewardship_role"
+        ]
+      },
+      {
+        "step": 6,
+        "name": "evaluation_reward_weight",
+        "fields": [
+          "evaluation_use",
+          "reward_mode",
+          "scorecard_weight_pct",
+          "calibration_required"
+        ]
+      },
+      {
+        "step": 7,
+        "name": "role_assignments",
+        "field": "role_assignments"
+      },
+      {
+        "step": 8,
+        "name": "counter_blocker_lifecycle",
+        "fields": [
+          "counter_metric",
+          "blocking_conditions",
+          "lifecycle_status",
+          "paired_metric",
+          "attribution_rule"
+        ]
+      }
     ]
   },
   "customer_requirement_profiles": {
@@ -8604,7 +9058,11 @@
           "written_special_release_required_before_delivery": true
         },
         "linked_metrics": [
-          "OTD", "COMPLAINT_RATE", "FPY", "CAL_COMPLIANCE", "TRAINING_COMP"
+          "OTD",
+          "COMPLAINT_RATE",
+          "FPY",
+          "CAL_COMPLIANCE",
+          "TRAINING_COMP"
         ]
       },
       "LAM_SEMSYSCO": {
@@ -8612,7 +9070,10 @@
         "profile_name_vi": "Hồ sơ yêu cầu chất lượng bán dẫn LAM Research / SEMSYSCO",
         "status": "active",
         "applies_when": {
-          "customer_codes": ["LAM", "SEMSYSCO"],
+          "customer_codes": [
+            "LAM",
+            "SEMSYSCO"
+          ],
           "manual_profile_assignment_allowed": true,
           "order_or_po_override_allowed": true,
           "default_for_unassigned": false,
@@ -8624,8 +9085,14 @@
           "qms_effectiveness_evidence_required": true,
           "audit_access_required": true,
           "supplier_evaluation_dimensions": [
-            "otd", "quantity_accuracy", "complaints", "ppm",
-            "pricing", "customer_service", "qms_status", "audit_results"
+            "otd",
+            "quantity_accuracy",
+            "complaints",
+            "ppm",
+            "pricing",
+            "customer_service",
+            "qms_status",
+            "audit_results"
           ],
           "qualified_personnel_required": true,
           "customer_specific_requirements_acknowledgement_required": true,
@@ -8679,14 +9146,31 @@
           "= active requirement profile recorded on job_order.active_profile_code + actor + acked_at"
         ],
         "gate_coverage": {
-          "G0": ["RFQ_FEASIBILITY_STUDY_COMPLETENESS"],
-          "G1": ["CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED", "CSR_ACKNOWLEDGEMENT_RATE", "PROCESS_CHANGE_APPROVAL_RATE"],
-          "G2": ["INSPECTION_PLAN_COMPLETENESS"],
+          "G0": [
+            "RFQ_FEASIBILITY_STUDY_COMPLETENESS"
+          ],
+          "G1": [
+            "CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED",
+            "CSR_ACKNOWLEDGEMENT_RATE",
+            "PROCESS_CHANGE_APPROVAL_RATE"
+          ],
+          "G2": [
+            "INSPECTION_PLAN_COMPLETENESS"
+          ],
           "G3": [],
-          "G4": ["GAGE_VALID_FOR_RELEASE"],
+          "G4": [
+            "GAGE_VALID_FOR_RELEASE"
+          ],
           "G5": [],
-          "G6": ["CHECK_DIM_REPORT_ON_SHIP", "GAGE_VALID_FOR_RELEASE"],
-          "G7": ["SPECIAL_RELEASE_COMPLIANCE", "SPECIAL_RELEASE_MARKING_COMPLIANCE", "CUSTOMER_GAGE_DAMAGE_UNSUITABLE_NOTIFICATION_LT"]
+          "G6": [
+            "CHECK_DIM_REPORT_ON_SHIP",
+            "GAGE_VALID_FOR_RELEASE"
+          ],
+          "G7": [
+            "SPECIAL_RELEASE_COMPLIANCE",
+            "SPECIAL_RELEASE_MARKING_COMPLIANCE",
+            "CUSTOMER_GAGE_DAMAGE_UNSUITABLE_NOTIFICATION_LT"
+          ]
         },
         "evidence_pack_required": [
           "customer_csr_acknowledgement_letter",
@@ -9419,6 +9903,9 @@
     "version": "2026-05-23-track04-integrated",
     "rule": "Each JD carries a small active role-fit set plus candidate_bank, optional_rotate, and do_not_use lists. There is no fixed five-KPI rule; active count follows role complexity and evidence quality.",
     "reward_policy": "Role scorecards are evidence and coaching inputs only. They do not create automatic pay, discipline, or promotion decisions without HR/QMS/CEO calibration and blocker review.",
+    "role_performance_measures_note": "These per-role scorecards are Role Performance Measures, not official company KPIs. Items have weights summing to ~100% within each role for coaching and review balance, but contributes_to_reward defaults to false. A role measure becomes monetary-reward eligible only after HR/QMS/CEO calibration AND blocker-clearance per performance_governance_policy.reward_rules.",
+    "weight_sum_tolerance_pct": 5,
+    "recommended_max_items_per_role": 5,
     "data_contract_rule": "A role measure may be active only when it maps to a governed canonical metric or a manual_governed role-performance metric with evidence_source and dedicated counter_code.",
     "roles": {
       "CEO": {

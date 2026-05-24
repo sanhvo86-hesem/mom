@@ -34,6 +34,16 @@ declare(strict_types=1);
  *      blocking_conditions, or a staged KPI is reward eligible.
  *  10. Admin/API surfaces drift: required KPI action routes missing or Admin
  *      Console exposes raw JSON editing.
+ *  11. P0.7.1 (P07 fair-reward) reward_mode in (bonus_pool_candidate,
+ *      team_reward_candidate, role_review_input) without a non-empty
+ *      attribution_rule.
+ *  12. P0.7.2 (P07 fair-reward) reward-eligible rate/percent metric without
+ *      formula.min_sample >= 1.
+ *  13. P0.7.3 (P07 fair-reward) JD scorecard weight sum outside [95,105]
+ *      fairness band (strict ==100 already P0; this is a backstop).
+ *  14. P0.7.4 (P07 fair-reward) JD scorecard item with staged/candidate
+ *      scoring status AND scorecard_contributes_to_reward=true without an
+ *      explicit manual_governed_override.
  *
  * P1 findings (warn, do not block)
  * ────────────────────────────────
@@ -46,6 +56,10 @@ declare(strict_types=1);
  *   - A governance KPI code is not enumerated in ANNEX-128. ANNEX-128 is a
  *     document-usage matrix (only lists codes referenced in scanned docs),
  *     so this is advisory — re-run audit-kpi-system-matrix.php to confirm.
+ *   - P1.P07 (fair-reward) JD scorecard exceeds 5 items (spec §4 cap).
+ *   - P1.P07 (fair-reward) JD scorecard mixes a speed/throughput measure
+ *     with a defect-rate measure where at least one side has no
+ *     counter_code — risk of pulling the role in opposing directions.
  *
  * Exit code: 0 = clean (warnings allowed), 1 = at least one P0 finding.
  */
@@ -242,6 +256,38 @@ foreach ($governance as $row) {
         $blockers = $row['blocking_conditions'] ?? null;
         if (!is_array($blockers) || $blockers === []) {
             $p0[] = "Registry $code: reward_eligible=true requires blocking_conditions.";
+        }
+    }
+
+    // ── P0.7.1 — reward-eligible metric MUST have non-empty attribution_rule ─
+    // (P07 hardening) Per performance_governance_policy.reward_rules rule 5,
+    // any metric whose reward_mode allocates monetary or formal-review
+    // recognition (bonus_pool_candidate / team_reward_candidate /
+    // role_review_input) MUST have an attribution_rule string so red
+    // outcomes can be split between owner action and contributor action
+    // before any reward conversation. Missing attribution = the metric will
+    // either punish owner-uncontrollable factors or game the bundle.
+    $rewardModeP07     = strtolower(trim((string) ($row['reward_mode'] ?? '')));
+    $rewardEligibleSet = ['bonus_pool_candidate', 'team_reward_candidate', 'role_review_input'];
+    if (in_array($rewardModeP07, $rewardEligibleSet, true)) {
+        $attribution = trim((string) ($row['attribution_rule'] ?? ''));
+        if ($attribution === '') {
+            $p0[] = "P0.7.1 Registry $code: reward_mode '$rewardModeP07' requires "
+                . "non-empty attribution_rule (P07 reward-rules rule 5).";
+        }
+    }
+
+    // ── P0.7.2 — reward-eligible rate metric MUST have min_sample ≥ 1 ──────
+    // (P07 hardening) Per reward_rules rule 5 + anti-gaming risk register §2.3:
+    // a rate/percent KPI cannot drive bonus or role-review with zero or
+    // missing min_sample because small-N noise will swing the score.
+    if (in_array($rewardModeP07, $rewardEligibleSet, true) && isPercentMetric($row)) {
+        $msRaw    = $row['formula']['min_sample'] ?? null;
+        $msIsInt  = is_int($msRaw) || (is_string($msRaw) && ctype_digit($msRaw));
+        $msIntVal = $msIsInt ? (int) $msRaw : 0;
+        if (!$msIsInt || $msIntVal < 1) {
+            $p0[] = "P0.7.2 Registry $code: reward_mode '$rewardModeP07' on a percent/rate metric "
+                . "requires formula.min_sample as integer >= 1 (got " . var_export($msRaw, true) . ").";
         }
     }
 
@@ -774,6 +820,7 @@ if (is_array($scorecards)) {
             $p1[] = "JD scorecard $roleCode: active scorecard has " . count($items) . " items; exceeds the recommended maximum without Track 4 rationale.";
         }
         $sum = 0;
+        $directionSet = [];   // P1.P07 direction-conflict tracker
         foreach ($items as $it) {
             $kc = strtoupper(trim((string) ($it['kpi_code'] ?? ($it['mapped_canonical_metric'] ?? ''))));
             $w  = (int) ($it['weight'] ?? 0);
@@ -784,9 +831,69 @@ if (is_array($scorecards)) {
             if ($w <= 0) {
                 $p0[] = "JD scorecard $roleCode: kpi_code '$kc' has a non-positive weight.";
             }
+
+            // ── P0.7.4 — JD scorecard staged metric MUST NOT auto-reward ────
+            // (P07 hardening) per spec §5 + reward_rules rule 5(d) and the
+            // existing MCS-EXT-1 rule: a measure whose scorecard_scoring_status
+            // is staged_data_contract or candidate_data_contract MUST NOT have
+            // scorecard_contributes_to_reward=true unless it is also marked
+            // manual_governed (the only override path).
+            $ssStatus = strtolower(trim((string) ($it['scorecard_scoring_status'] ?? '')));
+            $stagedStatuses = ['staged_data_contract', 'candidate_data_contract'];
+            $contrib = ($it['scorecard_contributes_to_reward'] ?? false) === true;
+            if (in_array($ssStatus, $stagedStatuses, true) && $contrib) {
+                $hasManualOverride = ($it['manual_governed_override'] ?? false) === true
+                    || strtolower(trim((string) ($it['override_status'] ?? ''))) === 'manual_governed';
+                if (!$hasManualOverride) {
+                    $p0[] = "P0.7.4 JD scorecard $roleCode item $kc: scorecard_scoring_status='$ssStatus' "
+                        . "cannot have scorecard_contributes_to_reward=true without manual_governed_override.";
+                }
+            }
         }
         if ($sum !== 100) {
+            // ── P0.7.3 (relaxed tolerance) — already covered by strict ==100 ─
+            // The strict equality below is the hard rule; we keep both messages
+            // so that a future weight-sum tolerance migration can be staged.
             $p0[] = "JD scorecard $roleCode: weights sum to $sum, must be 100.";
+            if ($sum < 95 || $sum > 105) {
+                $p0[] = "P0.7.3 JD scorecard $roleCode: weights sum $sum is outside the [95,105] P07 fairness band.";
+            }
+        }
+
+        // ── P1.P07 — too many items (>5 == above spec §4 recommendation) ────
+        if (count($items) > 5) {
+            $p1[] = "P1.P07 JD scorecard $roleCode: " . count($items) . " items exceeds the P07 spec §4 "
+                . "recommendation of 3-5 role-fit measures.";
+        }
+
+        // ── P1.P07 — direction conflict heuristic ───────────────────────────
+        // (P07 hardening) Spec §4 forbids measures that pull the same role in
+        // opposing directions (e.g. setup-time-down vs first-piece-quality-up
+        // without a counter-metric pairing). Heuristic: if the role mixes a
+        // throughput/speed metric (SETUP_*, OEE, MACHINE_UTIL, PUT_THRU,
+        // THROUGHPUT_*) with a defect-rate metric (SCRAP_RATE, REWORK_RATE,
+        // IN_PROCESS_REJECT_RATE, FAI_FIRST_PASS) AND has no explicit
+        // counter_code on either, flag as a P1 imbalance.
+        $speedRegex = '/^(SETUP_|OEE|MACHINE_UTIL|PUT_THRU|THROUGHPUT|CYCLE_TIME_VARIANCE|CHANGEOVER_TIME)/';
+        $qualityRegex = '/^(SCRAP_RATE|REWORK_RATE|IN_PROCESS_REJECT_RATE|FAI_FIRST_PASS|FPY|DPMO)$/';
+        $hasSpeed = false; $hasQuality = false;
+        $speedHasCounter = true; $qualityHasCounter = true;
+        foreach ($items as $it) {
+            $kc2 = strtoupper(trim((string) ($it['kpi_code'] ?? ($it['mapped_canonical_metric'] ?? ''))));
+            $cc2 = trim((string) ($it['counter_code'] ?? ''));
+            if (preg_match($speedRegex, $kc2)) {
+                $hasSpeed = true;
+                if ($cc2 === '') { $speedHasCounter = false; }
+            }
+            if (preg_match($qualityRegex, $kc2)) {
+                $hasQuality = true;
+                if ($cc2 === '') { $qualityHasCounter = false; }
+            }
+        }
+        if ($hasSpeed && $hasQuality && (!$speedHasCounter || !$qualityHasCounter)) {
+            $p1[] = "P1.P07 JD scorecard $roleCode: mixes a speed/throughput measure with a defect-rate measure "
+                . "and at least one side has no counter_code; verify the bundle does not pull the role in "
+                . "opposing directions (spec §4).";
         }
     }
 }
