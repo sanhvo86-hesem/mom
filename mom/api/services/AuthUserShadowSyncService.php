@@ -1186,8 +1186,60 @@ class AuthUserShadowSyncService
                     ':metadata' => json_encode($metadata, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                 ]
             );
+
+            $this->endDuplicateActivePositionAssignments(
+                $employeeId,
+                $positionId,
+                'AUTH_JSON',
+                $sourceRecordId
+            );
         }
 
         $this->endStaleAuthJsonAssignments($employeeId, $username, array_values(array_unique($keepSourceIds)));
+    }
+
+    private function endDuplicateActivePositionAssignments(
+        string $employeeId,
+        string $positionId,
+        string $sourceSystem,
+        string $sourceRecordId
+    ): void {
+        $employeeId = trim($employeeId);
+        $positionId = trim($positionId);
+        $sourceSystem = trim($sourceSystem);
+        $sourceRecordId = trim($sourceRecordId);
+        if ($employeeId === '' || $positionId === '' || $sourceSystem === '' || $sourceRecordId === '') {
+            return;
+        }
+
+        $this->db->execute(
+            'UPDATE hcm_employee_position_assignments
+                SET assignment_status = :ended_status,
+                    effective_to = COALESCE(effective_to, CURRENT_DATE),
+                    metadata = COALESCE(metadata, \'{}\'::jsonb)
+                        || jsonb_build_object(
+                            \'ended_by\', \'auth_shadow_sync_duplicate_position\',
+                            \'ended_for_source_system\', :source_system,
+                            \'ended_for_source_record_id\', :source_record_id,
+                            \'ended_at\', to_jsonb(now())
+                        ),
+                    updated_at = now()
+              WHERE employee_id = :employee_id
+                AND hcm_position_id = :position_id
+                AND assignment_status = :active_status
+                AND (effective_to IS NULL OR effective_to > CURRENT_DATE)
+                AND NOT (
+                    source_system = :source_system
+                    AND source_record_id IS NOT DISTINCT FROM :source_record_id
+                )',
+            [
+                ':ended_status' => 'ended',
+                ':employee_id' => $employeeId,
+                ':position_id' => $positionId,
+                ':active_status' => 'active',
+                ':source_system' => $sourceSystem,
+                ':source_record_id' => $sourceRecordId,
+            ]
+        );
     }
 }
