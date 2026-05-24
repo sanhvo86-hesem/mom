@@ -1655,7 +1655,10 @@ class AdminController extends BaseController
         $body = curl_exec($ch);
         $http = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $err = curl_error($ch);
-        curl_close($ch);
+        // curl_close() is a no-op since PHP 8.0 and emits deprecation
+        // warning in PHP 8.5+ (our prod runtime), which the centralised
+        // error handler escalates to fatal. PHP GC closes handles on
+        // resource destruction automatically.
 
         if ($http < 200 || $http >= 300 || !is_string($body)) {
             $this->success([
