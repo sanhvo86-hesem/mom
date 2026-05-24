@@ -355,7 +355,12 @@ final class DashboardController extends BaseController
 
         try {
             $result = $this->kpi->calculateKpi($code, $period, $filters);
-            $this->success(['kpi' => $result->toArray()]);
+            // dashboard_render_contract.render_rules.staged_data_contract:
+            // when breakdown.value_suppressed=true, the renderer MUST set
+            // value=null and display='GREY · insufficient'. Centralised in
+            // applyRenderContract so every KPI endpoint honors it.
+            $kpi = $this->applyRenderContract($result->toArray());
+            $this->success(['kpi' => $kpi]);
         } catch (\Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('kpi_calculation_failed', 500, $e->getMessage());
@@ -511,35 +516,73 @@ final class DashboardController extends BaseController
         if (!is_numeric($body['value'])) {
             $this->error('invalid_value', 400, 'value must be numeric.');
         }
-        // Manual-input contract (KPI-MANUAL-INPUT-CONTRACT-1) §input_status_enum:
-        // draft/submitted/pending_review/approved/rejected/superseded. Legacy
-        // 'verified' is preserved as an alias for 'approved' so older inputs
-        // don't break. Anything else collapses to 'submitted'.
-        $allowedStatuses = ['draft', 'submitted', 'pending_review', 'approved', 'rejected', 'superseded', 'verified'];
-        $statusIn = (string) ($body['input_status'] ?? 'submitted');
-        if (!in_array($statusIn, $allowedStatuses, true)) {
+        // Manual-input contract (KPI-MANUAL-INPUT-CONTRACT-1) §input_status_enum
+        // is aligned with the DB CHECK in migration 196_kpi_manual_inputs.sql:
+        // {draft, submitted, verified, superseded}. The WRITE path (this
+        // endpoint) is restricted to {draft, submitted} only — 'verified' is
+        // a post-approval state set exclusively by kpiInputApprove() after
+        // separation-of-duties is enforced (approver != entered_by). Any
+        // attempt to write 'verified' here is rejected so a single user can
+        // never enter + self-verify in one call. 'superseded' is a write
+        // path of its own (handled by a future supersede endpoint), not via
+        // initial save.
+        $writeWhitelist = ['draft', 'submitted'];
+        $statusIn = strtolower(trim((string) ($body['input_status'] ?? 'submitted')));
+        if ($statusIn === 'verified' || $statusIn === 'approved') {
+            $this->error('separation_of_duties', 400,
+                "input_status='verified' cannot be set on the create path; use POST "
+                . "/api/kpi/{$code}/input/approve with a distinct approver user.");
+        }
+        if (!in_array($statusIn, $writeWhitelist, true)) {
             $statusIn = 'submitted';
         }
 
         // Unit guard (manual_input_contract.validation.unit): if the registry
         // declares a unit for this metric, accept either an empty client unit
-        // (it inherits) or a case-insensitive match. Mismatch is rejected so
-        // a "%" KPI never silently records a "ppm" input.
+        // (it inherits) or a case-insensitive match after alias normalisation
+        // ('%' === 'percent', 'h' === 'hour', etc.). Mismatch is rejected so
+        // a "%" KPI never silently records a "ppm" input. Falls back to the
+        // top-level metric.unit when metric.thresholds.unit is absent (some
+        // runtime-only metrics don't carry the thresholds block).
         $inputUnit = isset($body['unit']) ? trim((string) $body['unit']) : '';
         $registryUnit = '';
-        if (is_array($support['metric'] ?? null)
-            && is_array($support['metric']['thresholds'] ?? null)
-            && is_string($support['metric']['thresholds']['unit'] ?? null)) {
-            $registryUnit = trim((string) $support['metric']['thresholds']['unit']);
+        if (is_array($support['metric'] ?? null)) {
+            $m = $support['metric'];
+            if (is_array($m['thresholds'] ?? null)
+                && is_string($m['thresholds']['unit'] ?? null)) {
+                $registryUnit = trim((string) $m['thresholds']['unit']);
+            }
+            if ($registryUnit === '' && is_string($m['unit'] ?? null)) {
+                $registryUnit = trim((string) $m['unit']);
+            }
         }
         if ($registryUnit !== '' && $inputUnit !== ''
-            && strcasecmp($inputUnit, $registryUnit) !== 0) {
+            && $this->normalizeUnit($inputUnit) !== $this->normalizeUnit($registryUnit)) {
             $this->error('invalid_unit', 400,
                 "Input unit '{$inputUnit}' does not match registry unit '{$registryUnit}' for metric '{$code}'.");
         }
         $breakdown = $body['breakdown'] ?? [];
         if (!is_array($breakdown)) {
             $breakdown = [];
+        }
+
+        // Evidence reference WARN: a non-draft input without an evidence
+        // pointer (doc_code / NCR id / JO number / URL) is permitted but
+        // logged. DCC inspectors may request the evidence later; the warning
+        // gives auditors a way to spot inputs that landed without proof.
+        $evidenceRef = isset($body['evidence_reference'])
+            ? trim((string) $body['evidence_reference']) : '';
+        if ($statusIn !== 'draft' && $evidenceRef === '') {
+            error_log("kpi_input_save WARN: evidence_reference empty for non-draft status, "
+                . "metric={$code}, period={$periodStart}..{$periodEnd}");
+            // Best-effort audit row too — auditLog is sanitised + survives if
+            // the DB is unavailable.
+            $this->auditLog('kpi_input_save_evidence_missing', [
+                'metric_code' => $code,
+                'period'      => $periodStart . '..' . $periodEnd,
+                'input_status' => $statusIn,
+                'severity'    => 'warn',
+            ], (string) ($user['username'] ?? 'unknown'));
         }
 
         try {
@@ -592,7 +635,8 @@ final class DashboardController extends BaseController
         try {
             $rows = $this->db->query(
                 "SELECT input_id, metric_code, period_start, period_end, value, unit,
-                        input_status, evidence_reference, notes, entered_by, entered_at
+                        input_status, evidence_reference, notes, entered_by, entered_at,
+                        verified_by, verified_at
                  FROM kpi_manual_inputs
                  WHERE metric_code = :c
                  ORDER BY period_end DESC, entered_at DESC
@@ -608,6 +652,179 @@ final class DashboardController extends BaseController
             $this->rethrowResponse($e);
             $this->error('kpi_input_list_failed', 500, $e->getMessage());
         }
+    }
+
+    /**
+     * POST /api/kpi/{metricCode}/input/approve  (?action=kpi_input_approve)
+     * Body: { input_id: uuid, approval_status: 'verified'|'rejected', approver_note?: string }
+     *
+     * Approval transitions a submitted manual input to the post-approval
+     * state. Separation of duties is enforced server-side: the approver MUST
+     * NOT be the same user as the row's entered_by. Authorisation is
+     * narrowed to QA-side roles (qa_manager, internal_auditor) — the broad
+     * executiveDashboardRoles set is intentionally NOT reused here so that
+     * department heads who enter their own KPIs cannot also approve them.
+     *
+     * Notes on enum mapping: the DB CHECK in migration 196_kpi_manual_inputs
+     * allows {draft, submitted, verified, superseded} only. 'rejected' is
+     * not a stored state — a rejection drops the row back to 'submitted'
+     * with the approver_note appended to the notes column, and writes an
+     * audit_events row tagged kpi_input_reject so the rejection is
+     * historically retrievable even though the row's input_status returns
+     * to 'submitted'.
+     */
+    public function kpiInputApprove(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        // separation_of_duties: a narrow approver-only role set so the
+        // broad executive-dashboard list (which includes the people who
+        // enter their own department's KPIs) cannot self-approve.
+        $this->requireAnyRole($user, ['admin', 'it_admin', 'qa_manager', 'internal_auditor']);
+
+        $body = $this->jsonBody();
+        $inputId = trim((string) ($body['input_id'] ?? ''));
+        if ($inputId === ''
+            || !preg_match('/^[0-9a-fA-F\-]{36}$/', $inputId)) {
+            $this->error('missing_input_id', 400, 'input_id must be a UUID.');
+        }
+        $decision = strtolower(trim((string) ($body['approval_status'] ?? '')));
+        if (!in_array($decision, ['verified', 'rejected'], true)) {
+            $this->error('invalid_decision', 400,
+                "approval_status must be 'verified' or 'rejected'.");
+        }
+        $approverNote = isset($body['approver_note'])
+            ? trim((string) $body['approver_note']) : '';
+
+        try {
+            $row = $this->db->queryOne(
+                "SELECT input_id, metric_code, entered_by, input_status
+                 FROM kpi_manual_inputs
+                 WHERE input_id = :id
+                 LIMIT 1",
+                [':id' => $inputId],
+            );
+        } catch (\Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('kpi_input_approve_failed', 500, $e->getMessage());
+        }
+        if (!is_array($row)) {
+            $this->error('input_not_found', 404, "kpi_manual_inputs row {$inputId} not found.");
+        }
+
+        $approver = (string) ($user['username'] ?? '');
+        $enteredBy = (string) ($row['entered_by'] ?? '');
+        if ($approver === '' || $enteredBy === '' || $approver === $enteredBy) {
+            // separation_of_duties: the approver MUST be a different user
+            // from the one who entered the data point. Otherwise a single
+            // operator can write + verify in two calls and the reward gate
+            // becomes ceremonial.
+            $this->error('separation_of_duties', 403,
+                "Approver ({$approver}) must differ from entered_by ({$enteredBy}).");
+        }
+        $currentStatus = (string) ($row['input_status'] ?? '');
+        if ($currentStatus === 'verified' && $decision === 'verified') {
+            $this->error('already_verified', 409,
+                "Input {$inputId} is already verified.");
+        }
+        if ($currentStatus === 'superseded') {
+            $this->error('invalid_transition', 409,
+                "Cannot approve a superseded input row.");
+        }
+
+        try {
+            if ($decision === 'verified') {
+                $updated = $this->db->insertReturning(
+                    "UPDATE kpi_manual_inputs
+                     SET input_status = 'verified',
+                         verified_by  = :ap,
+                         verified_at  = now()
+                     WHERE input_id = :id
+                     RETURNING input_id, input_status, verified_by, verified_at",
+                    [':ap' => $approver, ':id' => $inputId],
+                );
+            } else {
+                // Rejection: drop back to 'submitted' (DB enum has no
+                // 'rejected' state) and stamp the approver_note onto notes.
+                $updated = $this->db->insertReturning(
+                    "UPDATE kpi_manual_inputs
+                     SET input_status = 'submitted',
+                         notes = COALESCE(notes, '') || :sep || :note
+                     WHERE input_id = :id
+                     RETURNING input_id, input_status",
+                    [
+                        ':id'   => $inputId,
+                        ':sep'  => "\n[REJECTED by {$approver} @ " . gmdate('c') . "] ",
+                        ':note' => $approverNote !== '' ? $approverNote : '(no note)',
+                    ],
+                );
+            }
+            $this->auditLog(
+                $decision === 'verified' ? 'kpi_input_approve' : 'kpi_input_reject',
+                [
+                    'input_id'    => $inputId,
+                    'metric_code' => (string) ($row['metric_code'] ?? ''),
+                    'entered_by'  => $enteredBy,
+                    'approver'    => $approver,
+                    'decision'    => $decision,
+                    'approver_note' => $approverNote,
+                ],
+                $approver,
+            );
+            $this->success([
+                'approved'    => true,
+                'decision'    => $decision,
+                'input'       => $updated,
+                'metric_code' => (string) ($row['metric_code'] ?? ''),
+            ]);
+        } catch (\Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('kpi_input_approve_failed', 500, $e->getMessage());
+        }
+    }
+
+    // ── Unit alias normalisation ────────────────────────────────────────────
+    /**
+     * Collapse unit aliases (`%` → `percent`, `h` → `hour`, `d` → `day`, …)
+     * so a manual input written as `'%'` matches a registry metric whose
+     * declared unit is `'percent'`. Without this, the unit guard rejects
+     * perfectly equivalent forms and operators end up encoding the same
+     * data point under arbitrarily different unit strings.
+     */
+    private function normalizeUnit(string $raw): string
+    {
+        $unit = strtolower(trim($raw));
+        if ($unit === '') {
+            return '';
+        }
+        $aliases = [
+            '%' => 'percent', 'pct' => 'percent', 'percentage' => 'percent',
+            'd' => 'day', 'days' => 'day',
+            'h' => 'hour', 'hr' => 'hour', 'hrs' => 'hour', 'hours' => 'hour',
+            'min' => 'minute', 'mins' => 'minute', 'minutes' => 'minute',
+            's' => 'second', 'sec' => 'second', 'seconds' => 'second',
+            'ratio' => 'ratio', 'rate' => 'rate',
+            'ppm' => 'ppm', 'count' => 'count', 'units' => 'count',
+        ];
+        return $aliases[$unit] ?? $unit;
+    }
+
+    /**
+     * dashboard_render_contract enforcement at the response composer: when a
+     * KpiResult carries breakdown.value_suppressed=true the renderer MUST
+     * show `null` + a "GREY · insufficient" display, never the numeric
+     * field. Centralised here so every KPI endpoint that returns a
+     * KpiResult honors the contract without ad-hoc per-card checks.
+     */
+    private function applyRenderContract(array $kpi): array
+    {
+        $breakdown = is_array($kpi['breakdown'] ?? null) ? $kpi['breakdown'] : [];
+        $valueSuppressed = (bool) ($breakdown['value_suppressed'] ?? false);
+        if ($valueSuppressed) {
+            $kpi['value'] = null;
+            $kpi['display'] = 'GREY · insufficient';
+        }
+        return $kpi;
     }
 
     // â”€â”€ SPC Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

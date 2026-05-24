@@ -1346,6 +1346,26 @@ if ($dashboardContract === null) {
             $p0[] = "P0.8.1 dashboard_render_contract.card_classes: missing class '$cls'.";
             continue;
         }
+        // P0.8.1.X — every card class MUST declare its allow-lists and
+        // staged_metric_policy. A class without these reverts to "anything
+        // goes" and the renderer can silently put a staged metric on the
+        // executive deck or a role measure on the gate page.
+        $clsCfg = (array) $cardClasses[$cls];
+        $typesAllowed = $clsCfg['metric_types_allowed'] ?? null;
+        if (!is_array($typesAllowed) || $typesAllowed === []) {
+            $p0[] = "P0.8.1.{$cls} dashboard_render_contract.card_classes.$cls: "
+                . "metric_types_allowed MUST be a non-empty array.";
+        }
+        $statusAllowed = $clsCfg['calculation_status_allowed'] ?? null;
+        if (!is_array($statusAllowed) || $statusAllowed === []) {
+            $p0[] = "P0.8.1.{$cls} dashboard_render_contract.card_classes.$cls: "
+                . "calculation_status_allowed MUST be a non-empty array.";
+        }
+        $stagedPolicy = $clsCfg['staged_metric_policy'] ?? null;
+        if (!is_string($stagedPolicy) || trim($stagedPolicy) === '') {
+            $p0[] = "P0.8.1.{$cls} dashboard_render_contract.card_classes.$cls: "
+                . "staged_metric_policy MUST be a non-empty string.";
+        }
     }
     if (isset($cardClasses['executive']['calculation_status_allowed'])) {
         $allowedExec = (array) $cardClasses['executive']['calculation_status_allowed'];
@@ -1366,9 +1386,11 @@ if ($dashboardContract === null) {
 
 // ── P0.8.2 — manual_input_contract present + reward gate declared ────────────
 // P08 introduced manual_input_contract; the engine + controller honor the
-// input_status enum + reward_gate from this block. If the enum loses
-// 'pending_review' or 'approved' the dashboard's "no pending in reward"
-// promise breaks silently.
+// input_status enum + reward_gate from this block. The enum MUST mirror the
+// DB CHECK constraint in migration 196_kpi_manual_inputs.sql, otherwise the
+// controller will accept a status the database physically rejects (500 on
+// insert). Approval flow uses 'verified' (DB term) as the post-approval state
+// — governance docs may call it 'approved' but the enum is the DB truth.
 $manualContract = is_array($registry['manual_input_contract'] ?? null)
     ? $registry['manual_input_contract'] : null;
 if ($manualContract === null) {
@@ -1381,16 +1403,26 @@ if ($manualContract === null) {
         }
     }
     $enum = (array) ($manualContract['input_status_enum'] ?? []);
-    foreach (['draft', 'submitted', 'pending_review', 'approved', 'rejected', 'superseded'] as $s) {
+    // Enum MUST exactly mirror DB CHECK in migration 196.
+    $dbEnum = ['draft', 'submitted', 'verified', 'superseded'];
+    foreach ($dbEnum as $s) {
         if (!in_array($s, $enum, true)) {
-            $p0[] = "P0.8.2 manual_input_contract.input_status_enum: missing required status '$s'.";
+            $p0[] = "P0.8.2 manual_input_contract.input_status_enum: missing required status '$s' "
+                . "(DB CHECK constraint in 196_kpi_manual_inputs.sql).";
+        }
+    }
+    foreach ($enum as $s) {
+        if (!in_array($s, $dbEnum, true)) {
+            $p0[] = "P0.8.2 manual_input_contract.input_status_enum: status '$s' is NOT in the DB "
+                . "CHECK constraint — insert with this value would fail at the database. "
+                . "Allowed: " . implode(',', $dbEnum) . ".";
         }
     }
     if (isset($manualContract['reward_gate']) && is_array($manualContract['reward_gate'])) {
         $policy = (string) ($manualContract['reward_gate']['policy'] ?? '');
-        if (stripos($policy, 'approved') === false || stripos($policy, 'pending') === false) {
+        if (stripos($policy, 'verified') === false || stripos($policy, 'submitted') === false) {
             $p0[] = "P0.8.2 manual_input_contract.reward_gate.policy: must explicitly state "
-                . "that 'approved' contributes and 'pending'/'submitted' do not.";
+                . "that 'verified' contributes and 'submitted' / 'draft' do not.";
         }
     }
     // Required fields must include the controller's REQUIRED_FIELDS.
@@ -1403,29 +1435,41 @@ if ($manualContract === null) {
 }
 
 // ── P0.8.3 — DashboardController.kpiInputSave enforces the manual contract ──
-// The controller must accept the full input_status enum (pending_review et
-// al.) and must apply the unit guard. A regression that strips one of these
-// checks would let a "%" metric silently record a "ppm" input or accept an
-// undocumented status.
+// The controller MUST whitelist write-path statuses to {draft, submitted}
+// only and apply the unit guard. 'verified' is reserved for the approve
+// endpoint (separation of duties — same user cannot enter + verify). A
+// regression that re-adds 'verified' to the write whitelist would silently
+// bypass the approver gate.
 $dashboardCtlFp = $base . '/api/controllers/DashboardController.php';
 if (is_readable($dashboardCtlFp)) {
     $dashboardSrc = readText($dashboardCtlFp);
-    foreach (['pending_review', 'approved', 'rejected', 'superseded'] as $s) {
+    foreach (['draft', 'submitted'] as $s) {
         if (!str_contains($dashboardSrc, "'" . $s . "'")) {
-            $p0[] = "P0.8.3 DashboardController.kpiInputSave: input_status enum missing '$s' "
-                . "— diverges from manual_input_contract.";
+            $p0[] = "P0.8.3 DashboardController.kpiInputSave: write-path status '$s' missing "
+                . "— must accept both draft and submitted.";
         }
     }
     if (!str_contains($dashboardSrc, 'invalid_unit')) {
         $p0[] = "P0.8.3 DashboardController.kpiInputSave: unit guard missing — "
             . "manual_input_contract.validation.unit not enforced.";
     }
+    // The approve endpoint MUST exist and MUST enforce separation of duties.
+    if (!str_contains($dashboardSrc, 'kpiInputApprove')) {
+        $p0[] = "P0.8.3 DashboardController.kpiInputApprove: approval endpoint missing — "
+            . "manual inputs cannot transition to 'verified' without a distinct approver.";
+    }
+    if (str_contains($dashboardSrc, 'kpiInputApprove')
+        && !str_contains($dashboardSrc, 'separation_of_duties')) {
+        $p0[] = "P0.8.3 DashboardController.kpiInputApprove: separation-of-duties guard missing "
+            . "— approver MUST NOT be the same as entered_by.";
+    }
 }
 
 // ── P0.8.4 — KpiEngine staged metric must not leak numeric value ─────────────
 // calculateFromManualInput must suppress the numeric value when there is no
-// approved input. The flag 'value_suppressed' + 'input_pending_review' are
-// what dashboard renderers read; if they disappear, staged metrics will
+// verified input AND when the metric is staged_data_contract (regardless of
+// whether a row exists). The flags 'value_suppressed' + 'input_pending_review'
+// are what dashboard renderers read; if they disappear, staged metrics will
 // silently render numbers again.
 if (is_readable($engineFp)) {
     $engineSrcCheck = readText($engineFp);
@@ -1435,11 +1479,22 @@ if (is_readable($engineFp)) {
     }
     if (!str_contains($engineSrcCheck, 'input_pending_review')) {
         $p0[] = "P0.8.4 KpiEngine.calculateFromManualInput: missing 'input_pending_review' "
-            . "flag — reward gate cannot distinguish pending from approved manual input.";
+            . "flag — reward gate cannot distinguish pending from verified manual input.";
     }
     if (!str_contains($engineSrcCheck, 'reward_eligible_input')) {
         $p0[] = "P0.8.4 KpiEngine.calculateFromManualInput: missing 'reward_eligible_input' "
             . "flag — JD scorecard reward roll-up cannot skip pending input.";
+    }
+    // Reward must be gated by 'verified' ONLY (DB CHECK term). Anything
+    // looser (e.g. accepting 'approved' or 'pending_review') diverges from
+    // the DB enum and re-introduces the silent-pass-through bug.
+    if (!preg_match("/inputStat\\s*===?\\s*['\"]verified['\"]/", $engineSrcCheck)
+        && !preg_match("/['\"]verified['\"]\\s*===?\\s*\\\$?inputStat/", $engineSrcCheck)
+        && !preg_match("/input_status['\"]?\\s*===?\\s*['\"]verified['\"]/", $engineSrcCheck)
+        && !preg_match("/reward_eligible_input[\\s\\S]{0,400}['\"]verified['\"]/", $engineSrcCheck)) {
+        $p0[] = "P0.8.4 KpiEngine.calculateFromManualInput: reward eligibility MUST be gated "
+            . "by input_status === 'verified' (DB CHECK term). Other governance synonyms ("
+            . "'approved', 'pending_review') diverge from the DB enum.";
     }
 }
 
@@ -1462,6 +1517,28 @@ if (is_readable($adminCtlFp)) {
     if (!preg_match('/kpiRegistrySave[\\s\\S]{0,3000}reason_required/', $adminSrc)) {
         $p0[] = "P0.8.6 AdminController.kpiRegistrySave: reason_required guard missing "
             . "— KPI registry edits can be saved without an audit reason.";
+    }
+    // Reason MUST be rejected (400) if longer than 500 chars, not silently
+    // truncated. Silent truncation loses the operator's stated intent.
+    if (!preg_match('/kpiRegistrySave[\\s\\S]{0,4000}reason_too_long/', $adminSrc)) {
+        $p0[] = "P0.8.6 AdminController.kpiRegistrySave: oversize reason MUST be rejected "
+            . "(reason_too_long), not silently truncated.";
+    }
+}
+
+// ── P0.8.7 — dashboard_render_contract resolves to a real consumer ───────────
+// The contract is passive metadata unless a PHP renderer actually reads it.
+// Cheap tripwire: at least one of value_suppressed / dashboard_render_contract
+// must be referenced in DashboardController.php. If 0 hits, the contract is
+// dangling and renderers can drift back to ad-hoc field selection.
+if (is_readable($dashboardCtlFp)) {
+    $dashboardSrc2 = readText($dashboardCtlFp);
+    if (!str_contains($dashboardSrc2, 'value_suppressed')
+        && !str_contains($dashboardSrc2, 'dashboard_render_contract')) {
+        $p0[] = "P0.8.7 DashboardController.php: neither 'value_suppressed' nor "
+            . "'dashboard_render_contract' is referenced — render contract is passive metadata "
+            . "with no PHP consumer. Wire the contract into a renderer or remove it from the "
+            . "registry to avoid silent-drift risk.";
     }
 }
 

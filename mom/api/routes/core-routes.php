@@ -170,6 +170,7 @@ return static function (Router $router, string $dataDir): void {
         'kpi_jd_scorecards'    => [DashboardController::class, 'kpiJdScorecards'],
         'kpi_input_save'       => [DashboardController::class, 'kpiInputSave'],
         'kpi_input_list'       => [DashboardController::class, 'kpiInputList'],
+        'kpi_input_approve'    => [DashboardController::class, 'kpiInputApprove'],
         'spc_capability'       => [DashboardController::class, 'spcCapability'],
         'spc_chart'            => [DashboardController::class, 'spcChart'],
         'spc_summary'          => [DashboardController::class, 'spcSummary'],

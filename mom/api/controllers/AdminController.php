@@ -2340,8 +2340,15 @@ class AdminController extends BaseController
             $this->error('reason_required', 400,
                 'A change reason of at least 4 characters is required for KPI registry edits.');
         }
+        // P08 fix: reject (not silently truncate) oversize reasons so the
+        // operator's stated intent is preserved in the audit trail. Silent
+        // truncation lost trailing context (the "why" usually lives at the
+        // end of a long justification) and gave Console users no signal
+        // that their reason was clipped.
         if (mb_strlen($rawReason) > 500) {
-            $rawReason = mb_substr($rawReason, 0, 500);
+            $this->error('reason_too_long', 400,
+                'Reason exceeds 500 characters (got ' . mb_strlen($rawReason) . '). '
+                . 'Shorten the reason or link a CR/ticket and reference it.');
         }
 
         try {

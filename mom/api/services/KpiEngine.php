@@ -446,6 +446,20 @@ final class KpiEngine
         $unit   = $rt['unit'] ?? (self::UNITS[$metricCode] ?? '%');
         $target = $this->getKpiTarget($metricCode);
 
+        // Resolve the registry metric so we can honor calculation_status.
+        // For staged_data_contract / data_contract_required metrics the value
+        // field MUST be suppressed even if a manual_input row exists — the
+        // metric is not yet a contracted data source, so any numeric value is
+        // by definition pre-contract noise. dashboard_render_contract.
+        // render_rules.staged_data_contract codifies this.
+        $support  = $this->describeMetricSupport($metricCode);
+        $metric   = is_array($support['metric'] ?? null) ? $support['metric'] : [];
+        $calcStat = (string) ($metric['calculation_status']
+            ?? $support['calculation_status']
+            ?? $support['backend_status']
+            ?? '');
+        $isStaged = in_array($calcStat, ['staged_data_contract', 'data_contract_required'], true);
+
         $row = null;
         try {
             $row = $this->db->queryOne(
@@ -493,18 +507,49 @@ final class KpiEngine
 
         $value      = (float) $row['value'];
         $inputStat  = (string) ($row['input_status'] ?? '');
-        // manual_input_contract.reward_gate: only 'approved'/'verified' count.
-        // Anything else (draft/submitted/pending_review/rejected) is rendered
-        // with a badge but MUST NOT contribute to reward roll-up. The flag is
-        // surfaced in breakdown so dashboard renderers and JD scorecard logic
-        // can skip it for reward (per dashboard_render_contract.render_rules.manual).
-        $isApproved = in_array($inputStat, ['approved', 'verified'], true);
-        $isPending  = !$isApproved; // covers draft/submitted/pending_review/rejected/empty
+        // manual_input_contract.reward_gate: only 'verified' counts toward
+        // reward. The DB CHECK constraint in migration 196 physically limits
+        // input_status to {draft, submitted, verified, superseded} — there is
+        // no 'approved' / 'pending_review' status in the DB. 'verified' is the
+        // post-approval state set by DashboardController.kpiInputApprove after
+        // separation-of-duties is enforced (approver != entered_by).
+        $isVerified = ($inputStat === 'verified');
+        $isPending  = !$isVerified; // covers draft / submitted / empty
         $status     = $this->evaluateStatus($metricCode, $value, $target);
         // Pending input MUST NOT show as solid green/red — render grey so the
         // operator sees the status badge instead of a tradeable RAG colour.
         if ($isPending) {
             $status = KpiStatus::GREY;
+        }
+
+        // Staged / data_contract_required metric: ALWAYS suppress the value,
+        // even with an existing manual_input row. The dashboard render rule
+        // for staged_data_contract requires the numeric value to be hidden;
+        // only the badge + data_contract_gap may render.
+        if ($isStaged) {
+            return new KpiResult(
+                metricCode:   $metricCode,
+                value:        0.0,
+                unit:         (string) ($row['unit'] ?? '') !== '' ? (string) $row['unit'] : $unit,
+                target:       $target,
+                status:       KpiStatus::GREY,
+                breakdown:    [
+                    'value'                    => null,
+                    'value_suppressed'         => true,
+                    'insufficient_data'        => true,
+                    'insufficient_data_reason' => 'metric_staged_data_contract_value_suppressed',
+                    'calculation_status'       => $calcStat,
+                    'data_source'              => 'manual_input',
+                    'input_status'             => $row['input_status'] ?? null,
+                    'input_pending_review'     => $isPending,
+                    'reward_eligible_input'    => false,
+                    'entered_by'               => $row['entered_by'] ?? null,
+                    'entered_at'               => $row['entered_at'] ?? null,
+                ],
+                periodStart:  $period->start,
+                periodEnd:    $period->end,
+                calculatedAt: gmdate('c'),
+            );
         }
 
         return new KpiResult(
@@ -518,7 +563,7 @@ final class KpiEngine
                 'data_source'            => 'manual_input',
                 'input_status'           => $row['input_status'] ?? null,
                 'input_pending_review'   => $isPending,
-                'reward_eligible_input'  => $isApproved,
+                'reward_eligible_input'  => $isVerified,
                 'entered_by'             => $row['entered_by'] ?? null,
                 'entered_at'             => $row['entered_at'] ?? null,
             ],

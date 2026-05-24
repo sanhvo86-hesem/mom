@@ -9943,11 +9943,11 @@
       "cadence": "metric.cadence MUST be one of daily/weekly/monthly/quarterly/yearly/ad_hoc; the input period length is informational, the engine does not reject mismatch (a CI WARN-only check)",
       "evidence_reference": "free-form string (doc_code, NCR id, JO number, URL); WARN-only when blank for non-DRAFT input — DCC inspector may request it"
     },
-    "input_status_enum": ["draft", "submitted", "pending_review", "approved", "rejected", "superseded"],
+    "input_status_enum": ["draft", "submitted", "verified", "superseded"],
     "default_status_on_save": "submitted",
     "reward_gate": {
-      "policy": "Only input_status in ['approved'] contributes to reward calculation. 'draft' and 'submitted' and 'pending_review' MAY render on the dashboard with a badge but MUST NOT count toward JD scorecard reward.",
-      "enforcement_point": "KpiEngine.calculateFromManualInput emits input_pending_review=true when status not in ['approved','verified']; dashboard renderer skips reward roll-up when input_pending_review=true."
+      "policy": "Only input_status='verified' (post-approval by a distinct approver, not the entered_by user) contributes to reward calculation. 'draft' and 'submitted' MAY render on the dashboard with a badge but MUST NOT count toward JD scorecard reward. 'superseded' rows are excluded from reward and from latest-input lookups. Note: 'verified' is the DB CHECK term; in governance language this state is equivalent to 'approved' — the approval workflow (POST /api/kpi/{metricCode}/input/approve) sets verified_by/verified_at and transitions submitted→verified after enforcing separation of duties (approver != entered_by).",
+      "enforcement_point": "KpiEngine.calculateFromManualInput emits input_pending_review=true when status != 'verified'; dashboard renderer skips reward roll-up when input_pending_review=true. The DB CHECK constraint (migration 196) physically forbids any other status, so the engine never sees pending_review/approved/rejected — those are governance synonyms only."
     },
     "audit": {
       "rows_written": ["kpi_manual_inputs", "audit_events"],
