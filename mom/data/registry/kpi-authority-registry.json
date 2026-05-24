@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
-  "version": "2026-05-23",
-  "schema_version": 19,
+  "version": "2026-05-24",
+  "schema_version": 20,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. The executive scorecard is a lean runtime-backed core; role scorecards use active/candidate measures; proposed metrics remain non-reward until governed evidence and data contracts are approved.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -9870,6 +9870,89 @@
     "calculation_endpoint": "GET /api/kpi/{metricCode}",
     "trend_endpoint": "GET /api/kpi/{metricCode}/trend",
     "rule": "Calculation endpoints are allowed only for runtime_calculated_metrics after alias normalization. Known non-runtime metrics must return catalog coverage and data-contract status, not a fake value."
+  },
+  "dashboard_render_contract": {
+    "contract_id": "KPI-DASHBOARD-RENDER-CONTRACT-1",
+    "introduced": "P08 — dashboard, tier-meeting, manual-input, admin UX",
+    "purpose": "Every dashboard surface (executive, daily ops, gate, role/JD, data-contract backlog) reads the same governance fields per card. The UI MAY format them differently but it MUST NOT silently drop a required field — otherwise an operator sees a green number with no min_sample, no counter, no owner and acts on it as if it were a real KPI.",
+    "required_fields_per_card": [
+      "metric_code",
+      "name_vi",
+      "value_or_status",
+      "calculation_status",
+      "min_sample_or_insufficient_data_reason",
+      "owner_role",
+      "next_action_if_red",
+      "counter_metric_status",
+      "trend",
+      "evidence_source_or_link",
+      "last_calculated_or_input_time"
+    ],
+    "render_rules": {
+      "staged_data_contract": "Card MUST display 'chưa đủ data contract' badge + data_contract_gap text; numeric value field is SUPPRESSED (never render staged metric value as a real number). Only the badge, the data contract gap and the input endpoint are shown.",
+      "data_contract_required": "Same as staged — value SUPPRESSED, gap text rendered, badge 'chưa đủ data contract'.",
+      "manual": "Card MAY display the latest manual_input.value but MUST tag it 'nhập tay có kiểm soát' with input_status badge. Pending-review inputs MUST NOT contribute to reward calculation.",
+      "manual_governed": "Same as manual but counter_metric_status MUST be visible alongside the primary value.",
+      "runtime_calculated": "Card displays the numeric value with the unit. If breakdown.insufficient_data=true the card MUST render grey + insufficient_data_reason and the numeric value MUST be hidden.",
+      "counter_metric_blocker": "If primary KPI is green/yellow but counter_metric is red OR counter_metric is missing/pending, the card MUST show a counter-metric blocker badge and recognition/reward is blocked."
+    },
+    "card_classes": {
+      "executive": {
+        "audience": "Tier-3 management / CEO scorecard",
+        "metric_types_allowed": ["kpi", "operating_metric"],
+        "calculation_status_allowed": ["runtime_calculated", "manual", "manual_governed"],
+        "staged_metric_policy": "Executive deck must NOT contain a staged_data_contract metric as a scoreable card. Staged candidates are visible only in the data-contract backlog card class."
+      },
+      "daily_ops": {
+        "audience": "Tier-1 / Tier-2 floor + cell meeting",
+        "metric_types_allowed": ["kpi", "operating_metric", "gate_control_metric", "health_indicator", "counter_metric"],
+        "calculation_status_allowed": ["runtime_calculated", "manual", "manual_governed", "staged_data_contract"],
+        "staged_metric_policy": "Staged metric is shown ONLY as a watch-item with the badge, never with a number."
+      },
+      "gate": {
+        "audience": "CDR + gate-pass meeting",
+        "metric_types_allowed": ["gate_control_metric"],
+        "calculation_status_allowed": ["runtime_calculated", "manual_governed", "staged_data_contract"],
+        "staged_metric_policy": "Staged gate metric blocks gate-pass; visible as red blocker even when there is no number."
+      },
+      "role": {
+        "audience": "Per-JD scorecard card on role profile page",
+        "metric_types_allowed": ["role_performance_measure"],
+        "calculation_status_allowed": ["runtime_calculated", "manual", "manual_governed", "staged_data_contract"],
+        "staged_metric_policy": "Staged role measure is visible but reward contribution is DISABLED (scorecard_contributes_to_reward=false enforced)."
+      },
+      "backlog": {
+        "audience": "Data-contract backlog / governance review",
+        "metric_types_allowed": ["kpi", "operating_metric", "gate_control_metric", "role_performance_measure", "counter_metric"],
+        "calculation_status_allowed": ["staged_data_contract", "data_contract_required"],
+        "staged_metric_policy": "All cards are staged by definition. Each card MUST show data_contract_gap + target_graduation_condition + owner + estimated_data_ready_date if known."
+      }
+    }
+  },
+  "manual_input_contract": {
+    "contract_id": "KPI-MANUAL-INPUT-CONTRACT-1",
+    "introduced": "P08 — dashboard, tier-meeting, manual-input, admin UX",
+    "endpoint_save": "POST /api/kpi/{metricCode}/input  (action=kpi_input_save)",
+    "endpoint_list": "GET  /api/kpi/{metricCode}/input  (action=kpi_input_list)",
+    "required_fields": ["period_start", "period_end", "value"],
+    "optional_fields": ["unit", "evidence_reference", "breakdown", "notes", "input_status"],
+    "validation": {
+      "period": "YYYY-MM-DD; period_start <= period_end",
+      "value": "numeric (int or float)",
+      "unit": "string; if metric has thresholds.unit declared, input.unit MUST match (case-insensitive); empty unit is allowed and inherits metric.thresholds.unit",
+      "cadence": "metric.cadence MUST be one of daily/weekly/monthly/quarterly/yearly/ad_hoc; the input period length is informational, the engine does not reject mismatch (a CI WARN-only check)",
+      "evidence_reference": "free-form string (doc_code, NCR id, JO number, URL); WARN-only when blank for non-DRAFT input — DCC inspector may request it"
+    },
+    "input_status_enum": ["draft", "submitted", "pending_review", "approved", "rejected", "superseded"],
+    "default_status_on_save": "submitted",
+    "reward_gate": {
+      "policy": "Only input_status in ['approved'] contributes to reward calculation. 'draft' and 'submitted' and 'pending_review' MAY render on the dashboard with a badge but MUST NOT count toward JD scorecard reward.",
+      "enforcement_point": "KpiEngine.calculateFromManualInput emits input_pending_review=true when status not in ['approved','verified']; dashboard renderer skips reward roll-up when input_pending_review=true."
+    },
+    "audit": {
+      "rows_written": ["kpi_manual_inputs", "audit_events"],
+      "audit_action_keys": ["kpi_input_save"]
+    }
   },
   "threshold_schema": {
     "version": 1,

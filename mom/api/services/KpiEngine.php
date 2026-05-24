@@ -463,6 +463,10 @@ final class KpiEngine
         }
 
         if ($row === null) {
+            // Staged/manual metric with no input → SUPPRESS the value (return
+            // 0 in the struct for backward compat but flag insufficient_data
+            // so dashboard renderers honoring dashboard_render_contract.
+            // render_rules.staged_data_contract hide the number).
             return new KpiResult(
                 metricCode:   $metricCode,
                 value:        0.0,
@@ -470,11 +474,15 @@ final class KpiEngine
                 target:       $target,
                 status:       KpiStatus::GREY,
                 breakdown:    [
-                    'value'           => 0,
-                    'no_manual_input' => true,
-                    'data_source'     => 'manual_input',
-                    'input_endpoint'  => $this->inputEndpoint($metricCode),
-                    'note'            => 'No manual input for this period — the KPI '
+                    'value'                    => 0,
+                    'value_suppressed'         => true,
+                    'no_manual_input'          => true,
+                    'insufficient_data'        => true,
+                    'insufficient_data_reason' => 'no manual input for this period — '
+                        . 'staged/manual metric awaiting input',
+                    'data_source'              => 'manual_input',
+                    'input_endpoint'           => $this->inputEndpoint($metricCode),
+                    'note'                     => 'No manual input for this period — the KPI '
                         . 'data-input endpoint is wired and waiting for a frontend POST.',
                 ],
                 periodStart:  $period->start,
@@ -483,8 +491,21 @@ final class KpiEngine
             );
         }
 
-        $value  = (float) $row['value'];
-        $status = $this->evaluateStatus($metricCode, $value, $target);
+        $value      = (float) $row['value'];
+        $inputStat  = (string) ($row['input_status'] ?? '');
+        // manual_input_contract.reward_gate: only 'approved'/'verified' count.
+        // Anything else (draft/submitted/pending_review/rejected) is rendered
+        // with a badge but MUST NOT contribute to reward roll-up. The flag is
+        // surfaced in breakdown so dashboard renderers and JD scorecard logic
+        // can skip it for reward (per dashboard_render_contract.render_rules.manual).
+        $isApproved = in_array($inputStat, ['approved', 'verified'], true);
+        $isPending  = !$isApproved; // covers draft/submitted/pending_review/rejected/empty
+        $status     = $this->evaluateStatus($metricCode, $value, $target);
+        // Pending input MUST NOT show as solid green/red — render grey so the
+        // operator sees the status badge instead of a tradeable RAG colour.
+        if ($isPending) {
+            $status = KpiStatus::GREY;
+        }
 
         return new KpiResult(
             metricCode:   $metricCode,
@@ -493,11 +514,13 @@ final class KpiEngine
             target:       $target,
             status:       $status,
             breakdown:    [
-                'value'        => $value,
-                'data_source'  => 'manual_input',
-                'input_status' => $row['input_status'] ?? null,
-                'entered_by'   => $row['entered_by'] ?? null,
-                'entered_at'   => $row['entered_at'] ?? null,
+                'value'                  => $value,
+                'data_source'            => 'manual_input',
+                'input_status'           => $row['input_status'] ?? null,
+                'input_pending_review'   => $isPending,
+                'reward_eligible_input'  => $isApproved,
+                'entered_by'             => $row['entered_by'] ?? null,
+                'entered_at'             => $row['entered_at'] ?? null,
             ],
             periodStart:  $period->start,
             periodEnd:    $period->end,

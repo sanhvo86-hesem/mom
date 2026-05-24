@@ -1296,6 +1296,175 @@ if ($profiles !== []) {
     }
 }
 
+// ── P0.8.1 — dashboard_render_contract present + shape complete ──────────────
+// P08 introduced dashboard_render_contract; every dashboard surface honors
+// the same governance fields per card. A missing or shape-broken contract
+// means a renderer could silently fall back to a hardcoded set and start
+// showing staged metric numbers again.
+$dashboardContract = is_array($registry['dashboard_render_contract'] ?? null)
+    ? $registry['dashboard_render_contract'] : null;
+if ($dashboardContract === null) {
+    $p0[] = "P0.8.1 Registry: missing dashboard_render_contract block — dashboard render rules become hardcoded.";
+} else {
+    $contractRequiredFields = ['contract_id', 'required_fields_per_card', 'render_rules', 'card_classes'];
+    foreach ($contractRequiredFields as $f) {
+        if (!isset($dashboardContract[$f])) {
+            $p0[] = "P0.8.1 dashboard_render_contract: missing top-level '$f'.";
+        }
+    }
+    // Required fields per card must include the spec §2 fields.
+    $requiredPerCard = (array) ($dashboardContract['required_fields_per_card'] ?? []);
+    $mustHaveFields = [
+        'metric_code', 'calculation_status',
+        'min_sample_or_insufficient_data_reason', 'owner_role',
+        'next_action_if_red', 'counter_metric_status',
+        'evidence_source_or_link', 'last_calculated_or_input_time',
+    ];
+    foreach ($mustHaveFields as $f) {
+        if (!in_array($f, $requiredPerCard, true)) {
+            $p0[] = "P0.8.1 dashboard_render_contract.required_fields_per_card: missing '$f'.";
+        }
+    }
+    // Render rules must cover every calculation_status that may appear on
+    // a card AND the counter-metric blocker rule.
+    $renderRules = is_array($dashboardContract['render_rules'] ?? null)
+        ? $dashboardContract['render_rules'] : [];
+    $renderRuleKeys = ['staged_data_contract', 'data_contract_required',
+        'manual', 'manual_governed', 'runtime_calculated', 'counter_metric_blocker'];
+    foreach ($renderRuleKeys as $rk) {
+        if (!isset($renderRules[$rk]) || !is_string($renderRules[$rk])
+            || trim($renderRules[$rk]) === '') {
+            $p0[] = "P0.8.1 dashboard_render_contract.render_rules: missing rule for '$rk'.";
+        }
+    }
+    // Card classes — executive must forbid staged scoring; backlog must
+    // accept only staged_data_contract / data_contract_required.
+    $cardClasses = is_array($dashboardContract['card_classes'] ?? null)
+        ? $dashboardContract['card_classes'] : [];
+    foreach (['executive', 'daily_ops', 'gate', 'role', 'backlog'] as $cls) {
+        if (!isset($cardClasses[$cls])) {
+            $p0[] = "P0.8.1 dashboard_render_contract.card_classes: missing class '$cls'.";
+            continue;
+        }
+    }
+    if (isset($cardClasses['executive']['calculation_status_allowed'])) {
+        $allowedExec = (array) $cardClasses['executive']['calculation_status_allowed'];
+        if (in_array('staged_data_contract', $allowedExec, true)
+            || in_array('data_contract_required', $allowedExec, true)) {
+            $p0[] = "P0.8.1 dashboard_render_contract.card_classes.executive: "
+                . "MUST NOT allow staged_data_contract or data_contract_required (spec §2 executive policy).";
+        }
+    }
+    if (isset($cardClasses['backlog']['calculation_status_allowed'])) {
+        $allowedBacklog = (array) $cardClasses['backlog']['calculation_status_allowed'];
+        if (!in_array('staged_data_contract', $allowedBacklog, true)) {
+            $p0[] = "P0.8.1 dashboard_render_contract.card_classes.backlog: "
+                . "MUST allow staged_data_contract (it is the backlog's reason for existing).";
+        }
+    }
+}
+
+// ── P0.8.2 — manual_input_contract present + reward gate declared ────────────
+// P08 introduced manual_input_contract; the engine + controller honor the
+// input_status enum + reward_gate from this block. If the enum loses
+// 'pending_review' or 'approved' the dashboard's "no pending in reward"
+// promise breaks silently.
+$manualContract = is_array($registry['manual_input_contract'] ?? null)
+    ? $registry['manual_input_contract'] : null;
+if ($manualContract === null) {
+    $p0[] = "P0.8.2 Registry: missing manual_input_contract block.";
+} else {
+    foreach (['contract_id', 'endpoint_save', 'endpoint_list',
+              'required_fields', 'input_status_enum', 'reward_gate'] as $f) {
+        if (!isset($manualContract[$f])) {
+            $p0[] = "P0.8.2 manual_input_contract: missing '$f'.";
+        }
+    }
+    $enum = (array) ($manualContract['input_status_enum'] ?? []);
+    foreach (['draft', 'submitted', 'pending_review', 'approved', 'rejected', 'superseded'] as $s) {
+        if (!in_array($s, $enum, true)) {
+            $p0[] = "P0.8.2 manual_input_contract.input_status_enum: missing required status '$s'.";
+        }
+    }
+    if (isset($manualContract['reward_gate']) && is_array($manualContract['reward_gate'])) {
+        $policy = (string) ($manualContract['reward_gate']['policy'] ?? '');
+        if (stripos($policy, 'approved') === false || stripos($policy, 'pending') === false) {
+            $p0[] = "P0.8.2 manual_input_contract.reward_gate.policy: must explicitly state "
+                . "that 'approved' contributes and 'pending'/'submitted' do not.";
+        }
+    }
+    // Required fields must include the controller's REQUIRED_FIELDS.
+    $required = (array) ($manualContract['required_fields'] ?? []);
+    foreach (['period_start', 'period_end', 'value'] as $f) {
+        if (!in_array($f, $required, true)) {
+            $p0[] = "P0.8.2 manual_input_contract.required_fields: missing '$f'.";
+        }
+    }
+}
+
+// ── P0.8.3 — DashboardController.kpiInputSave enforces the manual contract ──
+// The controller must accept the full input_status enum (pending_review et
+// al.) and must apply the unit guard. A regression that strips one of these
+// checks would let a "%" metric silently record a "ppm" input or accept an
+// undocumented status.
+$dashboardCtlFp = $base . '/api/controllers/DashboardController.php';
+if (is_readable($dashboardCtlFp)) {
+    $dashboardSrc = readText($dashboardCtlFp);
+    foreach (['pending_review', 'approved', 'rejected', 'superseded'] as $s) {
+        if (!str_contains($dashboardSrc, "'" . $s . "'")) {
+            $p0[] = "P0.8.3 DashboardController.kpiInputSave: input_status enum missing '$s' "
+                . "— diverges from manual_input_contract.";
+        }
+    }
+    if (!str_contains($dashboardSrc, 'invalid_unit')) {
+        $p0[] = "P0.8.3 DashboardController.kpiInputSave: unit guard missing — "
+            . "manual_input_contract.validation.unit not enforced.";
+    }
+}
+
+// ── P0.8.4 — KpiEngine staged metric must not leak numeric value ─────────────
+// calculateFromManualInput must suppress the numeric value when there is no
+// approved input. The flag 'value_suppressed' + 'input_pending_review' are
+// what dashboard renderers read; if they disappear, staged metrics will
+// silently render numbers again.
+if (is_readable($engineFp)) {
+    $engineSrcCheck = readText($engineFp);
+    if (!str_contains($engineSrcCheck, 'value_suppressed')) {
+        $p0[] = "P0.8.4 KpiEngine.calculateFromManualInput: missing 'value_suppressed' flag — "
+            . "staged metric value leak risk.";
+    }
+    if (!str_contains($engineSrcCheck, 'input_pending_review')) {
+        $p0[] = "P0.8.4 KpiEngine.calculateFromManualInput: missing 'input_pending_review' "
+            . "flag — reward gate cannot distinguish pending from approved manual input.";
+    }
+    if (!str_contains($engineSrcCheck, 'reward_eligible_input')) {
+        $p0[] = "P0.8.4 KpiEngine.calculateFromManualInput: missing 'reward_eligible_input' "
+            . "flag — JD scorecard reward roll-up cannot skip pending input.";
+    }
+}
+
+// ── P0.8.5 — Admin Console JS requires a change reason client-side ──────────
+// The portal Console must reject empty/short reason before the save round-trip.
+// AdminController re-checks server-side (P08 hardening).
+if (is_readable($adminJsFp)) {
+    $consoleSrc = readText($adminJsFp);
+    if (!preg_match('/reasonTrim\\.length\\s*<\\s*4/', $consoleSrc)
+        && !preg_match('/_state\\.reason[^;]*length\\s*<\\s*4/', $consoleSrc)) {
+        $p0[] = "P0.8.5 Admin Console (00o-admin-kpi-registry.js): change-reason "
+            . "client-side guard missing — Save can be triggered with an empty reason.";
+    }
+}
+
+// ── P0.8.6 — AdminController.kpiRegistrySave enforces reason_required ───────
+$adminCtlFp = $base . '/api/controllers/AdminController.php';
+if (is_readable($adminCtlFp)) {
+    $adminSrc = readText($adminCtlFp);
+    if (!preg_match('/kpiRegistrySave[\\s\\S]{0,3000}reason_required/', $adminSrc)) {
+        $p0[] = "P0.8.6 AdminController.kpiRegistrySave: reason_required guard missing "
+            . "— KPI registry edits can be saved without an audit reason.";
+    }
+}
+
 // ── Report ───────────────────────────────────────────────────────────────────
 $statusKeys = ['runtime_calculated', 'staged_data_contract', 'manual', 'manual_governed', 'retired'];
 $byStatus = array_fill_keys($statusKeys, 0);

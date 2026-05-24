@@ -505,12 +505,37 @@ final class DashboardController extends BaseController
             || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $periodEnd)) {
             $this->error('invalid_period', 400, 'period_start and period_end must be YYYY-MM-DD.');
         }
+        if (strcmp($periodStart, $periodEnd) > 0) {
+            $this->error('invalid_period', 400, 'period_start must be on or before period_end.');
+        }
         if (!is_numeric($body['value'])) {
             $this->error('invalid_value', 400, 'value must be numeric.');
         }
+        // Manual-input contract (KPI-MANUAL-INPUT-CONTRACT-1) §input_status_enum:
+        // draft/submitted/pending_review/approved/rejected/superseded. Legacy
+        // 'verified' is preserved as an alias for 'approved' so older inputs
+        // don't break. Anything else collapses to 'submitted'.
+        $allowedStatuses = ['draft', 'submitted', 'pending_review', 'approved', 'rejected', 'superseded', 'verified'];
         $statusIn = (string) ($body['input_status'] ?? 'submitted');
-        if (!in_array($statusIn, ['draft', 'submitted', 'verified'], true)) {
+        if (!in_array($statusIn, $allowedStatuses, true)) {
             $statusIn = 'submitted';
+        }
+
+        // Unit guard (manual_input_contract.validation.unit): if the registry
+        // declares a unit for this metric, accept either an empty client unit
+        // (it inherits) or a case-insensitive match. Mismatch is rejected so
+        // a "%" KPI never silently records a "ppm" input.
+        $inputUnit = isset($body['unit']) ? trim((string) $body['unit']) : '';
+        $registryUnit = '';
+        if (is_array($support['metric'] ?? null)
+            && is_array($support['metric']['thresholds'] ?? null)
+            && is_string($support['metric']['thresholds']['unit'] ?? null)) {
+            $registryUnit = trim((string) $support['metric']['thresholds']['unit']);
+        }
+        if ($registryUnit !== '' && $inputUnit !== ''
+            && strcasecmp($inputUnit, $registryUnit) !== 0) {
+            $this->error('invalid_unit', 400,
+                "Input unit '{$inputUnit}' does not match registry unit '{$registryUnit}' for metric '{$code}'.");
         }
         $breakdown = $body['breakdown'] ?? [];
         if (!is_array($breakdown)) {

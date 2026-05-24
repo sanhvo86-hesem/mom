@@ -2332,6 +2332,17 @@ class AdminController extends BaseController
             && !$nonEmptyGroups($added) && !$nonEmptyGroups($retired)) {
             $this->error('invalid_config', 400, 'No KPI changes supplied to save.');
         }
+        // P08 — Admin Console must record a change reason for every save (it
+        // flows into the overlay + audit_events row). Empty / trivial reason
+        // is rejected so the audit trail stays usable.
+        $rawReason = trim((string)($body['reason'] ?? ''));
+        if ($rawReason === '' || mb_strlen($rawReason) < 4) {
+            $this->error('reason_required', 400,
+                'A change reason of at least 4 characters is required for KPI registry edits.');
+        }
+        if (mb_strlen($rawReason) > 500) {
+            $rawReason = mb_substr($rawReason, 0, 500);
+        }
 
         try {
             $result = $this->kpiRegistryAdmin()->save(
@@ -2343,7 +2354,7 @@ class AdminController extends BaseController
                     'retired_codes'        => $retired,
                 ],
                 $user,
-                trim((string)($body['reason'] ?? '')),
+                $rawReason,
             );
             $this->auditLog('admin_kpi_registry_save', [
                 'override_count'   => (int)($result['override_count'] ?? 0),

@@ -147,6 +147,15 @@ function _save(){
     _state.error = _t('Chưa có thay đổi nào để lưu.', 'No changes to save.');
     _syncStatus(); return;
   }
+  // P08 — Console save requires a change reason (audit-log requirement).
+  // Reject empty / too-short reason client-side so the user sees the prompt
+  // before the round-trip; the backend re-checks the same rule.
+  var reasonTrim = (_state.reason || '').trim();
+  if(reasonTrim.length < 4){
+    _state.error = _t('Cần nhập lý do cập nhật (tối thiểu 4 ký tự) cho nhật ký kiểm toán.',
+      'A change reason of at least 4 characters is required for the audit log.');
+    _syncStatus(); return;
+  }
   _state.saving = true; _state.error = ''; _state.message = '';
   _render();
   apiCall('admin_kpi_registry_save', {
