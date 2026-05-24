@@ -8104,6 +8104,12 @@ let ghaWorkflowState = {
   data: null,  // { status, latest_status_pill, latest, runs }
   lastFetchedAt: 0  // client-side throttle: refetch at most once per 30s
 };
+// GHA PAT settings (separate from workflow status). Backend never returns
+// the PAT itself — only a masked preview (first 12 chars + last 4).
+let ghaSettingsState = {
+  loading:false, loaded:false, error:'', saving:false,
+  data: null  // { configured_via, has_pat, pat_preview, pat_length, repo, workflow, updated_at, updated_by, env_pat_set }
+};
 
 // ─────────────────────────────────────────────────────────────────────────
 // VC Action Modal (replaces window.prompt/alert/confirm)
@@ -9055,6 +9061,102 @@ function deployFreezeIsActive(){
   return !!(deployFreezeState.data && deployFreezeState.data.is_active);
 }
 
+// GHA settings loader (PAT config)
+async function loadGhaSettings({force=false, silent=false} = {}){
+  if(ghaSettingsState.loading) return;
+  if(ghaSettingsState.loaded && !force) return;
+  ghaSettingsState = Object.assign({}, ghaSettingsState, {loading:true, error:''});
+  if(!silent) renderAdmin();
+  try{
+    const res = await apiCall('admin_gha_settings_get', null, 'GET');
+    if(res && res.ok){
+      ghaSettingsState = Object.assign({}, ghaSettingsState, {loading:false, loaded:true, error:'', data:res});
+    }else{
+      ghaSettingsState = Object.assign({}, ghaSettingsState, {loading:false, error:String((res && (res.error||res.detail))||'gha_settings_load_failed')});
+    }
+  }catch(e){
+    ghaSettingsState = Object.assign({}, ghaSettingsState, {loading:false, error:e.message});
+  }
+  if(currentPage === 'admin') renderAdmin();
+}
+
+function adminVCConfigureGha(){
+  const s = ghaSettingsState.data || {};
+  openAdminVCActionModal({
+    title: s.has_pat ? (lang==='en'?'Update GHA PAT':'Cập nhật GHA PAT') : (lang==='en'?'Configure GHA PAT':'Cấu hình GHA PAT'),
+    intro: lang==='en'
+      ? 'Paste a GitHub fine-grained PAT with Actions: Read-only permission on this repo. Token stored only on VPS (chmod 600), never returned to browser after save.'
+      : 'Dán GitHub fine-grained PAT (Actions: Read-only) trên repo này. Token chỉ lưu trên VPS (chmod 600), không trả lại browser sau khi lưu.',
+    fields: [
+      { name:'pat', label:lang==='en'?'GitHub PAT':'GitHub PAT', type:'text', required:true,
+        minLength:20, maxLength:200, regex:'^(ghp_|github_pat_|gho_|ghs_|ghr_)[A-Za-z0-9_]+$',
+        regexHelp:lang==='en'?'Must start with ghp_ or github_pat_. Generate at https://github.com/settings/personal-access-tokens':'Phải bắt đầu ghp_ hoặc github_pat_. Tạo tại https://github.com/settings/personal-access-tokens',
+        placeholder:'github_pat_11ABC...' },
+      { name:'repo', label:lang==='en'?'Repo (owner/name)':'Repo (owner/name)', type:'text', required:false,
+        regex:'^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$', default:s.repo||'sanhvo86-hesem/mom', placeholder:'sanhvo86-hesem/mom' },
+      { name:'workflow', label:lang==='en'?'Workflow file':'File workflow', type:'text', required:false,
+        regex:'^[A-Za-z0-9_.-]+\\.(yml|yaml)$', default:s.workflow||'deploy.yml', placeholder:'deploy.yml' }
+    ],
+    submitLabel:lang==='en'?'Save PAT':'Lưu PAT', submitTone:'good',
+    onSubmit: async (vals) => {
+      const res = await apiCall('admin_gha_settings_set', {pat:vals.pat.trim(), repo:(vals.repo||'').trim(), workflow:(vals.workflow||'').trim()}, 'POST');
+      if(res && res.ok){
+        ghaSettingsState = Object.assign({}, ghaSettingsState, {loaded:true, error:'', data:res});
+        ghaWorkflowState = Object.assign({}, ghaWorkflowState, {loaded:false, lastFetchedAt:0});
+        loadGhaWorkflow({force:true, silent:true});
+        return { ok:true, message:res.message||'Đã lưu', next_steps:[
+          'Đợi ≤30s để Deploy pill cập nhật.',
+          'PAT preview: '+(res.pat_preview||'')+' (len '+(res.pat_length||0)+')'
+        ]};
+      }
+      return res || { ok:false, error:'unknown' };
+    }
+  });
+}
+
+function adminVCTestGha(){
+  openAdminVCActionModal({
+    title:lang==='en'?'Test GHA connection':'Test kết nối GHA',
+    intro:lang==='en'?'Force-fetch latest 5 runs from GitHub now (bypass cache).':'Force-fetch 5 run gần nhất từ GitHub (bỏ cache).',
+    fields:[], submitLabel:lang==='en'?'Test now':'Test ngay', submitTone:'good',
+    onSubmit: async () => {
+      ghaWorkflowState = Object.assign({}, ghaWorkflowState, {loaded:false, lastFetchedAt:0});
+      const res = await apiCall('admin_gha_workflow_status', null, 'GET');
+      if(res && res.ok && res.status === 'ok'){
+        const latest = res.latest || {};
+        ghaWorkflowState = Object.assign({}, ghaWorkflowState, {loading:false, loaded:true, error:'', data:res, lastFetchedAt:Date.now()});
+        return { ok:true, message:'GHA OK · '+(res.runs||[]).length+' runs', next_steps:[
+          'Latest: '+(latest.head_sha||'?')+' '+(latest.status||'')+'/'+(latest.conclusion||''),
+          'Branch '+(latest.head_branch||'?')+' · Actor '+(latest.actor||'?')+' · Event '+(latest.event||'?'),
+          'URL: '+(latest.html_url||'?')
+        ]};
+      }
+      if(res && res.ok) return { ok:false, error:res.status+' — '+(res.message||'') };
+      return res || { ok:false, error:'unknown' };
+    }
+  });
+}
+
+function adminVCDeleteGhaPat(){
+  openAdminVCActionModal({
+    title:lang==='en'?'Delete GHA PAT':'Xoá GHA PAT',
+    intro:lang==='en'?'Removes the PAT file. Deploy pill reverts to "GHA chưa cấu hình" (or env var fallback).':'Xoá file PAT. Deploy pill về "GHA chưa cấu hình" (hoặc env var fallback).',
+    fields:[{ name:'reason', label:lang==='en'?'Reason':'Lý do', type:'text', required:true, minLength:4, maxLength:200, placeholder:lang==='en'?'Why remove?':'Vì sao xoá?' }],
+    submitLabel:lang==='en'?'Delete':'Xoá', submitTone:'error',
+    onSubmit: async () => {
+      const res = await apiCall('admin_gha_settings_delete', {}, 'POST');
+      if(res && res.ok){
+        ghaSettingsState = Object.assign({}, ghaSettingsState, {loaded:false});
+        ghaWorkflowState = Object.assign({}, ghaWorkflowState, {loaded:false, lastFetchedAt:0});
+        loadGhaSettings({force:true, silent:true});
+        loadGhaWorkflow({force:true, silent:true});
+        return { ok:true, message:res.message||'Đã xoá' };
+      }
+      return res || { ok:false, error:'unknown' };
+    }
+  });
+}
+
 // Mode + freeze are independent gates — operators can deploy in Dev mode
 // only when freeze is OFF. Helper used by render fns to short-circuit
 // button enablement without re-deriving the rule each time.
@@ -9667,6 +9769,67 @@ function renderAdminVCModePolicyCard(){
         'onclick="adminVCToggleProductionLock('+(lock?'false':'true')+')">'+
         escapeHtml(lock ? (lang==='en'?'Unlock production':'Tắt khoá production') : (lang==='en'?'Re-lock production':'Bật lại khoá production'))+
       '</button>'+
+    '</div>'+
+  '</article>';
+}
+
+// GHA PAT settings card — shows current state + Configure/Test/Delete buttons.
+// PAT never sent to FE after save; only masked preview (12+4 chars).
+function renderAdminVCGhaSettingsCard(){
+  const s = ghaSettingsState;
+  if(!s.loaded){
+    if(!s.loading && !s.error) setTimeout(()=>loadGhaSettings({silent:true}), 0);
+    return '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:12px">'+
+      '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'GHA settings (GitHub PAT)':'Cài đặt GHA (GitHub PAT)')+'</div>'+
+      '<div class="admin-sync-callout-bar is-info">'+escapeHtml(lang==='en'?'Loading…':'Đang tải…')+'</div>'+
+    '</article>';
+  }
+  if(s.error){
+    return '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:12px">'+
+      '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'GHA settings':'Cài đặt GHA')+'</div>'+
+      '<div class="admin-sync-callout-bar is-error">'+escapeHtml((lang==='en'?'Failed: ':'Lỗi: ')+s.error)+'</div>'+
+      '<button class="admin-sync-mini" onclick="loadGhaSettings({force:true})">'+escapeHtml(lang==='en'?'Retry':'Thử lại')+'</button>'+
+    '</article>';
+  }
+  const d = s.data || {};
+  const hasP = !!d.has_pat;
+  const via = d.configured_via;
+  const stateTone = hasP ? 'good' : 'warn';
+  const stateLabel = hasP
+    ? (via==='env_var' ? (lang==='en'?'Configured (env)':'Đã cấu hình (env)') : (lang==='en'?'Configured (admin UI)':'Đã cấu hình (admin UI)'))
+    : (lang==='en'?'Not configured':'Chưa cấu hình');
+  const envOnlyHint = (via==='env_var' && !d.pat_preview)
+    ? '<div style="color:var(--text-3);font-size:11px;margin-top:6px">'+
+        escapeHtml(lang==='en'?'PAT is set via env[GITHUB_PAT] on FPM pool. Use admin UI to override.':'PAT đang set qua env[GITHUB_PAT]. Dùng admin UI để override.')+
+      '</div>' : '';
+  return '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:12px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap">'+
+      '<div>'+
+        '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'GHA settings (GitHub PAT)':'Cài đặt GHA (GitHub PAT)')+'</div>'+
+        '<div style="color:var(--text-3);font-size:11px;margin-top:2px">'+
+          escapeHtml(lang==='en'?'PAT for polling deploy.yml. Stored on VPS (chmod 600). Never returned to browser after save.':'PAT để poll deploy.yml. Lưu trên VPS (chmod 600). Không trả browser sau khi lưu.')+
+        '</div>'+
+      '</div>'+
+      vcStatusPill(stateLabel, stateTone)+
+    '</div>'+
+    '<div class="admin-sync-meta-list" style="margin-top:10px">'+
+      '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'PAT preview':'Preview PAT')+'</div><div class="admin-sync-meta-value">'+
+        (d.pat_preview ? '<code>'+escapeHtml(d.pat_preview)+'</code> <span style="color:var(--text-3);font-size:11px">('+(d.pat_length||0)+' chars)</span>' : '<em>'+escapeHtml(lang==='en'?'not set':'chưa set')+'</em>')+
+      '</div></div>'+
+      '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">Repo</div><div class="admin-sync-meta-value"><code>'+escapeHtml(d.repo||'-')+'</code></div></div>'+
+      '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">Workflow</div><div class="admin-sync-meta-value"><code>'+escapeHtml(d.workflow||'-')+'</code></div></div>'+
+      '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Updated at':'Cập nhật')+'</div><div class="admin-sync-meta-value">'+escapeHtml(d.updated_at?vcFmtTime(d.updated_at):'--')+'</div></div>'+
+      '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Updated by':'Người set')+'</div><div class="admin-sync-meta-value"><code>'+escapeHtml(d.updated_by||'--')+'</code></div></div>'+
+      '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">env var fallback</div><div class="admin-sync-meta-value">'+(d.env_pat_set?'<code>set</code>':'<em>not set</em>')+'</div></div>'+
+    '</div>'+
+    envOnlyHint+
+    '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'+
+      '<button class="admin-sync-mini" onclick="adminVCConfigureGha()" style="background:var(--brand-2,#1565c0);color:#fff;border-color:var(--brand-2,#1565c0)">'+
+        escapeHtml(hasP ? (lang==='en'?'Update PAT':'Cập nhật PAT') : (lang==='en'?'Configure PAT':'Cấu hình PAT'))+
+      '</button>'+
+      (hasP ? '<button class="admin-sync-mini" onclick="adminVCTestGha()">'+escapeHtml(lang==='en'?'Test connection':'Test kết nối')+'</button>' : '')+
+      (hasP && via==='admin_ui' ? '<button class="admin-sync-mini" onclick="adminVCDeleteGhaPat()" style="background:color-mix(in srgb,var(--red,#dc2626) 14%,var(--bg-surface,#fff));border-color:var(--red,#dc2626);color:var(--red,#dc2626)">'+escapeHtml(lang==='en'?'Delete PAT':'Xoá PAT')+'</button>' : '')+
+      '<a class="admin-sync-mini" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="text-decoration:none">'+escapeHtml(lang==='en'?'Generate new PAT ↗':'Tạo PAT mới ↗')+'</a>'+
     '</div>'+
   '</article>';
 }
@@ -10663,7 +10826,7 @@ function renderAdminVCStatus(){
     '</div>'+
   '</article>';
 
-  return '<section>'+readinessHtml+tilesHtml+recentTable+renderAdminVCModePolicyCard()+linksHtml+'</section>';
+  return '<section>'+readinessHtml+tilesHtml+recentTable+renderAdminVCModePolicyCard()+renderAdminVCGhaSettingsCard()+linksHtml+'</section>';
 }
 
 // Pha 2: renderAdminVCProcess deprecated — bilingual SOP content moved to

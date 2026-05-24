@@ -1608,9 +1608,11 @@ class AdminController extends BaseController
     {
         $this->requireAuth();
 
-        $repo = getenv('GITHUB_REPO') ?: 'sanhvo86-hesem/mom';
-        $workflow = getenv('GITHUB_WORKFLOW_FILE') ?: 'deploy.yml';
-        $pat = (string)(getenv('GITHUB_PAT') ?: '');
+        $settings = admin_gha_settings_read();
+        $repo = $settings['repo'] ?: (getenv('GITHUB_REPO') ?: 'sanhvo86-hesem/mom');
+        $workflow = $settings['workflow'] ?: (getenv('GITHUB_WORKFLOW_FILE') ?: 'deploy.yml');
+        // PAT preference order: secrets file (admin UI) → env var (FPM pool conf).
+        $pat = $settings['pat'] !== '' ? $settings['pat'] : (string)(getenv('GITHUB_PAT') ?: '');
 
         if ($pat === '') {
             $this->success([
@@ -1618,7 +1620,7 @@ class AdminController extends BaseController
                 'repo' => $repo,
                 'workflow' => $workflow,
                 'runs' => [],
-                'message' => 'GITHUB_PAT env var not set. Add it to .env or the FPM pool config to enable GHA status polling.',
+                'message' => 'GitHub PAT chưa cấu hình. Vào tab Trạng thái → card "Cài đặt GHA" để nhập, hoặc set env[GITHUB_PAT] trong /etc/php/8.5/fpm/pool.d/mom.conf.',
             ]);
         }
 
@@ -1712,6 +1714,131 @@ class AdminController extends BaseController
         @file_put_contents($cacheFile, json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
         $this->success($payload);
+    }
+
+    /**
+     * GET admin_gha_settings_get — return GHA configuration WITHOUT exposing
+     * the PAT itself. Frontend gets only a masked preview ("github_pat_11A…last4")
+     * + configured-or-not boolean + repo + workflow + last-updated timestamp.
+     * Used by the "Cài đặt GHA" card on the Status tab.
+     */
+    public function ghaSettingsGet(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        $settings = admin_gha_settings_read();
+        $hasPat = $settings['pat'] !== '';
+        $patPreview = '';
+        if ($hasPat) {
+            $p = $settings['pat'];
+            // Show first 12 chars + last 4 for identification, never full value.
+            $patPreview = mb_strlen($p) > 18
+                ? mb_substr($p, 0, 12) . '…' . mb_substr($p, -4)
+                : '****';
+        }
+        $envPatSet = (string)(getenv('GITHUB_PAT') ?: '') !== '';
+
+        $this->success([
+            'configured_via' => $settings['pat'] !== '' ? 'admin_ui' : ($envPatSet ? 'env_var' : null),
+            'has_pat' => $hasPat || $envPatSet,
+            'pat_preview' => $patPreview,
+            'pat_length' => $hasPat ? mb_strlen($settings['pat']) : 0,
+            'repo' => $settings['repo'] ?: (getenv('GITHUB_REPO') ?: 'sanhvo86-hesem/mom'),
+            'workflow' => $settings['workflow'] ?: (getenv('GITHUB_WORKFLOW_FILE') ?: 'deploy.yml'),
+            'updated_at' => $settings['updated_at'],
+            'updated_by' => $settings['updated_by'],
+            'env_pat_set' => $envPatSet,
+        ]);
+    }
+
+    /**
+     * POST admin_gha_settings_set — write GitHub PAT to /var/www/data-private/
+     * secrets/github-pat.txt (chmod 600). PAT is NEVER logged/audited as
+     * plaintext; only a sha256 preview goes into audit_events for traceability.
+     *
+     * Body: { pat: <github_pat_...>, repo?: string, workflow?: string }
+     */
+    public function ghaSettingsSet(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body = $this->jsonBody();
+        $pat = trim((string)($body['pat'] ?? ''));
+        $repo = trim((string)($body['repo'] ?? ''));
+        $workflow = trim((string)($body['workflow'] ?? ''));
+
+        if ($pat === '' || mb_strlen($pat) < 20) {
+            $this->error('invalid_pat', 400, 'PAT phải có ít nhất 20 ký tự.');
+        }
+        if (mb_strlen($pat) > 200) {
+            $this->error('invalid_pat', 400, 'PAT dài quá 200 ký tự — kiểm tra paste đúng chưa.');
+        }
+        // GitHub PAT formats: ghp_, github_pat_, gho_, ghs_, ghr_. Accept all.
+        if (!preg_match('/^(ghp_|github_pat_|gho_|ghs_|ghr_)[A-Za-z0-9_]+$/', $pat)) {
+            $this->error('invalid_pat_format', 400, 'PAT phải bắt đầu bằng ghp_ hoặc github_pat_ (xem https://github.com/settings/personal-access-tokens).');
+        }
+
+        if ($repo !== '' && !preg_match('#^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$#', $repo)) {
+            $this->error('invalid_repo', 400, 'repo format owner/name.');
+        }
+        if ($workflow !== '' && !preg_match('/^[A-Za-z0-9_.-]+\.(yml|yaml)$/', $workflow)) {
+            $this->error('invalid_workflow', 400, 'workflow phải là tên file .yml/.yaml.');
+        }
+
+        $result = admin_gha_settings_write($pat, $repo, $workflow, (string)($me['username'] ?? 'unknown'));
+        if (!$result['ok']) {
+            $this->error('write_failed', 500, $result['error']);
+        }
+
+        // Invalidate cache so next status fetch uses new PAT.
+        @unlink($this->dataDir . '/cache/admin-gha-status.json');
+
+        $this->auditLog('admin_gha_settings_set', [
+            'repo' => $result['repo'],
+            'workflow' => $result['workflow'],
+            'pat_sha256_short' => substr(hash('sha256', $pat), 0, 12),
+            'pat_length' => mb_strlen($pat),
+        ]);
+
+        // Re-read with masking to return preview to UI.
+        $settings = admin_gha_settings_read();
+        $this->success([
+            'ok' => true,
+            'configured_via' => 'admin_ui',
+            'has_pat' => true,
+            'pat_preview' => mb_substr($pat, 0, 12) . '…' . mb_substr($pat, -4),
+            'pat_length' => mb_strlen($pat),
+            'repo' => $settings['repo'],
+            'workflow' => $settings['workflow'],
+            'updated_at' => $settings['updated_at'],
+            'updated_by' => $settings['updated_by'],
+            'message' => 'GHA PAT đã lưu. Pill Deploy sẽ refresh sau khi cache hết hạn (≤30s).',
+        ]);
+    }
+
+    /**
+     * POST admin_gha_settings_delete — remove the PAT file. Status pill
+     * reverts to "not_configured" (or falls back to env var if set).
+     */
+    public function ghaSettingsDelete(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $result = admin_gha_settings_delete();
+        @unlink($this->dataDir . '/cache/admin-gha-status.json');
+        $this->auditLog('admin_gha_settings_delete', [
+            'existed' => $result['existed'] ? '1' : '0',
+        ]);
+        $this->success([
+            'ok' => true,
+            'message' => 'GHA PAT đã xoá.',
+            'existed' => $result['existed'],
+        ]);
     }
 
     /**

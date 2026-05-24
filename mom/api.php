@@ -2724,6 +2724,85 @@ function deploy_freeze_public_payload(array $config): array {
   ];
 }
 
+// ── Admin GHA Settings (PAT in protected secrets file) ──────────────────────
+//
+// Storage: /var/www/data-private/secrets/github-pat.txt — chmod 600, owned
+// by web user (so PHP-FPM can read but no one else on the box can cat it).
+// Stored as a small JSON envelope so we can carry repo + workflow + updated_*
+// alongside the PAT itself. Never appears in audit_events as plaintext;
+// auditLog rows carry only sha256(pat) preview.
+//
+// Path is OUTSIDE the git working tree (data-private/) so deploy.sh's
+// git reset --hard cannot clobber it, and so it doesn't accidentally end
+// up in a snapshot archive (.deploy-snapshots/ captures runtime config
+// but not data-private/secrets/).
+
+function admin_gha_secrets_path(): string {
+  // Prefer the canonical VPS path; fall back to local data dir for dev runs.
+  $vps = '/var/www/data-private/secrets';
+  if (is_dir($vps) || @mkdir($vps, 0750, true)) return $vps . '/github-pat.json';
+  global $DATA_DIR;
+  $dir = ($DATA_DIR ?: __DIR__ . '/data') . '/secrets';
+  if (!is_dir($dir)) @mkdir($dir, 0750, true);
+  return $dir . '/github-pat.json';
+}
+
+function admin_gha_settings_read(): array {
+  $defaults = ['pat' => '', 'repo' => '', 'workflow' => '', 'updated_at' => null, 'updated_by' => ''];
+  $path = admin_gha_secrets_path();
+  if (!is_file($path) || !is_readable($path)) return $defaults;
+  $raw = @file_get_contents($path);
+  if (!is_string($raw) || $raw === '') return $defaults;
+  $decoded = json_decode($raw, true);
+  if (!is_array($decoded)) return $defaults;
+  return [
+    'pat' => is_string($decoded['pat'] ?? null) ? (string)$decoded['pat'] : '',
+    'repo' => is_string($decoded['repo'] ?? null) ? (string)$decoded['repo'] : '',
+    'workflow' => is_string($decoded['workflow'] ?? null) ? (string)$decoded['workflow'] : '',
+    'updated_at' => isset($decoded['updated_at']) && is_string($decoded['updated_at']) ? $decoded['updated_at'] : null,
+    'updated_by' => is_string($decoded['updated_by'] ?? null) ? (string)$decoded['updated_by'] : '',
+  ];
+}
+
+/** @return array{ok:bool, error?:string, repo:string, workflow:string} */
+function admin_gha_settings_write(string $pat, string $repo, string $workflow, string $actor): array {
+  $path = admin_gha_secrets_path();
+  $dir = dirname($path);
+  if (!is_dir($dir) && !@mkdir($dir, 0750, true)) {
+    return ['ok' => false, 'error' => 'mkdir failed: ' . $dir, 'repo' => $repo, 'workflow' => $workflow];
+  }
+  // Preserve existing repo/workflow if caller didn't provide.
+  $existing = admin_gha_settings_read();
+  $payload = [
+    'pat' => $pat,
+    'repo' => $repo !== '' ? $repo : ($existing['repo'] ?: ''),
+    'workflow' => $workflow !== '' ? $workflow : ($existing['workflow'] ?: ''),
+    'updated_at' => now_iso(),
+    'updated_by' => $actor,
+  ];
+  // Atomic write: tmp → rename so a partial write never leaves a corrupt file.
+  $tmp = $path . '.tmp.' . substr(bin2hex(random_bytes(4)), 0, 6);
+  $bytes = file_put_contents($tmp, json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+  if ($bytes === false) {
+    @unlink($tmp);
+    return ['ok' => false, 'error' => 'write failed', 'repo' => $payload['repo'], 'workflow' => $payload['workflow']];
+  }
+  @chmod($tmp, 0600);
+  if (!@rename($tmp, $path)) {
+    @unlink($tmp);
+    return ['ok' => false, 'error' => 'rename failed', 'repo' => $payload['repo'], 'workflow' => $payload['workflow']];
+  }
+  return ['ok' => true, 'repo' => $payload['repo'], 'workflow' => $payload['workflow']];
+}
+
+/** @return array{existed:bool} */
+function admin_gha_settings_delete(): array {
+  $path = admin_gha_secrets_path();
+  $existed = is_file($path);
+  if ($existed) @unlink($path);
+  return ['existed' => $existed];
+}
+
 function admin_vc_mode_public_payload(array $config): array {
   $cfg = admin_vc_mode_normalize((array)($config['admin_vc_mode'] ?? []));
   return [

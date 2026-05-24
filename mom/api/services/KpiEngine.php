@@ -214,6 +214,10 @@ final class KpiEngine
     public const METRIC_INVOICE_RFT          = 'INVOICE_RFT';
     public const METRIC_INCIDENT_ACTION_CLOSURE_AGING = 'INCIDENT_ACTION_CLOSURE_AGING';
 
+    /** Quality gate KPIs graduated to runtime calculation in Prompt 05. */
+    public const METRIC_FAI_FIRST_PASS         = 'FAI_FIRST_PASS';
+    public const METRIC_IN_PROCESS_REJECT_RATE = 'IN_PROCESS_REJECT_RATE';
+
     /** Age thresholds (days) past which an open item counts as aged. */
     private const AGE_DAYS_WIP             = 21;
     private const AGE_DAYS_NCR             = 30;
@@ -250,6 +254,8 @@ final class KpiEngine
         self::METRIC_DSO,
         self::METRIC_INVOICE_RFT,
         self::METRIC_INCIDENT_ACTION_CLOSURE_AGING,
+        self::METRIC_FAI_FIRST_PASS,
+        self::METRIC_IN_PROCESS_REJECT_RATE,
     ];
 
     /** Default target values per metric. */
@@ -282,6 +288,8 @@ final class KpiEngine
         self::METRIC_DSO                 => 45.0,     // ≤ 45 days
         self::METRIC_INVOICE_RFT         => 98.0,
         self::METRIC_INCIDENT_ACTION_CLOSURE_AGING => 10.0,
+        self::METRIC_FAI_FIRST_PASS         => 95.0,    // ≥ 95% (registry green_point)
+        self::METRIC_IN_PROCESS_REJECT_RATE => 1.0,     // ≤ 1% (registry target)
     ];
 
     /** Units per metric. */
@@ -314,6 +322,8 @@ final class KpiEngine
         self::METRIC_DSO                 => 'day',
         self::METRIC_INVOICE_RFT         => '%',
         self::METRIC_INCIDENT_ACTION_CLOSURE_AGING => '%',
+        self::METRIC_FAI_FIRST_PASS         => '%',
+        self::METRIC_IN_PROCESS_REJECT_RATE => '%',
     ];
 
     /** Metrics where lower is better (invert RAG logic). */
@@ -330,6 +340,7 @@ final class KpiEngine
         self::METRIC_ECO_CLOSURE_AGING,
         self::METRIC_DSO,
         self::METRIC_INCIDENT_ACTION_CLOSURE_AGING,
+        self::METRIC_IN_PROCESS_REJECT_RATE,
     ];
 
     private Connection $db;
@@ -1124,71 +1135,117 @@ final class KpiEngine
     // ── Individual KPI Calculators ──────────────────────────────────────────
 
     /**
-     * OEE = Availability x Performance x Quality
+     * OEE = Availability x Performance x Quality.
+     *
+     * Source: mes_oee_snapshots (migration 025_mes_tables.sql) — one row per
+     * equipment per snapshot_date per shift_code, with planned/run/downtime/
+     * setup all in seconds and good/total pieces in counts. We compute the
+     * three sub-factors from raw seconds/pieces (NOT averaging the per-row
+     * generated `oee` column — averaging ratios is statistically wrong).
+     *
+     * Prompt 05 phantom-table fix: previous implementation queried
+     * `equipment_logs` which has no migration (P04 finding).
      */
     private function calcOee(DateRange $period, array $filters): array
     {
-        $where = $this->buildEquipmentWhereClause($filters);
+        $where  = $this->buildOeeSnapshotWhereClause($filters);
+        $params = [':s' => $period->start, ':e' => $period->end];
 
-        // Availability: (Planned - Downtime) / Planned
-        $availRow = $this->db->queryOne(
+        $row = $this->db->queryOne(
             "SELECT
-                COALESCE(SUM(planned_hours), 0) AS planned,
-                COALESCE(SUM(downtime_hours), 0) AS downtime,
-                COALESCE(SUM(run_hours), 0) AS run_time
-             FROM equipment_logs
-             WHERE log_date BETWEEN :s AND :e {$where}",
-            [':s' => $period->start, ':e' => $period->end],
+                COUNT(*)                                              AS sample_size,
+                COALESCE(SUM(planned_production_time_sec), 0)         AS planned_sec,
+                COALESCE(SUM(actual_run_time_sec), 0)                 AS run_sec,
+                COALESCE(SUM(downtime_sec), 0)                        AS downtime_sec,
+                COALESCE(SUM(total_pieces), 0)                        AS total_pieces,
+                COALESCE(SUM(good_pieces), 0)                         AS good_pieces,
+                COALESCE(SUM(ideal_cycle_time_sec * total_pieces), 0) AS ideal_run_sec
+             FROM mes_oee_snapshots
+             WHERE snapshot_date BETWEEN :s AND :e {$where}",
+            $params,
         );
 
-        $planned  = (float) ($availRow['planned'] ?? 0);
-        $downtime = (float) ($availRow['downtime'] ?? 0);
-        $runTime  = (float) ($availRow['run_time'] ?? 0);
+        $sample      = (int)   ($row['sample_size']   ?? 0);
+        $plannedSec  = (float) ($row['planned_sec']   ?? 0);
+        $runSec      = (float) ($row['run_sec']       ?? 0);
+        $downtimeSec = (float) ($row['downtime_sec']  ?? 0);
+        $totalPieces = (float) ($row['total_pieces']  ?? 0);
+        $goodPieces  = (float) ($row['good_pieces']   ?? 0);
+        $idealRunSec = (float) ($row['ideal_run_sec'] ?? 0);
 
-        $availability = $planned > 0 ? (($planned - $downtime) / $planned) * 100 : 0;
+        if ($sample === 0) {
+            return [
+                'value'        => 0.0,
+                'sample_size'  => 0,
+                'numerator'    => 0.0,
+                'denominator'  => 0.0,
+                'breakdown'    => [],
+                'empty_result' => true,
+                'data_source'  => 'mes_oee_snapshots',
+            ];
+        }
 
-        // Performance: (Ideal Cycle Time x Total Count) / Run Time
-        $perfRow = $this->db->queryOne(
-            "SELECT
-                COALESCE(SUM(jo.completed_qty + jo.scrapped_qty + jo.rework_qty), 0) AS total_count,
-                COALESCE(SUM(jo.completed_qty * COALESCE(i.standard_cycle_time, 0)), 0) AS ideal_time
-             FROM job_orders jo
-             LEFT JOIN items i ON i.item_id = jo.item_id
-             WHERE jo.start_date_actual BETWEEN :s AND :e
-               AND jo.job_status IN ('released', 'active', 'completed', 'closed')",
-            [':s' => $period->start, ':e' => $period->end],
-        );
+        $availability = $plannedSec > 0
+            ? (($plannedSec - $downtimeSec) / $plannedSec) * 100
+            : 0.0;
+        $performance  = $runSec > 0 && $idealRunSec > 0
+            ? ($idealRunSec / $runSec) * 100
+            : 0.0;
+        $quality      = $totalPieces > 0
+            ? ($goodPieces / $totalPieces) * 100
+            : 0.0;
 
-        $idealTime = (float) ($perfRow['ideal_time'] ?? 0);
-        $performance = $runTime > 0 ? ($idealTime / $runTime) * 100 : 0;
-
-        // Quality: Good Count / Total Count
-        $qualRow = $this->db->queryOne(
-            "SELECT
-                COALESCE(SUM(completed_qty), 0) AS good,
-                COALESCE(SUM(completed_qty + scrapped_qty + rework_qty), 0) AS total
-             FROM job_orders
-             WHERE start_date_actual BETWEEN :s AND :e
-               AND job_status IN ('released', 'active', 'completed', 'closed')",
-            [':s' => $period->start, ':e' => $period->end],
-        );
-
-        $goodCount  = (float) ($qualRow['good'] ?? 0);
-        $totalCount = (float) ($qualRow['total'] ?? 0);
-        $quality    = $totalCount > 0 ? ($goodCount / $totalCount) * 100 : 0;
+        $dataQualityFlags = [];
+        if ($idealRunSec <= 0) {
+            $dataQualityFlags[] = 'missing_ideal_cycle_time';
+        }
+        if ($totalPieces <= 0) {
+            $dataQualityFlags[] = 'missing_piece_counts';
+        }
 
         $oee = ($availability / 100) * ($performance / 100) * ($quality / 100) * 100;
 
+        // Breakdown by equipment_id (top contributors).
+        $breakdown = [];
+        try {
+            $rows = $this->db->query(
+                "SELECT equipment_id AS key,
+                        COUNT(*) AS count,
+                        AVG(oee) * 100 AS value
+                 FROM mes_oee_snapshots
+                 WHERE snapshot_date BETWEEN :s AND :e {$where}
+                 GROUP BY equipment_id
+                 ORDER BY value ASC
+                 LIMIT 10",
+                $params,
+            );
+            foreach ($rows as $r) {
+                $breakdown[] = [
+                    'key'   => (string) $r['key'],
+                    'count' => (int)    $r['count'],
+                    'value' => round((float) $r['value'], 2),
+                ];
+            }
+        } catch (\Throwable) {
+            // Breakdown is best-effort.
+        }
+
         return [
-            'value'        => round($oee, 2),
-            'availability' => round($availability, 2),
-            'performance'  => round($performance, 2),
-            'quality'      => round($quality, 2),
-            'planned_hrs'  => round($planned, 2),
-            'downtime_hrs' => round($downtime, 2),
-            'run_time_hrs' => round($runTime, 2),
-            'good_count'   => $goodCount,
-            'total_count'  => $totalCount,
+            'value'         => round($oee, 2),
+            'sample_size'   => $sample,
+            'numerator'     => round($goodPieces, 2),
+            'denominator'   => round($totalPieces, 2),
+            'availability'  => round($availability, 2),
+            'performance'   => round($performance, 2),
+            'quality'       => round($quality, 2),
+            'planned_sec'   => round($plannedSec, 2),
+            'run_sec'       => round($runSec, 2),
+            'downtime_sec'  => round($downtimeSec, 2),
+            'good_pieces'   => $goodPieces,
+            'total_pieces'  => $totalPieces,
+            'breakdown'     => $breakdown,
+            'data_source'   => 'mes_oee_snapshots',
+            'data_quality_flags' => $dataQualityFlags,
         ];
     }
 
@@ -1346,49 +1403,158 @@ final class KpiEngine
     }
 
     /**
-     * Machine Utilization = Actual Machine Hours / Available Machine Hours x 100
+     * Machine Utilization = SUM(actual_run_time_sec) / SUM(planned_production_time_sec) x 100.
+     *
+     * Source: mes_oee_snapshots (migration 025_mes_tables.sql).
+     * Prompt 05 phantom-table fix: previous code queried `equipment_logs`
+     * which has no migration.
      */
     private function calcMachineUtil(DateRange $period, array $filters): array
     {
-        $where = $this->buildEquipmentWhereClause($filters);
+        $where  = $this->buildOeeSnapshotWhereClause($filters);
+        $params = [':s' => $period->start, ':e' => $period->end];
 
         $row = $this->db->queryOne(
             "SELECT
-                COALESCE(SUM(run_hours), 0) AS actual,
-                COALESCE(SUM(planned_hours), 0) AS available
-             FROM equipment_logs
-             WHERE log_date BETWEEN :s AND :e {$where}",
-            [':s' => $period->start, ':e' => $period->end],
+                COUNT(*) AS sample_size,
+                COALESCE(SUM(actual_run_time_sec), 0)         AS run_sec,
+                COALESCE(SUM(planned_production_time_sec), 0) AS planned_sec
+             FROM mes_oee_snapshots
+             WHERE snapshot_date BETWEEN :s AND :e {$where}",
+            $params,
         );
 
-        $actual    = (float) ($row['actual'] ?? 0);
-        $available = (float) ($row['available'] ?? 0);
-        $pct       = $available > 0 ? ($actual / $available) * 100 : 0;
+        $sample     = (int)   ($row['sample_size'] ?? 0);
+        $runSec     = (float) ($row['run_sec']     ?? 0);
+        $plannedSec = (float) ($row['planned_sec'] ?? 0);
 
-        return ['value' => round($pct, 2), 'actual_hrs' => round($actual, 2), 'available_hrs' => round($available, 2)];
+        if ($sample === 0) {
+            return [
+                'value'        => 0.0,
+                'sample_size'  => 0,
+                'numerator'    => 0.0,
+                'denominator'  => 0.0,
+                'breakdown'    => [],
+                'empty_result' => true,
+                'data_source'  => 'mes_oee_snapshots',
+            ];
+        }
+
+        $pct = $plannedSec > 0 ? ($runSec / $plannedSec) * 100 : 0.0;
+
+        $breakdown = [];
+        try {
+            $rows = $this->db->query(
+                "SELECT equipment_id AS key,
+                        COUNT(*) AS count,
+                        CASE WHEN SUM(planned_production_time_sec) > 0
+                             THEN (SUM(actual_run_time_sec) / SUM(planned_production_time_sec)) * 100
+                             ELSE 0 END AS value
+                 FROM mes_oee_snapshots
+                 WHERE snapshot_date BETWEEN :s AND :e {$where}
+                 GROUP BY equipment_id
+                 ORDER BY value ASC
+                 LIMIT 10",
+                $params,
+            );
+            foreach ($rows as $r) {
+                $breakdown[] = [
+                    'key'   => (string) $r['key'],
+                    'count' => (int)    $r['count'],
+                    'value' => round((float) $r['value'], 2),
+                ];
+            }
+        } catch (\Throwable) {
+            // best-effort
+        }
+
+        return [
+            'value'        => round($pct, 2),
+            'sample_size'  => $sample,
+            'numerator'    => round($runSec, 2),
+            'denominator'  => round($plannedSec, 2),
+            'run_sec'      => round($runSec, 2),
+            'planned_sec'  => round($plannedSec, 2),
+            'breakdown'    => $breakdown,
+            'data_source'  => 'mes_oee_snapshots',
+        ];
     }
 
     /**
-     * Setup Time Ratio = Total Setup Time / Total Available Time x 100
+     * Setup Time Ratio = SUM(setup_time_sec) / SUM(planned_production_time_sec) x 100.
+     *
+     * Source: mes_oee_snapshots (migration 025_mes_tables.sql).
+     * Prompt 05 phantom-table fix: previous code queried `equipment_logs`.
      */
     private function calcSetupRatio(DateRange $period, array $filters): array
     {
-        $where = $this->buildEquipmentWhereClause($filters);
+        $where  = $this->buildOeeSnapshotWhereClause($filters);
+        $params = [':s' => $period->start, ':e' => $period->end];
 
         $row = $this->db->queryOne(
             "SELECT
-                COALESCE(SUM(setup_hours), 0) AS setup,
-                COALESCE(SUM(planned_hours), 0) AS available
-             FROM equipment_logs
-             WHERE log_date BETWEEN :s AND :e {$where}",
-            [':s' => $period->start, ':e' => $period->end],
+                COUNT(*) AS sample_size,
+                COALESCE(SUM(setup_time_sec), 0)              AS setup_sec,
+                COALESCE(SUM(planned_production_time_sec), 0) AS planned_sec
+             FROM mes_oee_snapshots
+             WHERE snapshot_date BETWEEN :s AND :e {$where}",
+            $params,
         );
 
-        $setup     = (float) ($row['setup'] ?? 0);
-        $available = (float) ($row['available'] ?? 0);
-        $pct       = $available > 0 ? ($setup / $available) * 100 : 0;
+        $sample     = (int)   ($row['sample_size'] ?? 0);
+        $setupSec   = (float) ($row['setup_sec']   ?? 0);
+        $plannedSec = (float) ($row['planned_sec'] ?? 0);
 
-        return ['value' => round($pct, 2), 'setup_hrs' => round($setup, 2), 'available_hrs' => round($available, 2)];
+        if ($sample === 0) {
+            return [
+                'value'        => 0.0,
+                'sample_size'  => 0,
+                'numerator'    => 0.0,
+                'denominator'  => 0.0,
+                'breakdown'    => [],
+                'empty_result' => true,
+                'data_source'  => 'mes_oee_snapshots',
+            ];
+        }
+
+        $pct = $plannedSec > 0 ? ($setupSec / $plannedSec) * 100 : 0.0;
+
+        $breakdown = [];
+        try {
+            $rows = $this->db->query(
+                "SELECT equipment_id AS key,
+                        COUNT(*) AS count,
+                        CASE WHEN SUM(planned_production_time_sec) > 0
+                             THEN (SUM(setup_time_sec) / SUM(planned_production_time_sec)) * 100
+                             ELSE 0 END AS value
+                 FROM mes_oee_snapshots
+                 WHERE snapshot_date BETWEEN :s AND :e {$where}
+                 GROUP BY equipment_id
+                 ORDER BY value DESC
+                 LIMIT 10",
+                $params,
+            );
+            foreach ($rows as $r) {
+                $breakdown[] = [
+                    'key'   => (string) $r['key'],
+                    'count' => (int)    $r['count'],
+                    'value' => round((float) $r['value'], 2),
+                ];
+            }
+        } catch (\Throwable) {
+            // best-effort
+        }
+
+        return [
+            'value'        => round($pct, 2),
+            'sample_size'  => $sample,
+            'numerator'    => round($setupSec, 2),
+            'denominator'  => round($plannedSec, 2),
+            'setup_sec'    => round($setupSec, 2),
+            'planned_sec'  => round($plannedSec, 2),
+            'breakdown'    => $breakdown,
+            'data_source'  => 'mes_oee_snapshots',
+        ];
     }
 
     /**
@@ -1898,6 +2064,281 @@ final class KpiEngine
         ];
     }
 
+    /**
+     * FAI First-Pass Acceptance = COUNT(fai_overall_result = 'Approved')
+     *                             / COUNT(*) of FAI records in period × 100.
+     *
+     * Source: fai_records (migration 011_quality.sql).
+     * `fai_overall_result` CHECK constraint accepts 'Approved' / 'Conditional'
+     * / 'Rejected'. We count only 'Approved' as first-pass; 'Conditional'
+     * (accepted with deviations) and 'Rejected' both count as not-first-pass.
+     *
+     * Prompt 05 graduation: this metric was `staged_data_contract` in P04;
+     * source columns confirmed verified. Calc function authored fresh.
+     */
+    private function calcFaiFirstPass(DateRange $period, array $filters): array
+    {
+        $params = [':s' => $period->start, ':e' => $period->end];
+
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) FILTER (WHERE fai_overall_result = 'Approved') AS approved,
+                COUNT(*)                                                AS total,
+                COUNT(*) FILTER (WHERE fai_overall_result IS NULL
+                                   OR fai_overall_result NOT IN ('Approved','Conditional','Rejected')) AS unscored
+             FROM fai_records
+             WHERE created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz",
+            $params,
+        );
+
+        $approved = (int) ($row['approved'] ?? 0);
+        $total    = (int) ($row['total']    ?? 0);
+        $unscored = (int) ($row['unscored'] ?? 0);
+
+        if ($total === 0) {
+            return [
+                'value'        => 0.0,
+                'sample_size'  => 0,
+                'numerator'    => 0,
+                'denominator'  => 0,
+                'breakdown'    => [],
+                'empty_result' => true,
+                'data_source'  => 'fai_records',
+            ];
+        }
+
+        $pct = ($approved / $total) * 100;
+
+        $dataQualityFlags = [];
+        if ($unscored > 0) {
+            $dataQualityFlags[] = "unscored_fai_count={$unscored}";
+        }
+
+        // Breakdowns: by part_number (product family proxy), by fai_type, by customer.
+        $breakdown = [
+            'by_part_number' => [],
+            'by_fai_type'    => [],
+            'by_customer'    => [],
+        ];
+        try {
+            $rows = $this->db->query(
+                "SELECT COALESCE(part_number, '(unknown)') AS key,
+                        COUNT(*) AS count,
+                        CASE WHEN COUNT(*) > 0
+                             THEN (COUNT(*) FILTER (WHERE fai_overall_result = 'Approved')::numeric
+                                   / COUNT(*)) * 100
+                             ELSE 0 END AS value
+                 FROM fai_records
+                 WHERE created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz
+                 GROUP BY part_number
+                 ORDER BY value ASC, count DESC
+                 LIMIT 10",
+                $params,
+            );
+            foreach ($rows as $r) {
+                $breakdown['by_part_number'][] = [
+                    'key'   => (string) $r['key'],
+                    'count' => (int)    $r['count'],
+                    'value' => round((float) $r['value'], 2),
+                ];
+            }
+
+            $rows = $this->db->query(
+                "SELECT COALESCE(fai_type::text, '(unknown)') AS key,
+                        COUNT(*) AS count,
+                        CASE WHEN COUNT(*) > 0
+                             THEN (COUNT(*) FILTER (WHERE fai_overall_result = 'Approved')::numeric
+                                   / COUNT(*)) * 100
+                             ELSE 0 END AS value
+                 FROM fai_records
+                 WHERE created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz
+                 GROUP BY fai_type
+                 ORDER BY count DESC",
+                $params,
+            );
+            foreach ($rows as $r) {
+                $breakdown['by_fai_type'][] = [
+                    'key'   => (string) $r['key'],
+                    'count' => (int)    $r['count'],
+                    'value' => round((float) $r['value'], 2),
+                ];
+            }
+
+            $rows = $this->db->query(
+                "SELECT COALESCE(customer, '(unknown)') AS key,
+                        COUNT(*) AS count,
+                        CASE WHEN COUNT(*) > 0
+                             THEN (COUNT(*) FILTER (WHERE fai_overall_result = 'Approved')::numeric
+                                   / COUNT(*)) * 100
+                             ELSE 0 END AS value
+                 FROM fai_records
+                 WHERE created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz
+                 GROUP BY customer
+                 ORDER BY count DESC
+                 LIMIT 10",
+                $params,
+            );
+            foreach ($rows as $r) {
+                $breakdown['by_customer'][] = [
+                    'key'   => (string) $r['key'],
+                    'count' => (int)    $r['count'],
+                    'value' => round((float) $r['value'], 2),
+                ];
+            }
+        } catch (\Throwable) {
+            // best-effort
+        }
+
+        return [
+            'value'        => round($pct, 2),
+            'sample_size'  => $total,
+            'numerator'    => $approved,
+            'denominator'  => $total,
+            'approved'     => $approved,
+            'total'        => $total,
+            'breakdown'    => $breakdown,
+            'data_source'  => 'fai_records',
+            'data_quality_flags' => $dataQualityFlags,
+        ];
+    }
+
+    /**
+     * In-Process Reject Rate = COUNT(pass_fail = 'fail') / COUNT(*) × 100
+     * on ipqc_inspection_results in the period.
+     *
+     * Source: ipqc_inspection_results (migration 084_execution_quality_projection.sql).
+     * `pass_fail` is CHECK ('pass','fail'), lowercase.
+     *
+     * Prompt 05 graduation: this metric was `staged_data_contract` (gate G5)
+     * in P04. Lower-is-better: target ≤ 1% (registry green_point).
+     */
+    private function calcInProcessRejectRate(DateRange $period, array $filters): array
+    {
+        $params = [':s' => $period->start, ':e' => $period->end];
+
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) FILTER (WHERE pass_fail = 'fail') AS fails,
+                COUNT(*)                                   AS total,
+                COUNT(*) FILTER (WHERE pass_fail IS NULL OR pass_fail NOT IN ('pass','fail')) AS unscored
+             FROM ipqc_inspection_results
+             WHERE created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz",
+            $params,
+        );
+
+        $fails    = (int) ($row['fails']    ?? 0);
+        $total    = (int) ($row['total']    ?? 0);
+        $unscored = (int) ($row['unscored'] ?? 0);
+
+        if ($total === 0) {
+            return [
+                'value'        => 0.0,
+                'sample_size'  => 0,
+                'numerator'    => 0,
+                'denominator'  => 0,
+                'breakdown'    => [],
+                'empty_result' => true,
+                'data_source'  => 'ipqc_inspection_results',
+            ];
+        }
+
+        $pct = ($fails / $total) * 100;
+
+        $dataQualityFlags = [];
+        if ($unscored > 0) {
+            $dataQualityFlags[] = "unscored_ipqc_result_count={$unscored}";
+        }
+
+        // Breakdowns: by defect_code, by characteristic. Workcenter/shift are
+        // on the parent ipqc_inspections row — joined for the workcenter view.
+        $breakdown = [
+            'by_defect_code'     => [],
+            'by_characteristic'  => [],
+            'by_inspection_status' => [],
+        ];
+        try {
+            $rows = $this->db->query(
+                "SELECT COALESCE(defect_code, '(none)') AS key,
+                        COUNT(*) AS count,
+                        CASE WHEN COUNT(*) > 0
+                             THEN (COUNT(*) FILTER (WHERE pass_fail = 'fail')::numeric
+                                   / COUNT(*)) * 100
+                             ELSE 0 END AS value
+                 FROM ipqc_inspection_results
+                 WHERE created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz
+                 GROUP BY defect_code
+                 ORDER BY count DESC
+                 LIMIT 10",
+                $params,
+            );
+            foreach ($rows as $r) {
+                $breakdown['by_defect_code'][] = [
+                    'key'   => (string) $r['key'],
+                    'count' => (int)    $r['count'],
+                    'value' => round((float) $r['value'], 2),
+                ];
+            }
+
+            $rows = $this->db->query(
+                "SELECT characteristic AS key,
+                        COUNT(*) AS count,
+                        CASE WHEN COUNT(*) > 0
+                             THEN (COUNT(*) FILTER (WHERE pass_fail = 'fail')::numeric
+                                   / COUNT(*)) * 100
+                             ELSE 0 END AS value
+                 FROM ipqc_inspection_results
+                 WHERE created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz
+                 GROUP BY characteristic
+                 ORDER BY value DESC, count DESC
+                 LIMIT 10",
+                $params,
+            );
+            foreach ($rows as $r) {
+                $breakdown['by_characteristic'][] = [
+                    'key'   => (string) $r['key'],
+                    'count' => (int)    $r['count'],
+                    'value' => round((float) $r['value'], 2),
+                ];
+            }
+
+            $rows = $this->db->query(
+                "SELECT COALESCE(i.inspection_status, '(unknown)') AS key,
+                        COUNT(r.*) AS count,
+                        CASE WHEN COUNT(r.*) > 0
+                             THEN (COUNT(r.*) FILTER (WHERE r.pass_fail = 'fail')::numeric
+                                   / COUNT(r.*)) * 100
+                             ELSE 0 END AS value
+                 FROM ipqc_inspection_results r
+                 LEFT JOIN ipqc_inspections i ON i.ipqc_inspection_id = r.ipqc_inspection_id
+                 WHERE r.created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz
+                 GROUP BY i.inspection_status
+                 ORDER BY count DESC",
+                $params,
+            );
+            foreach ($rows as $r) {
+                $breakdown['by_inspection_status'][] = [
+                    'key'   => (string) $r['key'],
+                    'count' => (int)    $r['count'],
+                    'value' => round((float) $r['value'], 2),
+                ];
+            }
+        } catch (\Throwable) {
+            // best-effort
+        }
+
+        return [
+            'value'        => round($pct, 2),
+            'sample_size'  => $total,
+            'numerator'    => $fails,
+            'denominator'  => $total,
+            'fails'        => $fails,
+            'total'        => $total,
+            'breakdown'    => $breakdown,
+            'data_source'  => 'ipqc_inspection_results',
+            'data_quality_flags' => $dataQualityFlags,
+        ];
+    }
+
     // ── Internal Helpers ────────────────────────────────────────────────────
 
     /**
@@ -1939,6 +2380,8 @@ final class KpiEngine
             self::METRIC_DSO                 => $this->calcDso(...),
             self::METRIC_INVOICE_RFT         => $this->calcInvoiceRft(...),
             self::METRIC_INCIDENT_ACTION_CLOSURE_AGING => $this->calcIncidentActionClosureAging(...),
+            self::METRIC_FAI_FIRST_PASS         => $this->calcFaiFirstPass(...),
+            self::METRIC_IN_PROCESS_REJECT_RATE => $this->calcInProcessRejectRate(...),
             default => throw new RuntimeException("Unknown metric: {$metricCode}"),
         };
     }
@@ -2152,6 +2595,28 @@ final class KpiEngine
             $clauses[] = "AND equipment_id IN (
                 SELECT equipment_id FROM equipment WHERE department_id = "
                 . $this->db->getPdo()->quote($filters['dept_code']) . ")";
+        }
+        return implode(' ', $clauses);
+    }
+
+    /**
+     * Build optional WHERE clause fragment for mes_oee_snapshots-filtered
+     * queries. Distinct from buildEquipmentWhereClause() because the OEE
+     * snapshot table also carries shift_code and primary_job_number.
+     */
+    private function buildOeeSnapshotWhereClause(array $filters): string
+    {
+        $clauses = [];
+        if (!empty($filters['machine_id'])) {
+            $clauses[] = "AND equipment_id = " . $this->db->getPdo()->quote((string) $filters['machine_id']);
+        }
+        if (!empty($filters['shift_code'])) {
+            $clauses[] = "AND shift_code = " . $this->db->getPdo()->quote((string) $filters['shift_code']);
+        }
+        if (!empty($filters['dept_code'])) {
+            $clauses[] = "AND equipment_id IN (
+                SELECT equipment_id FROM equipment WHERE department_id = "
+                . $this->db->getPdo()->quote((string) $filters['dept_code']) . ")";
         }
         return implode(' ', $clauses);
     }
