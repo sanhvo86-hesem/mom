@@ -8875,7 +8875,11 @@ async function loadAdminVCMode({force=false, silent=false} = {}){
   if(!silent) renderAdmin();
   try{
     const res = await apiCall('admin_vc_mode_get', null, 'GET');
-    if(res && res.success){
+    // Pha 1 bugfix: BaseController->success() emits {ok:true,...}, not
+    // {success:true}. The first verification pass showed "lỗi mode" pill
+    // even though effective_mode was correctly returned — caused by the
+    // loader thinking the call had failed and falling to the error branch.
+    if(res && res.ok){
       adminVCModeState = Object.assign({}, adminVCModeState, {
         loading:false, loaded:true, error:'',
         data: { policy: res.policy || null, effective_mode: res.effective_mode || 'operation', your_roles: res.your_roles || [] }
@@ -8914,7 +8918,8 @@ async function saveAdminVCMode(patch, reason){
   try{
     const body = Object.assign({}, patch || {}, {reason: r});
     const res = await apiCall('admin_vc_mode_set', body, 'POST');
-    if(res && res.success){
+    // Same {ok:true} convention as the GET endpoint (see loadAdminVCMode).
+    if(res && res.ok){
       adminVCModeState = Object.assign({}, adminVCModeState, {
         saving:false, loaded:true, error:'',
         data: { policy: res.policy || null, effective_mode: res.effective_mode || 'operation', your_roles: res.your_roles || [] }
