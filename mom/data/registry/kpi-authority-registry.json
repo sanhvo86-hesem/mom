@@ -4731,8 +4731,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Access Review Completion",
-      "purpose": "Govern role-level evidence for Access Review Completion without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ hoàn thành rà soát quyền truy cập đúng kỳ",
+      "purpose": "Đo kỷ luật soát quyền truy cập định kỳ để chặn truy cập tồn dư khi vai trò/người thay đổi.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -4744,7 +4744,7 @@
       "counter_metric": {
         "code": "ACCESS_REVIEW_COMPLETION-CTR",
         "endpoint": "POST /api/kpi/ACCESS_REVIEW_COMPLETION-CTR/input",
-        "name_vi": "Access Review Completion counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ hoàn thành rà soát quyền truy cập đúng kỳ",
         "name": "Access Review Completion counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -4770,8 +4770,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Ar Dispute Aging",
-      "purpose": "Govern role-level evidence for Ar Dispute Aging without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tuổi tồn tranh chấp công nợ phải thu chưa khép",
+      "purpose": "Đo tuổi tồn tranh chấp khoản phải thu để quyết định leo thang thương mại và đóng tranh chấp.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -4783,7 +4783,7 @@
       "counter_metric": {
         "code": "AR_DISPUTE_AGING-CTR",
         "endpoint": "POST /api/kpi/AR_DISPUTE_AGING-CTR/input",
-        "name_vi": "Ar Dispute Aging counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tuổi tồn tranh chấp công nợ phải thu chưa khép",
         "name": "Ar Dispute Aging counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -4809,8 +4809,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Audit Finding Aging",
-      "purpose": "Govern role-level evidence for Audit Finding Aging without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tuổi tồn phát hiện audit chưa khép hành động",
+      "purpose": "Đo tuổi tồn phát hiện audit mở để quyết định leo thang khi quá hạn cam kết khắc phục.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -4822,7 +4822,7 @@
       "counter_metric": {
         "code": "AUDIT_FINDING_AGING-CTR",
         "endpoint": "POST /api/kpi/AUDIT_FINDING_AGING-CTR/input",
-        "name_vi": "Audit Finding Aging counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tuổi tồn phát hiện audit chưa khép hành động",
         "name": "Audit Finding Aging counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -4848,8 +4848,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Cmm Program Validation",
-      "purpose": "Govern role-level evidence for Cmm Program Validation without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ chương trình CMM được nghiệm thu trước khi đo loạt",
+      "purpose": "Đo kỷ luật nghiệm thu chương trình CMM để chặn kết quả đo loạt dựa trên chương trình chưa hiệu lực.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -4861,7 +4861,7 @@
       "counter_metric": {
         "code": "CMM_PROGRAM_VALIDATION-CTR",
         "endpoint": "POST /api/kpi/CMM_PROGRAM_VALIDATION-CTR/input",
-        "name_vi": "Cmm Program Validation counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ chương trình CMM được nghiệm thu trước khi đo loạt",
         "name": "Cmm Program Validation counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -4887,8 +4887,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Complaint Log On Time",
-      "purpose": "Govern role-level evidence for Complaint Log On Time without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ khiếu nại khách ghi nhận đúng thời hạn",
+      "purpose": "Đo độ kịp thời ghi nhận khiếu nại khách để chặn nén số bằng cách không mở phiếu.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -4900,7 +4900,7 @@
       "counter_metric": {
         "code": "COMPLAINT_LOG_ON_TIME-CTR",
         "endpoint": "POST /api/kpi/COMPLAINT_LOG_ON_TIME-CTR/input",
-        "name_vi": "Complaint Log On Time counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ khiếu nại khách ghi nhận đúng thời hạn",
         "name": "Complaint Log On Time counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -4926,8 +4926,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Defect Pareto Action Closure",
-      "purpose": "Govern role-level evidence for Defect Pareto Action Closure without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ khép hành động top Pareto lỗi đúng hạn",
+      "purpose": "Đo độ tập trung khép hành động trên các nguyên nhân lỗi đứng đầu Pareto để giảm tái diễn.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -4939,7 +4939,7 @@
       "counter_metric": {
         "code": "DEFECT_PARETO_ACTION_CLOSURE-CTR",
         "endpoint": "POST /api/kpi/DEFECT_PARETO_ACTION_CLOSURE-CTR/input",
-        "name_vi": "Defect Pareto Action Closure counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ khép hành động top Pareto lỗi đúng hạn",
         "name": "Defect Pareto Action Closure counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -4965,8 +4965,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Dfm Feasibility Rft",
-      "purpose": "Govern role-level evidence for Dfm Feasibility Rft without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ DFM đạt ngay lần đầu khi soát khả thi sản xuất",
+      "purpose": "Đo độ chín hồ sơ kỹ thuật khi nhận RFQ để tránh ngưng quote và phát sinh đổi yêu cầu sau.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -4978,7 +4978,7 @@
       "counter_metric": {
         "code": "DFM_FEASIBILITY_RFT-CTR",
         "endpoint": "POST /api/kpi/DFM_FEASIBILITY_RFT-CTR/input",
-        "name_vi": "Dfm Feasibility Rft counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ DFM đạt ngay lần đầu khi soát khả thi sản xuất",
         "name": "Dfm Feasibility Rft counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5004,8 +5004,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Document Change Rft",
-      "purpose": "Govern role-level evidence for Document Change Rft without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ thay đổi tài liệu DCC đạt ngay lần đầu",
+      "purpose": "Đo kỷ luật soạn thảo và soát xét thay đổi DCC để giảm vòng sửa và rủi ro phát hành sai.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5017,7 +5017,7 @@
       "counter_metric": {
         "code": "DOCUMENT_CHANGE_RFT-CTR",
         "endpoint": "POST /api/kpi/DOCUMENT_CHANGE_RFT-CTR/input",
-        "name_vi": "Document Change Rft counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ thay đổi tài liệu DCC đạt ngay lần đầu",
         "name": "Document Change Rft counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5043,8 +5043,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Ehs Risk Assessment Review",
-      "purpose": "Govern role-level evidence for Ehs Risk Assessment Review without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ đánh giá rủi ro EHS được soát định kỳ",
+      "purpose": "Đo độ cập nhật đánh giá rủi ro an toàn — môi trường để chặn vận hành dựa trên đánh giá cũ.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5056,7 +5056,7 @@
       "counter_metric": {
         "code": "EHS_RISK_ASSESSMENT_REVIEW-CTR",
         "endpoint": "POST /api/kpi/EHS_RISK_ASSESSMENT_REVIEW-CTR/input",
-        "name_vi": "Ehs Risk Assessment Review counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ đánh giá rủi ro EHS được soát định kỳ",
         "name": "Ehs Risk Assessment Review counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5082,8 +5082,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Engineering Blocker Closure Ot",
-      "purpose": "Govern role-level evidence for Engineering Blocker Closure Ot without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ khép vướng kỹ thuật đúng cam kết",
+      "purpose": "Đo độ kịp thời gỡ vướng kỹ thuật chặn sản xuất để bảo vệ kế hoạch và lịch giao.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5095,7 +5095,7 @@
       "counter_metric": {
         "code": "ENGINEERING_BLOCKER_CLOSURE_OT-CTR",
         "endpoint": "POST /api/kpi/ENGINEERING_BLOCKER_CLOSURE_OT-CTR/input",
-        "name_vi": "Engineering Blocker Closure Ot counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ khép vướng kỹ thuật đúng cam kết",
         "name": "Engineering Blocker Closure Ot counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5121,8 +5121,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Engineering Caused Ncr",
-      "purpose": "Govern role-level evidence for Engineering Caused Ncr without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Số NCR có nguyên nhân gốc thuộc kỹ thuật",
+      "purpose": "Đo phần lỗi do bản vẽ/program/spec kỹ thuật để định hướng nâng chất lượng đầu vào sản xuất.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5134,7 +5134,7 @@
       "counter_metric": {
         "code": "ENGINEERING_CAUSED_NCR-CTR",
         "endpoint": "POST /api/kpi/ENGINEERING_CAUSED_NCR-CTR/input",
-        "name_vi": "Engineering Caused Ncr counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Số NCR có nguyên nhân gốc thuộc kỹ thuật",
         "name": "Engineering Caused Ncr counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5160,8 +5160,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Erp Release Rft",
-      "purpose": "Govern role-level evidence for Erp Release Rft without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ phát hành/đổi cấu hình ERP đạt ngay lần đầu",
+      "purpose": "Đo kỷ luật kiểm thử phát hành ERP để chặn lỗi cấu hình lan xuống vận hành hạ nguồn.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5173,7 +5173,7 @@
       "counter_metric": {
         "code": "ERP_RELEASE_RFT-CTR",
         "endpoint": "POST /api/kpi/ERP_RELEASE_RFT-CTR/input",
-        "name_vi": "Erp Release Rft counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ phát hành/đổi cấu hình ERP đạt ngay lần đầu",
         "name": "Erp Release Rft counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5199,8 +5199,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Hoshin Resource Decision Lt",
-      "purpose": "Govern role-level evidence for Hoshin Resource Decision Lt without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Thời gian ra quyết định phân bổ nguồn lực Hoshin",
+      "purpose": "Đo tốc độ ra quyết định nguồn lực cho mục tiêu Hoshin để tránh tắc nghẽn thực thi chiến lược.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5212,7 +5212,7 @@
       "counter_metric": {
         "code": "HOSHIN_RESOURCE_DECISION_LT-CTR",
         "endpoint": "POST /api/kpi/HOSHIN_RESOURCE_DECISION_LT-CTR/input",
-        "name_vi": "Hoshin Resource Decision Lt counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Thời gian ra quyết định phân bổ nguồn lực Hoshin",
         "name": "Hoshin Resource Decision Lt counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5238,8 +5238,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Inspection Plan Adherence",
-      "purpose": "Govern role-level evidence for Inspection Plan Adherence without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Mức tuân thủ kế hoạch kiểm tra chất lượng",
+      "purpose": "Đo độ trung thành với kế hoạch kiểm tra đã duyệt để chặn bỏ bước hoặc đổi mẫu tự ý.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5251,7 +5251,7 @@
       "counter_metric": {
         "code": "INSPECTION_PLAN_ADHERENCE-CTR",
         "endpoint": "POST /api/kpi/INSPECTION_PLAN_ADHERENCE-CTR/input",
-        "name_vi": "Inspection Plan Adherence counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Mức tuân thủ kế hoạch kiểm tra chất lượng",
         "name": "Inspection Plan Adherence counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5277,8 +5277,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Inspection Queue Aging",
-      "purpose": "Govern role-level evidence for Inspection Queue Aging without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tuổi tồn hàng chờ kiểm tra QC",
+      "purpose": "Đo tuổi tồn lô đang chờ kiểm tra để quyết định bố trí năng lực QC và giải toả nút thắt.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5290,7 +5290,7 @@
       "counter_metric": {
         "code": "INSPECTION_QUEUE_AGING-CTR",
         "endpoint": "POST /api/kpi/INSPECTION_QUEUE_AGING-CTR/input",
-        "name_vi": "Inspection Queue Aging counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tuổi tồn hàng chờ kiểm tra QC",
         "name": "Inspection Queue Aging counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5317,8 +5317,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Inspection Rft",
-      "purpose": "Govern role-level evidence for Inspection Rft without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ kiểm tra đạt ngay lần đầu không phải kiểm lại",
+      "purpose": "Đo chất lượng đầu vào kiểm tra để phân biệt lỗi sản phẩm với lỗi quy trình đo.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5330,7 +5330,7 @@
       "counter_metric": {
         "code": "INSPECTION_RFT-CTR",
         "endpoint": "POST /api/kpi/INSPECTION_RFT-CTR/input",
-        "name_vi": "Inspection Rft counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ kiểm tra đạt ngay lần đầu không phải kiểm lại",
         "name": "Inspection Rft counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5356,8 +5356,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Job Cost Accuracy",
-      "purpose": "Govern role-level evidence for Job Cost Accuracy without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Độ chính xác giá thành lệnh sản xuất khi đóng sổ",
+      "purpose": "Đo sai lệch giữa giá thành quyết toán và giá thành kế hoạch theo lệnh để soát quy trình tính giá.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5369,7 +5369,7 @@
       "counter_metric": {
         "code": "JOB_COST_ACCURACY-CTR",
         "endpoint": "POST /api/kpi/JOB_COST_ACCURACY-CTR/input",
-        "name_vi": "Job Cost Accuracy counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Độ chính xác giá thành lệnh sản xuất khi đóng sổ",
         "name": "Job Cost Accuracy counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5395,8 +5395,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Kpi Red Action Closure",
-      "purpose": "Govern role-level evidence for Kpi Red Action Closure without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ khép hành động xử lý KPI đỏ đúng cam kết",
+      "purpose": "Đo kỷ luật khép hành động khắc phục cho mọi KPI rơi vùng đỏ để chặn tích tụ vùng đỏ kéo dài.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5408,7 +5408,7 @@
       "counter_metric": {
         "code": "KPI_RED_ACTION_CLOSURE-CTR",
         "endpoint": "POST /api/kpi/KPI_RED_ACTION_CLOSURE-CTR/input",
-        "name_vi": "Kpi Red Action Closure counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ khép hành động xử lý KPI đỏ đúng cam kết",
         "name": "Kpi Red Action Closure counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5434,8 +5434,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Kpi Registry Drift Count",
-      "purpose": "Govern role-level evidence for Kpi Registry Drift Count without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Số sai lệch giữa registry KPI và dữ liệu runtime",
+      "purpose": "Đo độ trôi giữa registry git và runtime để chặn dashboard hiển thị số ngoài thẩm quyền duyệt.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5447,7 +5447,7 @@
       "counter_metric": {
         "code": "KPI_REGISTRY_DRIFT_COUNT-CTR",
         "endpoint": "POST /api/kpi/KPI_REGISTRY_DRIFT_COUNT-CTR/input",
-        "name_vi": "Kpi Registry Drift Count counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Số sai lệch giữa registry KPI và dữ liệu runtime",
         "name": "Kpi Registry Drift Count counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5473,8 +5473,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Mrp Exception Aging",
-      "purpose": "Govern role-level evidence for Mrp Exception Aging without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tuổi tồn cảnh báo ngoại lệ MRP chưa xử lý",
+      "purpose": "Đo tuổi tồn cảnh báo MRP để quyết định leo thang khi vật tư/kế hoạch sắp lệch.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5486,7 +5486,7 @@
       "counter_metric": {
         "code": "MRP_EXCEPTION_AGING-CTR",
         "endpoint": "POST /api/kpi/MRP_EXCEPTION_AGING-CTR/input",
-        "name_vi": "Mrp Exception Aging counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tuổi tồn cảnh báo ngoại lệ MRP chưa xử lý",
         "name": "Mrp Exception Aging counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5512,8 +5512,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Msa Readiness",
-      "purpose": "Govern role-level evidence for Msa Readiness without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Mức sẵn sàng phân tích hệ thống đo (MSA/Gage R&R)",
+      "purpose": "Đo độ phủ MSA/Gage R&R cho thiết bị đo trọng yếu để bảo đảm kết quả đo tin cậy được.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5525,7 +5525,7 @@
       "counter_metric": {
         "code": "MSA_READINESS-CTR",
         "endpoint": "POST /api/kpi/MSA_READINESS-CTR/input",
-        "name_vi": "Msa Readiness counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Mức sẵn sàng phân tích hệ thống đo (MSA/Gage R&R)",
         "name": "Msa Readiness counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5551,8 +5551,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Ncr Capture Completeness",
-      "purpose": "Govern role-level evidence for Ncr Capture Completeness without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Mức đầy đủ ghi nhận NCR so với phát hiện thực tế",
+      "purpose": "Đo độ trung thực mở NCR — chặn việc nén số bằng cách bỏ qua phát hiện không mở phiếu.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5564,7 +5564,7 @@
       "counter_metric": {
         "code": "NCR_CAPTURE_COMPLETENESS-CTR",
         "endpoint": "POST /api/kpi/NCR_CAPTURE_COMPLETENESS-CTR/input",
-        "name_vi": "Ncr Capture Completeness counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Mức đầy đủ ghi nhận NCR so với phát hiện thực tế",
         "name": "Ncr Capture Completeness counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5590,8 +5590,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Near Miss Reporting Quality",
-      "purpose": "Govern role-level evidence for Near Miss Reporting Quality without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Chất lượng báo cáo suýt-tai-nạn EHS",
+      "purpose": "Đo chiều sâu báo cáo suýt-tai-nạn để khuyến khích báo cáo trung thực phục vụ phòng ngừa.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5603,7 +5603,7 @@
       "counter_metric": {
         "code": "NEAR_MISS_REPORTING_QUALITY-CTR",
         "endpoint": "POST /api/kpi/NEAR_MISS_REPORTING_QUALITY-CTR/input",
-        "name_vi": "Near Miss Reporting Quality counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Chất lượng báo cáo suýt-tai-nạn EHS",
         "name": "Near Miss Reporting Quality counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5629,8 +5629,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Ojt Verification Pass Rate",
-      "purpose": "Govern role-level evidence for Ojt Verification Pass Rate without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ đạt khi xác minh thực hành đào tạo tại chỗ",
+      "purpose": "Đo chất lượng đào tạo OJT bằng xác minh thực hành — chặn ký nhận đào tạo hình thức.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5642,7 +5642,7 @@
       "counter_metric": {
         "code": "OJT_VERIFICATION_PASS_RATE-CTR",
         "endpoint": "POST /api/kpi/OJT_VERIFICATION_PASS_RATE-CTR/input",
-        "name_vi": "Ojt Verification Pass Rate counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ đạt khi xác minh thực hành đào tạo tại chỗ",
         "name": "Ojt Verification Pass Rate counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5668,8 +5668,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Packaging Label Coc Rft",
-      "purpose": "Govern role-level evidence for Packaging Label Coc Rft without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ đóng gói — nhãn — CoC đạt ngay lần đầu",
+      "purpose": "Đo kỷ luật đóng gói/dán nhãn/lập CoC để chặn lỗi nhận diện hàng tại khâu phát hành cuối.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5681,7 +5681,7 @@
       "counter_metric": {
         "code": "PACKAGING_LABEL_COC_RFT-CTR",
         "endpoint": "POST /api/kpi/PACKAGING_LABEL_COC_RFT-CTR/input",
-        "name_vi": "Packaging Label Coc Rft counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ đóng gói — nhãn — CoC đạt ngay lần đầu",
         "name": "Packaging Label Coc Rft counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5707,8 +5707,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Plan Adherence With Approved Resequence",
-      "purpose": "Govern role-level evidence for Plan Adherence With Approved Resequence without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tuân thủ kế hoạch tính đến sắp xếp lại có phê duyệt",
+      "purpose": "Đo tuân thủ kế hoạch sau khi loại trừ sắp xếp lại có phê duyệt — chặn đổ lỗi cho PPL khi job re-sequence hợp lệ.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5720,7 +5720,7 @@
       "counter_metric": {
         "code": "PLAN_ADHERENCE_WITH_APPROVED_RESEQUENCE-CTR",
         "endpoint": "POST /api/kpi/PLAN_ADHERENCE_WITH_APPROVED_RESEQUENCE-CTR/input",
-        "name_vi": "Plan Adherence With Approved Resequence counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tuân thủ kế hoạch tính đến sắp xếp lại có phê duyệt",
         "name": "Plan Adherence With Approved Resequence counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5748,8 +5748,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Promise Date Risk",
-      "purpose": "Govern role-level evidence for Promise Date Risk without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Mức rủi ro trễ ngày cam kết giao hàng",
+      "purpose": "Đo dự báo rủi ro trễ ngày cam kết để chủ động phục hồi tiến độ trước khi vi phạm hợp đồng.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5761,7 +5761,7 @@
       "counter_metric": {
         "code": "PROMISE_DATE_RISK-CTR",
         "endpoint": "POST /api/kpi/PROMISE_DATE_RISK-CTR/input",
-        "name_vi": "Promise Date Risk counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Mức rủi ro trễ ngày cam kết giao hàng",
         "name": "Promise Date Risk counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5788,8 +5788,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Quote Margin Accuracy",
-      "purpose": "Govern role-level evidence for Quote Margin Accuracy without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Độ chính xác biên lợi nhuận giữa báo giá và thực tế",
+      "purpose": "Đo sai lệch giữa biên lợi nhuận báo giá và biên thực tế khi đóng sổ để soát mô hình ước tính chi phí.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5801,7 +5801,7 @@
       "counter_metric": {
         "code": "QUOTE_MARGIN_ACCURACY-CTR",
         "endpoint": "POST /api/kpi/QUOTE_MARGIN_ACCURACY-CTR/input",
-        "name_vi": "Quote Margin Accuracy counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Độ chính xác biên lợi nhuận giữa báo giá và thực tế",
         "name": "Quote Margin Accuracy counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5827,8 +5827,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Quote Package Rft",
-      "purpose": "Govern role-level evidence for Quote Package Rft without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ gói báo giá đạt ngay lần đầu khi soát nội bộ",
+      "purpose": "Đo kỷ luật chuẩn bị gói báo giá để giảm vòng sửa với khách và rút ngắn thời gian phản hồi.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5840,7 +5840,7 @@
       "counter_metric": {
         "code": "QUOTE_PACKAGE_RFT-CTR",
         "endpoint": "POST /api/kpi/QUOTE_PACKAGE_RFT-CTR/input",
-        "name_vi": "Quote Package Rft counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ gói báo giá đạt ngay lần đầu khi soát nội bộ",
         "name": "Quote Package Rft counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5866,8 +5866,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Rfq Completeness Rft",
-      "purpose": "Govern role-level evidence for Rfq Completeness Rft without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ RFQ đầu vào đầy đủ ngay lần đầu",
+      "purpose": "Đo chất lượng tiếp nhận RFQ để giảm chờ bổ sung thông tin từ khách trước khi báo giá.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5879,7 +5879,7 @@
       "counter_metric": {
         "code": "RFQ_COMPLETENESS_RFT-CTR",
         "endpoint": "POST /api/kpi/RFQ_COMPLETENESS_RFT-CTR/input",
-        "name_vi": "Rfq Completeness Rft counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ RFQ đầu vào đầy đủ ngay lần đầu",
         "name": "Rfq Completeness Rft counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5905,8 +5905,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Rfq Turnaround Time For Complete Rfq",
-      "purpose": "Govern role-level evidence for Rfq Turnaround Time For Complete Rfq without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Thời gian phản hồi RFQ tính từ khi RFQ đã đầy đủ",
+      "purpose": "Đo thời gian thuần xử lý báo giá khi RFQ đã đủ thông tin — tách phần chờ khách bổ sung.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5918,7 +5918,7 @@
       "counter_metric": {
         "code": "RFQ_TURNAROUND_TIME_FOR_COMPLETE_RFQ-CTR",
         "endpoint": "POST /api/kpi/RFQ_TURNAROUND_TIME_FOR_COMPLETE_RFQ-CTR/input",
-        "name_vi": "Rfq Turnaround Time For Complete Rfq counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Thời gian phản hồi RFQ tính từ khi RFQ đã đầy đủ",
         "name": "Rfq Turnaround Time For Complete Rfq counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5944,8 +5944,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Routing Bom Change Rft",
-      "purpose": "Govern role-level evidence for Routing Bom Change Rft without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ thay đổi định mức/quy trình ERP đạt ngay lần đầu",
+      "purpose": "Đo kỷ luật soát thay đổi định mức và quy trình ERP để chặn lỗi tính giá/kế hoạch hạ nguồn.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5957,7 +5957,7 @@
       "counter_metric": {
         "code": "ROUTING_BOM_CHANGE_RFT-CTR",
         "endpoint": "POST /api/kpi/ROUTING_BOM_CHANGE_RFT-CTR/input",
-        "name_vi": "Routing Bom Change Rft counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ thay đổi định mức/quy trình ERP đạt ngay lần đầu",
         "name": "Routing Bom Change Rft counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -5983,8 +5983,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Shift Handover Rft",
-      "purpose": "Govern role-level evidence for Shift Handover Rft without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ bàn giao ca đạt yêu cầu theo FRM-504",
+      "purpose": "Đo chất lượng bàn giao ca để chặn mất thông tin trạng thái máy/lệnh/vật tư giữa các ca.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -5996,7 +5996,7 @@
       "counter_metric": {
         "code": "SHIFT_HANDOVER_RFT-CTR",
         "endpoint": "POST /api/kpi/SHIFT_HANDOVER_RFT-CTR/input",
-        "name_vi": "Shift Handover Rft counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ bàn giao ca đạt yêu cầu theo FRM-504",
         "name": "Shift Handover Rft counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -6022,8 +6022,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Shortage Recovery Ot",
-      "purpose": "Govern role-level evidence for Shortage Recovery Ot without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tỷ lệ phục hồi thiếu hụt vật tư đúng hạn",
+      "purpose": "Đo độ kịp thời phục hồi khi phát hiện thiếu hụt vật tư để bảo vệ kế hoạch và ngày giao.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -6035,7 +6035,7 @@
       "counter_metric": {
         "code": "SHORTAGE_RECOVERY_OT-CTR",
         "endpoint": "POST /api/kpi/SHORTAGE_RECOVERY_OT-CTR/input",
-        "name_vi": "Shortage Recovery Ot counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tỷ lệ phục hồi thiếu hụt vật tư đúng hạn",
         "name": "Shortage Recovery Ot counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -6061,8 +6061,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Timesheet Exception Aging",
-      "purpose": "Govern role-level evidence for Timesheet Exception Aging without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tuổi tồn ngoại lệ chấm công chưa xử lý",
+      "purpose": "Đo tuổi tồn ngoại lệ chấm công để chặn tích tụ điều chỉnh hàng loạt cuối kỳ lương.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -6074,7 +6074,7 @@
       "counter_metric": {
         "code": "TIMESHEET_EXCEPTION_AGING-CTR",
         "endpoint": "POST /api/kpi/TIMESHEET_EXCEPTION_AGING-CTR/input",
-        "name_vi": "Timesheet Exception Aging counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tuổi tồn ngoại lệ chấm công chưa xử lý",
         "name": "Timesheet Exception Aging counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -6100,8 +6100,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Tool Fixture Ready To Plan",
-      "purpose": "Govern role-level evidence for Tool Fixture Ready To Plan without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Mức sẵn sàng dụng cụ/đồ gá theo kế hoạch sản xuất",
+      "purpose": "Đo mức sẵn sàng dụng cụ và đồ gá so với kế hoạch để chặn lệch lịch do thiếu công cụ.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -6113,7 +6113,7 @@
       "counter_metric": {
         "code": "TOOL_FIXTURE_READY_TO_PLAN-CTR",
         "endpoint": "POST /api/kpi/TOOL_FIXTURE_READY_TO_PLAN-CTR/input",
-        "name_vi": "Tool Fixture Ready To Plan counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Mức sẵn sàng dụng cụ/đồ gá theo kế hoạch sản xuất",
         "name": "Tool Fixture Ready To Plan counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -6139,8 +6139,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Training Matrix Freshness",
-      "purpose": "Govern role-level evidence for Training Matrix Freshness without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Mức cập nhật ma trận năng lực — đào tạo",
+      "purpose": "Đo độ tươi ma trận năng lực để chặn quyết định phân công dựa trên dữ liệu năng lực cũ.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -6152,7 +6152,7 @@
       "counter_metric": {
         "code": "TRAINING_MATRIX_FRESHNESS-CTR",
         "endpoint": "POST /api/kpi/TRAINING_MATRIX_FRESHNESS-CTR/input",
-        "name_vi": "Training Matrix Freshness counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Mức cập nhật ma trận năng lực — đào tạo",
         "name": "Training Matrix Freshness counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -6178,8 +6178,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Training Record Integrity",
-      "purpose": "Govern role-level evidence for Training Record Integrity without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Tính toàn vẹn hồ sơ đào tạo khi audit chéo",
+      "purpose": "Đo độ trung thực hồ sơ đào tạo qua audit chéo — chặn ký nhận đào tạo không có bằng chứng.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -6191,7 +6191,7 @@
       "counter_metric": {
         "code": "TRAINING_RECORD_INTEGRITY-CTR",
         "endpoint": "POST /api/kpi/TRAINING_RECORD_INTEGRITY-CTR/input",
-        "name_vi": "Training Record Integrity counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Tính toàn vẹn hồ sơ đào tạo khi audit chéo",
         "name": "Training Record Integrity counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -6217,8 +6217,8 @@
       "calculation_status": "manual_governed",
       "metric_type": "role_performance_measure",
       "tier": "role",
-      "name_vi": "Transaction Sync Reliability",
-      "purpose": "Govern role-level evidence for Transaction Sync Reliability without treating it as an automatic company KPI or reward trigger.",
+      "name_vi": "Độ tin cậy đồng bộ giao dịch giữa các hệ thống",
+      "purpose": "Đo tỷ lệ đồng bộ giao dịch thành công giữa các hệ thống để chặn lệch dữ liệu hạ nguồn.",
       "thresholds": {
         "direction": "higher_is_better",
         "unit": "score",
@@ -6230,7 +6230,7 @@
       "counter_metric": {
         "code": "TRANSACTION_SYNC_RELIABILITY-CTR",
         "endpoint": "POST /api/kpi/TRANSACTION_SYNC_RELIABILITY-CTR/input",
-        "name_vi": "Transaction Sync Reliability counter evidence breach",
+        "name_vi": "Bằng chứng vi phạm bộ đếm — Độ tin cậy đồng bộ giao dịch giữa các hệ thống",
         "name": "Transaction Sync Reliability counter evidence breach",
         "intent": "Prevent role scorecard improvement by hiding rework, bypassing gates, suppressing exceptions, or closing evidence without verification."
       },
@@ -9899,32 +9899,72 @@
     "card_classes": {
       "executive": {
         "audience": "Tier-3 management / CEO scorecard",
-        "metric_types_allowed": ["kpi", "operating_metric"],
-        "calculation_status_allowed": ["runtime_calculated", "manual", "manual_governed"],
+        "metric_types_allowed": [
+          "kpi",
+          "operating_metric"
+        ],
+        "calculation_status_allowed": [
+          "runtime_calculated",
+          "manual",
+          "manual_governed"
+        ],
         "staged_metric_policy": "Executive deck must NOT contain a staged_data_contract metric as a scoreable card. Staged candidates are visible only in the data-contract backlog card class."
       },
       "daily_ops": {
         "audience": "Tier-1 / Tier-2 floor + cell meeting",
-        "metric_types_allowed": ["kpi", "operating_metric", "gate_control_metric", "health_indicator", "counter_metric"],
-        "calculation_status_allowed": ["runtime_calculated", "manual", "manual_governed", "staged_data_contract"],
+        "metric_types_allowed": [
+          "kpi",
+          "operating_metric",
+          "gate_control_metric",
+          "health_indicator",
+          "counter_metric"
+        ],
+        "calculation_status_allowed": [
+          "runtime_calculated",
+          "manual",
+          "manual_governed",
+          "staged_data_contract"
+        ],
         "staged_metric_policy": "Staged metric is shown ONLY as a watch-item with the badge, never with a number."
       },
       "gate": {
         "audience": "CDR + gate-pass meeting",
-        "metric_types_allowed": ["gate_control_metric"],
-        "calculation_status_allowed": ["runtime_calculated", "manual_governed", "staged_data_contract"],
+        "metric_types_allowed": [
+          "gate_control_metric"
+        ],
+        "calculation_status_allowed": [
+          "runtime_calculated",
+          "manual_governed",
+          "staged_data_contract"
+        ],
         "staged_metric_policy": "Staged gate metric blocks gate-pass; visible as red blocker even when there is no number."
       },
       "role": {
         "audience": "Per-JD scorecard card on role profile page",
-        "metric_types_allowed": ["role_performance_measure"],
-        "calculation_status_allowed": ["runtime_calculated", "manual", "manual_governed", "staged_data_contract"],
+        "metric_types_allowed": [
+          "role_performance_measure"
+        ],
+        "calculation_status_allowed": [
+          "runtime_calculated",
+          "manual",
+          "manual_governed",
+          "staged_data_contract"
+        ],
         "staged_metric_policy": "Staged role measure is visible but reward contribution is DISABLED (scorecard_contributes_to_reward=false enforced)."
       },
       "backlog": {
         "audience": "Data-contract backlog / governance review",
-        "metric_types_allowed": ["kpi", "operating_metric", "gate_control_metric", "role_performance_measure", "counter_metric"],
-        "calculation_status_allowed": ["staged_data_contract", "data_contract_required"],
+        "metric_types_allowed": [
+          "kpi",
+          "operating_metric",
+          "gate_control_metric",
+          "role_performance_measure",
+          "counter_metric"
+        ],
+        "calculation_status_allowed": [
+          "staged_data_contract",
+          "data_contract_required"
+        ],
         "staged_metric_policy": "All cards are staged by definition. Each card MUST show data_contract_gap + target_graduation_condition + owner + estimated_data_ready_date if known."
       }
     }
@@ -9934,8 +9974,18 @@
     "introduced": "P08 — dashboard, tier-meeting, manual-input, admin UX",
     "endpoint_save": "POST /api/kpi/{metricCode}/input  (action=kpi_input_save)",
     "endpoint_list": "GET  /api/kpi/{metricCode}/input  (action=kpi_input_list)",
-    "required_fields": ["period_start", "period_end", "value"],
-    "optional_fields": ["unit", "evidence_reference", "breakdown", "notes", "input_status"],
+    "required_fields": [
+      "period_start",
+      "period_end",
+      "value"
+    ],
+    "optional_fields": [
+      "unit",
+      "evidence_reference",
+      "breakdown",
+      "notes",
+      "input_status"
+    ],
     "validation": {
       "period": "YYYY-MM-DD; period_start <= period_end",
       "value": "numeric (int or float)",
@@ -9943,15 +9993,25 @@
       "cadence": "metric.cadence MUST be one of daily/weekly/monthly/quarterly/yearly/ad_hoc; the input period length is informational, the engine does not reject mismatch (a CI WARN-only check)",
       "evidence_reference": "free-form string (doc_code, NCR id, JO number, URL); WARN-only when blank for non-DRAFT input — DCC inspector may request it"
     },
-    "input_status_enum": ["draft", "submitted", "verified", "superseded"],
+    "input_status_enum": [
+      "draft",
+      "submitted",
+      "verified",
+      "superseded"
+    ],
     "default_status_on_save": "submitted",
     "reward_gate": {
       "policy": "Only input_status='verified' (post-approval by a distinct approver, not the entered_by user) contributes to reward calculation. 'draft' and 'submitted' MAY render on the dashboard with a badge but MUST NOT count toward JD scorecard reward. 'superseded' rows are excluded from reward and from latest-input lookups. Note: 'verified' is the DB CHECK term; in governance language this state is equivalent to 'approved' — the approval workflow (POST /api/kpi/{metricCode}/input/approve) sets verified_by/verified_at and transitions submitted→verified after enforcing separation of duties (approver != entered_by).",
       "enforcement_point": "KpiEngine.calculateFromManualInput emits input_pending_review=true when status != 'verified'; dashboard renderer skips reward roll-up when input_pending_review=true. The DB CHECK constraint (migration 196) physically forbids any other status, so the engine never sees pending_review/approved/rejected — those are governance synonyms only."
     },
     "audit": {
-      "rows_written": ["kpi_manual_inputs", "audit_events"],
-      "audit_action_keys": ["kpi_input_save"]
+      "rows_written": [
+        "kpi_manual_inputs",
+        "audit_events"
+      ],
+      "audit_action_keys": [
+        "kpi_input_save"
+      ]
     }
   },
   "threshold_schema": {
