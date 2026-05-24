@@ -486,7 +486,100 @@ function _renderCustomerProfiles(){
       '</article>';
   }).join('');
 
-  return head + '<div class="kc-prof-grid">' + cards + '</div>';
+  return head + '<div class="kc-prof-grid">' + cards + '</div>' +
+    _renderRegistryContracts();
+}
+
+/* P10 — Render dashboard_render_contract + manual_input_contract as
+   read-only governance cards under the Profiles tab. Both contracts ship
+   in the registry from P08 onward and govern HOW every dashboard surface
+   and every manual-input form must behave. Surfacing them in the Admin
+   Console lets operators see the policy that the engine enforces. */
+function _renderRegistryContracts(){
+  var cfg = _state.config || {};
+  var drc = cfg.dashboard_render_contract || null;
+  var mic = cfg.manual_input_contract || null;
+  if(!drc && !mic){ return ''; }
+
+  var head = '<div class="kc-eyebrow" style="margin-top:24px">' +
+    _t('Hợp đồng dashboard & nhập liệu (P08–P10)', 'Dashboard & manual-input contracts (P08–P10)') +
+    '</div>';
+
+  var dashCard = '';
+  if(drc){
+    var rules = drc.render_rules || {};
+    var ruleRows = Object.keys(rules).map(function(k){
+      return '<div class="kc-prof-req">' +
+        '<span class="kc-prof-req-key">' + _esc(k) + '</span>' +
+        '<span class="kc-prof-req-val">' + _esc(rules[k]) + '</span></div>';
+    }).join('');
+    var classes = drc.card_classes || drc.dashboard_card_classes || {};
+    var classRows = Object.keys(classes).map(function(k){
+      var cls = classes[k] || {};
+      var allowed = cls.metric_types_allowed || cls.allowed_metric_types || [];
+      var statuses = cls.calculation_status_allowed || cls.allowed_status || [];
+      return '<div class="kc-prof-gate-row">' +
+        '<span class="kc-prof-gate-key">' + _esc(k) + '</span>' +
+        '<span class="kc-prof-gate-vals">' +
+          _t('metric_types', 'metric_types') + ': <b>' + _esc((allowed || []).join(', ') || '—') + '</b> · ' +
+          _t('status', 'status') + ': <b>' + _esc((statuses || []).join(', ') || '—') + '</b>' +
+        '</span></div>';
+    }).join('');
+    var req = (drc.required_fields_per_card || []).map(_esc).join(', ');
+    var staged = drc.staged_metric_policy || drc.render_rules && drc.render_rules.staged_data_contract || '';
+    dashCard = '<article class="kc-prof-card">' +
+      '<div class="kc-prof-head"><span class="kc-code">' + _esc(drc.contract_id || 'dashboard_render_contract') + '</span>' +
+      '<span class="kc-prof-name">' + _t('Hợp đồng render dashboard', 'Dashboard render contract') + '</span>' +
+      '<span class="kc-pill kc-pill--accent">contract</span></div>' +
+      '<div class="kc-prof-meta"><span class="kc-mini">' + _t('Trường bắt buộc / card', 'Required fields per card') + ':</span> ' + req + '</div>' +
+      (classRows
+        ? '<details open><summary>' + _t('Card classes', 'Card classes') + '</summary>' +
+          '<div class="kc-prof-gate-grid">' + classRows + '</div></details>'
+        : '') +
+      (ruleRows
+        ? '<details><summary>' + _t('Quy tắc render theo calculation_status', 'Render rules by calculation_status') + '</summary>' +
+          '<div class="kc-prof-req-grid">' + ruleRows + '</div></details>'
+        : '') +
+      (staged
+        ? '<div class="kc-mini" style="margin-top:8px"><b>' + _t('Chính sách metric staged', 'Staged metric policy') + ':</b> ' + _esc(staged) + '</div>'
+        : '') +
+      '</article>';
+  }
+
+  var inputCard = '';
+  if(mic){
+    var enums = mic.input_status_enum || [];
+    var validation = mic.validation || {};
+    var validationRows = Object.keys(validation).map(function(k){
+      return '<div class="kc-prof-req">' +
+        '<span class="kc-prof-req-key">' + _esc(k) + '</span>' +
+        '<span class="kc-prof-req-val">' + _esc(validation[k]) + '</span></div>';
+    }).join('');
+    var gate = mic.reward_gate || {};
+    var policy = gate.policy || '';
+    inputCard = '<article class="kc-prof-card">' +
+      '<div class="kc-prof-head"><span class="kc-code">' + _esc(mic.contract_id || 'manual_input_contract') + '</span>' +
+      '<span class="kc-prof-name">' + _t('Hợp đồng nhập tay (có kiểm soát)', 'Manual-input contract') + '</span>' +
+      '<span class="kc-pill kc-pill--accent">contract</span></div>' +
+      '<div class="kc-prof-meta">' +
+        '<span class="kc-mini">' + _t('Endpoint lưu', 'Save endpoint') + ':</span> <code>' + _esc(mic.endpoint_save || '') + '</code> · ' +
+        '<span class="kc-mini">' + _t('Endpoint xem', 'List endpoint') + ':</span> <code>' + _esc(mic.endpoint_list || '') + '</code>' +
+      '</div>' +
+      '<div class="kc-prof-meta">' +
+        '<span class="kc-mini">' + _t('Trạng thái nhập (input_status)', 'Input status enum') + ':</span> ' +
+        (enums || []).map(function(s){ return '<span class="kc-pill">' + _esc(s) + '</span>'; }).join(' ') +
+      '</div>' +
+      (policy
+        ? '<div class="kc-mini" style="margin-top:8px"><b>reward_gate.policy:</b> ' + _esc(policy) + '</div>'
+        : '') +
+      (validationRows
+        ? '<details><summary>' + _t('Quy tắc validation', 'Validation rules') + '</summary>' +
+          '<div class="kc-prof-req-grid">' + validationRows + '</div></details>'
+        : '') +
+      '</article>';
+  }
+
+  return head + '<div class="kc-prof-grid">' + dashCard + inputCard + '</div>';
 }
 
 function _renderOverview(){
@@ -1084,6 +1177,17 @@ function _renderEditCard(m, section, inline){
   if(section === 'gate'){
     html += '<div class="kc-mini">' + _t('Cổng', 'Gate') + ' ' + c(m.gate || '—') +
       ' · CDR ' + c((m.linked_cdr || []).join(', ')) + '</div>';
+    // P10 — cdr_accountable_role + owner_alignment_note: when multiple
+    // roles share a gate, surface the single accountable Decision-Right A
+    // and any note explaining the alignment with owner_role.
+    if(m.cdr_accountable_role || m.owner_alignment_note){
+      html += '<div class="kc-mini">' +
+        (m.cdr_accountable_role
+          ? '<b>' + _t('CDR A', 'CDR A') + ':</b> ' + c(m.cdr_accountable_role) + ' '
+          : '') +
+        (m.owner_alignment_note ? '— ' + c(m.owner_alignment_note) : '') +
+        '</div>';
+    }
   }
   if(status === 'staged_data_contract'){
     html += '<div class="kc-warn">' + _t('KPI chưa có hợp đồng dữ liệu — nhập số qua endpoint nhập liệu.',
@@ -1148,6 +1252,11 @@ function _renderEditCard(m, section, inline){
     _field(_t('Ý nghĩa — phát hiện gaming khi nào', 'Intent — what gaming it detects'),
       '<textarea class="kc-input kc-ta" oninput="_kpiSetCounter(\'' + section + '\',\'' + c(code) + '\',\'intent\',this.value)">' +
       c(_counterVal(m,section,'intent')) + '</textarea>') +
+    // P10 — intent_vi: Vietnamese business intent for the counter (the
+    // "why-this-matters" gloss used by daily-stand-up boards). Optional.
+    _field(_t('Ý đồ kinh doanh (intent_vi)', 'Business intent (intent_vi)'),
+      '<textarea class="kc-input kc-ta" rows="2" placeholder="VD: chống tự đóng 8D khi khách chưa acknowledge" oninput="_kpiSetCounter(\'' + section + '\',\'' + c(code) + '\',\'intent_vi\',this.value)">' +
+      c(_counterVal(m,section,'intent_vi')) + '</textarea>') +
     '</div>';
 
   if(hasThresholds){

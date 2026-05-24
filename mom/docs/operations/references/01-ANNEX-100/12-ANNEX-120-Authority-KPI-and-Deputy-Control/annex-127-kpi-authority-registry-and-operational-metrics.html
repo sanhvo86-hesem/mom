@@ -258,6 +258,22 @@ td,th{vertical-align:top}
 </div>
 
 <div class="section">
+<h2>10b. Cập nhật P05–P10 (2026-05-24)</h2>
+<p>Chương trình LAM 10× từ <span class="code">P05</span> đến <span class="code">P10</span> hoàn thành 2026-05-24. Tóm tắt tác động lên registry và Admin Console:</p>
+<ul>
+  <li><b>P05 graduate runtime:</b> 2 metric chuyển từ proposed → runtime tính tự động — <span class="code">FAI_FIRST_PASS</span> và <span class="code">IN_PROCESS_REJECT_RATE</span> (engine MES + QA event stream).</li>
+  <li><b>Phantom rewrite:</b> 3 metric đổi nguồn về <span class="code">mes_oee_snapshots</span> — <span class="code">OEE</span>, <span class="code">MACHINE_UTILIZATION</span>, <span class="code">SETUP_TO_RUN_RATIO</span> — xoá phantom JSON formula cũ.</li>
+  <li><b>Reward / attribution:</b> 6 reward rule mới + attribution template scorecard + dung sai trọng số ±5% trên scorecard tier.</li>
+  <li><b>Hợp đồng dashboard / input:</b> bổ sung <span class="code">dashboard_render_contract</span> (card_classes: executive, daily_ops, gate, role, backlog) và <span class="code">manual_input_contract</span> (input_status_enum, reward_gate.policy, validation). Render trong Admin Console <em>KPI Registry</em> tab Profile / Settings.</li>
+  <li><b>Separation of Duties:</b> endpoint mới <span class="code">kpi_input_approve</span> tách quyền nhập số khỏi quyền duyệt số (người nhập ≠ người duyệt).</li>
+  <li><b>CI guard:</b> các kiểm tra <span class="code">P0.6.X / P0.7.X / P0.8.X / P0.9.X</span> chạy trong <span class="code">check_kpi_integrity.php</span> bảo vệ registry khỏi drift schema.</li>
+  <li><b>VN rewrite:</b> 39 metric đã được viết lại chú giải kỹ thuật Việt + bổ sung trường <span class="code">intent_vi</span> mô tả ý đồ kinh doanh; Admin Console render <span class="code">intent_vi</span> dưới <span class="code">name_vi</span> của counter metric.</li>
+  <li><b>CDR accountable:</b> mỗi gate metric ghi thêm <span class="code">cdr_accountable_role</span> và <span class="code">owner_alignment_note</span> để chỉ rõ Decision Right A khi nhiều role cùng tham gia.</li>
+</ul>
+<p>Snapshot bằng chứng tại <span class="code">_reports/kpi-lam-10x/2026-05-24/</span>. Phép đếm registry hiện hành: <b>30 runtime</b>, <b>31 gate</b>, <b>120 proposed</b>, <b>33 governance KPI</b> (ANNEX-122 §4–§6 không đổi).</p>
+</div>
+
+<div class="section">
 <h2>11. Tài liệu liên kết</h2>
 <div class="table-card"><table class="table">
 <thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead>

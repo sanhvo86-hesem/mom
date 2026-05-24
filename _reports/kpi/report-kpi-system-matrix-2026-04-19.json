@@ -1,8 +1,8 @@
 {
-    "generated_at": "2026-05-24T00:21:15+00:00",
+    "generated_at": "2026-05-24T11:26:44+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
-    "registry_version": "2026-05-23",
+    "registry_version": "2026-05-24",
     "method": {
         "detection": "Registry canonical codes, legacy aliases, KPI-* local IDs, and Cxx-Mx competency role measures are detected in visible HTML text. Table rows are used to extract target/threshold snippets.",
         "interpretation": "The matrix separates official KPI, gate/control metric, operating metric, role performance measure, and health indicator. It flags context mismatch rather than mechanically rewriting every KPI word.",
@@ -16,7 +16,7 @@
     "summary": {
         "html_file_count": 481,
         "documents_with_metric_usage": 128,
-        "registry_metric_count": 170,
+        "registry_metric_count": 190,
         "metric_codes_seen": 142,
         "executive_scorecard_metrics_seen": 7,
         "role_measure_codes_seen": 95,
@@ -2987,6 +2987,7 @@
             "display_name": "FAI/first-piece first-pass acceptance",
             "classification": "operating_metric",
             "registry_sources": [
+                "runtime_calculated_metrics",
                 "legacy_aliases",
                 "annex122_governance_kpis",
                 "gate_control_metrics",
@@ -9767,6 +9768,7 @@
             "display_name": "In-process reject rate",
             "classification": "operating_metric",
             "registry_sources": [
+                "runtime_calculated_metrics",
                 "legacy_aliases",
                 "gate_control_metrics",
                 "proposed_operating_metrics"
@@ -9777,13 +9779,13 @@
             "local_ids": [
                 "KPI-G5-01"
             ],
-            "backend_status": "staged_data_contract",
+            "backend_status": "retained",
             "scorecard_weight_pct": null,
             "scorecard_target": null,
             "scorecard_unit": null,
             "scorecard_scoring_status": null,
             "scorecard_contributes_to_reward": null,
-            "statistical_plan_status": "candidate_data_contract_required_before_payout",
+            "statistical_plan_status": "not_declared_or_informational",
             "expected_thresholds": null,
             "expected_target_text": null,
             "total_occurrences": 1,
@@ -10279,6 +10281,17 @@
             "statistical_plan_status": "gate_hold_release_evidence_not_payout"
         },
         {
+            "code": "CHECK_DIM_REPORT_ON_SHIP",
+            "display_name": "Check-Dimension Report Attached to Shipment",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
             "code": "CONTROL_PLAN_PFMEA_APPROVAL",
             "display_name": "Control Plan / PFMEA Approval Before Baseline",
             "classification": "gate_control_metric",
@@ -10290,8 +10303,41 @@
             "statistical_plan_status": "gate_hold_release_evidence_not_payout"
         },
         {
+            "code": "CSR_ACKNOWLEDGEMENT_RATE",
+            "display_name": "Customer-Specific Requirement Acknowledgement Rate",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
             "code": "CUSTOMER_ESCAPE_NOTIFICATION_LT",
             "display_name": "Customer Escape Notification Lead Time",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "CUSTOMER_GAGE_DAMAGE_UNSUITABLE_NOTIFICATION_LT",
+            "display_name": "Customer-Supplied Gage Damage/Unsuitable Notification Lead Time",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED",
+            "display_name": "Customer Requirement Profile Assigned",
             "classification": "gate_control_metric",
             "registry_sources": [
                 "gate_control_metrics"
@@ -10334,6 +10380,28 @@
             "statistical_plan_status": "gate_hold_release_evidence_not_payout"
         },
         {
+            "code": "GAGE_VALID_FOR_RELEASE",
+            "display_name": "Gage Valid for Release",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "INSPECTION_PLAN_COMPLETENESS",
+            "display_name": "Inspection Plan Completeness",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
             "code": "IQC_PASS_RATE",
             "display_name": "IQC Pass Rate",
             "classification": "gate_control_metric",
@@ -10362,6 +10430,28 @@
             "classification": "gate_control_metric",
             "registry_sources": [
                 "annex122_governance_kpis",
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "PROCESS_CHANGE_APPROVAL_RATE",
+            "display_name": "Process Change Approval Before Implementation",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "RFQ_FEASIBILITY_STUDY_COMPLETENESS",
+            "display_name": "RFQ Feasibility Study Completeness",
+            "classification": "gate_control_metric",
+            "registry_sources": [
                 "gate_control_metrics"
             ],
             "backend_status": "not_declared",
@@ -10408,6 +10498,28 @@
         {
             "code": "SPC_SIGNAL_REACTION_TIME",
             "display_name": "SPC Signal Reaction Time",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "SPECIAL_RELEASE_COMPLIANCE",
+            "display_name": "Written Special Release Before Delivery",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "gate_control_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout"
+        },
+        {
+            "code": "SPECIAL_RELEASE_MARKING_COMPLIANCE",
+            "display_name": "Special-Release Load Carrier Marking",
             "classification": "gate_control_metric",
             "registry_sources": [
                 "gate_control_metrics"
@@ -10968,6 +11080,17 @@
             "statistical_plan_status": "candidate_data_contract_required_before_payout"
         },
         {
+            "code": "CONTINGENCY_PLAN_READINESS_LAM",
+            "display_name": "Contingency Plan Readiness (LAM scope)",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
             "code": "CRITICAL_ROLE_CERT_COVERAGE",
             "display_name": "Critical role certification coverage",
             "classification": "operating_metric",
@@ -10977,6 +11100,17 @@
             "backend_status": "staged_data_contract",
             "expected_target_text": null,
             "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "CUSTOMER_ACCEPTED_8D_CLOSURE_RATE",
+            "display_name": "Customer-Accepted 8D Closure Rate",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
         },
         {
             "code": "CYCLE_TIME_VARIANCE",
@@ -11020,6 +11154,17 @@
                 "proposed_operating_metrics"
             ],
             "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "DOC_RECORD_RETENTION_10Y",
+            "display_name": "Quality Record Retention ≥10 years",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
             "expected_target_text": null,
             "statistical_plan_status": "not_declared_or_informational"
         },
@@ -11072,6 +11217,7 @@
             "display_name": "FAI/first-piece first-pass acceptance",
             "classification": "operating_metric",
             "registry_sources": [
+                "runtime_calculated_metrics",
                 "legacy_aliases",
                 "annex122_governance_kpis",
                 "gate_control_metrics",
@@ -11130,13 +11276,14 @@
             "display_name": "In-process reject rate",
             "classification": "operating_metric",
             "registry_sources": [
+                "runtime_calculated_metrics",
                 "legacy_aliases",
                 "gate_control_metrics",
                 "proposed_operating_metrics"
             ],
-            "backend_status": "staged_data_contract",
+            "backend_status": "retained",
             "expected_target_text": null,
-            "statistical_plan_status": "candidate_data_contract_required_before_payout"
+            "statistical_plan_status": "not_declared_or_informational"
         },
         {
             "code": "JOB_COST_ACCURACY",
@@ -11214,6 +11361,39 @@
             "backend_status": "staged_data_contract",
             "expected_target_text": null,
             "statistical_plan_status": "candidate_data_contract_required_before_payout"
+        },
+        {
+            "code": "NCR_3D_RESPONSE_SLA",
+            "display_name": "NCR 3D Response SLA (≤1 working day)",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "NCR_4D_PRELIMINARY_SLA",
+            "display_name": "NCR 4D Preliminary SLA (≤2 working days)",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "NCR_8D_UPDATE_SLA",
+            "display_name": "NCR Updated 8D SLA (≤10 working days)",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
         },
         {
             "code": "NCR_CAPTURE_COMPLETENESS",
@@ -11898,6 +12078,17 @@
             "statistical_plan_status": "not_declared_or_informational"
         },
         {
+            "code": "PROJECT_PLAN_DEVIATION_COMMUNICATION_LT",
+            "display_name": "Project-Plan Deviation Communication Lead Time",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
             "code": "PROMISE_DATE_RISK",
             "display_name": "Promise Date Risk",
             "classification": "operating_metric",
@@ -12014,6 +12205,28 @@
             "statistical_plan_status": "not_declared_or_informational"
         },
         {
+            "code": "SUBTIER_REQUIREMENT_FLOWDOWN",
+            "display_name": "Sub-tier Requirement Flowdown Coverage",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "SUPPLIER_RBA_COMPLIANCE_EVIDENCE",
+            "display_name": "Supplier RBA / Lam Supplier Code Compliance Evidence",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
             "code": "SUPPLIER_READINESS",
             "display_name": "Supplier readiness composite from OTD and incoming quality",
             "classification": "operating_metric",
@@ -12054,6 +12267,17 @@
                 "proposed_operating_metrics"
             ],
             "backend_status": "manual_governed",
+            "expected_target_text": null,
+            "statistical_plan_status": "not_declared_or_informational"
+        },
+        {
+            "code": "TRAINING_AS_CAPA_COUNTER",
+            "display_name": "Training-only CAPA counter",
+            "classification": "operating_metric",
+            "registry_sources": [
+                "proposed_operating_metrics"
+            ],
+            "backend_status": "not_declared",
             "expected_target_text": null,
             "statistical_plan_status": "not_declared_or_informational"
         },

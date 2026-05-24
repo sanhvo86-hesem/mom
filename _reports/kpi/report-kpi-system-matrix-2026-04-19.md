@@ -1,6 +1,6 @@
 # KPI System Matrix Audit
 
-Generated: 2026-05-24T00:21:15+00:00
+Generated: 2026-05-24T11:26:44+00:00
 
 ## Summary
 
@@ -8,7 +8,7 @@ Generated: 2026-05-24T00:21:15+00:00
 |---|---:|
 | `html_file_count` | 481 |
 | `documents_with_metric_usage` | 128 |
-| `registry_metric_count` | 170 |
+| `registry_metric_count` | 190 |
 | `metric_codes_seen` | 142 |
 | `executive_scorecard_metrics_seen` | 7 |
 | `role_measure_codes_seen` | 95 |
@@ -169,7 +169,7 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 | `FINAL_RELEASE_RFT` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `GROSS_MARGIN_JOB_FAMILY` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `INCIDENT_ACTION_CLOSURE_AGING` | governance_kpi | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `IN_PROCESS_REJECT_RATE` | operating_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `IN_PROCESS_REJECT_RATE` | operating_metric | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `ORDER_REVIEW_RFT` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `RFQ_TURNAROUND_TIME` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `SAFETY_ONBOARDING_COMPLIANCE` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
@@ -191,18 +191,28 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 | `PLAN_ADHERENCE` | executive_scorecard_kpi | runtime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides | staged_data_contract / runtime_calculated_with_registry_contract | ≥90% |
 | `WIP_AGING` | executive_scorecard_kpi | runtime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides | runtime_calculated / runtime_calculated_with_registry_contract | ≤5 aged_wip_percent |
 | `CHANGEOVER_TIME` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `CHECK_DIM_REPORT_ON_SHIP` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `CONTROL_PLAN_PFMEA_APPROVAL` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `CSR_ACKNOWLEDGEMENT_RATE` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `CUSTOMER_ESCAPE_NOTIFICATION_LT` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `CUSTOMER_GAGE_DAMAGE_UNSUITABLE_NOTIFICATION_LT` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `ECN_LEAD_TIME` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `ENGINEERING_RELEASE_RFT` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `FAI_CYCLE_TIME` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `GAGE_VALID_FOR_RELEASE` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `INSPECTION_PLAN_COMPLETENESS` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `IQC_PASS_RATE` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `OEE` | gate_control_metric | runtime_calculated_metrics, gate_control_metrics | runtime_calculated / runtime_calculated_with_registry_contract |  |
 | `ORDER_REVIEW_RFT` | gate_control_metric | annex122_governance_kpis, gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `PROCESS_CHANGE_APPROVAL_RATE` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `RFQ_FEASIBILITY_STUDY_COMPLETENESS` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `RFQ_TURNAROUND_TIME` | gate_control_metric | annex122_governance_kpis, gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `SHIP_PACKET_COMPLETENESS` | gate_control_metric | legacy_aliases, dashboard_core_kpis, gate_control_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
 | `SHIP_READY_TO_INVOICE_LT` | gate_control_metric | annex122_governance_kpis, gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `SPC_SIGNAL_REACTION_TIME` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `SPECIAL_RELEASE_COMPLIANCE` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `SPECIAL_RELEASE_MARKING_COMPLIANCE` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `TRACEABILITY_COMPLETENESS` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `TRACEABILITY_DRILL_TIME` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `BCP_READINESS` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
@@ -251,21 +261,24 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 | `CMM_PROGRAM_VALIDATION` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `COMPLAINT_LOG_ON_TIME` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `CONSTRAINT_LOST_HOURS` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `CONTINGENCY_PLAN_READINESS_LAM` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
 | `CRITICAL_ROLE_CERT_COVERAGE` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `CUSTOMER_ACCEPTED_8D_CLOSURE_RATE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
 | `CYCLE_TIME_VARIANCE` | operating_metric | legacy_aliases, proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
 | `DEFECT_PARETO_ACTION_CLOSURE` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `DFM_FEASIBILITY_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `DOCUMENT_CHANGE_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `DOC_RECORD_RETENTION_10Y` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
 | `EHS_RISK_ASSESSMENT_REVIEW` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `ENGINEERING_BLOCKER_CLOSURE_OT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `ENGINEERING_CAUSED_NCR` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `ERP_RELEASE_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
-| `FAI_FIRST_PASS` | operating_metric | legacy_aliases, annex122_governance_kpis, gate_control_metrics, proposed_operating_metrics | retained_from_annex122 / not_declared_or_informational |  |
+| `FAI_FIRST_PASS` | operating_metric | runtime_calculated_metrics, legacy_aliases, annex122_governance_kpis, gate_control_metrics, proposed_operating_metrics | retained_from_annex122 / not_declared_or_informational |  |
 | `HOSHIN_RESOURCE_DECISION_LT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `INSPECTION_PLAN_ADHERENCE` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `INSPECTION_QUEUE_AGING` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `INSPECTION_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
-| `IN_PROCESS_REJECT_RATE` | operating_metric | legacy_aliases, gate_control_metrics, proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `IN_PROCESS_REJECT_RATE` | operating_metric | runtime_calculated_metrics, legacy_aliases, gate_control_metrics, proposed_operating_metrics | retained / not_declared_or_informational |  |
 | `JOB_COST_ACCURACY` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `KPI_RED_ACTION_CLOSURE` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `KPI_REGISTRY_DRIFT_COUNT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
@@ -273,6 +286,9 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 | `MSA_READINESS` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `MTBF` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
 | `MTTR` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `NCR_3D_RESPONSE_SLA` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `NCR_4D_PRELIMINARY_SLA` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `NCR_8D_UPDATE_SLA` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
 | `NCR_CAPTURE_COMPLETENESS` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `NEAR_MISS_REPORTING_QUALITY` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `OEE_BOTTLENECK` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
@@ -335,6 +351,7 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 | `POS_TOOL_INVENTORY_ACCURACY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
 | `POS_TOOL_LIFE_ADHERENCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
 | `POS_TOOL_PRESET_ACCURACY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `PROJECT_PLAN_DEVIATION_COMMUNICATION_LT` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
 | `PROMISE_DATE_RISK` | operating_metric | legacy_aliases, dashboard_core_kpis, proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `QUOTE_MARGIN_ACCURACY` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `QUOTE_PACKAGE_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
@@ -345,10 +362,13 @@ Change-control rule: every KPI/metric creation, rename, target/threshold change,
 | `SETUP_FIRST_PASS` | operating_metric | legacy_aliases, gate_control_metrics, proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
 | `SHIFT_HANDOVER_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `SHORTAGE_RECOVERY_OT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `SUBTIER_REQUIREMENT_FLOWDOWN` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `SUPPLIER_RBA_COMPLIANCE_EVIDENCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
 | `SUPPLIER_READINESS` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
 | `THROUGHPUT_PER_CONSTRAINT_HOUR` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
 | `TIMESHEET_EXCEPTION_AGING` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `TOOL_FIXTURE_READY_TO_PLAN` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `TRAINING_AS_CAPA_COUNTER` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
 | `TRAINING_MATRIX_FRESHNESS` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `TRAINING_RECORD_INTEGRITY` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `TRANSACTION_SYNC_RELIABILITY` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
