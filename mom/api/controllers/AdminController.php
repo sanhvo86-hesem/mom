@@ -2316,8 +2316,10 @@ class AdminController extends BaseController
         $proposed   = $body['proposed_overrides'] ?? [];
         $added      = $body['added_kpis'] ?? [];
         $retired    = $body['retired_codes'] ?? [];
+        $profiles   = $body['customer_requirement_profiles'] ?? null;
         if (!is_array($governance) || !is_array($gate) || !is_array($proposed)
-            || !is_array($added) || !is_array($retired)) {
+            || !is_array($added) || !is_array($retired)
+            || ($profiles !== null && !is_array($profiles))) {
             $this->error('invalid_config', 400, 'KPI registry save needs override objects.');
         }
         $nonEmptyGroups = static function (array $g): bool {
@@ -2329,7 +2331,8 @@ class AdminController extends BaseController
             return false;
         };
         if ($governance === [] && $gate === [] && $proposed === []
-            && !$nonEmptyGroups($added) && !$nonEmptyGroups($retired)) {
+            && !$nonEmptyGroups($added) && !$nonEmptyGroups($retired)
+            && $profiles === null) {
             $this->error('invalid_config', 400, 'No KPI changes supplied to save.');
         }
         // P08 — Admin Console must record a change reason for every save (it
@@ -2359,6 +2362,7 @@ class AdminController extends BaseController
                     'proposed_overrides'   => $proposed,
                     'added_kpis'           => $added,
                     'retired_codes'        => $retired,
+                    'customer_requirement_profiles' => $profiles,
                 ],
                 $user,
                 $rawReason,
@@ -2367,6 +2371,7 @@ class AdminController extends BaseController
                 'override_count'   => (int)($result['override_count'] ?? 0),
                 'added_count'      => (int)($result['added_count'] ?? 0),
                 'retired_count'    => (int)($result['retired_count'] ?? 0),
+                'profile_count'    => (int)($result['profile_count'] ?? 0),
                 'annex122_updated' => (bool)($result['annex122_updated'] ?? false),
             ], (string)($user['username'] ?? 'admin'));
             $this->success($result);
