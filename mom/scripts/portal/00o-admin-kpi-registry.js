@@ -41,7 +41,8 @@ var _state = {
   activeView:'overview',
   reason:'',
   /* KPI Library filters (the only view; group + tier are filter chips) */
-  filters:{ process:'', category:'', group:'', tier:'', jd:'', status:'', search:'', retired:'' }
+  filters:{ process:'', category:'', group:'', tier:'', jd:'', status:'', search:'', retired:'',
+    metric_subtype:'', control_intent:'', evaluation_use:'', reward_mode:'', lifecycle_status:'' }
 };
 
 /* A fresh add-KPI form draft. */
@@ -52,7 +53,11 @@ function _newAddForm(){
     cadence:'monthly', direction:'higher_is_better', unit:'percent',
     green_point:'', yellow_point:'', target:'', purpose:'',
     decision_action:'', data_contract_gap:'', target_graduation_condition:'',
-    evidence_source:'', blocking_conditions:'' };
+    evidence_source:'', blocking_conditions:'',
+    // MCS-EXT-1 fields (all optional; empty string preserves legacy add).
+    metric_subtype:'', control_intent:'', measurement_data_type:'',
+    scoring_model_detail:'', evaluation_use:'', reward_mode:'',
+    paired_metric:'', attribution_rule:'', lifecycle_status:'' };
 }
 /* Deep-clone a {governance,gate,proposed} group map. */
 function _cloneGroups(src){
@@ -334,6 +339,7 @@ var _viewDefs = [
   ['data', 'Data Contracts', 'Data Contracts'],
   ['counter', 'Counter/Blockers', 'Counter/Blockers'],
   ['retired', 'Retired/Aliases', 'Retired/Aliases'],
+  ['profiles', 'Hồ sơ Khách', 'Customer Profiles'],
   ['audit', 'Audit/Drift', 'Audit/Drift']
 ];
 
@@ -369,8 +375,109 @@ function _renderActiveView(){
   if(_state.activeView === 'counter') return _renderCounterBlockers();
   if(_state.activeView === 'retired')
     return _metricPanel(_t('Retired / Aliases', 'Retired / Aliases'), _viewRows('retired_metrics'), false);
+  if(_state.activeView === 'profiles') return _renderCustomerProfiles();
   if(_state.activeView === 'audit') return _renderAuditDrift();
   return _renderOverview();
+}
+
+/* P03 — Customer Requirement Profiles view.
+   Read-only browser of customer_requirement_profiles section. Shows each
+   profile's status, applies_when, quality_requirements toggle grid, linked
+   metrics (with click-through to library), gate_coverage (G0-G7 buckets),
+   evidence_pack_required checklist, and unresolved-metric validation findings. */
+function _renderCustomerProfiles(){
+  var cfg = _state.config || {};
+  var profilesRoot = cfg.customer_requirement_profiles || {};
+  var profiles = profilesRoot.profiles || {};
+  var keys = Object.keys(profiles);
+  if(!keys.length){
+    return '<div class="hm-empty">' + _t('Chưa có hồ sơ khách hàng nào được khai báo.', 'No customer requirement profiles declared.') + '</div>';
+  }
+  // Build a code lookup for linked-metric validity badges.
+  var libCodes = {};
+  ((_state.config || {}).library || []).forEach(function(r){
+    libCodes[String(r.canonical_code).toUpperCase()] = true;
+  });
+
+  var head = '<div class="kc-eyebrow">' + _t('Hồ sơ yêu cầu khách hàng', 'Customer Requirement Profiles') + '</div>' +
+    '<h3>' + _t('Hồ sơ Khách hàng (Customer Profiles)', 'Customer Profiles') + '</h3>' +
+    '<p class="kc-mini">' + _esc(profilesRoot.rule || '') + '</p>';
+
+  var cards = keys.map(function(code){
+    var p = profiles[code] || {};
+    var qreq = p.quality_requirements || {};
+    var applies = p.applies_when || {};
+    var linked = p.linked_metrics || [];
+    var gateCov = p.gate_coverage || {};
+    var evidence = p.evidence_pack_required || [];
+    var custCodes = applies.customer_codes || [];
+    var status = String(p.status || '');
+    var statusBadge = '<span class="kc-pill' + (status === 'active' ? ' kc-pill--accent' : '') + '">' + _esc(status || 'unset') + '</span>';
+
+    // Quality requirements toggle grid — boolean values rendered as ✓/✗,
+    // non-boolean (numbers, arrays) rendered as their value.
+    var reqRows = Object.keys(qreq).map(function(k){
+      var v = qreq[k];
+      var disp;
+      if(typeof v === 'boolean'){ disp = v ? '✓' : '✗'; }
+      else if(Array.isArray(v)){ disp = v.join(', '); }
+      else { disp = String(v); }
+      return '<div class="kc-prof-req">' +
+        '<span class="kc-prof-req-key">' + _esc(k) + '</span>' +
+        '<span class="kc-prof-req-val">' + _esc(disp) + '</span></div>';
+    }).join('');
+
+    // Linked metrics with validity badge.
+    var linkedRows = linked.map(function(lc){
+      var ok = libCodes[String(lc).toUpperCase()];
+      return '<span class="kc-pill' + (ok ? ' kc-pill--accent' : '') + '" title="' +
+        (ok ? _esc(_t('Đã có trong registry', 'Resolved in registry')) :
+              _esc(_t('CHƯA có trong registry — chặn bằng P0.14', 'NOT in registry — blocked by P0.14'))) +
+        '">' + _esc(lc) + '</span>';
+    }).join('');
+
+    // Gate coverage G0-G7.
+    var gateRows = ['G0','G1','G2','G3','G4','G5','G6','G7'].map(function(g){
+      var list = Array.isArray(gateCov[g]) ? gateCov[g] : [];
+      return '<div class="kc-prof-gate-row">' +
+        '<span class="kc-prof-gate-key">' + g + '</span>' +
+        '<span class="kc-prof-gate-vals">' + (list.length ? list.map(_esc).join(', ') :
+          '<span class="kc-mini">— ' + _t('chưa có metric', 'no metric') + ' —</span>') + '</span></div>';
+    }).join('');
+
+    var evidenceRows = evidence.map(function(e){
+      return '<li>' + _esc(e) + '</li>';
+    }).join('');
+
+    var unresolved = linked.filter(function(lc){ return !libCodes[String(lc).toUpperCase()]; });
+    var unresolvedBlock = unresolved.length
+      ? '<div class="kc-alert error" style="display:block;margin-top:8px">' +
+        _t('Linked metric chưa resolve trong registry:', 'Unresolved linked metric in registry:') +
+        ' <b>' + unresolved.map(_esc).join(', ') + '</b></div>'
+      : '';
+
+    return '<article class="kc-prof-card">' +
+      '<div class="kc-prof-head"><span class="kc-code">' + _esc(code) + '</span>' +
+      '<span class="kc-prof-name">' + _esc(p.profile_name_vi || p.profile_name || code) + '</span>' +
+      statusBadge + '</div>' +
+      '<div class="kc-prof-meta">' +
+        '<span class="kc-mini">' + _t('Khách áp dụng', 'Applies to customers') + ':</span> ' +
+        (custCodes.length ? custCodes.map(_esc).join(', ') : '<i>' + _t('default', 'default') + '</i>') +
+        (applies.silent_default_forbidden ? ' · <b>' + _t('Không default ngầm', 'No silent default') + '</b>' : '') +
+      '</div>' +
+      unresolvedBlock +
+      '<details><summary>' + _t('Quality requirements', 'Quality requirements') +
+        ' (' + Object.keys(qreq).length + ')</summary><div class="kc-prof-req-grid">' + reqRows + '</div></details>' +
+      '<details><summary>' + _t('Linked metrics', 'Linked metrics') + ' (' + linked.length + ')</summary>' +
+        '<div class="kc-pill-list">' + linkedRows + '</div></details>' +
+      '<details><summary>' + _t('Bao phủ cổng G0–G7', 'Gate coverage G0–G7') + '</summary>' +
+        '<div class="kc-prof-gate-grid">' + gateRows + '</div></details>' +
+      (evidence.length ? '<details><summary>' + _t('Bộ bằng chứng bắt buộc', 'Required evidence pack') +
+        ' (' + evidence.length + ')</summary><ul class="kc-prof-evidence">' + evidenceRows + '</ul></details>' : '') +
+      '</article>';
+  }).join('');
+
+  return head + '<div class="kc-prof-grid">' + cards + '</div>';
 }
 
 function _renderOverview(){
@@ -555,6 +662,12 @@ function _filteredLib(){
     if(f.tier     && r.tier     !== f.tier)     return false;
     if(f.status   && r.calculation_status !== f.status) return false;
     if(f.jd && (r.applicable_jds || []).indexOf(f.jd) < 0) return false;
+    // MCS-EXT-1 filter axes — all optional, only filter when set.
+    if(f.metric_subtype  && r.metric_subtype  !== f.metric_subtype)  return false;
+    if(f.control_intent  && r.control_intent  !== f.control_intent)  return false;
+    if(f.evaluation_use  && r.evaluation_use  !== f.evaluation_use)  return false;
+    if(f.reward_mode     && r.reward_mode     !== f.reward_mode)     return false;
+    if(f.lifecycle_status&& r.lifecycle_status!== f.lifecycle_status)return false;
     if(q){
       var hay = (r.canonical_code + ' ' + (r.name_vi||'') + ' ' + (r.name||'')).toLowerCase();
       if(hay.indexOf(q) < 0) return false;
@@ -568,6 +681,28 @@ function _selOptions(pairs, selected){
     return '<option value="' + _esc(p[0]) + '"' + (p[0] === selected ? ' selected' : '') +
       '>' + _esc(p[1]) + '</option>';
   }).join('');
+}
+
+/* MCS-EXT-1 filter dropdowns — appended to the filter bar.
+   Only render a dropdown if the facet has at least one populated value, so the
+   bar stays clean for orgs that have not yet enriched any metrics. */
+function _mcsExtFilterDropdowns(facets, f){
+  var html = '';
+  var make = function(key, viLabel, enLabel){
+    var counts = facets[key] || {};
+    var keys = Object.keys(counts);
+    if(!keys.length) return '';
+    var opts = [['', _t('— ' + viLabel + ' —', '— ' + enLabel + ' —')]];
+    keys.forEach(function(k){ opts.push([k, k + ' (' + counts[k] + ')']); });
+    return '<select class="kc-input" onchange="_kpiSetFilter(\'' + key + '\',this.value)">' +
+      _selOptions(opts, f[key] || '') + '</select>';
+  };
+  html += make('metric_subtype',   'Mọi metric subtype',   'All metric subtypes');
+  html += make('control_intent',   'Mọi control intent',    'All control intents');
+  html += make('evaluation_use',   'Mọi evaluation use',    'All evaluation uses');
+  html += make('reward_mode',      'Mọi reward mode',        'All reward modes');
+  html += make('lifecycle_status', 'Mọi lifecycle status',  'All lifecycle statuses');
+  return html;
 }
 
 function _renderLibrary(){
@@ -623,6 +758,7 @@ function _renderLibrary(){
       '<select class="kc-input" onchange="_kpiSetFilter(\'jd\',this.value)">' + _selOptions(jdOpts, f.jd) + '</select>' +
       '<select class="kc-input" onchange="_kpiSetFilter(\'status\',this.value)">' + _selOptions(stOpts, f.status) + '</select>' +
       '<select class="kc-input" onchange="_kpiSetFilter(\'retired\',this.value)">' + _selOptions(retOpts, f.retired) + '</select>' +
+      _mcsExtFilterDropdowns(facets, f) +
       '<button class="kc-btn" type="button" onclick="_kpiClearFilters()">' + _t('Xóa lọc', 'Clear') + '</button>' +
     '</div>';
 
@@ -694,9 +830,38 @@ function _renderAddForm(){
   });
 
   function row(label, control){ return _field(label, control); }
-  var html = '<div class="kc-addform"><h3>+ ' + _t('Đề xuất metric mới', 'Propose a new metric') + '</h3>' +
-    '<p class="kc-mini">' + _t('Metric mới luôn ở trạng thái staged data contract. Console không được tạo runtime, công thức, hoặc scoring chính thức.',
-      'New metrics always stay staged data contract. The console cannot create runtime logic, formula truth, or official scoring.') + '</p>' +
+
+  // MCS-EXT-1 wizard step indicator. The add form remains a single page (faster
+  // for power users) but the 8 conceptual steps from registry.wizard_steps are
+  // shown as a progress strip so admins know which axis each field belongs to.
+  // Steps light up as their primary field is filled.
+  var ext = cfg.metric_control_schema_extension || {};
+  var steps = ext.wizard_steps || [
+    {step:1, name:'problem_type'}, {step:2, name:'metric_subtype'},
+    {step:3, name:'measurement_data_type'}, {step:4, name:'scoring_model'},
+    {step:5, name:'data_contract_evidence'}, {step:6, name:'evaluation_reward_weight'},
+    {step:7, name:'role_assignments'}, {step:8, name:'counter_blocker_lifecycle'}
+  ];
+  var stepDone = function(s){
+    if(s.name === 'problem_type')          return !!a.control_intent;
+    if(s.name === 'metric_subtype')        return !!a.metric_subtype || !!a.group;
+    if(s.name === 'measurement_data_type') return !!a.measurement_data_type || !!a.unit;
+    if(s.name === 'scoring_model')         return !!a.scoring_model_detail || !!a.green_point;
+    if(s.name === 'data_contract_evidence')return !!a.data_contract_gap || !!a.evidence_source;
+    if(s.name === 'evaluation_reward_weight') return !!a.evaluation_use || !!a.reward_mode;
+    if(s.name === 'role_assignments')      return !!a.owner_role;
+    if(s.name === 'counter_blocker_lifecycle') return !!(a.counter_metric && a.counter_metric.name_vi) || !!a.blocking_conditions;
+    return false;
+  };
+  var wizStrip = '<div class="kc-wiz-steps">' + steps.map(function(s){
+    var cls = stepDone(s) ? 'kc-wiz-step kc-wiz-step--done' : 'kc-wiz-step';
+    return '<span class="' + cls + '">' + s.step + '. ' + _esc(s.name.replace(/_/g, ' ')) + '</span>';
+  }).join('') + '</div>';
+
+  var html = '<div class="kc-addform"><h3>+ ' + _t('Đề xuất metric mới (wizard)', 'Propose a new metric (wizard)') + '</h3>' +
+    wizStrip +
+    '<p class="kc-mini">' + _t('Metric mới luôn ở trạng thái staged data contract. Console không được tạo runtime, công thức, hoặc scoring chính thức. Điền đủ các bước MCS-EXT để metric có ngữ nghĩa kiểm soát rõ ràng (control_intent, metric_subtype, scoring_model, evaluation_use, reward_mode).',
+      'New metrics always stay staged data contract. The console cannot create runtime logic, formula truth, or official scoring. Fill the MCS-EXT steps so the metric carries explicit control semantics (control_intent, metric_subtype, scoring_model, evaluation_use, reward_mode).') + '</p>' +
     '<div class="kc-grid">' +
     row(_t('Nhóm', 'Group'),
       '<select class="kc-input" onchange="_kpiAddField(\'group\',this.value)">' + _selOptions(grpOpts, a.group) + '</select>') +
@@ -750,7 +915,8 @@ function _renderAddForm(){
     _field(_t('Quyết định khi lệch ngưỡng', 'Decision on threshold breach'),
       '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'decision_action\',this.value)">' + _esc(a.decision_action) + '</textarea>') +
     _field(_t('Blocking conditions (mỗi dòng một điều kiện)', 'Blocking conditions (one per line)'),
-      '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'blocking_conditions\',this.value)">' + _esc(a.blocking_conditions) + '</textarea>');
+      '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'blocking_conditions\',this.value)">' + _esc(a.blocking_conditions) + '</textarea>') +
+    _renderMcsExtAddBlock(a, ext);
 
   var b = _ragBands({ green_point:parseFloat(a.green_point), yellow_point:parseFloat(a.yellow_point),
     direction:a.direction, unit:a.unit });
@@ -988,7 +1154,123 @@ function _renderEditCard(m, section, inline){
       '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'governance\',\'' + c(code) + '\',\'action_reference\',this.value)">' +
       c(_val(m,section,'action_reference')) + '</textarea>');
   }
+
+  // Audit fix (Prompt 01 §1.4): blocking_conditions was editable only on add.
+  // Expose on edit too — multi-line list, one condition per line.
+  var blkRaw = _val(m, section, 'blocking_conditions');
+  var blkText = '';
+  if(blkRaw && blkRaw.length){
+    blkText = blkRaw.join('\n');
+  } else if(m.blocking_conditions && m.blocking_conditions.length){
+    blkText = m.blocking_conditions.join('\n');
+  }
+  html += '<div class="kc-blocker-edit">' +
+    _field(_t('Điều kiện chặn (mỗi dòng một mục)', 'Blocking conditions (one per line)'),
+      '<textarea class="kc-input kc-ta" rows="3" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'blocking_conditions\',this.value)">' +
+      _esc(blkText) + '</textarea>') +
+    '</div>';
+
+  // MCS-EXT-1 block (Metric Control Schema extension fields).
+  // Collapsed by default — admin opens it explicitly to enrich a metric.
+  html += _renderMcsExtBlock(m, section, code);
+
   return html + '</article>';
+}
+
+/* MCS-EXT-1 fields block for the Add wizard.
+   Surfaces the 8-step extension axes inline so a new metric is born with
+   complete control semantics. All fields optional — defaults preserve
+   legacy behavior. */
+function _renderMcsExtAddBlock(a, ext){
+  if(!ext || !ext.metric_subtypes){ return ''; } // schema not yet loaded
+  var enumSel = function(field, current, options){
+    var opts = ['<option value="">— ' + _t('chưa đặt', 'unset') + ' —</option>'];
+    (options || []).forEach(function(opt){
+      opts.push('<option value="' + _esc(opt) + '"' + (opt === current ? ' selected' : '') + '>' + _esc(opt) + '</option>');
+    });
+    return '<select class="kc-input" onchange="_kpiAddField(\'' + field + '\',this.value)">' + opts.join('') + '</select>';
+  };
+  var scoringOpts = ext.scoring_model || [];
+  if(a.metric_subtype && ext.scoring_model_by_metric_subtype && ext.scoring_model_by_metric_subtype[a.metric_subtype]){
+    scoringOpts = ext.scoring_model_by_metric_subtype[a.metric_subtype];
+  }
+  var grid = '<div class="kc-grid">' +
+    _field(_t('Ý đồ kiểm soát (control_intent) — bước 1', 'Control intent — step 1'),
+      enumSel('control_intent', a.control_intent || '', ext.control_intent)) +
+    _field(_t('Metric subtype — bước 2', 'Metric subtype — step 2'),
+      enumSel('metric_subtype', a.metric_subtype || '', ext.metric_subtypes)) +
+    _field(_t('Kiểu dữ liệu đo — bước 3', 'Measurement data type — step 3'),
+      enumSel('measurement_data_type', a.measurement_data_type || '', ext.measurement_data_type)) +
+    _field(_t('Mô hình tính điểm — bước 4', 'Scoring model — step 4'),
+      enumSel('scoring_model_detail', a.scoring_model_detail || '', scoringOpts)) +
+    _field(_t('Mục đích đánh giá — bước 6a', 'Evaluation use — step 6a'),
+      enumSel('evaluation_use', a.evaluation_use || '', ext.evaluation_use)) +
+    _field(_t('Chế độ thưởng — bước 6b', 'Reward mode — step 6b'),
+      enumSel('reward_mode', a.reward_mode || '', ext.reward_mode)) +
+    _field(_t('Vòng đời — bước 8', 'Lifecycle status — step 8'),
+      enumSel('lifecycle_status', a.lifecycle_status || '', ext.lifecycle_status)) +
+    _field(_t('KPI ghép cặp — bước 8', 'Paired metric — step 8'),
+      '<input class="kc-input" type="text" value="' + _esc(a.paired_metric || '') +
+      '" placeholder="VD: FPY" oninput="_kpiAddField(\'paired_metric\',this.value)">') +
+    '</div>';
+  return '<details class="kc-mcs-ext" open><summary>⚙ ' +
+    _t('Metric Control Schema (MCS-EXT-1) — các bước mở rộng',
+       'Metric Control Schema (MCS-EXT-1) — extension steps') + '</summary>' + grid + '</details>';
+}
+
+/* MCS-EXT-1 progressive enrichment block — all fields optional.
+   Enum dropdowns read live from _state.config.metric_control_schema_extension
+   so the registry stays the single source of enum membership. */
+function _renderMcsExtBlock(m, section, code){
+  var c = function(s){ return _esc(s == null ? '' : s); };
+  var ext = (_state.config && _state.config.metric_control_schema_extension) || {};
+  if(!ext || !ext.metric_subtypes){ return ''; } // schema not yet loaded
+  var subtype = _val(m, section, 'metric_subtype') || m.metric_subtype || '';
+  var intent  = _val(m, section, 'control_intent') || m.control_intent || '';
+  var measure = _val(m, section, 'measurement_data_type') || m.measurement_data_type || '';
+  var scoring = _val(m, section, 'scoring_model_detail') || m.scoring_model_detail || '';
+  var evalUse = _val(m, section, 'evaluation_use') || m.evaluation_use || '';
+  var reward  = _val(m, section, 'reward_mode') || m.reward_mode || '';
+  var paired  = _val(m, section, 'paired_metric') || m.paired_metric || '';
+  var attrib  = _val(m, section, 'attribution_rule') || m.attribution_rule || '';
+  var lifecyc = _val(m, section, 'lifecycle_status') || m.lifecycle_status || '';
+  var anyExt  = !!(subtype || intent || measure || scoring || evalUse || reward || paired || attrib || lifecyc);
+  var openAttr = anyExt ? ' open' : '';
+
+  // Dynamic scoring options narrowed to subtype if available.
+  var scoringOpts = ext.scoring_model || [];
+  if(subtype && ext.scoring_model_by_metric_subtype && ext.scoring_model_by_metric_subtype[subtype]){
+    scoringOpts = ext.scoring_model_by_metric_subtype[subtype];
+  }
+  var enumSel = function(field, current, options){
+    var opts = ['<option value="">— ' + _t('chưa đặt', 'unset') + ' —</option>'];
+    (options || []).forEach(function(opt){
+      opts.push('<option value="' + _esc(opt) + '"' + (opt === current ? ' selected' : '') + '>' + _esc(opt) + '</option>');
+    });
+    return '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'' + field + '\',this.value)">' +
+      opts.join('') + '</select>';
+  };
+
+  var body = '<div class="kc-grid">' +
+    _field(_t('Phân loại con (metric_subtype)', 'Metric subtype'), enumSel('metric_subtype', subtype, ext.metric_subtypes)) +
+    _field(_t('Ý đồ kiểm soát (control_intent)', 'Control intent'), enumSel('control_intent', intent, ext.control_intent)) +
+    _field(_t('Kiểu dữ liệu đo', 'Measurement data type'), enumSel('measurement_data_type', measure, ext.measurement_data_type)) +
+    _field(_t('Mô hình tính điểm', 'Scoring model'), enumSel('scoring_model_detail', scoring, scoringOpts)) +
+    _field(_t('Mục đích đánh giá', 'Evaluation use'), enumSel('evaluation_use', evalUse, ext.evaluation_use)) +
+    _field(_t('Chế độ thưởng', 'Reward mode'), enumSel('reward_mode', reward, ext.reward_mode)) +
+    _field(_t('Vòng đời', 'Lifecycle status'), enumSel('lifecycle_status', lifecyc, ext.lifecycle_status)) +
+    _field(_t('KPI ghép cặp (paired_metric)', 'Paired metric'),
+      '<input class="kc-input" type="text" value="' + c(paired) +
+      '" placeholder="VD: FPY" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'paired_metric\',this.value)">') +
+    '</div>' +
+    _field(_t('Quy tắc quy trách nhiệm (attribution_rule)', 'Attribution rule'),
+      '<textarea class="kc-input kc-ta" rows="2" placeholder="rule:plan_adherence_breakdown_by_cause" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'attribution_rule\',this.value)">' +
+      c(attrib) + '</textarea>');
+
+  return '<details class="kc-mcs-ext"' + openAttr + '>' +
+    '<summary>⚙ ' + _t('Metric Control Schema (MCS-EXT-1) — mở rộng', 'Metric Control Schema (MCS-EXT-1) — extended attributes') +
+    (anyExt ? ' <span class="kc-pill kc-pill--accent">' + _t('đã có dữ liệu', 'has data') + '</span>' : '') +
+    '</summary>' + body + '</details>';
 }
 
 function _field(label, control){
@@ -1215,6 +1497,45 @@ function _styleBlock(){
   '.kc-sc-fill{display:block;height:100%;background:var(--accent)}' +
   '.kc-sc-w{flex:0 0 40px;font-size:12px;font-weight:700;color:var(--accent);text-align:right}' +
   '.kc-sc-why{flex:1}' +
+  /* MCS-EXT-1 styling — Graphics Authority tokens only */
+  '.kc-mcs-ext{border:1px solid var(--border);border-radius:8px;padding:8px 10px;' +
+    'background:var(--surface-2);margin-top:8px}' +
+  '.kc-mcs-ext>summary{font-size:12px;font-weight:700;color:var(--text-2);' +
+    'text-transform:uppercase;letter-spacing:.3px;cursor:pointer;outline:none}' +
+  '.kc-mcs-ext[open]{background:var(--surface)}' +
+  '.kc-mcs-ext>div{margin-top:8px}' +
+  '.kc-blocker-edit{border:1px solid var(--warning);border-radius:8px;padding:8px 10px;' +
+    'background:var(--warning-soft);margin-top:8px}' +
+  '.kc-pill--accent{background:var(--accent-soft);color:var(--accent);' +
+    'border:1px solid var(--accent)}' +
+  '.kc-wiz-steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}' +
+  '.kc-wiz-step{font-size:11px;border:1px solid var(--border);border-radius:999px;' +
+    'padding:3px 8px;color:var(--text-3);background:var(--surface)}' +
+  '.kc-wiz-step--active{border-color:var(--accent);color:var(--accent);' +
+    'background:var(--accent-soft);font-weight:700}' +
+  '.kc-wiz-step--done{border-color:var(--success);color:var(--success)}' +
+  /* P03 — Customer profile card styles */
+  '.kc-prof-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));' +
+    'gap:12px;margin-top:10px}' +
+  '.kc-prof-card{border:1px solid var(--border);border-radius:10px;padding:12px;' +
+    'background:var(--surface);display:flex;flex-direction:column;gap:8px}' +
+  '.kc-prof-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}' +
+  '.kc-prof-name{font-weight:700;color:var(--text-1);flex:1}' +
+  '.kc-prof-meta{font-size:12px;color:var(--text-2)}' +
+  '.kc-prof-card details{border:1px solid var(--border);border-radius:8px;' +
+    'padding:6px 10px;background:var(--surface-2)}' +
+  '.kc-prof-card details summary{font-size:12px;font-weight:700;color:var(--text-2);' +
+    'cursor:pointer;outline:none;text-transform:uppercase;letter-spacing:.3px}' +
+  '.kc-prof-req-grid{display:grid;grid-template-columns:1fr auto;gap:4px 12px;margin-top:6px;' +
+    'font-size:12px}' +
+  '.kc-prof-req{display:contents}' +
+  '.kc-prof-req-key{color:var(--text-2)}' +
+  '.kc-prof-req-val{color:var(--text-1);font-weight:600;text-align:right}' +
+  '.kc-prof-gate-grid{display:flex;flex-direction:column;gap:4px;margin-top:6px;font-size:12px}' +
+  '.kc-prof-gate-row{display:flex;gap:8px;align-items:flex-start}' +
+  '.kc-prof-gate-key{flex:0 0 30px;font-weight:700;color:var(--accent)}' +
+  '.kc-prof-gate-vals{flex:1;color:var(--text-1)}' +
+  '.kc-prof-evidence{margin:6px 0 0;padding-left:18px;font-size:12px;color:var(--text-1)}' +
   '</style>';
 }
 
@@ -1275,6 +1596,11 @@ function _addSubmit(){
     evidence_source:a.evidence_source || '',
     blocking_conditions:String(a.blocking_conditions || '').split(/\n+/).map(function(x){ return x.trim(); }).filter(Boolean)
   };
+  // MCS-EXT-1 fields — pass through only when explicitly set so the row
+  // stays compatible with legacy validators.
+  ['metric_subtype','control_intent','measurement_data_type','scoring_model_detail',
+   'evaluation_use','reward_mode','paired_metric','attribution_rule','lifecycle_status'
+  ].forEach(function(k){ if(a[k]) row[k] = a[k]; });
   if(!_state.addedDraft[a.group]) _state.addedDraft[a.group] = [];
   _state.addedDraft[a.group].push(row);
   _state.addForm = null;
@@ -1300,7 +1626,8 @@ window._kpiSetView = function(view){
   _render();
 };
 window._kpiClearFilters = function(){
-  _state.filters = { process:'', category:'', group:'', tier:'', jd:'', status:'', search:'', retired:'' };
+  _state.filters = { process:'', category:'', group:'', tier:'', jd:'', status:'', search:'', retired:'',
+    metric_subtype:'', control_intent:'', evaluation_use:'', reward_mode:'', lifecycle_status:'' };
   _render();
 };
 /* Toggle the inline editor for one library card (only one open at a time). */
