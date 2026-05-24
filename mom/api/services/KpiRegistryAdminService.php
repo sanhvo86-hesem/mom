@@ -28,6 +28,9 @@ final class KpiRegistryAdminService
     private const OVERLAY_RELATIVE    = 'registry/kpi-authority-registry.runtime.json';
     private const ANNEX122_RELATIVE   = 'mom/docs/operations/references/01-ANNEX-100/'
         . '12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html';
+    private const ANNEX128_RELATIVE   = 'mom/docs/operations/references/01-ANNEX-100/'
+        . '12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html';
+    private const KPI_MATRIX_REPORT_RELATIVE = '_reports/kpi/report-kpi-system-matrix-2026-04-19.json';
 
     /** Role code → [JD href relative to ANNEX-122, hover title]. */
     private const ROLE_LINKS = [
@@ -244,6 +247,7 @@ final class KpiRegistryAdminService
                 ? $seed['dashboard_render_contract'] : new \stdClass(),
             'manual_input_contract' => is_array($seed['manual_input_contract'] ?? null)
                 ? $seed['manual_input_contract'] : new \stdClass(),
+            'admin_console_contract' => $this->adminConsoleContract(),
             'all_metric_codes'  => array_keys($allCodes),
             'governance_kpis'   => $governance,
             'gate_control_metrics'      => $gate,
@@ -621,6 +625,9 @@ final class KpiRegistryAdminService
                 . ' (reward_mode=' . $rewardMode . ' but calculation_status=' . $calcStatus . ')'
             );
         }
+        if ($rewardMode === 'bonus_pool_candidate') {
+            $this->validateBonusPoolCandidateContract($row, $code);
+        }
 
         if (!$adopted) {
             return;
@@ -891,6 +898,50 @@ final class KpiRegistryAdminService
         return $this->hasText($row, 'anti_gaming_intent');
     }
 
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function validateBonusPoolCandidateContract(array $row, string $code): void
+    {
+        if ((string) ($row['calculation_status'] ?? '') !== 'runtime_calculated') {
+            throw new RuntimeException('kpi_registry_mco_bonus_requires_runtime:' . $code);
+        }
+        if (!$this->hasText($row, 'attribution_rule')) {
+            throw new RuntimeException('kpi_registry_mco_bonus_missing_attribution:' . $code);
+        }
+        if (!$this->hasCounterIntent($row)) {
+            throw new RuntimeException('kpi_registry_mco_bonus_missing_counter_metric:' . $code);
+        }
+        if (!$this->hasNonEmptyList($row['blocking_conditions'] ?? null)) {
+            throw new RuntimeException('kpi_registry_mco_bonus_missing_blocking_conditions:' . $code);
+        }
+        if (!$this->hasRewardSamplePolicy($row)) {
+            throw new RuntimeException('kpi_registry_mco_bonus_missing_min_sample:' . $code);
+        }
+        if (array_key_exists('calibration_required', $row) && $row['calibration_required'] === false) {
+            throw new RuntimeException('kpi_registry_mco_bonus_calibration_disabled:' . $code);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function hasRewardSamplePolicy(array $row): bool
+    {
+        foreach ([
+            ['sample_policy', 'min_n_score'],
+            ['formula', 'min_sample'],
+            ['thresholds', 'min_sample'],
+        ] as [$objectKey, $valueKey]) {
+            $object = $row[$objectKey] ?? null;
+            if (is_array($object) && is_numeric($object[$valueKey] ?? null)
+                && (float) $object[$valueKey] > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private function roleAssignmentsCarryControllability(mixed $value): bool
     {
         if (!is_array($value)) {
@@ -1094,6 +1145,81 @@ final class KpiRegistryAdminService
     }
 
     /**
+     * P10 Admin Console contract. Kept backend-side so the frontend renders
+     * the wizard and save guardrails from an explicit contract instead of
+     * relying only on UI copy.
+     *
+     * @return array<string, mixed>
+     */
+    private function adminConsoleContract(): array
+    {
+        return [
+            'contract_id' => 'KPI-ADMIN-CONSOLE-DYNAMIC-UX-P10',
+            'wizard_sections' => [
+                'problem_control_intent',
+                'metric_subtype',
+                'measurement_data_type',
+                'scoring_model',
+                'data_contract_evidence',
+                'evaluation_reward_weight',
+                'role_assignments',
+                'counter_blocker_lifecycle',
+            ],
+            'blocked_save_fields' => [
+                'formula',
+                'data_source',
+                'runtime_calculator',
+                'calculation_status_runtime_promotion',
+                'source_table',
+                'source_column',
+            ],
+            'save_policy' => [
+                'console_added_metrics' => 'staged_data_contract + pilot lifecycle only; no runtime promotion from Admin Console',
+                'runtime_metric_formula' => 'read_only',
+                'runtime_metric_source_table' => 'read_only',
+                'reward_enablement' => 'blocked unless backend guardrails pass runtime/counter/blocker/attribution/min-sample rules',
+                'audit_reason' => 'required_min_4_chars_max_500_chars',
+            ],
+            'dynamic_validation_rules' => [
+                'spc_capability_metric' => [
+                    'sample_policy.min_n_score >= 25',
+                    'sample_policy.internal_n >= 50',
+                    'sample_policy.customer_grade_n >= 100',
+                    'stability_required=true',
+                    'gage_validity_required=true',
+                    'data_contract_gap or runtime CTQ/spec/gage contract required',
+                ],
+                'gate_control_metric' => [
+                    'gate required',
+                    'linked_cdr required',
+                    'gate_pass_condition required',
+                    'hold_release_rule required',
+                    'reward_mode in blocker_only|not_rewardable',
+                ],
+                'composite_readiness_index' => [
+                    'components required',
+                    'component weights sum to 100',
+                ],
+                'bonus_pool_candidate' => [
+                    'calculation_status=runtime_calculated',
+                    'attribution_rule required',
+                    'counter_metric intent required',
+                    'blocking_conditions required',
+                    'sample_policy.min_n_score or formula.min_sample required',
+                    'calibration must not be explicitly disabled',
+                ],
+                'health_indicator' => [
+                    'reward_mode=not_rewardable',
+                    'scorecard_contributes_to_reward=false',
+                ],
+                'customer_specific_requirement' => [
+                    'profile link or applicability rule required',
+                ],
+            ],
+        ];
+    }
+
+    /**
      * @param array<int, array<string, mixed>> $library
      * @param array<string, mixed>             $seed
      * @return array<string, mixed>
@@ -1194,6 +1320,19 @@ final class KpiRegistryAdminService
             }
         }
 
+        $bscPanel = $this->bscIntegrityPanel($seed, $library);
+        $lamPanel = $this->lamCoveragePanel($seed);
+        $cpkPanel = $this->cpkPolicyPanel($library);
+        $severityPanel = $this->severityBonusPanel($seed, $library);
+        $annex128Panel = $this->annex128Panel($seed);
+        foreach ([$bscPanel, $lamPanel, $cpkPanel, $severityPanel, $annex128Panel] as $panel) {
+            foreach (($panel['findings'] ?? []) as $finding) {
+                if (is_array($finding)) {
+                    $findings[] = $finding;
+                }
+            }
+        }
+
         $rank = ['P0' => 0, 'P1' => 1, 'P2' => 2, 'P3' => 3];
         usort($findings, static fn(array $a, array $b): int
             => ($rank[(string) $a['priority']] ?? 3) <=> ($rank[(string) $b['priority']] ?? 3));
@@ -1249,7 +1388,288 @@ final class KpiRegistryAdminService
                 'finding_count' => count($findings),
                 'findings' => array_slice($findings, 0, 200),
             ],
+            'integrity_panels' => [
+                'bsc_model' => $bscPanel,
+                'lam_profile' => $lamPanel,
+                'cpk_sample_policy' => $cpkPanel,
+                'severity_bonus_simulation' => $severityPanel,
+                'annex128_matrix' => $annex128Panel,
+            ],
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $seed
+     * @param array<int, array<string, mixed>> $library
+     * @return array<string, mixed>
+     */
+    private function bscIntegrityPanel(array $seed, array $library): array
+    {
+        $model = is_array($seed['scorecard_operating_model'] ?? null) ? $seed['scorecard_operating_model'] : [];
+        $modelId = (string) ($model['model_id'] ?? '');
+        $core = is_array($seed['executive_scorecard'] ?? null) ? $seed['executive_scorecard'] : [];
+        $items = is_array($model['executive_scorecard_items'] ?? null) ? $model['executive_scorecard_items'] : [];
+        $weightTotal = 0.0;
+        $stagedCore = [];
+        $byCode = [];
+        foreach ($library as $row) {
+            $code = strtoupper((string) ($row['canonical_code'] ?? ''));
+            if ($code !== '') {
+                $byCode[$code] = $row;
+            }
+        }
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $code = strtoupper((string) ($item['canonical_code'] ?? ''));
+            $weightTotal += (float) ($item['scorecard_weight_pct'] ?? 0);
+            $status = (string) ($byCode[$code]['calculation_status'] ?? $item['calculation_status'] ?? '');
+            if ($status !== 'runtime_calculated' && $status !== 'manual_governed') {
+                $stagedCore[] = $code;
+            }
+        }
+        $findings = [];
+        if (!str_contains($modelId, 'LEAN-7')) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'BSC_MODEL_NOT_LEAN_7',
+                'metric_code' => 'executive_scorecard',
+                'message' => 'BSC operating model id does not declare LEAN-7.',
+            ];
+        }
+        if (count($core) !== 7 || count($items) !== 7) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'BSC_CORE_COUNT_DRIFT',
+                'metric_code' => 'executive_scorecard',
+                'message' => 'Executive scored core must contain exactly 7 metrics.',
+            ];
+        }
+        if (abs($weightTotal - 100.0) > 0.01) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'BSC_WEIGHT_TOTAL_NOT_100',
+                'metric_code' => 'executive_scorecard',
+                'message' => 'Executive scored-core weights do not sum to 100.',
+            ];
+        }
+        if ($stagedCore !== []) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'BSC_STAGED_CORE_METRIC',
+                'metric_code' => implode(',', $stagedCore),
+                'message' => 'Staged metric appears in the scored BSC core.',
+            ];
+        }
+
+        return [
+            'status' => $this->panelStatusFromFindings($findings),
+            'model_id' => $modelId,
+            'core_count' => count($core),
+            'item_count' => count($items),
+            'weight_total' => $weightTotal,
+            'staged_core_metrics' => $stagedCore,
+            'findings' => $findings,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $seed
+     * @return array<string, mixed>
+     */
+    private function lamCoveragePanel(array $seed): array
+    {
+        $profiles = $seed['customer_requirement_profiles']['profiles'] ?? [];
+        $profile = is_array($profiles['LAM_SEMSYSCO'] ?? null) ? $profiles['LAM_SEMSYSCO'] : [];
+        $coverage = is_array($profile['gate_coverage'] ?? null) ? $profile['gate_coverage'] : [];
+        $byGate = [];
+        $empty = [];
+        foreach (['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'] as $gate) {
+            $metrics = is_array($coverage[$gate] ?? null) ? array_values($coverage[$gate]) : [];
+            $byGate[$gate] = count($metrics);
+            if ($metrics === []) {
+                $empty[] = $gate;
+            }
+        }
+        $findings = [];
+        if ($profile === []) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'LAM_PROFILE_MISSING',
+                'metric_code' => 'LAM_SEMSYSCO',
+                'message' => 'LAM/Semsysco customer requirement profile is missing.',
+            ];
+        } elseif ($empty !== []) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'LAM_GATE_COVERAGE_EMPTY',
+                'metric_code' => implode(',', $empty),
+                'message' => 'LAM/Semsysco gate coverage has empty gates.',
+            ];
+        }
+
+        return [
+            'status' => $this->panelStatusFromFindings($findings),
+            'profile_id' => (string) ($profile['profile_id'] ?? 'LAM_SEMSYSCO'),
+            'linked_metric_count' => is_array($profile['linked_metrics'] ?? null) ? count($profile['linked_metrics']) : 0,
+            'gate_counts' => $byGate,
+            'empty_gates' => $empty,
+            'findings' => $findings,
+        ];
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $library
+     * @return array<string, mixed>
+     */
+    private function cpkPolicyPanel(array $library): array
+    {
+        $checked = 0;
+        $gaps = [];
+        foreach ($library as $row) {
+            $subtype = (string) ($row['metric_subtype'] ?? '');
+            $scoring = (string) ($row['scoring_model_detail'] ?? '');
+            if ($subtype !== 'spc_capability_metric'
+                && !in_array($scoring, ['spc_control_chart', 'spec_limit_capability'], true)) {
+                continue;
+            }
+            $checked++;
+            $sample = is_array($row['sample_policy'] ?? null) ? $row['sample_policy'] : [];
+            if (!isset($sample['min_n_score']) || !is_numeric($sample['min_n_score'])) {
+                $gaps[] = (string) ($row['canonical_code'] ?? '');
+            }
+        }
+        $findings = [];
+        if ($gaps !== []) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'CPK_SAMPLE_POLICY_GAP',
+                'metric_code' => implode(',', $gaps),
+                'message' => 'Cpk/SPC capability metrics must declare sample_policy.min_n_score.',
+            ];
+        }
+        return [
+            'status' => $this->panelStatusFromFindings($findings),
+            'checked_metric_count' => $checked,
+            'gap_codes' => $gaps,
+            'findings' => $findings,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $seed
+     * @param array<int, array<string, mixed>> $library
+     * @return array<string, mixed>
+     */
+    private function severityBonusPanel(array $seed, array $library): array
+    {
+        $bonus = is_array($seed['bonus_simulation_model'] ?? null) ? $seed['bonus_simulation_model'] : [];
+        $severity = is_array($seed['customer_ncr_severity_matrix'] ?? null) ? $seed['customer_ncr_severity_matrix'] : [];
+        $required = [
+            'CUSTOMER_NCR_SEVERITY_SCORE',
+            'NCR_3D_RESPONSE_SLA',
+            'NCR_4D_PRELIMINARY_SLA',
+            'NCR_8D_UPDATE_SLA',
+            'CUSTOMER_ACCEPTED_8D_CLOSURE_RATE',
+        ];
+        $known = [];
+        foreach ($library as $row) {
+            $code = strtoupper((string) ($row['canonical_code'] ?? ''));
+            if ($code !== '') {
+                $known[$code] = true;
+            }
+        }
+        $missing = array_values(array_filter($required, static fn(string $code): bool => !isset($known[$code])));
+        $findings = [];
+        if (($bonus['simulation_only'] ?? null) !== true) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'BONUS_SIMULATION_NOT_SIM_ONLY',
+                'metric_code' => 'bonus_simulation_model',
+                'message' => 'Bonus simulation model must remain simulation_only=true.',
+            ];
+        }
+        if ($severity === []) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'CUSTOMER_NCR_SEVERITY_MATRIX_MISSING',
+                'metric_code' => 'customer_ncr_severity_matrix',
+                'message' => 'Customer NCR severity matrix is missing.',
+            ];
+        }
+        if ($missing !== []) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'CUSTOMER_NCR_REQUIRED_METRIC_MISSING',
+                'metric_code' => implode(',', $missing),
+                'message' => 'Customer NCR severity/SLA required metrics are missing from the library.',
+            ];
+        }
+        return [
+            'status' => $this->panelStatusFromFindings($findings),
+            'simulation_only' => (bool) ($bonus['simulation_only'] ?? false),
+            'severity_levels' => array_keys($severity),
+            'required_metric_count' => count($required),
+            'missing_required_metrics' => $missing,
+            'findings' => $findings,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $seed
+     * @return array<string, mixed>
+     */
+    private function annex128Panel(array $seed): array
+    {
+        $version = (string) ($seed['version'] ?? '');
+        $annexPath = $this->rootDir . '/' . self::ANNEX128_RELATIVE;
+        $reportPath = $this->rootDir . '/' . self::KPI_MATRIX_REPORT_RELATIVE;
+        $report = is_file($reportPath) ? FileHelper::readJson($reportPath) : null;
+        $reportVersion = is_array($report) ? (string) ($report['registry_version'] ?? '') : '';
+        $findings = [];
+        if (!is_file($annexPath)) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'ANNEX128_MISSING',
+                'metric_code' => 'ANNEX-128',
+                'message' => 'ANNEX-128 generated matrix HTML is missing.',
+            ];
+        }
+        if ($reportVersion === '' || $reportVersion !== $version) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'ANNEX128_REPORT_STALE',
+                'metric_code' => 'ANNEX-128',
+                'message' => 'KPI system-matrix audit report registry_version does not match the current registry.',
+            ];
+        }
+        return [
+            'status' => $this->panelStatusFromFindings($findings),
+            'annex128_path' => self::ANNEX128_RELATIVE,
+            'report_path' => self::KPI_MATRIX_REPORT_RELATIVE,
+            'registry_version' => $version,
+            'report_registry_version' => $reportVersion,
+            'annex_exists' => is_file($annexPath),
+            'findings' => $findings,
+        ];
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $findings
+     */
+    private function panelStatusFromFindings(array $findings): string
+    {
+        $status = 'PASS';
+        foreach ($findings as $finding) {
+            if (($finding['priority'] ?? '') === 'P0') {
+                return 'FAIL';
+            }
+            if (($finding['priority'] ?? '') === 'P1') {
+                $status = 'WARN';
+            }
+        }
+        return $status;
     }
 
     /**

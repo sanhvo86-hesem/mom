@@ -302,6 +302,19 @@ function _setCounter(section, code, key, value){
 	  });
 	  return has ? total : null;
 	}
+	function _hasRewardMinSample(row){
+	  var direct = parseFloat(row.sample_min_n_score);
+	  if(!isNaN(direct) && direct > 0) return true;
+	  var sample = row.sample_policy || {};
+	  var sampleN = parseFloat(sample.min_n_score);
+	  if(!isNaN(sampleN) && sampleN > 0) return true;
+	  var formula = row.formula || {};
+	  var formulaN = parseFloat(formula.min_sample);
+	  if(!isNaN(formulaN) && formulaN > 0) return true;
+	  var thresholds = row.thresholds || {};
+	  var thresholdN = parseFloat(thresholds.min_sample);
+	  return !isNaN(thresholdN) && thresholdN > 0;
+	}
 	function _mcoRowErrors(row, requireComplete){
 	  var e = [];
 	  var subtype = row.metric_subtype || '';
@@ -315,6 +328,15 @@ function _setCounter(section, code, key, value){
 	    e.push(_t('Scoring model không phù hợp metric_subtype.', 'Scoring model does not match metric_subtype.'));
 	  if(['team_reward_candidate','role_review_input','bonus_pool_candidate'].indexOf(reward) >= 0 && status !== 'runtime_calculated')
 	    e.push(_t('Metric staged/manual không được rewardable.', 'Staged/manual metric cannot be rewardable.'));
+	  if(reward === 'bonus_pool_candidate'){
+	    var cmBonus = row.counter_metric || {};
+	    if(status !== 'runtime_calculated') e.push(_t('Bonus pool chỉ được bật khi runtime_calculated.', 'Bonus pool requires runtime_calculated.'));
+	    if(!String(row.attribution_rule || '').trim()) e.push(_t('Bonus pool thiếu attribution_rule.', 'Bonus pool missing attribution_rule.'));
+	    if(!String(cmBonus.intent || row.anti_gaming_intent || '').trim()) e.push(_t('Bonus pool thiếu counter-metric intent.', 'Bonus pool missing counter-metric intent.'));
+	    if(!_splitList(row.blocking_conditions).length) e.push(_t('Bonus pool thiếu blocking_conditions.', 'Bonus pool missing blocking_conditions.'));
+	    if(!_hasRewardMinSample(row)) e.push(_t('Bonus pool thiếu min sample.', 'Bonus pool missing minimum sample policy.'));
+	    if(row.calibration_required === false) e.push(_t('Bonus pool không được tắt calibration.', 'Bonus pool calibration cannot be disabled.'));
+	  }
 	  if(requireComplete){
 	    if(!String(row.canonical_code || '').trim()) e.push(_t('Thiếu canonical_code.', 'Missing canonical_code.'));
 	    if(!String(row.name || row.name_vi || '').trim()) e.push(_t('Thiếu tên metric.', 'Missing metric name.'));
@@ -387,9 +409,11 @@ function _setCounter(section, code, key, value){
 	      var base = rows.filter(function(r){ return String(r.canonical_code).toUpperCase() === String(code).toUpperCase(); })[0] || {};
 	      var row = Object.assign({}, base, sec[code]);
 	      var hasMco = ['metric_subtype','control_intent','measurement_data_type','scoring_model_detail',
-	        'evaluation_use','lifecycle_status','sample_policy','usage_contexts','role_assignments'].some(function(k){
+	        'evaluation_use','reward_mode','lifecycle_status','sample_policy','usage_contexts','role_assignments',
+	        'attribution_rule','counter_metric','blocking_conditions'].some(function(k){
 	          var v = row[k];
-	          return (typeof v === 'string' && v.trim()) || (Array.isArray(v) && v.length);
+	          return (typeof v === 'string' && v.trim()) || (Array.isArray(v) && v.length) ||
+	            (v && typeof v === 'object' && Object.keys(v).length);
 	        });
 	      if(hasMco) _mcoRowErrors(row, false).forEach(function(msg){ errors.push(code + ': ' + msg); });
 	    });
@@ -639,7 +663,8 @@ function _renderRegistryContracts(){
   var cfg = _state.config || {};
   var drc = cfg.dashboard_render_contract || null;
   var mic = cfg.manual_input_contract || null;
-  if(!drc && !mic){ return ''; }
+  var acc = cfg.admin_console_contract || null;
+  if(!drc && !mic && !acc){ return ''; }
 
   var head = '<div class="kc-eyebrow" style="margin-top:24px">' +
     _t('Hợp đồng dashboard & nhập liệu (P08–P10)', 'Dashboard & manual-input contracts (P08–P10)') +
@@ -697,6 +722,10 @@ function _renderRegistryContracts(){
     }).join('');
     var gate = mic.reward_gate || {};
     var policy = gate.policy || '';
+    var displayFields = (mic.required_fields || []).concat([
+      'input_status', 'entered_by', 'verified_by', 'verified_at', 'evidence_reference',
+      'reward contribution disabled until verified'
+    ]);
     inputCard = '<article class="kc-prof-card">' +
       '<div class="kc-prof-head"><span class="kc-code">' + _esc(mic.contract_id || 'manual_input_contract') + '</span>' +
       '<span class="kc-prof-name">' + _t('Hợp đồng nhập tay (có kiểm soát)', 'Manual-input contract') + '</span>' +
@@ -709,6 +738,10 @@ function _renderRegistryContracts(){
         '<span class="kc-mini">' + _t('Trạng thái nhập (input_status)', 'Input status enum') + ':</span> ' +
         (enums || []).map(function(s){ return '<span class="kc-pill">' + _esc(s) + '</span>'; }).join(' ') +
       '</div>' +
+      '<div class="kc-prof-meta"><span class="kc-mini">' +
+        _t('Trường phải render cho dữ liệu nhập tay', 'Manual-input display fields') + ':</span> ' +
+        displayFields.map(function(s){ return '<span class="kc-pill">' + _esc(s) + '</span>'; }).join(' ') +
+      '</div>' +
       (policy
         ? '<div class="kc-mini" style="margin-top:8px"><b>reward_gate.policy:</b> ' + _esc(policy) + '</div>'
         : '') +
@@ -719,7 +752,44 @@ function _renderRegistryContracts(){
       '</article>';
   }
 
-  return head + '<div class="kc-prof-grid">' + dashCard + inputCard + '</div>';
+  var adminCard = '';
+  if(acc){
+    var sections = acc.wizard_sections || [];
+    var blocked = acc.blocked_save_fields || [];
+    var savePolicy = acc.save_policy || {};
+    var saveRows = Object.keys(savePolicy).map(function(k){
+      return '<div class="kc-prof-req">' +
+        '<span class="kc-prof-req-key">' + _esc(k) + '</span>' +
+        '<span class="kc-prof-req-val">' + _esc(savePolicy[k]) + '</span></div>';
+    }).join('');
+    var dyn = acc.dynamic_validation_rules || {};
+    var dynRows = Object.keys(dyn).map(function(k){
+      return '<div class="kc-prof-gate-row">' +
+        '<span class="kc-prof-gate-key">' + _esc(k) + '</span>' +
+        '<span class="kc-prof-gate-vals">' + _esc((dyn[k] || []).join(' · ')) + '</span></div>';
+    }).join('');
+    adminCard = '<article class="kc-prof-card">' +
+      '<div class="kc-prof-head"><span class="kc-code">' + _esc(acc.contract_id || 'admin_console_contract') + '</span>' +
+      '<span class="kc-prof-name">' + _t('Hợp đồng Admin Console', 'Admin Console contract') + '</span>' +
+      '<span class="kc-pill kc-pill--accent">P10</span></div>' +
+      '<div class="kc-prof-meta"><span class="kc-mini">' +
+        _t('Wizard sections', 'Wizard sections') + ':</span> ' +
+        sections.map(function(s){ return '<span class="kc-pill">' + _esc(s) + '</span>'; }).join(' ') + '</div>' +
+      '<div class="kc-prof-meta"><span class="kc-mini">' +
+        _t('Không được ghi từ Console', 'Blocked Console-save fields') + ':</span> ' +
+        blocked.map(function(s){ return '<span class="kc-pill">' + _esc(s) + '</span>'; }).join(' ') + '</div>' +
+      (saveRows
+        ? '<details open><summary>' + _t('Save policy', 'Save policy') + '</summary>' +
+          '<div class="kc-prof-req-grid">' + saveRows + '</div></details>'
+        : '') +
+      (dynRows
+        ? '<details><summary>' + _t('Luật validation động', 'Dynamic validation rules') + '</summary>' +
+          '<div class="kc-prof-gate-grid">' + dynRows + '</div></details>'
+        : '') +
+      '</article>';
+  }
+
+  return head + '<div class="kc-prof-grid">' + dashCard + inputCard + adminCard + '</div>';
 }
 
 	function _renderQualityEscapeSeverity(){
@@ -865,7 +935,45 @@ function _renderOverview(){
       findings.slice(0, 8).map(_findingRow).join('') + '</div>';
   }
   html += '</section>';
-  return html;
+  return html + _renderIntegrityPanels(views);
+}
+
+function _renderIntegrityPanels(views){
+  var panels = (views || {}).integrity_panels || {};
+  var keys = Object.keys(panels);
+  if(!keys.length) return '';
+  var labels = {
+    bsc_model:_t('BSC model', 'BSC model'),
+    lam_profile:_t('LAM coverage', 'LAM coverage'),
+    cpk_sample_policy:_t('Cpk sample policy', 'Cpk sample policy'),
+    severity_bonus_simulation:_t('Severity / bonus simulation', 'Severity / bonus simulation'),
+    annex128_matrix:_t('ANNEX-128 freshness', 'ANNEX-128 freshness')
+  };
+  var compact = function(v){
+    if(Array.isArray(v)) return v.length ? v.join(', ') : '—';
+    if(v && typeof v === 'object') return Object.keys(v).map(function(k){ return k + ':' + v[k]; }).join(' · ') || '—';
+    if(v === true) return 'true';
+    if(v === false) return 'false';
+    return v == null || v === '' ? '—' : String(v);
+  };
+  return '<section class="kc-panel"><div class="kc-panel-head"><h3>' +
+    _t('Integrity panels', 'Integrity panels') + '</h3><span class="kc-mini">P10</span></div>' +
+    '<div class="kc-prof-grid">' + keys.map(function(key){
+      var p = panels[key] || {};
+      var status = String(p.status || 'PASS');
+      var rows = Object.keys(p).filter(function(k){ return k !== 'findings' && k !== 'status'; }).map(function(k){
+        return '<div class="kc-prof-req"><span class="kc-prof-req-key">' + _esc(k) + '</span>' +
+          '<span class="kc-prof-req-val">' + _esc(compact(p[k])) + '</span></div>';
+      }).join('');
+      var findings = (p.findings || []).map(_findingRow).join('');
+      return '<article class="kc-prof-card">' +
+        '<div class="kc-prof-head"><span class="kc-code">' + _esc(key) + '</span>' +
+        '<span class="kc-prof-name">' + _esc(labels[key] || key) + '</span>' +
+        '<span class="kc-integrity kc-integrity-' + _esc(status.toLowerCase()) + '">' + _esc(status) + '</span></div>' +
+        '<div class="kc-prof-req-grid">' + rows + '</div>' +
+        (findings ? '<div class="kc-finding-list">' + findings + '</div>' : '') +
+      '</article>';
+    }).join('') + '</div></section>';
 }
 
 function _summaryList(title, map){
@@ -1389,6 +1497,16 @@ function _renderLibCard(r){
   var expanded = !r._draft && _state.expandedCode === key;
   var counterName = _counterDisplay(r.counter_metric) || '—';
   var tierLabel = TIER_VI[r.tier] || r.tier;
+  var statusNotice = '';
+  if(r.calculation_status === 'staged_data_contract' || r.calculation_status === 'data_contract_required'){
+    statusNotice = '<div class="kc-warn kc-card-note">' +
+      _t('Value suppressed; target/ngưỡng chỉ là proposal cho tới khi có data contract.',
+        'Value suppressed; targets are proposal-only until the data contract is approved.') + '</div>';
+  } else if(r.calculation_status === 'manual' || r.calculation_status === 'manual_governed'){
+    statusNotice = '<div class="kc-warn kc-card-note">' +
+      _t('Manual-input value chỉ dùng cho reward khi input_status=verified và có evidence.',
+        'Manual-input value is reward-eligible only after verified status and evidence.') + '</div>';
+  }
 
   /* footer action — retire / restore / drop-draft */
   var action;
@@ -1429,6 +1547,7 @@ function _renderLibCard(r){
     (b ? '<div class="kc-rag"><span class="kc-badge kc-badge-ok">' + _esc(b.green) + '</span>' +
          '<span class="kc-badge kc-badge-staged">' + _esc(b.yellow) + '</span>' +
          '<span class="kc-badge kc-badge-bad">' + _esc(b.red) + '</span></div>' : '') +
+    statusNotice +
     '<div class="kc-lib-foot">' +
       '<span class="kc-mini">JD: ' + c((r.applicable_jds || []).join(', ') || '—') + '</span>' +
       '<span class="kc-mini" title="' + _t('Counter-metric', 'Counter-metric') + '">↔ ' + c(counterName) + '</span>' +
@@ -1861,6 +1980,7 @@ function _styleBlock(){
     'margin-left:2px;letter-spacing:.2px}' +
   '.kc-warn{font-size:11px;color:var(--warning);background:var(--warning-soft);' +
     'border-radius:6px;padding:5px 8px}' +
+  '.kc-card-note{line-height:1.35}' +
   '.kc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}' +
   '.kc-f{display:flex;flex-direction:column;gap:3px}' +
   '.kc-f label{font-size:11px;color:var(--text-3)}' +

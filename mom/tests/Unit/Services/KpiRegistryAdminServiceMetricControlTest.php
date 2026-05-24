@@ -33,6 +33,38 @@ final class KpiRegistryAdminServiceMetricControlTest extends TestCase
         $validator($row, true);
     }
 
+    public function testServiceRejectsBonusCandidateWithoutMinimumSamplePolicy(): void
+    {
+        $validator = $this->validator();
+        $row = $this->completeMetricControlRow([
+            'calculation_status' => 'runtime_calculated',
+            'reward_mode' => 'bonus_pool_candidate',
+            'attribution_rule' => 'service test attribution rule',
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('kpi_registry_mco_bonus_missing_min_sample:TEST_MCO_SERVICE');
+
+        $validator($row, true);
+    }
+
+    public function testServiceAllowsBonusCandidateWithGuardrails(): void
+    {
+        $validator = $this->validator();
+        $row = $this->completeMetricControlRow([
+            'calculation_status' => 'runtime_calculated',
+            'reward_mode' => 'bonus_pool_candidate',
+            'attribution_rule' => 'service test attribution rule',
+            'formula' => [
+                'min_sample' => 5,
+            ],
+        ]);
+
+        $validator($row, true);
+
+        $this->addToAssertionCount(1);
+    }
+
     public function testServiceAllowsStagedPilotCpkMetricWithStrictSamplePolicy(): void
     {
         $validator = $this->validator();
@@ -52,6 +84,22 @@ final class KpiRegistryAdminServiceMetricControlTest extends TestCase
         $this->expectExceptionMessage('kpi_registry_mco_capability_gage_validity_required:TEST_CPK_SERVICE');
 
         $validator($row, true);
+    }
+
+    public function testLoadExposesPrompt10AdminConsoleContractAndIntegrityPanels(): void
+    {
+        $repoRoot = dirname(__DIR__, 4);
+        $service = new KpiRegistryAdminService($repoRoot, $repoRoot . '/mom/data');
+
+        $config = $service->load();
+
+        self::assertSame(
+            'KPI-ADMIN-CONSOLE-DYNAMIC-UX-P10',
+            $config['admin_console_contract']['contract_id'] ?? null,
+        );
+        self::assertArrayHasKey('integrity_panels', $config['admin_views'] ?? []);
+        self::assertArrayHasKey('bsc_model', $config['admin_views']['integrity_panels'] ?? []);
+        self::assertArrayHasKey('annex128_matrix', $config['admin_views']['integrity_panels'] ?? []);
     }
 
     /**
