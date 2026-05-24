@@ -4,47 +4,25 @@
 declare(strict_types=1);
 
 /**
- * KPI Integrity Drift Test (P09)
+ * KPI Integrity Drift Test (P12)
  * ────────────────────────────────────────────────────────────────────────────
- * Verifies the integrity guard actually fires on the regressions it claims to
- * cover. We do not call check_kpi_integrity.php's internal functions
- * (top-level script, not a class) — instead we:
- *   1. Load the live registry JSON.
- *   2. Mutate one field in-memory per scenario.
- *   3. Serialize to a tmp file.
- *   4. Invoke `php check_kpi_integrity.php` via `proc_open` with
- *      KPI_INTEGRITY_REGISTRY pointed at the tmp file.
- *   5. Assert the expected P0 / P1 marker token appears in output AND the
- *      guard exits non-zero (P0) / zero (P1).
- *
- * Scenarios (minimal, high-value):
- *   A. Gate metric linked_cdr mutated to 'Z99' (fake CDR) → expect P0.6 fire.
- *   B. executive_scorecard adds a code whose governance row is
- *      staged_data_contract → expect P0.9.C fire.
- *   C. A reward-eligible rate metric formula.min_sample forced to 0 →
- *      expect P0.7.2 fire (rate / reward / sample-size combo).
- *   E. dashboard_core_kpis[0].primary_endpoint mutated to a fake path
- *      → expect P0.9.B fire (route resolution across mom/api/routes/*.php).
- *
- *  (Scenario D is reserved for nested-alias-chain coverage of the deleted
- *   P0.9.A; current registry has no nested aliases and the rule was
- *   removed in the P09 audit fix, so D is intentionally skipped.)
- *
- * Exit 0 = all scenarios caught by the guard. Exit 1 = at least one scenario
- * was NOT caught (the guard has degraded; CI will flag the regression).
+ * Mutates temporary registry / document copies only, then invokes the real
+ * check_kpi_integrity.php guard via KPI_INTEGRITY_* env overrides. Exit 0
+ * means the CI guard caught every fake drift and the untouched registry still
+ * passes afterwards.
  */
 
-$base       = dirname(__DIR__, 2);          // -> mom
+$base       = dirname(__DIR__, 2);          // -> repo .../mom/mom
 $registryFp = $base . '/data/registry/kpi-authority-registry.json';
 $guardFp    = $base . '/tools/release/check_kpi_integrity.php';
+$annexDir   = $base . '/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control';
+$annex125Fp = $annexDir . '/annex-125-cnc-performance-operating-system.html';
 
-if (!is_readable($registryFp)) {
-    fwrite(STDERR, "drift_test: registry not readable: $registryFp\n");
-    exit(2);
-}
-if (!is_readable($guardFp)) {
-    fwrite(STDERR, "drift_test: guard not readable: $guardFp\n");
-    exit(2);
+foreach ([$registryFp, $guardFp, $annex125Fp] as $fp) {
+    if (!is_readable($fp)) {
+        fwrite(STDERR, "drift_test: file not readable: $fp\n");
+        exit(2);
+    }
 }
 
 $registry = json_decode((string) file_get_contents($registryFp), true);
@@ -54,17 +32,21 @@ if (!is_array($registry)) {
 }
 
 /**
- * Run the guard with KPI_INTEGRITY_REGISTRY pointed at a tmp file containing
- * the supplied (already-mutated) registry array. Returns [exitCode, stdout].
+ * @param array<string, mixed> $mutatedRegistry
+ * @param array<string, string> $extraEnv
+ * @return array{0:int,1:string}
  */
-$runGuard = static function (array $mutatedRegistry) use ($guardFp): array {
-    $tmp = tempnam(sys_get_temp_dir(), 'kpi_drift_');
+$runGuard = static function (array $mutatedRegistry, array $extraEnv = []) use ($guardFp): array {
+    $tmp = tempnam(sys_get_temp_dir(), 'kpi_drift_registry_');
     if ($tmp === false) {
-        throw new RuntimeException('drift_test: cannot create temp file');
+        throw new RuntimeException('drift_test: cannot create temp registry file');
     }
-    file_put_contents($tmp, json_encode($mutatedRegistry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+    file_put_contents(
+        $tmp,
+        json_encode($mutatedRegistry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT),
+    );
 
-    $env = array_merge($_ENV, getenv(), [
+    $env = array_merge($_ENV, getenv(), $extraEnv, [
         'KPI_INTEGRITY_REGISTRY' => $tmp,
     ]);
     $descr = [
@@ -72,13 +54,7 @@ $runGuard = static function (array $mutatedRegistry) use ($guardFp): array {
         1 => ['pipe', 'w'],
         2 => ['pipe', 'w'],
     ];
-    $proc = proc_open(
-        ['php', $guardFp],
-        $descr,
-        $pipes,
-        null,
-        $env
-    );
+    $proc = proc_open([PHP_BINARY, $guardFp], $descr, $pipes, null, $env);
     if (!is_resource($proc)) {
         @unlink($tmp);
         throw new RuntimeException('drift_test: proc_open failed');
@@ -90,7 +66,91 @@ $runGuard = static function (array $mutatedRegistry) use ($guardFp): array {
     fclose($pipes[2]);
     $code = proc_close($proc);
     @unlink($tmp);
+
     return [$code, $stdout . $stderr];
+};
+
+/**
+ * @param array<string, mixed> $registry
+ * @param callable(array<string, mixed>): void $mutate
+ */
+$mutateMetric = static function (array &$registry, string $code, callable $mutate): void {
+    foreach (['annex122_governance_kpis', 'gate_control_metrics', 'proposed_operating_metrics'] as $section) {
+        if (!is_array($registry[$section] ?? null)) {
+            continue;
+        }
+        foreach ($registry[$section] as &$row) {
+            if (is_array($row) && strtoupper((string) ($row['canonical_code'] ?? '')) === $code) {
+                $mutate($row);
+                unset($row);
+                return;
+            }
+        }
+        unset($row);
+    }
+    throw new RuntimeException("drift_test: metric '$code' not found");
+};
+
+/** @param array<string, mixed> $registry */
+$removeMetricEverywhere = static function (array &$registry, string $code): void {
+    foreach (['annex122_governance_kpis', 'gate_control_metrics', 'proposed_operating_metrics', 'dashboard_core_kpis'] as $section) {
+        if (!is_array($registry[$section] ?? null)) {
+            continue;
+        }
+        $registry[$section] = array_values(array_filter(
+            $registry[$section],
+            static fn(array $row): bool => strtoupper((string) ($row['canonical_code'] ?? '')) !== $code,
+        ));
+    }
+    if (is_array($registry['runtime_calculated_metrics'] ?? null)) {
+        $registry['runtime_calculated_metrics'] = array_values(array_filter(
+            $registry['runtime_calculated_metrics'],
+            static fn(string $rowCode): bool => strtoupper($rowCode) !== $code,
+        ));
+    }
+};
+
+/**
+ * @param array<string, mixed> $overrides
+ * @return array<string, mixed>
+ */
+$baseFakeMetric = static function (array $overrides): array {
+    return array_merge([
+        'canonical_code' => 'FAKE_P12_DRIFT',
+        'name' => 'Fake Prompt 12 drift',
+        'name_vi' => 'Sai lệch giả lập Prompt 12',
+        'layer' => 'test_only',
+        'status' => 'staged_data_contract',
+        'calculation_status' => 'staged_data_contract',
+        'metric_type' => 'operating_metric',
+        'metric_subtype' => 'operating_metric',
+        'control_intent' => 'flow_constraint',
+        'measurement_data_type' => 'percent_ratio',
+        'scoring_model_detail' => 'rag_3_band',
+        'evaluation_use' => 'daily_management',
+        'reward_mode' => 'not_rewardable',
+        'lifecycle_status' => 'pilot',
+        'thresholds' => [
+            'direction' => 'higher_is_better',
+            'unit' => 'percent',
+            'green_point' => 95,
+            'yellow_point' => 85,
+            'target' => 95,
+        ],
+        'counter_metric' => [
+            'code' => 'FAKE_P12_DRIFT-CTR',
+            'endpoint' => 'POST /api/kpi/FAKE_P12_DRIFT-CTR/input',
+            'name_vi' => 'Counter giả lập Prompt 12',
+            'intent' => 'Prevent fake drift from passing silently.',
+        ],
+        'blocking_conditions' => ['fake_prompt_12_drift_blocker'],
+        'process' => 'quality_assurance',
+        'category' => 'internal',
+        'owner_role' => 'QA',
+        'evidence_source' => 'fake test evidence',
+        'data_contract_gap' => 'fake test gap',
+        'target_graduation_condition' => 'fake test graduation',
+    ], $overrides);
 };
 
 $report = [];
@@ -102,90 +162,112 @@ $assert = static function (string $scenario, bool $cond, string $detail) use (&$
     }
 };
 
-// ── Scenario A: fake CDR on a gate metric → P0.6 must fire ──────────────────
-$mut = $registry;
-if (isset($mut['gate_control_metrics'][0]['linked_cdr']) && is_array($mut['gate_control_metrics'][0]['linked_cdr'])) {
-    $originalCdr = $mut['gate_control_metrics'][0]['linked_cdr'];
-    $mut['gate_control_metrics'][0]['linked_cdr'] = ['Z99'];
-    [$codeA, $outA] = $runGuard($mut);
-    $assert('A.fake_cdr', $codeA === 1, "guard exit code = $codeA (expected 1)");
-    $assert('A.fake_cdr', str_contains($outA, "linked_cdr 'Z99'"), "output mentions linked_cdr 'Z99'");
-    // restore not needed — we operated on a copy
-    unset($originalCdr);
-} else {
-    $assert('A.fake_cdr', false, 'no gate_control_metrics[0].linked_cdr to mutate');
-}
+/**
+ * @param callable(array<string, mixed>): void $mutate
+ * @param array<string, string> $extraEnv
+ */
+$expectP0 = static function (
+    string $scenario,
+    callable $mutate,
+    string $expectedOutput,
+    array $extraEnv = []
+) use ($registry, $runGuard, $assert): void {
+    $mut = $registry;
+    $mutate($mut);
+    [$code, $out] = $runGuard($mut, $extraEnv);
+    $assert($scenario, $code === 1, "guard exit code = $code (expected 1)");
+    $assert($scenario, str_contains($out, $expectedOutput), "output contains '$expectedOutput'");
+};
 
-// ── Scenario B: executive_scorecard adds a staged_data_contract code → P0.9.C ──
-$mut = $registry;
-$stagedCode = null;
-foreach ($mut['annex122_governance_kpis'] ?? [] as $row) {
-    if (is_array($row) && (($row['calculation_status'] ?? '') === 'staged_data_contract')) {
-        $stagedCode = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
-        break;
-    }
-}
-if ($stagedCode !== null && $stagedCode !== '') {
-    if (!in_array($stagedCode, (array) ($mut['executive_scorecard'] ?? []), true)) {
-        $mut['executive_scorecard'][] = $stagedCode;
-    }
-    [$codeB, $outB] = $runGuard($mut);
-    $assert('B.staged_in_scorecard', $codeB === 1, "guard exit code = $codeB (expected 1)");
-    $assert('B.staged_in_scorecard',
-        str_contains($outB, 'P0.9.C') && str_contains($outB, $stagedCode),
-        "output mentions P0.9.C with code $stagedCode");
-} else {
-    $assert('B.staged_in_scorecard', false, 'no staged_data_contract governance KPI to mutate');
-}
+// 1. Remove linked CDR from a gate metric.
+$expectP0('01.remove_gate_cdr', static function (array &$mut) use ($mutateMetric): void {
+    $mutateMetric($mut, 'CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED', static function (array &$row): void {
+        $row['linked_cdr'] = [];
+    });
+}, 'gate_control_metric requires linked_cdr');
 
-// ── Scenario C: reward-eligible rate metric formula.min_sample forced to 0 ───
-$mut = $registry;
-$mutatedCodeC = null;
-$rewardSet = ['bonus_pool_candidate', 'team_reward_candidate', 'role_review_input'];
-foreach ($mut['annex122_governance_kpis'] ?? [] as $idx => $row) {
-    if (!is_array($row)) {
-        continue;
+// 2. Put staged metric in scored core / executive scorecard.
+$expectP0('02.staged_in_scored_core', static function (array &$mut): void {
+    foreach ($mut['annex122_governance_kpis'] ?? [] as $row) {
+        if (is_array($row) && (($row['calculation_status'] ?? '') === 'staged_data_contract')) {
+            $mut['executive_scorecard'][] = strtoupper((string) $row['canonical_code']);
+            return;
+        }
     }
-    $unit = strtolower(trim((string) ($row['formula']['unit'] ?? $row['thresholds']['unit'] ?? '')));
-    $isRate = in_array($unit, ['%', 'percent', 'percentage', 'ppm', 'dppm', 'rate', 'ratio', 'per_million', 'parts_per_million'], true);
-    $rewardMode = strtolower(trim((string) ($row['reward_mode'] ?? '')));
-    if ($isRate && in_array($rewardMode, $rewardSet, true)) {
-        $mut['annex122_governance_kpis'][$idx]['formula']['min_sample'] = 0;
-        $mutatedCodeC = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
-        break;
-    }
-}
-if ($mutatedCodeC !== null && $mutatedCodeC !== '') {
-    [$codeC, $outC] = $runGuard($mut);
-    $assert('C.percent_min_sample', $codeC === 1, "guard exit code = $codeC (expected 1)");
-    $assert('C.percent_min_sample',
-        str_contains($outC, 'P0.7.2') && str_contains($outC, $mutatedCodeC),
-        "output mentions P0.7.2 with code $mutatedCodeC");
-} else {
-    $assert('C.percent_min_sample', false, 'no reward-eligible rate metric to mutate');
-}
+    throw new RuntimeException('drift_test: no staged governance metric found');
+}, 'P0.9.C executive_scorecard');
 
-// ── Scenario E: dashboard endpoint primary_endpoint points at a fake path ────
-//      → P0.9.B must fire (route does not resolve under mom/api/routes/*.php).
-$mut = $registry;
-if (isset($mut['dashboard_core_kpis'][0]) && is_array($mut['dashboard_core_kpis'][0])) {
-    // Use a non-/api/kpi/ prefix so the endpoint-to-action mapper returns null
-    // (the /api/kpi/{tail} fallback resolves to 'kpi_get' which is registered).
-    // This path is not under any router->get/post in mom/api/routes/*.php.
-    $mut['dashboard_core_kpis'][0]['primary_endpoint'] = 'GET /api/__P09_TEST_FAKE_PATH__/zzz';
-    [$codeE, $outE] = $runGuard($mut);
-    $assert('E.fake_endpoint', $codeE === 1, "guard exit code = $codeE (expected 1)");
-    $assert('E.fake_endpoint',
-        str_contains($outE, 'P0.9.B')
-            && (str_contains($outE, '__P09_TEST_FAKE_PATH__')
-                || str_contains($outE, 'primary_endpoint')),
-        "output mentions P0.9.B + fake path / primary_endpoint marker");
-} else {
-    $assert('E.fake_endpoint', false, 'no dashboard_core_kpis[0] to mutate');
+// 3. Add SPC/Cpk metric without sample_policy.
+$expectP0('03.cpk_without_sample_policy', static function (array &$mut) use ($baseFakeMetric): void {
+    $mut['proposed_operating_metrics'][] = $baseFakeMetric([
+        'canonical_code' => 'FAKE_CPK_NO_SAMPLE_P12',
+        'metric_subtype' => 'spc_capability_metric',
+        'control_intent' => 'quality_at_source',
+        'measurement_data_type' => 'spc_variable',
+        'scoring_model_detail' => 'spec_limit_capability',
+    ]);
+}, 'spc_capability_metric requires sample_policy.min_n_score');
+
+// 4. Remove one LAM linked metric row while profile still references it.
+$expectP0('04.remove_lam_metric_row', static function (array &$mut) use ($removeMetricEverywhere): void {
+    $removeMetricEverywhere($mut, 'CHECK_DIM_REPORT_ON_SHIP');
+}, "linked_metric 'CHECK_DIM_REPORT_ON_SHIP' does not resolve");
+
+// 5. Disable simulation-only bonus model.
+$expectP0('05.bonus_simulation_disabled', static function (array &$mut): void {
+    $mut['bonus_simulation_model']['simulation_only'] = false;
+}, 'bonus_simulation_model.simulation_only MUST be true');
+
+// 6. Reintroduce old ANNEX-125 15-KPI wording while registry is LEAN-7.
+$tmpAnnex125 = tempnam(sys_get_temp_dir(), 'kpi_drift_annex125_');
+if ($tmpAnnex125 === false) {
+    throw new RuntimeException('drift_test: cannot create temp ANNEX-125 file');
 }
+file_put_contents(
+    $tmpAnnex125,
+    (string) file_get_contents($annex125Fp)
+        . "\n<!-- fake drift: Scorecard lãnh đạo 15 KPI CNC-EXEC-BSC-15-2026 -->\n",
+);
+$expectP0('06.annex125_old_15_kpi', static function (array &$mut): void {
+    // Registry stays unchanged; only the ANNEX-125 temp file drifts.
+}, 'P0.20 BSC docs drift', ['KPI_INTEGRITY_ANNEX125' => $tmpAnnex125]);
+@unlink($tmpAnnex125);
+
+// 7. Mark a non-runtime metric rewardable.
+$expectP0('07.non_runtime_rewardable', static function (array &$mut) use ($mutateMetric): void {
+    $mutateMetric($mut, 'DOWNTIME_IMPACT', static function (array &$row): void {
+        $row['calculation_status'] = 'staged_data_contract';
+        $row['reward_mode'] = 'bonus_pool_candidate';
+        $row['reward_eligible'] = true;
+    });
+}, "reward_mode 'bonus_pool_candidate' requires calculation_status=runtime_calculated");
+
+// 8. Composite readiness component weights sum to 90.
+$expectP0('08.composite_weight_90', static function (array &$mut) use ($baseFakeMetric): void {
+    $mut['proposed_operating_metrics'][] = $baseFakeMetric([
+        'canonical_code' => 'FAKE_COMPOSITE_WEIGHT_90_P12',
+        'metric_subtype' => 'composite_readiness_index',
+        'control_intent' => 'continuous_improvement',
+        'measurement_data_type' => 'composite_index',
+        'scoring_model_detail' => 'composite_weighted_score',
+        'components' => [
+            ['code' => 'A', 'weight_pct' => 50],
+            ['code' => 'B', 'weight_pct' => 40],
+        ],
+    ]);
+}, 'composite_weighted_score component weights must sum to 100');
+
+// Prove the untouched registry/document set still passes after temp mutations.
+[$cleanCode, $cleanOut] = $runGuard($registry);
+$assert('09.clean_pass_after_temp_mutations', $cleanCode === 0, "guard exit code = $cleanCode (expected 0)");
+$assert(
+    '09.clean_pass_after_temp_mutations',
+    str_contains($cleanOut, 'KPI integrity check PASSED'),
+    'clean output reports PASS',
+);
 
 echo "KPI integrity drift test\n";
-echo "  scenarios: 4 (A,B,C,E — D reserved for deleted P0.9.A nested-alias rule)\n";
+echo "  scenarios: 8 required Prompt 12 fake drifts + clean pass proof\n";
 foreach ($report as $line) {
     echo $line . "\n";
 }
@@ -193,5 +275,5 @@ if (!$allPass) {
     echo "\nDrift test FAILED — guard did not catch at least one expected regression.\n";
     exit(1);
 }
-echo "\nDrift test PASSED — guard caught all expected regressions.\n";
+echo "\nDrift test PASSED — guard caught all required regressions and clean state still passes.\n";
 exit(0);

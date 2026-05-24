@@ -139,6 +139,31 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
         );
     }
 
+    public function testRejectsAnnex125Old15KpiWording(): void
+    {
+        $repoRoot = dirname(__DIR__, 4);
+        $annex125 = $repoRoot . '/mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html';
+        $tmp = tempnam(sys_get_temp_dir(), 'kpi-annex125-drift-');
+        self::assertIsString($tmp);
+        file_put_contents(
+            $tmp,
+            (string) file_get_contents($annex125)
+                . "\n<!-- fake drift: Scorecard lãnh đạo 15 KPI CNC-EXEC-BSC-15-2026 -->\n",
+        );
+
+        try {
+            $this->assertFakeDriftRejected(
+                static function (array &$registry): void {
+                    // Registry remains LEAN-7; only the temp ANNEX-125 copy drifts.
+                },
+                'P0.20 BSC docs drift',
+                ['KPI_INTEGRITY_ANNEX125' => $tmp],
+            );
+        } finally {
+            @unlink($tmp);
+        }
+    }
+
     public function testRejectsCustomerSeverityMatrixHardGateWithoutRegisteredBlocker(): void
     {
         $this->assertFakeDriftRejected(
@@ -429,8 +454,9 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
 
     /**
      * @param callable(array<string, mixed>): void $mutate
+     * @param array<string, string> $extraEnv
      */
-    private function assertFakeDriftRejected(callable $mutate, string $expectedOutput): void
+    private function assertFakeDriftRejected(callable $mutate, string $expectedOutput, array $extraEnv = []): void
     {
         $repoRoot = dirname(__DIR__, 4);
         $registryPath = $repoRoot . '/mom/data/registry/kpi-authority-registry.json';
@@ -447,7 +473,11 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
 
         try {
             $script = $repoRoot . '/mom/tools/release/check_kpi_integrity.php';
-            $command = 'KPI_INTEGRITY_REGISTRY=' . escapeshellarg($tmp)
+            $env = 'KPI_INTEGRITY_REGISTRY=' . escapeshellarg($tmp);
+            foreach ($extraEnv as $name => $value) {
+                $env .= ' ' . $name . '=' . escapeshellarg($value);
+            }
+            $command = $env
                 . ' ' . escapeshellarg(PHP_BINARY)
                 . ' ' . escapeshellarg($script)
                 . ' 2>&1';

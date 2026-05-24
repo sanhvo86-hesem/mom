@@ -166,11 +166,12 @@ jobs:
         run: php mom/tools/release/check_kpi_integrity.php
 
       - name: KPI integrity drift test (guard self-test)
-        # (P09 hardening) Mutates the registry in-memory across 3 scenarios
-        # (fake CDR, staged metric in executive_scorecard, reward-eligible
-        # rate metric with min_sample=0) and asserts check_kpi_integrity.php
-        # fires the matching P0 each time. Catches guard regressions before
-        # they let a real drift slip through.
+        # (P12 hardening) Mutates temporary registry/document copies across
+        # the required fake-drift scenarios: missing CDR, staged scored-core
+        # metric, Cpk without sample policy, missing LAM row, disabled bonus
+        # simulation-only flag, stale ANNEX-125 15-KPI wording, non-runtime
+        # rewardable metric, and composite weights != 100. Catches guard
+        # regressions before they let a real drift slip through.
         run: php mom/tools/release/check_kpi_integrity_drift_test.php
 
       - name: Migration drift check (offline)

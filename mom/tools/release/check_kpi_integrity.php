@@ -96,6 +96,8 @@ $annexDir   = $base . '/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Aut
 $annex122Fp = $envPath('KPI_INTEGRITY_ANNEX122', $annexDir . '/annex-122-kpi-cascade-dictionary.html');
 $annex121Fp = $envPath('KPI_INTEGRITY_CDR_MATRIX', $base . '/docs/system/organization/04-RACI-Authority/raci-master-matrix.html');
 $annex128Fp = $envPath('KPI_INTEGRITY_ANNEX128', $annexDir . '/annex-128-kpi-system-matrix-and-document-usage.html');
+$annex125Fp = $envPath('KPI_INTEGRITY_ANNEX125', $annexDir . '/annex-125-cnc-performance-operating-system.html');
+$annex129Fp = $envPath('KPI_INTEGRITY_ANNEX129', $annexDir . '/annex-129-bsc-kpi-operating-mechanism-assessment.html');
 $engineFp   = $envPath('KPI_INTEGRITY_ENGINE', $base . '/api/services/KpiEngine.php');
 $routesFp   = $envPath('KPI_INTEGRITY_ROUTES', $base . '/api/routes/core-routes.php');
 $adminJsFp  = $envPath('KPI_INTEGRITY_ADMIN_JS', $base . '/scripts/portal/00o-admin-kpi-registry.js');
@@ -445,11 +447,105 @@ foreach (array_diff($annexSet, $govSet) as $stray) {
 // not yet cited elsewhere is legitimately absent. This is advisory, not a
 // blocker — a cluster of absences is the signal to re-run the matrix audit.
 $annex128 = readText($annex128Fp);
+$annex128RequiredTokens = [
+    'ANNEX-128 - KPI System Matrix and Document Usage',
+    'HTML quét',
+    'Tài liệu có metric',
+    'Metric code thấy được',
+    'Findings',
+    'OTD',
+    'COMPLAINT_RATE',
+    'FPY',
+    'COPQ',
+    'PLAN_ADHERENCE',
+    'WIP_AGING',
+    'MATERIAL_AVAILABILITY_PLAN',
+];
+foreach ($annex128RequiredTokens as $token) {
+    if (!str_contains($annex128, $token)) {
+        $p0[] = "P0.20 ANNEX-128 stale/missing generated content: token '$token' absent.";
+    }
+}
 foreach ($govSet as $code) {
     if (strpos($annex128, $code) === false) {
         $p1[] = "ANNEX-128: governance KPI '$code' is not enumerated in the "
             . "system matrix — re-run audit-kpi-system-matrix.php if recent "
             . "registry changes should be reflected.";
+    }
+}
+
+// ── P0.20 — BSC model and docs must not drift back to the old 15-KPI model ─
+// Prompt 11 closed the last visible 15-KPI BSC wording. The registry and docs
+// must continue to agree on 7 scored core + strategic driver panel + gate
+// blockers. This catches a future doc-only edit that reintroduces the legacy
+// CNC-EXEC-BSC-15 wording while the registry remains LEAN-7.
+$scorecardModel = is_array($registry['scorecard_operating_model'] ?? null)
+    ? $registry['scorecard_operating_model'] : [];
+$modelId = trim((string) ($scorecardModel['model_id'] ?? ''));
+$expectedModelId = 'CNC-EXEC-BSC-LEAN-7+DRIVERS-2026';
+if ($modelId !== $expectedModelId) {
+    $p0[] = "P0.20 scorecard_operating_model.model_id must be '$expectedModelId' (got '$modelId').";
+}
+$scoredCore = array_map('strtoupper', array_map('strval', (array) ($scorecardModel['scored_core'] ?? [])));
+$scorecardSet = $scorecard;
+sort($scoredCore);
+sort($scorecardSet);
+if (count($scorecardSet) !== 7 || $scorecardSet !== $scoredCore) {
+    $p0[] = "P0.20 BSC scored_core must equal the 7-code executive_scorecard.";
+}
+$scorecardWeightTotal = 0.0;
+foreach ((array) ($scorecardModel['executive_scorecard_items'] ?? []) as $item) {
+    if (!is_array($item)) {
+        continue;
+    }
+    if ((string) ($item['scorecard_role'] ?? '') === 'scored_core'
+        && is_numeric($item['scorecard_weight_pct'] ?? null)) {
+        $scorecardWeightTotal += (float) $item['scorecard_weight_pct'];
+    }
+}
+if (abs($scorecardWeightTotal - 100.0) > 0.01) {
+    $p0[] = "P0.20 BSC scored_core weights must sum to 100 (got $scorecardWeightTotal).";
+}
+$annex125 = readText($annex125Fp);
+$annex129 = readText($annex129Fp);
+$docsByName = [
+    'ANNEX-125' => $annex125,
+    'ANNEX-129' => $annex129,
+];
+foreach ($docsByName as $docName => $docText) {
+    foreach (['CNC-EXEC-BSC-15-2026', '15 KPI', '15-KPI', 'Scorecard lãnh đạo 15'] as $staleToken) {
+        if (str_contains($docText, $staleToken)) {
+            $p0[] = "P0.20 BSC docs drift: $docName contains stale '$staleToken' wording.";
+        }
+    }
+    if (!str_contains($docText, $expectedModelId)) {
+        $p0[] = "P0.20 BSC docs drift: $docName missing current model '$expectedModelId'.";
+    }
+}
+if (!str_contains($annex125, '7 core') || !str_contains($annex125, 'driver panel')) {
+    $p0[] = "P0.20 BSC docs drift: ANNEX-125 must state 7 core + driver panel.";
+}
+if (!str_contains($annex129, 'BSC là layer 2')) {
+    $p0[] = "P0.20 BSC docs drift: ANNEX-129 must state BSC là layer 2.";
+}
+foreach ((array) ($scorecardModel['strategic_driver_panel'] ?? []) as $driver) {
+    if (!is_array($driver)) {
+        continue;
+    }
+    $code = strtoupper(trim((string) ($driver['canonical_code'] ?? '')));
+    if ($code === '') {
+        continue;
+    }
+    $row = $metricIndex[$code] ?? [];
+    $approved = ($driver['scorecard_promotion_approved'] ?? false) === true
+        || ($driver['reward_approval'] ?? false) === true;
+    if (!$approved && (
+        ($driver['scorecard_contributes_to_reward'] ?? false) === true
+        || ($row['scorecard_contributes_to_reward'] ?? false) === true
+        || ($driver['reward_eligible'] ?? false) === true
+        || ($row['reward_eligible'] ?? false) === true
+    )) {
+        $p0[] = "P0.20 strategic_driver_panel '$code' must remain visible-only unless promotion/reward approval is explicit.";
     }
 }
 
