@@ -1137,6 +1137,336 @@ class AdminController extends BaseController
     }
 
     /**
+     * POST admin_deploy_trigger — Pha 4 (Developer mode only).
+     *
+     * Records a deploy intent in audit_events. Does NOT actually push code
+     * or run the deploy script — that would violate the CLAUDE.md
+     * governance rule that PHP-FPM never mutates the git working tree on
+     * the VPS. Instead it returns "next steps" so the operator can either
+     *   (a) push from their developer laptop, OR
+     *   (b) trigger the GitHub Actions workflow manually
+     * and the audit row preserves the intent + actor + sha + reason for
+     * ISO §8.5.6 traceability.
+     *
+     * Body:
+     *   { target_sha?:   <git sha to deploy (default = current HEAD on VPS)>
+     *     reason:        <required, ≥4 chars> }
+     *
+     * Enforcement (defence in depth):
+     *   1. Admin role + CSRF
+     *   2. Effective VC mode MUST be 'developer' (fails 409 in Op mode).
+     *      Production lock_on_production=true means this is unreachable
+     *      on the live VPS regardless of role overrides — by design.
+     *
+     * Output:
+     *   { ok, intent_id, target_sha, gha_workflow_url, next_steps:[...] }
+     */
+    public function deployTrigger(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $configFile = $this->confDir . '/module_access_config.json';
+        $config = module_access_load_config($configFile);
+        $roles = $this->rolesForUser($me);
+        $effectiveMode = admin_vc_mode_resolve_for_roles($config, $roles);
+        if ($effectiveMode !== 'developer') {
+            $this->error('mode_not_developer', 409, 'Effective VC mode is "' . $effectiveMode . '". Use admin_change_request_submit instead, or switch to Developer mode (requires lock_on_production=false on this runtime).');
+        }
+
+        $body = $this->jsonBody();
+        $reason = trim((string)($body['reason'] ?? ''));
+        if ($reason === '' || mb_strlen($reason) < 4) {
+            $this->error('reason_required', 400, 'A reason of at least 4 characters is required.');
+        }
+        if (mb_strlen($reason) > 500) $reason = mb_substr($reason, 0, 500);
+
+        $targetSha = trim((string)($body['target_sha'] ?? ''));
+        if ($targetSha !== '' && !preg_match('/^[a-f0-9]{7,40}$/i', $targetSha)) {
+            $this->error('invalid_sha', 400, 'target_sha must be a hex git SHA (7..40 chars) or empty for HEAD.');
+        }
+
+        $intentId = 'DEPLOY-' . date('YmdHis') . '-' . substr(bin2hex(random_bytes(3)), 0, 6);
+        $ghaWorkflowUrl = 'https://github.com/sanhvo86-hesem/mom/actions/workflows/deploy.yml';
+
+        $this->auditLog('admin_deploy_trigger_intent', [
+            'intent_id' => $intentId,
+            'target_sha' => $targetSha,
+            'reason' => $reason,
+            'effective_mode' => $effectiveMode,
+            'gha_workflow_url' => $ghaWorkflowUrl,
+        ]);
+
+        $this->success([
+            'intent_id' => $intentId,
+            'target_sha' => $targetSha !== '' ? $targetSha : 'HEAD',
+            'gha_workflow_url' => $ghaWorkflowUrl,
+            'next_steps' => [
+                'Push your local branch to origin/main (if not already there): git push origin main',
+                'Trigger or watch the GitHub Actions workflow at: ' . $ghaWorkflowUrl,
+                'Or run manually on VPS: ssh eqms \'sudo -n bash /var/www/eqms.hesemeng.com/tools/vps-setup/scripts/deploy.sh\'',
+                'Audit row recorded with intent_id=' . $intentId,
+            ],
+            'message' => 'Deploy intent recorded. Run one of the next_steps to perform the actual deploy.',
+        ]);
+    }
+
+    /**
+     * POST admin_change_request_submit — Pha 4 (Operation mode flow).
+     *
+     * Creates a deploy change request in audit_events. The request stays
+     * pending until an admin with separation-of-duties (different actor
+     * than the submitter) calls admin_change_request_approve.
+     *
+     * Body:
+     *   { target_sha?, reason (required, ≥10 chars for Op),
+     *     change_ref? (CR ticket id; auto-generated if absent),
+     *     approver_hint? (optional username/role to notify; not enforced server-side) }
+     *
+     * Allowed in BOTH modes (so an admin in Dev can also use it for
+     * audit-friendly deploys) but enforced via change_ref / approval.
+     */
+    public function changeRequestSubmit(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body = $this->jsonBody();
+        $reason = trim((string)($body['reason'] ?? ''));
+        if ($reason === '' || mb_strlen($reason) < 10) {
+            $this->error('reason_required', 400, 'Operation mode requires a reason of at least 10 characters.');
+        }
+        if (mb_strlen($reason) > 1000) $reason = mb_substr($reason, 0, 1000);
+
+        $targetSha = trim((string)($body['target_sha'] ?? ''));
+        if ($targetSha !== '' && !preg_match('/^[a-f0-9]{7,40}$/i', $targetSha)) {
+            $this->error('invalid_sha', 400, 'target_sha must be a hex git SHA (7..40 chars) or empty for HEAD.');
+        }
+
+        $changeRef = trim((string)($body['change_ref'] ?? ''));
+        if ($changeRef === '') {
+            $changeRef = 'CR-' . date('YmdHis') . '-' . substr(bin2hex(random_bytes(3)), 0, 6);
+        }
+        if (!preg_match('/^[A-Za-z0-9._:-]{3,80}$/', $changeRef)) {
+            $this->error('invalid_change_ref', 400, 'change_ref must match [A-Za-z0-9._:-]{3,80}.');
+        }
+
+        $approverHint = trim((string)($body['approver_hint'] ?? ''));
+        if (mb_strlen($approverHint) > 120) $approverHint = mb_substr($approverHint, 0, 120);
+
+        $this->auditLog('admin_change_request_submit', [
+            'change_ref' => $changeRef,
+            'target_sha' => $targetSha,
+            'reason' => $reason,
+            'approver_hint' => $approverHint,
+            'submitted_by' => (string)($me['username'] ?? 'unknown'),
+            'status' => 'pending_approval',
+        ]);
+
+        $this->success([
+            'change_ref' => $changeRef,
+            'target_sha' => $targetSha !== '' ? $targetSha : 'HEAD',
+            'status' => 'pending_approval',
+            'submitted_by' => (string)($me['username'] ?? 'unknown'),
+            'approver_hint' => $approverHint,
+            'next_steps' => [
+                'Pending until an admin (different from the submitter) approves via admin_change_request_approve.',
+                'Search the timeline for change_ref=' . $changeRef . ' to find the approval row.',
+            ],
+            'message' => 'Change request ' . $changeRef . ' submitted and pending approval.',
+        ]);
+    }
+
+    /**
+     * POST admin_change_request_approve — Pha 4.
+     *
+     * Approver decision on a previously-submitted CR. Enforces
+     * separation-of-duties: the approver MUST be a different actor than
+     * the original submitter. (Tightening to a dedicated 'cr_approver'
+     * role is a follow-up — admin_roles() is the gate today.)
+     *
+     * Body: { change_ref, decision: 'approve'|'reject', reason }
+     *
+     * Does NOT actually run the deploy on approve — same governance
+     * reason as deployTrigger. Returns next_steps + records audit row.
+     */
+    public function changeRequestApprove(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body = $this->jsonBody();
+        $changeRef = trim((string)($body['change_ref'] ?? ''));
+        if (!preg_match('/^[A-Za-z0-9._:-]{3,80}$/', $changeRef)) {
+            $this->error('invalid_change_ref', 400, 'change_ref required and must match [A-Za-z0-9._:-]{3,80}.');
+        }
+        $decision = strtolower(trim((string)($body['decision'] ?? '')));
+        if (!in_array($decision, ['approve', 'reject'], true)) {
+            $this->error('invalid_decision', 400, 'decision must be "approve" or "reject".');
+        }
+        $reason = trim((string)($body['reason'] ?? ''));
+        if ($reason === '' || mb_strlen($reason) < 4) {
+            $this->error('reason_required', 400, 'A reason of at least 4 characters is required.');
+        }
+        if (mb_strlen($reason) > 1000) $reason = mb_substr($reason, 0, 1000);
+
+        // Look up the most-recent matching submit audit row to enforce
+        // separation-of-duties + prevent double-approval.
+        try {
+            $existing = $this->data->getAuditLog([
+                'event_type' => 'admin_change_request_submit',
+                'search' => $changeRef,
+                'limit' => 50,
+            ]);
+        } catch (Throwable $e) {
+            $this->error('audit_lookup_failed', 500, $e->getMessage());
+        }
+        $submitRow = null;
+        foreach ((is_array($existing) ? $existing : []) as $row) {
+            if (!is_array($row)) continue;
+            // BaseController->auditLog wraps the context inside payload.context,
+            // so the change_ref we passed lives at payload.context.change_ref
+            // rather than payload.change_ref. Read through the wrapper.
+            $payload = is_array($row['payload'] ?? null) ? $row['payload'] : [];
+            $ctx = is_array($payload['context'] ?? null) ? $payload['context'] : $payload;
+            if (($ctx['change_ref'] ?? '') === $changeRef) { $submitRow = $row; break; }
+        }
+        if ($submitRow === null) {
+            $this->error('change_ref_not_found', 404, 'No submit row found for change_ref=' . $changeRef);
+        }
+        $submitter = (string)($submitRow['actor_name'] ?? $submitRow['user'] ?? '');
+        $approver = (string)($me['username'] ?? '');
+        if ($submitter !== '' && $approver !== '' && strcasecmp($submitter, $approver) === 0) {
+            $this->error('self_approval_forbidden', 403, 'You submitted ' . $changeRef . '. A different admin must approve it (separation of duties).');
+        }
+
+        // Block double-approve / approve-after-reject by scanning for an
+        // existing approve row on the same CR.
+        try {
+            $prior = $this->data->getAuditLog([
+                'event_type' => 'admin_change_request_approve',
+                'search' => $changeRef,
+                'limit' => 20,
+            ]);
+        } catch (Throwable $e) {
+            $prior = [];
+        }
+        foreach ((is_array($prior) ? $prior : []) as $row) {
+            $payload = is_array($row['payload'] ?? null) ? $row['payload'] : [];
+            $ctx = is_array($payload['context'] ?? null) ? $payload['context'] : $payload;
+            if (($ctx['change_ref'] ?? '') === $changeRef) {
+                $this->error('already_decided', 409, 'change_ref=' . $changeRef . ' already has a decision in audit_events.');
+            }
+        }
+
+        $this->auditLog('admin_change_request_approve', [
+            'change_ref' => $changeRef,
+            'decision' => $decision,
+            'reason' => $reason,
+            'submitter' => $submitter,
+            'approver' => $approver,
+            'submit_recorded_at' => (string)($submitRow['recorded_at'] ?? ''),
+        ]);
+
+        $nextSteps = $decision === 'approve'
+            ? [
+                'Approval recorded. Run the deploy from the developer laptop or via GHA.',
+                'Pass --change-ref ' . $changeRef . ' to data-push.sh if a config sync is part of this CR.',
+              ]
+            : [
+                'Rejection recorded. No further action needed.',
+                'Submitter should address the reason and submit a new CR if appropriate.',
+              ];
+
+        $this->success([
+            'change_ref' => $changeRef,
+            'decision' => $decision,
+            'submitter' => $submitter,
+            'approver' => $approver,
+            'next_steps' => $nextSteps,
+        ]);
+    }
+
+    /**
+     * GET admin_change_request_list — Pha 4 helper.
+     *
+     * Returns the most-recent N change requests with their resolved status
+     * by joining submit + approve rows in audit_events. Drives the
+     * "Pending change requests" section in Status tab (Op mode).
+     */
+    public function changeRequestList(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        $limit = max(1, min(200, (int)($this->query('limit', '50') ?? '50')));
+        try {
+            $submits = $this->data->getAuditLog([
+                'event_type' => 'admin_change_request_submit',
+                'limit' => $limit * 2,
+            ]);
+            $approves = $this->data->getAuditLog([
+                'event_type' => 'admin_change_request_approve',
+                'limit' => $limit * 2,
+            ]);
+        } catch (Throwable $e) {
+            $this->error('change_request_list_failed', 500, $e->getMessage());
+        }
+
+        // BaseController->auditLog wraps the context under payload.context.
+        // Helper to dereference once + read field defensively.
+        $ctxOf = static function (array $row): array {
+            $p = is_array($row['payload'] ?? null) ? $row['payload'] : [];
+            return is_array($p['context'] ?? null) ? $p['context'] : $p;
+        };
+
+        $approvalsByCr = [];
+        foreach ((is_array($approves) ? $approves : []) as $row) {
+            $ctx = $ctxOf($row);
+            $cr = (string)($ctx['change_ref'] ?? '');
+            if ($cr === '') continue;
+            $approvalsByCr[$cr] = [
+                'decision' => (string)($ctx['decision'] ?? ''),
+                'approver' => (string)($ctx['approver'] ?? ''),
+                'reason' => (string)($ctx['reason'] ?? ''),
+                'recorded_at' => (string)($row['recorded_at'] ?? ''),
+            ];
+        }
+
+        $crs = [];
+        foreach ((is_array($submits) ? $submits : []) as $row) {
+            $ctx = $ctxOf($row);
+            $cr = (string)($ctx['change_ref'] ?? '');
+            if ($cr === '' || isset($crs[$cr])) continue; // dedupe — latest submit wins (already sorted DESC by getAuditLog)
+            $approval = $approvalsByCr[$cr] ?? null;
+            $status = $approval === null
+                ? 'pending_approval'
+                : ($approval['decision'] === 'approve' ? 'approved' : 'rejected');
+            $crs[$cr] = [
+                'change_ref' => $cr,
+                'status' => $status,
+                'submitter' => (string)($row['actor_name'] ?? ''),
+                'submitted_at' => (string)($row['recorded_at'] ?? ''),
+                'target_sha' => (string)($ctx['target_sha'] ?? ''),
+                'reason' => (string)($ctx['reason'] ?? ''),
+                'approver_hint' => (string)($ctx['approver_hint'] ?? ''),
+                'approval' => $approval,
+            ];
+            if (count($crs) >= $limit) break;
+        }
+
+        $this->success([
+            'change_requests' => array_values($crs),
+            'count' => count($crs),
+            'pending_count' => count(array_filter($crs, static fn($c) => $c['status'] === 'pending_approval')),
+            'limit' => $limit,
+        ]);
+    }
+
+    /**
      * GET admin_version_control_unified_timeline — Pha 3 of the admin VC
      * v2 redesign. Merges three previously-separate streams into a single
      * chronological feed so an operator can answer "what changed in the

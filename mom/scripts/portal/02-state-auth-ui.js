@@ -9395,6 +9395,92 @@ function renderAdminVCTimeline(){
   return '<section>'+chipsHtml+notice+tableHtml+'</section>';
 }
 
+// ── Pha 4 button handlers ────────────────────────────────────────────────
+//
+// Both handlers POST to backend endpoints that intentionally do NOT mutate
+// the git working tree or trigger the deploy script — that would violate
+// CLAUDE.md governance. They record an audit row + return next_steps the
+// operator runs (git push / GHA / SSH).
+
+async function adminVCDeployTrigger(){
+  if(vcEffectiveMode() !== 'developer'){
+    showToast(lang==='en'
+      ? 'Deploy trigger only available in Developer mode. Submit a change request instead.'
+      : 'Push & Deploy chỉ ở Developer mode. Dùng Gửi yêu cầu deploy thay thế.', 'error');
+    return;
+  }
+  const reason = window.prompt(lang==='en'
+    ? 'Reason for this deploy (≥4 chars, logged to audit_events):'
+    : 'Lý do deploy (≥4 ký tự, ghi vào audit_events):', '');
+  if(reason === null) return;
+  if(reason.trim().length < 4){
+    showToast(lang==='en'?'Reason ≥4 chars required.':'Cần lý do ≥4 ký tự.', 'error');
+    return;
+  }
+  const sha = window.prompt(lang==='en'
+    ? 'Optional: target git SHA (7-40 hex chars). Leave blank for HEAD:'
+    : 'Tuỳ chọn: SHA git đích (7-40 hex). Trống = HEAD:', '');
+  if(sha === null) return;
+  try{
+    const res = await apiCall('admin_deploy_trigger', {
+      reason: reason.trim(),
+      target_sha: (sha || '').trim()
+    }, 'POST');
+    if(res && res.ok){
+      const steps = (res.next_steps || []).map(s => '• ' + s).join('\n');
+      window.alert((lang==='en'?'Deploy intent recorded.\nIntent ID: ':'Đã ghi nhận deploy.\nIntent ID: ')
+        + (res.intent_id || '?')
+        + '\nSHA: ' + (res.target_sha || 'HEAD')
+        + '\n\n' + (lang==='en'?'Next steps:':'Các bước tiếp theo:') + '\n' + steps);
+      showToast(lang==='en'?'Deploy intent recorded — see next steps.':'Đã ghi nhận deploy — xem next steps.', 'success');
+    }else{
+      const msg = (res && (res.detail || res.error)) || 'deploy_trigger_failed';
+      showToast((lang==='en'?'Deploy trigger failed: ':'Lỗi: ')+String(msg).slice(0,200), 'error');
+    }
+  }catch(e){
+    showToast((lang==='en'?'Deploy trigger error: ':'Lỗi: ')+e.message, 'error');
+  }
+}
+
+async function adminVCChangeRequestSubmit(){
+  const reason = window.prompt(lang==='en'
+    ? 'Reason for this change request (≥10 chars, logged for audit):'
+    : 'Lý do CR (≥10 ký tự, ghi vào audit):', '');
+  if(reason === null) return;
+  if(reason.trim().length < 10){
+    showToast(lang==='en'?'Reason ≥10 chars required in Operation mode.':'Operation mode cần lý do ≥10 ký tự.', 'error');
+    return;
+  }
+  const sha = window.prompt(lang==='en'
+    ? 'Optional: target git SHA. Leave blank for HEAD:'
+    : 'Tuỳ chọn: SHA git đích. Trống = HEAD:', '');
+  if(sha === null) return;
+  const cr = window.prompt(lang==='en'
+    ? 'Optional: existing change_ref (e.g. CR-2026-099). Leave blank to auto-generate:'
+    : 'Tuỳ chọn: change_ref đã có (e.g. CR-2026-099). Trống = tự sinh:', '');
+  if(cr === null) return;
+  try{
+    const res = await apiCall('admin_change_request_submit', {
+      reason: reason.trim(),
+      target_sha: (sha || '').trim(),
+      change_ref: (cr || '').trim()
+    }, 'POST');
+    if(res && res.ok){
+      const steps = (res.next_steps || []).map(s => '• ' + s).join('\n');
+      window.alert((lang==='en'?'Change request submitted.\nCR: ':'Đã gửi CR.\nCR: ')
+        + (res.change_ref || '?')
+        + '\n' + (lang==='en'?'Status: ':'Trạng thái: ') + (res.status || '?')
+        + '\n\n' + (lang==='en'?'Next steps:':'Các bước tiếp theo:') + '\n' + steps);
+      showToast(lang==='en'?'CR submitted — pending approval.':'Đã gửi CR — chờ duyệt.', 'success');
+    }else{
+      const msg = (res && (res.detail || res.error)) || 'cr_submit_failed';
+      showToast((lang==='en'?'CR submit failed: ':'Lỗi CR: ')+String(msg).slice(0,200), 'error');
+    }
+  }catch(e){
+    showToast((lang==='en'?'CR submit error: ':'Lỗi CR: ')+e.message, 'error');
+  }
+}
+
 // Filter helper handlers — called inline from chips/inputs.
 function adminVCTimelineToggleType(typeId){
   const all = ['audit','snapshot','doc_revision'];
@@ -9751,20 +9837,25 @@ function renderAdminVCStatus(){
                                  : aheadN + ' commit trên VPS chưa có ở origin/' + branch + '. Bất thường — kiểm tra.');
   }
 
-  // Mode-aware CTA — Pha 4 wires these to real endpoints. For now they are
-  // disabled stubs that show the affordance + which mode owns each action.
-  const devCTA = '<button class="admin-sync-mini" disabled aria-disabled="true" title="'+
-    escapeHtml(lang==='en'?'Wired in Phase 4 (git push + GHA poll)':'Có ở Pha 4 (git push + theo dõi GHA)')+'">'+
-    escapeHtml(lang==='en'?'🚀 Push & Deploy (P4)':'🚀 Push & Deploy (P4)')+
+  // Mode-aware CTA — Pha 4 wires these to real endpoints.
+  // Dev: admin_deploy_trigger (records intent + returns GHA url).
+  // Op:  admin_change_request_submit (creates pending CR awaiting approval).
+  // Both: BE never actually pushes code — UI prints the next_steps[] payload
+  // so the operator runs the deploy where appropriate (GHA / SSH / laptop).
+  const devCTA = '<button class="admin-sync-mini" '+
+    'onclick="adminVCDeployTrigger()" '+
+    'title="'+escapeHtml(lang==='en'?'Record a deploy intent (audited) and show next steps':'Ghi nhận ý định deploy (có audit) và hiện next steps')+'">'+
+    escapeHtml(lang==='en'?'🚀 Push & Deploy':'🚀 Push & Deploy')+
     '</button>';
-  const opCTA = '<button class="admin-sync-mini" disabled aria-disabled="true" title="'+
-    escapeHtml(lang==='en'?'Wired in Phase 4 (creates change_request row)':'Có ở Pha 4 (tạo change_request)')+'">'+
-    escapeHtml(lang==='en'?'📝 Submit deploy request (P4)':'📝 Gửi yêu cầu deploy (P4)')+
+  const opCTA = '<button class="admin-sync-mini" '+
+    'onclick="adminVCChangeRequestSubmit()" '+
+    'title="'+escapeHtml(lang==='en'?'Submit a deploy change request — pending approval':'Gửi yêu cầu deploy — chờ duyệt')+'">'+
+    escapeHtml(lang==='en'?'📝 Submit deploy request':'📝 Gửi yêu cầu deploy')+
     '</button>';
   const modeCTA = isDev ? devCTA : opCTA;
   const modeCTANote = isDev
-    ? (lang==='en'?'Developer mode — direct deploy authorised once Pha 4 lands.':'Developer mode — deploy thẳng sau khi Pha 4 hoàn tất.')
-    : (lang==='en'?'Operation mode — change request flow only.':'Operation mode — luồng change request bắt buộc.');
+    ? (lang==='en'?'Developer mode — direct deploy (audited).':'Developer mode — deploy trực tiếp (có audit).')
+    : (lang==='en'?'Operation mode — change request flow with approver.':'Operation mode — luồng CR có người duyệt.');
 
   const readinessHtml =
     '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">'+
