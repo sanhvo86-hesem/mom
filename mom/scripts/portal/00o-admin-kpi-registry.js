@@ -473,6 +473,7 @@ var _viewDefs = [
   ['jd', 'JD', 'JD'],
   ['data', 'Data Contracts', 'Data Contracts'],
   ['counter', 'Counter/Blockers', 'Counter/Blockers'],
+  ['quality_escape', 'Quality Escape', 'Quality Escape'],
   ['retired', 'Retired/Aliases', 'Retired/Aliases'],
   ['profiles', 'Hồ sơ Khách', 'Customer Profiles'],
   ['audit', 'Audit/Drift', 'Audit/Drift']
@@ -508,6 +509,7 @@ function _renderActiveView(){
   if(_state.activeView === 'jd') return _renderJdScorecards();
   if(_state.activeView === 'data') return _renderDataContracts();
   if(_state.activeView === 'counter') return _renderCounterBlockers();
+  if(_state.activeView === 'quality_escape') return _renderQualityEscapeSeverity();
   if(_state.activeView === 'retired')
     return _metricPanel(_t('Retired / Aliases', 'Retired / Aliases'), _viewRows('retired_metrics'), false);
   if(_state.activeView === 'profiles') return _renderCustomerProfiles();
@@ -706,6 +708,67 @@ function _renderRegistryContracts(){
   }
 
   return head + '<div class="kc-prof-grid">' + dashCard + inputCard + '</div>';
+}
+
+function _renderQualityEscapeSeverity(){
+  var cfg = _state.config || {};
+  var matrix = cfg.customer_ncr_severity_matrix || {};
+  var dataContract = cfg.customer_ncr_data_contract || {};
+  var bonus = cfg.bonus_simulation_model || {};
+  var dash = cfg.quality_escape_dashboard_contract || {};
+  var matrixKeys = Object.keys(matrix).filter(function(k){
+    return matrix[k] && typeof matrix[k] === 'object' && !Array.isArray(matrix[k]) &&
+      ['matrix_id','authority','usage_rule'].indexOf(k) < 0;
+  });
+  var matrixRows = matrixKeys.map(function(k){
+    var row = matrix[k] || {};
+    return [
+      k,
+      row.scope || '—',
+      row.hard_gate ? 'yes' : 'no',
+      row.blocking_condition_id || '—',
+      row.score_impact || '—',
+      row.required_action || '—'
+    ];
+  });
+  var reqFields = (dataContract.required_fields || []).map(function(f){
+    return [
+      f.field || '',
+      f.table || '',
+      f.column || '',
+      f.evidence || ''
+    ];
+  });
+  var hardGates = (bonus.hard_gates || []).map(function(g){
+    return '<span class="kc-pill kc-pill--accent">' + _esc(g) + '</span>';
+  }).join(' ');
+  var dashFields = (dash.row_fields || dash.required_cards || []).map(function(f){
+    return '<span class="kc-pill">' + _esc(f) + '</span>';
+  }).join(' ');
+  var severityTable = matrixRows.length
+    ? _simpleTable(['Severity','Scope','Hard gate','Blocker','Score impact','Required action'], matrixRows)
+    : '<div class="hm-empty">' + _t('Chưa khai báo severity matrix.', 'No severity matrix declared.') + '</div>';
+  var contractTable = reqFields.length
+    ? _simpleTable(['Field','Table','Column','Evidence'], reqFields)
+    : '<div class="hm-empty">' + _t('Chưa khai báo data contract.', 'No data contract declared.') + '</div>';
+
+  return '<section class="kc-panel"><div class="kc-panel-head"><h3>' +
+    _t('Customer NCR severity & 8D', 'Customer NCR severity & 8D') +
+    '</h3><span class="kc-pill' + (bonus.simulation_only ? ' kc-pill--accent' : '') + '">' +
+    (bonus.simulation_only ? 'simulation_only' : 'simulation_not_configured') + '</span></div>' +
+    '<div class="kc-mini">' + _esc(matrix.usage_rule || '') + '</div>' +
+    '<details open><summary>' + _t('Severity matrix', 'Severity matrix') + '</summary>' + severityTable + '</details>' +
+    '<details><summary>' + _t('3D/4D/8D data contract', '3D/4D/8D data contract') + '</summary>' +
+      '<div class="kc-mini">' + _esc(dataContract.event_time_distinction_rule || '') + '</div>' + contractTable + '</details>' +
+    '<details open><summary>' + _t('Bonus simulation hard gates', 'Bonus simulation hard gates') + '</summary>' +
+      '<div class="kc-prof-meta"><b>' + _esc(bonus.payout_formula || '') + '</b></div>' +
+      '<div class="kc-prof-meta">' + _esc(bonus.scope_rule || '') + '</div>' +
+      '<div class="kc-pill-list">' + hardGates + '</div>' +
+      '<div class="kc-mini">' + _esc(bonus.no_real_payout_rule || '') + '</div></details>' +
+    '<details><summary>' + _t('Dashboard contract', 'Dashboard contract') + '</summary>' +
+      '<div class="kc-pill-list">' + dashFields + '</div>' +
+      '<div class="kc-mini">' + _esc(dash.staged_render_rule || '') + '</div></details>' +
+    '</section>';
 }
 
 function _renderOverview(){

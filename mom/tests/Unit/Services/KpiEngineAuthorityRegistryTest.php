@@ -78,7 +78,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertSame(30, $catalog['counts']['runtime_calculated_metrics'] ?? null);
         $this->assertSame(18, $catalog['counts']['dashboard_core_kpis'] ?? null);
         $this->assertSame(41, $catalog['counts']['gate_control_metrics'] ?? null);
-        $this->assertSame(123, $catalog['counts']['proposed_operating_metrics'] ?? null);
+        $this->assertSame(129, $catalog['counts']['proposed_operating_metrics'] ?? null);
         $this->assertNotEmpty($catalog['data_contract_required_fields'] ?? []);
         $this->assertContains('canonical_code', $catalog['data_contract_required_fields'] ?? []);
         $this->assertContains('metric_type', $catalog['data_contract_required_fields'] ?? []);
@@ -99,6 +99,9 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         );
         $this->assertContains('metric_type', $catalog['metric_governance_schema']['required_catalog_fields'] ?? []);
         $this->assertSame('CNC-EXEC-BSC-LEAN-7+DRIVERS-2026', $catalog['scorecard_operating_model']['model_id'] ?? null);
+        $this->assertSame(true, $catalog['bonus_simulation_model']['simulation_only'] ?? null);
+        $this->assertArrayHasKey('critical', $catalog['customer_ncr_severity_matrix'] ?? []);
+        $this->assertNotEmpty($catalog['customer_ncr_data_contract']['required_fields'] ?? []);
 
         $metricsByCode = [];
         foreach (($catalog['metrics'] ?? []) as $metric) {

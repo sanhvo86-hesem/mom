@@ -61,6 +61,12 @@ final class EqmsComplaintsController extends EqmsBaseController
                     received_date, severity, category, assigned_to, department, status, version,
                     containment_action, investigation_summary, customer_response, capa_id,
                     field_action_id, resolution_date, closed_by, closed_at,
+                    received_at, detected_at, customer_notification_sent_at,
+                    containment_started_at, containment_verified_at,
+                    d3_sent_at, d4_sent_at, d8_updated_at,
+                    corrective_action_effective_at, customer_acceptance_at,
+                    repeat_root_cause_family, severity_classification,
+                    hard_gate_status, bonus_simulation_scope, bonus_simulation_impact,
                     created_at, created_by, updated_at, updated_by
              FROM eqms_complaints
              WHERE complaint_id = :id
@@ -146,6 +152,9 @@ final class EqmsComplaintsController extends EqmsBaseController
         $items = $this->data->query(
             "SELECT complaint_id, complaint_number, customer_id, customer_name, subject,
                     received_date, severity, category, assigned_to, status, version,
+                    severity_classification, hard_gate_status, received_at,
+                    containment_started_at, containment_verified_at,
+                    d3_sent_at, d4_sent_at, d8_updated_at, customer_acceptance_at,
                     created_at, updated_at
              FROM eqms_complaints
              WHERE {$whereClause}
@@ -208,6 +217,81 @@ final class EqmsComplaintsController extends EqmsBaseController
             "SELECT COUNT(*) FROM eqms_complaints WHERE severity = 'critical' AND status NOT IN ('closed')"
         ) ?? 0);
 
+        $severityClassifications = $this->data->query(
+            "SELECT COALESCE(severity_classification, severity, 'unclassified') AS severity_classification,
+                    COUNT(*) AS count
+             FROM eqms_complaints
+             WHERE status NOT IN ('closed','voided')
+             GROUP BY COALESCE(severity_classification, severity, 'unclassified')
+             ORDER BY count DESC"
+        ) ?? [];
+
+        $hardGateStatus = $this->data->query(
+            "SELECT COALESCE(hard_gate_status, 'open') AS hard_gate_status, COUNT(*) AS count
+             FROM eqms_complaints
+             WHERE status NOT IN ('closed','voided')
+               AND severity_classification IS NOT NULL
+             GROUP BY COALESCE(hard_gate_status, 'open')
+             ORDER BY count DESC"
+        ) ?? [];
+
+        $slaStatus = [
+            'late_3d_open' => (int)($this->data->scalar(
+                "SELECT COUNT(*) FROM eqms_complaints
+                 WHERE status NOT IN ('closed','voided')
+                   AND received_at IS NOT NULL
+                   AND d3_sent_at IS NULL
+                   AND received_at < (now() - interval '1 day')"
+            ) ?? 0),
+            'late_4d_open' => (int)($this->data->scalar(
+                "SELECT COUNT(*) FROM eqms_complaints
+                 WHERE status NOT IN ('closed','voided')
+                   AND received_at IS NOT NULL
+                   AND d4_sent_at IS NULL
+                   AND received_at < (now() - interval '2 days')"
+            ) ?? 0),
+            'late_8d_open' => (int)($this->data->scalar(
+                "SELECT COUNT(*) FROM eqms_complaints
+                 WHERE status NOT IN ('closed','voided')
+                   AND received_at IS NOT NULL
+                   AND d8_updated_at IS NULL
+                   AND received_at < (now() - interval '10 days')"
+            ) ?? 0),
+            'awaiting_customer_acceptance' => (int)($this->data->scalar(
+                "SELECT COUNT(*) FROM eqms_complaints
+                 WHERE status NOT IN ('closed','voided')
+                   AND customer_response IS NOT NULL
+                   AND customer_acceptance_at IS NULL"
+            ) ?? 0),
+        ];
+
+        $containmentStatus = [
+            'missing_or_unverified_open' => (int)($this->data->scalar(
+                "SELECT COUNT(*) FROM eqms_complaints
+                 WHERE status NOT IN ('closed','voided')
+                   AND COALESCE(severity_classification, severity) IN ('major','critical','no_containment')
+                   AND (containment_started_at IS NULL OR containment_verified_at IS NULL)"
+            ) ?? 0),
+            'verified_open' => (int)($this->data->scalar(
+                "SELECT COUNT(*) FROM eqms_complaints
+                 WHERE status NOT IN ('closed','voided')
+                   AND containment_started_at IS NOT NULL
+                   AND containment_verified_at IS NOT NULL"
+            ) ?? 0),
+        ];
+
+        $openComplaintRows = $this->data->query(
+            "SELECT complaint_id, complaint_number, customer_name, status, severity,
+                    severity_classification, hard_gate_status, received_at,
+                    containment_started_at, containment_verified_at,
+                    d3_sent_at, d4_sent_at, d8_updated_at,
+                    customer_acceptance_at, bonus_simulation_impact
+             FROM eqms_complaints
+             WHERE status NOT IN ('closed','voided')
+             ORDER BY COALESCE(received_at, received_date::timestamptz, created_at) DESC
+             LIMIT 25"
+        ) ?? [];
+
         $this->success([
             'metrics' => [
                 'open_count'           => $openCount,
@@ -216,6 +300,13 @@ final class EqmsComplaintsController extends EqmsBaseController
                 'by_severity'          => $bySeverity,
                 'by_status'            => $byStatus,
                 'top_categories'       => $topCategories,
+                'quality_escape_severity' => [
+                    'by_severity_classification' => $severityClassifications,
+                    'hard_gate_status'           => $hardGateStatus,
+                    'sla_status'                 => $slaStatus,
+                    'containment_status'         => $containmentStatus,
+                    'open_complaints'            => $openComplaintRows,
+                ],
             ],
         ]);
     }
@@ -294,7 +385,11 @@ final class EqmsComplaintsController extends EqmsBaseController
         $subject       = trim((string)($body['subject'] ?? ''));
         $description   = trim((string)($body['description'] ?? ''));
         $receivedDate  = trim((string)($body['received_date'] ?? ''));
+        $receivedAt    = trim((string)($body['received_at'] ?? ''));
+        $detectedAt    = trim((string)($body['detected_at'] ?? ''));
         $severity      = trim((string)($body['severity'] ?? ''));
+        $severityClassification = trim((string)($body['severity_classification'] ?? ''));
+        $repeatRootCauseFamily = trim((string)($body['repeat_root_cause_family'] ?? ''));
         $customerId    = trim((string)($body['customer_id'] ?? ''));
         $customerName  = trim((string)($body['customer_name'] ?? ''));
 
@@ -323,11 +418,13 @@ final class EqmsComplaintsController extends EqmsBaseController
             "INSERT INTO eqms_complaints (
                 complaint_id, complaint_number, customer_id, customer_name,
                 subject, description, received_date, severity,
+                received_at, detected_at, severity_classification, repeat_root_cause_family,
                 category, status, version,
                 created_at, created_by, updated_at, updated_by
              ) VALUES (
                 :id, :number, :customer_id, :customer_name,
                 :subject, :description, :received_date, :severity,
+                :received_at, :detected_at, :severity_classification, :repeat_root_cause_family,
                 :category, 'draft', 1,
                 :now, :actor, :now, :actor
              )",
@@ -340,6 +437,10 @@ final class EqmsComplaintsController extends EqmsBaseController
                 ':description'   => $description,
                 ':received_date' => $receivedDate,
                 ':severity'      => $severity,
+                ':received_at'   => $receivedAt !== '' ? $receivedAt : null,
+                ':detected_at'   => $detectedAt !== '' ? $detectedAt : null,
+                ':severity_classification' => $severityClassification !== '' ? $severityClassification : null,
+                ':repeat_root_cause_family' => $repeatRootCauseFamily !== '' ? $repeatRootCauseFamily : null,
                 ':category'      => trim((string)($body['category'] ?? '')),
                 ':now'           => $now,
                 ':actor'         => $actor,
@@ -400,7 +501,9 @@ final class EqmsComplaintsController extends EqmsBaseController
         $params  = [':id' => $id, ':version_new' => (int)$record['version'] + 1, ':now' => $now, ':actor' => $actor];
 
         $editableFields = [
-            'subject', 'description', 'received_date', 'category',
+            'subject', 'description', 'received_date', 'received_at', 'detected_at',
+            'category', 'severity_classification', 'repeat_root_cause_family',
+            'customer_notification_sent_at', 'hard_gate_status', 'bonus_simulation_scope',
             'customer_id', 'customer_name',
         ];
 
@@ -418,6 +521,20 @@ final class EqmsComplaintsController extends EqmsBaseController
             }
             $updates[]          = "severity = :severity";
             $params[':severity'] = $sev;
+        }
+        if (array_key_exists('hard_gate_status', $body)) {
+            $hardGateStatus = trim((string)($body['hard_gate_status'] ?? ''));
+            if (!in_array($hardGateStatus, ['open', 'blocked', 'cleared', 'waived'], true)) {
+                $this->error('invalid_hard_gate_status', 400,
+                    "'hard_gate_status' must be open, blocked, cleared, or waived.");
+            }
+        }
+        if (array_key_exists('bonus_simulation_scope', $body)) {
+            $simulationScope = trim((string)($body['bonus_simulation_scope'] ?? ''));
+            if (!in_array($simulationScope, ['order', 'customer', 'value_stream', 'company', 'affected_scope'], true)) {
+                $this->error('invalid_bonus_simulation_scope', 400,
+                    "'bonus_simulation_scope' must be order, customer, value_stream, company, or affected_scope.");
+            }
         }
 
         if (empty($updates)) {
@@ -774,16 +891,22 @@ final class EqmsComplaintsController extends EqmsBaseController
 
         $actor = (string)($user['username'] ?? $user['user'] ?? 'unknown');
         $now   = $this->nowIso();
+        $containmentStartedAt = trim((string)($body['containment_started_at'] ?? $body['containment_date'] ?? $now));
+        $containmentVerifiedAt = trim((string)($body['containment_verified_at'] ?? ''));
 
         $this->data->execute(
             "UPDATE eqms_complaints
              SET containment_action = :containment_action,
                  containment_date = :containment_date,
+                 containment_started_at = COALESCE(containment_started_at, :containment_started_at),
+                 containment_verified_at = COALESCE(:containment_verified_at, containment_verified_at),
                  version = version + 1, updated_at = :now, updated_by = :actor
              WHERE complaint_id = :id",
             [
                 ':containment_action' => $containmentAction,
                 ':containment_date'   => trim((string)($body['containment_date'] ?? $now)),
+                ':containment_started_at' => $containmentStartedAt,
+                ':containment_verified_at' => $containmentVerifiedAt !== '' ? $containmentVerifiedAt : null,
                 ':now'                => $now,
                 ':actor'              => $actor,
                 ':id'                 => $id,
@@ -970,19 +1093,33 @@ final class EqmsComplaintsController extends EqmsBaseController
 
         $actor = (string)($user['username'] ?? $user['user'] ?? 'unknown');
         $now   = $this->nowIso();
+        $responseSentAt = trim((string)($body['response_sent_at'] ?? $body['response_date'] ?? $now));
+        $responseStep = strtoupper(trim((string)($body['response_step'] ?? '')));
+        $d3SentAt = trim((string)($body['d3_sent_at'] ?? ($responseStep === 'D3' ? $responseSentAt : '')));
+        $d4SentAt = trim((string)($body['d4_sent_at'] ?? ($responseStep === 'D4' ? $responseSentAt : '')));
+        $d8UpdatedAt = trim((string)($body['d8_updated_at'] ?? ($responseStep === 'D8' ? $responseSentAt : '')));
 
         $this->data->execute(
             "UPDATE eqms_complaints
              SET status = 'response_issued',
                  customer_response = :response,
                  response_date = :response_date,
+                 response_sent_at = :response_sent_at,
+                 customer_notification_sent_at = COALESCE(customer_notification_sent_at, :response_sent_at),
                  response_method = :response_method,
+                 d3_sent_at = COALESCE(d3_sent_at, :d3_sent_at),
+                 d4_sent_at = COALESCE(d4_sent_at, :d4_sent_at),
+                 d8_updated_at = COALESCE(d8_updated_at, :d8_updated_at),
                  version = version + 1, updated_at = :now, updated_by = :actor
              WHERE complaint_id = :id",
             [
                 ':response'        => $customerResponse,
                 ':response_date'   => trim((string)($body['response_date'] ?? $now)),
+                ':response_sent_at' => $responseSentAt,
                 ':response_method' => trim((string)($body['response_method'] ?? '')),
+                ':d3_sent_at'      => $d3SentAt !== '' ? $d3SentAt : null,
+                ':d4_sent_at'      => $d4SentAt !== '' ? $d4SentAt : null,
+                ':d8_updated_at'   => $d8UpdatedAt !== '' ? $d8UpdatedAt : null,
                 ':now'             => $now,
                 ':actor'           => $actor,
                 ':id'              => $id,
@@ -1026,12 +1163,16 @@ final class EqmsComplaintsController extends EqmsBaseController
 
         $actor = (string)($user['username'] ?? $user['user'] ?? 'unknown');
         $now   = $this->nowIso();
+        $customerAcceptanceAt = trim((string)($body['customer_acceptance_at'] ?? ''));
+        $correctiveActionEffectiveAt = trim((string)($body['corrective_action_effective_at'] ?? ''));
 
         $this->data->execute(
             "UPDATE eqms_complaints
              SET status = 'closed',
                  closure_reason = :closure_reason,
                  resolution_date = :resolution_date,
+                 customer_acceptance_at = COALESCE(:customer_acceptance_at, customer_acceptance_at),
+                 corrective_action_effective_at = COALESCE(:corrective_action_effective_at, corrective_action_effective_at),
                  closed_by = :actor,
                  closed_at = :now,
                  version = version + 1, updated_at = :now, updated_by = :actor
@@ -1039,6 +1180,8 @@ final class EqmsComplaintsController extends EqmsBaseController
             [
                 ':closure_reason'  => $closureReason,
                 ':resolution_date' => trim((string)($body['resolution_date'] ?? $now)),
+                ':customer_acceptance_at' => $customerAcceptanceAt !== '' ? $customerAcceptanceAt : null,
+                ':corrective_action_effective_at' => $correctiveActionEffectiveAt !== '' ? $correctiveActionEffectiveAt : null,
                 ':now'             => $now,
                 ':actor'           => $actor,
                 ':id'              => $id,

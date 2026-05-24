@@ -129,6 +129,49 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
         );
     }
 
+    public function testRejectsBonusSimulationDisabled(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['bonus_simulation_model']['simulation_only'] = false;
+            },
+            'bonus_simulation_model.simulation_only MUST be true',
+        );
+    }
+
+    public function testRejectsCustomerSeverityMatrixHardGateWithoutRegisteredBlocker(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['customer_ncr_severity_matrix']['critical']['blocking_condition_id'] = 'unknown_hard_gate';
+            },
+            'customer_ncr_severity_matrix.critical blocking_condition_id',
+        );
+    }
+
+    public function testRejectsCustomerNcrSeverityMetricRewardable(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'CUSTOMER_NCR_SEVERITY_SCORE', static function (array &$row): void {
+                    $row['reward_mode'] = 'bonus_pool_candidate';
+                    $row['reward_eligible'] = true;
+                });
+            },
+            'CUSTOMER_NCR_SEVERITY_SCORE: severity/hard-gate metrics must not be directly rewardable',
+        );
+    }
+
+    public function testRejectsMissingPrompt05CustomerNcrMetric(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::removeMetric($registry, 'NO_CONTAINMENT_COUNTER');
+            },
+            "Prompt 05 required metric 'NO_CONTAINMENT_COUNTER' missing",
+        );
+    }
+
     /**
      * @param callable(array<string, mixed>): void $mutate
      */
@@ -180,6 +223,24 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
                 }
             }
             unset($row);
+        }
+        self::fail("Metric {$code} not found in fake registry.");
+    }
+
+    /**
+     * @param array<string, mixed> $registry
+     */
+    private static function removeMetric(array &$registry, string $code): void
+    {
+        foreach (['annex122_governance_kpis', 'gate_control_metrics', 'proposed_operating_metrics'] as $section) {
+            $before = count($registry[$section]);
+            $registry[$section] = array_values(array_filter(
+                $registry[$section],
+                static fn(array $row): bool => strtoupper((string) ($row['canonical_code'] ?? '')) !== $code,
+            ));
+            if (count($registry[$section]) !== $before) {
+                return;
+            }
         }
         self::fail("Metric {$code} not found in fake registry.");
     }

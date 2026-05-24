@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
-  "version": "2026-05-24",
-  "schema_version": 21,
+  "version": "2026-05-24+p05",
+  "schema_version": 22,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. The executive scorecard is a lean runtime-backed core; role scorecards use active/candidate measures; proposed metrics remain non-reward until governed evidence and data contracts are approved.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -217,7 +217,7 @@
       "data_stewardship_role": "CS",
       "cadence": "monthly",
       "lead_or_lag": "lag",
-      "paired_metric": "FPY",
+      "paired_metric": "CUSTOMER_NCR_SEVERITY_SCORE",
       "decision_action": "Đỏ: CEO/QA soát xét, mở bao vây trong 24h và thông báo khách nếu cần.",
       "action_reference": "SOP-902 xem xét của lãnh đạo + quy trình NCR/CAPA; CDR cổng G6.",
       "attribution_rule": "Đỏ phải tách theo nguyên nhân: lỗi sản xuất do D-PROD/WKM, lỗi thiết kế do D-ENG, lỗi đóng gói/giao hàng do D-WHS/CS; phần thuộc owner QA giới hạn ở vận hành cổng phát hành cuối. Khiếu nại phải được ghi nhận đầy đủ — cấm nén số bằng cách không mở NCR; kiểm tra chéo qua data-integrity gate.",
@@ -233,7 +233,11 @@
         "customer_containment_open",
         "ncr_suppression_evidence",
         "data_integrity_red",
-        "gate_bypass_open"
+        "gate_bypass_open",
+        "critical_customer_escape",
+        "customer_escape_without_containment",
+        "late_or_no_customer_ncr",
+        "falsified_customer_quality_record"
       ],
       "calculation_status": "runtime_calculated",
       "status": "retained",
@@ -252,7 +256,15 @@
         "engineering_defect_with_open_eco",
         "qa_hold_valid_per_gate",
         "force_majeure_or_utility_outage"
-      ]
+      ],
+      "low_volume_policy": "Do not use complaint rate alone for payout, discipline or punishment in high-mix/low-volume cells; require sample/denominator context plus severity/hard-gate review.",
+      "severity_gate_note": "Critical, no-containment, late/no-NCR, unauthorized change, special-release, expired-gage and falsified-record cases block simulation even when PPM/DPPM is numerically low.",
+      "sample_policy": {
+        "min_n_score": 30,
+        "provisional_n": 10,
+        "denominator_context_required": true,
+        "low_volume_review_required": true
+      }
     },
     {
       "no": 3,
@@ -6369,7 +6381,50 @@
         "CS"
       ],
       "lam_profile_link": "LAM_SEMSYSCO",
-      "evidence_source": "ncr_response_log + customer email timestamps"
+      "evidence_source": "ncr_response_log + customer email timestamps",
+      "paired_metric": "NO_CONTAINMENT_COUNTER",
+      "data_contract_gap": "Needs governed received_at, containment_started_at and d3_sent_at timestamps with customer/email evidence.",
+      "target_graduation_condition": "90 days of LAM complaints have complete received_at, containment_started_at, d3_sent_at and customer evidence with no late/missing NCR exceptions.",
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "eqms_complaints",
+          "capa_8d_steps"
+        ],
+        "columns": [
+          "received_at",
+          "containment_started_at",
+          "d3_sent_at"
+        ],
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05"
+      },
+      "required_evidence": [
+        "complaint_received_at",
+        "containment_started_at",
+        "d3_sent_at",
+        "customer response evidence"
+      ],
+      "usage_contexts": [
+        "quality_escape_dashboard",
+        "lam_8d_sla",
+        "bonus_simulation_hard_gate"
+      ],
+      "role_assignments": [
+        {
+          "role_code": "QA",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "owns classification, containment evidence and customer quality response governance"
+        },
+        {
+          "role_code": "CS",
+          "assignment_type": "contributor",
+          "controllability_scope": "owns customer communication timestamps and acceptance evidence"
+        }
+      ],
+      "hold_release_rule": "Late 3D for LAM complaint blocks bonus simulation and customer-risk sign-off until escalated and contained.",
+      "action_when_red": "Escalate to QA/CS owner, verify containment, notify customer and document recovery plan.",
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false
     },
     {
       "canonical_code": "NCR_4D_PRELIMINARY_SLA",
@@ -6410,7 +6465,49 @@
         "QA"
       ],
       "lam_profile_link": "LAM_SEMSYSCO",
-      "evidence_source": "ncr_response_log"
+      "evidence_source": "ncr_response_log",
+      "paired_metric": "CUSTOMER_NCR_SEVERITY_SCORE",
+      "data_contract_gap": "Needs governed received_at and d4_sent_at timestamps with preliminary root-cause response evidence.",
+      "target_graduation_condition": "90 days of LAM complaints have complete 4D preliminary timestamps, root-cause evidence and customer communication evidence.",
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "eqms_complaints",
+          "capa_8d_steps"
+        ],
+        "columns": [
+          "received_at",
+          "d4_sent_at"
+        ],
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05"
+      },
+      "required_evidence": [
+        "complaint_received_at",
+        "d4_sent_at",
+        "preliminary root cause evidence",
+        "customer response evidence"
+      ],
+      "usage_contexts": [
+        "quality_escape_dashboard",
+        "lam_8d_sla",
+        "bonus_simulation_hard_gate"
+      ],
+      "role_assignments": [
+        {
+          "role_code": "QA",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "owns classification, containment evidence and customer quality response governance"
+        },
+        {
+          "role_code": "QE",
+          "assignment_type": "contributor",
+          "controllability_scope": "owns customer communication timestamps and acceptance evidence"
+        }
+      ],
+      "hold_release_rule": "Late 4D for LAM complaint blocks simulation until recovery plan is accepted.",
+      "action_when_red": "Escalate preliminary root-cause response and document customer recovery commitment.",
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false
     },
     {
       "canonical_code": "NCR_8D_UPDATE_SLA",
@@ -6452,7 +6549,51 @@
         "QE"
       ],
       "lam_profile_link": "LAM_SEMSYSCO",
-      "evidence_source": "8d_report_history with progress update timestamps"
+      "evidence_source": "8d_report_history with progress update timestamps",
+      "paired_metric": "CUSTOMER_ACCEPTED_8D_CLOSURE_RATE",
+      "data_contract_gap": "Needs governed received_at, d8_updated_at, progress update and CAPA effectiveness timestamps.",
+      "target_graduation_condition": "90 days of LAM complaints have complete updated 8D/progress evidence and CAPA effectiveness verification lineage.",
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "eqms_complaints",
+          "capa_8d_steps",
+          "capa_effectiveness_checks"
+        ],
+        "columns": [
+          "received_at",
+          "d8_updated_at",
+          "corrective_action_effective_at"
+        ],
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05"
+      },
+      "required_evidence": [
+        "complaint_received_at",
+        "d8_updated_at",
+        "progress update evidence",
+        "corrective_action_effective_at"
+      ],
+      "usage_contexts": [
+        "quality_escape_dashboard",
+        "lam_8d_sla",
+        "bonus_simulation_hard_gate"
+      ],
+      "role_assignments": [
+        {
+          "role_code": "QA",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "owns classification, containment evidence and customer quality response governance"
+        },
+        {
+          "role_code": "QE",
+          "assignment_type": "contributor",
+          "controllability_scope": "owns customer communication timestamps and acceptance evidence"
+        }
+      ],
+      "hold_release_rule": "Late/stale 8D blocks simulation until customer update and recovery plan are documented.",
+      "action_when_red": "Escalate stale 8D, update customer and verify CAPA effectiveness path.",
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false
     },
     {
       "canonical_code": "CUSTOMER_ACCEPTED_8D_CLOSURE_RATE",
@@ -6493,7 +6634,49 @@
         "QA"
       ],
       "lam_profile_link": "LAM_SEMSYSCO",
-      "evidence_source": "8d_closure_log + customer acceptance email"
+      "evidence_source": "8d_closure_log + customer acceptance email",
+      "paired_metric": "CUSTOMER_NCR_SEVERITY_SCORE",
+      "data_contract_gap": "Needs governed customer_acceptance_at and customer closure evidence; self-closure without customer acceptance remains blocked.",
+      "target_graduation_condition": "90 days of customer complaint closures have customer acceptance/closure timestamp or approved no-response closure rationale.",
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "eqms_complaints",
+          "capa_8d_steps"
+        ],
+        "columns": [
+          "customer_acceptance_at",
+          "closed_at",
+          "d8_updated_at"
+        ],
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05"
+      },
+      "required_evidence": [
+        "customer_acceptance_at",
+        "customer closure evidence",
+        "8D final response evidence"
+      ],
+      "usage_contexts": [
+        "quality_escape_dashboard",
+        "lam_8d_closure",
+        "bonus_simulation_hard_gate"
+      ],
+      "role_assignments": [
+        {
+          "role_code": "QA",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "owns classification, containment evidence and customer quality response governance"
+        },
+        {
+          "role_code": "CS",
+          "assignment_type": "contributor",
+          "controllability_scope": "owns customer communication timestamps and acceptance evidence"
+        }
+      ],
+      "hold_release_rule": "Self-closed 8D without customer acceptance blocks simulation until customer acceptance or QMS-approved rationale is recorded.",
+      "action_when_red": "Reopen customer closure path and obtain acceptance evidence.",
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false
     },
     {
       "canonical_code": "TRAINING_AS_CAPA_COUNTER",
@@ -6872,6 +7055,536 @@
       ],
       "evidence_source": "labor transaction log + supervisor correction approval",
       "origin": "prompt_02_legacy_alias_backcompat_2026_05_24"
+    },
+    {
+      "canonical_code": "CUSTOMER_NCR_SEVERITY_SCORE",
+      "name": "Customer NCR Severity Score",
+      "name_vi": "Điểm mức độ nghiêm trọng NCR khách hàng",
+      "process": "quality_system",
+      "category": "customer",
+      "owner_role": "QA",
+      "cadence": "per-event/monthly-review",
+      "calculation_status": "manual_governed",
+      "metric_subtype": "counter_metric",
+      "measurement_data_type": "risk_score",
+      "scoring_model_detail": "event_severity_score",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "severity_points",
+        "green_point": 0,
+        "yellow_point": 20,
+        "target": 0,
+        "basis": "Severity points from customer_ncr_severity_matrix; hard-gate rows block simulation until closed."
+      },
+      "counter_metric": {
+        "code": "CUSTOMER_NCR_SEVERITY_SCORE-CTR",
+        "endpoint": "POST /api/kpi/CUSTOMER_NCR_SEVERITY_SCORE-CTR/input",
+        "name": "Unclassified customer NCR severity count",
+        "name_vi": "Số NCR khách hàng chưa phân loại severity",
+        "intent": "Prevents closing or simulating customer NCRs without controlled severity classification."
+      },
+      "blocking_conditions": [
+        "critical_customer_escape",
+        "repeat_same_root_cause_escape",
+        "customer_escape_without_containment",
+        "late_or_no_customer_ncr",
+        "unauthorized_process_or_product_change",
+        "ship_deviation_without_special_release",
+        "expired_gage_used_for_release",
+        "falsified_customer_quality_record"
+      ],
+      "paired_metric": "COMPLAINT_RATE",
+      "action_when_red": "Escalate hard gate, containment and customer response; use only for management review and bonus simulation.",
+      "decision_action": "Red/hard gate triggers QMS/CEO review, not automatic payout or discipline.",
+      "required_evidence": [
+        "severity matrix classification",
+        "customer complaint received timestamp",
+        "NCR link",
+        "containment evidence",
+        "customer acceptance/closure evidence"
+      ],
+      "metric_type": "counter_metric",
+      "control_intent": "customer_quality_escape",
+      "evaluation_use": "management_review",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "applicable_jds": [
+        "QA",
+        "CS"
+      ],
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "customer_profile_link": "LAM_SEMSYSCO",
+      "role_assignments": [
+        {
+          "role_code": "QA",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "owns classification, containment evidence and customer quality response governance"
+        },
+        {
+          "role_code": "CS",
+          "assignment_type": "contributor",
+          "controllability_scope": "owns customer communication timestamps and acceptance evidence"
+        }
+      ],
+      "usage_contexts": [
+        "quality_escape_dashboard",
+        "management_review",
+        "bonus_simulation_only"
+      ],
+      "evidence_source": "customer_ncr_data_contract + EQMS complaint/NCR/CAPA evidence",
+      "attribution_rule": "Severity and SLA blockers are attributed by root-cause family, controllable owner and customer scope; never by complaint rate alone.",
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "eqms_complaints",
+          "eqms_ncr_records",
+          "ncr_records",
+          "capa_8d_steps",
+          "capa_effectiveness_checks"
+        ],
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05"
+      }
+    },
+    {
+      "canonical_code": "CUSTOMER_NCR_EVENTS_M",
+      "name": "Customer NCR Events per Month",
+      "name_vi": "Số sự kiện NCR khách hàng/tháng",
+      "process": "quality_system",
+      "category": "customer",
+      "owner_role": "QA",
+      "cadence": "monthly",
+      "calculation_status": "manual_governed",
+      "metric_subtype": "operating_metric",
+      "measurement_data_type": "count",
+      "scoring_model_detail": "rag_3_band",
+      "evaluation_use": "management_review",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "count",
+        "green_point": 0,
+        "yellow_point": 2,
+        "target": 0,
+        "basis": "Monthly event count used with severity and denominator context; count alone is not reward or discipline."
+      },
+      "counter_metric": {
+        "code": "CUSTOMER_NCR_EVENTS_M-CTR",
+        "endpoint": "POST /api/kpi/CUSTOMER_NCR_EVENTS_M-CTR/input",
+        "name": "Unlogged customer NCR event count",
+        "name_vi": "Số sự kiện NCR khách hàng chưa được ghi nhận",
+        "intent": "Prevents hiding customer events to improve monthly count."
+      },
+      "blocking_conditions": [
+        "late_or_no_customer_ncr",
+        "falsified_customer_quality_record"
+      ],
+      "paired_metric": "CUSTOMER_NCR_SEVERITY_SCORE",
+      "required_evidence": [
+        "complaint log",
+        "NCR link",
+        "customer notification timestamp"
+      ],
+      "action_when_red": "Review event trend with severity, containment and denominator context.",
+      "decision_action": "Use as management-review volume signal only; never as stand-alone low-volume punishment.",
+      "metric_type": "operating_metric",
+      "control_intent": "customer_quality_escape",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "applicable_jds": [
+        "QA",
+        "CS"
+      ],
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "customer_profile_link": "LAM_SEMSYSCO",
+      "role_assignments": [
+        {
+          "role_code": "QA",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "owns classification, containment evidence and customer quality response governance"
+        },
+        {
+          "role_code": "CS",
+          "assignment_type": "contributor",
+          "controllability_scope": "owns customer communication timestamps and acceptance evidence"
+        }
+      ],
+      "usage_contexts": [
+        "quality_escape_dashboard",
+        "management_review",
+        "bonus_simulation_only"
+      ],
+      "evidence_source": "customer_ncr_data_contract + EQMS complaint/NCR/CAPA evidence",
+      "attribution_rule": "Severity and SLA blockers are attributed by root-cause family, controllable owner and customer scope; never by complaint rate alone.",
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "eqms_complaints",
+          "eqms_ncr_records",
+          "ncr_records",
+          "capa_8d_steps",
+          "capa_effectiveness_checks"
+        ],
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05"
+      }
+    },
+    {
+      "canonical_code": "DEFECTIVE_ORDER_RATE_M",
+      "name": "Defective Order Rate Monthly",
+      "name_vi": "Tỷ lệ đơn hàng lỗi theo tháng",
+      "process": "quality_system",
+      "category": "customer",
+      "owner_role": "QA",
+      "cadence": "monthly",
+      "calculation_status": "staged_data_contract",
+      "metric_subtype": "operating_metric",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "rag_3_band",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 0,
+        "yellow_point": 1,
+        "target": 0,
+        "basis": "Defective orders / shipped orders; staged until order-to-complaint denominator join is proven."
+      },
+      "sample_policy": {
+        "min_n_score": 30,
+        "provisional_n": 10,
+        "stability_required": true,
+        "denominator_context_required": true
+      },
+      "counter_metric": {
+        "code": "DEFECTIVE_ORDER_RATE_M-CTR",
+        "endpoint": "POST /api/kpi/DEFECTIVE_ORDER_RATE_M-CTR/input",
+        "name": "Defective-order denominator mismatch count",
+        "name_vi": "Số lệch mẫu số đơn hàng lỗi",
+        "intent": "Prevents reducing the rate by excluding affected orders or splitting lots."
+      },
+      "blocking_conditions": [
+        "late_or_no_customer_ncr",
+        "falsified_customer_quality_record"
+      ],
+      "paired_metric": "COMPLAINT_RATE",
+      "data_contract_gap": "Needs governed order/shipment denominator joined to complaint/NCR affected order scope.",
+      "target_graduation_condition": "90 days of reconciled shipped-order denominator, affected order mapping and complaint/NCR linkage with zero P0 integrity findings.",
+      "required_evidence": [
+        "shipped order denominator",
+        "affected order mapping",
+        "complaint/NCR linkage"
+      ],
+      "action_when_red": "Use with severity matrix; do not punish low-volume cell when sample_policy says provisional/insufficient.",
+      "decision_action": "Management review only while staged.",
+      "metric_type": "operating_metric",
+      "control_intent": "customer_quality_escape",
+      "evaluation_use": "management_review",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "applicable_jds": [
+        "QA",
+        "CS"
+      ],
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "customer_profile_link": "LAM_SEMSYSCO",
+      "role_assignments": [
+        {
+          "role_code": "QA",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "owns classification, containment evidence and customer quality response governance"
+        },
+        {
+          "role_code": "CS",
+          "assignment_type": "contributor",
+          "controllability_scope": "owns customer communication timestamps and acceptance evidence"
+        }
+      ],
+      "usage_contexts": [
+        "quality_escape_dashboard",
+        "management_review",
+        "bonus_simulation_only"
+      ],
+      "evidence_source": "customer_ncr_data_contract + EQMS complaint/NCR/CAPA evidence",
+      "attribution_rule": "Severity and SLA blockers are attributed by root-cause family, controllable owner and customer scope; never by complaint rate alone.",
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "eqms_complaints",
+          "eqms_ncr_records",
+          "ncr_records",
+          "capa_8d_steps",
+          "capa_effectiveness_checks"
+        ],
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05"
+      }
+    },
+    {
+      "canonical_code": "CUSTOMER_ESCAPE_DPPM_12M",
+      "name": "Customer Escape DPPM Rolling 12 Months",
+      "name_vi": "DPPM lỗi thoát ra khách hàng 12 tháng rolling",
+      "process": "quality_system",
+      "category": "customer",
+      "owner_role": "QA",
+      "cadence": "monthly",
+      "calculation_status": "staged_data_contract",
+      "metric_subtype": "operating_metric",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "rag_3_band",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "dppm",
+        "green_point": 100,
+        "yellow_point": 233,
+        "target": 100,
+        "basis": "12M customer escape DPPM; critical escape cannot be diluted by low DPPM."
+      },
+      "sample_policy": {
+        "min_n_score": 100,
+        "provisional_n": 30,
+        "stability_required": true,
+        "denominator_context_required": true
+      },
+      "counter_metric": {
+        "code": "CUSTOMER_ESCAPE_DPPM_12M-CTR",
+        "endpoint": "POST /api/kpi/CUSTOMER_ESCAPE_DPPM_12M-CTR/input",
+        "name": "Escape DPPM exclusion count",
+        "name_vi": "Số trường hợp loại trừ sai khỏi DPPM",
+        "intent": "Prevents excluding escaped units from the DPPM numerator or denominator."
+      },
+      "blocking_conditions": [
+        "critical_customer_escape",
+        "late_or_no_customer_ncr",
+        "falsified_customer_quality_record"
+      ],
+      "paired_metric": "CUSTOMER_NCR_SEVERITY_SCORE",
+      "data_contract_gap": "Needs rolling 12M shipped unit denominator and escaped defective unit mapping by customer/order.",
+      "target_graduation_condition": "12M denominator lineage reconciles shipments, affected quantities and customer NCR severity events with QMS approval.",
+      "required_evidence": [
+        "rolling 12M shipped units",
+        "escaped defective quantity",
+        "customer NCR severity event link"
+      ],
+      "action_when_red": "Escalate with severity matrix; critical wrong-material/wrong-revision escape blocks even if DPPM remains numerically low.",
+      "decision_action": "Management review and simulation only while staged.",
+      "metric_type": "operating_metric",
+      "control_intent": "customer_quality_escape",
+      "evaluation_use": "management_review",
+      "reward_mode": "not_rewardable",
+      "lifecycle_status": "pilot",
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "applicable_jds": [
+        "QA",
+        "CS"
+      ],
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "customer_profile_link": "LAM_SEMSYSCO",
+      "role_assignments": [
+        {
+          "role_code": "QA",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "owns classification, containment evidence and customer quality response governance"
+        },
+        {
+          "role_code": "CS",
+          "assignment_type": "contributor",
+          "controllability_scope": "owns customer communication timestamps and acceptance evidence"
+        }
+      ],
+      "usage_contexts": [
+        "quality_escape_dashboard",
+        "management_review",
+        "bonus_simulation_only"
+      ],
+      "evidence_source": "customer_ncr_data_contract + EQMS complaint/NCR/CAPA evidence",
+      "attribution_rule": "Severity and SLA blockers are attributed by root-cause family, controllable owner and customer scope; never by complaint rate alone.",
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "eqms_complaints",
+          "eqms_ncr_records",
+          "ncr_records",
+          "capa_8d_steps",
+          "capa_effectiveness_checks"
+        ],
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05"
+      }
+    },
+    {
+      "canonical_code": "NO_LATE_NO_NCR_COUNTER",
+      "name": "No Late / No Missing Customer NCR Counter",
+      "name_vi": "Counter không trễ/không thiếu NCR khách hàng",
+      "process": "quality_system",
+      "category": "customer",
+      "owner_role": "QA",
+      "cadence": "monthly",
+      "calculation_status": "manual_governed",
+      "metric_subtype": "counter_metric",
+      "measurement_data_type": "count",
+      "scoring_model_detail": "blocker_only",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "count",
+        "green_point": 0,
+        "yellow_point": 1,
+        "target": 0,
+        "basis": "Any late or missing customer NCR is a blocker for simulation."
+      },
+      "counter_metric": {
+        "code": "NO_LATE_NO_NCR_COUNTER-CTR",
+        "endpoint": "POST /api/kpi/NO_LATE_NO_NCR_COUNTER-CTR/input",
+        "name": "Late/missing customer NCR audit exceptions",
+        "name_vi": "Số ngoại lệ audit NCR khách hàng trễ/thiếu",
+        "intent": "Prevents bypassing the late/no-NCR blocker itself."
+      },
+      "blocking_conditions": [
+        "late_or_no_customer_ncr",
+        "ncr_suppression",
+        "falsified_customer_quality_record"
+      ],
+      "paired_metric": "COMPLAINT_RATE",
+      "parent_metric": "COMPLAINT_RATE",
+      "required_evidence": [
+        "complaint received timestamp",
+        "NCR created timestamp",
+        "audit trail of any delay"
+      ],
+      "hold_release_rule": "Any open late/no-NCR exception blocks bonus simulation and management sign-off for the affected period.",
+      "action_when_red": "Open NCR, reconstruct timeline and close data-integrity corrective action.",
+      "decision_action": "Hard gate blocker only; no payout, no automatic discipline.",
+      "metric_type": "counter_metric",
+      "control_intent": "customer_quality_escape",
+      "evaluation_use": "management_review",
+      "reward_mode": "blocker_only",
+      "lifecycle_status": "pilot",
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "applicable_jds": [
+        "QA",
+        "CS"
+      ],
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "customer_profile_link": "LAM_SEMSYSCO",
+      "role_assignments": [
+        {
+          "role_code": "QA",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "owns classification, containment evidence and customer quality response governance"
+        },
+        {
+          "role_code": "CS",
+          "assignment_type": "contributor",
+          "controllability_scope": "owns customer communication timestamps and acceptance evidence"
+        }
+      ],
+      "usage_contexts": [
+        "quality_escape_dashboard",
+        "management_review",
+        "bonus_simulation_only"
+      ],
+      "evidence_source": "customer_ncr_data_contract + EQMS complaint/NCR/CAPA evidence",
+      "attribution_rule": "Severity and SLA blockers are attributed by root-cause family, controllable owner and customer scope; never by complaint rate alone.",
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "eqms_complaints",
+          "eqms_ncr_records",
+          "ncr_records",
+          "capa_8d_steps",
+          "capa_effectiveness_checks"
+        ],
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05"
+      }
+    },
+    {
+      "canonical_code": "NO_CONTAINMENT_COUNTER",
+      "name": "No Containment Customer Escape Counter",
+      "name_vi": "Counter thiếu containment cho lỗi thoát ra khách hàng",
+      "process": "quality_system",
+      "category": "customer",
+      "owner_role": "QA",
+      "cadence": "per-event/monthly",
+      "calculation_status": "manual_governed",
+      "metric_subtype": "counter_metric",
+      "measurement_data_type": "count",
+      "scoring_model_detail": "blocker_only",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "count",
+        "green_point": 0,
+        "yellow_point": 1,
+        "target": 0,
+        "basis": "Any uncontained customer escape is a hard gate until verified containment."
+      },
+      "counter_metric": {
+        "code": "NO_CONTAINMENT_COUNTER-CTR",
+        "endpoint": "POST /api/kpi/NO_CONTAINMENT_COUNTER-CTR/input",
+        "name": "Unverified containment exception count",
+        "name_vi": "Số ngoại lệ containment chưa xác minh",
+        "intent": "Prevents claiming containment without verification evidence."
+      },
+      "blocking_conditions": [
+        "customer_escape_without_containment",
+        "containment_overdue"
+      ],
+      "paired_metric": "NCR_3D_RESPONSE_SLA",
+      "parent_metric": "NCR_3D_RESPONSE_SLA",
+      "required_evidence": [
+        "containment action",
+        "containment_started_at",
+        "containment_verified_at",
+        "affected scope list",
+        "customer protection evidence"
+      ],
+      "hold_release_rule": "Any open no-containment exception blocks affected release and bonus simulation until containment is verified.",
+      "action_when_red": "Contain suspect lots/customer stock immediately and verify closure by QA.",
+      "decision_action": "Hard gate blocker only; no payout, no automatic discipline.",
+      "metric_type": "counter_metric",
+      "control_intent": "customer_quality_escape",
+      "evaluation_use": "management_review",
+      "reward_mode": "blocker_only",
+      "lifecycle_status": "pilot",
+      "reward_eligible": false,
+      "scorecard_contributes_to_reward": false,
+      "applicable_jds": [
+        "QA",
+        "CS"
+      ],
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "customer_profile_link": "LAM_SEMSYSCO",
+      "role_assignments": [
+        {
+          "role_code": "QA",
+          "assignment_type": "accountable_owner",
+          "controllability_scope": "owns classification, containment evidence and customer quality response governance"
+        },
+        {
+          "role_code": "CS",
+          "assignment_type": "contributor",
+          "controllability_scope": "owns customer communication timestamps and acceptance evidence"
+        }
+      ],
+      "usage_contexts": [
+        "quality_escape_dashboard",
+        "management_review",
+        "bonus_simulation_only"
+      ],
+      "evidence_source": "customer_ncr_data_contract + EQMS complaint/NCR/CAPA evidence",
+      "attribution_rule": "Severity and SLA blockers are attributed by root-cause family, controllable owner and customer scope; never by complaint rate alone.",
+      "data_source": {
+        "system": "EQMS",
+        "tables": [
+          "eqms_complaints",
+          "eqms_ncr_records",
+          "ncr_records",
+          "capa_8d_steps",
+          "capa_effectiveness_checks"
+        ],
+        "contract": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05"
+      }
     }
   ],
   "dashboard_core_kpis": [
@@ -10345,7 +11058,13 @@
           "SPC_SIGNAL_REACTION_TIME",
           "CMM_QUEUE_AGING",
           "NCR_CONTAINMENT_ON_TIME",
-          "GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT"
+          "GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT",
+          "CUSTOMER_NCR_SEVERITY_SCORE",
+          "CUSTOMER_NCR_EVENTS_M",
+          "DEFECTIVE_ORDER_RATE_M",
+          "CUSTOMER_ESCAPE_DPPM_12M",
+          "NO_LATE_NO_NCR_COUNTER",
+          "NO_CONTAINMENT_COUNTER"
         ],
         "activation_flow": [
           "1. customer master default profile suggestion (customers.profile_code) — never silent for LAM/SEMSYSCO",
@@ -10416,7 +11135,12 @@
           "ipqc_characteristic_completion_record",
           "cmm_queue_escalation_record_when_overdue",
           "ncr_containment_verification_record",
-          "in_process_gage_validity_evidence"
+          "in_process_gage_validity_evidence",
+          "customer_ncr_severity_matrix_classification",
+          "complaint_received_detected_ncr_created_notification_timestamps",
+          "3d_4d_8d_customer_response_timestamps",
+          "customer_acceptance_or_closure_evidence",
+          "repeat_root_cause_family_review"
         ]
       }
     }
@@ -10513,9 +11237,25 @@
         "required_gate_bypass",
         "customer_escape_without_containment",
         "major_audit_nonconformance_overdue",
-        "open_red_quality_or_safety_counter_metric"
+        "open_red_quality_or_safety_counter_metric",
+        "critical_customer_escape",
+        "late_or_no_customer_ncr",
+        "3d_late_for_lam_complaint",
+        "4d_late_for_lam_complaint",
+        "8d_late_or_no_progress_update",
+        "8d_self_closed_without_customer_ack",
+        "unauthorized_process_or_product_change",
+        "ship_deviation_without_special_release",
+        "expired_gage_used_for_release",
+        "falsified_customer_quality_record",
+        "repeat_same_root_cause_escape"
       ],
-      "calibration_rule": "Final recognition and reward decisions require HR/QMS/CEO calibration. KPI output is an input, not an automatic payout or discipline engine."
+      "calibration_rule": "Final recognition and reward decisions require HR/QMS/CEO calibration. KPI output is an input, not an automatic payout or discipline engine.",
+      "customer_ncr_bonus_simulation": {
+        "model_id": "BSC-BONUS-SIMULATION-CUSTOMER-NCR-2026-05",
+        "simulation_only": true,
+        "rule": "Customer NCR severity hard gates affect calibration/simulation only until formal reward policy is approved; no automatic payout or discipline."
+      }
     },
     "executive_scorecard_items": [
       {
@@ -11045,7 +11785,14 @@
           "containment_overdue",
           "supplier_escape_without_scar",
           "repeat_major_escape",
-          "repeat_ncr_red"
+          "repeat_ncr_red",
+          "critical_customer_escape",
+          "repeat_same_root_cause_escape",
+          "late_or_no_customer_ncr",
+          "3d_late_for_lam_complaint",
+          "4d_late_for_lam_complaint",
+          "8d_late_or_no_progress_update",
+          "8d_self_closed_without_customer_ack"
         ],
         "source_domain": "EQMS complaints / NCR / supplier quality",
         "source_table_or_record": "eqms_complaints; customer_complaints; ncr_records; scar record",
@@ -11061,7 +11808,10 @@
           "setup_record_missing",
           "prove_out_loop_hidden",
           "capa_closed_without_effectiveness_evidence",
-          "recurrence_after_capa"
+          "recurrence_after_capa",
+          "unauthorized_process_or_product_change",
+          "ship_deviation_without_special_release",
+          "expired_gage_used_for_release"
         ],
         "source_domain": "QMS/MES gate evidence",
         "source_table_or_record": "FAI/first-piece gate; inspection result; setup checklist; CAPA verification evidence",
@@ -11079,7 +11829,8 @@
           "unapproved_cost_exclusion",
           "unapproved_quality_cost_adjustment",
           "copq_cost_bucket_not_approved",
-          "evidence_tampering_or_signature_misuse"
+          "evidence_tampering_or_signature_misuse",
+          "falsified_customer_quality_record"
         ],
         "source_domain": "ERP/MOM/MES/EQMS audit and finance close",
         "source_table_or_record": "audit trail; promise-date approval; constraint register; OEE reason-code log; finance cost-bucket approval",
@@ -18023,5 +18774,366 @@
         "fairness_notes": "ITA measures should value reliability, access control, backups, and patch discipline."
       }
     }
+  },
+  "customer_ncr_severity_matrix": {
+    "matrix_id": "CUSTOMER-NCR-SEVERITY-MATRIX-2026-05",
+    "authority": "QMS owns classification; CEO/QMS calibration required for hard-gate waiver; no automatic individual discipline.",
+    "usage_rule": "Use for management review, containment priority, hard gates, customer communication and bonus simulation only. Complaint/PPM rate alone must not be used to punish low-volume operations.",
+    "minor": {
+      "criteria": "Customer issue with no confirmed escaped nonconforming product, no fit/function/safety impact, and no missed contractual response clock.",
+      "examples": [
+        "documentation clarification",
+        "packaging label question corrected before use",
+        "customer administrative request"
+      ],
+      "score_impact": "Track as 0-5 severity points for trend only; cannot block company recognition by itself.",
+      "scope": "order",
+      "hard_gate": false,
+      "required_action": "Log complaint, acknowledge customer, verify no shipped defect and close with QA review.",
+      "closure_evidence": "Complaint log, QA disposition and customer acknowledgement or documented no-response after agreed follow-up."
+    },
+    "major": {
+      "criteria": "Confirmed customer escape or customer-impacting defect requiring containment, sort, replacement, deviation response or CAPA, without critical safety/regulatory/systemic impact.",
+      "examples": [
+        "wrong cosmetic/finish condition at customer",
+        "missing certificate after shipment",
+        "dimension out of tolerance contained at customer"
+      ],
+      "score_impact": "20 severity points; impacts affected value stream/customer scope until containment and NCR/CAPA evidence are closed.",
+      "scope": "value-stream",
+      "hard_gate": false,
+      "required_action": "Open NCR, contain affected lots, perform 8D/CAPA when required and confirm customer communication.",
+      "closure_evidence": "NCR record, containment evidence, customer notification and CAPA/8D closure where applicable."
+    },
+    "critical": {
+      "criteria": "Escape with safety, regulatory, critical-to-quality, wrong material/revision, customer line-stop, recall, or high-risk semiconductor/process impact.",
+      "examples": [
+        "wrong revision shipped",
+        "wrong material/heat lot released",
+        "line-stop at LAM/Semsysco",
+        "critical CTQ escape"
+      ],
+      "score_impact": "100 severity points and hard-gate block; company or customer scope depending on systemic assessment.",
+      "scope": "company",
+      "hard_gate": true,
+      "blocking_condition_id": "critical_customer_escape",
+      "required_action": "Immediate executive/QMS escalation, containment, customer notice, formal NCR/CAPA/8D and release hold until disposition.",
+      "closure_evidence": "Executive escalation record, containment verification, customer response, 8D/CAPA effectiveness evidence and release authority."
+    },
+    "repeat_same_root_cause": {
+      "criteria": "Repeat customer NCR with same root-cause family or same failed control within rolling 12 months.",
+      "examples": [
+        "same gage-control failure recurs",
+        "same deburr miss repeats for same customer family",
+        "same packaging FOD recurrence"
+      ],
+      "score_impact": "60 severity points; hard gate when repeat is major/critical or CAPA effectiveness was claimed.",
+      "scope": "value-stream",
+      "hard_gate": true,
+      "blocking_condition_id": "repeat_same_root_cause_escape",
+      "required_action": "Reopen or escalate CAPA, revalidate process controls and review effectiveness window.",
+      "closure_evidence": "Root-cause family link, prior CAPA comparison, updated controls, effectiveness check and customer acceptance when required."
+    },
+    "late_or_no_ncr": {
+      "criteria": "Customer complaint or escaped defect not converted to NCR on time, or logged after response/containment clocks should have started.",
+      "examples": [
+        "customer email handled outside EQMS",
+        "NCR opened after 3D due date",
+        "shipment defect hidden in informal notes"
+      ],
+      "score_impact": "50 severity points; hard gate because suppression can make PPM/complaint rate look good.",
+      "scope": "company",
+      "hard_gate": true,
+      "blocking_condition_id": "late_or_no_customer_ncr",
+      "required_action": "Open NCR, reconstruct event timeline, notify QMS/data owner and classify data-integrity exposure.",
+      "closure_evidence": "Complaint received timestamp, NCR created timestamp, audit note explaining delay, corrective action for logging failure."
+    },
+    "no_containment": {
+      "criteria": "Customer escape lacks documented containment, suspect-lot quarantine, customer protection or containment verification within required clock.",
+      "examples": [
+        "no suspect lot list",
+        "no customer stock check",
+        "no segregation of WIP/FG"
+      ],
+      "score_impact": "75 severity points and hard gate until containment is verified.",
+      "scope": "customer",
+      "hard_gate": true,
+      "blocking_condition_id": "customer_escape_without_containment",
+      "required_action": "Contain shipped/WIP/FG scope, confirm customer protection and assign owner with due time.",
+      "closure_evidence": "Containment action, affected scope list, verification timestamp, customer communication and release decision."
+    },
+    "unauthorized_change": {
+      "criteria": "Process, product, supplier, program, material, gage method or inspection plan changed without required customer/internal approval.",
+      "examples": [
+        "process changed before customer approval",
+        "alternate material used without deviation",
+        "inspection method changed without authorization"
+      ],
+      "score_impact": "90 severity points and hard gate; can elevate to company scope when systemic.",
+      "scope": "company",
+      "hard_gate": true,
+      "blocking_condition_id": "unauthorized_process_or_product_change",
+      "required_action": "Stop release, open deviation/CAPA, restore approved baseline or obtain authorized approval before shipment.",
+      "closure_evidence": "Change approval, deviation or ECO record, customer authorization where required and affected-lot disposition."
+    },
+    "ship_deviation_without_special_release": {
+      "criteria": "Known nonconformance or deviation shipped without approved special release/customer concession.",
+      "examples": [
+        "ship with open deviation but no MRB/customer release",
+        "accepted-out-of-spec lot shipped on verbal approval"
+      ],
+      "score_impact": "100 severity points and hard gate until authority chain is reconstructed and customer risk is contained.",
+      "scope": "customer",
+      "hard_gate": true,
+      "blocking_condition_id": "ship_deviation_without_special_release",
+      "required_action": "Stop shipment/release, obtain MRB/customer special release or recall/contain affected product.",
+      "closure_evidence": "MRB disposition, customer concession/special release, affected-lot list and shipping hold/release audit trail."
+    },
+    "expired_gage_used_for_release": {
+      "criteria": "Expired, invalid, out-of-calibration or wrong gage used for final/customer release measurement.",
+      "examples": [
+        "expired micrometer used at final inspection",
+        "wrong CMM program/gage used for release",
+        "gage recall not assessed"
+      ],
+      "score_impact": "85 severity points and hard gate for affected measurement/release scope.",
+      "scope": "value-stream",
+      "hard_gate": true,
+      "blocking_condition_id": "expired_gage_used_for_release",
+      "required_action": "Hold affected product, perform gage impact assessment and remeasure/release under valid method.",
+      "closure_evidence": "Gage calibration status, affected-release assessment, reinspection result and customer notification if escaped."
+    },
+    "falsified_record": {
+      "criteria": "Verified falsified, altered, backdated or intentionally misleading customer quality record, inspection evidence or 8D/NCR timestamp.",
+      "examples": [
+        "backdated 8D response",
+        "altered inspection record",
+        "fabricated containment evidence"
+      ],
+      "score_impact": "100 severity points and hard gate; company scope until investigation and evidence correction are complete.",
+      "scope": "company",
+      "hard_gate": true,
+      "blocking_condition_id": "falsified_customer_quality_record",
+      "required_action": "Freeze recognition, preserve evidence, open QMS/data-integrity investigation and notify customer/regulator when required.",
+      "closure_evidence": "Investigation record, corrected evidence, disciplinary/coaching decision if warranted by behavior evidence, QMS/CEO closure."
+    }
+  },
+  "customer_ncr_data_contract": {
+    "contract_id": "CUSTOMER-NCR-3D4D8D-DATA-CONTRACT-2026-05",
+    "authority_rule": "EQMS complaint and NCR event timestamps are the SSOT for customer escape severity, SLA and simulation. Derived dashboards cannot overwrite event truth.",
+    "source_tables": [
+      "eqms_complaints",
+      "customer_complaints",
+      "eqms_ncr_records",
+      "ncr_records",
+      "capa_8d_steps",
+      "capa_effectiveness_checks",
+      "shipments"
+    ],
+    "event_time_distinction_rule": "Do not reuse one timestamp for detection, NCR creation, customer notification, containment, 3D/4D/8D response, customer acceptance or closure. Each event has separate evidence and actor lineage.",
+    "low_volume_statistics_rule": "For low shipment or complaint counts, display insufficient/provisional status; do not use complaint rate alone for punishment or payout decisions.",
+    "required_fields": [
+      {
+        "field": "complaint_received_at",
+        "table": "eqms_complaints",
+        "column": "received_at",
+        "fallback_column": "received_date",
+        "evidence": "customer complaint receipt/email/API timestamp"
+      },
+      {
+        "field": "detected_at",
+        "table": "eqms_complaints",
+        "column": "detected_at",
+        "evidence": "customer detection or internal discovery timestamp"
+      },
+      {
+        "field": "ncr_created_at",
+        "table": "eqms_ncr_records|ncr_records",
+        "column": "created_at",
+        "evidence": "NCR creation audit timestamp"
+      },
+      {
+        "field": "customer_notification_sent_at",
+        "table": "eqms_complaints",
+        "column": "customer_notification_sent_at",
+        "evidence": "customer acknowledgement/notification record"
+      },
+      {
+        "field": "containment_started_at",
+        "table": "eqms_complaints",
+        "column": "containment_started_at",
+        "evidence": "containment action start timestamp"
+      },
+      {
+        "field": "containment_verified_at",
+        "table": "eqms_complaints",
+        "column": "containment_verified_at",
+        "evidence": "QA verification timestamp"
+      },
+      {
+        "field": "d3_sent_at",
+        "table": "eqms_complaints|capa_8d_steps",
+        "column": "d3_sent_at|completed_at where d_step=D3",
+        "evidence": "3D/containment response sent to customer"
+      },
+      {
+        "field": "d4_sent_at",
+        "table": "eqms_complaints|capa_8d_steps",
+        "column": "d4_sent_at|completed_at where d_step=D4",
+        "evidence": "preliminary 4D/root-cause response sent to customer"
+      },
+      {
+        "field": "d8_updated_at",
+        "table": "eqms_complaints|capa_8d_steps",
+        "column": "d8_updated_at|completed_at/verified_at where d_step=D8",
+        "evidence": "updated 8D/progress response sent to customer"
+      },
+      {
+        "field": "corrective_action_effective_at",
+        "table": "eqms_complaints|capa_effectiveness_checks",
+        "column": "corrective_action_effective_at|verified_at",
+        "evidence": "CAPA effectiveness verification"
+      },
+      {
+        "field": "customer_acceptance_at",
+        "table": "eqms_complaints",
+        "column": "customer_acceptance_at",
+        "evidence": "customer accepted 8D/closure response"
+      },
+      {
+        "field": "customer_closure_at",
+        "table": "eqms_complaints",
+        "column": "closed_at",
+        "evidence": "formal complaint closure timestamp"
+      },
+      {
+        "field": "repeat_root_cause_family",
+        "table": "eqms_complaints",
+        "column": "repeat_root_cause_family",
+        "evidence": "controlled root-cause taxonomy / CAPA family"
+      }
+    ],
+    "staged_until": "All required timestamps, customer acceptance evidence and denominator joins are populated with actor/audit evidence for 90 days."
+  },
+  "bonus_simulation_model": {
+    "model_id": "BSC-BONUS-SIMULATION-CUSTOMER-NCR-2026-05",
+    "simulation_only": true,
+    "no_real_payout_rule": "This model is used for calibration and management review only; it does not authorize payout, payroll change or automatic individual discipline.",
+    "payout_formula": "BonusPool × CompanyMultiplier × DeptKpiScore × IndividualFactor × HardGate",
+    "hard_gates": [
+      "critical_customer_escape",
+      "repeat_same_root_cause_escape",
+      "customer_escape_without_containment",
+      "late_or_no_customer_ncr",
+      "3d_late_for_lam_complaint",
+      "4d_late_for_lam_complaint",
+      "8d_late_or_no_progress_update",
+      "8d_self_closed_without_customer_ack",
+      "unauthorized_process_or_product_change",
+      "ship_deviation_without_special_release",
+      "expired_gage_used_for_release",
+      "falsified_customer_quality_record"
+    ],
+    "severity_deductions": [
+      {
+        "severity": "minor",
+        "deduction_pct": 0,
+        "scope": "order",
+        "note": "trend/coaching only; never blocks company pool by itself"
+      },
+      {
+        "severity": "major",
+        "deduction_pct": 10,
+        "scope": "affected value stream/customer",
+        "note": "requires containment and NCR/CAPA review before simulation clears"
+      },
+      {
+        "severity": "critical",
+        "deduction_pct": 100,
+        "scope": "company unless QMS/CEO narrows systemic risk",
+        "note": "hard gate"
+      },
+      {
+        "severity": "repeat_same_root_cause",
+        "deduction_pct": 50,
+        "scope": "affected value stream",
+        "note": "requires CAPA effectiveness review"
+      },
+      {
+        "severity": "late_or_no_ncr",
+        "deduction_pct": 100,
+        "scope": "company/data integrity",
+        "note": "hard gate for suppressed/late logging"
+      },
+      {
+        "severity": "no_containment",
+        "deduction_pct": 100,
+        "scope": "customer/value stream",
+        "note": "hard gate until verified containment"
+      },
+      {
+        "severity": "unauthorized_change",
+        "deduction_pct": 100,
+        "scope": "company/customer",
+        "note": "hard gate pending authorized disposition"
+      },
+      {
+        "severity": "ship_deviation_without_special_release",
+        "deduction_pct": 100,
+        "scope": "customer/order family",
+        "note": "hard gate pending concession/special release"
+      },
+      {
+        "severity": "expired_gage_used_for_release",
+        "deduction_pct": 75,
+        "scope": "affected measurement/release scope",
+        "note": "hard gate pending remeasurement and impact assessment"
+      },
+      {
+        "severity": "falsified_record",
+        "deduction_pct": 100,
+        "scope": "company",
+        "note": "hard gate and QMS/data-integrity investigation"
+      }
+    ],
+    "scope_rule": "deduct/block only the impacted scope unless critical or systemic",
+    "calibration_required": true,
+    "calibration_body": "CEO + QMS + Finance + process owner monthly simulation review",
+    "discipline_boundary": "No automatic individual discipline. Any discipline must cite a separate verified behavior blocker from blocking_condition_registry and a coaching/investigation record."
+  },
+  "quality_escape_dashboard_contract": {
+    "contract_id": "QUALITY-ESCAPE-SEVERITY-DASHBOARD-2026-05",
+    "source_endpoints": [
+      "GET /api/eqms/complaints/metrics",
+      "GET /api/kpi/catalog"
+    ],
+    "row_fields": [
+      "complaint_id",
+      "complaint_number",
+      "customer_name",
+      "status",
+      "severity",
+      "severity_classification",
+      "sla_status",
+      "containment_status",
+      "d3_status",
+      "d4_status",
+      "d8_status",
+      "customer_acceptance_status",
+      "hard_gate_status",
+      "simulation_impact"
+    ],
+    "required_cards": [
+      "open complaint status",
+      "SLA status",
+      "severity",
+      "containment",
+      "8D status",
+      "customer accepted/not accepted",
+      "hard gate open/closed",
+      "simulation impact"
+    ],
+    "staged_render_rule": "Show missing evidence/staged contract state, not numeric score, when required timestamps or acceptance evidence are absent.",
+    "reward_boundary": "Severity and hard-gate cards are not payout cards; they feed bonus_simulation_model only."
   }
 }

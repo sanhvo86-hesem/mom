@@ -824,6 +824,10 @@ final class KpiEngine
             'metric_governance_schema' => is_array($registry['metric_governance_schema'] ?? null) ? $registry['metric_governance_schema'] : [],
             'metric_governance_defaults' => is_array($registry['metric_governance_defaults'] ?? null) ? $registry['metric_governance_defaults'] : [],
             'scorecard_operating_model' => is_array($registry['scorecard_operating_model'] ?? null) ? $registry['scorecard_operating_model'] : [],
+            'customer_ncr_severity_matrix' => is_array($registry['customer_ncr_severity_matrix'] ?? null) ? $registry['customer_ncr_severity_matrix'] : [],
+            'customer_ncr_data_contract' => is_array($registry['customer_ncr_data_contract'] ?? null) ? $registry['customer_ncr_data_contract'] : [],
+            'bonus_simulation_model' => is_array($registry['bonus_simulation_model'] ?? null) ? $registry['bonus_simulation_model'] : [],
+            'quality_escape_dashboard_contract' => is_array($registry['quality_escape_dashboard_contract'] ?? null) ? $registry['quality_escape_dashboard_contract'] : [],
             'document_audit' => is_array($registry['document_audit'] ?? null) ? $registry['document_audit'] : [],
             'performance_governance_audit' => is_array($registry['performance_governance_audit'] ?? null) ? $registry['performance_governance_audit'] : [],
             'jd_scorecards' => $jdScorecards,
@@ -3563,7 +3567,7 @@ final class KpiEngine
 	            if (!is_array($assignment)) {
 	                continue;
 	            }
-	            $role = trim((string) ($assignment['role'] ?? ''));
+	            $role = trim((string) ($assignment['role'] ?? $assignment['role_code'] ?? ''));
 	            if ($role !== '') {
 	                $assignmentRoles[] = strtoupper($role);
 	            }

@@ -222,6 +222,14 @@ final class KpiRegistryAdminService
                 ? $seed['metric_control_schema_extension'] : new \stdClass(),
             'customer_requirement_profiles' => is_array($seed['customer_requirement_profiles'] ?? null)
                 ? $seed['customer_requirement_profiles'] : new \stdClass(),
+            'customer_ncr_severity_matrix' => is_array($seed['customer_ncr_severity_matrix'] ?? null)
+                ? $seed['customer_ncr_severity_matrix'] : new \stdClass(),
+            'customer_ncr_data_contract' => is_array($seed['customer_ncr_data_contract'] ?? null)
+                ? $seed['customer_ncr_data_contract'] : new \stdClass(),
+            'bonus_simulation_model' => is_array($seed['bonus_simulation_model'] ?? null)
+                ? $seed['bonus_simulation_model'] : new \stdClass(),
+            'quality_escape_dashboard_contract' => is_array($seed['quality_escape_dashboard_contract'] ?? null)
+                ? $seed['quality_escape_dashboard_contract'] : new \stdClass(),
             // P08 — dashboard render + manual input contracts are exposed to
             // the portal so dashboards and the manual-input form honor the
             // same governance rules (no staged value leak, reward gate on

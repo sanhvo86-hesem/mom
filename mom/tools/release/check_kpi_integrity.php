@@ -1532,6 +1532,211 @@ if ($profiles !== []) {
     }
 }
 
+// ── P0.15 — Prompt 05 customer NCR severity + bonus simulation guard ───────
+// Customer complaint/PPM rates are dangerous in high-mix low-volume work when
+// severity, containment, 8D timing and evidence integrity are not modeled.
+// This guard keeps the severity matrix, hard-gate blocker vocabulary, 3D/4D/8D
+// data contract and simulation-only bonus model from drifting independently.
+$conditionIds = [];
+foreach ((array) ($blockingRegistry['groups'] ?? []) as $groupName => $group) {
+    if (!is_array($group)) {
+        continue;
+    }
+    foreach ((array) ($group['condition_ids'] ?? []) as $conditionId) {
+        $conditionId = trim((string) $conditionId);
+        if ($conditionId !== '') {
+            $conditionIds[$conditionId] = (string) $groupName;
+        }
+    }
+}
+
+$rowsByCodeP05 = [];
+foreach ([$governance, $gateMetrics, $proposed] as $set) {
+    foreach ($set as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+        if ($code !== '') {
+            $rowsByCodeP05[$code] = $row;
+        }
+    }
+}
+
+$p05RequiredMetricCodes = [
+    'CUSTOMER_NCR_SEVERITY_SCORE',
+    'CUSTOMER_NCR_EVENTS_M',
+    'DEFECTIVE_ORDER_RATE_M',
+    'CUSTOMER_ESCAPE_DPPM_12M',
+    'NCR_3D_RESPONSE_SLA',
+    'NCR_4D_PRELIMINARY_SLA',
+    'NCR_8D_UPDATE_SLA',
+    'CUSTOMER_ACCEPTED_8D_CLOSURE_RATE',
+    'NO_LATE_NO_NCR_COUNTER',
+    'NO_CONTAINMENT_COUNTER',
+];
+foreach ($p05RequiredMetricCodes as $code) {
+    if (!isset($rowsByCodeP05[$code])) {
+        $p0[] = "Prompt 05 required metric '$code' missing from KPI registry.";
+    }
+}
+
+$p05NoDirectRewardCodes = [
+    'CUSTOMER_NCR_SEVERITY_SCORE',
+    'CUSTOMER_NCR_EVENTS_M',
+    'DEFECTIVE_ORDER_RATE_M',
+    'CUSTOMER_ESCAPE_DPPM_12M',
+    'NCR_3D_RESPONSE_SLA',
+    'NCR_4D_PRELIMINARY_SLA',
+    'NCR_8D_UPDATE_SLA',
+    'CUSTOMER_ACCEPTED_8D_CLOSURE_RATE',
+    'NO_LATE_NO_NCR_COUNTER',
+    'NO_CONTAINMENT_COUNTER',
+];
+foreach ($p05NoDirectRewardCodes as $code) {
+    $row = $rowsByCodeP05[$code] ?? null;
+    if (!is_array($row)) {
+        continue;
+    }
+    $rewardMode = strtolower(trim((string) ($row['reward_mode'] ?? '')));
+    if (($row['reward_eligible'] ?? false) === true
+        || ($row['scorecard_contributes_to_reward'] ?? false) === true
+        || in_array($rewardMode, ['bonus_pool_candidate', 'team_reward_candidate', 'role_review_input'], true)) {
+        $p0[] = "Prompt 05 $code: severity/hard-gate metrics must not be directly rewardable.";
+    }
+}
+
+$severityMatrix = is_array($registry['customer_ncr_severity_matrix'] ?? null)
+    ? $registry['customer_ncr_severity_matrix'] : [];
+$requiredSeverityRows = [
+    'minor',
+    'major',
+    'critical',
+    'repeat_same_root_cause',
+    'late_or_no_ncr',
+    'no_containment',
+    'unauthorized_change',
+    'ship_deviation_without_special_release',
+    'expired_gage_used_for_release',
+    'falsified_record',
+];
+$matrixHardGateConditionIds = [];
+foreach ($requiredSeverityRows as $key) {
+    $row = is_array($severityMatrix[$key] ?? null) ? $severityMatrix[$key] : null;
+    if ($row === null) {
+        $p0[] = "customer_ncr_severity_matrix.$key missing.";
+        continue;
+    }
+    foreach (['criteria', 'score_impact', 'scope', 'required_action', 'closure_evidence'] as $field) {
+        if (trim((string) ($row[$field] ?? '')) === '') {
+            $p0[] = "customer_ncr_severity_matrix.$key missing $field.";
+        }
+    }
+    if (!is_array($row['examples'] ?? null) || $row['examples'] === []) {
+        $p0[] = "customer_ncr_severity_matrix.$key missing examples.";
+    }
+    if (!is_bool($row['hard_gate'] ?? null)) {
+        $p0[] = "customer_ncr_severity_matrix.$key hard_gate must be boolean.";
+    }
+    if (($row['hard_gate'] ?? false) === true) {
+        $conditionId = trim((string) ($row['blocking_condition_id'] ?? ''));
+        if ($conditionId === '' || !isset($conditionIds[$conditionId])) {
+            $p0[] = "customer_ncr_severity_matrix.$key blocking_condition_id '$conditionId' "
+                . "must match blocking_condition_registry.groups[*].condition_ids.";
+        } else {
+            $matrixHardGateConditionIds[$conditionId] = true;
+        }
+    }
+}
+
+$bonusModel = is_array($registry['bonus_simulation_model'] ?? null)
+    ? $registry['bonus_simulation_model'] : [];
+if ($bonusModel === []) {
+    $p0[] = "bonus_simulation_model missing.";
+} else {
+    if (($bonusModel['simulation_only'] ?? null) !== true) {
+        $p0[] = "bonus_simulation_model.simulation_only MUST be true.";
+    }
+    foreach (['payout_formula', 'scope_rule'] as $field) {
+        if (trim((string) ($bonusModel[$field] ?? '')) === '') {
+            $p0[] = "bonus_simulation_model.$field missing.";
+        }
+    }
+    if (($bonusModel['calibration_required'] ?? null) !== true) {
+        $p0[] = "bonus_simulation_model.calibration_required MUST be true.";
+    }
+    if (!is_array($bonusModel['severity_deductions'] ?? null) || $bonusModel['severity_deductions'] === []) {
+        $p0[] = "bonus_simulation_model.severity_deductions missing.";
+    }
+    $bonusHardGates = is_array($bonusModel['hard_gates'] ?? null) ? $bonusModel['hard_gates'] : [];
+    if ($bonusHardGates === []) {
+        $p0[] = "bonus_simulation_model.hard_gates missing.";
+    }
+    $bonusHardGateSet = [];
+    foreach ($bonusHardGates as $conditionId) {
+        $conditionId = trim((string) $conditionId);
+        if ($conditionId === '') {
+            continue;
+        }
+        $bonusHardGateSet[$conditionId] = true;
+        if (!isset($conditionIds[$conditionId])) {
+            $p0[] = "bonus_simulation_model.hard_gates '$conditionId' "
+                . "must match blocking_condition_registry.groups[*].condition_ids.";
+        }
+    }
+    foreach (array_keys($matrixHardGateConditionIds) as $conditionId) {
+        if (!isset($bonusHardGateSet[$conditionId])) {
+            $p0[] = "bonus_simulation_model.hard_gates missing matrix hard gate '$conditionId'.";
+        }
+    }
+}
+
+$customerNcrContract = is_array($registry['customer_ncr_data_contract'] ?? null)
+    ? $registry['customer_ncr_data_contract'] : [];
+$contractFields = [];
+foreach ((array) ($customerNcrContract['required_fields'] ?? []) as $fieldSpec) {
+    if (is_array($fieldSpec)) {
+        $field = trim((string) ($fieldSpec['field'] ?? ''));
+        if ($field !== '') {
+            $contractFields[$field] = true;
+        }
+    }
+}
+$requiredContractFields = [
+    'complaint_received_at',
+    'detected_at',
+    'ncr_created_at',
+    'customer_notification_sent_at',
+    'containment_started_at',
+    'containment_verified_at',
+    'd3_sent_at',
+    'd4_sent_at',
+    'd8_updated_at',
+    'corrective_action_effective_at',
+    'customer_acceptance_at',
+    'customer_closure_at',
+    'repeat_root_cause_family',
+];
+foreach ($requiredContractFields as $field) {
+    if (!isset($contractFields[$field])) {
+        $p0[] = "customer_ncr_data_contract.required_fields missing '$field'.";
+    }
+}
+$distinctionRule = trim((string) ($customerNcrContract['event_time_distinction_rule'] ?? ''));
+foreach (['detection', 'NCR creation', 'customer notification', 'customer acceptance'] as $token) {
+    if (stripos($distinctionRule, $token) === false) {
+        $p0[] = "customer_ncr_data_contract.event_time_distinction_rule must distinguish $token.";
+    }
+}
+
+$complaintRate = $rowsByCodeP05['COMPLAINT_RATE'] ?? null;
+if (is_array($complaintRate)) {
+    if (trim((string) ($complaintRate['low_volume_policy'] ?? '')) === ''
+        || trim((string) ($complaintRate['paired_metric'] ?? '')) !== 'CUSTOMER_NCR_SEVERITY_SCORE') {
+        $p0[] = "COMPLAINT_RATE: Prompt 05 requires low_volume_policy and paired_metric=CUSTOMER_NCR_SEVERITY_SCORE.";
+    }
+}
+
 // ── P0.8.1 — dashboard_render_contract present + shape complete ──────────────
 // P08 introduced dashboard_render_contract; every dashboard surface honors
 // the same governance fields per card. A missing or shape-broken contract
