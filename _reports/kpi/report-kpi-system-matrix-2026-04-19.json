@@ -1,8 +1,8 @@
 {
-    "generated_at": "2026-05-24T15:59:05+00:00",
+    "generated_at": "2026-05-24T16:47:06+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
-    "registry_version": "2026-05-24+p08",
+    "registry_version": "2026-05-24+p09",
     "method": {
         "detection": "Registry canonical codes, legacy aliases, KPI-* local IDs, and Cxx-Mx competency role measures are detected in visible HTML text. Table rows are used to extract target/threshold snippets.",
         "interpretation": "The matrix separates official KPI, gate/control metric, operating metric, role performance measure, and health indicator. It flags context mismatch rather than mechanically rewriting every KPI word.",

@@ -62,6 +62,10 @@ declare(strict_types=1);
  *  18. Prompt 08 Lean/TOC flow drift: constraint, CMM/QC queue and material
  *      readiness metrics must remain visible, non-reward fake-runtime-proof
  *      drivers with declared data gaps, dashboard cards and blocker contracts.
+ *  19. Prompt 09 JD role scorecard drift: every active role measure must be
+ *      de-templated with target/checklist/action/controllability/attribution,
+ *      frontline/support roles must not carry unfair outcome measures, and
+ *      JD documents must hydrate scorecards from the registry renderer.
  *
  * P1 findings (warn, do not block)
  * ────────────────────────────────
@@ -885,11 +889,42 @@ if (is_array($scorecards)) {
         if (!is_array($card)) {
             continue;
         }
+        $roleCode = strtoupper((string) $roleCode);
         $items = is_array($card['active_scorecard'] ?? null)
             ? $card['active_scorecard']
             : (is_array($card['scorecard'] ?? null) ? $card['scorecard'] : []);
         if ($items === []) {
             continue; // a Wave-2 role not yet populated — not a blocker
+        }
+        foreach (['role_blockers', 'attribution_rules'] as $requiredRoleField) {
+            if (!is_array($card[$requiredRoleField] ?? null) || $card[$requiredRoleField] === []) {
+                $p0[] = "P0.19 JD scorecard $roleCode: missing $requiredRoleField for controllability/fairness governance.";
+            }
+        }
+        if (trim((string) ($card['controllability_scope'] ?? '')) === '') {
+            $p0[] = "P0.19 JD scorecard $roleCode: missing role-level controllability_scope.";
+        }
+        if (trim((string) ($card['not_automatic_reward_or_discipline_warning'] ?? '')) === '') {
+            $p0[] = "P0.19 JD scorecard $roleCode: missing no automatic reward/discipline warning.";
+        }
+        foreach (['candidate_bank', 'optional_rotate', 'do_not_use'] as $requiredList) {
+            if (!is_array($card[$requiredList] ?? null) || $card[$requiredList] === []) {
+                $p0[] = "P0.19 JD scorecard $roleCode: active_candidate model requires non-empty $requiredList.";
+            }
+        }
+        $jdFile = trim((string) ($card['jd_file'] ?? ''));
+        if ($jdFile === '') {
+            $p0[] = "P0.19 JD scorecard $roleCode: missing jd_file link.";
+        } else {
+            $repoRoot = dirname($base);
+            $candidatePath = str_starts_with($jdFile, 'mom/')
+                ? $repoRoot . '/' . $jdFile
+                : $base . '/' . ltrim($jdFile, '/');
+            if (!is_file($candidatePath)) {
+                $p0[] = "P0.19 JD scorecard $roleCode: jd_file '$jdFile' does not exist.";
+            } elseif (!str_contains(readText($candidatePath), '13-jd-scorecard-renderer.js')) {
+                $p0[] = "P0.19 JD scorecard $roleCode: JD file '$jdFile' does not load the registry JD scorecard renderer.";
+            }
         }
         $recommended = (int) ($card['recommended_active_count'] ?? 0);
         if ($isActiveCandidateModel) {
@@ -905,7 +940,9 @@ if (is_array($scorecards)) {
             $p1[] = "JD scorecard $roleCode: active scorecard has exactly 5 items; verify this is role-fit and not a fixed-count assumption.";
         }
         if (count($items) > 6) {
-            $p1[] = "JD scorecard $roleCode: active scorecard has " . count($items) . " items; exceeds the recommended maximum without Track 4 rationale.";
+            if (trim((string) ($card['active_count_justification'] ?? '')) === '') {
+                $p0[] = "P0.19 JD scorecard $roleCode: active scorecard has " . count($items) . " items; >6 requires active_count_justification.";
+            }
         }
         $sum = 0;
         $rewardEligibleModes = ['bonus_pool_candidate', 'team_reward_candidate', 'role_review_input'];
@@ -926,6 +963,36 @@ if (is_array($scorecards)) {
             }
             if ($w <= 0) {
                 $p0[] = "JD scorecard $roleCode: kpi_code '$kc' has a non-positive weight.";
+            }
+            foreach ([
+                'target_definition',
+                'formula_or_checklist',
+                'action_when_red',
+                'controllability_scope',
+                'attribution_rule',
+                'lifecycle_status',
+                'reward_warning',
+            ] as $requiredItemField) {
+                if (trim((string) ($it[$requiredItemField] ?? '')) === '') {
+                    $p0[] = "P0.19 JD scorecard $roleCode item $kc: missing $requiredItemField.";
+                }
+            }
+            if (trim((string) ($it['controllability_scope'] ?? '')) === 'Role accountable only for the evidence and actions inside the JD authority boundary; upstream blockers must be logged and escalated.') {
+                $p0[] = "P0.19 JD scorecard $roleCode item $kc: generic template controllability text was not de-templated.";
+            }
+            if (($it['scorecard_contributes_to_reward'] ?? false) === true
+                || trim((string) ($it['reward_mode'] ?? '')) !== 'not_rewardable') {
+                $p0[] = "P0.19 JD scorecard $roleCode item $kc: role measures must stay not_rewardable in Prompt 09.";
+            }
+            $frontlineRoles = ['OPR', 'SET', 'QC', 'DBT', 'CPT', 'WAR'];
+            if (in_array($roleCode, $frontlineRoles, true)
+                && in_array($kc, ['OTD', 'COPQ', 'GROSS_MARGIN_JOB_FAMILY'], true)) {
+                $p0[] = "P0.19 JD scorecard $roleCode item $kc: frontline role cannot carry OTD/COPQ/gross-margin as an active personal measure.";
+            }
+            $supportRoles = ['FIN', 'HR', 'ITA', 'ESA', 'EHS'];
+            if (in_array($roleCode, $supportRoles, true)
+                && in_array($kc, ['OTD', 'PLAN_ADHERENCE', 'WIP_AGING', 'GROSS_MARGIN_JOB_FAMILY'], true)) {
+                $p0[] = "P0.19 JD scorecard $roleCode item $kc: support role cannot carry production-output or enterprise outcome metric as active personal score.";
             }
 
             $resolvedMetric = $metricIndex[$kc] ?? null;

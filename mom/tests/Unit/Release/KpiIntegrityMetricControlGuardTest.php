@@ -360,6 +360,73 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
         );
     }
 
+    public function testRejectsPrompt09GenericRoleMeasureText(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['jd_kpi_scorecards']['roles']['OPR']['active_scorecard'][0]['controllability_scope']
+                    = 'Role accountable only for the evidence and actions inside the JD authority boundary; upstream blockers must be logged and escalated.';
+            },
+            'generic template controllability text was not de-templated',
+        );
+    }
+
+    public function testRejectsPrompt09FrontlineOutcomeMetric(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['jd_kpi_scorecards']['roles']['OPR']['active_scorecard'][0]['kpi_code'] = 'OTD';
+            },
+            'frontline role cannot carry OTD/COPQ/gross-margin',
+        );
+    }
+
+    public function testRejectsPrompt09MissingRoleBlockers(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                unset($registry['jd_kpi_scorecards']['roles']['QC']['role_blockers']);
+            },
+            'missing role_blockers for controllability/fairness governance',
+        );
+    }
+
+    public function testRejectsPrompt09RoleWithMoreThanSixActiveMeasuresWithoutJustification(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $item = $registry['jd_kpi_scorecards']['roles']['OPR']['active_scorecard'][0];
+                while (count($registry['jd_kpi_scorecards']['roles']['OPR']['active_scorecard']) <= 6) {
+                    $copy = $item;
+                    $copy['role_measure_code'] = 'OPR_FAKE_EXTRA_' . count($registry['jd_kpi_scorecards']['roles']['OPR']['active_scorecard']);
+                    $registry['jd_kpi_scorecards']['roles']['OPR']['active_scorecard'][] = $copy;
+                }
+            },
+            '>6 requires active_count_justification',
+        );
+    }
+
+    public function testRejectsPrompt09JdFileWithoutRegistryRenderer(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['jd_kpi_scorecards']['roles']['OPR']['jd_file']
+                    = 'mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html';
+            },
+            'does not load the registry JD scorecard renderer',
+        );
+    }
+
+    public function testRejectsPrompt09RoleMeasureMadeRewardable(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['jd_kpi_scorecards']['roles']['QC']['active_scorecard'][0]['scorecard_contributes_to_reward'] = true;
+            },
+            'role measures must stay not_rewardable in Prompt 09',
+        );
+    }
+
     /**
      * @param callable(array<string, mixed>): void $mutate
      */

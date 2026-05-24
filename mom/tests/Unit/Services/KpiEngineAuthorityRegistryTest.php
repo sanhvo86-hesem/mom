@@ -311,6 +311,57 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         );
     }
 
+    public function testJdScorecardsExposeControllabilityAndCandidateModel(): void
+    {
+        $engine = $this->newEngineWithoutConstructor();
+        $scorecards = $engine->jdScorecards();
+
+        $this->assertSame('active_candidate_role_scorecard', $scorecards['model'] ?? null);
+        $this->assertSame(
+            'P09-JD-ROLE-SCORECARD-DETEMPLATE-2026-05',
+            $scorecards['detemplating_policy']['policy_id'] ?? null,
+        );
+        $roles = $scorecards['roles'] ?? [];
+        $this->assertIsArray($roles);
+        $this->assertArrayHasKey('OPR', $roles);
+        $this->assertArrayHasKey('FIN', $roles);
+
+        $opr = $roles['OPR'];
+        $this->assertSame(3, $opr['active_measure_count'] ?? null);
+        $this->assertNotEmpty($opr['candidate_bank'] ?? []);
+        $this->assertNotEmpty($opr['optional_rotate'] ?? []);
+        $this->assertNotEmpty($opr['do_not_use'] ?? []);
+        $this->assertNotEmpty($opr['role_blockers'] ?? []);
+        $this->assertNotEmpty($opr['controllability_scope'] ?? null);
+        $this->assertStringContainsString('not automatic reward', strtolower((string) ($opr['not_automatic_reward_or_discipline_warning'] ?? '')));
+
+        foreach (($opr['active_scorecard'] ?? []) as $item) {
+            $this->assertIsArray($item);
+            $this->assertFalse($item['scorecard_contributes_to_reward'] ?? true);
+            $this->assertSame('not_rewardable', $item['reward_mode'] ?? null);
+            $this->assertNotEmpty($item['target_definition'] ?? null);
+            $this->assertNotEmpty($item['formula_or_checklist'] ?? null);
+            $this->assertNotEmpty($item['action_when_red'] ?? null);
+            $this->assertNotEmpty($item['controllability_scope'] ?? null);
+            $this->assertNotEmpty($item['attribution_rule'] ?? null);
+            $this->assertNotEmpty($item['lifecycle_status'] ?? null);
+            $this->assertNotSame(
+                'Role accountable only for the evidence and actions inside the JD authority boundary; upstream blockers must be logged and escalated.',
+                $item['controllability_scope'] ?? '',
+            );
+        }
+
+        $oprCodes = array_column($opr['active_scorecard'] ?? [], 'kpi_code');
+        $this->assertContains('TIME_ENTRY_COMPLIANCE', $oprCodes);
+        $this->assertNotContains('OTD', $oprCodes);
+        $this->assertNotContains('COPQ', $oprCodes);
+        $this->assertNotContains('GROSS_MARGIN_JOB_FAMILY', $oprCodes);
+
+        $finCodes = array_column($roles['FIN']['active_scorecard'] ?? [], 'kpi_code');
+        $this->assertContains('INVOICE_RFT', $finCodes);
+        $this->assertNotContains('GROSS_MARGIN_JOB_FAMILY', $finCodes);
+    }
+
     public function testMetricSupportSeparatesKnownNonRuntimeFromUnknownMetric(): void
     {
         $engine = $this->newEngineWithoutConstructor();

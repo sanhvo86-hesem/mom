@@ -1330,13 +1330,19 @@ final class KpiRegistryAdminService
                 'jd_title_vi' => (string) ($role['jd_title_vi'] ?? ''),
                 'jd_file' => (string) ($role['jd_file'] ?? ''),
                 'model' => is_array($role['active_scorecard'] ?? null) ? 'active_candidate' : 'legacy_scorecard_projection',
+                'role_scorecard_model' => (string) ($role['role_scorecard_model'] ?? ''),
                 'recommended_active_count' => (int) ($role['recommended_active_count'] ?? count($active)),
                 'active_measure_count' => count($active),
                 'active_weight_total' => $weightTotal,
                 'candidate_count' => is_array($role['candidate_bank'] ?? null) ? count($role['candidate_bank']) : 0,
                 'optional_count' => is_array($role['optional_rotate'] ?? null) ? count($role['optional_rotate']) : 0,
                 'do_not_use_count' => is_array($role['do_not_use'] ?? null) ? count($role['do_not_use']) : 0,
-                'fairness_notes' => is_array($role['fairness_notes'] ?? null) ? $role['fairness_notes'] : [],
+                'role_blocker_count' => is_array($role['role_blockers'] ?? null) ? count($role['role_blockers']) : 0,
+                'controllability_scope' => (string) ($role['controllability_scope'] ?? ''),
+                'attribution_rules' => is_array($role['attribution_rules'] ?? null) ? $role['attribution_rules'] : [],
+                'warning' => (string) ($role['not_automatic_reward_or_discipline_warning'] ?? ''),
+                'fairness_notes' => is_array($role['fairness_notes'] ?? null)
+                    ? $role['fairness_notes'] : (string) ($role['fairness_notes'] ?? ''),
             ];
         }
         usort($out, static fn(array $a, array $b): int

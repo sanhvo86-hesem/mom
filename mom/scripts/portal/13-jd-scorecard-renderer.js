@@ -2,10 +2,10 @@
  * JD KPI-Scorecard Renderer — HESEM Portal
  * ----------------------------------------------------------------------------
  * Hydrates the §KPI section of every job-description document with the
- * researched, weighted KPI scorecard from the KPI Authority registry
- * (jd_kpi_scorecards). Each JD shows its own KPIs with weight, threshold
- * (G/Y/R), the dedicated counter-metric and the rationale — instead of the
- * old generic, un-weighted KPI text.
+ * researched, weighted role scorecard from the KPI Authority registry
+ * (jd_kpi_scorecards). Each JD shows active measures, candidate/rotation
+ * banks, evidence, controllability, attribution, blockers and lifecycle —
+ * instead of the old generic, un-weighted KPI text.
  *
  * The renderer derives the JD from the document filename, fetches
  * /api.php?action=kpi_jd_scorecards, matches the role whose jd_file ends with
@@ -76,6 +76,10 @@ function _injectStyle() {
     '.jd-scorecard .jd-sc-kpi{font-weight:600}' +
     '.jd-scorecard .jd-sc-code{display:inline-block;font-family:monospace;font-size:10px;' +
       'background:var(--surface-2);padding:1px 5px;border-radius:5px;overflow-wrap:anywhere}' +
+    '.jd-scorecard .jd-sc-tag{display:inline-block;font-size:11px;border:1px solid var(--border);' +
+      'border-radius:5px;padding:1px 6px;margin:0 4px 4px 0;background:var(--surface-2)}' +
+    '.jd-scorecard .jd-sc-detail{margin-top:5px}.jd-scorecard .jd-sc-detail summary{cursor:pointer;' +
+      'font-size:12px;color:var(--text-2)}' +
     /* weight cell: % above, full-width thin bar below — no column collision */
     '.jd-sc-wt{display:flex;flex-direction:column;gap:4px;align-items:flex-start}' +
     '.jd-sc-w{font-weight:700;color:var(--accent);font-size:14px;line-height:1}' +
@@ -83,17 +87,41 @@ function _injectStyle() {
       'overflow:hidden;border:1px solid var(--border)}' +
     '.jd-sc-wfill{display:block;height:100%;background:var(--accent)}' +
     '.jd-sc-g{color:var(--success)}.jd-sc-y{color:var(--warning)}.jd-sc-r{color:var(--danger)}' +
-    '.jd-sc-muted{color:var(--text-3)}.jd-sc-sym{cursor:help}.jd-scorecard-bank{margin-top:8px}';
+    '.jd-sc-muted{color:var(--text-3)}.jd-sc-sym{cursor:help}.jd-scorecard-bank{margin-top:8px}' +
+    '.jd-scorecard-warning{border:1px solid var(--warning);background:var(--warning-soft);' +
+      'padding:8px;border-radius:6px;margin:8px 0;font-size:13px}' +
+    '.jd-scorecard-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin:8px 0}' +
+    '.jd-scorecard-meta div{border:1px solid var(--border);border-radius:6px;padding:8px;background:var(--surface-1)}';
   var st = document.createElement('style');
   st.id = 'jd-scorecard-style';
   st.textContent = css;
   (document.head || document.documentElement).appendChild(st);
 }
 
+function _list(values) {
+  if (!values || !values.length) return '<span class="jd-sc-muted">—</span>';
+  return values.slice(0, 8).map(function (v) {
+    if (v && typeof v === 'object') {
+      return '<span class="jd-sc-tag"><span class="jd-sc-code">' + _esc(v.code || v.kpi_code || '') +
+        '</span> ' + _esc(v.description || v.reason || '') + '</span>';
+    }
+    return '<span class="jd-sc-tag">' + _esc(v) + '</span>';
+  }).join(' ');
+}
+
+function _textDetail(label, value) {
+  if (!value) return '';
+  return '<details class="jd-sc-detail"><summary>' + _esc(label) + '</summary><div>' +
+    _esc(value) + '</div></details>';
+}
+
 /* Build the live scorecard table-card HTML. */
 function _render(role) {
   var items = role.active_scorecard || role.scorecard || [];
   var candidate = role.candidate_bank || [];
+  var optional = role.optional_rotate || [];
+  var doNotUse = role.do_not_use || [];
+  var blockers = role.role_blockers || [];
   var total = 0;
   var rows = items.map(function (it) {
     total += (parseInt(it.weight, 10) || 0);
@@ -104,31 +132,51 @@ function _render(role) {
       : '<span class="jd-sc-muted">—</span>';
     var sym = STATUS_SYM[it.calculation_status] || STATUS_SYM.staged_data_contract;
     var w = parseInt(it.weight, 10) || 0;
+    var lifecycle = it.lifecycle_status || it.scorecard_scoring_status || it.calculation_status || '—';
+    var evidence = it.evidence_source || '—';
+    var control = it.controllability_scope || it.owner_control_boundary || '—';
+    var action = it.action_when_red || '—';
+    var target = it.target_definition || band;
+    var checklist = it.formula_or_checklist || '';
+    var attr = it.attribution_rule || '';
+    var itemBlockers = it.blocking_conditions || [];
     return '<tr>' +
-      '<td><span class="jd-sc-kpi">' + _esc(it.name_vi || it.kpi_code) + '</span><br>' +
+      '<td><span class="jd-sc-kpi">' + _esc(it.measure_name_vi || it.name_vi || it.kpi_code) + '</span><br>' +
+        '<span class="jd-sc-code">' + _esc(it.role_measure_code || it.kpi_code) + '</span> ' +
         '<span class="jd-sc-code">' + _esc(it.kpi_code) + '</span> ' +
         '<span class="jd-sc-sym" title="' + _esc(sym[1]) + '">' + sym[0] + '</span></td>' +
       '<td><div class="jd-sc-wt"><span class="jd-sc-w">' + w + '%</span>' +
         '<span class="jd-sc-wbar"><span class="jd-sc-wfill" style="width:' + w + '%"></span>' +
-        '</span></div></td>' +
-      '<td>' + band + '</td>' +
-      '<td><span class="jd-sc-code">' + _esc(it.counter_code || '—') + '</span></td>' +
-      '<td>' + _esc(it.rationale || '') + '</td>' +
+        '</span><span class="jd-sc-tag">' + _esc(lifecycle) + '</span></div></td>' +
+      '<td><b>Evidence</b><br>' + _esc(evidence) +
+        _textDetail('Target / checklist', target + (checklist ? ' | ' + checklist : '')) + '</td>' +
+      '<td><b>Control</b><br>' + _esc(control) +
+        _textDetail('Action when red', action) + _textDetail('Attribution', attr) + '</td>' +
+      '<td><span class="jd-sc-code">' + _esc(it.counter_code || '—') + '</span><br>' +
+        '<span class="jd-sc-muted">' + _esc(it.counter_status || '') + '</span>' +
+        _textDetail('Blockers', itemBlockers.join(', ')) + '</td>' +
     '</tr>';
   }).join('');
-  var bank = candidate.length
-    ? '<p class="jd-scorecard-note jd-scorecard-bank">Candidate bank: ' +
-      candidate.slice(0, 8).map(function (it) { return _esc(it.kpi_code || it.canonical_code || ''); }).join(', ') +
-      '</p>' : '';
+  var warning = role.not_automatic_reward_or_discipline_warning ||
+    'Role scorecards are for coaching, OJT and calibrated review only; no automatic reward or discipline.';
+  var meta = '<div class="jd-scorecard-meta">' +
+    '<div><b>Candidate bank</b><br>' + _list(candidate) + '</div>' +
+    '<div><b>Optional rotate</b><br>' + _list(optional) + '</div>' +
+    '<div><b>Do not use</b><br>' + _list(doNotUse) + '</div>' +
+    '<div><b>Role blockers</b><br>' + _list(blockers) + '</div>' +
+    '</div>';
   return '<p class="jd-scorecard-note">Thẻ điểm KPI active cho chức danh ' +
       '<b>' + _esc(role.jd_title_vi || role.role_code) + '</b> — đồng bộ trực tiếp từ ' +
-      'KPI Authority (tổng trọng số ' + total + '%). Chỉ dùng cho coaching/OJT/calibration; không kỷ luật trực tiếp từ một metric đơn lẻ.</p>' +
+      'KPI Authority (active ' + _esc(role.active_measure_count || items.length) + '/' +
+      _esc(role.recommended_active_count || items.length) + ', tổng trọng số ' + total + '%).</p>' +
+    '<div class="jd-scorecard-warning">' + _esc(warning) + '</div>' +
+    meta +
     '<div class="table-card jd-scorecard"><table class="table">' +
-      '<colgroup><col style="width:30%"><col style="width:11%"><col style="width:19%">' +
-      '<col style="width:19%"><col style="width:21%"></colgroup>' +
-      '<thead><tr><th>KPI trọng yếu</th><th>Trọng số</th><th>Ngưỡng G/Y/R</th>' +
-      '<th>Counter-metric</th><th>Vì sao đo vị trí này</th></tr></thead>' +
-      '<tbody>' + rows + '</tbody></table></div>' + bank;
+      '<colgroup><col style="width:24%"><col style="width:10%"><col style="width:23%">' +
+      '<col style="width:27%"><col style="width:16%"></colgroup>' +
+      '<thead><tr><th>Active role measure</th><th>Weight / lifecycle</th><th>Evidence / target</th>' +
+      '<th>Controllability / action</th><th>Counter / blocker</th></tr></thead>' +
+      '<tbody>' + rows + '</tbody></table></div>';
 }
 
 /* Universal rule for every JD document (all 39, regardless of the §KPI

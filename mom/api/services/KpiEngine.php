@@ -1041,9 +1041,33 @@ final class KpiEngine
                     'evidence_source'    => (string) ($row['evidence_source'] ?? ''),
                     'blocking_conditions'=> is_array($row['blocking_conditions'] ?? null)
                         ? $row['blocking_conditions'] : [],
+                    'decision_action'    => (string) ($row['decision_action'] ?? ''),
+                    'attribution_rule'   => (string) ($row['attribution_rule'] ?? ''),
+                    'reward_mode'        => (string) ($row['reward_mode'] ?? ''),
+                    'lifecycle_status'   => (string) ($row['lifecycle_status'] ?? ''),
+                    'cadence'            => (string) ($row['cadence'] ?? ''),
                 ];
             }
         }
+        $normalizeBank = static function (array $values): array {
+            $out = [];
+            foreach ($values as $value) {
+                if (is_array($value)) {
+                    $code = strtoupper(trim((string) ($value['code'] ?? $value['kpi_code'] ?? $value['canonical_code'] ?? '')));
+                    $out[] = [
+                        'code' => $code,
+                        'description' => (string) ($value['description'] ?? $value['name_vi'] ?? $value['name'] ?? $code),
+                        'reason' => (string) ($value['reason'] ?? ''),
+                    ];
+                    continue;
+                }
+                $code = strtoupper(trim((string) $value));
+                if ($code !== '') {
+                    $out[] = ['code' => $code, 'description' => $code, 'reason' => 'candidate_or_rotation_only'];
+                }
+            }
+            return $out;
+        };
         $out = [];
         foreach ($roles as $roleCode => $card) {
             if (!is_array($card)) {
@@ -1063,20 +1087,39 @@ final class KpiEngine
                 $defaultScoreStatus = in_array($calcStatus, ['staged_data_contract', 'data_contract_required'], true)
                     ? 'candidate_data_contract'
                     : 'active_runtime_or_manual';
+                $roleScope = (string) ($card['controllability_scope'] ?? '');
+                $warning = (string) ($it['reward_warning']
+                    ?? ($card['not_automatic_reward_or_discipline_warning'] ?? ''));
                 $items[] = [
+                    'role_measure_code'  => (string) ($it['role_measure_code'] ?? ''),
                     'kpi_code'           => $code,
                     'mapped_canonical_metric' => (string) ($it['mapped_canonical_metric'] ?? $code),
                     'measure_type'       => (string) ($it['measure_type'] ?? ($m['metric_type'] ?? 'role_performance_measure')),
                     'weight'             => (int) ($it['weight'] ?? 0),
                     'rationale'          => (string) ($it['rationale'] ?? ''),
-                    'name_vi'            => $m['name_vi'] ?? '',
+                    'name_vi'            => (string) ($it['measure_name_vi'] ?? ($m['name_vi'] ?? '')),
+                    'measure_name_vi'    => (string) ($it['measure_name_vi'] ?? ($m['name_vi'] ?? '')),
+                    'measure_name_en'    => (string) ($it['measure_name_en'] ?? ($m['name'] ?? '')),
+                    'metric_name_vi'     => (string) ($m['name_vi'] ?? ''),
                     'thresholds'         => $m['thresholds'] ?? null,
                     'calculation_status' => $calcStatus,
                     'counter_code'       => $m['counter_code'] ?? '',
                     'scorecard_scoring_status' => (string) ($it['scorecard_scoring_status'] ?? $defaultScoreStatus),
                     'scorecard_contributes_to_reward' => (bool) ($it['scorecard_contributes_to_reward'] ?? false),
                     'evidence_source'    => (string) ($it['evidence_source'] ?? ($m['evidence_source'] ?? '')),
-                    'controllability_scope' => (string) ($it['controllability_scope'] ?? ''),
+                    'target_definition'  => (string) ($it['target_definition'] ?? ''),
+                    'formula_or_checklist' => (string) ($it['formula_or_checklist'] ?? ''),
+                    'checklist'          => is_array($it['checklist'] ?? null) ? $it['checklist'] : [],
+                    'action_when_red'    => (string) ($it['action_when_red'] ?? ($m['decision_action'] ?? '')),
+                    'controllability_scope' => (string) ($it['controllability_scope'] ?? $roleScope),
+                    'owner_control_boundary' => (string) ($it['owner_control_boundary'] ?? ($it['controllability_scope'] ?? $roleScope)),
+                    'attribution_rule'   => (string) ($it['attribution_rule'] ?? ($m['attribution_rule'] ?? '')),
+                    'lifecycle_status'   => (string) ($it['lifecycle_status'] ?? ($m['lifecycle_status'] ?? '')),
+                    'evaluation_use'     => (string) ($it['evaluation_use'] ?? 'role_performance_review'),
+                    'reward_mode'        => (string) ($it['reward_mode'] ?? ($m['reward_mode'] ?? 'not_rewardable')),
+                    'reward_warning'     => $warning,
+                    'cadence'            => (string) ($it['cadence'] ?? ($m['cadence'] ?? '')),
+                    'counter_status'     => (string) ($it['counter_status'] ?? (($m['counter_code'] ?? '') !== '' ? 'specific_counter_required' : 'missing_counter_blocked')),
                     'blocking_conditions'=> is_array($it['blocking_conditions'] ?? null)
                         ? $it['blocking_conditions'] : ($m['blocking_conditions'] ?? []),
                 ];
@@ -1088,18 +1131,33 @@ final class KpiEngine
                 'role_code' => (string) ($card['role_code'] ?? $roleCode),
                 'jd_title_vi' => (string) ($card['jd_title_vi'] ?? ''),
                 'jd_file' => (string) ($card['jd_file'] ?? ''),
+                'role_category' => (string) ($card['role_category'] ?? ''),
                 'model' => is_array($card['active_scorecard'] ?? null) ? 'active_candidate' : 'legacy_scorecard_projection',
+                'role_scorecard_model' => (string) ($card['role_scorecard_model'] ?? ''),
                 'recommended_active_count' => (int) ($card['recommended_active_count'] ?? count($items)),
                 'active_measure_count' => count($items),
                 'active_scorecard' => $items,
                 'scorecard' => $items,
-                'candidate_bank' => $candidateBank,
-                'optional_rotate' => $optionalRotate,
-                'do_not_use' => $doNotUse,
-                'fairness_notes' => is_array($card['fairness_notes'] ?? null) ? $card['fairness_notes'] : [],
+                'candidate_bank' => $normalizeBank($candidateBank),
+                'optional_rotate' => $normalizeBank($optionalRotate),
+                'do_not_use' => $normalizeBank($doNotUse),
+                'role_blockers' => is_array($card['role_blockers'] ?? null) ? $card['role_blockers'] : [],
+                'controllability_scope' => (string) ($card['controllability_scope'] ?? ''),
+                'attribution_rules' => is_array($card['attribution_rules'] ?? null) ? $card['attribution_rules'] : [],
+                'not_automatic_reward_or_discipline_warning' => (string) ($card['not_automatic_reward_or_discipline_warning'] ?? ''),
+                'fairness_notes' => is_array($card['fairness_notes'] ?? null)
+                    ? $card['fairness_notes'] : (string) ($card['fairness_notes'] ?? ''),
             ];
         }
-        return ['roles' => $out];
+        return [
+            'model' => (string) ($registry['jd_kpi_scorecards']['model'] ?? ''),
+            'version' => (string) ($registry['jd_kpi_scorecards']['version'] ?? ''),
+            'detemplating_policy' => is_array($registry['jd_kpi_scorecards']['detemplating_policy'] ?? null)
+                ? $registry['jd_kpi_scorecards']['detemplating_policy'] : [],
+            'renderer_contract' => is_array($registry['jd_kpi_scorecards']['renderer_contract'] ?? null)
+                ? $registry['jd_kpi_scorecards']['renderer_contract'] : [],
+            'roles' => $out,
+        ];
     }
 
     public function isRuntimeCalculatedMetric(string $metricCode): bool

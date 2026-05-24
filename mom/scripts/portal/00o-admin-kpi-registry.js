@@ -909,15 +909,21 @@ function _renderJdScorecards(){
       var total = items.reduce(function(sum, it){ return sum + (parseInt(it.weight,10) || 0); }, 0);
       return { role_code:k, jd_title_vi:role.jd_title_vi || '', active_measure_count:items.length,
         active_weight_total:total, candidate_count:(role.candidate_bank || []).length,
-        optional_count:(role.optional_rotate || []).length, do_not_use_count:(role.do_not_use || []).length };
+        optional_count:(role.optional_rotate || []).length, do_not_use_count:(role.do_not_use || []).length,
+        role_blocker_count:(role.role_blockers || []).length,
+        controllability_scope:role.controllability_scope || '',
+        warning:role.not_automatic_reward_or_discipline_warning || '' };
     });
   }
   return '<section class="kc-panel"><div class="kc-panel-head"><h3>JD Scorecards</h3><span class="kc-mini">' +
     _esc(roles.length) + ' roles</span></div>' +
-    _simpleTable(['Role','JD','Active','Weight','Candidate','Optional','Do not use'], roles.map(function(r){
+    '<div class="kc-warn">' + _t('Role scorecards are coaching/OJT/review inputs only; no automatic reward or discipline from a single role measure.',
+      'Role scorecards are coaching/OJT/review inputs only; no automatic reward or discipline from a single role measure.') + '</div>' +
+    _simpleTable(['Role','JD','Active','Weight','Candidate','Optional','Do not use','Blockers','Control scope'], roles.map(function(r){
       return [r.role_code, r.jd_title_vi || '', r.active_measure_count || 0,
         (r.active_weight_total == null ? '—' : r.active_weight_total + '%'),
-        r.candidate_count || 0, r.optional_count || 0, r.do_not_use_count || 0];
+        r.candidate_count || 0, r.optional_count || 0, r.do_not_use_count || 0,
+        r.role_blocker_count || 0, r.controllability_scope || '—'];
     })) + '</section>';
 }
 
