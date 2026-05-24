@@ -792,18 +792,9 @@ foreach (['gate_control_metrics' => $gateMetrics, 'proposed_operating_metrics' =
     }
 }
 
-// ── P1 — staged KPI in the executive scorecard ───────────────────────────────
-foreach ($governance as $row) {
-    if (!is_array($row)) {
-        continue;
-    }
-    $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
-    if (in_array($code, $scorecard, true)
-        && ($row['calculation_status'] ?? '') === 'staged_data_contract') {
-        $p1[] = "Registry $code: staged_data_contract KPI is in the executive "
-            . "scorecard (CEO sees a metric with no data contract).";
-    }
-}
+// ── P1 — staged KPI in the executive scorecard (REMOVED in P09 audit fix) ───
+// Replaced by P0.9.C below — promoted to a hard-blocking P0. The legacy P1
+// warning is kept out to avoid double-output for the same condition.
 
 // ── P1 — dashboard endpoint namespace ────────────────────────────────────────
 foreach ($dashboard as $row) {
@@ -1542,65 +1533,45 @@ if (is_readable($dashboardCtlFp)) {
     }
 }
 
-// ── P0.9.A — legacy alias target must resolve to a real registry code ───────
-// (P09 hardening) Spec §3.13 — every legacy_aliases value must hit a
-// canonical_code that lives in governance / gate / proposed / dashboard
-// (knownCodes). P0.5 already covers governance-side resolution via
-// runtime_calculated_metrics list, but a freshly added section (proposed /
-// dashboard) is reachable only through the full $knownCodes union. This is
-// a second-pass strict check using that union, plus dashboard codes —
-// catches alias rot whenever a target metric is renamed or removed and the
-// alias map silently lags behind.
-$aliasUniverse = $knownCodes;
-foreach ($dashboard as $row) {
-    if (is_array($row) && isset($row['canonical_code'])) {
-        $aliasUniverse[strtoupper(trim((string) $row['canonical_code']))] = true;
-    }
-}
-foreach ($aliases as $alias => $target) {
-    if (!is_string($target)) {
-        $p0[] = "P0.9.A Registry: legacy_aliases['$alias'] target is not a string.";
-        continue;
-    }
-    $t = strtoupper(trim($target));
-    if ($t === '') {
-        $p0[] = "P0.9.A Registry: legacy_aliases['$alias'] target is empty.";
-        continue;
-    }
-    if (!isset($aliasUniverse[$t])) {
-        $p0[] = "P0.9.A Registry: legacy_aliases['$alias'] => '$t' does not "
-            . "resolve to any canonical_code in governance / gate / proposed / "
-            . "dashboard / runtime_calculated_metrics — alias rot, rename or remove.";
-    }
-}
+// ── P0.9.A — REMOVED (P09 audit fix) ─────────────────────────────────────────
+// Spec §3.13 (legacy alias target resolves to a real registry code) is
+// already covered by the pre-P09 P0.5 check above. The original P0.9.A
+// block duplicated that logic against a wider universe but did not
+// detect any new failure mode in the current registry shape. Deleted to
+// avoid double-firing. If a nested-alias-chain rule is ever needed
+// (alias A → alias B chained), reintroduce a dedicated check here.
 
 // ── P0.9.B — dashboard_core_kpis primary_endpoint must hit a real route ─────
 // (P09 hardening) Spec §3.14 — every dashboard card's primary_endpoint must
-// reach a registered HTTP route in mom/api/routes/core-routes.php or
-// rest-routes.php. Without this guard, a card can point at a vanished
-// endpoint and silently render zero data. We parse the endpoint into a
-// method + path template, then accept it when:
-//   (a) the path matches a known REST template (GET /api/kpi/{metricCode},
-//       GET /api/kpi/{metricCode}/trend, GET /api/kpi/catalog, GET /api/kpi/alerts),
-//       OR
-//   (b) the corresponding action_key is registered in core-routes.php
-//       (kpi_get / kpi_trend / kpi_catalog / kpi_alerts / kpi_threshold_badges /
-//        kpi_jd_scorecards / kpi_input_list / kpi_input_save / kpi_input_approve).
-$coreRoutesFp = $routesFp;
-$restRoutesFp = $base . '/api/routes/rest-routes.php';
-$coreRoutesSrc = is_readable($coreRoutesFp) ? readText($coreRoutesFp) : '';
-$restRoutesSrc = is_readable($restRoutesFp) ? readText($restRoutesFp) : '';
+// reach a registered HTTP route anywhere under mom/api/routes/*.php.
+// Without this guard, a card can point at a vanished endpoint and silently
+// render zero data. We parse the endpoint into a method + path template,
+// then accept it when:
+//   (a) the path matches a known REST template (router->get/post/... in any
+//       route file), OR
+//   (b) the corresponding action_key is registered (action-keyed map in any
+//       route file).
+// P09 audit MEDIUM-3 fix: union ALL files under mom/api/routes/*.php so a
+// route registered in (e.g.) operations-routes.php or platform-routes.php
+// is also considered "registered".
+$routesDir       = $base . '/api/routes';
+$routesGlob      = glob($routesDir . '/*.php') ?: [];
 $registeredActions = [];
-if ($coreRoutesSrc !== '') {
-    if (preg_match_all("/'([a-z][a-z0-9_]+)'\\s*=>\\s*\\[/", $coreRoutesSrc, $actionMatches)) {
+$restPathRegexes   = [];
+foreach ($routesGlob as $routeFile) {
+    if (!is_readable($routeFile)) {
+        continue;
+    }
+    $src = @file_get_contents($routeFile);
+    if (!is_string($src) || $src === '') {
+        continue;
+    }
+    if (preg_match_all("/'([a-z][a-z0-9_]+)'\\s*=>\\s*\\[/", $src, $actionMatches)) {
         foreach ($actionMatches[1] as $a) {
             $registeredActions[$a] = true;
         }
     }
-}
-$restPathRegexes = [];
-if ($restRoutesSrc !== '') {
-    if (preg_match_all('/\\$router->(get|post|put|delete|patch)\\(\\s*[\'"]([^\'"]+)[\'"]/i', $restRoutesSrc, $restMatches, PREG_SET_ORDER)) {
+    if (preg_match_all('/\\$router->(get|post|put|delete|patch)\\(\\s*[\'"]([^\'"]+)[\'"]/i', $src, $restMatches, PREG_SET_ORDER)) {
         foreach ($restMatches as $m) {
             $method = strtoupper($m[1]);
             $path   = $m[2];
@@ -1659,15 +1630,18 @@ foreach ($dashboard as $row) {
         }
     }
     $p0[] = "P0.9.B Dashboard $code: primary_endpoint '$ep' does not resolve "
-        . "to any registered action_key in core-routes.php or REST path in "
-        . "rest-routes.php — card will render zero data.";
+        . "to any registered action_key or REST path across mom/api/routes/*.php "
+        . "— card will render zero data.";
 }
 
 // ── P0.9.C — executive_scorecard must not list a staged_data_contract metric ─
 // (P09 hardening) Spec §3.11 — the executive scorecard is what the CEO and
 // directors see at the top of the dashboard. A staged_data_contract metric
 // has no data contract yet — surfacing it on the executive scorecard at all
-// is a P0 (the legacy P1 warning is now hard-blocking). Resolves each
+// is a P0 (the legacy P1 warning is now hard-blocking).
+// (Replaces former P1 staged-in-scorecard warning — promoted to P0 in P09;
+// the duplicate P1 block above was deleted in the P09 audit fix.)
+// Resolves each
 // executive_scorecard code through governance, then through metricIndex to
 // catch a code that lives only on a non-governance section.
 foreach ($scorecard as $code) {

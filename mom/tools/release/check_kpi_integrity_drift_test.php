@@ -23,6 +23,12 @@ declare(strict_types=1);
  *      staged_data_contract → expect P0.9.C fire.
  *   C. A reward-eligible rate metric formula.min_sample forced to 0 →
  *      expect P0.7.2 fire (rate / reward / sample-size combo).
+ *   E. dashboard_core_kpis[0].primary_endpoint mutated to a fake path
+ *      → expect P0.9.B fire (route resolution across mom/api/routes/*.php).
+ *
+ *  (Scenario D is reserved for nested-alias-chain coverage of the deleted
+ *   P0.9.A; current registry has no nested aliases and the rule was
+ *   removed in the P09 audit fix, so D is intentionally skipped.)
  *
  * Exit 0 = all scenarios caught by the guard. Exit 1 = at least one scenario
  * was NOT caught (the guard has degraded; CI will flag the regression).
@@ -159,8 +165,27 @@ if ($mutatedCodeC !== null && $mutatedCodeC !== '') {
     $assert('C.percent_min_sample', false, 'no reward-eligible rate metric to mutate');
 }
 
+// ── Scenario E: dashboard endpoint primary_endpoint points at a fake path ────
+//      → P0.9.B must fire (route does not resolve under mom/api/routes/*.php).
+$mut = $registry;
+if (isset($mut['dashboard_core_kpis'][0]) && is_array($mut['dashboard_core_kpis'][0])) {
+    // Use a non-/api/kpi/ prefix so the endpoint-to-action mapper returns null
+    // (the /api/kpi/{tail} fallback resolves to 'kpi_get' which is registered).
+    // This path is not under any router->get/post in mom/api/routes/*.php.
+    $mut['dashboard_core_kpis'][0]['primary_endpoint'] = 'GET /api/__P09_TEST_FAKE_PATH__/zzz';
+    [$codeE, $outE] = $runGuard($mut);
+    $assert('E.fake_endpoint', $codeE === 1, "guard exit code = $codeE (expected 1)");
+    $assert('E.fake_endpoint',
+        str_contains($outE, 'P0.9.B')
+            && (str_contains($outE, '__P09_TEST_FAKE_PATH__')
+                || str_contains($outE, 'primary_endpoint')),
+        "output mentions P0.9.B + fake path / primary_endpoint marker");
+} else {
+    $assert('E.fake_endpoint', false, 'no dashboard_core_kpis[0] to mutate');
+}
+
 echo "KPI integrity drift test\n";
-echo "  scenarios: 3\n";
+echo "  scenarios: 4 (A,B,C,E — D reserved for deleted P0.9.A nested-alias rule)\n";
 foreach ($report as $line) {
     echo $line . "\n";
 }
