@@ -1548,14 +1548,29 @@ class AdminController extends BaseController
                     $actor = (string)($row['actor_name'] ?? $row['user'] ?? '');
                     $ts = (string)($row['recorded_at'] ?? $row['timestamp'] ?? '');
                     $id = 'audit:' . ($row['id'] ?? md5($ts . '|' . $eventType . '|' . $actor));
+                    // Pull the wrapped context payload (BaseController->auditLog
+                    // wraps everything under payload.context). If it exists and
+                    // contains a change_ref / intent_id / similar identifier,
+                    // suffix it into the summary so the substring search picks
+                    // it up — without this, a user searching the timeline for
+                    // a CR id wouldn't find the audit row it lives in.
+                    $rawPayload = is_array($row['payload'] ?? null) ? $row['payload'] : [];
+                    $ctx = is_array($rawPayload['context'] ?? null) ? $rawPayload['context'] : $rawPayload;
+                    $idHint = '';
+                    foreach (['change_ref', 'intent_id', 'cr_id', 'snapshot_id', 'doc_code'] as $hintKey) {
+                        if (!empty($ctx[$hintKey]) && is_scalar($ctx[$hintKey])) {
+                            $idHint = ' [' . (string)$ctx[$hintKey] . ']';
+                            break;
+                        }
+                    }
                     $events[] = [
                         'id' => $id,
                         'ts' => $ts,
                         'type' => 'audit',
                         'source' => 'audit_events',
                         'actor' => $actor,
-                        'summary' => $eventType . ($aggType !== '' ? ' · ' . $aggType : '') . ($aggId !== '' ? '#' . substr($aggId, 0, 12) : ''),
-                        'key' => $eventType,
+                        'summary' => $eventType . ($aggType !== '' ? ' · ' . $aggType : '') . ($aggId !== '' ? '#' . substr($aggId, 0, 12) : '') . $idHint,
+                        'key' => $eventType . ($idHint !== '' ? trim($idHint, ' []') : ''),
                         'payload' => [
                             'event_type' => $eventType,
                             'aggregate_type' => $aggType,
