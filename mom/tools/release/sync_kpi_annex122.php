@@ -33,10 +33,14 @@ if (!is_array($seed) || !is_array($seed['annex122_governance_kpis'] ?? null)) {
 
 $service = new KpiRegistryAdminService($root, $data);
 $method = new ReflectionMethod($service, 'regenerateAnnex122');
-$changed = (bool) $method->invoke($service, $seed['annex122_governance_kpis']);
+$changed = (bool) $method->invoke(
+    $service,
+    $seed['annex122_governance_kpis'],
+    is_array($seed['gate_control_metrics'] ?? null) ? $seed['gate_control_metrics'] : [],
+);
 
 echo $changed
-    ? "ANNEX-122 §4/§5/§6 regenerated from registry (schema_version "
+    ? "ANNEX-122 §4/§5/§6/§9 regenerated from registry (schema_version "
         . (int) ($seed['schema_version'] ?? 0) . ").\n"
     : "ANNEX-122 already in sync (or marker regions absent).\n";
 exit(0);

@@ -292,6 +292,8 @@ final class KpiRegistryAdminService
         ];
         $totalOverrides = 0;
         $effectiveGovernance = [];
+        $effectiveGate = is_array($seed['gate_control_metrics'] ?? null)
+            ? $seed['gate_control_metrics'] : [];
         $addedAll   = ['governance' => [], 'gate' => [], 'proposed' => []];
         $retiredAll = ['governance' => [], 'gate' => [], 'proposed' => []];
 
@@ -387,6 +389,9 @@ final class KpiRegistryAdminService
             if ($section === 'annex122_governance_kpis') {
                 $this->validate($live);
                 $effectiveGovernance = $live;
+            } elseif ($section === 'gate_control_metrics') {
+                $this->validateMetricThresholds($live, $section);
+                $effectiveGate = $live;
             } else {
                 $this->validateMetricThresholds($live, $section);
             }
@@ -400,7 +405,7 @@ final class KpiRegistryAdminService
         $overlay['retired_codes']= $retiredAll;
 
         FileHelper::writeJson($this->overlayPath(), $overlay);
-        $regenerated = $this->regenerateAnnex122($effectiveGovernance);
+        $regenerated = $this->regenerateAnnex122($effectiveGovernance, $effectiveGate);
 
         $addedCount   = count($addedAll['governance']) + count($addedAll['gate']) + count($addedAll['proposed']);
         $retiredCount = count($retiredAll['governance']) + count($retiredAll['gate']) + count($retiredAll['proposed']);
@@ -1808,8 +1813,9 @@ final class KpiRegistryAdminService
      * regions inside ANNEX-122 from the effective governance KPI set.
      *
      * @param array<int, array<string, mixed>> $kpis
+     * @param array<int, array<string, mixed>> $gateMetrics
      */
-    private function regenerateAnnex122(array $kpis): bool
+    private function regenerateAnnex122(array $kpis, array $gateMetrics = []): bool
     {
         $path = $this->rootDir . '/' . self::ANNEX122_RELATIVE;
         if (!is_file($path)) {
@@ -1830,6 +1836,14 @@ final class KpiRegistryAdminService
             ));
             $table = $this->renderGovernanceTable($rows);
             $next = $this->replaceRegion($html, $marker, $table);
+            if ($next !== null) {
+                $html = $next;
+                $changed = true;
+            }
+        }
+        if ($gateMetrics !== []) {
+            $table = $this->renderGateControlTable($gateMetrics);
+            $next = $this->replaceRegion($html, 'KPI-GATE', $table);
             if ($next !== null) {
                 $html = $next;
                 $changed = true;
@@ -1876,6 +1890,65 @@ final class KpiRegistryAdminService
             $body .= $this->renderGovernanceRow($k);
         }
         return $head . $body . '</tbody></table></div>';
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $rows
+     */
+    private function renderGateControlTable(array $rows): string
+    {
+        $head = '<div class="table-card"><table class="table" style="table-layout:fixed">'
+            . '<colgroup><col style="width:7%"><col style="width:8%">'
+            . '<col style="width:17%"><col style="width:22%"><col style="width:9%">'
+            . '<col style="width:8%"><col style="width:8%"><col style="width:7%">'
+            . '<col style="width:14%"></colgroup>'
+            . '<thead><tr><th>Gate</th><th>ID</th><th>Metric</th><th>Điều kiện pass</th>'
+            . '<th>CDR</th><th>Target</th><th>Owner</th><th>Nhịp</th>'
+            . '<th>Evidence / status</th></tr></thead><tbody>';
+        $body = '';
+        foreach ($rows as $row) {
+            $body .= $this->renderGateControlRow($row);
+        }
+        return $head . $body . '</tbody></table></div>';
+    }
+
+    /**
+     * @param array<string, mixed> $g
+     */
+    private function renderGateControlRow(array $g): string
+    {
+        $e = fn(mixed $v): string => $this->esc((string) ($v ?? ''));
+        $localId = (string) ($g['local_id'] ?? '');
+        $code = (string) ($g['canonical_code'] ?? '');
+        $cdrs = array_map(
+            static fn(mixed $v): string => strtoupper(trim((string) $v)),
+            (array) ($g['linked_cdr'] ?? []),
+        );
+        $cdrCell = implode(' ', array_map(
+            fn(string $cdr): string => '<span class="role-code">' . $this->esc($cdr) . '</span>',
+            array_filter($cdrs, static fn(string $cdr): bool => $cdr !== ''),
+        ));
+        $target = (string) ($g['target'] ?? ($g['thresholds']['target'] ?? ''));
+        $cadence = (string) (self::CADENCE_VI[$g['cadence'] ?? ''] ?? ($g['cadence'] ?? ''));
+        $evidence = $e($g['data_source'] ?? '');
+        if (trim((string) ($g['evidence_source'] ?? '')) !== '') {
+            $evidence .= '<br><span class="mini-note">' . $e($g['evidence_source']) . '</span>';
+        }
+        $evidence .= '<br>' . $this->calcStatusSymbol((string) ($g['calculation_status'] ?? ''));
+
+        $metric = '<b>' . $e($g['name_vi'] ?? ($g['name'] ?? '')) . '</b><br>'
+            . '<span class="role-code">' . $e($code) . '</span>';
+        if (trim((string) ($g['name'] ?? '')) !== '' && trim((string) ($g['name_vi'] ?? '')) !== '') {
+            $metric .= ' <span class="mini-note">' . $e($g['name']) . '</span>';
+        }
+
+        return '<tr data-gate-metric="' . $e($localId) . '"><td><span class="badge-soft">'
+            . $e($g['gate'] ?? '') . '</span></td><td class="kpi-gate-code">'
+            . str_replace('-', '<br>', $e($localId)) . '</td><td>' . $metric . '</td><td>'
+            . $e($g['gate_pass_condition'] ?? '') . '</td><td class="center">' . $cdrCell
+            . '</td><td class="nowrap">' . $e($target) . '</td><td>'
+            . $this->roleLink((string) ($g['owner_role'] ?? '')) . '</td><td>'
+            . $e($cadence) . '</td><td>' . $evidence . '</td></tr>';
     }
 
     /**

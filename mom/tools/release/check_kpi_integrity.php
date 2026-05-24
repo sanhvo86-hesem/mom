@@ -1425,6 +1425,91 @@ if ($profiles !== []) {
                 $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: applies_when.silent_default_forbidden "
                     . "MUST be true (LAM/SEMSYSCO orders must not default silently).";
             }
+            $assignment = $applies['assignment_event_contract'] ?? null;
+            if (($applies['assignment_event_required'] ?? false) !== true
+                || !is_array($assignment)
+                || trim((string) ($assignment['event_name'] ?? '')) === ''
+                || !is_array($assignment['required_fields'] ?? null)
+                || $assignment['required_fields'] === []) {
+                $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: explicit assignment event contract "
+                    . "with actor/time/evidence is required before G1 release.";
+            }
+        }
+
+        if ($profileCode === 'LAM_SEMSYSCO') {
+            $profileGateCoverage = is_array($profile['gate_coverage'] ?? null) ? $profile['gate_coverage'] : [];
+            $requiredCoverage = [
+                'G3' => [
+                    'MATERIAL_CERT_VERIFICATION_COMPLETENESS',
+                    'IQC_RELEASE_ON_TIME',
+                    'LAM_MATERIAL_KIT_READY_TO_PLAN',
+                    'TRACEABILITY_LABEL_VERIFIED',
+                    'SPECIAL_PROCESS_REQUIREMENT_CLEAR',
+                    'SUBTIER_REQUIREMENT_FLOWDOWN',
+                ],
+                'G5' => [
+                    'IN_PROCESS_REJECT_RATE',
+                    'IPQC_CHARACTERISTIC_COMPLETENESS',
+                    'SPC_SIGNAL_REACTION_TIME',
+                    'CMM_QUEUE_AGING',
+                    'NCR_CONTAINMENT_ON_TIME',
+                    'GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT',
+                ],
+            ];
+            $gateByCode = [];
+            foreach ($gateMetrics as $g) {
+                if (!is_array($g)) {
+                    continue;
+                }
+                $c = strtoupper(trim((string) ($g['canonical_code'] ?? '')));
+                if ($c !== '') {
+                    $gateByCode[$c] = $g;
+                }
+            }
+            foreach ($requiredCoverage as $gate => $codes) {
+                $covered = array_map('strtoupper', array_map('strval', (array) ($profileGateCoverage[$gate] ?? [])));
+                if ($covered === []) {
+                    $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: gate_coverage.$gate must not be empty.";
+                }
+                foreach ($codes as $requiredCode) {
+                    if (!in_array($requiredCode, $linked, true)) {
+                        $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: required linked_metric "
+                            . "'$requiredCode' missing for $gate LAM gate coverage.";
+                    }
+                    if (!in_array($requiredCode, $covered, true)) {
+                        $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: gate_coverage.$gate missing "
+                            . "required metric '$requiredCode'.";
+                    }
+                    $gateRow = $gateByCode[$requiredCode] ?? null;
+                    if (!is_array($gateRow)) {
+                        $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: required $gate metric "
+                            . "'$requiredCode' has no gate_control_metrics row.";
+                        continue;
+                    }
+                    if (strtoupper(trim((string) ($gateRow['gate'] ?? ''))) !== $gate) {
+                        $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: required metric '$requiredCode' "
+                            . "must be declared on gate $gate.";
+                    }
+                    if (trim((string) ($gateRow['lam_profile_link'] ?? '')) !== 'LAM_SEMSYSCO') {
+                        $p0[] = "Gate $requiredCode: LAM G3/G5 metric must declare lam_profile_link=LAM_SEMSYSCO.";
+                    }
+                    foreach (['linked_cdr', 'gate_pass_condition', 'evidence_source', 'hold_release_rule'] as $field) {
+                        $value = $gateRow[$field] ?? null;
+                        $missing = is_array($value) ? $value === [] : trim((string) $value) === '';
+                        if ($missing) {
+                            $p0[] = "Gate $requiredCode: LAM G3/G5 metric missing $field.";
+                        }
+                    }
+                    if (($gateRow['reward_eligible'] ?? false) === true
+                        || ($gateRow['scorecard_contributes_to_reward'] ?? false) === true) {
+                        $p0[] = "Gate $requiredCode: LAM G3/G5 gate metrics must not contribute to reward.";
+                    }
+                    $reward = strtolower(trim((string) ($gateRow['reward_mode'] ?? '')));
+                    if (!in_array($reward, ['blocker_only', 'not_rewardable'], true)) {
+                        $p0[] = "Gate $requiredCode: LAM G3/G5 reward_mode must be blocker_only or not_rewardable.";
+                    }
+                }
+            }
         }
     }
     // Reverse: every metric.lam_profile_link must reference a known profile.

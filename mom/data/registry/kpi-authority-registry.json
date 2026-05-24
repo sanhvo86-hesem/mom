@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
   "version": "2026-05-24",
-  "schema_version": 20,
+  "schema_version": 21,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. The executive scorecard is a lean runtime-backed core; role scorecards use active/candidate measures; proposed metrics remain non-reward until governed evidence and data contracts are approved.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -7716,7 +7716,7 @@
         "annex122_gate_table"
       ],
       "result_type": "gate",
-      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "evaluation_use": "gate_hold_release",
       "scorecard_scoring_status": "gate_only",
       "scorecard_contributes_to_reward": false,
       "is_official_kpi": false,
@@ -7726,7 +7726,24 @@
       "data_stewardship_role": "WKM",
       "hold_release_rule": "Hold affected operation when reject rate exceeds 1% or D3 evidence is missing; WKM opens containment and QA decides NCR/CAPA path.",
       "decision_action": "Hold production line; WKM + QA stop-the-line + IPQC reaction.",
-      "reward_mode": "blocker_only"
+      "reward_mode": "blocker_only",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "quality_at_source",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "binary_pass_fail",
+      "lifecycle_status": "active_runtime",
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "blocking_conditions": [
+        "in_process_reject_rate_above_gate_threshold"
+      ],
+      "owner_alignment_note": "WKM owns in-process reaction; QA remains accountable for D3 NCR classification and containment decision.",
+      "required_evidence": [
+        "ipqc_inspection_results",
+        "operation_or_lot_link",
+        "defect_code_breakdown",
+        "containment_or_disposition"
+      ],
+      "target_graduation_condition": "Already runtime via ipqc_inspection_results.pass_fail; Prompt 04 keeps it as a G5 driver and LAM gate, not a reward KPI."
     },
     {
       "local_id": "KPI-G5-02",
@@ -7771,7 +7788,7 @@
         "annex122_gate_table"
       ],
       "result_type": "gate",
-      "evaluation_use": "hold_release_only_not_reward_or_discipline",
+      "evaluation_use": "gate_hold_release",
       "scorecard_scoring_status": "gate_only",
       "scorecard_contributes_to_reward": false,
       "is_official_kpi": false,
@@ -7781,7 +7798,26 @@
       "data_stewardship_role": "WKM",
       "hold_release_rule": "Stop or hold process when SPC reaction exceeds 15 minutes; WKM/QA must verify containment before continuing production.",
       "decision_action": "Escalate to QA; force operator stop-the-line + supervisor intervene.",
-      "reward_mode": "blocker_only"
+      "reward_mode": "blocker_only",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "quality_at_source",
+      "measurement_data_type": "time_duration",
+      "scoring_model_detail": "sla_aging_bucket",
+      "lifecycle_status": "pilot",
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "blocking_conditions": [
+        "spc_signal_reaction_late_or_unverified"
+      ],
+      "owner_alignment_note": "WKM owns immediate reaction; QA verifies that containment and D3/D4 disposition protect the customer.",
+      "data_contract_gap": "SPC signal detection/reaction timestamps are not normalized yet; evidence remains FRM-631/manual log until Prompt 06 capability module.",
+      "target_graduation_condition": "Graduate after SPC chart signal events expose detection_at, reaction_at, containment_at, characteristic, gage_id, job/operation, and active_profile_code.",
+      "manual_input_form": "FRM-631 SPC chart signal log",
+      "required_evidence": [
+        "spc_signal_log",
+        "reaction_timestamp",
+        "containment_action",
+        "qa_verification"
+      ]
     },
     {
       "local_id": "KPI-G6-01",
@@ -8871,6 +8907,778 @@
       "lam_profile_link": "LAM_SEMSYSCO",
       "cdr_review_note": "Currently linked D11 (quality escape). Consider re-binding to E7 (customer property exception). Defer per P06.1.",
       "decision_action": "Notify customer immediately on gage damage; QA + CS escalate per D11."
+    },
+    {
+      "classification": "gate_metric_lam_profile",
+      "target": "100%",
+      "cadence": "per-event",
+      "calculation_status": "staged_data_contract",
+      "counter_metric": {
+        "code": "MATERIAL_CERT_VERIFICATION_COMPLETENESS-CTR",
+        "endpoint": "POST /api/kpi/MATERIAL_CERT_VERIFICATION_COMPLETENESS-CTR/input",
+        "name_vi": "Số lô LAM được kit khi cert vật tư thiếu hoặc lệch heat/lot/spec",
+        "name": "LAM lot kitted with missing or mismatched cert",
+        "intent": "Bắt việc gọi vật tư sẵn sàng trong khi chứng chỉ vật tư chưa được xác minh."
+      },
+      "process": "procurement",
+      "category": "customer",
+      "applicable_jds": [
+        "SCM",
+        "QA",
+        "WAR"
+      ],
+      "metric_type": "gate_control_metric",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "customer_specific_requirement",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "binary_pass_fail",
+      "evaluation_use": "gate_hold_release",
+      "reward_mode": "blocker_only",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "gate_control",
+        "lam_profile_gate",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Hold or release LAM/SEMSYSCO work only when required customer evidence is complete.",
+      "data_stewardship_role": "QA",
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "local_id": "KPI-LAM-G3-01",
+      "canonical_code": "MATERIAL_CERT_VERIFICATION_COMPLETENESS",
+      "name": "Material Certificate Verification Completeness",
+      "name_vi": "Mức đầy đủ xác minh chứng chỉ vật tư",
+      "gate": "G3",
+      "linked_cdr": [
+        "D10"
+      ],
+      "gate_pass_condition": "100% vật tư LAM/SEMSYSCO cấp vào kế hoạch sản xuất có chứng chỉ vật tư đối chiếu đúng heat/lot/spec trước khi kit release (CDR D10).",
+      "owner_role": "SCM",
+      "owner_alignment_note": "SCM owns material release readiness; QA remains accountable for D10 technical acceptance and cert conformance evidence.",
+      "data_source": "trace_material_certificates + incoming_inspections + supplier cert PDF",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 99,
+        "target": 100,
+        "basis": "LAM material release is zero-tolerance: one missing/mismatched certificate blocks release."
+      },
+      "blocking_conditions": [
+        "lam_material_cert_missing_or_mismatched"
+      ],
+      "evidence_source": "trace_material_certificates record, supplier certificate PDF, incoming inspection acceptance note, heat/lot/spec match evidence",
+      "hold_release_rule": "Hold G3 material kit release when any LAM material certificate is missing, mismatched, expired, or not tied to the lot; SCM resolves and QA verifies before plan release.",
+      "decision_action": "Hold material kit; SCM + QA reconcile certificate before G3 release.",
+      "data_contract_gap": "No certified runtime join yet across trace_material_certificates, incoming_inspections, purchase receipt, and job kit release event.",
+      "target_graduation_condition": "Graduate after material certificate records carry lot/heat/spec/customer profile links and KpiEngine can compute completeness per LAM job without manual review.",
+      "manual_input_form": "FRM-402 material certificate verification checklist",
+      "required_evidence": [
+        "supplier_certificate_pdf",
+        "heat_lot_match",
+        "incoming_inspection_acceptance",
+        "job_kit_link"
+      ]
+    },
+    {
+      "classification": "gate_metric_lam_profile",
+      "target": "100%",
+      "cadence": "per-event",
+      "calculation_status": "staged_data_contract",
+      "counter_metric": {
+        "code": "IQC_RELEASE_ON_TIME-CTR",
+        "endpoint": "POST /api/kpi/IQC_RELEASE_ON_TIME-CTR/input",
+        "name_vi": "Số lần vật tư LAM được đưa vào kế hoạch khi IQC chưa disposition",
+        "name": "LAM material planned before IQC disposition",
+        "intent": "Bắt việc ép tiến độ bằng cách coi IQC chưa xong là sẵn sàng."
+      },
+      "process": "quality_assurance",
+      "category": "customer",
+      "applicable_jds": [
+        "QA",
+        "SCM",
+        "WAR"
+      ],
+      "metric_type": "gate_control_metric",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "customer_specific_requirement",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "binary_pass_fail",
+      "evaluation_use": "gate_hold_release",
+      "reward_mode": "blocker_only",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "gate_control",
+        "lam_profile_gate",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Hold or release LAM/SEMSYSCO work only when required customer evidence is complete.",
+      "data_stewardship_role": "SCM",
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "local_id": "KPI-LAM-G3-02",
+      "canonical_code": "IQC_RELEASE_ON_TIME",
+      "name": "IQC Release On Time",
+      "name_vi": "Tỷ lệ IQC nhả đúng hạn cho vật tư LAM",
+      "gate": "G3",
+      "linked_cdr": [
+        "D10"
+      ],
+      "gate_pass_condition": "100% lô vật tư LAM cần IQC được nghiệm thu, disposition và nhả kho trước thời điểm kit theo kế hoạch; quá hạn hoặc chưa disposition thì G3 không pass (CDR D10).",
+      "owner_role": "QA",
+      "owner_alignment_note": "QA owns D10 IQC acceptance; SCM provides receipt/need-date and material movement evidence.",
+      "data_source": "incoming_inspections + incoming_inspection_results + supplier_asn_lines + kit need-date",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 95,
+        "target": 100,
+        "basis": "LAM material cannot enter production until IQC disposition is complete; late release creates delivery risk or bypass pressure."
+      },
+      "blocking_conditions": [
+        "lam_iqc_not_released_before_kit"
+      ],
+      "evidence_source": "incoming_inspections disposition, incoming_inspection_results acceptance, supplier ASN/receipt timestamp, kit need-date log",
+      "hold_release_rule": "Hold G3 plan release when IQC disposition is open, rejected, or later than the kit need-date; QA closes disposition before SCM releases material.",
+      "decision_action": "Hold material-to-plan release; QA closes IQC or SCM replans shortage.",
+      "data_contract_gap": "Need governed linkage between receipt/ASN line, IQC inspection disposition, job kit demand, and active LAM profile.",
+      "target_graduation_condition": "Graduate after incoming_inspections records expose disposition timestamps, lot linkage, and kit need-date per LAM job.",
+      "manual_input_form": "FRM-701 IQC release and material disposition log",
+      "required_evidence": [
+        "iqc_disposition_record",
+        "receipt_or_asn_line",
+        "kit_need_date",
+        "active_profile_code"
+      ]
+    },
+    {
+      "classification": "gate_metric_lam_profile",
+      "target": "100%",
+      "cadence": "per-event",
+      "calculation_status": "staged_data_contract",
+      "counter_metric": {
+        "code": "LAM_MATERIAL_KIT_READY_TO_PLAN-CTR",
+        "endpoint": "POST /api/kpi/LAM_MATERIAL_KIT_READY_TO_PLAN-CTR/input",
+        "name_vi": "Số lệnh LAM đưa vào dispatch dù kit thiếu cert/IQC/traceability",
+        "name": "LAM dispatch with incomplete material kit",
+        "intent": "Bắt việc làm đẹp plan adherence bằng cách release lệnh chưa đủ vật tư hợp lệ."
+      },
+      "process": "planning",
+      "category": "customer",
+      "applicable_jds": [
+        "PPL",
+        "SCM",
+        "QA"
+      ],
+      "metric_type": "gate_control_metric",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "customer_specific_requirement",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "binary_pass_fail",
+      "evaluation_use": "gate_hold_release",
+      "reward_mode": "blocker_only",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "gate_control",
+        "lam_profile_gate",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Hold or release LAM/SEMSYSCO work only when required customer evidence is complete.",
+      "data_stewardship_role": "SCM",
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "local_id": "KPI-LAM-G3-03",
+      "canonical_code": "LAM_MATERIAL_KIT_READY_TO_PLAN",
+      "name": "LAM Material Kit Ready to Plan",
+      "name_vi": "Bộ vật tư LAM sẵn sàng trước khi chốt kế hoạch",
+      "gate": "G3",
+      "linked_cdr": [
+        "C2",
+        "E5",
+        "D10"
+      ],
+      "gate_pass_condition": "100% kit LAM có đủ vật tư, cert, IQC disposition và trace lot trước khi chốt dispatch/plan trong ngày; thiếu bất kỳ thành phần nào thì G3 không pass.",
+      "owner_role": "PPL",
+      "owner_alignment_note": "PPL owns plan release; SCM owns material readiness evidence and QA owns D10 acceptance when quality evidence is involved.",
+      "data_source": "MATERIAL_AVAILABILITY_PLAN runtime read model + material reservation + cert/IQC/trace evidence",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 95,
+        "target": 100,
+        "basis": "LAM plan release must not treat phantom availability as usable material."
+      },
+      "blocking_conditions": [
+        "lam_kit_not_ready_at_plan_release"
+      ],
+      "evidence_source": "material reservation snapshot, IQC disposition, material cert verification, trace lot label, active LAM profile on job_order",
+      "hold_release_rule": "Hold G3 dispatch when LAM kit readiness is below 100%; PPL either replans or SCM/QA close the missing material evidence before release.",
+      "decision_action": "Hold dispatch; PPL replans or SCM/QA close kit evidence gap.",
+      "data_contract_gap": "Runtime MATERIAL_AVAILABILITY_PLAN does not yet include LAM-specific cert/IQC/trace completeness in the denominator.",
+      "target_graduation_condition": "Graduate after material readiness read model joins active LAM profile, reservation, cert verification, IQC disposition, and trace label state.",
+      "paired_metric": "MATERIAL_AVAILABILITY_PLAN",
+      "manual_input_form": "FRM-502 daily dispatch list with LAM material readiness attachment",
+      "required_evidence": [
+        "material_reservation_snapshot",
+        "cert_verification",
+        "iqc_disposition",
+        "trace_lot_label",
+        "dispatch_release_record"
+      ]
+    },
+    {
+      "classification": "gate_metric_lam_profile",
+      "target": "100%",
+      "cadence": "per-event",
+      "calculation_status": "staged_data_contract",
+      "counter_metric": {
+        "code": "TRACEABILITY_LABEL_VERIFIED-CTR",
+        "endpoint": "POST /api/kpi/TRACEABILITY_LABEL_VERIFIED-CTR/input",
+        "name_vi": "Số lần phát hiện nhãn traceability sai sau khi đã chuyển công đoạn",
+        "name": "Post-transfer traceability label mismatch count",
+        "intent": "Bắt việc chuyển lệnh khi label chưa được đối chiếu thực tế."
+      },
+      "process": "quality_assurance",
+      "category": "customer",
+      "applicable_jds": [
+        "QA",
+        "WKM",
+        "QC"
+      ],
+      "metric_type": "gate_control_metric",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "customer_specific_requirement",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "binary_pass_fail",
+      "evaluation_use": "gate_hold_release",
+      "reward_mode": "blocker_only",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "gate_control",
+        "lam_profile_gate",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Hold or release LAM/SEMSYSCO work only when required customer evidence is complete.",
+      "data_stewardship_role": "WKM",
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "local_id": "KPI-LAM-G3-04",
+      "canonical_code": "TRACEABILITY_LABEL_VERIFIED",
+      "name": "Traceability Label Verified",
+      "name_vi": "Nhãn truy xuất được xác minh trước khi chuyển công đoạn",
+      "gate": "G3",
+      "linked_cdr": [
+        "D10",
+        "D8"
+      ],
+      "gate_pass_condition": "100% lô LAM có nhãn traceability đúng part/revision/lot/heat trước khi chuyển sang sản xuất hoặc đóng gói; label mismatch giữ lô tại gate.",
+      "owner_role": "QA",
+      "owner_alignment_note": "QA owns traceability acceptance; WKM verifies physical label at the work-transfer point.",
+      "data_source": "trace_label_print_jobs + trace_lot_attributes + job traveler scan evidence",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 99,
+        "target": 100,
+        "basis": "LAM traceability is zero-tolerance; wrong label can become wrong-revision or wrong-lot escape."
+      },
+      "blocking_conditions": [
+        "traceability_label_missing_or_mismatched"
+      ],
+      "evidence_source": "trace_label_print_jobs record, traveler barcode scan, part/revision/lot/heat verification checklist",
+      "hold_release_rule": "Hold G3 work transfer when label is missing, stale revision, wrong lot/heat, or not scanned by the verifier; QA/WKM must re-label and re-verify.",
+      "decision_action": "Hold work transfer; QA/WKM re-label and verify trace link.",
+      "data_contract_gap": "Trace label print jobs exist but no governed pass/fail verification event is wired to LAM gate release.",
+      "target_graduation_condition": "Graduate after trace_label_print_jobs and traveler scans produce a verified label event tied to job_order.active_profile_code.",
+      "manual_input_form": "FRM-203 job dossier traceability label verification checklist",
+      "required_evidence": [
+        "label_print_job",
+        "traveler_scan",
+        "part_revision_lot_heat_match",
+        "verifier_signature"
+      ]
+    },
+    {
+      "classification": "gate_metric_lam_profile",
+      "target": "100%",
+      "cadence": "per-event",
+      "calculation_status": "staged_data_contract",
+      "counter_metric": {
+        "code": "SPECIAL_PROCESS_REQUIREMENT_CLEAR-CTR",
+        "endpoint": "POST /api/kpi/SPECIAL_PROCESS_REQUIREMENT_CLEAR-CTR/input",
+        "name_vi": "Số lệnh LAM chạy/gia công ngoài khi special process chưa rõ hoặc supplier chưa duyệt",
+        "name": "LAM special process released without clarity",
+        "intent": "Bắt việc bỏ qua yêu cầu đặc biệt để giữ tiến độ."
+      },
+      "process": "engineering",
+      "category": "customer",
+      "applicable_jds": [
+        "ENGM",
+        "SCM",
+        "QA"
+      ],
+      "metric_type": "gate_control_metric",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "customer_specific_requirement",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "binary_pass_fail",
+      "evaluation_use": "gate_hold_release",
+      "reward_mode": "blocker_only",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "gate_control",
+        "lam_profile_gate",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Hold or release LAM/SEMSYSCO work only when required customer evidence is complete.",
+      "data_stewardship_role": "SCM",
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "local_id": "KPI-LAM-G3-05",
+      "canonical_code": "SPECIAL_PROCESS_REQUIREMENT_CLEAR",
+      "name": "Special Process Requirement Clear Before Outsource or Run",
+      "name_vi": "Yêu cầu quá trình đặc biệt được làm rõ trước khi chạy / gia công ngoài",
+      "gate": "G3",
+      "linked_cdr": [
+        "B8",
+        "E3",
+        "E4"
+      ],
+      "gate_pass_condition": "100% yêu cầu special process/subcontract của LAM có spec, flowdown, approved supplier và acceptance evidence trước khi dispatch hoặc outsource.",
+      "owner_role": "ENGM",
+      "owner_alignment_note": "ENGM owns technical special-process interpretation; SCM owns sub-tier dispatch evidence and QA verifies quality acceptance.",
+      "data_source": "control_plan_characteristics + outsource dispatch checklist + supplier qualification/flowdown evidence",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 95,
+        "target": 100,
+        "basis": "Special process ambiguity before run/outsource is a direct LAM CSR and escape risk."
+      },
+      "blocking_conditions": [
+        "special_process_requirement_unclear"
+      ],
+      "evidence_source": "control plan characteristic flag, FRM-403 outsource request, FRM-404 outsource dispatch checklist, supplier approval/flowdown record",
+      "hold_release_rule": "Hold G3 dispatch or outsource release until special-process requirement, qualified sub-tier, acceptance plan, and flowdown evidence are complete.",
+      "decision_action": "Hold special-process release; ENGM/SCM/QA close requirement and sub-tier evidence.",
+      "data_contract_gap": "Special-process flags are not yet a normalized runtime contract across control plan, supplier qualification, and outsource dispatch records.",
+      "target_graduation_condition": "Graduate after control_plan_characteristics exposes special-process flags and outsource dispatch records carry supplier approval + flowdown evidence.",
+      "manual_input_form": "FRM-403/FRM-404 special process and outsource release checklist",
+      "required_evidence": [
+        "special_process_flag",
+        "approved_supplier_or_subtier",
+        "flowdown_attestation",
+        "acceptance_plan"
+      ]
+    },
+    {
+      "classification": "gate_metric_lam_profile",
+      "target": "100%",
+      "cadence": "per-event",
+      "calculation_status": "manual_governed",
+      "counter_metric": {
+        "code": "SUBTIER_REQUIREMENT_FLOWDOWN-CTR",
+        "endpoint": "POST /api/kpi/SUBTIER_REQUIREMENT_FLOWDOWN-CTR/input",
+        "name_vi": "Số sub-tier nhận việc LAM nhưng thiếu flowdown attestation",
+        "name": "LAM subtier without flowdown attestation",
+        "intent": "Bắt việc chuyển rủi ro cho nhà cung cấp dưới chuỗi mà không áp yêu cầu khách."
+      },
+      "process": "procurement",
+      "category": "customer",
+      "applicable_jds": [
+        "SCM",
+        "QA"
+      ],
+      "metric_type": "gate_control_metric",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "customer_specific_requirement",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "binary_pass_fail",
+      "evaluation_use": "gate_hold_release",
+      "reward_mode": "blocker_only",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "gate_control",
+        "lam_profile_gate",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Hold or release LAM/SEMSYSCO work only when required customer evidence is complete.",
+      "data_stewardship_role": "QA",
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "local_id": "KPI-LAM-G3-06",
+      "canonical_code": "SUBTIER_REQUIREMENT_FLOWDOWN",
+      "name": "Sub-tier Requirement Flowdown Gate",
+      "name_vi": "Gate áp yêu cầu khách xuống nhà cung cấp dưới chuỗi",
+      "gate": "G3",
+      "linked_cdr": [
+        "E3",
+        "E4",
+        "E6"
+      ],
+      "gate_pass_condition": "100% công đoạn/vật tư LAM đi sub-tier có flowdown attestation cho CSR, quality, traceability, change approval và retention trước khi phát hành PO/outsource.",
+      "owner_role": "SCM",
+      "owner_alignment_note": "SCM owns sub-tier commercial release; QA verifies quality/customer-specific requirements are flowed down.",
+      "data_source": "subtier_flowdown_attestation_register + supplier quality agreement + outsource PO/dispatch evidence",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 95,
+        "target": 100,
+        "basis": "LAM/SEMSYSCO requires sub-tier flowdown before work is placed outside the plant."
+      },
+      "blocking_conditions": [
+        "subtier_without_flowdown_attestation"
+      ],
+      "evidence_source": "subtier_flowdown_attestation_register, supplier quality agreement, outsource dispatch record, PO clause evidence",
+      "hold_release_rule": "Hold G3 outsource/sub-tier release until flowdown attestation is signed and linked to the PO/operation; SCM and QA co-verify.",
+      "decision_action": "Hold outsource/sub-tier release; SCM + QA secure flowdown evidence.",
+      "manual_input_form": "Sub-tier flowdown attestation register",
+      "required_evidence": [
+        "flowdown_attestation",
+        "supplier_quality_agreement",
+        "outsource_dispatch_or_po",
+        "csr_clause_reference"
+      ]
+    },
+    {
+      "classification": "gate_metric_lam_profile",
+      "target": "100%",
+      "cadence": "per-event",
+      "calculation_status": "staged_data_contract",
+      "counter_metric": {
+        "code": "IPQC_CHARACTERISTIC_COMPLETENESS-CTR",
+        "endpoint": "POST /api/kpi/IPQC_CHARACTERISTIC_COMPLETENESS-CTR/input",
+        "name_vi": "Số lần chuyển công đoạn khi còn thiếu đặc tính IPQC bắt buộc",
+        "name": "Downstream transfer with missing IPQC characteristic",
+        "intent": "Bắt việc chuyển lô vì tiến độ trong khi record IPQC chưa đủ."
+      },
+      "process": "quality_assurance",
+      "category": "customer",
+      "applicable_jds": [
+        "QA",
+        "QC",
+        "WKM"
+      ],
+      "metric_type": "gate_control_metric",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "customer_specific_requirement",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "binary_pass_fail",
+      "evaluation_use": "gate_hold_release",
+      "reward_mode": "blocker_only",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "gate_control",
+        "lam_profile_gate",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Hold or release LAM/SEMSYSCO work only when required customer evidence is complete.",
+      "data_stewardship_role": "QC",
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "local_id": "KPI-LAM-G5-01",
+      "canonical_code": "IPQC_CHARACTERISTIC_COMPLETENESS",
+      "name": "IPQC Characteristic Completeness",
+      "name_vi": "Mức đầy đủ kiểm đặc tính IPQC",
+      "gate": "G5",
+      "linked_cdr": [
+        "D3",
+        "D4"
+      ],
+      "gate_pass_condition": "100% đặc tính IPQC bắt buộc/CTQ trong control plan được ghi nhận kết quả trước khi chuyển công đoạn; thiếu đặc tính thì hold lô và mở phản ứng IPQC.",
+      "owner_role": "QA",
+      "owner_alignment_note": "QA owns the D3/D4 quality gate; QC records the inspection characteristic results.",
+      "data_source": "ipqc_inspections + ipqc_inspection_results + control_plan_characteristics",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 98,
+        "target": 100,
+        "basis": "IPQC cannot protect CTQ if required characteristics are not recorded before downstream release."
+      },
+      "blocking_conditions": [
+        "ipqc_required_characteristic_missing"
+      ],
+      "evidence_source": "ipqc_inspection_results per required characteristic, control_plan_characteristics requirement list, FRM-651 reaction record when missing",
+      "hold_release_rule": "Hold G5 downstream transfer when any required IPQC characteristic is missing, unscored, or failed without disposition; QA/QC complete evidence or open NCR before release.",
+      "decision_action": "Hold downstream transfer; QA/QC close IPQC characteristic evidence.",
+      "data_contract_gap": "Need runtime mapping from control_plan_characteristics.required_for_ipqc to ipqc_inspection_results per job operation.",
+      "target_graduation_condition": "Graduate after each IPQC inspection result can be reconciled to the required characteristic list for job/operation/part revision.",
+      "manual_input_form": "FRM-651 IPQC/NCR record",
+      "required_evidence": [
+        "required_characteristic_list",
+        "ipqc_result_per_characteristic",
+        "operation_or_lot_link",
+        "disposition_for_fail_or_missing"
+      ]
+    },
+    {
+      "classification": "gate_metric_lam_profile",
+      "target": "≤ 4h",
+      "cadence": "per-event",
+      "calculation_status": "staged_data_contract",
+      "counter_metric": {
+        "code": "CMM_QUEUE_AGING-CTR",
+        "endpoint": "POST /api/kpi/CMM_QUEUE_AGING-CTR/input",
+        "name_vi": "Số lô bị bỏ qua CMM/đo thay thế chưa duyệt để giảm queue",
+        "name": "Unauthorized CMM bypass count",
+        "intent": "Bắt việc giảm queue bằng cách bỏ đo CMM hoặc dùng phương án đo chưa được phê duyệt."
+      },
+      "process": "quality_assurance",
+      "category": "customer",
+      "applicable_jds": [
+        "QA",
+        "QC",
+        "PPL"
+      ],
+      "metric_type": "gate_control_metric",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "customer_specific_requirement",
+      "measurement_data_type": "time_duration",
+      "scoring_model_detail": "sla_aging_bucket",
+      "evaluation_use": "gate_hold_release",
+      "reward_mode": "blocker_only",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "gate_control",
+        "lam_profile_gate",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Hold or release LAM/SEMSYSCO work only when required customer evidence is complete.",
+      "data_stewardship_role": "QC",
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "local_id": "KPI-LAM-G5-02",
+      "canonical_code": "CMM_QUEUE_AGING",
+      "name": "CMM Queue Aging",
+      "name_vi": "Tuổi hàng chờ CMM cho lô LAM/CTQ",
+      "gate": "G5",
+      "linked_cdr": [
+        "D1",
+        "D4",
+        "D7"
+      ],
+      "gate_pass_condition": "Không có lô LAM/CTQ chờ CMM quá 4 giờ làm việc trước FAI/IPQC/final release; quá hạn phải escalation để bảo vệ OTD và chất lượng.",
+      "owner_role": "QA",
+      "owner_alignment_note": "QA owns release risk; QC/CMM owns queue timestamp evidence and measurement execution.",
+      "data_source": "CMM queue log, inspection assignment, FAI/IPQC/final release hold record",
+      "thresholds": {
+        "direction": "lower_is_better",
+        "unit": "hour",
+        "green_point": 4,
+        "yellow_point": 8,
+        "target": 4,
+        "basis": "CMM queue aging is a visible bottleneck for LAM delivery and release evidence; >8h threatens OTD or bypass pressure."
+      },
+      "blocking_conditions": [
+        "lam_cmm_queue_overdue_without_escalation"
+      ],
+      "evidence_source": "CMM queue entry timestamp, inspection assignment, priority/escalation log, release hold record",
+      "hold_release_rule": "Escalate and hold affected release when LAM CMM queue exceeds 4 working hours without approved recovery; QA/QC/PPL prioritize constraint recovery.",
+      "decision_action": "Escalate CMM queue; QA/QC/PPL recover before release bypass.",
+      "data_contract_gap": "No normalized CMM queue table yet; current evidence is inspection assignment and manual queue log.",
+      "target_graduation_condition": "Graduate after CMM queue events record queued_at, started_at, completed_at, job/operation, customer profile, and release linkage.",
+      "manual_input_form": "CMM queue and inspection assignment log",
+      "required_evidence": [
+        "queue_timestamp",
+        "inspection_assignment",
+        "release_hold_link",
+        "recovery_action"
+      ]
+    },
+    {
+      "classification": "gate_metric_lam_profile",
+      "target": "100%",
+      "cadence": "per-event",
+      "calculation_status": "staged_data_contract",
+      "counter_metric": {
+        "code": "NCR_CONTAINMENT_ON_TIME-CTR",
+        "endpoint": "POST /api/kpi/NCR_CONTAINMENT_ON_TIME-CTR/input",
+        "name_vi": "Số NCR LAM được nhả công đoạn khi containment chưa xác minh",
+        "name": "LAM NCR released without verified containment",
+        "intent": "Bắt việc đóng/nhả NCR để thông dòng khi containment chưa bảo vệ khách."
+      },
+      "process": "quality_system",
+      "category": "customer",
+      "applicable_jds": [
+        "QA",
+        "WKM",
+        "QC"
+      ],
+      "metric_type": "gate_control_metric",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "customer_specific_requirement",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "binary_pass_fail",
+      "evaluation_use": "gate_hold_release",
+      "reward_mode": "blocker_only",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "gate_control",
+        "lam_profile_gate",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Hold or release LAM/SEMSYSCO work only when required customer evidence is complete.",
+      "data_stewardship_role": "WKM",
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "local_id": "KPI-LAM-G5-03",
+      "canonical_code": "NCR_CONTAINMENT_ON_TIME",
+      "name": "NCR Containment On Time",
+      "name_vi": "Bao vây NCR đúng hạn trước khi nhả công đoạn",
+      "gate": "G5",
+      "linked_cdr": [
+        "D3",
+        "D4",
+        "D6"
+      ],
+      "gate_pass_condition": "100% NCR/defect LAM có containment documented trong 24 giờ hoặc trước downstream release, tùy mốc nào đến trước; chưa containment thì không nhả giữ.",
+      "owner_role": "QA",
+      "owner_alignment_note": "QA owns NCR containment sufficiency; WKM owns shop-floor segregation and physical hold execution.",
+      "data_source": "ncr_records + hold/disposition log + containment action timestamp",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 95,
+        "target": 100,
+        "basis": "LAM zero-defect requires containment before downstream release; no containment is a hard gate failure."
+      },
+      "blocking_conditions": [
+        "ncr_without_verified_containment"
+      ],
+      "evidence_source": "NCR record, containment action timestamp, suspect-lot segregation evidence, QA verification signature",
+      "hold_release_rule": "Hold affected job/lot when containment is missing, late, or unverified; QA verifies containment before D6 release or downstream transfer.",
+      "decision_action": "Hold NCR lot; QA/WKM verify containment before release.",
+      "data_contract_gap": "ncr_records exist, but containment due-time and verified_at are not yet normalized for runtime KPI calculation.",
+      "target_graduation_condition": "Graduate after NCR records carry containment_due_at, containment_completed_at, verified_by, affected lots, and active_profile_code.",
+      "manual_input_form": "FRM-651 NCR report and FRM-413 hold/disposition log",
+      "required_evidence": [
+        "ncr_record",
+        "containment_action",
+        "suspect_lot_segregation",
+        "qa_verification"
+      ]
+    },
+    {
+      "classification": "gate_metric_lam_profile",
+      "target": "100%",
+      "cadence": "per-event",
+      "calculation_status": "staged_data_contract",
+      "counter_metric": {
+        "code": "GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT-CTR",
+        "endpoint": "POST /api/kpi/GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT-CTR/input",
+        "name_vi": "Số kết quả IPQC/SPC LAM dùng gage hết hạn hoặc ngoài phạm vi",
+        "name": "LAM IPQC/SPC result made with invalid gage",
+        "intent": "Bắt việc tạo bằng chứng kiểm sai vì gage không hợp lệ."
+      },
+      "process": "quality_assurance",
+      "category": "customer",
+      "applicable_jds": [
+        "MCS",
+        "QA",
+        "QC"
+      ],
+      "metric_type": "gate_control_metric",
+      "metric_subtype": "gate_control_metric",
+      "control_intent": "customer_specific_requirement",
+      "measurement_data_type": "percent_ratio",
+      "scoring_model_detail": "binary_pass_fail",
+      "evaluation_use": "gate_hold_release",
+      "reward_mode": "blocker_only",
+      "lifecycle_status": "pilot",
+      "usage_types": [
+        "gate_control",
+        "lam_profile_gate",
+        "annex122_gate_table"
+      ],
+      "result_type": "gate",
+      "scorecard_scoring_status": "gate_only",
+      "scorecard_contributes_to_reward": false,
+      "is_official_kpi": false,
+      "reward_eligible": false,
+      "decision_purpose": "Hold or release LAM/SEMSYSCO work only when required customer evidence is complete.",
+      "data_stewardship_role": "QA",
+      "lam_profile_link": "LAM_SEMSYSCO",
+      "local_id": "KPI-LAM-G5-04",
+      "canonical_code": "GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT",
+      "name": "Gage Valid for In-Process Measurement",
+      "name_vi": "Thiết bị đo hợp lệ cho kiểm trong quá trình",
+      "gate": "G5",
+      "linked_cdr": [
+        "D3",
+        "D14"
+      ],
+      "gate_pass_condition": "100% kết quả IPQC/SPC dùng cho LAM được đo bằng gage còn hiệu chuẩn, đúng dải đo, đúng MSA/GRR và hợp lệ tại thời điểm đo; gage nghi ngờ thì hold measurement/release.",
+      "owner_role": "MCS",
+      "owner_alignment_note": "MCS owns gage status; QA owns D3/D14 measurement-use acceptance and any recall decision.",
+      "data_source": "calibration_records + calibration_grr_studies + ipqc_inspection_results.gage_id + gage_usage_log",
+      "thresholds": {
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100,
+        "yellow_point": 99.5,
+        "target": 100,
+        "basis": "Invalid gage invalidates in-process measurement and can create false SPC/IPQC pass evidence."
+      },
+      "blocking_conditions": [
+        "invalid_gage_used_for_ipqc_or_spc"
+      ],
+      "evidence_source": "calibration_records, GRR/MSA status, gage_usage_log tied to IPQC/SPC result, suspect-gage hold record",
+      "hold_release_rule": "Block G5 measurement/release if the gage used for IPQC/SPC is expired, out-of-range, failed GRR, or not traceable to the result; remeasure with valid gage before release.",
+      "decision_action": "Block IPQC/SPC result; MCS/QA revalidate gage and remeasure.",
+      "data_contract_gap": "IPQC result to gage_id and calibration validity-at-measurement is not yet fully wired to runtime calculation.",
+      "target_graduation_condition": "Graduate after every IPQC/SPC result carries gage_id and KpiEngine can verify calibration/GRR validity at measurement time.",
+      "manual_input_form": "FRM-601 calibration log + FRM-651 IPQC measurement evidence",
+      "required_evidence": [
+        "gage_id",
+        "calibration_valid_at_measurement",
+        "grr_or_msa_status",
+        "ipqc_result_link"
+      ]
     }
   ],
   "document_audit": {
@@ -9453,7 +10261,21 @@
           "manual_profile_assignment_allowed": true,
           "order_or_po_override_allowed": true,
           "default_for_unassigned": false,
-          "silent_default_forbidden": true
+          "silent_default_forbidden": true,
+          "assignment_event_required": true,
+          "assignment_event_contract": {
+            "event_name": "customer_requirement_profile_assignment_event",
+            "required_fields": [
+              "job_order_id",
+              "customer_code",
+              "profile_code",
+              "assignment_source",
+              "actor_user_id",
+              "assigned_at",
+              "evidence_reference"
+            ],
+            "g1_block_rule": "LAM/SEMSYSCO order cannot pass G1 when profile_code is missing, inherited silently, or assignment evidence lacks actor/time/evidence."
+          }
         },
         "quality_requirements": {
           "zero_defect_strategy": true,
@@ -9512,14 +10334,25 @@
           "SPECIAL_RELEASE_COMPLIANCE",
           "SPECIAL_RELEASE_MARKING_COMPLIANCE",
           "CONTINGENCY_PLAN_READINESS_LAM",
-          "SUPPLIER_RBA_COMPLIANCE_EVIDENCE"
+          "SUPPLIER_RBA_COMPLIANCE_EVIDENCE",
+          "MATERIAL_CERT_VERIFICATION_COMPLETENESS",
+          "IQC_RELEASE_ON_TIME",
+          "LAM_MATERIAL_KIT_READY_TO_PLAN",
+          "TRACEABILITY_LABEL_VERIFIED",
+          "SPECIAL_PROCESS_REQUIREMENT_CLEAR",
+          "IN_PROCESS_REJECT_RATE",
+          "IPQC_CHARACTERISTIC_COMPLETENESS",
+          "SPC_SIGNAL_REACTION_TIME",
+          "CMM_QUEUE_AGING",
+          "NCR_CONTAINMENT_ON_TIME",
+          "GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT"
         ],
         "activation_flow": [
-          "1. customer master default profile (from customers.profile_code)",
-          "2. + PO/spec/customer requirement override (from orders.profile_override)",
-          "3. + part family risk class (from item_master.risk_class)",
-          "4. + order risk class (from orders.risk_class)",
-          "= active requirement profile recorded on job_order.active_profile_code + actor + acked_at"
+          "1. customer master default profile suggestion (customers.profile_code) — never silent for LAM/SEMSYSCO",
+          "2. PO/spec/customer requirement override (orders.profile_override) reviewed by CS/QA",
+          "3. part family risk class (item_master.risk_class) can require LAM_SEMSYSCO profile",
+          "4. order risk class (orders.risk_class) can require LAM_SEMSYSCO profile",
+          "= explicit customer_requirement_profile_assignment_event recorded with actor_user_id, assigned_at, evidence_reference, and job_order.active_profile_code before G1 release"
         ],
         "gate_coverage": {
           "G0": [
@@ -9533,11 +10366,25 @@
           "G2": [
             "INSPECTION_PLAN_COMPLETENESS"
           ],
-          "G3": [],
+          "G3": [
+            "MATERIAL_CERT_VERIFICATION_COMPLETENESS",
+            "IQC_RELEASE_ON_TIME",
+            "LAM_MATERIAL_KIT_READY_TO_PLAN",
+            "TRACEABILITY_LABEL_VERIFIED",
+            "SPECIAL_PROCESS_REQUIREMENT_CLEAR",
+            "SUBTIER_REQUIREMENT_FLOWDOWN"
+          ],
           "G4": [
             "GAGE_VALID_FOR_RELEASE"
           ],
-          "G5": [],
+          "G5": [
+            "IN_PROCESS_REJECT_RATE",
+            "IPQC_CHARACTERISTIC_COMPLETENESS",
+            "SPC_SIGNAL_REACTION_TIME",
+            "CMM_QUEUE_AGING",
+            "NCR_CONTAINMENT_ON_TIME",
+            "GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT"
+          ],
           "G6": [
             "CHECK_DIM_REPORT_ON_SHIP",
             "GAGE_VALID_FOR_RELEASE"
@@ -9560,7 +10407,16 @@
           "written_special_release_when_deviation",
           "load_carrier_marking_evidence_when_special_release",
           "subtier_flowdown_attestation",
-          "rba_compliance_self_assessment"
+          "rba_compliance_self_assessment",
+          "material_certificate_verification_record",
+          "iqc_release_disposition_before_kit",
+          "material_kit_readiness_snapshot",
+          "traceability_label_verification_scan",
+          "special_process_requirement_clearance",
+          "ipqc_characteristic_completion_record",
+          "cmm_queue_escalation_record_when_overdue",
+          "ncr_containment_verification_record",
+          "in_process_gage_validity_evidence"
         ]
       }
     }

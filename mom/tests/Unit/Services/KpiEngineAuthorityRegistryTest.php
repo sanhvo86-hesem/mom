@@ -77,7 +77,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
 
         $this->assertSame(30, $catalog['counts']['runtime_calculated_metrics'] ?? null);
         $this->assertSame(18, $catalog['counts']['dashboard_core_kpis'] ?? null);
-        $this->assertSame(31, $catalog['counts']['gate_control_metrics'] ?? null);
+        $this->assertSame(41, $catalog['counts']['gate_control_metrics'] ?? null);
         $this->assertSame(123, $catalog['counts']['proposed_operating_metrics'] ?? null);
         $this->assertNotEmpty($catalog['data_contract_required_fields'] ?? []);
         $this->assertContains('canonical_code', $catalog['data_contract_required_fields'] ?? []);

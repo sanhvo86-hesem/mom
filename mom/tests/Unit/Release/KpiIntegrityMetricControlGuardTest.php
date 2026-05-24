@@ -94,6 +94,41 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
         );
     }
 
+    public function testRejectsEmptyLamG3GateCoverage(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['customer_requirement_profiles']['profiles']['LAM_SEMSYSCO']['gate_coverage']['G3'] = [];
+            },
+            'customer_requirement_profiles LAM_SEMSYSCO: gate_coverage.G3 must not be empty',
+        );
+    }
+
+    public function testRejectsLamG5MetricMissingGateRow(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['gate_control_metrics'] = array_values(array_filter(
+                    $registry['gate_control_metrics'],
+                    static fn(array $row): bool => ($row['canonical_code'] ?? '') !== 'CMM_QUEUE_AGING',
+                ));
+            },
+            "required G5 metric 'CMM_QUEUE_AGING' has no gate_control_metrics row",
+        );
+    }
+
+    public function testRejectsLamGateRowWithoutProfileLink(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'IPQC_CHARACTERISTIC_COMPLETENESS', static function (array &$row): void {
+                    unset($row['lam_profile_link']);
+                });
+            },
+            'Gate IPQC_CHARACTERISTIC_COMPLETENESS: LAM G3/G5 metric must declare lam_profile_link=LAM_SEMSYSCO',
+        );
+    }
+
     /**
      * @param callable(array<string, mixed>): void $mutate
      */
