@@ -44,7 +44,9 @@
     "INVENTORY_ACCURACY",
     "DSO",
     "INVOICE_RFT",
-    "INCIDENT_ACTION_CLOSURE_AGING"
+    "INCIDENT_ACTION_CLOSURE_AGING",
+    "FAI_FIRST_PASS",
+    "IN_PROCESS_REJECT_RATE"
   ],
   "legacy_aliases": {
     "SCRAP": "SCRAP_RATE",
@@ -675,7 +677,7 @@
       "layer": "qms_mes_gate",
       "purpose": "Đo tỷ lệ mẫu đầu đạt không cần lặp để quyết định soát CAM/setup/quy trình/đo lường.",
       "formula": {
-        "numerator": "Số FAI đạt ngay lần kiểm đầu tiên (attempt_number = 1) trong kỳ",
+        "numerator": "Số FAI có fai_overall_result='Approved' tạo trong kỳ — mỗi fai_records row tính 1 lần tại created_at; chưa có cột attempt_number để tracking re-FAI sau rework, defer migration",
         "denominator": "Tổng số FAI thực hiện trong kỳ",
         "unit": "percent",
         "rounding": "round to 2 decimals",
@@ -694,14 +696,16 @@
       "data_source": {
         "system": "EQMS",
         "tables": [
-          "inspection_results"
+          "fai_records"
         ],
         "columns": [
-          "inspection_type",
-          "attempt_number",
-          "result"
+          "fai_overall_result",
+          "part_number",
+          "fai_type",
+          "customer",
+          "created_at"
         ],
-        "evidence": "Hợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*."
+        "evidence": "KpiEngine::calcFaiFirstPass — fai_records.fai_overall_result CHECK constraint ('Approved'/'Conditional'/'Rejected'); 'Approved' = first-pass numerator. Migration 011_quality.sql."
       },
       "owner_role": "QA",
       "data_stewardship_role": "QC",
@@ -719,7 +723,7 @@
         "intent": "Bắt việc nới tiêu chí FAI để đạt lần đầu, lỗi xuất hiện khi vào loạt."
       },
       "reward_eligible": false,
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "status": "retained",
       "process": "quality_assurance",
       "category": "internal",
@@ -2338,7 +2342,7 @@
         "name": "Post-FAI production defect leakage",
         "intent": "Bắt việc nới tiêu chí FAI để đạt lần đầu, lỗi xuất hiện khi vào loạt."
       },
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "process": "quality_assurance",
       "category": "internal",
       "owner_role": "QA",
@@ -2350,7 +2354,7 @@
       "canonical_code": "IN_PROCESS_REJECT_RATE",
       "name": "In-process reject rate",
       "layer": "lean_daily",
-      "status": "staged_data_contract",
+      "status": "retained",
       "name_vi": "Tỷ lệ loại trong quá trình",
       "purpose": "Đo tỷ lệ loại trong quá trình để quyết định mở NCR và soát quy trình.",
       "thresholds": {
@@ -2368,7 +2372,7 @@
         "name": "Unauthorized in-line criteria relaxation count",
         "intent": "Bắt việc ép tỷ lệ loại trong chuyền xuống bằng cách tự nới tiêu chí kiểm."
       },
-      "calculation_status": "staged_data_contract",
+      "calculation_status": "runtime_calculated",
       "process": "quality_assurance",
       "category": "internal",
       "owner_role": "QA",
@@ -6935,8 +6939,8 @@
       "target": "≥ 98%",
       "owner_role": "QA",
       "cadence": "monthly",
-      "data_source": "FRM-311",
-      "calculation_status": "staged_data_contract",
+      "data_source": "FRM-311; runtime source fai_records.fai_overall_result (KpiEngine::calcFaiFirstPass)",
+      "calculation_status": "runtime_calculated",
       "counter_metric": {
         "code": "FAI_FIRST_PASS-CTR",
         "endpoint": "POST /api/kpi/FAI_FIRST_PASS-CTR/input",
@@ -7032,8 +7036,8 @@
       "target": "≤ 1%",
       "owner_role": "WKM",
       "cadence": "weekly",
-      "data_source": "FRM-651",
-      "calculation_status": "staged_data_contract",
+      "data_source": "FRM-651; runtime source ipqc_inspection_results.pass_fail (KpiEngine::calcInProcessRejectRate)",
+      "calculation_status": "runtime_calculated",
       "thresholds": {
         "direction": "lower_is_better",
         "unit": "percent",
@@ -7489,7 +7493,7 @@
       "target": "≥ 85%",
       "owner_role": "WKM",
       "cadence": "daily",
-      "data_source": "Epicor MES",
+      "data_source": "mes_oee_snapshots (migration 025_mes_tables.sql); KpiEngine::calcOee aggregates planned_production_time_sec / actual_run_time_sec / downtime_sec / setup_time_sec / good_pieces / total_pieces / ideal_cycle_time_sec.",
       "calculation_status": "runtime_calculated",
       "thresholds": {
         "direction": "higher_is_better",
