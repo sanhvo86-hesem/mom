@@ -2531,7 +2531,11 @@ function admin_vc_mode_defaults(): array {
 }
 
 function admin_vc_mode_normalize_value($value, string $fallback = 'operation'): string {
-  $v = strtolower(trim((string)$value));
+  // Defensive: refuse non-scalar (arrays/objects) before the (string) cast
+  // to avoid PHP's "Array to string conversion" warning when on-disk
+  // state is corrupt. Caught by Pha 5 scenario test S6.
+  if (!is_scalar($value) && $value !== null) return $fallback;
+  $v = strtolower(trim((string)($value ?? '')));
   return in_array($v, ['developer', 'operation'], true) ? $v : $fallback;
 }
 
@@ -2653,12 +2657,19 @@ function deploy_freeze_defaults(): array {
 
 function deploy_freeze_normalize(array $raw): array {
   $defaults = deploy_freeze_defaults();
-  $enabled = array_key_exists('enabled', $raw) ? (bool)$raw['enabled'] : $defaults['enabled'];
-  $reason = trim((string)($raw['reason'] ?? ''));
+  // Defensive scalar coercion — corrupted on-disk state (someone editing
+  // module_access_config.json by hand and writing an array where a string
+  // is expected) used to crash with "Array to string conversion" before
+  // S6 scenario testing surfaced this. is_scalar guards every (string)
+  // cast so the loader is fully fail-soft on bad input shapes.
+  $scalar = static fn($v) => (is_scalar($v) || $v === null) ? (string)($v ?? '') : '';
+
+  $enabled = array_key_exists('enabled', $raw) && is_scalar($raw['enabled']) ? (bool)$raw['enabled'] : $defaults['enabled'];
+  $reason = trim($scalar($raw['reason'] ?? ''));
   if (mb_strlen($reason) > 500) $reason = mb_substr($reason, 0, 500);
-  $ticket = trim((string)($raw['ticket_id'] ?? ''));
+  $ticket = trim($scalar($raw['ticket_id'] ?? ''));
   if (mb_strlen($ticket) > 80) $ticket = mb_substr($ticket, 0, 80);
-  $setBy = trim((string)($raw['set_by'] ?? ''));
+  $setBy = trim($scalar($raw['set_by'] ?? ''));
   if (mb_strlen($setBy) > 80) $setBy = mb_substr($setBy, 0, 80);
   $setAt = isset($raw['set_at']) && is_string($raw['set_at']) && $raw['set_at'] !== '' ? $raw['set_at'] : null;
   $exp = isset($raw['expires_at']) && is_string($raw['expires_at']) && $raw['expires_at'] !== '' ? $raw['expires_at'] : null;
