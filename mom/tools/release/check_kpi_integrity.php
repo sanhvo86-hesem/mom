@@ -1542,6 +1542,159 @@ if (is_readable($dashboardCtlFp)) {
     }
 }
 
+// ── P0.9.A — legacy alias target must resolve to a real registry code ───────
+// (P09 hardening) Spec §3.13 — every legacy_aliases value must hit a
+// canonical_code that lives in governance / gate / proposed / dashboard
+// (knownCodes). P0.5 already covers governance-side resolution via
+// runtime_calculated_metrics list, but a freshly added section (proposed /
+// dashboard) is reachable only through the full $knownCodes union. This is
+// a second-pass strict check using that union, plus dashboard codes —
+// catches alias rot whenever a target metric is renamed or removed and the
+// alias map silently lags behind.
+$aliasUniverse = $knownCodes;
+foreach ($dashboard as $row) {
+    if (is_array($row) && isset($row['canonical_code'])) {
+        $aliasUniverse[strtoupper(trim((string) $row['canonical_code']))] = true;
+    }
+}
+foreach ($aliases as $alias => $target) {
+    if (!is_string($target)) {
+        $p0[] = "P0.9.A Registry: legacy_aliases['$alias'] target is not a string.";
+        continue;
+    }
+    $t = strtoupper(trim($target));
+    if ($t === '') {
+        $p0[] = "P0.9.A Registry: legacy_aliases['$alias'] target is empty.";
+        continue;
+    }
+    if (!isset($aliasUniverse[$t])) {
+        $p0[] = "P0.9.A Registry: legacy_aliases['$alias'] => '$t' does not "
+            . "resolve to any canonical_code in governance / gate / proposed / "
+            . "dashboard / runtime_calculated_metrics — alias rot, rename or remove.";
+    }
+}
+
+// ── P0.9.B — dashboard_core_kpis primary_endpoint must hit a real route ─────
+// (P09 hardening) Spec §3.14 — every dashboard card's primary_endpoint must
+// reach a registered HTTP route in mom/api/routes/core-routes.php or
+// rest-routes.php. Without this guard, a card can point at a vanished
+// endpoint and silently render zero data. We parse the endpoint into a
+// method + path template, then accept it when:
+//   (a) the path matches a known REST template (GET /api/kpi/{metricCode},
+//       GET /api/kpi/{metricCode}/trend, GET /api/kpi/catalog, GET /api/kpi/alerts),
+//       OR
+//   (b) the corresponding action_key is registered in core-routes.php
+//       (kpi_get / kpi_trend / kpi_catalog / kpi_alerts / kpi_threshold_badges /
+//        kpi_jd_scorecards / kpi_input_list / kpi_input_save / kpi_input_approve).
+$coreRoutesFp = $routesFp;
+$restRoutesFp = $base . '/api/routes/rest-routes.php';
+$coreRoutesSrc = is_readable($coreRoutesFp) ? readText($coreRoutesFp) : '';
+$restRoutesSrc = is_readable($restRoutesFp) ? readText($restRoutesFp) : '';
+$registeredActions = [];
+if ($coreRoutesSrc !== '') {
+    if (preg_match_all("/'([a-z][a-z0-9_]+)'\\s*=>\\s*\\[/", $coreRoutesSrc, $actionMatches)) {
+        foreach ($actionMatches[1] as $a) {
+            $registeredActions[$a] = true;
+        }
+    }
+}
+$restPathRegexes = [];
+if ($restRoutesSrc !== '') {
+    if (preg_match_all('/\\$router->(get|post|put|delete|patch)\\(\\s*[\'"]([^\'"]+)[\'"]/i', $restRoutesSrc, $restMatches, PREG_SET_ORDER)) {
+        foreach ($restMatches as $m) {
+            $method = strtoupper($m[1]);
+            $path   = $m[2];
+            $restPathRegexes[] = [
+                'method'  => $method,
+                'pattern' => '#^' . preg_replace('/\\{[a-zA-Z_][a-zA-Z0-9_]*\\}/', '[^/]+', preg_quote($path, '#')) . '$#',
+            ];
+        }
+    }
+}
+$dashboardEndpointToAction = static function (string $endpoint): ?string {
+    if (!preg_match('#^(GET|POST|PUT|DELETE|PATCH)\\s+(/api/kpi/[^\\s?]+)#i', $endpoint, $m)) {
+        return null;
+    }
+    $method = strtoupper($m[1]);
+    $path   = $m[2];
+    // Tail of /api/kpi/...
+    $tail = substr($path, strlen('/api/kpi/'));
+    if ($tail === 'catalog')            { return 'kpi_catalog'; }
+    if ($tail === 'alerts')             { return 'kpi_alerts'; }
+    if ($tail === 'threshold-badges')   { return 'kpi_threshold_badges'; }
+    if ($tail === 'jd-scorecards')      { return 'kpi_jd_scorecards'; }
+    if (preg_match('#^[^/]+/trend$#', $tail))           { return 'kpi_trend'; }
+    if (preg_match('#^[^/]+/input/approve$#', $tail))   { return 'kpi_input_approve'; }
+    if (preg_match('#^[^/]+/input$#', $tail)) {
+        return $method === 'POST' ? 'kpi_input_save' : 'kpi_input_list';
+    }
+    if (preg_match('#^[^/]+$#', $tail)) {
+        return 'kpi_get';
+    }
+    return null;
+};
+foreach ($dashboard as $row) {
+    if (!is_array($row)) {
+        continue;
+    }
+    $code = (string) ($row['canonical_code'] ?? $row['local_id'] ?? '?');
+    $ep   = trim((string) ($row['primary_endpoint'] ?? ''));
+    if ($ep === '') {
+        $p0[] = "P0.9.B Dashboard $code: primary_endpoint is empty — card cannot resolve to a route.";
+        continue;
+    }
+    // Reach (b): action_key resolution
+    $action = $dashboardEndpointToAction($ep);
+    if ($action !== null && isset($registeredActions[$action])) {
+        continue;
+    }
+    // Reach (a): REST path template match
+    if (preg_match('#^(GET|POST|PUT|DELETE|PATCH)\\s+(\\S+)#i', $ep, $m)) {
+        $method = strtoupper($m[1]);
+        $path   = $m[2];
+        foreach ($restPathRegexes as $rt) {
+            if ($rt['method'] === $method && preg_match($rt['pattern'], $path)) {
+                continue 2;
+            }
+        }
+    }
+    $p0[] = "P0.9.B Dashboard $code: primary_endpoint '$ep' does not resolve "
+        . "to any registered action_key in core-routes.php or REST path in "
+        . "rest-routes.php — card will render zero data.";
+}
+
+// ── P0.9.C — executive_scorecard must not list a staged_data_contract metric ─
+// (P09 hardening) Spec §3.11 — the executive scorecard is what the CEO and
+// directors see at the top of the dashboard. A staged_data_contract metric
+// has no data contract yet — surfacing it on the executive scorecard at all
+// is a P0 (the legacy P1 warning is now hard-blocking). Resolves each
+// executive_scorecard code through governance, then through metricIndex to
+// catch a code that lives only on a non-governance section.
+foreach ($scorecard as $code) {
+    if ($code === '') {
+        continue;
+    }
+    $row = null;
+    foreach ($governance as $g) {
+        if (is_array($g) && strtoupper(trim((string) ($g['canonical_code'] ?? ''))) === $code) {
+            $row = $g;
+            break;
+        }
+    }
+    if ($row === null && isset($metricIndex[$code])) {
+        $row = $metricIndex[$code];
+    }
+    if ($row === null) {
+        // P0.1 / P0.4 already catch unknown scorecard codes via ANNEX-122
+        // and dup-code paths; skip here to avoid double-counting.
+        continue;
+    }
+    if (metricStatus($row) === 'staged_data_contract') {
+        $p0[] = "P0.9.C executive_scorecard: '$code' is staged_data_contract "
+            . "— CEO scorecard must not surface a metric without a data contract.";
+    }
+}
+
 // ── Report ───────────────────────────────────────────────────────────────────
 $statusKeys = ['runtime_calculated', 'staged_data_contract', 'manual', 'manual_governed', 'retired'];
 $byStatus = array_fill_keys($statusKeys, 0);

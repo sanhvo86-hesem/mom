@@ -39,6 +39,13 @@ Three guards prevent data loss between sessions:
    bug that lost `188_error_code_registry`), duplicate ids, prefix
    collisions, naming violations. P0 findings block deploy.
 
+**KPI registry edits PHẢI pass `php mom/tools/release/check_kpi_integrity.php`
++ `php mom/tools/release/check_kpi_integrity_drift_test.php` locally before
+push. Both run unconditionally in `.github/workflows/deploy.yml` (validate
+job) and block deploy on any P0 finding — the drift test is the guard's
+self-test for fake-CDR, staged-in-executive-scorecard, and
+reward-rate-min-sample-zero regressions.**
+
 **Fast deploy path**: `.github/workflows/deploy.yml` has a `classify` job
 that skips PHPStan/PHPUnit/SSOT/audit when the changeset is frontend-only
 (`mom/scripts/**`, `mom/styles/**`, `mom/templates/**`, `mom/docs/**`,

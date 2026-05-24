@@ -165,6 +165,14 @@ jobs:
         # findings block the deploy.
         run: php mom/tools/release/check_kpi_integrity.php
 
+      - name: KPI integrity drift test (guard self-test)
+        # (P09 hardening) Mutates the registry in-memory across 3 scenarios
+        # (fake CDR, staged metric in executive_scorecard, reward-eligible
+        # rate metric with min_sample=0) and asserts check_kpi_integrity.php
+        # fires the matching P0 each time. Catches guard regressions before
+        # they let a real drift slip through.
+        run: php mom/tools/release/check_kpi_integrity_drift_test.php
+
       - name: Migration drift check (offline)
         # Catches the 188_error_code_registry repeat: live DB applied a
         # migration whose file was deleted from the repo, so fresh clones
