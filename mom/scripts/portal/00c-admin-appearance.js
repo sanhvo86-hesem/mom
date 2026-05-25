@@ -4719,6 +4719,42 @@ function renderComponents(){
     + previewDropdown()
   , false, statusChip('full', L('Shared dropdown', 'Shared dropdown')));
 
+  h += sect('🧩 '+L('Đối tượng trong Admin', 'Admin objects'),
+    sectionLead(
+      L('Các đối tượng riêng của module Admin phải đi qua cùng lớp đồ họa này', 'Admin-specific objects must go through this same graphics layer'),
+      L('Nhóm này chi phối toolbar, nút phân đoạn, thẻ người dùng, thẻ thống kê, panel cây tổ chức, canvas sơ đồ và cụm điều khiển phóng to. Không sửa kích thước từng màn hình bằng hardcode.', 'This group governs toolbars, segmented controls, user cards, stat cards, org tree panels, graph canvas, and zoom controls. Do not tune individual screens with hardcoded values.'),
+      statusChip('admin', L('SSOT cho Admin', 'Admin SSOT'))
+      + statusChip('full', L('Có consumer thật', 'Real consumers'))
+    )
+    + slider(L('Đệm toolbar', 'Toolbar padding'), '--admin-toolbar-padding', 'components.admin.toolbarPadding', 0, 20, 8, 'px')
+    + slider(L('Chiều cao control Admin', 'Admin control height'), '--admin-object-min-h', 'components.admin.objectMinH', 28, 56, 34, 'px')
+    + slider(L('Chiều cao tối thiểu thẻ', 'Card minimum height'), '--admin-card-min-h', 'components.admin.cardMinH', 88, 180, 118, 'px')
+    + slider(L('Cỡ ảnh đại diện', 'Avatar size'), '--admin-avatar-size', 'components.admin.avatarSize', 28, 64, 36, 'px')
+    + slider(L('Cỡ chấm trạng thái', 'Status dot size'), '--admin-status-dot-size', 'components.admin.statusDotSize', 10, 28, 18, 'px')
+    + slider(L('Chiều cao canvas tối thiểu', 'Canvas min height'), '--admin-canvas-min-h', 'components.admin.canvasMinH', 360, 760, 520, 'px')
+    + slider(L('Ô lưới canvas', 'Canvas grid size'), '--admin-canvas-grid-size', 'components.admin.canvasGridSize', 12, 40, 24, 'px')
+    + slider(L('Đệm cụm zoom', 'Zoom tool padding'), '--admin-canvas-tool-padding', 'components.admin.canvasToolPadding', 2, 12, 4, 'px')
+    + previewBox(
+      L('Xem trước đối tượng Admin', 'Preview Admin objects'),
+      '<div style="display:grid;gap:var(--admin-gap-md,14px)">'
+      + '<div style="display:flex;gap:var(--admin-gap-sm,8px);align-items:center;padding:var(--admin-toolbar-padding,8px);border:1px solid var(--border);border-radius:var(--admin-surface-radius,18px);background:var(--bg-surface)">'
+      + '<button class="btn-admin primary" style="height:var(--admin-object-min-h,34px)">Đang chọn</button>'
+      + '<button class="btn-admin secondary" style="height:var(--admin-object-min-h,34px)">Tác vụ</button>'
+      + '<span style="height:var(--admin-object-min-h,34px);min-width:54px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--admin-nested-radius,14px);font-weight:800">100%</span>'
+      + '</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--admin-gap-md,14px)">'
+      + '<div style="min-height:var(--admin-card-min-h,118px);padding:var(--admin-row-padding,12px);border:1px solid var(--border);border-radius:var(--admin-nested-radius,14px);background:var(--bg-surface);display:flex;gap:var(--admin-gap-sm,8px);align-items:flex-start">'
+      + '<span style="width:var(--admin-avatar-size,36px);height:var(--admin-avatar-size,36px);border-radius:999px;background:var(--brand-2);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800">NV</span>'
+      + '<div style="flex:1"><div style="height:12px;width:70%;border-radius:999px;background:var(--bg-surface-alt)"></div><div style="margin-top:8px;height:10px;width:52%;border-radius:999px;background:var(--bg-surface-alt)"></div></div>'
+      + '<span style="width:var(--admin-status-dot-size,18px);height:var(--admin-status-dot-size,18px);border-radius:999px;background:var(--green)"></span>'
+      + '</div>'
+      + '<div style="min-height:var(--admin-canvas-min-h,520px);max-height:140px;padding:var(--admin-canvas-tool-padding,4px);border:1px solid var(--border);border-radius:var(--admin-surface-radius,18px);background:repeating-linear-gradient(0deg,var(--bg-surface-alt) 0 1px,transparent 1px var(--admin-canvas-grid-size,24px)),repeating-linear-gradient(90deg,var(--bg-surface-alt) 0 1px,transparent 1px var(--admin-canvas-grid-size,24px)),var(--bg-surface)"></div>'
+      + '</div>'
+      + '</div>',
+      L('Cùng token đang áp dụng cho Người dùng, Phòng ban & Chức danh và Sơ đồ tổ chức.', 'The same tokens feed Users, Departments & Titles, and Org Chart.')
+    )
+  , false, statusChip('full', L('Toolbar / card / canvas', 'Toolbar / card / canvas')));
+
   /* NAV ITEM */
   h += sect('🧭 '+T('navSettings'),
     slider('Height', '--nav-item-height', 'components.nav.height', 28, 48, 36, 'px')

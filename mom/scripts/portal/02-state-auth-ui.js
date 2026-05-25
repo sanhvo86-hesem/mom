@@ -13400,7 +13400,7 @@ function renderAdminUsers(){
               <div class="uc-name">${escapeHtml(u.name)}</div>
               <div class="uc-title">${escapeHtml(u.title)} · @${escapeHtml(u.username)}</div>
             </div>
-            <span style="font-size:18px">${u.active!==false?'🟢':'🔴'}</span>
+            <span class="uc-status-dot ${u.active!==false?'is-active':'is-inactive'}" title="${u.active!==false?'Đang hoạt động':'Đã khóa'}"></span>
           </div>
           <div class="uc-meta">
             <span class="tag" style="background:${colorBg}15;color:${colorBg}">${r?r.icon:''} ${r?r.label:u.role}</span>

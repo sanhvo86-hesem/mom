@@ -356,6 +356,14 @@ function _applyCustomVars(){
   _setVarPx('--admin-panel-radius', cfg, 'layout.admin.panelRadius');
   _setVarPx('--admin-surface-radius', cfg, 'layout.admin.surfaceRadius');
   _setVarPx('--admin-nested-radius', cfg, 'layout.admin.nestedRadius');
+  _setVarPx('--admin-toolbar-padding', cfg, 'components.admin.toolbarPadding');
+  _setVarPx('--admin-object-min-h', cfg, 'components.admin.objectMinH');
+  _setVarPx('--admin-card-min-h', cfg, 'components.admin.cardMinH');
+  _setVarPx('--admin-avatar-size', cfg, 'components.admin.avatarSize');
+  _setVarPx('--admin-status-dot-size', cfg, 'components.admin.statusDotSize');
+  _setVarPx('--admin-canvas-min-h', cfg, 'components.admin.canvasMinH');
+  _setVarPx('--admin-canvas-grid-size', cfg, 'components.admin.canvasGridSize');
+  _setVarPx('--admin-canvas-tool-padding', cfg, 'components.admin.canvasToolPadding');
 
   /* Spacing */
   _setVarPx('--space-1', cfg, 'spacing.1');
