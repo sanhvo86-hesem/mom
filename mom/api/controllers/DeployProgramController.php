@@ -660,7 +660,7 @@ class DeployProgramController extends BaseController
         $this->requireAnyRole($me, self::SIGNOFF_ROLES);
 
         $champions = $this->normalizeChampionState($this->loadFile(self::FILE_CHAMPIONS));
-        $users = $this->loadUserDirectory();
+        $users = $this->loadUserDirectory($me);
         $kpis = (new DocAccessAnalyticsService($this->data))->aggregateKpis($champions, $users);
 
         $state = $this->loadFile(self::FILE_READINESS);
