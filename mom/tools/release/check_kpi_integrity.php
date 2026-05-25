@@ -447,8 +447,14 @@ foreach (array_diff($annexSet, $govSet) as $stray) {
 // not yet cited elsewhere is legitimately absent. This is advisory, not a
 // blocker — a cluster of absences is the signal to re-run the matrix audit.
 $annex128 = readText($annex128Fp);
-$annex128RequiredTokens = [
+$annex128TitleTokens = [
     'ANNEX-128 - KPI System Matrix and Document Usage',
+    'ANNEX-128 - KPI Ma trận hệ thống và Cách dùng tài liệu',
+];
+if (!array_reduce($annex128TitleTokens, static fn(bool $carry, string $token): bool => $carry || str_contains($annex128, $token), false)) {
+    $p0[] = "P0.20 ANNEX-128 stale/missing generated content: title token absent.";
+}
+$annex128RequiredTokens = [
     'HTML quét',
     'Tài liệu có metric',
     'Metric code thấy được',
