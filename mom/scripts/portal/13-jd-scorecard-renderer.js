@@ -158,6 +158,7 @@ function _render(role) {
     '</tr>';
   }).join('');
   var warning = 'Thẻ điểm vai trò chỉ dùng cho coaching, OJT, đánh giá năng lực và review đã hiệu chuẩn; không tự động tạo thưởng, payout hoặc kỷ luật.';
+  var adminHref = APP_BASE + '/portal.html#admin/kpi-registry';
   var meta = '<div class="jd-scorecard-meta">' +
     '<div><b>Nhóm candidate</b><br>' + _list(candidate) + '</div>' +
     '<div><b>Nhóm xoay vòng tùy chọn</b><br>' + _list(optional) + '</div>' +
@@ -166,7 +167,7 @@ function _render(role) {
     '</div>';
   return '<p class="jd-scorecard-note">Thẻ điểm KPI đang áp dụng cho chức danh ' +
       '<b>' + _esc(role.jd_title_vi || role.role_code) + '</b> — đồng bộ trực tiếp từ ' +
-      'KPI Authority (đang áp dụng ' + _esc(role.active_measure_count || items.length) + '/' +
+      '<a href="' + _esc(adminHref) + '">KPI Authority Admin Console</a> (đang áp dụng ' + _esc(role.active_measure_count || items.length) + '/' +
       _esc(role.recommended_active_count || items.length) + ', tổng trọng số ' + total + '%).</p>' +
     '<div class="jd-scorecard-warning">' + _esc(warning) + '</div>' +
     meta +
