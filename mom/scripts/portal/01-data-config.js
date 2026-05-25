@@ -2949,19 +2949,14 @@ function setLang(l){
       apiCall('user_set_language',{lang:l},'POST').catch(()=>{});
     }
   }catch(e){}
-  const viBtn = document.getElementById('btn-lang-vi');
-  const enBtn = document.getElementById('btn-lang-en');
-  if(viBtn){
-    viBtn.className = l==='vi'?'active':'';
-    viBtn.setAttribute('aria-pressed', l==='vi'?'true':'false');
-    viBtn.setAttribute('title', 'Tiếng Việt');
-    viBtn.setAttribute('aria-label', 'Tiếng Việt');
-  }
-  if(enBtn){
-    enBtn.className = l==='en'?'active':'';
-    enBtn.setAttribute('aria-pressed', l==='en'?'true':'false');
-    enBtn.setAttribute('title', 'English');
-    enBtn.setAttribute('aria-label', 'English');
+  const toggleBtn = document.getElementById('btn-lang-toggle');
+  if(toggleBtn){
+    const flagVi = document.getElementById('flag-vi');
+    const flagEn = document.getElementById('flag-en');
+    if(flagVi) flagVi.style.display = l==='vi' ? 'block' : 'none';
+    if(flagEn) flagEn.style.display = l==='en' ? 'block' : 'none';
+    toggleBtn.setAttribute('aria-label', l==='vi' ? 'Tiếng Việt' : 'English');
+    toggleBtn.setAttribute('title', l==='vi' ? 'Tiếng Việt → English' : 'English → Tiếng Việt');
   }
   try{ document.querySelectorAll('.vp-overlay').forEach(el=>el.remove()); }catch(e){}
   const ct = document.getElementById('collapse-text');
@@ -3066,17 +3061,20 @@ function setLang(l){
   try{ schedulePortalShellLayoutAssert('set-lang-complete'); }catch(e){}
 }
 
+function toggleLang(){
+  setLang(lang === 'vi' ? 'en' : 'vi');
+}
+
 function initLang(){
   try{ const s=localStorage.getItem('hesem_lang'); if(s)lang=s; }catch(e){}
-  const viBtn = document.getElementById('btn-lang-vi');
-  const enBtn = document.getElementById('btn-lang-en');
-  if(viBtn){
-    viBtn.className = lang==='vi'?'active':'';
-    viBtn.setAttribute('aria-pressed', lang==='vi'?'true':'false');
-  }
-  if(enBtn){
-    enBtn.className = lang==='en'?'active':'';
-    enBtn.setAttribute('aria-pressed', lang==='en'?'true':'false');
+  const toggleBtn = document.getElementById('btn-lang-toggle');
+  if(toggleBtn){
+    const flagVi = document.getElementById('flag-vi');
+    const flagEn = document.getElementById('flag-en');
+    if(flagVi) flagVi.style.display = lang==='vi' ? 'block' : 'none';
+    if(flagEn) flagEn.style.display = lang==='en' ? 'block' : 'none';
+    toggleBtn.setAttribute('aria-label', lang==='vi' ? 'Tiếng Việt' : 'English');
+    toggleBtn.setAttribute('title', lang==='vi' ? 'Tiếng Việt → English' : 'English → Tiếng Việt');
   }
   try{ if(typeof syncSidebarToggleState === 'function') syncSidebarToggleState(); }catch(e){}
 }
