@@ -107,6 +107,7 @@ button{cursor:pointer;border:none;background:none;appearance:none;-webkit-appear
 .collapsed .nav-item span:not(.icon){display:none}
 .collapsed .nav-item .badge{display:none}
 .collapsed .nav-item{justify-content:center;padding:0}
+.collapsed .nav-section{padding:4px 0;background:transparent;border-color:transparent;backdrop-filter:none;margin:0}
 
 #sidebar .sidebar-footer{padding:10px 10px 12px;border-top:1px solid var(--border,#e2e8f0);display:flex;justify-content:center}
 .sidebar-toggle{display:flex;align-items:center;justify-content:flex-start;gap:10px;width:100%;min-height:38px;padding:0 12px;border-radius:12px;border:1px solid var(--border,#dbe5f0);background:var(--bg-surface,#fff);color:var(--text-secondary,#475569);font-size:11px;font-weight:600;letter-spacing:.01em;line-height:1;cursor:pointer;transition:background .16s ease,border-color .16s ease,color .16s ease,transform .16s ease,box-shadow .16s ease;box-shadow:0 8px 18px rgba(15,23,42,.04)}
