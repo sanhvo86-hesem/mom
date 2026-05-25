@@ -3063,6 +3063,7 @@ function setLang(l){
 
 function toggleLang(){
   setLang(lang === 'vi' ? 'en' : 'vi');
+  var b = document.getElementById('btn-lang-toggle'); if(b) b.blur();
 }
 
 function initLang(){
