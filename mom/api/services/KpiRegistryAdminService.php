@@ -1694,7 +1694,7 @@ final class KpiRegistryAdminService
                 'priority' => 'P1',
                 'code' => 'ANNEX128_REPORT_STALE',
                 'metric_code' => 'ANNEX-128',
-                'message' => 'KPI system-matrix audit report registry_version does not match the current registry.',
+                'message' => 'Báo cáo kiểm tra ma trận hệ thống KPI đang dùng registry_version cũ, không khớp registry hiện hành.',
             ];
         }
         return [
