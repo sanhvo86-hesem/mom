@@ -6682,12 +6682,13 @@ function adminDataSyncDownload(name){
 
 function adminDataSyncUploadPrompt(name){
   if(!name) return;
-  // Find current sha so we can pass expected_sha256 (drift detection).
+  // Find the full current sha so backend drift detection compares the same
+  // 64-char digest it computes on disk.
   const data = dataSyncStatusState.data;
   let currentSha = '';
   if(data && Array.isArray(data.config_files)){
     const f = data.config_files.find(x => x && x.name === name);
-    if(f && f.site_sha256_short) currentSha = f.site_sha256_short;
+    if(f && f.site_sha256) currentSha = f.site_sha256;
   }
 
   const input = document.createElement('input');
@@ -6844,7 +6845,7 @@ function showAdminFormModal(titleVi, titleEn, fields, onSubmit) {
 }
 
 function adminDataSyncResolveDrift(name, direction){
-  const dirLabel = direction === 'site_to_mirror' ? 'VPS → Local' : 'Local → VPS';
+  const dirLabel = direction === 'site_to_mirror' ? 'VPS site → VPS mirror' : 'VPS mirror → VPS site';
   showAdminConfirmModal(
     `Giải quyết lệch ${name} bằng cách copy ${dirLabel}? Snapshot sẽ được tạo trước.`,
     `Resolve drift for ${name} by copying ${dirLabel}? A snapshot is taken first.`,

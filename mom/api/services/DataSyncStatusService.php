@@ -154,8 +154,10 @@ final class DataSyncStatusService
             $sitePath    = $this->dataDir . '/config/' . $name;
             $privatePath = $this->privateDataDir . '/config/' . $name;
 
-            $siteHash    = $this->hashFileShort($sitePath);
-            $privateHash = $this->hashFileShort($privatePath);
+            $siteHashFull = $this->hashFileFull($sitePath);
+            $privateHashFull = $this->hashFileFull($privatePath);
+            $siteHashShort = $siteHashFull !== '' ? substr($siteHashFull, 0, 12) : '';
+            $privateHashShort = $privateHashFull !== '' ? substr($privateHashFull, 0, 12) : '';
 
             $rows[] = [
                 'name'                 => $name,
@@ -163,15 +165,17 @@ final class DataSyncStatusService
                 'site_present'         => is_file($sitePath),
                 'site_size'            => is_file($sitePath) ? (int)@filesize($sitePath) : 0,
                 'site_mtime'           => is_file($sitePath) ? gmdate('c', (int)@filemtime($sitePath)) : '',
-                'site_sha256_short'    => $siteHash,
+                'site_sha256'          => $siteHashFull,
+                'site_sha256_short'    => $siteHashShort,
                 'private_present'      => is_file($privatePath),
                 'private_size'         => is_file($privatePath) ? (int)@filesize($privatePath) : 0,
                 'private_mtime'        => is_file($privatePath) ? gmdate('c', (int)@filemtime($privatePath)) : '',
-                'private_sha256_short' => $privateHash,
+                'private_sha256'       => $privateHashFull,
+                'private_sha256_short' => $privateHashShort,
                 // True iff site equals private mirror. False is the interesting state:
                 // it usually means deploy.sh restored from one source while the other
                 // was edited, or the mirror was never seeded.
-                'in_sync_with_mirror'  => $siteHash !== '' && $siteHash === $privateHash,
+                'in_sync_with_mirror'  => $siteHashFull !== '' && $siteHashFull === $privateHashFull,
             ];
         }
         return $rows;
@@ -308,12 +312,12 @@ final class DataSyncStatusService
         return $out;
     }
 
-    private function hashFileShort(string $path): string
+    private function hashFileFull(string $path): string
     {
         if (!is_file($path) || !is_readable($path)) {
             return '';
         }
         $full = @hash_file('sha256', $path);
-        return is_string($full) ? substr($full, 0, 12) : '';
+        return is_string($full) ? $full : '';
     }
 }
