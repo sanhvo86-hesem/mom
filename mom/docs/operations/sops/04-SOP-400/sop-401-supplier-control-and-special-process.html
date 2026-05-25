@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-
-<html lang="vi">
+<!DOCTYPE html> <html lang="vi">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SOP-401 - Supplier Control and Quy trình đặc biệt | HESEM MOM</title>
+<title>SOP-401 - nhà cung cấp kiểm soát và Quy trình đặc biệt | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap — computes absolute URLs from location.pathname so the
  * stylesheet + renderer load correctly regardless of how the document is
@@ -103,22 +101,22 @@
 <td>W2</td>
 <td>P1 · gov + doc</td>
 <td>P1-01</td>
-<td>SCM chốt JD, RACI, owner AVL và người dẫn dắt Đợt 2; mọi quyền phát hành nguồn phải nối về SOP-401.</td>
-<td>Biên bản W2, RACI sign-off, supplier owner list.</td>
+<td>SCM chốt JD, RACI, chủ sở hữu AVL và người dẫn dắt Đợt 2; mọi quyền phát hành nguồn phải nối về SOP-401.</td>
+<td>Biên bản W2, RACI sign-off, nhà cung cấp chủ sở hữu danh sách.</td>
 </tr>
 <tr>
 <td>W4</td>
 <td>P2 · pilot + gov</td>
 <td>P2-04</td>
 <td>SCM + QA đối chiếu AVL với chuẩn ANNEX trước quyết định Đợt 2; không mở G1 cho nguồn ngoài AVL.</td>
-<td><code>readiness.json</code>, AVL review log.</td>
+<td><code>readiness.json</code>, AVL rà soát log.</td>
 </tr>
 <tr>
 <td>W5-W6</td>
 <td>P3 · golive + pilot</td>
 <td>P3-02 + P3-04</td>
 <td>Đợt 2 kiểm đơn nhận hàng, PO, chứng chỉ và tài liệu đặc biệt; lệch chứng từ hoặc nguồn phải ghi vào issue trong ngày.</td>
-<td><code>audit_events</code>, <code>issues.json</code>, receiving packet.</td>
+<td><code>audit_events</code>, <code>issues.json</code>, receiving bộ hồ sơ.</td>
 </tr>
 <tr>
 <td>W7-W8</td>
@@ -132,12 +130,12 @@
 <td>P4 · doc</td>
 <td>P4-03</td>
 <td>SCM, QA và QMS cập nhật SOP-401 theo bài học về AVL, SCAR, chứng chỉ và công đoạn đặc biệt.</td>
-<td><code>dcc_document_revision</code>, supplier lesson log.</td>
+<td><code>dcc_document_revision</code>, nhà cung cấp lesson log.</td>
 </tr>
 </tbody>
 </table>
 </div>
-<p class="note">Mỗi hàng trong bản đồ này phải được xác nhận bằng bằng chứng có đường dẫn hoặc bản ghi kiểm soát. Nếu playbook tuần, gate code, KPI hoặc hồ sơ chứng minh không khớp nhau, trạng thái của tuần đó giữ ở cảnh báo đỏ cho đến khi owner chức năng cập nhật <code>issues.json</code>, xác nhận lại <code>readiness.json</code> và ghi quyết định vào audit log. Không dùng ảnh chụp màn hình rời, email riêng hoặc lời xác nhận miệng để thay thế bằng chứng đóng gate.</p>
+<p class="note">Mỗi hàng trong bản đồ này phải được xác nhận bằng bằng chứng có đường dẫn hoặc bản ghi kiểm soát. Nếu playbook tuần, gate code, KPI hoặc hồ sơ chứng minh không khớp nhau, trạng thái của tuần đó giữ ở cảnh báo đỏ cho đến khi chủ sở hữu chức năng cập nhật <code>issues.json</code>, xác nhận lại <code>readiness.json</code> và ghi quyết định vào audit log. Không dùng ảnh chụp màn hình rời, email riêng hoặc lời xác nhận miệng để thay thế bằng chứng đóng gate.</p>
 </div>
 <div class="section" id="deploy-kpi-dock">
 <h2 class="h2">6B. KPI điều hành phải theo dõi</h2>
@@ -146,7 +144,7 @@
 <div class="metric-card"><div class="value">KPI-DEP-02</div><div class="label">≥95% phiếu việc nguồn cung hoặc SCAR đóng đúng hạn.</div></div>
 <div class="metric-card"><div class="value">KPI-DEP-03</div><div class="label">Tỉ lệ thay đổi thất bại ≤10%; cảnh báo khi nguồn thay đổi gây lỗi &gt;15%.</div></div>
 </div>
-<p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code> trong ngày, gắn severity theo mức ảnh hưởng, leo thang theo <a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>, cập nhật <code>readiness.json</code> và chỉ đóng khi có bằng chứng owner đã xử lý nguyên nhân gốc.</p>
+<p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code> trong ngày, gắn severity theo mức ảnh hưởng, leo thang theo <a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>, cập nhật <code>readiness.json</code> và chỉ đóng khi có bằng chứng chủ sở hữu đã xử lý nguyên nhân gốc.</p>
 </div>
 <div class="section" id="deploy-no-go">
 <h2 class="h2">6C. Điều kiện NO-GO theo W0-W12</h2>

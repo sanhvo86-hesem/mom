@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>WI-702 - Storage Environment Vị trí and FIFO Control | HESEM MOM</title>
+<title>WI-702 - Storage Environment Vị trí and FIFO kiểm soát | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap — computes absolute URLs from location.pathname so the
  * stylesheet + renderer load correctly regardless of how the document is
@@ -64,18 +64,14 @@ ul.tight li {margin:4px 0;}
      data-dcc-doc-code="WI-702"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;WI-702&quot;,&quot;title&quot;:&quot;Storage Environment Vị trí and FIFO Control&quot;,&quot;subtitle&quot;:&quot;Hướng dẫn kho vận&quot;,&quot;doc_type&quot;:&quot;WI&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
-
-<div class="note">
-<strong>ÁP DỤNG KHI</strong><br>Dùng cho mọi khu vực lưu kho, khu vực chuẩn bị / sắp xếp, WIP, khu clean hold và thành phẩm chờ giao để duy trì đúng điều kiện, vị trí và thứ tự cấp phát.</div>
-
-<section class="wi-section" id="wi-s1"><h2>1. Mục đích, phạm vi và quyền dừng</h2>
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;WI-702&quot;,&quot;title&quot;:&quot;Storage Environment Vị trí and FIFO Control&quot;,&quot;subtitle&quot;:&quot;Hướng dẫn kho vận&quot;,&quot;doc_type&quot;:&quot;WI&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div> <div class="note">
+<strong>ÁP DỤNG KHI</strong><br>Dùng cho mọi khu vực lưu kho, khu vực chuẩn bị / sắp xếp, WIP, khu clean hold và thành phẩm chờ giao để duy trì đúng điều kiện, vị trí và thứ tự cấp phát.</div> <section class="wi-section" id="wi-s1"><h2>1. Mục đích, phạm vi và quyền dừng</h2>
 <p>WI này khóa cách lưu kho, khu vực chuẩn bị / sắp xếp, giữ môi trường, bố trí vị trí, cấp phát FIFO/FEFO, hoàn trả hàng và phản ứng khi phát hiện bất thường đối với raw nguyên vật liệu, bán thành phẩm, thành phẩm, hàng vệ sinh và đóng gói và vật tư đóng gói có kiểm soát. Mục tiêu là giữ đúng <strong>truy vết</strong>, đúng <strong>tình trạng bảo quản</strong>, đúng <strong>vị trí</strong> và đúng <strong>thứ tự cấp phát</strong> từ lúc hàng được nhập vị trí cho đến khi vấn đề cho công đoạn hoặc giao cho khách.</p>
 <p><strong>QUYỀN DỪNG:</strong> <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a></span>, IQC, <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a>, Kế hoạch, <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="entity-code role-code">WKM</span></a> / <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a> và Người có thẩm quyền phát hành được quyền dừng cấp phát hoặc dừng chuyển vị trí khi phát hiện sai nhãn trạng thái, thiếu lot/mẻ nấu (heat), lệch môi trường, lô vệ sinh và đóng gói mất niêm phong, dấu hiệu ăn mòn, lẫn phiên bản, lẫn vị trí hoặc tồn già vượt rule.</p>
 <div class="callout-danger">
 <span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Lưu hàng cách nền, cách tường, trong giới hạn chịu tải, ghi nhận mọi vị trí tạm, cấp phát theo FIFO hoặc FEFO đã xác nhận và dùng đúng vật liệu ngăn cách cho part đã hoàn thiện bề mặt.</div></section><section class="wi-section" id="wi-s2"><h2>2. Rule phân vùng, trạng thái và quyền vận hành theo khu vực</h2>
 <div style="background:#FEF9C3;border-left: 3px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em">
-<strong>Reference:</strong> Chi tiết đầy đủ xem <a href="../../references/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Quy tắc vị trí kho, phân vùng, FIFO/FEFO, khu vực chuẩn bị / sắp xếp và cycle count</a>. WI này tóm tắt các quy tắc chính để vận hành nhanh tại hiện trường.</div>
+<strong>tham chiếu:</strong> Chi tiết đầy đủ xem <a href="../../references/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Quy tắc vị trí kho, phân vùng, FIFO/FEFO, khu vực chuẩn bị / sắp xếp và cycle count</a>. WI này tóm tắt các quy tắc chính để vận hành nhanh tại hiện trường.</div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr>
 <th>Khu vực</th>
@@ -118,17 +114,17 @@ ul.tight li {margin:4px 0;}
 </tr>
 <tr>
 <td>FG</td>
-<td>Thành phẩm đã final phát hành nhưng chưa ship</td>
+<td>Thành phẩm đã final phát hành nhưng chưa giao hàng</td>
 <td>
 <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> phát hành xong mới bàn giao cho <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a></span>/Giao vận</td>
-<td>Part/Rev, qty, ship set, phát hành trạng thái</td>
+<td>Part/Rev, qty, giao hàng set, phát hành trạng thái</td>
 <td>Chỉ rời khu vực khi vào luồng đóng gói/phê duyệt giao hàng (phê duyệt giao hàng)</td>
 </tr>
 <tr>
 <td>CLEAN</td>
 <td>Hàng sạch, chân không, low-hạt / phần tử, vệ sinh và đóng gói</td>
 <td>Nhân sự được chỉ định, có mặc đồ bảo hộ (gowning)/PPE phù hợp</td>
-<td>Clean trạng thái, niêm phong trạng thái, mở time nếu có, xử lý / vận chuyển note</td>
+<td>Clean trạng thái, niêm phong trạng thái, mở time nếu có, xử lý / vận chuyển ghi chú</td>
 <td>Chỉ được mở/đóng lại theo <a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a> hoặc <a href="wi-716-vacuum-compatible-clean-build-and-bagging.html">WI-716</a>
 </td>
 </tr>
@@ -173,7 +169,7 @@ ul.tight li {margin:4px 0;}
 <td>Hàng vệ sinh và đóng gói / chân không-nhạy cảm</td>
 <td>Khu CLEAN hoặc tủ/kệ quy định; không để thùng carton hở, bụi, dầu, mảnh phoi (chip), băng keo rời</td>
 <td>niêm phong nguyên vẹn, mở time, chất hút ẩm/HIC khi có yêu cầu, clean label</td>
-<td>TẠM GIỮ ngay; đánh giá tái làm sạch / re-pack / tái kiểm sạch trước khi phát hành lại</td>
+<td>TẠM GIỮ ngay; đánh giá tái làm sạch / re-bộ hồ sơ / tái kiểm sạch trước khi phát hành lại</td>
 </tr>
 <tr>
 <td>Vật tư đóng gói, nhãn, túi, chất hút ẩm, HIC</td>
@@ -182,9 +178,9 @@ ul.tight li {margin:4px 0;}
 <td>Loại khỏi dòng / chuyền-cạnh / mặt bên nếu ướt, rách, nhiễm bẩn hoặc hết hạn</td>
 </tr>
 <tr>
-<td>Customer thuộc tính / tài sản / khách hàng-đã trả lại mục / hạng mục</td>
-<td>Tách khu vực nhận diện riêng, gắn nhãn rõ owner và tình trạng kiểm tra</td>
-<td>Qty, nhận dạng, hư hỏng-at-phiếu nhận / biên nhận, khách hàng ref, đặc biệt xử lý / vận chuyển note</td>
+<td>khách hàng thuộc tính / tài sản / khách hàng-đã trả lại mục / hạng mục</td>
+<td>Tách khu vực nhận diện riêng, gắn nhãn rõ chủ sở hữu và tình trạng kiểm tra</td>
+<td>Qty, nhận dạng, hư hỏng-at-phiếu nhận / biên nhận, khách hàng ref, đặc biệt xử lý / vận chuyển ghi chú</td>
 <td>Không được nhập chung với tồn kho HESEM; lệch phải báo khách hàng và <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a>
 </td>
 </tr>
@@ -200,7 +196,7 @@ ul.tight li {margin:4px 0;}
 <div class="step-item">
 <strong>tạm thời khu vực chuẩn bị / sắp xếp.</strong><br>khu vực chuẩn bị / sắp xếp phục vụ giao ca, gom đủ lô hoặc chờ xe nội bộ chỉ được dùng ngắn hạn. Nếu hàng nằm tại khu vực chuẩn bị / sắp xếp quá 1 ca hoặc qua đêm, <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a></span>/Sản xuất PHẢI gán người chịu trách nhiệm, lý do và Ngày hết hạn khu vực chuẩn bị / sắp xếp; quá hạn mà chưa xử lý phải báo cáo vượt cấp cho Kế hoạch.</div>
 <div class="step-item">
-<strong>Trả lại từ sản xuất.</strong><br>Hàng dư sau khi vấn đề, vật liệu thừa nguyên liệu, cân bằng / số dư của một phần lot hoặc part chưa gia công hết vận hành không được trả vào tồn kho dùng chung nếu thiếu nhãn cân bằng / số dư. Nhãn cân bằng / số dư tối thiểu phải có Job/WO, part/rev, lot/mẻ nấu (heat), qty còn lại, công đoạn Current và tình trạng có thể sử dụng / hold / làm lại.</div>
+<strong>Trả lại từ sản xuất.</strong><br>Hàng dư sau khi vấn đề, vật liệu thừa nguyên liệu, cân bằng / số dư của một phần lot hoặc part chưa gia công hết vận hành không được trả vào tồn kho dùng chung nếu thiếu nhãn cân bằng / số dư. Nhãn cân bằng / số dư tối thiểu phải có Job/WO, part/rev, lot/mẻ nấu (heat), qty còn lại, công đoạn hiện tại và tình trạng có thể sử dụng / hold / làm lại.</div>
 <div class="step-item">
 <strong>tràn / khẩn cấp di chuyển.</strong><br>Khi phải dùng vị trí tràn do đầy tải hoặc sự cố mặt bằng, <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a> PHẢI mở quyền tràn, ghi vị trí chuẩn gốc, thời gian bắt đầu và điều kiện đưa hàng trở lại. Hàng vệ sinh và đóng gói hoặc hàng đã final phát hành không được đẩy vào tràn bừa bãi cùng hàng thường.</div>
 </div></section><section class="wi-section" id="wi-s5"><h2>5. FIFO/FEFO, tách / chia lot, vật liệu thừa và cấp phát theo Job</h2>
@@ -268,7 +264,7 @@ ul.tight li {margin:4px 0;}
 <div class="step-item">
 <strong>Thiếu nhãn / mất truy vết.</strong><br>Dừng cấp phát ngay. Chuyển lô sang QH, dán lý do hold, khoanh vùng toàn bộ khay/kệ liên quan và truy lại giao dịch Cần nhất. Không được tự viết tay lại lot/mẻ nấu (heat) nếu chưa chứng minh được nguồn gốc.</div>
 <div class="step-item">
-<strong>Ướt, rỉ, mốc, niêm phong vi phạm, bao rách.</strong><br>Tách lô ảnh hưởng, chụp bằng chứng, đánh giá mức lan rộng. Đối với vệ sinh và đóng gói hoặc chân không-nhạy cảm, niêm phong vi phạm đồng nghĩa mất tình trạng clean trước đó cho đến khi <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> quyết định tái làm sạch và re-pack.</div>
+<strong>Ướt, rỉ, mốc, niêm phong vi phạm, bao rách.</strong><br>Tách lô ảnh hưởng, chụp bằng chứng, đánh giá mức lan rộng. Đối với vệ sinh và đóng gói hoặc chân không-nhạy cảm, niêm phong vi phạm đồng nghĩa mất tình trạng clean trước đó cho đến khi <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> quyết định tái làm sạch và re-bộ hồ sơ.</div>
 <div class="step-item">
 <strong>Vị trí không khớp / hỗn hợp / lẫn lộn lot / hỗn hợp / lẫn lộn phiên bản.</strong><br>Dừng mọi vấn đề từ vị trí đó. Thực hiện quét / dọn dẹp cùng lối đi/kệ liên quan, đối chiếu count thực tế với giao dịch và đóng lại chỉ / duy nhất sau không khớp nguyên nhân gốc đã được ghi nhận.</div>
 <div class="step-item">
@@ -360,14 +356,9 @@ ul.tight li {margin:4px 0;}
 <td>PPE và mối nguy theo vận hành xếp dỡ/bảo quản.</td>
 </tr>
 </tbody>
-</table></div></section>
-
-
-<!-- .page-body -->
-
-<section class="wi-section" data-operating-rule="true" id="wi-s9"><h2>9. Quy tắc điều hành — Hạn chế lưu kho / lưu trữ lớp / phân loại và thẩm quyền-to-phát hành</h2>
+</table></div></section> <!-- .page-body --> <section class="wi-section" data-operating-rule="true" id="wi-s9"><h2>9. Quy tắc điều hành — Hạn chế lưu kho / lưu trữ lớp / phân loại và thẩm quyền-to-phát hành</h2>
 <div style="background:#FEF9C3;border-left: 3px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em">
-<strong>Reference:</strong> Chi tiết đầy đủ xem <a href="../../references/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Hạn chế lưu kho / lưu trữ lớp / phân loại S0-S4</a>. WI này tóm tắt các quy tắc chính để vận hành nhanh tại hiện trường.</div>
+<strong>tham chiếu:</strong> Chi tiết đầy đủ xem <a href="../../references/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Hạn chế lưu kho / lưu trữ lớp / phân loại S0-S4</a>. WI này tóm tắt các quy tắc chính để vận hành nhanh tại hiện trường.</div>
 <p><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a></span> không được đối xử mọi vị trí như nhau. Ngay tại thời điểm phiếu nhận / biên nhận / put-cách xa / rời phải gán <b>lưu kho / lưu trữ class</b> cho lô hoặc khu: <b>S0</b> standard được kiểm soát tồn kho, <b>S1</b> kệ-tuổi thọ / vòng đời/FEFO, <b>S2</b> nhiệt ẩm nhạy, <b>S3</b> vệ sinh và đóng gói/chân không-nhạy cảm, <b>S4</b> cách ly / biệt trữ/hạn chế truy cập. Mỗi class kéo theo rule riêng về vị trí được phép, Người được chạm, điều kiện di dời và Người có quyền nhả TẠM GIỮ.</p>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr>
@@ -394,8 +385,8 @@ ul.tight li {margin:4px 0;}
 <tr>
 <td>vi phạm trên S3 vệ sinh và đóng gói / chân không-nhạy cảm</td>
 <td>
-<a download="" href="../../../forms/frm-700-maintenance/FRM-708_Environment_Log.xlsx">FRM-708</a> + <a href="../../../forms/frm-700-maintenance/FRM-709_Clean_Packaging_Checklist.xlsx" download="">FRM-709</a> khi liên quan pack sạch</td>
-<td>Chuyển clean-hold; PHẢI chặn vấn đề, chặn ship và đánh giá re-clean / re-pack / re-xác minh.</td>
+<a download="" href="../../../forms/frm-700-maintenance/FRM-708_Environment_Log.xlsx">FRM-708</a> + <a href="../../../forms/frm-700-maintenance/FRM-709_Clean_Packaging_Checklist.xlsx" download="">FRM-709</a> khi liên quan bộ hồ sơ sạch</td>
+<td>Chuyển clean-hold; PHẢI chặn vấn đề, chặn giao hàng và đánh giá re-clean / re-bộ hồ sơ / re-xác minh.</td>
 <td>
 <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> / clean-khu vực người chịu trách nhiệm theo <a href="../../sops/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a>.</td>
 </tr>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANNEX-140 — Ranh giới dữ liệu runtime trên VPS: PostgreSQL, Redis, RabbitMQ và qms-data filesystem | HESEM MOM</title>
+<title>ANNEX-140 — Ranh giới dữ liệu môi trường chạy trên VPS: PostgreSQL, Redis, RabbitMQ và qms-data filesystem | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap */
 (function () {
@@ -39,189 +39,132 @@
 </head>
 <body>
 <div class="container"><div class="page"><div class="page-body">
-<div class="dcc-header" data-dcc-doc-code="ANNEX-140" data-dcc-locale="vi" data-dcc-logo="../../../../../assets/hesem-logo.svg" data-dcc-bootstrap='{"header":{"doc_code":"ANNEX-140","title":"Ranh giới dữ liệu runtime trên VPS — PostgreSQL, Redis, RabbitMQ và qms-data filesystem","subtitle":"Phân loại 4 lớp dữ liệu runtime; ai được mutate; bao giờ phải sinh evidence SharePoint; chống tái diễn sự cố mất dữ liệu mutate","doc_type":"ANNEX","revision":"V0","effective_date":"2026-05-16","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":"ISO 9001:2015 §7.5.3 §8.5.6 §10.2","status":"released"}}'></div>
-
-<div class="doc-content" id="docContent">
-
-<h1>Ranh giới dữ liệu runtime trên VPS — PostgreSQL, Redis, RabbitMQ và qms-data filesystem</h1>
-
-<div class="callout"><strong>BỐI CẢNH — vì sao có tài liệu này?</strong><br>
-Cụm ANNEX-130 mô tả đầy đủ kho SharePoint nhưng <b>không có ANNEX nào nắm tách bạch các lớp dữ liệu mutate-tại-runtime trên VPS</b> (PostgreSQL row, Redis cache/session, RabbitMQ event, filesystem JSON config). Hệ quả là tháng 04-2026 đã có sự cố mất user <span class="code">ianr</span> khỏi <span class="code">users.json</span> do thao tác <span class="code">git reset --hard origin/main</span> qua SSH ghi đè file mutate bằng snapshot pre-mutation trong commit <span class="code">4a8ffebd</span>. ANNEX-140 lấp khoảng trống đó: <b>mỗi byte mutate trên VPS phải có một chủ sở hữu rõ ràng và một quy tắc tồn lưu rõ ràng</b>.</div>
-
-<section class="card">
+<div class="dcc-header" data-dcc-doc-code="ANNEX-140" data-dcc-locale="vi" data-dcc-logo="../../../../../assets/hesem-logo.svg" data-dcc-bootstrap='{"header":{"doc_code":"ANNEX-140","title":"Ranh giới dữ liệu runtime trên VPS — PostgreSQL, Redis, RabbitMQ và qms-data filesystem","subtitle":"Phân loại 4 lớp dữ liệu runtime; ai được mutate; bao giờ phải sinh evidence SharePoint; chống tái diễn sự cố mất dữ liệu mutate","doc_type":"ANNEX","revision":"V0","effective_date":"2026-05-16","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":"ISO 9001:2015 §7.5.3 §8.5.6 §10.2","status":"released"}}'></div> <div class="doc-content" id="docContent"> <h1>Ranh giới dữ liệu môi trường chạy trên VPS — PostgreSQL, Redis, RabbitMQ và qms-data filesystem</h1> <div class="callout"><strong>BỐI CẢNH — vì sao có tài liệu này?</strong><br>
+Cụm ANNEX-130 mô tả đầy đủ kho SharePoint nhưng <b>không có ANNEX nào nắm tách bạch các lớp dữ liệu mutate-tại-môi trường chạy trên VPS</b> (PostgreSQL row, Redis cache/session, RabbitMQ event, filesystem JSON config). Hệ quả là tháng 04-2026 đã có sự cố mất user <span class="code">ianr</span> khỏi <span class="code">users.json</span> do thao tác <span class="code">git reset --hard origin/main</span> qua SSH ghi đè file mutate bằng ảnh chụp trạng thái pre-mutation trong commit <span class="code">4a8ffebd</span>. ANNEX-140 lấp khoảng trống đó: <b>mỗi byte mutate trên VPS phải có một chủ sở hữu rõ ràng và một quy tắc tồn lưu rõ ràng</b>.</div> <section class="card">
 <h2>1. Phạm vi và đối chiếu với cụm ANNEX-130</h2>
-<p>ANNEX-140 phủ <b>vùng runtime</b> trên VPS <span class="code">eqms.hesemeng.com</span> (host PHP 8.5 + nginx + PostgreSQL + Redis + RabbitMQ tại <span class="code">/var/www/eqms.hesemeng.com/</span>). Đây là vùng bị <b>loại trừ</b> khỏi SharePoint <span class="code">QMS-Source-Control</span> theo <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> §7 (runtime noise). ANNEX-140 nói rõ: từng lớp runtime nằm ở đâu, ai mutate, có cần mirror sang SharePoint không, retention bao lâu.</p>
+<p>ANNEX-140 phủ <b>vùng môi trường chạy</b> trên VPS <span class="code">eqms.hesemeng.com</span> (host PHP 8.5 + nginx + PostgreSQL + Redis + RabbitMQ tại <span class="code">/var/www/eqms.hesemeng.com/</span>). Đây là vùng bị <b>loại trừ</b> khỏi SharePoint <span class="code">QMS-Source-Control</span> theo <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> §7 (môi trường chạy noise). ANNEX-140 nói rõ: từng lớp môi trường chạy nằm ở đâu, ai mutate, có cần mirror sang SharePoint không, lưu giữ bao lâu.</p>
 <table>
 <thead><tr><th>Trục</th><th>ANNEX phủ</th><th>Vùng dữ liệu</th></tr></thead>
 <tbody>
-<tr><td>Kho controlled source (HTML tài liệu, mã portal)</td><td><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> + <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></td><td>SharePoint <span class="code">QMS-Source-Control</span> → Git → <span class="code">/var/www/eqms.hesemeng.com/</span></td></tr>
-<tr><td>Hồ sơ vận hành (đã ký, đã phát hành)</td><td><a href="annex-130-m365-eqms-ssot-boundary-and-cross-reference-policy.html">ANNEX-130</a> + <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td><td>SharePoint <span class="code">HESEM-Records</span> + cross-reference list</td></tr>
-<tr><td><b>Dữ liệu runtime mutate-trên-VPS</b> (file này)</td><td><b>ANNEX-140</b></td><td>PostgreSQL + Redis + RabbitMQ + <span class="code">mom/qms-data/</span> + <span class="code">mom/data/config/*.json</span> + <span class="code">/var/www/data-private/</span></td></tr>
+<tr><td>Kho controlled nguồn (HTML tài liệu, mã portal)</td><td><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> + <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></td><td>SharePoint <span class="code">QMS-Source-Control</span> → Git → <span class="code">/var/www/eqms.hesemeng.com/</span></td></tr>
+<tr><td>Hồ sơ vận hành (đã ký, đã phát hành)</td><td><a href="annex-130-m365-eqms-ssot-boundary-and-cross-reference-policy.html">ANNEX-130</a> + <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td><td>SharePoint <span class="code">HESEM-Hồ sơ</span> + tham chiếu chéo danh sách</td></tr>
+<tr><td><b>Dữ liệu môi trường chạy mutate-trên-VPS</b> (file này)</td><td><b>ANNEX-140</b></td><td>PostgreSQL + Redis + RabbitMQ + <span class="code">mom/qms-data/</span> + <span class="code">mom/data/config/*.json</span> + <span class="code">/var/www/data-private/</span></td></tr>
 </tbody>
 </table>
-</section>
-
-<section class="card">
-<h2>2. Bốn lớp dữ liệu runtime — định nghĩa và đường dẫn vật lý</h2>
-<div class="layer-grid">
- <div class="layer-card">
-  <h3>Lớp 1 — PostgreSQL (chuyển trạng thái có kiểm soát)</h3>
-  <p>Bảng <span class="code">audit_events</span>, <span class="code">dcc_document_header</span>, <span class="code">roles</span> + <span class="code">role_permissions</span> JSONB, <span class="code">graphics_token_catalog</span>, các bảng nghiệp vụ (NCR/CAPA/JobOrder…).</p>
-  <p><b>Đường dẫn vật lý:</b> <span class="code">postgresql://127.0.0.1:5432/eqms_db</span> · data dir <span class="code">/var/lib/postgresql/16/main/</span>. Backup: <span class="code">/var/backups/postgresql/eqms_db-{YYYYMMDD}.sql.gz</span> theo cron hằng ngày 02:00.</p>
-  <p><b>Người mutate được phép:</b> <span class="code">DataSyncMutationService</span> (qua portal API) là cổng duy nhất. Cấm <span class="code">psql ... UPDATE/INSERT/DELETE</span> trực tiếp ngoài migration script.</p>
- </div>
- <div class="layer-card">
-  <h3>Lớp 2 — Redis (cache + session + rate-limit)</h3>
-  <p>Session cookie hiện hành, rate-limit counter, cache module bộ nhớ portal (DEPLOY_CONFIG resolve, doc index, KPI snapshot).</p>
-  <p><b>Đường dẫn vật lý:</b> <span class="code">redis://127.0.0.1:6379</span> · không persist (RDB snapshot 6h theo <span class="code">/etc/redis/redis.conf</span>). Dump file <span class="code">/var/lib/redis/dump.rdb</span>.</p>
-  <p><b>Đặc tính:</b> <i>không có giá trị bằng chứng</i> — mất Redis = mất session, người dùng đăng nhập lại. KHÔNG được dùng Redis làm lưu trữ chính cho bất kỳ trường nào quan trọng vận hành.</p>
- </div>
- <div class="layer-card">
-  <h3>Lớp 3 — RabbitMQ (event queue)</h3>
-  <p>Hàng đợi thông báo nội bộ: <span class="code">notification.outbox</span>, <span class="code">doc_index.rebuild</span>, <span class="code">deploy.drill.reminder</span>, <span class="code">capa.escalation</span>.</p>
-  <p><b>Đường dẫn vật lý:</b> <span class="code">amqp://127.0.0.1:5672</span> · durable queue có persist xuống <span class="code">/var/lib/rabbitmq/mnesia/</span>. Mọi consumer phải <span class="code">ack</span> sau khi đã ghi outcome vào PostgreSQL.</p>
-  <p><b>Retention:</b> queue thường ≤24h (consume xong là xoá). Audit log của broker giữ 30 ngày trong <span class="code">/var/log/rabbitmq/</span> rồi rotate.</p>
- </div>
- <div class="layer-card">
-  <h3>Lớp 4 — Filesystem JSON config (bootstrap + runtime mutate hỗn hợp)</h3>
-  <p><b>Hai loại file khác nhau:</b></p>
-  <ul class="tight">
-   <li><span class="code">*.bootstrap.json</span> — git-tracked seed, KHÔNG mutate runtime. Ví dụ <span class="code">mom/data/config/deploy/program.bootstrap.json</span>.</li>
-   <li><span class="code">*.json</span> (không có <span class="code">.bootstrap</span>) — runtime mutate qua <span class="code">DataSyncMutationService</span>. Gitignored. Ví dụ <span class="code">mom/data/config/users.json</span>, <span class="code">role_permissions.json</span>, <span class="code">deploy/program.json</span>.</li>
-  </ul>
-  <p><b>Hồ sơ runtime nhạy cảm (không chia sẻ):</b> <span class="code">/var/www/data-private/</span> chứa <span class="code">.deploy-snapshots/</span>, secret backup, session dump. <b>Tuyệt đối không nằm trong worktree Git</b>.</p>
- </div>
-</div>
-
-<table>
-<thead><tr><th>Lớp</th><th>Đường dẫn vật lý</th><th>Người mutate</th><th>Có evidence SharePoint?</th><th>Retention</th></tr></thead>
+</section> <section class="card">
+<h2>2. Bốn lớp dữ liệu môi trường chạy — định nghĩa và đường dẫn vật lý</h2>
+<div class="layer-grid"> <div class="layer-card"> <h3>Lớp 1 — PostgreSQL (chuyển trạng thái có kiểm soát)</h3> <p>Bảng <span class="code">audit_events</span>, <span class="code">dcc_document_header</span>, <span class="code">roles</span> + <span class="code">role_permissions</span> JSONB, <span class="code">graphics_token_catalog</span>, các bảng nghiệp vụ (NCR/CAPA/JobOrder…).</p> <p><b>Đường dẫn vật lý:</b> <span class="code">postgresql://127.0.0.1:5432/eqms_db</span> · data dir <span class="code">/var/lib/postgresql/16/main/</span>. Backup: <span class="code">/var/backups/postgresql/eqms_db-{YYYYMMDD}.sql.gz</span> theo cron hằng ngày 02:00.</p> <p><b>Người mutate được phép:</b> <span class="code">DataSyncMutationService</span> (qua portal API) là cổng duy nhất. Cấm <span class="code">psql ... UPDATE/INSERT/DELETE</span> trực tiếp ngoài migration script.</p> </div> <div class="layer-card"> <h3>Lớp 2 — Redis (cache + session + rate-limit)</h3> <p>Session cookie hiện hành, rate-limit counter, cache module bộ nhớ portal (DEPLOY_CONFIG resolve, doc index, KPI ảnh chụp trạng thái).</p> <p><b>Đường dẫn vật lý:</b> <span class="code">redis://127.0.0.1:6379</span> · không persist (RDB ảnh chụp trạng thái 6h theo <span class="code">/etc/redis/redis.conf</span>). Dump file <span class="code">/var/lib/redis/dump.rdb</span>.</p> <p><b>Đặc tính:</b> <i>không có giá trị bằng chứng</i> — mất Redis = mất session, người dùng đăng nhập lại. KHÔNG được dùng Redis làm lưu trữ chính cho bất kỳ trường nào quan trọng vận hành.</p> </div> <div class="layer-card"> <h3>Lớp 3 — RabbitMQ (event queue)</h3> <p>Hàng đợi thông báo nội bộ: <span class="code">notification.outbox</span>, <span class="code">doc_index.rebuild</span>, <span class="code">deploy.drill.reminder</span>, <span class="code">capa.chuyển cấp</span>.</p> <p><b>Đường dẫn vật lý:</b> <span class="code">amqp://127.0.0.1:5672</span> · durable queue có persist xuống <span class="code">/var/lib/rabbitmq/mnesia/</span>. Mọi bên sử dụng phải <span class="code">ack</span> sau khi đã ghi outcome vào PostgreSQL.</p> <p><b>lưu giữ:</b> queue thường ≤24h (consume xong là xoá). Audit log của broker giữ 30 ngày trong <span class="code">/var/log/rabbitmq/</span> rồi rotate.</p> </div> <div class="layer-card"> <h3>Lớp 4 — Filesystem JSON config (bootstrap + môi trường chạy mutate hỗn hợp)</h3> <p><b>Hai loại file khác nhau:</b></p> <ul class="tight"> <li><span class="code">*.bootstrap.json</span> — git-tracked seed, KHÔNG mutate môi trường chạy. Ví dụ <span class="code">mom/data/config/deploy/program.bootstrap.json</span>.</li> <li><span class="code">*.json</span> (không có <span class="code">.bootstrap</span>) — môi trường chạy mutate qua <span class="code">DataSyncMutationService</span>. Gitignored. Ví dụ <span class="code">mom/data/config/users.json</span>, <span class="code">role_permissions.json</span>, <span class="code">deploy/program.json</span>.</li> </ul> <p><b>Hồ sơ môi trường chạy nhạy cảm (không chia sẻ):</b> <span class="code">/var/www/data-private/</span> chứa <span class="code">.deploy-snapshots/</span>, secret backup, session dump. <b>Tuyệt đối không nằm trong worktree Git</b>.</p> </div>
+</div> <table>
+<thead><tr><th>Lớp</th><th>Đường dẫn vật lý</th><th>Người mutate</th><th>Có bằng chứng SharePoint?</th><th>lưu giữ</th></tr></thead>
 <tbody>
-<tr><td>1. PostgreSQL</td><td><span class="code">/var/lib/postgresql/16/main/</span></td><td>Chỉ qua <span class="code">DataSyncMutationService</span> (cấm <span class="code">psql UPDATE</span> tay)</td><td>Có — audit_events row mirror sang SharePoint <span class="code">System-Records/08-Automation-Run-Logs/{YYYY}/</span> theo lô tuần (xem §5)</td><td>10 năm (theo RET-QMS-DOCCTRL)</td></tr>
-<tr><td>2. Redis</td><td><span class="code">/var/lib/redis/dump.rdb</span></td><td>php-fpm worker (tự động)</td><td>Không — runtime noise, không có giá trị bằng chứng</td><td>RDB snapshot 6h; mất = không bù được</td></tr>
+<tr><td>1. PostgreSQL</td><td><span class="code">/var/lib/postgresql/16/main/</span></td><td>Chỉ qua <span class="code">DataSyncMutationService</span> (cấm <span class="code">psql UPDATE</span> tay)</td><td>Có — audit_events row mirror sang SharePoint <span class="code">System-Hồ sơ/08-Automation-Run-Logs/{YYYY}/</span> theo lô tuần (xem §5)</td><td>10 năm (theo RET-QMS-DOCCTRL)</td></tr>
+<tr><td>2. Redis</td><td><span class="code">/var/lib/redis/dump.rdb</span></td><td>php-fpm worker (tự động)</td><td>Không — môi trường chạy noise, không có giá trị bằng chứng</td><td>RDB ảnh chụp trạng thái 6h; mất = không bù được</td></tr>
 <tr><td>3. RabbitMQ</td><td><span class="code">/var/lib/rabbitmq/mnesia/</span></td><td>Producer trong code PHP/service worker</td><td>Một phần — broker audit log giữ 30 ngày; outcome quan trọng phải ghi PostgreSQL ngay khi consume</td><td>Queue 24h; broker log 30 ngày</td></tr>
 <tr><td>4a. JSON bootstrap (git-tracked)</td><td><span class="code">mom/data/config/*.bootstrap.json</span></td><td>QMS Engineer qua commit + PR</td><td>Không — đã ở trong <span class="code">QMS-Source-Control</span></td><td>Vĩnh viễn theo Git history</td></tr>
-<tr><td>4b. JSON runtime (gitignored)</td><td><span class="code">mom/data/config/*.json</span> (không có <span class="code">.bootstrap</span>)</td><td>Chỉ qua <span class="code">DataSyncMutationService</span></td><td>Có — snapshot trước/sau mutate vào <span class="code">/var/www/data-private/.deploy-snapshots/&lt;TS&gt;/</span>; audit_events row mirror SharePoint</td><td>Snapshot giữ 90 ngày; audit_events giữ 10 năm</td></tr>
-<tr><td>4c. Data-private</td><td><span class="code">/var/www/data-private/</span></td><td>Tự động bởi <span class="code">deploy.sh</span> capture/restore</td><td>Không mirror SharePoint (chứa secret); chỉ archive cục bộ</td><td>Snapshot 90 ngày; rotate manual</td></tr>
+<tr><td>4b. JSON môi trường chạy (gitignored)</td><td><span class="code">mom/data/config/*.json</span> (không có <span class="code">.bootstrap</span>)</td><td>Chỉ qua <span class="code">DataSyncMutationService</span></td><td>Có — ảnh chụp trạng thái trước/sau mutate vào <span class="code">/var/www/data-private/.deploy-snapshots/&lt;TS&gt;/</span>; audit_events row mirror SharePoint</td><td>ảnh chụp trạng thái giữ 90 ngày; audit_events giữ 10 năm</td></tr>
+<tr><td>4c. Data-private</td><td><span class="code">/var/www/data-private/</span></td><td>Tự động bởi <span class="code">deploy.sh</span> capture/restore</td><td>Không mirror SharePoint (chứa secret); chỉ archive cục bộ</td><td>ảnh chụp trạng thái 90 ngày; rotate manual</td></tr>
 </tbody>
 </table>
-</section>
-
-<section class="card">
+</section> <section class="card">
 <h2>3. Quy tắc cứng — ai được mutate, ai không</h2>
 <table>
 <thead><tr><th>Hành động</th><th>Được phép</th><th>Không được phép</th><th>Hậu quả nếu vi phạm</th></tr></thead>
 <tbody>
-<tr><td>Sửa <span class="code">mom/data/config/users.json</span></td><td>Qua portal admin UI → <span class="code">DataSyncMutationService</span> → sinh snapshot + audit_events row</td><td>SSH vào VPS chạy <span class="code">vi users.json</span>, <span class="code">sed -i</span>, <span class="code">cat &gt; users.json</span></td><td>Audit không truy được dấu vết; risk mất user khi rollback</td></tr>
-<tr><td>Khôi phục bản tài liệu HTML đã release</td><td>Sửa file trong worktree local → commit → push → CI deploy theo <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> §6</td><td><span class="code">ssh eqms 'cd /var/www/... &amp;&amp; git reset --hard origin/main'</span></td><td>Ghi đè runtime JSON gitignored — đã có tiền lệ commit <span class="code">4a8ffebd</span> mất user <span class="code">ianr</span></td></tr>
+<tr><td>Sửa <span class="code">mom/data/config/users.json</span></td><td>Qua portal admin UI → <span class="code">DataSyncMutationService</span> → sinh ảnh chụp trạng thái + audit_events row</td><td>SSH vào VPS chạy <span class="code">vi users.json</span>, <span class="code">sed -i</span>, <span class="code">cat &gt; users.json</span></td><td>Audit không truy được dấu vết; rủi ro mất user khi rollback</td></tr>
+<tr><td>Khôi phục bản tài liệu HTML đã phát hành</td><td>Sửa file trong worktree local → commit → push → CI deploy theo <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> §6</td><td><span class="code">ssh eqms 'cd /var/www/... &amp;&amp; git reset --hard origin/main'</span></td><td>Ghi đè môi trường chạy JSON gitignored — đã có tiền lệ commit <span class="code">4a8ffebd</span> mất user <span class="code">ianr</span></td></tr>
 <tr><td>Xoá row trong <span class="code">audit_events</span></td><td><b>KHÔNG AI</b> — bảng có trigger chặn UPDATE/DELETE (immutable INSERT-only)</td><td>Bất kỳ thao tác <span class="code">DELETE FROM audit_events</span></td><td>Lệnh sẽ fail với error <span class="code">audit_events_no_mutation</span>; vi phạm chính sách §5.1.1 ISO 9001</td></tr>
 <tr><td>Sửa <span class="code">dcc_document_header</span></td><td>Qua portal "Chỉnh Sửa Tài Liệu" modal → API <span class="code">/api/v1/dcc/documents/upsert</span> → audit_events row</td><td>Sửa inline <span class="code">data-dcc-bootstrap</span> trong HTML — sẽ bị renderer ghi đè</td><td>Mất công sửa; thay đổi không tồn tại sau reload</td></tr>
 <tr><td>Cập nhật Redis key</td><td>php-fpm tự cache; không cần manual</td><td>Phụ thuộc Redis cho dữ liệu quan trọng vận hành</td><td>Mất khi Redis restart (đã thấy nhiều lần)</td></tr>
 </tbody>
 </table>
-<div class="callout"><strong>Quy tắc tổng:</strong> <b>Không bao giờ chạm runtime data trên VPS qua SSH tay nếu cổng portal đã có chức năng tương đương.</b> Mọi mutate phải để lại 3 dấu vết: (1) audit_events PostgreSQL row, (2) snapshot trước/sau trong <span class="code">/var/www/data-private/.deploy-snapshots/</span>, (3) hồ sơ thay đổi trong SharePoint <span class="code">QMS-Source-Control/04-Reverse-Sync-Intake/{YYYY}/</span> (nếu là hot-fix khẩn).</div>
-</section>
-
-<section class="card">
+<div class="callout"><strong>Quy tắc tổng:</strong> <b>Không bao giờ chạm môi trường chạy data trên VPS qua SSH tay nếu cổng portal đã có chức năng tương đương.</b> Mọi mutate phải để lại 3 dấu vết: (1) audit_events PostgreSQL row, (2) ảnh chụp trạng thái trước/sau trong <span class="code">/var/www/data-private/.deploy-snapshots/</span>, (3) hồ sơ thay đổi trong SharePoint <span class="code">QMS-Source-Control/04-Reverse-Sync-Intake/{YYYY}/</span> (nếu là hot-fix khẩn).</div>
+</section> <section class="card">
 <h2>4. Dòng chảy mutate chuẩn — 4 đường được duyệt</h2>
 <table>
-<thead><tr><th>Đường</th><th>Khi dùng</th><th>Cơ chế</th><th>Evidence ghi ở đâu</th></tr></thead>
+<thead><tr><th>Đường</th><th>Khi dùng</th><th>Cơ chế</th><th>Bằng chứng ghi ở đâu</th></tr></thead>
 <tbody>
-<tr><td><b>Đường A — Deploy theo CI</b></td><td>Cập nhật mã, doc HTML, bootstrap config</td><td>Push branch <span class="code">main</span> → GitHub Actions <span class="code">.github/workflows/deploy.yml</span> → SSH VPS → <span class="code">deploy.sh</span> capture/restore</td><td>Deploy receipt vào <span class="code">QMS-Source-Control/03-Server-Deploy-Receipts/{YYYY}/</span></td></tr>
-<tr><td><b>Đường B — Manual deploy</b></td><td>Khi CI không khả dụng</td><td><span class="code">ssh eqms 'sudo -n bash /var/www/eqms.hesemeng.com/tools/vps-setup/scripts/deploy.sh'</span> — script tự capture data-private + restore</td><td>Tương tự đường A; thêm dòng note "manual fallback" trong deploy receipt</td></tr>
-<tr><td><b>Đường C — Admin UI mutate runtime</b></td><td>Đổi quyền role, sửa users.json, đổi token graphics</td><td>Portal admin UI → <span class="code">DataSyncMutationService</span> → snapshot trước/sau + audit_events</td><td>audit_events row (PostgreSQL) + snapshot trong <span class="code">data-private</span>. Nếu là decision có ảnh hưởng phạm vi rộng (e.g. khoá tài khoản): hồ sơ ở <span class="code">System-Records/01-Access-and-Identity/{YYYY}/</span></td></tr>
-<tr><td><b>Đường D — Hot-fix khẩn cấp trên VPS</b></td><td>Chỉ khi A/B/C đều không khả dụng và có sự cố Mức 1</td><td>Portal admin UI write-through (không phải vi/sed/cat&gt; tay). Nếu buộc phải SSH: chạy lệnh đã review trước, có lý do ghi sổ, có người đối soát thứ hai</td><td>Audit_events row + hồ sơ reverse-sync trong <span class="code">QMS-Source-Control/04-Reverse-Sync-Intake/{YYYY}/</span> trong 24h sau hot-fix theo <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> §6</td></tr>
+<tr><td><b>Đường A — Deploy theo CI</b></td><td>Cập nhật mã, doc HTML, bootstrap config</td><td>Push branch <span class="code">main</span> → GitHub Actions <span class="code">.github/luồng công việcs/deploy.yml</span> → SSH VPS → <span class="code">deploy.sh</span> capture/restore</td><td>Deploy receipt vào <span class="code">QMS-Source-Control/03-Server-Deploy-Receipts/{YYYY}/</span></td></tr>
+<tr><td><b>Đường B — Manual deploy</b></td><td>Khi CI không khả dụng</td><td><span class="code">ssh eqms 'sudo -n bash /var/www/eqms.hesemeng.com/tools/vps-setup/scripts/deploy.sh'</span> — script tự capture data-private + restore</td><td>Tương tự đường A; thêm dòng ghi chú "manual dự phòng" trong deploy receipt</td></tr>
+<tr><td><b>Đường C — Admin UI mutate môi trường chạy</b></td><td>Đổi quyền vai trò, sửa users.json, đổi token graphics</td><td>Portal admin UI → <span class="code">DataSyncMutationService</span> → ảnh chụp trạng thái trước/sau + audit_events</td><td>audit_events row (PostgreSQL) + ảnh chụp trạng thái trong <span class="code">data-private</span>. Nếu là quyết định có ảnh hưởng phạm vi rộng (e.g. khoá tài khoản): hồ sơ ở <span class="code">System-Hồ sơ/01-Access-and-Identity/{YYYY}/</span></td></tr>
+<tr><td><b>Đường D — Hot-fix khẩn cấp trên VPS</b></td><td>Chỉ khi A/B/C đều không khả dụng và có sự cố Mức 1</td><td>Portal admin UI write-through (không phải vi/sed/cat&gt; tay). Nếu buộc phải SSH: chạy lệnh đã rà soát trước, có lý do ghi sổ, có người đối soát thứ hai</td><td>Audit_events row + hồ sơ reverse-sync trong <span class="code">QMS-Source-Control/04-Reverse-Sync-Intake/{YYYY}/</span> trong 24h sau hot-fix theo <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> §6</td></tr>
 </tbody>
 </table>
-<div class="ok-callout"><strong>Cách kiểm tra đã đi đúng đường:</strong> sau mỗi mutate, chạy <span class="code">SELECT event, user_id, created_at, metadata FROM audit_events WHERE created_at &gt; now() - interval '1 hour' ORDER BY created_at DESC LIMIT 20;</span> — nếu thay đổi tương ứng không xuất hiện thì đã đi sai đường, phải khôi phục từ snapshot và làm lại.</div>
-</section>
-
-<section class="card">
+<div class="ok-callout"><strong>Cách kiểm tra đã đi đúng đường:</strong> sau mỗi mutate, chạy <span class="code">SELECT event, user_id, created_at, siêu dữ liệu FROM audit_events WHERE created_at &gt; now() - interval '1 hour' ORDER BY created_at DESC LIMIT 20;</span> — nếu thay đổi tương ứng không xuất hiện thì đã đi sai đường, phải khôi phục từ ảnh chụp trạng thái và làm lại.</div>
+</section> <section class="card">
 <h2>5. Mirror audit_events sang SharePoint — chu kỳ và payload</h2>
-<p>Bảng <span class="code">audit_events</span> PostgreSQL là SSOT pháp lý cho mọi mutate. Để hồ sơ tồn lưu &gt;1 năm và đối chứng với kiểm toán bên ngoài (ISO 9001 §9.2), audit_events phải được mirror sang SharePoint <span class="code">HESEM-Digital/System-Records/08-Automation-Run-Logs/{YYYY}/</span> theo lô tuần.</p>
+<p>Bảng <span class="code">audit_events</span> PostgreSQL là SSOT pháp lý cho mọi mutate. Để hồ sơ tồn lưu &gt;1 năm và đối chứng với kiểm toán bên ngoài (ISO 9001 §9.2), audit_events phải được mirror sang SharePoint <span class="code">HESEM-Digital/System-Hồ sơ/08-Automation-Run-Logs/{YYYY}/</span> theo lô tuần.</p>
 <table>
 <thead><tr><th>Yếu tố</th><th>Quy định</th></tr></thead>
 <tbody>
-<tr><td>Chu kỳ</td><td>Mỗi Thứ Bảy 22:00 ICT, RabbitMQ flow <span class="code">audit_events.weekly_export</span> kích hoạt</td></tr>
+<tr><td>Chu kỳ</td><td>Mỗi Thứ Bảy 22:00 ICT, RabbitMQ luồng <span class="code">audit_events.weekly_export</span> kích hoạt</td></tr>
 <tr><td>Định dạng</td><td>File CSV nén <span class="code">audit-events-{YYYY}-W{WW}.csv.gz</span> + manifest <span class="code">.sha256</span></td></tr>
-<tr><td>Trường bắt buộc</td><td><span class="code">event, user_id, ip_address, user_agent, session_id, created_at, metadata</span> (JSON)</td></tr>
-<tr><td>Upload</td><td>Power Automate flow <span class="code">SystemRecordsAuditExport</span> đặt file vào <span class="code">System-Records/08-Automation-Run-Logs/{YYYY}/audit-events/</span></td></tr>
+<tr><td>Trường bắt buộc</td><td><span class="code">event, user_id, ip_address, user_agent, session_id, created_at, siêu dữ liệu</span> (JSON)</td></tr>
+<tr><td>Upload</td><td>Power Automate luồng <span class="code">SystemHồ sơAuditExport</span> đặt file vào <span class="code">System-Hồ sơ/08-Automation-Run-Logs/{YYYY}/audit-events/</span></td></tr>
 <tr><td>Validation</td><td>SharePoint luồng công việc tính lại sha256, so với <span class="code">.sha256</span> manifest; mismatch → cảnh báo Trưởng IT trong 4 giờ</td></tr>
-<tr><td>Retention</td><td>10 năm (theo RET-QMS-DOCCTRL); năm thứ 11 trở đi move sang <span class="code">06-Archive/01-Closed-Year-Archive/{YYYY}/</span></td></tr>
+<tr><td>lưu giữ</td><td>10 năm (theo RET-QMS-DOCCTRL); năm thứ 11 trở đi move sang <span class="code">06-Archive/01-Closed-Year-Archive/{YYYY}/</span></td></tr>
 </tbody>
 </table>
 <p>RabbitMQ broker log trong <span class="code">/var/log/rabbitmq/</span> KHÔNG mirror SharePoint (volume quá lớn, ít giá trị bằng chứng). Khi cần điều tra một event sự cố, lấy bằng SSH có biên bản trong 30 ngày kể từ event.</p>
-</section>
-
-<section class="card">
+</section> <section class="card">
 <h2>6. Backup/Restore — RPO/RTO theo lớp</h2>
 <table>
 <thead><tr><th>Lớp</th><th>RPO (mất tối đa)</th><th>RTO (khôi phục trong)</th><th>Cơ chế</th></tr></thead>
 <tbody>
 <tr><td>PostgreSQL</td><td>24h</td><td>4h</td><td>pg_dump hằng ngày + WAL archive; backup ra <span class="code">/var/backups/postgresql/</span> và external storage tuần</td></tr>
-<tr><td>Redis</td><td>6h (RDB snapshot)</td><td>không cần khôi phục</td><td>RDB snapshot tự động; mất Redis = re-login users, không khôi phục</td></tr>
-<tr><td>RabbitMQ</td><td>queue mất khi node die; durable queue khôi phục được</td><td>1h</td><td>Cluster 1-node hiện tại; nếu broker chết, restart php-fpm để retry consumer</td></tr>
-<tr><td>JSON runtime (config/*.json)</td><td>Theo cron snapshot deploy.sh; thường ≤ ngày</td><td>15 phút</td><td>Snapshot trong <span class="code">/var/www/data-private/.deploy-snapshots/&lt;TS&gt;/</span>; restore theo sha256 match</td></tr>
-<tr><td>SharePoint tenant</td><td>Theo Microsoft 365 native (14 ngày recycle + 30 ngày backup)</td><td>4 giờ cho 1 site</td><td>Microsoft 365 native; không có third-party backup hiện tại (lỗ hổng đã ghi)</td></tr>
+<tr><td>Redis</td><td>6h (RDB ảnh chụp trạng thái)</td><td>không cần khôi phục</td><td>RDB ảnh chụp trạng thái tự động; mất Redis = re-login users, không khôi phục</td></tr>
+<tr><td>RabbitMQ</td><td>queue mất khi node die; durable queue khôi phục được</td><td>1h</td><td>Cluster 1-node hiện tại; nếu broker chết, restart php-fpm để retry bên sử dụng</td></tr>
+<tr><td>JSON môi trường chạy (config/*.json)</td><td>Theo cron ảnh chụp trạng thái deploy.sh; thường ≤ ngày</td><td>15 phút</td><td>ảnh chụp trạng thái trong <span class="code">/var/www/data-private/.deploy-snapshots/&lt;TS&gt;/</span>; restore theo sha256 match</td></tr>
+<tr><td>SharePoint tenant</td><td>Theo Microsoft 365 native (14 ngày recycle + 30 ngày backup)</td><td>4 giờ cho 1 không gian</td><td>Microsoft 365 native; không có third-party backup hiện tại (lỗ hổng đã ghi)</td></tr>
 </tbody>
 </table>
-<div class="callout"><strong>Lỗ hổng đã ghi:</strong> chưa có third-party backup cho SharePoint tenant. Nếu bị ransomware hoặc admin xoá nhầm site collection, M365 native backup 30 ngày là sàn duy nhất — đề xuất bổ sung Veeam/Avepoint trong roadmap 2027 (xem <a href="../../../../system/quality-manual/qms-man-001-qms-manual.html">MAN-001</a> §rủi ro).</div>
-</section>
-
-<section class="card">
+<div class="callout"><strong>Lỗ hổng đã ghi:</strong> chưa có third-party backup cho SharePoint tenant. Nếu bị ransomware hoặc admin xoá nhầm không gian collection, M365 native backup 30 ngày là sàn duy nhất — đề xuất bổ sung Veeam/Avepoint trong roadmap 2027 (xem <a href="../../../../system/quality-manual/qms-man-001-qms-manual.html">MAN-001</a> §rủi ro).</div>
+</section> <section class="card">
 <h2>7. Anti-pattern — đã hoặc có nguy cơ tái diễn</h2>
 <table>
 <thead><tr><th>Mã</th><th>Anti-pattern</th><th>Hậu quả thực</th><th>Cơ chế chặn</th></tr></thead>
 <tbody>
-<tr><td>AP-140-01</td><td><span class="code">git reset --hard origin/main</span> trên VPS qua SSH</td><td>Đã xảy ra: mất user <span class="code">ianr</span> khỏi <span class="code">users.json</span> vì rollback đè bản pre-mutation trong commit <span class="code">4a8ffebd</span></td><td>CLAUDE.md §VPS deployment chính sách + <span class="code">deploy.sh</span> bắt buộc capture/restore + commit <span class="code">41436ee2</span> untrack <span class="code">users.json</span></td></tr>
-<tr><td>AP-140-02</td><td>Sửa <span class="code">mom/data/config/*.json</span> bằng <span class="code">vi/sed/cat&gt;</span> trên VPS</td><td>Audit không truy được dấu; không có snapshot trước/sau</td><td>Quy ước trong tài liệu này §3; cảnh báo khi developer training</td></tr>
+<tr><td>AP-140-01</td><td><span class="code">git reset --hard origin/main</span> trên VPS qua SSH</td><td>Đã xảy ra: mất user <span class="code">ianr</span> khỏi <span class="code">users.json</span> vì rollback đè bản pre-mutation trong commit <span class="code">4a8ffebd</span></td><td>CLAUDE.md §VPS triển khai chính sách + <span class="code">deploy.sh</span> bắt buộc capture/restore + commit <span class="code">41436ee2</span> untrack <span class="code">users.json</span></td></tr>
+<tr><td>AP-140-02</td><td>Sửa <span class="code">mom/data/config/*.json</span> bằng <span class="code">vi/sed/cat&gt;</span> trên VPS</td><td>Audit không truy được dấu; không có ảnh chụp trạng thái trước/sau</td><td>Quy ước trong tài liệu này §3; cảnh báo khi developer đào tạo</td></tr>
 <tr><td>AP-140-03</td><td>Sửa inline <span class="code">data-dcc-bootstrap</span> trong file HTML</td><td>Thay đổi mất sau khi DCC renderer ghi đè từ DB</td><td>Quy ước CLAUDE.md §DCC Header Standard — phải dùng portal modal</td></tr>
-<tr><td>AP-140-04</td><td>Dùng Redis làm storage chính cho cờ vận hành</td><td>Mất khi Redis restart, không có audit</td><td>Quy ước §2 layer card 2</td></tr>
+<tr><td>AP-140-04</td><td>Dùng Redis làm storage chính cho cờ vận hành</td><td>Mất khi Redis restart, không có audit</td><td>Quy ước §2 layer thẻ 2</td></tr>
 <tr><td>AP-140-05</td><td>Xoá <span class="code">audit_events</span> row để "che" sai sót</td><td>Trigger PostgreSQL chặn; vi phạm ISO 9001 §5.1.1</td><td>Migration <span class="code">148_audit_events_immutable.sql</span> tạo trigger BEFORE UPDATE/DELETE RAISE EXCEPTION</td></tr>
-<tr><td>AP-140-06</td><td>Mirror <span class="code">audit_events</span> sang SharePoint trễ &gt;1 tuần</td><td>Kiểm toán viên không thấy hồ sơ tuần trước trong site Records</td><td>Power Automate flow <span class="code">SystemRecordsAuditExport</span> chạy mỗi Thứ Bảy 22:00; alert nếu fail</td></tr>
+<tr><td>AP-140-06</td><td>Mirror <span class="code">audit_events</span> sang SharePoint trễ &gt;1 tuần</td><td>Kiểm toán viên không thấy hồ sơ tuần trước trong không gian Hồ sơ</td><td>Power Automate luồng <span class="code">SystemHồ sơAuditExport</span> chạy mỗi Thứ Bảy 22:00; alert nếu fail</td></tr>
 </tbody>
 </table>
-</section>
-
-<section class="card">
+</section> <section class="card">
 <h2>8. Trách nhiệm theo vai trò</h2>
 <table>
 <thead><tr><th>Vai trò</th><th>Trách nhiệm chính</th><th>Mặt cấm</th></tr></thead>
 <tbody>
-<tr><td>Trưởng IT (D-IT)</td><td>Vận hành PostgreSQL/Redis/RabbitMQ trên VPS; kiểm soát quyền SSH; chạy snapshot backup; điều tra sự cố mutate</td><td>Không tự ý sửa <span class="code">mom/data/config/*.json</span> qua SSH ngoài quy trình</td></tr>
-<tr><td>Kỹ sư QMS (QMS)</td><td>Sửa bootstrap config qua Git PR; sửa runtime config qua portal admin UI; review audit_events tuần</td><td>Không dùng quyền admin để bypass <span class="code">DataSyncMutationService</span></td></tr>
+<tr><td>Trưởng IT (D-IT)</td><td>Vận hành PostgreSQL/Redis/RabbitMQ trên VPS; kiểm soát quyền SSH; chạy ảnh chụp trạng thái backup; điều tra sự cố mutate</td><td>Không tự ý sửa <span class="code">mom/data/config/*.json</span> qua SSH ngoài quy trình</td></tr>
+<tr><td>Kỹ sư QMS (QMS)</td><td>Sửa bootstrap config qua Git PR; sửa môi trường chạy config qua portal admin UI; rà soát audit_events tuần</td><td>Không dùng quyền admin để bypass <span class="code">DataSyncMutationService</span></td></tr>
 <tr><td>Trưởng QMS (QMS Manager)</td><td>Ký quyết định khi cần hot-fix đường D; đối soát mirror SharePoint tuần</td><td>Không phê duyệt sửa trực tiếp khi đường A/B/C khả dụng</td></tr>
 <tr><td>Giám đốc Vận hành (operations_director)</td><td>Ký quyết định khi VPS mất điện toàn ngày kích hoạt <span class="code">deploy.offline.fallback</span> theo TRN-DEP-PLAYBOOK chương 7</td><td>Không thay quy trình đã chốt mà không đi qua MAN-001 revision</td></tr>
-<tr><td>QA Manager (qa_manager)</td><td>Audit nội bộ chu kỳ Q1/Q2/Q3/Q4 kiểm tra audit_events có khớp evidence SharePoint</td><td>—</td></tr>
+<tr><td>QA Manager (qa_manager)</td><td>Audit nội bộ chu kỳ Q1/Q2/Q3/Q4 kiểm tra audit_events có khớp bằng chứng SharePoint</td><td>—</td></tr>
 </tbody>
 </table>
-</section>
-
-<section class="card">
+</section> <section class="card">
 <h2>9. Cập nhật ngược — ảnh hưởng tới ANNEX khác</h2>
 <table>
 <thead><tr><th>ANNEX</th><th>Mục bị ảnh hưởng</th><th>Hành động</th></tr></thead>
 <tbody>
-<tr><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> §6</td><td>Danh sách 15 list bắt buộc</td><td>Bổ sung list <span class="code">SystemRecordsAuditExport-Log</span> (host trên <span class="code">HESEM-Digital</span>) ghi mỗi lần mirror tuần — frequency, sha256, file size, fail reason nếu có.</td></tr>
-<tr><td><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> §10</td><td>System-Records/08-Automation-Run-Logs</td><td>Bổ sung sub-folder <span class="code">audit-events/</span> trong 08; đăng ký retention 10 năm RET-QMS-DOCCTRL.</td></tr>
-<tr><td><a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> §7</td><td>"Runtime noise" table</td><td>Tách <span class="code">mom/data/config/*.json</span> runtime ra khỏi cùng nhóm với <span class="code">sessions/</span>: chúng là runtime mutate nhưng có giá trị bằng chứng và phải mirror SharePoint.</td></tr>
-<tr><td><a href="../11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a></td><td>Offline fallback kit</td><td>Bổ sung bước "khi VPS phục hồi từ offline 24h, chạy <span class="code">deploy.offline.fallback</span> endpoint để ghi sự kiện vào <span class="code">readiness.offlineFallbacks[]</span>" — đã có trong endpoint backend, cần neo trong ANNEX-118.</td></tr>
+<tr><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> §6</td><td>Danh sách 15 danh sách bắt buộc</td><td>Bổ sung danh sách <span class="code">SystemHồ sơAuditExport-Log</span> (host trên <span class="code">HESEM-Digital</span>) ghi mỗi lần mirror tuần — frequency, sha256, file size, fail reason nếu có.</td></tr>
+<tr><td><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> §10</td><td>System-Hồ sơ/08-tự động hóa-Run-Logs</td><td>Bổ sung sub-thư mục <span class="code">audit-events/</span> trong 08; đăng ký lưu giữ 10 năm RET-QMS-DOCCTRL.</td></tr>
+<tr><td><a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> §7</td><td>"môi trường chạy noise" table</td><td>Tách <span class="code">mom/data/config/*.json</span> môi trường chạy ra khỏi cùng nhóm với <span class="code">sessions/</span>: chúng là môi trường chạy mutate nhưng có giá trị bằng chứng và phải mirror SharePoint.</td></tr>
+<tr><td><a href="../11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a></td><td>Bộ dự phòng ngoại tuyến</td><td>Bổ sung bước "khi VPS phục hồi từ ngoại tuyến 24h, chạy <span class="code">deploy.offline.fallback</span> endpoint để ghi sự kiện vào <span class="code">readiness.offlineFallbacks[]</span>" — đã có trong endpoint backend, cần neo trong ANNEX-118.</td></tr>
 </tbody>
 </table>
-</section>
-
-<section class="card">
+</section> <section class="card">
 <h2>10. Tài liệu liên kết bắt buộc</h2>
 <ul class="tight">
-<li><a href="annex-130-m365-eqms-ssot-boundary-and-cross-reference-policy.html">ANNEX-130</a> — SSOT 3 tầng EQMS↔M365 (cùng trục NGANG); ANNEX-140 phủ trục RUNTIME còn 130 phủ trục RECORDS.</li>
-<li><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> — Site topology + library; ANNEX-140 dẫn về 133 §10 cho System-Records.</li>
-<li><a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> — Sync SP↔Git↔server; ANNEX-140 mở rộng "runtime noise" §7 thành 4 lớp riêng biệt.</li>
+<li><a href="annex-130-m365-eqms-ssot-boundary-and-cross-reference-policy.html">ANNEX-130</a> — SSOT 3 tầng EQMS↔M365 (cùng trục NGANG); ANNEX-140 phủ trục môi trường chạy còn 130 phủ trục HỒ SƠ.</li>
+<li><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> — Không gian topology + thư viện; ANNEX-140 dẫn về 133 §10 cho System-Hồ sơ.</li>
+<li><a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> — Sync SP↔Git↔server; ANNEX-140 mở rộng "môi trường chạy noise" §7 thành 4 lớp riêng biệt.</li>
 <li><a href="../11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html">ANNEX-114</a> — Sổ tay cutover; ANNEX-140 §4 đường D neo về 114 §rollback.</li>
-<li><a href="../11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a> — Bộ dự phòng offline; ANNEX-140 §6 retention liên kết về 118.</li>
-<li>CLAUDE.md §VPS deployment chính sách — chính sách cấm <span class="code">git reset --hard</span> trên VPS (ngoài tài liệu ANNEX, nằm trong codebase guide).</li>
+<li><a href="../11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a> — Bộ dự phòng ngoại tuyến; ANNEX-140 §6 lưu giữ liên kết về 118.</li>
+<li>CLAUDE.md §VPS triển khai chính sách — chính sách cấm <span class="code">git reset --hard</span> trên VPS (ngoài tài liệu ANNEX, nằm trong codebase guide).</li>
 </ul>
-</section>
-
-</div>
+</section> </div>
 </div></div></div>
 </body>
 </html>

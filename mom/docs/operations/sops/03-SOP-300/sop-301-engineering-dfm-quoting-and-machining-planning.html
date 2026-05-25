@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-
-<html lang="vi">
+<!DOCTYPE html> <html lang="vi">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SOP-301 - Engineering DFM Quoting and Machining Planning | HESEM MOM</title>
+<title>SOP-301 - Engineering DFM Quoting và Machining Planning | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap — computes absolute URLs from location.pathname so the
  * stylesheet + renderer load correctly regardless of how the document is
@@ -81,12 +79,12 @@
 <div class="callout-card"><h3>Có bao phủ</h3><ul class="tight"><li>Tiếp nhận dữ liệu RFQ, khóa phiên bản đầu vào và làm rõ điểm mơ hồ.</li><li><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html" title="DFM Engineer (Kỹ sư DFM)"><span class="entity-code role-code">DFM</span></a>, phân loại chi tiết, lộ trình công đoạn sơ bộ, lựa chọn nhóm máy, tự làm hay mua ngoài và kiểm tra khái niệm.</li><li>Đánh giá CTQ, FAI điều kiện kích hoạt, công đoạn đặc biệt, rủi ro nhà cung cấp và yếu tố ảnh hưởng thời gian giao.</li><li>Phát hành báo giá, báo giá có điều kiện hoặc quyết định không báo giá kèm lý do rõ ràng.</li></ul></div>
 <div class="callout-card"><h3>Không thay thế / không được vượt quyền</h3><ul class="tight"><li>Không thay cho hợp đồng rà soát và điều phối đơn hàng sau khi khách trao đơn tại SOP-201.</li><li>Không thay cho hồ sơ chuẩn gốc và kiểm soát bản chụp trạng thái hiệu lực tại SOP-303.</li><li>Không thay cho phát hành setup, chạy xác nhận và máy thực thi tại SOP-504 và SOP-502.</li><li>Không cho phép dùng SOP-301 để hợp thức hóa việc báo giá khi dữ liệu chưa khóa hoặc năng lực chưa được xác nhận.</li></ul></div>
 </div>
-<h2 class="h2" id="p3">3. Thuật ngữ &amp; nguyên tắc</h2><div class="table-card"><table class="table"><colgroup><col style="width:32%"/><col style="width:68%"/></colgroup><thead><tr><th>Thuật ngữ / nguyên tắc</th><th>Quy định sử dụng</th></tr></thead><tbody><tr><td><b>Design for Manufacturability - DFM (thiết kế thuận cho chế tạo)</b></td><td>Đánh giá mức độ phù hợp của thiết kế với năng lực gia công, đo kiểm và chi phí thực tế.</td></tr><tr><td><b>Tính khả thi (tính khả thi)</b></td><td>Kết luận xem HESEM có thể đáp ứng part, dung sai, vật liệu, lịch và chất lượng hay không.</td></tr><tr><td><b>Quote Assumption (giả định báo giá)</b></td><td>Điều kiện nền để báo giá có giá trị, ví dụ source vật liệu, chu kỳ, fixture hoặc mức đo kiểm.</td></tr></tbody></table></div><h2 class="h2" id="p4">4. Vai trò, quyền hạn &amp; RACI</h2>
+<h2 class="h2" id="p3">3. Thuật ngữ &amp; nguyên tắc</h2><div class="table-card"><table class="table"><colgroup><col style="width:32%"/><col style="width:68%"/></colgroup><thead><tr><th>Thuật ngữ / nguyên tắc</th><th>Quy định sử dụng</th></tr></thead><tbody><tr><td><b>Design for Manufacturability - DFM (thiết kế thuận cho chế tạo)</b></td><td>Đánh giá mức độ phù hợp của thiết kế với năng lực gia công, đo kiểm và chi phí thực tế.</td></tr><tr><td><b>Tính khả thi (tính khả thi)</b></td><td>Kết luận xem HESEM có thể đáp ứng part, dung sai, vật liệu, lịch và chất lượng hay không.</td></tr><tr><td><b>Quote Assumption (giả định báo giá)</b></td><td>Điều kiện nền để báo giá có giá trị, ví dụ nguồn vật liệu, chu kỳ, fixture hoặc mức đo kiểm.</td></tr></tbody></table></div><h2 class="h2" id="p4">4. Vai trò, quyền hạn &amp; RACI</h2>
 <!-- RACI-MATRIX:START kind=sop code=SOP-301 -->
 <div class="table-card"><table class="table"><thead><tr><th>Cổng</th><th>CDR</th><th>Hoạt động</th><th>CS</th><th>EST</th><th>ENG</th><th>PPL</th><th>WKM</th><th>PD</th><th>QA</th><th>SCM</th><th>CEO</th><th>EHS</th><th>HR</th><th>IT</th></tr></thead>
 <tbody>
 <tr><td>G1</td><td>B1</td><td>DFM rà soát và phân loại rủi ro kỹ thuật</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-R">R</td><td></td><td></td><td></td><td></td><td></td></tr>
-<tr><td>G1</td><td>B8</td><td>Phê duyệt Control Plan và PFMEA trước khi phát hành gói nền</td><td></td><td></td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td></td><td class="raci-cell raci-C">C</td><td></td><td></td><td></td></tr>
+<tr><td>G1</td><td>B8</td><td>Phê duyệt kiểm soát Plan và PFMEA trước khi phát hành gói nền</td><td></td><td></td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td></td><td class="raci-cell raci-C">C</td><td></td><td></td><td></td></tr>
 </tbody></table></div>
 <!-- RACI-MATRIX:END -->
 <!-- RACI-ROLES:START sop=sop-301-engineering-dfm-quoting-and-machining-planning -->

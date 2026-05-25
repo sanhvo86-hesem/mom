@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANNEX-147 — v7 Unified Workspace CustomerCode-Keyed Architecture | HESEM MOM</title>
+<title>ANNEX-147 — v7 Unified Workspace CustomerCode-Keyed Kiến trúc | HESEM MOM</title>
 <script>
 (function () {
   var DCC_VERSION = '2026-05-18-1';
@@ -40,58 +40,44 @@
      data-dcc-doc-code="ANNEX-147"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap='{"header":{"doc_code":"ANNEX-147","title":"v7 Unified Workspace + CustomerCode-Keyed Architecture","subtitle":"Đập đi xây lại lần 3 theo industry standard của international contract CNC manufacturer: 3 sites (Workspace + Internal + Archive), customer là folder /Customers/{Code}/ chứ không phải site riêng","doc_type":"ANNEX","revision":"V0","effective_date":"2026-05-18","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":"ISO 9001:2015 §7.5.3 + AS9100D §7.5.3","status":"released"}}'></div>
-
-<div class="doc-content" id="docContent">
-
-<h1>v7 Unified Workspace + CustomerCode-Keyed Architecture</h1>
-
-<div class="callout"><strong>BỐI CẢNH — v6 thất bại vì over-segmentation:</strong><br>
-v6 tách 4 customer-OEM site riêng (HESEM-AMAT, -LAM, -ASML, -TEL) — tưởng là perfect IB nhưng phản hồi người dùng: <em>"không cần HESEM-LAM, HESEM-ASML gì cả, tất cả được quản lý bên trong mã khách hàng"</em>. Đây là cách <b>international contract CNC manufacturer</b> (Moog Aerospace, Heico, Onto Innovation, tier-1 contract shops) thực sự làm — <b>1 workspace duy nhất</b> với CustomerCode làm key folder. Thêm khách mới = thêm folder (không cần tạo site mới, provision IB segment mới, training member mới).</div>
-
-<div class="ok-callout"><strong>v7 = Industry Standard Pattern</strong> cho contract CNC manufacturer scale 200-500 employees:
+     data-dcc-bootstrap='{"header":{"doc_code":"ANNEX-147","title":"v7 Unified Workspace + CustomerCode-Keyed Architecture","subtitle":"Đập đi xây lại lần 3 theo industry standard của international contract CNC manufacturer: 3 sites (Workspace + Internal + Archive), customer là folder /Customers/{Code}/ chứ không phải site riêng","doc_type":"ANNEX","revision":"V0","effective_date":"2026-05-18","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":"ISO 9001:2015 §7.5.3 + AS9100D §7.5.3","status":"released"}}'></div> <div class="doc-content" id="docContent"> <h1>v7 Unified Workspace + CustomerCode-Keyed Kiến trúc</h1> <div class="callout"><strong>BỐI CẢNH — v6 thất bại vì over-segmentation:</strong><br>
+v6 tách 4 khách hàng-OEM không gian riêng (HESEM-AMAT, -LAM, -ASML, -TEL) — tưởng là perfect IB nhưng phản hồi người dùng: <em>"không cần HESEM-LAM, HESEM-ASML gì cả, tất cả được quản lý bên trong mã khách hàng"</em>. Đây là cách <b>international contract CNC manufacturer</b> (Moog Aerospace, Heico, Onto Innovation, tầng-1 contract shops) thực sự làm — <b>1 workspace duy nhất</b> với CustomerCode làm key thư mục. Thêm khách mới = thêm thư mục (không cần tạo không gian mới, provision IB segment mới, đào tạo member mới).</div> <div class="ok-callout"><strong>v7 = Industry Standard Pattern</strong> cho contract CNC manufacturer scale 200-500 employees:
 <ol class="tight">
-<li><b>3 sites duy nhất</b>: HESEM-Workspace (transactional), HESEM-Internal (PII/IT/OT/Legal/Exec), HESEM-Archive (long-term retention).</li>
-<li><b>CustomerCode là top-level folder</b> trong Workspace/Customers/{Code}/. Permission via folder inheritance + SG-Cust-{Code} groups.</li>
-<li><b>Industry vocabulary</b>: Drawings, BOM, CAM, Inspection, Specification, FAI, ECN, Planning, Purchasing, Manufacturing, Quality, Shipping, Reports.</li>
-<li><b>MOM = SSOT cho controlled docs</b> (Manual/chính sách/SOP/WI/RACI/ANNEX/Training/JD/Forms). M365 chỉ chứa transactional evidence.</li>
-<li><b>IB ở folder level</b> (không site) — đủ mạnh cho contract CM thông thường, đơn giản admin.</li>
-<li><b>Adding new customer = create folder</b>, không cần tạo site/IB segment mới.</li>
+<li><b>3 không gians duy nhất</b>: HESEM-Workspace (transactional), HESEM-Internal (PII/IT/OT/Pháp lý/Exec), HESEM-Archive (long-term lưu giữ).</li>
+<li><b>CustomerCode là top-level thư mục</b> trong Workspace/Customers/{Code}/. Permission via thư mục inheritance + SG-Cust-{Code} groups.</li>
+<li><b>Industry vocabulary</b>: Drawings, BOM, CAM, Inspection, Specification, FAI, ECN, Planning, Purchasing, Manufacturing, chất lượng, Giao hàngping, Reports.</li>
+<li><b>MOM = SSOT cho controlled docs</b> (Manual/chính sách/SOP/WI/RACI/ANNEX/đào tạo/JD/biểu mẫu). M365 chỉ chứa transactional bằng chứng.</li>
+<li><b>IB ở thư mục level</b> (không không gian) — đủ mạnh cho contract CM thông thường, đơn giản admin.</li>
+<li><b>Adding new khách hàng = create thư mục</b>, không cần tạo không gian/IB segment mới.</li>
 </ol>
-</div>
-
-<section class="card">
-<h2>1. v7 vs v6 — vì sao đổi</h2>
+</div> <section class="card">
+<h2>1. v7 so với v6 — vì sao đổi</h2>
 <table>
-<thead><tr><th>Vấn đề</th><th>v6 (6 sites per-OEM)</th><th>v7 (3 sites + CustomerCode folder)</th></tr></thead>
+<thead><tr><th>Vấn đề</th><th>v6 (6 không gians per-OEM)</th><th>v7 (3 không gians + CustomerCode thư mục)</th></tr></thead>
 <tbody>
-<tr><td>Số site cần admin</td><td>6 sites + 6 group + 6 IB segment + 6 retention chính sách per site</td><td>3 sites, permission qua folder + 4 SG-Cust groups + 4 IB tag (folder-level)</td></tr>
-<tr><td>Thêm khách hàng mới</td><td>Tạo site mới + provision IB + setup group + training member + thêm vào nav</td><td>Tạo folder <code>Customers/{NewCode}/</code> + tạo SG-Cust-{NewCode} group, xong</td></tr>
-<tr><td>Cross-customer report</td><td>Multi-site query phức tạp</td><td>Single-site query với filter Customer column</td></tr>
-<tr><td>Customer audit access</td><td>Guest invite vào site (clean nhưng phức tạp setup)</td><td>Guest invite scope tới folder Customers/{Code}/ (sharing link)</td></tr>
-<tr><td>luồng công việc-Lists scope</td><td>Per-site (NCR-List trong site nào? duplicate?)</td><td>Single-site Lists với Customer column filter</td></tr>
-<tr><td>IB enforcement</td><td>Site-level (bulletproof nhưng over-engineering cho 200 nv)</td><td>Folder-level (đủ mạnh, Microsoft supported)</td></tr>
-<tr><td>Industry parallel</td><td>Hiếm — multi-site pattern thường ở enterprise &gt;2000 nv</td><td>Standard — contract CNC manufacturer 200-500 nv (Moog/Heico/Onto)</td></tr>
-<tr><td>Scaling</td><td>Mỗi customer mới = 6→7→8 sites; non-linear admin growth</td><td>Linear: customer mới = 1 folder + 1 group</td></tr>
+<tr><td>Số không gian cần admin</td><td>6 không gians + 6 group + 6 IB segment + 6 lưu giữ chính sách per không gian</td><td>3 không gians, permission qua thư mục + 4 SG-Cust groups + 4 IB tag (thư mục-level)</td></tr>
+<tr><td>Thêm khách hàng mới</td><td>Tạo không gian mới + provision IB + setup group + đào tạo member + thêm vào nav</td><td>Tạo thư mục <code>Customers/{NewCode}/</code> + tạo SG-Cust-{NewCode} group, xong</td></tr>
+<tr><td>Cross-khách hàng report</td><td>Multi-không gian query phức tạp</td><td>Single-không gian query với filter khách hàng column</td></tr>
+<tr><td>khách hàng audit access</td><td>Guest invite vào không gian (clean nhưng phức tạp setup)</td><td>Guest invite scope tới thư mục Customers/{Code}/ (sharing link)</td></tr>
+<tr><td>luồng công việc-Lists scope</td><td>Per-không gian (NCR-danh sách trong không gian nào? duplicate?)</td><td>Single-không gian Lists với khách hàng column filter</td></tr>
+<tr><td>IB enforcement</td><td>Không gian-level (bulletproof nhưng over-engineering cho 200 nv)</td><td>Thư mục-level (đủ mạnh, Microsoft supported)</td></tr>
+<tr><td>Industry parallel</td><td>Hiếm — multi-không gian pattern thường ở enterprise &gt;2000 nv</td><td>Standard — contract CNC manufacturer 200-500 nv (Moog/Heico/Onto)</td></tr>
+<tr><td>Scaling</td><td>Mỗi khách hàng mới = 6→7→8 không gians; non-linear admin growth</td><td>Linear: khách hàng mới = 1 thư mục + 1 group</td></tr>
 </tbody>
 </table>
-<div class="ok-callout"><b>Verdict:</b> v7 là pattern thực tế của contract CNC supplier quốc tế kích cỡ HESEM. v6 over-engineered cho scale enterprise lớn (chỉ phù hợp khi có 10+ customer với IP segregation tuyệt đối khắt khe).</div>
-</section>
-
-<section class="card">
-<h2>2. v7 — 3 Sites</h2>
+<div class="ok-callout"><b>Verdict:</b> v7 là pattern thực tế của contract CNC nhà cung cấp quốc tế kích cỡ HESEM. v6 over-engineered cho scale enterprise lớn (chỉ phù hợp khi có 10+ khách hàng với IP segregation tuyệt đối khắt khe).</div>
+</section> <section class="card">
+<h2>2. v7 — 3 Không gians</h2>
 <table>
-<thead><tr><th>Site</th><th>Mục đích</th><th>Default permission</th><th>IB scope</th></tr></thead>
+<thead><tr><th>Không gian</th><th>Mục đích</th><th>mặc định permission</th><th>IB scope</th></tr></thead>
 <tbody>
-<tr><td><b>HESEM-Workspace</b></td><td>Main transactional: Customers, Suppliers, Assets, Parts-HESEM-Owned, Lot-Trace, Quality (cross-customer), Compliance, Training, Reports</td><td>Read = all HESEM employees; write per dept group; Customer folders = SG-Cust-{Code}</td><td>Folder-level IB cho Customers/{Code}/, Cross-OEM-Usage và Lot-Trace là IB-exempt (cross-customer by design)</td></tr>
-<tr><td><b>HESEM-Internal</b></td><td>PII (HR), IT, OT (air-gapped), Legal (non-customer), Executive (BOD)</td><td>Per-library named-only (SG-HR-Custodians, SG-IT-Admin, SG-OT, SG-Legal, SG-BOD+Exec)</td><td>HR/Medical/Payroll: 3-person named; OT: air-gapped workstation only</td></tr>
-<tr><td><b>HESEM-Archive</b></td><td>Closed-Year-Archive, Superseded, Legal-Hold, Locked-Job-Pack, Disposition-Log, Retention-Schedule</td><td>Read = all HESEM; Write = QMS + Legal only</td><td>Inherits source sensitivity (frozen at promotion)</td></tr>
+<tr><td><b>HESEM-Workspace</b></td><td>Main transactional: Customers, Suppliers, Assets, Parts-HESEM-Owned, Lot-truy xuất, chất lượng (cross-khách hàng), Compliance, đào tạo, Reports</td><td>Read = all HESEM employees; write per dept group; khách hàng thư mụcs = SG-Cust-{Code}</td><td>Thư mục-level IB cho Customers/{Code}/, Cross-OEM-Usage và Lot-truy xuất là IB-exempt (cross-khách hàng by design)</td></tr>
+<tr><td><b>HESEM-Internal</b></td><td>PII (HR), IT, OT (air-gapped), Pháp lý (non-khách hàng), Executive (BOD)</td><td>Per-thư viện named-only (SG-HR-Custodians, SG-IT-Admin, SG-OT, SG-Pháp lý, SG-BOD+Exec)</td><td>HR/Medical/Payroll: 3-person named; OT: air-gapped workstation only</td></tr>
+<tr><td><b>HESEM-Archive</b></td><td>Closed-Year-Archive, Superseded, Pháp lý-Hold, Locked-Job-Bộ hồ sơ, Disposition-Log, lưu giữ-Schedule</td><td>Read = all HESEM; Write = QMS + Pháp lý only</td><td>Inherits nguồn sensitivity (frozen at promotion)</td></tr>
 </tbody>
 </table>
-</section>
-
-<section class="card">
-<h2>3. v7 Folder Structure — HESEM-Workspace (main site)</h2>
+</section> <section class="card">
+<h2>3. v7 Thư mục Structure — HESEM-Workspace (main không gian)</h2>
 <pre class="tree">
 HESEM-Workspace/
 ├── _README.md
@@ -213,9 +199,7 @@ HESEM-Workspace/
 │   └── Critical-Certs/{CNC-Operator, Special-Process, CMM-Operator, ...}
 └── Reports/{Daily, Weekly, Monthly, Quarterly, Annual}
 </pre>
-</section>
-
-<section class="card">
+</section> <section class="card">
 <h2>4. v7 HESEM-Internal + HESEM-Archive</h2>
 <pre class="tree">
 HESEM-Internal/                             # strict named-only permission
@@ -255,130 +239,116 @@ HESEM-Archive/                              # frozen records
 ├── Records-Retention-Schedule
 └── List-Row-Destruction-Trail/{YYYY}
 </pre>
-</section>
-
-<section class="card">
-<h2>5. Permission Model — folder-level IB</h2>
+</section> <section class="card">
+<h2>5. Mô hình phân quyền — thư mục-level IB</h2>
 <table>
 <thead><tr><th>Entra ID group</th><th>Access scope</th><th>IB constraint</th></tr></thead>
 <tbody>
-<tr><td><code>SG-Cust-AMAT-Members</code></td><td><code>HESEM-Workspace/Customers/AMAT/</code> (full per role) + Shared resources (Read on Assets, Suppliers, Parts-HESEM-Owned, etc.)</td><td>IB folder tag <code>Customer-AMAT</code> applied to Customers/AMAT/* — no copy/move to non-AMAT folders</td></tr>
-<tr><td><code>SG-Cust-LAM-Members</code></td><td><code>Customers/LAM/</code> + Shared</td><td>IB folder tag <code>Customer-LAM</code></td></tr>
-<tr><td><code>SG-Cust-ASML-Members</code></td><td><code>Customers/ASML/</code> + Shared</td><td>IB folder tag <code>Customer-ASML</code></td></tr>
-<tr><td><code>SG-Cust-TEL-Members</code></td><td><code>Customers/TEL/</code> + Shared</td><td>IB folder tag <code>Customer-TEL</code></td></tr>
-<tr><td><code>SG-Multi-Customer-Eng</code> (engineer làm nhiều account)</td><td>Multiple Customers/{Code}/ folders</td><td>Cross-folder access audit log; Purview activity report</td></tr>
-<tr><td><code>SG-DEP-SCM-Members</code></td><td>Suppliers/ (Edit), Customers/.../Purchasing/ (Read all customers)</td><td>n/a (cross-customer by job)</td></tr>
-<tr><td><code>SG-DEP-METRO-Members</code></td><td>Assets/Gages/ (Edit), Customers/.../Inspection/ (Read all)</td><td>n/a (cross-customer cal cert apply)</td></tr>
-<tr><td><code>SG-DEP-HR-Training-Coord</code></td><td>Training/ (Edit), Customers/.../Customer-Audit-People-Pack (Read)</td><td>n/a</td></tr>
-<tr><td><code>SG-HR-Custodians</code></td><td><code>HESEM-Internal/HR/</code></td><td>Per-employee folder strict</td></tr>
+<tr><td><code>SG-Cust-AMAT-Members</code></td><td><code>HESEM-Workspace/Customers/AMAT/</code> (full per vai trò) + Shared resources (Read on Assets, Suppliers, Parts-HESEM-Owned, etc.)</td><td>IB thư mục tag <code>Customer-AMAT</code> applied to Customers/AMAT/* — no copy/move to non-AMAT thư mụcs</td></tr>
+<tr><td><code>SG-Cust-LAM-Members</code></td><td><code>Customers/LAM/</code> + Shared</td><td>IB thư mục tag <code>Customer-LAM</code></td></tr>
+<tr><td><code>SG-Cust-ASML-Members</code></td><td><code>Customers/ASML/</code> + Shared</td><td>IB thư mục tag <code>Customer-ASML</code></td></tr>
+<tr><td><code>SG-Cust-TEL-Members</code></td><td><code>Customers/TEL/</code> + Shared</td><td>IB thư mục tag <code>Customer-TEL</code></td></tr>
+<tr><td><code>SG-Multi-Customer-Eng</code> (engineer làm nhiều account)</td><td>Multiple Customers/{Code}/ thư mụcs</td><td>Cross-thư mục access audit log; Purview activity report</td></tr>
+<tr><td><code>SG-DEP-SCM-Members</code></td><td>Suppliers/ (Edit), Customers/.../Purchasing/ (Read all customers)</td><td>n/a (cross-khách hàng by job)</td></tr>
+<tr><td><code>SG-DEP-METRO-Members</code></td><td>Assets/Gages/ (Edit), Customers/.../Inspection/ (Read all)</td><td>n/a (cross-khách hàng cal cert apply)</td></tr>
+<tr><td><code>SG-DEP-HR-Training-Coord</code></td><td>đào tạo/ (Edit), Customers/.../khách hàng-Audit-People-Bộ hồ sơ (Read)</td><td>n/a</td></tr>
+<tr><td><code>SG-HR-Custodians</code></td><td><code>HESEM-Internal/HR/</code></td><td>Per-employee thư mục strict</td></tr>
 <tr><td><code>SG-HR-Medical</code> (3 named)</td><td><code>HESEM-Internal/HR/Employees/.../08-Medical-Restricted</code></td><td>Named-only, audit every access</td></tr>
-<tr><td><code>SG-IT-Admin</code></td><td><code>HESEM-Internal/IT/</code></td><td>Library-level</td></tr>
+<tr><td><code>SG-IT-Admin</code></td><td><code>HESEM-Internal/IT/</code></td><td>Thư viện-level</td></tr>
 <tr><td><code>SG-OT + IT-SOC</code></td><td><code>HESEM-Internal/OT/</code></td><td>Air-gap workstation only (Conditional Access)</td></tr>
-<tr><td><code>SG-Legal-Custodians</code></td><td><code>HESEM-Internal/Legal/</code></td><td>Library-level</td></tr>
+<tr><td><code>SG-Legal-Custodians</code></td><td><code>HESEM-Internal/Legal/</code></td><td>Thư viện-level</td></tr>
 <tr><td><code>SG-BOD + Exec</code></td><td><code>HESEM-Internal/Executive/</code></td><td>Encryption + access expiry</td></tr>
-<tr><td><code>SG-Customer-Auditor-Guest-{Code}</code> (temp 7-30d)</td><td><code>HESEM-Workspace/Customers/{Code}/</code> (read-only scoped sharing link)</td><td>Time-bound; auto-revoke; no cross-customer leak</td></tr>
+<tr><td><code>SG-Customer-Auditor-Guest-{Code}</code> (temp 7-30d)</td><td><code>HESEM-Workspace/Customers/{Code}/</code> (read-only scoped sharing link)</td><td>Time-bound; auto-revoke; no cross-khách hàng leak</td></tr>
 </tbody>
 </table>
-<div class="ok-callout"><b>Folder-level IB enforcement:</b> Microsoft Purview Information Barriers v2 hỗ trợ <em>folder-scoped</em> segments. Set tag <code>Customer-AMAT</code> trên <code>Customers/AMAT/</code> → AMAT engineer trong group SG-Cust-AMAT-Members chỉ thấy folder này; LAM/ASML/TEL folder không xuất hiện trong M365 search, không share được, không copy/move qua được (DLP block).</div>
-<div class="warn-callout"><b>v7 verdict:</b> Folder-level IB enough cho contract CM 200 nv. Site-level IB (v6) là over-engineering trừ khi (a) HESEM grow &gt;500 nv với 10+ customer khắt khe IP, hoặc (b) một customer require <em>dedicated tenant</em> (rare).</div>
-</section>
-
-<section class="card">
-<h2>6. SSOT Boundary — MOM vs M365</h2>
+<div class="ok-callout"><b>Thư mục-level IB enforcement:</b> Microsoft Purview Information Barriers v2 hỗ trợ <em>thư mục-scoped</em> segments. Set tag <code>Customer-AMAT</code> trên <code>Customers/AMAT/</code> → AMAT engineer trong group SG-Cust-AMAT-Members chỉ thấy thư mục này; LAM/ASML/TEL thư mục không xuất hiện trong M365 search, không share được, không copy/move qua được (DLP block).</div>
+<div class="warn-callout"><b>v7 verdict:</b> Thư mục-level IB enough cho contract CM 200 nv. Không gian-level IB (v6) là over-engineering trừ khi (a) HESEM grow &gt;500 nv với 10+ khách hàng khắt khe IP, hoặc (b) một khách hàng require <em>dedicated tenant</em> (rare).</div>
+</section> <section class="card">
+<h2>6. SSOT Ranh giới — MOM so với M365</h2>
 <table>
 <thead><tr><th>Loại tài liệu</th><th>SSOT</th><th>Lý do</th></tr></thead>
 <tbody>
-<tr><td>Quality Manual, Quality chính sách</td><td><b>MOM</b> mom/docs/system/</td><td>DCC-controlled, version qua git, dcc_document_header</td></tr>
+<tr><td>chất lượng Manual, chất lượng chính sách</td><td><b>MOM</b> mom/docs/system/</td><td>DCC-controlled, version qua git, dcc_document_header</td></tr>
 <tr><td>SOPs, Work Instructions</td><td><b>MOM</b> mom/docs/operations/sops/, /wis/</td><td>Tương tự</td></tr>
-<tr><td>RACI Matrix</td><td><b>MOM</b> mom/docs/system/raci/</td><td>Cross-functional, controlled</td></tr>
-<tr><td>ANNEX reference docs</td><td><b>MOM</b> mom/docs/operations/references/</td><td>Reference vault</td></tr>
-<tr><td>Training curriculum</td><td><b>MOM</b> mom/docs/training/</td><td>Curriculum + materials</td></tr>
-<tr><td>Form templates (FRM-xxx blank)</td><td><b>MOM</b> mom/docs/forms/</td><td>Blank templates</td></tr>
+<tr><td>RACI ma trận</td><td><b>MOM</b> mom/docs/system/raci/</td><td>Cross-functional, controlled</td></tr>
+<tr><td>ANNEX tham chiếu docs</td><td><b>MOM</b> mom/docs/operations/references/</td><td>tham chiếu vault</td></tr>
+<tr><td>đào tạo curriculum</td><td><b>MOM</b> mom/docs/đào tạo/</td><td>Curriculum + materials</td></tr>
+<tr><td>Form templates (FRM-xxx blank)</td><td><b>MOM</b> mom/docs/biểu mẫu/</td><td>Blank templates</td></tr>
 <tr><td>Job Descriptions (38 canonical)</td><td><b>MOM</b> mom/docs/system/organization/03-Job-Descriptions/</td><td>DCC-controlled</td></tr>
-<tr><td>Org chart + position register</td><td><b>MOM</b></td><td>—</td></tr>
-<tr><td colspan="3" style="background:#ebfbee;text-align:center;"><b>— Transactional evidence (M365 below) —</b></td></tr>
-<tr><td>FAI execution PDF (filled for Job J260315)</td><td><b>M365</b> Customers/AMAT/04-Jobs/2026/J260315/Quality/FAI-Execution/</td><td>Per-Job evidence</td></tr>
-<tr><td>NCR PDF (NCR-2026-0043)</td><td><b>M365</b> Customers/AMAT/04-Jobs/2026/J260315/Quality/NCR/</td><td>Per-Job evidence</td></tr>
-<tr><td>Cal cert (Gage GAGE-CMM-001 in 2026)</td><td><b>M365</b> Assets/Gages/CMM-001/Calibration/2026/</td><td>Asset evidence</td></tr>
-<tr><td>Customer PO (AMAT-PO-79101)</td><td><b>M365</b> Customers/AMAT/03-POs/2026/PO-79101/Source/</td><td>Inbound transactional</td></tr>
-<tr><td>Internal audit IA-2026-005</td><td><b>M365</b> Quality/Internal-Audits/2026/</td><td>Audit evidence</td></tr>
-<tr><td>Supplier S047 CMRT 2026</td><td><b>M365</b> Suppliers/S047/CMRT-EMRT/2026/</td><td>Supplier evidence</td></tr>
-<tr><td>Employee performance review</td><td><b>M365</b> HESEM-Internal/HR/Employees/{EmpID}/05-Performance/</td><td>PII record</td></tr>
+<tr><td>Org chart + position sổ đăng ký</td><td><b>MOM</b></td><td>—</td></tr>
+<tr><td colspan="3" style="background:#ebfbee;text-align:center;"><b>— Transactional bằng chứng (M365 below) —</b></td></tr>
+<tr><td>FAI execution PDF (filled for Job J260315)</td><td><b>M365</b> Customers/AMAT/04-Jobs/2026/J260315/chất lượng/FAI-Execution/</td><td>Per-Job bằng chứng</td></tr>
+<tr><td>NCR PDF (NCR-2026-0043)</td><td><b>M365</b> Customers/AMAT/04-Jobs/2026/J260315/chất lượng/NCR/</td><td>Per-Job bằng chứng</td></tr>
+<tr><td>Cal cert (Gage GAGE-CMM-001 in 2026)</td><td><b>M365</b> Assets/Gages/CMM-001/Calibration/2026/</td><td>Asset bằng chứng</td></tr>
+<tr><td>khách hàng PO (AMAT-PO-79101)</td><td><b>M365</b> Customers/AMAT/03-POs/2026/PO-79101/nguồn/</td><td>Inbound transactional</td></tr>
+<tr><td>Internal audit IA-2026-005</td><td><b>M365</b> chất lượng/Internal-Audits/2026/</td><td>Audit bằng chứng</td></tr>
+<tr><td>nhà cung cấp S047 CMRT 2026</td><td><b>M365</b> Suppliers/S047/CMRT-EMRT/2026/</td><td>nhà cung cấp bằng chứng</td></tr>
+<tr><td>Employee hiệu suất rà soát</td><td><b>M365</b> HESEM-Internal/HR/Employees/{EmpID}/05-hiệu suất/</td><td>PII hồ sơ</td></tr>
 <tr><td>CNC controller param backup</td><td><b>M365</b> HESEM-Internal/OT/CNC-Param-Backup/{ID}/{YYYY}/</td><td>OT artifact</td></tr>
 </tbody>
 </table>
-</section>
-
-<section class="card">
-<h2>7. Adding a New Customer (v7 advantage)</h2>
+</section> <section class="card">
+<h2>7. Adding a New khách hàng (v7 advantage)</h2>
 <div class="keyline">
-<b>Scenario:</b> HESEM win new customer "KLA Tencor" (KLA). Cần workspace cho KLA.
+<b>tình huống:</b> HESEM win new khách hàng "KLA Tencor" (KLA). Cần workspace cho KLA.
 <br><br>
-<b>v6 (6-site) effort:</b>
+<b>v6 (6-không gian) effort:</b>
 <ol class="tight">
-<li>Create new SharePoint site <code>HESEM-KLA</code></li>
+<li>Create new SharePoint không gian <code>HESEM-KLA</code></li>
 <li>Set up M365 group <code>SG-Cust-KLA-Members</code></li>
 <li>Configure Information Barrier segment <code>Customer-KLA</code> + pairwise IB rules với AMAT/LAM/ASML/TEL</li>
-<li>Configure site default sensitivity label</li>
-<li>Configure site retention chính sách</li>
-<li>Provision folder template (Parts/, Jobs/, POs/, etc.)</li>
-<li>Add site to hub navigation</li>
+<li>Configure không gian mặc định sensitivity label</li>
+<li>Configure không gian lưu giữ chính sách</li>
+<li>Provision thư mục template (Parts/, Jobs/, POs/, etc.)</li>
+<li>Add không gian to hub navigation</li>
 <li>Train members</li>
 </ol>
 <em>Estimate: ~3-5 ngày người + IT admin overhead</em>
 <br><br>
-<b>v7 (3-site) effort:</b>
+<b>v7 (3-không gian) effort:</b>
 <ol class="tight">
-<li>Tạo folder <code>HESEM-Workspace/Customers/KLA/</code> bằng PowerShell script (copy từ <code>_TEMPLATE-NewCustomer/</code>)</li>
+<li>Tạo thư mục <code>HESEM-Workspace/Customers/KLA/</code> bằng PowerShell script (copy từ <code>_TEMPLATE-NewCustomer/</code>)</li>
 <li>Create AAD group <code>SG-Cust-KLA-Members</code></li>
-<li>Apply folder permission (inherit từ Customers/, override với SG-Cust-KLA-Members + IB tag <code>Customer-KLA</code>)</li>
+<li>Apply thư mục permission (inherit từ Customers/, override với SG-Cust-KLA-Members + IB tag <code>Customer-KLA</code>)</li>
 <li>Đã xong</li>
 </ol>
 <em>Estimate: ~2-4 giờ</em>
 </div>
-<div class="ok-callout"><b>Scaling advantage:</b> v7 linear scaling. v6 non-linear (site count grows, IB matrix grows quadratic O(N²) pairs).</div>
-</section>
-
-<section class="card">
+<div class="ok-callout"><b>Scaling advantage:</b> v7 linear scaling. v6 non-linear (không gian count grows, IB ma trận grows quadratic O(N²) pairs).</div>
+</section> <section class="card">
 <h2>8. v6 → v7 Migration plan</h2>
 <table>
 <thead><tr><th>Phase</th><th>Action</th><th>Status</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Wipe blueprint + rewrite build_blueprint.py v7 (3 sites)</td><td>✓ Done (747 dirs)</td></tr>
-<tr><td>2</td><td>Write ANNEX-147 (file này) — v7 industry-standard architecture</td><td>✓ Done</td></tr>
+<tr><td>1</td><td>Wipe bản thiết kế + rewrite build_bản thiết kế.py v7 (3 không gians)</td><td>✓ Done (747 dirs)</td></tr>
+<tr><td>2</td><td>Write ANNEX-147 (file này) — v7 industry-standard kiến trúc</td><td>✓ Done</td></tr>
 <tr><td>3</td><td>Mark ANNEX-144 + 145 + 146 = SUPERSEDED-BY-ANNEX-147</td><td>Next</td></tr>
-<tr><td>4</td><td>Register ANNEX-147 trong dcc_document_header</td><td>Next</td></tr>
+<tr><td>4</td><td>sổ đăng ký ANNEX-147 trong dcc_document_header</td><td>Next</td></tr>
 <tr><td>5</td><td>Commit + push + deploy + Chrome verify</td><td>Next</td></tr>
-<tr><td>6</td><td>(Future) Update ANNEX-142 permission model — folder-level IB spec</td><td>Pending</td></tr>
-<tr><td>7</td><td>(Future) PowerShell script provision 3 sites + IB tags + SG groups</td><td>Pending</td></tr>
-<tr><td>8</td><td>(Future) 16 luồng công việc-Lists provisioned in HESEM-Workspace (with Customer column filter)</td><td>Pending — sửa ANNEX-145 §5</td></tr>
+<tr><td>6</td><td>(Future) Update ANNEX-142 mô hình phân quyền — thư mục-level IB spec</td><td>Pending</td></tr>
+<tr><td>7</td><td>(Future) PowerShell script provision 3 không gians + IB tags + SG groups</td><td>Pending</td></tr>
+<tr><td>8</td><td>(Future) 16 luồng công việc-Lists provisioned in HESEM-Workspace (with khách hàng column filter)</td><td>Pending — sửa ANNEX-145 §5</td></tr>
 </tbody>
 </table>
-</section>
-
-<section class="card">
+</section> <section class="card">
 <h2>9. Supersession + tham chiếu</h2>
 <ul class="tight">
-<li><b>v7 blueprint:</b> <code>tools/m365-provisioning/build_blueprint.py</code></li>
+<li><b>v7 bản thiết kế:</b> <code>tools/m365-provisioning/build_blueprint.py</code></li>
 <li><b>v7 tree:</b> <code>tools/m365-provisioning/blueprint/_TREE.txt</code> (747 directories)</li>
 <li><a href="annex-144-ssot-3-axis-job-part-asset-architecture.html"><b>ANNEX-144 (v4)</b></a> → SUPERSEDED</li>
-<li><a href="annex-145-v5-stress-test-fixes-and-workflow-lists-schema.html"><b>ANNEX-145 (v5)</b></a> → SUPERSEDED cho site architecture; <em>§5 luồng công việc-Lists schema vẫn áp dụng (now scoped to single HESEM-Workspace site với Customer column filter)</em></li>
-<li><a href="annex-146-v6-customer-ip-segregated-6-site-architecture.html"><b>ANNEX-146 (v6)</b></a> → SUPERSEDED. v6 multi-site model retained as <em>alternative pattern for enterprise &gt;500 nv với 10+ customer khắt khe IP segregation</em>.</li>
-<li><a href="annex-142-m365-permission-model-for-semi-supplier-audit.html">ANNEX-142</a> — permission model (cần update với folder-level IB spec cho v7)</li>
-<li><a href="annex-141-semi-equipment-parts-cnc-supplier-compliance.html">ANNEX-141</a> — Pack-6 (implement trong Customers/{Code}/04-Jobs/.../Shipping/Cleanliness-Pack-6/)</li>
+<li><a href="annex-145-v5-stress-test-fixes-and-workflow-lists-schema.html"><b>ANNEX-145 (v5)</b></a> → SUPERSEDED cho không gian kiến trúc; <em>§5 luồng công việc-Lists schema vẫn áp dụng (now scoped to single HESEM-Workspace không gian với khách hàng column filter)</em></li>
+<li><a href="annex-146-v6-customer-ip-segregated-6-site-architecture.html"><b>ANNEX-146 (v6)</b></a> → SUPERSEDED. v6 multi-không gian mô hình retained as <em>alternative pattern for enterprise &gt;500 nv với 10+ khách hàng khắt khe IP segregation</em>.</li>
+<li><a href="annex-142-m365-permission-model-for-semi-supplier-audit.html">ANNEX-142</a> — mô hình phân quyền (cần update với thư mục-level IB spec cho v7)</li>
+<li><a href="annex-141-semi-equipment-parts-cnc-supplier-compliance.html">ANNEX-141</a> — Bộ hồ sơ-6 (implement trong Customers/{Code}/04-Jobs/.../Giao hàngping/độ sạch-Bộ hồ sơ-6/)</li>
 </ul>
-</section>
-
-<section class="card">
+</section> <section class="card">
 <h2>10. Lịch sử phiên bản</h2>
 <table>
 <thead><tr><th>Rev</th><th>Ngày</th><th>Người</th><th>Mô tả</th></tr></thead>
 <tbody>
-<tr><td>V0</td><td>2026-05-18</td><td>QMS</td><td>Đập đi xây lại lần 3 theo phản hồi: bỏ multi-site per-OEM (v6), về 3-site unified workspace với CustomerCode làm top-level folder key. Đây là industry standard cho contract CNC manufacturer 200-500 nv (Moog/Heico/Onto pattern). Permission via folder-level IB + SG-Cust-{Code} groups. Thêm khách mới = tạo folder (linear scaling). MOM giữ SSOT cho controlled docs. Tổng blueprint: 672 (v6) → 747 (v7) directories (tăng do seed full 4 OEM customer folders + _TEMPLATE-NewCustomer).</td></tr>
+<tr><td>V0</td><td>2026-05-18</td><td>QMS</td><td>Đập đi xây lại lần 3 theo phản hồi: bỏ multi-không gian per-OEM (v6), về 3-không gian unified workspace với CustomerCode làm top-level thư mục key. Đây là industry standard cho contract CNC manufacturer 200-500 nv (Moog/Heico/Onto pattern). Permission via thư mục-level IB + SG-Cust-{Code} groups. Thêm khách mới = tạo thư mục (linear scaling). MOM giữ SSOT cho controlled docs. Tổng bản thiết kế: 672 (v6) → 747 (v7) directories (tăng do seed full 4 OEM khách hàng thư mụcs + _TEMPLATE-NewCustomer).</td></tr>
 </tbody>
 </table>
-</section>
-
-</div></div></div></div>
+</section> </div></div></div></div>
 </body>
 </html>
