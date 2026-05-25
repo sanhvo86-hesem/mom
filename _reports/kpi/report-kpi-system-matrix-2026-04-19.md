@@ -1,12 +1,12 @@
 # KPI System Matrix Audit
 
-Generated: 2026-05-24T18:30:38+00:00
+Generated: 2026-05-25T03:23:49+00:00
 
 ## Summary
 
 | Item | Count |
 |---|---:|
-| `html_file_count` | 482 |
+| `html_file_count` | 481 |
 | `documents_with_metric_usage` | 128 |
 | `registry_metric_count` | 216 |
 | `metric_codes_seen` | 180 |
@@ -42,7 +42,7 @@ Luật change-control: mọi lần tạo KPI/metric, đổi tên, đổi target/
 | `FPY` | executive_scorecard_kpi | 28 | 40 | ≥98% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
 | `COPQ` | executive_scorecard_kpi | 22 | 33 | ≤2 percent_of_sales | manual_governed_with_evidence_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
 | `OEE` | gate_control_metric | 20 | 44 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `MTTR` | operating_metric | 9 | 13 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `MTTR` | operating_metric | 9 | 12 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CAPA_EFFECTIVENESS` | operating_metric | 9 | 11 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `PLAN_ADHERENCE` | executive_scorecard_kpi | 7 | 12 | ≥90% | runtime_calculated_with_registry_contract | target_seen_needs_review_against_registry | canonical_or_mapped_name |
 | `WIP_AGING` | executive_scorecard_kpi | 7 | 10 | ≤5 aged_wip_percent | runtime_calculated_with_registry_contract | registered_target_not_repeated_in_docs | canonical_or_mapped_name |

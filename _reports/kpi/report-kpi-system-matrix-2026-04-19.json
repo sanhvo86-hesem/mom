@@ -1,8 +1,8 @@
 {
-    "generated_at": "2026-05-24T18:30:38+00:00",
+    "generated_at": "2026-05-25T03:23:49+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
-    "registry_version": "2026-05-24+p09",
+    "registry_version": "2026-05-25+p11",
     "method": {
         "detection": "Registry canonical codes, legacy aliases, KPI-* local IDs, and Cxx-Mx competency role measures are detected in visible HTML text. Table rows are used to extract target/threshold snippets.",
         "interpretation": "The matrix separates official KPI, gate/control metric, operating metric, role performance measure, and health indicator. It flags context mismatch rather than mechanically rewriting every KPI word.",
@@ -14,7 +14,7 @@
         ]
     },
     "summary": {
-        "html_file_count": 482,
+        "html_file_count": 481,
         "documents_with_metric_usage": 128,
         "registry_metric_count": 216,
         "metric_codes_seen": 180,
@@ -2217,7 +2217,7 @@
             "statistical_plan_status": "candidate_data_contract_required_before_payout",
             "expected_thresholds": null,
             "expected_target_text": null,
-            "total_occurrences": 13,
+            "total_occurrences": 12,
             "documents_count": 9,
             "target_values_seen": [],
             "documents": [
@@ -2236,9 +2236,9 @@
                     }
                 },
                 {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html",
-                    "title": "ANNEX-117 - Ma trận chuyển cấp and SLA | HESEM MOM",
-                    "bucket": "annex_references",
+                    "path": "mom/docs/operations/sops/08-SOP-800/sop-802-incident-near-miss-and-ehs.html",
+                    "title": "SOP-802 - Incident Near Miss and EHS | HESEM MOM",
+                    "bucket": "sops",
                     "occurrences": 2,
                     "matched_terms": [
                         "MTTR"
@@ -2250,10 +2250,10 @@
                     }
                 },
                 {
-                    "path": "mom/docs/operations/sops/08-SOP-800/sop-802-incident-near-miss-and-ehs.html",
-                    "title": "SOP-802 - Incident Near Miss and EHS | HESEM MOM",
-                    "bucket": "sops",
-                    "occurrences": 2,
+                    "path": "mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html",
+                    "title": "ANNEX-117 - Ma trận leo thang và thời hạn phản ứng | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
                     "matched_terms": [
                         "MTTR"
                     ],
@@ -22765,31 +22765,6 @@
             "findings": []
         },
         {
-            "path": "mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html",
-            "title": "ANNEX-117 - Ma trận chuyển cấp and SLA | HESEM MOM",
-            "bucket": "annex_references",
-            "metrics_count": 1,
-            "total_metric_occurrences": 2,
-            "metrics": [
-                {
-                    "code": "MTTR",
-                    "display_name": "Mean time to repair",
-                    "classification": "operating_metric",
-                    "occurrences": 2,
-                    "matched_terms": [
-                        "MTTR"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Context acceptable or informational."
-                    },
-                    "row_snippets": []
-                }
-            ],
-            "findings": []
-        },
-        {
             "path": "mom/docs/operations/references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-145-v5-stress-test-fixes-and-workflow-lists-schema.html",
             "title": "v5 SSOT Stress Test Fixes + Workflow-Lists Schema",
             "bucket": "annex_references",
@@ -23643,6 +23618,31 @@
                     "occurrences": 1,
                     "matched_terms": [
                         "FPY"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    },
+                    "row_snippets": []
+                }
+            ],
+            "findings": []
+        },
+        {
+            "path": "mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html",
+            "title": "ANNEX-117 - Ma trận leo thang và thời hạn phản ứng | HESEM MOM",
+            "bucket": "annex_references",
+            "metrics_count": 1,
+            "total_metric_occurrences": 1,
+            "metrics": [
+                {
+                    "code": "MTTR",
+                    "display_name": "Mean time to repair",
+                    "classification": "operating_metric",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "MTTR"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
