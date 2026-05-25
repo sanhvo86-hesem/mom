@@ -4762,11 +4762,11 @@ function renderComponents(){
     + slider('Font size', '--nav-item-font-size', 'components.nav.fontSize', 11, 16, 13, 'px')
     + slider('Icon size', '--nav-item-icon-size', 'components.nav.iconSize', 12, 24, 16, 'px')
     + slider(T('gap'), '--nav-item-gap', 'components.nav.gap', 4, 16, 10, 'px')
-    + slider('Border radius', '--nav-item-radius', 'components.nav.radius', 0, 20, 10, 'px')
+    + slider('Border radius', '--nav-item-radius', 'components.nav.radius', 0, 20, 14, 'px')
     + '<div style="margin:14px 0 8px;font-size:11px;font-weight:700;color:var(--text-secondary);letter-spacing:.04em;text-transform:uppercase">📦 '+L('Thẻ nhóm mục','Section Card')+'</div>'
     + slider(L('Bo góc nhóm','Section radius'), '--nav-section-radius', 'components.nav.sectionRadius', 8, 24, 14, 'px')
-    + slider(L('Khoảng cách trong nhóm','Section gap'), '--nav-section-gap', 'components.nav.sectionGap', 2, 12, 5, 'px')
-    + slider(L('Đậm màu xanh nhóm','Section blue tint'), '--nav-section-blue-pct', 'components.nav.sectionBluePct', 4, 30, 13, '%')
+    + slider(L('Khoảng cách trong nhóm','Section gap'), '--nav-section-gap', 'components.nav.sectionGap', 2, 12, 8, 'px')
+    + slider(L('Đậm màu xanh nhóm','Section blue tint'), '--nav-section-blue-pct', 'components.nav.sectionBluePct', 0, 30, 10, '%')
     + previewNav()
   , false, statusChip('full', L('Shared nav item', 'Shared nav item')));
 
