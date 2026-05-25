@@ -7165,11 +7165,14 @@ ${docs.readme || 'tools/vps-setup/README-DATA-SYNC.md'}`)}</pre>
   </details>`;
 
   return `<style>
-    .dsync-actions { display:flex; gap:4px; flex-wrap:wrap; }
-    .dsync-act { font-size:10px; padding:2px 6px; border-radius:4px; border:1px solid var(--border-light,#cbd5e1); background:var(--bg-surface-alt,#f8fafc); cursor:pointer; line-height:1.2; }
+    .dsync-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:flex-start; }
+    .dsync-act-group { display:inline-flex; gap:6px; flex-wrap:wrap; align-items:center; }
+    .dsync-act-group-drift { padding:6px 8px; border:1px solid color-mix(in srgb, var(--purple-light,#6366f1) 20%, var(--border-light,#cbd5e1)); border-radius:10px; background:color-mix(in srgb, var(--purple-light,#6366f1) 4%, var(--bg-surface,#fff)); }
+    .dsync-act { font-size:11px; padding:4px 8px; border-radius:6px; border:1px solid var(--border-light,#cbd5e1); background:var(--bg-surface-alt,#f8fafc); cursor:pointer; line-height:1.25; white-space:nowrap; }
     .dsync-act:hover { background:var(--bg-hover,#e2e8f0); }
     .dsync-dl { color:var(--blue,#1e40af); }
     .dsync-up { color:var(--teal,#0f766e); }
+    .dsync-diff { color:var(--purple-light,#6366f1); }
     .dsync-resolve { color:var(--amber-dark,#92400e); }
     .dsync-restore { color:var(--purple,#7e22ce); font-weight:600; }
   </style>
@@ -7622,9 +7625,13 @@ function renderAdminVCConfigSync(){
     }
     acts.push(`<button class="dsync-act dsync-up" onclick='adminDataSyncUploadPrompt(${fName})' title="${escapeHtml(lang==='en'?'Upload new version from laptop':'Đẩy phiên bản mới từ laptop')}">⬆ ${escapeHtml(lang==='en'?'Đẩy':'Đẩy')}</button>`);
     if(drifted){
-      acts.push(`<button class="dsync-act" style="color:var(--purple-light,#6366f1)" onclick='adminDataSyncViewDiff(${fName})' title="${escapeHtml(lang==='en'?'View diff between site and mirror':'Xem khác biệt site và mirror')}">⊞ ${escapeHtml(lang==='en'?'Diff':'Diff')}</button>`);
-      acts.push(`<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"site_to_mirror")' title="${escapeHtml(lang==='en'?'Copy VPS → mirror (trust VPS)':'Ghi bản VPS vào mirror (tin VPS)')}">→ VPS→M</button>`);
-      acts.push(`<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"mirror_to_site")' title="${escapeHtml(lang==='en'?'Copy mirror → VPS (trust mirror)':'Ghi mirror lên VPS (tin mirror)')}">← M→VPS</button>`);
+      acts.push(
+        `<span class="dsync-act-group dsync-act-group-drift">
+          <button class="dsync-act dsync-diff" onclick='adminDataSyncViewDiff(${fName})' title="${escapeHtml(lang==='en'?'View diff between site and mirror':'Xem khác biệt site và mirror')}">⊞ ${escapeHtml(lang==='en'?'View diff':'Diff')}</button>
+          <button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"site_to_mirror")' title="${escapeHtml(lang==='en'?'Copy VPS → mirror (trust VPS)':'Ghi bản VPS vào mirror (tin VPS)')}">${escapeHtml(lang==='en'?'VPS → mirror':'VPS → M')}</button>
+          <button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"mirror_to_site")' title="${escapeHtml(lang==='en'?'Copy mirror → VPS (trust mirror)':'Ghi mirror lên VPS (tin mirror)')}">${escapeHtml(lang==='en'?'Mirror → VPS':'M → VPS')}</button>
+        </span>`
+      );
     }
     if(noMirror){
       acts.push(`<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"site_to_mirror")' title="${escapeHtml(lang==='en'?'Create mirror copy from VPS site file':'Tạo bản mirror từ file site VPS')}">+ ${escapeHtml(lang==='en'?'Seed mirror':'Tạo mirror')}</button>`);
