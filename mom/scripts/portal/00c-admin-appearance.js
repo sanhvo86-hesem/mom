@@ -201,12 +201,13 @@ window._admAppearanceTabKeydown = function(event){
 };
 
 /* ── Helper: slider + number input ──────────────────────────────────────── */
-function slider(label, cssVar, path, min, max, def, unit, step){
+function slider(label, cssVar, path, min, max, def, unit, step, idSuffix){
   var val = cfgNum(path, def);
   step = step || 1;
   var u = unit || 'px';
-  var sid = 'adm_s_'+path.replace(/\./g,'_');
-  var nid = 'adm_n_'+path.replace(/\./g,'_');
+  var suffix = idSuffix ? ('_' + String(idSuffix).replace(/[^a-zA-Z0-9_-]/g, '_')) : '';
+  var sid = 'adm_s_'+path.replace(/\./g,'_')+suffix;
+  var nid = 'adm_n_'+path.replace(/\./g,'_')+suffix;
   /* For unitless values like opacity, ratio — don't append unit */
   var unitArg = '\'' + String(u).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + '\'';
   return '<div class="adm-control-row" data-control="slider" data-css-var="'+esc(cssVar)+'" data-path="'+esc(path)+'" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
@@ -4710,10 +4711,11 @@ function renderComponents(){
 
   /* DROPDOWN */
   h += sect('📋 '+T('dropdownSettings'),
-    slider('Border radius', '--dropdown-radius', 'components.dropdown.radius', 0, 16, 8, 'px')
-    + slider('Item padding', '--dropdown-item-padding', 'components.dropdown.itemPadding', 4, 16, 8, 'px')
-    + slider('Item font', '--dropdown-item-font-size', 'components.dropdown.itemFontSize', 11, 16, 13, 'px')
-    + colorPick('Hover BG', '--dropdown-item-hover-bg', 'components.dropdown.hoverBg', '#f8fafc')
+    slider(L('Chiều cao box', 'Box height'), '--hds-control-h', 'density.controlH', 24, 48, 32, 'px', 1, 'dropdown')
+    + slider(L('Bo góc menu', 'Menu radius'), '--dropdown-radius', 'components.dropdown.radius', 0, 16, 8, 'px')
+    + slider(L('Đệm dòng chọn', 'Item padding'), '--dropdown-item-padding', 'components.dropdown.itemPadding', 4, 16, 8, 'px')
+    + slider(L('Cỡ chữ dòng chọn', 'Item font'), '--dropdown-item-font-size', 'components.dropdown.itemFontSize', 11, 16, 13, 'px')
+    + colorPick(L('Nền khi rê chuột', 'Hover BG'), '--dropdown-item-hover-bg', 'components.dropdown.hoverBg', '#f8fafc')
     + previewDropdown()
   , false, statusChip('full', L('Shared dropdown', 'Shared dropdown')));
 

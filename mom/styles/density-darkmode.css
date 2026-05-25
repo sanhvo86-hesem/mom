@@ -113,8 +113,8 @@
 .hm-btn-lg     { min-height: var(--hds-control-h-lg); height: auto; padding: var(--btn-padding-y, 0px) calc(var(--btn-padding-x, var(--hds-control-px-lg)) * 1.5); font-size: var(--hds-control-font-lg); }
 
 .hm-input,
-.hm-select     { min-height: 0; height: auto; padding: var(--input-padding-y, 0px) var(--hds-control-px); font-size: var(--hds-control-font); border-radius: var(--hds-control-radius); border-width: var(--input-border-width, 1px); background: var(--input-bg, var(--bg-surface)); }
-.hm-input-lg   { min-height: 0; height: auto; padding: var(--input-padding-y, 0px) var(--hds-control-px-lg); font-size: var(--hds-control-font-lg); }
+.hm-select     { min-height: var(--hds-control-h); height: auto; padding: var(--input-padding-y, 0px) var(--hds-control-px); font-size: var(--hds-control-font); line-height: var(--leading-tight, 1.25); border-radius: var(--hds-control-radius); border-width: var(--input-border-width, 1px); background: var(--input-bg, var(--bg-surface)); }
+.hm-input-lg   { min-height: var(--hds-control-h-lg); height: auto; padding: var(--input-padding-y, 0px) var(--hds-control-px-lg); font-size: var(--hds-control-font-lg); line-height: var(--leading-tight, 1.25); }
 
 .hm-card       { padding: var(--hds-card-pad); border-radius: var(--hds-card-radius); }
 .hm-badge      { padding: var(--hds-badge-py) var(--hds-badge-px); font-size: var(--hds-badge-font); }

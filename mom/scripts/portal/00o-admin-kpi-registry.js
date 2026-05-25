@@ -2396,8 +2396,14 @@ function _styleBlock(){
   '.kc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}' +
   '.kc-f{display:flex;flex-direction:column;gap:3px}' +
   '.kc-f label{font-size:11px;color:var(--text-3)}' +
-  '.kc-input{border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:12px;' +
-    'background:var(--surface);color:var(--text-1);width:100%}' +
+  '.kc-input{min-height:var(--hds-control-h);border:var(--input-border-width,1px) solid var(--border);' +
+    'border-radius:var(--hds-control-radius,var(--dropdown-radius,var(--radius-md)));' +
+    'padding:var(--input-padding-y,0px) var(--hds-control-px);font-size:var(--hds-control-font);' +
+    'line-height:var(--leading-tight,1.25);background:var(--input-bg,var(--surface));' +
+    'color:var(--text-1);width:100%;box-sizing:border-box}' +
+  'select.kc-input{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3e%3cpath stroke=\'%236b7280\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3e%3c/svg%3e");' +
+    'background-position:right var(--hds-control-px) center;background-repeat:no-repeat;' +
+    'background-size:var(--hds-icon-md);padding-right:calc((var(--hds-control-px) * 2) + var(--hds-icon-md))}' +
   '.kc-lock-wrap{display:block;position:relative}' +
   '.kc-input--locked{background:var(--surface-2);color:var(--text-3);cursor:not-allowed;opacity:.64}' +
   '.kc-lock-tip{position:absolute;left:0;top:calc(100% + 6px);z-index:30;max-width:320px;' +
