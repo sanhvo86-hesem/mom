@@ -2062,8 +2062,11 @@ function _renderUnifiedMcoEditCard(m, section, inline){
     'Khóa SSOT: Nhóm và Mã KPI là định danh cấu trúc. Với KPI tính tự động như COMPLAINT_RATE, đổi trực tiếp sẽ làm lệch công thức KpiEngine, bảng điều khiển, tài liệu, thẻ điểm JD và các KPI ghép cặp. Cần dùng luồng đổi định danh có kiểm soát hoặc tạo KPI thay thế kèm bí danh.',
     'SSOT locked identity fields.'
   );
-  var identityNote = '<div class="kc-lock-note">🔒 ' + c(identityHelp) + '</div>';
   var lockedTitle = c(identityHelp);
+  var lockedControl = function(control){
+    return '<span class="kc-lock-wrap" tabindex="0" aria-label="' + lockedTitle + '">' +
+      control + '<span class="kc-lock-tip" role="tooltip">' + c(identityHelp) + '</span></span>';
+  };
   var b = _ragBands(_val(m, section, 'thresholds') || m.thresholds || {});
   var sampleGrid = '<div class="kc-grid">' +
     _field('min_n_score', '<input class="kc-input" type="number" min="0" value="' + c(_sampleVal(m,section,'min_n_score')) + '" oninput="_kpiSetSample(\'' + section + '\',\'' + c(code) + '\',\'min_n_score\',this.value)">') +
@@ -2085,9 +2088,9 @@ function _renderUnifiedMcoEditCard(m, section, inline){
     '</div>';
   html += sectionHtml('1', _t('Ý đồ kiểm soát', 'Intent'),
     '<div class="kc-grid">' +
-    _field(_t('Nhóm (khóa SSOT)', 'Group'), '<select class="kc-input kc-input--locked" title="' + lockedTitle + '" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'group\',this.value)" disabled>' + _selOptions(grpOpts, section) + '</select>' + identityNote) +
+    _field(_t('Nhóm', 'Group'), lockedControl('<select class="kc-input kc-input--locked" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'group\',this.value)" disabled>' + _selOptions(grpOpts, section) + '</select>')) +
     _field(_t('Cấp', 'Tier'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'tier\',this.value)">' + _selOptions(tierOpts, _val(m,section,'tier') || '') + '</select>') +
-    _field(_t('Mã KPI (khóa SSOT)', 'KPI code'), '<input class="kc-input kc-input--locked" type="text" title="' + lockedTitle + '" disabled value="' + c(code) + '">' + identityNote) +
+    _field(_t('Mã KPI', 'KPI code'), lockedControl('<input class="kc-input kc-input--locked" type="text" disabled value="' + c(code) + '">')) +
     _field(_t('Tên tiếng Việt', 'Name VI'), '<input class="kc-input" type="text" value="' + c(_val(m,section,'name_vi')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'name_vi\',this.value)">') +
     _field(_t('Tên tiếng Anh', 'Name EN'), '<input class="kc-input" type="text" value="' + c(_val(m,section,'name')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'name\',this.value)">') +
     _field(_t('Quá trình', 'Process'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'process\',this.value)">' + _selOptions(procOpts, _val(m,section,'process') || 'unclassified') + '</select>') +
@@ -2395,8 +2398,15 @@ function _styleBlock(){
   '.kc-f label{font-size:11px;color:var(--text-3)}' +
   '.kc-input{border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:12px;' +
     'background:var(--surface);color:var(--text-1);width:100%}' +
-  '.kc-input--locked{background:var(--surface-2);color:var(--text-3);cursor:not-allowed}' +
-  '.kc-lock-note{font-size:10px;line-height:1.35;color:var(--text-3);margin-top:3px}' +
+  '.kc-lock-wrap{display:block;position:relative}' +
+  '.kc-input--locked{background:var(--surface-2);color:var(--text-3);cursor:not-allowed;opacity:.64}' +
+  '.kc-lock-tip{position:absolute;left:0;top:calc(100% + 6px);z-index:30;max-width:320px;' +
+    'min-width:min(260px,calc(100vw - 32px));padding:8px 10px;border:1px solid var(--border);' +
+    'border-radius:6px;background:var(--surface);box-shadow:var(--shadow-lg);color:var(--text-2);' +
+    'font-size:11px;line-height:1.35;opacity:0;pointer-events:none;transform:translateY(-3px);' +
+    'transition:opacity .14s ease,transform .14s ease}' +
+  '.kc-lock-wrap:hover .kc-lock-tip,.kc-lock-wrap:focus-within .kc-lock-tip,.kc-lock-wrap:focus .kc-lock-tip{' +
+    'opacity:1;transform:translateY(0)}' +
   '.kc-ta{min-height:54px;resize:vertical;font-family:inherit}' +
   '.kc-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}' +
   '.kc-table{width:100%;border-collapse:collapse;font-size:12px}' +
