@@ -12260,12 +12260,15 @@ function moduleAccessRoleOptions(){
     if(!usersByRole[id]) usersByRole[id] = [];
     usersByRole[id].push(user);
   });
-  const candidateRoles = [
-    ...ADMIN_ROLES,
-    ...Object.keys(ROLES || {}),
-    ...Object.keys(usersByRole),
-    ...PURCHASING_MODULE_DEFAULT_ROLES
-  ];
+  // When the DB catalog is loaded, it is the SSOT for which roles exist.
+  // Prefer DB role codes; fall back to the union of hardcoded lists only when
+  // the catalog has not been fetched yet (first render before async load).
+  const dbItems = ADMIN_AUTH_STATE && ADMIN_AUTH_STATE.roles.loaded
+    ? (ADMIN_AUTH_STATE.roles.items || []).map(r => r.role_code).filter(Boolean)
+    : null;
+  const candidateRoles = dbItems
+    ? [...dbItems, ...Object.keys(usersByRole)]   // DB-first: only catalog roles + user roles
+    : [...ADMIN_ROLES, ...Object.keys(ROLES || {}), ...Object.keys(usersByRole), ...PURCHASING_MODULE_DEFAULT_ROLES];
   candidateRoles.forEach(role => {
     const id = normalizeAccessRole(role);
     if(!id || seen.has(id)) return;
