@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use MOM\Services\DeployDrillReminderService;
 use MOM\Services\NotificationGateway;
 use MOM\Api\Services\DocAccessAnalyticsService;
+use MOM\Api\Services\PortalServices;
 use Throwable;
 
 /**
@@ -50,7 +51,7 @@ class DeployProgramController extends BaseController
         $me = $this->requireAuth();
         $drillService = $this->deployDrillReminderService();
         $champions = $this->normalizeChampionState($this->loadFile(self::FILE_CHAMPIONS));
-        $users     = $this->loadUserDirectory();
+        $users     = $this->loadUserDirectory($me);
         $this->success([
             'data' => [
                 'program'   => $this->loadFile(self::FILE_PROGRAM),
@@ -1171,39 +1172,53 @@ class DeployProgramController extends BaseController
 
     public function listUsers(): never
     {
-        $this->requireAuth();
-        $this->success(['data' => $this->loadUserDirectory()]);
+        $me = $this->requireAuth();
+        $this->success(['data' => $this->loadUserDirectory($me)]);
     }
 
-    private function loadUserDirectory(): array
+    /**
+     * Reuse the same identity read path as Admin so deploy roster cards do not
+     * drift from the canonical user directory.
+     *
+     * @param array<string, mixed> $viewer
+     * @return list<array<string, mixed>>
+     */
+    private function loadUserDirectory(array $viewer): array
     {
-        $store = $this->store;
-        if (!is_array($store) || !isset($store['users']) || !is_array($store['users'])) {
-            return [];
+        $users = is_array($this->store['users'] ?? null) ? $this->store['users'] : [];
+        $identity = PortalServices::identity($this->dataDir, $this->rootDir);
+        if ($identity !== null) {
+            try {
+                $users = $identity->listUsers();
+            } catch (Throwable $e) {
+                @error_log('[DeployProgramController] IdentityRepository.listUsers failed; falling back: ' . $e->getMessage());
+            }
         }
+
         $out = [];
-        foreach ($store['users'] as $u) {
+        foreach ($users as $u) {
             if (!is_array($u)) continue;
-            if (!($u['active'] ?? false)) continue;
-            $employeeId = (string)($u['employee_id'] ?? '');
-            $username = (string)($u['username'] ?? '');
+            $sanitized = sanitize_user_for_client($u, $viewer);
+            if (!($sanitized['active'] ?? false)) continue;
+            $employeeId = (string)($sanitized['employee_id'] ?? '');
+            $username = (string)($sanitized['username'] ?? '');
             $out[] = [
                 'id'                  => $employeeId !== '' ? $employeeId : $username,
                 'employee_id'         => $employeeId,
                 'username'            => $username,
-                'name'                => (string)($u['name'] ?? ''),
-                'role'                => (string)($u['role'] ?? ''),
-                'title'               => (string)($u['title'] ?? ''),
-                'dept'                => (string)($u['dept'] ?? ''),
-                'active'              => (bool)($u['active'] ?? true),
-                'phone'               => (string)($u['phone'] ?? ''),
-                'email'               => (string)($u['personal_email'] ?? ''),
-                'personal_email'      => (string)($u['personal_email'] ?? ''),
-                'jd_code'             => (string)($u['jd_code'] ?? ''),
-                'jd_title'            => (string)($u['jd_title'] ?? ''),
-                'role_source'         => is_array($u['role_source'] ?? null) ? (array)$u['role_source'] : new \stdClass(),
-                'hcm_org_unit_id'     => (string)($u['hcm_org_unit_id'] ?? ''),
-                'hcm_position_id'     => (string)($u['hcm_position_id'] ?? ''),
+                'name'                => (string)($sanitized['name'] ?? ''),
+                'role'                => (string)($sanitized['role'] ?? ''),
+                'title'               => (string)($sanitized['title'] ?? ''),
+                'dept'                => (string)($sanitized['dept'] ?? ''),
+                'active'              => (bool)($sanitized['active'] ?? true),
+                'phone'               => (string)($sanitized['phone'] ?? ''),
+                'email'               => (string)($sanitized['personal_email'] ?? ''),
+                'personal_email'      => (string)($sanitized['personal_email'] ?? ''),
+                'jd_code'             => (string)($sanitized['jd_code'] ?? ''),
+                'jd_title'            => (string)($sanitized['jd_title'] ?? ''),
+                'role_source'         => is_array($sanitized['role_source'] ?? null) ? (array)$sanitized['role_source'] : new \stdClass(),
+                'hcm_org_unit_id'     => (string)($sanitized['hcm_org_unit_id'] ?? ''),
+                'hcm_position_id'     => (string)($sanitized['hcm_position_id'] ?? ''),
             ];
         }
         usort($out, static fn($a, $b) => strcasecmp($a['name'], $b['name']));
