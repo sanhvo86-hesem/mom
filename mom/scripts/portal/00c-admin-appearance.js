@@ -874,22 +874,22 @@ function previewBackdrop(){
 
 function previewButtons(){
   return previewBox(
-    'Preview button',
+    L('Xem trước nút bấm', 'Button preview'),
     '<div style="display:grid;gap:10px">'
     + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
-    + '<button class="hm-btn hm-btn-primary"><span class="hm-btn-icon">🚀</span><span class="hm-btn-label">Primary</span></button>'
-    + '<button class="hm-btn hm-btn-secondary"><span class="hm-btn-icon">📄</span><span class="hm-btn-label">Secondary</span></button>'
-    + '<button class="hm-btn hm-btn-ghost"><span class="hm-btn-icon">🧭</span><span class="hm-btn-label">Ghost</span></button>'
-    + '<button class="hm-btn hm-btn-danger"><span class="hm-btn-icon">⚠️</span><span class="hm-btn-label">Danger</span></button>'
+    + '<button class="hm-btn hm-btn-primary"><span class="hm-btn-icon">🚀</span><span class="hm-btn-label">'+esc(L('Chính', 'Primary'))+'</span></button>'
+    + '<button class="hm-btn hm-btn-secondary"><span class="hm-btn-icon">📄</span><span class="hm-btn-label">'+esc(L('Phụ', 'Secondary'))+'</span></button>'
+    + '<button class="hm-btn hm-btn-ghost"><span class="hm-btn-icon">🧭</span><span class="hm-btn-label">'+esc(L('Nền trong', 'Ghost'))+'</span></button>'
+    + '<button class="hm-btn hm-btn-danger"><span class="hm-btn-icon">⚠️</span><span class="hm-btn-label">'+esc(L('Nguy hiểm', 'Danger'))+'</span></button>'
     + '</div>'
     + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
-    + '<button class="hm-btn hm-btn-primary hm-btn-icon-only" aria-label="Save"><span class="hm-btn-icon">💾</span></button>'
-    + '<button class="hm-btn hm-btn-secondary hm-btn-icon-only" aria-label="Search"><span class="hm-btn-icon">🔍</span></button>'
-    + '<button class="hm-btn hm-btn-ghost hm-btn-icon-only" aria-label="Layout"><span class="hm-btn-icon">↔</span></button>'
-    + '<button class="hm-btn hm-btn-danger hm-btn-icon-only" aria-label="Delete"><span class="hm-btn-icon">🗑</span></button>'
+    + '<button class="hm-btn hm-btn-primary hm-btn-icon-only" aria-label="'+esc(L('Lưu', 'Save'))+'"><span class="hm-btn-icon">💾</span></button>'
+    + '<button class="hm-btn hm-btn-secondary hm-btn-icon-only" aria-label="'+esc(L('Tìm kiếm', 'Search'))+'"><span class="hm-btn-icon">🔍</span></button>'
+    + '<button class="hm-btn hm-btn-ghost hm-btn-icon-only" aria-label="'+esc(L('Bố cục', 'Layout'))+'"><span class="hm-btn-icon">↔</span></button>'
+    + '<button class="hm-btn hm-btn-danger hm-btn-icon-only" aria-label="'+esc(L('Xóa', 'Delete'))+'"><span class="hm-btn-icon">🗑</span></button>'
     + '</div>'
     + '</div>',
-    'Use these samples to tune icon-leading vs icon-only rhythm before applying the same rule system-wide.'
+    L('Dùng mẫu này để chỉnh nhịp icon kèm chữ và icon độc lập trước khi áp dụng cùng quy tắc cho toàn hệ thống.', 'Use these samples to tune icon-leading vs icon-only rhythm before applying the same rule system-wide.')
   );
 }
 
@@ -2317,36 +2317,36 @@ function renderImpactAnalysisPanel(wrap){
   var snap = graphicsSnapshot();
   var impact = snap.impact || (graphicsSvc() && graphicsSvc().computeImpact ? graphicsSvc().computeImpact(snap.lastChange || {}, BASE_TEMPLATE_PRESETS) : null) || {};
   var content = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px">'
-    + infoCard(L('Affected modules', 'Affected modules'), String((impact.affectedModules || []).length), (impact.affectedModules || []).length ? 'partial' : 'neutral')
-    + infoCard(L('Affected routes', 'Affected routes'), String((impact.affectedRoutes || []).length), 'preview')
-    + infoCard(L('Affected screens', 'Affected screens'), String((impact.affectedScreens || []).length), 'preview')
-    + infoCard(L('Block families', 'Block families'), String((impact.affectedBlockFamilies || []).length), 'admin')
-    + infoCard(L('Affected templates', 'Affected templates'), String((impact.affectedTemplates || []).length), 'admin')
-    + infoCard(L('Severity', 'Severity'), impact.severityClass || 'low', (impact.severityClass === 'regulated' || impact.severityClass === 'shopfloor-critical' || impact.severityClass === 'high') ? 'partial' : 'full')
-    + infoCard(L('Blast radius', 'Blast radius'), String((impact.blastRadius && impact.blastRadius.score) || 0), (impact.blastRadius && impact.blastRadius.score > 60) ? 'partial' : 'full')
-    + infoCard(L('Regulated touched', 'Regulated touched'), String((impact.regulatedModules || []).length), (impact.regulatedModules || []).length ? 'partial' : 'full')
-    + infoCard(L('Shopfloor touched', 'Shopfloor touched'), String((impact.shopfloorModules || []).length), (impact.shopfloorModules || []).length ? 'partial' : 'full')
+    + infoCard(L('Module bị ảnh hưởng', 'Affected modules'), String((impact.affectedModules || []).length), (impact.affectedModules || []).length ? 'partial' : 'neutral')
+    + infoCard(L('Route bị ảnh hưởng', 'Affected routes'), String((impact.affectedRoutes || []).length), 'preview')
+    + infoCard(L('Màn hình bị ảnh hưởng', 'Affected screens'), String((impact.affectedScreens || []).length), 'preview')
+    + infoCard(L('Nhóm khối bị ảnh hưởng', 'Block families'), String((impact.affectedBlockFamilies || []).length), 'admin')
+    + infoCard(L('Template bị ảnh hưởng', 'Affected templates'), String((impact.affectedTemplates || []).length), 'admin')
+    + infoCard(L('Mức nghiêm trọng', 'Severity'), impact.severityClass || 'low', (impact.severityClass === 'regulated' || impact.severityClass === 'shopfloor-critical' || impact.severityClass === 'high') ? 'partial' : 'full')
+    + infoCard(L('Bán kính ảnh hưởng', 'Blast radius'), String((impact.blastRadius && impact.blastRadius.score) || 0), (impact.blastRadius && impact.blastRadius.score > 60) ? 'partial' : 'full')
+    + infoCard(L('Chạm module kiểm soát', 'Regulated touched'), String((impact.regulatedModules || []).length), (impact.regulatedModules || []).length ? 'partial' : 'full')
+    + infoCard(L('Chạm shopfloor', 'Shopfloor touched'), String((impact.shopfloorModules || []).length), (impact.shopfloorModules || []).length ? 'partial' : 'full')
     + '</div>'
     + '<div style="display:grid;grid-template-columns:minmax(220px,1fr) minmax(220px,1fr);gap:10px">'
     + '<div style="padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg-surface)">'
-    + '<div style="font-size:11px;font-weight:800;color:var(--text-primary);margin-bottom:8px">'+esc(L('Impact scope', 'Impact scope'))+'</div>'
+    + '<div style="font-size:11px;font-weight:800;color:var(--text-primary);margin-bottom:8px">'+esc(L('Phạm vi ảnh hưởng', 'Impact scope'))+'</div>'
     + '<div style="font-size:11px;line-height:1.75;color:var(--text-secondary)">'
-    + '<strong>'+esc(L('Change', 'Change'))+':</strong> '+esc((impact.kind || '-') + ' / ' + (impact.target || '-'))+'<br>'
-    + '<strong>'+esc(L('Modules', 'Modules'))+':</strong> '+joinList(impact.affectedModules)+'<br>'
-    + '<strong>'+esc(L('Routes', 'Routes'))+':</strong> '+joinList(impact.affectedRoutes)+'<br>'
-    + '<strong>'+esc(L('Screens', 'Screens'))+':</strong> '+joinList((impact.affectedScreens || []).slice(0, 10), '-')+'<br>'
-    + '<strong>'+esc(L('Templates', 'Templates'))+':</strong> '+joinList(impact.affectedTemplates)+'<br>'
-    + '<strong>'+esc(L('Block families', 'Block families'))+':</strong> '+joinList(impact.affectedBlockFamilies)
+    + '<strong>'+esc(L('Thay đổi', 'Change'))+':</strong> '+esc((impact.kind || '-') + ' / ' + (impact.target || '-'))+'<br>'
+    + '<strong>'+esc(L('Module', 'Modules'))+':</strong> '+joinList(impact.affectedModules)+'<br>'
+    + '<strong>'+esc(L('Route', 'Routes'))+':</strong> '+joinList(impact.affectedRoutes)+'<br>'
+    + '<strong>'+esc(L('Màn hình', 'Screens'))+':</strong> '+joinList((impact.affectedScreens || []).slice(0, 10), '-')+'<br>'
+    + '<strong>'+esc(L('Template', 'Templates'))+':</strong> '+joinList(impact.affectedTemplates)+'<br>'
+    + '<strong>'+esc(L('Nhóm khối', 'Block families'))+':</strong> '+joinList(impact.affectedBlockFamilies)
     + '</div></div>'
     + '<div style="padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg-surface)">'
-    + '<div style="font-size:11px;font-weight:800;color:var(--text-primary);margin-bottom:8px">'+esc(L('Release blockers', 'Release blockers'))+'</div>'
+    + '<div style="font-size:11px;font-weight:800;color:var(--text-primary);margin-bottom:8px">'+esc(L('Chặn phát hành', 'Release blockers'))+'</div>'
     + '<div style="font-size:11px;line-height:1.75;color:var(--text-secondary)">'
     + '<strong>'+esc(L('Gates cần rerun', 'Gates to rerun'))+':</strong> '+joinList(impact.gatesToRerun)+'<br>'
-    + '<strong>'+esc(L('Evidence', 'Evidence'))+':</strong> '+joinList((impact.requiredEvidence || []).map(function(row){ return row.evidenceType || row; }))+'<br>'
-    + '<strong>'+esc(L('Regulated modules', 'Regulated modules'))+':</strong> '+joinList(impact.regulatedModules)+'<br>'
-    + '<strong>'+esc(L('Shopfloor modules', 'Shopfloor modules'))+':</strong> '+joinList(impact.shopfloorModules)+'<br>'
-    + '<strong>'+esc(L('Attestation', 'Attestation'))+':</strong> '+esc(impact.backendAttested ? L('Backend attested', 'Backend attested') : L('Frontend estimate', 'Frontend estimate'))+'<br>'
-    + '<strong>'+esc(L('Summary', 'Summary'))+':</strong> '+esc(impact.releaseBlockerSummary || '-')
+    + '<strong>'+esc(L('Bằng chứng', 'Evidence'))+':</strong> '+joinList((impact.requiredEvidence || []).map(function(row){ return row.evidenceType || row; }))+'<br>'
+    + '<strong>'+esc(L('Module kiểm soát', 'Regulated modules'))+':</strong> '+joinList(impact.regulatedModules)+'<br>'
+    + '<strong>'+esc(L('Module shopfloor', 'Shopfloor modules'))+':</strong> '+joinList(impact.shopfloorModules)+'<br>'
+    + '<strong>'+esc(L('Xác nhận', 'Attestation'))+':</strong> '+esc(impact.backendAttested ? L('Máy chủ đã xác nhận', 'Backend attested') : L('Ước tính từ giao diện', 'Frontend estimate'))+'<br>'
+    + '<strong>'+esc(L('Tóm tắt', 'Summary'))+':</strong> '+esc(impact.releaseBlockerSummary || '-')
     + '</div></div>'
     + '</div>';
   if(wrap === false) return content;
@@ -3952,8 +3952,8 @@ function render(el, subTab, currentLang){
 
   /* Title */
 	  h += '<div class="hm-page-header" style="align-items:flex-start;margin-bottom:16px">';
-	  h += '<div style="width:100%"><h3 class="hm-page-title" style="margin:0;font-size:18px">'+(typeof lang!=='undefined'&&lang==='en'?'Graphics Control Plane':'Graphics Control Plane')+'</h3>';
-	  h += '<div style="margin-top:6px;padding:5px 10px;background:var(--bg-surface-alt,var(--bg-hover));border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text-secondary)">'+esc(L('Authority: Standard 36 + Admin/shared token layer. Local template cache is preview/draft only.', 'Authority: Standard 36 + admin/shared token layer. Local template cache is preview/draft only.'))+'</div></div>';
+	  h += '<div style="width:100%"><h3 class="hm-page-title" style="margin:0;font-size:18px">'+esc(L('Mặt phẳng điều khiển đồ họa', 'Graphics Control Plane'))+'</h3>';
+	  h += '<div style="margin-top:6px;padding:5px 10px;background:var(--bg-surface-alt,var(--bg-hover));border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text-secondary)">'+esc(L('Authority: Standard 36 + lớp token dùng chung/Admin. Cache template tại máy chỉ để xem trước hoặc lưu nháp.', 'Authority: Standard 36 + admin/shared token layer. Local template cache is preview/draft only.'))+'</div></div>';
 	  h += '</div>';
 	  h += '<div id="adm-graphics-live" role="status" aria-live="polite" aria-atomic="true" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">'+esc(_graphicsLiveMessage)+'</div>';
 
@@ -4645,9 +4645,9 @@ function renderComponents(){
   var h = '';
 
   h += sectionLead(
-    L('Core controls', 'Core controls'),
+    L('Điều khiển cốt lõi', 'Core controls'),
     L('Nhóm này chỉnh component contract dùng chung. Mọi thay đổi button, input, table, tab, modal hoặc field đều được đưa vào impact analysis trước rollout.', 'This group edits shared component contracts. Button, input, table, tab, modal, or field changes feed impact analysis before rollout.'),
-    statusChip('full', L('Ưu tiên cao', 'High priority')) + statusChip('full', L('Áp dụng rộng', 'System-wide')) + statusChip('admin', L('Impact-aware', 'Impact-aware'))
+    statusChip('full', L('Ưu tiên cao', 'High priority')) + statusChip('full', L('Áp dụng rộng', 'System-wide')) + statusChip('admin', L('Có phân tích ảnh hưởng', 'Impact-aware'))
   );
   h += '<div id="adm-graphics-impact-panel" style="margin-bottom:16px">'+renderImpactAnalysisPanel(false)+'</div>';
 
@@ -4665,7 +4665,7 @@ function renderComponents(){
     + slider(T('borderWidth'), '--btn-border-width', 'components.btn.borderWidth', 0, 3, 1, 'px')
     + slider(T('minWidth'), '--btn-min-width', 'components.btn.minWidth', 0, 120, 0, 'px')
     + previewButtons()
-  , true, statusChip('full', L('Shared button', 'Shared button')));
+  , true, statusChip('full', L('Nút dùng chung', 'Shared button')));
 
   /* INPUT */
   h += sect('📝 '+T('inputSettings'),
