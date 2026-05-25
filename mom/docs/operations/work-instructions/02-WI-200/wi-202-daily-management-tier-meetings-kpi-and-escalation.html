@@ -66,7 +66,7 @@ ul.tight li {margin:4px 0;}
 <div class="page">
 <div class="page-body">
 <div class="dcc-header" data-dcc-bootstrap='{"header":{"doc_code":"WI-202","title":"Điều hành hằng ngày, họp tầng, KPI và leo thang xử lý","subtitle":"Nhịp họp tầng, KPI, escalation và bàn giao nhịp điều hành theo chương trình W0-W12.","doc_type":"WI","revision":"V1","effective_date":"2026-05-14","owner_role_code":"QA","approver_role_code":"CEO","iso_clause":null,"status":"released"},"labels":{"doc_id":{"short":"Mã","long":"Mã tài liệu","sort":10},"revision":{"short":"PB","long":"Phiên bản","sort":20},"effective_date":{"short":"HL","long":"Ngày hiệu lực","sort":30},"owner":{"short":"CSH","long":"Chủ sở hữu","sort":40},"approver":{"short":"Duyệt","long":"Người phê duyệt","sort":50}}}' data-dcc-doc-code="WI-202" data-dcc-locale="vi" data-dcc-logo="../../../../assets/hesem-logo.svg"></div>
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng xuyên suốt W0-W12: W0 chốt nhịp Thứ Bảy 9:00 và ngoại lệ khởi động Thứ Năm, W2 brief trưởng phòng, W3-W4 mở họp nhanh đầu ngày cho QA pilot, W5-W9 vận hành trung tâm điều hành theo đợt, W10 soát dashboard governance và W12 bàn giao nhịp họp cho chủ sở hữu vận hành thường xuyên.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng xuyên suốt W0-W12: W0 chốt nhịp Thứ Bảy 9:00 và ngoại lệ khởi động Thứ Năm, W2 brief trưởng phòng, W3-W4 mở họp nhanh đầu ngày cho QA pilot, W5-W9 vận hành trung tâm điều hành theo đợt, W10 soát bảng điều khiển governance và W12 bàn giao nhịp họp cho chủ sở hữu vận hành thường xuyên.</div>
 <div class="section"><h2>1. Mục đích và nguyên tắc điều hành</h2>
 <p>WI này khóa nhịp điều hành để không treo lệnh sản xuất, không để dữ liệu chậm hơn hiện trường, không để sự cố đi qua ca mà không có người chịu trách nhiệm. Mọi họp tầng chỉ có giá trị khi tạo ra quyết định, hạn đóng, người chịu trách nhiệm và bằng chứng đóng việc.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Điều hành họp tầng ngắn, trực tiếp trên bảng điều hành, chỉ đóng hành động khi đã có bằng chứng và cập nhật trạng thái ngay trên giao dịch gốc trong Epicor.</div>
@@ -140,7 +140,7 @@ ul.tight li {margin:4px 0;}
 <h3>6.1 Bảng phản ứng chuẩn theo tín hiệu đỏ/vàng</h3>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tín hiệu</th><th>Hành động bắt buộc</th><th>Người chốt</th><th>Bằng chứng đóng</th></tr></thead><tbody>
 <tr><td>An toàn đỏ</td><td>Dừng công việc liên quan, cô lập rủi ro, báo cáo vượt cấp ngay theo ANNEX-117; không chờ cuộc họp kế tiếp.</td><td>SL / WKM / EHS</td><td>Incident/near-miss record, ảnh cô lập, hành động khắc phục tạm thời.</td></tr>
-<tr><td>Customer escape</td><td>Bao vây sản phẩm, thông báo khách trong 24 giờ khi áp dụng, mở NCR/CAPA hoặc complaint workflow.</td><td>QA / CS</td><td>Complaint/escape log, thông báo khách, containment evidence.</td></tr>
+<tr><td>Customer escape</td><td>Bao vây sản phẩm, thông báo khách trong 24 giờ khi áp dụng, mở NCR/CAPA hoặc complaint luồng công việc.</td><td>QA / CS</td><td>Complaint/escape log, thông báo khách, containment evidence.</td></tr>
 <tr><td>OTD risk</td><td>Mở recovery review, xác định job/operation chặn, chọn phương án phục hồi hoặc báo khách khi không thể giữ cam kết.</td><td>PPL / PD / SCM</td><td>Recovery action, revised dispatch list, customer communication khi có.</td></tr>
 <tr><td>Constraint lost hours</td><td>Bảo vệ nguồn lực tại điểm thắt cổ chai: ưu tiên vật tư, người, fixture, gage, CMM và bảo trì cho constraint trước local efficiency.</td><td>WKM / PPL / MNT</td><td>Constraint action log, downtime reason, quyết định đổi nguồn lực.</td></tr>
 <tr><td>Hàng đợi CMM/QC đỏ</td><td>Ưu tiên queue chất lượng như một constraint thật; không bypass FAI, CMM, final inspection hoặc QC hold để giữ OTD đẹp.</td><td>QA / QC / PPL</td><td>Queue age, oldest job, release condition, người phụ trách/hạn hành động, evidence link.</td></tr>
@@ -201,7 +201,7 @@ ul.tight li {margin:4px 0;}
 <div class="section"><h2>12. KPI điều hành phải theo dõi</h2>
 <div class="metric-grid">
 <div class="metric-card"><strong>KPI-DEP-02</strong><br/>Đóng phiếu việc đúng hạn <code>>= 95%</code>; theo dõi từng tầng họp, từng đợt và từng severity.</div>
-<div class="metric-card"><strong>KPI-DEP-05</strong><br/>Cập nhật dashboard đúng hạn <code>>= 95%</code>; nguồn ANNEX-110 và dashboard readiness.</div>
+<div class="metric-card"><strong>KPI-DEP-05</strong><br/>Cập nhật bảng điều khiển đúng hạn <code>>= 95%</code>; nguồn ANNEX-110 và bảng điều khiển readiness.</div>
 <div class="metric-card"><strong>KPI-DEP-07</strong><br/>MTTR sự cố Mức 1 <code>&lt;= 24 h</code>; bắt buộc có người trực, giờ mở, giờ đóng và bằng chứng khôi phục.</div>
 </div>
 <p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code>, phân severity theo ANNEX-117, cập nhật <code>readiness.json</code> và đưa lên tầng họp cao hơn trong cùng ngày làm việc.</p>

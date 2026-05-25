@@ -145,7 +145,7 @@ Cụm ANNEX-130 mô tả đầy đủ kho SharePoint nhưng <b>không có ANNEX 
 <tr><td>Định dạng</td><td>File CSV nén <span class="code">audit-events-{YYYY}-W{WW}.csv.gz</span> + manifest <span class="code">.sha256</span></td></tr>
 <tr><td>Trường bắt buộc</td><td><span class="code">event, user_id, ip_address, user_agent, session_id, created_at, metadata</span> (JSON)</td></tr>
 <tr><td>Upload</td><td>Power Automate flow <span class="code">SystemRecordsAuditExport</span> đặt file vào <span class="code">System-Records/08-Automation-Run-Logs/{YYYY}/audit-events/</span></td></tr>
-<tr><td>Validation</td><td>SharePoint workflow tính lại sha256, so với <span class="code">.sha256</span> manifest; mismatch → cảnh báo Trưởng IT trong 4 giờ</td></tr>
+<tr><td>Validation</td><td>SharePoint luồng công việc tính lại sha256, so với <span class="code">.sha256</span> manifest; mismatch → cảnh báo Trưởng IT trong 4 giờ</td></tr>
 <tr><td>Retention</td><td>10 năm (theo RET-QMS-DOCCTRL); năm thứ 11 trở đi move sang <span class="code">06-Archive/01-Closed-Year-Archive/{YYYY}/</span></td></tr>
 </tbody>
 </table>
@@ -172,7 +172,7 @@ Cụm ANNEX-130 mô tả đầy đủ kho SharePoint nhưng <b>không có ANNEX 
 <table>
 <thead><tr><th>Mã</th><th>Anti-pattern</th><th>Hậu quả thực</th><th>Cơ chế chặn</th></tr></thead>
 <tbody>
-<tr><td>AP-140-01</td><td><span class="code">git reset --hard origin/main</span> trên VPS qua SSH</td><td>Đã xảy ra: mất user <span class="code">ianr</span> khỏi <span class="code">users.json</span> vì rollback đè bản pre-mutation trong commit <span class="code">4a8ffebd</span></td><td>CLAUDE.md §VPS deployment policy + <span class="code">deploy.sh</span> bắt buộc capture/restore + commit <span class="code">41436ee2</span> untrack <span class="code">users.json</span></td></tr>
+<tr><td>AP-140-01</td><td><span class="code">git reset --hard origin/main</span> trên VPS qua SSH</td><td>Đã xảy ra: mất user <span class="code">ianr</span> khỏi <span class="code">users.json</span> vì rollback đè bản pre-mutation trong commit <span class="code">4a8ffebd</span></td><td>CLAUDE.md §VPS deployment chính sách + <span class="code">deploy.sh</span> bắt buộc capture/restore + commit <span class="code">41436ee2</span> untrack <span class="code">users.json</span></td></tr>
 <tr><td>AP-140-02</td><td>Sửa <span class="code">mom/data/config/*.json</span> bằng <span class="code">vi/sed/cat&gt;</span> trên VPS</td><td>Audit không truy được dấu; không có snapshot trước/sau</td><td>Quy ước trong tài liệu này §3; cảnh báo khi developer training</td></tr>
 <tr><td>AP-140-03</td><td>Sửa inline <span class="code">data-dcc-bootstrap</span> trong file HTML</td><td>Thay đổi mất sau khi DCC renderer ghi đè từ DB</td><td>Quy ước CLAUDE.md §DCC Header Standard — phải dùng portal modal</td></tr>
 <tr><td>AP-140-04</td><td>Dùng Redis làm storage chính cho cờ vận hành</td><td>Mất khi Redis restart, không có audit</td><td>Quy ước §2 layer card 2</td></tr>
@@ -217,7 +217,7 @@ Cụm ANNEX-130 mô tả đầy đủ kho SharePoint nhưng <b>không có ANNEX 
 <li><a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> — Sync SP↔Git↔server; ANNEX-140 mở rộng "runtime noise" §7 thành 4 lớp riêng biệt.</li>
 <li><a href="../11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html">ANNEX-114</a> — Sổ tay cutover; ANNEX-140 §4 đường D neo về 114 §rollback.</li>
 <li><a href="../11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a> — Bộ dự phòng offline; ANNEX-140 §6 retention liên kết về 118.</li>
-<li>CLAUDE.md §VPS deployment policy — chính sách cấm <span class="code">git reset --hard</span> trên VPS (ngoài tài liệu ANNEX, nằm trong codebase guide).</li>
+<li>CLAUDE.md §VPS deployment chính sách — chính sách cấm <span class="code">git reset --hard</span> trên VPS (ngoài tài liệu ANNEX, nằm trong codebase guide).</li>
 </ul>
 </section>
 

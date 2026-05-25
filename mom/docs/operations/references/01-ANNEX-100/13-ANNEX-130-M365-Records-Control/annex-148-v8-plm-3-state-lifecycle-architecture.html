@@ -94,7 +94,7 @@ Part-Master/
 │           └── 99-Superseded                (old Rev moves here on new release)
 </pre>
 
-<h3>2.2 Job-Dossier structure (workflow gate order corrected)</h3>
+<h3>2.2 Job-Dossier structure (luồng công việc gate order corrected)</h3>
 <pre class="tree">
 Job-Dossier/
 ├── {CustomerCode}/
@@ -132,7 +132,7 @@ Job-Dossier/
 <thead><tr><th>Variant</th><th>States</th><th>Use case</th><th>Examples</th></tr></thead>
 <tbody>
 <tr><td><b>3-state default</b></td><td>1-Working → 2-In-Review → 3-Released</td><td>Standard authoring với approval gate</td><td>CAM, Drawing, BOM, CAPA RCA, Audit response, Monthly Close, Internal Audit, Risk Register</td></tr>
-<tr><td><b>4-state contract</b></td><td>1-Working → 2-In-Review → 3-Pending-Signature → 4-Executed</td><td>Counterparty signing required</td><td>NDA, MSA, LTA, Quality-Agreement, Employment Contract, Insurance Policy</td></tr>
+<tr><td><b>4-state contract</b></td><td>1-Working → 2-In-Review → 3-Pending-Signature → 4-Executed</td><td>Counterparty signing required</td><td>NDA, MSA, LTA, Quality-Agreement, Employment Contract, Insurance chính sách</td></tr>
 <tr><td><b>4-state customer-outbound</b></td><td>1-Working → 2-In-Review → 3-Submitted-to-Customer → 4-Customer-Approved</td><td>Customer must approve/respond</td><td>Quote, PCN-Outbound, FAI-Execution submission, 8D-Final-Response, Concession-Deviation, APSL submission, Open-Book Costing</td></tr>
 <tr><td><b>2-state Intake</b></td><td>_Intake/{Op}-{TS} → formal-ID/</td><td>Event-driven (immediate evidence drop)</td><td>NCR (pre-NCR# photo), Incident (EHS/safety/cyber first response)</td></tr>
 <tr><td><b>Single-pass</b></td><td>Released only</td><td>External receive, no authoring</td><td>Customer drawing inbound, supplier cal cert, traveler from Epicor, master log entries</td></tr>
@@ -184,20 +184,20 @@ Job-Dossier/
 <table>
 <thead><tr><th>Flow</th><th>Trigger</th><th>Action</th></tr></thead>
 <tbody>
-<tr><td><b>Promote 2-In-Review → 3-Released</b></td><td>Approval form YES</td><td>Move files, set retention label read-only, generate <code>_release-note.md</code>, update Workflow-Lists, notify downstream</td></tr>
+<tr><td><b>Promote 2-In-Review → 3-Released</b></td><td>Approval form YES</td><td>Move files, set retention label read-only, generate <code>_release-note.md</code>, update luồng công việc-Lists, notify downstream</td></tr>
 <tr><td><b>Promote 1-Working → 2-In-Review</b></td><td>"Submit for Review" custom button</td><td>Validate completeness, move files, notify reviewer</td></tr>
 <tr><td><b>NCR Intake → Formalize</b></td><td>QA Engineer creates NCR# in NCR-Master-List</td><td>Move <code>_Intake/{Op}-{TS}/*</code> → <code>NCR-{Id}/00-Source-Evidence/</code></td></tr>
 <tr><td><b>Job Engineering-Release snapshot</b></td><td>Job opened in Epicor → webhook</td><td>Read Part-Master/.../3-Released/ versions, generate <code>_release-manifest.json</code> trong Job-Dossier/.../01-Engineering-Release/</td></tr>
 <tr><td><b>Contract Executed promotion</b></td><td>Counterparty signed file uploaded</td><td>Move 3-Pending-Signature → 4-Executed, lock retention, update Customer-Account master log</td></tr>
 <tr><td><b>Customer-submission tracker</b></td><td>File moved to 3-Submitted-to-Customer</td><td>Log to Customer-Portal-Evidence-Log; SLA timer for customer response</td></tr>
 <tr><td><b>Stale 1-Working cleanup</b></td><td>Quarterly cron</td><td>Files >90d untouched → alert owner + auto-archive to <code>_archive/</code></td></tr>
-<tr><td><b>Job-Closure</b></td><td>Job status = Closed in Epicor</td><td>Move Job-Dossier → HESEM-Archive/Locked-Job-Pack-Final; rewrite Canonical-Path on all linked Workflow-List rows</td></tr>
+<tr><td><b>Job-Closure</b></td><td>Job status = Closed in Epicor</td><td>Move Job-Dossier → HESEM-Archive/Locked-Job-Pack-Final; rewrite Canonical-Path on all linked luồng công việc-List rows</td></tr>
 </tbody>
 </table>
 </section>
 
 <section class="card">
-<h2>7. 16 Workflow-Lists schema (SharePoint Lists, NOT folders)</h2>
+<h2>7. 16 luồng công việc-Lists schema (SharePoint Lists, NOT folders)</h2>
 <table>
 <thead><tr><th>#</th><th>List</th><th>Key columns</th><th>Canonical-Path target</th></tr></thead>
 <tbody>
@@ -294,7 +294,7 @@ Asset-Master/Lines/{LineCode}/
 <li><b>v8 blueprint:</b> <code>tools/m365-provisioning/build_blueprint.py</code></li>
 <li><b>v8 tree:</b> <code>tools/m365-provisioning/blueprint/_TREE.txt</code> (1180 directories)</li>
 <li><a href="annex-144-ssot-3-axis-job-part-asset-architecture.html">ANNEX-144 (v4)</a> → SUPERSEDED</li>
-<li><a href="annex-145-v5-stress-test-fixes-and-workflow-lists-schema.html">ANNEX-145 (v5)</a> → SUPERSEDED cho site architecture; §5 Workflow-Lists schema ratified và extended trong v8 §7</li>
+<li><a href="annex-145-v5-stress-test-fixes-and-workflow-lists-schema.html">ANNEX-145 (v5)</a> → SUPERSEDED cho site architecture; §5 luồng công việc-Lists schema ratified và extended trong v8 §7</li>
 <li><a href="annex-146-v6-customer-ip-segregated-6-site-architecture.html">ANNEX-146 (v6)</a> → SUPERSEDED</li>
 <li><a href="annex-147-v7-unified-workspace-customer-keyed-architecture.html">ANNEX-147 (v7)</a> → SUPERSEDED; PLM Part-Master/Job-Dossier split là evolution chính của v8</li>
 <li><a href="annex-141-semi-equipment-parts-cnc-supplier-compliance.html">ANNEX-141</a> — Pack-6 implement trong Job-Dossier/.../08-Final-QC/Cleanliness-Pack-6/</li>
@@ -307,7 +307,7 @@ Asset-Master/Lines/{LineCode}/
 <table>
 <thead><tr><th>Rev</th><th>Ngày</th><th>Người</th><th>Mô tả</th></tr></thead>
 <tbody>
-<tr><td>V0</td><td>2026-05-18</td><td>QMS</td><td>v8.1 — PLM 3-state lifecycle architecture. Part-Master và Job-Dossier ngang hàng (Teamcenter/Windchill pattern). 5 lifecycle variants (3-state, 4-state contract, 4-state customer-outbound, 2-state Intake, single-pass) áp dụng universal cho 13 phòng ban. NEW HESEM-Internal/Finance library. NEW Quality/Incident-Investigation. NEW Asset-Master/Lines category (NADCAP AC7108). 16 Workflow-Lists schemas formalized. Workflow gate order corrected (Engineering-Release → Material-Receiving → Job-Setup). Tổng 1180 directories (vs 747 v7, +58%) do 3-state expansion + new libraries.</td></tr>
+<tr><td>V0</td><td>2026-05-18</td><td>QMS</td><td>v8.1 — PLM 3-state lifecycle architecture. Part-Master và Job-Dossier ngang hàng (Teamcenter/Windchill pattern). 5 lifecycle variants (3-state, 4-state contract, 4-state customer-outbound, 2-state Intake, single-pass) áp dụng universal cho 13 phòng ban. NEW HESEM-Internal/Finance library. NEW Quality/Incident-Investigation. NEW Asset-Master/Lines category (NADCAP AC7108). 16 luồng công việc-Lists schemas formalized. luồng công việc gate order corrected (Engineering-Release → Material-Receiving → Job-Setup). Tổng 1180 directories (vs 747 v7, +58%) do 3-state expansion + new libraries.</td></tr>
 </tbody>
 </table>
 </section>

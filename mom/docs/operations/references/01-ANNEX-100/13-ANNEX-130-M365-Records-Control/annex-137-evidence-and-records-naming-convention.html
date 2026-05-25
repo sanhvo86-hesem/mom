@@ -263,7 +263,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </thead>
  <tbody>
  <tr><td><code>{AssetType}-{AssetID}</code></td><td>Luôn</td><td>Loại tài sản + mã tài sản. AssetType chuẩn theo <a href="annex-139-m365-ip-and-restricted-library-internal-blueprint.html">ANNEX-139</a> §6: TOOL/FIX/GAGE/PROC/RM (tooling, fixture, gage, subcontract processor, cleanroom). Sub-type tùy AssetType (END/INSERT cho TOOL; CMM/MIC cho GAGE; PLAT/HT cho PROC; CR/INSP/PACK cho RM).</td><td>FIX-0089, GAGE-CMM-0007, TOOL-END-0125, PROC-PLAT-012, RM-CR-01</td></tr>
- <tr><td><code>{DocType}</code></td><td>Luôn</td><td>Loại tài liệu đính kèm. Mã chuẩn DocType cho ANNEX-139 use case (xem Section 4): DWG, CAL-CERT, MSA-STUDY, PHOTO, MAINT-LOG, FIXTURE-DWG, TOOL-SPEC, HR-POLICY, CSR-EXTRACT, PARTICLE-LOG, GOWNING-CERT, PROC-QUAL-PACK, PROC-AUDIT-RPT.</td><td>DWG, CAL-CERT, PARTICLE-LOG, GOWNING-CERT</td></tr>
+ <tr><td><code>{DocType}</code></td><td>Luôn</td><td>Loại tài liệu đính kèm. Mã chuẩn DocType cho ANNEX-139 use case (xem Section 4): DWG, CAL-CERT, MSA-STUDY, PHOTO, MAINT-LOG, FIXTURE-DWG, TOOL-SPEC, HR-chính sách, CSR-EXTRACT, PARTICLE-LOG, GOWNING-CERT, PROC-QUAL-PACK, PROC-AUDIT-RPT.</td><td>DWG, CAL-CERT, PARTICLE-LOG, GOWNING-CERT</td></tr>
  <tr><td><code>{YYYYMMDD}</code></td><td>Luôn</td><td>Ngày tạo</td><td>20260327</td></tr>
  <tr><td><code>{HHMM}-{UserID}</code></td><td>Luôn</td><td>Giờ phút + mã người tạo</td><td>0800-ENGM1</td></tr>
  <tr><td><code>.{ext}</code></td><td>Luôn</td><td>Extension gốc</td><td>.pdf</td></tr>
@@ -371,7 +371,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tr><td><code>MINUTES</code></td><td>Meeting minutes (MR, dept)</td></tr>
  <tr><td><code>INPUT-PACK</code></td><td>MR input, audit input package</td></tr>
  <tr><td><code>ACTION-LOG</code></td><td>Follow-up actions</td></tr>
- <tr><td><code>KPI-REPORT</code></td><td>Dashboard export, analysis</td></tr>
+ <tr><td><code>KPI-REPORT</code></td><td>bảng điều khiển export, analysis</td></tr>
  <tr><td><code>RISK-REG</code></td><td>Risk register snapshot</td></tr>
  <tr><td><code>MEETING-MIN</code></td><td>Department meeting minutes</td></tr>
  </tbody>
@@ -412,7 +412,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tr><td><code>MSA-STUDY</code></td><td>Measurement System Analysis study (GR&amp;R, độ chệch, độ tuyến tính, độ ổn định) — bắt buộc cho gage MSA tại <a href="annex-139-m365-ip-and-restricted-library-internal-blueprint.html">ANNEX-139</a> §4 Tooling-Fixture-Gage/03-Gages/.../03-MSA-and-GR-R-Studies/</td></tr>
  <tr><td><code>FIXTURE-DWG</code></td><td>Fixture design drawing — đặt tại Tooling-Fixture-Gage/02-Workholding-Fixtures/{FixtureID}/01-Design-Pack/</td></tr>
  <tr><td><code>TOOL-SPEC</code></td><td>Cutting tool specification — đặt tại Tooling-Fixture-Gage/01-Cutting-Tools/{ToolID}/01-Tool-Master-Spec/</td></tr>
- <tr><td><code>HR-POLICY</code></td><td>HR policy / handbook — đặt tại HR-Operations/03-HR-Policy-and-Handbook-Current/</td></tr>
+ <tr><td><code>HR-POLICY</code></td><td>HR chính sách / handbook — đặt tại HR-Operations/03-HR-chính sách-and-Handbook-Current/</td></tr>
  <tr><td><code>CSR-EXTRACT</code></td><td>Customer-Specific Requirement extract for a part rev — đặt tại Part-REV-Master/.../08-Standards-Customer-Specific/</td></tr>
  <tr><td><code>PARTICLE-LOG</code></td><td>Cleanroom particle count log (0.5μm, 5μm) — đặt tại Cleanroom-Records/01-Environment-Monitoring/{Room}/{YYYY-MM}/</td></tr>
  <tr><td><code>GOWNING-CERT</code></td><td>Cleanroom gowning training certificate — đặt tại Cleanroom-Records/04-Personnel-Gowning-and-Training/{YYYY}/</td></tr>
@@ -793,7 +793,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tr><td><a href="../../../sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td><td>Engineering Release, Baseline Package and Job Snapshot Control</td><td>Kiểm soát engineering baseline và version release</td></tr>
  <tr><td><a href="../../../work-instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a></td><td>SharePoint record sites, libraries and permissions</td><td>Thiết lập site hồ sơ, thư viện và quyền truy cập có kiểm soát</td></tr>
  <tr><td><a href="../../../work-instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a></td><td>M365 SharePoint local sync, Git and server deployment control</td><td>Kiểm soát local sync, Git và boundary triển khai hệ thống</td></tr>
- <tr><td><a href="../../../work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Job dossier evidence pack and record completeness</td><td>Gói bằng chứng theo job và kiểm tra tính đầy đủ của hồ sơ</td></tr>
+ <tr><td><a href="../../../work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Job dossier bộ bằng chứng and record completeness</td><td>Gói bằng chứng theo job và kiểm tra tính đầy đủ của hồ sơ</td></tr>
  <tr><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></td><td>M365 Records metadata, list schema and register catalog</td><td>Schema metadata và danh mục list trên SharePoint</td></tr>
  <tr><td><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></td><td>M365 Records site topology, library and folder blueprint</td><td>Cấu trúc site, thư viện và thư mục trên SharePoint</td></tr>
  <tr><td><a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td><td>M365 operational records file plan by department, role and job</td><td>File plan chi tiết theo phòng ban, vai trò và job gate</td></tr>
