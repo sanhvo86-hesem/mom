@@ -465,21 +465,24 @@ button{cursor:pointer;border:none;background:none;appearance:none;-webkit-appear
 #admin-content input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
 #admin-content select,
 #admin-content textarea{
-  min-height:var(--hds-control-h);
-  padding:var(--input-padding-y,0px) var(--hds-control-px);
-  border-radius:var(--hds-control-radius);
-  font-size:var(--hds-control-font);
-  line-height:var(--leading-tight,1.25);
-  box-sizing:border-box;
+  min-height:var(--admin-object-min-h,var(--hds-control-h)) !important;
+  padding:var(--input-padding-y,0px) var(--hds-control-px) !important;
+  border-radius:var(--hds-control-radius) !important;
+  font-size:var(--hds-control-font) !important;
+  line-height:var(--leading-tight,1.25) !important;
+  border:var(--input-border-width,1px) solid var(--border,#d1d5db) !important;
+  background-color:var(--input-bg,var(--bg-surface,#fff)) !important;
+  color:var(--text-primary,var(--text,#0f172a)) !important;
+  box-sizing:border-box !important;
 }
 #admin-content select{
-  appearance:none;
-  -webkit-appearance:none;
+  appearance:none !important;
+  -webkit-appearance:none !important;
   background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position:right var(--hds-control-px) center;
-  background-repeat:no-repeat;
-  background-size:var(--hds-icon-md);
-  padding-right:calc((var(--hds-control-px) * 2) + var(--hds-icon-md));
+  background-position:right var(--hds-control-px) center !important;
+  background-repeat:no-repeat !important;
+  background-size:var(--hds-icon-md) !important;
+  padding-right:calc((var(--hds-control-px) * 2) + var(--hds-icon-md)) !important;
 }
 #admin-content textarea{min-height:calc(var(--hds-control-h) * 2);line-height:var(--leading-normal,1.5)}
 .btn-admin{display:inline-flex;align-items:center;justify-content:center;gap:var(--btn-gap,6px);min-height:var(--hds-control-h-sm,28px);height:auto;padding:var(--btn-padding-y,0px) var(--btn-padding-x,11px);border-radius:var(--hds-control-radius,var(--radius-md,6px));font-size:var(--hds-control-font-sm,var(--text-xs,11px));font-weight:var(--btn-font-weight,600);line-height:1;cursor:pointer;border:1px solid transparent;transition:all .15s}
@@ -514,6 +517,41 @@ button{cursor:pointer;border:none;background:none;appearance:none;-webkit-appear
   height:var(--admin-object-min-h,var(--hds-control-h));
   box-sizing:border-box;
   line-height:1;
+}
+.admin-toolbar > input:not([type="file"]),
+.admin-toolbar > select,
+.admin-toolbar > .btn-admin,
+.admin-toolbar > label.btn-admin,
+.admin-toolbar > .admin-view-toggle,
+#admin-content .btn-admin,
+#admin-content button.btn-admin{
+  min-height:var(--admin-object-min-h,var(--hds-control-h)) !important;
+  border-radius:var(--hds-control-radius,var(--radius-md,6px)) !important;
+  font-size:var(--hds-control-font-sm,var(--text-xs,11px)) !important;
+  box-sizing:border-box !important;
+}
+#admin-content .admin-panel,
+#admin-content .admin-nav-panel,
+#admin-content .admin-nav-group,
+#admin-content .admin-table,
+#admin-content .admin-view-toggle,
+#admin-content .uc-card,
+#admin-content .admin-authority-card,
+#admin-content .admin-org-node-shell,
+#admin-content .admin-org-position,
+#admin-content .org-pane,
+#admin-content .org-unit-card,
+#admin-content .org-position-card,
+#admin-content .org-canvas-wrap{
+  border-radius:var(--admin-surface-radius,18px) !important;
+  border-color:var(--border,#dbe5f0) !important;
+}
+#admin-content .uc-card,
+#admin-content .admin-authority-card,
+#admin-content .org-unit-card,
+#admin-content .org-position-card{
+  min-height:var(--admin-card-min-h,118px) !important;
+  box-shadow:var(--shadow-sm,0 10px 24px rgba(15,23,42,.06)) !important;
 }
 .admin-toolbar > .admin-view-toggle{align-items:stretch;padding:0}
 .admin-toolbar > .admin-view-toggle .admin-view-toggle-btn{height:100%;min-height:0;padding-top:0;padding-bottom:0}
