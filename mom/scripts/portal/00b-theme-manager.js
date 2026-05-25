@@ -540,6 +540,15 @@ function _applyCustomVars(){
   _setVarPx('--nav-item-icon-size', cfg, 'components.nav.iconSize');
   _setVarPx('--nav-item-gap', cfg, 'components.nav.gap');
   _setVarPx('--nav-item-radius', cfg, 'components.nav.radius');
+  _setVarPx('--nav-section-radius', cfg, 'components.nav.sectionRadius');
+  _setVarPx('--nav-section-gap', cfg, 'components.nav.sectionGap');
+  _setVar('--nav-section-blue-pct', cfg, 'components.nav.sectionBluePct');
+  _setVar('--nav-item-bg', cfg, 'components.nav.bgNormal');
+  _setVar('--nav-item-bg-hover', cfg, 'components.nav.bgHover');
+  _setVar('--nav-item-bg-active', cfg, 'components.nav.bgActive');
+  _setVar('--nav-item-color', cfg, 'components.nav.colorNormal');
+  _setVar('--nav-item-color-hover', cfg, 'components.nav.colorHover');
+  _setVar('--nav-item-color-active', cfg, 'components.nav.colorActive');
   _setVarPx('--pagination-btn-size', cfg, 'components.pagination.btnSize');
   _setVarPx('--pagination-btn-radius', cfg, 'components.pagination.radius');
   _setVarPx('--pagination-font-size', cfg, 'components.pagination.fontSize');
