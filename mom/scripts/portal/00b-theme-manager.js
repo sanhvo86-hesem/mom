@@ -1085,17 +1085,12 @@ function saveAdminConfig(config, callback){
   _adminConfigAuthorityState = 'pending-backend-save';
   _adminConfigPreviewDirty = true;
   _adminConfigPreviewReason = 'backend-save-pending';
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', 'api.php?action=admin_design_config_save', true);
-  xhr.setRequestHeader('Content-Type', 'application/json');
-  if(_adminConfigEtag || _adminConfigVersion) xhr.setRequestHeader('If-Match', _adminConfigEtag || _adminConfigVersion);
-  if(typeof csrfToken !== 'undefined' && csrfToken) xhr.setRequestHeader('X-CSRF-Token', csrfToken);
-  xhr.onreadystatechange = function(){
-    if(xhr.readyState !== 4) return;
-    var ok = xhr.status >= 200 && xhr.status < 300;
+  var payload = JSON.stringify({ config: config, expectedVersion: _adminConfigEtag || _adminConfigVersion || '' });
+
+  function _finish(ok, respText){
     if(ok){
       try {
-        var resp = JSON.parse(xhr.responseText);
+        var resp = JSON.parse(respText);
         var nextConfig = resp && resp.config ? resp.config : (resp && resp.data ? resp.data : config);
         _adminConfig = nextConfig || config;
         _adminConfigVersion = String((resp && resp.version) || (_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || _adminConfigVersion || '');
@@ -1112,8 +1107,35 @@ function saveAdminConfig(config, callback){
     }
     _apply();
     if(callback) callback(ok);
-  };
-  xhr.send(JSON.stringify({ config: config, expectedVersion: _adminConfigEtag || _adminConfigVersion || '' }));
+  }
+
+  function _send(retried){
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'api.php?action=admin_design_config_save', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    if(_adminConfigEtag || _adminConfigVersion) xhr.setRequestHeader('If-Match', _adminConfigEtag || _adminConfigVersion);
+    if(typeof csrfToken !== 'undefined' && csrfToken) xhr.setRequestHeader('X-CSRF-Token', csrfToken);
+    xhr.onreadystatechange = function(){
+      if(xhr.readyState !== 4) return;
+      var ok = xhr.status >= 200 && xhr.status < 300;
+      /* CSRF token expired — refresh once and retry */
+      if(!ok && !retried && xhr.status === 403){
+        try {
+          var b = JSON.parse(xhr.responseText);
+          if(b && b.error === 'csrf_expired' && typeof window.refreshCsrfForRetry === 'function'){
+            window.refreshCsrfForRetry().then(function(refreshed){
+              if(refreshed) _send(true); else _finish(false, '');
+            }).catch(function(){ _finish(false, ''); });
+            return;
+          }
+        } catch(_e){}
+      }
+      _finish(ok, xhr.responseText);
+    };
+    xhr.send(payload);
+  }
+
+  _send(false);
 }
 
 /** WCAG contrast ratio calculator */
