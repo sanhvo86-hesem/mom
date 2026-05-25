@@ -543,7 +543,7 @@
         el.querySelector('#pm-seed').addEventListener('click', function(){
           UI.confirmDestructive({
             title: t('Apply canonical seed','Áp seed chuẩn quốc tế'),
-            message: t('Re-apply the canonical least-privilege seed (NIST 800-53 AC-6 + SOX 404 SoD) to all 38 catalog roles. Existing custom grants on those roles will be overwritten with the canonical baseline; custom roles outside the catalog are left untouched.','Áp lại bộ phân quyền chuẩn (least-privilege NIST + SoD SOX) cho cả 38 vai trò trong catalog. Mọi cấu hình tuỳ chỉnh hiện tại sẽ bị ghi đè bằng chuẩn; vai trò ngoài catalog không bị động.'),
+            message: t('Re-apply the canonical least-privilege seed (NIST 800-53 AC-6 + SOX 404 SoD) to all '+roles.length+' catalog roles. Existing custom grants on those roles will be overwritten with the canonical baseline; custom roles outside the catalog are left untouched.','Áp lại bộ phân quyền chuẩn (least-privilege NIST + SoD SOX) cho cả '+roles.length+' vai trò trong catalog. Mọi cấu hình tuỳ chỉnh hiện tại sẽ bị ghi đè bằng chuẩn; vai trò ngoài catalog không bị động.'),
             requireText: 'SEED',
             requireReason: true,
             confirmLabel: t('Apply seed','Áp seed')
@@ -554,7 +554,7 @@
               body: { reason: r.reason }
             }).then(function(resp){
               UI.audit('rbac.canonical_seed.apply', { reason: r.reason, applied: resp && resp.applied });
-              UI.toast(t('Seed applied to '+(resp && resp.applied ? resp.applied : '38')+' roles','Đã áp seed cho '+(resp && resp.applied ? resp.applied : '38')+' vai trò'),'ok');
+              UI.toast(t('Seed applied to '+(resp && resp.applied ? resp.applied : roles.length)+' roles','Đã áp seed cho '+(resp && resp.applied ? resp.applied : roles.length)+' vai trò'),'ok');
               renderPermissions(el);
             }).catch(function(err){ UI.toast((err && err.message) || t('Seed failed','Áp seed thất bại'),'block'); });
           });

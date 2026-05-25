@@ -2219,7 +2219,7 @@ async function loadAuthoritativeRoleCatalog(options={}){
     ADMIN_AUTH_STATE.roles.error = (e && e.message) ? e.message : 'roles_load_failed';
   }finally{
     ADMIN_AUTH_STATE.roles.loading = false;
-    if(currentPage === 'admin' && ['roles','users','activity'].includes(adminTab)) renderAdmin();
+    if(currentPage === 'admin' && ['roles','users','activity','module_access'].includes(adminTab)) renderAdmin();
   }
 }
 
@@ -11147,6 +11147,11 @@ function adminTabGroupCatalog(){
 
 function adminTabBadgeValue(tabId){
   if(tabId === 'users') return USERS.length;
+  if(tabId === 'roles'){
+    if(ADMIN_AUTH_STATE.roles.loading && !ADMIN_AUTH_STATE.roles.loaded) return '…';
+    const n = (ADMIN_AUTH_STATE.roles.items || []).length;
+    return n > 0 ? n : '';
+  }
   if(tabId === 'activity'){
     if(!canViewActivityLog()) return '';
     if(ADMIN_AUTH_STATE.audit.loading && !ADMIN_AUTH_STATE.audit.loaded) return '…';
@@ -11207,7 +11212,7 @@ function renderAdmin(){
   syncPortalScrollMode('admin', adminTab);
   const el = document.getElementById('page-admin');
   if(['users','dept_title','orgchart'].includes(adminTab)) loadAuthoritativeOrgCatalog({silent:true});
-  if(['users','roles','activity'].includes(adminTab)) loadAuthoritativeRoleCatalog({silent:true});
+  loadAuthoritativeRoleCatalog({silent:true}); // always — populates sidebar badge regardless of active tab
   if(adminTab === 'activity') loadAuthoritativeAuditTrail({silent:true});
   el.innerHTML = `
     <div class="admin-console-shell">
