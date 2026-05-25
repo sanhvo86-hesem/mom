@@ -1227,11 +1227,11 @@ final class KpiRegistryAdminService
                 'source_column',
             ],
             'save_policy' => [
-                'console_added_metrics' => 'staged_data_contract + pilot lifecycle only; no runtime promotion from Admin Console',
-                'runtime_metric_formula' => 'read_only',
-                'runtime_metric_source_table' => 'read_only',
-                'reward_enablement' => 'blocked unless backend guardrails pass runtime/counter/blocker/attribution/min-sample rules',
-                'audit_reason' => 'required_min_4_chars_max_500_chars',
+                'console_added_metrics' => 'Chỉ số tạo từ bảng quản trị luôn ở calculation_status=staged_data_contract và lifecycle_status=pilot; bảng quản trị không được tự nâng lên runtime_calculated.',
+                'runtime_metric_formula' => 'Chỉ đọc; công thức tính tự động phải đổi trong dịch vụ máy chủ có kiểm soát.',
+                'runtime_metric_source_table' => 'Chỉ đọc; source_table của luồng tính tự động phải đổi qua hợp đồng dữ liệu và dịch vụ máy chủ.',
+                'reward_enablement' => 'Bị chặn nếu chưa đạt hàng rào kiểm soát máy chủ về runtime_calculated, chỉ số đối trọng, điều kiện chặn, attribution_rule và cỡ mẫu tối thiểu.',
+                'audit_reason' => 'Bắt buộc nhập lý do thay đổi, tối thiểu 4 ký tự và tối đa 500 ký tự.',
             ],
             'dynamic_validation_rules' => [
                 'spc_capability_metric' => [
@@ -1240,33 +1240,33 @@ final class KpiRegistryAdminService
                     'sample_policy.customer_grade_n >= 100',
                     'stability_required=true',
                     'gage_validity_required=true',
-                    'data_contract_gap or runtime CTQ/spec/gage contract required',
+                    'Bắt buộc có data_contract_gap hoặc hợp đồng tính tự động cho CTQ/spec/gage.',
                 ],
                 'gate_control_metric' => [
-                    'gate required',
-                    'linked_cdr required',
-                    'gate_pass_condition required',
-                    'hold_release_rule required',
-                    'reward_mode in blocker_only|not_rewardable',
+                    'Bắt buộc có gate.',
+                    'Bắt buộc có linked_cdr.',
+                    'Bắt buộc có gate_pass_condition.',
+                    'Bắt buộc có hold_release_rule.',
+                    'reward_mode chỉ được là blocker_only hoặc not_rewardable',
                 ],
                 'composite_readiness_index' => [
-                    'components required',
-                    'component weights sum to 100',
+                    'Bắt buộc có components.',
+                    'Tổng weight của components phải bằng 100.',
                 ],
                 'bonus_pool_candidate' => [
-                    'calculation_status=runtime_calculated',
-                    'attribution_rule required',
-                    'counter_metric intent required',
-                    'blocking_conditions required',
-                    'sample_policy.min_n_score or formula.min_sample required',
-                    'calibration must not be explicitly disabled',
+                    'calculation_status phải là runtime_calculated',
+                    'Bắt buộc có attribution_rule.',
+                    'Bắt buộc có counter_metric intent.',
+                    'Bắt buộc có blocking_conditions.',
+                    'Bắt buộc có sample_policy.min_n_score hoặc formula.min_sample.',
+                    'Không được tắt calibration một cách tường minh.',
                 ],
                 'health_indicator' => [
                     'reward_mode=not_rewardable',
                     'scorecard_contributes_to_reward=false',
                 ],
                 'customer_specific_requirement' => [
-                    'profile link or applicability rule required',
+                    'Bắt buộc có profile link hoặc applicability rule.',
                 ],
             ],
         ];
@@ -1326,7 +1326,7 @@ final class KpiRegistryAdminService
                     'priority' => 'P0',
                     'code' => 'STAGED_REWARD_METRIC',
                     'metric_code' => $code,
-                    'message' => 'Staged metric is still reward eligible.',
+                    'message' => 'Chỉ số chờ hợp đồng dữ liệu vẫn đang được đánh dấu đủ điều kiện tính thưởng.',
                 ];
             }
             if (($row['group'] ?? '') === 'governance'
@@ -1336,7 +1336,7 @@ final class KpiRegistryAdminService
                     'priority' => 'P1',
                     'code' => 'REWARD_KPI_WITHOUT_COUNTER',
                     'metric_code' => $code,
-                    'message' => 'Reward KPI has no counter-metric guardrail.',
+                    'message' => 'KPI có tính thưởng chưa có chỉ số đối trọng để chống thao túng.',
                 ];
             }
         }
@@ -1349,7 +1349,7 @@ final class KpiRegistryAdminService
                 'priority' => 'P1',
                 'code' => 'GATE_METRIC_WITHOUT_CDR',
                 'metric_code' => $missingCode,
-                'message' => 'Gate control metric has no linked CDR.',
+                'message' => 'Chỉ số kiểm soát cổng chưa liên kết CDR.',
             ];
         }
 
@@ -1360,7 +1360,7 @@ final class KpiRegistryAdminService
                     'priority' => 'P1',
                     'code' => 'JD_WEIGHT_TOTAL_NOT_100',
                     'role_code' => $role['role_code'] ?? '',
-                    'message' => 'JD active scorecard weight total is not 100.',
+                    'message' => 'Tổng trọng số thẻ điểm JD đang dùng không bằng 100.',
                 ];
             }
             if (($role['active_measure_count'] ?? 0) > 6) {
@@ -1368,7 +1368,7 @@ final class KpiRegistryAdminService
                     'priority' => 'P2',
                     'code' => 'JD_ACTIVE_SET_TOO_LARGE',
                     'role_code' => $role['role_code'] ?? '',
-                    'message' => 'JD active set may be too broad for practical coaching.',
+                    'message' => 'Bộ chỉ số đang dùng của JD có thể quá rộng để kèm cặp thực tế.',
                 ];
             }
         }

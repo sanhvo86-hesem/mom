@@ -18,7 +18,7 @@ var _lang = 'vi';
 
 /* Tier display labels — tier is a filter chip in the library-only console. */
 var TIER_VI = {
-  company:'Cấp công ty', value_stream:'Value-stream', department:'Phòng ban',
+  company:'Cấp công ty', value_stream:'Dòng giá trị', department:'Phòng ban',
   position:'Cấp vị trí'
 };
 
@@ -39,7 +39,9 @@ var _state = {
   customerProfiles:null,
   customerProfilesBaseline:'',
   customerProfileForm:null,
-  /* the one library card expanded into its inline editor: "group:CODE" */
+  /* modal editor draft: changes are staged only after OK */
+  editorDialog:null,
+  /* legacy inline state kept only to avoid breaking old handlers */
   expandedCode:'',
   activeView:'overview',
   reason:'',
@@ -87,6 +89,7 @@ function _seedAddRetireState(cfg){
   _state.customerProfiles = _cloneObj(cfg.customer_requirement_profiles || {});
   _state.customerProfilesBaseline = _stableJson(_state.customerProfiles);
   _state.customerProfileForm = null;
+  _state.editorDialog = null;
 }
 /* Merge persisted + draft added KPIs for the save payload. */
 function _addedPayload(){
@@ -109,7 +112,7 @@ function _retiredChanged(){
 
 /* Group display labels. */
 var GROUP_VI = {
-  governance:'Governance', gate:'Gate', proposed:'Đề xuất / Vị trí'
+  governance:'Quản trị KPI', gate:'Cổng kiểm soát', proposed:'Chỉ số đề xuất / vị trí'
 };
 
 /* Category display labels. */
@@ -125,7 +128,12 @@ window._renderAdminKpiRegistry = function(el, langCode){
   _render();
 };
 
-function _t(vi, en){ return _lang === 'en' ? en : vi; }
+function _t(vi, en){
+  void en;
+  // KPI Admin is a Vietnamese operating console; keep English only in
+  // parameter names, enum values, endpoints, and other governed tokens.
+  return vi;
+}
 
 function _esc(value){
   return String(value == null ? '' : value)
@@ -164,7 +172,7 @@ function _load(){
       _state.reason = '';
     })
     .catch(function(err){
-      _state.error = _t('Không tải được Console KPI.', 'Cannot load the KPI console.')
+      _state.error = _t('Không tải được bảng quản trị KPI.', 'Cannot load the KPI console.')
         + ' ' + (err && err.message ? err.message : '');
     })
     .finally(function(){ _state.loading = false; _render(); });
@@ -178,7 +186,7 @@ function _save(){
 	  }
 	  var validationErrors = _consoleValidationErrors();
 	  if(validationErrors.length){
-	    _state.error = _t('Không thể lưu vì Metric Control Object chưa hợp lệ: ',
+	    _state.error = _t('Không thể lưu vì cấu trúc kiểm soát chỉ số chưa hợp lệ: ',
 	      'Cannot save because Metric Control Object validation is incomplete: ')
 	      + validationErrors.slice(0, 4).join(' | ');
 	    _syncStatus(); return;
@@ -233,6 +241,30 @@ function _sectionMetrics(section){
   if(section === 'proposed') return _state.config.proposed_operating_metrics || [];
   return _kpis();
 }
+function _findMetric(section, code){
+  code = String(code || '').toUpperCase();
+  var list = _sectionMetrics(section);
+  for(var i=0;i<list.length;i++){
+    if(String(list[i].canonical_code || '').toUpperCase() === code) return list[i];
+  }
+  return null;
+}
+function _dialogMatches(section, code){
+  var d = _state.editorDialog;
+  return !!(d && d.group === section && String(d.code || '').toUpperCase() === String(code || '').toUpperCase());
+}
+function _dialogPatch(){
+  if(!_state.editorDialog) return null;
+  if(!_state.editorDialog.patch) _state.editorDialog.patch = {};
+  return _state.editorDialog.patch;
+}
+function _dialogEffectiveRow(){
+  var d = _state.editorDialog;
+  if(!d) return null;
+  var metric = _findMetric(d.group, d.code);
+  if(!metric) return null;
+  return Object.assign({}, metric, d.patch || {});
+}
 function _dirty(){
   var o = _state.overrides, d = _state.addedDraft;
   var n = Object.keys(o.governance||{}).length
@@ -249,6 +281,10 @@ function _profilesChanged(){
 function _val(metric, section, field){
   var sec = _state.overrides[section] || {};
   var code = metric.canonical_code;
+  if(_dialogMatches(section, code)){
+    var patch = _dialogPatch() || {};
+    if(Object.prototype.hasOwnProperty.call(patch, field)) return patch[field];
+  }
   if(sec[code] && Object.prototype.hasOwnProperty.call(sec[code], field)){
     return sec[code][field];
   }
@@ -260,6 +296,15 @@ function _threshold(metric, section, key){
 }
 
 function _setField(section, code, field, value){
+  code = String(code || '').toUpperCase();
+  if(_dialogMatches(section, code)){
+    var patch = _dialogPatch();
+    patch[field] = value;
+    _state.editorDialog.dirty = true;
+    _state.error = ''; _state.message = '';
+    _syncDialogStatus();
+    return;
+  }
   if(!_state.overrides[section]) _state.overrides[section] = {};
   if(!_state.overrides[section][code]) _state.overrides[section][code] = {};
   _state.overrides[section][code][field] = value;
@@ -267,13 +312,12 @@ function _setField(section, code, field, value){
   _syncStatus();
 }
 function _setThreshold(section, code, key, value){
-  var metric = null, list = _sectionMetrics(section);
-  for(var i=0;i<list.length;i++){ if(list[i].canonical_code===code){ metric=list[i]; break; } }
+  code = String(code || '').toUpperCase();
+  var metric = _findMetric(section, code);
   if(!metric) return;
   var sec = _state.overrides[section] || {};
-  var cur = (sec[code] && sec[code].thresholds)
-    ? sec[code].thresholds
-    : Object.assign({}, metric.thresholds || {});
+  var patch = _dialogMatches(section, code) ? (_dialogPatch() || {}) : (sec[code] || null);
+  var cur = (patch && patch.thresholds) ? Object.assign({}, patch.thresholds) : Object.assign({}, metric.thresholds || {});
   // green_point / yellow_point / target are numeric SSOT fields.
   if(key === 'green_point' || key === 'yellow_point' || key === 'target'){
     var n = parseFloat(value);
@@ -293,12 +337,13 @@ function _counterVal(m, section, key){
 }
 /* Edit one key of the dedicated counter-metric object on the override draft. */
 function _setCounter(section, code, key, value){
-  var metric = null, list = _sectionMetrics(section);
-  for(var i=0;i<list.length;i++){ if(list[i].canonical_code===code){ metric=list[i]; break; } }
+  code = String(code || '').toUpperCase();
+  var metric = _findMetric(section, code);
   if(!metric) return;
   var sec = _state.overrides[section] || {};
-  var existing = (sec[code] && sec[code].counter_metric && typeof sec[code].counter_metric === 'object')
-    ? sec[code].counter_metric : null;
+  var patch = _dialogMatches(section, code) ? (_dialogPatch() || {}) : (sec[code] || null);
+  var existing = (patch && patch.counter_metric && typeof patch.counter_metric === 'object')
+    ? patch.counter_metric : null;
   var base = (metric.counter_metric && typeof metric.counter_metric === 'object')
     ? metric.counter_metric : {};
   var cur = existing || Object.assign({}, base);
@@ -310,12 +355,13 @@ function _sampleVal(m, section, key){
   return sample && sample[key] != null ? sample[key] : '';
 }
 function _setSample(section, code, key, value){
-  var metric = null, list = _sectionMetrics(section);
-  for(var i=0;i<list.length;i++){ if(list[i].canonical_code===code){ metric=list[i]; break; } }
+  code = String(code || '').toUpperCase();
+  var metric = _findMetric(section, code);
   if(!metric) return;
   var sec = _state.overrides[section] || {};
-  var cur = (sec[code] && sec[code].sample_policy && typeof sec[code].sample_policy === 'object')
-    ? sec[code].sample_policy : Object.assign({}, metric.sample_policy || {});
+  var patch = _dialogMatches(section, code) ? (_dialogPatch() || {}) : (sec[code] || null);
+  var cur = (patch && patch.sample_policy && typeof patch.sample_policy === 'object')
+    ? Object.assign({}, patch.sample_policy) : Object.assign({}, metric.sample_policy || {});
   if(key === 'stability_required' || key === 'gage_validity_required'){
     cur[key] = !!value;
   } else {
@@ -408,21 +454,21 @@ function _profileOptions(selected){
 	  var bySubtype = ext.scoring_model_by_metric_subtype || {};
 	  if(subtype && !row.control_intent) e.push(_t('Thiếu control_intent.', 'Missing control_intent.'));
 	  if(scoring && subtype && bySubtype[subtype] && bySubtype[subtype].indexOf(scoring) < 0)
-	    e.push(_t('Scoring model không phù hợp metric_subtype.', 'Scoring model does not match metric_subtype.'));
+	    e.push(_t('Mô hình tính điểm không phù hợp metric_subtype.', 'Scoring model does not match metric_subtype.'));
 	  if(['team_reward_candidate','role_review_input','bonus_pool_candidate'].indexOf(reward) >= 0 && status !== 'runtime_calculated')
-	    e.push(_t('Metric staged/manual không được rewardable.', 'Staged/manual metric cannot be rewardable.'));
+	    e.push(_t('Chỉ số chờ dữ liệu hoặc nhập tay không được bật tính thưởng.', 'Staged/manual metric cannot be rewardable.'));
 	  if(reward === 'bonus_pool_candidate'){
 	    var cmBonus = row.counter_metric || {};
-	    if(status !== 'runtime_calculated') e.push(_t('Bonus pool chỉ được bật khi runtime_calculated.', 'Bonus pool requires runtime_calculated.'));
-	    if(!String(row.attribution_rule || '').trim()) e.push(_t('Bonus pool thiếu attribution_rule.', 'Bonus pool missing attribution_rule.'));
-	    if(!String(cmBonus.intent || row.anti_gaming_intent || '').trim()) e.push(_t('Bonus pool thiếu counter-metric intent.', 'Bonus pool missing counter-metric intent.'));
-	    if(!_splitList(row.blocking_conditions).length) e.push(_t('Bonus pool thiếu blocking_conditions.', 'Bonus pool missing blocking_conditions.'));
-	    if(!_hasRewardMinSample(row)) e.push(_t('Bonus pool thiếu min sample.', 'Bonus pool missing minimum sample policy.'));
-	    if(row.calibration_required === false) e.push(_t('Bonus pool không được tắt calibration.', 'Bonus pool calibration cannot be disabled.'));
+	    if(status !== 'runtime_calculated') e.push(_t('Quỹ thưởng chỉ được bật khi calculation_status=runtime_calculated.', 'Bonus pool requires runtime_calculated.'));
+	    if(!String(row.attribution_rule || '').trim()) e.push(_t('Quỹ thưởng thiếu attribution_rule.', 'Bonus pool missing attribution_rule.'));
+	    if(!String(cmBonus.intent || row.anti_gaming_intent || '').trim()) e.push(_t('Quỹ thưởng thiếu intent của chỉ số đối trọng.', 'Bonus pool missing counter-metric intent.'));
+	    if(!_splitList(row.blocking_conditions).length) e.push(_t('Quỹ thưởng thiếu blocking_conditions.', 'Bonus pool missing blocking_conditions.'));
+	    if(!_hasRewardMinSample(row)) e.push(_t('Quỹ thưởng thiếu chính sách cỡ mẫu tối thiểu.', 'Bonus pool missing minimum sample policy.'));
+	    if(row.calibration_required === false) e.push(_t('Quỹ thưởng không được tắt yêu cầu hiệu chuẩn.', 'Bonus pool calibration cannot be disabled.'));
 	  }
 	  if(requireComplete){
 	    if(!String(row.canonical_code || '').trim()) e.push(_t('Thiếu canonical_code.', 'Missing canonical_code.'));
-	    if(!String(row.name || row.name_vi || '').trim()) e.push(_t('Thiếu tên metric.', 'Missing metric name.'));
+	    if(!String(row.name || row.name_vi || '').trim()) e.push(_t('Thiếu tên chỉ số.', 'Missing metric name.'));
 	    ['metric_subtype','control_intent','measurement_data_type','scoring_model_detail',
 	     'evaluation_use','reward_mode','lifecycle_status','owner_role','evidence_source',
 	     'data_contract_gap','target_graduation_condition'].forEach(function(k){
@@ -430,26 +476,26 @@ function _profileOptions(selected){
 	    });
 	    if(['health_indicator','counter_metric','blocker_metric'].indexOf(subtype) < 0){
 	      var cm = row.counter_metric || {};
-	      if(!String(cm.intent || '').trim()) e.push(_t('Thiếu counter-metric intent.', 'Missing counter-metric intent.'));
+	      if(!String(cm.intent || '').trim()) e.push(_t('Thiếu intent của chỉ số đối trọng.', 'Missing counter-metric intent.'));
 	    }
 	    if(subtype !== 'health_indicator' && !_splitList(row.blocking_conditions).length)
-	      e.push(_t('Thiếu blocking conditions.', 'Missing blocking conditions.'));
+	      e.push(_t('Thiếu blocking_conditions.', 'Missing blocking conditions.'));
 	  }
 	  if(subtype === 'health_indicator' && reward && reward !== 'not_rewardable')
-	    e.push(_t('Health indicator chỉ được not_rewardable.', 'Health indicator must be not_rewardable.'));
+	    e.push(_t('Chỉ báo sức khỏe chỉ được reward_mode=not_rewardable.', 'Health indicator must be not_rewardable.'));
 	  if(subtype === 'gate_control_metric'){
 	    ['gate','gate_pass_condition','hold_release_rule','evidence_source'].forEach(function(k){
-	      if(!String(row[k] || '').trim()) e.push(_t('Gate thiếu ', 'Gate missing ') + k + '.');
+	      if(!String(row[k] || '').trim()) e.push(_t('Cổng thiếu ', 'Gate missing ') + k + '.');
 	    });
-	    if(!_splitList(row.linked_cdr).length) e.push(_t('Gate thiếu linked CDR.', 'Gate missing linked CDR.'));
+	    if(!_splitList(row.linked_cdr).length) e.push(_t('Cổng thiếu linked CDR.', 'Gate missing linked CDR.'));
 	    if(['blocker_only','not_rewardable'].indexOf(reward) < 0)
-	      e.push(_t('Gate chỉ được blocker_only/not_rewardable.', 'Gate must be blocker_only/not_rewardable.'));
+	      e.push(_t('Chỉ số cổng chỉ được dùng reward_mode=blocker_only hoặc not_rewardable.', 'Gate must be blocker_only/not_rewardable.'));
 	  }
 	  if(subtype === 'role_performance_measure'){
 	    if(!String(row.controllability_scope || '').trim())
-	      e.push(_t('Role measure thiếu controllability_scope.', 'Role measure missing controllability_scope.'));
+	      e.push(_t('Chỉ số vai trò thiếu controllability_scope.', 'Role measure missing controllability_scope.'));
 	    if(!String(row.action_when_red || row.decision_action || '').trim())
-	      e.push(_t('Role measure thiếu action_when_red.', 'Role measure missing action_when_red.'));
+	      e.push(_t('Chỉ số vai trò thiếu action_when_red.', 'Role measure missing action_when_red.'));
 	  }
 	  if(subtype === 'spc_capability_metric' || scoring === 'spc_control_chart' || scoring === 'spec_limit_capability'){
 	    var minN = parseInt(row.sample_min_n_score || ((row.sample_policy || {}).min_n_score), 10);
@@ -461,24 +507,24 @@ function _profileOptions(selected){
 	    if(minN && minN < 25) e.push(_t('Cpk/SPC min_n_score phải ≥ 25.', 'Cpk/SPC min_n_score must be at least 25.'));
 	    if(!internalN || internalN < 50) e.push(_t('Cpk/SPC internal_n phải ≥ 50.', 'Cpk/SPC internal_n must be at least 50.'));
 	    if(!customerN || customerN < 100) e.push(_t('Cpk/SPC customer_grade_n phải ≥ 100.', 'Cpk/SPC customer_grade_n must be at least 100.'));
-	    if(!stableRequired) e.push(_t('Cpk/SPC phải yêu cầu stability.', 'Cpk/SPC must require stability.'));
-	    if(!gageRequired) e.push(_t('Cpk/SPC phải yêu cầu gage validity.', 'Cpk/SPC must require gage validity.'));
-	    if(reward && reward !== 'not_rewardable') e.push(_t('Cpk/SPC staged/pilot không được rewardable.', 'Cpk/SPC staged/pilot cannot be rewardable.'));
+	    if(!stableRequired) e.push(_t('Cpk/SPC phải yêu cầu stability_required.', 'Cpk/SPC must require stability.'));
+	    if(!gageRequired) e.push(_t('Cpk/SPC phải yêu cầu gage_validity_required.', 'Cpk/SPC must require gage validity.'));
+	    if(reward && reward !== 'not_rewardable') e.push(_t('Cpk/SPC đang chờ dữ liệu/thử nghiệm không được tính thưởng.', 'Cpk/SPC staged/pilot cannot be rewardable.'));
 	  }
 	  if(subtype === 'composite_readiness_index' || scoring === 'composite_weighted_score'){
 	    var total = _componentWeightTotal(row.components || '');
-	    if(total == null) e.push(_t('Composite thiếu component weights.', 'Composite missing component weights.'));
-	    else if(Math.abs(total - 100) > 0.01) e.push(_t('Composite weights phải bằng 100%.', 'Composite weights must equal 100%.'));
+	    if(total == null) e.push(_t('Chỉ số tổng hợp thiếu trọng số component.', 'Composite missing component weights.'));
+	    else if(Math.abs(total - 100) > 0.01) e.push(_t('Tổng trọng số component phải bằng 100%.', 'Composite weights must equal 100%.'));
 	  }
 	  if(scoring === 'rag_3_band'){
 	    var gp = parseFloat(row.green_point != null ? row.green_point : ((row.thresholds || {}).green_point));
 	    var yp = parseFloat(row.yellow_point != null ? row.yellow_point : ((row.thresholds || {}).yellow_point));
-	    if(isNaN(gp) || isNaN(yp)) e.push(_t('RAG 3-band thiếu green/yellow point.', 'RAG 3-band missing green/yellow point.'));
+	    if(isNaN(gp) || isNaN(yp)) e.push(_t('RAG 3-band thiếu green_point hoặc yellow_point.', 'RAG 3-band missing green/yellow point.'));
 	  }
 	  if(scoring === 'binary_pass_fail' && !String(row.gate_pass_condition || '').trim())
-	    e.push(_t('Binary pass/fail thiếu pass condition.', 'Binary pass/fail missing pass condition.'));
+	    e.push(_t('Mô hình đạt/không đạt thiếu điều kiện đạt.', 'Binary pass/fail missing pass condition.'));
 	  if(scoring === 'blocker_only' && !_splitList(row.blocking_conditions).length && !String(row.hold_release_rule || '').trim())
-	    e.push(_t('Blocker-only thiếu blocker/hold rule.', 'Blocker-only missing blocker/hold rule.'));
+	    e.push(_t('Chế độ chỉ chặn thiếu điều kiện chặn hoặc hold_release_rule.', 'Blocker-only missing blocker/hold rule.'));
 	  return _uniqueMessages(e);
 	}
 	function _mcoAddErrors(a){ return _mcoRowErrors(a || {}, true); }
@@ -547,13 +593,62 @@ function _setAlert(id, text){
 	  _syncAddStatus();
 	  _syncCustomerProfileStatus();
 	}
+function _syncDialogStatus(){
+  var errNode = document.getElementById('kc-dialog-errors');
+  var okBtn = document.getElementById('kc-dialog-ok');
+  if(!_state.editorDialog){
+    if(okBtn) okBtn.disabled = true;
+    if(errNode) errNode.hidden = true;
+    return;
+  }
+  var row = _dialogEffectiveRow();
+  var errors = row ? _mcoRowErrors(row, false) : [_t('Không tìm thấy KPI để sửa.', 'Cannot find the KPI to edit.')];
+  if(errNode){
+    errNode.innerHTML = errors.slice(0, 6).map(_esc).join('<br>');
+    errNode.hidden = errors.length === 0;
+  }
+  if(okBtn) okBtn.disabled = errors.length > 0;
+}
+
+function _renderMetricDialog(){
+  var d = _state.editorDialog;
+  if(!d) return '';
+  var metric = _findMetric(d.group, d.code);
+  if(!metric) return '';
+  var row = _dialogEffectiveRow() || metric;
+  var c = function(s){ return _esc(s == null ? '' : s); };
+  var retired = _isRetired({ group:d.group, canonical_code:d.code });
+  var leftAction = retired
+    ? '<button class="kc-btn kc-btn-restore" type="button" onclick="_kpiDialogRestore()">' + _t('Khôi phục', 'Restore') + '</button>'
+    : '<button class="kc-btn kc-btn-danger" type="button" onclick="_kpiDialogRetire()">' + _t('Ngừng dùng', 'Retire') + '</button>';
+  var errors = _mcoRowErrors(row, false);
+  return '<div class="kc-dialog-backdrop" role="presentation" onclick="_kpiDialogBackdrop(event)">' +
+    '<section class="kc-dialog" role="dialog" aria-modal="true" aria-labelledby="kc-dialog-title">' +
+      '<header class="kc-dialog-head">' +
+        '<div><span class="kc-eyebrow">' + _esc(GROUP_VI[d.group] || d.group) + '</span>' +
+        '<h3 id="kc-dialog-title"><span class="kc-code">' + c(d.code) + '</span> ' +
+          c(row.name_vi || row.name || d.code) + '</h3></div>' +
+        '<button class="kc-icon-btn" type="button" onclick="_kpiDialogCancel()" aria-label="' +
+          _t('Đóng', 'Close') + '">&times;</button>' +
+      '</header>' +
+      '<div class="kc-alert error" id="kc-dialog-errors" ' + (errors.length ? '' : 'hidden') + '>' +
+        errors.slice(0, 6).map(_esc).join('<br>') + '</div>' +
+      '<div class="kc-dialog-body">' + _renderEditCard(metric, d.group, true) + '</div>' +
+      '<footer class="kc-dialog-foot">' +
+        leftAction +
+        '<button class="kc-btn" type="button" onclick="_kpiDialogCancel()">' + _t('Hủy', 'Cancel') + '</button>' +
+        '<button class="kc-btn primary" id="kc-dialog-ok" type="button" ' + (errors.length ? 'disabled' : '') +
+          ' onclick="_kpiDialogOk()">OK</button>' +
+      '</footer>' +
+    '</section></div>';
+}
 
 /* ── Render ───────────────────────────────────────────────────────── */
 function _render(){
   var el = _el || document.getElementById('admin-content');
   if(!el || !document.contains(el)) return;
   if(_state.loading){
-    el.innerHTML = '<div class="hm-empty">' + _t('Đang tải Console KPI...', 'Loading KPI console...') + '</div>';
+    el.innerHTML = '<div class="hm-empty">' + _t('Đang tải bảng quản trị KPI...', 'Loading KPI console...') + '</div>';
     return;
   }
   var body = _renderActiveView();
@@ -563,8 +658,8 @@ function _render(){
   '<header class="kc-head">' +
     '<div class="kc-head-titles">' +
       '<span class="kc-eyebrow">' + _t('Quản trị điều hành', 'Operations governance') + '</span>' +
-      '<h2>' + _t('Console KPI — Governance', 'KPI Console — Governance') + '</h2>' +
-      '<p>' + _t('Thư viện KPI thực chiến: lọc, mở thẻ để biên tập ngưỡng / owner / nhịp / counter-metric. Lưu ghi overlay runtime và tái tạo §4/§5/§6 trong ANNEX-122.',
+      '<h2>' + _t('Bảng quản trị KPI — quản trị chỉ số', 'KPI Console — Governance') + '</h2>' +
+      '<p>' + _t('Thư viện KPI vận hành: lọc, mở thẻ để sửa ngưỡng, chủ sở hữu, nhịp đo và chỉ số đối trọng. Khi bấm lưu, hệ thống ghi lớp thay đổi vận hành và tái tạo §4/§5/§6 trong ANNEX-122.',
                  'The operating-KPI governance console: structured tabs, no raw JSON editing, with runtime/manual/staged/retired labels and ANNEX-122 sync.') + '</p>' +
     '</div>' +
     '<div class="kc-actions">' +
@@ -582,27 +677,29 @@ function _render(){
       '">' + _esc(_state.reason || '') + '</textarea></div>' +
   _renderTabs() +
   body +
+  _renderMetricDialog() +
 '</section>';
   _syncStatus();
+  _syncDialogStatus();
 }
 
 var _viewDefs = [
   ['overview', 'Tổng quan', 'Overview'],
-  ['official', 'Official KPI', 'Official KPI'],
-  ['operating', 'Operating', 'Operating'],
-  ['gate', 'Gate G0-G7', 'Gate G0-G7'],
+  ['official', 'KPI chính thức', 'Official KPI'],
+  ['operating', 'Chỉ số vận hành', 'Operating'],
+  ['gate', 'Cổng G0-G7', 'Gate G0-G7'],
   ['jd', 'JD', 'JD'],
-  ['data', 'Data Contracts', 'Data Contracts'],
-  ['counter', 'Counter/Blockers', 'Counter/Blockers'],
-	  ['quality_escape', 'Quality Escape', 'Quality Escape'],
+  ['data', 'Hợp đồng dữ liệu', 'Data Contracts'],
+  ['counter', 'Đối trọng / chặn', 'Counter/Blockers'],
+	  ['quality_escape', 'Lọt lỗi khách hàng', 'Quality Escape'],
 	  ['ctq_capability', 'CTQ/Cpk', 'CTQ/Cpk'],
-	  ['retired', 'Retired/Aliases', 'Retired/Aliases'],
+	  ['retired', 'Ngừng dùng / bí danh', 'Retired/Aliases'],
   ['profiles', 'Hồ sơ Khách', 'Customer Profiles'],
-  ['audit', 'Audit/Drift', 'Audit/Drift']
+  ['audit', 'Kiểm tra / trôi chuẩn', 'Audit/Drift']
 ];
 
 function _renderTabs(){
-  return '<nav class="kc-tabs" aria-label="KPI console sections">' +
+  return '<nav class="kc-tabs" aria-label="Các phần quản trị KPI">' +
     _viewDefs.map(function(v){
       var active = _state.activeView === v[0];
       var label = _t(v[1], v[2]);
@@ -623,18 +720,18 @@ function _renderActiveView(){
   if(_state.addForm) return _renderAddForm();
   if(_state.activeView === 'overview') return _renderOverview();
   if(_state.activeView === 'official')
-    return _metricPanel(_t('Official KPI Scorecard', 'Official KPI Scorecard'), _viewRows('official_kpis'), true);
+    return _metricPanel(_t('KPI chính thức', 'Official KPI Scorecard'), _viewRows('official_kpis'), true);
   if(_state.activeView === 'operating')
-    return _metricPanel(_t('Operating Metrics', 'Operating Metrics'), _viewRows('operating_metrics'), true);
+    return _metricPanel(_t('Chỉ số vận hành', 'Operating Metrics'), _viewRows('operating_metrics'), true);
   if(_state.activeView === 'gate')
-    return _renderGateCoverage() + _metricPanel(_t('Gate Control Metrics', 'Gate Control Metrics'), _viewRows('gate_control_metrics'), true);
+    return _renderGateCoverage() + _metricPanel(_t('Chỉ số kiểm soát cổng', 'Gate Control Metrics'), _viewRows('gate_control_metrics'), true);
   if(_state.activeView === 'jd') return _renderJdScorecards();
   if(_state.activeView === 'data') return _renderDataContracts();
   if(_state.activeView === 'counter') return _renderCounterBlockers();
 	  if(_state.activeView === 'quality_escape') return _renderQualityEscapeSeverity();
 	  if(_state.activeView === 'ctq_capability') return _renderCtqCapability();
 	  if(_state.activeView === 'retired')
-    return _metricPanel(_t('Retired / Aliases', 'Retired / Aliases'), _viewRows('retired_metrics'), false);
+    return _metricPanel(_t('Chỉ số ngừng dùng / bí danh', 'Retired / Aliases'), _viewRows('retired_metrics'), false);
   if(_state.activeView === 'profiles') return _renderCustomerProfiles();
   if(_state.activeView === 'audit') return _renderAuditDrift();
   return _renderOverview();
@@ -658,7 +755,7 @@ function _renderCustomerProfiles(){
 
   var head = '<div class="kc-eyebrow">' + _t('Hồ sơ yêu cầu khách hàng', 'Customer Requirement Profiles') + '</div>' +
     '<div class="kc-nav"><span class="kc-nav-title">' +
-      _t('Hồ sơ Khách hàng (Customer Profiles)', 'Customer Profiles') + '</span>' +
+      _t('Hồ sơ khách hàng', 'Customer Profiles') + '</span>' +
       '<span class="kc-nav-spacer"></span><button class="kc-btn primary" type="button" onclick="_kpiCustomerProfileOpen()">+ ' +
       _t('Thêm hồ sơ khách hàng', 'Add customer profile') + '</button></div>' +
     '<p class="kc-mini">' + _esc(profilesRoot.rule || '') + '</p>' +
@@ -677,7 +774,7 @@ function _renderCustomerProfiles(){
     var evidence = p.evidence_pack_required || [];
     var custCodes = applies.customer_codes || [];
     var status = String(p.status || '');
-    var statusBadge = '<span class="kc-pill' + (status === 'active' ? ' kc-pill--accent' : '') + '">' + _esc(status || 'unset') + '</span>';
+    var statusBadge = '<span class="kc-pill' + (status === 'active' ? ' kc-pill--accent' : '') + '">' + _esc(_statusVi(status || 'unset') || status || 'chưa đặt') + '</span>';
 
     // Quality requirements toggle grid — boolean values rendered as ✓/✗,
     // non-boolean (numbers, arrays) rendered as their value.
@@ -707,7 +804,7 @@ function _renderCustomerProfiles(){
       return '<div class="kc-prof-gate-row">' +
         '<span class="kc-prof-gate-key">' + g + '</span>' +
         '<span class="kc-prof-gate-vals">' + (list.length ? list.map(_esc).join(', ') :
-          '<span class="kc-mini">— ' + _t('chưa có metric', 'no metric') + ' —</span>') + '</span></div>';
+          '<span class="kc-mini">— ' + _t('chưa có chỉ số', 'no metric') + ' —</span>') + '</span></div>';
     }).join('');
 
     var evidenceRows = evidence.map(function(e){
@@ -717,7 +814,7 @@ function _renderCustomerProfiles(){
     var unresolved = linked.filter(function(lc){ return !libCodes[String(lc).toUpperCase()]; });
     var unresolvedBlock = unresolved.length
       ? '<div class="kc-alert error" style="display:block;margin-top:8px">' +
-        _t('Linked metric chưa resolve trong registry:', 'Unresolved linked metric in registry:') +
+        _t('KPI liên kết chưa tìm thấy trong registry:', 'Unresolved linked metric in registry:') +
         ' <b>' + unresolved.map(_esc).join(', ') + '</b></div>'
       : '';
 
@@ -727,13 +824,13 @@ function _renderCustomerProfiles(){
       statusBadge + '</div>' +
       '<div class="kc-prof-meta">' +
         '<span class="kc-mini">' + _t('Khách áp dụng', 'Applies to customers') + ':</span> ' +
-        (custCodes.length ? custCodes.map(_esc).join(', ') : '<i>' + _t('default', 'default') + '</i>') +
-        (applies.silent_default_forbidden ? ' · <b>' + _t('Không default ngầm', 'No silent default') + '</b>' : '') +
+        (custCodes.length ? custCodes.map(_esc).join(', ') : '<i>' + _t('mặc định', 'default') + '</i>') +
+        (applies.silent_default_forbidden ? ' · <b>' + _t('Không mặc định ngầm', 'No silent default') + '</b>' : '') +
       '</div>' +
       unresolvedBlock +
-      '<details><summary>' + _t('Quality requirements', 'Quality requirements') +
+      '<details><summary>' + _t('Yêu cầu chất lượng', 'Quality requirements') +
         ' (' + Object.keys(qreq).length + ')</summary><div class="kc-prof-req-grid">' + reqRows + '</div></details>' +
-      '<details><summary>' + _t('Linked metrics', 'Linked metrics') + ' (' + linked.length + ')</summary>' +
+      '<details><summary>' + _t('KPI liên kết', 'Linked metrics') + ' (' + linked.length + ')</summary>' +
         '<div class="kc-pill-list">' + linkedRows + '</div></details>' +
       '<details><summary>' + _t('Bao phủ cổng G0–G7', 'Gate coverage G0–G7') + '</summary>' +
         '<div class="kc-prof-gate-grid">' + gateRows + '</div></details>' +
@@ -823,23 +920,23 @@ function _renderCustomerProfileForm(){
     '<div class="kc-alert error" ' + (errors.length ? '' : 'hidden') + '>' +
       errors.map(_esc).join('<br>') + '</div>' +
     '<div class="kc-warn">' +
-      _t('Hồ sơ khách hàng được lưu vào runtime overlay của KPI registry; metric liên kết phải resolve về canonical_code, không nhập JSON thô.',
+      _t('Hồ sơ khách hàng được lưu vào lớp thay đổi vận hành của KPI registry; chỉ số liên kết phải khớp canonical_code, không nhập JSON thô.',
         'Customer profiles are saved to the KPI registry runtime overlay; linked metrics must resolve to canonical_code, no raw JSON editing.') +
     '</div>' +
     '<section class="kc-mco-section"><div class="kc-mco-title"><b>1</b><span>' +
       _t('Định danh khách hàng', 'Customer identity') + '</span></div><div class="kc-grid">' +
       _field('profile_code', '<input class="kc-input" type="text" value="' + _esc(f.profile_code) + '" placeholder="ACME_AEROSPACE" oninput="_kpiCustomerProfileField(\'profile_code\',this.value)">') +
-      _field(_t('Tên VI', 'Name VI'), '<input class="kc-input" type="text" value="' + _esc(f.profile_name_vi) + '" oninput="_kpiCustomerProfileField(\'profile_name_vi\',this.value)">') +
-      _field(_t('Tên EN', 'Name EN'), '<input class="kc-input" type="text" value="' + _esc(f.profile_name) + '" oninput="_kpiCustomerProfileField(\'profile_name\',this.value)">') +
+      _field(_t('Tên tiếng Việt', 'Name VI'), '<input class="kc-input" type="text" value="' + _esc(f.profile_name_vi) + '" oninput="_kpiCustomerProfileField(\'profile_name_vi\',this.value)">') +
+      _field(_t('Tên tiếng Anh', 'Name EN'), '<input class="kc-input" type="text" value="' + _esc(f.profile_name) + '" oninput="_kpiCustomerProfileField(\'profile_name\',this.value)">') +
       _field('status', '<select class="kc-input" onchange="_kpiCustomerProfileField(\'status\',this.value)">' +
-        _selOptions([['active','active'],['pilot','pilot'],['draft','draft'],['retired','retired']], f.status) + '</select>') +
+        _selOptions([['active','đang dùng'],['pilot','thử nghiệm'],['draft','nháp'],['retired','ngừng dùng']], f.status) + '</select>') +
       '</div></section>' +
     '<section class="kc-mco-section"><div class="kc-mco-title"><b>2</b><span>' +
-      _t('Áp dụng & chống default ngầm', 'Applicability and defaulting') + '</span></div><div class="kc-grid">' +
+      _t('Áp dụng & chống mặc định ngầm', 'Applicability and defaulting') + '</span></div><div class="kc-grid">' +
       _field('customer_codes', '<input class="kc-input" type="text" value="' + _esc(f.customer_codes) + '" placeholder="ACME, ACME-SG" oninput="_kpiCustomerProfileField(\'customer_codes\',this.value)">') +
-      _field('default_for_unassigned', '<label class="kc-check"><input type="checkbox" ' + (f.default_for_unassigned ? 'checked' : '') + ' onchange="_kpiCustomerProfileField(\'default_for_unassigned\',this.checked)"> default</label>') +
-      _field('silent_default_forbidden', '<label class="kc-check"><input type="checkbox" ' + (f.silent_default_forbidden ? 'checked' : '') + ' onchange="_kpiCustomerProfileField(\'silent_default_forbidden\',this.checked)"> no silent default</label>') +
-      _field('assignment_event_required', '<label class="kc-check"><input type="checkbox" ' + (f.assignment_event_required ? 'checked' : '') + ' onchange="_kpiCustomerProfileField(\'assignment_event_required\',this.checked)"> assignment event</label>') +
+      _field('default_for_unassigned', '<label class="kc-check"><input type="checkbox" ' + (f.default_for_unassigned ? 'checked' : '') + ' onchange="_kpiCustomerProfileField(\'default_for_unassigned\',this.checked)"> đặt mặc định khi chưa gán</label>') +
+      _field('silent_default_forbidden', '<label class="kc-check"><input type="checkbox" ' + (f.silent_default_forbidden ? 'checked' : '') + ' onchange="_kpiCustomerProfileField(\'silent_default_forbidden\',this.checked)"> cấm mặc định ngầm</label>') +
+      _field('assignment_event_required', '<label class="kc-check"><input type="checkbox" ' + (f.assignment_event_required ? 'checked' : '') + ' onchange="_kpiCustomerProfileField(\'assignment_event_required\',this.checked)"> bắt buộc có sự kiện gán</label>') +
       '</div></section>' +
     '<section class="kc-mco-section"><div class="kc-mco-title"><b>3</b><span>' +
       _t('Yêu cầu chất lượng & KPI liên kết', 'Quality requirements and linked KPIs') + '</span></div>' +
@@ -910,7 +1007,7 @@ function _renderRegistryContracts(){
   if(!drc && !mic && !acc){ return ''; }
 
   var head = '<div class="kc-eyebrow" style="margin-top:24px">' +
-    _t('Hợp đồng dashboard & nhập liệu (P08–P10)', 'Dashboard & manual-input contracts (P08–P10)') +
+      _t('Hợp đồng bảng điều khiển và nhập liệu (P08-P10)', 'Dashboard & manual-input contracts (P08-P10)') +
     '</div>';
 
   var dashCard = '';
@@ -937,19 +1034,19 @@ function _renderRegistryContracts(){
     var staged = drc.staged_metric_policy || drc.render_rules && drc.render_rules.staged_data_contract || '';
     dashCard = '<article class="kc-prof-card">' +
       '<div class="kc-prof-head"><span class="kc-code">' + _esc(drc.contract_id || 'dashboard_render_contract') + '</span>' +
-      '<span class="kc-prof-name">' + _t('Hợp đồng render dashboard', 'Dashboard render contract') + '</span>' +
-      '<span class="kc-pill kc-pill--accent">contract</span></div>' +
-      '<div class="kc-prof-meta"><span class="kc-mini">' + _t('Trường bắt buộc / card', 'Required fields per card') + ':</span> ' + req + '</div>' +
+      '<span class="kc-prof-name">' + _t('Hợp đồng hiển thị bảng điều khiển', 'Dashboard render contract') + '</span>' +
+      '<span class="kc-pill kc-pill--accent">hợp đồng</span></div>' +
+      '<div class="kc-prof-meta"><span class="kc-mini">' + _t('Trường bắt buộc / thẻ', 'Required fields per card') + ':</span> ' + req + '</div>' +
       (classRows
-        ? '<details open><summary>' + _t('Card classes', 'Card classes') + '</summary>' +
+        ? '<details open><summary>' + _t('Phân lớp thẻ', 'Card classes') + '</summary>' +
           '<div class="kc-prof-gate-grid">' + classRows + '</div></details>'
         : '') +
       (ruleRows
-        ? '<details><summary>' + _t('Quy tắc render theo calculation_status', 'Render rules by calculation_status') + '</summary>' +
+        ? '<details><summary>' + _t('Quy tắc hiển thị theo calculation_status', 'Render rules by calculation_status') + '</summary>' +
           '<div class="kc-prof-req-grid">' + ruleRows + '</div></details>'
         : '') +
       (staged
-        ? '<div class="kc-mini" style="margin-top:8px"><b>' + _t('Chính sách metric staged', 'Staged metric policy') + ':</b> ' + _esc(staged) + '</div>'
+        ? '<div class="kc-mini" style="margin-top:8px"><b>' + _t('Chính sách chỉ số chờ dữ liệu', 'Staged metric policy') + ':</b> ' + _esc(staged) + '</div>'
         : '') +
       '</article>';
   }
@@ -967,29 +1064,29 @@ function _renderRegistryContracts(){
     var policy = gate.policy || '';
     var displayFields = (mic.required_fields || []).concat([
       'input_status', 'entered_by', 'verified_by', 'verified_at', 'evidence_reference',
-      'reward contribution disabled until verified'
+      'không tính thưởng cho tới khi input_status=verified'
     ]);
     inputCard = '<article class="kc-prof-card">' +
       '<div class="kc-prof-head"><span class="kc-code">' + _esc(mic.contract_id || 'manual_input_contract') + '</span>' +
-      '<span class="kc-prof-name">' + _t('Hợp đồng nhập tay (có kiểm soát)', 'Manual-input contract') + '</span>' +
-      '<span class="kc-pill kc-pill--accent">contract</span></div>' +
+      '<span class="kc-prof-name">' + _t('Hợp đồng nhập tay có kiểm soát', 'Manual-input contract') + '</span>' +
+      '<span class="kc-pill kc-pill--accent">hợp đồng</span></div>' +
       '<div class="kc-prof-meta">' +
-        '<span class="kc-mini">' + _t('Endpoint lưu', 'Save endpoint') + ':</span> <code>' + _esc(mic.endpoint_save || '') + '</code> · ' +
-        '<span class="kc-mini">' + _t('Endpoint xem', 'List endpoint') + ':</span> <code>' + _esc(mic.endpoint_list || '') + '</code>' +
+        '<span class="kc-mini">' + _t('Đường dẫn lưu', 'Save endpoint') + ':</span> <code>' + _esc(mic.endpoint_save || '') + '</code> · ' +
+        '<span class="kc-mini">' + _t('Đường dẫn xem', 'List endpoint') + ':</span> <code>' + _esc(mic.endpoint_list || '') + '</code>' +
       '</div>' +
       '<div class="kc-prof-meta">' +
         '<span class="kc-mini">' + _t('Trạng thái nhập (input_status)', 'Input status enum') + ':</span> ' +
         (enums || []).map(function(s){ return '<span class="kc-pill">' + _esc(s) + '</span>'; }).join(' ') +
       '</div>' +
       '<div class="kc-prof-meta"><span class="kc-mini">' +
-        _t('Trường phải render cho dữ liệu nhập tay', 'Manual-input display fields') + ':</span> ' +
+        _t('Trường phải hiển thị cho dữ liệu nhập tay', 'Manual-input display fields') + ':</span> ' +
         displayFields.map(function(s){ return '<span class="kc-pill">' + _esc(s) + '</span>'; }).join(' ') +
       '</div>' +
       (policy
         ? '<div class="kc-mini" style="margin-top:8px"><b>reward_gate.policy:</b> ' + _esc(policy) + '</div>'
         : '') +
       (validationRows
-        ? '<details><summary>' + _t('Quy tắc validation', 'Validation rules') + '</summary>' +
+        ? '<details><summary>' + _t('Quy tắc kiểm tra dữ liệu', 'Validation rules') + '</summary>' +
           '<div class="kc-prof-req-grid">' + validationRows + '</div></details>'
         : '') +
       '</article>';
@@ -1013,26 +1110,49 @@ function _renderRegistryContracts(){
     }).join('');
     adminCard = '<article class="kc-prof-card">' +
       '<div class="kc-prof-head"><span class="kc-code">' + _esc(acc.contract_id || 'admin_console_contract') + '</span>' +
-      '<span class="kc-prof-name">' + _t('Hợp đồng Admin Console', 'Admin Console contract') + '</span>' +
+      '<span class="kc-prof-name">' + _t('Hợp đồng bảng quản trị KPI', 'Admin Console contract') + '</span>' +
       '<span class="kc-pill kc-pill--accent">P10</span></div>' +
       '<div class="kc-prof-meta"><span class="kc-mini">' +
-        _t('Wizard sections', 'Wizard sections') + ':</span> ' +
-        sections.map(function(s){ return '<span class="kc-pill">' + _esc(s) + '</span>'; }).join(' ') + '</div>' +
+        _t('Các phần cấu hình', 'Wizard sections') + ':</span> ' +
+        sections.map(function(s){ return '<span class="kc-pill">' + _esc(_contractSectionLabel(s)) + '</span>'; }).join(' ') + '</div>' +
       '<div class="kc-prof-meta"><span class="kc-mini">' +
-        _t('Không được ghi từ Console', 'Blocked Console-save fields') + ':</span> ' +
+        _t('Không được ghi từ bảng quản trị', 'Blocked Console-save fields') + ':</span> ' +
         blocked.map(function(s){ return '<span class="kc-pill">' + _esc(s) + '</span>'; }).join(' ') + '</div>' +
       (saveRows
-        ? '<details open><summary>' + _t('Save policy', 'Save policy') + '</summary>' +
+        ? '<details open><summary>' + _t('Chính sách lưu', 'Save policy') + '</summary>' +
           '<div class="kc-prof-req-grid">' + saveRows + '</div></details>'
         : '') +
       (dynRows
-        ? '<details><summary>' + _t('Luật validation động', 'Dynamic validation rules') + '</summary>' +
+        ? '<details><summary>' + _t('Luật kiểm tra động', 'Dynamic validation rules') + '</summary>' +
           '<div class="kc-prof-gate-grid">' + dynRows + '</div></details>'
         : '') +
       '</article>';
   }
 
   return head + '<div class="kc-prof-grid">' + dashCard + inputCard + adminCard + '</div>';
+}
+
+function _contractSectionLabel(s){
+  var map = {
+    problem_control_intent:'ý đồ kiểm soát',
+    problem_type:'ý đồ kiểm soát',
+    metric_subtype:'phân loại chỉ số',
+    measurement_data_type:'kiểu dữ liệu đo',
+    scoring_model:'mô hình tính điểm',
+    data_contract_evidence:'dữ liệu và bằng chứng',
+    evaluation_reward_weight:'đánh giá, thưởng và trọng số',
+    role_assignments:'phân công vai trò',
+    counter_blocker_lifecycle:'đối trọng, điều kiện chặn và vòng đời'
+  };
+  return map[s] || s;
+}
+
+function _customerNcrEventRuleVi(text){
+  if(!text) return '';
+  if(String(text).indexOf('Distinguish detection, NCR creation, customer notification, and customer acceptance timestamps.') >= 0){
+    return 'Phải tách riêng các mốc detection, NCR creation, customer notification và customer acceptance; đây là bốn timestamp kiểm soát khác nhau, không được gộp khi tính SLA hoặc mô phỏng.';
+  }
+  return text;
 }
 
 	function _renderQualityEscapeSeverity(){
@@ -1047,10 +1167,10 @@ function _renderRegistryContracts(){
   });
   var matrixRows = matrixKeys.map(function(k){
     var row = matrix[k] || {};
-    return [
-      k,
-      row.scope || '—',
-      row.hard_gate ? 'yes' : 'no',
+      return [
+        k,
+        row.scope || '—',
+        row.hard_gate ? 'có' : 'không',
       row.blocking_condition_id || '—',
       row.score_impact || '—',
       row.required_action || '—'
@@ -1071,26 +1191,26 @@ function _renderRegistryContracts(){
     return '<span class="kc-pill">' + _esc(f) + '</span>';
   }).join(' ');
   var severityTable = matrixRows.length
-    ? _simpleTable(['Severity','Scope','Hard gate','Blocker','Score impact','Required action'], matrixRows)
-    : '<div class="hm-empty">' + _t('Chưa khai báo severity matrix.', 'No severity matrix declared.') + '</div>';
+    ? _simpleTable(['Mức độ','Phạm vi','Cổng chặn','Điều kiện chặn','Tác động điểm','Hành động bắt buộc'], matrixRows)
+    : '<div class="hm-empty">' + _t('Chưa khai báo ma trận mức độ nghiêm trọng.', 'No severity matrix declared.') + '</div>';
   var contractTable = reqFields.length
-    ? _simpleTable(['Field','Table','Column','Evidence'], reqFields)
-    : '<div class="hm-empty">' + _t('Chưa khai báo data contract.', 'No data contract declared.') + '</div>';
+    ? _simpleTable(['Trường','Bảng','Cột','Bằng chứng'], reqFields)
+    : '<div class="hm-empty">' + _t('Chưa khai báo hợp đồng dữ liệu.', 'No data contract declared.') + '</div>';
 
   return '<section class="kc-panel"><div class="kc-panel-head"><h3>' +
-    _t('Customer NCR severity & 8D', 'Customer NCR severity & 8D') +
+    _t('Mức độ nghiêm trọng NCR khách hàng và 8D', 'Customer NCR severity & 8D') +
     '</h3><span class="kc-pill' + (bonus.simulation_only ? ' kc-pill--accent' : '') + '">' +
-    (bonus.simulation_only ? 'simulation_only' : 'simulation_not_configured') + '</span></div>' +
+    (bonus.simulation_only ? 'chỉ mô phỏng' : 'chưa cấu hình mô phỏng') + '</span></div>' +
     '<div class="kc-mini">' + _esc(matrix.usage_rule || '') + '</div>' +
-    '<details open><summary>' + _t('Severity matrix', 'Severity matrix') + '</summary>' + severityTable + '</details>' +
-    '<details><summary>' + _t('3D/4D/8D data contract', '3D/4D/8D data contract') + '</summary>' +
-      '<div class="kc-mini">' + _esc(dataContract.event_time_distinction_rule || '') + '</div>' + contractTable + '</details>' +
-    '<details open><summary>' + _t('Bonus simulation hard gates', 'Bonus simulation hard gates') + '</summary>' +
+    '<details open><summary>' + _t('Ma trận mức độ nghiêm trọng', 'Severity matrix') + '</summary>' + severityTable + '</details>' +
+    '<details><summary>' + _t('Hợp đồng dữ liệu 3D/4D/8D', '3D/4D/8D data contract') + '</summary>' +
+      '<div class="kc-mini">' + _esc(_customerNcrEventRuleVi(dataContract.event_time_distinction_rule || '')) + '</div>' + contractTable + '</details>' +
+    '<details open><summary>' + _t('Cổng chặn khi mô phỏng thưởng', 'Bonus simulation hard gates') + '</summary>' +
       '<div class="kc-prof-meta"><b>' + _esc(bonus.payout_formula || '') + '</b></div>' +
       '<div class="kc-prof-meta">' + _esc(bonus.scope_rule || '') + '</div>' +
       '<div class="kc-pill-list">' + hardGates + '</div>' +
       '<div class="kc-mini">' + _esc(bonus.no_real_payout_rule || '') + '</div></details>' +
-    '<details><summary>' + _t('Dashboard contract', 'Dashboard contract') + '</summary>' +
+    '<details><summary>' + _t('Hợp đồng hiển thị bảng điều khiển', 'Dashboard contract') + '</summary>' +
       '<div class="kc-pill-list">' + dashFields + '</div>' +
       '<div class="kc-mini">' + _esc(dash.staged_render_rule || '') + '</div></details>' +
     '</section>';
@@ -1110,7 +1230,7 @@ function _renderRegistryContracts(){
 	    var sp = row.sample_policy || {};
 	    return [
 	      code,
-	      status,
+	      _statusVi(status) || status,
 	      row.metric_subtype || '—',
 	      sp.min_n_score || '—',
 	      sp.customer_grade_n || '—',
@@ -1123,9 +1243,9 @@ function _renderRegistryContracts(){
 	      k,
 	      (b.min_n == null ? '—' : b.min_n) + (b.max_n == null ? '+' : '-' + b.max_n),
 	      b.capability_status || '—',
-	      b.suppress_numeric_cpk ? 'hide Cpk' : 'show Cpk',
-	      b.forbid_green ? 'no green' : 'green allowed',
-	      b.customer_claim_allowed ? 'claim allowed' : 'no customer claim'
+	      b.suppress_numeric_cpk ? 'ẩn Cpk' : 'hiển thị Cpk',
+	      b.forbid_green ? 'không được xanh' : 'được phép xanh',
+	      b.customer_claim_allowed ? 'được cam kết khách hàng' : 'không cam kết khách hàng'
 	    ];
 	  });
 	  var reqFields = (chars.required_fields || []).map(function(f){ return '<span class="kc-pill">' + _esc(f) + '</span>'; }).join(' ');
@@ -1133,18 +1253,18 @@ function _renderRegistryContracts(){
 	    return [f.field || '', f.source || '', f.reason || ''];
 	  });
 	  return '<section class="kc-panel"><div class="kc-panel-head"><h3>' +
-	    _t('CTQ / Cpk / SPC capability', 'CTQ / Cpk / SPC capability') +
+	    _t('Năng lực CTQ / Cpk / SPC', 'CTQ / Cpk / SPC capability') +
 	    '</h3><span class="kc-pill kc-pill--accent">' + _esc(contract.status || 'staged_data_contract') + '</span></div>' +
 	    '<div class="kc-mini">' + _esc(policy.authority_rule || contract.authority_rule || '') + '</div>' +
-	    '<details open><summary>' + _t('Sample policy bands', 'Sample policy bands') + '</summary>' +
-	      (bandRows.length ? _simpleTable(['Band','n','Status','Numeric','Color','Customer'], bandRows) : '<div class="hm-empty">—</div>') + '</details>' +
-	    '<details open><summary>' + _t('Capability metrics', 'Capability metrics') + '</summary>' +
-	      (metrics.length ? _simpleTable(['Metric','Status','Subtype','min_n','customer_n','Evidence'], metrics) : '<div class="hm-empty">—</div>') + '</details>' +
-	    '<details><summary>' + _t('CTQ characteristic required fields', 'CTQ characteristic required fields') + '</summary>' +
+	    '<details open><summary>' + _t('Dải chính sách mẫu', 'Sample policy bands') + '</summary>' +
+	      (bandRows.length ? _simpleTable(['Dải','n','Trạng thái','Hiển thị số','Màu','Khách hàng'], bandRows) : '<div class="hm-empty">—</div>') + '</details>' +
+	    '<details open><summary>' + _t('Chỉ số năng lực', 'Capability metrics') + '</summary>' +
+	      (metrics.length ? _simpleTable(['Chỉ số','Trạng thái','Subtype','min_n','customer_n','Bằng chứng'], metrics) : '<div class="hm-empty">—</div>') + '</details>' +
+	    '<details><summary>' + _t('Trường bắt buộc của đặc tính CTQ', 'CTQ characteristic required fields') + '</summary>' +
 	      '<div class="kc-pill-list">' + reqFields + '</div><div class="kc-mini">' + _esc(chars.staged_gap || '') + '</div></details>' +
-	    '<details><summary>' + _t('Runtime data contract fields', 'Runtime data contract fields') + '</summary>' +
-	      (contractFields.length ? _simpleTable(['Field','Source','Reason'], contractFields) : '<div class="hm-empty">—</div>') + '</details>' +
-	    '<div class="kc-warn">' + _t('Cpk không được xanh khi n<25; provisional 25-49 không reward/claim; customer-grade chỉ khi n≥100 + stable + gage hợp lệ + revalidation sau thay đổi.',
+	    '<details><summary>' + _t('Trường hợp đồng dữ liệu tính tự động', 'Runtime data contract fields') + '</summary>' +
+	      (contractFields.length ? _simpleTable(['Trường','Nguồn','Lý do'], contractFields) : '<div class="hm-empty">—</div>') + '</details>' +
+	    '<div class="kc-warn">' + _t('Cpk không được xanh khi n<25; mức 25-49 chỉ là nội bộ tạm thời, không dùng cho thưởng hoặc cam kết khách hàng; mức khách hàng chỉ được dùng khi n≥100, quá trình ổn định, thiết bị đo hợp lệ và đã tái xác nhận sau thay đổi.',
 	      'Cpk cannot be green when n<25; 25-49 provisional is not reward/claim eligible; customer-grade requires n>=100 + stability + valid gage + post-change revalidation.') + '</div>' +
 	    '</section>';
 	}
@@ -1156,12 +1276,12 @@ function _renderOverview(){
   var integrity = views.integrity_status || cfg.integrity_status || {};
   var gate = views.gate_coverage || cfg.gate_coverage || {};
   var boxes = [
-    [_t('Tổng metric', 'Total metrics'), counts.total_metrics || ((_state.config || {}).library || []).length],
-    [_t('Official active', 'Official active'), counts.official_active || 0],
-    [_t('Staged', 'Staged'), counts.staged || 0],
-    [_t('Counter', 'Counter'), counts.counter_metrics || 0],
-    [_t('JD scorecard', 'JD scorecard'), counts.role_scorecards || 0],
-    [_t('Gate CDR', 'Gate CDR'), (gate.with_linked_cdr || 0) + '/' + (gate.total_gate_metrics || 0)]
+    [_t('Tổng chỉ số', 'Total metrics'), counts.total_metrics || ((_state.config || {}).library || []).length],
+    [_t('KPI chính thức đang dùng', 'Official active'), counts.official_active || 0],
+    [_t('Chờ dữ liệu / thử nghiệm', 'Staged'), counts.staged || 0],
+    [_t('Chỉ số đối trọng', 'Counter'), counts.counter_metrics || 0],
+    [_t('Thẻ điểm JD', 'JD scorecard'), counts.role_scorecards || 0],
+    [_t('Cổng có CDR', 'Gate CDR'), (gate.with_linked_cdr || 0) + '/' + (gate.total_gate_metrics || 0)]
   ];
   var status = String(integrity.status || 'PASS');
   var html = '<section class="kc-panel"><div class="kc-panel-head"><h3>' +
@@ -1171,10 +1291,10 @@ function _renderOverview(){
       return '<div class="kc-summary"><span>' + _esc(b[0]) + '</span><b>' + _esc(b[1]) + '</b></div>';
     }).join('') + '</div>' +
     '<div class="kc-metric-split"><div>' + _summaryList(_t('Theo trạng thái', 'By status'), counts.by_calculation_status || {}) +
-    '</div><div>' + _summaryList(_t('Theo loại metric', 'By metric type'), counts.by_metric_type || {}) + '</div></div>';
+    '</div><div>' + _summaryList(_t('Theo loại chỉ số', 'By metric type'), counts.by_metric_type || {}) + '</div></div>';
   var findings = integrity.findings || [];
   if(findings.length){
-    html += '<div class="kc-finding-list"><h4>' + _t('Integrity findings', 'Integrity findings') + '</h4>' +
+    html += '<div class="kc-finding-list"><h4>' + _t('Phát hiện kiểm tra toàn vẹn', 'Integrity findings') + '</h4>' +
       findings.slice(0, 8).map(_findingRow).join('') + '</div>';
   }
   html += '</section>';
@@ -1186,11 +1306,11 @@ function _renderIntegrityPanels(views){
   var keys = Object.keys(panels);
   if(!keys.length) return '';
   var labels = {
-    bsc_model:_t('BSC model', 'BSC model'),
-    lam_profile:_t('LAM coverage', 'LAM coverage'),
-    cpk_sample_policy:_t('Cpk sample policy', 'Cpk sample policy'),
-    severity_bonus_simulation:_t('Severity / bonus simulation', 'Severity / bonus simulation'),
-    annex128_matrix:_t('ANNEX-128 freshness', 'ANNEX-128 freshness')
+    bsc_model:_t('Mô hình BSC', 'BSC model'),
+    lam_profile:_t('Bao phủ LAM', 'LAM coverage'),
+    cpk_sample_policy:_t('Chính sách mẫu Cpk', 'Cpk sample policy'),
+    severity_bonus_simulation:_t('Mức độ nghiêm trọng / mô phỏng thưởng', 'Severity / bonus simulation'),
+    annex128_matrix:_t('Độ mới ANNEX-128', 'ANNEX-128 freshness')
   };
   var compact = function(v){
     if(Array.isArray(v)) return v.length ? v.join(', ') : '—';
@@ -1200,7 +1320,7 @@ function _renderIntegrityPanels(views){
     return v == null || v === '' ? '—' : String(v);
   };
   return '<section class="kc-panel"><div class="kc-panel-head"><h3>' +
-    _t('Integrity panels', 'Integrity panels') + '</h3><span class="kc-mini">P10</span></div>' +
+    _t('Bảng kiểm tra toàn vẹn', 'Integrity panels') + '</h3><span class="kc-mini">P10</span></div>' +
     '<div class="kc-prof-grid">' + keys.map(function(key){
       var p = panels[key] || {};
       var status = String(p.status || 'PASS');
@@ -1223,16 +1343,53 @@ function _summaryList(title, map){
   var keys = Object.keys(map || {});
   if(!keys.length) return '<div class="kc-mini">' + _esc(title) + ': —</div>';
   return '<h4>' + _esc(title) + '</h4><div class="kc-pill-list">' + keys.map(function(k){
-    return '<span class="kc-pill">' + _esc(k) + ' <b>' + _esc(map[k]) + '</b></span>';
+    return '<span class="kc-pill">' + _esc(_summaryKeyLabel(k)) + ' <b>' + _esc(map[k]) + '</b></span>';
   }).join('') + '</div>';
+}
+
+function _summaryKeyLabel(k){
+  return _statusVi(k) || _metricTypeVi(k) || k;
+}
+function _statusVi(status){
+  var map = {
+    active:'đang dùng',
+    pilot:'thử nghiệm',
+    draft:'nháp',
+    retired:'ngừng dùng',
+    unset:'chưa đặt',
+    unknown:'không rõ',
+    runtime_calculated:'tính tự động',
+    staged_data_contract:'chờ hợp đồng dữ liệu',
+    data_contract_required:'cần hợp đồng dữ liệu',
+    manual_governed:'nhập tay có kiểm soát',
+    manual:'nhập tay',
+    counter_metric_blocker:'bị chặn bởi chỉ số đối trọng',
+    pass:'đạt',
+    warn:'cảnh báo',
+    fail:'lỗi'
+  };
+  var key = String(status || '').toLowerCase();
+  return map[key] || '';
+}
+function _metricTypeVi(type){
+  var map = {
+    kpi:'KPI',
+    operating_metric:'chỉ số vận hành',
+    gate_control_metric:'chỉ số kiểm soát cổng',
+    role_performance_measure:'chỉ số vai trò',
+    health_indicator:'chỉ báo sức khỏe',
+    counter_metric:'chỉ số đối trọng',
+    blocker_metric:'chỉ số chặn'
+  };
+  return map[String(type || '')] || '';
 }
 
 function _metricPanel(title, rows, editable){
   rows = rows || [];
   var nav = '<div class="kc-nav"><span class="kc-nav-title">' + _esc(title) + '</span><span class="kc-nav-spacer"></span>' +
     (editable ? '<button class="kc-btn primary" type="button" onclick="_kpiAddOpen()">+ ' +
-      _t('Đề xuất metric', 'Propose metric') + '</button>' : '') + '</div>';
-  if(!rows.length) return nav + '<div class="hm-empty">' + _t('Chưa có dữ liệu cho view này.', 'No data for this view yet.') + '</div>';
+      _t('Đề xuất chỉ số', 'Propose metric') + '</button>' : '') + '</div>';
+  if(!rows.length) return nav + '<div class="hm-empty">' + _t('Chưa có dữ liệu cho màn hình này.', 'No data for this view yet.') + '</div>';
   return nav + '<div class="kc-lib-grid">' + rows.map(_renderLibCard).join('') + '</div>';
 }
 
@@ -1240,7 +1397,7 @@ function _renderGateCoverage(){
   var cov = (_state.config && (_state.config.gate_coverage || ((_state.config.admin_views || {}).gate_coverage))) || {};
   var gates = cov.by_gate || [];
   if(!gates.length) return '';
-  return '<section class="kc-panel"><div class="kc-panel-head"><h3>Gate G0-G7</h3><span class="kc-mini">' +
+  return '<section class="kc-panel"><div class="kc-panel-head"><h3>Cổng G0-G7</h3><span class="kc-mini">' +
     _esc(cov.coverage_pct || 0) + '% CDR</span></div><div class="kc-gate-grid">' +
     gates.map(function(g){
       return '<div class="kc-gate"><b>' + _esc(g.gate) + '</b><span>' + _esc(g.with_cdr || 0) + '/' +
@@ -1266,11 +1423,11 @@ function _renderJdScorecards(){
         warning:role.not_automatic_reward_or_discipline_warning || '' };
     });
   }
-  return '<section class="kc-panel"><div class="kc-panel-head"><h3>JD Scorecards</h3><span class="kc-mini">' +
-    _esc(roles.length) + ' roles</span></div>' +
-    '<div class="kc-warn">' + _t('Role scorecards are coaching/OJT/review inputs only; no automatic reward or discipline from a single role measure.',
+  return '<section class="kc-panel"><div class="kc-panel-head"><h3>Thẻ điểm JD</h3><span class="kc-mini">' +
+    _esc(roles.length) + ' vai trò</span></div>' +
+    '<div class="kc-warn">' + _t('Thẻ điểm vai trò chỉ là dữ liệu đầu vào cho kèm cặp, OJT và rà soát; không được tự động thưởng hoặc kỷ luật từ một chỉ số vai trò đơn lẻ.',
       'Role scorecards are coaching/OJT/review inputs only; no automatic reward or discipline from a single role measure.') + '</div>' +
-    _simpleTable(['Role','JD','Active','Weight','Candidate','Optional','Do not use','Blockers','Control scope'], roles.map(function(r){
+    _simpleTable(['Vai trò','JD','Đang dùng','Trọng số','Dự tuyển','Tùy chọn','Không dùng','Điều kiện chặn','Phạm vi kiểm soát'], roles.map(function(r){
       return [r.role_code, r.jd_title_vi || '', r.active_measure_count || 0,
         (r.active_weight_total == null ? '—' : r.active_weight_total + '%'),
         r.candidate_count || 0, r.optional_count || 0, r.do_not_use_count || 0,
@@ -1280,10 +1437,10 @@ function _renderJdScorecards(){
 
 function _renderDataContracts(){
   var rows = _viewRows('data_contracts');
-  return '<section class="kc-panel"><div class="kc-panel-head"><h3>Data Contracts</h3><span class="kc-mini">' +
-    _esc(rows.length) + ' metrics</span></div>' +
-    _simpleTable(['Code','Status','Gap','Graduation','Input','Runtime'], rows.map(function(r){
-      return [r.canonical_code, r.calculation_status || r.data_contract_status,
+  return '<section class="kc-panel"><div class="kc-panel-head"><h3>Hợp đồng dữ liệu</h3><span class="kc-mini">' +
+    _esc(rows.length) + ' chỉ số</span></div>' +
+    _simpleTable(['Mã','Trạng thái','Khoảng trống','Điều kiện chính thức','Nhập liệu','Tự động'], rows.map(function(r){
+      return [r.canonical_code, _statusVi(r.calculation_status || r.data_contract_status) || r.calculation_status || r.data_contract_status,
         r.data_contract_gap || '—', r.target_graduation_condition || '—',
         r.input_endpoint || '—', r.runtime_endpoint || '—'];
     })) + '</section>';
@@ -1291,11 +1448,11 @@ function _renderDataContracts(){
 
 function _renderCounterBlockers(){
   var rows = _viewRows('counter_metrics');
-  return '<section class="kc-panel"><div class="kc-panel-head"><h3>Counter / Blockers</h3><span class="kc-mini">' +
-    _esc(rows.length) + ' counters</span></div>' +
-    _simpleTable(['Parent','Counter','Intent','Parent status','Reward'], rows.map(function(r){
-      return [r.parent_code, r.counter_code, r.intent || r.name_vi || '—',
-        r.parent_status || '—', r.parent_reward_eligible ? 'yes' : 'no'];
+  return '<section class="kc-panel"><div class="kc-panel-head"><h3>Đối trọng / điều kiện chặn</h3><span class="kc-mini">' +
+    _esc(rows.length) + ' chỉ số đối trọng</span></div>' +
+    _simpleTable(['KPI gốc','Chỉ số đối trọng','Ý đồ kiểm soát','Trạng thái gốc','Tính thưởng'], rows.map(function(r){
+      return [r.parent_code, r.counter_code, r.name_vi || r.intent || '—',
+        _statusVi(r.parent_status) || r.parent_status || '—', r.parent_reward_eligible ? 'có' : 'không'];
     })) + '</section>';
 }
 
@@ -1306,10 +1463,10 @@ function _renderAuditDrift(){
   var rows = findings.map(function(f){
     return [f.priority || '', f.code || '', f.metric_code || f.role_code || '', f.message || ''];
   });
-  return '<section class="kc-panel"><div class="kc-panel-head"><h3>Audit / Drift</h3><span class="kc-integrity kc-integrity-' +
+  return '<section class="kc-panel"><div class="kc-panel-head"><h3>Kiểm tra / trôi chuẩn</h3><span class="kc-integrity kc-integrity-' +
     _esc(String(integrity.status || 'pass').toLowerCase()) + '">' + _esc(integrity.status || 'PASS') +
-    '</span></div>' + (rows.length ? _simpleTable(['P','Finding','Object','Message'], rows)
-      : '<div class="hm-empty">' + _t('Không có finding integrity đang hiển thị.', 'No integrity finding to show.') + '</div>') +
+    '</span></div>' + (rows.length ? _simpleTable(['P','Phát hiện','Đối tượng','Thông điệp'], rows)
+      : '<div class="hm-empty">' + _t('Không có phát hiện kiểm tra toàn vẹn đang hiển thị.', 'No integrity finding to show.') + '</div>') +
     '</section>';
 }
 
@@ -1433,7 +1590,7 @@ function _renderLibrary(){
     '<span class="kc-nav-title">📚 ' + _t('Thư viện KPI', 'KPI Library') + '</span>' +
     '<span class="kc-nav-spacer"></span>' +
     '<button class="kc-btn primary" type="button" onclick="_kpiAddOpen()">+ ' +
-      _t('Đề xuất metric', 'Propose metric') + '</button></div>';
+      _t('Đề xuất chỉ số', 'Propose metric') + '</button></div>';
 
   if(_state.addForm) return nav + _renderAddForm();
 
@@ -1447,7 +1604,7 @@ function _renderLibrary(){
     catOpts.push([k, (CATEGORY_VI[k] || k) + ' (' + facets.category[k] + ')']);
   });
   var grpOpts = [['', _t('— Mọi nhóm —', '— All groups —')],
-    ['governance', _t('Governance', 'Governance')], ['gate', 'Gate'], ['proposed', _t('Đề xuất', 'Proposed')]];
+    ['governance', _t('Quản trị', 'Governance')], ['gate', _t('Cổng kiểm soát', 'Gate')], ['proposed', _t('Đề xuất', 'Proposed')]];
   var tierOpts = [['', _t('— Mọi cấp —', '— All tiers —')]];
   Object.keys(facets.tier || {}).forEach(function(k){
     if(TIER_VI[k]) tierOpts.push([k, TIER_VI[k] + ' (' + facets.tier[k] + ')']);
@@ -1457,8 +1614,8 @@ function _renderLibrary(){
     jdOpts.push([k, k + ' (' + facets.applicable_jds[k] + ')']);
   });
   var stOpts = [['', _t('— Mọi trạng thái —', '— All statuses —')],
-    ['runtime_calculated', _t('Tính runtime', 'Runtime')],
-    ['staged_data_contract', _t('Chờ data contract', 'Staged')],
+    ['runtime_calculated', _t('Tính tự động', 'Runtime')],
+    ['staged_data_contract', _t('Chờ hợp đồng dữ liệu', 'Staged')],
     ['manual_governed', _t('Nhập tay có kiểm soát', 'Manual governed')],
     ['manual', _t('Nhập tay', 'Manual')]];
   var nRetired = (facets.retired || 0);
@@ -1575,10 +1732,10 @@ function _renderAddForm(){
   var a = _state.addForm;
   var cfg = _state.config || {};
   var ext = cfg.metric_control_schema_extension || {};
-  var grpOpts = [['governance', _t('Governance (công ty / value-stream / phòng ban)', 'Governance')],
-    ['gate', _t('Gate metric', 'Gate metric')], ['proposed', _t('Metric đề xuất', 'Proposed metric')]];
+  var grpOpts = [['governance', _t('Quản trị KPI (công ty / dòng giá trị / phòng ban)', 'Governance')],
+    ['gate', _t('Chỉ số cổng kiểm soát', 'Gate metric')], ['proposed', _t('Chỉ số đề xuất', 'Proposed metric')]];
   var tierOpts = [['company', _t('Cấp công ty', 'Company')],
-    ['value_stream', _t('Value-stream', 'Value-stream')], ['department', _t('Phòng ban', 'Department')]];
+    ['value_stream', _t('Dòng giá trị', 'Value-stream')], ['department', _t('Phòng ban', 'Department')]];
   var catOpts = Object.keys(CATEGORY_VI).map(function(k){ return [k, CATEGORY_VI[k]]; });
   var dirOpts = [['higher_is_better', _t('Cao hơn là tốt', 'Higher is better')],
     ['lower_is_better', _t('Thấp hơn là tốt', 'Lower is better')]];
@@ -1624,9 +1781,22 @@ function _renderAddForm(){
     if(s.name === 'counter_blocker_lifecycle') return !!(a.counter_metric && a.counter_metric.intent) && !!a.lifecycle_status;
     return false;
   };
+  var stepLabel = function(name){
+    var labels = {
+      problem_type:'ý đồ kiểm soát',
+      metric_subtype:'phân loại chỉ số',
+      measurement_data_type:'kiểu dữ liệu đo',
+      scoring_model:'mô hình tính điểm',
+      data_contract_evidence:'dữ liệu và bằng chứng',
+      evaluation_reward_weight:'đánh giá và thưởng',
+      role_assignments:'phân công vai trò',
+      counter_blocker_lifecycle:'đối trọng, chặn và vòng đời'
+    };
+    return labels[name] || String(name || '').replace(/_/g, ' ');
+  };
   var wizStrip = '<div class="kc-wiz-steps">' + steps.map(function(s){
     var cls = stepDone(s) ? 'kc-wiz-step kc-wiz-step--done' : 'kc-wiz-step';
-    return '<span class="' + cls + '">' + s.step + '. ' + _esc(s.name.replace(/_/g, ' ')) + '</span>';
+    return '<span class="' + cls + '">' + s.step + '. ' + _esc(stepLabel(s.name)) + '</span>';
   }).join('') + '</div>';
 
   var b = _ragBands({ green_point:parseFloat(a.green_point), yellow_point:parseFloat(a.yellow_point),
@@ -1636,51 +1806,51 @@ function _renderAddForm(){
     _field('provisional_n', '<input class="kc-input" type="number" min="0" value="' + _esc(a.sample_provisional_n) + '" oninput="_kpiAddField(\'sample_provisional_n\',this.value)">') +
     _field('internal_n', '<input class="kc-input" type="number" min="0" value="' + _esc(a.sample_internal_n) + '" oninput="_kpiAddField(\'sample_internal_n\',this.value)">') +
     _field('customer_grade_n', '<input class="kc-input" type="number" min="0" value="' + _esc(a.sample_customer_grade_n) + '" oninput="_kpiAddField(\'sample_customer_grade_n\',this.value)">') +
-    _field('stability_required', '<label class="kc-check"><input type="checkbox" ' + (a.sample_stability_required ? 'checked' : '') + ' onchange="_kpiAddField(\'sample_stability_required\',this.checked)"> stable</label>') +
-    _field('gage_validity_required', '<label class="kc-check"><input type="checkbox" ' + (a.sample_gage_validity_required ? 'checked' : '') + ' onchange="_kpiAddField(\'sample_gage_validity_required\',this.checked)"> gage valid</label>') +
+    _field('stability_required', '<label class="kc-check"><input type="checkbox" ' + (a.sample_stability_required ? 'checked' : '') + ' onchange="_kpiAddField(\'sample_stability_required\',this.checked)"> quá trình ổn định</label>') +
+    _field('gage_validity_required', '<label class="kc-check"><input type="checkbox" ' + (a.sample_gage_validity_required ? 'checked' : '') + ' onchange="_kpiAddField(\'sample_gage_validity_required\',this.checked)"> thiết bị đo hợp lệ</label>') +
     '</div>';
 
-  var html = '<div class="kc-addform"><h3>+ ' + _t('Đề xuất metric mới', 'Propose a new metric') + '</h3>' +
+  var html = '<div class="kc-addform"><h3>+ ' + _t('Đề xuất chỉ số mới', 'Propose a new metric') + '</h3>' +
     wizStrip +
     '<div class="kc-alert error" id="kc-add-errors" ' + (errors.length ? '' : 'hidden') + '>' +
       errors.slice(0, 6).map(_esc).join('<br>') + '</div>' +
-    '<div class="kc-warn">' + _t('Metric mới luôn là staged/pilot: không runtime, không công thức thật, không reward cho tới khi có data contract được duyệt.',
+    '<div class="kc-warn">' + _t('Chỉ số mới luôn ở trạng thái chờ dữ liệu/thử nghiệm: chưa có luồng tính chính thức, chưa có công thức được duyệt và chưa được tính thưởng cho tới khi hợp đồng dữ liệu được duyệt.',
       'New metrics stay staged/pilot: no runtime, no authoritative formula, no reward until an approved data contract exists.') + '</div>' +
-    section('1', _t('Intent', 'Intent'),
+    section('1', _t('Ý đồ kiểm soát', 'Intent'),
       '<div class="kc-grid">' +
       _field(_t('Nhóm', 'Group'), '<select class="kc-input" onchange="_kpiAddField(\'group\',this.value)">' + _selOptions(grpOpts, a.group) + '</select>') +
       (a.group === 'governance' ? _field(_t('Cấp', 'Tier'), '<select class="kc-input" onchange="_kpiAddField(\'tier\',this.value)">' + _selOptions(tierOpts, a.tier) + '</select>') : '') +
       _field(_t('Mã KPI', 'KPI code'), '<input class="kc-input" type="text" value="' + _esc(a.canonical_code) + '" placeholder="TOOL_LIFE_VARIANCE" oninput="_kpiAddField(\'canonical_code\',this.value)">') +
-      _field(_t('Tên VI', 'Name VI'), '<input class="kc-input" type="text" value="' + _esc(a.name_vi) + '" oninput="_kpiAddField(\'name_vi\',this.value)">') +
-      _field(_t('Tên EN', 'Name EN'), '<input class="kc-input" type="text" value="' + _esc(a.name) + '" oninput="_kpiAddField(\'name\',this.value)">') +
+      _field(_t('Tên tiếng Việt', 'Name VI'), '<input class="kc-input" type="text" value="' + _esc(a.name_vi) + '" oninput="_kpiAddField(\'name_vi\',this.value)">') +
+      _field(_t('Tên tiếng Anh', 'Name EN'), '<input class="kc-input" type="text" value="' + _esc(a.name) + '" oninput="_kpiAddField(\'name\',this.value)">') +
       _field(_t('Quá trình', 'Process'), '<select class="kc-input" onchange="_kpiAddField(\'process\',this.value)">' + _selOptions(procOpts, a.process) + '</select>') +
       _field(_t('Phân loại', 'Category'), '<select class="kc-input" onchange="_kpiAddField(\'category\',this.value)">' + _selOptions(catOpts, a.category) + '</select>') +
       _field('control_intent', enumSel('control_intent', a.control_intent, ext.control_intent)) +
       '</div>') +
-    section('2', _t('Subtype', 'Subtype'),
+    section('2', _t('Phân loại chỉ số', 'Subtype'),
       '<div class="kc-grid">' +
       _field('metric_subtype', enumSel('metric_subtype', a.metric_subtype, ext.metric_subtypes)) +
-      _field(_t('Owner', 'Owner'), '<select class="kc-input" onchange="_kpiAddField(\'owner_role\',this.value)">' + _roleOptions(a.owner_role) + '</select>') +
-      _field(_t('Nhịp', 'Cadence'), '<select class="kc-input" onchange="_kpiAddField(\'cadence\',this.value)">' + _cadenceOptions(a.cadence) + '</select>') +
+      _field(_t('Chủ sở hữu', 'Owner'), '<select class="kc-input" onchange="_kpiAddField(\'owner_role\',this.value)">' + _roleOptions(a.owner_role) + '</select>') +
+      _field(_t('Nhịp đo', 'Cadence'), '<select class="kc-input" onchange="_kpiAddField(\'cadence\',this.value)">' + _cadenceOptions(a.cadence) + '</select>') +
       '</div>') +
-    section('3', _t('Measurement', 'Measurement'),
+    section('3', _t('Kiểu đo lường', 'Measurement'),
       '<div class="kc-grid">' +
       _field('measurement_data_type', enumSel('measurement_data_type', a.measurement_data_type, ext.measurement_data_type)) +
-      _field(_t('Chiều', 'Direction'), '<select class="kc-input" onchange="_kpiAddField(\'direction\',this.value)">' + _selOptions(dirOpts, a.direction) + '</select>') +
+      _field(_t('Chiều tính', 'Direction'), '<select class="kc-input" onchange="_kpiAddField(\'direction\',this.value)">' + _selOptions(dirOpts, a.direction) + '</select>') +
       _field(_t('Đơn vị', 'Unit'), '<select class="kc-input" onchange="_kpiAddField(\'unit\',this.value)">' + _selOptions(unitOpts, a.unit) + '</select>') +
       _field('green_point', '<input class="kc-input" type="number" step="any" value="' + _esc(a.green_point) + '" oninput="_kpiAddField(\'green_point\',this.value)">') +
       _field('yellow_point', '<input class="kc-input" type="number" step="any" value="' + _esc(a.yellow_point) + '" oninput="_kpiAddField(\'yellow_point\',this.value)">') +
       _field('target', '<input class="kc-input" type="number" step="any" value="' + _esc(a.target) + '" oninput="_kpiAddField(\'target\',this.value)">') +
       '</div>' + (b ? '<div class="kc-rag"><span class="kc-badge kc-badge-ok">' + _esc(b.green) + '</span><span class="kc-badge kc-badge-staged">' + _esc(b.yellow) + '</span><span class="kc-badge kc-badge-bad">' + _esc(b.red) + '</span></div>' : '')) +
-    section('4', _t('Scoring', 'Scoring'),
+    section('4', _t('Mô hình tính điểm', 'Scoring'),
       '<div class="kc-grid">' +
       _field('scoring_model_detail', enumSel('scoring_model_detail', a.scoring_model_detail, scoringOpts)) +
       _field('gate_pass_condition', '<input class="kc-input" type="text" value="' + _esc(a.gate_pass_condition) + '" oninput="_kpiAddField(\'gate_pass_condition\',this.value)">') +
       '</div>' +
       sampleGrid +
-      _field(_t('Composite components (CODE|weight|name)', 'Composite components (CODE|weight|name)'),
+      _field(_t('Thành phần composite (CODE|weight|name)', 'Composite components (CODE|weight|name)'),
         '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'components\',this.value)">' + _esc(a.components) + '</textarea>')) +
-    section('5', _t('Data / Evidence', 'Data / Evidence'),
+    section('5', _t('Dữ liệu / bằng chứng', 'Data / Evidence'),
       _field('data_contract_gap', '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'data_contract_gap\',this.value)">' + _esc(a.data_contract_gap) + '</textarea>') +
       _field('target_graduation_condition', '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'target_graduation_condition\',this.value)">' + _esc(a.target_graduation_condition) + '</textarea>') +
       _field('evidence_source', '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'evidence_source\',this.value)">' + _esc(a.evidence_source) + '</textarea>') +
@@ -1689,35 +1859,35 @@ function _renderAddForm(){
       _field('lam_profile_link', '<input class="kc-input" type="text" value="' + _esc(a.lam_profile_link) + '" oninput="_kpiAddField(\'lam_profile_link\',this.value)">') +
       _field('applicability_rule', '<input class="kc-input" type="text" value="' + _esc(a.applicability_rule) + '" oninput="_kpiAddField(\'applicability_rule\',this.value)">') +
       '</div>') +
-    section('6', _t('Evaluation / Reward', 'Evaluation / Reward'),
+    section('6', _t('Đánh giá / thưởng', 'Evaluation / Reward'),
       '<div class="kc-grid">' +
       _field('evaluation_use', enumSel('evaluation_use', a.evaluation_use, ext.evaluation_use)) +
       _field('reward_mode', enumSel('reward_mode', a.reward_mode, ext.reward_mode)) +
       _field('lifecycle_status', enumSel('lifecycle_status', a.lifecycle_status, ext.lifecycle_status)) +
       _field('usage_contexts', '<input class="kc-input" type="text" value="' + _esc(a.usage_contexts) + '" oninput="_kpiAddField(\'usage_contexts\',this.value)">') +
       '</div>') +
-    section('7', _t('Role Assignments', 'Role Assignments'),
+    section('7', _t('Phân công vai trò', 'Role Assignments'),
       '<div class="kc-grid">' +
       _field('assignment_type', enumSel('assignment_type', a.assignment_type, ext.assignment_type)) +
       _field('controllability_scope', '<input class="kc-input" type="text" value="' + _esc(a.controllability_scope) + '" oninput="_kpiAddField(\'controllability_scope\',this.value)">') +
       _field('action_when_red', '<input class="kc-input" type="text" value="' + _esc(a.action_when_red) + '" oninput="_kpiAddField(\'action_when_red\',this.value)">') +
       '</div>') +
-    section('8', _t('Counter / Blocker / Lifecycle', 'Counter / Blocker / Lifecycle'),
+    section('8', _t('Đối trọng / điều kiện chặn / vòng đời', 'Counter / Blocker / Lifecycle'),
       '<div class="kc-grid">' +
-      _field(_t('Counter name VI', 'Counter name VI'), '<input class="kc-input" type="text" value="' + _esc(a.counter_metric.name_vi) + '" oninput="_kpiAddCounter(\'name_vi\',this.value)">') +
+      _field(_t('Tên chỉ số đối trọng tiếng Việt', 'Counter name VI'), '<input class="kc-input" type="text" value="' + _esc(a.counter_metric.name_vi) + '" oninput="_kpiAddCounter(\'name_vi\',this.value)">') +
       _field('paired_metric', '<input class="kc-input" type="text" value="' + _esc(a.paired_metric) + '" oninput="_kpiAddField(\'paired_metric\',this.value)">') +
       _field('gate', '<input class="kc-input" type="text" value="' + _esc(a.gate) + '" placeholder="G1" oninput="_kpiAddField(\'gate\',this.value)">') +
       _field('linked_cdr', '<input class="kc-input" type="text" value="' + _esc(a.linked_cdr) + '" placeholder="A2, D8" oninput="_kpiAddField(\'linked_cdr\',this.value)">') +
       '</div>' +
-      _field(_t('Counter anti-gaming intent', 'Counter anti-gaming intent'), '<textarea class="kc-input kc-ta" oninput="_kpiAddCounter(\'intent\',this.value)">' + _esc(a.counter_metric.intent) + '</textarea>') +
+      _field(_t('Ý đồ chống thao túng của chỉ số đối trọng', 'Counter anti-gaming intent'), '<textarea class="kc-input kc-ta" oninput="_kpiAddCounter(\'intent\',this.value)">' + _esc(a.counter_metric.intent) + '</textarea>') +
       _field('blocking_conditions', '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'blocking_conditions\',this.value)">' + _esc(a.blocking_conditions) + '</textarea>') +
       _field('hold_release_rule', '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'hold_release_rule\',this.value)">' + _esc(a.hold_release_rule) + '</textarea>') +
       _field('attribution_rule', '<textarea class="kc-input kc-ta" oninput="_kpiAddField(\'attribution_rule\',this.value)">' + _esc(a.attribution_rule) + '</textarea>')) +
     '<div class="kc-addform-actions">' +
     '<button class="kc-btn" type="button" onclick="_kpiAddClose()">' + _t('Hủy', 'Cancel') + '</button>' +
     '<button class="kc-btn primary" id="kc-add-submit-btn" type="button" ' + (errors.length ? 'disabled' : '') +
-      ' onclick="_kpiAddSubmit()">' + _t('Thêm proposal vào danh sách lưu', 'Add proposal to save list') + '</button></div>' +
-    '<p class="kc-mini">' + _t('Proposal được ghi khi bấm “Lưu & đồng bộ tài liệu”.',
+      ' onclick="_kpiAddSubmit()">' + _t('Thêm đề xuất vào danh sách chờ lưu', 'Add proposal to save list') + '</button></div>' +
+    '<p class="kc-mini">' + _t('Đề xuất chỉ được ghi thật khi bấm “Lưu & đồng bộ tài liệu”.',
       'The proposal is persisted when you click “Save & sync documents”.') + '</p></div>';
   return html;
 }
@@ -1743,11 +1913,11 @@ function _renderLibCard(r){
   var statusNotice = '';
   if(r.calculation_status === 'staged_data_contract' || r.calculation_status === 'data_contract_required'){
     statusNotice = '<div class="kc-warn kc-card-note">' +
-      _t('Value suppressed; target/ngưỡng chỉ là proposal cho tới khi có data contract.',
+      _t('Giá trị đang bị ẩn; target và ngưỡng chỉ là đề xuất cho tới khi có hợp đồng dữ liệu được duyệt.',
         'Value suppressed; targets are proposal-only until the data contract is approved.') + '</div>';
   } else if(r.calculation_status === 'manual' || r.calculation_status === 'manual_governed'){
     statusNotice = '<div class="kc-warn kc-card-note">' +
-      _t('Manual-input value chỉ dùng cho reward khi input_status=verified và có evidence.',
+      _t('Giá trị nhập tay chỉ được dùng cho rà soát/thưởng khi input_status=verified và có bằng chứng.',
         'Manual-input value is reward-eligible only after verified status and evidence.') + '</div>';
   }
 
@@ -1762,14 +1932,12 @@ function _renderLibCard(r){
       'onclick="event.stopPropagation();_kpiRestore(\'' + c(r.group) + '\',\'' + c(code) + '\')">↩ ' +
       _t('Khôi phục', 'Restore') + '</button>';
   } else {
-    action = '<button class="kc-act kc-act-del" type="button" ' +
-      'onclick="event.stopPropagation();_kpiRetire(\'' + c(r.group) + '\',\'' + c(code) + '\')">🗑 ' +
-      _t('Ngừng dùng', 'Retire') + '</button>';
+    action = '';
   }
 
   var mainOpen = r._draft ? '' :
-    ' onclick="_kpiToggleCard(\'' + c(r.group) + '\',\'' + c(code) + '\')" role="button" tabindex="0" title="' +
-    _t('Mở / đóng trình biên tập', 'Open / close the editor') + '"';
+    ' onclick="_kpiOpenDialog(\'' + c(r.group) + '\',\'' + c(code) + '\')" role="button" tabindex="0" title="' +
+    _t('Mở hộp thoại biên tập', 'Open the edit dialog') + '"';
 
   var head = '<div class="kc-lib-card-main"' + mainOpen + '>' +
     '<div class="kc-lib-card-top">' +
@@ -1793,12 +1961,12 @@ function _renderLibCard(r){
     statusNotice +
     '<div class="kc-lib-foot">' +
       '<span class="kc-mini">JD: ' + c((r.applicable_jds || []).join(', ') || '—') + '</span>' +
-      '<span class="kc-mini" title="' + _t('Counter-metric', 'Counter-metric') + '">↔ ' + c(counterName) + '</span>' +
+      '<span class="kc-mini" title="' + _t('Chỉ số đối trọng', 'Counter-metric') + '">↔ ' + c(counterName) + '</span>' +
     '</div></div>';
 
   return '<div class="kc-lib-card' + (retired ? ' kc-lib-card--retired' : '') +
     (r._draft ? ' kc-lib-card--draft' : '') + (expanded ? ' kc-lib-card--expanded' : '') + '">' +
-    head + '<div class="kc-lib-act">' + action + '</div>' +
+    head + (action ? '<div class="kc-lib-act">' + action + '</div>' : '') +
     (expanded ? '<div class="kc-lib-editor">' + _inlineEditor(r) + '</div>' : '') +
   '</div>';
 }
@@ -1835,17 +2003,17 @@ function _cadenceOptions(selected){
 function _calcBadge(status){
   if(status === 'runtime_calculated')
     return '<span class="kc-stat-sym kc-sym-ok" title="' +
-      _t('Tính runtime — số tính tự động từ hệ thống', 'Runtime — computed automatically') +
+      _t('Tính tự động từ hệ thống', 'Runtime — computed automatically') +
       '">⚙</span>';
   if(status === 'manual' || status === 'manual_governed')
     return '<span class="kc-stat-sym kc-sym-manual" title="' +
-      _t('Nhập tay có kiểm soát — nạp số qua endpoint nhập liệu', 'Manual governed — fed via the data-input endpoint') +
+      _t('Nhập tay có kiểm soát qua đường dẫn nhập liệu', 'Manual governed — fed via the data-input endpoint') +
       '">✎</span>';
   if(status === 'retired')
     return '<span class="kc-stat-sym kc-sym-bad" title="' +
       _t('Đã ngừng dùng', 'Retired') + '">⊘</span>';
   return '<span class="kc-stat-sym kc-sym-staged" title="' +
-    _t('Chờ hợp đồng dữ liệu — chưa có nguồn số', 'Awaiting data contract — no source yet') +
+    _t('Chờ hợp đồng dữ liệu — chưa có nguồn số được duyệt', 'Awaiting data contract — no source yet') +
     '">○</span>';
 }
 
@@ -1855,142 +2023,6 @@ function _calcBadge(status){
    and cadence. Structural fields (formula, gate, linked_cdr) are read-only. */
 function _renderEditCard(m, section, inline){
   return _renderUnifiedMcoEditCard(m, section, inline);
-  var code = m.canonical_code;
-  var c = function(s){ return _esc(s == null ? '' : s); };
-  var sec = _state.overrides[section] || {};
-  var dirty = !!sec[code];
-  var hasThresholds = !!(_val(m, section, 'thresholds') || m.thresholds);
-  var status = m.calculation_status || (m.status === 'retained_from_annex122' ? 'staged_data_contract' : m.status);
-
-  var html = '<article class="kc-card' + (dirty ? ' kc-card--dirty' : '') +
-    (inline ? ' kc-card--inline' : '') + '" data-kpi-code="' + c(code) + '">';
-  if(!inline){
-    html += '<div class="kc-card-head">' +
-      '<div><span class="kc-code">' + c(code) + '</span> ' +
-        '<span class="kc-card-name">' + c(m.name_vi || m.name) + '</span></div>' +
-      _calcBadge(status) +
-    '</div>';
-  }
-
-  if(section === 'gate'){
-    html += '<div class="kc-mini">' + _t('Cổng', 'Gate') + ' ' + c(m.gate || '—') +
-      ' · CDR ' + c((m.linked_cdr || []).join(', ')) + '</div>';
-    // P10 — cdr_accountable_role + owner_alignment_note: when multiple
-    // roles share a gate, surface the single accountable Decision-Right A
-    // and any note explaining the alignment with owner_role.
-    if(m.cdr_accountable_role || m.owner_alignment_note){
-      html += '<div class="kc-mini">' +
-        (m.cdr_accountable_role
-          ? '<b>' + _t('CDR A', 'CDR A') + ':</b> ' + c(m.cdr_accountable_role) + ' '
-          : '') +
-        (m.owner_alignment_note ? '— ' + c(m.owner_alignment_note) : '') +
-        '</div>';
-    }
-  }
-  if(status === 'staged_data_contract'){
-    html += '<div class="kc-warn">' + _t('KPI chưa có hợp đồng dữ liệu — nhập số qua endpoint nhập liệu.',
-      'KPI has no data contract — feed it via the data-input endpoint.') + '</div>';
-  }
-  if(status === 'staged_data_contract' || status === 'manual' || status === 'manual_governed'){
-    html += '<div class="kc-data-contract">' +
-      _field(_t('Data-contract gap', 'Data-contract gap'),
-        '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'data_contract_gap\',this.value)">' +
-        c(_val(m,section,'data_contract_gap')) + '</textarea>') +
-      _field(_t('Điều kiện graduation', 'Graduation condition'),
-        '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'target_graduation_condition\',this.value)">' +
-        c(_val(m,section,'target_graduation_condition')) + '</textarea>') +
-      _field(_t('Nguồn evidence', 'Evidence source'),
-        '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'evidence_source\',this.value)">' +
-        c(_val(m,section,'evidence_source')) + '</textarea>') +
-    '</div>';
-  }
-  html += _ragPreview(m, section);
-
-  html += '<div class="kc-grid">';
-  if(hasThresholds){
-    html += _field(_t('Điểm xanh (green_point)', 'Green point'),
-        '<input class="kc-input" type="number" step="any" value="' + c(_threshold(m,section,'green_point')) +
-        '" oninput="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'green_point\',this.value)">') +
-      _field(_t('Điểm vàng (yellow_point)', 'Yellow point'),
-        '<input class="kc-input" type="number" step="any" value="' + c(_threshold(m,section,'yellow_point')) +
-        '" oninput="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'yellow_point\',this.value)">') +
-      _field(_t('Chiều / đơn vị', 'Direction / unit'),
-        '<input class="kc-input" type="text" disabled value="' +
-        c((_threshold(m,section,'direction')||'') + ' · ' + (_threshold(m,section,'unit')||'')) + '">');
-  } else {
-    html += _field(_t('Ngưỡng', 'Thresholds'),
-      '<input class="kc-input" type="text" disabled value="' +
-      _t('Quản lý ở KPI governance cùng mã', 'Managed on the governance KPI of the same code') + '">');
-  }
-  if(section === 'governance' || section === 'gate'){
-    html += _field(_t('Owner', 'Owner'),
-      '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'owner_role\',this.value)">' +
-      _roleOptions(_val(m,section,'owner_role')) + '</select>') +
-      _field(_t('Nhịp', 'Cadence'),
-      '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'cadence\',this.value)">' +
-      _cadenceOptions(_val(m,section,'cadence')) + '</select>');
-  }
-  if(section === 'governance'){
-    html += _field(_t('Xác nhận dữ liệu', 'Data steward'),
-      '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'data_stewardship_role\',this.value)">' +
-      _roleOptions(_val(m,section,'data_stewardship_role')) + '</select>');
-  }
-  html += '</div>';
-
-  // Dedicated counter-metric — unique code + endpoint (1:1 with the KPI),
-  // plus an editable name + anti-gaming intent.
-  var ctrCode = c(code) + '-CTR';
-  html += '<div class="kc-counter-edit"><div class="kc-counter-head">↔ ' +
-    _t('Counter-metric chuyên biệt (chống gaming)', 'Dedicated counter-metric (anti-gaming)') + '</div>' +
-    '<div class="kc-counter-id"><span class="kc-code">' + ctrCode + '</span>' +
-      '<span class="kc-mini">POST /api/kpi/' + ctrCode + '/input</span></div>' +
-    _field(_t('Tên counter-metric (tiếng Việt)', 'Counter-metric name (VI)'),
-      '<input class="kc-input" type="text" value="' + c(_counterVal(m,section,'name_vi')) +
-      '" oninput="_kpiSetCounter(\'' + section + '\',\'' + c(code) + '\',\'name_vi\',this.value)">') +
-    _field(_t('Ý nghĩa — phát hiện gaming khi nào', 'Intent — what gaming it detects'),
-      '<textarea class="kc-input kc-ta" oninput="_kpiSetCounter(\'' + section + '\',\'' + c(code) + '\',\'intent\',this.value)">' +
-      c(_counterVal(m,section,'intent')) + '</textarea>') +
-    // P10 — intent_vi: Vietnamese business intent for the counter (the
-    // "why-this-matters" gloss used by daily-stand-up boards). Optional.
-    _field(_t('Ý đồ kinh doanh (intent_vi)', 'Business intent (intent_vi)'),
-      '<textarea class="kc-input kc-ta" rows="2" placeholder="VD: chống tự đóng 8D khi khách chưa acknowledge" oninput="_kpiSetCounter(\'' + section + '\',\'' + c(code) + '\',\'intent_vi\',this.value)">' +
-      c(_counterVal(m,section,'intent_vi')) + '</textarea>') +
-    '</div>';
-
-  if(hasThresholds){
-    html += _field(_t('Căn cứ ngưỡng', 'Threshold basis'),
-      '<textarea class="kc-input kc-ta" oninput="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'basis\',this.value)">' +
-      c(_threshold(m,section,'basis')) + '</textarea>');
-  }
-  if(section === 'governance'){
-    html += _field(_t('Quyết định khi lệch ngưỡng', 'Decision on threshold breach'),
-      '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'governance\',\'' + c(code) + '\',\'decision_action\',this.value)">' +
-      c(_val(m,section,'decision_action')) + '</textarea>') +
-      _field(_t('Tham chiếu hành động (CDR / SOP / WI)', 'Action reference (CDR / SOP / WI)'),
-      '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'governance\',\'' + c(code) + '\',\'action_reference\',this.value)">' +
-      c(_val(m,section,'action_reference')) + '</textarea>');
-  }
-
-  // Audit fix (Prompt 01 §1.4): blocking_conditions was editable only on add.
-  // Expose on edit too — multi-line list, one condition per line.
-  var blkRaw = _val(m, section, 'blocking_conditions');
-  var blkText = '';
-  if(blkRaw && blkRaw.length){
-    blkText = blkRaw.join('\n');
-  } else if(m.blocking_conditions && m.blocking_conditions.length){
-    blkText = m.blocking_conditions.join('\n');
-  }
-  html += '<div class="kc-blocker-edit">' +
-    _field(_t('Điều kiện chặn (mỗi dòng một mục)', 'Blocking conditions (one per line)'),
-      '<textarea class="kc-input kc-ta" rows="3" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'blocking_conditions\',this.value)">' +
-      _esc(blkText) + '</textarea>') +
-    '</div>';
-
-  // MCS-EXT-1 block (Metric Control Schema extension fields).
-  // Collapsed by default — admin opens it explicitly to enrich a metric.
-  html += _renderMcsExtBlock(m, section, code);
-
-  return html + '</article>';
 }
 
 function _renderUnifiedMcoEditCard(m, section, inline){
@@ -2017,8 +2049,8 @@ function _renderUnifiedMcoEditCard(m, section, inline){
     return '<section class="kc-mco-section"><div class="kc-mco-title"><b>' + no + '</b><span>' +
       _esc(title) + '</span></div>' + (help ? '<p class="kc-mco-help">' + _esc(help) + '</p>' : '') + body + '</section>';
   };
-  var grpOpts = [['governance', _t('Governance', 'Governance')], ['gate', 'Gate'], ['proposed', _t('Đề xuất', 'Proposed')]];
-  var tierOpts = [['company', _t('Cấp công ty', 'Company')], ['value_stream', 'Value-stream'], ['department', _t('Phòng ban', 'Department')], ['', '—']];
+  var grpOpts = [['governance', _t('Quản trị KPI', 'Governance')], ['gate', _t('Cổng kiểm soát', 'Gate')], ['proposed', _t('Đề xuất', 'Proposed')]];
+  var tierOpts = [['company', _t('Cấp công ty', 'Company')], ['value_stream', _t('Dòng giá trị', 'Value-stream')], ['department', _t('Phòng ban', 'Department')], ['', '—']];
   var dirOpts = [['higher_is_better', _t('Cao hơn là tốt', 'Higher is better')], ['lower_is_better', _t('Thấp hơn là tốt', 'Lower is better')]];
   var unitOpts = [['percent','%'],['ppm','ppm'],['day',_t('ngày','day')],['rate','rate'],['ratio','ratio'],['count',_t('đếm','count')],['vnd','VND ₫']];
   var catOpts = Object.keys(CATEGORY_VI).map(function(k){ return [k, CATEGORY_VI[k]]; });
@@ -2032,8 +2064,8 @@ function _renderUnifiedMcoEditCard(m, section, inline){
     _field('provisional_n', '<input class="kc-input" type="number" min="0" value="' + c(_sampleVal(m,section,'provisional_n')) + '" oninput="_kpiSetSample(\'' + section + '\',\'' + c(code) + '\',\'provisional_n\',this.value)">') +
     _field('internal_n', '<input class="kc-input" type="number" min="0" value="' + c(_sampleVal(m,section,'internal_n')) + '" oninput="_kpiSetSample(\'' + section + '\',\'' + c(code) + '\',\'internal_n\',this.value)">') +
     _field('customer_grade_n', '<input class="kc-input" type="number" min="0" value="' + c(_sampleVal(m,section,'customer_grade_n')) + '" oninput="_kpiSetSample(\'' + section + '\',\'' + c(code) + '\',\'customer_grade_n\',this.value)">') +
-    _field('stability_required', '<label class="kc-check"><input type="checkbox" ' + (_sampleVal(m,section,'stability_required') ? 'checked' : '') + ' onchange="_kpiSetSample(\'' + section + '\',\'' + c(code) + '\',\'stability_required\',this.checked)"> stable</label>') +
-    _field('gage_validity_required', '<label class="kc-check"><input type="checkbox" ' + (_sampleVal(m,section,'gage_validity_required') ? 'checked' : '') + ' onchange="_kpiSetSample(\'' + section + '\',\'' + c(code) + '\',\'gage_validity_required\',this.checked)"> gage valid</label>') +
+    _field('stability_required', '<label class="kc-check"><input type="checkbox" ' + (_sampleVal(m,section,'stability_required') ? 'checked' : '') + ' onchange="_kpiSetSample(\'' + section + '\',\'' + c(code) + '\',\'stability_required\',this.checked)"> quá trình ổn định</label>') +
+    _field('gage_validity_required', '<label class="kc-check"><input type="checkbox" ' + (_sampleVal(m,section,'gage_validity_required') ? 'checked' : '') + ' onchange="_kpiSetSample(\'' + section + '\',\'' + c(code) + '\',\'gage_validity_required\',this.checked)"> thiết bị đo hợp lệ</label>') +
     '</div>';
 
   var html = '<article class="kc-card kc-card--mco' + (dirty ? ' kc-card--dirty' : '') +
@@ -2042,43 +2074,43 @@ function _renderUnifiedMcoEditCard(m, section, inline){
     '<span class="kc-card-name">' + c(_val(m,section,'name_vi') || _val(m,section,'name') || code) + '</span></div>' +
     _calcBadge(status) + '</div>';
   html += '<div class="kc-warn kc-card-note">' +
-    _t('Editor này dùng cùng 8 section với luồng tạo KPI mới; mọi field lưu qua runtime overlay và backend allowlist, không hardcode trong JS.',
+    _t('Hộp biên tập này dùng cùng 8 phần với luồng tạo KPI mới. Mọi trường được lưu qua lớp thay đổi vận hành và danh sách cho phép ở dịch vụ máy chủ, không lưu bằng JSON thô trong giao diện.',
       'This editor uses the same 8 sections as new KPI creation; fields save through the runtime overlay and backend allowlist, not JS hardcode.') +
     '</div>';
-  html += sectionHtml('1', _t('Intent', 'Intent'),
+  html += sectionHtml('1', _t('Ý đồ kiểm soát', 'Intent'),
     '<div class="kc-grid">' +
     _field(_t('Nhóm', 'Group'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'group\',this.value)" disabled>' + _selOptions(grpOpts, section) + '</select>') +
     _field(_t('Cấp', 'Tier'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'tier\',this.value)">' + _selOptions(tierOpts, _val(m,section,'tier') || '') + '</select>') +
     _field(_t('Mã KPI', 'KPI code'), '<input class="kc-input" type="text" disabled value="' + c(code) + '">') +
-    _field(_t('Tên VI', 'Name VI'), '<input class="kc-input" type="text" value="' + c(_val(m,section,'name_vi')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'name_vi\',this.value)">') +
-    _field(_t('Tên EN', 'Name EN'), '<input class="kc-input" type="text" value="' + c(_val(m,section,'name')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'name\',this.value)">') +
+    _field(_t('Tên tiếng Việt', 'Name VI'), '<input class="kc-input" type="text" value="' + c(_val(m,section,'name_vi')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'name_vi\',this.value)">') +
+    _field(_t('Tên tiếng Anh', 'Name EN'), '<input class="kc-input" type="text" value="' + c(_val(m,section,'name')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'name\',this.value)">') +
     _field(_t('Quá trình', 'Process'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'process\',this.value)">' + _selOptions(procOpts, _val(m,section,'process') || 'unclassified') + '</select>') +
     _field(_t('Phân loại', 'Category'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'category\',this.value)">' + _selOptions(catOpts, _val(m,section,'category') || 'internal') + '</select>') +
     _field('control_intent', enumSel('control_intent', _val(m,section,'control_intent') || '', ext.control_intent)) +
     '</div>');
-  html += sectionHtml('2', _t('Subtype', 'Subtype'),
+  html += sectionHtml('2', _t('Phân loại chỉ số', 'Subtype'),
     '<div class="kc-grid">' +
     _field('metric_subtype', enumSel('metric_subtype', subtype, ext.metric_subtypes)) +
-    _field(_t('Owner', 'Owner'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'owner_role\',this.value)">' + _roleOptions(_val(m,section,'owner_role')) + '</select>') +
-    _field(_t('Nhịp', 'Cadence'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'cadence\',this.value)">' + _cadenceOptions(_val(m,section,'cadence')) + '</select>') +
+    _field(_t('Chủ sở hữu', 'Owner'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'owner_role\',this.value)">' + _roleOptions(_val(m,section,'owner_role')) + '</select>') +
+    _field(_t('Nhịp đo', 'Cadence'), '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'cadence\',this.value)">' + _cadenceOptions(_val(m,section,'cadence')) + '</select>') +
     '</div>');
-  html += sectionHtml('3', _t('Measurement', 'Measurement'),
+  html += sectionHtml('3', _t('Kiểu đo lường', 'Measurement'),
     '<div class="kc-grid">' +
     _field('measurement_data_type', enumSel('measurement_data_type', _val(m,section,'measurement_data_type') || '', ext.measurement_data_type)) +
-    _field(_t('Chiều', 'Direction'), '<select class="kc-input" onchange="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'direction\',this.value)">' + _selOptions(dirOpts, _threshold(m,section,'direction') || 'higher_is_better') + '</select>') +
+    _field(_t('Chiều tính', 'Direction'), '<select class="kc-input" onchange="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'direction\',this.value)">' + _selOptions(dirOpts, _threshold(m,section,'direction') || 'higher_is_better') + '</select>') +
     _field(_t('Đơn vị', 'Unit'), '<select class="kc-input" onchange="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'unit\',this.value)">' + _selOptions(unitOpts, _threshold(m,section,'unit') || 'percent') + '</select>') +
     _field('green_point', '<input class="kc-input" type="number" step="any" value="' + c(_threshold(m,section,'green_point')) + '" oninput="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'green_point\',this.value)">') +
     _field('yellow_point', '<input class="kc-input" type="number" step="any" value="' + c(_threshold(m,section,'yellow_point')) + '" oninput="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'yellow_point\',this.value)">') +
     _field('target', '<input class="kc-input" type="number" step="any" value="' + c(_threshold(m,section,'target')) + '" oninput="_kpiSetThreshold(\'' + section + '\',\'' + c(code) + '\',\'target\',this.value)">') +
     '</div>' + (b ? '<div class="kc-rag"><span class="kc-badge kc-badge-ok">' + _esc(b.green) + '</span><span class="kc-badge kc-badge-staged">' + _esc(b.yellow) + '</span><span class="kc-badge kc-badge-bad">' + _esc(b.red) + '</span></div>' : ''));
-  html += sectionHtml('4', _t('Scoring', 'Scoring'),
+  html += sectionHtml('4', _t('Mô hình tính điểm', 'Scoring'),
     '<div class="kc-grid">' +
     _field('scoring_model_detail', enumSel('scoring_model_detail', scoring, scoringOpts)) +
     _field('gate_pass_condition', '<input class="kc-input" type="text" value="' + c(_val(m,section,'gate_pass_condition')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'gate_pass_condition\',this.value)">') +
     '</div>' + sampleGrid +
-    _field(_t('Composite components (CODE|weight|name)', 'Composite components (CODE|weight|name)'),
+    _field(_t('Thành phần composite (CODE|weight|name)', 'Composite components (CODE|weight|name)'),
       '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'components\',this.value)">' + c(_componentsText(_val(m,section,'components') || m.components || [])) + '</textarea>'));
-  html += sectionHtml('5', _t('Data / Evidence', 'Data / Evidence'),
+  html += sectionHtml('5', _t('Dữ liệu / bằng chứng', 'Data / Evidence'),
     _field('data_contract_gap', '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'data_contract_gap\',this.value)">' + c(_val(m,section,'data_contract_gap')) + '</textarea>') +
     _field('target_graduation_condition', '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'target_graduation_condition\',this.value)">' + c(_val(m,section,'target_graduation_condition')) + '</textarea>') +
     _field('evidence_source', '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'evidence_source\',this.value)">' + c(_val(m,section,'evidence_source')) + '</textarea>') +
@@ -2088,27 +2120,27 @@ function _renderUnifiedMcoEditCard(m, section, inline){
     _field('customer_profile_link', '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'customer_profile_link\',this.value)">' + _profileOptions(_val(m,section,'customer_profile_link') || '') + '</select>') +
     _field('applicability_rule', '<input class="kc-input" type="text" value="' + c(_val(m,section,'applicability_rule')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'applicability_rule\',this.value)">') +
     '</div>');
-  html += sectionHtml('6', _t('Evaluation / Reward', 'Evaluation / Reward'),
+  html += sectionHtml('6', _t('Đánh giá / thưởng', 'Evaluation / Reward'),
     '<div class="kc-grid">' +
     _field('evaluation_use', enumSel('evaluation_use', _val(m,section,'evaluation_use') || '', ext.evaluation_use)) +
     _field('reward_mode', enumSel('reward_mode', _val(m,section,'reward_mode') || '', ext.reward_mode)) +
     _field('lifecycle_status', enumSel('lifecycle_status', _val(m,section,'lifecycle_status') || '', ext.lifecycle_status)) +
     _field('usage_contexts', '<input class="kc-input" type="text" value="' + c(_listText(_val(m,section,'usage_contexts') || m.usage_contexts || [])) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'usage_contexts\',this.value)">') +
     '</div>');
-  html += sectionHtml('7', _t('Role Assignments', 'Role Assignments'),
+  html += sectionHtml('7', _t('Phân công vai trò', 'Role Assignments'),
     '<div class="kc-grid">' +
     _field('data_stewardship_role', '<select class="kc-input" onchange="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'data_stewardship_role\',this.value)">' + _roleOptions(_val(m,section,'data_stewardship_role')) + '</select>') +
     _field('controllability_scope', '<input class="kc-input" type="text" value="' + c(_val(m,section,'controllability_scope')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'controllability_scope\',this.value)">') +
     _field('action_when_red', '<input class="kc-input" type="text" value="' + c(_val(m,section,'action_when_red')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'action_when_red\',this.value)">') +
     '</div>');
-  html += sectionHtml('8', _t('Counter / Blocker / Lifecycle', 'Counter / Blocker / Lifecycle'),
+  html += sectionHtml('8', _t('Đối trọng / điều kiện chặn / vòng đời', 'Counter / Blocker / Lifecycle'),
     '<div class="kc-grid">' +
-    _field(_t('Counter name VI', 'Counter name VI'), '<input class="kc-input" type="text" value="' + c(_counterVal(m,section,'name_vi')) + '" oninput="_kpiSetCounter(\'' + section + '\',\'' + c(code) + '\',\'name_vi\',this.value)">') +
+    _field(_t('Tên chỉ số đối trọng tiếng Việt', 'Counter name VI'), '<input class="kc-input" type="text" value="' + c(_counterVal(m,section,'name_vi')) + '" oninput="_kpiSetCounter(\'' + section + '\',\'' + c(code) + '\',\'name_vi\',this.value)">') +
     _field('paired_metric', '<input class="kc-input" type="text" value="' + c(_val(m,section,'paired_metric')) + '" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'paired_metric\',this.value)">') +
     _field('gate', '<input class="kc-input" type="text" value="' + c(_val(m,section,'gate')) + '" placeholder="G1" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'gate\',this.value)">') +
     _field('linked_cdr', '<input class="kc-input" type="text" value="' + c(_listText(_val(m,section,'linked_cdr') || m.linked_cdr || [])) + '" placeholder="A2, D8" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'linked_cdr\',this.value)">') +
     '</div>' +
-    _field(_t('Counter anti-gaming intent', 'Counter anti-gaming intent'), '<textarea class="kc-input kc-ta" oninput="_kpiSetCounter(\'' + section + '\',\'' + c(code) + '\',\'intent\',this.value)">' + c(_counterVal(m,section,'intent')) + '</textarea>') +
+    _field(_t('Ý đồ chống thao túng của chỉ số đối trọng', 'Counter anti-gaming intent'), '<textarea class="kc-input kc-ta" oninput="_kpiSetCounter(\'' + section + '\',\'' + c(code) + '\',\'intent\',this.value)">' + c(_counterVal(m,section,'intent')) + '</textarea>') +
     _field('blocking_conditions', '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'blocking_conditions\',this.value)">' + c(_listText(_val(m,section,'blocking_conditions') || m.blocking_conditions || [])) + '</textarea>') +
     _field('hold_release_rule', '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'hold_release_rule\',this.value)">' + c(_val(m,section,'hold_release_rule')) + '</textarea>') +
     _field('attribution_rule', '<textarea class="kc-input kc-ta" oninput="_kpiSetField(\'' + section + '\',\'' + c(code) + '\',\'attribution_rule\',this.value)">' + c(_val(m,section,'attribution_rule')) + '</textarea>'));
@@ -2135,7 +2167,7 @@ function _renderMcsExtAddBlock(a, ext){
   var grid = '<div class="kc-grid">' +
     _field(_t('Ý đồ kiểm soát (control_intent) — bước 1', 'Control intent — step 1'),
       enumSel('control_intent', a.control_intent || '', ext.control_intent)) +
-    _field(_t('Metric subtype — bước 2', 'Metric subtype — step 2'),
+    _field(_t('Phân loại con (metric_subtype) — bước 2', 'Metric subtype — step 2'),
       enumSel('metric_subtype', a.metric_subtype || '', ext.metric_subtypes)) +
     _field(_t('Kiểu dữ liệu đo — bước 3', 'Measurement data type — step 3'),
       enumSel('measurement_data_type', a.measurement_data_type || '', ext.measurement_data_type)) +
@@ -2152,7 +2184,7 @@ function _renderMcsExtAddBlock(a, ext){
       '" placeholder="VD: FPY" oninput="_kpiAddField(\'paired_metric\',this.value)">') +
     '</div>';
   return '<details class="kc-mcs-ext" open><summary>⚙ ' +
-    _t('Metric Control Schema (MCS-EXT-1) — các bước mở rộng',
+    _t('Sơ đồ kiểm soát chỉ số (MCS-EXT-1) — các bước mở rộng',
        'Metric Control Schema (MCS-EXT-1) — extension steps') + '</summary>' + grid + '</details>';
 }
 
@@ -2206,7 +2238,7 @@ function _renderMcsExtBlock(m, section, code){
       c(attrib) + '</textarea>');
 
   return '<details class="kc-mcs-ext"' + openAttr + '>' +
-    '<summary>⚙ ' + _t('Metric Control Schema (MCS-EXT-1) — mở rộng', 'Metric Control Schema (MCS-EXT-1) — extended attributes') +
+    '<summary>⚙ ' + _t('Sơ đồ kiểm soát chỉ số (MCS-EXT-1) — mở rộng', 'Metric Control Schema (MCS-EXT-1) — extended attributes') +
     (anyExt ? ' <span class="kc-pill kc-pill--accent">' + _t('đã có dữ liệu', 'has data') + '</span>' : '') +
     '</summary>' + body + '</details>';
 }
@@ -2273,7 +2305,11 @@ function _styleBlock(){
   '.kc-btn{border:1px solid var(--border);background:var(--surface);color:var(--text-1);' +
     'border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer}' +
   '.kc-btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}' +
+  '.kc-btn-danger{border-color:var(--danger);color:var(--danger);background:var(--danger-soft)}' +
+  '.kc-btn-restore{border-color:var(--success);color:var(--success);background:var(--success-soft)}' +
   '.kc-btn[disabled]{opacity:.5;cursor:not-allowed}' +
+  '.kc-icon-btn{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;' +
+    'background:var(--surface);color:var(--text-1);font-size:20px;line-height:1;cursor:pointer}' +
   '.kc-alert{border-radius:8px;padding:9px 12px;font-size:13px}' +
   '.kc-alert.error{background:var(--danger-soft);color:var(--danger);border:1px solid var(--danger)}' +
   '.kc-alert.ok{background:var(--success-soft);color:var(--success);border:1px solid var(--success)}' +
@@ -2377,11 +2413,12 @@ function _styleBlock(){
   '.kc-filterbar .kc-input{width:auto;min-width:150px;flex:0 0 auto}' +
   '.kc-result-head{font-size:13px;color:var(--text-2);padding:2px 2px}' +
   '.kc-result-head b{color:var(--accent);font-size:15px}' +
-  '.kc-lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}' +
-  '.kc-lib-card{text-align:left;display:flex;flex-direction:column;gap:7px;' +
-    'border:1px solid var(--border);border-radius:10px;padding:12px;background:var(--surface)}' +
+  '.kc-lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}' +
+  '.kc-lib-card{text-align:left;display:flex;flex-direction:column;gap:7px;position:relative;' +
+    'border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:8px;padding:12px;' +
+    'background:var(--surface);box-shadow:var(--shadow-xs);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}' +
   '.kc-lib-card[role=button]{cursor:pointer}' +
-  '.kc-lib-card[role=button]:hover{border-color:var(--accent);box-shadow:var(--shadow-sm)}' +
+  '.kc-lib-card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:var(--shadow-md)}' +
   '.kc-lib-card--retired{opacity:.62;background:var(--surface-2)}' +
   '.kc-lib-card--draft{border-color:var(--accent);border-style:dashed}' +
   '.kc-lib-card-top{display:flex;justify-content:space-between;align-items:center;gap:8px}' +
@@ -2428,6 +2465,17 @@ function _styleBlock(){
   '.kc-lib-card--expanded{grid-column:1/-1;border-color:var(--accent);' +
     'box-shadow:var(--shadow-md)}' +
   '.kc-lib-editor{margin-top:8px;border-top:1px solid var(--border);padding-top:8px}' +
+  '.kc-dialog-backdrop{position:fixed;inset:0;z-index:9999;background:color-mix(in srgb,var(--text-1) 48%,transparent);' +
+    'display:flex;align-items:center;justify-content:center;padding:22px}' +
+  '.kc-dialog{width:min(1120px,calc(100vw - 28px));max-height:calc(100vh - 44px);' +
+    'display:flex;flex-direction:column;border:1px solid var(--border);border-radius:8px;' +
+    'background:var(--surface);box-shadow:var(--shadow-lg);overflow:hidden}' +
+  '.kc-dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;' +
+    'padding:14px 16px;border-bottom:1px solid var(--border);background:var(--surface-2)}' +
+  '.kc-dialog-head h3{margin:3px 0 0;font-size:16px;color:var(--text-1)}' +
+  '.kc-dialog-body{overflow:auto;padding:14px 16px;min-height:0}' +
+  '.kc-dialog-foot{display:flex;justify-content:flex-end;gap:8px;align-items:center;' +
+    'padding:12px 16px;border-top:1px solid var(--border);background:var(--surface-2)}' +
   '.kc-card--inline{border:0;padding:0;gap:8px}' +
   '.kc-counter-edit{border:1px solid var(--border);border-radius:8px;' +
     'padding:8px 10px;display:flex;flex-direction:column;gap:6px;background:var(--surface-2)}' +
@@ -2495,7 +2543,7 @@ function _styleBlock(){
 	  if(!a) return;
 	  var mcoErrors = _mcoAddErrors(a);
 	  if(mcoErrors.length){
-	    _state.error = _t('Metric Control Object chưa hợp lệ: ', 'Metric Control Object is incomplete: ')
+	    _state.error = _t('Cấu trúc kiểm soát chỉ số chưa hợp lệ: ', 'Metric Control Object is incomplete: ')
 	      + mcoErrors.slice(0, 4).join(' | ');
 	    _render(); return;
 	  }
@@ -2529,7 +2577,7 @@ function _styleBlock(){
     _render(); return;
   }
   if(!String(a.data_contract_gap || '').trim() || !String(a.target_graduation_condition || '').trim()){
-    _state.error = _t('Cần nhập data-contract gap và điều kiện graduation cho metric staged.',
+    _state.error = _t('Cần nhập data_contract_gap và điều kiện chuyển chính thức cho chỉ số chờ dữ liệu.',
       'Data-contract gap and graduation condition are required for a staged metric.');
     _render(); return;
   }
@@ -2596,7 +2644,7 @@ function _styleBlock(){
   _state.addedDraft[a.group].push(row);
   _state.addForm = null;
   _state.error = '';
-  _state.message = _t('Đã thêm proposal metric: ', 'Draft metric proposal added: ') + code + ' — ' +
+  _state.message = _t('Đã thêm đề xuất chỉ số: ', 'Draft metric proposal added: ') + code + ' — ' +
     _t('bấm “Lưu & đồng bộ tài liệu” để ghi.', 'click “Save & sync documents” to persist.');
   _render();
 }
@@ -2615,6 +2663,7 @@ window._kpiSetView = function(view){
   _state.activeView = view || 'overview';
   _state.addForm = null;
   _state.customerProfileForm = null;
+  _state.editorDialog = null;
   _state.expandedCode = '';
   _render();
 };
@@ -2628,6 +2677,59 @@ window._kpiToggleCard = function(group, code){
   var key = group + ':' + String(code).toUpperCase();
   _state.expandedCode = (_state.expandedCode === key) ? '' : key;
   _render();
+};
+window._kpiOpenDialog = function(group, code){
+  code = String(code || '').toUpperCase();
+  if(!_findMetric(group, code)){
+    _state.error = _t('Không tìm thấy KPI: ', 'Cannot find KPI: ') + code;
+    _syncStatus(); return;
+  }
+  var existing = ((_state.overrides[group] || {})[code]) || {};
+  _state.editorDialog = { group:group, code:code, patch:_cloneObj(existing), dirty:false };
+  _state.expandedCode = '';
+  _state.error = ''; _state.message = '';
+  _render();
+};
+window._kpiDialogOk = function(){
+  var d = _state.editorDialog;
+  if(!d) return;
+  var row = _dialogEffectiveRow();
+  var errors = row ? _mcoRowErrors(row, false) : [_t('Không tìm thấy KPI để sửa.', 'Cannot find the KPI to edit.')];
+  if(errors.length){
+    _state.error = errors.slice(0, 4).join(' | ');
+    _syncDialogStatus();
+    _syncStatus();
+    return;
+  }
+  if(Object.keys(d.patch || {}).length){
+    if(!_state.overrides[d.group]) _state.overrides[d.group] = {};
+    _state.overrides[d.group][d.code] = _cloneObj(d.patch);
+    _state.message = _t('Đã áp dụng thay đổi KPI vào danh sách chờ lưu: ',
+      'Applied KPI changes to the pending save set: ') + d.code;
+  }
+  _state.editorDialog = null;
+  _render();
+};
+window._kpiDialogCancel = function(){
+  _state.editorDialog = null;
+  _render();
+};
+window._kpiDialogBackdrop = function(event){
+  if(event && event.target && event.target.classList && event.target.classList.contains('kc-dialog-backdrop')){
+    window._kpiDialogCancel();
+  }
+};
+window._kpiDialogRetire = function(){
+  var d = _state.editorDialog;
+  if(!d) return;
+  _state.editorDialog = null;
+  window._kpiRetire(d.group, d.code);
+};
+window._kpiDialogRestore = function(){
+  var d = _state.editorDialog;
+  if(!d) return;
+  _state.editorDialog = null;
+  window._kpiRestore(d.group, d.code);
 };
 window._kpiAddOpen   = function(){ _state.addForm = _newAddForm(); _state.error = ''; _state.message = ''; _render(); };
 window._kpiAddClose  = function(){ _state.addForm = null; _render(); };
