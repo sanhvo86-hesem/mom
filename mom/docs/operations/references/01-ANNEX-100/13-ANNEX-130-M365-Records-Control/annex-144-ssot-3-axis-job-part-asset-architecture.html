@@ -46,7 +46,7 @@
 <h1>SSOT 3-Axis Job×Part×Asset Architecture (v4)</h1>
 
 <div class="callout"><strong>BỐI CẢNH — vì sao v3.1 thất bại + v4 ra đời:</strong><br>
-v1–v3.1 (ANNEX-131..143) tổ chức cấu trúc folder M365 theo <em>Department × Workflow Scenario</em>. Mô hình này tuân theo cách mệnh đề ISO/AS9100 chia chương — nhưng KHÔNG khớp cách <b>shop floor CNC thực sự vận hành</b>. Khi review thực tế phát hiện <b>SSOT bị vi phạm nghiêm trọng</b>: một file evidence tồn tại ở 2-3 path khác nhau (vd cal cert gage cùng lúc nằm tại <code>DEP-METRO</code>, <code>DEP-QA</code>, <code>Part-REV-Master</code>; NCR-2026-0043 vừa ở <code>DEP-QA/02-Operations/06-NCR/{YYYY}/</code> vừa ở <code>Job-Dossiers/.../09-NCR-CAPA/</code>). Người dùng không biết đâu là canonical → folder trở thành nghĩa địa.<br>
+v1–v3.1 (ANNEX-131..143) tổ chức cấu trúc folder M365 theo <em>Department × luồng công việc Scenario</em>. Mô hình này tuân theo cách mệnh đề ISO/AS9100 chia chương — nhưng KHÔNG khớp cách <b>shop floor CNC thực sự vận hành</b>. Khi review thực tế phát hiện <b>SSOT bị vi phạm nghiêm trọng</b>: một file evidence tồn tại ở 2-3 path khác nhau (vd cal cert gage cùng lúc nằm tại <code>DEP-METRO</code>, <code>DEP-QA</code>, <code>Part-REV-Master</code>; NCR-2026-0043 vừa ở <code>DEP-QA/02-Operations/06-NCR/{YYYY}/</code> vừa ở <code>Job-Dossiers/.../09-NCR-CAPA/</code>). Người dùng không biết đâu là canonical → folder trở thành nghĩa địa.<br>
 <b>v4 quy hoạch lại theo 3-axis SSOT</b> bám sát thực chiến: operator tìm file theo <em>Job number</em>; QA filter NCR theo <em>Job × Part</em>; Maintenance tra cal cert theo <em>GageID</em>; Sales tra hợp đồng theo <em>Customer</em>; Auditor request "FAI cho Part XYZ Rev B" → đi 1 path canonical. <b>Department-Ops bị shrink dramatically</b>: chỉ giữ SOPs + dept-KPI + MR inputs + risk register; KHÔNG giữ evidence transactional. Tổng directory: 2129 (v3.1) → <b>597 (v4)</b> — giảm 72% vì xoá duplicate.</div>
 
 <section class="card">
@@ -153,7 +153,7 @@ HESEM-Job-Evidence/                  [SITE 1 — TRANSACTIONAL SSOT, 90% file vo
 
 HESEM-Records/                       [SITE 2 — GOVERNANCE + REFERENCE + SOPs]
 ├── QMS-Master/
-│   ├── 01-Quality-Policy-and-Manual
+│   ├── 01-Quality-chính sách-and-Manual
 │   ├── 02-Management-Review/{YYYY}
 │   ├── 03-Internal-Audit-Program/{YYYY}
 │   ├── 04-External-Cert-Audits/{YYYY}
@@ -207,7 +207,7 @@ HESEM-Records/                       [SITE 2 — GOVERNANCE + REFERENCE + SOPs]
 │   ├── 03-Approved-Supplier-Notices
 │   └── 04-Bulletins-and-Updates/{YYYY}
 ├── Industry-Standards/{SEMI|AMS|ASTM|ISO-AS|IEST|NADCAP|RBA}
-└── Workflow-Lists/                                     [SharePoint Lists, NOT folders — link to canonical]
+└── luồng công việc-Lists/                                     [SharePoint Lists, NOT folders — link to canonical]
     ├── NCR-Master-List           → links to Job-Dossiers/.../09-NCR
     ├── CAPA-Master-List          → links to NCR + audit + complaint
     ├── 8D-SCAR-Master-List
@@ -329,7 +329,7 @@ Bắt đầu: File X được sinh bởi role R.
 <tr><td><code>Cert-Expiry-Watch-90d</code></td><td>EmpId, CertCode, ExpiryDate, DaysToExpiry, OwnerSupervisor</td><td><code>Training-Master/07-Cert-Master-Register-per-Employee/...</code></td></tr>
 <tr><td><code>ECO-Master-List</code></td><td>EcoId, Status, AffectedPartNo, Driver (Customer/Internal), Owner, BoardDate</td><td><code>Part-REV-Master/.../07-PCN-History</code> + <code>QMS-Master/10-Change-Control</code></td></tr>
 <tr><td><code>Customer-Audit-Master-List</code></td><td>AuditId, Customer, AuditType, Status, OpeningDate, ClosureDate</td><td><code>Customer-Account/{Cust}/06-Customer-Audit/{YYYY}/</code></td></tr>
-<tr><td><code>Customer-Portal-Evidence-Log</code></td><td>Direction (In/Out), Portal (Ariba/Coupa/myASML/TPS), DocType, Customer, UploadId, Timestamp</td><td>Inbound copy stored in PO-Index/.../00-Source; Outbound staging in workflow library</td></tr>
+<tr><td><code>Customer-Portal-Evidence-Log</code></td><td>Direction (In/Out), Portal (Ariba/Coupa/myASML/TPS), DocType, Customer, UploadId, Timestamp</td><td>Inbound copy stored in PO-Index/.../00-Source; Outbound staging in luồng công việc library</td></tr>
 </tbody>
 </table>
 <p>Power Automate flow tự động đồng bộ List metadata với file event ở canonical path. List chỉ có metadata + link; không host file copy.</p>
@@ -338,7 +338,7 @@ Bắt đầu: File X được sinh bởi role R.
 <section class="card">
 <h2>6. Department-Reference (BIG CHANGE v3.1 → v4)</h2>
 <div class="callout"><b>Trước v4:</b> Department-Ops chiếm ~280 scenario folder × 16 dept = ~4500 folder potential (mỗi sub có 00-Current + {YYYY}). Tạo cảm giác "phòng ban có everything" — nhưng evidence transactional thực ra thuộc Job/Part/Asset axis, nên Department-Ops vô tình duplicate.</div>
-<div class="ok-callout"><b>v4 Department-Reference:</b> Mỗi DEP-{CODE} chỉ giữ <b>8 sub fixed</b>: SOPs + Forms + KPI + MR-Inputs + Risk + Audit-Findings + Org-Chart + Reference-Material. <em>Tổng 16 dept × 8 = 128 folder</em> (so với ~4500). Evidence transactional KHÔNG ở đây — link tới Job/Part/Asset/Account paths qua workflow lists.</div>
+<div class="ok-callout"><b>v4 Department-Reference:</b> Mỗi DEP-{CODE} chỉ giữ <b>8 sub fixed</b>: SOPs + Forms + KPI + MR-Inputs + Risk + Audit-Findings + Org-Chart + Reference-Material. <em>Tổng 16 dept × 8 = 128 folder</em> (so với ~4500). Evidence transactional KHÔNG ở đây — link tới Job/Part/Asset/Account paths qua luồng công việc lists.</div>
 <pre class="tree">
 HESEM-Records/Department-Reference/DEP-{CODE}/
 ├── 01-SOPs-and-Work-Instructions           [DCC-controlled procedures]
@@ -390,7 +390,7 @@ HESEM-Records/Department-Reference/DEP-{CODE}/
 <tr><td>9</td><td>Register ANNEX-144 trong dcc_document_header trên VPS</td><td>DCC</td><td>Next</td></tr>
 <tr><td>10</td><td>Deploy + Chrome verify</td><td>IT</td><td>Next</td></tr>
 <tr><td>11</td><td>(Future) Provisioning script ANNEX-134 update theo v4 site list</td><td>IT</td><td>Pending</td></tr>
-<tr><td>12</td><td>(Future) SharePoint List schema thiết kế chi tiết cho 13 workflow lists</td><td>QMS + IT</td><td>Pending — sẽ thành ANNEX-145</td></tr>
+<tr><td>12</td><td>(Future) SharePoint List schema thiết kế chi tiết cho 13 luồng công việc lists</td><td>QMS + IT</td><td>Pending — sẽ thành ANNEX-145</td></tr>
 </tbody>
 </table>
 </section>

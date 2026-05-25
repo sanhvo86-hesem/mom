@@ -88,13 +88,13 @@
 
  <div class="section">
  <h2>2. Mô hình SSOT ba tầng EQMS-M365</h2>
- <p style="margin:8px 0;">HESEM vận hành một kiến trúc dữ liệu ba lớp dành cho hồ sơ chất lượng và vận hành. ANNEX-131 §2 đã xác lập ranh giới giữa Epicor (SoR giao dịch) và M365 (SSOT hồ sơ). ANNEX này bổ sung tầng thứ ba — EQMS Portal — là hệ thống dữ liệu có cấu trúc dành riêng cho luồng làm việc chất lượng (workflow), không phải giao dịch tài chính/sản xuất của Epicor, cũng không phải file tài liệu của M365.</p>
+ <p style="margin:8px 0;">HESEM vận hành một kiến trúc dữ liệu ba lớp dành cho hồ sơ chất lượng và vận hành. ANNEX-131 §2 đã xác lập ranh giới giữa Epicor (SoR giao dịch) và M365 (SSOT hồ sơ). ANNEX này bổ sung tầng thứ ba — EQMS Portal — là hệ thống dữ liệu có cấu trúc dành riêng cho luồng làm việc chất lượng (luồng công việc), không phải giao dịch tài chính/sản xuất của Epicor, cũng không phải file tài liệu của M365.</p>
  <div class="figure-box">
  <p style="margin:0;"><strong>Sơ đồ ba tầng:</strong></p>
  <pre class="decision-tree" style="white-space:pre;">
                  ┌─────────────────────────────────────────────────────────┐
                  │   TIER 1 — EQMS Portal Database (MOM)                   │
-                 │   ↳ Structured workflow data SSOT                       │
+                 │   ↳ Structured luồng công việc data SSOT                       │
                  │   ↳ eqms_ncr_records, eqms_capa_records, fai_records    │
                  │   ↳ Số NCR, status, disposition, linked jobs, audit log │
                  │   ↳ Owner: QA + Application admin                       │
@@ -123,7 +123,7 @@
 
  <h3>2.1. Tier 1 — EQMS Portal (Structured Data SSOT)</h3>
  <div class="tier-card">
- <p style="margin:0 0 6px;"><span class="tier-tag tier-1">TIER 1</span> &nbsp;<strong>Vai trò:</strong> hệ thống dữ liệu có cấu trúc cho mọi trường workflow liên quan đến NCR, CAPA, FAI và các record series tương đương.</p>
+ <p style="margin:0 0 6px;"><span class="tier-tag tier-1">TIER 1</span> &nbsp;<strong>Vai trò:</strong> hệ thống dữ liệu có cấu trúc cho mọi trường luồng công việc liên quan đến NCR, CAPA, FAI và các record series tương đương.</p>
  <p style="margin:6px 0;"><strong>Vị trí vật lý:</strong> PostgreSQL database của HESEM MOM portal. Bảng chính: <span class="code">eqms_ncr_records</span>, <span class="code">eqms_capa_records</span>, <span class="code">nonconformance_dispositions</span>, <span class="code">corrective_action_tasks</span>, <span class="code">corrective_action_verifications</span>, <span class="code">fqc_inspections</span>, <span class="code">oqc_inspections</span>, <span class="code">msa_studies</span>, <span class="code">spc_observations</span>, <span class="code">concessions</span>, <span class="code">deviations</span>.</p>
  <p style="margin:6px 0;"><strong>Lý do tồn tại:</strong> SharePoint List có giới hạn về indexing, validation, state machine và audit log. Một NCR có state machine 8 bậc (draft → submitted → under_review → mrb_review → disposition_set → rework_in_progress → closed) với các invariant không thể đóng nếu thiếu disposition evidence. SharePoint không thực thi được loại invariant này. EQMS Portal có controller riêng (<span class="code">EqmsNcrController</span>, <span class="code">EqmsCapaController</span>) thực thi state transition, role-based write control, audit log và linked-record integrity.</p>
  <p style="margin:6px 0;"><strong>Loại trường được sở hữu bởi Tier 1:</strong></p>
@@ -135,7 +135,7 @@
  <li><span class="code">root_cause_analysis</span>, <span class="code">action_plan</span> (JSONB), <span class="code">effectiveness_verification</span></li>
  <li>Audit trail per row qua bảng <span class="code">audit_events</span> với user, action, before/after value, timestamp</li>
  </ul>
- <p style="margin:6px 0;"><strong>Endpoint chuẩn (REST):</strong> <span class="code">POST /api/v1/eqms/ncr/query</span>, <span class="code">POST /api/v1/eqms/ncr/{id}/transition</span>, <span class="code">POST /api/v1/eqms/capa/query</span>, <span class="code">POST /api/v1/eqms/capa/{id}/transition</span>. Mọi truy vấn trending, MR input, supplier quality view, KPI dashboard đều lấy từ tầng này.</p>
+ <p style="margin:6px 0;"><strong>Endpoint chuẩn (REST):</strong> <span class="code">POST /api/v1/eqms/ncr/query</span>, <span class="code">POST /api/v1/eqms/ncr/{id}/transition</span>, <span class="code">POST /api/v1/eqms/capa/query</span>, <span class="code">POST /api/v1/eqms/capa/{id}/transition</span>. Mọi truy vấn trending, MR input, supplier quality view, KPI bảng điều khiển đều lấy từ tầng này.</p>
  <p style="margin:6px 0;"><strong>Quy tắc cứng:</strong></p>
  <ol>
  <li>Không bao giờ tái tạo các trường thuộc Tier 1 dưới dạng SharePoint column độc lập. Nếu cần hiển thị status/disposition ở M365, phải fetch qua API tại thời điểm hiển thị hoặc qua Power Automate flow đồng bộ một chiều EQMS → M365.</li>
@@ -176,7 +176,7 @@
  <ul>
  <li><strong>Cross-reference metadata</strong>: cột <span class="code">NCR_Refs</span>, <span class="code">CAPA_Refs</span>, <span class="code">FAI_Refs</span> trong content type của Document Set hoặc folder metadata; entry trong SharePoint List <span class="code">NCR-Cross-Reference</span></li>
  <li><strong>Job-specific working evidence</strong> không phải SSOT chính thức: ảnh containment thô chụp tại line, video rework, ghi chú handwritten của operator, biên bản họp daily tier — những thứ phát sinh trong context của job đó và không có đời sống độc lập</li>
- <li><strong>Working pack</strong> của phòng ban (dashboard snapshot, internal tracker, action log) — chứ không phải bản chính thức của NCR/CAPA</li>
+ <li><strong>Working pack</strong> của phòng ban (bảng điều khiển snapshot, internal tracker, action log) — chứ không phải bản chính thức của NCR/CAPA</li>
  <li><strong>SharePoint shortcut</strong> trỏ về Tier 2 — <strong>chỉ làm navigation aid, không phải bằng chứng compliance</strong></li>
  </ul>
  <p style="margin:6px 0;"><strong>Loại nội dung TUYỆT ĐỐI KHÔNG được lưu ở Tier 3:</strong></p>
@@ -217,7 +217,7 @@
  <tr><td><span class="code">SSOT-R02</span></td><td>Số NCR/CAPA/FAI được cấp DUY NHẤT bởi EQMS Portal (auto-sequence). Không được điền tay trong SharePoint metadata.</td><td>Tier 1 → Tier 2 → Tier 3</td><td>EQMS controller cấp số; M365 List validation rule reject input không khớp regex <span class="code">^(NCR|CAPA|FAI)-\d{4}-\d{3,5}$</span></td></tr>
  <tr><td><span class="code">SSOT-R03</span></td><td>File PDF báo cáo chính thức chỉ tồn tại ở đúng một path trong Tier 2. Mọi vị trí khác (Tier 3) chỉ chứa cross-reference metadata, không chứa physical file.</td><td>Tier 2 ↔ Tier 3</td><td>Power Automate guard: reject upload nếu filename match pattern NCR/CAPA/FAI SSOT và destination không phải Tier 2</td></tr>
  <tr><td><span class="code">SSOT-R04</span></td><td>Cập nhật status/disposition của NCR/CAPA chỉ được thực hiện qua EQMS state-transition endpoint. Cập nhật trực tiếp trong SharePoint metadata bị reject.</td><td>Tier 1</td><td>EQMS endpoint authoritative; SharePoint Source_System field readonly cho user, chỉ flow EQMS có quyền ghi</td></tr>
- <tr><td><span class="code">SSOT-R05</span></td><td>Mỗi file ở Tier 2 phải có đúng một retention label áp tại cấp library default, không vá thủ công từng file.</td><td>Tier 2</td><td>Library default retention label policy thông qua Microsoft Purview; auto-apply policy review hàng tháng</td></tr>
+ <tr><td><span class="code">SSOT-R05</span></td><td>Mỗi file ở Tier 2 phải có đúng một retention label áp tại cấp library default, không vá thủ công từng file.</td><td>Tier 2</td><td>Library default retention label chính sách thông qua Microsoft Purview; auto-apply chính sách review hàng tháng</td></tr>
  <tr><td><span class="code">SSOT-R06</span></td><td>Mỗi entry cross-reference ở Tier 3 phải có giá trị <span class="code">SSOT_Reference_Key</span> hợp lệ và resolve được. Entry orphan (key trỏ vào file không tồn tại) bị flag.</td><td>Tier 3</td><td>Weekly Power Automate verification job; orphan entry vào báo cáo Records Integrity</td></tr>
  <tr><td><span class="code">SSOT-R07</span></td><td>Khi rename hoặc move file ở Tier 2, hệ thống tự động cập nhật <span class="code">SSOT_Reference_Key</span> ở mọi Tier 3 reference qua background flow.</td><td>Tier 2 → Tier 3</td><td>SharePoint webhook + Power Automate; nếu webhook fail, file move bị abort</td></tr>
  <tr><td><span class="code">SSOT-R08</span></td><td>Cross-site shortcut SharePoint không được coi là evidence compliance. Mọi cross-tier link phải đi qua <span class="code">NCR-Cross-Reference</span> List với Document ID + path resolution.</td><td>Tier 2 ↔ Tier 3</td><td>Purview documentation xác nhận shortcuts không kế thừa retention label; List item là evidence record</td></tr>
@@ -240,13 +240,13 @@
  │   ├─ Có  → Stop. Lưu trong Epicor. M365 chỉ snapshot nếu cần (ANNEX-131 §7).
  │   └─ Không → Q2.
  │
- ├─ Q2. Nó có phải là bản ghi workflow chất lượng có state machine (NCR, CAPA, FAI, Complaint)?
+ ├─ Q2. Nó có phải là bản ghi luồng công việc chất lượng có state machine (NCR, CAPA, FAI, Complaint)?
  │   ├─ Có  → TIER 1: tạo trong EQMS Portal.
  │   │       Sau khi disposition_set/signed → tự động push file PDF sang TIER 2.
  │   │       Tiếp tục Q5 để xác định cross-reference ở TIER 3.
  │   └─ Không → Q3.
  │
- ├─ Q3. Nó có phải là tài liệu chính thức cấp công ty (SOP, WI, policy, controlled doc)?
+ ├─ Q3. Nó có phải là tài liệu chính thức cấp công ty (SOP, WI, chính sách, controlled doc)?
  │   ├─ Có  → TIER 2: lưu trong QMS-Governance library theo DCC.
  │   │       Tiếp tục Q5 để xác định cross-reference ở TIER 3.
  │   └─ Không → Q4.
@@ -269,7 +269,7 @@
      ├─ Có ≥1 job liên quan
      │   → Tạo entry trong NCR-Cross-Reference List với Job_Number + SSOT_Reference_Key.
      │     KHÔNG copy file vào job folder. Chỉ ghi cross-reference.
-     ├─ Có phòng ban cần đưa vào dashboard điều hành
+     ├─ Có phòng ban cần đưa vào bảng điều khiển điều hành
      │   → Department-Ops/.../03-Registers-and-Logs/00-Current/ chứa view live
      │     của EQMS NCR Register, KHÔNG copy file.
      └─ Có nhân viên là người phụ trách hoặc bị ảnh hưởng (cho hồ sơ training/competence)
@@ -465,7 +465,7 @@
 
  <div class="anti-pattern">
  <p style="margin:0;"><strong>AP-06 — Tạo retention label khác nhau cho cùng record series ở các site khác nhau.</strong></p>
- <p style="margin:4px 0 0; font-size:13px;"><em>Hiện tượng:</em> Tier 2 NCR file có label RET-QMS-NCR (10 năm). Cross-reference List có label RET-LIST-2Y (2 năm). <em>Hậu quả:</em> List entry bị xóa năm thứ 2 trong khi file SSOT còn — mất cross-reference, không thể truy ngược job→NCR; vi phạm SSOT-R05 + ALCOA+ "enduring". <em>Detection:</em> Retention policy audit hàng tháng; List retention label phải ≥ Tier 2 file retention.</p>
+ <p style="margin:4px 0 0; font-size:13px;"><em>Hiện tượng:</em> Tier 2 NCR file có label RET-QMS-NCR (10 năm). Cross-reference List có label RET-LIST-2Y (2 năm). <em>Hậu quả:</em> List entry bị xóa năm thứ 2 trong khi file SSOT còn — mất cross-reference, không thể truy ngược job→NCR; vi phạm SSOT-R05 + ALCOA+ "enduring". <em>Detection:</em> Retention chính sách audit hàng tháng; List retention label phải ≥ Tier 2 file retention.</p>
  </div>
 
  <div class="anti-pattern">
@@ -563,8 +563,8 @@
  <tr><th>Section</th><th>Nội dung</th><th>Áp dụng tại ANNEX-130</th></tr>
  </thead>
  <tbody>
- <tr><td><span class="legal-clause">9. Audit Trails</span></td><td>Consideration should be given, based on a risk assessment, to building into the system the creation of a record of all GMP-relevant changes and deletions. The audit trail must be available and convertible to a generally intelligible form and regularly reviewed.</td><td>Audit trail Tier 1 + Tier 2 + Tier 3 đồng bộ; export qua Power BI Records Integrity dashboard.</td></tr>
- <tr><td><span class="legal-clause">17. Archiving</span></td><td>Data may be archived. Data should be checked for accessibility, readability and integrity. If relevant changes are to be made to the system, then the ability to retrieve the data should be ensured and tested.</td><td>Quarterly reconciliation script (§9); migration verification; retention policy review trước mỗi M365 site rename hay collection split.</td></tr>
+ <tr><td><span class="legal-clause">9. Audit Trails</span></td><td>Consideration should be given, based on a risk assessment, to building into the system the creation of a record of all GMP-relevant changes and deletions. The audit trail must be available and convertible to a generally intelligible form and regularly reviewed.</td><td>Audit trail Tier 1 + Tier 2 + Tier 3 đồng bộ; export qua Power BI Records Integrity bảng điều khiển.</td></tr>
+ <tr><td><span class="legal-clause">17. Archiving</span></td><td>Data may be archived. Data should be checked for accessibility, readability and integrity. If relevant changes are to be made to the system, then the ability to retrieve the data should be ensured and tested.</td><td>Quarterly reconciliation script (§9); migration verification; retention chính sách review trước mỗi M365 site rename hay collection split.</td></tr>
  </tbody>
  </table>
  </div>
@@ -922,11 +922,11 @@
  <div class="section">
  <h2>Phụ lục A — Glossary ngắn</h2>
  <ul>
- <li><strong>SoT (Source of Truth):</strong> hệ thống chứa bản ghi dữ liệu cấu trúc gốc. Trong HESEM: Epicor cho giao dịch, EQMS Portal cho workflow chất lượng.</li>
+ <li><strong>SoT (Source of Truth):</strong> hệ thống chứa bản ghi dữ liệu cấu trúc gốc. Trong HESEM: Epicor cho giao dịch, EQMS Portal cho luồng công việc chất lượng.</li>
  <li><strong>SSOT (Single Source of Truth):</strong> chỉ định duy nhất "vị trí có thẩm quyền" cho một loại bằng chứng. Có thể là một record trong database (Tier 1) hoặc một file trong library (Tier 2).</li>
  <li><strong>Cross-Reference:</strong> liên kết giữa các tier hoặc giữa các record series khác nhau. Không phải SSOT; chỉ trỏ về SSOT.</li>
  <li><strong>Tier 1 / 2 / 3:</strong> ba lớp dữ liệu được định nghĩa trong §2 của ANNEX này.</li>
- <li><strong>EQMS Portal:</strong> ứng dụng HESEM MOM, PostgreSQL backend, bảng <span class="code">eqms_*</span> cho quality workflow.</li>
+ <li><strong>EQMS Portal:</strong> ứng dụng HESEM MOM, PostgreSQL backend, bảng <span class="code">eqms_*</span> cho quality luồng công việc.</li>
  <li><strong>Cross-Reference Register:</strong> SharePoint List làm connector tissue giữa các tier; thay thế Document ID Service không hoạt động cross-site.</li>
  <li><strong>Link-not-copy:</strong> nguyên tắc của ANNEX-131 §2 — chỉ lưu liên kết, không sao chép file. ANNEX-130 mở rộng nguyên tắc này với cross-reference register cụ thể.</li>
  <li><strong>ALCOA+:</strong> chuẩn data integrity 9 nguyên tắc (Attributable, Legible, Contemporaneous, Original, Accurate + Complete, Consistent, Enduring, Available).</li>

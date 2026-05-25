@@ -57,7 +57,7 @@
 <div class="callout"><strong>BỐI CẢNH — vì sao có tài liệu này?</strong><br>
 HESEM gia công chi tiết cơ khí cho thiết bị bán dẫn (chamber parts, electrostatic chuck ESC, end-effector, gas distribution manifold). Khách hàng chính: <b>Applied Materials (AMAT) · LAM Research · ASML · Tokyo Electron (TEL)</b> — 4 OEM kiểm soát ~80% thị trường semi equipment. Mỗi OEM có hệ supplier quality riêng (NDA-locked) nhưng yêu cầu chung là <b>cleanliness là tiêu chí pass/fail #1, không phải dung sai kích thước</b>. ANNEX-141 đặt khung tuân thủ thực chiến cho HESEM, từ <b>mới bắt đầu</b> đến <b>Tier-1 audit-ready</b> trong 12-18 tháng.</div>
 
-<div class="ok-callout" style="background:#ebfbee;border-left:4px solid #2b8a3e;padding:10px 14px;margin:10px 0;font-size:13px;"><strong>v3 cross-reference (2026-05-16):</strong> Mỗi workflow + special process + Pack-6 element trong ANNEX-141 này đã được ánh xạ vào ma trận thực chiến <em>Department × Role × Scenario × File</em> tại <a href="annex-143-department-role-scenario-file-master-matrix.html">ANNEX-143</a> §4 (DEP-QA cho FAI/CAPA/8D, DEP-METRO cho LPC/NVR/IC/FTIR/Ra/CMM, DEP-SP cho Anodize/EP/Pass/Clean/Outgas/He-leak/Bath-trend) + §6 (Pack-6 evidence bundle flow 8-element cross-dept link). <strong>v3 đã XÓA SITE 6 HESEM-Customer-Portals</strong> — HESEM là consumer Ariba/Coupa/myASML/TPS chứ không host portal; portal pull/push evidence chuyển sang <code>HESEM-Records/QMS-Governance/19-Customer-Portal-Evidence/</code>.</div>
+<div class="ok-callout" style="background:#ebfbee;border-left:4px solid #2b8a3e;padding:10px 14px;margin:10px 0;font-size:13px;"><strong>v3 cross-reference (2026-05-16):</strong> Mỗi luồng công việc + special process + Pack-6 element trong ANNEX-141 này đã được ánh xạ vào ma trận thực chiến <em>Department × Role × Scenario × File</em> tại <a href="annex-143-department-role-scenario-file-master-matrix.html">ANNEX-143</a> §4 (DEP-QA cho FAI/CAPA/8D, DEP-METRO cho LPC/NVR/IC/FTIR/Ra/CMM, DEP-SP cho Anodize/EP/Pass/Clean/Outgas/He-leak/Bath-trend) + §6 (Pack-6 evidence bundle flow 8-element cross-dept link). <strong>v3 đã XÓA SITE 6 HESEM-Customer-Portals</strong> — HESEM là consumer Ariba/Coupa/myASML/TPS chứ không host portal; portal pull/push evidence chuyển sang <code>HESEM-Records/QMS-Governance/19-Customer-Portal-Evidence/</code>.</div>
 
 <section class="card">
 <h2>1. So sánh 4 OEM — đặc thù tuân thủ</h2>
@@ -220,15 +220,15 @@ HESEM gia công chi tiết cơ khí cho thiết bị bán dẫn (chamber parts, 
 </section>
 
 <section class="card">
-<h2>3. Workflow nghiệp vụ thực chiến — 5 luồng cốt lõi</h2>
+<h2>3. luồng công việc nghiệp vụ thực chiến — 5 luồng cốt lõi</h2>
 
-<h3>3.1. Workflow PCN (Process Change Notification) — luồng quan trọng nhất</h3>
+<h3>3.1. luồng công việc PCN (Process Change Notification) — luồng quan trọng nhất</h3>
 <table>
 <thead><tr><th>Bước</th><th>Owner</th><th>Hành động</th><th>SLA</th></tr></thead>
 <tbody>
 <tr><td>1. Phát hiện cần đổi process</td><td>Engineering / QE</td><td>Lý do: defect rate ↑, vendor đổi, customer DCN, cost reduction. Tạo PCN ID, nhập vào <span class="code">PCN-Register</span> List, status=Draft</td><td>D0</td></tr>
 <tr><td>2. Risk assessment + qual plan</td><td>QA Manager + Engineering Lead</td><td>Đánh giá risk (critical/major/minor); plan qual gồm sample qty, test method, acceptance criteria. Status=Risk-Assessed</td><td>D+3</td></tr>
-<tr><td>3. Áp <span class="code">PCN-Pending</span> sensitivity label</td><td>DCC</td><td>Drawing release rev hiện hành áp label <span class="code">PCN-Pending</span> → sensitivity label workflow BLOCK operator mở file để chạy job mới. Job đang chạy được hoàn thành nhưng không nhận job mới với rev đó</td><td>D+3</td></tr>
+<tr><td>3. Áp <span class="code">PCN-Pending</span> sensitivity label</td><td>DCC</td><td>Drawing release rev hiện hành áp label <span class="code">PCN-Pending</span> → sensitivity label luồng công việc BLOCK operator mở file để chạy job mới. Job đang chạy được hoàn thành nhưng không nhận job mới với rev đó</td><td>D+3</td></tr>
 <tr><td>4. Submit PCN qua customer portal</td><td>Sales / Account Manager</td><td>Submit AMAT SCMS / LAM Ariba / ASML supplier portal / TEL portal. Đính kèm: change description, risk assessment, qual plan, FAI plan</td><td>D+5</td></tr>
 <tr><td>5. Customer review</td><td>Customer SQE</td><td>Customer xem xét — có thể yêu cầu sample submission, additional test, deviation. Lead time: 90d (AMAT/TEL), 90-120d (LAM cat-A), 120-180d (ASML EUV)</td><td>D+5 → D+95-185</td></tr>
 <tr><td>6. Customer approval + signature</td><td>Customer SQE → HESEM Sales</td><td>Approval letter PDF + e-signature evidence. Lưu <span class="code">PCN-Register/Records/{PCN-ID}/04-Customer-Approval-Letter.pdf</span></td><td>Customer-dependent</td></tr>
@@ -237,9 +237,9 @@ HESEM gia công chi tiết cơ khí cho thiết bị bán dẫn (chamber parts, 
 <tr><td>9. Remove <span class="code">PCN-Pending</span> label</td><td>DCC + QA Manager</td><td>Áp label mới <span class="code">Released-Post-PCN-{YYYY}-{PCN-ID}</span>; status=Closed-Approved. Drawing rev tăng nếu có drawing change.</td><td>D+15</td></tr>
 </tbody>
 </table>
-<div class="ok-callout"><strong>Cốt lõi PCN workflow:</strong> Sensitivity label <span class="code">PCN-Pending</span> là <b>cơ chế kỹ thuật</b> ngăn operator chạy job với rev đã không còn hợp lệ; không có cơ chế này thì PCN chỉ là giấy. Implementation: Microsoft Purview sensitivity label + DLP rule "block edit when label = PCN-Pending" + auto-apply theo metadata column <span class="code">drawing_rev</span>.</div>
+<div class="ok-callout"><strong>Cốt lõi PCN luồng công việc:</strong> Sensitivity label <span class="code">PCN-Pending</span> là <b>cơ chế kỹ thuật</b> ngăn operator chạy job với rev đã không còn hợp lệ; không có cơ chế này thì PCN chỉ là giấy. Implementation: Microsoft Purview sensitivity label + DLP rule "block edit when label = PCN-Pending" + auto-apply theo metadata column <span class="code">drawing_rev</span>.</div>
 
-<h3>3.2. Workflow Cleanliness Evidence Pack (auto-gom mỗi lô)</h3>
+<h3>3.2. luồng công việc Cleanliness bộ bằng chứng (auto-gom mỗi lô)</h3>
 <table>
 <thead><tr><th>Bước</th><th>Trigger</th><th>Hành động auto</th></tr></thead>
 <tbody>
@@ -255,10 +255,10 @@ HESEM gia công chi tiết cơ khí cho thiết bị bán dẫn (chamber parts, 
 </tbody>
 </table>
 
-<h3>3.3. Workflow Customer Audit (AMAT auditor đến site)</h3>
+<h3>3.3. luồng công việc Customer Audit (AMAT auditor đến site)</h3>
 <p>Tham chiếu ANNEX-142 §G — Guest Audit Access Flow.</p>
 
-<h3>3.4. Workflow Subcontractor APSL Approval</h3>
+<h3>3.4. luồng công việc Subcontractor APSL Approval</h3>
 <table>
 <thead><tr><th>Bước</th><th>Owner</th><th>Hành động</th></tr></thead>
 <tbody>
@@ -273,12 +273,12 @@ HESEM gia công chi tiết cơ khí cho thiết bị bán dẫn (chamber parts, 
 </tbody>
 </table>
 
-<h3>3.5. Workflow ESG quarterly reporting</h3>
+<h3>3.5. luồng công việc ESG quarterly reporting</h3>
 <table>
 <thead><tr><th>Tần suất</th><th>Hành động</th></tr></thead>
 <tbody>
 <tr><td>Monthly</td><td>Cập nhật Scope 1 (fuel, refrigerant) + Scope 2 (electricity) emissions data từ ERP</td></tr>
-<tr><td>Quarterly</td><td>5S audit score nộp; Kaizen quarterly count; Carbon dashboard refresh; report to CEO</td></tr>
+<tr><td>Quarterly</td><td>5S audit score nộp; Kaizen quarterly count; Carbon bảng điều khiển refresh; report to CEO</td></tr>
 <tr><td>Annually</td><td>RBA SAQ refresh + submit; CMRT compile + submit; CDP Supply Chain response; SBTi progress check; UFLPA statement</td></tr>
 <tr><td>Mỗi 2-3 năm</td><td>RBA VAP audit on-site bởi RBA-approved auditor</td></tr>
 </tbody>
@@ -293,10 +293,10 @@ HESEM gia công chi tiết cơ khí cho thiết bị bán dẫn (chamber parts, 
 <li>Mua/license 12 standard core: ISO 9001:2015, ISO 14644-1:2015, IEST-STD-CC1246E, ASTM E595, AS9102 Rev C, SEMI E155, S2, S8, F19, F47, MIL-A-8625F, AMS 2700F</li>
 <li>Provision SITE 5 (HESEM-ESG-Compliance), bổ sung 2.1-2.5 folder cấu trúc</li>
 <li>Setup Customer-Spec-Map List với 4 OEM placeholder (chưa NDA = không có spec ID; chỉ đăng ký framework)</li>
-<li>Setup PCN-Register List với workflow Power Automate</li>
+<li>Setup PCN-Register List với luồng công việc Power Automate</li>
 <li>Đào tạo DCC + QA + Engineering về 4 OEM expectation</li>
 </ul>
-<p><b>Acceptance:</b> 12 standard có sẵn trên SharePoint; gap analysis matrix (HESEM SOP ↔ SEMI clause) hoàn tất; SITE 5 + workflow PCN/Customer-Spec-Map active.</p>
+<p><b>Acceptance:</b> 12 standard có sẵn trên SharePoint; gap analysis matrix (HESEM SOP ↔ SEMI clause) hoàn tất; SITE 5 + luồng công việc PCN/Customer-Spec-Map active.</p>
 
 <h3>Pha 2 — Tháng 4-6: Cleanliness Capability</h3>
 <ul class="tight">
@@ -324,8 +324,8 @@ HESEM gia công chi tiết cơ khí cho thiết bị bán dẫn (chamber parts, 
 <li>AMAT SQE on-site audit (2-3 ngày)</li>
 <li>Findings → CAR closure trong 90 ngày</li>
 <li>Tier promotion: từ Conditional → Approved (sau audit pass)</li>
-<li>Mở rộng PCN workflow real với 3-5 PCN active</li>
-<li>Setup ESG dashboard public-facing cho customer review</li>
+<li>Mở rộng PCN luồng công việc real với 3-5 PCN active</li>
+<li>Setup ESG bảng điều khiển public-facing cho customer review</li>
 </ul>
 <p><b>Acceptance:</b> AMAT audit pass với ≤2 major finding, đóng trong SLA; HESEM trong AMAT Approved Supplier List.</p>
 

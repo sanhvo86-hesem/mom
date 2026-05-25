@@ -79,7 +79,7 @@
  <tr><td>Source library path</td><td><span class="code">HESEM-Digital/QMS-Source-Control/01-Controlled-Source/eqms.hesemeng.com/</span></td><td>Đây là nguồn SharePoint duy nhất được phép đồng bộ xuống máy local.</td></tr>
  <tr><td>Local synced worktree</td><td><span class="code">%UserProfile%\HESEM Engineering\HESEM-Digital - QMS-Source-Control\01-Controlled-Source\eqms.hesemeng.com\</span></td><td>Đây là nơi người dùng làm việc với source content đã được kiểm soát.</td></tr>
  <tr><td>Local git-dir</td><td><span class="code">C:\HESEM-Git\eqms.hesemeng.com.git\</span></td><td>Phải đặt ngoài vùng sync; không được nằm trong worktree.</td></tr>
- <tr><td>Server worktree</td><td><span class="code">/var/www/eqms.hesemeng.com/</span></td><td>Worktree runtime trên VPS (host PHP 8.5 + nginx + PostgreSQL + Redis + RabbitMQ). Chỉ dùng cho deploy runtime; không phải nơi biên tập chính. Hồ sơ runtime mutate (state JSON, audit log, snapshot dữ liệu) nằm tại <span class="code">/var/www/data-private/</span> — tách khỏi worktree theo CLAUDE.md §VPS deployment policy.</td></tr>
+ <tr><td>Server worktree</td><td><span class="code">/var/www/eqms.hesemeng.com/</span></td><td>Worktree runtime trên VPS (host PHP 8.5 + nginx + PostgreSQL + Redis + RabbitMQ). Chỉ dùng cho deploy runtime; không phải nơi biên tập chính. Hồ sơ runtime mutate (state JSON, audit log, snapshot dữ liệu) nằm tại <span class="code">/var/www/data-private/</span> — tách khỏi worktree theo CLAUDE.md §VPS deployment chính sách.</td></tr>
  </tbody>
  </table>
  </div>
@@ -160,7 +160,7 @@ Git metadata
  <tr><th>Nhóm dữ liệu</th><th>Xử lý</th></tr>
  </thead>
  <tbody>
- <tr><td>Runtime workflow binaries, sessions, ratelimit, caches</td><td>Giữ ở server hoặc runtime path; không sync vào worktree.</td></tr>
+ <tr><td>Runtime luồng công việc binaries, sessions, ratelimit, caches</td><td>Giữ ở server hoặc runtime path; không sync vào worktree.</td></tr>
  <tr><td>Secrets, keys, server-only credentials</td><td>Giữ ở server-only protected path; không đặt trong source library.</td></tr>
  <tr><td>Submission payload, approvals, operational record data</td><td>Phải route về records libraries hoặc runtime record area; không đưa vào source worktree.</td></tr>
  <tr><td>.git internals</td><td>Đặt ở git-dir riêng ngoài vùng sync.</td></tr>

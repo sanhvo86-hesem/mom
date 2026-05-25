@@ -73,7 +73,7 @@
  <p>Tài liệu này là kế hoạch điều hành duy nhất cho lịch W0-W12 hiện hành. W0 ngày 2026-05-14 chỉ là buổi ký hiệu lực 3 tài liệu nền WI-105, WI-106 và ANNEX-114 của tổ điều hành thu hẹp; W1 ngày 2026-05-16 mới là buổi công bố chính thức tới đại diện phòng ban. Mỗi tuần phải có mục tiêu, tài liệu bắt buộc, gate code, playbook và bằng chứng kết thúc rõ.</p>
 </div>
 
-<div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong><br>Chương trình chỉ được công nhận triển khai thành công khi từng tuần W0-W12 có bằng chứng đạt gate, không còn Sev-1 mở ở phạm vi đang go-live, người dùng tự tra cứu đúng trong ngưỡng, dashboard có nguồn dữ liệu rõ và mọi thay đổi tài liệu đi qua DCC/source-control thay vì sửa nóng ngoài luồng.</div>
+<div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong><br>Chương trình chỉ được công nhận triển khai thành công khi từng tuần W0-W12 có bằng chứng đạt gate, không còn Sev-1 mở ở phạm vi đang go-live, người dùng tự tra cứu đúng trong ngưỡng, bảng điều khiển có nguồn dữ liệu rõ và mọi thay đổi tài liệu đi qua DCC/source-control thay vì sửa nóng ngoài luồng.</div>
 
 <div class="section">
  <h2>0. Nguồn điều hành đang có hiệu lực</h2>
@@ -105,7 +105,7 @@
  <tr>
  <td><strong>Module Kiểm Soát Tài Liệu</strong><br><small><code>dcc_document_header</code>, <code>scan_cache.json</code>, portal DCC</small></td>
  <td>DCC quyết định trạng thái phát hành; portal giúp tìm và mở đúng tài liệu.</td>
- <td>Listing cache và dashboard là read model; không thay thế DCC header hoặc SOP/WI nguồn.</td>
+ <td>Listing cache và bảng điều khiển là read model; không thay thế DCC header hoặc SOP/WI nguồn.</td>
  </tr>
  <tr>
  <td><strong>Quy tắc Ranh Giới Nguồn</strong><br><small><a href="../../references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> / <a href="wi-107-sharefile-git-cpanel-sync.html">WI-107</a></small></td>
@@ -257,11 +257,11 @@
  <h3>Pha 4 — Ổn định, cập nhật và bàn giao</h3>
  <span class="tag">W10-W12 · 2026-07-18 đến 2026-08-01</span>
  <ul class="tight">
- <li>W10 rà quyền dashboard, KPI tra cứu ≥95%, đào tạo ≥90%, phủ Champion 100%.</li>
+ <li>W10 rà quyền bảng điều khiển, KPI tra cứu ≥95%, đào tạo ≥90%, phủ Champion 100%.</li>
  <li>W11 cập nhật tài liệu theo bài học, làm mới QR và phát hành danh mục học bản 2.</li>
  <li>W12 bàn giao sang vận hành thường xuyên, nhịp họp tầng hằng tuần và MRR hằng tháng.</li>
  </ul>
- <div class="mini-note"><b>Điều kiện qua cổng:</b> chủ sở hữu vận hành nhận KPI, dashboard công khai, lịch audit năm 1 được lập và tài liệu hậu triển khai đã cập nhật.</div>
+ <div class="mini-note"><b>Điều kiện qua cổng:</b> chủ sở hữu vận hành nhận KPI, bảng điều khiển công khai, lịch audit năm 1 được lập và tài liệu hậu triển khai đã cập nhật.</div>
  </div>
  </div>
 </div>
@@ -313,7 +313,7 @@
  <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-finance-handbook.html" title="Finance Department (Phòng Tài chính)"><span class="entity-code dept-code">D-FIN</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phòng Nhân sự)"><span class="entity-code dept-code">D-HR</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phòng EHS)"><span class="entity-code dept-code">D-EHS</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bộ phận quản trị ERP)"><span class="entity-code dept-code">D-ERP</span></a></span></td>
  <td>W9-W10 · 2026-07-11 đến 2026-07-18</td>
  <td>Đợt Sản xuất không Sev-1 mở, người dẫn dắt Đợt 3 và backup đã được đề cử/đào tạo.</td>
- <td>Dashboard access review đạt, KPI tra cứu ≥95%, đào tạo ≥90%, phủ người dẫn dắt 100%.</td>
+ <td>bảng điều khiển access review đạt, KPI tra cứu ≥95%, đào tạo ≥90%, phủ người dẫn dắt 100%.</td>
  </tr>
  <tr>
  <td>Bàn giao</td>
@@ -374,7 +374,7 @@
  <td>Pha 4 / W10-W12</td>
  <td>Đào tạo nhắc lại, bàn giao người chịu trách nhiệm và sẵn sàng đánh giá</td>
  <td>Cập nhật tài liệu hậu triển khai, QR/video bản mới, CAPA và bàn giao vận hành thường ngày</td>
- <td>Khóa cơ chế dashboard/source-control, lưu liên kết cũ và rà quyền theo ANNEX-110/113/136</td>
+ <td>Khóa cơ chế bảng điều khiển/source-control, lưu liên kết cũ và rà quyền theo ANNEX-110/113/136</td>
  <td>KPI vận hành ổn định, kết thúc hỗ trợ tăng cường, lịch audit năm 1 và đầu vào MRR</td>
  </tr>
  </tbody>
