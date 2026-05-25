@@ -39,6 +39,12 @@
   function fetchRoles(){
     return UI.runtime.list('core_system','roles',{ limit:500 }).then(function(r){
       state.roles = (r && r.data) || r || [];
+      // sync to shared state so sidebar badge sees the same count
+      if (window.ADMIN_AUTH_STATE && window.ADMIN_AUTH_STATE.roles) {
+        window.ADMIN_AUTH_STATE.roles.items = state.roles.slice();
+        window.ADMIN_AUTH_STATE.roles.loaded = true;
+        window.ADMIN_AUTH_STATE.roles.lastLoadedAt = Date.now();
+      }
     });
   }
   function fetchModules(){
@@ -718,6 +724,12 @@
       rootEl.innerHTML = UI.errorHtml(err && err.message, function(){ renderPortalDisplay(rootEl); });
     });
   }
+
+  // When the Vai trò tab creates / deletes a role, clear cached roles so the
+  // next render of any permissions sub-tab picks up the fresh count from the DB.
+  window.addEventListener('admin:roles:invalidated', function(){
+    state.roles = [];
+  });
 
   // ── Public dispatcher ───────────────────────────────────────────────────────
   window._renderAdminPermTab = function(rootEl, slug){

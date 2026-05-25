@@ -72,6 +72,12 @@
       state.roles = ((r && r.data) || r || []).map(decorateRole);
       state.rolesById = {};
       state.roles.forEach(function(r){ state.rolesById[r.role_code] = r; });
+      // sync count to shared state so sidebar badge and other panels stay consistent
+      if (window.ADMIN_AUTH_STATE && window.ADMIN_AUTH_STATE.roles) {
+        window.ADMIN_AUTH_STATE.roles.items = state.roles.slice();
+        window.ADMIN_AUTH_STATE.roles.loaded = true;
+        window.ADMIN_AUTH_STATE.roles.lastLoadedAt = Date.now();
+      }
     }));
     if (force || !state.permissionCatalog.length) p.push(UI.runtime.list('core_system','permission_catalog',{ limit:500 }).then(function(r){
       state.permissionCatalog = (r && r.data) || r || [];
