@@ -421,44 +421,70 @@ class EmailIntakeController extends BaseController
             $this->error('missing_email_body', 400, 'email_body is required.');
         }
 
-        // Reflective dry-run: run both the body-header parser AND (if
-        // configured) the Claude API parser, return both side-by-side
-        // without writing to the DB. Lets admins iterate on the email
-        // template + sanity-check the LLM response shape before going
-        // live.
+        // Reflective dry-run: run both the body-header parser AND the
+        // LLM extraction router (multi-provider with fallback chain),
+        // return both side-by-side without writing to the DB. Lets
+        // admins iterate on the email template + sanity-check the LLM
+        // response shape before going live.
         require_once __DIR__ . '/../services/EmailIntakeImapService.php';
         require_once __DIR__ . '/../services/OrderEmailParserService.php';
 
         // Cheap path: invoke the body-header parser via reflection.
-        // It's a private method but the algorithm matches what
-        // EmailIntakeImapService::fetchAndIngest would run.
         $hdrParserResult = $this->runBodyHeaderParse($emailBody);
 
-        // Optional LLM path:
-        $claudeResult = null;
-        $claudeError  = null;
+        // LLM path — routes through the tier configured in aeoi_llm_routing
+        // so the test mirrors what the live IMAP poll would do. If the
+        // caller passed attachment_text, we use the extraction_pdf tier;
+        // otherwise extraction_default. Same logic as IMAP poll.
+        $attachmentText = (string)($body['attachment_text'] ?? '');
+        $tier           = $attachmentText !== '' ? 'extraction_pdf' : 'extraction_default';
+
+        $llmResult   = null;
+        $llmError    = null;
+        $llmProvider = null;
+        $llmModel    = null;
+        $llmAttempts = [];
         $claudeConfigured = \MOM\Api\Services\OrderEmailParserService::isConfigured();
-        if ($claudeConfigured && empty($body['skip_claude'])) {
+
+        if (empty($body['skip_claude'])) {
             try {
-                $parser = new \MOM\Api\Services\OrderEmailParserService();
-                $claudeResult = $parser->extractOrder($emailBody, [
-                    'from_email' => (string)($body['from_email'] ?? 'test@example.com'),
-                    'subject'    => (string)($body['subject']    ?? '(test parse)'),
-                ]);
+                $outcome = $this->llmRouter()->extract($emailBody, [
+                    'from_email'          => (string)($body['from_email'] ?? 'test@example.com'),
+                    'subject'             => (string)($body['subject']    ?? '(test parse)'),
+                    'attachment_filename' => (string)($body['attachment_filename'] ?? ''),
+                    'attachment_text'     => $attachmentText,
+                ], $tier);
+                $llmResult   = $outcome['result'];
+                $llmProvider = $outcome['provider'];
+                $llmModel    = $outcome['model'];
+                $llmAttempts = $outcome['attempts'];
             } catch (\Throwable $e) {
-                $claudeError = $e->getMessage();
+                $llmError = $e->getMessage();
             }
         }
 
+        // Surface a credit-too-low hint in a structured field so the UI
+        // can show a clean banner. The legacy claude_error / claude_result
+        // keys stay populated for back-compat with the existing test_parse
+        // modal renderer.
+        $creditTooLow = $llmError !== null
+            && (str_contains($llmError, 'credit balance is too low')
+             || str_contains($llmError, 'credit_balance_too_low'));
+
         $this->success([
             'dry_run'           => true,
+            'tier_used'         => $tier,
             'header_block'      => $hdrParserResult,
             'claude_configured' => $claudeConfigured,
-            'claude_result'     => $claudeResult,
-            'claude_error'      => $claudeError,
+            'claude_result'     => $llmResult,       // legacy field name kept for UI compat
+            'claude_error'      => $llmError,
+            'llm_provider'      => $llmProvider,
+            'llm_model'         => $llmModel,
+            'llm_attempts'      => $llmAttempts,
+            'credit_too_low'    => $creditTooLow,
             'received'          => [
                 'email_body_length'   => strlen($emailBody),
-                'has_attachment_text' => !empty($body['attachment_text']),
+                'has_attachment_text' => $attachmentText !== '',
             ],
         ]);
     }
