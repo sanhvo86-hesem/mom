@@ -386,9 +386,44 @@ final class EmailIntakeImapService
                 // Parse the [HESEM-ORDER-INTAKE]…[/HESEM-ORDER-INTAKE] body
                 // block — admin-controlled header that supplies the structured
                 // fields without needing a Claude API call. Returns []
-                // (and we fall back to subject-regex only values) if the
+                // (and we fall back to Claude API or subject-regex only) if the
                 // body has no header block.
                 $hdr = $this->parseBodyHeaderBlock($bodyText);
+
+                // If no header block and Claude API is configured, try LLM
+                // extraction as a fallback. Cheap-first, AI-second policy:
+                // the well-templated emails get parsed deterministically;
+                // free-form ones fall through to Claude.
+                $claudeExtract = null;
+                if ($hdr['customer_id'] === ''
+                    && $hdr['customer_po_number'] === ''
+                    && OrderEmailParserService::isConfigured()) {
+                    try {
+                        $parser = new OrderEmailParserService();
+                        $claudeExtract = $parser->extractOrder($bodyText, [
+                            'from_email'          => $fromEmail,
+                            'subject'             => $subject,
+                            'received_at'         => $receivedAt,
+                            'internet_message_id' => $internetMsgId,
+                        ]);
+                        // Bridge Claude's fields into the same $hdr shape so
+                        // the rest of the flow doesn't branch.
+                        $hdr['doc_type']           = (string)($claudeExtract['document_type'] ?? '');
+                        $hdr['action']             = (string)($claudeExtract['action'] ?? '');
+                        $hdr['customer_id']        = (string)($claudeExtract['customer']['customer_id'] ?? '');
+                        $hdr['customer_name']      = (string)($claudeExtract['customer']['customer_name'] ?? '');
+                        $hdr['customer_po_number'] = (string)($claudeExtract['purchase_order']['customer_po_number'] ?? '');
+                        $hdr['po_date']            = (string)($claudeExtract['purchase_order']['po_date'] ?? '');
+                        $hdr['currency_code']      = (string)($claudeExtract['purchase_order']['currency_code'] ?? '');
+                        $hdr['incoterm_code']      = (string)($claudeExtract['purchase_order']['incoterm_code'] ?? '');
+                        $hdr['payment_term_code']  = (string)($claudeExtract['purchase_order']['payment_term_code'] ?? '');
+                        $hdr['ship_to_name']       = (string)($claudeExtract['ship_to']['ship_to_name'] ?? '');
+                        $hdr['ship_to_addr']       = (string)($claudeExtract['ship_to']['delivery_address'] ?? '');
+                    } catch (Throwable $e) {
+                        @error_log('[AEOI Claude] uid=' . $uid . ' err=' . $e->getMessage());
+                        $claudeExtract = null; // fall through to empty
+                    }
+                }
 
                 $case = $this->cases->createCase([
                     'message_id'          => $messageId,
@@ -427,6 +462,36 @@ final class EmailIntakeImapService
                 // Parse body line items section (best-effort regex).
                 // Pattern: "Line NN ... Part Number: X ... Revision: Y ... Quantity: Z EA ... Need Date: D"
                 $lines = $this->parseBodyLineItems($bodyText);
+
+                // If body regex found nothing and Claude API gave us lines,
+                // use those instead.
+                if ($lines === [] && is_array($claudeExtract ?? null)
+                    && isset($claudeExtract['lines']) && is_array($claudeExtract['lines'])) {
+                    foreach ($claudeExtract['lines'] as $cl) {
+                        if (empty($cl['part_number']) || (float)($cl['quantity'] ?? 0) <= 0) {
+                            continue;
+                        }
+                        $lines[] = [
+                            'line_no'                 => (string)($cl['line_no'] ?? ''),
+                            'customer_part_number'    => (string)($cl['customer_part_number'] ?? ''),
+                            'part_number'             => (string)$cl['part_number'],
+                            'part_description'        => (string)($cl['part_description'] ?? ''),
+                            'revision_number'         => (string)($cl['revision_number'] ?? ''),
+                            'customer_revision'       => (string)($cl['customer_revision'] ?? ''),
+                            'drawing_revision'        => (string)($cl['drawing_revision'] ?? ''),
+                            'quantity'                => (float)$cl['quantity'],
+                            'uom'                     => (string)($cl['uom'] ?? 'EA'),
+                            'requested_delivery_date' => $this->normaliseIsoDate((string)($cl['requested_delivery_date'] ?? '')),
+                            'delivery_address'        => (string)($cl['delivery_address'] ?? ''),
+                            'ship_to_site_id'         => '',
+                            'unit_price'              => isset($cl['unit_price']) ? (float)$cl['unit_price'] : null,
+                            'line_total'              => isset($cl['line_total']) ? (float)$cl['line_total'] : null,
+                            'field_confidence'        => (array)($cl['field_confidence'] ?? []),
+                            'evidence'                => (array)($cl['evidence'] ?? ['source' => 'claude_api']),
+                        ];
+                    }
+                }
+
                 foreach ($lines as $line) {
                     $this->cases->addLine($caseId, $line);
                 }
