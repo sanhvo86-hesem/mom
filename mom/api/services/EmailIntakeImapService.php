@@ -53,8 +53,6 @@ final class EmailIntakeImapService
         private readonly EmailIntakeAdminCatalogService $catalog,
         private readonly EmailIntakeConfigService       $config,
         private readonly EmailIntakeCaseService         $cases,
-        /** @phpstan-ignore-next-line property.unused — reserved for the
-         *  auto-validate-after-extraction path; harmless to inject now. */
         private readonly EmailIntakeValidationService   $validation
     ) {
         if (!extension_loaded('imap')) {
@@ -498,6 +496,17 @@ final class EmailIntakeImapService
 
                 foreach ($attachments as $att) {
                     $this->cases->addAttachment($caseId, $messageId, $att);
+                }
+
+                // Advance status: extraction_pending → extracted, then run the
+                // 20-check validation pipeline which sets the final state
+                // (commit_ready / needs_review / security_hold / etc.). Without
+                // this the case stays stuck at extraction_pending forever.
+                try {
+                    $this->cases->updateCase($caseId, ['status' => 'extracted'], $actor);
+                    $this->validation->validateCase($caseId, $actor);
+                } catch (Throwable $e) {
+                    @error_log('[AEOI validate] case=' . $caseId . ' err=' . $e->getMessage());
                 }
 
                 $created++;

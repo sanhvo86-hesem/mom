@@ -300,7 +300,7 @@ class EmailIntakeController extends BaseController
             // and returns aggregate counts.
             require_once dirname(__DIR__) . '/services/ScheduledJobs.php';
             $jobs = new \MOM\Services\ScheduledJobs($this->dataDir, $this->db());
-            $result = $jobs->runEmailInboxPoll();
+            $result = $jobs->runEmailInboxPoll('manual', $this->actor($user));
 
             $this->auditLog('admin_email_intake_trigger', [
                 'actor'   => $user['username'] ?? 'unknown',

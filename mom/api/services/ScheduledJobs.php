@@ -1056,9 +1056,9 @@ final class ScheduledJobs
      * are provisioned in sprint 2. This stub logs a skipped run with the
      * reason so the audit table populates correctly from day 1.
      */
-    public function runEmailInboxPoll(): array
+    public function runEmailInboxPoll(string $triggeredBy = 'cron', string $triggeredByActor = 'system.cron'): array
     {
-        return $this->executeJob('email_inbox_poll', function (): array {
+        return $this->executeJob('email_inbox_poll', function () use ($triggeredBy, $triggeredByActor): array {
             require_once __DIR__ . '/EmailIntakeConfigService.php';
             require_once __DIR__ . '/EmailIntakeAdminCatalogService.php';
 
@@ -1076,7 +1076,7 @@ final class ScheduledJobs
             }
 
             $start = microtime(true);
-            $runId = $configSvc->openPollRun('cron', 'system.cron');
+            $runId = $configSvc->openPollRun($triggeredBy, $triggeredByActor);
 
             // We support two operating modes:
             //   • outlook_local_push  → the local Windows worker submits envelopes
