@@ -79,9 +79,8 @@ final class EmailIntakeConfigService
             'escalation_review_hours',
         ];
 
-        $sets   = ['updated_at = NOW()', 'updated_by = $1'];
-        $params = [$actor];
-        $idx    = 2;
+        $sets   = ['updated_at = NOW()', 'updated_by = :p_actor'];
+        $params = [':p_actor' => $actor];
 
         foreach ($allowed as $col) {
             if (!array_key_exists($col, $data)) {
@@ -96,25 +95,23 @@ final class EmailIntakeConfigService
             } elseif ($val === '') {
                 $val = null;
             }
-            $sets[]   = "$col = \$$idx";
-            $params[] = $val;
-            $idx++;
+            $sets[]                = "$col = :p_$col";
+            $params[":p_$col"]     = $val;
         }
 
         // Handle secret separately — only write when new value supplied
         if (!empty($data['m365_client_secret']) && is_string($data['m365_client_secret'])) {
-            $sets[]   = "m365_client_secret_enc = \$$idx";
-            $params[] = $this->encryptSecret($data['m365_client_secret']);
-            $idx++;
+            $sets[]                  = 'm365_client_secret_enc = :p_secret_enc';
+            $params[':p_secret_enc'] = $this->encryptSecret($data['m365_client_secret']);
         }
 
         if (count($sets) < 2) {
             return $this->loadConfig();
         }
 
-        $params[] = self::CONFIG_ID;
+        $params[':p_id'] = self::CONFIG_ID;
         $sql = 'UPDATE ' . self::CONFIG_TABLE . ' SET ' . implode(', ', $sets)
-             . ' WHERE id = $' . $idx;
+             . ' WHERE id = :p_id';
         $this->db->execute($sql, $params);
 
         return $this->loadConfig();
@@ -156,14 +153,21 @@ final class EmailIntakeConfigService
 
         $sql = 'INSERT INTO ' . self::ALLOW_TABLE
              . ' (entry_type, value, label, customer_id, notes, created_by, updated_by)
-                VALUES ($1,$2,$3,$4,$5,$6,$6)
+                VALUES (:p_type, :p_value, :p_label, :p_customer, :p_notes, :p_actor, :p_actor)
                 ON CONFLICT (entry_type, value) DO UPDATE
                    SET active = true, label = EXCLUDED.label,
                        customer_id = EXCLUDED.customer_id,
                        notes = EXCLUDED.notes,
                        updated_at = NOW(), updated_by = EXCLUDED.updated_by
                 RETURNING id';
-        $row = $this->db->queryOne($sql, [$type, $value, $label, $customerId, $notes, $actor]);
+        $row = $this->db->queryOne($sql, [
+            ':p_type'     => $type,
+            ':p_value'    => $value,
+            ':p_label'    => $label,
+            ':p_customer' => $customerId,
+            ':p_notes'    => $notes,
+            ':p_actor'    => $actor,
+        ]);
         return $this->getAllowlistEntry((int)$row['id']);
     }
 
@@ -171,9 +175,8 @@ final class EmailIntakeConfigService
     public function updateAllowlistEntry(int $id, array $data, string $actor): array
     {
         $allowed = ['label','customer_id','active','notes'];
-        $sets    = ['updated_at = NOW()', 'updated_by = $1'];
-        $params  = [$actor];
-        $idx     = 2;
+        $sets    = ['updated_at = NOW()', 'updated_by = :p_actor'];
+        $params  = [':p_actor' => $actor];
 
         foreach ($allowed as $col) {
             if (!array_key_exists($col, $data)) {
@@ -183,18 +186,17 @@ final class EmailIntakeConfigService
             if ($col === 'active') {
                 $val = $val ? 'true' : 'false';
             }
-            $sets[]   = "$col = \$$idx";
-            $params[] = $val;
-            $idx++;
+            $sets[]            = "$col = :p_$col";
+            $params[":p_$col"] = $val;
         }
 
         if (count($sets) < 2) {
             return $this->getAllowlistEntry($id);
         }
 
-        $params[] = $id;
+        $params[':p_id'] = $id;
         $sql = 'UPDATE ' . self::ALLOW_TABLE . ' SET ' . implode(', ', $sets)
-             . ' WHERE id = $' . $idx;
+             . ' WHERE id = :p_id';
         $this->db->execute($sql, $params);
         return $this->getAllowlistEntry($id);
     }
@@ -202,7 +204,10 @@ final class EmailIntakeConfigService
     /** Hard-delete an allowlist entry (admin only). */
     public function deleteAllowlistEntry(int $id): void
     {
-        $this->db->execute('DELETE FROM ' . self::ALLOW_TABLE . ' WHERE id = $1', [$id]);
+        $this->db->execute(
+            'DELETE FROM ' . self::ALLOW_TABLE . ' WHERE id = :p_id',
+            [':p_id' => $id]
+        );
     }
 
     /**
@@ -226,8 +231,8 @@ final class EmailIntakeConfigService
         // Check exact email match
         $exactRow = $this->db->queryOne(
             'SELECT id FROM ' . self::ALLOW_TABLE
-            . ' WHERE entry_type = $1 AND lower(value) = $2 AND active = true',
-            ['email', $email]
+            . ' WHERE entry_type = :p_type AND lower(value) = :p_value AND active = true',
+            [':p_type' => 'email', ':p_value' => $email]
         );
         if ($exactRow) {
             return ['allowed' => true, 'match_type' => 'email', 'entry_id' => (int)$exactRow['id']];
@@ -236,8 +241,8 @@ final class EmailIntakeConfigService
         // Check domain match (both modes accept domain entries)
         $domainRow = $this->db->queryOne(
             'SELECT id FROM ' . self::ALLOW_TABLE
-            . ' WHERE entry_type = $1 AND lower(value) = $2 AND active = true',
-            ['domain', $domain]
+            . ' WHERE entry_type = :p_type AND lower(value) = :p_value AND active = true',
+            [':p_type' => 'domain', ':p_value' => $domain]
         );
         if ($domainRow) {
             return ['allowed' => true, 'match_type' => 'domain', 'entry_id' => (int)$domainRow['id']];
@@ -253,8 +258,8 @@ final class EmailIntakeConfigService
     {
         $row = $this->db->queryOne(
             'INSERT INTO email_intake_poll_run (triggered_by, triggered_user)
-             VALUES ($1,$2) RETURNING id',
-            [$triggeredBy, $triggeredUser]
+             VALUES (:p_by, :p_user) RETURNING id',
+            [':p_by' => $triggeredBy, ':p_user' => $triggeredUser]
         );
         return (int)$row['id'];
     }
@@ -265,31 +270,31 @@ final class EmailIntakeConfigService
         $this->db->execute(
             'UPDATE email_intake_poll_run SET
                 finished_at          = NOW(),
-                status               = $1,
-                messages_found       = $2,
-                messages_processed   = $3,
-                messages_skipped     = $4,
-                messages_quarantined = $5,
-                orders_created       = $6,
-                review_items_added   = $7,
-                parse_errors         = $8,
-                duration_ms          = $9,
-                error_detail         = $10,
-                graph_api_calls      = $11
-             WHERE id = $12',
+                status               = :p_status,
+                messages_found       = :p_found,
+                messages_processed   = :p_processed,
+                messages_skipped     = :p_skipped,
+                messages_quarantined = :p_quarantined,
+                orders_created       = :p_created,
+                review_items_added   = :p_review,
+                parse_errors         = :p_errors,
+                duration_ms          = :p_duration,
+                error_detail         = :p_error_detail,
+                graph_api_calls      = :p_api_calls
+             WHERE id = :p_id',
             [
-                $status,
-                $stats['found']        ?? 0,
-                $stats['processed']    ?? 0,
-                $stats['skipped']      ?? 0,
-                $stats['quarantined']  ?? 0,
-                $stats['created']      ?? 0,
-                $stats['review']       ?? 0,
-                $stats['errors']       ?? 0,
-                $stats['duration_ms']  ?? null,
-                $stats['error_detail'] ?? null,
-                $stats['api_calls']    ?? 0,
-                $runId,
+                ':p_status'       => $status,
+                ':p_found'        => $stats['found']        ?? 0,
+                ':p_processed'    => $stats['processed']    ?? 0,
+                ':p_skipped'      => $stats['skipped']      ?? 0,
+                ':p_quarantined'  => $stats['quarantined']  ?? 0,
+                ':p_created'      => $stats['created']      ?? 0,
+                ':p_review'       => $stats['review']       ?? 0,
+                ':p_errors'       => $stats['errors']       ?? 0,
+                ':p_duration'     => $stats['duration_ms']  ?? null,
+                ':p_error_detail' => $stats['error_detail'] ?? null,
+                ':p_api_calls'    => $stats['api_calls']    ?? 0,
+                ':p_id'           => $runId,
             ]
         );
     }
@@ -301,8 +306,8 @@ final class EmailIntakeConfigService
             'UPDATE email_intake_config
                 SET last_poll_at = NOW(),
                     next_poll_at = NOW() + (poll_interval_minutes * interval \'1 minute\')
-              WHERE id = $1',
-            [self::CONFIG_ID]
+              WHERE id = :p_id',
+            [':p_id' => self::CONFIG_ID]
         );
     }
 
@@ -312,8 +317,8 @@ final class EmailIntakeConfigService
     public function getPollRunLog(int $limit = 50, int $offset = 0): array
     {
         $rows = $this->db->query(
-            'SELECT * FROM email_intake_poll_run ORDER BY started_at DESC LIMIT $1 OFFSET $2',
-            [$limit, $offset]
+            'SELECT * FROM email_intake_poll_run ORDER BY started_at DESC LIMIT :p_limit OFFSET :p_offset',
+            [':p_limit' => $limit, ':p_offset' => $offset]
         );
         $total = (int)($this->db->queryOne('SELECT COUNT(*) AS n FROM email_intake_poll_run')['n'] ?? 0);
         return ['items' => $rows, 'total' => $total, 'limit' => $limit, 'offset' => $offset];
@@ -322,20 +327,20 @@ final class EmailIntakeConfigService
     /** Paginated message log with optional status filter. */
     public function getMessageLog(?string $status, int $limit = 50, int $offset = 0): array
     {
-        $where  = $status ? 'WHERE status = $3' : '';
-        $params = $status ? [$limit, $offset, $status] : [$limit, $offset];
+        $where  = $status ? 'WHERE status = :p_status' : '';
+        $params = [':p_limit' => $limit, ':p_offset' => $offset];
+        if ($status) { $params[':p_status'] = $status; }
         $rows   = $this->db->query(
             'SELECT id, poll_run_id, from_email, from_name, subject, received_at,
                     has_attachments, attachment_count, attachment_names,
                     allowlist_match, status, skip_reason, so_number, created_at
                FROM email_intake_message ' . $where . '
-              ORDER BY received_at DESC LIMIT $1 OFFSET $2',
+              ORDER BY received_at DESC LIMIT :p_limit OFFSET :p_offset',
             $params
         );
-        $cntWhere  = $status ? 'WHERE status = $1' : '';
-        $cntParams = $status ? [$status] : [];
+        $cntParams = $status ? [':p_status' => $status] : [];
         $total = (int)($this->db->queryOne(
-            'SELECT COUNT(*) AS n FROM email_intake_message ' . $cntWhere, $cntParams
+            'SELECT COUNT(*) AS n FROM email_intake_message ' . $where, $cntParams
         )['n'] ?? 0);
         return ['items' => $rows, 'total' => $total, 'limit' => $limit, 'offset' => $offset];
     }
@@ -349,8 +354,8 @@ final class EmailIntakeConfigService
                     q.from_email, q.subject, q.severity, q.notified,
                     q.reviewed, q.review_action, q.reviewed_by, q.reviewed_at, q.created_at
                FROM email_intake_quarantine q ' . $where . '
-              ORDER BY q.created_at DESC LIMIT $1 OFFSET $2',
-            [$limit, $offset]
+              ORDER BY q.created_at DESC LIMIT :p_limit OFFSET :p_offset',
+            [':p_limit' => $limit, ':p_offset' => $offset]
         );
         $total = (int)($this->db->queryOne(
             'SELECT COUNT(*) AS n FROM email_intake_quarantine ' . $where
@@ -367,10 +372,10 @@ final class EmailIntakeConfigService
         }
         $this->db->execute(
             'UPDATE email_intake_quarantine
-                SET reviewed = true, review_action = $1, review_notes = $2,
-                    reviewed_by = $3, reviewed_at = NOW()
-              WHERE id = $4',
-            [$action, $notes, $actor, $qid]
+                SET reviewed = true, review_action = :p_action, review_notes = :p_notes,
+                    reviewed_by = :p_by, reviewed_at = NOW()
+              WHERE id = :p_id',
+            [':p_action' => $action, ':p_notes' => $notes, ':p_by' => $actor, ':p_id' => $qid]
         );
     }
 
@@ -379,8 +384,8 @@ final class EmailIntakeConfigService
     private function fetchConfigRow(): array
     {
         $row = $this->db->queryOne(
-            'SELECT * FROM ' . self::CONFIG_TABLE . ' WHERE id = $1',
-            [self::CONFIG_ID]
+            'SELECT * FROM ' . self::CONFIG_TABLE . ' WHERE id = :p_id',
+            [':p_id' => self::CONFIG_ID]
         );
         if (!$row) {
             throw new RuntimeException('email_intake_config singleton row missing — run migration 203.');
@@ -393,8 +398,8 @@ final class EmailIntakeConfigService
         $row = $this->db->queryOne(
             'SELECT id, entry_type, value, label, customer_id, active, notes,
                     created_at, created_by, updated_at, updated_by
-               FROM ' . self::ALLOW_TABLE . ' WHERE id = $1',
-            [$id]
+               FROM ' . self::ALLOW_TABLE . ' WHERE id = :p_id',
+            [':p_id' => $id]
         );
         if (!$row) {
             throw new RuntimeException('Allowlist entry not found: ' . $id);
