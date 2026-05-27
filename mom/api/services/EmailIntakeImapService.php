@@ -383,15 +383,53 @@ final class EmailIntakeImapService
                     $action = strtoupper($m[1]);
                 }
 
+                // Parse the [HESEM-ORDER-INTAKE]…[/HESEM-ORDER-INTAKE] body
+                // block — admin-controlled header that supplies the structured
+                // fields without needing a Claude API call. Returns []
+                // (and we fall back to subject-regex only values) if the
+                // body has no header block.
+                $hdr = $this->parseBodyHeaderBlock($bodyText);
+
                 $case = $this->cases->createCase([
                     'message_id'          => $messageId,
                     'mailbox_id'          => $mailboxId,
                     'sender_allowlist_id' => $allow['entry_id'] ?? null,
                     'status'              => 'extraction_pending',
-                    'document_type'       => $docType ?: null,
-                    'action_type'         => $action  ?: null,
+                    'document_type'       => $hdr['doc_type']   ?: ($docType ?: null),
+                    'action_type'         => $hdr['action']     ?: ($action  ?: null),
+                    'customer_id'         => $hdr['customer_id']        ?: null,
+                    'customer_name'       => $hdr['customer_name']      ?: null,
+                    'customer_po_number'  => $hdr['customer_po_number'] ?: null,
                 ], $actor);
                 $caseId = (int)$case['id'];
+
+                // Patch additional case fields the createCase signature
+                // doesn't accept (po_date, currency, incoterm, payment_term).
+                if ($hdr['po_date'] !== '' || $hdr['currency_code'] !== ''
+                    || $hdr['incoterm_code'] !== '' || $hdr['payment_term_code'] !== '') {
+                    $this->cases->updateCase($caseId, [
+                        'po_date'           => $hdr['po_date']           ?: null,
+                        'currency_code'     => $hdr['currency_code']     ?: null,
+                        'incoterm_code'     => $hdr['incoterm_code']     ?: null,
+                        'payment_term_code' => $hdr['payment_term_code'] ?: null,
+                        'extracted_json'    => [
+                            'email_header_block'  => $hdr['raw_block'],
+                            'parsed_header'       => $hdr['parsed'],
+                            'ship_to'             => [
+                                'name'    => $hdr['ship_to_name'],
+                                'address' => $hdr['ship_to_addr'],
+                            ],
+                            'ai_process'          => $hdr['ai_process'],
+                        ],
+                    ], $actor);
+                }
+
+                // Parse body line items section (best-effort regex).
+                // Pattern: "Line NN ... Part Number: X ... Revision: Y ... Quantity: Z EA ... Need Date: D"
+                $lines = $this->parseBodyLineItems($bodyText);
+                foreach ($lines as $line) {
+                    $this->cases->addLine($caseId, $line);
+                }
 
                 foreach ($attachments as $att) {
                     $this->cases->addAttachment($caseId, $messageId, $att);
@@ -643,5 +681,248 @@ final class EmailIntakeImapService
             'created'     => 0,
             'skipped'     => 0,
         ];
+    }
+
+    // ── Body header / line item parsers ──────────────────────────────────
+    //
+    // These are the "Phase 2.5" parsers that close the GPT Pro gap of
+    // unparsed [HESEM-ORDER-INTAKE] block. They don't replace the full
+    // Claude API extraction (Phase 3) — they handle the standard
+    // admin-controlled header format the user templates with.
+
+    /**
+     * Parse the [HESEM-ORDER-INTAKE]...[/HESEM-ORDER-INTAKE] block from
+     * a plain-text email body. Returns a normalized map of the fields
+     * we care about — always populated, missing keys default to ''.
+     *
+     * @return array{
+     *   doc_type:string, action:string, customer_id:string, customer_name:string,
+     *   customer_po_number:string, po_date:string, currency_code:string,
+     *   incoterm_code:string, payment_term_code:string,
+     *   ship_to_name:string, ship_to_addr:string,
+     *   ai_process:string, raw_block:string, parsed:array<string,string>
+     * }
+     */
+    private function parseBodyHeaderBlock(string $bodyText): array
+    {
+        $out = [
+            'doc_type'           => '',
+            'action'             => '',
+            'customer_id'        => '',
+            'customer_name'      => '',
+            'customer_po_number' => '',
+            'po_date'            => '',
+            'currency_code'      => '',
+            'incoterm_code'      => '',
+            'payment_term_code'  => '',
+            'ship_to_name'       => '',
+            'ship_to_addr'       => '',
+            'ai_process'         => '',
+            'raw_block'          => '',
+            'parsed'             => [],
+        ];
+        if ($bodyText === '') {
+            return $out;
+        }
+
+        // Tolerant regex: any whitespace between markers, multi-line
+        if (!preg_match(
+            '/\[HESEM-ORDER-INTAKE\](.*?)\[\/HESEM-ORDER-INTAKE\]/is',
+            $bodyText,
+            $m
+        )) {
+            return $out;
+        }
+
+        $block = trim((string)$m[1]);
+        $out['raw_block'] = mb_substr($block, 0, 2000);
+
+        // Each non-empty line is Key: Value
+        $parsed = [];
+        foreach (preg_split('/\r?\n/', $block) ?: [] as $rawLine) {
+            $line = trim($rawLine);
+            if ($line === '') { continue; }
+            if (!preg_match('/^([A-Za-z0-9 _\-]+)\s*:\s*(.*)$/u', $line, $kv)) {
+                continue;
+            }
+            $key = strtolower(str_replace(' ', '-', trim($kv[1])));
+            $val = trim($kv[2]);
+            if ($val !== '') {
+                $parsed[$key] = $val;
+            }
+        }
+        $out['parsed'] = $parsed;
+
+        // Map keys to our normalised case columns. Accept several
+        // synonyms so the user can template loosely.
+        $get = static fn(string ...$keys): string => (function () use ($keys, $parsed) {
+            foreach ($keys as $k) {
+                if (isset($parsed[$k]) && $parsed[$k] !== '') { return $parsed[$k]; }
+            }
+            return '';
+        })();
+
+        $out['doc_type']           = strtoupper($get('doc-type', 'document-type'));
+        $out['action']             = strtoupper($get('action'));
+        $out['customer_id']        = strtoupper($get('customer-code', 'customer-id', 'customer'));
+        $out['customer_name']      = $get('customer-name');
+        $out['customer_po_number'] = $get('po-no', 'po-number', 'customer-po', 'customer-po-number');
+        $out['po_date']            = $this->normaliseIsoDate($get('po-date'));
+        $out['currency_code']      = strtoupper($get('currency', 'currency-code'));
+        $out['incoterm_code']      = strtoupper($get('incoterm', 'incoterm-code'));
+        $out['payment_term_code']  = strtoupper($get('payment-term', 'payment-terms'));
+        $out['ship_to_name']       = $get('ship-to-name', 'ship-to');
+        $out['ship_to_addr']       = $get('ship-to-addr', 'ship-to-address');
+        $out['ai_process']         = strtoupper($get('ai-process'));
+
+        return $out;
+    }
+
+    /**
+     * Parse "Line NN" blocks from the body. Each block looks like:
+     *
+     *   Line 10
+     *     Part Number:   HSM-2200-A
+     *     Revision:      Rev B
+     *     Description:   ...
+     *     Quantity:      40 EA
+     *     Unit Price:    USD 125.00
+     *     Need Date:     2026-07-15
+     *
+     * The grammar is intentionally loose — labels can be any case,
+     * indentation arbitrary, ":" or "-" or "—" separator accepted.
+     * Lines that don't have a Part Number are skipped (validation gate).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function parseBodyLineItems(string $bodyText): array
+    {
+        if ($bodyText === '') {
+            return [];
+        }
+
+        // Strip the header block out so its keys don't confuse the parser
+        $bodyText = preg_replace(
+            '/\[HESEM-ORDER-INTAKE\].*?\[\/HESEM-ORDER-INTAKE\]/is',
+            '', $bodyText
+        ) ?? $bodyText;
+
+        // Split on "Line NN" markers. The first chunk before any "Line N"
+        // is preamble; ignore it.
+        $chunks = preg_split('/^\s*Line\s+(\d+)\s*\r?\n/m', $bodyText, -1, PREG_SPLIT_DELIM_CAPTURE);
+        if (!is_array($chunks) || count($chunks) < 3) {
+            return [];
+        }
+
+        $out = [];
+        // chunks[0] = preamble, then pairs [lineNo, body, lineNo, body, ...]
+        for ($i = 1; $i + 1 < count($chunks); $i += 2) {
+            $lineNo = (string)$chunks[$i];
+            $body   = (string)$chunks[$i + 1];
+            $row    = $this->extractLineFields($lineNo, $body);
+            if ($row['part_number'] !== '' && (float)$row['quantity'] > 0) {
+                $out[] = $row;
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Extract Key: Value pairs from a single line block.
+     * Returns the array shape EmailIntakeCaseService::addLine expects.
+     *
+     * @return array{
+     *   line_no:string, customer_part_number:string, part_number:string,
+     *   part_description:string, revision_number:string, customer_revision:string,
+     *   drawing_revision:string, quantity:float, uom:string,
+     *   requested_delivery_date:string, delivery_address:string,
+     *   ship_to_site_id:string, unit_price:?float, line_total:?float,
+     *   field_confidence:array<string,float>, evidence:array<string,string>
+     * }
+     */
+    private function extractLineFields(string $lineNo, string $body): array
+    {
+        $fields = [];
+        foreach (preg_split('/\r?\n/', $body) ?: [] as $rawLine) {
+            $line = trim($rawLine);
+            if ($line === '') { continue; }
+            // Stop at the next "==" section header or "Best regards" etc.
+            if (preg_match('/^(==|Best regards|Regards|Sincerely|Total)/i', $line)) {
+                break;
+            }
+            if (!preg_match('/^([A-Za-z][A-Za-z0-9 _\-]*?)\s*[:\-]\s*(.*)$/u', $line, $m)) {
+                continue;
+            }
+            $key = strtolower(preg_replace('/\s+/', '-', trim($m[1])) ?? '');
+            $val = trim($m[2]);
+            if ($val !== '') {
+                $fields[$key] = $val;
+            }
+        }
+
+        $partNumber = $fields['part-number'] ?? $fields['part'] ?? '';
+        $rev        = preg_replace('/^Rev\.?\s*/i', '', $fields['revision'] ?? $fields['rev'] ?? '') ?? '';
+        $qtyRaw     = $fields['quantity'] ?? $fields['qty'] ?? '';
+        // Quantity might be "40 EA" — split numeric prefix + UOM suffix.
+        $qty = 0.0;
+        $uom = 'EA';
+        if (preg_match('/^([\d.,]+)\s*([A-Za-z]+)?/', $qtyRaw, $qm)) {
+            $qty = (float)str_replace(',', '', $qm[1]);
+            if (!empty($qm[2])) { $uom = strtoupper($qm[2]); }
+        }
+        // Unit price might be "USD 125.00" — strip currency prefix.
+        $unitPrice = null;
+        if (!empty($fields['unit-price']) && preg_match('/([\d.,]+)/', (string)$fields['unit-price'], $upm)) {
+            $unitPrice = (float)str_replace(',', '', $upm[1]);
+        }
+
+        return [
+            'line_no'                 => $lineNo,
+            'customer_part_number'    => $fields['customer-part-number']    ?? '',
+            'part_number'             => trim((string)$partNumber),
+            'part_description'        => $fields['description']             ?? '',
+            'revision_number'         => trim((string)$rev),
+            'customer_revision'       => '',
+            'drawing_revision'        => $fields['drawing-revision']        ?? '',
+            'quantity'                => $qty,
+            'uom'                     => $uom,
+            'requested_delivery_date' => $this->normaliseIsoDate($fields['need-date']
+                                                             ?? $fields['needed-date']
+                                                             ?? $fields['delivery-date']
+                                                             ?? $fields['requested-delivery-date']
+                                                             ?? ''),
+            'delivery_address'        => $fields['ship-to']                 ?? '',
+            'ship_to_site_id'         => '',
+            'unit_price'              => $unitPrice,
+            'line_total'              => ($unitPrice !== null && $qty > 0) ? round($unitPrice * $qty, 4) : null,
+            'field_confidence'        => [
+                'part_number'             => $partNumber !== '' ? 1.0 : 0.0,
+                'revision_number'         => $rev !== '' ? 1.0 : 0.0,
+                'quantity'                => $qty > 0 ? 1.0 : 0.0,
+                'requested_delivery_date' => isset($fields['need-date']) ? 1.0 : 0.0,
+            ],
+            'evidence'                => [
+                'source' => 'email_body_line_block',
+                'line_no'=> $lineNo,
+            ],
+        ];
+    }
+
+    /** Best-effort date normalisation. Returns '' if input is empty/unparseable. */
+    private function normaliseIsoDate(string $raw): string
+    {
+        $raw = trim($raw);
+        if ($raw === '') { return ''; }
+        // Strip trailing parenthetical notes — "2026-07-01  (early — pre-stage...)"
+        $raw = trim((string)preg_replace('/\s*\(.*$/', '', $raw));
+        // If already ISO YYYY-MM-DD pass through
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $raw)) {
+            return $raw;
+        }
+        $ts = strtotime($raw);
+        if ($ts === false) {
+            return '';
+        }
+        return date('Y-m-d', $ts);
     }
 }
