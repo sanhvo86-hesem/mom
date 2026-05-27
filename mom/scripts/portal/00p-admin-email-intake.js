@@ -789,7 +789,7 @@
           + '</tr>';
       });
       html += '</tbody></table></div>';
-      html += _pager(data.offset, 50, data.total, 'aeoi.loadCases');
+      html += _pagination(data.offset, data.total, 50, 'aeoi.loadCases');
     }
     html += '</div>';
     return html;
@@ -865,7 +865,7 @@
     saveLogic: function(){
       var payload = {
         auto_create_mode:       aeoi._val('aeoi-auto-create-mode'),
-        confidence_threshold:   parseFloat(aeoi._val('aeoi-confidence'))||0.75,
+        confidence_threshold:   parseFloat(aeoi._val('aeoi-confidence'))||0.95,
         part_match_mode:        aeoi._val('aeoi-part-match'),
         missing_field_action:   aeoi._val('aeoi-missing-field'),
         duplicate_check_days:   parseInt(aeoi._val('aeoi-dup-days'))||30,
