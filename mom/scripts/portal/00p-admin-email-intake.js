@@ -1175,24 +1175,18 @@
     },
 
     loadCases: function(offset){
-      // The case_list endpoint reads limit/offset from $_GET query string.
-      // The apiCall shim doesn't append query params for GET, so we use
-      // the raw window.apiCall (Promise) with the action including the
-      // pagination — server-side AdminController routes parse the action
-      // before the '?' anyway.
-      offset = offset || 0;
-      if(typeof window.apiCall === 'function'){
-        window.apiCall('ai_order_intake_case_list&limit=50&offset=' + offset, null, 'GET')
-          .then(function(res){
-            if(res && res.ok){
-              STATE.cases = {items:res.cases||[], total:res.total||0, offset:offset};
-            }
-            _refreshSection();
-          }).catch(function(err){
-            STATE.cases = {items:[], total:0, offset:0};
-            _refreshSection();
-          });
-      }
+      // window.apiCall URL-encodes the action, so we can't smuggle &-delimited
+      // query params through the `action` argument. For the admin-tab overview
+      // we just fetch the first 50 (server default) and let the full
+      // Orders > AI Intake Queue tab handle real pagination.
+      apiCall('ai_order_intake_case_list', {}, function(res){
+        if(res && res.ok){
+          STATE.cases = {items:res.cases||[], total:res.total||0, offset:0};
+        } else {
+          STATE.cases = {items:[], total:0, offset:0};
+        }
+        _refreshSection();
+      });
     },
   };
 
