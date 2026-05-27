@@ -213,7 +213,7 @@
           + '<td>' + activeBadge + '</td>'
           + '<td style="white-space:nowrap">'
             + '<button onclick="aeoi.toggleEntry(' + e.id + ',' + (e.active?'false':'true') + ')" class="hm-btn hm-btn-xs" title="' + (e.active?'Tắt':'Bật') + '">' + (e.active ? '⏸' : '▶') + '</button> '
-            + '<button onclick="aeoi.deleteEntry(' + e.id + ',\'' + escHtml(e.value) + '\')" class="hm-btn hm-btn-xs" style="color:var(--danger-1,#ef4444)" title="Xóa">🗑</button>'
+            + '<button onclick="aeoi.deleteEntry(' + e.id + ')" data-aeoi-value="' + escHtml(e.value) + '" class="hm-btn hm-btn-xs" style="color:var(--danger-1,#ef4444)" title="Xóa">🗑</button>'
           + '</td>'
           + '</tr>';
       });
@@ -223,7 +223,7 @@
     html += '</div>';
 
     // Add-entry modal placeholder
-    html += '<div id="aeoi-add-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center">'
+    html += '<div id="aeoi-add-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center">'
       + '<div style="background:var(--surface-0,#fff);border-radius:12px;padding:24px;width:420px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.18)">'
       + '<div style="font-size:14px;font-weight:700;margin-bottom:16px">Thêm email / domain được phép</div>'
       + '<div style="margin-bottom:10px">'
@@ -484,7 +484,7 @@
 
   /* ── Test parse modal ─────────────────────────────────────────────────── */
   function _testParseModal(){
-    return '<div id="aeoi-test-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">'
+    return '<div id="aeoi-test-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center" data-modal-display="flex">'
       + '<div style="background:var(--surface-0,#fff);border-radius:12px;padding:24px;width:600px;max-width:95vw;max-height:90vh;overflow:auto;box-shadow:0 8px 32px rgba(0,0,0,.2)">'
       + '<div style="font-size:14px;font-weight:700;margin-bottom:12px">🧪 Test phân tích email (dry run — không tạo đơn hàng)</div>'
       + '<label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Nội dung email</label>'

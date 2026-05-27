@@ -35,26 +35,6 @@ final class EmailIntakeConfigService
     private const CONFIG_TABLE = 'email_intake_config';
     private const ALLOW_TABLE  = 'email_intake_sender_allowlist';
 
-    /** Columns returned to the frontend (secret excluded). */
-    private const SAFE_CONFIG_COLS = [
-        'id','m365_tenant_id','m365_client_id','intake_mailbox','enabled',
-        'poll_interval_minutes','last_poll_at','next_poll_at',
-        'require_attachment','allowed_attachment_types','subject_filter_regex',
-        'extraction_scope','max_attachments_per_email',
-        'auto_create_mode','confidence_threshold','duplicate_check_days',
-        'part_match_mode','missing_field_action','auto_cascade_jo',
-        'business_hours_only','business_hours_start','business_hours_end',
-        'business_hours_timezone',
-        'allowlist_enforcement','require_spf_dkim','max_orders_per_poll',
-        'quarantine_unknown_senders','quarantine_review_alert',
-        'high_value_threshold','high_value_currency','high_value_action',
-        'audit_retention_days','mask_prices_in_log',
-        'notify_roles_on_create','notify_roles_on_review','notify_roles_on_error',
-        'escalation_review_hours',
-        'updated_at','updated_by',
-        'secret_configured',   // virtual: bool — is secret stored?
-    ];
-
     public function __construct(
         private readonly Connection $db
     ) {}

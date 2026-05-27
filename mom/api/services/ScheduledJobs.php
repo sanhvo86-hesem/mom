@@ -1061,7 +1061,7 @@ final class ScheduledJobs
         return $this->executeJob('email_inbox_poll', function (): array {
             require_once __DIR__ . '/EmailIntakeConfigService.php';
 
-            $svc = new EmailIntakeConfigService($this->db);
+            $svc = new \MOM\Api\Services\EmailIntakeConfigService($this->db);
 
             // Check enabled flag before opening a run record
             $config = $svc->loadConfig();
