@@ -54,12 +54,6 @@ final class EmailIntakeValidationService
         'low_confidence'            => 'needs_review',
     ];
 
-    /** Default required fields for SO commit eligibility. */
-    private const REQUIRED_FIELDS = [
-        'customer_po_number','customer_id','part_number','revision_number',
-        'quantity','requested_delivery_date','delivery_address',
-    ];
-
     public function __construct(
         private readonly Connection $db,
         private readonly EmailIntakeCaseService $cases,
@@ -299,12 +293,16 @@ final class EmailIntakeValidationService
             'needs_review' => 5,
         ];
         $best = 'needs_review';
-        $bestRank = 99;
+        $bestRank = $priority['needs_review'];
         foreach ($blockers as $b) {
             $s = self::STATUS_BY_CODE[$b] ?? 'needs_review';
-            if (($priority[$s] ?? 99) < $bestRank) {
+            // PHPStan knows STATUS_BY_CODE values are always in $priority,
+            // so a direct lookup is safe. Fall back to needs_review rank
+            // only for forward-compat with new status values.
+            $rank = isset($priority[$s]) ? $priority[$s] : $priority['needs_review'];
+            if ($rank < $bestRank) {
                 $best = $s;
-                $bestRank = $priority[$s] ?? 99;
+                $bestRank = $rank;
             }
         }
         return $best;

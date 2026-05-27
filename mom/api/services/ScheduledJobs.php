@@ -1091,60 +1091,48 @@ final class ScheduledJobs
             //                            skipped with a clear reason so admins
             //                            can see in the poll log why nothing
             //                            happened.
-            $mode = 'outlook_local_push'; // currently the only supported runtime
-            $mailboxes = $catalog->listEnabledMailboxes();
+            // Currently the only supported runtime is outlook_local_push —
+            // microsoft_graph polling will be added in a follow-up commit when
+            // the Graph credentials path is wired in. Until then this cron
+            // entry is a heartbeat: it confirms config is healthy and touches
+            // last_scan_at on each enabled mailbox so admins see the schedule
+            // is alive. The actual envelope ingest happens via the
+            // POST /aeoi_worker_email_envelope endpoint from the PowerShell
+            // worker running on the Windows machine.
+            $mailboxes      = $catalog->listEnabledMailboxes();
             $heartbeatCount = 0;
-
-            if ($mode === 'outlook_local_push') {
-                foreach ($mailboxes as $mbx) {
-                    if (($mbx['provider'] ?? '') === 'outlook_local') {
-                        // Touch last_scan_at on each enabled mailbox so admins
-                        // can see the cron heartbeat is alive in the UI.
-                        // The real "completed" status comes from the worker
-                        // submission path.
-                        $catalog->recordMailboxScan(
-                            (int)$mbx['id'],
-                            'heartbeat',
-                            'Local worker schedule active; envelopes arrive via push endpoint.'
-                        );
-                        $heartbeatCount++;
-                    }
+            foreach ($mailboxes as $mbx) {
+                if (($mbx['provider'] ?? '') === 'outlook_local') {
+                    $catalog->recordMailboxScan(
+                        (int)$mbx['id'],
+                        'heartbeat',
+                        'Local worker schedule active; envelopes arrive via push endpoint.'
+                    );
+                    $heartbeatCount++;
                 }
-                $configSvc->closePollRun($runId, [
-                    'found'        => 0,
-                    'processed'    => 0,
-                    'skipped'      => 0,
-                    'quarantined'  => 0,
-                    'created'      => 0,
-                    'review'       => 0,
-                    'errors'       => 0,
-                    'duration_ms'  => (int)((microtime(true) - $start) * 1000),
-                    'api_calls'    => 0,
-                    'error_detail' => "Heartbeat for $heartbeatCount local-Outlook mailbox(es).",
-                ], 'completed');
-                $configSvc->updateNextPollAt();
-
-                return [
-                    'status'         => 'completed',
-                    'mode'           => $mode,
-                    'run_id'         => $runId,
-                    'mailboxes_seen' => $heartbeatCount,
-                    'orders_created' => 0,
-                    'note'           => 'Local Outlook worker pushes envelopes via /aeoi_worker_email_envelope.',
-                ];
             }
 
-            // Future: microsoft_graph polling lands here.
             $configSvc->closePollRun($runId, [
-                'duration_ms' => (int)((microtime(true) - $start) * 1000),
-                'error_detail'=> "Mode $mode not yet implemented.",
-            ], 'skipped');
+                'found'        => 0,
+                'processed'    => 0,
+                'skipped'      => 0,
+                'quarantined'  => 0,
+                'created'      => 0,
+                'review'       => 0,
+                'errors'       => 0,
+                'duration_ms'  => (int)((microtime(true) - $start) * 1000),
+                'api_calls'    => 0,
+                'error_detail' => "Heartbeat for $heartbeatCount local-Outlook mailbox(es).",
+            ], 'completed');
             $configSvc->updateNextPollAt();
+
             return [
-                'status' => 'skipped',
-                'mode'   => $mode,
-                'run_id' => $runId,
-                'note'   => 'microsoft_graph polling not implemented.',
+                'status'         => 'completed',
+                'mode'           => 'outlook_local_push',
+                'run_id'         => $runId,
+                'mailboxes_seen' => $heartbeatCount,
+                'orders_created' => 0,
+                'note'           => 'Local Outlook worker pushes envelopes via /aeoi_worker_email_envelope.',
             ];
         });
     }

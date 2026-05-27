@@ -51,10 +51,15 @@
   /* ── Section tab labels ──────────────────────────────────────────────── */
   var SECTIONS = [
     { id:'connection',   label:'Kết nối M365',       icon:'🔗' },
+    { id:'mailboxes',    label:'Mailbox & Folder',    icon:'📬' },
     { id:'allowlist',    label:'Email cho phép',      icon:'✅' },
+    { id:'header_rules', label:'Header Rules',         icon:'📑' },
+    { id:'templates',    label:'Template KH',          icon:'🎯' },
+    { id:'workers',      label:'Worker Tokens',        icon:'🔑' },
     { id:'logic',        label:'Cơ chế vận hành',     icon:'⚙️' },
     { id:'security',     label:'Bảo mật',             icon:'🔒' },
     { id:'notify',       label:'Thông báo',           icon:'🔔' },
+    { id:'cases',        label:'Intake Cases',         icon:'📦' },
     { id:'poll_log',     label:'Nhật ký poll',        icon:'📋' },
     { id:'msg_log',      label:'Nhật ký email',       icon:'📨' },
     { id:'quarantine',   label:'Kiểm duyệt',          icon:'🚨' },
@@ -131,14 +136,19 @@
 
   function _renderSection(id){
     switch(id){
-      case 'connection': return _sectionConnection();
-      case 'allowlist':  return _sectionAllowlist();
-      case 'logic':      return _sectionLogic();
-      case 'security':   return _sectionSecurity();
-      case 'notify':     return _sectionNotify();
-      case 'poll_log':   return _sectionPollLog();
-      case 'msg_log':    return _sectionMsgLog();
-      case 'quarantine': return _sectionQuarantine();
+      case 'connection':   return _sectionConnection();
+      case 'mailboxes':    return _sectionMailboxes();
+      case 'allowlist':    return _sectionAllowlist();
+      case 'header_rules': return _sectionHeaderRules();
+      case 'templates':    return _sectionTemplates();
+      case 'workers':      return _sectionWorkers();
+      case 'logic':        return _sectionLogic();
+      case 'security':     return _sectionSecurity();
+      case 'notify':       return _sectionNotify();
+      case 'cases':        return _sectionCases();
+      case 'poll_log':     return _sectionPollLog();
+      case 'msg_log':      return _sectionMsgLog();
+      case 'quarantine':   return _sectionQuarantine();
       default: return '';
     }
   }
@@ -604,6 +614,184 @@
       + '</div>';
   }
 
+  /* ── Sprint A-D new sections ──────────────────────────────────────────── */
+
+  function _sectionMailboxes(){
+    var rows = STATE.mailboxes || [];
+    var html = '<div class="aeoi-card">'
+      + _cardHead('📬 Mailbox & Folder', 'Danh sách mailbox/folder AI worker được phép đọc. Worker chỉ scan các row enabled bên dưới.')
+      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
+      + '<button onclick="aeoi.openMailboxForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Thêm Mailbox</button>'
+      + '<button onclick="aeoi.loadMailboxes()" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
+      + '</div>';
+    if(rows.length===0){
+      html += '<div class="hm-empty">Chưa có mailbox nào. Bấm "Thêm Mailbox" để cấu hình.</div>';
+    } else {
+      html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
+        + '<th>#</th><th>Mailbox</th><th>Provider</th><th>Folder</th><th>Đọc body</th><th>Đính kèm</th><th>Trạng thái</th><th>Scan gần nhất</th><th>Hành động</th>'
+        + '</tr></thead><tbody>';
+      rows.forEach(function(m,i){
+        var active = m.enabled
+          ? '<span style="color:var(--green-1,#065f46);font-size:11px">● Bật</span>'
+          : '<span style="color:var(--text-3,#6b7280);font-size:11px">○ Tắt</span>';
+        html += '<tr style="' + (!m.enabled ? 'opacity:0.5' : '') + '">'
+          + '<td>'+(i+1)+'</td>'
+          + '<td style="font-family:monospace;font-weight:600">' + escHtml(m.mailbox_address) + '</td>'
+          + '<td><span style="font-size:10px;padding:1px 6px;background:var(--surface-2,#f3f4f6);border-radius:4px">' + escHtml(m.provider) + '</span></td>'
+          + '<td style="font-family:monospace;font-size:11px">' + escHtml(m.folder_path) + '</td>'
+          + '<td>' + (m.read_body ? '✓' : '—') + '</td>'
+          + '<td>' + (m.read_attachments ? '✓' : '—') + '</td>'
+          + '<td>' + active + '</td>'
+          + '<td style="font-size:11px;color:var(--text-3,#6b7280)">' + fmtDt(m.last_scan_at) + (m.last_status ? '<br>'+escHtml(m.last_status) : '') + '</td>'
+          + '<td style="white-space:nowrap">'
+          + '<button onclick="aeoi.openMailboxForm('+m.id+')" class="hm-btn hm-btn-xs" title="Sửa">✏</button> '
+          + '<button onclick="aeoi.toggleMailbox('+m.id+','+(m.enabled?'false':'true')+')" class="hm-btn hm-btn-xs" title="' + (m.enabled?'Tắt':'Bật') + '">' + (m.enabled?'⏸':'▶') + '</button> '
+          + '<button onclick="aeoi.deleteMailbox('+m.id+')" class="hm-btn hm-btn-xs" style="color:var(--danger-1,#ef4444)" title="Xóa">🗑</button>'
+          + '</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function _sectionHeaderRules(){
+    var rows = STATE.headerRules || [];
+    var html = '<div class="aeoi-card">'
+      + _cardHead('📑 Header Rules', 'Quy tắc nhận diện email đầu vào. Worker prefilter theo subject_prefix; backend revalidate body markers + required fields.')
+      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
+      + '<button onclick="aeoi.openHeaderRuleForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Thêm Rule</button>'
+      + '<button onclick="aeoi.loadHeaderRules()" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
+      + '</div>';
+    if(rows.length===0){
+      html += '<div class="hm-empty">Chưa có header rule.</div>';
+    } else {
+      html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
+        + '<th>#</th><th>Tên rule</th><th>Subject prefix</th><th>Markers</th><th>Doc types</th><th>Actions</th><th>Trạng thái</th><th>Thiếu header → </th><th>Hành động</th>'
+        + '</tr></thead><tbody>';
+      rows.forEach(function(r,i){
+        html += '<tr style="'+(!r.enabled?'opacity:0.5':'')+'">'
+          + '<td>'+(i+1)+'</td>'
+          + '<td style="font-weight:600">' + escHtml(r.rule_name) + '</td>'
+          + '<td style="font-family:monospace;font-size:11px">' + escHtml(r.subject_prefix||'—') + '</td>'
+          + '<td style="font-family:monospace;font-size:10px">' + escHtml(r.body_start_marker) + '<br>' + escHtml(r.body_end_marker) + '</td>'
+          + '<td style="font-size:10px">' + (r.allowed_doc_types||[]).map(escHtml).join(', ') + '</td>'
+          + '<td style="font-size:10px">' + (r.allowed_actions||[]).map(escHtml).join(', ') + '</td>'
+          + '<td>' + (r.enabled?'● Bật':'○ Tắt') + '</td>'
+          + '<td style="font-size:10px">' + escHtml(r.missing_header_action) + '</td>'
+          + '<td style="white-space:nowrap">'
+          + '<button onclick="aeoi.openHeaderRuleForm('+r.id+')" class="hm-btn hm-btn-xs">✏</button> '
+          + '<button onclick="aeoi.deleteHeaderRule('+r.id+')" class="hm-btn hm-btn-xs" style="color:var(--danger-1,#ef4444)">🗑</button>'
+          + '</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function _sectionTemplates(){
+    var rows = STATE.templates || [];
+    var html = '<div class="aeoi-card">'
+      + _cardHead('🎯 Template Khách hàng', 'Field hints AI dùng để định vị PO number, part number, revision, qty, ngày giao... theo từng khách + định dạng file.')
+      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
+      + '<button onclick="aeoi.openTemplateForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Thêm Template</button>'
+      + '<button onclick="aeoi.loadTemplates()" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
+      + '</div>';
+    if(rows.length===0){
+      html += '<div class="hm-empty">Chưa có template.</div>';
+    } else {
+      html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
+        + '<th>#</th><th>Khách</th><th>Tên template</th><th>Doc type</th><th>File</th><th>Min confidence</th><th>Trạng thái</th><th>Hành động</th>'
+        + '</tr></thead><tbody>';
+      rows.forEach(function(t,i){
+        html += '<tr style="'+(!t.enabled?'opacity:0.5':'')+'">'
+          + '<td>'+(i+1)+'</td>'
+          + '<td style="font-weight:600">' + escHtml(t.customer_id) + '</td>'
+          + '<td>' + escHtml(t.template_name) + '</td>'
+          + '<td><span style="font-size:10px;padding:1px 6px;background:var(--surface-2,#f3f4f6);border-radius:4px">' + escHtml(t.document_type) + '</span></td>'
+          + '<td>' + escHtml(t.file_type) + '</td>'
+          + '<td style="font-size:11px">overall ≥ ' + t.min_confidence_overall + '<br>field ≥ ' + t.min_confidence_required_field + '</td>'
+          + '<td>' + (t.enabled?'● Bật':'○ Tắt') + '</td>'
+          + '<td style="white-space:nowrap">'
+          + '<button onclick="aeoi.openTemplateForm('+t.id+')" class="hm-btn hm-btn-xs">✏</button> '
+          + '<button onclick="aeoi.deleteTemplate('+t.id+')" class="hm-btn hm-btn-xs" style="color:var(--danger-1,#ef4444)">🗑</button>'
+          + '</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function _sectionWorkers(){
+    var rows = STATE.workerTokens || [];
+    var html = '<div class="aeoi-card">'
+      + _cardHead('🔑 Worker Tokens (HMAC)', 'Credentials cho local Outlook worker. Secret hiển thị 1 LẦN duy nhất khi tạo hoặc rotate — lưu ngay vào file C:\\HESEM\\secrets\\.')
+      + '<div style="padding:8px 12px;border-left:3px solid var(--warning-1,#f59e0b);background:var(--warning-bg,#fef3c7);margin-bottom:10px;font-size:11px">'
+      + '⚠ Tải PowerShell worker từ <code>tools/ai-order-intake/outlook-order-intake-worker.ps1</code> và làm theo <code>windows-task-scheduler-setup.md</code>.'
+      + '</div>'
+      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
+      + '<button onclick="aeoi.openWorkerForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Tạo Worker Token</button>'
+      + '<button onclick="aeoi.loadWorkers()" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
+      + '</div>';
+    if(rows.length===0){
+      html += '<div class="hm-empty">Chưa có worker token.</div>';
+    } else {
+      html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
+        + '<th>#</th><th>Worker ID</th><th>Tên</th><th>Trạng thái</th><th>IP allowlist</th><th>Lần dùng cuối</th><th>Hành động</th>'
+        + '</tr></thead><tbody>';
+      rows.forEach(function(w,i){
+        html += '<tr style="'+(!w.enabled?'opacity:0.5':'')+'">'
+          + '<td>'+(i+1)+'</td>'
+          + '<td style="font-family:monospace;font-weight:600">' + escHtml(w.worker_id) + '</td>'
+          + '<td>' + escHtml(w.worker_name||'—') + '</td>'
+          + '<td>' + (w.enabled?'● Bật':'○ Tắt') + '</td>'
+          + '<td style="font-size:10px;font-family:monospace">' + ((w.ip_allowlist||[]).length ? (w.ip_allowlist||[]).map(escHtml).join(', ') : '—') + '</td>'
+          + '<td style="font-size:11px;color:var(--text-3,#6b7280)">' + fmtDt(w.last_used_at) + (w.last_used_ip ? '<br>'+escHtml(w.last_used_ip) : '') + '</td>'
+          + '<td style="white-space:nowrap">'
+          + '<button onclick="aeoi.rotateWorker('+w.id+')" class="hm-btn hm-btn-xs" title="Rotate secret">🔄</button> '
+          + '<button onclick="aeoi.toggleWorker('+w.id+','+(w.enabled?'false':'true')+')" class="hm-btn hm-btn-xs" title="' + (w.enabled?'Tắt':'Bật') + '">' + (w.enabled?'⏸':'▶') + '</button>'
+          + '</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function _sectionCases(){
+    var data = STATE.cases || { items:[], total:0, offset:0 };
+    var html = '<div class="aeoi-card">'
+      + _cardHead('📦 Intake Cases', 'Các case đã tạo từ AI. Tab "AI Intake Queue" trong M2-Orders module là nơi sales/planning xử lý chi tiết. Đây là view tổng quát của admin.')
+      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
+      + '<button onclick="aeoi.loadCases(0)" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
+      + '<a href="?module=M2-orders&tab=ai-intake-queue" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;text-decoration:none">Mở Intake Queue đầy đủ →</a>'
+      + '</div>';
+    if(data.items.length===0){
+      html += '<div class="hm-empty">Chưa có case nào.</div>';
+    } else {
+      html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
+        + '<th>#</th><th>Intake</th><th>Trạng thái</th><th>Khách</th><th>PO khách</th><th>Confidence</th><th>Tạo lúc</th>'
+        + '</tr></thead><tbody>';
+      data.items.forEach(function(c,i){
+        html += '<tr>'
+          + '<td>'+(data.offset+i+1)+'</td>'
+          + '<td style="font-family:monospace;font-weight:600">' + escHtml(c.intake_no) + '</td>'
+          + '<td><span style="font-size:10px;padding:1px 6px;background:var(--surface-2,#f3f4f6);border-radius:4px">' + escHtml(c.status) + '</span></td>'
+          + '<td>' + escHtml(c.customer_id||'—') + '</td>'
+          + '<td style="font-family:monospace">' + escHtml(c.customer_po_number||'—') + '</td>'
+          + '<td style="text-align:right">' + (c.overall_confidence!=null ? Number(c.overall_confidence).toFixed(2) : '—') + '</td>'
+          + '<td style="font-size:11px">' + fmtDt(c.created_at) + '</td>'
+          + '</tr>';
+      });
+      html += '</tbody></table></div>';
+      html += _pager(data.offset, 50, data.total, 'aeoi.loadCases');
+    }
+    html += '</div>';
+    return html;
+  }
+
   /* ── Public API (window.aeoi) ─────────────────────────────────────────── */
   window.aeoi = {
     _msgStatus: '',
@@ -612,7 +800,12 @@
       STATE.activeSection = id;
       var el = document.getElementById('aeoi-section-content');
       if(!el) return;
-      // Lazy-load log sections
+      // Lazy-load each section's data
+      if(id==='mailboxes'    && !STATE.mailboxes)    aeoi.loadMailboxes();
+      if(id==='header_rules' && !STATE.headerRules)  aeoi.loadHeaderRules();
+      if(id==='templates'    && !STATE.templates)    aeoi.loadTemplates();
+      if(id==='workers'      && !STATE.workerTokens) aeoi.loadWorkers();
+      if(id==='cases'        && !STATE.cases)        aeoi.loadCases(0);
       if(id==='poll_log' && STATE.pollLog.items.length===0) aeoi.loadPollLog(0);
       if(id==='msg_log'  && STATE.msgLog.items.length===0)  aeoi.loadMsgLog(0,'');
       if(id==='quarantine' && STATE.quarantine.items.length===0) aeoi.loadQuarantine(0);
@@ -834,6 +1027,172 @@
         if(res.ok) aeoi.loadQuarantine(STATE.quarantine.offset||0);
         else alert('Lỗi: ' + (res.error||''));
       });
+    },
+
+    // ── Sprint A-D loaders ──────────────────────────────────────────────
+    loadMailboxes: function(){
+      apiCall('admin_email_intake_mailbox_list', {}, function(res){
+        STATE.mailboxes = (res.ok && res.mailboxes) ? res.mailboxes : [];
+        _refreshSection();
+      });
+    },
+    openMailboxForm: function(id){
+      var existing = id ? (STATE.mailboxes||[]).find(function(m){return m.id===id;}) : null;
+      var addr   = prompt('Mailbox address (vd: orders@hesemeng.com):', existing ? existing.mailbox_address : '');
+      if(addr==null) return;
+      var folder = prompt('Folder path (vd: Inbox/AI-Order-Intake):', existing ? existing.folder_path : 'Inbox/AI-Order-Intake');
+      if(folder==null) return;
+      var provider = prompt('Provider (outlook_local | microsoft_graph | manual_upload):', existing ? existing.provider : 'outlook_local');
+      if(provider==null) return;
+      var payload = {
+        mailbox_address: addr, folder_path: folder, provider: provider,
+        enabled: true, read_body: true, read_attachments: true,
+      };
+      if(id){ payload.id = id; }
+      var action = id ? 'admin_email_intake_mailbox_update' : 'admin_email_intake_mailbox_create';
+      apiCall(action, payload, function(res){
+        if(res.ok) aeoi.loadMailboxes();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+    toggleMailbox: function(id, enabled){
+      apiCall('admin_email_intake_mailbox_update', {id:id, enabled:enabled}, function(res){
+        if(res.ok) aeoi.loadMailboxes();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+    deleteMailbox: function(id){
+      if(!confirm('Xóa mailbox này? Không thể hoàn tác.')) return;
+      apiCall('admin_email_intake_mailbox_delete', {id:id}, function(res){
+        if(res.ok) aeoi.loadMailboxes();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+
+    loadHeaderRules: function(){
+      apiCall('admin_email_intake_header_rule_list', {}, function(res){
+        STATE.headerRules = (res.ok && res.header_rules) ? res.header_rules : [];
+        _refreshSection();
+      });
+    },
+    openHeaderRuleForm: function(id){
+      var existing = id ? (STATE.headerRules||[]).find(function(r){return r.id===id;}) : null;
+      var name = prompt('Tên rule:', existing ? existing.rule_name : 'HESEM Standard Order Intake Header');
+      if(name==null) return;
+      var subject = prompt('Subject prefix (rỗng = bỏ qua):', existing ? (existing.subject_prefix||'') : '[HESEM-ORDER-INTAKE]');
+      if(subject==null) return;
+      var payload = {
+        rule_name: name, subject_prefix: subject||null, enabled: true,
+        body_start_marker: '[HESEM-ORDER-INTAKE]',
+        body_end_marker:   '[/HESEM-ORDER-INTAKE]',
+      };
+      if(id){ payload.id = id; }
+      var action = id ? 'admin_email_intake_header_rule_update' : 'admin_email_intake_header_rule_create';
+      apiCall(action, payload, function(res){
+        if(res.ok) aeoi.loadHeaderRules();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+    deleteHeaderRule: function(id){
+      if(!confirm('Xóa header rule?')) return;
+      apiCall('admin_email_intake_header_rule_delete', {id:id}, function(res){
+        if(res.ok) aeoi.loadHeaderRules();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+
+    loadTemplates: function(){
+      apiCall('admin_email_intake_template_list', {}, function(res){
+        STATE.templates = (res.ok && res.templates) ? res.templates : [];
+        _refreshSection();
+      });
+    },
+    openTemplateForm: function(id){
+      var existing = id ? (STATE.templates||[]).find(function(t){return t.id===id;}) : null;
+      var custId = prompt('Customer ID:', existing ? existing.customer_id : '');
+      if(custId==null) return;
+      var name = prompt('Template name:', existing ? existing.template_name : '');
+      if(name==null) return;
+      var docType = prompt('Document type (CUSTOMER_PO | PO_CHANGE | PO_CANCEL | EXPEDITE):', existing ? existing.document_type : 'CUSTOMER_PO');
+      if(docType==null) return;
+      var fileType = prompt('File type (pdf | xlsx | docx):', existing ? existing.file_type : 'pdf');
+      if(fileType==null) return;
+      var payload = {
+        customer_id: custId, template_name: name,
+        document_type: docType, file_type: fileType, enabled: true,
+      };
+      if(id){ payload.id = id; }
+      var action = id ? 'admin_email_intake_template_update' : 'admin_email_intake_template_create';
+      apiCall(action, payload, function(res){
+        if(res.ok) aeoi.loadTemplates();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+    deleteTemplate: function(id){
+      if(!confirm('Xóa template?')) return;
+      apiCall('admin_email_intake_template_delete', {id:id}, function(res){
+        if(res.ok) aeoi.loadTemplates();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+
+    loadWorkers: function(){
+      apiCall('admin_email_intake_worker_token_list', {}, function(res){
+        STATE.workerTokens = (res.ok && res.tokens) ? res.tokens : [];
+        _refreshSection();
+      });
+    },
+    openWorkerForm: function(){
+      var workerId = prompt('Worker ID (vd: AIW-LOCAL-001):', '');
+      if(!workerId) return;
+      var workerName = prompt('Worker name (mô tả ngắn):', '');
+      if(workerName===null) return;
+      apiCall('admin_email_intake_worker_token_create', {
+        worker_id: workerId, worker_name: workerName, enabled: true,
+      }, function(res){
+        if(!res.ok){ alert('Lỗi: ' + (res.error||'')); return; }
+        // Show raw secret ONCE
+        alert('Token created!\n\nWorker ID: ' + res.token.worker_id +
+              '\n\nRAW SECRET (lưu ngay, sẽ không xem lại được):\n\n' + res.raw_secret +
+              '\n\nSecret notice: ' + (res.secret_notice||''));
+        aeoi.loadWorkers();
+      });
+    },
+    rotateWorker: function(id){
+      if(!confirm('Rotate secret? Worker hiện tại sẽ KHÔNG dùng được cho đến khi cập nhật secret file.')) return;
+      apiCall('admin_email_intake_worker_token_rotate', {id:id}, function(res){
+        if(!res.ok){ alert('Lỗi: ' + (res.error||'')); return; }
+        alert('Token rotated!\n\nNEW SECRET (lưu ngay):\n\n' + res.raw_secret);
+        aeoi.loadWorkers();
+      });
+    },
+    toggleWorker: function(id, enable){
+      var action = enable ? 'admin_email_intake_worker_token_enable' : 'admin_email_intake_worker_token_disable';
+      apiCall(action, {id:id}, function(res){
+        if(res.ok) aeoi.loadWorkers();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+
+    loadCases: function(offset){
+      // The case_list endpoint reads limit/offset from $_GET query string.
+      // The apiCall shim doesn't append query params for GET, so we use
+      // the raw window.apiCall (Promise) with the action including the
+      // pagination — server-side AdminController routes parse the action
+      // before the '?' anyway.
+      offset = offset || 0;
+      if(typeof window.apiCall === 'function'){
+        window.apiCall('ai_order_intake_case_list&limit=50&offset=' + offset, null, 'GET')
+          .then(function(res){
+            if(res && res.ok){
+              STATE.cases = {items:res.cases||[], total:res.total||0, offset:offset};
+            }
+            _refreshSection();
+          }).catch(function(err){
+            STATE.cases = {items:[], total:0, offset:0};
+            _refreshSection();
+          });
+      }
     },
   };
 
