@@ -442,9 +442,10 @@ final class EmailIntakeConfigService
 
     /**
      * Encrypt a secret using AES-256-CBC with a key derived from APP_SECRET.
-     * Stored as base64(iv + ciphertext).
+     * Stored as base64(iv + ciphertext). Public so other AEOI services
+     * (mailbox catalog, worker tokens, etc.) can reuse the same key path.
      */
-    private function encryptSecret(string $plaintext): string
+    public function encryptSecret(string $plaintext): string
     {
         $key = $this->deriveKey();
         $iv  = random_bytes(16);

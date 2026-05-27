@@ -166,6 +166,7 @@ return static function (Router $router, string $dataDir): void {
         'admin_email_intake_mailbox_create'      => [EmailIntakeController::class, 'mailboxCreate'],
         'admin_email_intake_mailbox_update'      => [EmailIntakeController::class, 'mailboxUpdate'],
         'admin_email_intake_mailbox_delete'      => [EmailIntakeController::class, 'mailboxDelete'],
+        'admin_email_intake_mailbox_poll'        => [EmailIntakeController::class, 'mailboxPoll'],
         'admin_email_intake_header_rule_list'    => [EmailIntakeController::class, 'headerRuleList'],
         'admin_email_intake_header_rule_create'  => [EmailIntakeController::class, 'headerRuleCreate'],
         'admin_email_intake_header_rule_update'  => [EmailIntakeController::class, 'headerRuleUpdate'],
