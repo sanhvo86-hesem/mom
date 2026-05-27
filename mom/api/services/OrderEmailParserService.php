@@ -241,27 +241,24 @@ PROMPT;
         if ($ch === false) {
             throw new RuntimeException('curl_init failed.');
         }
-        try {
-            curl_setopt_array($ch, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_POST           => true,
-                CURLOPT_POSTFIELDS     => json_encode($payload, JSON_UNESCAPED_SLASHES),
-                CURLOPT_HTTPHEADER     => [
-                    'Content-Type: application/json',
-                    'x-api-key: ' . $this->apiKey,
-                    'anthropic-version: ' . self::API_VERSION,
-                ],
-                CURLOPT_TIMEOUT        => self::TIMEOUT_SECONDS,
-                CURLOPT_CONNECTTIMEOUT => 15,
-                CURLOPT_SSL_VERIFYPEER => true,
-                CURLOPT_SSL_VERIFYHOST => 2,
-            ]);
-            $raw = curl_exec($ch);
-            $err = curl_error($ch);
-            $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        } finally {
-            curl_close($ch);
-        }
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => json_encode($payload, JSON_UNESCAPED_SLASHES),
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'x-api-key: ' . $this->apiKey,
+                'anthropic-version: ' . self::API_VERSION,
+            ],
+            CURLOPT_TIMEOUT        => self::TIMEOUT_SECONDS,
+            CURLOPT_CONNECTTIMEOUT => 15,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+        ]);
+        $raw = curl_exec($ch);
+        $err = curl_error($ch);
+        $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        unset($ch);
 
         if ($raw === false || $err !== '') {
             throw new RuntimeException('Anthropic API curl error: ' . $err);
