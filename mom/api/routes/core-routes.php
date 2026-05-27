@@ -146,6 +146,22 @@ return static function (Router $router, string $dataDir): void {
         'admin_data_layer_config_get'      => [AdminDataLayerController::class, 'getConfig'],
         'admin_data_layer_config_save'     => [AdminDataLayerController::class, 'saveConfig'],
     ]);
+
+    // AI Email Order Intake (AEOI) — admin panel
+    $router->actions([
+        'admin_email_intake_config_get'         => [EmailIntakeController::class, 'configGet'],
+        'admin_email_intake_config_save'        => [EmailIntakeController::class, 'configSave'],
+        'admin_email_intake_allowlist_get'      => [EmailIntakeController::class, 'allowlistGet'],
+        'admin_email_intake_allowlist_add'      => [EmailIntakeController::class, 'allowlistAdd'],
+        'admin_email_intake_allowlist_update'   => [EmailIntakeController::class, 'allowlistUpdate'],
+        'admin_email_intake_allowlist_delete'   => [EmailIntakeController::class, 'allowlistDelete'],
+        'admin_email_intake_trigger'            => [EmailIntakeController::class, 'triggerPoll'],
+        'admin_email_intake_test_parse'         => [EmailIntakeController::class, 'testParse'],
+        'admin_email_intake_poll_log'           => [EmailIntakeController::class, 'pollLog'],
+        'admin_email_intake_message_log'        => [EmailIntakeController::class, 'messageLog'],
+        'admin_email_intake_quarantine_get'     => [EmailIntakeController::class, 'quarantineGet'],
+        'admin_email_intake_quarantine_action'  => [EmailIntakeController::class, 'quarantineAction'],
+    ]);
     
     // Dictionary
     $router->actions([
