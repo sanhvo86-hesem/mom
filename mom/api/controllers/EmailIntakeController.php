@@ -998,8 +998,66 @@ class EmailIntakeController extends BaseController
                 $action = strtoupper($m[1]);
             }
 
-            // Create the intake case
+            // De-dupe: an internet_message_id we've already seen returns the
+            // existing case instead of creating a new one. This is the same
+            // safety net Phase 1's email_intake_message ledger gives us.
+            $msgKey = $internetMsg !== '' ? $internetMsg : ($mailboxId . ':' . $providerMsg);
+            $existing = $this->db()->queryOne(
+                'SELECT m.id AS msg_id, c.id AS case_id, c.intake_no
+                   FROM email_intake_message m
+                   LEFT JOIN email_intake_case c ON c.message_id = m.id
+                  WHERE m.graph_message_id = :p_key',
+                [':p_key' => $msgKey]
+            );
+            if ($existing) {
+                $this->auditLog('aeoi_worker_envelope_duplicate', [
+                    'worker'    => $worker['worker_id'],
+                    'message_id'=> (int)$existing['msg_id'],
+                    'case_id'   => $existing['case_id'] ? (int)$existing['case_id'] : null,
+                ]);
+                $this->success([
+                    'ok'        => true,
+                    'action'    => 'duplicate',
+                    'case_id'   => $existing['case_id'] ? (int)$existing['case_id'] : null,
+                    'intake_no' => $existing['intake_no'] ?? null,
+                    'reason'    => 'message_already_processed',
+                ]);
+            }
+
+            // Persist the Phase 1 email_intake_message row first. The case's
+            // message_id FK points back here so the message log + poll log
+            // views show the full lifecycle.
+            $msgRow = $this->db()->queryOne(
+                'INSERT INTO email_intake_message
+                    (graph_message_id, internet_message_id, received_at,
+                     from_email, from_name, subject,
+                     has_attachments, attachment_count, attachment_names,
+                     allowlist_match, status, body_preview)
+                 VALUES (:p_key, :p_imid, :p_recv,
+                         :p_from, :p_name, :p_subj,
+                         :p_has, :p_cnt, :p_atts,
+                         :p_allow, :p_status, :p_preview)
+                 RETURNING id',
+                [
+                    ':p_key'     => $msgKey,
+                    ':p_imid'    => $internetMsg ?: null,
+                    ':p_recv'    => $receivedAt,
+                    ':p_from'    => $fromEmail,
+                    ':p_name'    => trim((string)($body['from_name'] ?? '')) ?: null,
+                    ':p_subj'    => $subject,
+                    ':p_has'     => count($atts) > 0 ? 'true' : 'false',
+                    ':p_cnt'     => count($atts),
+                    ':p_atts'    => json_encode(array_map(static fn($a) => (string)($a['filename'] ?? ''), $atts)),
+                    ':p_allow'   => (string)($allow['match_type'] ?? 'none'),
+                    ':p_status'  => 'extracted',
+                    ':p_preview' => mb_substr(trim((string)($body['body_text'] ?? '')), 0, 500),
+                ]
+            );
+            $messageId = (int)$msgRow['id'];
+
+            // Create the intake case linked to the message row
             $case = $this->caseSvc()->createCase([
+                'message_id'          => $messageId,
                 'mailbox_id'          => $mailboxId,
                 'sender_allowlist_id' => $allow['entry_id'] ?? null,
                 'status'              => 'extraction_pending',
@@ -1008,13 +1066,25 @@ class EmailIntakeController extends BaseController
             ], $worker['worker_id']);
             $caseId = (int)$case['id'];
 
+            // Backfill the message row with the case_id-derived so_number
+            // slot via the standard message status flow (so_number stays
+            // empty until a Sales Order is committed; we just mark the
+            // message as 'extraction_pending' so the message log shows it
+            // is being processed).
+            $this->db()->execute(
+                'UPDATE email_intake_message
+                    SET status = :p_status, updated_at = NOW()
+                  WHERE id = :p_id',
+                [':p_status' => 'extraction_pending', ':p_id' => $messageId]
+            );
+
             // Persist attachments
             foreach ($atts as $att) {
                 $sha256 = trim((string)($att['sha256'] ?? ''));
                 if ($sha256 === '' || !preg_match('/^[a-f0-9]{64}$/i', $sha256)) {
                     continue;
                 }
-                $this->caseSvc()->addAttachment($caseId, null, [
+                $this->caseSvc()->addAttachment($caseId, $messageId, [
                     'original_filename' => (string)($att['filename'] ?? 'unknown'),
                     'safe_filename'     => (string)($att['safe_filename'] ?? $att['filename'] ?? 'unknown'),
                     'mime_type'         => trim((string)($att['mime_type'] ?? '')) ?: null,
