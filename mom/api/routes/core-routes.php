@@ -180,6 +180,12 @@ return static function (Router $router, string $dataDir): void {
         'admin_email_intake_worker_token_rotate' => [EmailIntakeController::class, 'workerTokenRotate'],
         'admin_email_intake_worker_token_disable'=> [EmailIntakeController::class, 'workerTokenDisable'],
         'admin_email_intake_worker_token_enable' => [EmailIntakeController::class, 'workerTokenEnable'],
+        // AEOI Phase 3 — LLM model routing (migration 207)
+        'admin_email_intake_llm_providers_list'   => [EmailIntakeController::class, 'llmProvidersList'],
+        'admin_email_intake_llm_rules_list'       => [EmailIntakeController::class, 'llmRulesList'],
+        'admin_email_intake_llm_rule_save'        => [EmailIntakeController::class, 'llmRuleSave'],
+        'admin_email_intake_llm_rule_delete'      => [EmailIntakeController::class, 'llmRuleDelete'],
+        'admin_email_intake_llm_health'           => [EmailIntakeController::class, 'llmHealth'],
         // AEOI Phase 2 — case lifecycle (Orders > AI Intake Queue tab uses these)
         'ai_order_intake_case_list'              => [EmailIntakeController::class, 'caseList'],
         'ai_order_intake_case_detail'            => [EmailIntakeController::class, 'caseDetail'],

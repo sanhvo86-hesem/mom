@@ -56,6 +56,7 @@
     { id:'header_rules', label:'Header Rules',         icon:'📑' },
     { id:'templates',    label:'Template KH',          icon:'🎯' },
     { id:'workers',      label:'Worker Tokens',        icon:'🔑' },
+    { id:'llm_model',    label:'LLM Model',           icon:'🤖' },
     { id:'logic',        label:'Cơ chế vận hành',     icon:'⚙️' },
     { id:'security',     label:'Bảo mật',             icon:'🔒' },
     { id:'notify',       label:'Thông báo',           icon:'🔔' },
@@ -142,6 +143,7 @@
       case 'header_rules': return _sectionHeaderRules();
       case 'templates':    return _sectionTemplates();
       case 'workers':      return _sectionWorkers();
+      case 'llm_model':    return _sectionLlmModel();
       case 'logic':        return _sectionLogic();
       case 'security':     return _sectionSecurity();
       case 'notify':       return _sectionNotify();
@@ -265,6 +267,74 @@
       + '</div></div></div>';
 
     return html;
+  }
+
+  /* ── 2.5. LLM Model routing ──────────────────────────────────────────── */
+  function _sectionLlmModel(){
+    if(!STATE.llm){ aeoi.loadLlmConfig(); return '<div class="hm-empty">Đang tải cấu hình LLM...</div>'; }
+    var rules     = STATE.llm.rules || [];
+    var providers = STATE.llm.providers || [];
+    var health    = STATE.llm.health || {};
+
+    // Provider health summary cards
+    var healthHtml = '';
+    providers.forEach(function(p){
+      var h = health[p.provider_key] || {};
+      var ok = !!h.ok;
+      var dot = ok ? '🟢' : (h.message ? '🔴' : '⚪');
+      healthHtml += '<div style="background:var(--surface-2,#f3f4f6);border-radius:8px;padding:10px;font-size:11px">'
+        + '<div style="font-weight:600">' + dot + ' ' + escHtml(p.display_name) + '</div>'
+        + '<div style="color:var(--text-3,#6b7280);margin-top:2px">' + escHtml(p.provider_kind) + ' • ' + (p.models ? p.models.length : 0) + ' model(s)</div>'
+        + '<div style="color:' + (ok?'#10b981':'#dc2626') + ';margin-top:4px;font-size:10px">' + escHtml((h.message||'no health probe').substring(0,120)) + '</div>'
+        + '</div>';
+    });
+
+    var rulesHtml = '<table class="aeoi-tbl" style="width:100%;border-collapse:collapse;font-size:12px;margin-top:10px">'
+      + '<thead><tr style="background:var(--surface-2,#f3f4f6)">'
+      + '<th style="padding:6px;text-align:left;font-weight:600">Scope</th>'
+      + '<th style="padding:6px;text-align:left;font-weight:600">Primary Provider</th>'
+      + '<th style="padding:6px;text-align:left;font-weight:600">Primary Model</th>'
+      + '<th style="padding:6px;text-align:left;font-weight:600">Fallback chain</th>'
+      + '<th style="padding:6px;text-align:left;font-weight:600">Priority</th>'
+      + '<th style="padding:6px;text-align:left;font-weight:600">Status</th>'
+      + '<th style="padding:6px;text-align:left;font-weight:600">Hành động</th>'
+      + '</tr></thead><tbody>';
+
+    rules.forEach(function(r){
+      var chain = (r.fallback_chain || []).map(function(s){ return s.provider + (s.model ? ':' + s.model : ''); }).join(' → ');
+      rulesHtml += '<tr style="border-bottom:1px solid var(--border-1,#e5e7eb)">'
+        + '<td style="padding:6px"><span style="font-family:monospace;background:var(--surface-2,#f3f4f6);padding:2px 6px;border-radius:4px">' + escHtml(r.scope_type) + '</span><br><span style="font-size:11px">' + escHtml(r.scope_value) + '</span></td>'
+        + '<td style="padding:6px;font-family:monospace">' + escHtml(r.primary_provider) + '</td>'
+        + '<td style="padding:6px;font-family:monospace">' + escHtml(r.primary_model || '—') + '</td>'
+        + '<td style="padding:6px;font-size:11px;color:var(--text-3,#6b7280)">' + escHtml(chain || '—') + '</td>'
+        + '<td style="padding:6px">' + r.priority + '</td>'
+        + '<td style="padding:6px">' + (r.is_enabled ? '<span style="color:#10b981">● Bật</span>' : '<span style="color:#9ca3af">○ Tắt</span>') + '</td>'
+        + '<td style="padding:6px">'
+        +   '<button onclick="aeoi.editLlmRule(' + r.routing_id + ')" class="hm-btn hm-btn-sm" title="Sửa">✏️</button> '
+        +   '<button onclick="aeoi.deleteLlmRule(' + r.routing_id + ', \'' + escHtml(r.scope_type) + ':' + escHtml(r.scope_value) + '\')" class="hm-btn hm-btn-sm" style="color:#dc2626" title="Xóa">🗑️</button>'
+        + '</td></tr>';
+    });
+    rulesHtml += '</tbody></table>';
+    if(rules.length === 0){
+      rulesHtml = '<div style="padding:20px;text-align:center;color:var(--text-3,#6b7280);font-size:12px;background:var(--surface-2,#f3f4f6);border-radius:8px;margin-top:10px">Chưa có rule nào. Hệ thống sẽ fall back về Anthropic API nếu được cấu hình.</div>';
+    }
+
+    return '<div class="aeoi-card">'
+      + _cardHead('🤖 LLM Model Routing', 'Định tuyến extraction qua nhiều LLM. Resolution order: doc_code > doc_pattern > tier > global_default. Mỗi rule có chain fallback nếu primary fail.')
+      + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:14px">' + healthHtml + '</div>'
+      + '<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">'
+      +   '<button onclick="aeoi.openLlmRuleForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Thêm Rule</button>'
+      +   '<button onclick="aeoi.loadLlmConfig(true)" class="hm-btn hm-btn-sm">🔄 Tải lại + Health probe</button>'
+      +   '<span style="font-size:11px;color:var(--text-3,#6b7280)">' + rules.length + ' rule(s)</span>'
+      + '</div>'
+      + rulesHtml
+      + '<div style="margin-top:14px;padding:10px;background:#dbeafe;border-left:3px solid #2563eb;border-radius:4px;font-size:11px;color:#1e3a8a">'
+      +   'ℹ <strong>Tier scopes:</strong>'
+      +   '<br>• <code>extraction_default</code> — email body when deterministic header parser empty'
+      +   '<br>• <code>extraction_pdf</code> — email có PDF attachment cần pdftotext + LLM extract'
+      +   '<br>• <code>extraction_complex</code> — multi-page PO, change orders, expedites'
+      + '</div>'
+      + '</div>';
   }
 
   /* ── 3. Cơ chế vận hành ──────────────────────────────────────────────── */
@@ -544,6 +614,60 @@
       + '<div id="aeoi-worker-secret-msg" style="font-size:11px;color:#10b981;margin-top:6px;height:14px"></div>'
       + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">'
       + '<button onclick="aeoi.closeWorkerSecret()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">Đã lưu, đóng</button>'
+      + '</div></div></div>';
+  }
+
+  /* ── LLM rule create/edit modal ───────────────────────────────────────── */
+  function _llmRuleModal(){
+    return '<div id="aeoi-llm-rule-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center" data-modal-display="flex">'
+      + '<div style="background:var(--surface-0,#fff);border-radius:12px;padding:24px;width:640px;max-width:95vw;max-height:90vh;overflow:auto;box-shadow:0 8px 32px rgba(0,0,0,.2)">'
+      + '<div style="font-size:14px;font-weight:700;margin-bottom:12px" id="aeoi-llm-rule-title">🤖 Thêm LLM Routing Rule</div>'
+      + '<div style="display:grid;gap:10px">'
+
+      + '<div style="display:grid;grid-template-columns:1fr 2fr;gap:10px">'
+      +   '<div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Scope type</label>'
+      +   '<select id="aeoi-llm-scope-type" onchange="aeoi._llmOnScopeTypeChange()" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px">'
+      +     '<option value="global_default">global_default</option>'
+      +     '<option value="tier">tier</option>'
+      +     '<option value="doc_pattern">doc_pattern</option>'
+      +     '<option value="doc_code">doc_code</option>'
+      +   '</select></div>'
+      +   '<div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Scope value</label>'
+      +   '<input id="aeoi-llm-scope-value" placeholder="*" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px;font-family:monospace">'
+      +   '<div id="aeoi-llm-scope-hint" style="font-size:10px;color:var(--text-3,#6b7280);margin-top:2px">global_default: "*". tier: extraction_default | extraction_pdf | extraction_complex.</div></div>'
+      + '</div>'
+
+      + '<div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Primary provider <span style="color:#dc2626">*</span></label>'
+      +   '<select id="aeoi-llm-primary-provider" onchange="aeoi._llmOnProviderChange(\'primary\')" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px"></select></div>'
+
+      + '<div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Primary model</label>'
+      +   '<select id="aeoi-llm-primary-model" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px"></select></div>'
+
+      + '<div>'
+      +   '<div style="display:flex;justify-content:space-between;align-items:center">'
+      +     '<label style="font-size:11px;font-weight:600">Fallback chain (thử theo thứ tự nếu primary fail)</label>'
+      +     '<button onclick="aeoi._llmAddFallback()" class="hm-btn hm-btn-sm">+ Thêm fallback</button>'
+      +   '</div>'
+      +   '<div id="aeoi-llm-fallback-rows" style="margin-top:6px"></div>'
+      + '</div>'
+
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+      +   '<div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Priority</label>'
+      +     '<input id="aeoi-llm-priority" type="number" value="100" min="0" max="9999" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px"></div>'
+      +   '<div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Trạng thái</label>'
+      +     '<label style="display:flex;align-items:center;gap:6px;padding:6px 0;font-size:12px"><input type="checkbox" id="aeoi-llm-enabled" checked> Enabled</label></div>'
+      + '</div>'
+
+      + '<div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Mô tả</label>'
+      +   '<textarea id="aeoi-llm-description" rows="2" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px;resize:vertical" placeholder="Vì sao chọn provider+model này..."></textarea></div>'
+
+      + '<input type="hidden" id="aeoi-llm-routing-id" value="">'
+      + '</div>'
+
+      + '<div id="aeoi-llm-rule-err" style="display:none;color:#dc2626;font-size:12px;margin-top:8px"></div>'
+      + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">'
+      +   '<button onclick="aeoi.closeLlmRuleForm()" class="hm-btn hm-btn-sm">Hủy</button>'
+      +   '<button onclick="aeoi.submitLlmRuleForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">Lưu</button>'
       + '</div></div></div>';
   }
 
@@ -853,6 +977,7 @@
       if(id==='poll_log' && STATE.pollLog.items.length===0) aeoi.loadPollLog(0);
       if(id==='msg_log'  && STATE.msgLog.items.length===0)  aeoi.loadMsgLog(0,'');
       if(id==='quarantine' && STATE.quarantine.items.length===0) aeoi.loadQuarantine(0);
+      if(id==='llm_model'  && !STATE.llm)            aeoi.loadLlmConfig();
       el.innerHTML = _renderSection(id);
       _bindSection();
       // Update tab highlight
@@ -1292,6 +1417,173 @@
         _refreshSection();
       });
     },
+
+    /* LLM Model routing */
+    loadLlmConfig: function(forceProbe){
+      STATE.llm = STATE.llm || {providers: [], rules: [], health: {}};
+      var pending = 2 + (forceProbe ? 1 : 0);
+      function done(){ if(--pending === 0) _refreshSection(); }
+      apiCall('admin_email_intake_llm_providers_list', {}, function(res){
+        STATE.llm.providers = (res.ok && res.providers) ? res.providers : [];
+        done();
+      });
+      apiCall('admin_email_intake_llm_rules_list', {}, function(res){
+        STATE.llm.rules = (res.ok && res.rules) ? res.rules : [];
+        done();
+      });
+      if(forceProbe){
+        apiCall('admin_email_intake_llm_health', {}, function(res){
+          STATE.llm.health = (res.ok && res.health) ? res.health : {};
+          done();
+        });
+      } else if(!STATE.llm.healthLoaded){
+        // fetch in background, then refresh
+        apiCall('admin_email_intake_llm_health', {}, function(res){
+          STATE.llm.health = (res.ok && res.health) ? res.health : {};
+          STATE.llm.healthLoaded = true;
+          if(STATE.activeSection === 'llm_model') _refreshSection();
+        });
+      }
+    },
+
+    openLlmRuleForm: function(){
+      var el = document.getElementById('aeoi-llm-rule-modal');
+      if(!el){
+        document.body.insertAdjacentHTML('beforeend', _llmRuleModal());
+        el = document.getElementById('aeoi-llm-rule-modal');
+      }
+      // Populate provider dropdown
+      var provSel = document.getElementById('aeoi-llm-primary-provider');
+      provSel.innerHTML = (STATE.llm.providers || []).map(function(p){
+        return '<option value="' + escHtml(p.provider_key) + '">' + escHtml(p.display_name) + '</option>';
+      }).join('');
+      document.getElementById('aeoi-llm-rule-title').textContent = '🤖 Thêm LLM Routing Rule';
+      document.getElementById('aeoi-llm-routing-id').value = '';
+      document.getElementById('aeoi-llm-scope-type').value = 'global_default';
+      document.getElementById('aeoi-llm-scope-value').value = '*';
+      document.getElementById('aeoi-llm-priority').value = '100';
+      document.getElementById('aeoi-llm-enabled').checked = true;
+      document.getElementById('aeoi-llm-description').value = '';
+      document.getElementById('aeoi-llm-fallback-rows').innerHTML = '';
+      document.getElementById('aeoi-llm-rule-err').style.display = 'none';
+      aeoi._llmOnProviderChange('primary');
+      el.style.display = 'flex';
+    },
+
+    editLlmRule: function(routingId){
+      var rule = (STATE.llm.rules || []).find(function(r){ return r.routing_id == routingId; });
+      if(!rule) return;
+      aeoi.openLlmRuleForm();
+      document.getElementById('aeoi-llm-rule-title').textContent = '🤖 Sửa LLM Routing Rule #' + routingId;
+      document.getElementById('aeoi-llm-routing-id').value = routingId;
+      document.getElementById('aeoi-llm-scope-type').value = rule.scope_type;
+      document.getElementById('aeoi-llm-scope-value').value = rule.scope_value;
+      document.getElementById('aeoi-llm-priority').value = rule.priority || 100;
+      document.getElementById('aeoi-llm-enabled').checked = !!rule.is_enabled;
+      document.getElementById('aeoi-llm-description').value = rule.description || '';
+      document.getElementById('aeoi-llm-primary-provider').value = rule.primary_provider;
+      aeoi._llmOnProviderChange('primary');
+      setTimeout(function(){
+        document.getElementById('aeoi-llm-primary-model').value = rule.primary_model || '';
+      }, 30);
+      var rowsEl = document.getElementById('aeoi-llm-fallback-rows');
+      rowsEl.innerHTML = '';
+      (rule.fallback_chain || []).forEach(function(step){ aeoi._llmAddFallback(step.provider, step.model); });
+    },
+
+    closeLlmRuleForm: function(){
+      var el = document.getElementById('aeoi-llm-rule-modal');
+      if(el) el.style.display = 'none';
+    },
+
+    _llmOnScopeTypeChange: function(){
+      var st  = aeoi._val('aeoi-llm-scope-type');
+      var val = document.getElementById('aeoi-llm-scope-value');
+      var hint = document.getElementById('aeoi-llm-scope-hint');
+      if(st === 'global_default'){
+        val.value = '*'; val.disabled = true;
+        hint.textContent = 'global_default scope is fixed to "*".';
+      } else {
+        val.disabled = false;
+        if(st === 'tier'){
+          if(['extraction_default','extraction_pdf','extraction_complex'].indexOf(val.value) < 0) val.value = 'extraction_default';
+          hint.textContent = 'tier: extraction_default | extraction_pdf | extraction_complex';
+        } else if(st === 'doc_pattern'){
+          hint.textContent = 'Glob: e.g. PO_CHANGE* (use * and ? wildcards)';
+        } else {
+          hint.textContent = 'Exact doc_type code: CUSTOMER_PO | PO_CHANGE | PO_CANCEL | EXPEDITE';
+        }
+      }
+    },
+
+    _llmOnProviderChange: function(which){
+      var providerKey = aeoi._val('aeoi-llm-primary-provider');
+      var prov = (STATE.llm.providers || []).find(function(p){ return p.provider_key === providerKey; });
+      var modelSel = document.getElementById('aeoi-llm-primary-model');
+      if(!modelSel) return;
+      var models = prov ? (prov.models || []) : [];
+      modelSel.innerHTML = models.length === 0
+        ? '<option value="">(default)</option>'
+        : models.map(function(m){ return '<option value="' + escHtml(m) + '">' + escHtml(m) + '</option>'; }).join('');
+    },
+
+    _llmAddFallback: function(provider, model){
+      var rowsEl = document.getElementById('aeoi-llm-fallback-rows');
+      var idx = rowsEl.children.length;
+      var rowId = 'aeoi-llm-fb-' + idx;
+      var providerOptions = (STATE.llm.providers || []).map(function(p){
+        return '<option value="' + escHtml(p.provider_key) + '"' + (p.provider_key === provider ? ' selected' : '') + '>' + escHtml(p.display_name) + '</option>';
+      }).join('');
+      var row = document.createElement('div');
+      row.id = rowId;
+      row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:center;margin-bottom:4px';
+      row.innerHTML = ''
+        + '<select class="aeoi-llm-fb-provider" style="padding:5px;border:1px solid var(--border-1,#e5e7eb);border-radius:4px;font-size:12px">' + providerOptions + '</select>'
+        + '<input type="text" class="aeoi-llm-fb-model" placeholder="model id" value="' + escHtml(model||'') + '" style="padding:5px;border:1px solid var(--border-1,#e5e7eb);border-radius:4px;font-size:12px;font-family:monospace">'
+        + '<button onclick="document.getElementById(\'' + rowId + '\').remove()" class="hm-btn hm-btn-sm" style="color:#dc2626">✕</button>';
+      rowsEl.appendChild(row);
+    },
+
+    submitLlmRuleForm: function(){
+      var routingId = aeoi._val('aeoi-llm-routing-id');
+      var payload = {
+        scope_type:       aeoi._val('aeoi-llm-scope-type'),
+        scope_value:      aeoi._val('aeoi-llm-scope-value').trim() || '*',
+        primary_provider: aeoi._val('aeoi-llm-primary-provider'),
+        primary_model:    aeoi._val('aeoi-llm-primary-model').trim() || null,
+        priority:         parseInt(aeoi._val('aeoi-llm-priority')) || 100,
+        is_enabled:       aeoi._checked('aeoi-llm-enabled'),
+        description:      aeoi._val('aeoi-llm-description').trim() || null,
+        fallback_chain:   []
+      };
+      if(routingId) payload.routing_id = parseInt(routingId);
+      var rows = document.querySelectorAll('#aeoi-llm-fallback-rows > div');
+      rows.forEach(function(row){
+        var p = row.querySelector('.aeoi-llm-fb-provider').value;
+        var m = row.querySelector('.aeoi-llm-fb-model').value.trim();
+        if(p) payload.fallback_chain.push({provider: p, model: m});
+      });
+      var errEl = document.getElementById('aeoi-llm-rule-err');
+      apiCall('admin_email_intake_llm_rule_save', payload, function(res){
+        if(!res.ok){
+          if(errEl){ errEl.textContent = 'Lỗi: ' + (res.error||'unknown') + ' — ' + (res.detail||''); errEl.style.display = 'block'; }
+          return;
+        }
+        aeoi.closeLlmRuleForm();
+        STATE.llm = null;
+        aeoi.loadLlmConfig();
+      });
+    },
+
+    deleteLlmRule: function(routingId, label){
+      if(!confirm('Xóa rule "' + label + '"?')) return;
+      apiCall('admin_email_intake_llm_rule_delete', {routing_id: routingId}, function(res){
+        if(!res.ok){ alert('Lỗi: ' + (res.error||'')); return; }
+        STATE.llm = null;
+        aeoi.loadLlmConfig();
+      });
+    },
+
     openWorkerForm: function(){
       var el = document.getElementById('aeoi-worker-modal');
       if(!el){

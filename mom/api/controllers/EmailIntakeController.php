@@ -10,6 +10,7 @@ use MOM\Api\Services\EmailIntakeCommitService;
 use MOM\Api\Services\EmailIntakeConfigService;
 use MOM\Api\Services\EmailIntakeValidationService;
 use MOM\Api\Services\EmailIntakeWorkerAuthService;
+use MOM\Api\Services\LlmExtractionRouterService;
 use MOM\Services\CustomerPurchaseOrderService;
 use MOM\Services\OrderService;
 use Throwable;
@@ -45,6 +46,7 @@ class EmailIntakeController extends BaseController
     private ?EmailIntakeCaseService $caseSvc = null;
     private ?EmailIntakeValidationService $validationSvc = null;
     private ?EmailIntakeCommitService $commitSvc = null;
+    private ?LlmExtractionRouterService $llmRouterSvc = null;
 
     private function db(): \MOM\Database\Connection
     {
@@ -115,6 +117,83 @@ class EmailIntakeController extends BaseController
     private function actor(array $user): string
     {
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
+    }
+
+    private function llmRouter(): LlmExtractionRouterService
+    {
+        if ($this->llmRouterSvc === null) {
+            $this->llmRouterSvc = new LlmExtractionRouterService($this->db());
+        }
+        return $this->llmRouterSvc;
+    }
+
+    // ── LLM Model routing (migration 207) ────────────────────────────────
+
+    public function llmProvidersList(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        try {
+            $this->success(['providers' => $this->llmRouter()->listProvidersForUi()]);
+        } catch (Throwable $e) {
+            $this->error('llm_providers_failed', 500, $e->getMessage());
+        }
+    }
+
+    public function llmRulesList(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        try {
+            $this->success(['rules' => $this->llmRouter()->listRulesForUi()]);
+        } catch (Throwable $e) {
+            $this->error('llm_rules_failed', 500, $e->getMessage());
+        }
+    }
+
+    public function llmRuleSave(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $this->requireCsrf();
+        try {
+            $row = $this->llmRouter()->saveRule($this->jsonBody(), $this->actor($user));
+            $this->auditLog('admin_email_intake_llm_rule_save', [
+                'scope_type'  => $row['scope_type']  ?? null,
+                'scope_value' => $row['scope_value'] ?? null,
+            ]);
+            $this->success(['rule' => $row, 'saved' => true]);
+        } catch (Throwable $e) {
+            $this->error('llm_rule_save_failed', 400, $e->getMessage());
+        }
+    }
+
+    public function llmRuleDelete(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $id   = (int)($body['routing_id'] ?? $body['id'] ?? 0);
+        if ($id <= 0) { $this->error('missing_id', 400, 'routing_id is required.'); }
+        try {
+            $this->llmRouter()->deleteRule($id);
+            $this->auditLog('admin_email_intake_llm_rule_delete', ['routing_id' => $id]);
+            $this->success(['deleted' => true, 'routing_id' => $id]);
+        } catch (Throwable $e) {
+            $this->error('llm_rule_delete_failed', 400, $e->getMessage());
+        }
+    }
+
+    public function llmHealth(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        try {
+            $this->success(['health' => $this->llmRouter()->healthAll()]);
+        } catch (Throwable $e) {
+            $this->error('llm_health_failed', 500, $e->getMessage());
+        }
     }
 
     // ── Config ────────────────────────────────────────────────────────────
@@ -612,7 +691,7 @@ class EmailIntakeController extends BaseController
             $row = $this->catalog()->getMailboxWithSecret($id);
             $imap = new \MOM\Api\Services\EmailIntakeImapService(
                 $this->db(), $this->catalog(), $this->svc(),
-                $this->caseSvc(), $this->validation()
+                $this->caseSvc(), $this->validation(), $this->dataDir
             );
             $result = $imap->pollMailbox($row, $this->actor($user));
 

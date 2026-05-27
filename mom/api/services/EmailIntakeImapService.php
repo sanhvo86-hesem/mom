@@ -53,7 +53,8 @@ final class EmailIntakeImapService
         private readonly EmailIntakeAdminCatalogService $catalog,
         private readonly EmailIntakeConfigService       $config,
         private readonly EmailIntakeCaseService         $cases,
-        private readonly EmailIntakeValidationService   $validation
+        private readonly EmailIntakeValidationService   $validation,
+        private readonly string                        $dataDir = ''
     ) {
         if (!extension_loaded('imap')) {
             throw new RuntimeException('PHP imap extension is not loaded on this server. Run: sudo apt install php-imap.');
@@ -392,19 +393,51 @@ final class EmailIntakeImapService
                 // extraction as a fallback. Cheap-first, AI-second policy:
                 // the well-templated emails get parsed deterministically;
                 // free-form ones fall through to Claude.
-                $claudeExtract = null;
-                if ($hdr['customer_id'] === ''
-                    && $hdr['customer_po_number'] === ''
-                    && OrderEmailParserService::isConfigured()) {
+                // If the deterministic header parser came up empty, run the
+                // LLM extraction router. The router picks a tier based on
+                // whether the email has a PDF attachment, then dispatches
+                // to the chosen provider (Ollama / Anthropic / etc.) with
+                // automatic fallback chain.
+                $claudeExtract     = null;
+                $extractionAttempts = [];
+                if ($hdr['customer_id'] === '' && $hdr['customer_po_number'] === '') {
+                    // Pre-extract text from PDF attachments. Result is fed
+                    // into the LLM prompt as `attachment_text`. We process
+                    // the FIRST pdf only (most POs are a single document)
+                    // and cache the extracted text on the attachment row
+                    // after addAttachment runs.
+                    $pdfText  = '';
+                    $pdfFname = '';
+                    foreach ($attachments as $att) {
+                        if (($att['extension'] ?? '') === 'pdf' && !empty($att['_bytes'])) {
+                            try {
+                                $pdfSvc  = new PdfExtractorService();
+                                $pdfRes  = $pdfSvc->extractFromBytes((string)$att['_bytes'], (string)$att['original_filename']);
+                                $pdfText = $pdfRes['text'];
+                                $pdfFname = (string)$att['original_filename'];
+                                break;
+                            } catch (Throwable $e) {
+                                @error_log('[AEOI PDF] uid=' . $uid . ' file=' . $att['original_filename'] . ' err=' . $e->getMessage());
+                            }
+                        }
+                    }
+
+                    // Choose tier: pdf-attached → extraction_pdf, else default.
+                    $tier = $pdfText !== '' ? 'extraction_pdf' : 'extraction_default';
+
                     try {
-                        $parser = new OrderEmailParserService();
-                        $claudeExtract = $parser->extractOrder($bodyText, [
+                        $router  = new LlmExtractionRouterService($this->db);
+                        $outcome = $router->extract($bodyText, [
                             'from_email'          => $fromEmail,
                             'subject'             => $subject,
                             'received_at'         => $receivedAt,
                             'internet_message_id' => $internetMsgId,
-                        ]);
-                        // Bridge Claude's fields into the same $hdr shape so
+                            'attachment_filename' => $pdfFname,
+                            'attachment_text'     => $pdfText,
+                        ], $tier);
+                        $claudeExtract      = $outcome['result'];
+                        $extractionAttempts = $outcome['attempts'];
+                        // Bridge LLM fields into the same $hdr shape so
                         // the rest of the flow doesn't branch.
                         $hdr['doc_type']           = (string)($claudeExtract['document_type'] ?? '');
                         $hdr['action']             = (string)($claudeExtract['action'] ?? '');
@@ -418,9 +451,13 @@ final class EmailIntakeImapService
                         $hdr['ship_to_name']       = (string)($claudeExtract['ship_to']['ship_to_name'] ?? '');
                         $hdr['ship_to_addr']       = (string)($claudeExtract['ship_to']['delivery_address'] ?? '');
                     } catch (Throwable $e) {
-                        @error_log('[AEOI Claude] uid=' . $uid . ' err=' . $e->getMessage());
-                        $claudeExtract = null; // fall through to empty
+                        @error_log('[AEOI LLM] uid=' . $uid . ' err=' . $e->getMessage());
                     }
+
+                    // Stash for case extracted_json + attachment cache below.
+                    $pdfTextCache = $pdfText;
+                } else {
+                    $pdfTextCache = '';
                 }
 
                 $case = $this->cases->createCase([
@@ -495,7 +532,45 @@ final class EmailIntakeImapService
                 }
 
                 foreach ($attachments as $att) {
-                    $this->cases->addAttachment($caseId, $messageId, $att);
+                    // Strip the in-memory bytes blob before persisting —
+                    // never write raw PDF bytes to the DB.
+                    $persistable = $att;
+                    unset($persistable['_bytes']);
+                    $this->cases->addAttachment($caseId, $messageId, $persistable);
+                }
+
+                // Cache the pdftotext output on the first PDF attachment row
+                // so a re-validation doesn't re-shell out to pdftotext.
+                if (($pdfTextCache ?? '') !== '') {
+                    $this->db->execute(
+                        'UPDATE email_intake_attachment
+                            SET pdf_text_extracted    = :p_text,
+                                pdf_text_extracted_at = NOW(),
+                                pdf_text_chars        = :p_chars
+                          WHERE case_id = :p_case
+                            AND extension = :p_ext
+                            AND pdf_text_extracted IS NULL
+                          LIMIT 1',
+                        [
+                            ':p_text'  => $pdfTextCache,
+                            ':p_chars' => mb_strlen($pdfTextCache),
+                            ':p_case'  => $caseId,
+                            ':p_ext'   => 'pdf',
+                        ]
+                    );
+                }
+
+                // Auto-create master-data records from extracted PO data so
+                // downstream validation + commit don't fail on "unknown
+                // customer" / "unknown part". Audit trail goes to
+                // aeoi_auto_created_record.
+                if (is_array($claudeExtract ?? null) && $this->dataDir !== '') {
+                    try {
+                        $auto = new AeoiAutoCreateService($this->db, $this->dataDir);
+                        $auto->createMissingMasterData($caseId, $claudeExtract, $actor);
+                    } catch (Throwable $e) {
+                        @error_log('[AEOI auto-create] case=' . $caseId . ' err=' . $e->getMessage());
+                    }
                 }
 
                 // Advance status: extraction_pending → extracted, then run the
@@ -679,6 +754,10 @@ final class EmailIntakeImapService
                     'storage_path'        => null,
                     'extracted_text_path' => null,
                     'ocr_status'          => 'not_required',
+                    // Decoded bytes retained in-memory for the duration of
+                    // this poll. The pollMailbox loop reads them to run
+                    // pdftotext on PDFs, then discards. NEVER persisted.
+                    '_bytes'              => $decoded,
                 ];
             }
             return;

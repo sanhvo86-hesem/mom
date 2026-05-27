@@ -1131,7 +1131,7 @@ final class ScheduledJobs
                     $this->db, $caseSvc, $configSvc
                 );
                 $imapSvc = new \MOM\Api\Services\EmailIntakeImapService(
-                    $this->db, $catalog, $configSvc, $caseSvc, $vSvc
+                    $this->db, $catalog, $configSvc, $caseSvc, $vSvc, $this->dataDir
                 );
 
                 foreach ($imapMailboxIds as $mid) {
