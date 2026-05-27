@@ -242,19 +242,38 @@ final class EmailIntakeImapService
             $mailbox['imap_last_uidvalidity'] = $serverUidvalidity;
         }
 
-        // imap_search by UID range. The "UID a:b" syntax wants UIDs.
-        // a = lastUid+1, b = '*' (the highest existing UID).
-        $criterion = 'UID ' . ($lastUid + 1) . ':*';
-        $uids = imap_search($conn, $criterion, SE_UID) ?: [];
+        // PHP's imap_search() does NOT accept the raw IMAP "UID a:b"
+        // criterion — it returns false with "Unknown search criterion: UID".
+        // Workaround: fetch ALL UIDs and filter in PHP. The set is bounded
+        // by the mailbox size and we cap to MAX_MESSAGES_PER_POLL anyway.
+        $allUids = imap_search($conn, 'ALL', SE_UID) ?: [];
+        if (!is_array($allUids) || $allUids === []) {
+            $this->persistCursor($mailboxId, $lastUid, $mailbox['imap_last_uidvalidity'] ?? null);
+            return ['fetched' => 0, 'created' => 0, 'skipped' => 0];
+        }
+
+        // Keep only UIDs strictly greater than our cursor, sorted ascending
+        // so we always advance the cursor monotonically.
+        $uids = array_values(array_filter(
+            array_map('intval', $allUids),
+            static fn(int $u) => $u > $lastUid
+        ));
+        sort($uids, SORT_NUMERIC);
+
         if ($uids === []) {
             $this->persistCursor($mailboxId, $lastUid, $mailbox['imap_last_uidvalidity'] ?? null);
             return ['fetched' => 0, 'created' => 0, 'skipped' => 0];
         }
 
-        // imap_search() returns UIDs in arbitrary order; sort ascending so
-        // we always advance the cursor monotonically.
-        sort($uids, SORT_NUMERIC);
-        $uids = array_slice($uids, 0, self::MAX_MESSAGES_PER_POLL);
+        // First-run safeguard: if the cursor was 0 (brand-new mailbox row)
+        // and the inbox is large, skip ancient mail by taking the NEWEST
+        // MAX_MESSAGES_PER_POLL only. Subsequent polls naturally process
+        // any new mail past the advanced cursor.
+        if ($lastUid === 0 && count($uids) > self::MAX_MESSAGES_PER_POLL) {
+            $uids = array_slice($uids, -self::MAX_MESSAGES_PER_POLL);
+        } else {
+            $uids = array_slice($uids, 0, self::MAX_MESSAGES_PER_POLL);
+        }
 
         $fetched = 0;
         $created = 0;
