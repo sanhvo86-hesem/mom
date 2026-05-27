@@ -154,7 +154,54 @@
 </div>
 <div class="callout warn">Không mở rộng bảng điều khiển bằng cách thêm số tùy ý. Mọi KPI mới phải đi qua ANNEX-127 và có data contract trước khi đưa vào hệ thống tính tự động.</div>
 </div> <div class="section">
-<h2>6. Benchmark anchors</h2>
+<h2>6. Pilot 90 ngày trước rollout/thưởng</h2>
+<div class="callout"><b>Quy tắc cứng:</b> Pilot 90 ngày là bắt buộc cho hồ sơ LAM/SEMSYSCO trước khi claim full rollout, claim customer-grade CTQ/Cpk hoặc bật thưởng tiền. Trong pilot, scorecard chỉ dùng để điều hành, corrective action và hiệu chuẩn; không dùng để chi tiền hoặc kỷ luật tự động.</div>
+<div class="grid-2">
+<div class="card">
+<h3>Phạm vi pilot</h3>
+<ul class="tight">
+<li>Chọn 1 value stream / customer profile: <span class="code">LAM_SEMSYSCO</span>.</li>
+<li>Giữ 7 scored core: <span class="code">OTD</span>, <span class="code">COMPLAINT_RATE</span>, <span class="code">FPY</span>, <span class="code">COPQ</span>, <span class="code">PLAN_ADHERENCE</span>, <span class="code">WIP_AGING</span>, <span class="code">MATERIAL_AVAILABILITY_PLAN</span>.</li>
+<li>Dùng driver panel để bảo vệ flow/chất lượng: constraint, CMM queue, material-cert-IQC, traceability, special process, check-dimension, 3D/8D.</li>
+<li>Giữ LAM evidence gates và CTQ/Cpk pilot bundle ở trạng thái evidence-first; chỉ graduate khi có bằng chứng.</li>
+</ul>
+</div>
+<div class="card">
+<h3>Trường bắt buộc trên bảng pilot</h3>
+<ul class="tight">
+<li>Trạng thái metric: runtime / manual / staged.</li>
+<li>Data confidence.</li>
+<li>Owner/action và due date.</li>
+<li>Blocker status và counter metric.</li>
+<li>Evidence completeness.</li>
+<li>Pilot learning notes khi có workaround, yellow/red kéo dài hoặc đề xuất prune metric.</li>
+</ul>
+</div>
+<div class="card">
+<h3>Nhịp rà soát</h3>
+<ul class="tight">
+<li>Hằng ngày: tier review để containment, owner/action và blocker removal.</li>
+<li>Hằng tuần: TOC/quality review để chốt constraint hiện tại, CMM/material/quality bottleneck và metric cần prune hoặc graduate.</li>
+<li>Hằng tháng: management review để rà data confidence, burden của role scorecard, dấu hiệu reward gaming và quyết định giữ/cắt scope pilot.</li>
+<li>Ngày 90: go/no-go review có kết luận rollout, kéo dài pilot hoặc rollback.</li>
+</ul>
+</div>
+<div class="card">
+<h3>Go / no-go</h3>
+<ul class="tight">
+<li><span class="code">check_kpi_integrity.php</span> giữ <b>P0 = 0</b> trong 30 ngày liên tục.</li>
+<li>Không còn lỗi canonical code hoặc tài liệu audit-facing.</li>
+<li>Metric staged không render thành score.</li>
+<li>Gate evidence pass/fail được dùng thật để giữ/phát hành.</li>
+<li>Complaint / 8D workflow hoạt động bằng timestamp và acceptance evidence.</li>
+<li>Có ít nhất 1 CTQ/Cpk pilot bundle chứng minh sample-policy discipline.</li>
+<li>Role scorecard dễ hiểu, không quá tải và không xuất hiện reward gaming.</li>
+</ul>
+</div>
+</div>
+<div class="callout warn"><b>Guardrail chống quan liêu:</b> metric nào không đổi quyết định giao hàng, chất lượng, flow, CTQ, compliance hoặc risk control trong 30 ngày thì phải prune, chuyển learning-only hoặc giải trình rõ trong monthly review.</div>
+</div> <div class="section">
+<h2>7. Benchmark anchors</h2>
 <ul class="tight small">
 <li>SAP Balanced Scorecard mô hình hóa strategy, objective, perspective, measure và initiative: <a href="https://help.sap.com/docs/SAP_ERP/32af182dce754f85af2e4cfcf876b8cf/b0a5cf535b804808e10000000a174cb4.html">SAP Help - Balanced Scorecard Elements</a>.</li>
 <li>SAP Theory of Constraints dùng critical constraint resource và drum-buffer-rope: <a href="https://help.sap.com/docs/SCMCSTOC/e152941d2dd14e62813b65953ae5bae1/91c473a45ff847d4a1ff0df5168f0a8d.html">SAP Help - Theory of Constraints</a>.</li>
@@ -163,7 +210,7 @@
 <li>OPC UA Machine Tools minh họa cách KPI máy cần job, quantity, status và order context để tính đúng: <a href="https://reference.opcfoundation.org/MachineTool/v101/docs/C">OPC Foundation - Machine Tool KPI Calculation</a>.</li>
 </ul>
 </div> <div class="section">
-<h2>7. Tài liệu liên kết</h2>
+<h2>8. Tài liệu liên kết</h2>
 <div class="table-card"><table class="table">
 <thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead>
 <tbody>
