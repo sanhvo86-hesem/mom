@@ -32,7 +32,9 @@ thead { display: table-header-group; }
  
 }
 .page-body { overflow-x: hidden; }
-.table-card, .table-block, .table-wrap { overflow-x: auto; overflow-y: visible !important; max-height: none !important; max-width: 100%; }
+.table-card, .table-block, .table-wrap { overflow: visible !important; max-height: none !important; max-width: 100%; }
+/* Keep table itself contained so wide tables wrap rather than horizontally scroll */
+.table-card table, .table-block table, .table-wrap table { table-layout: fixed; width: 100%; }
 table { max-width: 100%; table-layout: fixed; }
 td, th { max-width: 420px; overflow-wrap: anywhere; word-wrap: break-word; }
 .role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
