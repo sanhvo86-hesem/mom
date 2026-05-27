@@ -18320,6 +18320,9 @@
       "owner_role": "FIN",
       "cadence": "per-event",
       "data_source": "Epicor AR",
+      "manual_input_form": "Ship-to-invoice discrepancy and release log",
+      "evidence_form": "Shipment release register + invoice release timestamp log",
+      "manual_fallback": "Nếu feed Epicor AR chưa sẵn sàng, FIN phải ghi actual ship release time, invoice release time, discrepancy reason và approver vào log trước khi đóng G7.",
       "calculation_status": "staged_data_contract",
       "counter_metric": {
         "code": "SHIP_READY_TO_INVOICE_LT-CTR",
@@ -19683,6 +19686,9 @@
       "hold_release_rule": "Không phát hành cổng khi SPECIAL_RELEASE_COMPLIANCE đỏ/không đạt cho tới khi chủ sở hữu CDR ghi kết luận xử lý, biện pháp ngăn chặn và bằng chứng.",
       "lam_profile_link": "LAM_SEMSYSCO",
       "decision_action": "Khi không đạt: giữ cổng G7, yêu cầu QA hoàn tất bằng chứng CDR/hồ sơ ngoại lệ, ghi biện pháp ngăn chặn và chỉ phát hành sau khi được phê duyệt.",
+      "manual_input_form": "FRM-724 written special-release register",
+      "evidence_form": "Written customer special release letter + deviated-shipment approval record",
+      "manual_fallback": "Khi chưa có integration concession-to-shipment, QA ghi số waiver, ngày phê duyệt, customer approver, shipment reference và bằng chứng đính kèm trước khi cho phép G7 pass.",
       "backend_status": "manual_governed",
       "primary_endpoint": "GET /api/kpi/SPECIAL_RELEASE_COMPLIANCE",
       "manual_input_contract": {
@@ -19747,6 +19753,9 @@
       "owner_role": "CPS",
       "cadence": "per-event",
       "data_source": "shipment_marking_evidence",
+      "manual_input_form": "Special release marking verification log",
+      "evidence_form": "FRM-702 shipping checklist + load-carrier marking photo log",
+      "manual_fallback": "Khi chưa có feed marking runtime, CPS phải ghi shipment, special release reference, marking verifier, verification time và ảnh marking vào log trước khi G7 được phát hành.",
       "calculation_status": "staged_data_contract",
       "counter_metric": {
         "code": "SPECIAL_RELEASE_MARKING_COMPLIANCE-CTR",
@@ -19844,6 +19853,9 @@
       "owner_role": "QA",
       "cadence": "per-event",
       "data_source": "customer_gage_incident_log",
+      "manual_input_form": "Customer gage incident and notification log",
+      "evidence_form": "Incident record + customer notification email + CAPA reference",
+      "manual_fallback": "Khi chưa có event feed, QA ghi detected_at, customer_notified_at, incident reference, email evidence và approver vào log để giữ/phát hành G7 có kiểm soát.",
       "calculation_status": "staged_data_contract",
       "counter_metric": {
         "code": "CUSTOMER_GAGE_DAMAGE_UNSUITABLE_NOTIFICATION_LT-CTR",
@@ -22879,6 +22891,140 @@
       }
     ]
   },
+  "pilot_governance_program": {
+    "program_id": "LAM-CNC-KPI-90DAY-PILOT-2026-05",
+    "status": "active_design_baseline",
+    "authority_rule": "A 90-day pilot is mandatory before full rollout, customer-grade capability claims, or any monetary reward enablement for the LAM/Semsysco CNC KPI system.",
+    "reward_freeze_rule": "No monetary payout, payroll impact, or automatic discipline is authorized during the pilot. Scorecards remain management-review, corrective-action, and calibration instruments only.",
+    "pilot_scope": {
+      "customer_profile": "LAM_SEMSYSCO",
+      "value_stream": "Semiconductor CNC precision-machined parts from RFQ through shipment release and complaint closure.",
+      "scored_core": [
+        "OTD",
+        "COMPLAINT_RATE",
+        "FPY",
+        "COPQ",
+        "PLAN_ADHERENCE",
+        "WIP_AGING",
+        "MATERIAL_AVAILABILITY_PLAN"
+      ],
+      "strategic_driver_panel": [
+        "CURRENT_CONSTRAINT_RESOURCE",
+        "CONSTRAINT_LOST_HOURS",
+        "CONSTRAINT_STARVED_TIME",
+        "CMM_QUEUE_AGING",
+        "FINAL_INSPECTION_QUEUE_AGING",
+        "MATERIAL_CERT_VERIFICATION_COMPLETENESS",
+        "IQC_RELEASE_ON_TIME",
+        "LAM_MATERIAL_KIT_READY_TO_PLAN",
+        "TRACEABILITY_LABEL_VERIFIED",
+        "SPECIAL_PROCESS_REQUIREMENT_CLEAR",
+        "CHECK_DIM_REPORT_ON_SHIP",
+        "NCR_3D_RESPONSE_SLA",
+        "NCR_8D_UPDATE_SLA"
+      ],
+      "lam_evidence_gates": [
+        "CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED",
+        "CSR_ACKNOWLEDGEMENT_RATE",
+        "RFQ_FEASIBILITY_STUDY_COMPLETENESS",
+        "INSPECTION_PLAN_COMPLETENESS",
+        "MATERIAL_CERT_VERIFICATION_COMPLETENESS",
+        "IQC_RELEASE_ON_TIME",
+        "LAM_MATERIAL_KIT_READY_TO_PLAN",
+        "GAGE_VALID_FOR_RELEASE",
+        "CHECK_DIM_REPORT_ON_SHIP",
+        "SPECIAL_RELEASE_COMPLIANCE",
+        "SPECIAL_RELEASE_MARKING_COMPLIANCE"
+      ],
+      "ctq_cpk_pilot_bundle": [
+        "CTQ_SAMPLE_POLICY_STATUS",
+        "CPK_PRODUCT_MIN_CTQ",
+        "GAGE_VALID_FOR_CTQ_MEASUREMENT",
+        "POST_CHANGE_CPK_REVALIDATION"
+      ],
+      "customer_quality_simulation": [
+        "CUSTOMER_NCR_SEVERITY_SCORE",
+        "CUSTOMER_NCR_EVENTS_M",
+        "DEFECTIVE_ORDER_RATE_M",
+        "NO_LATE_NO_NCR_COUNTER",
+        "NCR_3D_RESPONSE_SLA",
+        "NCR_4D_PRELIMINARY_SLA",
+        "NCR_8D_UPDATE_SLA",
+        "CUSTOMER_ACCEPTED_8D_CLOSURE_RATE"
+      ]
+    },
+    "pilot_dashboard_contract": {
+      "required_fields": [
+        "metric_code",
+        "metric_status_runtime_manual_staged",
+        "data_confidence_level",
+        "owner_role",
+        "owner_action",
+        "owner_action_due_date",
+        "blocker_status",
+        "counter_metric_status",
+        "evidence_completeness_status",
+        "pilot_learning_notes"
+      ],
+      "status_rule": "Every pilot card must show runtime/manual/staged explicitly. Staged metrics may appear for action and learning, but never as scored numeric performance.",
+      "learning_rule": "Pilot learning notes are mandatory when a metric stays yellow/red for more than one review cadence, when a manual workaround is used, or when the team proposes pruning the metric.",
+      "pruning_rule": "Any metric not used in a real decision for 30 consecutive days must be pruned, downgraded to learning-only, or explicitly justified in the monthly pilot review."
+    },
+    "review_cadence": [
+      {
+        "forum": "daily_tier_review",
+        "purpose": "Containment, blocker removal, owner/action follow-up, and runtime-manual-staged visibility.",
+        "required_outputs": [
+          "red metric owner and due date",
+          "open blocker status",
+          "evidence completeness gap",
+          "pilot learning note when workaround is used"
+        ]
+      },
+      {
+        "forum": "weekly_toc_quality_review",
+        "purpose": "Review constraint movement, CMM queue, LAM gate evidence, CTQ sample readiness, and complaint/8D discipline.",
+        "required_outputs": [
+          "current constraint decision",
+          "CMM / material / quality bottleneck actions",
+          "metrics to prune or graduate",
+          "risk list for the next week"
+        ]
+      },
+      {
+        "forum": "monthly_management_review",
+        "purpose": "Check pilot learning, scorecard comprehensibility, data confidence trend, and reward-gaming signals.",
+        "required_outputs": [
+          "pilot scope kept or cut",
+          "data confidence trend",
+          "role scorecard burden review",
+          "reward freeze reaffirmed"
+        ]
+      },
+      {
+        "forum": "day_90_go_no_go",
+        "purpose": "Decide rollout, extension, or rollback using evidence instead of opinion.",
+        "required_outputs": [
+          "go/no-go verdict",
+          "metrics approved for graduation",
+          "metrics kept staged/manual",
+          "explicit risks and owner path"
+        ]
+      }
+    ],
+    "go_no_go_criteria": [
+      "CI guard P0 = 0 for 30 consecutive days.",
+      "No canonical code or audit-facing document defect remains open.",
+      "Staged metrics are never rendered as scored values.",
+      "Gate evidence pass/fail is actually used in release decisions.",
+      "Customer complaint and 8D workflow operates with factual timestamps and acceptance evidence.",
+      "At least one CTQ/Cpk pilot bundle shows validated sample-policy discipline.",
+      "Role scorecards are understandable, calibrated, and not overloaded.",
+      "No reward gaming or hidden bypass pattern is observed during the pilot."
+    ],
+    "graduation_rule": "A metric graduates only with evidence: approved data contract, stable decision use, acceptable burden, clean anti-gaming review, and forum-approved owner path.",
+    "bureaucracy_guardrail": "If a metric creates reporting work but does not change delivery, quality, flow, CTQ, compliance, or risk-control decisions, remove it from the pilot."
+  },
   "scorecard_evidence_contracts": {
     "OTD": {
       "scorecard_scoring_status": "active_runtime",
@@ -23320,10 +23466,13 @@
       "name_vi",
       "value_or_status",
       "calculation_status",
+      "data_confidence_level",
       "min_sample_or_insufficient_data_reason",
       "owner_role",
       "next_action_if_red",
+      "blocker_status",
       "counter_metric_status",
+      "evidence_completeness_status",
       "trend",
       "evidence_source_or_link",
       "last_calculated_or_input_time",
@@ -23331,6 +23480,7 @@
       "bsc_perspective",
       "review_forum",
       "staged_flag",
+      "pilot_learning_notes",
       "owner_action_due_date",
       "cause_breakdown",
       "driver_panel_role"
