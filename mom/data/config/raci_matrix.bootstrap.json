@@ -1,5 +1,5 @@
 {
-  "schema_version": 6,
+  "schema_version": 7,
   "updated_at": "2026-05-21T08:56:06.309513Z",
   "updated_by": "bootstrap-extract",
   "reason": "Initial seed extracted from RACI-MASTER-MATRIX §5 gate matrix",
@@ -24,7 +24,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Tiếp nhận RFQ và làm rõ yêu cầu khách hàng",
+      "level_hint_html": "<b>L1:</b> CS làm rõ RFQ ≤24 giờ · <b>L2:</b> EST + ENGM rà soát gói kỹ thuật ≤48 giờ · <b>L3:</b> CEO leo thang nếu RFQ treo &gt; L2 hoặc khách không phản hồi &gt;72 giờ. <b>VD thực chiến:</b> Lam Research gửi RFQ 50 wafer chuck Inconel 718 rev C — CS clarify khoảng trống GD&amp;T trong ngày, ENGM rà soát workpiece holding + tooling khả thi trước khi báo giá. Xem <a href=\"authority-matrix.html#cdr-A1\">Auth A1</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G0</a>",
@@ -46,7 +48,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt báo giá theo bậc giá trị",
+      "level_hint_html": "<b>L1:</b> EST ký báo giá ≤3000 USD · <b>L2:</b> CEO ký &gt;3000 USD sau khi EST hoàn tất bảng giá + biên gộp. <b>Leo thang:</b> Biên gộp &lt;30% → CEO. <b>VD:</b> Báo giá lot Aluminum 6061 50 chi tiết ~$2800 → EST tự ký; lot Inconel 30 chi tiết ~$5200 → CEO duyệt sau review margin. Xem <a href=\"authority-matrix.html#cdr-A2\">Auth A2</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G0</a>",
@@ -68,7 +72,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt chiết khấu / điều kiện thương mại ngoại lệ",
+      "level_hint_html": "<b>L1:</b> EST đề xuất &gt;0% chiết khấu → CEO duyệt mọi trường hợp. <b>VD:</b> Khách Applied Materials xin chiết khấu 8% cho lot mở rộng 100 chi tiết → EST chuẩn bị bảng tính ảnh hưởng dòng tiền, CEO ký quyết định. Không EST nào được tự duyệt chiết khấu. Xem <a href=\"authority-matrix.html#cdr-A3\">Auth A3</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G0</a>",
@@ -90,7 +96,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt điều kiện thanh toán ngoại lệ",
+      "level_hint_html": "<b>L1:</b> EST chuẩn bị hồ sơ ≤NET30, CS xác nhận yêu cầu · <b>L2:</b> &gt;NET30 → CEO duyệt. <b>Leo thang:</b> Khách có nợ quá hạn hoặc tăng rủi ro dòng tiền → CEO. <b>VD:</b> Khách mới xin NET45 cho đơn $50K → CEO duyệt sau rà soát tín dụng + hợp đồng cụ thể. Xem <a href=\"authority-matrix.html#cdr-A4\">Auth A4</a>. <b>R thay đổi (sync 2026-05):</b> EST=R (chuẩn bị hồ sơ + đề xuất terms), CS=A (xác nhận yêu cầu + ký FRM-202 L1); CEO=C ở L2 khi vượt NET30."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G0</a>",
@@ -112,7 +120,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Chấp thuận đơn hàng và xem xét hợp đồng",
+      "level_hint_html": "<b>L1:</b> CS xác nhận hồ sơ ≤24 giờ · <b>L2:</b> EST + ENGM + QA rà soát rủi ro kỹ thuật · <b>L3:</b> CEO ký khi giá/lịch/phạm vi vượt chuẩn. <b>VD:</b> Lam Research xác nhận đơn 200 wafer chuck — PD đồng ký kết luận khả thi (năng lực máy + đồ gá + lịch giao) trước khi phát hành lệnh. Mẫu/prototype vẫn yêu cầu FAIR Form 1+2. Xem <a href=\"authority-matrix.html#cdr-A5\">Auth A5</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G0</a>",
@@ -134,7 +144,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt yêu cầu thay đổi của khách hàng (CCR) ảnh hưởng giá / lịch / phạm vi",
+      "level_hint_html": "<b>L1:</b> CS + PPL xử lý CCR tác động ≤1 ngày giao hoặc 2% giá trị · <b>L2:</b> ENGM + QA + PD rà soát ≤3 ngày hoặc 5% · <b>L3:</b> CEO duyệt vượt L2 hoặc G5–G7 hoặc đụng cam kết. <b>VD:</b> Khách đổi 1 GD&amp;T feature ở G1 — ENGM + QA đánh giá impact 1 ngày, PPL chỉnh lịch. Nếu chạm CTQ → CEO + QA leo thang. Xem <a href=\"authority-matrix.html#cdr-A6\">Auth A6</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G1</a>",
@@ -156,7 +168,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "<a class=\"entity-link role-link\" href=\"../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html\">DFM</a> rà soát và phân loại rủi ro kỹ thuật",
+      "level_hint_html": "<b>L1:</b> PE phân loại rủi ro thấp ≤48 giờ · <b>L2:</b> ENGM duyệt rủi ro trung bình hoặc ≥3 điểm chưa rõ · <b>L3:</b> ENGM + PD khi rủi ro cao, ≥5 điểm chưa rõ hoặc CTQ chưa xác nhận. <b>VD:</b> Chi tiết mới có 3 dung sai &lt;±0.01mm trên vật liệu Inconel — PE flag rủi ro trung bình, ENGM review tooling + đo kiểm. Xem <a href=\"authority-matrix.html#cdr-B1\">Auth B1</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G1</a>",
@@ -178,7 +192,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt phát hành kỹ thuật / gói nền",
+      "level_hint_html": "<b>L1:</b> ENGM phát hành gói tiêu chuẩn ≤1 lần sửa · <b>L2:</b> ENGM + QA nếu ảnh hưởng CTQ hoặc kế hoạch kiểm · <b>L3:</b> + PD khi ảnh hưởng &gt;1 nguyên công trọng yếu. <b>VD:</b> Gói kỹ thuật cho lot wafer chuck mới đầy đủ BOM + quy trình công nghệ + Control Plan — ENGM ký sau pilot dry-run đạt; CTQ pos tolerance → +QA. Xem <a href=\"authority-matrix.html#cdr-B2\">Auth B2</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G1</a>",
@@ -200,7 +216,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt lệnh thay đổi kỹ thuật (ECO)",
+      "level_hint_html": "<b>L1:</b> ENGM duyệt ECO nội bộ tác động ≤1 công đoạn · <b>L2:</b> + QA ảnh hưởng cổng chất lượng · <b>L3:</b> + PD ECO đụng nhiều nguyên công hoặc đổi nguồn vật tư. <b>Bắt buộc đồng ký ENGM+QA+PPL khi lệnh đã G3+.</b> <b>VD:</b> Đổi feed rate trên rãnh phay 1 nguyên công → ENGM duyệt; đổi vị trí gia công sang máy khác workshop → +PD. Xem <a href=\"authority-matrix.html#cdr-B3\">Auth B3</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G1</a>",
@@ -222,7 +240,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt Package Supersedure và Withdrawal",
+      "level_hint_html": "<b>L1:</b> ENGM rút gói chưa phát hành ≤24 giờ · <b>L2:</b> + QA rút gói đã dùng cho lệnh đang mở · <b>L3:</b> + PD khi lệnh đang chạy nhưng chưa giao hàng. <b>VD:</b> Phát hiện sai vật liệu trên gói kỹ thuật JO-815 sau khi đã phát hành — ENGM rút gói rev A, phát rev B, QA xác nhận lô đang chạy chưa bị ảnh hưởng. Xem <a href=\"authority-matrix.html#cdr-B4\">Auth B4</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G1</a>",
@@ -244,7 +264,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt Control Plan và PFMEA trước khi phát hành gói nền",
+      "level_hint_html": "<b>L1:</b> QA + ENGM khi không phát sinh CTQ mới · <b>L2:</b> + PD khi có CTQ mới hoặc đổi nguyên công trọng yếu · <b>L3:</b> QA + CEO khi khách yêu cầu phê duyệt PFMEA hoặc thuộc PPAP. <b>VD:</b> PFMEA cho chi tiết Inconel mới với 2 CTQ và rãnh phay 3D — QA + ENGM ký sau review failure modes; nếu khách AMAT yêu cầu PPAP → +CEO. Xem <a href=\"authority-matrix.html#cdr-B8\">Auth B8</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G2</a>",
@@ -266,7 +288,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phát hành kế hoạch đưa lệnh xuống xưởng",
+      "level_hint_html": "<b>L1:</b> PPL phát hành lệnh tiêu chuẩn ≤1 dây chuyền/1 ca · <b>L2:</b> PD nếu rủi ro công suất hoặc vật tư chờ ≤2 ngày · <b>L3:</b> PD khi vật tư chờ &gt;2 ngày hoặc thiếu cổng bắt buộc có kế hoạch khắc phục. <b>Leo thang CEO+CS</b> khi vỡ cam kết khách (FAI/PPAP đã cam kết). <b>VD:</b> PPL phát hành JO-820 cho M-08 cùng workshop, năng lực + vật tư + gói kỹ thuật đầy đủ → tự ký FRM-501; thiếu wafer wait 3 ngày → +PD. Xem <a href=\"authority-matrix.html#cdr-C1\">Auth C1</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G2</a>",
@@ -288,7 +312,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Nghiệm thu vật tư mua vào, đối chiếu chứng chỉ truy xuất và sàng lọc hàng giả",
+      "level_hint_html": "<b>L1:</b> QCL nghiệm thu khi chứng chỉ đầy đủ + truy xuất rõ + đạt kiểm mẫu · <b>L2:</b> QA + ENGM xử lý sai lệch nhỏ hoặc thiếu chứng chỉ không trọng yếu · <b>L3:</b> QA + SCM xử lý sai lệch trọng yếu hoặc kiểm fail, vật tư có thể trả NCC. <b>Leo thang CEO+QA+khách</b> khi nghi hàng giả, sai vật liệu hoặc vật tư khách chỉ định. <b>VD:</b> Lot Inconel 718 đến kho — cert đầy đủ, mill test report match, QCL kiểm 5 chi tiết đạt → nghiệm thu trong giờ; lot# mismatch → +QA. Xem <a href=\"authority-matrix.html#cdr-D10\">Auth D10</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G2</a>",
@@ -310,7 +336,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt PO theo bậc giá trị",
+      "level_hint_html": "<b>L1:</b> ≤1M VND — mua hàng phát hành khi có yêu cầu đã xác nhận · <b>L2:</b> ≤10M — SCM duyệt sau kiểm nhu cầu/giá/ngày · <b>L3:</b> 10–100M — SCM phát hành PO khi NCC đã qualify, không đụng khách chiến lược. <b>Leo thang CEO+SCM</b> khi &gt;100M, NCC mới rủi ro cao hoặc ảnh hưởng giao hàng khách chiến lược. <b>VD:</b> Mua dao endmill carbide cho Aluminum 6061 = 8M VND, NCC đã qualify → SCM ký PO. Xem <a href=\"authority-matrix.html#cdr-E1\">Auth E1</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G2</a>",
@@ -332,7 +360,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt nhà cung cấp mới (qualify)",
+      "level_hint_html": "<b>L1:</b> SCM đánh giá NCC rủi ro thấp sau hồ sơ đủ ≤30 ngày · <b>L2:</b> + QA đánh giá NCC trọng yếu hoặc ≤2 NC nghiêm trọng · <b>L3:</b> CEO duyệt nếu NCC trọng yếu chưa đóng NC nhưng cần dùng. <b>Leo thang QA+CEO</b> khi đánh giá không đạt hoặc thiếu chứng nhận bắt buộc. <b>VD:</b> Khách AMAT yêu cầu dùng NCC mới cho coating PVD — SCM + QA audit NCC tại chỗ, đánh giá ISO 9001 + record CoC mẫu trước khi qualify. Xem <a href=\"authority-matrix.html#cdr-E2\">Auth E2</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G2</a>",
@@ -354,7 +384,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt đơn mua khẩn / vật tư khẩn",
+      "level_hint_html": "<b>L1:</b> ≤2M VND — BUY + SCM xác nhận lý do khẩn + nguồn · <b>L2:</b> ≤20M — SCM duyệt sau chứng minh không có tồn kho/thay thế · <b>L3:</b> 20–100M khi NCC đã qualify + có bằng chứng. <b>Leo thang CEO+SCM</b> khi &gt;100M hoặc ảnh hưởng giao hàng khách. <b>Đặc biệt:</b> NCC ngoài AVL → CEO+QA cùng ký + FRM-406. <b>VD:</b> Dao endmill đột nhiên hỏng giữa ca, không có dao thay thế trong kho → SCM ký mua khẩn 15M qua NCC qualify. Xem <a href=\"authority-matrix.html#cdr-E5\">Auth E5</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -376,7 +408,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt điều phối ngày/ca",
+      "level_hint_html": "<b>L1:</b> <a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-shift-leader.html\">SL</a> hoặc <a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-production-planner.html\">PPL</a> điều phối ≤1 ca không đổi ưu tiên lệnh khác · <b>L2:</b> <a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html\">WKM</a> + PPL khi đổi thứ tự trong ngày · <b>L3:</b> <a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-production-director.html\">PD</a> khi đổi ưu tiên trễ lệnh khác &gt;1 ngày giao hàng. <b>SL không có cột riêng trong bảng nhưng giữ A tại L1 theo Auth C2</b> — xem <a href=\"authority-matrix.html#cdr-C2\">Auth C2</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -398,7 +432,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt phá băng lịch / đổi ưu tiên khẩn cấp",
+      "level_hint_html": "<b>L1:</b> PPL đổi lịch tác động ≤1 ngày giao hàng · <b>L2:</b> PD duyệt tác động ≤3 ngày · <b>L3:</b> PD duyệt tác động ≤5 ngày khi không đụng khách chiến lược. <b>Leo thang CEO+CS</b> khi tác động &gt;5 ngày, đụng Lam/AMAT hoặc cần đổi cam kết đã xác nhận — xem <a href=\"authority-matrix.html#cdr-C3\">Auth C3</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -420,7 +456,9 @@
         "EHS": "C",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt thay đổi cài đặt máy ngoài kế hoạch",
+      "level_hint_html": "<b>L1:</b> WKM duyệt cài đặt lệch nhỏ ≤1 giờ (không CTQ, không cần lập lại first piece) · <b>L2:</b> PD + ENGM nếu tác động ≤1 ca · <b>L3:</b> PD + QA khi tác động ≤1 ngày hoặc cần lập lại mẫu đầu tiên. <b>Leo thang CEO+QA</b> khi cài đặt đổi tăng rủi ro CTQ hoặc khách yêu cầu chứng kiến — xem <a href=\"authority-matrix.html#cdr-C4\">Auth C4</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -442,7 +480,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt chuyển việc giữa máy/ca",
+      "level_hint_html": "<b>L1:</b> WKM duyệt chuyển nội bộ giữa máy có cùng năng lực đã xác nhận · <b>L2:</b> + PD + QA nếu CTQ hoặc mẫu đầu tiên cần lập lại · <b>L3:</b> + PD + QA khi đổi nguồn năng lực máy hoặc cần lập lại first piece. <b>Leo thang CEO+CS</b> khi chuyển làm trễ &gt;1 ngày đụng khách chiến lược. <b>VD:</b> M-07 alarm spindle → chuyển JO-821 sang M-12 cùng cấp năng lực, không CTQ → WKM ký FRM-518 trong 15 phút. Xem <a href=\"authority-matrix.html#cdr-C5\">Auth C5</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -464,7 +504,9 @@
         "EHS": "",
         "HR": "C",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt OT theo bậc giờ",
+      "level_hint_html": "<b>L1:</b> WKM phối hợp PPL ra phiếu OT ≤4 giờ/người/ca · <b>L2:</b> PD duyệt OT ≤16 giờ/người/tuần hoặc kéo dài &gt;1 tuần liên tiếp · <b>L3:</b> PD duyệt OT &gt;2 tuần liên tiếp hoặc tổng chi phí lệnh &gt;50 triệu VND. <b>Leo thang CEO+HR</b> khi OT do thiếu người hệ thống, crash máy hoặc tổng OT lệnh &gt;200 triệu VND — xem <a href=\"authority-matrix.html#cdr-C6\">Auth C6</a>. <b>R thay đổi (sync 2026-05):</b> PPL=R (lập phiếu OT theo lệnh sản xuất + đăng ký HR), WKM=A (ký FRM-504 L1 ≤4h/người/ca); PD=C ở L2+ khi OT kéo dài hoặc &gt;16h/tuần."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -486,7 +528,9 @@
         "EHS": "C",
         "HR": "C",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt phục hồi tiến độ sau dừng máy hoặc va chạm máy",
+      "level_hint_html": "<b>L1:</b> WKM + PPL tái điều phối tác động ≤2 ngày giao hàng (PD nhận thông tin trong 1h; RCA sơ bộ ≤4h) · <b>L2:</b> PD + ENGM duyệt phục hồi ≤4 ngày cần OT/đổi tổ vận hành/hoán đổi máy (RCA chính thức ≤24h, SEMI E10) · <b>L3:</b> PD + SCM duyệt phục hồi ≤7 ngày cần gia công ngoài/đổi vật tư/đẩy ca đêm, bắt buộc phương án B. <b>Leo thang CEO+CS+Maintenance Lead</b> khi tác động &gt;7 ngày, crash thiệt hại &gt;500 triệu VND, lặp ≥3 lần/90 ngày — xem <a href=\"authority-matrix.html#cdr-C7\">Auth C7</a> <i>(L1 nâng từ 1 → 2 ngày, L2 từ 3 → 4, L3 từ 5 → 7 theo rà soát 2026-05 — giảm tải PD ở L1 thường xuyên).</i>"
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -508,7 +552,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Đổi dao / dụng cụ ngoài kế hoạch trong gia công (dao gãy, mòn quá ngưỡng, đổi geometry)",
+      "level_hint_html": "<b>L1:</b> SET đổi dao cùng spec/geometry, kiểm cài đặt + chi tiết đầu kế tiếp đạt; ghi FRM-515. WKM nhận thông tin trong ca · <b>L2:</b> SET + WKM duyệt khi đổi dao khác spec hoặc cần đổi feed/speed; kiểm chi tiết đầu sau đổi · <b>L3:</b> WKM + QA + ENGM khi đụng CTQ, cần first piece chính thức, hoặc nghi chi tiết vừa chạy bị ảnh hưởng. <b>Leo thang CEO+QA</b> khi tool failure lặp lại ≥3x/30 ngày, scrap &gt;30M VND, hoặc khách chiến lược. <b>VD thực chiến:</b> Endmill carbide trên M-08 gãy giữa JO-823 — SET đổi insert cùng spec, kiểm 5 chi tiết tiếp theo bằng calipers, không CTQ → WKM nhận thông tin, ghi FRM-515 trong ca. Xem <a href=\"authority-matrix.html#cdr-C8\">Auth C8</a>. <b>Lưu ý cột R:</b> SET (Kỹ thuật viên cài đặt) là người trực tiếp đổi dao nhưng không có cột riêng trong RACI 11-cột; PPL=R đại diện vì PPL phối hợp lệnh sản xuất + ghi nhận tác động lịch khi tool change xảy ra."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -530,7 +576,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phát hành chương trình <a class=\"entity-link role-link\" href=\"../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html\">CAM</a>/NC (mới + sửa đổi)",
+      "level_hint_html": "<b>L1:</b> CAM phát hành chương trình nội bộ sau kiểm chéo · <b>L2:</b> + ENGM + QA nếu CTQ, đồ gá mới hoặc đường chạy dao sửa lớn · <b>L3:</b> + PD chương trình có CTQ + đồ gá mới + đổi phương pháp gia công. <b>VD:</b> Mã NC mới cho rãnh GD&amp;T pos 0.02 trên Inconel — CAM viết, ENGM + QA review simulation trước khi release ra xưởng. Xem <a href=\"authority-matrix.html#cdr-B5\">Auth B5</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -552,7 +600,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt Pilot/Dry-run trước loạt",
+      "level_hint_html": "<b>L1:</b> PE + WKM duyệt chạy thử ≤1 máy/1 ca · <b>L2:</b> ENGM + QA loạt thử có CTQ hoặc khách chứng kiến · <b>L3:</b> + PD ≤1 lô/1 ca có CTQ hoặc khách chứng kiến video. <b>VD:</b> Pilot 5 chi tiết trên máy M-12 với chương trình mới — PE + WKM ký phiếu chạy thử FRM-106, QA kiểm mẫu đầu trước khi vào loạt. Xem <a href=\"authority-matrix.html#cdr-B6\">Auth B6</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -574,7 +624,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt yêu cầu gia công ngoài",
+      "level_hint_html": "<b>L1:</b> SCM kiểm NCC + điều kiện giao nhận · <b>L2:</b> + ENGM + QA ký điều kiện kỹ thuật/chất lượng + xác nhận đầu vào · <b>L3:</b> + ENGM + QA khi NCC đã được phê duyệt + CTQ không trọng yếu. <b>Leo thang CEO+QA</b> khi đụng CTQ trọng yếu hoặc NCC chưa qualify. <b>VD:</b> Gửi chi tiết Inconel ra ngoài nhiệt luyện — SCM + ENGM + QA ký FRM-403 ghi rõ hardness target + spec cooling rate. Xem <a href=\"authority-matrix.html#cdr-E3\">Auth E3</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -596,7 +648,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt giao gia công ngoài và xác minh đầu vào",
+      "level_hint_html": "<b>L1:</b> SCM kiểm NCC + điều kiện giao nhận khi hàng về · <b>L2:</b> + ENGM + QA ký điều kiện kỹ thuật/chất lượng · <b>L3:</b> + ENGM + QA khi NCC đã phê duyệt + CTQ không trọng yếu. <b>Leo thang CEO+QA</b> đụng CTQ trọng yếu. <b>VD:</b> Hàng nhiệt luyện 50 chi tiết Inconel về → IQC kiểm hardness ngẫu nhiên 5 chi tiết bằng Rockwell, SCM ký FRM-411 nếu pass. Xem <a href=\"authority-matrix.html#cdr-E4\">Auth E4</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -618,7 +672,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt đơn mua khẩn / vật tư khẩn",
+      "level_hint_html": "<b>L1:</b> ≤2M VND — BUY + SCM xác nhận lý do khẩn + nguồn · <b>L2:</b> ≤20M — SCM duyệt sau chứng minh không có tồn kho/thay thế · <b>L3:</b> 20–100M khi NCC đã qualify + có bằng chứng. <b>Leo thang CEO+SCM</b> khi &gt;100M hoặc ảnh hưởng giao hàng khách. <b>Đặc biệt:</b> NCC ngoài AVL → CEO+QA cùng ký + FRM-406. <b>VD:</b> Dao endmill đột nhiên hỏng giữa ca, không có dao thay thế trong kho → SCM ký mua khẩn 15M qua NCC qualify. Xem <a href=\"authority-matrix.html#cdr-E5\">Auth E5</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -640,7 +696,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Xử lý ngoại lệ tài sản khách hàng",
+      "level_hint_html": "<b>L1:</b> CS + SCM xử lý ngoại lệ ≤5M VND · <b>L2:</b> QA + CS + CEO khi ảnh hưởng sản phẩm hoặc truy xuất · <b>L3:</b> CEO + khách ký khi tài sản mất/hỏng hoặc cần bồi hoàn. <b>Leo thang CEO+QA</b> khi không truy xuất được hoặc có thiệt hại. <b>VD:</b> Khuôn khách gửi để gia công bị xước nhẹ trong vận chuyển → CS + SCM ghi nhận FRM-221, QA đánh giá impact lên độ chính xác chi tiết. Xem <a href=\"authority-matrix.html#cdr-E7\">Auth E7</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -662,7 +720,9 @@
         "EHS": "",
         "HR": "",
         "IT": "A"
-      }
+      },
+      "activity_label": "Phê duyệt yêu cầu cấp, đổi hoặc gỡ quyền CNTT",
+      "level_hint_html": "<b>L1:</b> ITA xử lý quyền tiêu chuẩn ≤24 giờ hành chính · <b>L2:</b> ESA + người sở hữu duyệt quyền nhạy cảm hoặc ngoại lệ SoD · <b>L3:</b> ITA + ESA duyệt quyền nhạy cảm có thời hạn ≤30 ngày theo SoD. <b>Leo thang CEO</b> khi cấp quyền đặc quyền (root/admin DB/bypass) hoặc gia hạn nhạy cảm &gt;30 ngày. <b>VD:</b> Cấp quyền edit BOM cho engineer mới qua thử việc → ITA mở quyền sau ENGM duyệt FRM-141. Xem <a href=\"authority-matrix.html#cdr-F1\">Auth F1</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -684,7 +744,9 @@
         "EHS": "",
         "HR": "",
         "IT": "R"
-      }
+      },
+      "activity_label": "Phê duyệt truy cập ERP khẩn cấp",
+      "level_hint_html": "<b>L1:</b> ESA kích hoạt ≤2 giờ + ghi FRM-141 · <b>L2:</b> Kéo dài đến 8 giờ — ESA + CEO đồng ý, đóng quyền ngay sau khôi phục · <b>L3:</b> &gt;8 giờ hoặc rủi ro dữ liệu — CEO duyệt gia hạn. <b>Leo thang CEO</b> khi quyền còn mở sau hạn, sửa dữ liệu nhạy cảm hoặc ảnh hưởng audit trail. <b>VD:</b> ERP cần fix lỗi sau-giờ cho lệnh giao mai → ESA kích hoạt 90 phút, đóng quyền + nhật ký truy cập đầy đủ. Xem <a href=\"authority-matrix.html#cdr-F2\">Auth F2</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -706,7 +768,9 @@
         "EHS": "",
         "HR": "A",
         "IT": ""
-      }
+      },
+      "activity_label": "Kích hoạt phó / đại diện vai trò trọng yếu (FRM-504)",
+      "level_hint_html": "<b>L1:</b> Trưởng tuyến (DIRECT_LINE_MGRS — PD/WKM/ENGM/QA/SCM tùy vai trò bị kích hoạt phó) trigger kích hoạt sau A vắng ≥4 giờ trong ca hoặc ≥24 giờ hành chính, HR ghi nhật ký FRM-504 · <b>L2:</b> CEO xác nhận nếu vai trò trọng yếu hoặc đang ở G5–G7 · <b>L3:</b> TOP_MGMT nếu CEO vắng và cần thay quyền khẩn. <b>Leo thang</b> khi thiếu nhật ký FRM-504 hoặc không có phó hợp lệ → không chuyển quyền — xem <a href=\"authority-matrix.html#cdr-F3\">Auth F3</a> + <a href=\"../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html\">ANNEX-123</a>. <b>Cột A=HR</b> vì HR sở hữu FRM-504; <b>R=PD</b> là trưởng tuyến mặc định trigger (WKM/ENGM/QA cũng có thể trigger cho phạm vi riêng — xem hint)."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -728,7 +792,9 @@
         "EHS": "A",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt ứng phó sự cố <a class=\"entity-link role-link\" href=\"../../../system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html\">EHS</a> và dừng việc vì an toàn",
+      "level_hint_html": "<b>L1:</b> EHS kích hoạt dừng việc ngay khi có nguy cơ · <b>L2:</b> EHS + PD duyệt khôi phục sau khắc phục + kiểm tra · <b>L3:</b> EHS duyệt dừng+phục hồi cho mức nguy cơ trung bình–cao sau xác nhận khắc phục. <b>Leo thang CEO+EHS</b> khi gây thương tích, ảnh hưởng môi trường phải báo cáo bên ngoài hoặc dừng &gt;1 ca. <b>VD:</b> Phát hiện rò chất tẩy ở khu gia công Inconel → EHS dừng khu vực, kiểm hệ thống thông gió + chiếu ánh sáng, MNT khắc phục. Xem <a href=\"authority-matrix.html#cdr-F4\">Auth F4</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -750,7 +816,9 @@
         "EHS": "R",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Ứng phó rủi ro khí hậu (cảnh báo thiên tai, mất điện kéo dài, gián đoạn vận chuyển ảnh hưởng giao hàng)",
+      "level_hint_html": "<b>L1:</b> EHS + SCM mở hành động nếu tác động ≤2 ngày giao hàng · <b>L2:</b> CEO + SCM duyệt hành động ảnh hưởng lịch ≤3 ngày · <b>L3:</b> CEO duyệt nếu cần đổi nguồn, đổi cam kết khách hoặc đầu tư khẩn. <b>Leo thang</b> khi thiên tai làm gián đoạn nguồn cung hoặc cam kết giao hàng → CEO + CS + SCM — xem <a href=\"authority-matrix.html#cdr-F6\">Auth F6</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G4</a>",
@@ -772,7 +840,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt nhả mẫu đầu tiên đạt",
+      "level_hint_html": "<b>L1:</b> <a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html\">QCL</a> nhả FAI đạt đủ đặc tính ≤1 lô (không có sai lệch CTQ và khách không yêu cầu chứng kiến) · <b>L2:</b> <a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a> nhả khi sai lệch đã đóng hoặc khách chứng kiến · <b>L3:</b> QA + <a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html\">ENGM</a> khi cần ghi điều kiện sản xuất tiếp theo (lấy mẫu tăng cường, ràng buộc thông số máy). <b>Cột A=QA</b> chỉ phạm vi L2+; tại L1 QCL hoàn toàn đủ thẩm quyền ký FRM-311 — xem <a href=\"authority-matrix.html#cdr-D1\">Auth D1</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G4</a>",
@@ -794,7 +864,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Xử lý mẫu đầu tiên không đạt (sửa lại / loại bỏ / xin chấp thuận khách hàng)",
+      "level_hint_html": "<b>L1:</b> QA + ENGM quyết định xử lý lỗi đơn lẻ ≤5 chi tiết · <b>L2:</b> + PD xử lý lô ≤50 chi tiết · <b>L3:</b> + PD &gt;50 chi tiết hoặc 30–100M VND khi không cần khách chấp thuận. <b>Leo thang CEO+khách</b> khi cần miễn trừ, loại bỏ &gt;100 chi tiết hoặc trễ giao. <b>VD:</b> FAI feature pos = 0.06 vs spec 0.05mm — ENGM phân tích nguyên nhân (drift đồ gá), QA quyết định sửa lại 4 chi tiết bằng grinding. Xem <a href=\"authority-matrix.html#cdr-D2\">Auth D2</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G4</a>",
@@ -816,7 +888,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Nộp hồ sơ FAI/FAIR/PPAP cho khách hàng và xin phê duyệt trước khi sản xuất loạt",
+      "level_hint_html": "<b>L1:</b> QA duyệt nộp khi FAI nội bộ đạt + khách không yêu cầu phê duyệt trước · <b>L2:</b> QA + CS nộp hồ sơ + theo dõi phê duyệt khi khách yêu cầu phê duyệt FAIR/PPAP · <b>L3:</b> CEO + khách quyết định khi hồ sơ bị từ chối hoặc cần bảo lưu. <b>Leo thang khi khách reject — giữ sản xuất loạt + mở NCR.</b> <b>VD:</b> FAIR Form 1+2+3 cho 50 chi tiết AMK-120 — QCL chuẩn bị, QA review, CS nộp portal AMAT chờ approve trước khi vào loạt. Xem <a href=\"authority-matrix.html#cdr-D12\">Auth D12</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G4</a>",
@@ -838,7 +912,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt sai lệch/nhượng bộ kỹ thuật (chấp thuận nhượng bộ)",
+      "level_hint_html": "<b>L1:</b> ENGM + QA ≤5 chi tiết, không CTQ, không cần thông báo khách (\"use-as-is no-inform\") · <b>L2:</b> + PD MRB ≤50 chi tiết, ảnh hưởng lịch nhưng không cam kết hợp đồng · <b>L3:</b> + PD &gt;50 chi tiết hoặc đổi kế hoạch kiểm, đặc tính phụ. <b>Leo thang CEO+khách</b> khi chạm CTQ trọng yếu hoặc khách bán dẫn yêu cầu concession bằng văn bản (AS9100D §8.7.1.4). <b>VD:</b> 3 chi tiết Ra 0.85 vs spec 0.8 trên đặc tính phụ → ENGM + QA \"use-as-is\". Xem <a href=\"authority-matrix.html#cdr-B7\">Auth B7</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
@@ -860,7 +936,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Mở NCR và phân loại nhỏ/lớn/nghiêm trọng",
+      "level_hint_html": "<b>L1:</b> QA mở NCR và phân loại sơ bộ ≤4 giờ · <b>L2:</b> + PD phân loại lớn/nghiêm trọng ≤24 giờ + xác nhận phạm vi lô · <b>L3:</b> + PD NC nghiêm trọng ≤48 giờ + mở hành động ngăn chặn. <b>Leo thang CEO+QA</b> khi thoát lỗi lặp lại ≥3 lần/90 ngày hoặc đụng CTQ. <b>VD:</b> OPR báo 2 lô có burr quá ngưỡng — QCL mở NCR trong giờ, phân loại \"lớn\" vì lan ra 5 lô → +PD trong 24h. Xem <a href=\"authority-matrix.html#cdr-D3\">Auth D3</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
@@ -882,7 +960,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt xử lý NCR",
+      "level_hint_html": "<b>L1:</b> QA quyết định lỗi nhỏ/sửa lại nội bộ ≤5 chi tiết · <b>L2:</b> + PD xử lý lô ≤50 chi tiết hoặc 20M VND · <b>L3:</b> + PD MRB &gt;50 chi tiết hoặc 30–100M VND, có kế hoạch sửa lại/sàng lọc. <b>Leo thang CEO+khách</b> khi MRB dùng-như-hiện-trạng hoặc loại bỏ &gt;100 chi tiết. <b>VD:</b> 7 chi tiết oversize 0.02mm trên đặc tính phụ — QA + PD quyết rework bằng EDM, ENGM xác nhận không ảnh hưởng CTQ. Xem <a href=\"authority-matrix.html#cdr-D4\">Auth D4</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
@@ -904,7 +984,9 @@
         "EHS": "",
         "HR": "I",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt đóng CAPA và xác minh hiệu lực",
+      "level_hint_html": "<b>L1:</b> QA xác nhận ngăn chặn ≤24 giờ + đóng CAPA nhỏ sau xác minh ≤30 ngày · <b>L2:</b> + người sở hữu kế hoạch khắc phục ≤5 ngày + đóng CAPA lớn ≤60 ngày · <b>L3:</b> CAPA nghiêm trọng vào CTQ hoặc kéo dài 30–90 ngày, có bằng chứng RCA + xác minh hiệu lực. <b>VD:</b> CAPA cho spindle alarm M-07 lặp lại — QA + MNT verify effectiveness sau 30 ngày qua trending OEE + sound monitoring. Xem <a href=\"authority-matrix.html#cdr-D5\">Auth D5</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
@@ -926,7 +1008,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt nhả giữ hàng",
+      "level_hint_html": "<b>L1:</b> Trong dung sai — QCL nhả khi bằng chứng kiểm cuối đạt · <b>L2:</b> Ngoài dung sai nhưng có xử lý được — QA xác nhận điều kiện nhả + ràng buộc hồ sơ · <b>L3:</b> QA + PD đồng ký nhả lot khi sai lệch đã đóng, lot sẵn sàng giao, không còn rủi ro mở. <b>Leo thang CEO+QA</b> khi ảnh hưởng khách, nhượng bộ hoặc giao sát hạn (&lt;2 ngày). <b>VD:</b> Lô giữ vì lot mismatch — QA xác nhận cert NCC gửi lại đúng, ký nhả lot sang đóng gói. Xem <a href=\"authority-matrix.html#cdr-D6\">Auth D6</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
@@ -948,7 +1032,9 @@
         "EHS": "I",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt xử lý phế phẩm theo bậc giá trị",
+      "level_hint_html": "<b>L1:</b> WKM + QA xác nhận bằng chứng lỗi + cách ly ≤5M VND · <b>L2:</b> + PD quyết định loại bỏ ≤30M VND sau phân tích ảnh hưởng · <b>L3:</b> + PD scrap 30–100M VND có RCA sơ bộ. <b>Leo thang CEO+QA</b> khi scrap &gt;100M, ảnh hưởng đặt cọc hoặc lặp lỗi hệ thống ≥3 lần/90 ngày. <b>VD:</b> 8 chi tiết Inconel scrap do va chạm máy = ~40M VND — QA + PD ký FRM-413 + ảnh bằng chứng, MNT mở report nguyên nhân. Xem <a href=\"authority-matrix.html#cdr-D9\">Auth D9</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
@@ -970,7 +1056,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt SCAR leo thang",
+      "level_hint_html": "<b>L1:</b> SCM mở SCAR nhỏ/lớn ≤2 NC nghiêm trọng · <b>L2:</b> + QA leo thang ≤5 NC/tháng/lệnh · <b>L3:</b> + QA leo thang NCC ≥5 NC nghiêm trọng/tháng hoặc 1 NC vào CTQ, có kế hoạch giám sát cường độ. <b>Leo thang CEO+SCM</b> khi cần khóa NCC, đổi nguồn hoặc đòi bồi hoàn. <b>VD:</b> NCC nhiệt luyện giao 3 lô fail hardness trong 30 ngày → SCM + QA mở SCAR cấp 3, yêu cầu 8D từ NCC trong 14 ngày. Xem <a href=\"authority-matrix.html#cdr-E6\">Auth E6</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
@@ -992,7 +1080,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt sai lệch/nhượng bộ kỹ thuật (chấp thuận nhượng bộ)",
+      "level_hint_html": "<b>L1:</b> ENGM + QA ≤5 chi tiết, không CTQ, không cần thông báo khách (\"use-as-is no-inform\") · <b>L2:</b> + PD MRB ≤50 chi tiết, ảnh hưởng lịch nhưng không cam kết hợp đồng · <b>L3:</b> + PD &gt;50 chi tiết hoặc đổi kế hoạch kiểm, đặc tính phụ. <b>Leo thang CEO+khách</b> khi chạm CTQ trọng yếu hoặc khách bán dẫn yêu cầu concession bằng văn bản (AS9100D §8.7.1.4). <b>VD:</b> 3 chi tiết Ra 0.85 vs spec 0.8 trên đặc tính phụ → ENGM + QA \"use-as-is\". Xem <a href=\"authority-matrix.html#cdr-B7\">Auth B7</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G6</a>",
@@ -1014,7 +1104,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt phát hành CoC / ký kiểm cuối",
+      "level_hint_html": "<b>L1:</b> QCL ký kiểm cuối đạt ≤1 lô · <b>L2:</b> QA phát hành CoC nếu NCR/sai lệch đã đóng · <b>L3:</b> QA phát hành CoC sau khi hồ sơ truy xuất hoàn chỉnh. <b>Leo thang CEO+QA</b> khi có tranh chấp CoC, cần miễn trừ hoặc CoC vừa được dỡ sau hold. <b>VD:</b> Lô 50 wafer chuck Lam Research kiểm cuối pass mọi đặc tính → QCL ký FRM-642, QA phát hành CoC kèm chứng chỉ vật liệu + báo cáo kiểm. Xem <a href=\"authority-matrix.html#cdr-D8\">Auth D8</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G6</a>",
@@ -1036,7 +1128,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt sai lệch/nhượng bộ kỹ thuật (chấp thuận nhượng bộ)",
+      "level_hint_html": "<b>L1:</b> ENGM + QA ≤5 chi tiết, không CTQ, không cần thông báo khách (\"use-as-is no-inform\") · <b>L2:</b> + PD MRB ≤50 chi tiết, ảnh hưởng lịch nhưng không cam kết hợp đồng · <b>L3:</b> + PD &gt;50 chi tiết hoặc đổi kế hoạch kiểm, đặc tính phụ. <b>Leo thang CEO+khách</b> khi chạm CTQ trọng yếu hoặc khách bán dẫn yêu cầu concession bằng văn bản (AS9100D §8.7.1.4). <b>VD:</b> 3 chi tiết Ra 0.85 vs spec 0.8 trên đặc tính phụ → ENGM + QA \"use-as-is\". Xem <a href=\"authority-matrix.html#cdr-B7\">Auth B7</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G6</a>",
@@ -1058,7 +1152,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Xử lý ngoại lệ tài sản khách hàng",
+      "level_hint_html": "<b>L1:</b> CS + SCM xử lý ngoại lệ ≤5M VND · <b>L2:</b> QA + CS + CEO khi ảnh hưởng sản phẩm hoặc truy xuất · <b>L3:</b> CEO + khách ký khi tài sản mất/hỏng hoặc cần bồi hoàn. <b>Leo thang CEO+QA</b> khi không truy xuất được hoặc có thiệt hại. <b>VD:</b> Khuôn khách gửi để gia công bị xước nhẹ trong vận chuyển → CS + SCM ghi nhận FRM-221, QA đánh giá impact lên độ chính xác chi tiết. Xem <a href=\"authority-matrix.html#cdr-E7\">Auth E7</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G7</a>",
@@ -1080,7 +1176,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt chặn giao hàng và dỡ chặn giao hàng (bao gồm phát hành CoC sau khi dỡ hold)",
+      "level_hint_html": "<b>L1:</b> QCL dỡ hold cho 1 lô đơn lẻ ≤24 giờ khi NCR đã đóng, containment xác nhận, kiểm cuối đầy đủ · <b>L2:</b> QA + PD đồng ký dỡ hold cho 2–5 lô liên quan, có CAPA mở · <b>L3:</b> QA + PD đồng ký dỡ hold sau RCA đầy đủ khi &gt;5 lô hoặc CTQ; CAPA đạt \"effectiveness verified\" trước khi dỡ. <b>Leo thang CEO+QA+CS</b> khi khách ra hold chính thức bằng văn bản hoặc có rủi ro danh tiếng/recall — xem <a href=\"authority-matrix.html#cdr-D7\">Auth D7</a>. <b>SCM=R</b> chỉ thực hiện shipment sau khi QA ký dỡ chặn; KHÔNG được tự nhả cho dù có pressure giao hàng."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G7</a>",
@@ -1102,7 +1200,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Thông báo khách hàng khi phát hiện sản phẩm không phù hợp đã hoặc có thể đã giao (quality escape)",
+      "level_hint_html": "<b>L1:</b> QA + CS thông báo khi đã khoanh vùng, sản phẩm chưa rời kho khách · <b>L2:</b> QA + CEO duyệt nội dung khi sản phẩm đã ở khách · <b>L3:</b> CEO + khách thống nhất hành động khoanh vùng khi có rủi ro an toàn/lắp ghép/pháp lý. <b>Leo thang khi khách yêu cầu thu hồi hoặc 8D chính thức.</b> <b>VD:</b> Phát hiện lô 30 chi tiết bị lọt lỗi Ra sau khi giao Lam Research — CS thông báo khách trong 24h, QA mở 8D song song. Xem <a href=\"authority-matrix.html#cdr-D11\">Auth D11</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G7</a>",
@@ -1124,7 +1224,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt yêu cầu thay đổi muộn của khách hàng (CCR) sau xác nhận đơn — ảnh hưởng giá / lịch / phạm vi",
+      "level_hint_html": "<b>L1:</b> CS + PPL xử lý CCR muộn ≤1 ngày · <b>L2:</b> ENGM + QA + PD ≤3 ngày · <b>L3:</b> CEO duyệt khi đụng FAI/CoC đã ký, hoặc đổi điều kiện chất lượng. <b>VD:</b> Lô đã ở G4 FAI pass, khách AMAT yêu cầu siết pos tolerance từ 0.05 → 0.04 → CEO + QA quyết định re-FAI + đàm phán chi phí với khách. Xem <a href=\"authority-matrix.html#cdr-A7\">Auth A7</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -1146,7 +1248,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt việc khách hủy đơn sau khi đã phát hành lệnh sản xuất (xác định trạng thái WIP, ngưỡng bồi thường, xử lý vật tư đã đặt)",
+      "level_hint_html": "<b>L1:</b> Lệnh G2–G3, phát sinh ≤50M VND, vật tư trả lại được — PPL + CS ghi nhận · <b>L2:</b> 50–300M hoặc WIP đã cut — PD + CEO đồng ký · <b>L3:</b> &gt;300M hoặc ≥G4 — CEO + khách đàm phán bồi hoàn. <b>VD:</b> Khách hủy đơn 100M sau khi mua vật tư Inconel custom + WIP đã cut 1 chi tiết → PD + CEO đánh giá thu hồi + bồi thường. Xem <a href=\"authority-matrix.html#cdr-A8\">Auth A8</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
@@ -1168,7 +1272,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Phê duyệt nhượng bộ khách hàng (concession có thư khách ký, chấp nhận đặc tính lệch chuẩn)",
+      "level_hint_html": "<b>L1:</b> QA + ENGM sai lệch nhỏ, không CTQ, ≤5 chi tiết hoặc ≤10M VND, soạn thư concession · <b>L2:</b> + PD ký dự thảo ≤50 chi tiết, ảnh hưởng chức năng không vào CTQ, CS gửi khách · <b>L3:</b> CEO + QA &gt;50 chi tiết, chạm CTQ hoặc khách bán dẫn yêu cầu concession bằng văn bản. <b>Leo thang khi concession lặp lại — mở CAPA hệ thống.</b> <b>VD:</b> 2 chi tiết Ra 0.85 vs spec 0.8, khách AMAT chấp nhận dùng → QA + ENGM soạn thư concession kèm bằng chứng kỹ thuật. Xem <a href=\"authority-matrix.html#cdr-D13\">Auth D13</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G5</a>",
@@ -1190,7 +1296,9 @@
         "EHS": "",
         "HR": "",
         "IT": ""
-      }
+      },
+      "activity_label": "Thu hồi lô nghi vấn sau lỗi hệ thống đo (calibration recall — xác định phạm vi lô bị ảnh hưởng từ lần kiểm định gần nhất)",
+      "level_hint_html": "<b>L1:</b> QA + QCL ≤1 lô/1 ca chưa giao — đo lại bằng dụng cụ thay thế · <b>L2:</b> + PD 2–10 lô hoặc 2–5 ca, một phần đã giao — mở NCR D3, thông báo CS · <b>L3:</b> CEO + QA + CS &gt;10 lô hoặc đã giao khách hoặc CTQ — thông báo khách theo D11, mở CAPA hệ thống. <b>VD:</b> CMM phát hiện out-of-cal sau 5 lô gia công — QA + PD quyết phạm vi thu hồi 8 lô liên quan, đo lại bằng máy CMM khác đã calibration. Xem <a href=\"authority-matrix.html#cdr-D14\">Auth D14</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -1212,7 +1320,9 @@
         "EHS": "",
         "HR": "A",
         "IT": ""
-      }
+      },
+      "activity_label": "Hết hạn năng lực vận hành trong ca (skill matrix expire, thiếu cert cho công việc đang giao)",
+      "level_hint_html": "<b>L1:</b> HR + SL hạn chế thao tác — chuyển OPR sang công việc không yêu cầu cert đã hết; ghi FRM-504 + cập nhật FRM-806 trong ca · <b>L2:</b> HR + WKM lên kế hoạch re-cert (FRM-803 OJT + FRM-804 assessment) + tạm thay người · <b>L3:</b> HR + PD khi thiếu người cùng năng lực ảnh hưởng lệnh ưu tiên. <b>Leo thang CEO+HR</b> khi thiếu hệ thống (≥3 vai trò hết hạn/tháng), khách bán dẫn ảnh hưởng → +CS. <b>VD thực chiến:</b> Cert CMM của OPR-A45 hết hạn 18:00 nay, JO-825 cần CMM lúc 19:00 — HR + SL chuyển OPR-A45 sang công việc khác, kéo OPR-B22 (có cert) trực thêm 2h; FRM-803 OJT lên kế hoạch tuần sau. Xem <a href=\"authority-matrix.html#cdr-D15\">Auth D15</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -1234,7 +1344,9 @@
         "EHS": "I",
         "HR": "I",
         "IT": ""
-      }
+      },
+      "activity_label": "Tiếp đoàn audit khách hàng hoặc cơ quan quản lý / source inspection (chứng kiến FAI, kiểm cuối hoặc đánh giá nhà máy)",
+      "level_hint_html": "<b>L1:</b> Audit định kỳ có lịch trước ≥5 ngày — QA + QMS chuẩn bị hồ sơ + dẫn đoàn · <b>L2:</b> Audit đột xuất hoặc mở rộng phạm vi — QA + CEO ký quyết định cho vào phạm vi mới, EHS đánh giá an toàn · <b>L3:</b> Khách yêu cầu xem dữ liệu nhạy cảm hoặc phát hiện NC nghiêm trọng tại chỗ — CEO quyết định nội dung tiết lộ. <b>Leo thang CEO+QA+CS</b> khi đe dọa rút PPAP hoặc khóa nguồn cung. <b>VD:</b> AMAT yêu cầu source inspection FAI tuần tới — QA + QMS chuẩn bị hồ sơ FAIR + visitor log + NDA, dẫn đoàn theo khu vực đã duyệt. Xem <a href=\"authority-matrix.html#cdr-F7\">Auth F7</a>."
     },
     {
       "gate_html": "<a href=\"raci-master-matrix.html#r5gate\">G3</a>",
@@ -1256,7 +1368,9 @@
         "EHS": "A",
         "HR": "C",
         "IT": ""
-      }
+      },
+      "activity_label": "Báo cáo near-miss / sự cố suýt xảy ra (vật rơi, thiếu PPE, suýt va chạm, FOD chưa gây hư)",
+      "level_hint_html": "<b>L1:</b> EHS tiếp nhận ≤4h, mở FRM-811, đánh giá rủi ro thấp: cảnh báo khu vực + PPE/5S nhắc nhở · <b>L2:</b> EHS + WKM phân tích nguyên nhân + ngăn chặn ≤24h cho mức trung bình (lặp pattern hoặc vùng đông): cập nhật WI, đào tạo lại tổ · <b>L3:</b> EHS + PD + HR rà soát đào tạo + cải tiến process cho mức cao (gần thương tích nghiêm trọng hoặc ≥3x/90 ngày): mở CAPA hệ thống. <b>Leo thang CEO+EHS</b> khi near-miss trở thành accident (kích hoạt F4) hoặc cần báo cáo bên ngoài. <b>VD thực chiến:</b> 10:15 OPR-C08 báo \"hộp phụ kiện rơi từ giá kệ suýt trúng người\" — EHS tiếp nhận FRM-811 trong giờ, kiểm giá kệ + ghim chống rơi, đào tạo 5S khu vực gia công Inconel. <i>Bắt buộc ghi mọi near-miss kể cả mức thấp — ISO 45001 §10.2.</i> Xem <a href=\"authority-matrix.html#cdr-F8\">Auth F8</a>."
     }
   ],
   "value_stream": [

@@ -218,6 +218,14 @@ final class RaciMatrixService
                 $roles[$role] = $this->cleanLetter((string)($srcRoles[$role] ?? ''));
             }
             $config['rows'][$i]['roles'] = $roles;
+            // Accept editable level_hint_html (sanitised) — admin can rewrite the
+            // tooltip content but cannot inject scripts or arbitrary markup.
+            if (array_key_exists('level_hint_html', $src)) {
+                $config['rows'][$i]['level_hint_html'] = $this->sanitiseHint((string)$src['level_hint_html']);
+                // Re-compose activity_html so the regenerated HTML region stays
+                // byte-consistent with the new hint content.
+                $config['rows'][$i]['activity_html'] = $this->renderActivityCell($config['rows'][$i]);
+            }
         }
 
         // Auxiliary datasets (§4 value-stream, §6 document-level, support
@@ -292,13 +300,15 @@ final class RaciMatrixService
                 $roles[$role] = $this->cleanLetter((string)($srcRoles[$role] ?? ''));
             }
             $rows[] = [
-                'gate'          => trim((string)($row['gate'] ?? '')),
-                'cdr'           => trim((string)($row['cdr'] ?? '')),
-                'gate_html'     => (string)($row['gate_html'] ?? ''),
-                'cdr_html'      => (string)($row['cdr_html'] ?? ''),
-                'activity_html' => (string)($row['activity_html'] ?? ''),
-                'frm_html'      => (string)($row['frm_html'] ?? ''),
-                'roles'         => $roles,
+                'gate'             => trim((string)($row['gate'] ?? '')),
+                'cdr'              => trim((string)($row['cdr'] ?? '')),
+                'gate_html'        => (string)($row['gate_html'] ?? ''),
+                'cdr_html'         => (string)($row['cdr_html'] ?? ''),
+                'activity_html'    => (string)($row['activity_html'] ?? ''),
+                'activity_label'   => (string)($row['activity_label'] ?? ''),
+                'level_hint_html'  => (string)($row['level_hint_html'] ?? ''),
+                'frm_html'         => (string)($row['frm_html'] ?? ''),
+                'roles'            => $roles,
             ];
         }
         return [
@@ -308,6 +318,81 @@ final class RaciMatrixService
             'reason'         => (string)($config['reason'] ?? ''),
             'rows'           => $rows,
         ];
+    }
+
+    /**
+     * Sanitise level-hint HTML — allow only safe inline tags + the Authority
+     * link convention. Strips scripts, event handlers, and inline styles.
+     * Allowed: <b>, <strong>, <i>, <em>, <br>, <a href="..."> (no target=_blank
+     * needed since tooltip is in-document). Class attribute kept only for <a>
+     * "entity-link role-link" used by role links.
+     */
+    private function sanitiseHint(string $html): string
+    {
+        $html = (string)$html;
+        // Strip script/style blocks entirely
+        $html = preg_replace('#<(script|style)\b[^>]*>.*?</\1>#is', '', $html) ?? '';
+        // Strip on*= handlers and javascript: URIs
+        $html = preg_replace('#\s+on[a-z]+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+)#i', '', $html) ?? '';
+        $html = preg_replace('#javascript:#i', '', $html) ?? '';
+        // Allowlist tags: b, strong, i, em, br, a. Strip anything else.
+        // Use a single-pass: keep allowed tags, strip others.
+        $allowed = ['b','strong','i','em','br','a'];
+        $allowedRe = '#</?(?!(?:' . implode('|', $allowed) . ')\b)[a-z][^>]*>#i';
+        $html = preg_replace($allowedRe, '', $html) ?? '';
+        // For <a> tags, keep href + class only
+        $html = preg_replace_callback(
+            '#<a\b([^>]*)>#i',
+            function ($m) {
+                $attrs = $m[1];
+                $href = '';
+                $class = '';
+                if (preg_match('#\bhref\s*=\s*"([^"]*)"#i', $attrs, $h)) {
+                    $href = htmlspecialchars($h[1], ENT_QUOTES | ENT_HTML5);
+                }
+                if (preg_match('#\bclass\s*=\s*"([^"]*)"#i', $attrs, $c)) {
+                    $class = htmlspecialchars($c[1], ENT_QUOTES | ENT_HTML5);
+                }
+                $out = '<a';
+                if ($href !== '') { $out .= ' href="' . $href . '"'; }
+                if ($class !== '') { $out .= ' class="' . $class . '"'; }
+                $out .= '>';
+                return $out;
+            },
+            $html
+        ) ?? '';
+        return trim($html);
+    }
+
+    /**
+     * Compose the activity cell HTML from label + optional hint.
+     * If level_hint_html is non-empty, wrap with the standard
+     * raci-hint-trigger / raci-level-hint structure used in HTML §3.2.
+     */
+    private function renderActivityCell(array $row): string
+    {
+        $label = (string)($row['activity_label'] ?? '');
+        $hint  = (string)($row['level_hint_html'] ?? '');
+        $stored = (string)($row['activity_html'] ?? '');
+
+        if ($label === '' && $hint === '') {
+            // No new-schema fields populated — fall back to stored activity_html
+            return $stored;
+        }
+        if ($label === '') {
+            // Derive label from stored activity_html by stripping hint wrapper
+            $label = trim(preg_replace('#<span class="raci-hint-trigger".*?</span></span>\s*#s', '', $stored) ?? $stored);
+        }
+        if ($hint === '') {
+            return $label;
+        }
+        $code = htmlspecialchars((string)($row['cdr'] ?? ''), ENT_QUOTES | ENT_HTML5);
+        return $label . ' '
+            . '<span class="raci-hint-trigger" tabindex="0" role="button" '
+            . 'aria-label="Chi tiết L1/L2/L3 + VD thực chiến cho ' . $code . '">'
+            . '<span class="raci-hint-chip">L1·L2·L3 ⓘ</span>'
+            . '<span class="raci-level-hint">' . $hint . '</span>'
+            . '</span>';
     }
 
     /**
@@ -509,7 +594,9 @@ final class RaciMatrixService
         foreach ($rows as $row) {
             $cells  = '<td><div class="gc-stack">' . $row['gate_html']
                     . '<hr>' . $row['cdr_html'] . '</div></td>';
-            $cells .= '<td>' . $row['activity_html'] . '</td>';
+            // Render activity cell from label + hint if new-schema fields are set;
+            // falls back to stored activity_html for backward compat.
+            $cells .= '<td>' . $this->renderActivityCell($row) . '</td>';
             foreach (self::ROLES as $role) {
                 $cells .= $this->raciCell((string)($row['roles'][$role] ?? ''));
             }

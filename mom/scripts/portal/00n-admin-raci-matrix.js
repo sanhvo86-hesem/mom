@@ -243,6 +243,30 @@ function _setRole(idx, role, value){
   _syncStatus();
 }
 
+/* Edit the L1·L2·L3 + workshop-example tooltip content per row. Backend
+   sanitises (only <b>/<i>/<em>/<strong>/<br>/<a href|class> kept) and
+   re-composes activity_html so the regenerated §5 HTML region carries
+   the new hint. Updates preview pane next to textarea in real time. */
+function _setHint(idx, value){
+  var rows = _rows();
+  if(!rows[idx]) return;
+  rows[idx].level_hint_html = String(value == null ? '' : value);
+  _state.error = '';
+  _state.message = '';
+  // Update preview live without full re-render so cursor stays in textarea
+  var card = document.querySelector('.rm-card[data-rm-idx="' + idx + '"]');
+  if(card){
+    var preview = card.querySelector('.rc-hint-preview');
+    if(preview){
+      if(rows[idx].level_hint_html){
+        preview.innerHTML = rows[idx].level_hint_html;
+      } else {
+        preview.innerHTML = '<i style="color:#94a3b8">' + _t('(chưa có ghi chú)', '(no hint set)') + '</i>';
+      }
+    }
+  }
+}
+
 function _setAuxCell(key, rowIdx, colIdx, value){
   var rows = _auxRows(key);
   if(!rows[rowIdx] || !Array.isArray(rows[rowIdx].cells)) return;
@@ -506,6 +530,11 @@ function _renderCard(row, idx){
       <select data-val="${_esc(cur)}" onchange="_rmSetRole(${idx},'${_esc(role)}',this.value);this.setAttribute('data-val',this.value)">${opts}</select>
     </div>`;
   }).join('');
+  var label = row.activity_label || row.activity_html || _esc(row.cdr || '');
+  // Hint is stored as raw HTML (b, i, a, br allowed). Show in a textarea so user
+  // can edit HTML directly; on input, fire _rmSetHint to update model.
+  var hintHtml = row.level_hint_html || '';
+  var hintEscaped = _esc(hintHtml);
   return `
 <article class="rm-card${flags.invalid ? ' rm-card--invalid' : ''}" data-rm-idx="${idx}">
   <div class="rc-card-head">
@@ -515,8 +544,22 @@ function _renderCard(row, idx){
       ? '⚠ ' + flags.a + ' A · ' + flags.r + ' R'
       : '✓ 1 A · ' + flags.r + ' R'}</span>
   </div>
-  <div class="rc-activity">${row.activity_html || _esc(row.cdr || '')}</div>
+  <div class="rc-activity">${label}</div>
   <div class="rc-role-grid">${rolesHtml}</div>
+  <details class="rc-hint" ${hintHtml ? '' : 'open'}>
+    <summary>${_t('Ghi chú L1·L2·L3 + VD thực chiến (hiện ra khi rê chuột vào chip)', 'L1·L2·L3 + workshop example tooltip (shown on hover)')}</summary>
+    <div class="rc-hint-edit">
+      <label class="rc-hint-label">${_t('Nội dung tooltip (HTML — cho phép <b>, <i>, <a href>, <br>)', 'Tooltip content (HTML — <b>, <i>, <a href>, <br> allowed)')}</label>
+      <textarea class="rc-hint-area" rows="6" spellcheck="false"
+        oninput="_rmSetHint(${idx},this.value)"
+        placeholder="${_t('L1: ... · L2: ... · L3: .... VD thực chiến: [kịch bản CNC cụ thể]. Xem Auth ...', 'L1: ... · L2: ... · L3: .... Example: [concrete CNC scenario].')}"
+      >${hintEscaped}</textarea>
+      <div class="rc-hint-preview-wrap">
+        <span class="rc-hint-preview-label">${_t('Xem trước:', 'Preview:')}</span>
+        <span class="rc-hint-preview">${hintHtml || '<i style="color:#94a3b8">' + _t('(chưa có ghi chú)', '(no hint set)') + '</i>'}</span>
+      </div>
+    </div>
+  </details>
 </article>`;
 }
 
@@ -750,6 +793,23 @@ function _styleBlock(){
   .rc-activity{color:var(--text-1);font-size:13px;line-height:1.5}
   .rc-activity a{color:var(--accent)}
   .rc-role-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:7px}
+  /* L1·L2·L3 + workshop example tooltip editor */
+  .rc-hint{margin-top:6px;border:1px solid var(--border);border-radius:8px;background:var(--surface);overflow:hidden}
+  .rc-hint > summary{padding:8px 12px;font-size:12px;font-weight:700;color:var(--text-2);cursor:pointer;list-style:none;user-select:none;background:var(--surface-2)}
+  .rc-hint > summary::-webkit-details-marker{display:none}
+  .rc-hint > summary::before{content:"▸ ";color:var(--accent);font-weight:800}
+  .rc-hint[open] > summary::before{content:"▾ "}
+  .rc-hint > summary:hover{color:var(--text-1)}
+  .rc-hint-edit{padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+  .rc-hint-label{font-size:11px;font-weight:700;color:var(--text-2);letter-spacing:.03em}
+  .rc-hint-area{width:100%;min-height:90px;border:1px solid var(--border);border-radius:7px;background:var(--surface-2);color:var(--text-1);padding:8px 10px;font:inherit;font-size:12px;line-height:1.45;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .rc-hint-area:focus{border-color:var(--accent);outline:none;background:var(--surface)}
+  .rc-hint-preview-wrap{display:flex;flex-direction:column;gap:4px;padding:8px 10px;background:#f8fafc;border:1px solid var(--border);border-left:3px solid #64748b;border-radius:5px;font-size:11.5px;line-height:1.5;color:#334155}
+  .rc-hint-preview-label{font-weight:700;color:#475569;font-size:10px;letter-spacing:.05em;text-transform:uppercase}
+  .rc-hint-preview{display:block}
+  .rc-hint-preview b{color:#0f172a}
+  .rc-hint-preview a{color:#1d4ed8;text-decoration:underline}
+  .rc-hint-preview i{color:#64748b}
   .rc-role{display:flex;flex-direction:column;gap:3px;border:1px solid var(--border);border-radius:7px;background:var(--surface);padding:6px 7px}
   .rc-role label{font-size:11px;font-weight:800;color:var(--text-2)}
   .rc-role select{border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text-1);font:inherit;font-weight:800;padding:4px}
@@ -842,6 +902,7 @@ window._rmSave = _save;
 window._rmGo = _go;
 window._rmRerender = _render;
 window._rmSetRole = _setRole;
+window._rmSetHint = _setHint;
 window._rmSetAuxCell = _setAuxCell;
 window._rmEditAux = _editAuxCell;
 window._rmEditDoc = _editDocBlob;
