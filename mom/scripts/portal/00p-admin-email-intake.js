@@ -707,7 +707,13 @@
     /* Allowlist */
     openAddEntry: function(){
       var el = document.getElementById('aeoi-add-modal');
-      if(el) el.style.display = 'flex';
+      if(!el) return;
+      ['aeoi-new-value','aeoi-new-label','aeoi-new-customer','aeoi-new-notes'].forEach(function(id){
+        var f = document.getElementById(id); if(f) f.value = '';
+      });
+      var typeSel = document.getElementById('aeoi-new-type'); if(typeSel) typeSel.value = 'email';
+      el.style.display = 'flex';
+      var first = document.getElementById('aeoi-new-value'); if(first) first.focus();
     },
     closeAddModal: function(){
       var el = document.getElementById('aeoi-add-modal');
