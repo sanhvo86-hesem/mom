@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-05-27T06:14:24.992Z",
-    "description": "Resolution plan for 0 orphan registry fields and 875 orphan DB column names."
+    "generatedAt": "2026-05-27T08:04:08.483Z",
+    "description": "Resolution plan for 0 orphan registry fields and 884 orphan DB column names."
   },
   "orphan_fields": {
     "computed": {
@@ -39,7 +39,7 @@
   "orphan_columns": {
     "needs_field_def": {
       "description": "Columns thực tế nhưng chưa có field definition trong registry.",
-      "count": 741,
+      "count": 750,
       "columns": [
         {
           "column": "username",
@@ -9119,6 +9119,123 @@
           "suggestedType": "string",
           "dbTypes": [
             "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "imap_host",
+          "tables": [
+            "email_intake_mailbox"
+          ],
+          "suggestedLabel": "Imap Host",
+          "suggestedLabelEn": "Imap Host",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(255)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "imap_port",
+          "tables": [
+            "email_intake_mailbox"
+          ],
+          "suggestedLabel": "Imap Port",
+          "suggestedLabelEn": "Imap Port",
+          "suggestedType": "number",
+          "dbTypes": [
+            "INTEGER"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "imap_encryption",
+          "tables": [
+            "email_intake_mailbox"
+          ],
+          "suggestedLabel": "Imap Encryption",
+          "suggestedLabelEn": "Imap Encryption",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(20)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "imap_username",
+          "tables": [
+            "email_intake_mailbox"
+          ],
+          "suggestedLabel": "Imap Tên đăng nhập",
+          "suggestedLabelEn": "Imap Username",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(255)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "imap_password_enc",
+          "tables": [
+            "email_intake_mailbox"
+          ],
+          "suggestedLabel": "Imap Mật khẩu Enc",
+          "suggestedLabelEn": "Imap Password Enc",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "imap_validate_cert",
+          "tables": [
+            "email_intake_mailbox"
+          ],
+          "suggestedLabel": "Imap Validate Cert",
+          "suggestedLabelEn": "Imap Validate Cert",
+          "suggestedType": "boolean",
+          "dbTypes": [
+            "BOOLEAN"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "imap_last_uid",
+          "tables": [
+            "email_intake_mailbox"
+          ],
+          "suggestedLabel": "Imap Last Uid",
+          "suggestedLabelEn": "Imap Last Uid",
+          "suggestedType": "number",
+          "dbTypes": [
+            "BIGINT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "imap_last_uidvalidity",
+          "tables": [
+            "email_intake_mailbox"
+          ],
+          "suggestedLabel": "Imap Last Uidvalidity",
+          "suggestedLabelEn": "Imap Last Uidvalidity",
+          "suggestedType": "number",
+          "dbTypes": [
+            "BIGINT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "imap_messages_fetched",
+          "tables": [
+            "email_intake_mailbox"
+          ],
+          "suggestedLabel": "Imap thông điệp Fetched",
+          "suggestedLabelEn": "Imap Messages Fetched",
+          "suggestedType": "textarea",
+          "dbTypes": [
+            "INTEGER"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
