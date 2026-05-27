@@ -1046,6 +1046,60 @@ final class ScheduledJobs
     }
 
     /**
+     * AI Email Order Intake — poll M365 mailbox for new order emails.
+     *
+     * Crontab recommendation:
+     *   0 *\/2 * * * php cli/run-job.php email_inbox_poll >> /var/log/mom-jobs/email-intake.log 2>&1
+     *
+     * Delegates to EmailIntakeConfigService for the poll run audit record.
+     * M365MailboxService and OrderEmailParserService (Claude API extraction)
+     * are provisioned in sprint 2. This stub logs a skipped run with the
+     * reason so the audit table populates correctly from day 1.
+     */
+    public function runEmailInboxPoll(): array
+    {
+        return $this->executeJob('email_inbox_poll', function (): array {
+            require_once __DIR__ . '/EmailIntakeConfigService.php';
+
+            $svc = new EmailIntakeConfigService($this->db);
+
+            // Check enabled flag before opening a run record
+            $config = $svc->loadConfig();
+            if (!($config['enabled'] ?? false)) {
+                return [
+                    'status'       => 'skipped',
+                    'reason'       => 'Email Order Intake is disabled in admin config.',
+                    'run_id'       => null,
+                    'orders_created' => 0,
+                ];
+            }
+
+            $start = microtime(true);
+            $runId = $svc->openPollRun('cron', 'system.cron');
+
+            // M365MailboxService + OrderEmailParserService not yet provisioned (sprint 2).
+            // Close as skipped so the poll log stays clean.
+            $svc->closePollRun($runId, [
+                'found' => 0, 'processed' => 0, 'skipped' => 0,
+                'quarantined' => 0, 'created' => 0, 'review' => 0,
+                'errors' => 0,
+                'duration_ms' => (int)((microtime(true) - $start) * 1000),
+                'api_calls'   => 0,
+                'error_detail' => 'M365MailboxService not yet provisioned — pending sprint 2.',
+            ], 'skipped');
+
+            $svc->updateNextPollAt();
+
+            return [
+                'status'         => 'skipped',
+                'run_id'         => $runId,
+                'orders_created' => 0,
+                'note'           => 'M365 connection service will be provisioned in sprint 2.',
+            ];
+        });
+    }
+
+    /**
      * Execute a job with timing, error handling, and logging.
      *
      * @param string   $jobName Job identifier.

@@ -727,6 +727,7 @@ function moduleAccessAdminTabCatalog(){
     {id:'version_control', group:'operations', icon:'🔄', labelEn:'Version control', labelVi:'Điều khiển phiên bản', noteEn:'Git synchronization and release hygiene.', noteVi:'Đồng bộ Git và vệ sinh phát hành.', defaultAccess:'admin'},
     {id:'ai_control', group:'operations', icon:'🤖', labelEn:'AI Control', labelVi:'Điều khiển AI', noteEn:'AI engine on/off, model selection, feature toggles, usage and cost tracking.', noteVi:'Bật/tắt AI engine, chọn model, tính năng, theo dõi sử dụng và chi phí.', defaultAccess:'admin'},
     {id:'translation_module', group:'operations', icon:'🌍', labelEn:'Translation Module', labelVi:'Module Dịch Thuật', noteEn:'Multi-provider routing (NLLB / Claude CLI / Codex CLI / API), credentials vault, model discovery, cost log, side-by-side test bench. Backed by migration 157.', noteVi:'Định tuyến đa engine (NLLB / Claude CLI / Codex CLI / API), kho API key mã hóa, chọn model, log chi phí, test song song. Migration 157.', defaultAccess:'admin'},
+    {id:'email_intake', group:'operations', icon:'📥', labelEn:'AI Order Intake', labelVi:'Tiếp Nhận Đơn Hàng AI', noteEn:'AI-powered email-to-order intake: M365 mailbox polling, sender allowlist, extraction rules, security controls, quarantine queue. Backed by migration 203.', noteVi:'Tự động đọc email đơn hàng từ Outlook, trích xuất SO/WO/PO/part number bằng AI, kiểm soát danh sách người gửi và bảo mật. Migration 203.', defaultAccess:'admin'},
     {id:'appearance', group:'content', icon:'🎨', labelEn:'Appearance', labelVi:'Giao diện', noteEn:'Portal design system and theme settings.', noteVi:'Thiết lập giao diện và design system.', defaultAccess:'admin'},
     {id:'doc_visualizer', group:'content', icon:'🗺️', labelEn:'Doc diagram gates', labelVi:'Sơ đồ tài liệu — Cổng', noteEn:'Manage which documents appear per gate in the fishbone & gate-flow diagrams.', noteVi:'Quản lý tài liệu hiển thị trên từng nhánh sơ đồ xương cá và luồng cổng.', defaultAccess:'admin'}
   ];
@@ -11253,6 +11254,7 @@ function renderAdmin(){
   if(adminTab==='data_sources') renderAdminDataSources();
   if(adminTab==='metadata_studio') renderAdminMetadataStudio();
   if(adminTab==='translation_module') renderAdminTranslationModuleTab();
+  if(adminTab==='email_intake') renderAdminEmailIntake();
   if(adminTab==='version_control') renderAdminVersionControl();
   if(adminTab==='portal_display') renderAdminPortalDisplay();  // legacy widget editor
   if(adminTab==='mfa') renderAdminMfa();              // legacy MFA settings (apiCall-backed)
@@ -11365,6 +11367,28 @@ function renderAdminKpiRegistry(){
     s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00o-admin-kpi-registry.js?v=' + (window.APP_VERSION || Date.now());
     s.onload = function(){
       if(typeof window._renderAdminKpiRegistry === 'function') window._renderAdminKpiRegistry(el, lang);
+    };
+    document.head.appendChild(s);
+  });
+}
+
+/* ── Admin: AI Email Order Intake tab ──────────────────────────────────── */
+function renderAdminEmailIntake(){
+  var el = document.getElementById('admin-content');
+  if(!el) return;
+  if(typeof window._renderAdminEmailIntake === 'function'){
+    window._renderAdminEmailIntake(el, lang);
+    return;
+  }
+  el.innerHTML = '<div class="hm-empty">' + (lang==='en' ? 'Đang tải AI Order Intake...' : 'Đang tải Tiếp Nhận Đơn Hàng AI...') + '</div>';
+  ensureAdminShared(function(){
+    var existing = document.getElementById('admin-email-intake-script');
+    if(existing){ existing.remove(); }
+    var s = document.createElement('script');
+    s.id  = 'admin-email-intake-script';
+    s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00p-admin-email-intake.js?v=' + (window.APP_VERSION || Date.now());
+    s.onload = function(){
+      if(typeof window._renderAdminEmailIntake === 'function') window._renderAdminEmailIntake(el, lang);
     };
     document.head.appendChild(s);
   });
