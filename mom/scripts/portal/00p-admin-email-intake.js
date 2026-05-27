@@ -270,8 +270,8 @@
            ['review_queue','Review queue — không tạo, chờ admin duyệt']],
           cfg.auto_create_mode||'draft')
 
-      + _fieldNum('Ngưỡng tin cậy AI (0.00–1.00)', 'aeoi-confidence', cfg.confidence_threshold||0.75,
-          'Độ tin cậy tối thiểu để tự động tạo SO. Dưới ngưỡng → review_queue.', 0, 1, 0.05)
+      + _fieldNum('Ngưỡng tin cậy AI (0.00–1.00)', 'aeoi-confidence', cfg.confidence_threshold||0.95,
+          'Độ tin cậy tối thiểu để tạo draft order. Dưới ngưỡng → review_queue.', 0, 1, 0.05)
 
       + _fieldSelect('Khớp part number', 'aeoi-part-match',
           [['exact','Exact — phải khớp chính xác với items table'],
@@ -292,8 +292,10 @@
           'Giới hạn số file AI xử lý mỗi email. File thứ N+1 trở đi bỏ qua.', 1, 10)
 
       + '</div>'
+      + '<div style="margin-top:10px;padding:8px 12px;border-left:3px solid var(--warning-1,#f59e0b);background:var(--warning-bg,#fef3c7);font-size:11px;color:var(--text-2,#374151)">'
+      + '⚠ <strong>Quan trọng:</strong> AI chỉ tạo Customer PO / draft Sales Order. JO/WO phải được tạo qua workflow gốc khi SO đạt trạng thái <code>engineering_ready</code> / <code>in_production</code> và part/revision đã release. Không có chế độ auto-cascade JO từ email.'
+      + '</div>'
       + '<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:12px">'
-      + _checkbox('aeoi-cascade-jo', 'Tự động tạo JO từ SO vừa tạo', !!cfg.auto_cascade_jo)
       + _checkbox('aeoi-biz-hours', 'Chỉ xử lý trong giờ làm việc', !!cfg.business_hours_only)
       + '</div>'
       + '<div id="aeoi-biz-hours-detail" style="margin-top:10px;' + (!cfg.business_hours_only ? 'display:none' : '') + ';display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">'
@@ -313,9 +315,8 @@
       + '<div class="aeoi-grid2">'
 
       + _fieldSelect('Chế độ kiểm tra allowlist', 'aeoi-allowlist-enforcement',
-          [['strict','Strict — chỉ email/domain trong danh sách mới được xử lý'],
-           ['domain_only','Domain only — chỉ cần @domain khớp là đủ'],
-           ['off','Tắt — tất cả người gửi được chấp nhận (KHÔNG khuyến nghị)']],
+          [['strict','Strict — chỉ email/domain trong danh sách mới được xử lý (KHUYẾN NGHỊ)'],
+           ['domain_only','Domain only — chỉ cần @domain khớp là đủ']],
           cfg.allowlist_enforcement||'strict')
 
       + _fieldNum('Giới hạn đơn hàng/chu kỳ', 'aeoi-max-orders', cfg.max_orders_per_poll||50,
@@ -673,7 +674,7 @@
         missing_field_action:   aeoi._val('aeoi-missing-field'),
         duplicate_check_days:   parseInt(aeoi._val('aeoi-dup-days'))||30,
         max_attachments_per_email: parseInt(aeoi._val('aeoi-max-att'))||3,
-        auto_cascade_jo:        aeoi._checked('aeoi-cascade-jo'),
+        auto_cascade_jo:        false,  // forbidden per migration 204; UI no longer exposes
         business_hours_only:    aeoi._checked('aeoi-biz-hours'),
         business_hours_start:   aeoi._val('aeoi-biz-start'),
         business_hours_end:     aeoi._val('aeoi-biz-end'),

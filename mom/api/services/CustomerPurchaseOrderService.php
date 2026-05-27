@@ -585,6 +585,17 @@ final class CustomerPurchaseOrderService
                 'line_total' => round($lineTotal, 2),
                 'requested_date' => trim((string)($rawLine['requested_date'] ?? '')),
                 'promise_date' => trim((string)($rawLine['promise_date'] ?? '')),
+                // ── AEOI traceability fields (preserve revision + intake link) ─────
+                // Required so customer revision survives the CPO normalisation
+                // and downstream SO/JO lookups can recover the exact rev the
+                // customer ordered. Empty-string default keeps backward compat
+                // with existing CPO writers that don't supply these.
+                'customer_revision'    => trim((string)($rawLine['customer_revision']    ?? $rawLine['revision_number'] ?? $rawLine['revision'] ?? '')),
+                'revision_number'      => trim((string)($rawLine['revision_number']      ?? $rawLine['customer_revision'] ?? $rawLine['revision'] ?? '')),
+                'drawing_revision'     => trim((string)($rawLine['drawing_revision']     ?? '')),
+                'delivery_address_raw' => trim((string)($rawLine['delivery_address_raw'] ?? $rawLine['delivery_address'] ?? '')),
+                'ship_to_site_id'      => trim((string)($rawLine['ship_to_site_id']      ?? '')),
+                'source_intake_id'     => trim((string)($rawLine['source_intake_id']     ?? '')),
             ];
             $lineNumber++;
         }
