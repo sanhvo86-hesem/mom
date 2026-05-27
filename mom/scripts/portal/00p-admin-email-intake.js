@@ -19,7 +19,20 @@
   'use strict';
 
   /* ── Helpers ──────────────────────────────────────────────────────────── */
-  var apiCall = window.apiCall || function(action, data, cb){ cb({ok:false, error:'apiCall not available'}); };
+  /* Wrap window.apiCall (async, returns Promise) into callback-style.
+   * Detects GET vs POST: actions ending in _get / _list / _log / _queue / _check use GET. */
+  function apiCall(action, data, cb){
+    if(typeof window.apiCall !== 'function'){ return cb({ok:false, error:'apiCall not available'}); }
+    var isGet = /(_get|_list|_log|_queue|_check)$/.test(action);
+    var method = isGet ? 'GET' : 'POST';
+    var payload = isGet ? null : (data || {});
+    var p;
+    try { p = window.apiCall(action, payload, method); }
+    catch(e){ return cb({ok:false, error:String(e && e.message || e)}); }
+    if(!p || typeof p.then !== 'function'){ return cb({ok:false, error:'apiCall did not return a Promise'}); }
+    p.then(function(res){ cb(res || {ok:false, error:'empty_response'}); })
+     .catch(function(err){ cb({ok:false, error:String(err && err.message || err)}); });
+  }
   var escHtml = window.escapeHtml || function(s){ return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);}); };
   var fmtDt   = function(s){ if(!s) return '—'; try{ return new Date(s).toLocaleString('vi-VN',{timeZone:'Asia/Ho_Chi_Minh',hour12:false}); } catch(e){ return s; } };
   var fmtDate = function(s){ if(!s) return '—'; try{ return new Date(s).toLocaleDateString('vi-VN'); } catch(e){ return s; } };
