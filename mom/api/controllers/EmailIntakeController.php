@@ -730,8 +730,12 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, [
-            'admin','it_admin','sales_manager','customer_service',
-            'planning_manager','production_planner','engineering_manager','quality_manager',
+            'admin','it_admin',
+            'ceo','general_director','production_director',
+            'sales_manager','customer_service',
+            'planning_manager','production_planner',
+            'engineering_manager','quality_manager','supply_chain_manager',
+            'cnc_workshop_manager','estimator',
         ]);
         $limit  = max(1, min(200, (int)($this->query('limit') ?? 50)));
         $offset = max(0, (int)($this->query('offset') ?? 0));
@@ -756,8 +760,12 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, [
-            'admin','it_admin','sales_manager','customer_service',
-            'planning_manager','production_planner','engineering_manager','quality_manager',
+            'admin','it_admin',
+            'ceo','general_director','production_director',
+            'sales_manager','customer_service',
+            'planning_manager','production_planner',
+            'engineering_manager','quality_manager','supply_chain_manager',
+            'cnc_workshop_manager','estimator',
         ]);
         $id = (int)($this->query('id') ?? 0);
         if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
@@ -772,7 +780,8 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, [
-            'admin','sales_manager','customer_service','engineering_manager','planning_manager',
+            'admin','ceo','general_director',
+            'sales_manager','customer_service','engineering_manager','planning_manager',
         ]);
         $this->requireCsrf();
         $body = $this->jsonBody();
@@ -791,7 +800,9 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, [
-            'admin','sales_manager','customer_service','engineering_manager','planning_manager','quality_manager',
+            'admin','ceo','general_director','production_director',
+            'sales_manager','customer_service',
+            'engineering_manager','planning_manager','quality_manager',
         ]);
         $this->requireCsrf();
         $body = $this->jsonBody();
@@ -810,7 +821,9 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, [
-            'admin','sales_manager','customer_service','engineering_manager','planning_manager','quality_manager',
+            'admin','ceo','general_director','production_director',
+            'sales_manager','customer_service',
+            'engineering_manager','planning_manager','quality_manager',
         ]);
         $this->requireCsrf();
         $body   = $this->jsonBody();
@@ -830,7 +843,9 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, [
-            'admin','sales_manager','customer_service','engineering_manager','planning_manager','quality_manager',
+            'admin','ceo','general_director','production_director',
+            'sales_manager','customer_service',
+            'engineering_manager','planning_manager','quality_manager',
         ]);
         $this->requireCsrf();
         $body   = $this->jsonBody();
@@ -849,7 +864,9 @@ class EmailIntakeController extends BaseController
     public function caseCommitCustomerPo(): never
     {
         $user = $this->requireAuth();
-        $this->requireAnyRole($user, ['admin','sales_manager','customer_service']);
+        $this->requireAnyRole($user, [
+            'admin','ceo','general_director','sales_manager','customer_service',
+        ]);
         $this->requireCsrf();
         $body = $this->jsonBody();
         $id   = (int)($body['id'] ?? 0);
@@ -869,7 +886,9 @@ class EmailIntakeController extends BaseController
     public function caseCommitSalesOrder(): never
     {
         $user = $this->requireAuth();
-        $this->requireAnyRole($user, ['admin','sales_manager','customer_service']);
+        $this->requireAnyRole($user, [
+            'admin','ceo','general_director','sales_manager','customer_service',
+        ]);
         $this->requireCsrf();
         $body = $this->jsonBody();
         $id   = (int)($body['id'] ?? 0);
