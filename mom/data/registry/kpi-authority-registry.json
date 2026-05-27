@@ -18320,6 +18320,9 @@
       "owner_role": "FIN",
       "cadence": "per-event",
       "data_source": "Epicor AR",
+      "manual_input_form": "Ship-to-invoice discrepancy and release log",
+      "evidence_form": "Shipment release register + invoice release timestamp log",
+      "manual_fallback": "Nếu feed Epicor AR chưa sẵn sàng, FIN phải ghi actual ship release time, invoice release time, discrepancy reason và approver vào log trước khi đóng G7.",
       "calculation_status": "staged_data_contract",
       "counter_metric": {
         "code": "SHIP_READY_TO_INVOICE_LT-CTR",
@@ -19683,6 +19686,9 @@
       "hold_release_rule": "Không phát hành cổng khi SPECIAL_RELEASE_COMPLIANCE đỏ/không đạt cho tới khi chủ sở hữu CDR ghi kết luận xử lý, biện pháp ngăn chặn và bằng chứng.",
       "lam_profile_link": "LAM_SEMSYSCO",
       "decision_action": "Khi không đạt: giữ cổng G7, yêu cầu QA hoàn tất bằng chứng CDR/hồ sơ ngoại lệ, ghi biện pháp ngăn chặn và chỉ phát hành sau khi được phê duyệt.",
+      "manual_input_form": "FRM-724 written special-release register",
+      "evidence_form": "Written customer special release letter + deviated-shipment approval record",
+      "manual_fallback": "Khi chưa có integration concession-to-shipment, QA ghi số waiver, ngày phê duyệt, customer approver, shipment reference và bằng chứng đính kèm trước khi cho phép G7 pass.",
       "backend_status": "manual_governed",
       "primary_endpoint": "GET /api/kpi/SPECIAL_RELEASE_COMPLIANCE",
       "manual_input_contract": {
@@ -19747,6 +19753,9 @@
       "owner_role": "CPS",
       "cadence": "per-event",
       "data_source": "shipment_marking_evidence",
+      "manual_input_form": "Special release marking verification log",
+      "evidence_form": "FRM-702 shipping checklist + load-carrier marking photo log",
+      "manual_fallback": "Khi chưa có feed marking runtime, CPS phải ghi shipment, special release reference, marking verifier, verification time và ảnh marking vào log trước khi G7 được phát hành.",
       "calculation_status": "staged_data_contract",
       "counter_metric": {
         "code": "SPECIAL_RELEASE_MARKING_COMPLIANCE-CTR",
@@ -19844,6 +19853,9 @@
       "owner_role": "QA",
       "cadence": "per-event",
       "data_source": "customer_gage_incident_log",
+      "manual_input_form": "Customer gage incident and notification log",
+      "evidence_form": "Incident record + customer notification email + CAPA reference",
+      "manual_fallback": "Khi chưa có event feed, QA ghi detected_at, customer_notified_at, incident reference, email evidence và approver vào log để giữ/phát hành G7 có kiểm soát.",
       "calculation_status": "staged_data_contract",
       "counter_metric": {
         "code": "CUSTOMER_GAGE_DAMAGE_UNSUITABLE_NOTIFICATION_LT-CTR",
