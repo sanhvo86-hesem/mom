@@ -247,12 +247,6 @@ final class EmailIntakeImapService
         // Workaround: fetch ALL UIDs and filter in PHP. The set is bounded
         // by the mailbox size and we cap to MAX_MESSAGES_PER_POLL anyway.
         $allUids = imap_search($conn, 'ALL', SE_UID);
-        @error_log(sprintf('[AEOI IMAP] mbx=%d lastUid=%d searchResult=%s errors=%s',
-            $mailboxId,
-            $lastUid,
-            is_array($allUids) ? ('array(' . count($allUids) . ')') : var_export($allUids, true),
-            json_encode(imap_errors() ?: [])
-        ));
         if (!is_array($allUids) || $allUids === []) {
             $allUids = [];
         }
@@ -369,7 +363,12 @@ final class EmailIntakeImapService
                         ':p_cnt'     => count($attachments),
                         ':p_atts'    => json_encode(array_map(static fn($a) => (string)$a['original_filename'], $attachments)),
                         ':p_allow'   => (string)($allow['match_type'] ?? 'none'),
-                        ':p_status'  => 'extraction_pending',
+                        // email_intake_message.status enum (migration 203):
+                        // pending | processing | extracted | created | review_queue
+                        // | quarantined | skipped | failed | duplicate.
+                        // 'pending' = received, awaiting extraction; the case
+                        // row's status drives the wider workflow.
+                        ':p_status'  => 'pending',
                         ':p_preview' => mb_substr($bodyText, 0, 500),
                     ]
                 );
