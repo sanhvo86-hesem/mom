@@ -2,13 +2,13 @@
 
 **Declared**: 2026-05-27
 **Scope**: Platform-global (869 tables)
-**Migration range**: 001–203 (203 migrations)
+**Migration range**: 001–205 (205 migrations)
 
 ## Authority Chain
 
 | Layer | File | Role |
 |-------|------|------|
-| **Executable Source of Truth** | `database/migrations/001–203_*.sql` | Sequential DDL. Applied in order. This IS the schema. |
+| **Executable Source of Truth** | `database/migrations/001–205_*.sql` | Sequential DDL. Applied in order. This IS the schema. |
 | **Generated Snapshot** | `database/schema.sql` | Aggregate of all migrations. Built by `build_schema_snapshot.php`. Reference only; regenerate after any migration change. |
 | **Conceptual Blueprint** | `database/canonical-erp-mes-eqms-7-layer-blueprint.sql` | ISA-95/IEC 62264 7-layer design input. NOT executable authority. |
 | **Specification Reference** | `database/mes-schema-specification.sql` | MES specification reference. NOT executable authority. |
@@ -30,7 +30,7 @@ No table definition outside migrations is authoritative.
 - Snapshot unique physical table count: 890
 - Snapshot logical runtime-contract table count: 869
 - Snapshot partition table count: 21
-- Registry contract table count: 880
+- Registry contract table count: 889
 - Drift verifier: `tools/verify_schema_authority.py`
 
 ## Verification

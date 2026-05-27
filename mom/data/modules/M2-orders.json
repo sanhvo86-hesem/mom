@@ -163,6 +163,104 @@
       ]
     },
     {
+      "tabId": "ai-intake-queue",
+      "title": { "vi": "Hàng chờ AI nhận đơn", "en": "AI Intake Queue" },
+      "icon": "🤖",
+      "roles": [
+        "admin",
+        "it_admin",
+        "ceo",
+        "sales_manager",
+        "customer_service",
+        "planning_manager",
+        "production_planner",
+        "engineering_manager",
+        "quality_manager"
+      ],
+      "blocks": [
+        {
+          "blockId": "blk-intake-queue-warning",
+          "type": "alert-banner",
+          "visible": true,
+          "order": 1,
+          "config": {
+            "severity": "info",
+            "title": { "vi": "AI Order Intake — chỉ tạo draft chờ duyệt", "en": "AI Order Intake — review-queue first" },
+            "body": {
+              "vi": "Các case AI extract được hiển thị ở đây trước khi commit Customer PO/Sales Order. JO/WO không được tạo trực tiếp từ email — chỉ phát hành qua workflow gốc khi SO đã engineering_ready/in_production và part/revision đã release.",
+              "en": "AI-extracted cases land here before any Customer PO / Sales Order commit. JO/WO are never created directly from email; they must be released through the existing workflow once the SO reaches engineering_ready/in_production with a released part/revision."
+            }
+          }
+        },
+        {
+          "blockId": "blk-intake-queue-filters",
+          "type": "filter-bar",
+          "visible": true,
+          "order": 2,
+          "config": {
+            "filters": [
+              { "key": "status", "label": { "vi": "Trạng thái", "en": "Status" }, "type": "multi-select", "options": [
+                { "id": "needs_review",        "label": { "vi": "Cần duyệt",          "en": "Needs review" } },
+                { "id": "engineering_review",  "label": { "vi": "Chờ kỹ thuật",       "en": "Engineering review" } },
+                { "id": "commercial_review",   "label": { "vi": "Chờ thương mại",     "en": "Commercial review" } },
+                { "id": "planning_review",     "label": { "vi": "Chờ kế hoạch",       "en": "Planning review" } },
+                { "id": "quality_review",      "label": { "vi": "Chờ chất lượng",     "en": "Quality review" } },
+                { "id": "duplicate_hold",      "label": { "vi": "Trùng",              "en": "Duplicate hold" } },
+                { "id": "security_hold",       "label": { "vi": "Giữ bảo mật",         "en": "Security hold" } },
+                { "id": "approved",            "label": { "vi": "Đã duyệt",            "en": "Approved" } },
+                { "id": "commit_ready",        "label": { "vi": "Sẵn sàng commit",     "en": "Commit-ready" } },
+                { "id": "committed_cpo",       "label": { "vi": "Đã tạo CPO",          "en": "CPO committed" } },
+                { "id": "committed_so",        "label": { "vi": "Đã tạo SO",           "en": "SO committed" } },
+                { "id": "rejected",            "label": { "vi": "Từ chối",             "en": "Rejected" } }
+              ] },
+              { "key": "customer_id",        "label": { "vi": "Khách hàng",          "en": "Customer" },     "type": "search" },
+              { "key": "customer_po_number", "label": { "vi": "Số PO khách",         "en": "Customer PO" }, "type": "search" },
+              { "key": "part_number",        "label": { "vi": "Part Number",         "en": "Part Number" }, "type": "search" },
+              { "key": "revision_number",    "label": { "vi": "Revision",            "en": "Revision" },     "type": "search" },
+              { "key": "received_at",        "label": { "vi": "Nhận từ ngày",         "en": "Received from" }, "type": "date-range" },
+              { "key": "min_confidence",     "label": { "vi": "Confidence ≥",        "en": "Confidence ≥" }, "type": "number" }
+            ]
+          }
+        },
+        {
+          "blockId": "blk-intake-queue-table",
+          "type": "data-table",
+          "visible": true,
+          "order": 3,
+          "config": {
+            "dataSource": { "api": "ai_order_intake_case_list", "method": "GET", "dataKey": "cases" },
+            "columns": [
+              { "key": "intake_no",                "label": { "vi": "Mã case",        "en": "Intake #" },        "width": 120 },
+              { "key": "status",                   "label": { "vi": "Trạng thái",     "en": "Status" },          "width": 140, "render": "status-badge" },
+              { "key": "customer_id",              "label": { "vi": "Khách",          "en": "Customer" },        "width": 100 },
+              { "key": "customer_po_number",       "label": { "vi": "PO khách",       "en": "Customer PO" },     "width": 130 },
+              { "key": "part_number",              "label": { "vi": "Part",           "en": "Part" },            "width": 120 },
+              { "key": "revision_number",          "label": { "vi": "Rev",            "en": "Rev" },             "width": 60 },
+              { "key": "quantity",                 "label": { "vi": "SL",             "en": "Qty" },             "width": 70, "align": "right" },
+              { "key": "requested_delivery_date",  "label": { "vi": "Ngày giao",      "en": "Due date" },        "width": 110 },
+              { "key": "delivery_address",         "label": { "vi": "Địa chỉ giao",   "en": "Ship to" },         "width": 200 },
+              { "key": "from_email",               "label": { "vi": "Người gửi",      "en": "From" },            "width": 200 },
+              { "key": "received_at",              "label": { "vi": "Nhận lúc",       "en": "Received" },        "width": 140 },
+              { "key": "overall_confidence",       "label": { "vi": "Confidence",     "en": "Conf." },           "width": 80, "align": "right", "render": "confidence-bar" },
+              { "key": "blocking_codes",           "label": { "vi": "Chặn",           "en": "Blockers" },        "width": 180, "render": "code-chips" }
+            ],
+            "rowActions": [
+              { "key": "validate",      "label": { "vi": "Validate",       "en": "Validate" },        "icon": "🔍", "api": "ai_order_intake_case_validate" },
+              { "key": "approve",       "label": { "vi": "Duyệt",          "en": "Approve" },         "icon": "✅", "api": "ai_order_intake_case_approve", "confirm": true },
+              { "key": "reject",        "label": { "vi": "Từ chối",        "en": "Reject" },          "icon": "❌", "api": "ai_order_intake_case_reject",  "confirm": true },
+              { "key": "commit_cpo",    "label": { "vi": "Tạo Customer PO", "en": "Commit Customer PO" }, "icon": "📥", "api": "ai_order_intake_commit_cpo", "confirm": true, "requiresStatus": ["approved","commit_ready"] },
+              { "key": "commit_so",     "label": { "vi": "Tạo SO",          "en": "Commit SO" },       "icon": "📄", "api": "ai_order_intake_commit_so",  "confirm": true, "requiresStatus": ["approved","commit_ready","committed_cpo"] },
+              { "key": "open_cpo",      "label": { "vi": "Mở Customer PO",  "en": "Open Customer PO" }, "icon": "🔗", "type": "navigate", "target": "/orders?cpo={committed_customer_po_id}" },
+              { "key": "open_so",       "label": { "vi": "Mở SO",           "en": "Open SO" },         "icon": "🔗", "type": "navigate", "target": "/orders?so={committed_so_number}" }
+            ],
+            "bulkActions": [],
+            "defaultSort": { "key": "received_at", "direction": "desc" },
+            "pagination": { "pageSize": 50 }
+          }
+        }
+      ]
+    },
+    {
       "tabId": "create-so",
       "title": { "vi": "Tạo SO", "en": "Create SO" },
       "icon": "➕",
