@@ -87,7 +87,7 @@ final class EmailIntakeCommitService
         }
 
         try {
-            $so = $this->orderService->createSalesOrder($payload, $actor);
+            $so = $this->orderService->createSalesOrder($payload);
             $soNumber = (string)($so['so_number'] ?? '');
             $this->cases->recordCommit($caseId, 'sales_order', $soNumber, $payload, $actor);
             return $so;
