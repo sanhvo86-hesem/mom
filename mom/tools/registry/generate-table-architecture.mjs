@@ -768,6 +768,13 @@ const migrationDomainDefaults = new Map([
   ['185_authz_decision_log.sql', 'core_system'],
   ['186_authz_kernel_apikey_perms.sql', 'core_system'],
   ['187_doc_access_log.sql', 'document_control'],
+  ['188_error_code_registry.sql', 'core_system'],
+  ['189_translation_review_module.sql', 'core_system'],
+  ['190_translation_learning.sql', 'core_system'],
+  ['191_translation_runtime_settings.sql', 'core_system'],
+  ['196_kpi_manual_inputs.sql', 'bi_datawarehouse'],
+  ['198_customer_ncr_severity_contract.sql', 'quality_management'],
+  ['203_email_intake_infrastructure.sql', 'system_infrastructure'],
 ]);
 
 const tableDomainOverrides = {
