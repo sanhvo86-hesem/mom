@@ -75,6 +75,7 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $this->requireCsrf();
 
         $body = $this->jsonBody();
         if (empty($body)) {
@@ -121,6 +122,7 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $this->requireCsrf();
 
         $body = $this->jsonBody();
         $type  = trim((string)($body['entry_type'] ?? ''));
@@ -155,6 +157,7 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $this->requireCsrf();
 
         $body = $this->jsonBody();
         $id   = (int)($body['id'] ?? 0);
@@ -181,6 +184,7 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $this->requireCsrf();
 
         $body = $this->jsonBody();
         $id   = (int)($body['id'] ?? 0);
@@ -209,6 +213,7 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $this->requireCsrf();
 
         try {
             $config = $this->svc()->loadConfig();
@@ -255,6 +260,7 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $this->requireCsrf();
 
         $body      = $this->jsonBody();
         $emailBody = trim((string)($body['email_body'] ?? ''));
@@ -349,6 +355,7 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $this->requireCsrf();
 
         $body   = $this->jsonBody();
         $qid    = (int)($body['id']     ?? 0);
