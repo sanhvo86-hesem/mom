@@ -1060,41 +1060,91 @@ final class ScheduledJobs
     {
         return $this->executeJob('email_inbox_poll', function (): array {
             require_once __DIR__ . '/EmailIntakeConfigService.php';
+            require_once __DIR__ . '/EmailIntakeAdminCatalogService.php';
 
-            $svc = new \MOM\Api\Services\EmailIntakeConfigService($this->db);
+            $configSvc = new \MOM\Api\Services\EmailIntakeConfigService($this->db);
+            $catalog   = new \MOM\Api\Services\EmailIntakeAdminCatalogService($this->db);
 
-            // Check enabled flag before opening a run record
-            $config = $svc->loadConfig();
+            $config = $configSvc->loadConfig();
             if (!($config['enabled'] ?? false)) {
                 return [
-                    'status'       => 'skipped',
-                    'reason'       => 'Email Order Intake is disabled in admin config.',
-                    'run_id'       => null,
+                    'status'         => 'skipped',
+                    'reason'         => 'Email Order Intake is disabled in admin config.',
+                    'run_id'         => null,
                     'orders_created' => 0,
                 ];
             }
 
             $start = microtime(true);
-            $runId = $svc->openPollRun('cron', 'system.cron');
+            $runId = $configSvc->openPollRun('cron', 'system.cron');
 
-            // M365MailboxService + OrderEmailParserService not yet provisioned (sprint 2).
-            // Close as skipped so the poll log stays clean.
-            $svc->closePollRun($runId, [
-                'found' => 0, 'processed' => 0, 'skipped' => 0,
-                'quarantined' => 0, 'created' => 0, 'review' => 0,
-                'errors' => 0,
+            // We support two operating modes:
+            //   • outlook_local_push  → the local Windows worker submits envelopes
+            //                            on its own schedule. The cron job here is
+            //                            a heartbeat only: it confirms config is
+            //                            healthy and updates last_scan timestamps
+            //                            for the configured mailbox rows. The
+            //                            actual emails are processed by the
+            //                            POST /aeoi_worker_email_envelope endpoint.
+            //   • microsoft_graph     → would poll the Graph API directly. NOT
+            //                            implemented yet; the run is marked
+            //                            skipped with a clear reason so admins
+            //                            can see in the poll log why nothing
+            //                            happened.
+            $mode = 'outlook_local_push'; // currently the only supported runtime
+            $mailboxes = $catalog->listEnabledMailboxes();
+            $heartbeatCount = 0;
+
+            if ($mode === 'outlook_local_push') {
+                foreach ($mailboxes as $mbx) {
+                    if (($mbx['provider'] ?? '') === 'outlook_local') {
+                        // Touch last_scan_at on each enabled mailbox so admins
+                        // can see the cron heartbeat is alive in the UI.
+                        // The real "completed" status comes from the worker
+                        // submission path.
+                        $catalog->recordMailboxScan(
+                            (int)$mbx['id'],
+                            'heartbeat',
+                            'Local worker schedule active; envelopes arrive via push endpoint.'
+                        );
+                        $heartbeatCount++;
+                    }
+                }
+                $configSvc->closePollRun($runId, [
+                    'found'        => 0,
+                    'processed'    => 0,
+                    'skipped'      => 0,
+                    'quarantined'  => 0,
+                    'created'      => 0,
+                    'review'       => 0,
+                    'errors'       => 0,
+                    'duration_ms'  => (int)((microtime(true) - $start) * 1000),
+                    'api_calls'    => 0,
+                    'error_detail' => "Heartbeat for $heartbeatCount local-Outlook mailbox(es).",
+                ], 'completed');
+                $configSvc->updateNextPollAt();
+
+                return [
+                    'status'         => 'completed',
+                    'mode'           => $mode,
+                    'run_id'         => $runId,
+                    'mailboxes_seen' => $heartbeatCount,
+                    'orders_created' => 0,
+                    'note'           => 'Local Outlook worker pushes envelopes via /aeoi_worker_email_envelope.',
+                ];
+            }
+
+            // Future: microsoft_graph polling lands here.
+            $configSvc->closePollRun($runId, [
                 'duration_ms' => (int)((microtime(true) - $start) * 1000),
-                'api_calls'   => 0,
-                'error_detail' => 'M365MailboxService not yet provisioned — pending sprint 2.',
+                'error_detail'=> "Mode $mode not yet implemented.",
             ], 'skipped');
-
-            $svc->updateNextPollAt();
-
+            $configSvc->updateNextPollAt();
             return [
-                'status'         => 'skipped',
-                'run_id'         => $runId,
-                'orders_created' => 0,
-                'note'           => 'M365 connection service will be provisioned in sprint 2.',
+                'status' => 'skipped',
+                'mode'   => $mode,
+                'run_id' => $runId,
+                'note'   => 'microsoft_graph polling not implemented.',
             ];
         });
     }

@@ -39,6 +39,20 @@ final class CsrfService
     ];
 
     /**
+     * Legacy action keys that bypass CSRF because they authenticate via
+     * a different mechanism (HMAC for AEOI worker, API key for Epicor, etc.).
+     * Matched against the `action` query parameter.
+     *
+     * @var array<string>
+     */
+    private static array $csrfExemptActions = [
+        // AI Email Order Intake — local Outlook worker uses HMAC (X-AEOI-*)
+        'aeoi_worker_config',
+        'aeoi_worker_email_envelope',
+        'aeoi_worker_extraction_result',
+    ];
+
+    /**
      * Get or generate a CSRF token for the current session.
      * Equivalent to legacy: csrf_token()
      * SECURITY FIX PIPE-CSRF-002: Tokens expire after 1 hour (3600 seconds)
@@ -104,21 +118,26 @@ final class CsrfService
      */
     public static function isExempt(string $path): bool
     {
-        $path = strtolower(trim($path));
-        if ($path === '') {
-            return false;
-        }
-
-        foreach (self::$csrfExempt as $exemptPattern) {
-            // Simple wildcard matching: /api/webhooks/* matches /api/webhooks/github
-            if (str_ends_with($exemptPattern, '*')) {
-                $prefix = substr($exemptPattern, 0, -1);
-                if (str_starts_with($path, $prefix)) {
+        // Path-based exemptions
+        $normalisedPath = strtolower(trim($path));
+        if ($normalisedPath !== '') {
+            foreach (self::$csrfExempt as $exemptPattern) {
+                // Simple wildcard matching: /api/webhooks/* matches /api/webhooks/github
+                if (str_ends_with($exemptPattern, '*')) {
+                    $prefix = substr($exemptPattern, 0, -1);
+                    if (str_starts_with($normalisedPath, $prefix)) {
+                        return true;
+                    }
+                } elseif ($normalisedPath === $exemptPattern) {
                     return true;
                 }
-            } elseif ($path === $exemptPattern) {
-                return true;
             }
+        }
+
+        // Action-based exemptions (legacy ?action=foo routing)
+        $action = strtolower(trim((string)($_GET['action'] ?? '')));
+        if ($action !== '' && in_array($action, self::$csrfExemptActions, true)) {
+            return true;
         }
 
         return false;
