@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANNEX-136 - Ranh giới đồng bộ nguồn giữa M365 SharePoint, Git, server và môi trường chạy | HESEM MOM</title>
+<title>ANNEX-136 - Ranh giới đồng bộ nguồn giữa M365 SharePoint, Git, máy chủ và môi trường chạy | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap — computes absolute URLs from location.pathname so the
  * stylesheet + renderer load correctly regardless of how the document is
@@ -54,14 +54,14 @@
      data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-136&quot;,&quot;title&quot;:&quot;Ranh giới đồng bộ nguồn giữa M365 SharePoint, Git, server và runtime&quot;,&quot;subtitle&quot;:&quot;Kiến trúc bốn lớp không trộn lẫn: SharePoint, Git, server và runtime của controlled source&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
 
 
- <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi quản lý tài liệu QMS, mã nguồn portal, định nghĩa biểu mẫu, manifest phát hành, biên nhận triển khai và hồ sơ đồng bộ ngược trên M365 SharePoint, nhưng vẫn phải biên tập cục bộ, quản trị bằng Git và triển khai lên server theo kiểm soát phát hành. ANNEX này khóa ranh giới giữa nguồn được kiểm soát, lịch sử phiên bản Git, bản đang chạy trên server và hồ sơ hoặc bằng chứng vận hành.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi quản lý tài liệu QMS, mã nguồn cổng, định nghĩa biểu mẫu, manifest phát hành, biên nhận triển khai và hồ sơ đồng bộ ngược trên M365 SharePoint, nhưng vẫn phải biên tập cục bộ, quản trị bằng Git và triển khai lên máy chủ theo kiểm soát phát hành. ANNEX này khóa ranh giới giữa nguồn được kiểm soát, lịch sử phiên bản Git, bản đang chạy trên máy chủ và hồ sơ hoặc bằng chứng vận hành.</div>
  
 
  <div class="section">
  <h2>1. Mục đích, phạm vi và kết quả bắt buộc</h2>
- <p style="margin:8px 0;">ANNEX này quy định kiến trúc bắt buộc để HESEM đặt bộ nguồn trên M365 SharePoint mà không làm mờ chuỗi kiểm soát: máy cục bộ được phê duyệt dùng để biên tập, Git giữ lịch sử phiên bản, server chỉ nhận bản đã được phát hành, còn dữ liệu runtime phải tách hẳn khỏi thư viện nguồn. Người đọc phải xác định rõ bốn điểm: nguồn nằm ở đâu, máy nào được phép đồng bộ, Git giữ vai trò gì và dữ liệu nào tuyệt đối không được quay ngược vào cây nguồn.</p>
- <div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong>: bộ tài liệu nguồn chỉ có một luồng chuẩn <b>SharePoint local sync worktree → Git remote → server deploy</b>; mọi hotfix buộc sửa trên server phải quay về <b>Git → SharePoint local sync</b>; dữ liệu runtime, bí mật hệ thống, binary nháp của luồng công việc, session files, trạng thái rate-limit và dữ liệu giao dịch của biểu mẫu không được trộn vào <span class="code">QMS-Source-Control</span>.</div>
- <div class="keyline"><strong>Ranh giới tài liệu:</strong> <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> khóa site, library và path; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> khóa cơ chế khởi tạo, phân quyền và tự động hóa; <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> khóa từ điển field và list; <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a> khóa file plan; <a href="../../../work-instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a> khóa thao tác tạo site, library và quyền; <a href="../../../work-instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a> khóa thao tác đồng bộ cục bộ, Git và server.</div>
+ <p style="margin:8px 0;">ANNEX này quy định kiến trúc bắt buộc để HESEM đặt bộ nguồn trên M365 SharePoint mà không làm mờ chuỗi kiểm soát: máy cục bộ được phê duyệt dùng để biên tập, Git giữ lịch sử phiên bản, máy chủ chỉ nhận bản đã được phát hành, còn dữ liệu môi trường chạy phải tách hẳn khỏi thư viện nguồn. Người đọc phải xác định rõ bốn điểm: nguồn nằm ở đâu, máy nào được phép đồng bộ, Git giữ vai trò gì và dữ liệu nào tuyệt đối không được quay ngược vào cây nguồn.</p>
+ <div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong>: bộ tài liệu nguồn chỉ có một luồng chuẩn <b>SharePoint local đồng bộ worktree → Git remote → máy chủ deploy</b>; mọi hotfix buộc sửa trên máy chủ phải quay về <b>Git → SharePoint local đồng bộ</b>; dữ liệu môi trường chạy, bí mật hệ thống, binary nháp của luồng công việc, session Tệps, trạng thái rate-limit và dữ liệu giao dịch của biểu mẫu không được trộn vào <span class="code">QMS-Source-Kiểm soát</span>.</div>
+ <div class="keyline"><strong>Ranh giới tài liệu:</strong> <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> khóa không gian, thư viện và đường dẫn; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> khóa cơ chế khởi tạo, phân quyền và tự động hóa; <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> khóa từ điển field và list; <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a> khóa Tệp kế hoạch; <a href="../../../work-instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a> khóa thao tác tạo không gian, thư viện và quyền; <a href="../../../work-instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a> khóa thao tác đồng bộ cục bộ, Git và máy chủ.</div>
  </div>
 
  <div class="section">
@@ -72,10 +72,10 @@
  <tr><th>Lớp</th><th>Vai trò bắt buộc</th><th>Ví dụ HESEM</th><th>Không được làm</th></tr>
  </thead>
  <tbody>
- <tr><td>Nguồn được kiểm soát</td><td>Nơi chứa nội dung nguồn đã được kiểm soát để soạn, rà soát, commit và phát hành.</td><td><span class="code">HESEM-Digital/QMS-Source-Control/01-Controlled-Source/eqms.hesemeng.com/</span></td><td>Không chứa session, luồng công việc draft binary, rate-limit log, secrets hoặc dữ liệu giao dịch của biểu mẫu.</td></tr>
- <tr><td>Lịch sử phiên bản Git</td><td>Sổ cái kỹ thuật trung tâm để quản lý commit, branch, merge, pull, push và rollback theo commit.</td><td>Repo remote của <span class="code">eqms.hesemeng.com</span> và local <span class="code">git-dir</span> được tách khỏi thư mục đang đồng bộ.</td><td>Không dùng Git để lưu hồ sơ giao dịch, approval log hay runtime export.</td></tr>
- <tr><td>Bản triển khai trên server</td><td>Bản đang chạy cho portal và điểm sử dụng sau khi pull hoặc deploy thành công.</td><td>Repo worktree đang chạy trên server hoặc cPanel.</td><td>Không để thay đổi có ý nghĩa nằm lại trên server mà không quay về Git.</td></tr>
- <tr><td>Runtime và hồ sơ vận hành</td><td>Dữ liệu đang chạy của hệ thống, bằng chứng, log, lịch sử phê duyệt, bản ghi giao dịch, binary lưu trữ và các thư viện hồ sơ.</td><td><span class="code">mom/qms-data/...</span>, <span class="code">System-Records</span>, các records library tại <span class="code">HESEM-Records</span>.</td><td>Không đồng bộ ngược dữ liệu runtime vào thư viện nguồn chỉ vì chúng cùng tồn tại dưới dạng file.</td></tr>
+ <tr><td>Nguồn được kiểm soát</td><td>Nơi chứa nội dung nguồn đã được kiểm soát để soạn, rà soát, commit và phát hành.</td><td><span class="code">HESEM-Digital/QMS-Source-Kiểm soát/01-Kiểm soátled-Source/eqms.hesemeng.com/</span></td><td>Không chứa session, luồng công việc draft binary, rate-limit log, secrets hoặc dữ liệu giao dịch của biểu mẫu.</td></tr>
+ <tr><td>Lịch sử phiên bản Git</td><td>Sổ cái kỹ thuật trung tâm để quản lý commit, branch, merge, pull, push và rollback theo commit.</td><td>Repo remote của <span class="code">eqms.hesemeng.com</span> và local <span class="code">git-dir</span> được tách khỏi thư mục đang đồng bộ.</td><td>Không dùng Git để lưu hồ sơ giao dịch, phê duyệt log hay môi trường chạy export.</td></tr>
+ <tr><td>Bản triển khai trên máy chủ</td><td>Bản đang chạy cho cổng và điểm sử dụng sau khi pull hoặc deploy thành công.</td><td>Repo worktree đang chạy trên máy chủ hoặc cPanel.</td><td>Không để thay đổi có ý nghĩa nằm lại trên máy chủ mà không quay về Git.</td></tr>
+ <tr><td>Môi trường chạy và hồ sơ vận hành</td><td>Dữ liệu đang chạy của hệ thống, bằng chứng, log, lịch sử phê duyệt, bản ghi giao dịch, binary lưu trữ và các thư viện hồ sơ.</td><td><span class="code">mom/qms-data/...</span>, <span class="code">System-Hồ sơ</span>, các hồ sơ thư viện tại <span class="code">HESEM-Hồ sơ</span>.</td><td>Không đồng bộ ngược dữ liệu môi trường chạy vào thư viện nguồn chỉ vì chúng cùng tồn tại dưới dạng Tệp.</td></tr>
  </tbody>
  </table>
  </div>
@@ -86,100 +86,100 @@
  <div class="table-card">
  <table class="table">
  <thead>
- <tr><th>Site</th><th>Library</th><th>Path bắt buộc</th><th>Mục đích</th><th>Nhóm phụ trách</th></tr>
+ <tr><th>Không gian</th><th>Thư viện</th><th>Đường dẫn bắt buộc</th><th>Mục đích</th><th>Nhóm phụ trách</th></tr>
  </thead>
  <tbody>
- <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Control</span></td><td class="path">QMS-Source-Control/01-Controlled-Source/eqms.hesemeng.com/</td><td>Nơi đặt tài liệu nguồn, mã nguồn portal, định nghĩa biểu mẫu đã phát hành, tài sản tĩnh và cấu hình được phép đi theo Git.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td></tr>
- <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Control</span></td><td class="path">QMS-Source-Control/02-Release-Manifests/{YYYY}/</td><td>Nơi lưu manifest phát hành, ánh xạ commit, branch, tag, phạm vi phát hành và ghi chú phát hành đã được phê duyệt.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
- <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Control</span></td><td class="path">QMS-Source-Control/03-Server-Deploy-Receipts/{YYYY}/</td><td>Nơi lưu bằng chứng pull hoặc deploy, kết quả smoke test, biên nhận rollback và xác nhận point-of-use.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
- <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Control</span></td><td class="path">QMS-Source-Control/04-Reverse-Sync-Intake/{YYYY}/</td><td>Nơi lưu hồ sơ tiếp nhận hotfix từ server, lý do sửa trực tiếp, commit quay ngược về nguồn và bằng chứng close-out.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
- <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">System-Records</span></td><td class="path">System-Records/</td><td>Nơi lưu hồ sơ cấu hình, rà soát quyền truy cập, sao lưu hoặc khôi phục, kiểm soát triển khai, sự cố hoặc vấn đề và bằng chứng runtime.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bộ phận quản trị ERP)"><span class="entity-code dept-code">D-ERP</span></a></span></td></tr>
+ <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Kiểm soát</span></td><td class="path">QMS-Source-Kiểm soát/01-Kiểm soátled-Source/eqms.hesemeng.com/</td><td>Nơi đặt tài liệu nguồn, mã nguồn cổng, định nghĩa biểu mẫu đã phát hành, tài sản tĩnh và cấu hình được phép đi theo Git.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td></tr>
+ <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Kiểm soát</span></td><td class="path">QMS-Source-Kiểm soát/02-Phát hành-Manifests/{YYYY}/</td><td>Nơi lưu manifest phát hành, ánh xạ commit, branch, tag, phạm vi phát hành và ghi chú phát hành đã được phê duyệt.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
+ <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Kiểm soát</span></td><td class="path">QMS-Source-Kiểm soát/03-Máy chủ-Deploy-Receipts/{YYYY}/</td><td>Nơi lưu bằng chứng pull hoặc deploy, kết quả smoke test, biên nhận rollback và xác nhận point-of-use.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
+ <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Kiểm soát</span></td><td class="path">QMS-Source-Kiểm soát/04-Reverse-Đồng bộ-Intake/{YYYY}/</td><td>Nơi lưu hồ sơ tiếp nhận hotfix từ máy chủ, lý do sửa trực tiếp, commit quay ngược về nguồn và bằng chứng close-out.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
+ <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">System-Hồ sơ</span></td><td class="path">System-Hồ sơ/</td><td>Nơi lưu hồ sơ cấu hình, rà soát quyền truy cập, sao lưu hoặc khôi phục, kiểm soát triển khai, sự cố hoặc vấn đề và bằng chứng môi trường chạy.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bộ phận quản trị ERP)"><span class="entity-code dept-code">D-ERP</span></a></span></td></tr>
  </tbody>
  </table>
  </div>
  <div class="tree">HESEM-Digital
- ├─ System-Records
- │ ├─ 01-Access-and-Identity
+ ├─ System-Hồ sơ
+ │ ├─ 01-Truy cập-and-Identity
  │ ├─ 02-M365-and-SharePoint-Configuration
- │ ├─ 03-Epicor-Master-Data-and-Role-Control
+ │ ├─ 03-Epicor-Master-Data-and-Vai trò-Kiểm soát
  │ ├─ 04-System-Deployment-UAT-and-Cutover
  │ ├─ 05-Backup-Restore-and-Recovery
  │ ├─ 06-Incident-and-Problem-Management
- │ ├─ 07-Asset-and-Endpoint-Control
+ │ ├─ 07-Asset-and-Endpoint-Kiểm soát
  │ └─ 08-Automation-Run-Logs
- └─ QMS-Source-Control
- ├─ 01-Controlled-Source
+ └─ QMS-Source-Kiểm soát
+ ├─ 01-Kiểm soátled-Source
  │ └─ eqms.hesemeng.com
- ├─ 02-Release-Manifests
- ├─ 03-Server-Deploy-Receipts
- └─ 04-Reverse-Sync-Intake</div>
+ ├─ 02-Phát hành-Manifests
+ ├─ 03-Máy chủ-Deploy-Receipts
+ └─ 04-Reverse-Đồng bộ-Intake</div>
  </div>
 
  <div class="section">
- <h2>4. Mô hình local sync bắt buộc</h2>
+ <h2>4. Mô hình local đồng bộ bắt buộc</h2>
  <div class="two-col">
  <div class="figure-box">
  <h3>Đường dẫn local được phép</h3>
- <p style="margin:8px 0;">Chỉ các máy đã được IT/QMS chỉ định mới được sync library <span class="code">QMS-Source-Control</span>. Worktree local phải nằm dưới thư mục sync do OneDrive quản lý trong hồ sơ người dùng, ví dụ:</p>
- <p class="path">%UserProfile%\HESEM Engineering\HESEM-Digital - QMS-Source-Control\01-Controlled-Source\eqms.hesemeng.com\</p>
+ <p style="margin:8px 0;">Chỉ các máy đã được IT/QMS chỉ định mới được đồng bộ thư viện <span class="code">QMS-Source-Kiểm soát</span>. Worktree local phải nằm dưới thư mục đồng bộ do OneDrive quản lý trong hồ sơ người dùng, ví dụ:</p>
+ <p class="path">%UserProTệp%\HESEM Engineering\HESEM-Digital - QMS-Source-Kiểm soát\01-Kiểm soátled-Source\eqms.hesemeng.com\</p>
  </div>
  <div class="figure-box">
- <h3>Git metadata được phép</h3>
- <p style="margin:8px 0;">Thư mục <span class="code">.git</span> không được nằm trong thư mục đang sync với SharePoint. Git metadata phải được đặt ở path tách rời ngoài vùng sync, ví dụ:</p>
+ <h3>Git siêu dữ liệu được phép</h3>
+ <p style="margin:8px 0;">Thư mục <span class="code">.git</span> không được nằm trong thư mục đang đồng bộ với SharePoint. Git siêu dữ liệu phải được đặt ở đường dẫn tách rời ngoài vùng đồng bộ, ví dụ:</p>
  <p class="path">C:\HESEM-Git\eqms.hesemeng.com.git\</p>
  </div>
  </div>
  <div class="step-box">
  <h3>Lý do kỹ thuật bắt buộc</h3>
  <ul>
- <li>Microsoft cho phép đồng bộ thư viện SharePoint xuống máy qua OneDrive hoặc File Explorer, nhưng không hỗ trợ đồng bộ vào network drive, mapped drive hoặc qua symbolic link hay junction. Thiết kế local workspace phải bám đúng ranh giới này.</li>
- <li>Git metadata thay đổi rất dày; đặt <span class="code">.git</span> trong vùng đang đồng bộ sẽ làm tăng nguy cơ xung đột sync, file lock và lịch sử nhiễu không liên quan đến nội dung thực.</li>
- <li>Mô hình <span class="code">git work-tree</span> tách khỏi <span class="code">git-dir</span> cho phép worktree nằm trong vùng SharePoint sync mà không kéo toàn bộ Git internals vào library đang đồng bộ.</li>
+ <li>Microsoft cho phép đồng bộ thư viện SharePoint xuống máy qua OneDrive hoặc Tệp Explorer, nhưng không hỗ trợ đồng bộ vào network drive, mapped drive hoặc qua symbolic liên kết hay junction. Thiết kế local workspace phải bám đúng ranh giới này.</li>
+ <li>Git siêu dữ liệu thay đổi rất dày; đặt <span class="code">.git</span> trong vùng đang đồng bộ sẽ làm tăng nguy cơ xung đột đồng bộ, Tệp lock và lịch sử nhiễu không liên quan đến nội dung thực.</li>
+ <li>Mô hình <span class="code">git work-tree</span> tách khỏi <span class="code">git-dir</span> cho phép worktree nằm trong vùng SharePoint đồng bộ mà không kéo toàn bộ Git internals vào thư viện đang đồng bộ.</li>
  </ul>
  </div>
  </div>
 
  <div class="section">
- <h2>5. Phân quyền bắt buộc cho source library</h2>
+ <h2>5. Phân quyền bắt buộc cho source thư viện</h2>
  <div class="table-card">
  <table class="table">
  <thead>
- <tr><th>Nhóm</th><th>QMS-Source-Control</th><th>Quy tắc</th></tr>
+ <tr><th>Nhóm</th><th>QMS-Source-Kiểm soát</th><th>Quy tắc</th></tr>
  </thead>
  <tbody>
- <tr><td><span class="code">QMS-Owners</span></td><td>Full Control</td><td>Chủ thư viện; được thay đổi cấu trúc, restore, audit và thu hồi quyền khẩn cấp.</td></tr>
- <tr><td><span class="code">QMS-IT-Administrators</span></td><td>Edit</td><td>Quản trị các máy đồng bộ, kiểm soát ranh giới Git, biên nhận triển khai và close-out cho reverse sync.</td></tr>
+ <tr><td><span class="code">QMS-Chủ sở hữus</span></td><td>Full Kiểm soát</td><td>Chủ thư viện; được thay đổi cấu trúc, restore, đánh giá và thu hồi quyền khẩn cấp.</td></tr>
+ <tr><td><span class="code">QMS-IT-Administrators</span></td><td>Edit</td><td>Quản trị các máy đồng bộ, kiểm soát ranh giới Git, biên nhận triển khai và close-out cho reverse đồng bộ.</td></tr>
  <tr><td><span class="code">QMS-QMS-Editors</span></td><td>Edit</td><td>Biên tập nội dung tài liệu nguồn, manifest phát hành và thay đổi nguồn đã được phê duyệt.</td></tr>
- <tr><td><span class="code">QMS-Portal-Editors</span></td><td>Edit trong <span class="code">01-Controlled-Source</span>; Read tại các nhánh còn lại</td><td>Được soạn thảo nội dung nhưng không tự ý sửa deploy receipt hoặc reverse-sync log.</td></tr>
- <tr><td><span class="code">QMS-ReadOnly</span></td><td>Không cấp mặc định</td><td>Library này không phải điểm đọc dùng chung cho toàn công ty; người dùng cuối chỉ tiêu thụ bản đã phát hành qua portal và records site, không đọc source tree.</td></tr>
- <tr><td>Tài khoản dịch vụ deploy</td><td>Không cần quyền SharePoint mặc định</td><td>Server deploy đi qua Git remote; không cấp quyền trực tiếp vào SharePoint nếu không có yêu cầu tích hợp riêng đã được phê duyệt.</td></tr>
+ <tr><td><span class="code">QMS-Cổng-Editors</span></td><td>Edit trong <span class="code">01-Kiểm soátled-Source</span>; Read tại các nhánh còn lại</td><td>Được soạn thảo nội dung nhưng không tự ý sửa deploy receipt hoặc reverse-đồng bộ log.</td></tr>
+ <tr><td><span class="code">QMS-ReadChỉ</span></td><td>Không cấp mặc định</td><td>Thư viện này không phải điểm đọc dùng chung cho toàn công ty; người dùng cuối chỉ tiêu thụ bản đã phát hành qua cổng và hồ sơ không gian, không đọc source tree.</td></tr>
+ <tr><td>Tài khoản dịch vụ deploy</td><td>Không cần quyền SharePoint mặc định</td><td>Máy chủ deploy đi qua Git remote; không cấp quyền trực tiếp vào SharePoint nếu không có yêu cầu tích hợp riêng đã được phê duyệt.</td></tr>
  </tbody>
  </table>
  </div>
- <div class="keyline"><strong>Quy tắc cứng:</strong> không cấp quyền trực tiếp theo từng người dùng ở item hoặc folder trong <span class="code">QMS-Source-Control</span>; mọi quyền phải đi qua group. Không dùng external sharing trên library này. Local sync chỉ cấp cho danh sách endpoint đã được đăng ký trong register quản lý.</div>
+ <div class="keyline"><strong>Quy tắc cứng:</strong> không cấp quyền trực tiếp theo từng người dùng ở item hoặc thư mục trong <span class="code">QMS-Source-Kiểm soát</span>; mọi quyền phải đi qua group. Không dùng external sharing trên thư viện này. Local đồng bộ chỉ cấp cho danh sách endpoint đã được đăng ký trong Sổ đăng ký quản lý.</div>
  </div>
 
  <div class="section">
- <h2>6. Luồng promotion chuẩn và luồng reverse sync</h2>
+ <h2>6. Luồng promotion chuẩn và luồng reverse đồng bộ</h2>
  <div class="three-col">
  <div class="figure-box">
  <h3>Luồng chuẩn</h3>
- <p style="margin:8px 0;">Worktree local đang đồng bộ SharePoint chỉ được chỉnh trên admin endpoint đã đăng ký, sau đó commit và push lên Git remote, rồi server pull hoặc deploy. Sau khi triển khai xong, phải lưu deploy receipt tại <span class="code">03-Server-Deploy-Receipts</span>.</p>
+ <p style="margin:8px 0;">Worktree local đang đồng bộ SharePoint chỉ được chỉnh trên admin endpoint đã đăng ký, sau đó commit và push lên Git remote, rồi máy chủ pull hoặc deploy. Sau khi triển khai xong, phải lưu deploy receipt tại <span class="code">03-Máy chủ-Deploy-Receipts</span>.</p>
  </div>
  <div class="figure-box">
- <h3>Luồng hotfix từ server</h3>
- <p style="margin:8px 0;">Chỉ dùng khi buộc phải sửa point-of-use trực tiếp trên server. Sau hotfix, thay đổi phải được commit và push về Git remote ngay; local admin phải kéo ngược về worktree đồng bộ; và hồ sơ reverse sync phải được đóng tại <span class="code">04-Reverse-Sync-Intake</span>.</p>
+ <h3>Luồng hotfix từ máy chủ</h3>
+ <p style="margin:8px 0;">Chỉ dùng khi buộc phải sửa point-of-use trực tiếp trên máy chủ. Sau hotfix, thay đổi phải được commit và push về Git remote ngay; local admin phải kéo ngược về worktree đồng bộ; và hồ sơ reverse đồng bộ phải được đóng tại <span class="code">04-Reverse-Đồng bộ-Intake</span>.</p>
  </div>
  <div class="figure-box">
- <h3>Luồng form</h3>
- <p style="margin:8px 0;">Định nghĩa biểu mẫu, schema đã phát hành và source template đi theo luồng nguồn chuẩn. Form entry, approval, runtime archive và submission payload không được đi vào Git hoặc source library trên SharePoint.</p>
+ <h3>Luồng biểu mẫu</h3>
+ <p style="margin:8px 0;">Định nghĩa biểu mẫu, schema đã phát hành và source template đi theo luồng nguồn chuẩn. Biểu mẫu entry, phê duyệt, môi trường chạy archive và submission payload không được đi vào Git hoặc source thư viện trên SharePoint.</p>
  </div>
  </div>
  <div class="callout"><strong>Cơ chế phát hành lên VPS thực tế (eqms.hesemeng.com — host chạy PHP 8.5 + nginx + PostgreSQL + Redis + RabbitMQ):</strong><br>
- <b>Đường mặc định:</b> push vào branch <span class="code">main</span> trên Git remote → GitHub Actions chạy <span class="code">.github/workflows/deploy.yml</span> → SSH vào VPS, gọi <span class="code">/var/www/eqms.hesemeng.com/tools/vps-setup/scripts/deploy.sh</span>. Script này chụp ảnh dữ liệu runtime vào <span class="code">/var/www/data-private/.deploy-snapshots/&lt;TS&gt;/</span>, chạy reset có kiểm soát, sau đó phục hồi runtime theo xác thực sha256; nếu mismatch sẽ dừng và báo lỗi to.<br>
- <b>Đường thủ công (khi CI không khả dụng):</b> <span class="code">ssh eqms 'sudo -n bash /var/www/eqms.hesemeng.com/tools/vps-setup/scripts/deploy.sh'</span> — bắt buộc dùng script này, không gõ trực tiếp <span class="code">git reset --hard</span>, <span class="code">git restore</span>, <span class="code">git clean -fd</span> trên VPS.<br>
- <b>Hot-fix tại VPS (hiếm):</b> chỉ chỉnh qua giao diện admin của portal đi qua <span class="code">DataSyncMutationService</span> (ghi snapshot + audit_events). Không sửa trực tiếp <span class="code">mom/data/config/*.json</span> bằng vi/sed/cat&gt;. Sau hotfix, đóng hồ sơ tại <span class="code">QMS-Source-Control/04-Reverse-Sync-Intake/{YYYY}/</span> theo §6 luồng reverse sync.<br>
- <b>Tuyệt đối cấm trên VPS:</b> bất kỳ thao tác Git phá huỷ nào (<span class="code">git reset --hard</span>, <span class="code">git restore</span>, <span class="code">git clean -fd</span>) trên <span class="code">/var/www/eqms.hesemeng.com</span> — đã có tiền lệ mất dữ liệu người dùng <span class="code">users.json</span> khi rollback bằng <span class="code">git reset --hard origin/main</span> qua SSH (sự cố commit <span class="code">4a8ffebd</span>); chính sách hiện hành neo tại CLAUDE.md §VPS deployment chính sách.</div>
+ <b>Đường mặc định:</b> push vào branch <span class="code">main</span> trên Git remote → GitHub Actions chạy <span class="code">.github/Luồng công việcs/deploy.yml</span> → SSH vào VPS, gọi <span class="code">/var/www/eqms.hesemeng.com/dao cụs/vps-chuẩn bị máy/scripts/deploy.sh</span>. Script này chụp ảnh dữ liệu môi trường chạy vào <span class="code">/var/www/data-private/.deploy-ảnh chụp trạng tháis/&lt;TS&gt;/</span>, chạy reset có kiểm soát, sau đó phục hồi môi trường chạy theo xác thực sha256; nếu mismatch sẽ dừng và báo lỗi to.<br>
+ <b>Đường thủ công (khi CI không khả dụng):</b> <span class="code">ssh eqms 'sudo -n bash /var/www/eqms.hesemeng.com/dao cụs/vps-chuẩn bị máy/scripts/deploy.sh'</span> — bắt buộc dùng script này, không gõ trực tiếp <span class="code">git reset --hard</span>, <span class="code">git restore</span>, <span class="code">git làm sạch -fd</span> trên VPS.<br>
+ <b>Hot-fix tại VPS (hiếm):</b> chỉ chỉnh qua giao diện admin của cổng đi qua <span class="code">DataĐồng bộMutationService</span> (ghi ảnh chụp trạng thái + đánh giá_events). Không sửa trực tiếp <span class="code">mom/data/config/*.json</span> bằng vi/sed/cat&gt;. Sau hotfix, đóng hồ sơ tại <span class="code">QMS-Source-Kiểm soát/04-Reverse-Đồng bộ-Intake/{YYYY}/</span> theo §6 luồng reverse đồng bộ.<br>
+ <b>Tuyệt đối cấm trên VPS:</b> bất kỳ thao tác Git phá huỷ nào (<span class="code">git reset --hard</span>, <span class="code">git restore</span>, <span class="code">git làm sạch -fd</span>) trên <span class="code">/var/www/eqms.hesemeng.com</span> — đã có tiền lệ mất dữ liệu người dùng <span class="code">users.json</span> khi rollback bằng <span class="code">git reset --hard origin/main</span> qua SSH (sự cố commit <span class="code">4a8ffebd</span>); chính sách hiện hành neo tại CLAUDE.md §VPS deployment chính sách.</div>
  </div>
 
  <div class="section">
@@ -187,64 +187,64 @@
  <div class="table-card">
  <table class="table">
  <thead>
- <tr><th>Nhóm file</th><th>Xử lý bắt buộc</th><th>Ví dụ</th></tr>
+ <tr><th>Nhóm Tệp</th><th>Xử lý bắt buộc</th><th>Ví dụ</th></tr>
  </thead>
  <tbody>
- <tr><td>Nguồn được kiểm soát</td><td>Được đồng bộ về máy cục bộ, commit vào Git và pull xuống server.</td><td>HTML SOP/WI/ANNEX, portal script, static asset, định nghĩa biểu mẫu đã phát hành và baseline cấu hình đã duyệt.</td></tr>
- <tr><td>Runtime noise</td><td>Không commit, không đồng bộ ngược về source library và không dùng làm bằng chứng phát hành.</td><td><span class="code">mom/qms-data/form-luồng công việc/</span>, <span class="code">sessions/</span>, <span class="code">ratelimit/</span>, <span class="code">php_error.log</span>, <span class="code">scan_cache.json</span>, <span class="code">config/users.json</span>.</td></tr>
- <tr><td>Dữ liệu giao dịch của biểu mẫu</td><td>Không đưa vào Git source; phải được điều hướng về records library hoặc runtime record area theo <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>.</td><td>Online form submission, approval payload, generated response JSON, scan upload và temporary entry store.</td></tr>
- <tr><td>Bí mật hoặc cấu hình riêng của server</td><td>Không đặt trong SharePoint-synced worktree nếu có chứa secret hoặc credential; phải lưu ở server-only control path đã được hạn chế.</td><td>SSH key, deploy secret, SMTP secret, credential store và server-only override config.</td></tr>
+ <tr><td>Nguồn được kiểm soát</td><td>Được đồng bộ về máy cục bộ, commit vào Git và pull xuống máy chủ.</td><td>HTML SOP/WI/ANNEX, cổng script, static asset, định nghĩa biểu mẫu đã phát hành và mốc chuẩn cấu hình đã duyệt.</td></tr>
+ <tr><td>Môi trường chạy noise</td><td>Không commit, không đồng bộ ngược về source thư viện và không dùng làm bằng chứng phát hành.</td><td><span class="code">mom/qms-data/biểu mẫu-luồng công việc/</span>, <span class="code">sessions/</span>, <span class="code">ratelimit/</span>, <span class="code">php_error.log</span>, <span class="code">scan_cache.json</span>, <span class="code">config/users.json</span>.</td></tr>
+ <tr><td>Dữ liệu giao dịch của biểu mẫu</td><td>Không đưa vào Git source; phải được điều hướng về hồ sơ thư viện hoặc môi trường chạy hồ sơ area theo <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>.</td><td>Onchuyền biểu mẫu submission, phê duyệt payload, generated response JSON, scan upload và temporary entry store.</td></tr>
+ <tr><td>Bí mật hoặc cấu hình riêng của máy chủ</td><td>Không đặt trong SharePoint-đồng bộed worktree nếu có chứa secret hoặc credential; phải lưu ở máy chủ-chỉ kiểm soát đường dẫn đã được hạn chế.</td><td>SSH key, deploy secret, SMTP secret, credential store và máy chủ-chỉ override config.</td></tr>
  </tbody>
  </table>
  </div>
  </div>
 
  <div class="section">
- <h2>8. Quy tắc cho online form và form luồng công việc</h2>
+ <h2>8. Quy tắc cho onchuyền biểu mẫu và biểu mẫu luồng công việc</h2>
  <div class="table-card">
  <table class="table">
  <thead>
  <tr><th>Thành phần</th><th>Nơi lưu bắt buộc</th><th>Đường đi bắt buộc</th></tr>
  </thead>
  <tbody>
- <tr><td>Form definition / schema / release model</td><td><span class="code">QMS-Source-Control/01-Controlled-Source/eqms.hesemeng.com/</span></td><td>Đi theo Git và SharePoint local sync như các nguồn được kiểm soát khác.</td></tr>
- <tr><td>Draft binary / in-review binary / archived obsolete workbook</td><td>Server runtime area dưới <span class="code">mom/qms-data/form-luồng công việc/</span> hoặc path runtime tương đương đã được duyệt</td><td>Không quay vào source library; chỉ lưu evidence, manifest hoặc receipt trong records khi thật sự cần.</td></tr>
- <tr><td>Form entry / submission / approval / operational response</td><td>Records library phù hợp tại <span class="code">HESEM-Records</span> hoặc runtime record area đã được phê duyệt</td><td>Không đi theo Git source. Chỉ điều hướng sang file plan chính thức hoặc runtime index có thời hạn lưu trữ.</td></tr>
+ <tr><td>Biểu mẫu definition / schema / phát hành model</td><td><span class="code">QMS-Source-Kiểm soát/01-Kiểm soátled-Source/eqms.hesemeng.com/</span></td><td>Đi theo Git và SharePoint local đồng bộ như các nguồn được kiểm soát khác.</td></tr>
+ <tr><td>Draft binary / in-Rà soát binary / archived obsolete workbook</td><td>Máy chủ môi trường chạy area dưới <span class="code">mom/qms-data/biểu mẫu-luồng công việc/</span> hoặc đường dẫn môi trường chạy tương đương đã được duyệt</td><td>Không quay vào source thư viện; chỉ lưu bằng chứng, manifest hoặc receipt trong hồ sơ khi thật sự cần.</td></tr>
+ <tr><td>Biểu mẫu entry / submission / phê duyệt / operational response</td><td>Hồ sơ thư viện phù hợp tại <span class="code">HESEM-Hồ sơ</span> hoặc môi trường chạy hồ sơ area đã được phê duyệt</td><td>Không đi theo Git source. Chỉ điều hướng sang Tệp kế hoạch chính thức hoặc môi trường chạy index có thời hạn lưu trữ.</td></tr>
  </tbody>
  </table>
  </div>
 
- <h3>8.1. Luồng sync chi tiết: Online form → SharePoint</h3>
+ <h3>8.1. Luồng đồng bộ chi tiết: Onchuyền biểu mẫu → SharePoint</h3>
  <div class="step-box">
- <p style="margin:0 0 8px;"><strong>Khi người dùng gửi form trực tuyến trên web portal, server phải xử lý tuần tự theo các bước sau:</strong></p>
+ <p style="margin:0 0 8px;"><strong>Khi người dùng gửi biểu mẫu trực tuyến trên web cổng, máy chủ phải xử lý tuần tự theo các bước sau:</strong></p>
  <table class="table">
  <thead>
  <tr><th>Bước</th><th>Hành động</th><th>Chi tiết kỹ thuật</th></tr>
  </thead>
  <tbody>
- <tr><td><strong>1</strong></td><td>Người dùng gửi form trên web portal</td><td>Server nhận request POST tại <span class="code">api.php</span> với payload đã qua kiểm tra phía client.</td></tr>
- <tr><td><strong>2</strong></td><td>Server lưu JSON entry làm bản gốc</td><td>Ghi vào <span class="code">qms-data/online-forms/entries/{form_code}.json</span>. Đây là bản gốc duy nhất trên server.</td></tr>
- <tr><td><strong>3</strong></td><td>Server tạo PDF snapshot</td><td>Tên file bắt buộc: <span class="code">FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.pdf</span>.</td></tr>
- <tr><td><strong>4</strong></td><td>Gán Record-ID khi loại hồ sơ yêu cầu</td><td>Áp dụng cho NCR, CAPA, FAI và các loại hồ sơ cần mã định danh. Server phải cấp từ atomic counter sử dụng <span class="code">LOCK_EX</span> để tránh trùng mã.</td></tr>
- <tr><td><strong>5</strong></td><td>Đồng bộ dữ liệu cấu trúc lên SharePoint List</td><td>Server gọi Microsoft Graph API để tạo hoặc cập nhật item trong SharePoint List tương ứng. Dữ liệu cấu trúc này phục vụ bảng điều khiển, báo cáo và truy vấn metadata.</td></tr>
- <tr><td><strong>6</strong></td><td>Upload PDF lên SharePoint Document Library</td><td>Server upload PDF snapshot vào document library phù hợp theo file plan. PDF là bằng chứng phục vụ audit và thời hạn lưu trữ.</td></tr>
- <tr><td><strong>7</strong></td><td>Ghi allocation log</td><td>Mọi Record-ID đã cấp phải được ghi vào <span class="code">qms-data/counters/_allocation_log.jsonl</span> theo kiểu append-only, không sửa và không xóa.</td></tr>
+ <tr><td><strong>1</strong></td><td>Người dùng gửi biểu mẫu trên web cổng</td><td>Máy chủ nhận request POST tại <span class="code">api.php</span> với payload đã qua kiểm tra phía client.</td></tr>
+ <tr><td><strong>2</strong></td><td>Máy chủ lưu JSON entry làm bản gốc</td><td>Ghi vào <span class="code">qms-data/onchuyền-biểu mẫus/entries/{biểu mẫu_code}.json</span>. Đây là bản gốc duy nhất trên máy chủ.</td></tr>
+ <tr><td><strong>3</strong></td><td>Máy chủ tạo PDF ảnh chụp trạng thái</td><td>Tên Tệp bắt buộc: <span class="code">FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.pdf</span>.</td></tr>
+ <tr><td><strong>4</strong></td><td>Gán Hồ sơ-ID khi loại hồ sơ yêu cầu</td><td>Áp dụng cho NCR, CAPA, FAI và các loại hồ sơ cần mã định danh. Máy chủ phải cấp từ atomic counter sử dụng <span class="code">LOCK_EX</span> để tránh trùng mã.</td></tr>
+ <tr><td><strong>5</strong></td><td>Đồng bộ dữ liệu cấu trúc lên SharePoint List</td><td>Máy chủ gọi Microsoft Graph API để tạo hoặc cập nhật item trong SharePoint List tương ứng. Dữ liệu cấu trúc này phục vụ bảng điều khiển, báo cáo và truy vấn siêu dữ liệu.</td></tr>
+ <tr><td><strong>6</strong></td><td>Upload PDF lên SharePoint Document Thư viện</td><td>Máy chủ upload PDF ảnh chụp trạng thái vào document thư viện phù hợp theo Tệp kế hoạch. PDF là bằng chứng phục vụ đánh giá và thời hạn lưu trữ.</td></tr>
+ <tr><td><strong>7</strong></td><td>Ghi allocation log</td><td>Mọi Hồ sơ-ID đã cấp phải được ghi vào <span class="code">qms-data/counters/_allocation_log.jsonl</span> theo kiểu append-chỉ, không sửa và không xóa.</td></tr>
  </tbody>
  </table>
  </div>
 
- <h3>8.2. Luồng dành cho Excel form (offline fill)</h3>
+ <h3>8.2. Luồng dành cho Excel biểu mẫu (offchuyền fill)</h3>
  <div class="step-box">
- <p style="margin:0 0 8px;"><strong>Khi hồ sơ yêu cầu điền Excel form ngoại tuyến, luồng bắt buộc như sau:</strong></p>
+ <p style="margin:0 0 8px;"><strong>Khi hồ sơ yêu cầu điền Excel biểu mẫu ngoại tuyến, luồng bắt buộc như sau:</strong></p>
  <table class="table">
  <thead>
  <tr><th>Bước</th><th>Hành động</th><th>Ghi chú</th></tr>
  </thead>
  <tbody>
- <tr><td><strong>1</strong></td><td>Người dùng xin Record-ID qua portal</td><td>Chọn chức năng <em>"Xin mã hồ sơ mới"</em> trên portal. Server cấp mã từ atomic counter (<span class="code">LOCK_EX</span>) và ghi allocation log.</td></tr>
- <tr><td><strong>2</strong></td><td>Người dùng tải blank form từ portal</td><td>Form phải được đóng dấu phiên bản bằng mã form, phiên bản và ngày phát hành để bảo đảm đúng revision đang hiệu lực.</td></tr>
- <tr><td><strong>3</strong></td><td>Người dùng điền Excel form tại máy cá nhân</td><td>Tệp phải được lưu theo đúng naming convention bắt buộc trong file plan.</td></tr>
- <tr><td><strong>4</strong></td><td>Người dùng upload lại qua portal</td><td>Portal tiếp nhận file Excel như controlled capture carrier, kiểm tra issuance ledger, version stamp, metadata và hash trước khi tạo submission attempt. SharePoint chỉ nhận bản snapshot chỉ-đọc do server publish sau khi hoàn tất.</td></tr>
+ <tr><td><strong>1</strong></td><td>Người dùng xin Hồ sơ-ID qua cổng</td><td>Chọn chức năng <em>"Xin mã hồ sơ mới"</em> trên cổng. Máy chủ cấp mã từ atomic counter (<span class="code">LOCK_EX</span>) và ghi allocation log.</td></tr>
+ <tr><td><strong>2</strong></td><td>Người dùng tải blank biểu mẫu từ cổng</td><td>Biểu mẫu phải được đóng dấu phiên bản bằng mã biểu mẫu, phiên bản và ngày phát hành để bảo đảm đúng revision đang hiệu lực.</td></tr>
+ <tr><td><strong>3</strong></td><td>Người dùng điền Excel biểu mẫu tại máy cá nhân</td><td>Tệp phải được lưu theo đúng naming convention bắt buộc trong Tệp kế hoạch.</td></tr>
+ <tr><td><strong>4</strong></td><td>Người dùng upload lại qua cổng</td><td>Cổng tiếp nhận Tệp Excel như kiểm soátled capture carrier, kiểm tra issuance ledger, version stamp, siêu dữ liệu và hash trước khi tạo submission attempt. SharePoint chỉ nhận bản ảnh chụp trạng thái chỉ-đọc do máy chủ publish sau khi hoàn tất.</td></tr>
  </tbody>
  </table>
  </div>
@@ -253,12 +253,12 @@
  <div class="section">
  <h2>9. Điều kiện không được go-live</h2>
  <ul>
- <li>Chưa tạo library <span class="code">QMS-Source-Control</span> hoặc chưa khóa quyền đúng theo mô hình group.</li>
- <li>Worktree local vẫn còn thư mục <span class="code">.git</span> nằm trong vùng SharePoint sync.</li>
- <li>Chưa chứng minh được trọn một vòng <span class="code">local sync → Git push → server pull → deploy receipt → local pull</span>.</li>
- <li>Runtime noise vẫn còn bị stage hoặc commit trong quá trình sync thử.</li>
- <li>Chưa có quy tắc tách riêng giữa online form source và dữ liệu giao dịch của online form.</li>
- <li>Chưa có WI thao tác cho admin endpoint và server operator.</li>
+ <li>Chưa tạo thư viện <span class="code">QMS-Source-Kiểm soát</span> hoặc chưa khóa quyền đúng theo mô hình group.</li>
+ <li>Worktree local vẫn còn thư mục <span class="code">.git</span> nằm trong vùng SharePoint đồng bộ.</li>
+ <li>Chưa chứng minh được trọn một vòng <span class="code">local đồng bộ → Git push → máy chủ pull → deploy receipt → local pull</span>.</li>
+ <li>Môi trường chạy noise vẫn còn bị stage hoặc commit trong quá trình đồng bộ thử.</li>
+ <li>Chưa có quy tắc tách riêng giữa onchuyền biểu mẫu source và dữ liệu giao dịch của onchuyền biểu mẫu.</li>
+ <li>Chưa có WI thao tác cho admin endpoint và máy chủ người vận hành.</li>
  </ul>
  </div>
 
@@ -271,8 +271,8 @@
  </thead>
  <tbody>
  <tr><td>SOP</td><td><a href="../../../sops/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a> ; <a href="../../../sops/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> ; <a href="../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td><td>Khóa kiểm soát tài liệu, quản trị dữ liệu và quản lý thay đổi hoặc cấu hình.</td></tr>
- <tr><td>WI</td><td><a href="../../../work-instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a> ; <a href="../../../work-instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a> ; <a href="../../../work-instructions/01-WI-100/wi-101-digital-online-forms-and-approvals.html">WI-101</a></td><td>Khóa thao tác tạo site, library, quyền, quy trình sync hoặc deploy và điều khiển online form.</td></tr>
- <tr><td>ANNEX</td><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> ; <a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a> ; <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> ; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> ; <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a> ; <a href="annex-138-sharepoint-local-sync-and-git-workspace-boundary.html">ANNEX-138</a> ; <a href="annex-137-evidence-and-records-naming-convention.html">ANNEX-137</a></td><td>Khóa metadata, flow, topology, permissions, file plan, ranh giới đồng bộ cục bộ và kiểm soát evidence cho online form.</td></tr>
+ <tr><td>WI</td><td><a href="../../../work-instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a> ; <a href="../../../work-instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a> ; <a href="../../../work-instructions/01-WI-100/wi-101-digital-online-forms-and-approvals.html">WI-101</a></td><td>Khóa thao tác tạo không gian, thư viện, quyền, quy trình đồng bộ hoặc deploy và điều khiển onchuyền biểu mẫu.</td></tr>
+ <tr><td>ANNEX</td><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> ; <a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a> ; <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> ; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> ; <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a> ; <a href="annex-138-sharepoint-local-sync-and-git-workspace-boundary.html">ANNEX-138</a> ; <a href="annex-137-evidence-and-records-naming-convention.html">ANNEX-137</a></td><td>Khóa siêu dữ liệu, flow, topology, permissions, Tệp kế hoạch, ranh giới đồng bộ cục bộ và kiểm soát bằng chứng cho onchuyền biểu mẫu.</td></tr>
  </tbody>
  </table>
  </div>

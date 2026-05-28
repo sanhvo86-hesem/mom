@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>ANNEX-703 - Warehouse Vị trí FIFO Rules | HESEM MOM</title>
+<title>ANNEX-703 - Warehouse Vị trí FIFO Quy tắcs | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap — computes absolute URLs from location.pathname so the
  * stylesheet + renderer load correctly regardless of how the document is
@@ -68,21 +68,25 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
      data-dcc-doc-code="ANNEX-703"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-703&quot;,&quot;title&quot;:&quot;Warehouse Vị trí FIFO Rules&quot;,&quot;subtitle&quot;:&quot;Tài liệu tham chiếu / chuẩn bổ trợ cho quy tắc vị trí kho, zoning, fifo/fefo, staging và cycle count.&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div> <div class="note">
-<strong>ÁP DỤNG KHI</strong><br>Dùng khi tạo mới vị trí, thay đổi zoning, put-away, relocation, overflow, cycle count, inventory adjustment hoặc rà soát FIFO/FEFO/shelf-life.</div> <section class="annex-section"><h2>1. Mục đích và nguyên tắc điều khiển</h2>
-<p>ANNEX này là chuẩn vận hành bắt buộc để quản lý vị trí kho, zoning, nhãn vị trí, staging, put-away, relocation, FIFO/FEFO, shelf-life, cycle count và điều chỉnh tồn. Warehouse, IQC, Production, Planning và <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> PHẢI dùng cùng một logic vị trí, cùng một quy tắc nhận diện trạng thái và cùng một nguồn dữ liệu. Epicor là Nguồn chuẩn cho giao dịch tồn. M365 là SSOT cho bằng chứng điều chỉnh, biên bản đếm và hồ sơ điều tra.</p>
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-703&quot;,&quot;title&quot;:&quot;Warehouse Vị trí FIFO Rules&quot;,&quot;subtitle&quot;:&quot;Tài liệu tham chiếu / chuẩn bổ trợ cho quy tắc vị trí kho, zoning, fifo/fefo, staging và cycle count.&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
+
+<div class="note">
+<strong>ÁP DỤNG KHI</strong><br>Dùng khi tạo mới vị trí, thay đổi zoning, put-away, relocation, overflow, cycle count, inventory adjustment hoặc Rà soát FIFO/FEFO/shelf-life.</div>
+
+<section class="annex-section"><h2>1. Mục đích và nguyên tắc điều khiển</h2>
+<p>ANNEX này là chuẩn vận hành bắt buộc để quản lý vị trí kho, zoning, nhãn vị trí, staging, put-away, relocation, FIFO/FEFO, shelf-life, cycle count và điều chỉnh tồn. Warehouse, IQC, Production, Kế hoạchning và <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> PHẢI dùng cùng một logic vị trí, cùng một quy tắc nhận diện trạng thái và cùng một nguồn dữ liệu. Epicor là Nguồn chuẩn cho giao dịch tồn. M365 là SSOT cho bằng chứng điều chỉnh, biên bản đếm và hồ sơ điều tra.</p>
 <div class="callout-danger">
-<span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Duy trì vị trí hợp lệ cho mọi vật tư, tách rõ từng lot, heat và expiry trong mỗi bao trong, chỉ lấy hàng từ zone HOLD, QH, RET hoặc CLEAN-BREACH sau khi đã có phát hành và thực hiện mọi điều chỉnh tồn bằng giao dịch hoặc hồ sơ kiểm soát chính thức.</div>
-<div class="callout-info"><strong>Ranh giới:</strong> ANNEX này khóa zoning, vị trí, FIFO/FEFO, overflow và cycle-count rule. Thao tác nhận hàng, put-away, bảo quản và phản ứng tại điểm dừng vẫn theo WI-701 và WI-702; không biến ANNEX này thành hướng dẫn thao tác từng bước cho hiện trường.</div>
+<span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Duy trì vị trí hợp lệ cho mọi vật tư, tách rõ từng lot, heat và expiry trong mỗi bao trong, chỉ lấy hàng từ zone TẠM GIỮ, QH, RET hoặc LÀM SẠCH-BREACH sau khi đã có phát hành và thực hiện mọi điều chỉnh tồn bằng giao dịch hoặc hồ sơ kiểm soát chính thức.</div>
+<div class="callout-info"><strong>Ranh giới:</strong> ANNEX này khóa zoning, vị trí, FIFO/FEFO, overflow và cycle-count quy tắc. Thao tác nhận hàng, put-away, bảo quản và phản ứng tại điểm dừng vẫn theo WI-701 và WI-702; không biến ANNEX này thành hướng dẫn thao tác từng bước cho hiện trường.</div>
 <div class="matrix">
 <div class="card">
 <strong>Nguyên tắc 1</strong><br>Một vị trí chỉ có giá trị khi có mã vị trí hợp lệ, nhãn quét được và giao dịch đã ghi nhận trong hệ thống.</div>
 <div class="card">
-<strong>Nguyên tắc 2</strong><br>Một bao trong chỉ được đại diện cho một Part–Rev–Lot/Heat–Trạng thái, trừ khi ANNEX này quy định khác và truy xuất nguồn gốc vẫn không đứt.</div>
+<strong>Nguyên tắc 2</strong><br>Một bao trong chỉ được đại diện cho một Chi tiết–Rev–Lot/Heat–Trạng thái, trừ khi ANNEX này quy định khác và truy xuất nguồn gốc vẫn không đứt.</div>
 <div class="card">
 <strong>Nguyên tắc 3</strong><br>FIFO là mặc định cho hàng không hạn dùng. FEFO là bắt buộc cho hàng có shelf-life, hóa chất, vật tư bảo quản, kit sạch và bất kỳ vật tư nào khách hàng quy định hạn dùng.</div>
 <div class="card">
-<strong>Nguyên tắc 4</strong><br>Bất kỳ chênh lệch tồn, mất nhãn, mixed lot, shelf-life breach hoặc negative stock đều phải dừng cấp phát và xử lý theo nhánh HOLD.</div>
+<strong>Nguyên tắc 4</strong><br>Bất kỳ chênh lệch tồn, mất nhãn, mixed lot, shelf-life breach hoặc negative stock đều phải dừng cấp phát và xử lý theo nhánh TẠM GIỮ.</div>
 </div></section>
 <section class="annex-section"><h2>2. Cấu trúc zoning, mã vị trí và nhãn vị trí</h2>
 <p>Zone code PHẢI phản ánh đúng trạng thái, mức kiểm soát và Người sở hữu giao dịch. Một kiện không được di chuyển giữa các zone chỉ bằng thay nhãn. Mọi chuyển zone PHẢI có giao dịch hoặc hồ sơ tương đương theo WI-205/WI-701.</p>
@@ -99,10 +103,10 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr>
 <td>RM</td>
 <td>Nguyên vật liệu đạt điều kiện nhận kho</td>
-<td>Raw bar/plate/tube, certified stock, được phê duyệt khách hàng vật liệu</td>
-<td>Hàng chưa IQC, hàng HOLD, hàng không rõ lot</td>
+<td>Raw bar/plate/tube, certified stock, approved khách hàng vật liệu</td>
+<td>Hàng chưa IQC, hàng TẠM GIỮ, hàng không rõ lot</td>
 <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td>
-<td>Nhiệt độ/độ ẩm theo WI-702; nhãn Part/Lot/Heat đầy đủ</td>
+<td>Nhiệt độ/độ ẩm theo WI-702; nhãn Chi tiết/Lot/Heat đầy đủ</td>
 </tr>
 <tr>
 <td>IQC</td>
@@ -114,17 +118,17 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tr>
 <tr>
 <td>QH</td>
-<td>Quarantine/Hold</td>
+<td>Quarantine/Tạm giữ</td>
 <td>Thiếu cert, nghi sai vật liệu, hư hại bao gói, quá hạn, mismatch label</td>
 <td>Không được pick/vấn đề</td>
 <td><span class="role-cluster"><a class="role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="role-code">QA</span></a></span></td>
-<td>Dùng nhãn HOLD đỏ; khóa trên hệ thống nếu có</td>
+<td>Dùng nhãn TẠM GIỮ đỏ; khóa trên hệ thống nếu có</td>
 </tr>
 <tr>
 <td>RET</td>
 <td>Hàng trả về / chờ quyết định</td>
 <td>Return từ Production, return từ giao hàng-prep, khách hàng return chưa xử lý</td>
-<td>Không nhập lại RM/FG khi chưa rà soát</td>
+<td>Không nhập lại RM/FG khi chưa Rà soát</td>
 <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td>
 <td>Phải có mã nguyên nhân và Người bàn giao</td>
 </tr>
@@ -147,17 +151,17 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr>
 <td>GIAO HÀNG</td>
 <td>Khu staging xuất hàng</td>
-<td>Kiện đã đầy đủ bộ hồ sơ, chờ xác nhận giao hàng (giao hàng confirm)/pickup</td>
+<td>Kiện đã đầy đủ pack, chờ xác nhận giao hàng (giao hàng confirm)/pickup</td>
 <td>Không dùng như vị trí lưu dài ngày</td>
 <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td>
 <td>Tối đa đến khi xe nhận; không qua đêm nếu chưa niêm phong</td>
 </tr>
 <tr>
-<td>CLEAN</td>
-<td>Vùng vật tư sạch / chân không sensitive</td>
-<td>Part đã clean, bag sạch, kit cleanroom, vật tư low-outgassing</td>
+<td>LÀM SẠCH</td>
+<td>Vùng vật tư sạch / vacuum sensitive</td>
+<td>Chi tiết đã làm sạch, bag sạch, kit phòng sạch, vật tư low-outgassing</td>
 <td>Không chứa vật tư hở, bẩn, dầu, carton rụng bụi</td>
-<td>Cleaning/Bộ hồ sơaging + WHS</td>
+<td>Làm sạching/Packaging + WHS</td>
 <td>Chỉ Người được ủy quyền mới được mở bao</td>
 </tr>
 <tr>
@@ -179,7 +183,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody>
 </table></div>
 <div class="figure-box">
-<strong>Định dạng mã vị trí bắt buộc:</strong> <span class="code">ZONE-AISLE-RACK-BAY-LEVEL</span> ví dụ: <span class="code">RM-A03-R02-B05-L1</span> hoặc <span class="code">CLEAN-A01-R01-B02-L0</span>.</div>
+<strong>Định dạng mã vị trí bắt buộc:</strong> <span class="code">ZONE-AISLE-RACK-BAY-LEVEL</span>  ví dụ: <span class="code">RM-A03-R02-B05-L1</span> hoặc <span class="code">LÀM SẠCH-A01-R01-B02-L0</span>.</div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr>
 <th>Thành phần</th>
@@ -189,7 +193,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tbody>
 <tr>
 <td>ZONE</td>
-<td>RM / IQC / QH / RET / WIP / FG / GIAO HÀNG / CLEAN / OVR / MRO</td>
+<td>RM / IQC / QH / RET / WIP / FG / GIAO HÀNG / LÀM SẠCH / OVR / MRO</td>
 <td>Không tự tạo mã viết tắt mới ngoài danh mục đã phê duyệt.</td>
 </tr>
 <tr>
@@ -215,23 +219,23 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr>
 <td>SUFFIX</td>
 <td>-BULK / -OVR / -KIT khi cần</td>
-<td>Chỉ dùng khi đã được cấu hình trong sổ đăng ký vị trí và mọi hệ thống liên quan chấp nhận.</td>
+<td>Chỉ dùng khi đã được cấu hình trong Sổ đăng ký vị trí và mọi hệ thống liên quan chấp nhận.</td>
 </tr>
 </tbody>
 </table></div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr>
 <th>Thông tin bắt buộc trên nhãn vị trí</th>
-<th>Rule</th>
+<th>Quy tắc</th>
 </tr></thead>
 <tbody>
 <tr>
 <td>Vị trí ID dạng chữ + mã vạch 1D</td>
-<td>Phải quét được ở khoảng cách thao tác bình thường; mờ/rách là HOLD vị trí.</td>
+<td>Phải quét được ở khoảng cách thao tác bình thường; mờ/rách là TẠM GIỮ vị trí.</td>
 </tr>
 <tr>
 <td>Zone và trạng thái kiểm soát</td>
-<td>Phải nhìn thấy từ lối đi chính; zone sạch và zone HOLD phải có nhận diện màu khác nhau.</td>
+<td>Phải nhìn thấy từ lối đi chính; zone sạch và zone TẠM GIỮ phải có nhận diện màu khác nhau.</td>
 </tr>
 <tr>
 <td>Giới hạn tải / hạn chế đặc biệt</td>
@@ -239,12 +243,12 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tr>
 <tr>
 <td>Người phụ trách/Contact khi là vị trí đặc biệt</td>
-<td>Áp dụng cho CLEAN, OVR, RET, zone vật tư khách hàng hoặc vị trí chia sẻ liên bộ phận.</td>
+<td>Áp dụng cho LÀM SẠCH, OVR, RET, zone vật tư khách hàng hoặc vị trí chia sẻ liên bộ phận.</td>
 </tr>
 </tbody>
 </table></div></section>
 <section class="annex-section"><h2>3. Put-away, relocation, overflow và kiểm soát mixed lot</h2>
-<p>Put-away, relocation, overflow và picking PHẢI được điều khiển bằng cùng một bộ rule. Mục tiêu là không tạo mixed lot ẩn, không sinh "ghost stock", không để vật tư rời khỏi truy xuất chain và không dùng overflow như kho chính thức.</p>
+<p>Put-away, relocation, overflow và picking PHẢI được điều khiển bằng cùng một bộ quy tắc. Mục tiêu là không tạo mixed lot ẩn, không sinh "ghost stock", không để vật tư rời khỏi trace chain và không dùng overflow như kho chính thức.</p>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr>
 <th>Tình huống</th>
@@ -253,11 +257,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tbody>
 <tr>
 <td>Put-away hàng mới nhận</td>
-<td>Chỉ put-away sau khi xác nhận đúng Part/Rev, lot/heat, qty, tình trạng bao gói, trạng thái PASS/IQC/HOLD và vị trí đích phù hợp với zone/điều kiện bảo quản.</td>
+<td>Chỉ put-away sau khi xác nhận đúng Chi tiết/Rev, lot/heat, qty, tình trạng bao gói, trạng thái PASS/IQC/TẠM GIỮ và vị trí đích phù hợp với zone/điều kiện bảo quản.</td>
 </tr>
 <tr>
 <td>Put-away vào vị trí đang có hàng</td>
-<td>Chỉ được thực hiện khi cùng Part/Rev, cùng trạng thái và truy xuất nguồn gốc vẫn tách được. Nếu khác lot/heat hoặc khác expiry thì PHẢI tách bằng bin/inner bag/thẻ riêng hoặc chuyển vị trí khác.</td>
+<td>Chỉ được thực hiện khi cùng Chi tiết/Rev, cùng trạng thái và truy xuất nguồn gốc vẫn tách được. Nếu khác lot/heat hoặc khác expiry thì PHẢI tách bằng bin/inner bag/card riêng hoặc chuyển vị trí khác.</td>
 </tr>
 <tr>
 <td>Relocation nội bộ</td>
@@ -269,31 +273,31 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tr>
 <tr>
 <td>Khu staging cho job</td>
-<td>Khu staging WIP chỉ chứa đúng job/kit đã gán. Nếu job đổi plan hoặc tạm dừng, kit phải được trả về zone phù hợp, không để staging vô thời hạn.</td>
+<td>Khu staging WIP chỉ chứa đúng job/kit đã gán. Nếu job đổi kế hoạch hoặc tạm dừng, kit phải được trả về zone phù hợp, không để staging vô thời hạn.</td>
 </tr>
 <tr>
 <td>Vật tư trả về từ Production</td>
-<td>Phải vào RET hoặc zone được chỉ định; không nhập thẳng lại RM nếu chưa rà soát quantity, label, trạng thái, nhiễm bẩn rủi ro và truy xuất nguồn gốc.</td>
+<td>Phải vào RET hoặc zone được chỉ định; không nhập thẳng lại RM nếu chưa Rà soát quantity, label, condition, nhiễm bẩn risk và truy xuất nguồn gốc.</td>
 </tr>
 <tr>
-<td>Mixed box / partial box</td>
-<td>Một hộp được phép chứa nhiều inner bag, nhưng từng inner bag PHẢI thể hiện rõ Part/Rev/Lot/Qty/Trạng thái; outer box phải có mapping danh sách.</td>
+<td>Mixed box / chi tiếtial box</td>
+<td>Một hộp được phép chứa nhiều inner bag, nhưng từng inner bag PHẢI thể hiện rõ Chi tiết/Rev/Lot/Qty/Trạng thái; outer box phải có mapping list.</td>
 </tr>
 <tr>
 <td>No-vị trí stock</td>
-<td>Bất kỳ vật tư nào không có vị trí hợp lệ sau khi kết thúc ca đều là nonconformance; <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a> phải mở điều tra và hoàn tất trong Ngày làm việc kế tiếp.</td>
+<td>Bất kỳ vật tư nào không có vị trí hợp lệ sau khi kết thúc ca đều là nonconbiểu mẫuance; <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a> phải mở điều tra và hoàn tất trong Ngày làm việc kế tiếp.</td>
 </tr>
 </tbody>
 </table></div>
 <div class="callout-warn">
-<strong>HOLD</strong> đối với mọi tình huống: vị trí label không quét được; bộ hồ sơ rách/bẹp ảnh hưởng nhận diện; mixed lot không giải thích được; vật tư sạch bị breach; vật tư đã nhận nhưng chưa xác định được zone đích; tồn phát sinh âm hoặc lệch logic FIFO.</div></section>
+<strong>TẠM GIỮ</strong> đối với mọi tình huống: vị trí label không quét được; package rách/bẹp ảnh hưởng nhận diện; mixed lot không giải thích được; vật tư sạch bị breach; vật tư đã nhận nhưng chưa xác định được zone đích; tồn phát sinh âm hoặc lệch logic FIFO.</div></section>
 <section class="annex-section"><h2>4. FIFO/FEFO, shelf-life bucket và ngoại lệ được phép</h2>
 <p>FIFO là mặc định cho vật tư không hạn dùng. FEFO là bắt buộc khi vật tư có hạn dùng, có life-after-open, có yêu cầu lưu kho sạch/bảo quản khí trơ hoặc khi khách hàng quy định dùng theo expiry. Không được chọn lô theo "hộp tiện lấy" nếu làm sai FIFO/FEFO.</p>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr>
 <th>Loại vật tư</th>
 <th>Phương pháp cấp phát</th>
-<th>Rule chọn lô</th>
+<th>Quy tắc chọn lô</th>
 </tr></thead>
 <tbody>
 <tr>
@@ -302,7 +306,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <td>Ưu tiên receipt date/close time sớm nhất; khi cắt remnant phải giữ liên kết remnant với heat và Ngày cắt.</td>
 </tr>
 <tr>
-<td>Hóa chất, adhesive, oil, desiccant, HIC, clean consumable</td>
+<td>Hóa chất, adhesive, oil, desiccant, HIC, làm sạch consumable</td>
 <td>FEFO</td>
 <td>Chọn lô có expiry Cần nhất nhưng vẫn còn cửa sổ sử dụng đủ cho job.</td>
 </tr>
@@ -312,13 +316,13 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <td>Sau khi mở phải gắn open date, user, expiry mới; quá hạn sau mở phải chuyển QH ngay.</td>
 </tr>
 <tr>
-<td>Part sạch/chân không-sensitive đã đóng gói</td>
+<td>Chi tiết sạch/vacuum-sensitive đã đóng gói</td>
 <td>FIFO theo sealed date, kèm preservation window</td>
-<td>Ưu tiên kiện đóng trước; kiện đã mở lại phải dùng rule breach/reseal theo WI-714/WI-716.</td>
+<td>Ưu tiên kiện đóng trước; kiện đã mở lại phải dùng quy tắc breach/reseal theo WI-714/WI-716.</td>
 </tr>
 <tr>
-<td>khách hàng supplied vật liệu</td>
-<td>Theo rule của khách + truy xuất nguồn gốc gốc</td>
+<td>Khách hàng supplied vật liệu</td>
+<td>Theo quy tắc của khách + truy xuất nguồn gốc gốc</td>
 <td>Nếu khách yêu cầu sử dụng theo lot/heat cụ thể thì PHẢI tách riêng, không trộn hoặc hoán đổi.</td>
 </tr>
 </tbody>
@@ -338,7 +342,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr>
 <td>90–180 ngày</td>
 <td>Vàng nhạt</td>
-<td>Planning rà soát cho job có thời gian dẫn (thời gian giao) dài; không mua mới nếu tồn hiện tại đủ dùng.</td>
+<td>Kế hoạchning Rà soát cho job có thời gian dẫn (thời gian giao) dài; không mua mới nếu tồn hiện tại đủ dùng.</td>
 </tr>
 <tr>
 <td>30–89 ngày</td>
@@ -354,12 +358,12 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr>
 <td>0 Ngày hoặc âm</td>
 <td>QH</td>
-<td>Chuyển Quarantine/Hold; PHẢI chặn vấn đề; xử lý theo quyết định xử lý.</td>
+<td>Chuyển Quarantine/Tạm giữ; PHẢI chặn vấn đề; xử lý theo quyết định xử lý.</td>
 </tr>
 </tbody>
 </table></div>
 <div class="keyline">
-<strong>Ngoại lệ FIFO/FEFO</strong><br>Ngoại lệ chỉ được mở khi có lý do kỹ thuật: khách hàng lot reservation, vật lý compatibility, cut remnant cùng setup, sample thời hạn lưu trữ, hoặc requirement truy xuất nguồn gốc đặc biệt. Ngoại lệ PHẢI ghi rõ lý do, Người phê duyệt và job áp dụng. Không dùng ngoại lệ để "tiện tay lấy hàng Cần cửa".</div></section>
+<strong>Ngoại lệ FIFO/FEFO</strong><br>Ngoại lệ chỉ được mở khi có lý do kỹ thuật: khách hàng lot reservation, physical compatibility, cut remnant cùng chuẩn bị máy, sample thời hạn lưu trữ, hoặc requirement truy xuất nguồn gốc đặc biệt. Ngoại lệ PHẢI ghi rõ lý do, Người phê duyệt và job áp dụng. Không dùng ngoại lệ để "tiện tay lấy hàng Cần cửa".</div></section>
 <section class="annex-section"><h2>5. Cycle count, điều chỉnh tồn và hồ sơ bắt buộc</h2>
 <p>Cycle count là công cụ duy trì độ tin cậy tồn kho, không phải thủ tục đối phó cuối tháng. Mọi vị trí A/B/C đều có tần suất tối thiểu; ngoài ra phải kích hoạt đếm bổ sung khi có tín hiệu bất thường.</p>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
@@ -367,12 +371,12 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <th>Nhóm</th>
 <th>Tiêu chí</th>
 <th>Tần suất tối thiểu</th>
-<th>Yêu cầu witness / rà soát</th>
+<th>Yêu cầu witness / Rà soát</th>
 </tr></thead>
 <tbody>
 <tr>
 <td>A</td>
-<td>Giá trị cao, part critical, vật tư CTQ, nguồn đơn (single-nguồn / nguồn đơn), hóa chất rủi ro hoặc ảnh hưởng OTD trực tiếp</td>
+<td>Giá trị cao, chi tiết critical, vật tư CTQ, nguồn đơn (single-source / nguồn đơn), hóa chất rủi ro hoặc ảnh hưởng OTD trực tiếp</td>
 <td>Hàng tuần</td>
 <td>
 <a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a> + <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> hoặc <a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a> witness; chênh lệch phải điều tra trước khi adjust.</td>
@@ -381,7 +385,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <td>B</td>
 <td>Giá trị trung bình, dùng thường xuyên, có ảnh hưởng kế hoạch sản xuất</td>
 <td>Hàng tháng</td>
-<td>WHS thực hiện, <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a> rà soát.</td>
+<td>WHS thực hiện, <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a> Rà soát.</td>
 </tr>
 <tr>
 <td>C</td>
@@ -399,7 +403,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tbody>
 <tr>
 <td>Negative stock / stock on hand âm</td>
-<td>Dừng vấn đề tại vị trí liên quan; recount 100%; rà soát giao dịch Cần nhất.</td>
+<td>Dừng vấn đề tại vị trí liên quan; recount 100%; Rà soát giao dịch Cần nhất.</td>
 </tr>
 <tr>
 <td>Pick không tìm thấy hàng</td>
@@ -407,7 +411,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tr>
 <tr>
 <td>Mixed lot / nhầm zone / label mismatch</td>
-<td>Count toàn bộ vị trí và các vị trí liên quan cùng part number.</td>
+<td>Count toàn bộ vị trí và các vị trí liên quan cùng chi tiết number.</td>
 </tr>
 <tr>
 <td>Return từ Production / khách hàng return</td>
@@ -426,15 +430,15 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tr></thead>
 <tbody>
 <tr>
-<td>Serial-controlled / khách hàng owned / clean kit / CTQ</td>
-<td>Chỉ cần lệch 1 đơn vị hoặc 1 hồ sơ là HOLD và điều tra.</td>
+<td>Serial-kiểm soátled / khách hàng owned / làm sạch kit / CTQ</td>
+<td>Chỉ cần lệch 1 đơn vị hoặc 1 hồ sơ là TẠM GIỮ và điều tra.</td>
 </tr>
 <tr>
-<td>Lot-controlled raw vật liệu</td>
-<td>Lệch &gt;1 pc hoặc &gt;1% qty hoặc bất kỳ mismatch heat/lot nào đều phải HOLD.</td>
+<td>Lot-kiểm soátled raw vật liệu</td>
+<td>Lệch &gt;1 pc hoặc &gt;1% qty hoặc bất kỳ mismatch heat/lot nào đều phải TẠM GIỮ.</td>
 </tr>
 <tr>
-<td>Consumable / bộ hồ sơaging vật liệu</td>
+<td>Consumable / packaging vật liệu</td>
 <td>Lệch &gt;5% hoặc vượt ngưỡng giá trị do <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a> phê duyệt hằng năm thì phải điều tra.</td>
 </tr>
 <tr>
@@ -475,16 +479,16 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tr>
 </tbody>
 </table></div></section>
-<section class="annex-section"><h2>6. Metrics kiểm soát và tài liệu liên kết</h2>
+<section class="annex-section"><h2>6. Chỉ số kiểm soát và tài liệu liên kết</h2>
 <div class="kpi-grid">
 <div class="kpi-box">
-<strong>Gate/kiểm soát metric 1</strong><br>Inventory accuracy theo zone và toàn kho phải được theo dõi theo tháng.</div>
+<strong>Cổng/kiểm soát chỉ số 1</strong><br>Inventory accuracy theo zone và toàn kho phải được theo dõi theo tháng.</div>
 <div class="kpi-box">
-<strong>Gate/kiểm soát metric 2</strong><br>Tỷ lệ no-vị trí, mixed lot, expired stock và overdue OVR phải được rà soát tại họp tầng hằng ngày/tuần.</div>
+<strong>Cổng/kiểm soát chỉ số 2</strong><br>Tỷ lệ no-vị trí, mixed lot, expired stock và overdue OVR phải được Rà soát tại họp tầng hằng ngày/tuần.</div>
 <div class="kpi-box">
-<strong>Gate/kiểm soát metric 3</strong><br>Số giờ đóng điều tra lệch tồn và số lần pick fail do sai vị trí phải lên bảng điều khiển.</div>
+<strong>Cổng/kiểm soát chỉ số 3</strong><br>Số giờ đóng điều tra lệch tồn và số lần pick fail do sai vị trí phải lên bảng điều khiển.</div>
 <div class="kpi-box">
-<strong>quản trị rule</strong><br><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a> rà soát tối thiểu tháng một lần các vị trí vi phạm lặp lại. Good catch được ghi nhận; lệch lặp lại mở hành động khắc phục/retraining. Kỷ luật chỉ áp dụng khi cố ý bypass FIFO/vị trí gate hoặc làm sai bằng chứng.</div>
+<strong>Governance quy tắc</strong><br><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a> Rà soát tối thiểu tháng một lần các vị trí vi phạm lặp lại. Good catch được ghi nhận; lệch lặp lại mở hành động khắc phục/retraining. Kỷ luật chỉ áp dụng khi cố ý bypass FIFO/vị trí cổng hoặc làm sai bằng chứng.</div>
 </div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr>
@@ -536,21 +540,21 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <th>Class</th>
 <th>Khu vực / vị trí nguyên tắc</th>
 <th>Chính / Sơ cấp hồ sơ</th>
-<th>Rule khi có vi phạm</th>
+<th>Quy tắc khi có vi phạm</th>
 </tr></thead>
 <tbody>
 <tr>
 <td>S0 Standard</td>
-<td>Khu vực có thể sử dụng chuẩn, theo FIFO/vị trí rule.</td>
+<td>Khu vực có thể sử dụng chuẩn, theo FIFO/vị trí quy tắc.</td>
 <td>
 <a href="../../../forms/frm-700-maintenance/FRM-708_Environment_Log.xlsx" download="">FRM-708</a> khi có alert/hành động.</td>
-<td>Tăng theo dõi hoặc hold theo rủi ro thực tế.</td>
+<td>Tăng theo dõi hoặc tạm giữ theo rủi ro thực tế.</td>
 </tr>
 <tr>
 <td>S1 FEFO / kệ-tuổi thọ / vòng đời</td>
 <td>Tách rõ hết hạn/mở-date khả năng nhìn thấy / minh bạch.</td>
 <td>
-<a download="" href="../../../forms/frm-700-maintenance/FRM-708_Environment_Log.xlsx">FRM-708</a> + tồn kho ghi chú / FEFO log.</td>
+<a download="" href="../../../forms/frm-700-maintenance/FRM-708_Environment_Log.xlsx">FRM-708</a> + tồn kho Ghi chú / FEFO log.</td>
 <td>PHẢI chặn vấn đề nếu không chứng minh được điều kiện hoặc cửa sổ sử dụng.</td>
 </tr>
 <tr>
@@ -564,14 +568,14 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <td>S3 Vệ sinh và đóng gói / chân không</td>
 <td>Khu vực sạch / tủ / bảo quản khu vực, tránh thùng carton hở và vi phạm.</td>
 <td>
-<a download="" href="../../../forms/frm-700-maintenance/FRM-708_Environment_Log.xlsx">FRM-708</a> + <a href="../../../forms/frm-700-maintenance/FRM-709_Clean_Packaging_Checklist.xlsx" download="">FRM-709</a> nếu liên quan bộ hồ sơ sạch.</td>
-<td>Clean-hold; đánh giá re-bộ hồ sơ / re-clean / re-xác minh.</td>
+<a download="" href="../../../forms/frm-700-maintenance/FRM-708_Environment_Log.xlsx">FRM-708</a> + <a href="../../../forms/frm-700-maintenance/FRM-709_Clean_Packaging_Checklist.xlsx" download="">FRM-709</a> nếu liên quan pack sạch.</td>
+<td>Làm sạch-tạm giữ; đánh giá re-pack / re-làm sạch / re-xác minh.</td>
 </tr>
 <tr>
 <td>S4 Hạn chế / cách ly / biệt trữ</td>
 <td>Chỉ Người được giao quyền mới được chạm hoặc di chuyển.</td>
 <td>
-<a download="" href="../../../forms/frm-700-maintenance/FRM-708_Environment_Log.xlsx">FRM-708</a> hoặc hold/quyết định xử lý hồ sơ liên quan.</td>
+<a download="" href="../../../forms/frm-700-maintenance/FRM-708_Environment_Log.xlsx">FRM-708</a> hoặc tạm giữ/quyết định xử lý hồ sơ liên quan.</td>
 <td>Không phát hành chỉ bằng việc đổi vị trí hoặc dán nhãn lại.</td>
 </tr>
 </tbody>

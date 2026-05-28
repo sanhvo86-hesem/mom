@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>ANNEX-401 - nhà cung cấp rủi ro mô hình và Thẻ điểm Method | HESEM MOM</title>
+<title>ANNEX-401 - Nhà cung cấp Risk Model and Scorecard Method | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap — computes absolute URLs from location.pathname so the
  * stylesheet + renderer load correctly regardless of how the document is
@@ -73,8 +73,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>Nhóm nguồn cung</th><th>Ví dụ</th><th>Rủi ro nền mặc định</th><th>Kiểm soát tối thiểu bắt buộc</th></tr></thead>
 <tbody>
-<tr><td>Nguyên vật liệu trực tiếp quan trọng</td><td>Thanh, tấm, ống, phôi rèn, phôi đúc, vật liệu đặc chủng, vật liệu do khách hàng chỉ định cấp vật liệu</td><td><span class="badge-red">R1</span></td><td>Phê duyệt nguồn trước mua, cert/MTR 100%, truy vết heat hoặc lot, xác minh đầu vào, kiểm soát thay thế vật liệu và thẻ điểm định kỳ.</td></tr>
-<tr><td>Nhà xử lý công đoạn đặc biệt</td><td>Anodize, plating, passivation, heat xử lý, NDT, làm sạch đặc biệt, coating</td><td><span class="badge-red">R1</span></td><td>Nằm trong danh sách phê duyệt, rà soát đúng phạm vi quy trình và không gian, bộ chứng chỉ còn hiệu lực, đáp ứng yêu cầu dòng chảy xuống của khách hàng và kiểm soát hết hạn.</td></tr>
+<tr><td>Nguyên vật liệu trực tiếp quan trọng</td><td>Thanh, tấm, ống, phôi rèn, phôi đúc, vật liệu đặc chủng, vật liệu do khách hàng chỉ định grade</td><td><span class="badge-red">R1</span></td><td>Phê duyệt nguồn trước mua, cert/MTR 100%, truy vết heat hoặc lot, xác minh đầu vào, kiểm soát thay thế vật liệu và thẻ điểm định kỳ.</td></tr>
+<tr><td>Nhà xử lý công đoạn đặc biệt</td><td>Anodize, plating, passivation, heat treatment, NDT, làm sạch đặc biệt, coating</td><td><span class="badge-red">R1</span></td><td>Nằm trong danh sách phê duyệt, rà soát đúng phạm vi quy trình và không gian, bộ chứng chỉ còn hiệu lực, đáp ứng yêu cầu dòng chảy xuống của khách hàng và kiểm soát hết hạn.</td></tr>
 <tr><td>Gia công ngoài hoặc công đoạn thứ cấp</td><td>Mài, EDM, laser marking, gia công thuê ngoài, cân bằng, lapping</td><td><span class="badge-amber">R2</span></td><td>Rà soát năng lực, xác nhận luồng quy trình xuống nhà cung cấp, áp dụng lô đầu tiên hoặc FAI khi cần, theo dõi giao hàng và quy tắc ngăn chặn khi có sự cố.</td></tr>
 <tr><td>Dịch vụ kiểm định, hiệu chuẩn, thử nghiệm bên ngoài</td><td>Phòng lab, nhà cung cấp hiệu chuẩn, dịch vụ đo kiểm và xác nhận bên ngoài</td><td><span class="badge-amber">R2</span></td><td>Phê duyệt đúng phạm vi, chứng chỉ còn hiệu lực, truy xuất chuỗi chuẩn, lưu bằng chứng đầy đủ và rà soát lại khi phạm vi thay đổi.</td></tr>
 <tr><td>Bao bì, logistics và vật tư phụ</td><td>Bao bì, vật tư tiêu hao, vận chuyển, vật tư không trực tiếp tạo đặc tính sản phẩm</td><td><span class="badge-blue">R3</span></td><td>PO rõ yêu cầu, kiểm tra nhận hàng cơ bản, theo dõi OTD và ghi nhận vấn đề phát sinh.</td></tr>
@@ -84,8 +84,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <h2>3. Cổng kiểm soát trước PO đầu tiên</h2>
 <div class="step-list">
 <div class="step-item"><b>Xác định nhóm nguồn cung và lớp R.</b> Mua hàng phân nhóm; QA và Kỹ thuật xác nhận mức ảnh hưởng tới CTQ, cert, độ sạch, công đoạn đặc biệt, yêu cầu khách hàng và tính liên tục kinh doanh.</div>
-<div class="step-item"><b>Thu hồ sơ năng lực.</b> Thu địa chỉ không gian, phạm vi quy trình, chứng chỉ hoặc công nhận, mẫu cert/MTR/CoC, thông tin liên hệ chuyển cấp, bằng chứng công suất và yêu cầu NDA hoặc bảo vệ dữ liệu khi cần.</div>
-<div class="step-item"><b>Đánh giá mức phù hợp.</b> Với nguyên vật liệu trực tiếp: rà soát cấp vật liệu, trạng thái, size và khả năng truy vết. Với nhà xử lý công đoạn đặc biệt: rà soát đúng quy trình và đúng không gian. Với gia công ngoài: rà soát năng lực máy, gage, luồng quy trình và hệ thống kiểm soát.</div>
+<div class="step-item"><b>Thu hồ sơ năng lực.</b> Thu địa chỉ không gian, phạm vi quy trình, chứng chỉ hoặc công nhận, mẫu cert/MTR/CoC, thông tin liên hệ escalation, bằng chứng công suất và yêu cầu NDA hoặc bảo vệ dữ liệu khi cần.</div>
+<div class="step-item"><b>Đánh giá mức phù hợp.</b> Với nguyên vật liệu trực tiếp: rà soát grade, condition, size và khả năng truy vết. Với nhà xử lý công đoạn đặc biệt: rà soát đúng quy trình và đúng không gian. Với gia công ngoài: rà soát năng lực máy, thiết bị đo, luồng quy trình và hệ thống kiểm soát.</div>
 <div class="step-item"><b>Chấm rủi ro nền và thiết lập mức kiểm soát đầu vào.</b> Xác định kế hoạch kiểm tra khi nhận hàng, quy tắc lô đầu tiên, chiều sâu rà soát cert, nhu cầu nguồn kép và yêu cầu dự phòng.</div>
 <div class="step-item"><b>Chỉ phát hành PO sau khi nhà cung cấp được phê duyệt.</b> Không phát hành PO trước rồi mới hợp thức hóa hồ sơ nhà cung cấp.</div>
 </div>
@@ -94,7 +94,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>Tiêu chí</th><th>Mô tả bắt buộc</th><th>Nguyên vật liệu trực tiếp</th><th>Nhà xử lý công đoạn đặc biệt</th><th>Gia công ngoài</th><th>Nguồn cung chung</th></tr></thead>
 <tbody>
-<tr><td>Hiệu suất chất lượng</td><td>Tỷ lệ bị từ chối, lỗi lặp lại, SCAR, escape, khiếu nại, lot hold</td><td>25%</td><td>25%</td><td>25%</td><td>20%</td></tr>
+<tr><td>Hiệu suất chất lượng</td><td>Tỷ lệ bị từ chối, lỗi lặp lại, SCAR, escape, khiếu nại, lot tạm giữ</td><td>25%</td><td>25%</td><td>25%</td><td>20%</td></tr>
 <tr><td>Độ tin cậy giao hàng</td><td>OTD, khả năng phản hồi expedite, độ ổn định lead time, giao thiếu hoặc giao tách lô</td><td>20%</td><td>15%</td><td>20%</td><td>25%</td></tr>
 <tr><td>Tính toàn vẹn cert và truy vết</td><td>MTR/CoC/cert đầy đủ, truy vết đúng lot, kiểm soát phiên bản và độ chính xác hồ sơ</td><td>25%</td><td>20%</td><td>15%</td><td>10%</td></tr>
 <tr><td>Mức phù hợp năng lực và phạm vi</td><td>Khả năng đáp ứng quy trình, size, dung sai, độ sạch và phạm vi khách hàng yêu cầu</td><td>10%</td><td>20%</td><td>20%</td><td>10%</td></tr>
@@ -104,7 +104,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="keyline"><b>Cách chấm:</b> Mỗi kích thước chấm 1–5 rồi nhân trọng số. Điểm quy đổi cuối cùng = tổng (điểm kích thước / 5 × trọng số). Chỉ dùng dữ liệu có nguồn trong Epicor hoặc SSOT; không dùng "ấn tượng cá nhân".</div>
 <h2>5. Dữ liệu dùng để chấm điểm</h2>
 <div class="two-col">
-<div class="card"><h3>5.1 SoR / SSOT</h3><p><b>Epicor</b> là nguồn cho PO, phiếu nhận, trả hàng, ngày cam kết, ngày nhận thực tế, số lượng nhận hoặc từ chối, mã nhà cung cấp, part, lot và các giao dịch liên quan. <b>M365/SSOT</b> là nguồn cho bộ cert, SCAR, phiếu đánh giá, rà soát công suất, bằng chứng phê duyệt của khách hàng và các trao đổi bắt buộc.</p></div>
+<div class="card"><h3>5.1 SoR / SSOT</h3><p><b>Epicor</b> là nguồn cho PO, phiếu nhận, trả hàng, ngày cam kết, ngày nhận thực tế, số lượng nhận hoặc từ chối, mã nhà cung cấp, chi tiết, lot và các giao dịch liên quan. <b>M365/SSOT</b> là nguồn cho bộ cert, SCAR, phiếu đánh giá, rà soát công suất, bằng chứng phê duyệt của khách hàng và các trao đổi bắt buộc.</p></div>
 <div class="card"><h3>5.2 Cửa sổ đánh giá</h3><p>Dùng cửa sổ cuốn chiếu 12 tháng cho nhà cung cấp ổn định. Nhà cung cấp mới dùng cửa sổ 3 tháng hoặc 3 lô đầu tiên, lấy mốc đến sau. Không kết luận nhà cung cấp tốt hoặc xấu chỉ bằng một lô nếu chưa đủ dữ liệu, trừ khi xuất hiện sự kiện nghiêm trọng có quyền ghi đè điểm.</p></div>
 </div>
 <h2>6. Sự kiện có quyền ghi đè điểm</h2>
@@ -112,9 +112,9 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <thead><tr><th>Sự kiện</th><th>Hành động bắt buộc</th><th>Thẩm quyền tối thiểu</th></tr></thead>
 <tbody>
 <tr><td>Cert bị giả mạo, chỉnh sửa không kiểm soát hoặc không truy được nguồn</td><td>Chặn ngay; dừng PO mới; giữ toàn bộ lô liên quan; đánh giá ranh giới ảnh hưởng</td><td>Trưởng QA + Trưởng mua hàng, đồng thời báo cáo vượt cấp</td></tr>
-<tr><td>Chứng nhận hoặc phạm vi công đoạn đặc biệt hết hạn, sai không gian hoặc sai quy trình</td><td>Hold ngay; không tiếp tục điều phối hàng tới nhà xử lý đó trong phạm vi bị ảnh hưởng</td><td>Trưởng mua hàng + <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></td></tr>
+<tr><td>Chứng nhận hoặc phạm vi công đoạn đặc biệt hết hạn, sai không gian hoặc sai quy trình</td><td>Tạm giữ ngay; không tiếp tục điều phối hàng tới nhà xử lý đó trong phạm vi bị ảnh hưởng</td><td>Trưởng mua hàng + <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></td></tr>
 <tr><td>Escape liên quan CTQ, khiếu nại khách hàng nghiêm trọng hoặc lỗi lặp lại không kiểm soát</td><td>Chuyển sang Thử việc hoặc Chặn; SCAR bắt buộc; rà soát ngăn chặn trước khi dùng lại</td><td>Trưởng QA</td></tr>
-<tr><td>Nhà cung cấp tự ý đổi nguồn phụ, vật liệu, sub-tầng hoặc quy trình mà không thông báo</td><td>Hold toàn bộ job hoặc lot bị ảnh hưởng; chấm điểm lại ngay; xem xét chặn theo phạm vi</td><td>Trưởng mua hàng + Kỹ thuật/QA</td></tr>
+<tr><td>Nhà cung cấp tự ý đổi nguồn phụ, vật liệu, sub-tier hoặc quy trình mà không thông báo</td><td>Tạm giữ toàn bộ job hoặc lot bị ảnh hưởng; chấm điểm lại ngay; xem xét chặn theo phạm vi</td><td>Trưởng mua hàng + Kỹ thuật/QA</td></tr>
 <tr><td>OTD suy giảm kéo dài hoặc không đáp ứng yêu cầu expedite với item nguồn đơn</td><td>Kích hoạt nguồn dự phòng hoặc nguồn kép; rà soát rủi ro công suất; tăng tần suất theo dõi</td><td>Trưởng kế hoạch + Trưởng mua hàng</td></tr>
 </tbody></table></div>
 <h2>7. Trạng thái, ngưỡng hành động và tần suất rà soát</h2>
@@ -123,7 +123,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tbody>
 <tr><td><span class="badge-green">90–100 ưu tiên</span></td><td>Hiệu năng ổn định, dữ liệu sạch, không có kiểm soát cổng sự kiện mở</td><td>Dùng theo lộ trình chuẩn; vẫn giữ kiểm soát nền theo lớp rủi ro</td><td>R1 hàng tháng; R2 hàng quý; R3/R4 nửa năm</td></tr>
 <tr><td><span class="badge-blue">80–89 Đã phê duyệt</span></td><td>Dùng được nhưng còn điểm cần theo dõi</td><td>Rà soát cải tiến theo log vấn đề; không được bỏ qua cert hay kiểm soát truy vết nền</td><td>R1 hàng tháng; R2 hàng quý; R3 nửa năm; R4 hàng năm</td></tr>
-<tr><td><span class="badge-amber">65–79 Có điều kiện</span></td><td>Cho phép dùng có điều kiện</td><td>Tăng kiểm tra đầu vào, giới hạn phạm vi part hoặc nhóm sản phẩm, yêu cầu kế hoạch hành động và xem xét nguồn kép</td><td>Hàng tháng đến khi phục hồi</td></tr>
+<tr><td><span class="badge-amber">65–79 Có điều kiện</span></td><td>Cho phép dùng có điều kiện</td><td>Tăng kiểm tra đầu vào, giới hạn phạm vi chi tiết hoặc nhóm sản phẩm, yêu cầu kế hoạch hành động và xem xét nguồn kép</td><td>Hàng tháng đến khi phục hồi</td></tr>
 <tr><td><span class="badge-red">50–64 Thử việc</span></td><td>Rủi ro cao, chỉ dùng khi có chấp thuận</td><td>PO mới cần phê duyệt theo từng trường hợp; phải có hành động ngăn chặn và kế hoạch phục hồi; có thể chặn theo item hoặc quy trình</td><td>Rà soát theo từng lô hoặc hàng tháng</td></tr>
 <tr><td><span class="badge-red">&lt; 50 Chặn</span></td><td>PHẢI chặn</td><td>Dừng PO mới; chỉ mở lại sau tái đánh giá năng lực và thẩm quyền phê duyệt</td><td>Chỉ rà soát lại khi đã có hồ sơ tái đánh giá năng lực</td></tr>
 </tbody></table></div>
@@ -132,7 +132,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <li>Nhà cung cấp thuộc <b>R1</b> và là nguồn đơn cho job quan trọng PHẢI có phương án dự phòng hoặc thay thế được Kế hoạch, Mua hàng và Kỹ thuật duyệt.</li>
 <li>Nguồn do khách hàng phê duyệt hoặc chỉ định chỉ hợp lệ trong đúng phạm vi khách hàng hoặc phạm vi được nêu. Không được suy diễn phê duyệt của khách hàng A sang khách hàng B.</li>
 <li>Nhà xử lý công đoạn đặc biệt phải được kiểm theo <a href="annex-403-approved-processor-list.html">ANNEX-403</a>; điểm rủi ro tốt không thay thế việc kiểm phạm vi, không gian và tình trạng hiệu lực của cert.</li>
-<li>Nhà cung cấp nguyên vật liệu trực tiếp phải phù hợp với <a href="../03-ANNEX-300/annex-302-approved-materials-list.html">ANNEX-302</a>; điểm tốt không cho phép tự ý thay vật liệu, cấp vật liệu hay trạng thái.</li>
+<li>Nhà cung cấp nguyên vật liệu trực tiếp phải phù hợp với <a href="../03-ANNEX-300/annex-302-approved-materials-list.html">ANNEX-302</a>; điểm tốt không cho phép tự ý thay vật liệu, grade hay condition.</li>
 </ul>
 <h2>8A. Quy tắc chấm 1–5 cho từng kích thước</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">

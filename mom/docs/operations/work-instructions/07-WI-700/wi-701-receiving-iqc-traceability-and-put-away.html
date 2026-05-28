@@ -58,9 +58,9 @@ ul.tight li { margin: 4px 0; }
       <section id="wi-s1" class="wi-section">
         <h2>1. Mục đích</h2>
         <ul class="tight">
-          <li>Chặn sai nguồn, sai Part/Rev, sai số lượng và mất lot hoặc heat ngay từ đầu tuyến.</li>
+          <li>Chặn sai nguồn, sai Chi tiết/Rev, sai số lượng và mất lot hoặc heat ngay từ đầu tuyến.</li>
           <li>Giữ một trạng thái duy nhất giữa hàng thực tế, nhãn vật lý và dữ liệu hệ thống trước khi cấp phát cho Job.</li>
-          <li>Để người lấy hàng hoặc auditor truy lại được nguồn gốc lô trong một lần mở hồ sơ.</li>
+          <li>Để người lấy hàng hoặc đánh giáor truy lại được nguồn gốc lô trong một lần mở hồ sơ.</li>
         </ul>
         <div class="callout-danger"><strong>STOP</strong><br>Dừng ngay và đưa vào khu giữ nếu thiếu cert bắt buộc, không đọc được lot hoặc heat, có dấu hiệu trộn lô, bao gói hư hỏng ảnh hưởng chất lượng hoặc chưa xác định được trạng thái IQC. Không được put-away vào vị trí dùng cho lô chưa sạch trạng thái.</div>
       </section>
@@ -73,15 +73,15 @@ ul.tight li { margin: 4px 0; }
             <ul class="tight">
               <li><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-warehouse-clerk.html" title="Warehouse Clerk (Nhân viên kho)"><span class="entity-code role-code">WAR</span></a>, <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="entity-code role-code">QCL</span></a>, <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> và người được giao nhận hàng/IQC đầu vào.</li>
               <li>Tất cả lô nguyên vật liệu, outsource return, khách hàng cấp và vật tư phải có truy vết trước khi đưa vào kho sử dụng.</li>
-              <li>Trường hợp online bình thường và cả tình huống phải dùng bộ offline được kiểm soát.</li>
+              <li>Trường hợp onchuyền bình thường và cả tình huống phải dùng bộ offchuyền được kiểm soát.</li>
             </ul>
           </div>
           <div class="card">
             <h3>Không thay cho</h3>
             <ul class="tight">
-              <li>Rule SSCC, pack reconciliation và data dictionary tại <a href="../../references/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>.</li>
-              <li>Rule vị trí kho, FIFO và movement control tại <a href="../../references/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a>.</li>
-              <li>Gate HOLD hoặc release ở cấp hệ thống tại <a href="../02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a>.</li>
+              <li>Quy tắc SSCC, pack reconciliation và data Từ điển tại <a href="../../references/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>.</li>
+              <li>Quy tắc vị trí kho, FIFO và movement kiểm soát tại <a href="../../references/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a>.</li>
+              <li>Cổng TẠM GIỮ hoặc phát hành ở cấp hệ thống tại <a href="../02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a>.</li>
             </ul>
           </div>
         </div>
@@ -117,7 +117,7 @@ ul.tight li { margin: 4px 0; }
               <tr>
                 <td>Tài liệu tham chiếu</td>
                 <td><a href="../../references/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>, <a href="../../references/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a> và <a href="../../sops/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">SOP-701</a>.</td>
-                <td>Dùng để tra rule, không chép lại vào nhãn tay.</td>
+                <td>Dùng để tra quy tắc, không chép lại vào nhãn tay.</td>
               </tr>
             </tbody>
           </table>
@@ -133,7 +133,7 @@ ul.tight li { margin: 4px 0; }
           <li>Hệ thống hoặc fallback kit sẵn sàng để ghi nhận ngay tại thời điểm nhận lô.</li>
           <li>Máy in nhãn và quyền nhập trạng thái sẵn sàng trước khi bắt đầu put-away.</li>
         </ul>
-        <div class="callout-warning"><strong>HOLD</strong><br>Nếu chưa có đủ khu giữ, chưa có biểu mẫu hoặc chưa xác định được yêu cầu truy vết của lô, chỉ được giữ ở trạng thái chờ xác minh. Không được bỏ qua bước tách lô để tiết kiệm thời gian dock.</div>
+        <div class="callout-warning"><strong>TẠM GIỮ</strong><br>Nếu chưa có đủ khu giữ, chưa có biểu mẫu hoặc chưa xác định được yêu cầu truy vết của lô, chỉ được giữ ở trạng thái chờ xác minh. Không được bỏ qua bước tách lô để tiết kiệm thời gian dock.</div>
       </section>
 
       <section id="wi-s5" class="wi-section">
@@ -147,7 +147,7 @@ ul.tight li { margin: 4px 0; }
 
         <div class="step-block">
           <h3>Bước 2: Đối chiếu chứng từ nguồn</h3>
-          <p>Đối chiếu nhà cung cấp, Part number, revision, số kiện và số lượng với PO hoặc danh sách chờ nhận trước khi mở kiện.</p>
+          <p>Đối chiếu nhà cung cấp, Chi tiết number, revision, số kiện và số lượng với PO hoặc danh sách chờ nhận trước khi mở kiện.</p>
           <div class="note-soft">Lý do: sai nguồn hoặc sai revision phải bị chặn trước khi đi sâu vào IQC.</div>
         </div>
 
@@ -177,13 +177,13 @@ ul.tight li { margin: 4px 0; }
 
         <div class="step-block">
           <h3>Bước 7: Nhập vị trí hệ thống</h3>
-          <p>Nhập trạng thái nhận hàng, kết quả IQC và vị trí lưu trữ vào hệ thống hoặc fallback record ngay sau khi dán nhãn.</p>
+          <p>Nhập trạng thái nhận hàng, kết quả IQC và vị trí lưu trữ vào hệ thống hoặc fallback hồ sơ ngay sau khi dán nhãn.</p>
           <div class="note-soft">Lý do: trạng thái hệ thống phải theo kịp trạng thái vật lý của lô.</div>
         </div>
 
         <div class="step-block">
           <h3>Bước 8: Lưu bằng chứng và bàn giao</h3>
-          <p>Lưu ảnh, cert, record IQC và liên kết chứng từ trước khi bàn giao lô sang kho dùng hoặc khu giữ.</p>
+          <p>Lưu ảnh, cert, hồ sơ IQC và liên kết chứng từ trước khi bàn giao lô sang kho dùng hoặc khu giữ.</p>
           <div class="note-soft">Lý do: người lấy hàng sau đó phải truy được nguồn gốc lô mà không cần hỏi lại người nhận.</div>
         </div>
 
@@ -217,8 +217,8 @@ ul.tight li { margin: 4px 0; }
               </tr>
               <tr>
                 <td><a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx" download>FRM-413</a></td>
-                <td>Lý do giữ lô, phạm vi ảnh hưởng, điều kiện gỡ hold và quyết định xử lý.</td>
-                <td>Hold log có link về lô liên quan.</td>
+                <td>Lý do giữ lô, phạm vi ảnh hưởng, điều kiện gỡ tạm giữ và quyết định xử lý.</td>
+                <td>Tạm giữ log có liên kết về lô liên quan.</td>
                 <td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></td>
               </tr>
               <tr>
@@ -234,7 +234,7 @@ ul.tight li { margin: 4px 0; }
 
 <div class="section" id="w0w12-map">
  <h2 class="h2">6A. Bản đồ W0-W12</h2>
- <p>WI-701 là hướng dẫn tại điểm nhận hàng của chương trình W0-W12. Nó được dùng khi lô vật tư, outsource return hoặc vật tư khách cấp đi vào Đợt 2 và Đợt Sản xuất; mọi lô phải có trạng thái, ID truy ngược, vị trí và bằng chứng IQC rõ trước khi cấp phát. Lịch nguồn vẫn là <code>mom/data/config/deploy/program.bootstrap.json</code>; WI-701 không thay SOP-401, không thay WI-201 và không thay bảng điều khiển. Người thao tác phải mở playbook tuần đúng, ghi bằng chứng vào hồ sơ nhận hàng và không đưa lô vào kho sử dụng khi gate còn thiếu.</p>
+ <p>WI-701 là hướng dẫn tại điểm nhận hàng của chương trình W0-W12. Nó được dùng khi lô vật tư, outsource return hoặc vật tư khách cấp đi vào Đợt 2 và Đợt Sản xuất; mọi lô phải có trạng thái, ID truy ngược, vị trí và bằng chứng IQC rõ trước khi cấp phát. Lịch nguồn vẫn là <code>mom/data/config/deploy/program.bootstrap.json</code>; WI-701 không thay SOP-401, không thay WI-201 và không thay bảng điều khiển. Người thao tác phải mở playbook tuần đúng, ghi bằng chứng vào hồ sơ nhận hàng và không đưa lô vào kho sử dụng khi cổng còn thiếu.</p>
  <div class="table-card">
  <table class="matrix-table">
  <thead><tr><th>Tuần</th><th>Pha · trụ</th><th>Cổng kiểm liên quan</th><th>Cách dùng tài liệu này</th><th>Bằng chứng đóng cổng</th></tr></thead>
@@ -251,14 +251,14 @@ ul.tight li { margin: 4px 0; }
  <td>P3 · golive + pilot</td>
  <td>P3-02 + P3-04</td>
  <td>Đợt 2 nhận hàng theo chuẩn mới: mọi lô có ID truy ngược đúng, chứng từ sạch và put-away đúng FIFO/vị trí.</td>
- <td><code>audit_events</code>, receiving log, IQC evidence.</td>
+ <td><code>audit_events</code>, receiving log, IQC bằng chứng.</td>
  </tr>
  <tr>
  <td>W7-W8</td>
  <td>P3 · golive</td>
  <td>P3-03</td>
- <td>Đợt Sản xuất đo <code>KPI-DEP-02 ≥95%</code> cho phiếu việc IQC đóng trong 24 giờ và không để lô HOLD lẫn vị trí dùng.</td>
- <td><code>issues.json</code>, put-away log, MTTR snapshot.</td>
+ <td>Đợt Sản xuất đo <code>KPI-DEP-02 ≥95%</code> cho phiếu việc IQC đóng trong 24 giờ và không để lô TẠM GIỮ lẫn vị trí dùng.</td>
+ <td><code>issues.json</code>, put-away log, MTTR ảnh chụp trạng thái.</td>
  </tr>
  <tr>
  <td>W11</td>
@@ -270,7 +270,7 @@ ul.tight li { margin: 4px 0; }
  </tbody>
  </table>
  </div>
- <p class="note">Mỗi hàng trong bản đồ này phải được xác nhận bằng bằng chứng có đường dẫn hoặc bản ghi kiểm soát. Nếu playbook tuần, gate code, KPI hoặc hồ sơ chứng minh không khớp nhau, trạng thái của tuần đó giữ ở cảnh báo đỏ cho đến khi owner chức năng cập nhật <code>issues.json</code>, xác nhận lại <code>readiness.json</code> và ghi quyết định vào audit log. Không dùng ảnh chụp màn hình rời, email riêng hoặc lời xác nhận miệng để thay thế bằng chứng đóng gate.</p>
+ <p class="note">Mỗi hàng trong bản đồ này phải được xác nhận bằng bằng chứng có đường dẫn hoặc bản ghi kiểm soát. Nếu playbook tuần, cổng code, KPI hoặc hồ sơ chứng minh không khớp nhau, trạng thái của tuần đó giữ ở cảnh báo đỏ cho đến khi chủ sở hữu chức năng cập nhật <code>issues.json</code>, xác nhận lại <code>readiness.json</code> và ghi quyết định vào đánh giá log. Không dùng ảnh chụp màn hình rời, email riêng hoặc lời xác nhận miệng để thay thế bằng chứng đóng cổng.</p>
 </div>
 
 <div class="section" id="deploy-kpi-dock">
@@ -280,7 +280,7 @@ ul.tight li { margin: 4px 0; }
  <div class="metric-card"><div class="value">KPI-DEP-02</div><div class="label">≥95% phiếu việc IQC đóng đúng hạn; mục tiêu xử lý trong 24 giờ ở W7-W8.</div></div>
  <div class="metric-card"><div class="value">KPI-DEP-07</div><div class="label">MTTR Sev-1 liên quan receiving/IQC ≤24 giờ.</div></div>
  </div>
- <p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code> trong ngày, gắn severity theo mức ảnh hưởng, leo thang theo <a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>, cập nhật <code>readiness.json</code> và chỉ đóng khi có bằng chứng owner đã xử lý nguyên nhân gốc.</p>
+ <p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code> trong ngày, gắn severity theo mức ảnh hưởng, leo thang theo <a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>, cập nhật <code>readiness.json</code> và chỉ đóng khi có bằng chứng chủ sở hữu đã xử lý nguyên nhân gốc.</p>
 </div>
 
 <div class="section" id="deploy-no-go">
@@ -288,7 +288,7 @@ ul.tight li { margin: 4px 0; }
  <div class="note-warn">
  <ul class="tight">
  <li>Không công nhận <code>P3-04</code> khi >5% lô không có ID truy ngược, thiếu vị trí hoặc không nối được FRM-701 với giao dịch nhận hàng.</li>
- <li>Không khóa <code>P3-03</code> khi <code>KPI-DEP-02 &lt;85%</code> ở IQC hoặc lô HOLD chưa có owner trong <code>issues.json</code>.</li>
+ <li>Không khóa <code>P3-03</code> khi <code>KPI-DEP-02 &lt;85%</code> ở IQC hoặc lô TẠM GIỮ chưa có chủ sở hữu trong <code>issues.json</code>.</li>
  <li>Không cho put-away vào vị trí dùng nếu chứng chỉ, lot/heat hoặc trạng thái IQC chưa sạch; lô đó phải giữ bằng FRM-413.</li>
  </ul>
  </div>
@@ -313,17 +313,17 @@ ul.tight li { margin: 4px 0; }
               </tr>
               <tr>
                 <td>ANNEX-701</td>
-                <td>GS1 SSCC data dictionary and pack reconciliation</td>
+                <td>GS1 SSCC data Từ điển and pack reconciliation</td>
                 <td><a href="../../references/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">Mở ANNEX-701</a></td>
               </tr>
               <tr>
                 <td>ANNEX-703</td>
-                <td>Warehouse vị trí and FIFO rules</td>
+                <td>Warehouse vị trí and FIFO quy tắcs</td>
                 <td><a href="../../references/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">Mở ANNEX-703</a></td>
               </tr>
               <tr>
                 <td>WI-201</td>
-                <td>Gate execution, HOLD và release tại hiện trường</td>
+                <td>Cổng execution, TẠM GIỮ và phát hành tại hiện trường</td>
                 <td><a href="../02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">Mở WI-201</a></td>
               </tr>
             </tbody>

@@ -128,7 +128,7 @@
   <span class="kicker">Quản trị bảng điều khiển triển khai</span>
   
   <p>Áp dụng cho mọi bảng điều khiển dùng để điều hành triển khai, quản trị tài liệu, theo dõi mức sẵn sàng, hỗ trợ tăng cường sau go-live, theo dõi KPI, công bố bộ số điều hành và làm cửa truy cập tài liệu cho nhiều phòng ban.</p>
-  <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng trong W0-W12 của chương trình triển khai QMS hiện hành: W0 để chốt quyền bảng điều khiển khung, W2 để nạp số liệu nền, W5-W8 để vận hành KPI live theo từng đợt go-live, W10 để rà governance bảng điều khiển và W12 để bàn giao owner vận hành thường xuyên.</div>
+  <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng trong W0-W12 của chương trình triển khai QMS hiện hành: W0 để chốt quyền bảng điều khiển khung, W2 để nạp số liệu nền, W5-W8 để vận hành KPI live theo từng đợt go-live, W10 để rà governance bảng điều khiển và W12 để bàn giao chủ sở hữu vận hành thường xuyên.</div>
   <div class="actions">
     <a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a>
     <a href="../../../work-instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a>
@@ -194,7 +194,7 @@
   <div class="d-sec-head"><h2>3 — Trường thông tin tối thiểu trên bảng điều khiển</h2></div>
   <div class="g2">
     <div class="d-card">
-      <h3>3.1 Metadata bắt buộc</h3>
+      <h3>3.1 Siêu dữ liệu bắt buộc</h3>
       <ul>
         <li>Tên bảng điều khiển và mục đích sử dụng</li>
         <li>Người chịu trách nhiệm nghiệp vụ và người chịu trách nhiệm dữ liệu</li>
@@ -209,7 +209,7 @@
         <li>Nhãn Hiện hành, Ngoại lệ, Đang dùng phương án dự phòng hoặc Lỗi thời</li>
         <li>Thông điệp ngoại lệ nếu bộ số đang dùng giải pháp tạm thời</li>
         <li>Đầu mối hỗ trợ hoặc người chịu trách nhiệm khi người dùng cần trợ giúp</li>
-        <li>Link đến tài liệu hành động tương ứng</li>
+        <li>Liên kết đến tài liệu hành động tương ứng</li>
       </ul>
     </div>
   </div>
@@ -237,16 +237,16 @@
 
 <!-- ═══ 5. REFRESH, FREEZE ═══ -->
 <div class="d-sec">
-  <div class="d-sec-head"><h2>5 — Refresh, freeze và exception note</h2></div>
+  <div class="d-sec-head"><h2>5 — Refresh, freeze và exception Ghi chú</h2></div>
   <div class="d-table-wrap">
     <table class="d-table">
       <thead>
         <tr><th style="width:20%">Ngữ cảnh</th><th style="width:28%">Quy tắc refresh</th><th style="width:26%">Quy tắc freeze</th><th style="width:26%">Khi nào gắn exception</th></tr>
       </thead>
       <tbody>
-        <tr><td><b>Daily command center</b></td><td>Refresh trước cuộc họp đủ sớm để kịp xác minh</td><td>Giữ snapshot nếu quyết định quan trọng đã chốt</td><td>Refresh thất bại, nguồn chậm, giải pháp chữa cháy bằng file xuất tay</td></tr>
-        <tr><td><b>Đánh giá cổng</b></td><td>Chỉ dùng bộ số đã xác minh và khóa thời điểm</td><td>Freeze theo thời điểm bắt đầu đánh giá cổng</td><td>Dữ liệu bổ sung sau gate hoặc sai lệch bảng điều khiển vs SoR</td></tr>
-        <tr><td><b>Hypercare daily</b></td><td>Refresh ≥1 lần trước review cuối ngày</td><td>Giữ bản báo cáo đã gửi</td><td>Issue log update thủ công hoặc bảng điều khiển chỉ phản ánh một phần</td></tr>
+        <tr><td><b>Daily command center</b></td><td>Refresh trước cuộc họp đủ sớm để kịp xác minh</td><td>Giữ ảnh chụp trạng thái nếu quyết định quan trọng đã chốt</td><td>Refresh thất bại, nguồn chậm, giải pháp chữa cháy bằng Tệp xuất tay</td></tr>
+        <tr><td><b>Đánh giá cổng</b></td><td>Chỉ dùng bộ số đã xác minh và khóa thời điểm</td><td>Freeze theo thời điểm bắt đầu đánh giá cổng</td><td>Dữ liệu bổ sung sau cổng hoặc sai lệch bảng điều khiển vs SoR</td></tr>
+        <tr><td><b>Hypercare daily</b></td><td>Refresh ≥1 lần trước Rà soát cuối ngày</td><td>Giữ bản báo cáo đã gửi</td><td>Issue log update thủ công hoặc bảng điều khiển chỉ phản ánh một phần</td></tr>
       </tbody>
     </table>
   </div>
@@ -262,7 +262,7 @@
       <div class="d-card-sub"><span class="pill pill-low">Rủi ro thấp</span></div>
       <ul>
         <li>Đổi bố cục, nhãn, grouping, style, icon</li>
-        <li>Vẫn phải ghi release note và người phê duyệt</li>
+        <li>Vẫn phải ghi phát hành Ghi chú và người phê duyệt</li>
       </ul>
     </div>
     <div class="d-card">
@@ -274,11 +274,11 @@
       </ul>
     </div>
     <div class="d-card">
-      <h3>Class C — Source &amp; access</h3>
+      <h3>Class C — Source &amp; truy cập</h3>
       <div class="d-card-sub"><span class="pill pill-high">Rủi ro cao</span></div>
       <ul>
-        <li>Đổi source-of-record, credential, workspace, access, refresh engine</li>
-        <li>Phải có cutover plan, rollback path và review sau triển khai</li>
+        <li>Đổi nguồn ghi nhận gốc, credential, workspace, truy cập, refresh engine</li>
+        <li>Phải có cutover kế hoạch, rollback đường dẫn và Rà soát sau triển khai</li>
       </ul>
     </div>
   </div>
@@ -296,7 +296,7 @@
     </div>
     <div class="d-kpi">
       <div class="val">≤10%</div>
-      <div class="lbl">Change failure</div>
+      <div class="lbl">Thay đổi failure</div>
       <div class="hint">Rollback hoặc exception</div>
     </div>
     <div class="d-kpi">
@@ -306,12 +306,12 @@
     </div>
     <div class="d-kpi">
       <div class="val">100%</div>
-      <div class="lbl">Owner coverage</div>
-      <div class="hint">owner nghiệp vụ + owner dữ liệu</div>
+      <div class="lbl">Chủ sở hữu coverage</div>
+      <div class="hint">chủ sở hữu nghiệp vụ + chủ sở hữu dữ liệu</div>
     </div>
     <div class="d-kpi">
       <div class="val">100%</div>
-      <div class="lbl">Access review</div>
+      <div class="lbl">Truy cập Rà soát</div>
       <div class="hint">Rà đúng kỳ</div>
     </div>
     <div class="d-kpi">
@@ -325,24 +325,24 @@
 
 <!-- ═══ 7A. W0-W12 MAP ═══ -->
 <div class="section" id="dashboard-w0w12"><h2>7A. Bản đồ W0-W12</h2>
-<p>Tài liệu này được dùng trong chương trình triển khai QMS hiện hành (lịch nguồn: <code>mom/data/config/deploy/program.bootstrap.json</code>) để kiểm soát quyền truy cập, nhịp làm mới, phát hành và cam kết dữ liệu của bảng điều khiển. ITA, QMS và MR_REPORT_OWNERS phải đọc bảng dưới đây cùng <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W10.html">TRN-DEP-W10</a> trước khi khóa review W10; với các tuần go-live, dùng thêm <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W05.html">TRN-DEP-W05</a>, <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W07.html">TRN-DEP-W07</a> và <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W12.html">TRN-DEP-W12</a>. Mọi quyền hoặc refresh ngoại lệ phải có owner, thời điểm hiệu lực, điều kiện khôi phục và người duyệt.</p>
+<p>Tài liệu này được dùng trong chương trình triển khai QMS hiện hành (lịch nguồn: <code>mom/data/config/deploy/program.bootstrap.json</code>) để kiểm soát quyền truy cập, nhịp làm mới, phát hành và cam kết dữ liệu của bảng điều khiển. ITA, QMS và MR_REPORT_CHỦ SỞ HỮUS phải đọc bảng dưới đây cùng <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W10.html">TRN-DEP-W10</a> trước khi khóa Rà soát W10; với các tuần go-live, dùng thêm <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W05.html">TRN-DEP-W05</a>, <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W07.html">TRN-DEP-W07</a> và <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W12.html">TRN-DEP-W12</a>. Mọi quyền hoặc refresh ngoại lệ phải có chủ sở hữu, thời điểm hiệu lực, điều kiện khôi phục và người duyệt.</p>
 <div class="table-card"><table class="matrix-table"><thead><tr><th>Tuần</th><th>Pha · trụ</th><th>Cổng kiểm liên quan</th><th>Cách dùng tài liệu này</th><th>Bằng chứng đóng cổng</th></tr></thead><tbody>
-<tr><td>W0</td><td>P0 · dash + m365</td><td>P0-04</td><td>ITA chốt quyền xem/quản trị cho bảng điều khiển khung theo vai trò, không mở quyền ngoài phạm vi triển khai.</td><td>Access log, <code>readiness.json</code> và danh sách nhóm quyền.</td></tr>
+<tr><td>W0</td><td>P0 · dash + m365</td><td>P0-04</td><td>ITA chốt quyền xem/quản trị cho bảng điều khiển khung theo vai trò, không mở quyền ngoài phạm vi triển khai.</td><td>Truy cập log, <code>readiness.json</code> và danh sách nhóm quyền.</td></tr>
 <tr><td>W2</td><td>P1 · dash</td><td>P1-04</td><td>QMS và IT xác nhận số liệu nền đã refresh đúng hạn; <code>KPI-DEP-05 ≥95%</code> cho các ô dữ liệu nền.</td><td><code>readiness.json</code>, refresh timestamp và issue ngoại lệ nếu có.</td></tr>
-<tr><td>W5-W8</td><td>P3 · dash + golive</td><td>P3-03</td><td>MR_REPORT_OWNERS kiểm KPI live cho Đợt 2 và Đợt Sản xuất, đối chiếu scan_cache/audit_events trước phiên điều hành.</td><td><code>scan_cache</code>, <code>audit_events</code>, note ngoại lệ theo ngày.</td></tr>
-<tr><td>W10</td><td>P4 · dash</td><td>P4-02</td><td>ITA và QMS rà quyền, owner từng ô dữ liệu, cam kết làm mới và cách thu hồi quyền sau chương trình.</td><td>Access review log, biên bản W10 và danh sách cam kết owner.</td></tr>
-<tr><td>W12</td><td>P4 · gov + dash</td><td>P4-04</td><td>Chủ sở hữu vận hành thường xuyên nhận bàn giao lịch refresh, quyền quản trị, rollback path và hồ sơ bảng điều khiển production.</td><td>Biên bản bàn giao W12, register bảng điều khiển và release log.</td></tr>
+<tr><td>W5-W8</td><td>P3 · dash + golive</td><td>P3-03</td><td>MR_REPORT_CHỦ SỞ HỮUS kiểm KPI live cho Đợt 2 và Đợt Sản xuất, đối chiếu scan_cache/đánh giá_events trước phiên điều hành.</td><td><code>scan_cache</code>, <code>audit_events</code>, Ghi chú ngoại lệ theo ngày.</td></tr>
+<tr><td>W10</td><td>P4 · dash</td><td>P4-02</td><td>ITA và QMS rà quyền, chủ sở hữu từng ô dữ liệu, cam kết làm mới và cách thu hồi quyền sau chương trình.</td><td>Truy cập Rà soát log, biên bản W10 và danh sách cam kết chủ sở hữu.</td></tr>
+<tr><td>W12</td><td>P4 · gov + dash</td><td>P4-04</td><td>Chủ sở hữu vận hành thường xuyên nhận bàn giao lịch refresh, quyền quản trị, rollback đường dẫn và hồ sơ bảng điều khiển production.</td><td>Biên bản bàn giao W12, Sổ đăng ký bảng điều khiển và phát hành log.</td></tr>
 </tbody></table></div></div>
 <div class="section" id="dashboard-kpi-dock"><h2>7B. KPI điều hành phải theo dõi</h2>
 <div class="metric-grid">
- <div class="metric-card"><strong>KPI-DEP-05</strong><p>Cập nhật bảng điều khiển đúng hạn ≥95%; mỗi bảng điều khiển production phải hiển thị lần làm mới gần nhất, owner dữ liệu và số issue refresh đang mở.</p></div>
- <div class="metric-card"><strong>KPI-DEP-06</strong><p>Tần suất phát hành ≥3 thay đổi/tuần khi cần cập nhật bảng điều khiển triển khai; mọi thay đổi Class B/C phải có release log và rollback path.</p></div>
- <div class="metric-card"><strong>KPI-DEP-03</strong><p>Tỉ lệ thay đổi thất bại ≤10%; nếu rollback hoặc exception vượt ngưỡng thì gate bảng điều khiển chuyển đỏ cho tới khi có hành động ổn định.</p></div>
- <div class="metric-card"><strong>KPI-DEP-07</strong><p>MTTR sự cố Mức 1 ≤24 h khi lỗi bảng điều khiển ảnh hưởng quyết định gate, quyền truy cập hoặc nguồn dữ liệu điều hành.</p></div>
+ <div class="metric-card"><strong>KPI-DEP-05</strong><p>Cập nhật bảng điều khiển đúng hạn ≥95%; mỗi bảng điều khiển production phải hiển thị lần làm mới gần nhất, chủ sở hữu dữ liệu và số issue refresh đang mở.</p></div>
+ <div class="metric-card"><strong>KPI-DEP-06</strong><p>Tần suất phát hành ≥3 thay đổi/tuần khi cần cập nhật bảng điều khiển triển khai; mọi thay đổi Class B/C phải có phát hành log và rollback đường dẫn.</p></div>
+ <div class="metric-card"><strong>KPI-DEP-03</strong><p>Tỉ lệ thay đổi thất bại ≤10%; nếu rollback hoặc exception vượt ngưỡng thì cổng bảng điều khiển chuyển đỏ cho tới khi có hành động ổn định.</p></div>
+ <div class="metric-card"><strong>KPI-DEP-07</strong><p>MTTR sự cố Mức 1 ≤24 h khi lỗi bảng điều khiển ảnh hưởng quyết định cổng, quyền truy cập hoặc nguồn dữ liệu điều hành.</p></div>
  </div>
-<p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code> với severity tương ứng, leo thang theo <a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> và cập nhật <code>readiness.json</code>. Không khoá <code>P4-02</code> khi quyền truy cập còn người ngoài đợt hoặc khi owner dữ liệu chưa ký cam kết làm mới.</p></div>
+<p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code> với severity tương ứng, leo thang theo <a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> và cập nhật <code>readiness.json</code>. Không khoá <code>P4-02</code> khi quyền truy cập còn người ngoài đợt hoặc khi chủ sở hữu dữ liệu chưa ký cam kết làm mới.</p></div>
 <div class="section" id="dashboard-nogo"><h2>7C. NO-GO quyền truy cập và refresh</h2>
-<ul class="tight"><li>Không đóng <code>P0-04</code> nếu bảng điều khiển khung chưa có owner, nguồn dữ liệu, nhịp làm mới và nhóm quyền theo vai trò.</li><li>Không công nhận <code>P3-03</code> ở W5-W8 nếu <code>KPI-DEP-05 &lt; 95%</code> trong 3 ngày làm việc liên tiếp hoặc refresh timestamp không khớp audit_events.</li><li>Không bàn giao W12 tại <code>P4-04</code> khi access review log còn quyền ngoài phạm vi, quyền admin không có người thay thế hoặc cam kết làm mới dữ liệu chưa ký bởi owner vận hành thường xuyên.</li></ul>
+<ul class="tight"><li>Không đóng <code>P0-04</code> nếu bảng điều khiển khung chưa có chủ sở hữu, nguồn dữ liệu, nhịp làm mới và nhóm quyền theo vai trò.</li><li>Không công nhận <code>P3-03</code> ở W5-W8 nếu <code>KPI-DEP-05 &lt; 95%</code> trong 3 ngày làm việc liên tiếp hoặc refresh timestamp không khớp đánh giá_events.</li><li>Không bàn giao W12 tại <code>P4-04</code> khi truy cập Rà soát log còn quyền ngoài phạm vi, quyền admin không có người thay thế hoặc cam kết làm mới dữ liệu chưa ký bởi chủ sở hữu vận hành thường xuyên.</li></ul>
 </div>
 
 <!-- ═══ 8. EVIDENCE PACK ═══ -->
@@ -351,14 +351,14 @@
   <div class="d-table-wrap">
     <table class="d-table">
       <thead>
-        <tr><th style="width:22%">Thành phần</th><th>Nội dung tối thiểu</th><th style="width:16%">Owner</th></tr>
+        <tr><th style="width:22%">Thành phần</th><th>Nội dung tối thiểu</th><th style="width:16%">Chủ sở hữu</th></tr>
       </thead>
       <tbody>
-        <tr><td><b>bảng điều khiển register</b></td><td>Tên, mục đích, owner, source, audience, environment</td><td><span class="role-cluster"><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="role-code">PD</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="role-code">ENGM</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)"><span class="role-code">QA[QMR]</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="role-code">SCM</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quản lý tài chính)"><span class="role-code">FIN</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="role-code">HR</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="role-code">EHS</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="role-code">ITA</span></a></span></td></tr>
-        <tr><td><b>Release log</b></td><td>Class thay đổi, ngày phát hành, người phê duyệt, ghi chú</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td></tr>
-        <tr><td><b>Refresh evidence</b></td><td>Timestamp, tình trạng refresh, issue nếu có, exception note</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quản trị viên hệ thống Epicor)"><span class="entity-code role-code">ESA</span></a></span></td></tr>
-        <tr><td><b>Access review</b></td><td>Danh sách quyền, người xem, publish/admin access, ngày rà</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td></tr>
-        <tr><td><b>Fallback note</b></td><td>Nguồn thay thế, trigger rollback, thời điểm phục hồi, người duyệt</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
+        <tr><td><b>bảng điều khiển Sổ đăng ký</b></td><td>Tên, mục đích, chủ sở hữu, source, audience, environment</td><td><span class="role-cluster"><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="role-code">PD</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="role-code">ENGM</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)"><span class="role-code">QA[QMR]</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="role-code">SCM</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quản lý tài chính)"><span class="role-code">FIN</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="role-code">HR</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="role-code">EHS</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="role-code">ITA</span></a></span></td></tr>
+        <tr><td><b>Phát hành log</b></td><td>Class thay đổi, ngày phát hành, người phê duyệt, ghi chú</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td></tr>
+        <tr><td><b>Refresh bằng chứng</b></td><td>Timestamp, tình trạng refresh, issue nếu có, exception Ghi chú</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quản trị viên hệ thống Epicor)"><span class="entity-code role-code">ESA</span></a></span></td></tr>
+        <tr><td><b>Truy cập Rà soát</b></td><td>Danh sách quyền, người xem, publish/admin truy cập, ngày rà</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td></tr>
+        <tr><td><b>Fallback Ghi chú</b></td><td>Nguồn thay thế, trigger rollback, thời điểm phục hồi, người duyệt</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
       </tbody>
     </table>
   </div>
@@ -384,7 +384,7 @@
       <a href="../13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135 — M365 File Plan</a>
     </div>
     <div class="d-ref">
-      <h4>Access &amp; Authority</h4>
+      <h4>Truy cập &amp; Authority</h4>
       <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101 — Access Map</a>
       <a href="../../../../system/organization/04-RACI-Authority/authority-matrix.html">ANNEX-120 — Authority Matrix</a>
     </div>
