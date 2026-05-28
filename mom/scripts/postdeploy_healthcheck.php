@@ -447,6 +447,12 @@ function dcc_translation_probe(array $paths): array
         return ['checked' => true, 'ok' => false, 'message' => 'DCC translation command is not configured in PHP-FPM pool env.'];
     }
 
+    $timeoutSeconds = 45;
+    $timeoutRaw = trim((string)(pool_env_value($poolConf, 'DCC_TRANSLATION_HEALTHCHECK_TIMEOUT_SECONDS') ?? ''));
+    if ($timeoutRaw !== '' && ctype_digit($timeoutRaw)) {
+        $timeoutSeconds = max(15, min(120, (int)$timeoutRaw));
+    }
+
     $probe = command_probe($command, $paths['root_dir'], [
         'doc_code' => 'HEALTHCHECK-DCC-TRANSLATION',
         'source_locale' => 'vi',
@@ -461,7 +467,7 @@ function dcc_translation_probe(array $paths): array
         'subtitle' => null,
         'source_html' => '<!DOCTYPE html><html lang=\"vi\"><body><p>Tai lieu kiem soat thu nghiem.</p></body></html>',
         'glossary_path' => $paths['base_dir'] . '/data/glossary/dict-data.json',
-    ], 30);
+    ], $timeoutSeconds);
 
     return [
         'checked' => true,
