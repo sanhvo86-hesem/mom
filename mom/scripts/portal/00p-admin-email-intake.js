@@ -932,7 +932,7 @@
       + _cardHead('📦 Intake Cases', 'Các case đã tạo từ AI. Tab "AI Intake Queue" trong M2-Orders module là nơi sales/planning xử lý chi tiết. Đây là view tổng quát của admin.')
       + '<div style="display:flex;gap:8px;margin-bottom:10px">'
       + '<button onclick="aeoi.loadCases(0)" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
-      + '<a href="?module=M2-orders&tab=ai-intake-queue" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;text-decoration:none">Mở Intake Queue đầy đủ →</a>'
+      + '<button onclick="aeoi.openOrdersAiQueue()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">Mở Intake Queue đầy đủ →</button>'
       + '</div>';
     if(data.items.length===0){
       html += '<div class="hm-empty">Chưa có case nào.</div>';
@@ -1130,6 +1130,28 @@
     },
 
     /* Test parse */
+    /* Navigate from admin AEOI to the M2-orders ai-intake-queue tab.
+     * The portal uses navigateTo(page) for module routing; a plain
+     * <a href> with ?module= bypasses the SPA router and forces a full
+     * page reload, which drops the auth session and bounces the user
+     * back to login. Use the JS API instead so navigation stays inside
+     * the SPA. */
+    openOrdersAiQueue: function(){
+      try {
+        if (typeof window.navigateTo === 'function') {
+          window.navigateTo('template-demo'); // template-demo page hosts M2-orders
+          setTimeout(function(){
+            if (window.HmModuleRouter && typeof window.HmModuleRouter.setActiveTab === 'function') {
+              window.HmModuleRouter.setActiveTab('ai-intake-queue');
+            }
+          }, 300);
+          return;
+        }
+      } catch(e) { /* fall through */ }
+      // Last-resort: open in a new tab so we don't kill the current session.
+      window.open(window.location.pathname + '#template-demo', '_blank');
+    },
+
     openTestParse: function(){
       var el = document.getElementById('aeoi-test-modal');
       if(!el){
