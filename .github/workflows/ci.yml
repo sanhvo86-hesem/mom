@@ -171,7 +171,7 @@ jobs:
           DB_PASS: test_password
           REDIS_HOST: localhost
           REDIS_PORT: 6379
-        run: vendor/bin/phpunit --testdox
+        run: php -d memory_limit=1G vendor/bin/phpunit --testdox
 
   openapi:
     name: OpenAPI Validation
@@ -233,4 +233,17 @@ jobs:
         run: php mom/tools/release/check_raci_integrity.php
       - name: RACI derivative integrity
         run: php mom/tools/release/check_raci_derivatives.php
-          echo "PASS: DCC compliance $COMPLIANT ≥ 389."
+      - name: Decision threshold consistency
+        run: php mom/tools/release/check_decision_threshold_consistency.php
+      - name: RACI role registry coverage
+        run: php mom/tools/release/check_role_registry_coverage.php
+      - name: RACI forbidden placeholders
+        run: php mom/tools/release/check_forbidden_placeholders.php
+      - name: RACI scenario coverage
+        run: php mom/tools/release/check_scenario_coverage.php
+      - name: Workflow authority coverage
+        run: php mom/tools/release/check_workflow_authority.php
+      - name: Managed marker inventory
+        run: php mom/tools/release/check_generated_marker_inventory.php
+      - name: ISO reference status
+        run: php mom/tools/release/check_iso_reference_status.php

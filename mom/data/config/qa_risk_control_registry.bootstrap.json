@@ -1,0 +1,365 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "QA risk-to-control registry for semiconductor CNC operations.",
+    "generated_at": "2026-05-28",
+    "generated_by": "codex"
+  },
+  "risks": [
+    {
+      "risk_id": "wrong_revision",
+      "risk": "Wrong revision",
+      "failure_mode": "Sai revision dùng trong quote / CAM / xưởng",
+      "detection": "revision mismatch check",
+      "prevention": "release review + version lock",
+      "hold_trigger": "missing approved revision",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "A5",
+        "B3",
+        "B5"
+      ],
+      "scenario_ids": [
+        "SCN-G1-REVISION-MISMATCH-IN-CAM",
+        "SCN-G7-COC-REVISION-MISMATCH"
+      ]
+    },
+    {
+      "risk_id": "ctq_undefined",
+      "risk": "CTQ undefined",
+      "failure_mode": "CTQ chưa định nghĩa rõ",
+      "detection": "DFM / Control Plan review",
+      "prevention": "ENGM + QA signoff",
+      "hold_trigger": "missing CTQ confirmation",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "B1",
+        "B8"
+      ],
+      "scenario_ids": [
+        "SCN-G1-CTQ-NOT-CONFIRMED"
+      ]
+    },
+    {
+      "risk_id": "material_mismatch",
+      "risk": "Material mismatch",
+      "failure_mode": "Sai vật liệu / cert",
+      "detection": "IQC cert verification",
+      "prevention": "approved supplier + cert review",
+      "hold_trigger": "heat/lot/cert mismatch",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "E2",
+        "E4"
+      ],
+      "scenario_ids": [
+        "SCN-G2-MATERIAL-SUBSTITUTION-WITHOUT-APPROVAL"
+      ]
+    },
+    {
+      "risk_id": "trace_missing",
+      "risk": "Traceability missing",
+      "failure_mode": "Thiếu trace heat/lot/CoC",
+      "detection": "traceability audit",
+      "prevention": "packet completeness",
+      "hold_trigger": "trace chain broken",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "D8",
+        "F5"
+      ],
+      "scenario_ids": [
+        "SCN-G7-COC-REVISION-MISMATCH"
+      ]
+    },
+    {
+      "risk_id": "special_process_cert_missing",
+      "risk": "Special process cert missing",
+      "failure_mode": "Thiếu cert special process",
+      "detection": "supplier qualification",
+      "prevention": "approved special-process source",
+      "hold_trigger": "cert expired/missing",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "E2",
+        "E3"
+      ],
+      "scenario_ids": [
+        "SCN-G2-SPECIAL-PROCESS-CERT-EXPIRED"
+      ]
+    },
+    {
+      "risk_id": "cmm_cal_invalid",
+      "risk": "CMM calibration invalid",
+      "failure_mode": "CMM hết hạn calib",
+      "detection": "calibration check",
+      "prevention": "calibration control",
+      "hold_trigger": "out-of-cal discovered",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "D5",
+        "D14"
+      ],
+      "scenario_ids": [
+        "SCN-G6-CMM-PROGRAM-UNVERIFIED"
+      ]
+    },
+    {
+      "risk_id": "cmm_program_unverified",
+      "risk": "CMM program unverified",
+      "failure_mode": "Program CMM chưa verify",
+      "detection": "program verification",
+      "prevention": "QA release",
+      "hold_trigger": "program unverified",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "D5",
+        "D8"
+      ],
+      "scenario_ids": [
+        "SCN-G6-CMM-PROGRAM-UNVERIFIED"
+      ]
+    },
+    {
+      "risk_id": "fai_fail",
+      "risk": "FAI fail",
+      "failure_mode": "FAI không đạt",
+      "detection": "FAI review",
+      "prevention": "FAI release by QA",
+      "hold_trigger": "FAI fail",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "D1",
+        "D3"
+      ],
+      "scenario_ids": [
+        "SCN-G4-FAIR-FORM-MISSING"
+      ]
+    },
+    {
+      "risk_id": "ipqc_drift",
+      "risk": "IPQC drift",
+      "failure_mode": "Xu hướng lệch process",
+      "detection": "SPC/IPQC checks",
+      "prevention": "reaction plan + containment",
+      "hold_trigger": "trend beyond control",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "D4",
+        "D6"
+      ],
+      "scenario_ids": [
+        "SCN-G5-SPC-DRIFT-NOT-CONTAINED"
+      ]
+    },
+    {
+      "risk_id": "oqc_fail",
+      "risk": "OQC fail",
+      "failure_mode": "Final/OQC fail",
+      "detection": "final inspection",
+      "prevention": "QA release only",
+      "hold_trigger": "final mismatch",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "D8"
+      ],
+      "scenario_ids": [
+        "SCN-G7-PARTIAL-SHIP-WITH-HOLD-OPEN"
+      ]
+    },
+    {
+      "risk_id": "fod_contamination",
+      "risk": "FOD contamination",
+      "failure_mode": "FOD / contamination semi",
+      "detection": "cleanliness inspection",
+      "prevention": "cleaning + pack control",
+      "hold_trigger": "FOD detected",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "D3",
+        "D8"
+      ],
+      "scenario_ids": [
+        "SCN-SEMI-FOD-IN-VACUUM-SURFACE"
+      ]
+    },
+    {
+      "risk_id": "packaging_mixup",
+      "risk": "Packaging label mix-up",
+      "failure_mode": "Nhãn/bao gói lẫn lot",
+      "detection": "label trace check",
+      "prevention": "packaging checklist",
+      "hold_trigger": "label mismatch",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "D8"
+      ],
+      "scenario_ids": [
+        "SCN-SEMI-PACKAGING-LABEL-MIXUP"
+      ]
+    },
+    {
+      "risk_id": "suspected_escape",
+      "risk": "Suspected escape",
+      "failure_mode": "Nghi thoát lỗi sau giao",
+      "detection": "complaint triage",
+      "prevention": "stop-ship / recall review",
+      "hold_trigger": "customer reports defect",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "D11",
+        "F5"
+      ],
+      "scenario_ids": [
+        "SCN-POST-CUSTOMER-STOP-SHIP"
+      ]
+    },
+    {
+      "risk_id": "concession_misuse",
+      "risk": "Concession misuse",
+      "failure_mode": "Lạm dụng waiver / concession",
+      "detection": "MRB review",
+      "prevention": "customer concession control",
+      "hold_trigger": "ship requested without disposition",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "D7",
+        "D13"
+      ],
+      "scenario_ids": [
+        "SCN-G7-CUSTOMER-REQUESTS-SHIP-WITHOUT-EVIDENCE"
+      ]
+    },
+    {
+      "risk_id": "rework_without_approval",
+      "risk": "Rework without approval",
+      "failure_mode": "Rework không phê duyệt",
+      "detection": "traveler & MRB check",
+      "prevention": "formal disposition",
+      "hold_trigger": "rework observed without record",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "D7",
+        "D6"
+      ],
+      "scenario_ids": [
+        "SCN-G5-SPC-DRIFT-NOT-CONTAINED"
+      ]
+    },
+    {
+      "risk_id": "supplier_nc_repeat",
+      "risk": "Supplier NC repeat",
+      "failure_mode": "Lỗi nhà cung cấp lặp lại",
+      "detection": "IQC + SCAR",
+      "prevention": "supplier escalation",
+      "hold_trigger": "repeat NC / overdue SCAR",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "E6"
+      ],
+      "scenario_ids": [
+        "SCN-POST-RMA-WITH-COST-RECOVERY"
+      ]
+    },
+    {
+      "risk_id": "capa_overdue",
+      "risk": "CAPA overdue",
+      "failure_mode": "CAPA quá hạn",
+      "detection": "CAPA review",
+      "prevention": "management escalation",
+      "hold_trigger": "CAPA past due",
+      "release_authority": "QA",
+      "evidence": [
+        "inspection_record",
+        "hold_log",
+        "traceability_packet"
+      ],
+      "cdr": [
+        "D6"
+      ],
+      "scenario_ids": [
+        "SCN-POST-8D-DEADLINE-MISSED"
+      ]
+    }
+  ]
+}

@@ -9,6 +9,7 @@ use RuntimeException;
 final class DecisionThresholdService
 {
     private const CONFIG_RELATIVE_PATH = 'config/decision_thresholds.json';
+    private const BOOTSTRAP_RELATIVE_PATH = 'config/decision_thresholds.bootstrap.json';
 
     /** @var array<string, string> */
     private const ROLE_LINKS = [
@@ -76,10 +77,28 @@ final class DecisionThresholdService
      */
     public function load(): array
     {
-        $stored = FileHelper::readJson($this->configPath());
-        $config = is_array($stored) ? $stored : [];
+        return $this->loadRuntime();
+    }
 
-        return $this->normaliseConfig($config);
+    /**
+     * @return array<string, mixed>
+     */
+    public function loadRuntime(): array
+    {
+        return $this->normaliseConfig($this->runtimeConfigRaw());
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function loadBootstrap(): array
+    {
+        return $this->normaliseConfig($this->bootstrapConfigRaw());
+    }
+
+    public function previewAuthorityLookupBlock(?array $config = null): string
+    {
+        return $this->authorityQuickLookupBlock($config === null ? $this->loadRuntime() : $this->normaliseConfig($config));
     }
 
     /**
@@ -121,11 +140,21 @@ final class DecisionThresholdService
      */
     private function normaliseConfig(array $config): array
     {
+        $bootstrap = $this->bootstrapConfigRaw();
         $items = [];
         $incomingItems = is_array($config['items'] ?? null) ? $config['items'] : [];
+        $bootstrapItems = is_array($bootstrap['items'] ?? null) ? $bootstrap['items'] : [];
         $defaultsByKey = [];
-        foreach ($this->defaultItems() as $item) {
+        foreach ($bootstrapItems as $item) {
+            if (!is_array($item) || !isset($item['key'])) {
+                continue;
+            }
             $defaultsByKey[(string)$item['key']] = $item;
+        }
+        if ($defaultsByKey === []) {
+            foreach ($this->legacyDefaultItems() as $item) {
+                $defaultsByKey[(string)$item['key']] = $item;
+            }
         }
 
         foreach ($defaultsByKey as $key => $default) {
@@ -158,12 +187,12 @@ final class DecisionThresholdService
         });
 
         return [
-            'schema_version' => '1.0',
-            'final_authority_role' => 'CEO',
-            'approval_role_code' => 'CEO',
-            'updated_at' => $this->cleanText($config['updated_at'] ?? ''),
-            'updated_by' => $this->cleanText($config['updated_by'] ?? ''),
-            'reason' => $this->cleanText($config['reason'] ?? ''),
+            'schema_version' => $this->cleanText($config['schema_version'] ?? $bootstrap['schema_version'] ?? '1.0'),
+            'final_authority_role' => $this->cleanText($config['final_authority_role'] ?? $bootstrap['final_authority_role'] ?? 'CEO'),
+            'approval_role_code' => $this->cleanText($config['approval_role_code'] ?? $bootstrap['approval_role_code'] ?? 'CEO'),
+            'updated_at' => $this->cleanText($config['updated_at'] ?? $bootstrap['updated_at'] ?? ''),
+            'updated_by' => $this->cleanText($config['updated_by'] ?? $bootstrap['updated_by'] ?? ''),
+            'reason' => $this->cleanText($config['reason'] ?? $bootstrap['reason'] ?? ''),
             'items' => $items,
             'managed_documents' => $this->managedDocuments(),
             'last_publication' => is_array($config['last_publication'] ?? null) ? $config['last_publication'] : null,
@@ -173,7 +202,7 @@ final class DecisionThresholdService
     /**
      * @return array<int, array<string, mixed>>
      */
-    private function defaultItems(): array
+    private function legacyDefaultItems(): array
     {
         return [
             [
@@ -1263,6 +1292,39 @@ final class DecisionThresholdService
     private function configPath(): string
     {
         return $this->dataDir . '/' . self::CONFIG_RELATIVE_PATH;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function runtimeConfigRaw(): array
+    {
+        $stored = FileHelper::readJson($this->configPath());
+
+        return is_array($stored) ? $stored : [];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function bootstrapConfigRaw(): array
+    {
+        $stored = FileHelper::readJson($this->bootstrapPath());
+        if (is_array($stored)) {
+            return $stored;
+        }
+
+        return [
+            'schema_version' => '1.0',
+            'final_authority_role' => 'CEO',
+            'approval_role_code' => 'CEO',
+            'items' => $this->legacyDefaultItems(),
+        ];
+    }
+
+    private function bootstrapPath(): string
+    {
+        return $this->dataDir . '/' . self::BOOTSTRAP_RELATIVE_PATH;
     }
 
     private function e(string $value): string

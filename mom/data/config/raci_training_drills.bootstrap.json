@@ -1,0 +1,1537 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "Training drill pack generated from RACI scenario registry.",
+    "generated_at": "2026-05-28",
+    "generated_by": "codex"
+  },
+  "drills": [
+    {
+      "drill_id": "DRL-001",
+      "scenario_id": "SCN-G0-RFQ-MISSING-DRAWING",
+      "title": "Thiếu bản vẽ RFQ",
+      "area": "RFQ/Hợp đồng",
+      "roles_participating": [
+        "CS",
+        "ENG",
+        "EST",
+        "QA"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "CS mở làm rõ trong 15 phút.",
+        "EST đánh dấu không báo giá khi thiếu revision.",
+        "ENGM rà soát rủi ro nếu khách ép tiến độ.",
+        "CS phản hồi khách chưa commit thời gian báo giá."
+      ],
+      "expected_cdr_authority_lookup": [
+        "A1",
+        "A2"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "CS",
+          "EST"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-202",
+        "SOP-201",
+        "costing_sheet",
+        "drawing_revision",
+        "margin_review",
+        "event_log"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.commercial.review",
+        "Epicor.quote.status",
+        "MOM.quote.approval",
+        "MOM.control.event"
+      ]
+    },
+    {
+      "drill_id": "DRL-002",
+      "scenario_id": "SCN-G0-RFQ-CONFLICTING-REQUIREMENTS",
+      "title": "Bản vẽ và yêu cầu khách mâu thuẫn",
+      "area": "RFQ/Hợp đồng",
+      "roles_participating": [
+        "CS",
+        "ENG",
+        "EST",
+        "PD",
+        "QA"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "CS đóng băng báo giá/acceptance.",
+        "EST tạo list câu hỏi làm rõ.",
+        "ENGM rà soát technical conflict.",
+        "CEO chỉ vào khi khách ép quyết nhanh."
+      ],
+      "expected_cdr_authority_lookup": [
+        "A1",
+        "A5"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "CS"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-202",
+        "SOP-201",
+        "po_vs_quote_review",
+        "technical_readiness",
+        "capacity_check",
+        "event_log"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.commercial.review",
+        "Epicor.quote.status",
+        "MOM.sales-order.confirm",
+        "Epicor.sales_order.release_readiness"
+      ]
+    },
+    {
+      "drill_id": "DRL-003",
+      "scenario_id": "SCN-G0-QUOTE-EXPEDITE",
+      "title": "Quote gấp trong ngày",
+      "area": "RFQ/Hợp đồng",
+      "roles_participating": [
+        "CS",
+        "ENG",
+        "EST",
+        "QA"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "CS xác nhận hạn phản hồi có điều kiện.",
+        "EST mở costing fast lane nhưng không bỏ FRM-202.",
+        "ENGM xác nhận chỉ các assumption được phép.",
+        "CEO duyệt nếu vượt threshold hoặc margin xuống thấp."
+      ],
+      "expected_cdr_authority_lookup": [
+        "A1",
+        "A2"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "CS",
+          "EST"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-202",
+        "SOP-201",
+        "costing_sheet",
+        "drawing_revision",
+        "margin_review",
+        "event_log"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.commercial.review",
+        "Epicor.quote.status",
+        "MOM.quote.approval",
+        "MOM.control.event"
+      ]
+    },
+    {
+      "drill_id": "DRL-004",
+      "scenario_id": "SCN-G0-LOW-MARGIN-QUOTE",
+      "title": "Quote margin thấp",
+      "area": "RFQ/Hợp đồng",
+      "roles_participating": [
+        "CS",
+        "ENG",
+        "EST",
+        "PD",
+        "QE"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "EST khóa phát hành quote.",
+        "CS chuẩn bị business context.",
+        "CEO xem xét threshold ngoại lệ.",
+        "Không gửi quote trước khi có authority L2/L3."
+      ],
+      "expected_cdr_authority_lookup": [
+        "A2",
+        "A3"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "EST",
+          "CEO"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-202",
+        "SOP-201",
+        "costing_sheet",
+        "drawing_revision",
+        "margin_review",
+        "event_log"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.commercial.review",
+        "Epicor.quote.status",
+        "MOM.quote.approval",
+        "MOM.control.event"
+      ]
+    },
+    {
+      "drill_id": "DRL-005",
+      "scenario_id": "SCN-G1-WRONG-REVISION-IN-SHOP",
+      "title": "Xưởng dùng sai revision",
+      "area": "Kỹ thuật",
+      "roles_participating": [
+        "ENG",
+        "PD",
+        "PPL",
+        "QA"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "WKM stop affected work.",
+        "ENGM xác định revision đúng.",
+        "QA mở containment nếu đã chạy máy.",
+        "PPL cập nhật dispatch sau khi baseline đúng."
+      ],
+      "expected_cdr_authority_lookup": [
+        "B2",
+        "B4"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "ENG"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-306",
+        "SOP-303",
+        "FRM-307",
+        "event_log",
+        "traceability_snapshot"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.engineering.release",
+        "MOM.control.event",
+        "audit.log"
+      ]
+    },
+    {
+      "drill_id": "DRL-006",
+      "scenario_id": "SCN-G1-CTQ-NOT-DEFINED",
+      "title": "CTQ chưa được xác định rõ",
+      "area": "Kỹ thuật",
+      "roles_participating": [
+        "ENG",
+        "EST",
+        "QA",
+        "WKM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "ENGM hold baseline release.",
+        "QE/QA rà control plan.",
+        "PE không được cho qua pilot nếu CTQ mờ.",
+        "CEO chỉ vào nếu khách ép tiến độ."
+      ],
+      "expected_cdr_authority_lookup": [
+        "B1",
+        "B8"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "ENG",
+          "QA"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-209",
+        "SOP-301",
+        "FRM-303",
+        "SOP-103",
+        "event_log",
+        "traceability_snapshot"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.engineering.release",
+        "MOM.control.event",
+        "audit.log"
+      ]
+    },
+    {
+      "drill_id": "DRL-007",
+      "scenario_id": "SCN-G1-CAM-TOOLPATH-SUSPECT",
+      "title": "Nghi ngờ lỗi toolpath CAM",
+      "area": "Kỹ thuật",
+      "roles_participating": [
+        "ENG",
+        "PD",
+        "QA",
+        "WKM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "CAM khóa program release.",
+        "SET/OPR không chạy thử không approved.",
+        "ENGM review simulation.",
+        "QA vào nếu CTQ bị ảnh hưởng."
+      ],
+      "expected_cdr_authority_lookup": [
+        "B5",
+        "B3"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "ENG"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-305",
+        "SOP-504",
+        "FRM-102",
+        "FRM-162",
+        "SOP-106",
+        "event_log"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.dispatch.control",
+        "MOM.engineering.release",
+        "MOM.control.event",
+        "audit.log"
+      ]
+    },
+    {
+      "drill_id": "DRL-008",
+      "scenario_id": "SCN-G1-MATERIAL-SUBSTITUTION",
+      "title": "Đề nghị thay vật liệu",
+      "area": "Kỹ thuật",
+      "roles_participating": [
+        "CEO",
+        "ENG",
+        "PPL",
+        "QA",
+        "WKM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "ENGM đánh giá kỹ thuật.",
+        "BUY xác nhận nguồn thay thế.",
+        "QA xác nhận cert và compliance.",
+        "Không release ECO nếu chưa đủ approval."
+      ],
+      "expected_cdr_authority_lookup": [
+        "B3",
+        "E1"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "ENG",
+          "SCM"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-102",
+        "FRM-162",
+        "SOP-106",
+        "FRM-401",
+        "SOP-201",
+        "event_log"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.engineering.release",
+        "MOM.planning.release",
+        "Epicor.po.status",
+        "MOM.control.event"
+      ]
+    },
+    {
+      "drill_id": "DRL-009",
+      "scenario_id": "SCN-G2-MISSING-COC-INCOMING",
+      "title": "Thiếu CoC đầu vào",
+      "area": "Vật tư/Nhà cung cấp",
+      "roles_participating": [
+        "CEO",
+        "ENG",
+        "QA",
+        "QE",
+        "SCM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "WAR hold receiving lot.",
+        "QA/QC không cho đưa vào sản xuất.",
+        "BUY liên hệ supplier ngay.",
+        "PPL replan nếu shortage chạm lịch."
+      ],
+      "expected_cdr_authority_lookup": [
+        "D10",
+        "E1"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "QA",
+          "SCM"
+        ]
+      },
+      "evidence_to_create": [
+        "SOP-402",
+        "FRM-401",
+        "SOP-201",
+        "event_log",
+        "traceability_snapshot"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.quality.control",
+        "Epicor.quality.status",
+        "MOM.planning.release",
+        "Epicor.po.status"
+      ]
+    },
+    {
+      "drill_id": "DRL-010",
+      "scenario_id": "SCN-G2-WRONG-HEAT-LOT-CERT",
+      "title": "Cert sai heat/lot",
+      "area": "Vật tư/Nhà cung cấp",
+      "roles_participating": [
+        "ENG",
+        "QA",
+        "QE",
+        "SCM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "WAR cô lập lot.",
+        "QA mở incoming NCR.",
+        "BUY yêu cầu supplier corrective response.",
+        "Không cho issue vật tư cho xưởng."
+      ],
+      "expected_cdr_authority_lookup": [
+        "D10",
+        "E6"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "QA"
+        ]
+      },
+      "evidence_to_create": [
+        "SOP-402",
+        "FRM-406",
+        "SOP-606",
+        "scar_record",
+        "supplier_response",
+        "incoming_ncr"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.quality.control",
+        "Epicor.quality.status",
+        "MOM.ncr.capa.control",
+        "MOM.supplier.scar"
+      ]
+    },
+    {
+      "drill_id": "DRL-011",
+      "scenario_id": "SCN-G2-SUPPLIER-LATE",
+      "title": "Supplier giao trễ vật tư trọng yếu",
+      "area": "Vật tư/Nhà cung cấp",
+      "roles_participating": [
+        "CEO",
+        "CS",
+        "PD",
+        "QA",
+        "QE",
+        "SCM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "BUY xác nhận ngày giao mới.",
+        "PPL đánh giá impact schedule.",
+        "CS chuẩn bị customer update nếu cần.",
+        "CEO vào nếu phải quyết định phương án đắt/rủi ro hơn."
+      ],
+      "expected_cdr_authority_lookup": [
+        "E1",
+        "E6"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "SCM",
+          "QA"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-401",
+        "SOP-201",
+        "FRM-406",
+        "SOP-606",
+        "scar_record",
+        "supplier_response"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.planning.release",
+        "Epicor.po.status",
+        "MOM.ncr.capa.control",
+        "MOM.supplier.scar"
+      ]
+    },
+    {
+      "drill_id": "DRL-012",
+      "scenario_id": "SCN-G2-SPECIAL-PROCESS-SUPPLIER-NOT-APPROVED",
+      "title": "Outsource special process chưa approved",
+      "area": "Vật tư/Nhà cung cấp",
+      "roles_participating": [
+        "CEO",
+        "ENG",
+        "PPL",
+        "QA",
+        "SCM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "BUY không phát PO chính thức.",
+        "QA/SQE đánh giá qualification gap.",
+        "PD xác nhận impact lịch.",
+        "CEO duyệt nếu cần risk acceptance."
+      ],
+      "expected_cdr_authority_lookup": [
+        "E2",
+        "E3"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "SCM"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-402",
+        "FRM-409",
+        "SOP-201",
+        "FRM-403",
+        "event_log",
+        "traceability_snapshot"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.planning.release",
+        "Epicor.po.status",
+        "MOM.dispatch.control",
+        "MOM.control.event"
+      ]
+    },
+    {
+      "drill_id": "DRL-013",
+      "scenario_id": "SCN-G3-MACHINE-CRASH",
+      "title": "Máy crash giữa ca",
+      "area": "Sản xuất",
+      "roles_participating": [
+        "ENG",
+        "PD",
+        "PPL",
+        "QA",
+        "WKM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "SL/WKM stop machine và cô lập sản phẩm.",
+        "MNT kiểm tra trạng thái máy.",
+        "ENGM xác định cần đổi machine/program không.",
+        "QA xác định cần first-piece lại không."
+      ],
+      "expected_cdr_authority_lookup": [
+        "C7",
+        "C5"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "PD",
+          "WKM"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-512",
+        "FRM-522",
+        "SOP-201",
+        "FRM-518",
+        "SOP-504",
+        "event_log"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.dispatch.control",
+        "MOM.control.event",
+        "audit.log"
+      ]
+    },
+    {
+      "drill_id": "DRL-014",
+      "scenario_id": "SCN-G3-TOOL-BREAKAGE",
+      "title": "Dao gãy hoặc mòn quá ngưỡng",
+      "area": "Sản xuất",
+      "roles_participating": [
+        "ENG",
+        "PPL",
+        "QA",
+        "WKM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "OPR báo ngay cho SET/SL.",
+        "Không tự thay geometry mới.",
+        "WKM/ENGM xác định có ảnh hưởng CTQ không.",
+        "QA quyết định cần containment mẫu đã chạy."
+      ],
+      "expected_cdr_authority_lookup": [
+        "C8",
+        "C4"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "WKM"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-513",
+        "FRM-515",
+        "FRM-511",
+        "SOP-504",
+        "FRM-302",
+        "event_log"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.dispatch.control",
+        "MOM.control.event",
+        "audit.log"
+      ]
+    },
+    {
+      "drill_id": "DRL-015",
+      "scenario_id": "SCN-G3-OFFSET-DRIFT",
+      "title": "Offset drift nghi ngờ",
+      "area": "Sản xuất",
+      "roles_participating": [
+        "ENG",
+        "PD",
+        "PPL",
+        "QA",
+        "QE",
+        "WKM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "OPR dừng part tiếp theo.",
+        "QC đo xác nhận.",
+        "SL/WKM hold lot nghi vấn.",
+        "ENG hỗ trợ root cause nếu cần."
+      ],
+      "expected_cdr_authority_lookup": [
+        "C4",
+        "D3"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "WKM",
+          "QA"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-302",
+        "FRM-511",
+        "SOP-504",
+        "FRM-651",
+        "SOP-606",
+        "event_log"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.dispatch.control",
+        "MOM.quality.control",
+        "Epicor.quality.status",
+        "MOM.control.event"
+      ]
+    },
+    {
+      "drill_id": "DRL-016",
+      "scenario_id": "SCN-G3-SETUP-FAIL",
+      "title": "Setup fail trước first piece",
+      "area": "Sản xuất",
+      "roles_participating": [
+        "ENG",
+        "PD",
+        "PPL",
+        "QA",
+        "QE",
+        "WKM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "SET giữ nguyên setup trạng thái.",
+        "QA không release chạy tiếp.",
+        "ENGM hỗ trợ phân tích baseline/program.",
+        "PPL cập nhật risk lịch."
+      ],
+      "expected_cdr_authority_lookup": [
+        "B6",
+        "D1"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "ENG",
+          "QA",
+          "QCL"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-106",
+        "SOP-504",
+        "FRM-311",
+        "FRM-511",
+        "SOP-302",
+        "fai_report"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.dispatch.control",
+        "MOM.quality.control",
+        "Epicor.quality.status",
+        "MOM.fai.release"
+      ]
+    },
+    {
+      "drill_id": "DRL-017",
+      "scenario_id": "SCN-G4-FAI-FAIL-EXPEDITE",
+      "title": "FAI fail nhưng khách yêu cầu giao gấp",
+      "area": "Chất lượng/FAI",
+      "roles_participating": [
+        "CS",
+        "ENG",
+        "ENGM",
+        "PD",
+        "QA",
+        "QCL",
+        "QE",
+        "QMS",
+        "SCM",
+        "WKM",
+        "XNK"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "QA/QC hold lot.",
+        "WKM dừng sản xuất tiếp trên setup ảnh hưởng.",
+        "ENG review drawing/revision/process.",
+        "CS xác nhận với khách là chưa cam kết ship."
+      ],
+      "expected_cdr_authority_lookup": [
+        "D2",
+        "D6",
+        "D7",
+        "D13"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "QA",
+          "CEO"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-311",
+        "FRM-413",
+        "SOP-302",
+        "fai_report",
+        "ncr_record",
+        "drawing_revision"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.quality.control",
+        "Epicor.quality.status",
+        "MOM.hold",
+        "Epicor.nonconformance"
+      ]
+    },
+    {
+      "drill_id": "DRL-018",
+      "scenario_id": "SCN-G4-IPQC-DRIFT",
+      "title": "IPQC drift trong lúc chạy lot",
+      "area": "Chất lượng/FAI",
+      "roles_participating": [
+        "ENG",
+        "ENGM",
+        "PD",
+        "QA",
+        "QE",
+        "WKM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "QC hold suspect lot.",
+        "SL stop at next safe point.",
+        "QE/ENG xem drift pattern.",
+        "QA quyết định containment scope."
+      ],
+      "expected_cdr_authority_lookup": [
+        "D3",
+        "D4",
+        "D6"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "QA"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-651",
+        "SOP-606",
+        "FRM-413",
+        "ncr_record",
+        "containment_record",
+        "disposition_evidence"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.quality.control",
+        "Epicor.quality.status",
+        "MOM.ncr.disposition",
+        "Epicor.nonconformance"
+      ]
+    },
+    {
+      "drill_id": "DRL-019",
+      "scenario_id": "SCN-G4-OQC-FAIL",
+      "title": "OQC fail trước giao hàng",
+      "area": "Chất lượng/FAI",
+      "roles_participating": [
+        "ENG",
+        "ENGM",
+        "PD",
+        "QA",
+        "QCL",
+        "QE",
+        "SCM",
+        "WKM",
+        "XNK"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "QA block shipment.",
+        "XNK không đóng chuyến.",
+        "QE/QCL xác định rework/disposition.",
+        "CS chuẩn bị customer update nếu ảnh hưởng lịch."
+      ],
+      "expected_cdr_authority_lookup": [
+        "D4",
+        "D7",
+        "D8"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "QA",
+          "CEO"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-651",
+        "FRM-413",
+        "SOP-606",
+        "ncr_record",
+        "containment_record",
+        "disposition_evidence"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.quality.control",
+        "Epicor.quality.status",
+        "MOM.ncr.disposition",
+        "Epicor.nonconformance"
+      ]
+    },
+    {
+      "drill_id": "DRL-020",
+      "scenario_id": "SCN-G4-CALIBRATION-EXPIRED",
+      "title": "Thiết bị đo hết hạn calibration",
+      "area": "Chất lượng/FAI",
+      "roles_participating": [
+        "CS",
+        "ENG",
+        "QA",
+        "QE",
+        "QMS",
+        "WKM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "QA hold affected lots.",
+        "QCL xác định khoảng ảnh hưởng từ lần calibration gần nhất.",
+        "QE mở recall assessment.",
+        "Không dùng dữ liệu đo đó để release."
+      ],
+      "expected_cdr_authority_lookup": [
+        "D14",
+        "D3"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "QA",
+          "CEO"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-601",
+        "FRM-651",
+        "SOP-601",
+        "calibration_failure_record",
+        "affected_lot_traceability",
+        "containment_log"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.quality.control",
+        "Epicor.quality.status",
+        "MOM.suspect_lot.recall",
+        "Epicor.quality.hold"
+      ]
+    },
+    {
+      "drill_id": "DRL-021",
+      "scenario_id": "SCN-SYS-ERP-OUTAGE",
+      "title": "ERP outage trong giờ vận hành",
+      "area": "System/Data",
+      "roles_participating": [
+        "CEO",
+        "HR",
+        "IT",
+        "ITA",
+        "PPL"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "ESA kích hoạt breakglass/process manual.",
+        "ITA ghi incident timeline.",
+        "PD/WKM chuyển sang controlled fallback.",
+        "QA giữ các gate không đủ evidence điện tử."
+      ],
+      "expected_cdr_authority_lookup": [
+        "F2"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "ESA"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-141",
+        "SOP-106",
+        "breakglass_request",
+        "incident_reference",
+        "backfill_plan",
+        "event_log"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.access.control",
+        "audit.log",
+        "Epicor.breakglass",
+        "MOM.breakglass"
+      ]
+    },
+    {
+      "drill_id": "DRL-022",
+      "scenario_id": "SCN-SYS-MOM-OUTAGE",
+      "title": "MOM outage hoặc mất truy cập portal",
+      "area": "System/Data",
+      "roles_participating": [
+        "CEO",
+        "HR",
+        "IT",
+        "ITA",
+        "PD",
+        "PPL",
+        "WKM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "ESA xác nhận phạm vi sự cố.",
+        "SL/WKM dùng fallback controlled logs.",
+        "QA khóa release chỉ dựa trí nhớ.",
+        "Backfill audit trail sau khôi phục."
+      ],
+      "expected_cdr_authority_lookup": [
+        "F2",
+        "F3"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "ESA"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-141",
+        "SOP-106",
+        "breakglass_request",
+        "incident_reference",
+        "backfill_plan",
+        "FRM-504"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.access.control",
+        "audit.log",
+        "Epicor.breakglass",
+        "MOM.breakglass"
+      ]
+    },
+    {
+      "drill_id": "DRL-023",
+      "scenario_id": "SCN-PEOPLE-A-ABSENT",
+      "title": "A_process vắng mặt",
+      "area": "Nhân sự/EHS",
+      "roles_participating": [
+        "HR",
+        "PD",
+        "PPL",
+        "WKM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "Kích hoạt deputy theo ANNEX-123.",
+        "SL/WKM/PD xác nhận deputy đủ điều kiện.",
+        "QA hold nếu deputy không đủ năng lực.",
+        "Không để khoảng trống authority."
+      ],
+      "expected_cdr_authority_lookup": [
+        "F3"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "ESA"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-504",
+        "ANNEX-123",
+        "event_log",
+        "traceability_snapshot"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.access.control",
+        "audit.log",
+        "MOM.control.event"
+      ]
+    },
+    {
+      "drill_id": "DRL-024",
+      "scenario_id": "SCN-AFTER-COMPLAINT",
+      "title": "Complaint từ khách hàng",
+      "area": "Sau giao hàng",
+      "roles_participating": [
+        "CEO",
+        "CS",
+        "QA",
+        "QE",
+        "QMS"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX"
+      ],
+      "expected_first_15_minutes": [
+        "CS ghi nhận facts và containment scope.",
+        "QA mở quality assessment.",
+        "CEO nhận escalation nếu chạm stop-ship hoặc field risk.",
+        "Không phản hồi nguyên nhân khi chưa có evidence."
+      ],
+      "expected_cdr_authority_lookup": [
+        "D11"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Quality / traceability / safety issue open"
+        ],
+        "release_authority": [
+          "CEO"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-211",
+        "SOP-202",
+        "escape_assessment",
+        "shipment_traceability",
+        "customer_notification_record",
+        "containment_record"
+      ],
+      "common_wrong_answer": "Tiếp tục chạy hoặc cam kết với khách trước khi đủ evidence / authority.",
+      "pass_fail_rubric": [
+        "Dừng/contain đúng khi cần",
+        "Tra đúng CDR/Authority",
+        "Ghi đúng evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ đoán sai?",
+        "Nếu A vắng thì kích hoạt phó ra sao?",
+        "Transaction nào phải replay nếu system down?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.quality.control",
+        "Epicor.quality.status",
+        "MOM.quality.escape",
+        "Epicor.customer_notification"
+      ]
+    }
+  ]
+}

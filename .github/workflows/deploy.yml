@@ -158,6 +158,27 @@ jobs:
       - name: RACI derivative integrity check
         run: php mom/tools/release/check_raci_derivatives.php
 
+      - name: Decision threshold consistency check
+        run: php mom/tools/release/check_decision_threshold_consistency.php
+
+      - name: RACI role registry coverage check
+        run: php mom/tools/release/check_role_registry_coverage.php
+
+      - name: RACI forbidden placeholder check
+        run: php mom/tools/release/check_forbidden_placeholders.php
+
+      - name: RACI scenario coverage check
+        run: php mom/tools/release/check_scenario_coverage.php
+
+      - name: Workflow authority coverage check
+        run: php mom/tools/release/check_workflow_authority.php
+
+      - name: Generated marker inventory check
+        run: php mom/tools/release/check_generated_marker_inventory.php
+
+      - name: ISO reference status check
+        run: php mom/tools/release/check_iso_reference_status.php
+
       - name: KPI integrity check (kpi-authority-registry SSOT)
         # Runs unconditionally — KPI changes are often doc-only changesets that
         # the classify job marks frontend-only. Validates ANNEX-122 ↔ registry

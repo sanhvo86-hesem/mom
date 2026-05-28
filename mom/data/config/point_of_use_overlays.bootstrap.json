@@ -1,0 +1,1250 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "Point-of-use overlays for frontline role interaction under the current RACI master.",
+    "generated_at": "2026-05-28",
+    "generated_by": "codex"
+  },
+  "overlays": [
+    {
+      "overlay_id": "workshop",
+      "use_point": "Workshop overlay",
+      "roles": [
+        "OPR",
+        "SET",
+        "SL",
+        "WKM",
+        "MNT"
+      ],
+      "decisions": [
+        "OPR: Thực hiện chạy máy, báo lệch, không tự nhả hold. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "SET: Chuẩn bị setup, first piece, giữ nguyên hiện trạng khi FAI fail. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "SL: Điều phối ca, được HOLD hiện trường nhưng không tự RELEASE lô chất lượng. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "WKM: Chủ trì phục hồi vận hành xưởng, khóa đổi máy/đổi ca khi chưa đủ evidence. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "MNT: Khôi phục máy, không tự tái chạy khi chưa có release từ tuyến chủ trì. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ."
+      ],
+      "cannot_do": [
+        "Không bỏ qua HOLD/stop đã mở.",
+        "Không tự đổi authority threshold hoặc waive evidence."
+      ],
+      "must_escalate_when": [
+        "OPR: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "SET: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "SL: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "WKM: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "MNT: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source."
+      ],
+      "evidence": [
+        "work-log",
+        "handover-log",
+        "control-row-evidence"
+      ],
+      "cdr_sop_wi": [
+        "c2",
+        "c4",
+        "c5",
+        "c7",
+        "d1",
+        "d2",
+        "d15",
+        "b5",
+        "b6",
+        "c3",
+        "c6",
+        "d6",
+        "f6"
+      ],
+      "source_group": {
+        "title": "Workshop overlay",
+        "roles": {
+          "OPR": {
+            "master_role": "WKM",
+            "source_rows": [
+              "c2",
+              "c4",
+              "c5",
+              "c7",
+              "d1",
+              "d2",
+              "d15"
+            ],
+            "when_this_role_acts_first": "Thực hiện chạy máy, báo lệch, không tự nhả hold.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "SET": {
+            "master_role": "WKM",
+            "source_rows": [
+              "c4",
+              "b5",
+              "b6",
+              "d1",
+              "d2"
+            ],
+            "when_this_role_acts_first": "Chuẩn bị setup, first piece, giữ nguyên hiện trạng khi FAI fail.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "SL": {
+            "master_role": "WKM",
+            "source_rows": [
+              "c2",
+              "c3",
+              "c5",
+              "c6",
+              "c7",
+              "d6"
+            ],
+            "when_this_role_acts_first": "Điều phối ca, được HOLD hiện trường nhưng không tự RELEASE lô chất lượng.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "WKM": {
+            "master_role": "WKM",
+            "source_rows": [
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6",
+              "c7",
+              "d1",
+              "d2",
+              "d6",
+              "d15"
+            ],
+            "when_this_role_acts_first": "Chủ trì phục hồi vận hành xưởng, khóa đổi máy/đổi ca khi chưa đủ evidence.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "MNT": {
+            "master_role": "WKM",
+            "source_rows": [
+              "c7",
+              "f6"
+            ],
+            "when_this_role_acts_first": "Khôi phục máy, không tự tái chạy khi chưa có release từ tuyến chủ trì.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "overlay_id": "engineering",
+      "use_point": "Engineering overlay",
+      "roles": [
+        "ENGM",
+        "PE",
+        "CAM",
+        "DFM",
+        "TOOL"
+      ],
+      "decisions": [
+        "ENGM: Khóa thay đổi kỹ thuật, xác minh baseline/program trước release. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "PE: Rà soát khả thi, pilot, hỗ trợ root cause hiện trường. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "CAM: Quản lý release chương trình, không tự đổi toolpath ngoài control. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "DFM: Làm rõ rủi ro công nghệ trước cam kết. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "TOOL: Kiểm soát tooling/fixture, không tự chấp nhận thay dao làm đổi geometry. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ."
+      ],
+      "cannot_do": [
+        "Không bỏ qua HOLD/stop đã mở.",
+        "Không tự đổi authority threshold hoặc waive evidence."
+      ],
+      "must_escalate_when": [
+        "ENGM: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "PE: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "CAM: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "DFM: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "TOOL: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source."
+      ],
+      "evidence": [
+        "work-log",
+        "handover-log",
+        "control-row-evidence"
+      ],
+      "cdr_sop_wi": [
+        "b1",
+        "b2",
+        "b3",
+        "b4",
+        "b5",
+        "b6",
+        "b7",
+        "b8",
+        "a6",
+        "d2",
+        "c7",
+        "d1",
+        "c4",
+        "a2",
+        "a5",
+        "c8"
+      ],
+      "source_group": {
+        "title": "Engineering overlay",
+        "roles": {
+          "ENGM": {
+            "master_role": "ENG",
+            "source_rows": [
+              "b1",
+              "b2",
+              "b3",
+              "b4",
+              "b5",
+              "b6",
+              "b7",
+              "b8",
+              "a6",
+              "d2"
+            ],
+            "when_this_role_acts_first": "Khóa thay đổi kỹ thuật, xác minh baseline/program trước release.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "PE": {
+            "master_role": "ENG",
+            "source_rows": [
+              "b1",
+              "b6",
+              "c7",
+              "d1"
+            ],
+            "when_this_role_acts_first": "Rà soát khả thi, pilot, hỗ trợ root cause hiện trường.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "CAM": {
+            "master_role": "ENG",
+            "source_rows": [
+              "b3",
+              "b5",
+              "c4"
+            ],
+            "when_this_role_acts_first": "Quản lý release chương trình, không tự đổi toolpath ngoài control.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "DFM": {
+            "master_role": "ENG",
+            "source_rows": [
+              "b1",
+              "a2",
+              "a5"
+            ],
+            "when_this_role_acts_first": "Làm rõ rủi ro công nghệ trước cam kết.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "TOOL": {
+            "master_role": "ENG",
+            "source_rows": [
+              "b5",
+              "c8"
+            ],
+            "when_this_role_acts_first": "Kiểm soát tooling/fixture, không tự chấp nhận thay dao làm đổi geometry.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "overlay_id": "quality",
+      "use_point": "Quality overlay",
+      "roles": [
+        "QC",
+        "QCL",
+        "QE",
+        "QA",
+        "QMS",
+        "MRB"
+      ],
+      "decisions": [
+        "QC: Đo/kiểm/xác nhận dữ liệu, được HOLD khi thấy nghi vấn. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "QCL: Lãnh đạo kiểm tra tuyến, giữ hàng và xác minh readiness release. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "QE: Xác minh độc lập, hiệu lực CAPA, traceability risk. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "QA: Quyền hold rộng hơn release; release chỉ khi evidence đủ. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "QMS: Giữ chuẩn hệ thống, xác minh sự phù hợp quy định và escalation khách hàng. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "MRB: Tuyến disposition chính thức, không bypass concession. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ."
+      ],
+      "cannot_do": [
+        "Không bỏ qua HOLD/stop đã mở.",
+        "Không tự đổi authority threshold hoặc waive evidence."
+      ],
+      "must_escalate_when": [
+        "QC: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "QCL: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "QE: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "QA: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "QMS: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "MRB: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source."
+      ],
+      "evidence": [
+        "work-log",
+        "handover-log",
+        "control-row-evidence"
+      ],
+      "cdr_sop_wi": [
+        "d1",
+        "d2",
+        "d3",
+        "d6",
+        "d8",
+        "b8",
+        "d4",
+        "d5",
+        "d11",
+        "d14",
+        "d7",
+        "d13",
+        "b7"
+      ],
+      "source_group": {
+        "title": "Quality overlay",
+        "roles": {
+          "QC": {
+            "master_role": "QA",
+            "source_rows": [
+              "d1",
+              "d2",
+              "d3",
+              "d6",
+              "d8"
+            ],
+            "when_this_role_acts_first": "Đo/kiểm/xác nhận dữ liệu, được HOLD khi thấy nghi vấn.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "QCL": {
+            "master_role": "QA",
+            "source_rows": [
+              "d1",
+              "d2",
+              "d6",
+              "d8"
+            ],
+            "when_this_role_acts_first": "Lãnh đạo kiểm tra tuyến, giữ hàng và xác minh readiness release.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "QE": {
+            "master_role": "QA",
+            "source_rows": [
+              "b8",
+              "d4",
+              "d5",
+              "d11",
+              "d14"
+            ],
+            "when_this_role_acts_first": "Xác minh độc lập, hiệu lực CAPA, traceability risk.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "QA": {
+            "master_role": "QA",
+            "source_rows": [
+              "d1",
+              "d2",
+              "d4",
+              "d5",
+              "d6",
+              "d7",
+              "d8",
+              "d11",
+              "d13",
+              "d14"
+            ],
+            "when_this_role_acts_first": "Quyền hold rộng hơn release; release chỉ khi evidence đủ.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "QMS": {
+            "master_role": "QA",
+            "source_rows": [
+              "d5",
+              "d11",
+              "d13",
+              "d14"
+            ],
+            "when_this_role_acts_first": "Giữ chuẩn hệ thống, xác minh sự phù hợp quy định và escalation khách hàng.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "MRB": {
+            "master_role": "QA",
+            "source_rows": [
+              "d4",
+              "b7",
+              "d13"
+            ],
+            "when_this_role_acts_first": "Tuyến disposition chính thức, không bypass concession.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "overlay_id": "supply_chain",
+      "use_point": "Supply chain overlay",
+      "roles": [
+        "BUY",
+        "WAR",
+        "XNK",
+        "SQE"
+      ],
+      "decisions": [
+        "BUY: Đặt hàng, xử lý supplier issue, không tự waive CoC/cert. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "WAR: Kho nhận/giao đúng traceability, HOLD khi thiếu nhận diện hoặc cert. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "XNK: Tổ chức giao hàng và hồ sơ xuất nhập, không ship khi QA hold. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "SQE: Đánh giá nhà cung cấp và leo thang SCAR. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ."
+      ],
+      "cannot_do": [
+        "Không bỏ qua HOLD/stop đã mở.",
+        "Không tự đổi authority threshold hoặc waive evidence."
+      ],
+      "must_escalate_when": [
+        "BUY: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "WAR: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "XNK: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "SQE: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source."
+      ],
+      "evidence": [
+        "work-log",
+        "handover-log",
+        "control-row-evidence"
+      ],
+      "cdr_sop_wi": [
+        "e1",
+        "e2",
+        "e5",
+        "e6",
+        "d10",
+        "e4",
+        "e7",
+        "d7",
+        "d8"
+      ],
+      "source_group": {
+        "title": "Supply chain overlay",
+        "roles": {
+          "BUY": {
+            "master_role": "SCM",
+            "source_rows": [
+              "e1",
+              "e2",
+              "e5",
+              "e6"
+            ],
+            "when_this_role_acts_first": "Đặt hàng, xử lý supplier issue, không tự waive CoC/cert.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "WAR": {
+            "master_role": "SCM",
+            "source_rows": [
+              "d10",
+              "e4",
+              "e7"
+            ],
+            "when_this_role_acts_first": "Kho nhận/giao đúng traceability, HOLD khi thiếu nhận diện hoặc cert.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "XNK": {
+            "master_role": "SCM",
+            "source_rows": [
+              "d7",
+              "d8",
+              "e7"
+            ],
+            "when_this_role_acts_first": "Tổ chức giao hàng và hồ sơ xuất nhập, không ship khi QA hold.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "SQE": {
+            "master_role": "SCM",
+            "source_rows": [
+              "e2",
+              "e6",
+              "d10"
+            ],
+            "when_this_role_acts_first": "Đánh giá nhà cung cấp và leo thang SCAR.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "overlay_id": "it_system",
+      "use_point": "IT and system overlay",
+      "roles": [
+        "ITA",
+        "ESA",
+        "M365A",
+        "EPA"
+      ],
+      "decisions": [
+        "ITA: Cấp/gỡ quyền chuẩn, ghi log, không tự tạo business authority. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "ESA: ERP/MOM breakglass, backfill audit trail, đóng quyền khẩn sau sự cố. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "M365A: Quản lý approval transport, không biến email thành authority. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "EPA: Epicor admin chỉ thực thi transaction được phê duyệt, không tự quyết ngoại lệ. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ."
+      ],
+      "cannot_do": [
+        "Không bỏ qua HOLD/stop đã mở.",
+        "Không tự đổi authority threshold hoặc waive evidence."
+      ],
+      "must_escalate_when": [
+        "ITA: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "ESA: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "M365A: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "EPA: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source."
+      ],
+      "evidence": [
+        "work-log",
+        "handover-log",
+        "control-row-evidence"
+      ],
+      "cdr_sop_wi": [
+        "f1",
+        "f2",
+        "d7",
+        "a2",
+        "a5"
+      ],
+      "source_group": {
+        "title": "IT and system overlay",
+        "roles": {
+          "ITA": {
+            "master_role": "IT",
+            "source_rows": [
+              "f1",
+              "f2"
+            ],
+            "when_this_role_acts_first": "Cấp/gỡ quyền chuẩn, ghi log, không tự tạo business authority.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "ESA": {
+            "master_role": "IT",
+            "source_rows": [
+              "f1",
+              "f2"
+            ],
+            "when_this_role_acts_first": "ERP/MOM breakglass, backfill audit trail, đóng quyền khẩn sau sự cố.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "M365A": {
+            "master_role": "IT",
+            "source_rows": [
+              "f1",
+              "f2",
+              "d7"
+            ],
+            "when_this_role_acts_first": "Quản lý approval transport, không biến email thành authority.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "EPA": {
+            "master_role": "IT",
+            "source_rows": [
+              "f2",
+              "a2",
+              "a5"
+            ],
+            "when_this_role_acts_first": "Epicor admin chỉ thực thi transaction được phê duyệt, không tự quyết ngoại lệ.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "overlay_id": "commercial",
+      "use_point": "Commercial overlay",
+      "roles": [
+        "CS",
+        "EST",
+        "CEO"
+      ],
+      "decisions": [
+        "CS: Giữ đầu mối khách hàng, không cam kết ship khi QA hold hoặc authority chưa đủ. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "EST: Chuẩn bị costing/term, không tự duyệt vượt threshold. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "CEO: Quyết định threshold L2/L3, không thay thế sign-off kỹ thuật/chất lượng thường lệ. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ."
+      ],
+      "cannot_do": [
+        "Không bỏ qua HOLD/stop đã mở.",
+        "Không tự đổi authority threshold hoặc waive evidence."
+      ],
+      "must_escalate_when": [
+        "CS: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "EST: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "CEO: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source."
+      ],
+      "evidence": [
+        "work-log",
+        "handover-log",
+        "control-row-evidence"
+      ],
+      "cdr_sop_wi": [
+        "a1",
+        "a2",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8",
+        "d11",
+        "a3",
+        "d7",
+        "f2"
+      ],
+      "source_group": {
+        "title": "Commercial overlay",
+        "roles": {
+          "CS": {
+            "master_role": "CS",
+            "source_rows": [
+              "a1",
+              "a2",
+              "a4",
+              "a5",
+              "a6",
+              "a7",
+              "a8",
+              "d11"
+            ],
+            "when_this_role_acts_first": "Giữ đầu mối khách hàng, không cam kết ship khi QA hold hoặc authority chưa đủ.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "EST": {
+            "master_role": "EST",
+            "source_rows": [
+              "a2",
+              "a3",
+              "a4",
+              "a5"
+            ],
+            "when_this_role_acts_first": "Chuẩn bị costing/term, không tự duyệt vượt threshold.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "CEO": {
+            "master_role": "CEO",
+            "source_rows": [
+              "a2",
+              "a3",
+              "a4",
+              "a5",
+              "a6",
+              "d7",
+              "d11",
+              "f2"
+            ],
+            "when_this_role_acts_first": "Quyết định threshold L2/L3, không thay thế sign-off kỹ thuật/chất lượng thường lệ.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "overlay_id": "planning",
+      "use_point": "Planning and dispatch overlay",
+      "roles": [
+        "PPL",
+        "PD",
+        "DISPATCH"
+      ],
+      "decisions": [
+        "PPL: Phát hành và điều phối lệnh, không bypass gate kỹ thuật/chất lượng. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "PD: Chịu trách nhiệm readiness năng lực và recovery plan liên phòng ban. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+        "DISPATCH: Vận hành bảng dispatch, không tự đổi ưu tiên khi chưa có phê duyệt. Release limit: Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ."
+      ],
+      "cannot_do": [
+        "Không bỏ qua HOLD/stop đã mở.",
+        "Không tự đổi authority threshold hoặc waive evidence."
+      ],
+      "must_escalate_when": [
+        "PPL: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "PD: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+        "DISPATCH: Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source."
+      ],
+      "evidence": [
+        "work-log",
+        "handover-log",
+        "control-row-evidence"
+      ],
+      "cdr_sop_wi": [
+        "c1",
+        "c2",
+        "c3",
+        "c5",
+        "a6",
+        "c6",
+        "c7",
+        "a5",
+        "d7"
+      ],
+      "source_group": {
+        "title": "Planning and dispatch overlay",
+        "roles": {
+          "PPL": {
+            "master_role": "PPL",
+            "source_rows": [
+              "c1",
+              "c2",
+              "c3",
+              "c5",
+              "a6"
+            ],
+            "when_this_role_acts_first": "Phát hành và điều phối lệnh, không bypass gate kỹ thuật/chất lượng.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "PD": {
+            "master_role": "PD",
+            "source_rows": [
+              "c1",
+              "c3",
+              "c6",
+              "c7",
+              "a5",
+              "a6",
+              "d7"
+            ],
+            "when_this_role_acts_first": "Chịu trách nhiệm readiness năng lực và recovery plan liên phòng ban.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          },
+          "DISPATCH": {
+            "master_role": "PPL",
+            "source_rows": [
+              "c2",
+              "c3",
+              "c5",
+              "c7"
+            ],
+            "when_this_role_acts_first": "Vận hành bảng dispatch, không tự đổi ưu tiên khi chưa có phê duyệt.",
+            "hold_rights": "Được HOLD trong phạm vi role overlay nếu tình huống chạm safety/quality/system control tương ứng.",
+            "release_limits": "Không được RELEASE khi authority row không cho phép hoặc evidence chưa đủ.",
+            "required_evidence": [
+              "work-log",
+              "handover-log",
+              "control-row-evidence"
+            ],
+            "must_call": [
+              "QA",
+              "ENGM",
+              "PD",
+              "CEO"
+            ],
+            "decision_boundary": "Chỉ quyết định trong phạm vi row được map; không tạo A mới ngoài source.",
+            "deputy_rule": "ANNEX-123",
+            "forbidden": [
+              "Không bỏ qua HOLD/stop đã mở.",
+              "Không tự đổi authority threshold hoặc waive evidence."
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

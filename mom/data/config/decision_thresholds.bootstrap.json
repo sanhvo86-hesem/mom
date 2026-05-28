@@ -1,0 +1,844 @@
+{
+    "schema_version": "1.0",
+    "final_authority_role": "CEO",
+    "approval_role_code": "CEO",
+    "updated_at": "2026-05-23T06:57:51+00:00",
+    "updated_by": "admin",
+    "reason": "L3 owner reallocation per approved 51-CDR matrix",
+    "items": {
+        "rfq_review": {
+            "key": "rfq_review",
+            "label": "Tiếp nhận RFQ",
+            "decision": "Tiếp nhận và làm rõ yêu cầu khách hàng",
+            "condition": "Mọi RFQ mới hoặc bản vẽ/yêu cầu kỹ thuật khách gửi",
+            "l1": "CS hoàn tất làm rõ ≤ 24 giờ làm việc",
+            "l2": "EST + ENGM rà soát gói kỹ thuật ≤ 48 giờ làm việc",
+            "l3": "CEO mở leo thang nếu RFQ treo > ngưỡng L2",
+            "r": "CS",
+            "evidence": "FRM-202 · SOP-201",
+            "escalation": "RFQ thiếu bản vẽ, yêu cầu kỹ thuật mâu thuẫn hoặc khách không phản hồi > 72 giờ làm việc → EST + CEO",
+            "cdrs": [
+                "A1"
+            ]
+        },
+        "quote": {
+            "key": "quote",
+            "label": "Báo giá",
+            "decision": "Phê duyệt báo giá theo bậc giá trị",
+            "condition": "Mọi báo giá ra ngoài",
+            "l1": "≤ 3000 USD: EST lập, CS xác nhận yêu cầu.",
+            "l2": "> 3000 USD: CEO ký sau khi EST hoàn tất bảng tính giá và biên gộp.",
+            "l3": "",
+            "r": "EST",
+            "evidence": "FRM-202 · SOP-201",
+            "escalation": "Biên gộp mục tiêu < 30% → CEO.",
+            "cdrs": [
+                "A2"
+            ]
+        },
+        "discount": {
+            "key": "discount",
+            "label": "Chiết khấu",
+            "decision": "Phê duyệt chiết khấu / điều kiện thương mại ngoại lệ",
+            "condition": "Chiết khấu, Incoterms, MOQ hoặc điều khoản giao hàng lệch chuẩn",
+            "l1": "> 0%: EST đề xuất trên hồ sơ báo giá → CEO duyệt.",
+            "l2": "",
+            "l3": "",
+            "r": "EST",
+            "evidence": "FRM-202 · SOP-201",
+            "escalation": "",
+            "cdrs": [
+                "A3"
+            ]
+        },
+        "payment_terms": {
+            "key": "payment_terms",
+            "label": "Điều kiện thanh toán ngoại lệ",
+            "decision": "Phê duyệt điều kiện thanh toán ngoại lệ",
+            "condition": "Khách yêu cầu công nợ, đặt cọc, giữ thanh toán hoặc hạn mức tín dụng lệch chuẩn",
+            "l1": "≤ công nợ 30 ngày: EST chuẩn bị hồ sơ, CS xác nhận yêu cầu.",
+            "l2": "> 30 ngày → CEO duyệt.",
+            "l3": "",
+            "r": "CS",
+            "evidence": "FRM-202 · SOP-201",
+            "escalation": "Khách có nợ quá hạn, điều kiện làm tăng rủi ro dòng tiền hoặc ảnh hưởng giao hàng → CEO.",
+            "cdrs": [
+                "A4"
+            ]
+        },
+        "order_acceptance": {
+            "key": "order_acceptance",
+            "label": "Chấp thuận đơn hàng",
+            "decision": "Chấp thuận đơn hàng và xem xét hợp đồng",
+            "condition": "Đã nhận đơn mua/hợp đồng khách hàng, trước khi phát hành lệnh sản xuất",
+            "l1": "CS xác nhận hồ sơ đủ ≤ 24 giờ làm việc",
+            "l2": "EST + ENGM + QA rà soát rủi ro nếu có yêu cầu kỹ thuật đặc biệt",
+            "l3": "CEO ký khi giá/lịch/phạm vi vượt chuẩn",
+            "r": "CS",
+            "evidence": "FRM-202 · SOP-201",
+            "escalation": "Khác biệt giữa báo giá và PO hoặc điều khoản chất lượng mới → CEO + QA Lô mẫu / prototype gửi khách không có PO chính thức vẫn yêu cầu hồ sơ FAI tối thiểu (FAIR Form 1+2 hoặc tương đương) và biên bản giao hàng ghi rõ \"mẫu thử — không sản xuất hàng loạt\".",
+            "cdrs": [
+                "A5"
+            ]
+        },
+        "customer_change": {
+            "key": "customer_change",
+            "label": "Yêu cầu thay đổi khách hàng",
+            "decision": "Phê duyệt yêu cầu thay đổi của khách hàng ảnh hưởng giá / lịch / phạm vi",
+            "condition": "CCR làm đổi giá, lịch, phạm vi, yêu cầu kỹ thuật hoặc cổng G0–G7",
+            "l1": "CS + PPL xử lý CCR tác động ≤ 1 ngày giao hoặc 2% giá trị.",
+            "l2": "ENGM + QA + PD rà soát CCR tác động ≤ 3 ngày giao hoặc 5% giá trị.",
+            "l3": "CEO phê duyệt CCR vượt ngưỡng L2, rơi vào G5–G7 hoặc ảnh hưởng cam kết khách.",
+            "r": "CS",
+            "evidence": "FRM-212 · SOP-201",
+            "escalation": "CCR muộn sau FAI, CoC, chặn giao hàng hoặc đổi điều kiện chất lượng → CEO + QA.",
+            "cdrs": [
+                "A6"
+            ]
+        },
+        "customer_change_request_late": {
+            "key": "customer_change_request_late",
+            "label": "CCR muộn (sau xác nhận đơn)",
+            "decision": "Phê duyệt yêu cầu thay đổi muộn của khách hàng phát sinh sau khi xác nhận đơn, trong giai đoạn sản xuất hoặc giao hàng",
+            "condition": "CCR làm đổi giá, lịch, phạm vi, yêu cầu kỹ thuật hoặc cổng G0–G7",
+            "l1": "CS + PPL xử lý CCR tác động ≤ 1 ngày giao hoặc 2% giá trị.",
+            "l2": "ENGM + QA + PD rà soát CCR tác động ≤ 3 ngày giao hoặc 5% giá trị.",
+            "l3": "CEO phê duyệt CCR vượt ngưỡng L2, rơi vào G5–G7 hoặc ảnh hưởng cam kết khách.",
+            "r": "CS",
+            "evidence": "FRM-212 · SOP-201",
+            "escalation": "CCR muộn sau FAI, CoC, chặn giao hàng hoặc đổi điều kiện chất lượng → CEO + QA.",
+            "cdrs": [
+                "A7"
+            ]
+        },
+        "order_cancel_after_release": {
+            "key": "order_cancel_after_release",
+            "label": "Khách hủy đơn sau phát hành lệnh",
+            "decision": "Xử lý quyết định của khách hủy đơn sau khi lệnh sản xuất đã phát hành",
+            "condition": "Lệnh sản xuất đã phát hành ≥ G2 (vật tư đã đặt hoặc WIP đã bắt đầu); khách thông báo hủy chính thức bằng văn bản hoặc email có xác nhận",
+            "l1": "Lệnh ở G2–G3, vật tư/WIP đã phát sinh ≤ 50 triệu VND, vật tư có thể trả lại: PPL + CS ghi nhận, tính chi phí thu hồi và trao đổi với khách.",
+            "l2": "Phát sinh 50–300 triệu VND hoặc WIP đã cut, vật tư không trả được: PD + CEO đồng ký, lập biên bản chi phí và phương án bồi hoàn.",
+            "l3": "Phát sinh > 300 triệu VND hoặc lệnh đã ≥ G4 (FAI đạt / gần CoC): CEO + khách hàng đàm phán bồi hoàn, chuyển đơn khác hoặc bồi thường hợp đồng.",
+            "r": "CS",
+            "evidence": "FRM-212 · FRM-503 · SOP-201",
+            "escalation": "Khách hủy nhiều đơn liên tiếp, có dấu hiệu mất khả năng thanh toán hoặc tranh chấp pháp lý → CEO + CS leo thang TOP_MGMT để rà soát hợp đồng và quan hệ.",
+            "cdrs": [
+                "A8"
+            ]
+        },
+        "dfm_review": {
+            "key": "dfm_review",
+            "label": "DFM rà soát rủi ro kỹ thuật",
+            "decision": "DFM rà soát và phân loại rủi ro kỹ thuật",
+            "condition": "RFQ/lệnh có bản vẽ mới, dung sai chặt hoặc vật liệu mới",
+            "l1": "PE phân loại rủi ro thấp trong ≤ 48 giờ làm việc",
+            "l2": "ENGM duyệt rủi ro trung bình hoặc có ≥ 3 điểm chưa rõ",
+            "l3": "ENGM + PD quyết định khi rủi ro cao, có ≥ 5 điểm chưa rõ hoặc CTQ chưa được PE và khách xác nhận.",
+            "r": "PE",
+            "evidence": "SOP-301",
+            "escalation": "Khi cần khách chấp thuận thay đổi kỹ thuật, thiếu dữ liệu CTQ chiến lược hoặc đụng năng lực máy chưa có → leo thang CEO + ENGM.",
+            "cdrs": [
+                "B1"
+            ]
+        },
+        "engineering_release": {
+            "key": "engineering_release",
+            "label": "Phát hành kỹ thuật / gói nền",
+            "decision": "Phê duyệt phát hành kỹ thuật / gói nền",
+            "condition": "Trước phát hành kế hoạch G2 hoặc sau thay đổi gói nền",
+            "l1": "ENGM phát hành gói tiêu chuẩn ≤ 1 lần sửa đổi",
+            "l2": "ENGM + QA phát hành nếu ảnh hưởng CTQ hoặc kế hoạch kiểm tra",
+            "l3": "ENGM + QA + PD phát hành khi đổi gói nền nội bộ ảnh hưởng > 1 nguyên công trọng yếu hoặc đổi kế hoạch kiểm tra.",
+            "r": "ENGM",
+            "evidence": "FRM-306 · SOP-303",
+            "escalation": "Khi thay đổi gói nền ảnh hưởng cam kết khách (CTQ, lịch giao, điều kiện hợp đồng) → leo thang CEO. Thiếu BOM, quy trình công nghệ, đặc tính kỹ thuật hoặc chữ ký QA khi có CTQ → giữ phát hành kỹ thuật.",
+            "cdrs": [
+                "B2"
+            ]
+        },
+        "eco_approval": {
+            "key": "eco_approval",
+            "label": "Lệnh thay đổi kỹ thuật (ECO)",
+            "decision": "Phê duyệt lệnh thay đổi kỹ thuật (ECO)",
+            "condition": "ECO đổi bản vẽ, BOM, quy trình công nghệ, chương trình hoặc kế hoạch kiểm tra",
+            "l1": "ENGM duyệt ECO nội bộ tác động thấp ≤ 1 công đoạn",
+            "l2": "ENGM + QA duyệt ECO ảnh hưởng cổng chất lượng hoặc cài đặt máy",
+            "l3": "ENGM + QA + PD duyệt ECO ảnh hưởng nhiều nguyên công, đổi vị trí gia công hoặc đụng nguồn vật tư nội bộ.",
+            "r": "ENGM",
+            "evidence": "FRM-102 · FRM-162 · SOP-106",
+            "escalation": "Khi ECO đổi giá / lịch / phạm vi → leo thang CEO + khách. ECO phát sinh khi lệnh đang chạy G3+ → ENGM + QA + PPL bắt buộc đồng ký. Sau ECO ảnh hưởng form / fit / function, đổi nguồn vật tư, đổi vị trí gia công, hoặc nghỉ sản xuất chi tiết đó ≥ 24 tháng → bắt buộc re-FAI theo AS9102 §5.4; mở CDR D1 song song.",
+            "cdrs": [
+                "B3"
+            ]
+        },
+        "package_withdrawal": {
+            "key": "package_withdrawal",
+            "label": "Thu hồi / thay thế gói kỹ thuật",
+            "decision": "Phê duyệt thay thế hoặc thu hồi gói kỹ thuật",
+            "condition": "Có gói kỹ thuật bị thay thế, thu hồi hoặc hết hiệu lực",
+            "l1": "ENGM rút gói chưa phát hành ≤ 24 giờ làm việc",
+            "l2": "ENGM + QA rút gói đã dùng cho lệnh đang mở",
+            "l3": "ENGM + QA + PD rút gói khi lệnh đang chạy nhưng chưa giao hàng và khách chưa nhận gói kỹ thuật.",
+            "r": "ENGM",
+            "evidence": "FRM-307 · SOP-303",
+            "escalation": "Khi ảnh hưởng giao hàng hoặc khách đã nhận gói kỹ thuật → leo thang CEO. Không đối soát được bản đang dùng tại xưởng → ngừng dùng + ENGM.",
+            "cdrs": [
+                "B4"
+            ]
+        },
+        "cam_program_release": {
+            "key": "cam_program_release",
+            "label": "Phát hành chương trình CAM/NC",
+            "decision": "Phát hành chương trình CAM/NC (mới + sửa đổi)",
+            "condition": "Chương trình CAM/NC mới hoặc sửa đổi trước G3",
+            "l1": "CAM phát hành chương trình nội bộ sau kiểm tra chéo",
+            "l2": "ENGM + QA phát hành nếu có CTQ, đồ gá mới hoặc đường chạy dao sửa lớn",
+            "l3": "ENGM + QA + PD phát hành chương trình có CTQ, đồ gá mới, đường chạy dao sửa lớn hoặc đổi phương pháp gia công.",
+            "r": "CAM",
+            "evidence": "FRM-305 · SOP-504",
+            "escalation": "Khi chương trình liên quan nhượng bộ kỹ thuật của khách hoặc cần khách phê duyệt mã NC → leo thang CEO + ENGM. Chưa có phiếu cài đặt hoặc bằng chứng mô phỏng → giữ tại kỹ thuật.",
+            "cdrs": [
+                "B5"
+            ]
+        },
+        "pilot_dryrun": {
+            "key": "pilot_dryrun",
+            "label": "Pilot / Dry-run trước loạt",
+            "decision": "Phê duyệt Pilot/Dry-run trước loạt",
+            "condition": "Lệnh mới, đồ gá mới, vật liệu mới hoặc rủi ro gia công cao",
+            "l1": "PE + WKM duyệt chạy thử ≤ 1 máy / 1 ca",
+            "l2": "ENGM + QA duyệt loạt thử có CTQ hoặc khách chứng kiến",
+            "l3": "ENGM + QA + PD duyệt loạt thử quy mô ≤ 1 lô / 1 ca có CTQ hoặc khách chứng kiến qua hội nghị truyền hình.",
+            "r": "PE",
+            "evidence": "FRM-106 · SOP-504",
+            "escalation": "Khi loạt thử làm trễ giao > 1 ngày hoặc khách cử người đến chứng kiến trực tiếp → leo thang CEO + CS.",
+            "cdrs": [
+                "B6"
+            ]
+        },
+        "tech_deviation": {
+            "key": "tech_deviation",
+            "label": "Sai lệch / miễn trừ kỹ thuật",
+            "decision": "Phê duyệt sai lệch/miễn trừ kỹ thuật",
+            "condition": "Sản phẩm lệch đặc tính kỹ thuật, khách yêu cầu miễn trừ hoặc nội bộ xin dùng như hiện trạng",
+            "l1": "ENGM + QA duyệt sai lệch nội bộ ≤ 5 chi tiết, không chạm CTQ và không cần thông báo khách (use-as-is \"no-inform\").",
+            "l2": "ENGM + QA + PD ký MRB cho lô ≤ 50 chi tiết, ảnh hưởng lịch giao nhưng chưa chạm đặc tính cam kết hợp đồng.",
+            "l3": "ENGM + QA + PD đồng ký kèm phương án giám sát tăng cường (lấy mẫu 100% hoặc kiểm CMM bổ sung) khi lô > 50 chi tiết, đổi kế hoạch kiểm tra, hoặc đề nghị \"use-as-is\" trên đặc tính phụ.",
+            "r": "ENGM",
+            "evidence": "FRM-413 · SOP-606",
+            "escalation": "Khi sai lệch chạm CTQ trọng yếu, vượt phạm vi hợp đồng, khách bán dẫn (Lam Research / Applied Materials) yêu cầu concession bằng văn bản, hoặc liên quan an toàn hoặc quy định → leo thang CEO + khách ký theo AS9100D §8.7.1.4.",
+            "cdrs": [
+                "B7"
+            ]
+        },
+        "control_plan_pfmea": {
+            "key": "control_plan_pfmea",
+            "label": "Control Plan & PFMEA",
+            "decision": "Phê duyệt Control Plan và PFMEA của chi tiết trước khi phát hành gói nền",
+            "condition": "Chi tiết mới, hoặc thay đổi đặc tính trọng yếu (CTQ), vật liệu, nguyên công hoặc hệ thống đo",
+            "l1": "QA + ENGM duyệt khi không phát sinh CTQ mới và không đổi nguyên công trọng yếu.",
+            "l2": "QA + PD duyệt khi có CTQ mới hoặc thay đổi nguyên công trọng yếu.",
+            "l3": "QA + CEO duyệt khi khách hàng yêu cầu phê duyệt PFMEA/Control Plan hoặc thuộc chương trình PPAP.",
+            "r": "QE",
+            "evidence": "FRM-303 · SOP-103",
+            "escalation": "Phát hiện CTQ chưa được kiểm soát sau khi vào sản xuất → mở NCR và rà soát lại PFMEA/Control Plan.",
+            "cdrs": [
+                "B8"
+            ]
+        },
+        "production_order_release": {
+            "key": "production_order_release",
+            "label": "Phát hành lệnh sản xuất",
+            "decision": "Phát hành kế hoạch đưa lệnh xuống xưởng",
+            "condition": "Lệnh đủ gói nền kỹ thuật, vật tư và năng lực sản xuất",
+            "l1": "PPL phát hành lệnh tiêu chuẩn ≤ 1 dây chuyền / 1 ca",
+            "l2": "PD phát hành nếu có rủi ro công suất hoặc vật tư chờ ≤ 2 ngày giao hàng",
+            "l3": "PD phát hành khi lệnh chạm rủi ro công suất nhiều dây chuyền, vật tư chờ > 2 ngày giao hàng hoặc thiếu một cổng bắt buộc đã có kế hoạch khắc phục.",
+            "r": "PPL",
+            "evidence": "FRM-501 · SOP-201",
+            "escalation": "Khi phát hành làm vỡ cam kết khách (lịch giao đã xác nhận, FAI hoặc PPAP đã cam kết) hoặc thiếu cổng bắt buộc không có kế hoạch khắc phục → leo thang CEO + CS.",
+            "cdrs": [
+                "C1"
+            ]
+        },
+        "daily_shift_dispatch": {
+            "key": "daily_shift_dispatch",
+            "label": "Điều phối ngày/ca",
+            "decision": "Phê duyệt điều phối ngày/ca",
+            "condition": "Lệnh ngày/ca đưa xuống xưởng",
+            "l1": "SL/PPL điều phối ≤ 1 ca",
+            "l2": "WKM + PPL điều phối khi đổi thứ tự trong ngày",
+            "l3": "PD duyệt khi đổi ưu tiên làm trễ lệnh khác > 1 ngày giao hàng.",
+            "r": "PPL",
+            "evidence": "FRM-502 · SOP-201",
+            "escalation": "Khi đổi ưu tiên đụng khách hàng chiến lược (Lam Research, Applied Materials) hoặc làm trễ ≥ 2 lệnh khác → leo thang CEO + CS.",
+            "cdrs": [
+                "C2"
+            ]
+        },
+        "schedule_freeze_break": {
+            "key": "schedule_freeze_break",
+            "label": "Phá băng lịch / đổi ưu tiên khẩn",
+            "decision": "Phê duyệt phá băng lịch / đổi ưu tiên khẩn cấp",
+            "condition": "Yêu cầu rút ngắn thời gian giao, khách VIP, máy hỏng hoặc vật tư về muộn",
+            "l1": "PPL đổi lịch tác động ≤ 1 ngày giao hàng",
+            "l2": "PD duyệt tác động ≤ 3 ngày giao hàng",
+            "l3": "PD duyệt phá băng lịch tác động ≤ 5 ngày giao hàng khi không đụng khách hàng chiến lược.",
+            "r": "PPL",
+            "evidence": "FRM-502 · SOP-201",
+            "escalation": "Khi tác động > 5 ngày, đụng khách hàng chiến lược hoặc cần đổi cam kết đã xác nhận → leo thang CEO + CS.",
+            "cdrs": [
+                "C3"
+            ]
+        },
+        "machine_setup_change": {
+            "key": "machine_setup_change",
+            "label": "Thay đổi cài đặt máy ngoài kế hoạch",
+            "decision": "Phê duyệt thay đổi cài đặt máy ngoài kế hoạch",
+            "condition": "Đổi cài đặt máy, đồ gá, dao, chương trình hoặc chi tiết đầu tiên ngoài kế hoạch",
+            "l1": "WKM duyệt cài đặt lệch nhỏ ≤ 1 giờ",
+            "l2": "PD + ENGM duyệt nếu tác động ≤ 1 ca",
+            "l3": "PD + QA duyệt khi cài đặt máy đổi tác động ≤ 1 ngày hoặc cần lập lại mẫu đầu tiên (first piece).",
+            "r": "WKM",
+            "evidence": "FRM-302 · FRM-511 · SOP-504",
+            "escalation": "Khi cài đặt máy đổi làm tăng rủi ro chất lượng vào CTQ trọng yếu hoặc khách đã yêu cầu chứng kiến → leo thang CEO + QA.",
+            "cdrs": [
+                "C4"
+            ]
+        },
+        "work_transfer": {
+            "key": "work_transfer",
+            "label": "Chuyển việc giữa máy/ca",
+            "decision": "Phê duyệt chuyển việc giữa máy/ca",
+            "condition": "Chuyển lệnh giữa máy, ca, người vận hành hoặc công đoạn",
+            "l1": "WKM duyệt chuyển nội bộ giữa máy có cùng năng lực đã xác nhận",
+            "l2": "PD + QA duyệt nếu CTQ hoặc mẫu đầu tiên cần lập lại",
+            "l3": "PD + QA duyệt khi chuyển việc đụng CTQ, đổi nguồn năng lực máy hoặc cần lập lại first piece.",
+            "r": "WKM",
+            "evidence": "FRM-518 · SOP-504",
+            "escalation": "Khi chuyển làm trễ giao > 1 ngày, đụng khách hàng chiến lược hoặc cần đổi cam kết khách → leo thang CEO + CS.",
+            "cdrs": [
+                "C5"
+            ]
+        },
+        "overtime": {
+            "key": "overtime",
+            "label": "Tăng ca",
+            "decision": "Phê duyệt tăng ca theo người và theo tuần",
+            "condition": "Tăng ca để giữ tiến độ job, phục hồi trễ hoặc xử lý sự cố xưởng",
+            "l1": "≤ 4 giờ OT / người / ca: WKM phối hợp PPL ra phiếu OT có lý do và đăng ký HR theo dõi.",
+            "l2": "≤ 16 giờ OT / người / tuần hoặc OT kéo dài > 1 tuần liên tiếp: PD duyệt sau khi PPL + WKM trình kế hoạch nhân lực.",
+            "l3": "PD duyệt OT kéo dài > 2 tuần liên tiếp hoặc tổng chi phí OT trong lệnh > 50 triệu VND.",
+            "r": "WKM",
+            "evidence": "FRM-504 · bảng chấm công · kế hoạch giao hàng",
+            "escalation": "Khi OT do thiếu người hệ thống, crash máy hoặc vật tư về muộn → leo thang CEO + HR. Tổng OT lệnh > 200 triệu VND hoặc lan ra nhiều dây chuyền → leo thang CEO.",
+            "cdrs": [
+                "C6"
+            ]
+        },
+        "recovery_after_downtime": {
+            "key": "recovery_after_downtime",
+            "label": "Phục hồi tiến độ sau dừng máy",
+            "decision": "Phê duyệt phục hồi tiến độ sau dừng máy hoặc va chạm máy",
+            "condition": "Dừng máy, va chạm máy, thiếu vật tư hoặc lỗi chất lượng làm lệch lịch",
+            "l1": "WKM + PPL phối hợp phục hồi tác động ≤ 1 ngày giao hàng bằng tái điều phối nội ca (re-priority, swap đồ gá, lấp máy cùng năng lực). PD nhận thông tin.",
+            "l2": "PD + ENGM duyệt phục hồi ≤ 3 ngày giao hàng cần OT, đổi tổ vận hành hoặc hoán đổi máy khác workshop; bắt buộc RCA sơ bộ ≤ 24 giờ theo SEMI E10.",
+            "l3": "PD + SCM duyệt phục hồi ≤ 5 ngày giao hàng cần gia công ngoài, đổi vật tư, hoặc đẩy sang ca đêm; bắt buộc RCA chính thức và phương án B nếu phục hồi không đạt.",
+            "r": "PD",
+            "evidence": "FRM-512 · FRM-522 · SOP-201",
+            "escalation": "Khi tác động > 5 ngày, đụng cam kết khách, crash máy thiệt hại > 500 triệu VND, lặp ≥ 3 lần / 90 ngày trên cùng máy hoặc kíp, hoặc khách yêu cầu báo cáo sự cố → leo thang CEO + CS + Maintenance Lead.",
+            "cdrs": [
+                "C7"
+            ]
+        },
+        "fai_release": {
+            "key": "fai_release",
+            "label": "Nhả FAI đạt",
+            "decision": "Phê duyệt nhả FAI đạt",
+            "condition": "First article hoàn tất trước sản xuất loạt",
+            "l1": "QCL nhả FAI đạt đủ đặc tính ≤ 1 lô",
+            "l2": "QA nhả nếu sai lệch đã đóng hoặc khách chứng kiến",
+            "l3": "QA + ENGM nhả FAI khi sai lệch đã đóng nhưng cần ghi điều kiện sản xuất tiếp theo (lấy mẫu tăng cường, ràng buộc thông số máy).",
+            "r": "QA",
+            "evidence": "FRM-311 · FRM-511 · SOP-302",
+            "escalation": "Khi FAI liên quan nhượng bộ kỹ thuật, miễn trừ hợp đồng hoặc khách yêu cầu phê duyệt riêng → leo thang CEO + QA.",
+            "cdrs": [
+                "D1"
+            ]
+        },
+        "fai_fail_disposition": {
+            "key": "fai_fail_disposition",
+            "label": "Xử lý FAI không đạt",
+            "decision": "Xử lý FAI không đạt (sửa lại / loại bỏ / miễn trừ khách hàng)",
+            "condition": "FAI không đạt hoặc chi tiết đầu tiên không đạt",
+            "l1": "QA + ENGM quyết định xử lý lỗi đơn lẻ ≤ 5 chi tiết",
+            "l2": "QA + PD quyết định xử lý lô ≤ 50 chi tiết",
+            "l3": "QA + PD quyết định xử lý lô > 50 chi tiết hoặc chi phí 30–100 triệu VND khi không cần khách chấp thuận.",
+            "r": "QA",
+            "evidence": "FRM-311 · FRM-413 · SOP-302",
+            "escalation": "Khi cần miễn trừ (use-as-is), loại bỏ > 100 chi tiết, trễ giao hoặc khách đã đặt cọc → leo thang CEO + khách.",
+            "cdrs": [
+                "D2"
+            ]
+        },
+        "ncr_open_classify": {
+            "key": "ncr_open_classify",
+            "label": "Mở NCR và phân loại",
+            "decision": "Mở NCR và phân loại nhỏ/lớn/nghiêm trọng",
+            "condition": "Sai lỗi sản phẩm, thoát lỗi quá trình, lỗi nhà cung cấp hoặc khiếu nại khách hàng",
+            "l1": "QA mở NCR và phân loại sơ bộ trong ≤ 4 giờ làm việc",
+            "l2": "QA + PD phân loại lớn/nghiêm trọng trong ≤ 24 giờ và xác nhận phạm vi lô",
+            "l3": "QA + PD phân loại NC nghiêm trọng, xác định phạm vi lô và mở hành động ngăn chặn trong ≤ 48 giờ làm việc.",
+            "r": "QA",
+            "evidence": "FRM-651 · SOP-606",
+            "escalation": "Khi thoát lỗi lặp lại (≥ 3 lần / 90 ngày trên cùng đặc tính), ảnh hưởng khách hàng đã giao hoặc đụng CTQ trọng yếu → leo thang CEO + QA.",
+            "cdrs": [
+                "D3"
+            ]
+        },
+        "ncr_disposition": {
+            "key": "ncr_disposition",
+            "label": "Xử lý NCR",
+            "decision": "Phê duyệt xử lý NCR (dùng như hiện trạng / sửa lại / loại bỏ / trả nhà cung cấp)",
+            "condition": "NCR cần quyết định xử lý",
+            "l1": "QA quyết định lỗi nhỏ/sửa lại nội bộ ≤ 5 chi tiết",
+            "l2": "QA + PD quyết định xử lý lô ≤ 50 chi tiết hoặc 20 triệu VND",
+            "l3": "QA + PD quyết định MRB lô > 50 chi tiết hoặc 30–100 triệu VND, có phương án sửa lại / sàng lọc rõ ràng.",
+            "r": "QA",
+            "evidence": "FRM-651 · FRM-413 · SOP-606",
+            "escalation": "Khi MRB quyết định dùng-như-hiện-trạng, loại bỏ > 100 chi tiết, ảnh hưởng hợp đồng hoặc cần thông báo khách → leo thang CEO + khách.",
+            "cdrs": [
+                "D4"
+            ]
+        },
+        "capa_close": {
+            "key": "capa_close",
+            "label": "Đóng CAPA và xác minh hiệu lực",
+            "decision": "Phê duyệt đóng CAPA và xác minh hiệu lực",
+            "condition": "CAPA đến hạn xác minh hiệu lực",
+            "l1": "QA xác nhận ngăn chặn trong ≤ 24 giờ và đóng CAPA nhỏ sau xác minh ≤ 30 ngày",
+            "l2": "QA + người sở hữu có kế hoạch khắc phục trong ≤ 5 ngày và đóng CAPA lớn ≤ 60 ngày",
+            "l3": "QA duyệt CAPA nghiêm trọng vào CTQ trọng yếu hoặc kéo dài 30–90 ngày, có bằng chứng phân tích nguyên nhân và xác minh hiệu lực.",
+            "r": "QA",
+            "evidence": "FRM-652 · SOP-606",
+            "escalation": "Khi CAPA quá hạn 90 ngày, lặp lỗi hệ thống hoặc cần đầu tư > 100 triệu VND → leo thang CEO + QA.",
+            "cdrs": [
+                "D5"
+            ]
+        },
+        "hold_release": {
+            "key": "hold_release",
+            "label": "Nhả giữ hàng",
+            "decision": "Nhả hàng đang giữ sau kiểm soát không phù hợp",
+            "condition": "Lot/job đang giữ cần nhả để chạy tiếp, giao hàng hoặc xử lý lại",
+            "l1": "Trong dung sai: QCL nhả khi bằng chứng kiểm cuối đạt.",
+            "l2": "Ngoài dung sai nhưng có xử lý được: QA xác nhận điều kiện nhả và ràng buộc hồ sơ.",
+            "l3": "QA + PD đồng ký nhả lot khi sai lệch đã đóng, lot đã sẵn sàng giao và không còn rủi ro mở.",
+            "r": "QA",
+            "evidence": "FRM-413 · kết quả kiểm cuối · NCR/CAPA nếu có",
+            "escalation": "Khi ảnh hưởng khách hàng, nhượng bộ hoặc giao sát hạn (< 2 ngày làm việc) → leo thang CEO + QA.",
+            "cdrs": [
+                "D6"
+            ]
+        },
+        "stop_ship": {
+            "key": "stop_ship",
+            "label": "Dỡ chặn giao hàng",
+            "decision": "Dỡ lệnh chặn giao hàng sau khi rủi ro được kiểm soát",
+            "condition": "Lệnh chặn giao hàng nội bộ hoặc do khách hàng cần quyết định gỡ chặn",
+            "l1": "QA dỡ hold cho 1 lô đơn lẻ trong ≤ 24 giờ khi nguyên nhân chặn đã rõ, NCR đã đóng, containment xác nhận và bằng chứng kiểm cuối đầy đủ.",
+            "l2": "QA + PD đồng ký dỡ hold cho 2–5 lô liên quan, hoặc khi một phần lô đã giao khách, có CAPA mở và kế hoạch xác minh hiệu lực.",
+            "l3": "QA + PD đồng ký dỡ hold sau RCA đầy đủ khi > 5 lô liên quan, kéo dài > 5 ngày, hoặc đặc tính trọng yếu (CTQ) liên quan; CAPA phải đạt mức \"effectiveness verified\" trước khi dỡ.",
+            "r": "QA",
+            "evidence": "FRM-413 · kết quả kiểm cuối · phản hồi khách hàng nếu có",
+            "escalation": "Khi khách ra hold chính thức bằng văn bản, có khiếu nại pháp lý, rủi ro danh tiếng (báo chí, mạng xã hội), recall risk hoặc audit đang mở → leo thang CEO + QA + CS, bắt buộc thông báo khách theo SOP-202 trước khi dỡ.",
+            "cdrs": [
+                "D7"
+            ]
+        },
+        "coc_release": {
+            "key": "coc_release",
+            "label": "Phát hành CoC / ký kiểm cuối",
+            "decision": "Phê duyệt phát hành CoC và ký xác nhận kiểm cuối",
+            "condition": "Kiểm cuối, CoC hoặc phát hành giao hàng",
+            "l1": "QCL ký kiểm cuối đạt ≤ 1 lô",
+            "l2": "QA phát hành CoC nếu NCR/sai lệch đã đóng",
+            "l3": "QA phát hành CoC sau khi NCR / sai lệch đã đóng và hồ sơ truy xuất hoàn chỉnh.",
+            "r": "QA",
+            "evidence": "FRM-641 · FRM-642 · SOP-605",
+            "escalation": "Khi có tranh chấp CoC, cần miễn trừ hoặc CoC vừa được dỡ sau hold → leo thang CEO + QA.",
+            "cdrs": [
+                "D8"
+            ]
+        },
+        "scrap": {
+            "key": "scrap",
+            "label": "Phế phẩm",
+            "decision": "Quyết định loại bỏ phế phẩm và ghi nhận tổn thất",
+            "condition": "Chi tiết không thể sửa, không thể nhượng bộ hoặc không còn giá trị sử dụng",
+            "l1": "≤ 5 triệu VND: WKM + QA xác nhận bằng chứng lỗi và cách ly.",
+            "l2": "≤ 30 triệu VND: QA + PD quyết định loại bỏ sau khi phân tích ảnh hưởng.",
+            "l3": "QA + PD quyết định scrap 30–100 triệu VND khi có bằng chứng lỗi đầy đủ và phân tích nguyên nhân sơ bộ.",
+            "r": "QA",
+            "evidence": "FRM-413 · NCR/CAPA · ảnh bằng chứng",
+            "escalation": "Khi scrap > 100 triệu VND, ảnh hưởng khách hàng đã đặt cọc hoặc lặp lỗi hệ thống ≥ 3 lần / 90 ngày → leo thang CEO + QA.",
+            "cdrs": [
+                "D9"
+            ]
+        },
+        "incoming_material_qc": {
+            "key": "incoming_material_qc",
+            "label": "Nghiệm thu vật tư mua vào",
+            "decision": "Nghiệm thu hoặc loại vật tư mua vào: kiểm tra ngoại quan/kích thước, đối chiếu chứng chỉ vật liệu và lô nhiệt, sàng lọc nguy cơ hàng giả",
+            "condition": "Mỗi lô vật tư hoặc bán thành phẩm nhận vào kho trước khi cấp cho sản xuất",
+            "l1": "QCL nghiệm thu khi chứng chỉ đầy đủ, truy xuất rõ ràng và đạt kiểm mẫu.",
+            "l2": "QA + ENGM xử lý khi sai lệch nhỏ hoặc thiếu mục chứng chỉ không trọng yếu, cần đánh giá kỹ thuật.",
+            "l3": "QA + SCM xử lý lô đầu vào khi sai lệch chứng chỉ trọng yếu hoặc kiểm mẫu fail nhưng vật tư có thể trả nhà cung cấp.",
+            "r": "QCL",
+            "evidence": "SOP-402",
+            "escalation": "Khi nghi hàng giả, thiếu truy xuất, sai vật liệu hoặc vật tư do khách chỉ định → leo thang CEO + QA + khách.",
+            "cdrs": [
+                "D10"
+            ]
+        },
+        "quality_escape_notice": {
+            "key": "quality_escape_notice",
+            "label": "Thông báo thoát lỗi tới khách",
+            "decision": "Thông báo khách hàng về sản phẩm không phù hợp đã hoặc có thể đã giao (thoát lỗi chất lượng, khoanh vùng phạm vi)",
+            "condition": "Phát hiện lỗi sau khi sản phẩm rời xưởng, hoặc nghi ngờ lô đã giao chứa đặc tính không đạt",
+            "l1": "QA + CS thông báo khi đã khoanh vùng, sản phẩm chưa rời kho khách và không có rủi ro hiện trường.",
+            "l2": "QA + CEO phê duyệt nội dung thông báo khi sản phẩm đã ở khách hàng.",
+            "l3": "CEO + khách hàng thống nhất hành động khoanh vùng khi có rủi ro an toàn, lắp ghép hoặc pháp lý.",
+            "r": "QCL",
+            "evidence": "FRM-211 · SOP-202",
+            "escalation": "Khách hàng yêu cầu sắp xếp lại lô, thu hồi hoặc 8D chính thức → mở CAPA và leo thang CEO.",
+            "cdrs": [
+                "D11"
+            ]
+        },
+        "fai_fair_ppap_submission": {
+            "key": "fai_fair_ppap_submission",
+            "label": "Nộp FAI/FAIR/PPAP cho khách",
+            "decision": "Nộp hồ sơ FAI/FAIR/PPAP cho khách hàng và xin phê duyệt trước khi sản xuất loạt",
+            "condition": "Chi tiết mới, thay đổi kỹ thuật, đổi nguồn vật tư hoặc khi hợp đồng/khách hàng yêu cầu FAIR/PPAP",
+            "l1": "QA duyệt nộp khi FAI nội bộ đạt và khách không yêu cầu phê duyệt trước.",
+            "l2": "QA + CS nộp hồ sơ và theo dõi phê duyệt khi khách hàng yêu cầu phê duyệt FAIR/PPAP trước loạt.",
+            "l3": "CEO + khách hàng quyết định khi hồ sơ bị từ chối hoặc cần điều kiện sản xuất có bảo lưu.",
+            "r": "QCL",
+            "evidence": "FRM-311 · SOP-302",
+            "escalation": "Khách hàng từ chối FAIR/PPAP → giữ sản xuất loạt, mở NCR và rà soát gói kỹ thuật.",
+            "cdrs": [
+                "D12"
+            ]
+        },
+        "customer_concession": {
+            "key": "customer_concession",
+            "label": "Nhượng bộ khách hàng (concession)",
+            "decision": "Phê duyệt nhượng bộ khách hàng — khách chấp thuận bằng văn bản dùng sản phẩm/lô có sai lệch đặc tính kỹ thuật",
+            "condition": "Sản phẩm hoặc lô có sai lệch đặc tính kỹ thuật so với bản vẽ; cần khách hàng chấp thuận bằng thư concession trước khi giao hoặc trước khi khách đưa vào sử dụng",
+            "l1": "Sai lệch nhỏ, không ảnh hưởng CTQ, ≤ 5 chi tiết hoặc ≤ 10 triệu VND: QA + ENGM xác nhận tác động kỹ thuật và soạn dự thảo thư concession.",
+            "l2": "Sai lệch ≤ 50 chi tiết, ảnh hưởng chức năng nhưng không vào CTQ trọng yếu: QA + PD ký dự thảo, CS gửi khách hàng xin chấp thuận chính thức.",
+            "l3": "Lô > 50 chi tiết, ảnh hưởng CTQ trọng yếu, hoặc khách bán dẫn cấp thiết bị (Lam Research / Applied Materials) chỉ định: CEO + QA ký thư concession kèm bằng chứng kỹ thuật và phương án phòng ngừa tái diễn.",
+            "r": "QA",
+            "evidence": "FRM-413 · FRM-651 · thư concession do khách ký",
+            "escalation": "Concession lặp lại cùng đặc tính, hoặc một lô bị tách thành nhiều đợt concession → QA + CEO mở CAPA hệ thống và rà soát Control Plan theo CDR B8.",
+            "cdrs": [
+                "D13"
+            ]
+        },
+        "suspect_lot_recall_after_msa_failure": {
+            "key": "suspect_lot_recall_after_msa_failure",
+            "label": "Thu hồi lô nghi vấn sau lỗi hệ thống đo",
+            "decision": "Quyết định phạm vi thu hồi và xử lý các lô được đo bằng dụng cụ đo / chương trình CMM / hệ thống đo phát hiện không đạt kiểm định",
+            "condition": "Dụng cụ đo, chương trình CMM, hoặc hệ thống đo phát hiện không đạt yêu cầu kiểm định (out-of-cal, MSA fail, drift vượt giới hạn); cần xác định phạm vi lô đã đo bằng thiết bị đó từ lần kiểm định đạt gần nhất",
+            "l1": "Phạm vi nghi vấn ≤ 1 lô / 1 ca, chưa giao khách: QA + QCL đánh giá lại, đo bằng dụng cụ thay thế đạt cal; xác nhận lô đạt hoặc mở NCR theo CDR D3.",
+            "l2": "Phạm vi 2–10 lô hoặc kéo dài 2–5 ca, một phần có thể đã giao: QA + PD quyết định phạm vi thu hồi nội bộ, mở NCR D3, thông báo CS chuẩn bị thông tin tới khách.",
+            "l3": "Phạm vi > 10 lô, đã giao khách hàng, hoặc liên quan đặc tính trọng yếu (CTQ): CEO + QA + CS thông báo khách hàng theo CDR D11, mở CAPA hệ thống và rà soát quy trình kiểm định.",
+            "r": "QA",
+            "evidence": "FRM-413 · FRM-651 · biên bản calibration · báo cáo MSA",
+            "escalation": "Hệ thống đo có lỗi lặp lại, cố ý vi phạm calibration, hoặc nghi ngờ giả mạo kết quả kiểm → CEO + QMS mở internal audit và báo cáo lãnh đạo.",
+            "cdrs": [
+                "D14"
+            ]
+        },
+        "purchase_order": {
+            "key": "purchase_order",
+            "label": "PO mua hàng",
+            "decision": "Phê duyệt đơn mua hàng theo giá trị và rủi ro nguồn cung",
+            "condition": "PO mua vật tư, dao cụ, dịch vụ hoặc nhà cung cấp mới",
+            "l1": "≤ 1 triệu VND: mua hàng phát hành khi có yêu cầu mua đã được xác nhận.",
+            "l2": "≤ 10 triệu VND: SCM duyệt sau khi kiểm tra nhu cầu, giá và ngày cần hàng.",
+            "l3": "SCM phát hành PO 10–100 triệu VND khi nhà cung cấp đã được phê duyệt và không đụng khách hàng chiến lược.",
+            "r": "BUY",
+            "evidence": "PO · báo giá nhà cung cấp · yêu cầu mua hàng",
+            "escalation": "Khi PO > 100 triệu VND, nhà cung cấp mới rủi ro cao hoặc ảnh hưởng giao hàng khách chiến lược → leo thang CEO + SCM.",
+            "cdrs": [
+                "E1"
+            ]
+        },
+        "supplier_qualification": {
+            "key": "supplier_qualification",
+            "label": "Phê duyệt nhà cung cấp mới",
+            "decision": "Phê duyệt nhà cung cấp mới (qualify)",
+            "condition": "Nhà cung cấp mới, công đoạn gia công ngoài mới hoặc vật tư trọng yếu",
+            "l1": "SCM đánh giá nhà cung cấp rủi ro thấp sau hồ sơ đủ ≤ 30 ngày",
+            "l2": "SCM + QA đánh giá nhà cung cấp trọng yếu hoặc đánh giá NC ≤ 2 NC nghiêm trọng",
+            "l3": "CEO duyệt nếu nhà cung cấp trọng yếu chưa đóng NC nhưng cần dùng",
+            "r": "SCM",
+            "evidence": "FRM-402 · FRM-409 · SOP-201",
+            "escalation": "Đánh giá nhà cung cấp không đạt hoặc thiếu chứng nhận bắt buộc → QA + CEO",
+            "cdrs": [
+                "E2"
+            ]
+        },
+        "outsource_tech": {
+            "key": "outsource_tech",
+            "label": "Điều kiện kỹ thuật gia công ngoài",
+            "decision": "Phê duyệt điều kiện kỹ thuật cho gia công ngoài",
+            "condition": "Cần chuyển công đoạn, xử lý nhiệt, phủ, mài, đo kiểm hoặc gia công phụ ra ngoài",
+            "l1": "SCM kiểm nhà cung cấp và điều kiện giao nhận.",
+            "l2": "SCM + ENGM + QA ký điều kiện kỹ thuật, chất lượng và xác nhận đầu vào.",
+            "l3": "SCM + ENGM + QA ký gia công ngoài khi nhà cung cấp đã được phê duyệt và CTQ không vào danh mục trọng yếu.",
+            "r": "SCM",
+            "evidence": "FRM-403 · yêu cầu kỹ thuật · kết quả kiểm đầu vào",
+            "escalation": "Khi gia công ngoài đụng CTQ trọng yếu, lịch giao khách chiến lược hoặc nhà cung cấp chưa được phê duyệt → leo thang CEO + QA.",
+            "cdrs": [
+                "E3"
+            ]
+        },
+        "outsource_incoming": {
+            "key": "outsource_incoming",
+            "label": "Xác nhận đầu vào sau gia công ngoài",
+            "decision": "Xác nhận chất lượng đầu vào sau gia công ngoài",
+            "condition": "Hàng về sau gia công ngoài cần kiểm tra đầu vào trước khi tiếp tục",
+            "l1": "SCM kiểm nhà cung cấp và điều kiện giao nhận.",
+            "l2": "SCM + ENGM + QA ký điều kiện kỹ thuật, chất lượng và xác nhận đầu vào.",
+            "l3": "SCM + ENGM + QA ký gia công ngoài khi nhà cung cấp đã được phê duyệt và CTQ không vào danh mục trọng yếu.",
+            "r": "SCM",
+            "evidence": "FRM-404 · FRM-411 · SOP-201",
+            "escalation": "Khi gia công ngoài đụng CTQ trọng yếu, lịch giao khách chiến lược hoặc nhà cung cấp chưa được phê duyệt → leo thang CEO + QA.",
+            "cdrs": [
+                "E4"
+            ]
+        },
+        "emergency_po": {
+            "key": "emergency_po",
+            "label": "Đơn mua khẩn",
+            "decision": "Phê duyệt đơn mua khẩn trước khi đặt hàng",
+            "condition": "Mua khẩn để tránh dừng máy, trễ job, thiếu dao cụ/vật tư hoặc phục hồi sự cố",
+            "l1": "≤ 2 triệu VND: BUYER + SCM xác nhận lý do khẩn và nguồn hàng.",
+            "l2": "≤ 20 triệu VND: SCM duyệt sau khi chứng minh không có lựa chọn tồn kho/thay thế phù hợp.",
+            "l3": "SCM duyệt đơn mua khẩn 20–100 triệu VND khi có bằng chứng không có lựa chọn tồn kho hoặc thay thế, và nhà cung cấp đã được phê duyệt.",
+            "r": "SCM",
+            "evidence": "Yêu cầu mua khẩn · PO · bằng chứng thiếu vật tư hoặc nguy cơ dừng máy",
+            "escalation": "Khi đơn mua khẩn > 100 triệu VND hoặc ảnh hưởng giao hàng khách → leo thang CEO + SCM. Nếu đến từ nhà cung cấp mới chưa qua qualify → đồng thời mở CDR E2.",
+            "cdrs": [
+                "E5"
+            ]
+        },
+        "scar_escalation": {
+            "key": "scar_escalation",
+            "label": "SCAR leo thang",
+            "decision": "Phê duyệt SCAR leo thang",
+            "condition": "NC nhà cung cấp lặp lại, NC nghiêm trọng hoặc giao hàng ảnh hưởng khách",
+            "l1": "SCM mở SCAR nhỏ/lớn ≤ 2 NC nghiêm trọng",
+            "l2": "SCM + QA leo thang ≤ 5 NC/tháng/lệnh",
+            "l3": "SCM + QA leo thang nhà cung cấp ≥ 5 NC nghiêm trọng / tháng hoặc 1 NC ảnh hưởng CTQ; có kế hoạch giám sát cường độ.",
+            "r": "SCM",
+            "evidence": "FRM-406 · SOP-606",
+            "escalation": "Khi cần khóa nhà cung cấp, cần nguồn thay thế hoặc phát sinh yêu cầu bồi hoàn → leo thang CEO + SCM.",
+            "cdrs": [
+                "E6"
+            ]
+        },
+        "customer_property_exception": {
+            "key": "customer_property_exception",
+            "label": "Ngoại lệ tài sản khách hàng",
+            "decision": "Xử lý ngoại lệ tài sản khách hàng",
+            "condition": "Tài sản khách hỏng, mất, thiếu nhận diện hoặc dùng sai mục đích",
+            "l1": "CS + SCM xử lý ngoại lệ giá trị ≤ 5 triệu VND",
+            "l2": "QA + CS + CEO xử lý nếu ảnh hưởng sản phẩm hoặc truy xuất",
+            "l3": "CEO + khách ký nếu tài sản mất/hỏng hoặc cần bồi hoàn",
+            "r": "CS",
+            "evidence": "FRM-221 · SOP-203",
+            "escalation": "Không truy xuất được tài sản khách hoặc có thiệt hại → CEO + QA",
+            "cdrs": [
+                "E7"
+            ]
+        },
+        "it_access": {
+            "key": "it_access",
+            "label": "Yêu cầu quyền CNTT",
+            "decision": "Phê duyệt yêu cầu cấp, đổi hoặc gỡ quyền CNTT",
+            "condition": "Yêu cầu cấp, đổi, khóa hoặc gỡ quyền hệ thống",
+            "l1": "ITA xử lý quyền tiêu chuẩn ≤ 24 giờ hành chính",
+            "l2": "ESA + người sở hữu duyệt quyền nhạy cảm hoặc ngoại lệ phân tách nhiệm vụ",
+            "l3": "ITA + ESA duyệt quyền nhạy cảm có thời hạn ≤ 30 ngày theo phân tách nhiệm vụ (SoD).",
+            "r": "ITA",
+            "evidence": "FRM-141 · SOP-106",
+            "escalation": "Khi cấp quyền đặc quyền (root, admin DB, bypass kiểm soát) hoặc gia hạn quyền nhạy cảm > 30 ngày → leo thang CEO.",
+            "cdrs": [
+                "F1"
+            ]
+        },
+        "erp_breakglass": {
+            "key": "erp_breakglass",
+            "label": "Truy cập ERP khẩn cấp",
+            "decision": "Kích hoạt quyền truy cập ERP khẩn cấp",
+            "condition": "ERP/MES cần quyền khẩn cấp để phục hồi vận hành hoặc xử lý lỗi truy cập",
+            "l1": "ESA kích hoạt tối đa 2 giờ và ghi FRM-141.",
+            "l2": "Kéo dài đến 8 giờ: ESA + CEO đồng ý, đóng quyền ngay sau khi khôi phục.",
+            "l3": "> 8 giờ hoặc có rủi ro dữ liệu/chứng cứ: CEO duyệt gia hạn.",
+            "r": "ESA",
+            "evidence": "FRM-141 · nhật ký truy cập · biên bản đóng quyền",
+            "escalation": "Quyền còn mở sau thời hạn, có sửa dữ liệu nhạy cảm hoặc ảnh hưởng audit trail → CEO.",
+            "cdrs": [
+                "F2"
+            ]
+        },
+        "deputy_activation": {
+            "key": "deputy_activation",
+            "label": "Kích hoạt phó vai trò",
+            "decision": "Kích hoạt phó/đại diện vai trò trọng yếu",
+            "condition": "Vai trò gốc vắng hoặc không phản hồi 2 kênh",
+            "l1": "DIRECT_LINE_MGRS kích hoạt phó sau vắng ≥ 4 giờ trong ca hoặc 24 giờ hành chính, có xác nhận CEO hoặc trưởng chức năng",
+            "l2": "CEO xác nhận nếu vai trò trọng yếu hoặc quyết định đang ở G5–G7",
+            "l3": "TOP_MGMT nếu CEO vắng và cần thay quyền khẩn",
+            "r": "HR",
+            "evidence": "ANNEX-123 d4",
+            "escalation": "Thiếu nhật ký FRM-504 hoặc không có phó hợp lệ → không chuyển quyền",
+            "cdrs": [
+                "F3"
+            ]
+        },
+        "ehs_incident": {
+            "key": "ehs_incident",
+            "label": "Ứng phó sự cố EHS",
+            "decision": "Phê duyệt ứng phó sự cố EHS và dừng việc vì an toàn",
+            "condition": "Sự cố EHS, nguy cơ an toàn, hóa chất, cháy nổ hoặc điều kiện không an toàn",
+            "l1": "EHS kích hoạt dừng việc ngay khi có nguy cơ",
+            "l2": "EHS + PD duyệt khôi phục sau khắc phục và kiểm tra",
+            "l3": "EHS duyệt dừng và phục hồi cho mức nguy cơ trung bình – cao sau khi PD và xưởng xác nhận khắc phục.",
+            "r": "EHS",
+            "evidence": "SOP-606",
+            "escalation": "Khi sự cố gây thương tích, ảnh hưởng môi trường phải báo cáo bên ngoài (Sở TNMT, BHLĐ) hoặc cần dừng > 1 ca → leo thang CEO + EHS.",
+            "cdrs": [
+                "F4"
+            ]
+        },
+        "complaint_rma": {
+            "key": "complaint_rma",
+            "label": "Khiếu nại khách hàng / RMA",
+            "decision": "Tiếp nhận khiếu nại khách hàng / chấp thuận RMA",
+            "condition": "Khách gửi khiếu nại, RMA hoặc nghi ngờ thoát lỗi sau giao",
+            "l1": "CS mở khiếu nại/RMA trong ≤ 24 giờ làm việc",
+            "l2": "QA + CS phân loại tổn thất ≤ 20 triệu VND trong ≤ 24 giờ làm việc",
+            "l3": "CEO + QA duyệt RMA/bồi hoàn vượt L2 hoặc chặn giao hàng",
+            "r": "CS",
+            "evidence": "FRM-211 · FRM-213 · FRM-654 · SOP-202",
+            "escalation": "Khiếu nại nghiêm trọng, thoát lỗi ngoài hiện trường hoặc khách dừng nhận hàng → CEO + QA",
+            "cdrs": [
+                "F5"
+            ]
+        },
+        "climate_risk": {
+            "key": "climate_risk",
+            "label": "Ứng phó rủi ro khí hậu",
+            "decision": "Phê duyệt hành động ứng phó rủi ro khí hậu",
+            "condition": "Rủi ro khí hậu ảnh hưởng năng lượng, vận chuyển, an toàn hoặc giao hàng",
+            "l1": "EHS + SCM mở hành động nếu tác động ≤ 2 ngày giao hàng",
+            "l2": "CEO + SCM duyệt hành động ảnh hưởng lịch ≤ 3 ngày giao hàng",
+            "l3": "CEO duyệt nếu cần đổi nguồn, đổi cam kết khách hoặc đầu tư khẩn",
+            "r": "EHS",
+            "evidence": "FRM-124 · FRM-121 · SOP-102",
+            "escalation": "Thiên tai làm gián đoạn nguồn cung hoặc cam kết giao hàng → CEO + CS + SCM",
+            "cdrs": [
+                "F6"
+            ]
+        },
+        "customer_audit_source_inspection": {
+            "key": "customer_audit_source_inspection",
+            "label": "Tiếp đoàn audit khách / source inspection",
+            "decision": "Phê duyệt nội dung tiếp đoàn audit khách hàng hoặc đoàn source inspection tại nhà máy",
+            "condition": "Khách hàng (hoặc đại diện được khách ủy quyền) yêu cầu thanh tra hệ thống quản lý chất lượng, kiểm tra hiện trường, hoặc chứng kiến FAI/CoC tại nhà máy HESEM",
+            "l1": "Audit định kỳ đã có lịch trước ≥ 5 ngày làm việc, phạm vi đã thống nhất bằng văn bản: QA + QMS chuẩn bị hồ sơ và dẫn đoàn theo khu vực đã duyệt; WKM phối hợp khu xưởng; HR ghi visitor log.",
+            "l2": "Audit đột xuất (báo trước < 5 ngày) hoặc khách yêu cầu mở rộng phạm vi vượt thống nhất ban đầu: QA + CEO ký quyết định cho vào theo phạm vi mới; EHS đánh giá an toàn; HR cập nhật visitor log; QMS giám sát nội dung tiết lộ.",
+            "l3": "Khách yêu cầu xem dữ liệu nhạy cảm (dữ liệu khách khác, công thức gia công nội bộ, mã NC), hoặc phát hiện non-conformance nghiêm trọng tại chỗ: CEO ký quyết định cuối về nội dung được phép tiết lộ; QA + ENGM phối hợp soạn phản hồi không-cam-kết-tức-thời cho khách.",
+            "r": "QMS",
+            "evidence": "FRM-141 (visitor log) · biên bản audit của khách · hồ sơ NDA · ghi chú nội bộ về câu trả lời cho khách",
+            "escalation": "Khách phát hiện non-conformance nghiêm trọng, đe dọa rút PPAP hoặc khóa nguồn cung → CEO + QA + CS mở response plan trong 24 giờ làm việc, soạn 8D hoặc CAPA chính thức.",
+            "cdrs": [
+                "F7"
+            ]
+        },
+        "tool_change_outside_plan": {
+            "key": "tool_change_outside_plan",
+            "label": "Đổi dao / dụng cụ ngoài kế hoạch",
+            "decision": "Phê duyệt đổi dao / dụng cụ ngoài kế hoạch trong gia công",
+            "condition": "Dao gãy, mòn quá ngưỡng, đổi geometry hoặc phải thay dao/dụng cụ ngoài kế hoạch trong lúc gia công.",
+            "l1": "SET đổi dao cùng spec/geometry, kiểm cài đặt + chi tiết đầu kế tiếp đạt; ghi FRM-515. WKM nhận thông tin trong ca.",
+            "l2": "SET + WKM duyệt khi đổi dao khác spec hoặc cần đổi feed/speed; kiểm chi tiết đầu sau đổi.",
+            "l3": "WKM + QA + ENGM duyệt khi đụng CTQ, cần first piece chính thức hoặc nghi chi tiết vừa chạy bị ảnh hưởng.",
+            "r": "WKM",
+            "evidence": "FRM-513 · FRM-515 · FRM-511 · SOP-504",
+            "escalation": "Tool failure lặp lại ≥ 3 lần / 30 ngày, scrap > 30 triệu VND hoặc ảnh hưởng khách hàng chiến lược → CEO + QA.",
+            "cdrs": [
+                "C8"
+            ]
+        },
+        "expired_competency_in_shift": {
+            "key": "expired_competency_in_shift",
+            "label": "Hết hạn năng lực vận hành trong ca",
+            "decision": "Xử lý hết hạn skill matrix / chứng nhận trong ca",
+            "condition": "Skill matrix hết hạn hoặc thiếu chứng nhận hợp lệ cho công việc đang giao trong ca sản xuất.",
+            "l1": "HR + SL hạn chế thao tác, chuyển OPR sang công việc không yêu cầu chứng nhận đã hết; ghi FRM-504 và cập nhật FRM-806 trong ca.",
+            "l2": "HR + WKM lập kế hoạch re-cert bằng FRM-803 OJT + FRM-804 assessment và tạm thay người.",
+            "l3": "HR + PD quyết định khi thiếu người cùng năng lực làm ảnh hưởng lệnh ưu tiên hoặc giao hàng đã cam kết.",
+            "r": "HR",
+            "evidence": "FRM-807 · FRM-803 · FRM-806 · FRM-504 · SOP-801",
+            "escalation": "Thiếu hệ thống ≥ 3 vai trò hết hạn / tháng hoặc ảnh hưởng khách hàng bán dẫn / cam kết khách → CEO + HR + CS.",
+            "cdrs": [
+                "D15"
+            ]
+        },
+        "near_miss_reporting": {
+            "key": "near_miss_reporting",
+            "label": "Báo cáo near-miss / sự cố suýt xảy ra",
+            "decision": "Phê duyệt tiếp nhận và xử lý near-miss",
+            "condition": "Near-miss về vật rơi, thiếu PPE, suýt va chạm, FOD chưa gây hư hoặc sự cố suýt gây thương tích / gián đoạn.",
+            "l1": "EHS tiếp nhận trong ≤ 4 giờ, mở FRM-811 và đánh giá rủi ro thấp; cảnh báo khu vực và nhắc PPE/5S.",
+            "l2": "EHS + WKM phân tích nguyên nhân và chặn tái diễn trong ≤ 24 giờ cho mức trung bình hoặc pattern lặp.",
+            "l3": "EHS + PD + HR rà soát đào tạo và cải tiến process cho mức cao, gần thương tích nghiêm trọng hoặc lặp ≥ 3 lần / 90 ngày; mở CAPA hệ thống nếu cần.",
+            "r": "EHS",
+            "evidence": "FRM-811 · FRM-651 · SOP-606",
+            "escalation": "Near-miss chuyển thành accident, cần báo cáo bên ngoài hoặc cho thấy lỗ hổng kiểm soát hệ thống → CEO + EHS.",
+            "cdrs": [
+                "F8"
+            ]
+        }
+    },
+    "managed_documents": [
+        {
+            "doc_code": "AUTHORITY-MATRIX",
+            "path": "mom/docs/system/organization/04-RACI-Authority/authority-matrix.html"
+        },
+        {
+            "doc_code": "RACI-MASTER-MATRIX",
+            "path": "mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html"
+        }
+    ],
+    "last_publication": {
+        "published_at": "2026-05-23T06:57:51+00:00",
+        "published_by": "admin",
+        "approval_role_code": "CEO",
+        "documents": [
+            {
+                "doc_code": "AUTHORITY-MATRIX",
+                "path": "mom/docs/system/organization/04-RACI-Authority/authority-matrix.html",
+                "previous_revision": "V1.5",
+                "new_revision": "V1.6",
+                "approval_role_code": "CEO"
+            }
+        ]
+    }
+}

@@ -1,0 +1,8 @@
+id,severity,status,area,summary,evidence,next_action
+RACI-V3-001,P0,closed,threshold-ssot,"DecisionThresholdService fallback semantics stale against runtime/published A2/A3/A4","mom/api/services/DecisionThresholdService.php; mom/data/config/decision_thresholds.json","Bootstrap source introduced; consistency gate added"
+RACI-V3-002,P0,closed,authority-publish,"AUTHORITY-MATRIX threshold block drifted from runtime render","mom/tools/release/check_decision_threshold_consistency.php; mom/docs/system/organization/04-RACI-Authority/authority-matrix.html","Republished from runtime SSOT"
+RACI-V3-003,P0,closed,authority-coverage,"Registry missing authority rows C8 D15 F8 referenced by RACI gate matrix","mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html; mom/data/config/decision_thresholds.json","Rows added to runtime + bootstrap; authority republished"
+RACI-V3-004,P1,closed,doc-reference,"SOP-201 cited ISO 9001:2026 as current standard","mom/docs/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html","Updated to ISO 9001:2015/Amd 1:2024"
+RACI-V3-005,P1,closed,shared-ui,"Global iso-map badge rendered ISO 9001:2026","mom/assets/style.css","Updated shared badge to ISO 9001:2015/Amd 1:2024"
+RACI-V3-006,P1,closed,checker-doc,"RACI integrity checker prose still described 16 columns while logic enforced 15","mom/tools/release/check_raci_integrity.php","Comment corrected to match code"
+RACI-V3-007,P1,open,repo-wide-standard-refs,"Broader repository still contains many ISO 9001:2026 references outside current tranche","rg -n \"ISO 9001:2026\" mom -S","Run broader stale-reference cleanup tranche with standards review"

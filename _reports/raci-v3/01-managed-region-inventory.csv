@@ -1,0 +1,87 @@
+path,marker_type,marker_meta
+mom/docs/operations/sops/01-SOP-100/sop-101-document-and-data-control.html,RACI-ROLES,sop=sop-101-document-and-data-control
+mom/docs/operations/sops/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html,RACI-ROLES,sop=sop-102-quality-policy-objectives-and-organizational-context
+mom/docs/operations/sops/01-SOP-100/sop-103-risk-opportunity-fmea-and-control-plan.html,RACI-ROLES,sop=sop-103-risk-opportunity-fmea-and-control-plan
+mom/docs/operations/sops/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html,RACI-ROLES,sop=sop-104-data-governance-records-security-and-ip-protection
+mom/docs/operations/sops/01-SOP-100/sop-105-organizational-knowledge-management.html,RACI-ROLES,sop=sop-105-organizational-knowledge-management
+mom/docs/operations/sops/01-SOP-100/sop-106-change-and-configuration-management.html,RACI-MATRIX,kind=sop code=SOP-106
+mom/docs/operations/sops/01-SOP-100/sop-106-change-and-configuration-management.html,RACI-ROLES,sop=sop-106-change-and-configuration-management
+mom/docs/operations/sops/01-SOP-100/sop-107-communication-management.html,RACI-ROLES,sop=sop-107-communication-management
+mom/docs/operations/sops/01-SOP-100/sop-108-operational-contingency-plan.html,RACI-ROLES,sop=sop-108-operational-contingency-plan
+mom/docs/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html,RACI-MATRIX,kind=sop code=SOP-201
+mom/docs/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html,RACI-ROLES,sop=sop-201-order-fulfillment-rfq-to-cash
+mom/docs/operations/sops/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html,RACI-MATRIX,kind=sop code=SOP-202
+mom/docs/operations/sops/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html,RACI-ROLES,sop=sop-202-customer-complaint-feedback-rma-and-escape
+mom/docs/operations/sops/02-SOP-200/sop-203-customer-property-control.html,RACI-MATRIX,kind=sop code=SOP-203
+mom/docs/operations/sops/02-SOP-200/sop-203-customer-property-control.html,RACI-ROLES,sop=sop-203-customer-property-control
+mom/docs/operations/sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html,RACI-MATRIX,kind=sop code=SOP-301
+mom/docs/operations/sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html,RACI-ROLES,sop=sop-301-engineering-dfm-quoting-and-machining-planning
+mom/docs/operations/sops/03-SOP-300/sop-302-first-article-inspection-fai.html,RACI-MATRIX,kind=sop code=SOP-302
+mom/docs/operations/sops/03-SOP-300/sop-302-first-article-inspection-fai.html,RACI-ROLES,sop=sop-302-first-article-inspection-fai
+mom/docs/operations/sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html,RACI-MATRIX,kind=sop code=SOP-303
+mom/docs/operations/sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html,RACI-ROLES,sop=sop-303-engineering-release-baseline-package-and-job-snapshot-control
+mom/docs/operations/sops/04-SOP-400/sop-401-supplier-control-and-special-process.html,RACI-ROLES,sop=sop-401-supplier-control-and-special-process
+mom/docs/operations/sops/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html,RACI-ROLES,sop=sop-402-material-verification-traceability-and-counterfeit-prevention
+mom/docs/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html,RACI-ROLES,sop=sop-501-production-planning-scheduling-and-dispatch-control
+mom/docs/operations/sops/05-SOP-500/sop-502-cnc-machining-operations.html,RACI-ROLES,sop=sop-502-cnc-machining-operations
+mom/docs/operations/sops/05-SOP-500/sop-503-tooling-maintenance-pm-and-breakdown-response.html,RACI-ROLES,sop=sop-503-tooling-maintenance-pm-and-breakdown-response
+mom/docs/operations/sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html,RACI-MATRIX,kind=sop code=SOP-504
+mom/docs/operations/sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html,RACI-ROLES,sop=sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control
+mom/docs/operations/sops/05-SOP-500/sop-505-finishing-deburr-and-secondary-operations-control.html,RACI-ROLES,sop=sop-505-finishing-deburr-and-secondary-operations-control
+mom/docs/operations/sops/06-SOP-600/sop-601-calibration-and-gage-control.html,RACI-ROLES,sop=sop-601-calibration-and-gage-control
+mom/docs/operations/sops/06-SOP-600/sop-602-measurement-system-analysis-msagr-r.html,RACI-ROLES,sop=sop-602-measurement-system-analysis-msagr-r
+mom/docs/operations/sops/06-SOP-600/sop-603-aql-sampling-inspection.html,RACI-ROLES,sop=sop-603-aql-sampling-inspection
+mom/docs/operations/sops/06-SOP-600/sop-604-spc-and-capability-control.html,RACI-ROLES,sop=sop-604-spc-and-capability-control
+mom/docs/operations/sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html,RACI-MATRIX,kind=sop code=SOP-605
+mom/docs/operations/sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html,RACI-ROLES,sop=sop-605-final-inspection-coc-and-shipment-release
+mom/docs/operations/sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html,RACI-MATRIX,kind=sop code=SOP-606
+mom/docs/operations/sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html,RACI-ROLES,sop=sop-606-ncr-capa-and-ipqc-reaction
+mom/docs/operations/sops/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html,RACI-ROLES,sop=sop-701-receiving-packaging-handling-and-storage
+mom/docs/operations/sops/07-SOP-700/sop-702-contamination-control-and-cleanliness.html,RACI-ROLES,sop=sop-702-contamination-control-and-cleanliness
+mom/docs/operations/sops/07-SOP-700/sop-703-product-safety-conformity-and-fod-prevention.html,RACI-ROLES,sop=sop-703-product-safety-conformity-and-fod-prevention
+mom/docs/operations/sops/08-SOP-800/sop-801-competence-training-and-certification.html,RACI-ROLES,sop=sop-801-competence-training-and-certification
+mom/docs/operations/sops/08-SOP-800/sop-802-incident-near-miss-and-ehs.html,RACI-ROLES,sop=sop-802-incident-near-miss-and-ehs
+mom/docs/operations/sops/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html,RACI-ROLES,sop=sop-803-invoicing-job-costing-and-arap
+mom/docs/operations/sops/08-SOP-800/sop-804-human-factors-and-error-proofing.html,RACI-ROLES,sop=sop-804-human-factors-and-error-proofing
+mom/docs/operations/sops/09-SOP-900/sop-901-internal-audit-and-lpa.html,RACI-ROLES,sop=sop-901-internal-audit-and-lpa
+mom/docs/operations/sops/09-SOP-900/sop-902-management-review.html,RACI-ROLES,sop=sop-902-management-review
+mom/docs/operations/sops/09-SOP-900/sop-903-continual-improvement-and-kaizen.html,RACI-ROLES,sop=sop-903-continual-improvement-and-kaizen
+mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html,RACI-MATRIX,kind=jd jd=jd-chief-executive-officer
+mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html,RACI-MATRIX,kind=jd jd=jd-production-director
+mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-and-packaging-supervisor.html,RACI-MATRIX,kind=jd jd=jd-cleaning-and-packaging-supervisor
+mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-packaging-technician.html,RACI-MATRIX,kind=jd jd=jd-cleaning-packaging-technician
+mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html,RACI-MATRIX,kind=jd jd=jd-cnc-operator
+mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html,RACI-MATRIX,kind=jd jd=jd-cnc-workshop-manager
+mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-deburr-team-lead.html,RACI-MATRIX,kind=jd jd=jd-deburr-team-lead
+mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-deburr-technician.html,RACI-MATRIX,kind=jd jd=jd-deburr-technician
+mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html,RACI-MATRIX,kind=jd jd=jd-maintenance-technician
+mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-engineer-industrial-engineer.html,RACI-MATRIX,kind=jd jd=jd-production-engineer-industrial-engineer
+mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html,RACI-MATRIX,kind=jd jd=jd-production-planner
+mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html,RACI-MATRIX,kind=jd jd=jd-setup-technician
+mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html,RACI-MATRIX,kind=jd jd=jd-shift-leader
+mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html,RACI-MATRIX,kind=jd jd=jd-cam-nc-programmer
+mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html,RACI-MATRIX,kind=jd jd=jd-dfm-engineer
+mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html,RACI-MATRIX,kind=jd jd=jd-engineering-lead-manager
+mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html,RACI-MATRIX,kind=jd jd=jd-process-engineer
+mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-internal-auditor-outsource.html,RACI-MATRIX,kind=jd jd=jd-internal-auditor-outsource
+mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html,RACI-MATRIX,kind=jd jd=jd-metrology-and-calibration-specialist
+mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html,RACI-MATRIX,kind=jd jd=jd-qa-manager
+mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html,RACI-MATRIX,kind=jd jd=jd-qc-inspector-cmm-programmer-operator
+mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html,RACI-MATRIX,kind=jd jd=jd-qc-inspector-lead
+mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html,RACI-MATRIX,kind=jd jd=jd-qms-engineer
+mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html,RACI-MATRIX,kind=jd jd=jd-quality-engineer
+mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html,RACI-MATRIX,kind=jd jd=jd-buyer-purchasing
+mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-import-export-staff.html,RACI-MATRIX,kind=jd jd=jd-import-export-staff
+mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-material-planning-inventory-control.html,RACI-MATRIX,kind=jd jd=jd-material-planning-inventory-control
+mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html,RACI-MATRIX,kind=jd jd=jd-supply-chain-manager
+mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-tool-crib-tool-storekeeper.html,RACI-MATRIX,kind=jd jd=jd-tool-crib-tool-storekeeper
+mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-warehouse-clerk.html,RACI-MATRIX,kind=jd jd=jd-warehouse-clerk
+mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html,RACI-MATRIX,kind=jd jd=jd-customer-service
+mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html,RACI-MATRIX,kind=jd jd=jd-estimator
+mom/docs/system/organization/03-Job-Descriptions/07-JD-Finance/jd-ap-ar-and-payments-accountant.html,RACI-MATRIX,kind=jd jd=jd-ap-ar-and-payments-accountant
+mom/docs/system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html,RACI-MATRIX,kind=jd jd=jd-finance-manager
+mom/docs/system/organization/03-Job-Descriptions/07-JD-Finance/jd-general-ledger-and-payroll-accountant.html,RACI-MATRIX,kind=jd jd=jd-general-ledger-and-payroll-accountant
+mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html,RACI-MATRIX,kind=jd jd=jd-hr-manager
+mom/docs/system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html,RACI-MATRIX,kind=jd jd=jd-ehs-specialist
+mom/docs/system/organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html,RACI-MATRIX,kind=jd jd=jd-epicor-system-administrator
+mom/docs/system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html,RACI-MATRIX,kind=jd jd=jd-it-admin

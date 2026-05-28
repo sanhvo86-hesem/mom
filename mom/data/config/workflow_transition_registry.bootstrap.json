@@ -1,0 +1,1015 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "Workflow transition registry bound to RACI/Authority control plane.",
+    "generated_at": "2026-05-28",
+    "generated_by": "codex"
+  },
+  "rows": [
+    {
+      "id": "quote_approval",
+      "label": "Quote approval",
+      "gate": "G0",
+      "cdr": "A2",
+      "source_state": "READY_FOR_REVIEW",
+      "target_state": "APPROVED",
+      "action": "approve",
+      "channels": [
+        "mom",
+        "epicor",
+        "m365",
+        "manual"
+      ],
+      "a_process": "EST",
+      "proposer_roles": [
+        "EST"
+      ],
+      "verifier_roles": [],
+      "approver_roles": [
+        "EST",
+        "CEO"
+      ],
+      "hold_roles": [
+        "CS",
+        "EST"
+      ],
+      "release_roles": [
+        "EST"
+      ],
+      "mandatory_evidence": [
+        "FRM-202",
+        "SOP-201",
+        "costing_sheet",
+        "drawing_revision",
+        "margin_review"
+      ],
+      "required_cdr": "A2",
+      "threshold_required": true,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.quote_approval.approve",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "CEO"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": [
+        "SCN-G0-RFQ-MISSING-DRAWING"
+      ]
+    },
+    {
+      "id": "contract_review",
+      "label": "Contract review",
+      "gate": "G0",
+      "cdr": "A5",
+      "source_state": "READY_FOR_REVIEW",
+      "target_state": "APPROVED",
+      "action": "approve",
+      "channels": [
+        "mom",
+        "epicor",
+        "m365"
+      ],
+      "a_process": "CS",
+      "proposer_roles": [
+        "CS"
+      ],
+      "verifier_roles": [
+        "QA"
+      ],
+      "approver_roles": [
+        "CS",
+        "PD",
+        "CEO"
+      ],
+      "hold_roles": [
+        "CS",
+        "EST",
+        "PD",
+        "QA"
+      ],
+      "release_roles": [
+        "CS"
+      ],
+      "mandatory_evidence": [
+        "FRM-202",
+        "SOP-201",
+        "po_vs_quote_review",
+        "technical_readiness",
+        "capacity_check"
+      ],
+      "required_cdr": "A5",
+      "threshold_required": false,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.contract_review.approve",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "CEO"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": [
+        "SCN-G0-RFQ-CONFLICTING-REQUIREMENTS"
+      ]
+    },
+    {
+      "id": "job_release",
+      "label": "Job release",
+      "gate": "G1",
+      "cdr": "B4",
+      "source_state": "APPROVED",
+      "target_state": "RELEASED",
+      "action": "release",
+      "channels": [
+        "mom",
+        "epicor",
+        "manual"
+      ],
+      "a_process": "ENG",
+      "proposer_roles": [
+        "ENG"
+      ],
+      "verifier_roles": [
+        "QA"
+      ],
+      "approver_roles": [
+        "ENGM",
+        "ENGM",
+        "ENGM"
+      ],
+      "hold_roles": [
+        "ENG",
+        "QA"
+      ],
+      "release_roles": [
+        "ENG"
+      ],
+      "mandatory_evidence": [
+        "FRM-307",
+        "SOP-303"
+      ],
+      "required_cdr": "B4",
+      "threshold_required": false,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.job_release.release",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "PD"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": [
+        "SCN-G1-WRONG-REVISION-IN-SHOP"
+      ]
+    },
+    {
+      "id": "material_release",
+      "label": "Material release",
+      "gate": "G3",
+      "cdr": "C3",
+      "source_state": "READY_FOR_REVIEW",
+      "target_state": "RELEASED",
+      "action": "release",
+      "channels": [
+        "mom",
+        "epicor",
+        "manual"
+      ],
+      "a_process": "PPL",
+      "proposer_roles": [
+        "PPL"
+      ],
+      "verifier_roles": [
+        "QA"
+      ],
+      "approver_roles": [
+        "PPL",
+        "PD",
+        "PD"
+      ],
+      "hold_roles": [
+        "PPL",
+        "QA",
+        "SL",
+        "WKM"
+      ],
+      "release_roles": [
+        "PPL"
+      ],
+      "mandatory_evidence": [
+        "FRM-502",
+        "SOP-201"
+      ],
+      "required_cdr": "C3",
+      "threshold_required": false,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.material_release.release",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "PD"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": []
+    },
+    {
+      "id": "fai_release",
+      "label": "FAI release",
+      "gate": "G5",
+      "cdr": "D3",
+      "source_state": "HOLD_OPEN",
+      "target_state": "RELEASE_PENDING",
+      "action": "release",
+      "channels": [
+        "mom",
+        "m365",
+        "manual"
+      ],
+      "a_process": "QA",
+      "proposer_roles": [
+        "QA"
+      ],
+      "verifier_roles": [
+        "QE"
+      ],
+      "approver_roles": [
+        "QA",
+        "PD",
+        "PD"
+      ],
+      "hold_roles": [
+        "QA",
+        "QE",
+        "WKM"
+      ],
+      "release_roles": [
+        "QA"
+      ],
+      "mandatory_evidence": [
+        "FRM-651",
+        "SOP-606"
+      ],
+      "required_cdr": "D3",
+      "threshold_required": false,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.fai_release.release",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "PD"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": [
+        "SCN-G2-INCOMING-QC-FAIL"
+      ]
+    },
+    {
+      "id": "ipqc_acceptance",
+      "label": "IPQC acceptance",
+      "gate": "G5",
+      "cdr": "D4",
+      "source_state": "IN_PROCESS",
+      "target_state": "RELEASE_PENDING",
+      "action": "release",
+      "channels": [
+        "mom",
+        "manual"
+      ],
+      "a_process": "QA",
+      "proposer_roles": [
+        "QA"
+      ],
+      "verifier_roles": [
+        "QE",
+        "ENGM"
+      ],
+      "approver_roles": [
+        "QA",
+        "PD",
+        "MRB"
+      ],
+      "hold_roles": [
+        "ENGM",
+        "QA",
+        "QCL",
+        "QE",
+        "SL",
+        "WKM"
+      ],
+      "release_roles": [
+        "QA"
+      ],
+      "mandatory_evidence": [
+        "FRM-651",
+        "FRM-413",
+        "SOP-606",
+        "ncr_record",
+        "containment_record",
+        "disposition_evidence",
+        "traceability_snapshot"
+      ],
+      "required_cdr": "D4",
+      "threshold_required": false,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.ipqc_acceptance.release",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "PD"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": [
+        "SCN-G4-IPQC-DRIFT"
+      ]
+    },
+    {
+      "id": "oqc_release",
+      "label": "OQC release",
+      "gate": "G6",
+      "cdr": "D8",
+      "source_state": "RELEASE_PENDING",
+      "target_state": "RELEASED",
+      "action": "release",
+      "channels": [
+        "mom",
+        "manual"
+      ],
+      "a_process": "QA",
+      "proposer_roles": [
+        "QA"
+      ],
+      "verifier_roles": [
+        "QE",
+        "QCL"
+      ],
+      "approver_roles": [
+        "QCL",
+        "QA",
+        "QA"
+      ],
+      "hold_roles": [
+        "QA",
+        "QCL",
+        "QE",
+        "WKM"
+      ],
+      "release_roles": [
+        "QA"
+      ],
+      "mandatory_evidence": [
+        "FRM-641",
+        "FRM-642",
+        "SOP-605",
+        "final_inspection_record",
+        "coc_draft",
+        "traceability_pack"
+      ],
+      "required_cdr": "D8",
+      "threshold_required": false,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.oqc_release.release",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "PD"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": [
+        "SCN-G4-OQC-FAIL"
+      ]
+    },
+    {
+      "id": "ncr_disposition",
+      "label": "NCR disposition",
+      "gate": "G2",
+      "cdr": "E1",
+      "source_state": "HOLD_OPEN",
+      "target_state": "DISPOSITION_PENDING",
+      "action": "approve",
+      "channels": [
+        "mom",
+        "m365",
+        "manual"
+      ],
+      "a_process": "SCM",
+      "proposer_roles": [
+        "SCM"
+      ],
+      "verifier_roles": [],
+      "approver_roles": [
+        "SCM",
+        "SCM",
+        "SCM"
+      ],
+      "hold_roles": [
+        "CEO",
+        "SCM"
+      ],
+      "release_roles": [
+        "SCM"
+      ],
+      "mandatory_evidence": [
+        "FRM-401",
+        "SOP-201"
+      ],
+      "required_cdr": "E1",
+      "threshold_required": false,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.ncr_disposition.approve",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "PD"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": [
+        "SCN-G1-MATERIAL-SUBSTITUTION"
+      ]
+    },
+    {
+      "id": "mrb_release",
+      "label": "MRB release",
+      "gate": "G3",
+      "cdr": "E3",
+      "source_state": "DISPOSITION_PENDING",
+      "target_state": "RELEASE_PENDING",
+      "action": "release",
+      "channels": [
+        "mom",
+        "m365",
+        "manual"
+      ],
+      "a_process": "SCM",
+      "proposer_roles": [
+        "SCM"
+      ],
+      "verifier_roles": [
+        "QA"
+      ],
+      "approver_roles": [
+        "SCM",
+        "ENGM",
+        "ENGM"
+      ],
+      "hold_roles": [
+        "ENG",
+        "QA",
+        "SCM",
+        "SL",
+        "WKM"
+      ],
+      "release_roles": [
+        "SCM"
+      ],
+      "mandatory_evidence": [
+        "FRM-403",
+        "SOP-201"
+      ],
+      "required_cdr": "E3",
+      "threshold_required": false,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.mrb_release.release",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "PD"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": [
+        "SCN-G2-SPECIAL-PROCESS-SUPPLIER-NOT-APPROVED"
+      ]
+    },
+    {
+      "id": "capa_closure",
+      "label": "CAPA closure",
+      "gate": "G5",
+      "cdr": "E6",
+      "source_state": "DISPOSITION_PENDING",
+      "target_state": "CLOSED",
+      "action": "approve",
+      "channels": [
+        "mom",
+        "m365"
+      ],
+      "a_process": "SCM",
+      "proposer_roles": [
+        "SCM"
+      ],
+      "verifier_roles": [
+        "QE",
+        "QA"
+      ],
+      "approver_roles": [
+        "SCM",
+        "SCM",
+        "SCM"
+      ],
+      "hold_roles": [
+        "QA",
+        "QE",
+        "SCM"
+      ],
+      "release_roles": [
+        "QA"
+      ],
+      "mandatory_evidence": [
+        "FRM-406",
+        "SOP-606",
+        "scar_record",
+        "supplier_response",
+        "incoming_ncr",
+        "delivery_impact"
+      ],
+      "required_cdr": "E6",
+      "threshold_required": false,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.capa_closure.approve",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "PD"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": [
+        "SCN-G2-WRONG-HEAT-LOT-CERT"
+      ]
+    },
+    {
+      "id": "shipment_release",
+      "label": "Shipment release",
+      "gate": "G3",
+      "cdr": "F2",
+      "source_state": "RELEASE_PENDING",
+      "target_state": "CLOSED",
+      "action": "release",
+      "channels": [
+        "mom",
+        "epicor",
+        "manual"
+      ],
+      "a_process": "CEO",
+      "proposer_roles": [
+        "CEO"
+      ],
+      "verifier_roles": [
+        "HR",
+        "ITA"
+      ],
+      "approver_roles": [
+        "ESA",
+        "CEO",
+        "CEO"
+      ],
+      "hold_roles": [
+        "CEO",
+        "ESA",
+        "HR",
+        "IT",
+        "ITA"
+      ],
+      "release_roles": [
+        "ESA"
+      ],
+      "mandatory_evidence": [
+        "FRM-141",
+        "SOP-106",
+        "breakglass_request",
+        "incident_reference",
+        "backfill_plan"
+      ],
+      "required_cdr": "F2",
+      "threshold_required": false,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.shipment_release.release",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "PD"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": [
+        "SCN-SYS-ERP-OUTAGE"
+      ]
+    },
+    {
+      "id": "customer_concession",
+      "label": "Customer concession",
+      "gate": "G3",
+      "cdr": "E4",
+      "source_state": "DISPOSITION_PENDING",
+      "target_state": "RELEASE_PENDING",
+      "action": "approve",
+      "channels": [
+        "mom",
+        "m365"
+      ],
+      "a_process": "SCM",
+      "proposer_roles": [
+        "SCM"
+      ],
+      "verifier_roles": [
+        "QA"
+      ],
+      "approver_roles": [
+        "SCM",
+        "ENGM",
+        "ENGM"
+      ],
+      "hold_roles": [
+        "QA",
+        "SCM",
+        "SL",
+        "WKM"
+      ],
+      "release_roles": [
+        "SCM"
+      ],
+      "mandatory_evidence": [
+        "FRM-404",
+        "FRM-411",
+        "SOP-201"
+      ],
+      "required_cdr": "E4",
+      "threshold_required": false,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.customer_concession.approve",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "PD"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": []
+    },
+    {
+      "id": "supplier_deviation",
+      "label": "Supplier deviation",
+      "gate": "G3",
+      "cdr": "C2",
+      "source_state": "HOLD_OPEN",
+      "target_state": "DISPOSITION_PENDING",
+      "action": "approve",
+      "channels": [
+        "mom",
+        "m365"
+      ],
+      "a_process": "PPL",
+      "proposer_roles": [
+        "PPL"
+      ],
+      "verifier_roles": [
+        "QA"
+      ],
+      "approver_roles": [
+        "PPL",
+        "PPL",
+        "PD"
+      ],
+      "hold_roles": [
+        "PPL",
+        "QA",
+        "SL",
+        "WKM"
+      ],
+      "release_roles": [
+        "PPL"
+      ],
+      "mandatory_evidence": [
+        "FRM-502",
+        "SOP-201"
+      ],
+      "required_cdr": "C2",
+      "threshold_required": false,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.supplier_deviation.approve",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "PD"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": [
+        "SCN-G3-CHANGE-SHIFT"
+      ]
+    },
+    {
+      "id": "overtime_approval",
+      "label": "Overtime approval",
+      "gate": "G3",
+      "cdr": "F4",
+      "source_state": "APPROVAL_PENDING",
+      "target_state": "APPROVED",
+      "action": "approve",
+      "channels": [
+        "mom",
+        "m365"
+      ],
+      "a_process": "EHS",
+      "proposer_roles": [
+        "EHS"
+      ],
+      "verifier_roles": [
+        "HR"
+      ],
+      "approver_roles": [
+        "EHS",
+        "EHS",
+        "EHS"
+      ],
+      "hold_roles": [
+        "EHS",
+        "ESA",
+        "HR",
+        "ITA",
+        "WKM"
+      ],
+      "release_roles": [
+        "ESA"
+      ],
+      "mandatory_evidence": [
+        "SOP-606"
+      ],
+      "required_cdr": "F4",
+      "threshold_required": true,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.overtime_approval.approve",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "PD"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": [
+        "SCN-PEOPLE-ACCIDENT"
+      ]
+    },
+    {
+      "id": "erp_outage_backfill",
+      "label": "ERP outage manual backfill",
+      "gate": "G3",
+      "cdr": "F2",
+      "source_state": "OUTAGE_FALLBACK",
+      "target_state": "APPROVED",
+      "action": "manual_backfill",
+      "channels": [
+        "manual"
+      ],
+      "a_process": "CEO",
+      "proposer_roles": [
+        "CEO"
+      ],
+      "verifier_roles": [
+        "HR",
+        "ITA"
+      ],
+      "approver_roles": [
+        "ESA",
+        "CEO",
+        "CEO"
+      ],
+      "hold_roles": [
+        "CEO",
+        "ESA",
+        "HR",
+        "IT",
+        "ITA"
+      ],
+      "release_roles": [
+        "ESA"
+      ],
+      "mandatory_evidence": [
+        "FRM-141",
+        "SOP-106",
+        "breakglass_request",
+        "incident_reference",
+        "backfill_plan"
+      ],
+      "required_cdr": "F2",
+      "threshold_required": false,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.erp_outage_backfill.manual_backfill",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "PD"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": [
+        "SCN-SYS-MANUAL-TRANSACTION-BACKFILL"
+      ]
+    },
+    {
+      "id": "master_data_change",
+      "label": "Master data change",
+      "gate": "G3",
+      "cdr": "F1",
+      "source_state": "DRAFT",
+      "target_state": "APPROVED",
+      "action": "approve",
+      "channels": [
+        "mom",
+        "manual"
+      ],
+      "a_process": "IT",
+      "proposer_roles": [
+        "IT"
+      ],
+      "verifier_roles": [
+        "HR"
+      ],
+      "approver_roles": [
+        "ITA",
+        "ESA",
+        "CEO"
+      ],
+      "hold_roles": [
+        "CEO",
+        "ESA",
+        "HR",
+        "IT",
+        "ITA"
+      ],
+      "release_roles": [
+        "ITA",
+        "ESA"
+      ],
+      "mandatory_evidence": [
+        "FRM-141",
+        "SOP-106",
+        "role_matrix",
+        "owner_approval"
+      ],
+      "required_cdr": "F1",
+      "threshold_required": false,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.master_data_change.approve",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "PD"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": [
+        "SCN-SYS-MASTER-DATA-WRONG"
+      ]
+    },
+    {
+      "id": "access_control_breakglass",
+      "label": "Access control breakglass",
+      "gate": "G3",
+      "cdr": "F2",
+      "source_state": "APPROVAL_PENDING",
+      "target_state": "APPROVED",
+      "action": "approve",
+      "channels": [
+        "mom",
+        "manual"
+      ],
+      "a_process": "CEO",
+      "proposer_roles": [
+        "CEO"
+      ],
+      "verifier_roles": [
+        "HR",
+        "ITA"
+      ],
+      "approver_roles": [
+        "ESA",
+        "CEO",
+        "CEO"
+      ],
+      "hold_roles": [
+        "CEO",
+        "ESA",
+        "HR",
+        "IT",
+        "ITA"
+      ],
+      "release_roles": [
+        "ESA"
+      ],
+      "mandatory_evidence": [
+        "FRM-141",
+        "SOP-106",
+        "breakglass_request",
+        "incident_reference",
+        "backfill_plan"
+      ],
+      "required_cdr": "F2",
+      "threshold_required": false,
+      "sod_rules": [
+        "Proposer cannot self-verify where verifier role exists.",
+        "System permission does not replace business authority."
+      ],
+      "audit_event": "workflow.access_control_breakglass.approve",
+      "timeout_escalation": {
+        "timeout": "24h",
+        "to": "PD"
+      },
+      "outage_fallback": {
+        "allowed": true,
+        "requires_incident_number": true,
+        "requires_replay": true
+      },
+      "scenario_ids": [
+        "SCN-SYS-ERP-OUTAGE"
+      ]
+    }
+  ]
+}
