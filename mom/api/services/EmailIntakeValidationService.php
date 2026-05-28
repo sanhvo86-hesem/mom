@@ -155,25 +155,29 @@ final class EmailIntakeValidationService
                 : 'Not required for this document_type.');
         }
 
-        // 7. customer_match — try customers table (skip silently if not available)
+        // 7. customer_match — look up canonical customer_status from customers table
         if (!empty($case['customer_id'])) {
             try {
                 $cust = $this->db->queryOne(
-                    'SELECT customer_id, is_active FROM customers WHERE customer_id = :p_id',
+                    'SELECT customer_id, customer_status FROM customers WHERE customer_id = :p_id',
                     [':p_id' => (string)$case['customer_id']]
                 );
                 if (!$cust) {
                     $blockers[] = 'unknown_customer';
                     $this->fail($caseId, 'customer_match', 'blocker', "Customer {$case['customer_id']} not in master data.");
-                } elseif (isset($cust['is_active']) && !$cust['is_active']) {
+                } elseif (strtolower((string)($cust['customer_status'] ?? 'active')) !== 'active') {
                     $blockers[] = 'customer_not_active';
-                    $this->fail($caseId, 'customer_match', 'blocker', "Customer {$case['customer_id']} is inactive.");
+                    $this->fail($caseId, 'customer_match', 'blocker',
+                        "Customer {$case['customer_id']} customer_status='{$cust['customer_status']}' (must be 'active').");
                 } else {
                     $this->pass($caseId, 'customer_match', 'info', "Customer {$case['customer_id']} active.");
                 }
             } catch (\Throwable $e) {
-                // customers table schema differs across deployments — skip gracefully
-                $this->pass($caseId, 'customer_match', 'warning', 'customers table not accessible; skipping check.');
+                // customers table query failed — block the case, don't soft-pass.
+                // A silent warning previously masked is_active vs customer_status drift.
+                $blockers[] = 'customer_lookup_failed';
+                $this->fail($caseId, 'customer_match', 'blocker',
+                    'customers lookup failed: ' . $e->getMessage());
             }
         }
 
