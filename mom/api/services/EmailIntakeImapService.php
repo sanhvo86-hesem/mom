@@ -609,29 +609,49 @@ final class EmailIntakeImapService
 
                 // Patch additional case fields the createCase signature
                 // doesn't accept (po_date, currency, incoterm, payment_term).
-                if ($hdr['po_date'] !== '' || $hdr['currency_code'] !== ''
-                    || $hdr['incoterm_code'] !== '' || $hdr['payment_term_code'] !== '') {
-                    $this->cases->updateCase($caseId, [
-                        'po_date'           => $hdr['po_date']           ?: null,
-                        'currency_code'     => $hdr['currency_code']     ?: null,
-                        'incoterm_code'     => $hdr['incoterm_code']     ?: null,
-                        'payment_term_code' => $hdr['payment_term_code'] ?: null,
-                        'extracted_json'    => [
-                            'email_header_block'  => $hdr['raw_block'],
-                            'parsed_header'       => $hdr['parsed'],
-                            'ship_to'             => [
-                                'name'    => $hdr['ship_to_name'],
-                                'address' => $hdr['ship_to_addr'],
-                            ],
-                            'ai_process'          => $hdr['ai_process'],
+                // overall_confidence: when policyOutcome == 'ok' we extracted
+                // every required field from the deterministic header rule
+                // (not LLM guessing), so confidence is high. When LLM ran,
+                // we use its confidence. Otherwise leave null and the case
+                // will block on low_confidence in validation — correct.
+                $headerConfidence = $policyOutcome === 'ok' ? 0.99 : null;
+                $llmConfidence    = isset($claudeExtract['overall_confidence'])
+                    ? (float)$claudeExtract['overall_confidence']
+                    : null;
+                $overallConf = $llmConfidence ?? $headerConfidence;
+
+                $patch = [
+                    'po_date'            => $hdr['po_date']           ?: null,
+                    'currency_code'      => $hdr['currency_code']     ?: null,
+                    'incoterm_code'      => $hdr['incoterm_code']     ?: null,
+                    'payment_term_code'  => $hdr['payment_term_code'] ?: null,
+                    'extracted_json'     => [
+                        'email_header_block'  => $hdr['raw_block'],
+                        'parsed_header'       => $hdr['parsed'],
+                        'ship_to'             => [
+                            'name'    => $hdr['ship_to_name'],
+                            'address' => $hdr['ship_to_addr'],
                         ],
-                    ], $actor);
+                        'ai_process'          => $hdr['ai_process'],
+                        'extraction_source'   => $policyOutcome === 'ok' ? 'header_rule' : 'llm',
+                    ],
+                ];
+                if ($overallConf !== null) {
+                    $patch['overall_confidence'] = $overallConf;
                 }
+                $this->cases->updateCase($caseId, $patch, $actor);
 
                 // Parse body line items section (best-effort regex).
                 // Pattern: "Line NN ... Part Number: X ... Revision: Y ... Quantity: Z EA ... Need Date: D"
                 $lines = $this->headerRules()->parseLineItems($bodyText);
+                // Backfill ship-to address on lines that didn't include it
+                // explicitly — fall through to the header block's Ship-To-
+                // Address so case-level validation can find the field.
+                $headerShipTo = trim((string)($hdr['ship_to_addr'] ?? ''));
                 foreach ($lines as $line) {
+                    if (trim((string)($line['delivery_address'] ?? '')) === '' && $headerShipTo !== '') {
+                        $line['delivery_address'] = $headerShipTo;
+                    }
                     $this->cases->addLine($caseId, $line);
                 }
 

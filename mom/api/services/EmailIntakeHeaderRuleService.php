@@ -308,7 +308,16 @@ final class EmailIntakeHeaderRuleService
         }
 
         $partNumber = $fields['part-number'] ?? $fields['part'] ?? '';
-        $rev        = preg_replace('/^Rev\.?\s*/i', '', $fields['revision'] ?? $fields['rev'] ?? '') ?? '';
+        // Bug fix 2026-05-28: the previous regex `^Rev\.?\s*` stripped the
+        // word "Rev" even when it was the leading half of "REV-C", leaving
+        // "-C" in revision_number. Now we only strip "Rev " / "Rev." with
+        // an explicit space/dot separator. Inputs like "REV-C", "A", "01"
+        // are preserved verbatim.
+        $revRaw = trim((string)($fields['revision'] ?? $fields['rev'] ?? ''));
+        $rev    = $revRaw;
+        if (preg_match('/^Rev(?:\.|\s)\s*(.+)$/i', $revRaw, $rm)) {
+            $rev = trim($rm[1]);
+        }
         $qtyRaw     = $fields['quantity'] ?? $fields['qty'] ?? '';
         $qty = 0.0;
         $uom = 'EA';
