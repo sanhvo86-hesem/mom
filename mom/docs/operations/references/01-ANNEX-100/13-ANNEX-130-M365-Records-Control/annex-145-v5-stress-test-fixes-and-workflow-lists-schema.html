@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANNEX-145 — v5 SSOT Stress Test Fixes + Workflow-Lists Schema | HESEM MOM</title>
+<title>ANNEX-145 — v5 SSOT Kiểm thử sức chịu tải Fixes + Danh sách luồng công việc Schema | HESEM MOM</title>
 <script>
 (function () {
   var DCC_VERSION = '2026-05-17-1';
@@ -46,67 +46,67 @@
 
 <div class="doc-content" id="docContent">
 
-<h1>v5 SSOT Stress Test Fixes + luồng công việc-Lists Schema</h1>
+<h1>v5 SSOT Kiểm thử sức chịu tải Fixes + luồng công việc-Lists Schema</h1>
 
-<div class="callout"><strong>BỐI CẢNH:</strong> Sau khi ANNEX-144 (v4) công bố cấu trúc SSOT 3-axis, người dùng yêu cầu stress test thực chiến. <b>4 agent độc lập</b> mô phỏng 10 PO end-to-end, audit SSOT compliance, reconcile 38 JD canonical, và reverse-think 20 scenario phá hủy. Kết quả: <b>146 finding</b> tổng hợp (8+22+17 từ SSOT Auditor + 6+15+8 từ PO Lifecycle + 4+30+4 từ JD Reconciliation + 25 stress upgrade từ Reverse-Think). v5 áp dụng 15 critical fix vào <code>build_blueprint.py</code>, định nghĩa schema cho 16 luồng công việc-Lists (vốn chỉ có tên trong v4), spec 6 JD mới, và RACI matrix 20-row.</div>
+<div class="callout"><strong>BỐI CẢNH:</strong> Sau khi ANNEX-144 (v4) công bố cấu trúc SSOT 3-axis, người dùng yêu cầu kiểm thử sức chịu tải thực chiến. <b>4 agent độc lập</b> mô phỏng 10 PO end-to-end, đánh giá SSOT compliance, reconcile 38 JD canonical, và reverse-think 20 Tình huống phá hủy. Kết quả: <b>146 finding</b> tổng hợp (8+22+17 từ SSOT Đánh giáor + 6+15+8 từ PO Lifecycle + 4+30+4 từ JD Reconciliation + 25 stress upgrade từ Reverse-Think). v5 áp dụng 15 critical fix vào <code>build_blueprint.py</code>, định nghĩa schema cho 16 luồng công việc-Lists (vốn chỉ có tên trong v4), spec 6 JD mới, và RACI Ma trận 20-row.</div>
 
-<div class="warn-callout"><strong>POSTURE: v5 là incremental hardening của v4, KHÔNG là rewrite.</strong> 5-axis SSOT architecture của v4 giữ nguyên. v5 thêm 3 axis mới (Multi-Job-Evidence, Lot-Trace-Master, Production-Run-Axis) cho cross-Job evidence, fix 12 SSOT collision điểm trong v4, và formalize luồng công việc-Lists schema. Tổng blueprint v4: 597 → v5: 750 directories (+25.6%).</div>
+<div class="warn-callout"><strong>POSTURE: v5 là incremental hardening của v4, KHÔNG là rewrite.</strong> 5-axis SSOT Kiến trúc của v4 giữ nguyên. v5 thêm 3 axis mới (Multi-Job-Bằng chứng, Lot-Trace-Master, Production-Run-Axis) cho cross-Job bằng chứng, fix 12 SSOT collision điểm trong v4, và biểu mẫualize luồng công việc-Lists schema. Tổng Bản thiết kế v4: 597 → v5: 750 directories (+25.6%).</div>
 
 <section class="card">
-<h2>1. 4-Agent Stress Test — kết quả tổng hợp</h2>
+<h2>1. 4-Agent Kiểm thử sức chịu tải — kết quả tổng hợp</h2>
 <table>
 <thead><tr><th>Agent</th><th>Phương pháp</th><th>Critical</th><th>Major</th><th>Minor</th><th>Output report</th></tr></thead>
 <tbody>
-<tr><td><b>Agent 1 — PO Lifecycle Simulator</b></td><td>Mô phỏng 10 PO (LTA recurring, NPI, UHV ASML, mid-volume, rush, subcon-fail+SCAR, mid-job PCN, field-failure 8D, banned-sub IQC catch, customer onsite audit) end-to-end qua 14 gate G0-G7+NCR+SP+Customer+Subcon+Cost</td><td>6</td><td>15</td><td>8</td><td><code>agent-1-po-lifecycle-simulation.md</code></td></tr>
-<tr><td><b>Agent 2 — SSOT Compliance Auditor</b></td><td>Audit v4 theo 7 dimension A-G: inter-axis collisions, luồng công việc-Lists vs folder duplicate, multi-cardinality edge cases, retention inheritance, provisioning gaps, operational user-flow, reverse-think simulation</td><td>8</td><td>22</td><td>17</td><td><code>agent-2-ssot-audit-findings.md</code></td></tr>
-<tr><td><b>Agent 3 — JD vs SSOT Reconciliation</b></td><td>Audit 38 canonical JD (170 file là EN mirror + draft preview của cùng 38 role) — 0% JD mention bất kỳ v3/v4 path</td><td>4</td><td>30</td><td>11</td><td><code>agent-3-jd-ssot-reconciliation.md</code></td></tr>
-<tr><td><b>Agent 4 — Reverse-Think Critic</b></td><td>20 stress scenario adversarial: multi-PO/Job split, sub-Job rework, multi-rev parallel, cross-Job root cause, same-Part-multi-OEM commodity, calibration year boundary, customer-witness multi-path, PCN ripple, IB trade-secret leak, asset retirement mid-job, etc.</td><td>5+</td><td>~12</td><td>~8</td><td><code>agent-4-reverse-think-critic.md</code></td></tr>
+<tr><td><b>Agent 1 — PO Lifecycle Simulator</b></td><td>Mô phỏng 10 PO (LTA recurring, NPI, UHV ASML, mid-volume, rush, subcon-fail+SCAR, mid-job PCN, field-failure 8D, banned-sub IQC catch, khách hàng onkhông gian đánh giá) end-to-end qua 14 cổng G0-G7+NCR+SP+Khách hàng+Subcon+Cost</td><td>6</td><td>15</td><td>8</td><td><code>agent-1-po-lifecycle-simulation.md</code></td></tr>
+<tr><td><b>Agent 2 — SSOT Compliance Đánh giáor</b></td><td>Đánh giá v4 theo 7 dimension A-G: inter-axis collisions, luồng công việc-Lists vs thư mục duplicate, multi-cardinality edge cases, retention inheritance, provisioning gaps, operational user-flow, reverse-think simulation</td><td>8</td><td>22</td><td>17</td><td><code>agent-2-ssot-audit-findings.md</code></td></tr>
+<tr><td><b>Agent 3 — JD vs SSOT Reconciliation</b></td><td>Đánh giá 38 canonical JD (170 Tệp là EN mirror + draft pRà soát của cùng 38 Vai trò) — 0% JD mention bất kỳ v3/v4 đường dẫn</td><td>4</td><td>30</td><td>11</td><td><code>agent-3-jd-ssot-reconciliation.md</code></td></tr>
+<tr><td><b>Agent 4 — Reverse-Think Critic</b></td><td>20 stress Tình huống adversarial: multi-PO/Job split, sub-Job rework, multi-rev parallel, cross-Job root cause, same-Chi tiết-multi-OEM commodity, calibration year boundary, khách hàng-witness multi-đường dẫn, PCN ripple, IB trade-secret rò rỉ, asset retirement mid-job, etc.</td><td>5+</td><td>~12</td><td>~8</td><td><code>agent-4-reverse-think-critic.md</code></td></tr>
 </tbody>
 </table>
-<div class="ok-callout"><b>Convergence:</b> 4 agent độc lập <em>cùng phát hiện</em> 3 vấn đề lớn nhất: (1) luồng công việc-Lists materialized as folders thay vì SharePoint Lists, (2) Cross-Job evidence (CAPA/8D/banned-sub) chiếm ~25% records nhưng không có canonical home trong v4, (3) `{placeholder}` literal folders trong tree manifest sẽ pollute live tenant.</div>
+<div class="ok-callout"><b>Convergence:</b> 4 agent độc lập <em>cùng phát hiện</em> 3 vấn đề lớn nhất: (1) luồng công việc-Lists vật liệuized as thư mụcs thay vì SharePoint Lists, (2) Cross-Job bằng chứng (CAPA/8D/banned-sub) chiếm ~25% hồ sơ nhưng không có canonical home trong v4, (3) `{placetạm giữer}` literal thư mụcs trong tree manifest sẽ pollute live tenant.</div>
 </section>
 
 <section class="card">
-<h2>2. 15 Critical Fix áp dụng vào v5 build_blueprint.py</h2>
+<h2>2. 15 Critical Fix áp dụng vào v5 build_Bản thiết kế.py</h2>
 <table>
 <thead><tr><th>#</th><th>Fix</th><th>Source agent + finding</th><th>v5 implementation</th></tr></thead>
 <tbody>
-<tr><td>C1</td><td><b>Drop literal `{placeholder}` folders</b> — chuyển vào <code>_TEMPLATES/</code> parking, không materialize</td><td>Agent 2 E-001/E-002</td><td>Tất cả `{CustomerID}/{PartNo}/{Rev}/{JobNum}/{ToolID}/{FixtureID}/{GageID}/{MachineID}/{SupplierID}/{CustPO}/{EmployeeID}/...` chuyển vào subfolder <code>_TEMPLATES/</code>. 4 OEM (AMAT/LAM/ASML/TEL) seeded với schema thực. PnP provisioner đọc <code>_TEMPLATES/</code> như schema definition, không clone thẳng.</td></tr>
-<tr><td>C2</td><td><b>Pack-6 Cleanliness Evidence folder</b> — vắng trong v4, mandate bởi ANNEX-141 §3.2</td><td>Agent 2 A-001</td><td>Thêm <code>Job-Dossiers/.../07-G6-Final-QC-and-Pack/_Cleanliness-Pack/{00-Banned-Substance, 01-LPC, 02-IC, 03-NVR, 04-FTIR, 05-Ra, 06-Visual, 07-He-Leak-or-Outgassing}/</code></td></tr>
-<tr><td>C3</td><td><b>Multi-Job-Evidence axis</b> — cross-Job CAPA/8D/banned-sub/audit/complaint scope</td><td>Agent 1 meta + Agent 4 sec 4 + Agent 2 A-003</td><td>Site-level mới <code>HESEM-Job-Evidence/Multi-Job-Evidence/{01-CAPA-Cross-Job-Scope, 02-8D-Field-Failure-Multi-Job-Scope, 03-Banned-Substance-Heat-Lot-Trace, 04-Audit-Finding-Cross-Job-Scope, 05-Customer-Complaint-Umbrella}/{ID}/</code>. SSOT rule: parent ở đây, children NCR/CAPA per Job back-link qua <code>ParentMultiJobID</code> trên NCR-Master-List.</td></tr>
-<tr><td>C4</td><td><b>HESEM-Owned-Parts overlay</b> cho commodity/standard parts</td><td>Agent 2 C-005 + Agent 4 sec 5</td><td>Thêm <code>Part-REV-Master/_HESEM-Owned-Parts/{PartNo}/REV-{Rev}/</code> với 11 sub gồm <code>08-Cross-OEM-Usage-Registry</code>. Decision rule: customer-IP drawing → customer-keyed; HESEM-owned drawing → <code>_HESEM-Owned-Parts/</code>.</td></tr>
-<tr><td>C5</td><td><b>Lot-Trace-Master axis</b> heat-lot → process-lot → finished-lot chain</td><td>Agent 4 sec 14 + Agent 1 PO-9</td><td>Site-level <code>HESEM-Job-Evidence/Lot-Trace-Master/{Heat-Lot|Process-Lot|Finished-Lot}/{LotID}/</code> — canonical lot chain cho recall/trace cross-Job.</td></tr>
-<tr><td>C6</td><td><b>Production-Run-Axis</b> cho consolidated runs (interim chính sách: forbidden cho multi-OEM)</td><td>Agent 4 sec 1c</td><td>Site-level <code>HESEM-Job-Evidence/Production-Run-Axis/{RunID}/</code> 5 sub. Cảnh báo: hiện cấm multi-OEM runs đến khi IB rules approved.</td></tr>
-<tr><td>C7</td><td><b>luồng công việc-Lists DROPPED as folders</b> — chỉ là documentation</td><td>Agent 2 B-001 + Agent 1 meta + Agent 4 sec 21</td><td>Folder <code>Workflow-Lists/</code> bị xoá. Thay bằng <code>Workflow-Lists-Specification-NOT-FOLDERS/_README.md</code> liệt kê 16 Lists + path mapping. Provisioning thực qua PnP PowerShell tạo SharePoint Lists.</td></tr>
-<tr><td>C8</td><td><b>FAI folder rename</b> tránh confusion giữa baseline vs execution</td><td>Agent 2 A-002</td><td>Part-REV: <code>06-FAI-Last-Released-Baseline-Reference-Only</code>. Job-Dossier: <code>05-G4-FAI-Execution-for-this-Job</code>. Mỗi folder có _README ghi rõ canonical vs reference.</td></tr>
-<tr><td>C9</td><td><b>NCR _Intake bucket</b> cho pre-NCR photo evidence</td><td>Agent 2 F-005</td><td>Thêm <code>Job-Dossiers/.../09-NCR-CAPA-Deviation-for-this-Job/_Intake/</code>. Operator dump photo defect ngay không cần NCR# trước; Power Automate route vào NCR# subfolder sau khi assigned.</td></tr>
-<tr><td>C10</td><td><b>Customer-ESG-Survey-Inbound</b> — vắng home trong v4</td><td>Agent 2 E-003</td><td>Thêm <code>Customer-Account/{OEM}/13-Customer-ESG-Survey-Inbound/</code>. Aggregate response stay tại <code>Compliance-Master/11-CDP-EcoVadis-Submissions/{YYYY}/</code>.</td></tr>
-<tr><td>C11</td><td><b>Gage MSA per-Customer overlay</b> — customer-specific GR&amp;R</td><td>Agent 2 C-006</td><td>Thêm <code>Asset-Master/Gages/{GageID}/03-MSA-GR-R-Studies/_per-Customer/{OEM}/</code> với library-folder permission. Generic GR&amp;R stay top-level.</td></tr>
+<tr><td>C1</td><td><b>Drop literal `{placetạm giữer}` thư mụcs</b> — chuyển vào <code>_TEMPLATES/</code> parking, không vật liệuize</td><td>Agent 2 E-001/E-002</td><td>Tất cả `{Khách hàngID}/{Chi tiếtNo}/{Rev}/{JobNum}/{Dao cụID}/{Đồ gáID}/{Thiết bị đoID}/{MachineID}/{Nhà cung cấpID}/{CustPO}/{EmployeeID}/...` chuyển vào subthư mục <code>_TEMPLATES/</code>. 4 OEM (AMAT/LAM/ASML/TEL) seeded với schema thực. PnP provisioner đọc <code>_TEMPLATES/</code> như schema definition, không clone thẳng.</td></tr>
+<tr><td>C2</td><td><b>Pack-6 Làm sạchchuyềnss Bằng chứng thư mục</b> — vắng trong v4, mandate bởi ANNEX-141 §3.2</td><td>Agent 2 A-001</td><td>Thêm <code>Job-Dossiers/.../07-G6-Final-QC-and-Pack/_Cleanliness-Pack/{00-Banned-Substance, 01-LPC, 02-IC, 03-NVR, 04-FTIR, 05-Ra, 06-Visual, 07-He-Leak-or-Outgassing}/</code></td></tr>
+<tr><td>C3</td><td><b>Multi-Job-Bằng chứng axis</b> — cross-Job CAPA/8D/banned-sub/đánh giá/complaint scope</td><td>Agent 1 meta + Agent 4 sec 4 + Agent 2 A-003</td><td>Không gian-level mới <code>HESEM-Job-Evidence/Multi-Job-Evidence/{01-CAPA-Cross-Job-Scope, 02-8D-Field-Failure-Multi-Job-Scope, 03-Banned-Substance-Heat-Lot-Trace, 04-Audit-Finding-Cross-Job-Scope, 05-Customer-Complaint-Umbrella}/{ID}/</code>. SSOT quy tắc: parent ở đây, children NCR/CAPA per Job back-liên kết qua <code>ParentMultiJobID</code> trên NCR-Master-List.</td></tr>
+<tr><td>C4</td><td><b>HESEM-Owned-Chi tiếts overlay</b> cho commodity/standard chi tiếts</td><td>Agent 2 C-005 + Agent 4 sec 5</td><td>Thêm <code>Part-REV-Master/_HESEM-Owned-Parts/{PartNo}/REV-{Rev}/</code> với 11 sub gồm <code>08-Cross-OEM-Usage-Registry</code>. Decision quy tắc: khách hàng-IP drawing → khách hàng-keyed; HESEM-owned drawing → <code>_HESEM-Owned-Parts/</code>.</td></tr>
+<tr><td>C5</td><td><b>Lot-Trace-Master axis</b> heat-lot → quá trình-lot → finished-lot chain</td><td>Agent 4 sec 14 + Agent 1 PO-9</td><td>Không gian-level <code>HESEM-Job-Evidence/Lot-Trace-Master/{Heat-Lot|Process-Lot|Finished-Lot}/{LotID}/</code> — canonical lot chain cho recall/trace cross-Job.</td></tr>
+<tr><td>C6</td><td><b>Production-Run-Axis</b> cho consolidated runs (interim chính sách: forbidden cho multi-OEM)</td><td>Agent 4 sec 1c</td><td>Không gian-level <code>HESEM-Job-Evidence/Production-Run-Axis/{RunID}/</code> 5 sub. Cảnh báo: hiện cấm multi-OEM runs đến khi IB quy tắcs approved.</td></tr>
+<tr><td>C7</td><td><b>luồng công việc-Lists DROPPED as thư mụcs</b> — chỉ là documentation</td><td>Agent 2 B-001 + Agent 1 meta + Agent 4 sec 21</td><td>Thư mục <code>Workflow-Lists/</code> bị xoá. Thay bằng <code>Workflow-Lists-Specification-NOT-FOLDERS/_README.md</code> liệt kê 16 Lists + đường dẫn mapping. Provisioning thực qua PnP PowerShell tạo SharePoint Lists.</td></tr>
+<tr><td>C8</td><td><b>FAI thư mục rename</b> tránh confusion giữa mốc chuẩn vs execution</td><td>Agent 2 A-002</td><td>Chi tiết-REV: <code>06-FAI-Last-Released-Baseline-Reference-Only</code>. Job-Dossier: <code>05-G4-FAI-Execution-for-this-Job</code>. Mỗi thư mục có _README ghi rõ canonical vs reference.</td></tr>
+<tr><td>C9</td><td><b>NCR _Intake bucket</b> cho pre-NCR photo bằng chứng</td><td>Agent 2 F-005</td><td>Thêm <code>Job-Dossiers/.../09-NCR-CAPA-Deviation-for-this-Job/_Intake/</code>. Người vận hành dump photo defect ngay không cần NCR# trước; Power Automate route vào NCR# subthư mục sau khi assigned.</td></tr>
+<tr><td>C10</td><td><b>Khách hàng-ESG-Survey-Inbound</b> — vắng home trong v4</td><td>Agent 2 E-003</td><td>Thêm <code>Customer-Account/{OEM}/13-Customer-ESG-Survey-Inbound/</code>. Aggrecổng response stay tại <code>Compliance-Master/11-CDP-EcoVadis-Submissions/{YYYY}/</code>.</td></tr>
+<tr><td>C11</td><td><b>Thiết bị đo MSA per-Khách hàng overlay</b> — khách hàng-specific GR&amp;R</td><td>Agent 2 C-006</td><td>Thêm <code>Asset-Master/Gages/{GageID}/03-MSA-GR-R-Studies/_per-Customer/{OEM}/</code> với thư viện-thư mục permission. Chung chung GR&amp;R stay top-level.</td></tr>
 <tr><td>C12</td><td><b>Cal cert Lab Methodology NDA</b> overlay</td><td>Agent 2 D-001</td><td>Thêm <code>Asset-Master/Gages/.../02-Calibration-Certificates/{YYYY}/_Lab-Methodology-NDA/</code> với L3 permission (lab's confidential methodology).</td></tr>
-<tr><td>C13</td><td><b>Trade-Secret double slot resolution</b></td><td>Agent 1 PO-2 + Agent 2 A-004 ref</td><td><code>Compliance-Master/13-Trade-Secret-Register-Master-Index/</code> = master register (redacted index of recipe IDs, owner, customers). Actual recipe ở <code>Part-REV-Master/.../09-Trade-Secret-Process-Notes-Restricted/</code> — never duplicated.</td></tr>
-<tr><td>C14</td><td><b>Equipment-Used-Binding-Log</b> on Machine</td><td>Agent 4 + Agent 2 G-006 ref</td><td>Thêm <code>Asset-Master/Machines/{ID}/10-Equipment-Used-Binding-Log/</code> — link Asset × Job × Date measured. Tránh dual-home câu hỏi "máy nào dùng cho Job nào".</td></tr>
-<tr><td>C15</td><td><b>Audit-Scoped Guest Access Groups + List-Row Destruction Trail</b></td><td>Agent 4 sec 18 + sec 19</td><td>Thêm <code>HESEM-Digital/System-Records/12-Audit-Scoped-Guest-Access-Groups/</code> + <code>HESEM-Archive/07-List-Row-Destruction-Audit-Trail/{YYYY}/</code> để track guest IB scope + List row purge khi canonical file destroyed.</td></tr>
+<tr><td>C13</td><td><b>Trade-Secret double slot resolution</b></td><td>Agent 1 PO-2 + Agent 2 A-004 ref</td><td><code>Compliance-Master/13-Trade-Secret-Register-Master-Index/</code> = master Sổ đăng ký (redacted index of recipe IDs, chủ sở hữu, khách hàngs). Actual recipe ở <code>Part-REV-Master/.../09-Trade-Secret-Process-Notes-Restricted/</code> — never duplicated.</td></tr>
+<tr><td>C14</td><td><b>Equipment-Used-Binding-Log</b> on Machine</td><td>Agent 4 + Agent 2 G-006 ref</td><td>Thêm <code>Asset-Master/Machines/{ID}/10-Equipment-Used-Binding-Log/</code> — liên kết Asset × Job × Date measured. Tránh dual-home câu hỏi "máy nào dùng cho Job nào".</td></tr>
+<tr><td>C15</td><td><b>Đánh giá-Scoped Guest Truy cập Groups + List-Row Destruction Trail</b></td><td>Agent 4 sec 18 + sec 19</td><td>Thêm <code>HESEM-Digital/System-Records/12-Audit-Scoped-Guest-Access-Groups/</code> + <code>HESEM-Archive/07-List-Row-Destruction-Audit-Trail/{YYYY}/</code> để track guest IB scope + List row purge khi canonical Tệp destroyed.</td></tr>
 </tbody>
 </table>
 </section>
 
 <section class="card">
-<h2>3. SSOT precedence rule — content-canonical vs index-reference (v5 NEW)</h2>
-<p>Một file class hợp pháp có thể XUẤT HIỆN ở 2+ path miễn là phân biệt rõ vai trò:</p>
+<h2>3. SSOT precedence quy tắc — content-canonical vs index-reference (v5 NEW)</h2>
+<p>Một nhóm tệp hợp pháp có thể XUẤT HIỆN ở 2+ đường dẫn miễn là phân biệt rõ vai trò:</p>
 <table>
-<thead><tr><th>Vai trò</th><th>Định nghĩa</th><th>Path pattern</th><th>Lưu ý</th></tr></thead>
+<thead><tr><th>Vai trò</th><th>Định nghĩa</th><th>Đường dẫn pattern</th><th>Lưu ý</th></tr></thead>
 <tbody>
-<tr><td><b>Content-Canonical</b></td><td>Path chứa <em>nội dung file thực</em>. Duy nhất 1 đối với mỗi file class.</td><td>Job-Dossiers/.../09-NCR (NCR PDF thực)<br/>Part-REV-Master/.../06-FAI-Last-Released-Baseline (FAI baseline PDF)<br/>Asset-Master/Gages/.../02-Cal-Cert (cal cert PDF)</td><td>Retention + sensitivity inherit từ path. Lưu PDF thực ở đây.</td></tr>
-<tr><td><b>Index-Reference</b></td><td>Path chứa <em>metadata + link</em> tới canonical, KHÔNG copy file</td><td>NCR-Master-List (SharePoint List row trỏ Job-Dossier path)<br/>Customer-Account/.../11-PCN-Master-Log (List metadata về PCN, link Part-REV/.../07-PCN-History)</td><td>List row có cột <code>Canonical-Path</code>. Khi canonical move → Power Automate update link.</td></tr>
-<tr><td><b>Derivative-Document</b></td><td>Path chứa <em>output mới sinh ra từ canonical</em> (impact analysis, response letter), KHÔNG là copy</td><td>Part-REV-Master/.../07-PCN-History (HESEM's impact assessment của customer PCN)<br/>Job-Dossiers/.../11-Customer-Touchpoints (PCN ack tailored cho Job này)</td><td>Derivative có own retention. Khi customer PCN inbound update → derivative regenerated.</td></tr>
-<tr><td><b>Lifecycle-Snapshot</b></td><td>Path chứa <em>copy at frozen point</em> (closed Job, archived FAI)</td><td>HESEM-Archive/04-Locked-Job-Pack-Final/{YYYY}/{Job}/ (frozen Job)</td><td>Read-only. Original Canonical-Path remains valid as historical pointer.</td></tr>
+<tr><td><b>Content-Canonical</b></td><td>Đường dẫn chứa <em>nội dung Tệp thực</em>. Duy nhất 1 đối với mỗi nhóm tệp.</td><td>Job-Dossiers/.../09-NCR (NCR PDF thực)<br/>Chi tiết-REV-Master/.../06-FAI-Last-Đã phát hành-Mốc chuẩn (FAI mốc chuẩn PDF)<br/>Asset-Master/Thiết bị đos/.../02-Cal-Cert (cal cert PDF)</td><td>Retention + Mức nhạy cảm inherit từ đường dẫn. Lưu PDF thực ở đây.</td></tr>
+<tr><td><b>Index-Reference</b></td><td>Đường dẫn chứa <em>siêu dữ liệu + liên kết</em> tới canonical, KHÔNG bản sao Tệp</td><td>NCR-Master-List (SharePoint List row trỏ Job-Dossier đường dẫn)<br/>Khách hàng-Account/.../11-PCN-Master-Log (List siêu dữ liệu về PCN, liên kết Chi tiết-REV/.../07-PCN-History)</td><td>List row có cột <code>Canonical-Path</code>. Khi canonical move → Power Automate update liên kết.</td></tr>
+<tr><td><b>Derivative-Document</b></td><td>Đường dẫn chứa <em>output mới sinh ra từ canonical</em> (impact analysis, response letter), KHÔNG là bản sao</td><td>Chi tiết-REV-Master/.../07-PCN-History (HESEM's impact assessment của khách hàng PCN)<br/>Job-Dossiers/.../11-Khách hàng-Touchpoints (PCN ack tailored cho Job này)</td><td>Derivative có own retention. Khi khách hàng PCN inbound update → derivative regenerated.</td></tr>
+<tr><td><b>Lifecycle-Ảnh chụp trạng thái</b></td><td>Đường dẫn chứa <em>bản sao at frozen point</em> (closed Job, archived FAI)</td><td>HESEM-Archive/04-Locked-Job-Pack-Cuối cùng/{YYYY}/{Job}/ (frozen Job)</td><td>Read-chỉ. Original Canonical-Đường dẫn remains valid as historical pointer.</td></tr>
 </tbody>
 </table>
-<div class="ok-callout"><b>SSOT v5 verdict:</b> "1 canonical path mỗi file" chỉ áp dụng cho <b>Content-Canonical</b>. Index/Derivative/Snapshot copies hợp pháp tồn tại miễn metadata column <code>Record-Role</code> minh bạch. Người dùng phải biết họ đang xem canonical hay reference.</div>
+<div class="ok-callout"><b>SSOT v5 verdict:</b> "1 canonical đường dẫn mỗi Tệp" chỉ áp dụng cho <b>Content-Canonical</b>. Index/Derivative/Ảnh chụp trạng thái copies hợp pháp tồn tại miễn siêu dữ liệu column <code>Record-Role</code> minh bạch. Người dùng phải biết họ đang xem canonical hay reference.</div>
 </section>
 
 <section class="card">
-<h2>4. v5 Folder tree — 750 directories</h2>
+<h2>4. v5 Thư mục tree — 750 directories</h2>
 <pre class="tree">
 blueprint/
 ├── 07-Working-Templates/                  (3 dir)
@@ -151,69 +151,69 @@ blueprint/
 
 <section class="card">
 <h2>5. luồng công việc-Lists Schema Specification (16 SharePoint Lists)</h2>
-<p>v4 chỉ liệt kê tên 13 List; v5 chính thức spec 16 List với cột + lookup + permission. Provisioned bằng PnP PowerShell, KHÔNG là folders.</p>
+<p>v4 chỉ liệt kê tên 13 List; v5 chính thức spec 16 List với cột + lookup + permission. Provisioned bằng PnP PowerShell, KHÔNG là thư mụcs.</p>
 
 <h3>5.1 NCR-Master-List</h3>
 <table>
 <thead><tr><th>Column</th><th>Type</th><th>Required</th><th>Source</th></tr></thead>
 <tbody>
 <tr><td>NcrId</td><td>Text (PK)</td><td>Yes</td><td>NCR-{YYYY}-{NNNN}</td></tr>
-<tr><td>Status</td><td>Choice (Open/Containment/MRB/CAPA/Closed)</td><td>Yes</td><td>Form</td></tr>
-<tr><td>JobNum</td><td>Lookup → Job-Master-List</td><td>Yes (if Job-axis)</td><td>Form</td></tr>
-<tr><td>PartNo + Rev</td><td>Lookup → Part-REV-Master</td><td>Yes</td><td>Form</td></tr>
-<tr><td>CustomerID</td><td>Lookup → Customer-Account</td><td>Yes</td><td>Auto from JobNum</td></tr>
-<tr><td>SupplierID</td><td>Lookup → Supplier-Account</td><td>If supplier-caused</td><td>Form</td></tr>
-<tr><td>GageID</td><td>Lookup → Asset-Master/Gages</td><td>If OOT-driven</td><td>Form</td></tr>
-<tr><td>ParentMultiJobID</td><td>Lookup → Multi-Job-Evidence</td><td>If cross-Job</td><td>Form</td></tr>
-<tr><td>Severity</td><td>Choice (Critical/Major/Minor)</td><td>Yes</td><td>Form</td></tr>
-<tr><td>OwnerRole</td><td>Person</td><td>Yes</td><td>Form</td></tr>
+<tr><td>Trạng thái</td><td>Choice (Open/Containment/MRB/CAPA/Closed)</td><td>Yes</td><td>Biểu mẫu</td></tr>
+<tr><td>JobNum</td><td>Lookup → Job-Master-List</td><td>Yes (if Job-axis)</td><td>Biểu mẫu</td></tr>
+<tr><td>Chi tiếtNo + Rev</td><td>Lookup → Chi tiết-REV-Master</td><td>Yes</td><td>Biểu mẫu</td></tr>
+<tr><td>Khách hàngID</td><td>Lookup → Khách hàng-Account</td><td>Yes</td><td>Auto from JobNum</td></tr>
+<tr><td>Nhà cung cấpID</td><td>Lookup → Nhà cung cấp-Account</td><td>If nhà cung cấp-caused</td><td>Biểu mẫu</td></tr>
+<tr><td>Thiết bị đoID</td><td>Lookup → Asset-Master/Thiết bị đos</td><td>If OOT-driven</td><td>Biểu mẫu</td></tr>
+<tr><td>ParentMultiJobID</td><td>Lookup → Multi-Job-Bằng chứng</td><td>If cross-Job</td><td>Biểu mẫu</td></tr>
+<tr><td>Severity</td><td>Choice (Critical/Major/Minor)</td><td>Yes</td><td>Biểu mẫu</td></tr>
+<tr><td>Chủ sở hữuVai trò</td><td>Person</td><td>Yes</td><td>Biểu mẫu</td></tr>
 <tr><td>OpenedDate / ClosedDate</td><td>DateTime</td><td>Auto</td><td>System</td></tr>
-<tr><td>Canonical-Path</td><td>Hyperlink → Job-Dossier folder</td><td>Yes</td><td>Power Automate</td></tr>
-<tr><td>Lifecycle-State</td><td>Choice (Active/Archived)</td><td>Yes</td><td>Power Automate</td></tr>
+<tr><td>Canonical-Đường dẫn</td><td>Hyperliên kết → Job-Dossier thư mục</td><td>Yes</td><td>Power Automate</td></tr>
+<tr><td>Lifecycle-Trạng thái</td><td>Choice (Active/Archived)</td><td>Yes</td><td>Power Automate</td></tr>
 </tbody>
 </table>
-<p>Permission: read = all DEP-QA + ownership-dept + customer SG; write = QA + assigned CAPA-Owner.</p>
+<p>Permission: read = all DEP-QA + chủ sở hữugiao hàng-dept + khách hàng SG; write = QA + assigned CAPA-Chủ sở hữu.</p>
 
-<h3>5.2 CAPA-Master-List + 5.3 8D-SCAR-Master-List + ... + 5.16 Supplier-CMRT-Master-List</h3>
-<p><em>(Spec tương tự — xem chi tiết tại <code>_reports/v4-ssot-stress-test/agent-2-ssot-audit-findings.md</code> §5).</em> Mỗi List có cột Lookup tương ứng + Canonical-Path + Lifecycle-State + ParentMultiJobID nếu cross-Job. Power Automate sync List row khi file event ở canonical path.</p>
+<h3>5.2 CAPA-Master-List + 5.3 8D-SCAR-Master-List + ... + 5.16 Nhà cung cấp-CMRT-Master-List</h3>
+<p><em>(Spec tương tự — xem chi tiết tại <code>_reports/v4-ssot-stress-test/agent-2-ssot-audit-findings.md</code> §5).</em> Mỗi List có cột Lookup tương ứng + Canonical-Đường dẫn + Lifecycle-Trạng thái + ParentMultiJobID nếu cross-Job. Power Automate đồng bộ List row khi Tệp event ở canonical đường dẫn.</p>
 
 <h3>5.17 FAI-Master-List (v5 NEW — đáp ứng "show me all FAI last 12 months")</h3>
 <table>
 <thead><tr><th>Column</th><th>Type</th><th>Required</th></tr></thead>
 <tbody>
 <tr><td>FaiId</td><td>Text PK</td><td>Yes</td></tr>
-<tr><td>PartNo + Rev</td><td>Lookup → Part-REV-Master</td><td>Yes</td></tr>
-<tr><td>CustomerID</td><td>Lookup</td><td>Yes</td></tr>
-<tr><td>JobNum</td><td>Lookup → Job-Master-List (only if per-Job execution)</td><td>Optional</td></tr>
-<tr><td>FaiType</td><td>Choice (NewPart/RevChange/2y-Dormancy/ProcessChange/LocationChange/CustomerRequest)</td><td>Yes</td></tr>
+<tr><td>Chi tiếtNo + Rev</td><td>Lookup → Chi tiết-REV-Master</td><td>Yes</td></tr>
+<tr><td>Khách hàngID</td><td>Lookup</td><td>Yes</td></tr>
+<tr><td>JobNum</td><td>Lookup → Job-Master-List (chỉ if per-Job execution)</td><td>Optional</td></tr>
+<tr><td>FaiType</td><td>Choice (NewChi tiết/RevThay đổi/2y-Dormancy/Quá trìnhThay đổi/LocationThay đổi/Khách hàngRequest)</td><td>Yes</td></tr>
 <tr><td>FaiDate / SubmittedDate / ApprovedDate</td><td>DateTime</td><td>Yes</td></tr>
 <tr><td>Witnessed</td><td>Y/N</td><td>Yes</td></tr>
-<tr><td>Status</td><td>Choice (Draft/Submitted/Approved/Rejected/Released)</td><td>Yes</td></tr>
-<tr><td>Canonical-Baseline-Path</td><td>Hyperlink → Part-REV/.../06-FAI-Last-Released-Baseline</td><td>Yes</td></tr>
-<tr><td>Canonical-Execution-Path</td><td>Hyperlink → Job-Dossier/.../05-G4-FAI-Execution</td><td>If per-Job</td></tr>
-<tr><td>Sensitivity-Label</td><td>Choice</td><td>Auto</td></tr>
+<tr><td>Trạng thái</td><td>Choice (Draft/Submitted/Approved/Rejected/Đã phát hành)</td><td>Yes</td></tr>
+<tr><td>Canonical-Mốc chuẩn-Đường dẫn</td><td>Hyperliên kết → Chi tiết-REV/.../06-FAI-Last-Đã phát hành-Mốc chuẩn</td><td>Yes</td></tr>
+<tr><td>Canonical-Execution-Đường dẫn</td><td>Hyperliên kết → Job-Dossier/.../05-G4-FAI-Execution</td><td>If per-Job</td></tr>
+<tr><td>Mức nhạy cảm-Label</td><td>Choice</td><td>Auto</td></tr>
 </tbody>
 </table>
 
 <h3>5.18 Job-Master-List (v5 NEW)</h3>
-<p>Cross-cut tất cả active Jobs: JobNum, PartNo+Rev (Lookup), CustomerID, POId (Lookup), Status (Open/InProcess/ShipReady/Closed), OpenedDate, PlannedShipDate, ActualShipDate, OwnerCellLead, Canonical-Path. Used cho "show all open Jobs" view.</p>
+<p>Cross-cut tất cả active Jobs: JobNum, Chi tiếtNo+Rev (Lookup), Khách hàngID, POId (Lookup), Trạng thái (Open/InQuá trình/Giao hàngReady/Closed), OpenedDate, Kế hoạchnedGiao hàngDate, ActualGiao hàngDate, Chủ sở hữuCellLead, Canonical-Đường dẫn. Used cho "show all open Jobs" view.</p>
 
-<h3>5.19 Supplier-CMRT-Master-List (v5 NEW)</h3>
-<p>Aggregate CMRT response status per supplier per year. SupplierID, Year, ResponseDate, Status (Pending/Received/Validated/Roll-Up-Done), Canonical-Path → Supplier-Account/.../08-CMRT/{YYYY}.</p>
+<h3>5.19 Nhà cung cấp-CMRT-Master-List (v5 NEW)</h3>
+<p>Aggrecổng CMRT response trạng thái per nhà cung cấp per year. Nhà cung cấpID, Year, ResponseDate, Trạng thái (Pending/Received/Validated/Roll-Up-Done), Canonical-Đường dẫn → Nhà cung cấp-Account/.../08-CMRT/{YYYY}.</p>
 
 <h3>Power Automate Flow Design (16 Lists)</h3>
 <ul class="tight">
-<li><b>Trigger source:</b> SharePoint file create/modify event OR Webhook từ MOM ERP (NCR creation in Epicor).</li>
+<li><b>Trigger source:</b> SharePoint Tệp create/modify event OR Webhook từ MOM ERP (NCR creation in Epicor).</li>
 <li><b>Idempotency key:</b> NcrId / CapaId / FaiId / etc. — flow re-run safe.</li>
 <li><b>Failure handler:</b> Queue retry 3 lần, alert ticket vào Action-Tracker-Master.</li>
-<li><b>Lag SLA:</b> 5 phút từ file save → list update.</li>
-<li><b>File-move flow (Job-Closure):</b> Move Job-Dossier → Archive, rewrite Canonical-Path column trên tất cả Lists linked, set Lifecycle-State=Archived, emit audit_events row.</li>
+<li><b>Lag SLA:</b> 5 phút từ Tệp save → list update.</li>
+<li><b>Tệp-move flow (Job-Closure):</b> Move Job-Dossier → Archive, rewrite Canonical-Đường dẫn column trên tất cả Lists liên kếted, set Lifecycle-Trạng thái=Archived, emit đánh giá_events row.</li>
 </ul>
 </section>
 
 <section class="card">
-<h2>6. JD §13 "M365 SSOT Path Map" template — áp dụng cho 38 JD</h2>
-<p>Agent 3 phát hiện: 100% (38/38) JD canonical KHÔNG mention bất kỳ M365 path nào. JD storage-abstract → role không biết file đi đâu → SSOT compliance phụ thuộc tri thức cá nhân. v5 mandate §13 mới:</p>
+<h2>6. JD §13 "M365 SSOT Đường dẫn Map" template — áp dụng cho 38 JD</h2>
+<p>Agent 3 phát hiện: 100% (38/38) JD canonical KHÔNG mention bất kỳ M365 đường dẫn nào. JD storage-abstract → Vai trò không biết Tệp đi đâu → SSOT compliance phụ thuộc tri thức cá nhân. v5 mandate §13 mới:</p>
 <div class="keyline"><pre style="font-size:11.5px; line-height:1.45; margin:0;">
 &lt;section class="card"&gt;
 &lt;h2&gt;13. M365 SSOT Path Map&lt;/h2&gt;
@@ -228,7 +228,7 @@ blueprint/
 &lt;p&gt;&lt;em&gt;Mọi role phải biết: tạo file gì → đi đâu → mức nhạy cảm → giữ bao lâu → cross-cut view nào.&lt;/em&gt;&lt;/p&gt;
 &lt;/section&gt;
 </pre></div>
-<p>Mỗi trong 38 JD canonical sẽ thêm §13 với 5-15 row tuỳ role. Estimate effort: 0.5 giờ × 38 JD = ~7 ngày người. Áp dụng theo wave: wave 1 = Director/Manager (15 JD), wave 2 = Engineer/Specialist (15 JD), wave 3 = Operator/Tech (8 JD).</p>
+<p>Mỗi trong 38 JD canonical sẽ thêm §13 với 5-15 row tuỳ Vai trò. Estimate effort: 0.5 giờ × 38 JD = ~7 ngày người. Áp dụng theo wave: wave 1 = Director/Quản lý (15 JD), wave 2 = Engineer/Specialist (15 JD), wave 3 = Người vận hành/Tech (8 JD).</p>
 </section>
 
 <section class="card">
@@ -236,62 +236,62 @@ blueprint/
 <table>
 <thead><tr><th>JD code</th><th>Dept</th><th>Title</th><th>Lý do v5</th></tr></thead>
 <tbody>
-<tr><td>jd-metro-manager.html</td><td>DEP-METRO</td><td>Metrology + Calibration Manager</td><td>v3.1+v4 tách Metrology khỏi DEP-QA. JD hiện chỉ có CMM Operator/Calibration Tech — thiếu Manager-level.</td></tr>
-<tr><td>jd-sp-lead.html</td><td>DEP-SP</td><td>Special Process Lead</td><td>v3.1+v4 tách Anodize/EP/Pass/Clean/Outgas khỏi DEP-PRO. Hoàn toàn KHÔNG có JD cho Special Process.</td></tr>
-<tr><td>jd-mnt-manager.html</td><td>DEP-MNT</td><td>Maintenance + Facility Manager</td><td>JD hiện có Maintenance-Tech nhưng không có Manager-level.</td></tr>
+<tr><td>jd-metro-quản lý.html</td><td>DEP-METRO</td><td>Metrology + Calibration Quản lý</td><td>v3.1+v4 tách Metrology khỏi DEP-QA. JD hiện chỉ có CMM Người vận hành/Calibration Tech — thiếu Quản lý-level.</td></tr>
+<tr><td>jd-sp-lead.html</td><td>DEP-SP</td><td>Công đoạn đặc biệt Lead</td><td>v3.1+v4 tách Anodize/EP/Pass/Làm sạch/Outgas khỏi DEP-PRO. Hoàn toàn KHÔNG có JD cho Công đoạn đặc biệt.</td></tr>
+<tr><td>jd-mnt-quản lý.html</td><td>DEP-MNT</td><td>Maintenance + Facility Quản lý</td><td>JD hiện có Maintenance-Tech nhưng không có Quản lý-level.</td></tr>
 <tr><td>jd-legal-officer.html</td><td>DEP-LEGAL</td><td>Legal + Corporate Secretary + IP Officer</td><td>Hoàn toàn KHÔNG có JD Legal.</td></tr>
-<tr><td>jd-erp-owner.html</td><td>DEP-ERP</td><td>ERP/App Admin (Epicor + MOM)</td><td>Hiện bundled với IT; cần tách vì SoD requirement.</td></tr>
-<tr><td>jd-training-coordinator.html</td><td>DEP-HR</td><td>Training &amp; Development Coordinator</td><td>v5 promote Training-Master thành first-class library — cần JD dedicated.</td></tr>
+<tr><td>jd-erp-chủ sở hữu.html</td><td>DEP-ERP</td><td>ERP/App Admin (Epicor + MOM)</td><td>Hiện bundled với IT; cần tách vì SoD requirement.</td></tr>
+<tr><td>jd-training-coordinator.html</td><td>DEP-HR</td><td>Training &amp; Development Coordinator</td><td>v5 promote Training-Master thành first-class thư viện — cần JD dedicated.</td></tr>
 </tbody>
 </table>
 </section>
 
 <section class="card">
-<h2>8. RACI Matrix — 20 luồng công việc gates → Accountable single role</h2>
+<h2>8. RACI Ma trận — 20 luồng công việc cổngs → Accountable single Vai trò</h2>
 <table>
-<thead><tr><th>Gate / Process</th><th>Accountable (A)</th><th>Responsible (R)</th><th>Consulted (C)</th><th>Informed (I)</th></tr></thead>
+<thead><tr><th>Cổng / Quá trình</th><th>Accountable (A)</th><th>Responsible (R)</th><th>Consulted (C)</th><th>Inbiểu mẫued (I)</th></tr></thead>
 <tbody>
-<tr><td>G0 Contract Kickoff</td><td>Sales Engineer (per OEM)</td><td>Quote Estimator, Legal</td><td>QA, Production Planner</td><td>CSO, CFO</td></tr>
-<tr><td>G1 Engineering Release</td><td>Engineering Manager</td><td>Design Eng, CAM Prog, Process Eng</td><td>QA Eng, Production Mgr</td><td>Sales Eng, NPI Lead</td></tr>
-<tr><td>G2 IQC Receiving</td><td>QA Manager</td><td>IQC Inspector, SQE</td><td>Procurement, Warehouse</td><td>Production Planner</td></tr>
-<tr><td>G3 Setup Release</td><td>Production Manager</td><td>Setup Tech, Cell Lead, Inspector-in-cell</td><td>QA Eng</td><td>Engineering</td></tr>
-<tr><td>G4 FAI First Article</td><td><b>QA Manager</b> (singular A; resolves 3-way QA/QE/QC ambiguity)</td><td>FAI Engineer, QC Inspector, CMM Prog</td><td>Engineering, Customer SQE</td><td>Production, Sales</td></tr>
-<tr><td>G5 IPQC Production</td><td>QA Engineer (per Job)</td><td>IPQC Inspector, Operator</td><td>Production Mgr, Process Eng</td><td>Customer-Audit Coord</td></tr>
-<tr><td>G6 Final QC + Pack (incl Pack-6)</td><td>QA Manager</td><td>FQC Inspector, Cleanliness Tech (DEP-METRO + DEP-SP)</td><td>Special Process Lead, Shipping</td><td>Sales Eng, Customer</td></tr>
-<tr><td>G7 Ship Release</td><td>Shipping Manager (DEP-SCM)</td><td>Shipping Clerk, Logistics Coord, Customs Broker liaison</td><td>QA Manager (CoC sign), Compliance Officer (export screen)</td><td>Sales Eng, Finance (AR)</td></tr>
-<tr><td>NCR Initiation</td><td>QA Engineer (per Job)</td><td>Inspector, Operator, MRB members</td><td>Engineering, Production</td><td>QA Manager, Customer (if affected)</td></tr>
-<tr><td>NCR MRB Disposition</td><td>QA Manager</td><td>MRB cross-functional team</td><td>Engineering, Customer SQE (if UAI)</td><td>Production, Finance (cost)</td></tr>
-<tr><td>CAPA</td><td>CAPA Owner (assigned)</td><td>RCA team</td><td>QA Manager, QA Engineer</td><td>Cross-dept, Customer</td></tr>
-<tr><td>Customer 8D / SCAR Response</td><td>QA Manager</td><td>8D Champion, Engineering, Production</td><td>CQO, Sales Eng, Customer-Audit Coord</td><td>CSO</td></tr>
-<tr><td>ECO (Engineering Change Order)</td><td>Engineering Manager (Internal); CTO/Customer (Customer-driven)</td><td>Design Eng, NPI Lead, QA, Production</td><td>Procurement, Customer</td><td>All affected</td></tr>
-<tr><td>PCN Inbound (Customer to HESEM)</td><td>QA Manager (impact assessment owner)</td><td>Engineering, Production, Process Eng</td><td>Customer SQE</td><td>Sales Eng, Production Planner</td></tr>
-<tr><td>PCN Outbound (HESEM to Customer)</td><td>Engineering Manager + QA Manager (joint A)</td><td>Process Eng, Quality Eng</td><td>Sales Eng, Compliance</td><td>Production, Customer-Audit Coord</td></tr>
-<tr><td>Internal Audit</td><td>Internal Auditor (assigned)</td><td>Audit team</td><td>QA Manager, CQO, Auditee Dept Head</td><td>Affected dept</td></tr>
-<tr><td>Customer Audit Response</td><td>QA Manager + Customer-Audit Coord (joint A)</td><td>Cross-functional</td><td>CQO, Compliance Officer</td><td>CSO, Customer</td></tr>
-<tr><td>Management Review</td><td>CQO</td><td>Dept Heads, QA Manager</td><td>CEO</td><td>BOD</td></tr>
-<tr><td>Calibration Cert Issuance</td><td>Metrology Manager (DEP-METRO)</td><td>Cal Tech, External Lab</td><td>QA Manager (if OOT)</td><td>All gage users</td></tr>
-<tr><td>PM Execution</td><td>Maintenance Manager (DEP-MNT)</td><td>Mech/Elec Tech</td><td>Production Mgr (downtime impact)</td><td>QA (if cap-impact)</td></tr>
+<tr><td>G0 Contract Kickoff</td><td>Sales Engineer (per OEM)</td><td>Quote Estimator, Legal</td><td>QA, Production Kế hoạchner</td><td>CSO, CFO</td></tr>
+<tr><td>G1 Engineering Phát hành</td><td>Engineering Quản lý</td><td>Design Eng, CAM Prog, Quá trình Eng</td><td>QA Eng, Production Mgr</td><td>Sales Eng, NPI Lead</td></tr>
+<tr><td>G2 IQC Receiving</td><td>QA Quản lý</td><td>IQC Inspector, SQE</td><td>Procurement, Warehouse</td><td>Production Kế hoạchner</td></tr>
+<tr><td>G3 Chuẩn bị máy Phát hành</td><td>Production Quản lý</td><td>Chuẩn bị máy Tech, Cell Lead, Inspector-in-cell</td><td>QA Eng</td><td>Engineering</td></tr>
+<tr><td>G4 FAI First Article</td><td><b>QA Quản lý</b> (singular A; resolves 3-way QA/QE/QC ambiguity)</td><td>FAI Engineer, QC Inspector, CMM Prog</td><td>Engineering, Khách hàng SQE</td><td>Production, Sales</td></tr>
+<tr><td>G5 IPQC Production</td><td>QA Engineer (per Job)</td><td>IPQC Inspector, Người vận hành</td><td>Production Mgr, Quá trình Eng</td><td>Khách hàng-Đánh giá Coord</td></tr>
+<tr><td>G6 Cuối cùng QC + Pack (incl Pack-6)</td><td>QA Quản lý</td><td>FQC Inspector, Làm sạchchuyềnss Tech (DEP-METRO + DEP-SP)</td><td>Công đoạn đặc biệt Lead, Giao hàngping</td><td>Sales Eng, Khách hàng</td></tr>
+<tr><td>G7 Giao hàng Phát hành</td><td>Giao hàngping Quản lý (DEP-SCM)</td><td>Giao hàngping Clerk, Logistics Coord, Customs Broker liaison</td><td>QA Quản lý (CoC sign), Compliance Officer (export screen)</td><td>Sales Eng, Finance (AR)</td></tr>
+<tr><td>NCR Initiation</td><td>QA Engineer (per Job)</td><td>Inspector, Người vận hành, MRB members</td><td>Engineering, Production</td><td>QA Quản lý, Khách hàng (if affected)</td></tr>
+<tr><td>NCR MRB Disposition</td><td>QA Quản lý</td><td>MRB cross-functional team</td><td>Engineering, Khách hàng SQE (if UAI)</td><td>Production, Finance (cost)</td></tr>
+<tr><td>CAPA</td><td>CAPA Chủ sở hữu (assigned)</td><td>RCA team</td><td>QA Quản lý, QA Engineer</td><td>Cross-dept, Khách hàng</td></tr>
+<tr><td>Khách hàng 8D / SCAR Response</td><td>QA Quản lý</td><td>8D Champion, Engineering, Production</td><td>CQO, Sales Eng, Khách hàng-Đánh giá Coord</td><td>CSO</td></tr>
+<tr><td>ECO (Engineering Thay đổi Order)</td><td>Engineering Quản lý (Internal); CTO/Khách hàng (Khách hàng-driven)</td><td>Design Eng, NPI Lead, QA, Production</td><td>Procurement, Khách hàng</td><td>All affected</td></tr>
+<tr><td>PCN Inbound (Khách hàng to HESEM)</td><td>QA Quản lý (impact assessment chủ sở hữu)</td><td>Engineering, Production, Quá trình Eng</td><td>Khách hàng SQE</td><td>Sales Eng, Production Kế hoạchner</td></tr>
+<tr><td>PCN Outbound (HESEM to Khách hàng)</td><td>Engineering Quản lý + QA Quản lý (joint A)</td><td>Quá trình Eng, Quality Eng</td><td>Sales Eng, Compliance</td><td>Production, Khách hàng-Đánh giá Coord</td></tr>
+<tr><td>Internal Đánh giá</td><td>Internal Đánh giáor (assigned)</td><td>Đánh giá team</td><td>QA Quản lý, CQO, Đánh giáee Dept Head</td><td>Affected dept</td></tr>
+<tr><td>Khách hàng Đánh giá Response</td><td>QA Quản lý + Khách hàng-Đánh giá Coord (joint A)</td><td>Cross-functional</td><td>CQO, Compliance Officer</td><td>CSO, Khách hàng</td></tr>
+<tr><td>Management Rà soát</td><td>CQO</td><td>Dept Heads, QA Quản lý</td><td>CEO</td><td>BOD</td></tr>
+<tr><td>Calibration Cert Issuance</td><td>Metrology Quản lý (DEP-METRO)</td><td>Cal Tech, External Lab</td><td>QA Quản lý (if OOT)</td><td>All thiết bị đo users</td></tr>
+<tr><td>PM Execution</td><td>Maintenance Quản lý (DEP-MNT)</td><td>Mech/Elec Tech</td><td>Production Mgr (downtime impact)</td><td>QA (if cap-impact)</td></tr>
 </tbody>
 </table>
-<div class="ok-callout"><b>RACI rule v5:</b> Mỗi gate có DUY NHẤT 1 role Accountable (A). Multiple R (do work) OK; multiple A = SSOT ownership violation.</div>
+<div class="ok-callout"><b>RACI quy tắc v5:</b> Mỗi cổng có DUY NHẤT 1 Vai trò Accountable (A). Multiple R (do work) OK; multiple A = SSOT chủ sở hữugiao hàng violation.</div>
 </section>
 
 <section class="card">
-<h2>9. Migration plan v4 → v5</h2>
+<h2>9. Migration kế hoạch v4 → v5</h2>
 <table>
-<thead><tr><th>Phase</th><th>Action</th><th>Owner</th><th>Effort</th><th>Status</th></tr></thead>
+<thead><tr><th>Phase</th><th>Action</th><th>Chủ sở hữu</th><th>Effort</th><th>Trạng thái</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Apply 15 critical fixes vào build_blueprint.py + wipe+rebuild blueprint</td><td>QMS</td><td>0.5 ngày</td><td>✓ Done (750 dirs)</td></tr>
-<tr><td>2</td><td>Write ANNEX-145 (file này) — v5 stress test fixes + luồng công việc-Lists schema + RACI</td><td>QMS</td><td>1 ngày</td><td>✓ Done</td></tr>
+<tr><td>1</td><td>Apply 15 critical fixes vào build_Bản thiết kế.py + wipe+rebuild Bản thiết kế</td><td>QMS</td><td>0.5 ngày</td><td>✓ Done (750 dirs)</td></tr>
+<tr><td>2</td><td>Write ANNEX-145 (Tệp này) — v5 kiểm thử sức chịu tải fixes + luồng công việc-Lists schema + RACI</td><td>QMS</td><td>1 ngày</td><td>✓ Done</td></tr>
 <tr><td>3</td><td>Mark ANNEX-144 = SUPERSEDED-BY-ANNEX-145; cập nhật cross-ref</td><td>QMS</td><td>0.5 ngày</td><td>Next</td></tr>
-<tr><td>4</td><td>Register ANNEX-145 trong dcc_document_header trên VPS</td><td>DCC</td><td>0.1 ngày</td><td>Next</td></tr>
+<tr><td>4</td><td>Sổ đăng ký ANNEX-145 trong dcc_document_header trên VPS</td><td>DCC</td><td>0.1 ngày</td><td>Next</td></tr>
 <tr><td>5</td><td>Deploy + Chrome verify</td><td>IT</td><td>0.2 ngày</td><td>Next</td></tr>
-<tr><td>6</td><td>Author 6 new JDs (METRO-MGR, SP-LEAD, MNT-MGR, LEGAL, ERP-OWNER, TRN-COORD)</td><td>HR + Dept Heads</td><td>3 ngày</td><td>Pending</td></tr>
-<tr><td>7</td><td>Add §13 "M365 SSOT Path Map" vào 38 canonical JDs (3 wave)</td><td>HR + DCC</td><td>7 ngày người</td><td>Pending (template ready)</td></tr>
+<tr><td>6</td><td>Author 6 new JDs (METRO-MGR, SP-LEAD, MNT-MGR, LEGAL, ERP-CHỦ SỞ HỮU, TRN-COORD)</td><td>HR + Dept Heads</td><td>3 ngày</td><td>Pending</td></tr>
+<tr><td>7</td><td>Add §13 "M365 SSOT Đường dẫn Map" vào 38 canonical JDs (3 wave)</td><td>HR + DCC</td><td>7 ngày người</td><td>Pending (template ready)</td></tr>
 <tr><td>8</td><td>Implement 16 luồng công việc-Lists qua PnP PowerShell trên live tenant</td><td>IT</td><td>5 ngày</td><td>Pending (schema ready trong §5)</td></tr>
-<tr><td>9</td><td>Power Automate flows cho List sync + Job-Closure file-move</td><td>IT</td><td>5 ngày</td><td>Pending</td></tr>
-<tr><td>10</td><td>Provisioning script <code>Provision-HesemTenant.ps1</code> đọc blueprint <code>_TEMPLATES/</code> như schema</td><td>IT</td><td>3 ngày</td><td>Pending</td></tr>
-<tr><td>11</td><td>v5 dry-run drill trên test tenant với 1 PO end-to-end</td><td>QMS+IT</td><td>2 ngày</td><td>Pending (gate before prod cutover)</td></tr>
+<tr><td>9</td><td>Power Automate flows cho List đồng bộ + Job-Closure Tệp-move</td><td>IT</td><td>5 ngày</td><td>Pending</td></tr>
+<tr><td>10</td><td>Provisioning script <code>Provision-HesemTenant.ps1</code> đọc Bản thiết kế <code>_TEMPLATES/</code> như schema</td><td>IT</td><td>3 ngày</td><td>Pending</td></tr>
+<tr><td>11</td><td>v5 dry-run drill trên test tenant với 1 PO end-to-end</td><td>QMS+IT</td><td>2 ngày</td><td>Pending (cổng before prod cutover)</td></tr>
 </tbody>
 </table>
 <div class="warn-callout"><b>BLOCK PROD CUTOVER</b> đến khi Phase 7 (JD §13) + Phase 8 (luồng công việc-Lists) + Phase 11 (dry-run) hoàn tất. Estimate tổng: ~25 ngày người.</div>
@@ -300,13 +300,13 @@ blueprint/
 <section class="card">
 <h2>10. Tham chiếu + Supersession</h2>
 <ul class="tight">
-<li><b>4 agent stress test output:</b> <code>_reports/v4-ssot-stress-test/{agent-1..4}-*.md</code> (4 file, tổng ~28K từ)</li>
-<li><b>v5 blueprint script:</b> <code>tools/m365-provisioning/build_blueprint.py</code></li>
+<li><b>4 agent kiểm thử sức chịu tải output:</b> <code>_reports/v4-ssot-stress-test/{agent-1..4}-*.md</code> (4 Tệp, tổng ~28K từ)</li>
+<li><b>v5 Bản thiết kế script:</b> <code>tools/m365-provisioning/build_blueprint.py</code></li>
 <li><b>v5 tree manifest:</b> <code>tools/m365-provisioning/blueprint/_TREE.txt</code> (750 directories)</li>
-<li><a href="annex-144-ssot-3-axis-job-part-asset-architecture.html"><b>ANNEX-144 (v4) → SUPERSEDED-BY ANNEX-145 (v5)</b></a> — v4 architecture giữ nguyên core (3-axis SSOT), v5 patch 15 critical + thêm 3 axis (Multi-Job-Evidence, Lot-Trace-Master, Production-Run-Axis) + formalize 16 luồng công việc-Lists schemas</li>
+<li><a href="annex-144-ssot-3-axis-job-part-asset-architecture.html"><b>ANNEX-144 (v4) → SUPERSEDED-BY ANNEX-145 (v5)</b></a> — v4 Kiến trúc giữ nguyên core (3-axis SSOT), v5 patch 15 critical + thêm 3 axis (Multi-Job-Bằng chứng, Lot-Trace-Master, Production-Run-Axis) + biểu mẫualize 16 luồng công việc-Lists schemas</li>
 <li><a href="annex-143-department-role-scenario-file-master-matrix.html">ANNEX-143 (v3.1)</a> — historical, đã superseded</li>
 <li><a href="annex-141-semi-equipment-parts-cnc-supplier-compliance.html">ANNEX-141</a> — Pack-6 spec (v5 đã implement)</li>
-<li><a href="annex-142-m365-permission-model-for-semi-supplier-audit.html">ANNEX-142</a> — permission model + IB (v5 cập nhật cấp library cho OT-Vault)</li>
+<li><a href="annex-142-m365-permission-model-for-semi-supplier-audit.html">ANNEX-142</a> — permission model + IB (v5 cập nhật cấp thư viện cho OT-Vault)</li>
 </ul>
 </section>
 
@@ -315,7 +315,7 @@ blueprint/
 <table>
 <thead><tr><th>Rev</th><th>Ngày</th><th>Người</th><th>Mô tả</th></tr></thead>
 <tbody>
-<tr><td>V0</td><td>2026-05-17</td><td>QMS + 4 agent stress test</td><td>Bản đầu tiên: tổng hợp 146 finding từ 4 agent (PO Lifecycle: 29 fix, SSOT Auditor: 47 issue, JD Reconciliation: 45 issue, Reverse-Think: 25 stress upgrade). Apply 15 critical fix vào build_blueprint.py: drop {placeholder} → _TEMPLATES, add Pack-6, Multi-Job-Evidence, _HESEM-Owned-Parts, Lot-Trace-Master, Production-Run-Axis, rename FAI folders, _Intake bucket, Customer-ESG-Survey-Inbound, Gage MSA per-Customer, Cal Lab NDA overlay, Equipment-Used-Binding-Log, Audit-Scoped-Guest, List-Row-Destruction-Trail. Drop luồng công việc-Lists folders. Spec 16 luồng công việc-Lists schema. Spec 6 new JDs. RACI 20-row. SSOT precedence rule (Content-Canonical vs Index-Reference vs Derivative vs Snapshot). Tổng blueprint: 597 → 750 directories (+25.6%).</td></tr>
+<tr><td>V0</td><td>2026-05-17</td><td>QMS + 4 agent kiểm thử sức chịu tải</td><td>Bản đầu tiên: tổng hợp 146 finding từ 4 agent (PO Lifecycle: 29 fix, SSOT Đánh giáor: 47 issue, JD Reconciliation: 45 issue, Reverse-Think: 25 stress upgrade). Apply 15 critical fix vào build_Bản thiết kế.py: drop {placetạm giữer} → _TEMPLATES, add Pack-6, Multi-Job-Bằng chứng, _HESEM-Owned-Chi tiếts, Lot-Trace-Master, Production-Run-Axis, rename FAI thư mụcs, _Intake bucket, Khách hàng-ESG-Survey-Inbound, Thiết bị đo MSA per-Khách hàng, Cal Lab NDA overlay, Equipment-Used-Binding-Log, Đánh giá-Scoped-Guest, List-Row-Destruction-Trail. Drop luồng công việc-Lists thư mụcs. Spec 16 luồng công việc-Lists schema. Spec 6 new JDs. RACI 20-row. SSOT precedence quy tắc (Content-Canonical vs Index-Reference vs Derivative vs Ảnh chụp trạng thái). Tổng Bản thiết kế: 597 → 750 directories (+25.6%).</td></tr>
 </tbody>
 </table>
 </section>

@@ -104,7 +104,7 @@ ul.tight li { margin: 4px 0; }
 </tr>
 <tr>
 <td>Trạng thái máy</td>
-<td>WCS, ToolID, bù trừ, mã đồ gá, dung dịch làm mát và vùng làm việc hiện tại.</td>
+<td>WCS, Dao cụID, bù trừ, mã đồ gá, dung dịch làm mát và vùng làm việc hiện tại.</td>
 <td>Nếu có bổ sung theo nhóm máy thì xem <a href="../../references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>.</td>
 </tr>
 </tbody>
@@ -179,9 +179,9 @@ ul.tight li { margin: 4px 0; }
 </tr>
 <tr>
 <td>4</td>
-<td>Xác nhận ToolID, WCS, đầu dò hoặc bù trừ đang ở đúng trạng thái cho cài đặt máy hiện tại.</td>
+<td>Xác nhận Dao cụID, WCS, đầu dò hoặc bù trừ đang ở đúng trạng thái cho cài đặt máy hiện tại.</td>
 <td>Lý do: sai trạng thái máy gây phế phẩm hoặc va chạm rất sớm.</td>
-<td>ToolID và trạng thái máy giải thích được, không có giá trị lạ.</td>
+<td>Dao cụID và trạng thái máy giải thích được, không có giá trị lạ.</td>
 <td>Dừng bấm chạy và quay lại WI-517 hoặc bảo trì khi cần.</td>
 </tr>
 <tr>
@@ -264,14 +264,14 @@ ul.tight li { margin: 4px 0; }
 </section>
 <section class="wi-section section" id="wi-s8">
 <h2>8. Bản đồ W0-W12</h2>
-<p>Tài liệu này được dùng trong chương trình triển khai QMS hiện hành (lịch nguồn: <code>mom/data/config/deploy/program.bootstrap.json</code>). WI-519 là bảng khóa ngay tại máy trước khi chạy; trong W0-W12, người thao tác chỉ được mở máy khi job packet, phiên bản kỹ thuật, setup và bằng chứng pre-run cùng sạch.</p>
+<p>Tài liệu này được dùng trong chương trình triển khai QMS hiện hành (lịch nguồn: <code>mom/data/config/deploy/program.bootstrap.json</code>). WI-519 là bảng khóa ngay tại máy trước khi chạy; trong W0-W12, người thao tác chỉ được mở máy khi job packet, phiên bản kỹ thuật, chuẩn bị máy và bằng chứng pre-run cùng sạch.</p>
 <div class="table-card">
 <table class="table matrix-table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>Tuần</th><th>Pha · trụ</th><th>Cổng kiểm liên quan</th><th>Cách dùng tài liệu này</th><th>Bằng chứng đóng cổng</th></tr></thead>
 <tbody>
 <tr><td>W3 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W03.html">TRN-DEP-W03</a></td><td>P2 · <code>pilot</code></td><td><code>P2-02</code></td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="role-code">WKM</span></a> + <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="role-code">QA</span></a> diễn tập pre-run cho 5 job packet mẫu; mỗi packet phải có checklist, điểm lệch và người xử lý.</td><td><code>drills.json</code>, <code>issues.json</code>, FRM-519 sample</td></tr>
 <tr><td>W7 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W07.html">TRN-DEP-W07</a></td><td>P3 · <code>golive</code> + <code>pilot</code></td><td><code>P3-04</code></td><td>Mỗi Job Order trước khi chạy máy đều qua WI-519; sai lệch pre-run phải <code>&lt;= 1%</code> trong ngày đầu Đợt Sản xuất.</td><td><code>audit_events</code>, checklist pre-run theo JobNum</td></tr>
-<tr><td>W8 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W08.html">TRN-DEP-W08</a></td><td>P3 · <code>golive</code></td><td><code>P3-03</code></td><td>Hypercare đưa bảng kiểm pre-run vào trung tâm điều hành; mọi điểm đỏ có severity, owner và giờ đóng theo WI-202.</td><td><code>readiness.json</code>, <code>issues.json</code>, MTTR snapshot</td></tr>
+<tr><td>W8 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W08.html">TRN-DEP-W08</a></td><td>P3 · <code>golive</code></td><td><code>P3-03</code></td><td>Hypercare đưa bảng kiểm pre-run vào trung tâm điều hành; mọi điểm đỏ có severity, chủ sở hữu và giờ đóng theo WI-202.</td><td><code>readiness.json</code>, <code>issues.json</code>, MTTR ảnh chụp trạng thái</td></tr>
 <tr><td>W11 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W11.html">TRN-DEP-W11</a></td><td>P4 · <code>doc</code></td><td><code>P4-03</code></td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="role-code">QMS</span></a> cập nhật bảng kiểm theo bài học về sai revision, dao cụ, WCS, bù trừ và điều kiện máy.</td><td><code>dcc_document_revision</code>, lesson-learned action log</td></tr>
 </tbody>
 </table>
@@ -280,8 +280,8 @@ ul.tight li { margin: 4px 0; }
 <section class="wi-section section" id="wi-s9">
 <h2>9. KPI điều hành phải theo dõi</h2>
 <div class="metric-grid">
-<div class="metric-card"><strong>KPI-FLD-01</strong><br>Định tuyến đúng thư mục <code>&gt;= 95%</code>; đo khi operator mở WI-519, WI-302 và job packet đúng nguồn.</div>
-<div class="metric-card"><strong>KPI-DEP-03</strong><br>Tỉ lệ thay đổi thất bại <code>&lt;= 10%</code>; đo trên thay đổi setup, chương trình, đồ gá và pre-run.</div>
+<div class="metric-card"><strong>KPI-FLD-01</strong><br>Định tuyến đúng thư mục <code>&gt;= 95%</code>; đo khi người vận hành mở WI-519, WI-302 và job packet đúng nguồn.</div>
+<div class="metric-card"><strong>KPI-DEP-03</strong><br>Tỉ lệ thay đổi thất bại <code>&lt;= 10%</code>; đo trên thay đổi chuẩn bị máy, chương trình, đồ gá và pre-run.</div>
 <div class="metric-card"><strong>KPI-DEP-07</strong><br>MTTR sự cố Mức 1 <code>&lt;= 24 h</code>; dùng khi pre-run phát hiện rủi ro chặn máy.</div>
 </div>
 <p class="note"><strong>Khi báo đỏ:</strong> mở <code>issues.json</code>, chặn chạy máy bằng trạng thái TẠM GIỮ, leo thang theo <a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> và cập nhật <code>readiness.json</code> trước khi nhả máy.</p>
@@ -289,9 +289,9 @@ ul.tight li { margin: 4px 0; }
 <section class="wi-section section" id="wi-s10">
 <h2>10. Điều kiện NO-GO cho pre-run</h2>
 <ul class="tight">
-<li>Không công nhận <code>P2-02</code> khi 5 job packet mẫu W3 thiếu checklist pre-run hoặc còn điểm lệch không có owner trong <code>issues.json</code>.</li>
+<li>Không công nhận <code>P2-02</code> khi 5 job packet mẫu W3 thiếu checklist pre-run hoặc còn điểm lệch không có chủ sở hữu trong <code>issues.json</code>.</li>
 <li>Không công nhận <code>P3-04</code> cho Đợt Sản xuất khi lệch pre-run <code>&gt; 3%</code> trong 2 ngày liên tiếp.</li>
-<li>Không cho máy chạy tại W7-W8 khi job packet thiếu phiên bản kỹ thuật, tool list, setup record hoặc quyết định FAI liên quan.</li>
+<li>Không cho máy chạy tại W7-W8 khi job packet thiếu phiên bản kỹ thuật, dao cụ list, chuẩn bị máy hồ sơ hoặc quyết định FAI liên quan.</li>
 <li>Không đóng <code>P4-03</code> khi bảng kiểm W11 chưa tạo <code>dcc_document_revision</code> hoặc còn bài học severity cao chưa có hành động phòng ngừa.</li>
 </ul>
 </section>

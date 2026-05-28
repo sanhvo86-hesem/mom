@@ -72,12 +72,12 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
      data-dcc-logo="../../../../assets/hesem-logo.svg"
      data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;WI-604&quot;,&quot;title&quot;:&quot;SPC Chart Use Năng lực quy trình and Reaction&quot;,&quot;subtitle&quot;:&quot;Dùng biểu đồ SPC, đánh giá capability, nhận biết mất kiểm soát và phản ứng theo reaction plan.&quot;,&quot;doc_type&quot;:&quot;WI&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
  
- <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho CTQ có dữ liệu lặp theo thời gian cần chart, năng lực / khả năng rà soát hoặc phản ứng plan khi trôi / sai lệch quá trình.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho CTQ có dữ liệu lặp theo thời gian cần chart, năng lực / khả năng rà soát hoặc phản ứng kế hoạch khi trôi / sai lệch quá trình.</div>
  
  
 <div class="section"><h2>1. Mục đích và nguyên tắc dùng SPC</h2>
 <p>WI này dùng cho CTQ có dữ liệu lặp theo thời gian để phát hiện trôi / sai lệch sớm, phản ứng nhanh và đánh giá năng lực / khả năng. SPC chỉ có giá trị khi dữ liệu đo đáng tin, lấy mẫu logic đúng và quá trình có kỷ luật / chuyên ngành ghi nhận theo nhóm con/time tem / dấu. Không dùng SPC để che lấp sản phẩm đã out-of-spec; sản phẩm vượt spec vẫn phải xử lý ngay dù chart còn "đẹp".</p>
-<div class="callout-danger"><strong>Phân biệt bắt buộc:</strong> <strong>Out of control</strong> là mất ổn định thống kê; <strong>In control but không đủ năng lực</strong> là ổn định nhưng vẫn không đạt yêu cầu khách. Hai tình huống này có hành động khác nhau và đều không được bỏ qua.</div></div>
+<div class="callout-danger"><strong>Phân biệt bắt buộc:</strong> <strong>Out of kiểm soát</strong> là mất ổn định thống kê; <strong>In kiểm soát but không đủ năng lực</strong> là ổn định nhưng vẫn không đạt yêu cầu khách. Hai tình huống này có hành động khác nhau và đều không được bỏ qua.</div></div>
 
 <div class="section"><h2>2. Điều kiện mở chart và chọn loại chart</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống dữ liệu</th><th>Chart áp dụng</th><th>Điều kiện mở</th></tr></thead><tbody>
@@ -89,34 +89,34 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>3. Trình tự vận hành chart tại hiện trường</h2>
 <div class="step-list">
-<div class="step-item"><strong>Khóa CTQ và phương pháp đo.</strong><br>Xác nhận đặc tính, spec giới hạn, đơn vị đo, tần suất đo, mẫu điểm và gage theo <a href="wi-602-gage-pre-use-verification-and-status-control.html">WI-602</a>.</div>
-<div class="step-item"><strong>Lập nhóm con đúng logic.</strong><br>nhóm con phải đại diện cho ảnh chụp trạng thái của quá trình trong cùng điều kiện; không gom dữ liệu qua ca, qua tool thay đổi hoặc qua machine khác vào cùng nhóm con nếu không có rule rõ.</div>
-<div class="step-item"><strong>Ghi chart theo thời gian thật.</strong><br>Không được bổ sung / thay thế sau nhiều giờ rồi vẽ như dữ liệu thời gian thực. Mỗi điểm phải có time tem / dấu, machine, Operator và sự kiện bút đánh dấu khi đổi dao/bù trừ (offset)/fixture.</div>
+<div class="step-item"><strong>Khóa CTQ và phương pháp đo.</strong><br>Xác nhận đặc tính, spec giới hạn, đơn vị đo, tần suất đo, mẫu điểm và thiết bị đo theo <a href="wi-602-gage-pre-use-verification-and-status-control.html">WI-602</a>.</div>
+<div class="step-item"><strong>Lập nhóm con đúng logic.</strong><br>nhóm con phải đại diện cho ảnh chụp trạng thái của quá trình trong cùng điều kiện; không gom dữ liệu qua ca, qua dao cụ thay đổi hoặc qua machine khác vào cùng nhóm con nếu không có quy tắc rõ.</div>
+<div class="step-item"><strong>Ghi chart theo thời gian thật.</strong><br>Không được bổ sung / thay thế sau nhiều giờ rồi vẽ như dữ liệu thời gian thực. Mỗi điểm phải có time tem / dấu, machine, Người vận hành và sự kiện bút đánh dấu khi đổi dao/bù trừ (offset)/đồ gá.</div>
 <div class="step-item"><strong>Đọc tín hiệu.</strong><br>Phản ứng với điểm vượt UCL/LCL, run, xu hướng, chuỗi cùng phía đường tâm, mẫu / quy luật bất thường hoặc mở rộng phân tán / biên độ. Không chỉ nhìn 1 điểm cuối.</div>
-<div class="step-item"><strong>Phản ứng và khoanh vùng.</strong><br>Khi mất kiểm soát: dừng công đoạn liên quan, kiểm gage, rà tool mài mòn, bù trừ (offset), fixture, nguyên vật liệu lot, dung dịch làm mát (dung dịch làm nguội)/nhiệt, và xác định phạm vi từ cuối cùng-đã biết-tốt / đạt.</div>
-<div class="step-item"><strong>Khôi phục và xác nhận.</strong><br>Sau điều chỉnh, phải đo xác nhận và đánh dấu sự kiện trên chart. Nếu có đổi tool/bù trừ (offset) lớn hoặc sự cố nghiêm trọng, theo dõi / tuân theo thêm <a href="../05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a> và <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a> nếu điều kiện Requests.</div>
+<div class="step-item"><strong>Phản ứng và khoanh vùng.</strong><br>Khi mất kiểm soát: dừng công đoạn liên quan, kiểm thiết bị đo, rà dao cụ mài mòn, bù trừ (offset), đồ gá, nguyên vật liệu lot, dung dịch làm mát (dung dịch làm nguội)/nhiệt, và xác định phạm vi từ cuối cùng-đã biết-tốt / đạt.</div>
+<div class="step-item"><strong>Khôi phục và xác nhận.</strong><br>Sau điều chỉnh, phải đo xác nhận và đánh dấu sự kiện trên chart. Nếu có đổi dao cụ/bù trừ (offset) lớn hoặc sự cố nghiêm trọng, theo dõi / tuân theo thêm <a href="../05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a> và <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a> nếu điều kiện Requests.</div>
 </div></div>
 
-<div class="section"><h2>4. Phản ứng plan chuẩn</h2>
+<div class="section"><h2>4. Phản ứng kế hoạch chuẩn</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Dấu hiệu</th><th>Phản ứng ngay</th><th>Must not do</th></tr></thead><tbody>
-<tr><td>Điểm vượt UCL/LCL</td><td>Dừng, xác minh gage, cô lập từ lần tốt / đạt Cần nhất, điều tra tool/bù trừ (offset)/fixture/nguyên vật liệu.</td><td>Không xóa điểm, không tiếp tục chạy để "xem thêm vài chiếc".</td></tr>
-<tr><td>Xu hướng tiến dần tới spec hoặc control giới hạn</td><td>Tăng tần suất đo, kiểm tuổi dao (tool tuổi thọ / vòng đời), kiểm nhiệt, chuẩn bị tool thay đổi có kiểm soát.</td><td>Không chờ đến khi vượt spec mới phản ứng.</td></tr>
+<tr><td>Điểm vượt UCL/LCL</td><td>Dừng, xác minh thiết bị đo, cô lập từ lần tốt / đạt Cần nhất, điều tra dao cụ/bù trừ (offset)/đồ gá/nguyên vật liệu.</td><td>Không xóa điểm, không tiếp tục chạy để "xem thêm vài chiếc".</td></tr>
+<tr><td>Xu hướng tiến dần tới spec hoặc kiểm soát giới hạn</td><td>Tăng tần suất đo, kiểm tuổi dao (dao cụ tuổi thọ / vòng đời), kiểm nhiệt, chuẩn bị dao cụ thay đổi có kiểm soát.</td><td>Không chờ đến khi vượt spec mới phản ứng.</td></tr>
 <tr><td>biên độ / phân tán tăng rộng bất thường</td><td>Kiểm kẹp, độ đảo (runout), mảnh dao (insert) mài mòn, machine điều kiện, dung dịch làm mát điều kiện.</td><td>Không chỉ chỉnh trung bình mà bỏ qua biến thiên.</td></tr>
-<tr><td>In control nhưng Cpk/Ppk thấp</td><td>Mở rà soát năng lực / khả năng; xem lại phương pháp, dung sai tiêu thụ, quy trình trung tâm, quy trình thiết kế lại nếu cần.</td><td>Không dùng chart ổn định để kết luận quá trình đủ năng lực.</td></tr>
-<tr><td>Đo lường system nghi ngờ</td><td>Tạm dừng chart, xác minh gage, đánh giá lại dữ liệu bị ảnh hưởng.</td><td>Không tính năng lực / khả năng từ dữ liệu đo không tin cậy.</td></tr>
+<tr><td>In kiểm soát nhưng Cpk/Ppk thấp</td><td>Mở rà soát năng lực / khả năng; xem lại phương pháp, dung sai tiêu thụ, quy trình trung tâm, quy trình thiết kế lại nếu cần.</td><td>Không dùng chart ổn định để kết luận quá trình đủ năng lực.</td></tr>
+<tr><td>Đo lường system nghi ngờ</td><td>Tạm dừng chart, xác minh thiết bị đo, đánh giá lại dữ liệu bị ảnh hưởng.</td><td>Không tính năng lực / khả năng từ dữ liệu đo không tin cậy.</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>5. Khả năng rà soát và hồ sơ</h2>
-<p>Khả năng phải đọc cùng bối cảnh: loại data, nhóm con logic, phân phối giả định, tool lịch sử thay đổi, shift hiệu ứng / tác dụng, nguyên vật liệu lot hiệu ứng / tác dụng và sự kiện quy trình. QA/Quality Engineer chịu trách nhiệm phê duyệt năng lực / khả năng rà soát; Operator và supervisor chịu trách nhiệm giữ chart sống, không vẽ sau cho đẹp số.</p>
+<p>Khả năng phải đọc cùng bối cảnh: loại data, nhóm con logic, phân phối giả định, dao cụ lịch sử thay đổi, shift hiệu ứng / tác dụng, nguyên vật liệu lot hiệu ứng / tác dụng và sự kiện quy trình. QA/Quality Engineer chịu trách nhiệm phê duyệt năng lực / khả năng rà soát; Người vận hành và supervisor chịu trách nhiệm giữ chart sống, không vẽ sau cho đẹp số.</p>
 <div class="two-col">
-<div class="card"><h3>Hồ sơ tối thiểu</h3><ul class="tight" style="padding-left:18px;"><li>Chart data có time tem / dấu và sự kiện bút đánh dấu.</li><li>Spec giới hạn, control giới hạn, nhóm con rule.</li><li>Phản ứng log: ai dừng, ai mở lại, hành động gì.</li><li>Khả năng tóm tắt kèm giả định và cửa sổ dữ liệu đã dùng.</li></ul></div>
-<div class="card"><h3>Gate/control metrics</h3><ul class="tight" style="padding-left:18px;"><li>Tỷ lệ chart phản ứng trễ so với tín hiệu.</li><li>Số lần out-of-control lặp theo machine/tool nhóm sản phẩm.</li><li>Cpk/Ppk theo CTQ trọng yếu.</li><li>Tỷ lệ trôi / sai lệch được chặn trước khi tạo NCR/lô giao hàng vấn đề.</li><li>QA/QE/WKM review theo ca/ngày; phản ứng sớm được ghi nhận trong kaizen/OJT; trễ phản ứng mở bao vây, NCR/CAPA hoặc retraining. Kỷ luật chỉ áp dụng khi cố ý bỏ qua tín hiệu, sửa dữ liệu hoặc tái phạm sau huấn luyện.</li></ul></div>
+<div class="card"><h3>Hồ sơ tối thiểu</h3><ul class="tight" style="padding-left:18px;"><li>Chart data có time tem / dấu và sự kiện bút đánh dấu.</li><li>Spec giới hạn, kiểm soát giới hạn, nhóm con quy tắc.</li><li>Phản ứng log: ai dừng, ai mở lại, hành động gì.</li><li>Khả năng tóm tắt kèm giả định và cửa sổ dữ liệu đã dùng.</li></ul></div>
+<div class="card"><h3>Cổng/kiểm soát chỉ số</h3><ul class="tight" style="padding-left:18px;"><li>Tỷ lệ chart phản ứng trễ so với tín hiệu.</li><li>Số lần out-of-kiểm soát lặp theo machine/dao cụ nhóm sản phẩm.</li><li>Cpk/Ppk theo CTQ trọng yếu.</li><li>Tỷ lệ trôi / sai lệch được chặn trước khi tạo NCR/lô giao hàng vấn đề.</li><li>QA/QE/WKM Rà soát theo ca/ngày; phản ứng sớm được ghi nhận trong kaizen/OJT; trễ phản ứng mở bao vây, NCR/CAPA hoặc retraining. Kỷ luật chỉ áp dụng khi cố ý bỏ qua tín hiệu, sửa dữ liệu hoặc tái phạm sau huấn luyện.</li></ul></div>
 </div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../sops/06-SOP-600/sop-604-spc-and-capability-control.html">SOP-604</a></td><td>Chính sách SPC/năng lực / khả năng ở cấp hệ thống.</td></tr>
-<tr><td><a href="../../references/06-ANNEX-600/annex-605-spc-lite-and-reaction-plan.html">ANNEX-605</a></td><td>Tham số chart, rule tín hiệu và phản ứng matrix.</td></tr>
+<tr><td><a href="../../references/06-ANNEX-600/annex-605-spc-lite-and-reaction-plan.html">ANNEX-605</a></td><td>Tham số chart, quy tắc tín hiệu và phản ứng Ma trận.</td></tr>
 <tr><td><a href="../../references/06-ANNEX-600/annex-602-msa-acceptance-criteria.html">ANNEX-602</a></td><td>Đo lường system acceptance tiêu chí.</td></tr>
-<tr><td><a href="wi-602-gage-pre-use-verification-and-status-control.html">WI-602</a></td><td>Cổng kiểm soát (gate) dụng cụ đo trước khi chart.</td></tr>
+<tr><td><a href="wi-602-gage-pre-use-verification-and-status-control.html">WI-602</a></td><td>Cổng kiểm soát (cổng) dụng cụ đo trước khi chart.</td></tr>
 <tr><td><a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></td><td>Ngăn chặn khi dữ liệu báo quá trình mất kiểm soát.</td></tr>
 </tbody></table></div></div>
 

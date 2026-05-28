@@ -80,10 +80,10 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <p>ANNEX này khóa toàn bộ chuẩn chọn vật tư, cấu trúc lớp đóng gói, nhãn, vùng dán nhãn, chống ẩm, ESD, FOD, bằng chứng ảnh và thời hạn bảo quản cho mọi hậu cần đơn vị của HESEM. <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a></span>, <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a>, Sản xuất và Người giao hàng <strong>PHẢI</strong> dùng ANNEX này khi chọn vật tư đóng gói, in nhãn, lập bảng kiểm và phê duyệt phê duyệt giao hàng (phê duyệt giao hàng).</p>
 <div class="callout-danger">
 <span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Đóng gói theo đúng ANNEX này. Mọi thay đổi chỉ được thực hiện khi có yêu cầu khách hàng, phê duyệt của <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> hoặc WHS và bằng chứng lưu trong Hồ sơ công việc (hồ sơ công việc).</div>
-<div class="callout-warning"><strong>Ranh giới:</strong> ANNEX này khóa cấp đóng gói, vật tư, nhãn, bằng chứng gói hàng và preservation window. Trình tự thao tác tại điểm dừng vẫn theo WI-714, WI-716, WI-205 và WI-206; khi nguồn acceptance chưa được release thì phải ghi <span class="code">source-controlled requirement</span>, không tự điền số.</div>
+<div class="callout-warning"><strong>Ranh giới:</strong> ANNEX này khóa cấp đóng gói, vật tư, nhãn, bằng chứng gói hàng và preservation window. Trình tự thao tác tại điểm dừng vẫn theo WI-714, WI-716, WI-205 và WI-206; khi nguồn acceptance chưa được phát hành thì phải ghi <span class="code">source-kiểm soátled requirement</span>, không tự điền số.</div>
 <div class="two-col">
 <div class="card">
-<h3>Nguyên tắc 1 — đúng Part/Rev/Qty/truy vết</h3>
+<h3>Nguyên tắc 1 — đúng Chi tiết/Rev/Qty/truy vết</h3>
 <p>Mỗi kiện chỉ được mang một trạng thái phát hành hợp lệ. Nhãn ngoài, nhãn trong, phiếu kê đóng gói, CoC và dữ liệu lô giao hàng phải nói cùng một tiếng.</p>
 </div>
 <div class="card">
@@ -102,9 +102,9 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tbody>
 <tr>
 <td><span class="badge-green">P1 — thường</span></td>
-<td>Part gia công thông thường, không ngoại quan / bề ngoài-quan trọng / nghiêm trọng, không ESD, không độ ẩm-nhạy cảm</td>
+<td>Chi tiết gia công thông thường, không ngoại quan / bề ngoài-quan trọng / nghiêm trọng, không ESD, không độ ẩm-nhạy cảm</td>
 <td>Túi <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html" title="Process Engineer (Kỹ sư quy trình)"><span class="entity-code role-code">PE</span></a> sạch hoặc giấy chống trầy + khay / thùng carton đúng cỡ</td>
-<td>Ngăn va đập, phân lô, nhãn Part/Rev/Qty, ảnh kiện hoàn tất</td>
+<td>Ngăn va đập, phân lô, nhãn Chi tiết/Rev/Qty, ảnh kiện hoàn tất</td>
 </tr>
 <tr>
 <td><span class="badge-blue">P2 — bề mặt / hình học nhạy</span></td>
@@ -114,25 +114,25 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </tr>
 <tr>
 <td><span class="badge-navy">P3 — chống ẩm / chống gỉ / chân không-tương thích</span></td>
-<td>Part cần VCI, chất hút ẩm, HIC, thanh lọc / loại bỏ hoặc niêm phong kín; linh kiện yêu cầu độ ẩm control / chân không tương thích</td>
+<td>Chi tiết cần VCI, chất hút ẩm, HIC, thanh lọc / loại bỏ hoặc niêm phong kín; linh kiện yêu cầu độ ẩm kiểm soát / chân không tương thích</td>
 <td>bên trong bag + chất hút ẩm/HIC + bên ngoài bag hoặc thùng kín; vật tư không phát bụi, không silicone nếu khách không cho phép</td>
 <td>Ghi loại chất hút ẩm, số lượng, HIC, thời gian đóng gói, thời hạn bảo quản; ảnh HIC và niêm phong</td>
 </tr>
 <tr>
 <td><span class="badge-amber">P4 — ESD</span></td>
-<td>Part / sub-lắp ráp nhạy ESD hoặc khách yêu cầu EPA-chỉ / duy nhất xử lý / vận chuyển</td>
+<td>Chi tiết / sub-lắp ráp nhạy ESD hoặc khách yêu cầu EPA-chỉ / duy nhất xử lý / vận chuyển</td>
 <td>Túi che chắn / vật tư ESD + nhãn ESD + cách ly với vật tư thường</td>
 <td>Dán nhãn ESD trên lớp trong và lớp ngoài; không trộn với vật tư không ESD</td>
 </tr>
 <tr>
-<td><span class="badge-red">P5 — vệ sinh và đóng gói / clean xây dựng</span></td>
-<td>Part vệ sinh / sạch sẽ, bán dẫn, chân không clean, rò rỉ-đã kiểm tra, yêu cầu kép / Cấp đôi-bag hoặc vệ sinh và đóng gói</td>
+<td><span class="badge-red">P5 — vệ sinh và đóng gói / làm sạch xây dựng</span></td>
+<td>Chi tiết vệ sinh / sạch sẽ, bán dẫn, chân không làm sạch, rò rỉ-đã kiểm tra, yêu cầu kép / Cấp đôi-bag hoặc vệ sinh và đóng gói</td>
 <td>Đóng gói sạch theo <a href="../../work-instructions/07-WI-700/wi-714-clean-packaging-handling-and-preservation.html">WI-714</a>; kép / Cấp đôi-bag khi lộ trình gia công Requests; vật tư sạch đủ cấp</td>
 <td>cuối cùng-xem / tra cứu, log môi trường, ảnh bên trong bag / bên ngoài bag / niêm phong, quy tắc mở lại và niêm phong lại, bảo quản cửa sổ / khung thời gian</td>
 </tr>
 </tbody>
 </table></div>
-<p class="tiny">Khi một part thỏa nhiều điều kiện, <strong>PHẢI</strong> chọn cấp cao hơn. Ví dụ: part xi mạ anốt (anodize) đồng thời cần độ ẩm control thì áp dụng tối thiểu P3, không được chỉ dùng P2.</p></section>
+<p class="tiny">Khi một chi tiết thỏa nhiều điều kiện, <strong>PHẢI</strong> chọn cấp cao hơn. Ví dụ: chi tiết xi mạ anốt (anodize) đồng thời cần độ ẩm kiểm soát thì áp dụng tối thiểu P3, không được chỉ dùng P2.</p></section>
 <section class="annex-section"><h2>3. Vật tư được phép và vật tư phải loại trừ</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr>
@@ -143,11 +143,11 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </tr></thead>
 <tbody>
 <tr>
-<td>Vật tư tiếp xúc trực tiếp part</td>
+<td>Vật tư tiếp xúc trực tiếp chi tiết</td>
 <td>
 <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html" title="Process Engineer (Kỹ sư quy trình)"><span class="entity-code role-code">PE</span></a> sạch, xốp / bọt sạch, xơ / bụi vải-miễn phí / tự do bọc / quấn, khay nhựa sạch, giấy VCI khi được phép</td>
-<td>Giấy carton trần chạm trực tiếp part, vải phát xơ, băng keo dán trực tiếp lên part</td>
-<td>Part ngoại quan / bề ngoài-quan trọng / nghiêm trọng và clean part phải có lớp ngăn trực tiếp riêng</td>
+<td>Giấy carton trần chạm trực tiếp chi tiết, vải phát xơ, băng keo dán trực tiếp lên chi tiết</td>
+<td>Chi tiết ngoại quan / bề ngoài-quan trọng / nghiêm trọng và làm sạch chi tiết phải có lớp ngăn trực tiếp riêng</td>
 </tr>
 <tr>
 <td>Vật tư chống ẩm</td>
@@ -165,7 +165,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <td>thùng carton / thùng / thùng gỗ</td>
 <td>thùng carton đúng tải, thùng gỗ sạch khô, pallet đạt tải, đệm chống xê dịch</td>
 <td>thùng carton mềm, ướt, móp, pallet nứt mục, thùng gỗ có đinh lộ, vật liệu bẩn có mùn</td>
-<td>nặng part phải có chặn, thanh giằng và kiểm soát tâm tải</td>
+<td>nặng chi tiết phải có chặn, thanh giằng và kiểm soát tâm tải</td>
 </tr>
 <tr>
 <td>niêm phong / băng dính / băng keo / label</td>
@@ -180,16 +180,16 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="card">
 <h3>4.1 Lớp tiếp xúc trực tiếp</h3>
 <ul class="tight">
-<li>Phải chọn vật tư không làm trầy, không bám xơ, không phản ứng với bề mặt part.</li>
-<li>Part có mép sắc hoặc ren hở phải có cap/nút bịt/cạnh / mép bảo vệ / tấm chắn trước khi cho vào túi.</li>
-<li>Chi tiết đã rò rỉ test, clean xây dựng hoặc vệ sinh / sạch sẽ-nhạy cảm phải dùng vật tư sạch đủ cấp.</li>
+<li>Phải chọn vật tư không làm trầy, không bám xơ, không phản ứng với bề mặt chi tiết.</li>
+<li>Chi tiết có mép sắc hoặc ren hở phải có cap/nút bịt/cạnh / mép bảo vệ / tấm chắn trước khi cho vào túi.</li>
+<li>Chi tiết đã rò rỉ test, làm sạch xây dựng hoặc vệ sinh / sạch sẽ-nhạy cảm phải dùng vật tư sạch đủ cấp.</li>
 </ul>
 </div>
 <div class="card">
 <h3>4.2 Lớp chứa bên trong</h3>
 <ul class="tight">
-<li>Khay / phân vùng phải giữ được định hướng / đào tạo hội nhập, không cho part va nhau khi rung nhẹ và khi xoay 90°.</li>
-<li>1 khay chỉ được chứa 1 Part/Rev/Lot trừ khi lộ trình gia công phê duyệt rõ cách phân ngăn.</li>
+<li>Khay / phân vùng phải giữ được định hướng / đào tạo hội nhập, không cho chi tiết va nhau khi rung nhẹ và khi xoay 90°.</li>
+<li>1 khay chỉ được chứa 1 Chi tiết/Rev/Lot trừ khi lộ trình gia công phê duyệt rõ cách phân ngăn.</li>
 <li>WIP khay nội bộ và xuất đi bên trong pack phải mang nhãn riêng, không dùng chung một nhãn cho nhiều lớp.</li>
 </ul>
 </div>
@@ -197,20 +197,20 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <h3>4.3 Lớp ngoài</h3>
 <ul class="tight">
 <li>thùng carton phải còn cứng, khô, không thủng; thùng gỗ/pallet phải đạt tải và sạch.</li>
-<li>nặng part hoặc part dài phải dùng chặn, thanh giằng, xốp / bọt định hình hoặc giá đỡ.</li>
-<li>Không đóng thùng tạo khoảng trống lớn làm part trượt tự do.</li>
+<li>nặng chi tiết hoặc chi tiết dài phải dùng chặn, thanh giằng, xốp / bọt định hình hoặc giá đỡ.</li>
+<li>Không đóng thùng tạo khoảng trống lớn làm chi tiết trượt tự do.</li>
 </ul>
 </div>
 <div class="card">
 <h3>4.4 pallet / thùng gỗ</h3>
 <ul class="tight">
 <li>đã xếp pallet load phải có nhãn ít nhất 2 mặt dễ quét.</li>
-<li>Dây đai không được chạm trực tiếp bề mặt part. Phải có góc bảo vệ hoặc lớp đệm.</li>
-<li>Khi dùng thùng gỗ gỗ: bên trong phải có lớp ngăn bụi/mùn nếu part nhạy sạch hoặc bề mặt cao.</li>
+<li>Dây đai không được chạm trực tiếp bề mặt chi tiết. Phải có góc bảo vệ hoặc lớp đệm.</li>
+<li>Khi dùng thùng gỗ gỗ: bên trong phải có lớp ngăn bụi/mùn nếu chi tiết nhạy sạch hoặc bề mặt cao.</li>
 </ul>
 </div>
 </div></section>
-<section class="annex-section"><h2>5. Rule chống ẩm, thanh lọc / loại bỏ, chất hút ẩm và ESD</h2>
+<section class="annex-section"><h2>5. Quy tắc chống ẩm, thanh lọc / loại bỏ, chất hút ẩm và ESD</h2>
 <h3>5.1 N<sub>2</sub> thanh lọc / loại bỏ</h3>
 <div class="callout-info">
 <strong>Chỉ áp dụng thanh lọc / loại bỏ</strong> khi lộ trình gia công khách hàng, QPL, <a href="../../work-instructions/07-WI-700/wi-714-clean-packaging-handling-and-preservation.html">WI-714</a> hoặc QA/Kỹ thuật Requests. Tuyệt đối không dùng khí nén nhà máy thay cho N<sub>2</sub> thanh lọc / loại bỏ.</div>
@@ -225,10 +225,10 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <td>bên trong bag độ ẩm-nhạy cảm / chân không-tương thích</td>
 <td>Dùng N<sub>2</sub> khô, sạch, không dầu; thanh lọc / loại bỏ tối thiểu 3 lần thể tích túi hoặc theo thời gian chuẩn của <a href="../../work-instructions/07-WI-700/wi-714-clean-packaging-handling-and-preservation.html">WI-714</a>
 </td>
-<td>Ghi thời gian thanh lọc / loại bỏ, Performer, loại khí; chụp ảnh HIC trước niêm phong khi áp dụng</td>
+<td>Ghi thời gian thanh lọc / loại bỏ, Perbiểu mẫuer, loại khí; chụp ảnh HIC trước niêm phong khi áp dụng</td>
 </tr>
 <tr>
-<td>Part đã rò rỉ test / clean xây dựng</td>
+<td>Chi tiết đã rò rỉ test / làm sạch xây dựng</td>
 <td>niêm phong ngay sau thanh lọc / loại bỏ; không để túi hở chờ vật tư</td>
 <td>Nếu niêm phong lại sau 15 phút phải thanh lọc / loại bỏ lại từ đầu</td>
 </tr>
@@ -277,8 +277,8 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <p class="tiny">chất hút ẩm phải còn hạn, còn nguyên bao, lưu trong thùng kín; HIC đổi màu ngoài ngưỡng chấp nhận trước khi niêm phong là <strong>TẠM GIỮ</strong>.</p>
 <h3>5.3 Quy tắc ESD</h3>
 <ul class="tight">
-<li>ESD part phải có lớp che chắn hoặc vật tư ESD tương đương; nhãn ESD phải xuất hiện ở lớp ngoài dễ nhìn.</li>
-<li>Không cho nhãn dán giấy rời, xốp / bọt thường, băng dính không kiểm soát ESD tiếp xúc trực tiếp part ESD-nhạy cảm.</li>
+<li>ESD chi tiết phải có lớp che chắn hoặc vật tư ESD tương đương; nhãn ESD phải xuất hiện ở lớp ngoài dễ nhìn.</li>
+<li>Không cho nhãn dán giấy rời, xốp / bọt thường, băng dính không kiểm soát ESD tiếp xúc trực tiếp chi tiết ESD-nhạy cảm.</li>
 <li>Nếu bên ngoài thùng carton là vật tư thường, bên trong bag vẫn phải bảo đảm che chắn còn nguyên và không bị thủng.</li>
 </ul></section>
 <section class="annex-section"><h2>6. Vùng dán nhãn và trường dữ liệu bắt buộc</h2>
@@ -293,13 +293,13 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr>
 <td>bên trong bag / bên trong khay</td>
 <td>Mặt phẳng dễ nhìn, không che niêm phong chính</td>
-<td>Job, Part No., Rev, Qty, Lot/số sê-ri khi áp dụng, Ngày đóng gói, Người đóng gói</td>
-<td>Dán lên vùng dễ Cấp, vùng phải cắt mở, hoặc dán trực tiếp lên bề mặt part</td>
+<td>Job, Chi tiết No., Rev, Qty, Lot/số sê-ri khi áp dụng, Ngày đóng gói, Người đóng gói</td>
+<td>Dán lên vùng dễ Cấp, vùng phải cắt mở, hoặc dán trực tiếp lên bề mặt chi tiết</td>
 </tr>
 <tr>
 <td>bên ngoài bag / thùng carton</td>
 <td>Một mặt chính, quét được khi đặt kiện trên kệ</td>
-<td>bên trong pack trường dữ liệu + ship-to / khách hàng ref khi xuất đi</td>
+<td>bên trong pack trường dữ liệu + giao hàng-to / khách hàng ref khi xuất đi</td>
 <td>Dán chồng nhiều nhãn cũ mới không xóa bỏ nhãn lỗi</td>
 </tr>
 <tr>
@@ -311,17 +311,17 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr>
 <td>Vệ sinh và đóng gói</td>
 <td>bên trong bag + bên ngoài bag</td>
-<td>Vệ sinh class / QPL, đã đóng gói date, bảo quản giới hạn, cảnh báo mở rule</td>
+<td>Vệ sinh class / QPL, đã đóng gói date, bảo quản giới hạn, cảnh báo mở quy tắc</td>
 <td>Dùng nhãn phát bụi hoặc viết tay lem mực</td>
 </tr>
 </tbody>
 </table></div>
 <div class="callout-warning">
-<strong>Dừng xuất</strong> nếu nhãn trên kiện, SSCC, phiếu kê đóng gói, CoC hoặc Lô giao hàng hồ sơ không khớp nhau về Part/Rev/Qty/Lot/số sê-ri/Pack ID.</div></section>
+<strong>Dừng xuất</strong> nếu nhãn trên kiện, SSCC, phiếu kê đóng gói, CoC hoặc Lô giao hàng hồ sơ không khớp nhau về Chi tiết/Rev/Qty/Lot/số sê-ri/Pack ID.</div></section>
 <section class="annex-section"><h2>7. Ảnh bằng chứng gói hàng bắt buộc</h2>
 <div class="photo-grid">
 <div class="card">
-<h3>Ảnh 1 — Part trước khi đóng lớp cuối</h3>
+<h3>Ảnh 1 — Chi tiết trước khi đóng lớp cuối</h3>
 <p>Thấy rõ tình trạng bề mặt, định hướng / đào tạo hội nhập và vật tư tiếp xúc trực tiếp.</p>
 </div>
 <div class="card">
@@ -357,7 +357,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr>
 <td>P1 / P2 thông thường</td>
 <td>30 Ngày nếu lưu trong kho khô, sạch, FIFO</td>
-<td>thùng carton rách, nhãn mất, vật tư đệm xô lệch, dấu ẩm hoặc part dịch chuyển</td>
+<td>thùng carton rách, nhãn mất, vật tư đệm xô lệch, dấu ẩm hoặc chi tiết dịch chuyển</td>
 </tr>
 <tr>
 <td>P3 chống ẩm / chống gỉ</td>
@@ -370,9 +370,9 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <td>che chắn bag thủng / rách / mất nhãn ESD / bị mở ngoài khu kiểm soát</td>
 </tr>
 <tr>
-<td>P5 vệ sinh và đóng gói / clean xây dựng</td>
+<td>P5 vệ sinh và đóng gói / làm sạch xây dựng</td>
 <td>Theo <a href="../../work-instructions/07-WI-700/wi-714-clean-packaging-handling-and-preservation.html">WI-714</a>; nếu không có lộ trình gia công riêng thì tối đa 30 Ngày khi bag kín và log môi trường đạt</td>
-<td>Bag hở, niêm phong lỗi, vật tư bẩn, khu lưu không đạt, part bị chạm bởi găng / bề mặt bẩn</td>
+<td>Bag hở, niêm phong lỗi, vật tư bẩn, khu lưu không đạt, chi tiết bị chạm bởi găng / bề mặt bẩn</td>
 </tr>
 </tbody>
 </table></div></section>
@@ -381,10 +381,10 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="card">
 <h3>TẠM GIỮ / TỪ CHỐI</h3>
 <ul class="tight">
-<li>Sai Part/Rev/Qty/Lot/số sê-ri giữa nhãn và dữ liệu lô giao hàng.</li>
+<li>Sai Chi tiết/Rev/Qty/Lot/số sê-ri giữa nhãn và dữ liệu lô giao hàng.</li>
 <li>Thiếu bằng chứng ảnh hoặc bảng kiểm bắt buộc.</li>
 <li>Không chứng minh được vật tư đóng gói phù hợp cấp rủi ro.</li>
-<li>Part dịch chuyển tự do khi lắc thử hợp lý; mép, ren, bề mặt không được bảo vệ.</li>
+<li>Chi tiết dịch chuyển tự do khi lắc thử hợp lý; mép, ren, bề mặt không được bảo vệ.</li>
 <li>Bag/niêm phong/SSCC lỗi, nhãn không quét được, HIC báo ẩm, chất hút ẩm không hợp lệ.</li>
 </ul>
 </div>
@@ -396,9 +396,9 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <li>
 <strong>Label đầu tiên-pass scan tỷ lệ</strong>: % nhãn quét PASS ngay lần đầu.</li>
 <li>
-<strong>Đóng gói hư hỏng / khiếu nại ppm</strong>: khiếu nại do đóng gói trên 1 triệu part đã giao hàng.</li>
+<strong>Đóng gói hư hỏng / khiếu nại ppm</strong>: khiếu nại do đóng gói trên 1 triệu chi tiết đã giao hàng.</li>
 <li>
-<strong>Evidence tính đầy đủ</strong>: % lô giao hàng có đủ bộ ảnh và bảng kiểm trước xác nhận giao hàng.</li>
+<strong>Bằng chứng tính đầy đủ</strong>: % lô giao hàng có đủ bộ ảnh và bảng kiểm trước xác nhận giao hàng.</li>
 </ul>
 </div>
 </div></section>
@@ -454,7 +454,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div data-support-control="true">
 <h2 class="h2" id="support-control-pack-forms">Kiểm soát bổ sung — Đóng gói quyết định hồ sơ liên kết</h2>
 <div class="note">
-<b>Triển khai xuống hiện trường</b><br>Specification này phải được kéo xuống hồ sơ hiện trường: <a href="../../../forms/frm-700-maintenance/FRM-707_Packaging_Checklist.xlsx" download="">FRM-707</a> cho lô giao hàng đóng gói nói chung và <a href="../../../forms/frm-700-maintenance/FRM-709_Clean_Packaging_Checklist.xlsx" download="">FRM-709</a> cho clean / nhiễm bẩn-nhạy cảm đóng gói.</div>
+<b>Triển khai xuống hiện trường</b><br>Specification này phải được kéo xuống hồ sơ hiện trường: <a href="../../../forms/frm-700-maintenance/FRM-707_Packaging_Checklist.xlsx" download="">FRM-707</a> cho lô giao hàng đóng gói nói chung và <a href="../../../forms/frm-700-maintenance/FRM-709_Clean_Packaging_Checklist.xlsx" download="">FRM-709</a> cho làm sạch / nhiễm bẩn-nhạy cảm đóng gói.</div>
 </div>
 </div>
 </div>

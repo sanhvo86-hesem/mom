@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WI-101 - Digital Online Forms and Approvals | HESEM MOM</title>
+<title>WI-101 - Digital Onchuyền Biểu mẫus and Phê duyệts | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap — computes absolute URLs from location.pathname so the
  * stylesheet + renderer load correctly regardless of how the document is
@@ -55,17 +55,17 @@ ul.tight li { margin: 4px 0; }
      data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;WI-101&quot;,&quot;title&quot;:&quot;Digital Online Forms and Approvals&quot;,&quot;subtitle&quot;:&quot;Hướng dẫn dùng biểu mẫu số, phê duyệt điện tử, timestamp, file evidence, offline fallback và nguyên tắc hồ sơ điện tử.&quot;,&quot;doc_type&quot;:&quot;WI&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
       
 
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi tạo, điền, gửi, phê duyệt hoặc lưu bằng chứng cho biểu mẫu số trên M365 hoặc cổng QMS. Đây là Digital-Operation WI; giao dịch sản xuất, kho, PO và shipment vẫn phải ghi trên Epicor theo SoR đã khóa.</div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi tạo, điền, gửi, phê duyệt hoặc lưu bằng chứng cho biểu mẫu số trên M365 hoặc cổng QMS. Đây là Digital-Operation WI; giao dịch sản xuất, kho, PO và giao hàngment vẫn phải ghi trên Epicor theo SoR đã khóa.</div>
       
 
       <section id="wi-s1" class="wi-section">
         <h2>1. Mục đích</h2>
         <ul class="tight">
-          <li>Giữ đúng ranh giới giữa SoR giao dịch, SSOT hồ sơ và source-controlled form definition.</li>
-          <li>Chặn việc dùng file cục bộ, form nháp hoặc link rời thay cho biểu mẫu số đã phát hành.</li>
-          <li>Để mọi quyết định submit, approve, hold hoặc release trên form số đều có bằng chứng truy lại được.</li>
+          <li>Giữ đúng ranh giới giữa SoR giao dịch, SSOT hồ sơ và source-kiểm soátled biểu mẫu definition.</li>
+          <li>Chặn việc dùng Tệp cục bộ, biểu mẫu nháp hoặc liên kết rời thay cho biểu mẫu số đã phát hành.</li>
+          <li>Để mọi quyết định submit, approve, tạm giữ hoặc phát hành trên biểu mẫu số đều có bằng chứng truy lại được.</li>
         </ul>
-        <div class="callout-danger"><strong>STOP</strong><br>Không dùng M365 để thay Epicor cho time entry, inventory transaction, PO, job completion hoặc shipment confirm. Không dùng file Excel cục bộ, bản chụp màn hình hay link cá nhân làm nguồn hồ sơ vận hành chính.</div>
+        <div class="callout-danger"><strong>STOP</strong><br>Không dùng M365 để thay Epicor cho time entry, inventory transaction, PO, job completion hoặc giao hàngment confirm. Không dùng Tệp Excel cục bộ, bản chụp màn hình hay liên kết cá nhân làm nguồn hồ sơ vận hành chính.</div>
       </section>
 
       <section id="wi-s2" class="wi-section">
@@ -75,16 +75,16 @@ ul.tight li { margin: 4px 0; }
             <h3>Áp dụng cho</h3>
             <ul class="tight">
               <li>Người tạo, điền, duyệt hoặc quản trị biểu mẫu số trên M365, SharePoint, Power Apps hoặc luồng duyệt điện tử.</li>
-              <li>Các biểu mẫu vận hành dùng để ghi nhận hồ sơ, checklist, gói bằng chứng, approval history và trạng thái kiểm soát.</li>
-              <li>Tình huống online bình thường và tình huống phải chuyển sang fallback kit khi hệ thống gián đoạn.</li>
+              <li>Các biểu mẫu vận hành dùng để ghi nhận hồ sơ, checklist, gói bằng chứng, phê duyệt history và trạng thái kiểm soát.</li>
+              <li>Tình huống onchuyền bình thường và tình huống phải chuyển sang fallback kit khi hệ thống gián đoạn.</li>
             </ul>
           </div>
           <div class="card">
             <h3>Không thay cho</h3>
             <ul class="tight">
-              <li>Giao dịch chuẩn trên Epicor như job status, inventory movement, PO, pack hoặc shipment confirm.</li>
-              <li>Rule kiến trúc M365, source control và deploy boundary tại các annex M365 chuyên biệt.</li>
-              <li>WI kỹ thuật khác như sync Git hoặc offline recovery chi tiết ngoài phạm vi thao tác biểu mẫu.</li>
+              <li>Giao dịch chuẩn trên Epicor như job trạng thái, inventory movement, PO, pack hoặc giao hàngment confirm.</li>
+              <li>Quy tắc kiến trúc M365, source kiểm soát và deploy boundary tại các annex M365 chuyên biệt.</li>
+              <li>WI kỹ thuật khác như đồng bộ Git hoặc offchuyền recovery chi tiết ngoài phạm vi thao tác biểu mẫu.</li>
             </ul>
           </div>
         </div>
@@ -104,7 +104,7 @@ ul.tight li { margin: 4px 0; }
             <tbody>
               <tr>
                 <td>Nền tảng số</td>
-                <td>M365, SharePoint, Power Apps, Power Automate, portal QMS và Epicor.</td>
+                <td>M365, SharePoint, Power Apps, Power Automate, cổng QMS và Epicor.</td>
                 <td>Epicor là SoR giao dịch; M365 là SSOT hồ sơ.</td>
               </tr>
               <tr>
@@ -115,11 +115,11 @@ ul.tight li { margin: 4px 0; }
               <tr>
                 <td>Tài liệu điều hành</td>
                 <td><a href="../../../../../docs/standards/18-online-vs-offline-form-decision-framework.md">core-standards/18</a>, <a href="../../references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a>, <a href="../../references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> và <a href="../../references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-137-evidence-and-records-naming-convention.html">ANNEX-137</a>.</td>
-                <td>Phải tra rule tại nguồn chính thức, không dùng hướng dẫn copy rời.</td>
+                <td>Phải tra quy tắc tại nguồn chính thức, không dùng hướng dẫn bản sao rời.</td>
               </tr>
               <tr>
                 <td>Fallback kit</td>
-                <td><a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a> và biểu mẫu giấy hoặc offline được phê duyệt.</td>
+                <td><a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a> và biểu mẫu giấy hoặc offchuyền được phê duyệt.</td>
                 <td>Chỉ dùng khi hệ thống số gián đoạn thật.</td>
               </tr>
             </tbody>
@@ -130,13 +130,13 @@ ul.tight li { margin: 4px 0; }
       <section id="wi-s4" class="wi-section">
         <h2>4. Điều kiện tiên quyết</h2>
         <ul class="tight">
-          <li>Biểu mẫu số đã được phát hành và mở từ portal hoặc thư viện tài liệu đang hiệu lực.</li>
+          <li>Biểu mẫu số đã được phát hành và mở từ cổng hoặc thư viện tài liệu đang hiệu lực.</li>
           <li>Người dùng đăng nhập bằng đúng tài khoản cá nhân đã cấp quyền theo vai trò.</li>
-          <li>Người dùng biết rõ biểu mẫu đó là online hay offline theo core-standards/18.</li>
-          <li>Đường dẫn EvidenceUrl hoặc thư mục SSOT đích đã xác định trước khi submit.</li>
-          <li>Luồng duyệt và người có quyền approve đã được cấu hình trước khi đưa form ra hiện trường.</li>
+          <li>Người dùng biết rõ biểu mẫu đó là onchuyền hay offchuyền theo core-standards/18.</li>
+          <li>Đường dẫn Bằng chứngUrl hoặc thư mục SSOT đích đã xác định trước khi submit.</li>
+          <li>Luồng duyệt và người có quyền approve đã được cấu hình trước khi đưa biểu mẫu ra hiện trường.</li>
         </ul>
-        <div class="callout-warning"><strong>HOLD</strong><br>Nếu biểu mẫu chưa phát hành, chưa có luồng duyệt đúng hoặc chưa có đường dẫn SSOT hợp lệ, không được cho người dùng điền live tại hiện trường.</div>
+        <div class="callout-warning"><strong>TẠM GIỮ</strong><br>Nếu biểu mẫu chưa phát hành, chưa có luồng duyệt đúng hoặc chưa có đường dẫn SSOT hợp lệ, không được cho người dùng điền live tại hiện trường.</div>
       </section>
 
       <section id="wi-s5" class="wi-section">
@@ -144,59 +144,59 @@ ul.tight li { margin: 4px 0; }
 
         <div class="step-block">
           <h3>Bước 1: Chọn đúng mode biểu mẫu</h3>
-          <p>Chọn online hoặc offline cho biểu mẫu theo core-standards/18 trước khi mở biểu mẫu để dùng.</p>
-          <div class="note-soft">Lý do: form online và offline có route hồ sơ, approve và recovery khác nhau.</div>
+          <p>Chọn onchuyền hoặc offchuyền cho biểu mẫu theo core-standards/18 trước khi mở biểu mẫu để dùng.</p>
+          <div class="note-soft">Lý do: biểu mẫu onchuyền và offchuyền có route hồ sơ, approve và recovery khác nhau.</div>
         </div>
 
         <div class="step-block">
           <h3>Bước 2: Mở đúng biểu mẫu đã phát hành</h3>
-          <p>Mở biểu mẫu từ portal hoặc thư viện phát hành đang hiệu lực thay vì dùng bản tải cục bộ hoặc link chia sẻ cá nhân.</p>
+          <p>Mở biểu mẫu từ cổng hoặc thư viện phát hành đang hiệu lực thay vì dùng bản tải cục bộ hoặc liên kết chia sẻ cá nhân.</p>
           <div class="note-soft">Lý do: chỉ biểu mẫu đã phát hành mới bảo đảm schema, field và luồng công việc đúng.</div>
         </div>
 
         <div class="step-block">
           <h3>Bước 3: Xác nhận ranh giới dữ liệu</h3>
-          <p>Xác nhận dữ liệu nào phải ghi ở Epicor, dữ liệu nào là evidence trên M365 và dữ liệu nào chỉ là definition trong source-controlled library.</p>
+          <p>Xác nhận dữ liệu nào phải ghi ở Epicor, dữ liệu nào là bằng chứng trên M365 và dữ liệu nào chỉ là definition trong source-kiểm soátled thư viện.</p>
           <div class="note-soft">Lý do: ranh giới sai sẽ tạo hai nguồn sự thật cho cùng một nghiệp vụ.</div>
         </div>
 
         <div class="step-block">
           <h3>Bước 4: Điền đầy đủ trường bắt buộc</h3>
           <p>Điền đầy đủ trường bắt buộc và không dùng ký hiệu thay thế khi dữ liệu thật chưa có.</p>
-          <div class="note-soft">Lý do: dữ liệu thiếu hoặc mơ hồ sẽ làm hỏng validation và approval sau đó.</div>
+          <div class="note-soft">Lý do: dữ liệu thiếu hoặc mơ hồ sẽ làm hỏng validation và phê duyệt sau đó.</div>
         </div>
 
         <div class="step-block">
-          <h3>Bước 5: Gắn EvidenceUrl đúng SSOT</h3>
-          <p>Gắn đường dẫn evidence về đúng SSOT hoặc thư mục hồ sơ đã kiểm soát trước khi submit các bước có evidence bắt buộc.</p>
-          <div class="note-soft">Lý do: evidence nằm ngoài SSOT sẽ không đủ giá trị audit.</div>
+          <h3>Bước 5: Gắn Bằng chứngUrl đúng SSOT</h3>
+          <p>Gắn đường dẫn bằng chứng về đúng SSOT hoặc thư mục hồ sơ đã kiểm soát trước khi submit các bước có bằng chứng bắt buộc.</p>
+          <div class="note-soft">Lý do: bằng chứng nằm ngoài SSOT sẽ không đủ giá trị đánh giá.</div>
         </div>
 
         <div class="step-block">
           <h3>Bước 6: Gửi biểu mẫu</h3>
-          <p>Gửi biểu mẫu bằng hành động submit chính thức để hệ thống tạo record, timestamp và lịch sử thay đổi.</p>
-          <div class="note-soft">Lý do: ảnh chụp màn hình hoặc email không thay cho record submit hợp lệ.</div>
+          <p>Gửi biểu mẫu bằng hành động submit chính thức để hệ thống tạo hồ sơ, timestamp và lịch sử thay đổi.</p>
+          <div class="note-soft">Lý do: ảnh chụp màn hình hoặc email không thay cho hồ sơ submit hợp lệ.</div>
         </div>
 
         <div class="step-block">
           <h3>Bước 7: Kích hoạt phê duyệt điện tử</h3>
-          <p>Kích hoạt luồng approve điện tử đúng tuyến cho các điểm hold, release hoặc shipment approval cần duyệt độc lập.</p>
-          <div class="note-soft">Lý do: approval chỉ có giá trị khi đúng người, đúng luồng và có approval history.</div>
+          <p>Kích hoạt luồng approve điện tử đúng tuyến cho các điểm tạm giữ, phát hành hoặc giao hàngment phê duyệt cần duyệt độc lập.</p>
+          <div class="note-soft">Lý do: phê duyệt chỉ có giá trị khi đúng người, đúng luồng và có phê duyệt history.</div>
         </div>
 
         <div class="step-block">
-          <h3>Bước 8: Khóa record sau duyệt</h3>
-          <p>Khóa record sau khi đã approved hoặc released và chỉ sửa bằng change path được kiểm soát.</p>
+          <h3>Bước 8: Khóa hồ sơ sau duyệt</h3>
+          <p>Khóa hồ sơ sau khi đã approved hoặc đã phát hành và chỉ sửa bằng thay đổi đường dẫn được kiểm soát.</p>
           <div class="note-soft">Lý do: hồ sơ đóng phải giữ nguyên dấu vết trước và sau khi sửa.</div>
         </div>
 
         <div class="step-block">
-          <h3>Bước 9: Backfill sau offline</h3>
-          <p>Nếu phải dùng fallback offline, backfill đầy đủ record và evidence lên hệ thống ngay khi nền tảng số phục hồi.</p>
-          <div class="note-soft">Lý do: offline chỉ là chế độ tạm, không được trở thành nguồn hồ sơ song song lâu dài.</div>
+          <h3>Bước 9: Backfill sau offchuyền</h3>
+          <p>Nếu phải dùng fallback offchuyền, backfill đầy đủ hồ sơ và bằng chứng lên hệ thống ngay khi nền tảng số phục hồi.</p>
+          <div class="note-soft">Lý do: offchuyền chỉ là chế độ tạm, không được trở thành nguồn hồ sơ song song lâu dài.</div>
         </div>
 
-        <div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Kết thúc WI-101, mỗi biểu mẫu số có record hợp lệ, approval history đúng tuyến và evidence truy lại được trong SSOT mà không lẫn với giao dịch SoR trên Epicor.</div>
+        <div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Kết thúc WI-101, mỗi biểu mẫu số có hồ sơ hợp lệ, phê duyệt history đúng tuyến và bằng chứng truy lại được trong SSOT mà không lẫn với giao dịch SoR trên Epicor.</div>
       </section>
 
       <section id="wi-s6" class="wi-section">
@@ -213,26 +213,26 @@ ul.tight li { margin: 4px 0; }
             </thead>
             <tbody>
               <tr>
-                <td>Form record</td>
-                <td>Dữ liệu submit, timestamp, người tạo và trạng thái record.</td>
-                <td>SharePoint List hoặc hệ thống form đang hiệu lực.</td>
-                <td>Owner của form</td>
+                <td>Biểu mẫu hồ sơ</td>
+                <td>Dữ liệu submit, timestamp, người tạo và trạng thái hồ sơ.</td>
+                <td>SharePoint List hoặc hệ thống biểu mẫu đang hiệu lực.</td>
+                <td>Chủ sở hữu của biểu mẫu</td>
               </tr>
               <tr>
-                <td>Approval history</td>
+                <td>Phê duyệt history</td>
                 <td>Người duyệt, thời gian duyệt, quyết định và bình luận.</td>
-                <td>Approval log hoặc SSOT của luồng công việc.</td>
-                <td>QMS / form owner</td>
+                <td>Phê duyệt log hoặc SSOT của luồng công việc.</td>
+                <td>QMS / biểu mẫu chủ sở hữu</td>
               </tr>
               <tr>
                 <td>Gói bằng chứng</td>
-                <td>EvidenceUrl, file scan, ảnh, PDF snapshot hoặc hồ sơ đính kèm đúng SSOT.</td>
-                <td>Thư mục evidence trên M365 theo naming convention.</td>
+                <td>Bằng chứngUrl, Tệp scan, ảnh, PDF ảnh chụp trạng thái hoặc hồ sơ đính kèm đúng SSOT.</td>
+                <td>Thư mục bằng chứng trên M365 theo naming convention.</td>
                 <td>Người submit</td>
               </tr>
               <tr>
-                <td>Change log</td>
-                <td>Lý do sửa, trước-sau, người sửa và thời điểm sửa sau khi record đã đóng.</td>
+                <td>Thay đổi log</td>
+                <td>Lý do sửa, trước-sau, người sửa và thời điểm sửa sau khi hồ sơ đã đóng.</td>
                 <td>Log thay đổi có kiểm soát.</td>
                 <td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a> / QMS</td>
               </tr>
@@ -255,47 +255,47 @@ ul.tight li { margin: 4px 0; }
             <tbody>
               <tr>
                 <td>SOP-101</td>
-                <td>Document and data control</td>
+                <td>Document and data kiểm soát</td>
                 <td><a href="../../sops/01-SOP-100/sop-101-document-and-data-control.html">Mở SOP-101</a></td>
               </tr>
               <tr>
                 <td>SOP-104</td>
-                <td>Quản trị dữ liệu, records security and IP protection</td>
+                <td>Quản trị dữ liệu, hồ sơ security and IP protection</td>
                 <td><a href="../../sops/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">Mở SOP-104</a></td>
               </tr>
               <tr>
                 <td>SOP-108</td>
-                <td>Operational contingency plan</td>
+                <td>Operational contingency kế hoạch</td>
                 <td><a href="../../sops/01-SOP-100/sop-108-operational-contingency-plan.html">Mở SOP-108</a></td>
               </tr>
               <tr>
                 <td>ANNEX-131</td>
-                <td>M365 records metadata list schema and register catalog</td>
+                <td>M365 hồ sơ lược đồ danh sách siêu dữ liệu và danh mục sổ đăng ký</td>
                 <td><a href="../../references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">Mở ANNEX-131</a></td>
               </tr>
               <tr>
                 <td>ANNEX-136</td>
-                <td>M365 SharePoint Git server source sync promotion and runtime boundary</td>
+                <td>M365 Ranh giới đồng bộ nguồn SharePoint, Git, máy chủ và môi trường chạy</td>
                 <td><a href="../../references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">Mở ANNEX-136</a></td>
               </tr>
               <tr>
                 <td>ANNEX-137</td>
-                <td>Evidence and records naming convention</td>
+                <td>Quy ước đặt tên bằng chứng và hồ sơ</td>
                 <td><a href="../../references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-137-evidence-and-records-naming-convention.html">Mở ANNEX-137</a></td>
               </tr>
               <tr>
                 <td>WI-107</td>
-                <td>ShareFile Git cPanel sync</td>
+                <td>ShareTệp Git cPanel đồng bộ</td>
                 <td><a href="wi-107-sharefile-git-cpanel-sync.html">Mở WI-107</a></td>
               </tr>
               <tr>
                 <td>ANNEX-118</td>
-                <td>Offline fallback kit</td>
+                <td>Bộ dự phòng ngoại tuyến</td>
                 <td><a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">Mở ANNEX-118</a></td>
               </tr>
               <tr>
                 <td>core-standards/18</td>
-                <td>Online vs offline form decision framework</td>
+                <td>Onchuyền vs offchuyền biểu mẫu decision framework</td>
                 <td><a href="../../../../../docs/standards/18-online-vs-offline-form-decision-framework.md">Mở core-standards/18</a></td>
               </tr>
             </tbody>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANNEX-144 — SSOT 3-Axis Job×Part×Asset Architecture (v4) | HESEM MOM</title>
+<title>ANNEX-144 — SSOT 3-Axis Job×Chi tiết×Asset Kiến trúc (v4) | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap */
 (function () {
@@ -43,46 +43,46 @@
 
 <div class="doc-content" id="docContent">
 
-<h1>SSOT 3-Axis Job×Part×Asset Architecture (v4)</h1>
+<h1>SSOT 3-Axis Job×Chi tiết×Asset Kiến trúc (v4)</h1>
 
 <div class="callout"><strong>BỐI CẢNH — vì sao v3.1 thất bại + v4 ra đời:</strong><br>
-v1–v3.1 (ANNEX-131..143) tổ chức cấu trúc folder M365 theo <em>Department × luồng công việc Scenario</em>. Mô hình này tuân theo cách mệnh đề ISO/AS9100 chia chương — nhưng KHÔNG khớp cách <b>shop floor CNC thực sự vận hành</b>. Khi review thực tế phát hiện <b>SSOT bị vi phạm nghiêm trọng</b>: một file evidence tồn tại ở 2-3 path khác nhau (vd cal cert gage cùng lúc nằm tại <code>DEP-METRO</code>, <code>DEP-QA</code>, <code>Part-REV-Master</code>; NCR-2026-0043 vừa ở <code>DEP-QA/02-Operations/06-NCR/{YYYY}/</code> vừa ở <code>Job-Dossiers/.../09-NCR-CAPA/</code>). Người dùng không biết đâu là canonical → folder trở thành nghĩa địa.<br>
-<b>v4 quy hoạch lại theo 3-axis SSOT</b> bám sát thực chiến: operator tìm file theo <em>Job number</em>; QA filter NCR theo <em>Job × Part</em>; Maintenance tra cal cert theo <em>GageID</em>; Sales tra hợp đồng theo <em>Customer</em>; Auditor request "FAI cho Part XYZ Rev B" → đi 1 path canonical. <b>Department-Ops bị shrink dramatically</b>: chỉ giữ SOPs + dept-KPI + MR inputs + risk register; KHÔNG giữ evidence transactional. Tổng directory: 2129 (v3.1) → <b>597 (v4)</b> — giảm 72% vì xoá duplicate.</div>
+v1–v3.1 (ANNEX-131..143) tổ chức cấu trúc thư mục M365 theo <em>Phòng ban × luồng công việc Tình huống</em>. Mô hình này tuân theo cách mệnh đề ISO/AS9100 chia chương — nhưng KHÔNG khớp cách <b>shop floor CNC thực sự vận hành</b>. Khi Rà soát thực tế phát hiện <b>SSOT bị vi phạm nghiêm trọng</b>: một Tệp bằng chứng tồn tại ở 2-3 đường dẫn khác nhau (vd cal cert thiết bị đo cùng lúc nằm tại <code>DEP-METRO</code>, <code>DEP-QA</code>, <code>Part-REV-Master</code>; NCR-2026-0043 vừa ở <code>DEP-QA/02-Operations/06-NCR/{YYYY}/</code> vừa ở <code>Job-Dossiers/.../09-NCR-CAPA/</code>). Người dùng không biết đâu là canonical → thư mục trở thành nghĩa địa.<br>
+<b>v4 quy hoạch lại theo 3-axis SSOT</b> bám sát thực chiến: người vận hành tìm Tệp theo <em>Job number</em>; QA filter NCR theo <em>Job × Chi tiết</em>; Maintenance tra cal cert theo <em>Thiết bị đoID</em>; Sales tra hợp đồng theo <em>Khách hàng</em>; Đánh giáor request "FAI cho Chi tiết XYZ Rev B" → đi 1 đường dẫn canonical. <b>Phòng ban-Ops bị shrink dramatically</b>: chỉ giữ SOPs + dept-KPI + MR inputs + risk Sổ đăng ký; KHÔNG giữ bằng chứng transactional. Tổng directory: 2129 (v3.1) → <b>597 (v4)</b> — giảm 72% vì xoá duplicate.</div>
 
 <section class="card">
 <h2>1. SSOT vi phạm trong v3.1 (case study)</h2>
 <table>
-<thead><tr><th>File class</th><th>Path #1 (v3.1)</th><th>Path #2 (v3.1)</th><th>Path #3 (v3.1)</th><th>SSOT v4</th></tr></thead>
+<thead><tr><th>Nhóm tệp</th><th>Đường dẫn #1 (v3.1)</th><th>Đường dẫn #2 (v3.1)</th><th>Đường dẫn #3 (v3.1)</th><th>SSOT v4</th></tr></thead>
 <tbody>
-<tr><td>Cal cert gage GAGE-CMM-001 năm 2026</td><td><code>DEP-METRO/02-Operations/{YYYY}/03-Calibration-External-ISO17025-Cert/</code></td><td><code>DEP-QA/02-Operations/{YYYY}/03-Calibration-and-MSA-Coordination/</code></td><td><code>HESEM-Engineering-IP/.../03-Inspection-Master/</code> (link)</td><td><b style="color:#2b8a3e;"><code>HESEM-Job-Evidence/Asset-Master/Gages/GAGE-CMM-001/02-Calibration-Certificates/2026/</code></b></td></tr>
-<tr><td>NCR-2026-0043 phát sinh từ Job J260315</td><td><code>DEP-QA/02-Operations/{YYYY}/06-NCR-Initiation-Containment/</code></td><td><code>Job-Dossiers/2026/J260315-.../09-NCR-CAPA-Deviation/</code></td><td><code>Quality-Records/04-NCR/{YYYY}/</code></td><td><b style="color:#2b8a3e;"><code>HESEM-Job-Evidence/Job-Dossiers/2026/J260315-PN7788-REV-B/09-NCR-CAPA-Deviation-for-this-Job/</code></b> + LinkedList tại <code>HESEM-Records/Workflow-Lists/NCR-Master-List</code></td></tr>
-<tr><td>Customer LTA AMAT 2025-2027</td><td><code>DEP-SCS/02-Operations/{YYYY}/08-LTA-Frame-Agreement/</code></td><td><code>DEP-LEGAL/02-Operations/{YYYY}/01-Customer-MSA-Supply-Agreement/</code></td><td><code>HESEM-Engineering-IP/09-Customer-Standards-Mirror/AMAT/</code></td><td><b style="color:#2b8a3e;"><code>HESEM-Job-Evidence/Customer-Account/AMAT/02-NDA-MSA-LTA-Contracts-Executed/</code></b></td></tr>
-<tr><td>FAI cho Part PN7788 Rev B (last released)</td><td><code>Quality-Records/07-FAI-and-First-Article/{YYYY}/</code></td><td><code>Job-Dossiers/{YYYY}/.../05-G4-FAI/</code></td><td><code>DEP-QA/05-Interfaces-and-Released-Packs/03-Customer-FAI-Submission/</code></td><td><b style="color:#2b8a3e;">Baseline tại <code>HESEM-Job-Evidence/Part-REV-Master/AMAT/PN7788/REV-B/06-FAI-Baseline-Pack/</code></b> + per-Job execution tại <code>Job-Dossiers/.../05-G4-FAI-First-Article/</code> (NOT duplicate — Part-REV giữ baseline, Job-Dossier giữ execution for THAT job)</td></tr>
-<tr><td>CMRT response của supplier S001 năm 2026</td><td><code>DEP-SCM/02-Operations/{YYYY}/24-Conflict-Mineral-CMRT-Flowdown/</code></td><td><code>DEP-EHS/02-Operations/{YYYY}/21-Conflict-Mineral-CMRT-EMRT-RollUp/</code></td><td><code>HESEM-ESG-Compliance/03-Conflict-Minerals-3TG-Cobalt/{YYYY}/</code></td><td><b style="color:#2b8a3e;"><code>HESEM-Job-Evidence/Supplier-Account/S001/08-CMRT-EMRT-Responses/2026/</code></b> + roll-up tại <code>HESEM-Records/Compliance-Master/02-Conflict-Minerals-CMRT/2026/</code> (aggregate index, not duplicate)</td></tr>
-<tr><td>Operator cert CNC-Op cho EmpID E0247 expired 2027-03</td><td><code>DEP-HR/02-Operations/{YYYY}/11-Critical-Cert-CNC-SP-CMM/</code></td><td><code>HESEM-People-Competency/05-Cert-Expiry-Watch-90d/</code></td><td><code>Training-Records/05-Certification-Register/{YYYY}/</code></td><td><b style="color:#2b8a3e;"><code>HESEM-Records/Training-Master/07-Cert-Master-Register-per-Employee/</code></b> (master) + filter via SharePoint List <code>Workflow-Lists/Cert-Expiry-Watch-90d</code></td></tr>
+<tr><td>Cal cert thiết bị đo THIẾT BỊ ĐO-CMM-001 năm 2026</td><td><code>DEP-METRO/02-Operations/{YYYY}/03-Calibration-External-ISO17025-Cert/</code></td><td><code>DEP-QA/02-Operations/{YYYY}/03-Calibration-and-MSA-Coordination/</code></td><td><code>HESEM-Engineering-IP/.../03-Inspection-Master/</code> (liên kết)</td><td><b style="color:#2b8a3e;"><code>HESEM-Job-Evidence/Asset-Master/Gages/GAGE-CMM-001/02-Calibration-Certificates/2026/</code></b></td></tr>
+<tr><td>NCR-2026-0043 phát sinh từ Job J260315</td><td><code>DEP-QA/02-Operations/{YYYY}/06-NCR-Initiation-Containment/</code></td><td><code>Job-Dossiers/2026/J260315-.../09-NCR-CAPA-Deviation/</code></td><td><code>Quality-Records/04-NCR/{YYYY}/</code></td><td><b style="color:#2b8a3e;"><code>HESEM-Job-Evidence/Job-Dossiers/2026/J260315-PN7788-REV-B/09-NCR-CAPA-Deviation-for-this-Job/</code></b> + Liên kếtedList tại <code>HESEM-Records/Workflow-Lists/NCR-Master-List</code></td></tr>
+<tr><td>Khách hàng LTA AMAT 2025-2027</td><td><code>DEP-SCS/02-Operations/{YYYY}/08-LTA-Frame-Agreement/</code></td><td><code>DEP-LEGAL/02-Operations/{YYYY}/01-Customer-MSA-Supply-Agreement/</code></td><td><code>HESEM-Engineering-IP/09-Customer-Standards-Mirror/AMAT/</code></td><td><b style="color:#2b8a3e;"><code>HESEM-Job-Evidence/Customer-Account/AMAT/02-NDA-MSA-LTA-Contracts-Executed/</code></b></td></tr>
+<tr><td>FAI cho Chi tiết PN7788 Rev B (last đã phát hành)</td><td><code>Quality-Records/07-FAI-and-First-Article/{YYYY}/</code></td><td><code>Job-Dossiers/{YYYY}/.../05-G4-FAI/</code></td><td><code>DEP-QA/05-Interfaces-and-Released-Packs/03-Customer-FAI-Submission/</code></td><td><b style="color:#2b8a3e;">Mốc chuẩn tại <code>HESEM-Job-Evidence/Part-REV-Master/AMAT/PN7788/REV-B/06-FAI-Baseline-Pack/</code></b> + per-Job execution tại <code>Job-Dossiers/.../05-G4-FAI-First-Article/</code> (NOT duplicate — Chi tiết-REV giữ mốc chuẩn, Job-Dossier giữ execution for THAT job)</td></tr>
+<tr><td>CMRT response của nhà cung cấp S001 năm 2026</td><td><code>DEP-SCM/02-Operations/{YYYY}/24-Conflict-Mineral-CMRT-Flowdown/</code></td><td><code>DEP-EHS/02-Operations/{YYYY}/21-Conflict-Mineral-CMRT-EMRT-RollUp/</code></td><td><code>HESEM-ESG-Compliance/03-Conflict-Minerals-3TG-Cobalt/{YYYY}/</code></td><td><b style="color:#2b8a3e;"><code>HESEM-Job-Evidence/Supplier-Account/S001/08-CMRT-EMRT-Responses/2026/</code></b> + roll-up tại <code>HESEM-Records/Compliance-Master/02-Conflict-Minerals-CMRT/2026/</code> (aggrecổng index, not duplicate)</td></tr>
+<tr><td>Người vận hành cert CNC-Op cho EmpID E0247 expired 2027-03</td><td><code>DEP-HR/02-Operations/{YYYY}/11-Critical-Cert-CNC-SP-CMM/</code></td><td><code>HESEM-People-Competency/05-Cert-Expiry-Watch-90d/</code></td><td><code>Training-Records/05-Certification-Register/{YYYY}/</code></td><td><b style="color:#2b8a3e;"><code>HESEM-Records/Training-Master/07-Cert-Master-Register-per-Employee/</code></b> (master) + filter via SharePoint List <code>Workflow-Lists/Cert-Expiry-Watch-90d</code></td></tr>
 </tbody>
 </table>
-<div class="warn-callout"><b>Nguyên tắc rút ra:</b> <em>Evidence transactional có DUY NHẤT 1 path canonical (trục Job hoặc Part hoặc Asset hoặc Account).</em> Department-Ops + Quality-Records + ESG-Compliance v3.1 đã tạo "phòng quan sát" duplicate — chúng bị bỏ ở v4. Cross-cutting view (cần xem all NCR, all CAPA, all cal-due) được giải bằng <b>SharePoint List + filter/group-by metadata</b>, KHÔNG bằng folder duplicate.</div>
+<div class="warn-callout"><b>Nguyên tắc rút ra:</b> <em>Bằng chứng transactional có DUY NHẤT 1 đường dẫn canonical (trục Job hoặc Chi tiết hoặc Asset hoặc Account).</em> Phòng ban-Ops + Quality-Hồ sơ + ESG-Compliance v3.1 đã tạo "phòng quan sát" duplicate — chúng bị bỏ ở v4. Cross-cutting view (cần xem all NCR, all CAPA, all cal-due) được giải bằng <b>SharePoint List + filter/group-by siêu dữ liệu</b>, KHÔNG bằng thư mục duplicate.</div>
 </section>
 
 <section class="card">
 <h2>2. Mô hình 3-Axis SSOT (v4)</h2>
 <table>
-<thead><tr><th>Trục</th><th>Site / Library</th><th>Khoá định danh</th><th>Loại evidence chứa</th><th>Owner role</th></tr></thead>
+<thead><tr><th>Trục</th><th>Không gian / Thư viện</th><th>Khoá định danh</th><th>Loại bằng chứng chứa</th><th>Chủ sở hữu Vai trò</th></tr></thead>
 <tbody>
-<tr><td><b>JOB</b> (transactional — 70% volume)</td><td><code>HESEM-Job-Evidence/Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Rev}/</code></td><td>JobNum</td><td>Traveler, setup-FAI, IPQC SPC, OQC, NCR-per-job, CAPA-link, SP-records, Pack-6, ship-CoC, customer-touchpoints-for-this-job, subcon-routing, cost-actuals</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html"><span class="entity-code role-code">QA</span></a> + <a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-production-handbook.html"><span class="entity-code dept-code">D-PROD</span></a></td></tr>
-<tr><td><b>PART</b> (engineering baseline)</td><td><code>HESEM-Job-Evidence/Part-REV-Master/{CustomerID}/{PartNo}/REV-{Rev}/</code></td><td>CustomerID + PartNo + Rev</td><td>Customer drawing controlled copy, MBD, CAM master, CMM .prg baseline, control plan, FAI baseline pack, PCN history, special-process spec per customer, trade-secret notes</td><td><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html"><span class="entity-code dept-code">D-ENG</span></a></td></tr>
-<tr><td><b>ASSET</b> (equipment lifecycle)</td><td><code>HESEM-Job-Evidence/Asset-Master/{Tools|Fixtures|Gages|Machines}/{AssetID}/</code></td><td>AssetID</td><td>Asset spec, cal certs (Gages), MSA studies, daily check, OOT investigation, PM records (Machines), geom-verify, firmware-update, breakdown-RCA, CNC param backup</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html" title="Metrology and Calibration Specialist (Chuyên viên đo lường và hiệu chuẩn)"><span class="entity-code role-code">MCS</span></a> + <a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Maintenance Function (Bộ phận Bảo trì)"><span class="entity-code dept-code">D-MNT</span></a></td></tr>
-<tr><td><b>ACCOUNT</b> — Customer (relationship)</td><td><code>HESEM-Job-Evidence/Customer-Account/{CustomerID}/</code></td><td>CustomerID</td><td>Profile, NDA+MSA+LTA executed, QA agreement, scorecard, customer-audit cycle, demand forecast, customer spec library, complaint master log, PCN master log</td><td><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html"><span class="entity-code dept-code">D-SCS</span></a></td></tr>
-<tr><td><b>ACCOUNT</b> — Supplier (relationship)</td><td><code>HESEM-Job-Evidence/Supplier-Account/{SupplierID}/</code></td><td>SupplierID</td><td>Qualification (SAQ/financial), NDA+SQA, APSL scope per OEM, annual audit, scorecard, process-cert letters, sub-PO history, CMRT/EMRT responses, supplier SCAR log</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html"><span class="entity-code role-code">SCM</span></a></td></tr>
-<tr><td><b>ACCOUNT</b> — PO Index (trans-event)</td><td><code>HESEM-Job-Evidence/PO-Index/{CustomerID}/{YYYY}/PO-{CustPO}/</code></td><td>CustomerID + Year + CustPO</td><td>PO source pulled from portal, contract review pack, OA sent, quote trace, linked jobs list, LTA cross-ref, PCN-inbound on this PO, complaint-outbound, invoice trace</td><td><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html"><span class="entity-code dept-code">D-SCS</span></a> + <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html"><span class="entity-code role-code">FIN</span></a></td></tr>
+<tr><td><b>JOB</b> (transactional — 70% volume)</td><td><code>HESEM-Job-Evidence/Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Rev}/</code></td><td>JobNum</td><td>Traveler, chuẩn bị máy-FAI, IPQC SPC, OQC, NCR-per-job, CAPA-liên kết, SP-hồ sơ, Pack-6, giao hàng-CoC, khách hàng-touchpoints-for-this-job, subcon-routing, cost-actuals</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html"><span class="entity-code role-code">QA</span></a> + <a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-production-handbook.html"><span class="entity-code dept-code">D-PROD</span></a></td></tr>
+<tr><td><b>CHI TIẾT</b> (engineering mốc chuẩn)</td><td><code>HESEM-Job-Evidence/Part-REV-Master/{CustomerID}/{PartNo}/REV-{Rev}/</code></td><td>Khách hàngID + Chi tiếtNo + Rev</td><td>Khách hàng drawing kiểm soátled bản sao, MBD, CAM master, CMM .prg mốc chuẩn, kiểm soát kế hoạch, FAI mốc chuẩn pack, PCN history, special-quá trình spec per khách hàng, trade-secret Ghi chú</td><td><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html"><span class="entity-code dept-code">D-ENG</span></a></td></tr>
+<tr><td><b>ASSET</b> (equipment lifecycle)</td><td><code>HESEM-Job-Evidence/Asset-Master/{Tools|Fixtures|Gages|Machines}/{AssetID}/</code></td><td>AssetID</td><td>Asset spec, cal certs (Thiết bị đos), MSA studies, daily check, OOT investigation, PM hồ sơ (Machines), geom-verify, firmware-update, breakdown-RCA, CNC param backup</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html" title="Metrology and Calibration Specialist (Chuyên viên đo lường và hiệu chuẩn)"><span class="entity-code role-code">MCS</span></a> + <a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Maintenance Function (Bộ phận Bảo trì)"><span class="entity-code dept-code">D-MNT</span></a></td></tr>
+<tr><td><b>ACCOUNT</b> — Khách hàng (relationgiao hàng)</td><td><code>HESEM-Job-Evidence/Customer-Account/{CustomerID}/</code></td><td>Khách hàngID</td><td>ProTệp, NDA+MSA+LTA executed, QA agreement, scorecard, khách hàng-đánh giá cycle, demand forecast, khách hàng spec thư viện, complaint master log, PCN master log</td><td><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html"><span class="entity-code dept-code">D-SCS</span></a></td></tr>
+<tr><td><b>ACCOUNT</b> — Nhà cung cấp (relationgiao hàng)</td><td><code>HESEM-Job-Evidence/Supplier-Account/{SupplierID}/</code></td><td>Nhà cung cấpID</td><td>Qualification (SAQ/financial), NDA+SQA, APSL scope per OEM, annual đánh giá, scorecard, quá trình-cert letters, sub-PO history, CMRT/EMRT responses, nhà cung cấp SCAR log</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html"><span class="entity-code role-code">SCM</span></a></td></tr>
+<tr><td><b>ACCOUNT</b> — PO Index (trans-event)</td><td><code>HESEM-Job-Evidence/PO-Index/{CustomerID}/{YYYY}/PO-{CustPO}/</code></td><td>Khách hàngID + Year + CustPO</td><td>PO source pulled from cổng, contract Rà soát pack, OA sent, quote trace, liên kếted jobs list, LTA cross-ref, PCN-inbound on this PO, complaint-outbound, invoice trace</td><td><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html"><span class="entity-code dept-code">D-SCS</span></a> + <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html"><span class="entity-code role-code">FIN</span></a></td></tr>
 </tbody>
 </table>
-<div class="ok-callout"><b>SSOT rule:</b> Mỗi file thuộc đúng 1 trục. Cross-trục linking qua <em>metadata column</em> trong SharePoint List (vd NCR-Master-List có cột JobNum + PartNo + GageID + SupplierID làm reference link) — KHÔNG copy file sang 2 path.</div>
+<div class="ok-callout"><b>SSOT quy tắc:</b> Mỗi Tệp thuộc đúng 1 trục. Cross-trục liên kếting qua <em>siêu dữ liệu column</em> trong SharePoint List (vd NCR-Master-List có cột JobNum + Chi tiếtNo + Thiết bị đoID + Nhà cung cấpID làm reference liên kết) — KHÔNG bản sao Tệp sang 2 đường dẫn.</div>
 </section>
 
 <section class="card">
-<h2>3. Cấu trúc M365 v4 — 5 sites (clean)</h2>
+<h2>3. Cấu trúc M365 v4 — 5 không gians (làm sạch)</h2>
 <pre class="tree">
 HESEM-Job-Evidence/                  [SITE 1 — TRANSACTIONAL SSOT, 90% file volume]
 ├── Part-REV-Master/{CustomerID}/{PartNo}/REV-{Rev}/   [Engineering baseline]
@@ -240,11 +240,11 @@ HESEM-Archive/                       [SITE 5 — closed / superseded / legal-hol
 
 07-Working-Templates/{Function}/{TemplateType}        [cross-site templates]
 </pre>
-<div class="ok-callout"><b>Tổng directory v4: 597</b> (giảm từ 2129 ở v3.1 — bỏ duplicate 72%). 5 sites (clean) — bỏ 3 site overlap của v3.1 (HESEM-ESG-Compliance, HESEM-Engineering-IP, HESEM-People-Competency), content gộp vào Records/Compliance-Master + Records/Training-Master + Part-REV-Master/.../09-Trade-Secret. 06-Archive promoted thành SITE 5 HESEM-Archive cho legal-hold + retention schedule.</div>
+<div class="ok-callout"><b>Tổng directory v4: 597</b> (giảm từ 2129 ở v3.1 — bỏ duplicate 72%). 5 không gians (làm sạch) — bỏ 3 không gian overlap của v3.1 (HESEM-ESG-Compliance, HESEM-Engineering-IP, HESEM-People-Competency), content gộp vào Hồ sơ/Compliance-Master + Hồ sơ/Training-Master + Chi tiết-REV-Master/.../09-Trade-Secret. 06-Archive promoted thành KHÔNG GIAN 5 HESEM-Archive cho legal-tạm giữ + retention schedule.</div>
 </section>
 
 <section class="card">
-<h2>4. Decision tree — "File X đi đâu?" (v4)</h2>
+<h2>4. Decision tree — "Tệp X đi đâu?" (v4)</h2>
 <pre class="tree">
 Bắt đầu: File X được sinh bởi role R.
 │
@@ -313,32 +313,32 @@ Bắt đầu: File X được sinh bởi role R.
     YES → HESEM-Archive/0X/{YYYY}/
     NO  → STOP: file không thuộc HESEM SSOT → reject hoặc reclassify.
 </pre>
-<p>Mọi file class đều trả lời "YES" tại 1 và CHỈ 1 Q (Q1..Q16). Không có file phải hỏi 2 lần.</p>
+<p>Mọi nhóm tệp đều trả lời "YES" tại 1 và CHỈ 1 Q (Q1..Q16). Không có Tệp phải hỏi 2 lần.</p>
 </section>
 
 <section class="card">
-<h2>5. Cross-cutting view = SharePoint List, KHÔNG phải folder duplicate</h2>
-<p>Khi user cần xem "tất cả NCR đang mở" hoặc "tất cả cal cert sắp hết hạn 90d" — KHÔNG tạo folder duplicate. Thay vào đó, dùng <b>SharePoint List có metadata column</b> link tới file canonical:</p>
+<h2>5. Cross-cutting view = SharePoint List, KHÔNG phải thư mục duplicate</h2>
+<p>Khi user cần xem "tất cả NCR đang mở" hoặc "tất cả cal cert sắp hết hạn 90d" — KHÔNG tạo thư mục duplicate. Thay vào đó, dùng <b>SharePoint List có siêu dữ liệu column</b> liên kết tới Tệp canonical:</p>
 <table>
-<thead><tr><th>SharePoint List</th><th>Columns chính</th><th>Link tới canonical path</th></tr></thead>
+<thead><tr><th>SharePoint List</th><th>Columns chính</th><th>Liên kết tới canonical đường dẫn</th></tr></thead>
 <tbody>
-<tr><td><code>NCR-Master-List</code></td><td>NcrId, Status, JobNum, PartNo, CustomerID, Severity, OwnerRole, OpenedDate, ClosedDate</td><td><code>Job-Dossiers/{YYYY}/{Job}/09-NCR-CAPA-Deviation/...</code></td></tr>
-<tr><td><code>CAPA-Master-List</code></td><td>CapaId, Source (NCR/Audit/Complaint/MR), RootCauseStatus, EffectivenessDate, OwnerRole</td><td>Trỏ tới NCR-Master-List + audit/complaint sources</td></tr>
-<tr><td><code>Calibration-Due-List</code></td><td>GageId, GageType, LastCalDate, DueDate, Status, Owner</td><td><code>Asset-Master/Gages/{GageID}/02-Calibration-Certificates/...</code></td></tr>
-<tr><td><code>PM-Schedule-Master</code></td><td>MachineId, PmType (Daily/Weekly/Monthly/Annual), DueDate, LastDone, Owner</td><td><code>Asset-Master/Machines/{MachineID}/04-PM-Records/...</code></td></tr>
-<tr><td><code>Cert-Expiry-Watch-90d</code></td><td>EmpId, CertCode, ExpiryDate, DaysToExpiry, OwnerSupervisor</td><td><code>Training-Master/07-Cert-Master-Register-per-Employee/...</code></td></tr>
-<tr><td><code>ECO-Master-List</code></td><td>EcoId, Status, AffectedPartNo, Driver (Customer/Internal), Owner, BoardDate</td><td><code>Part-REV-Master/.../07-PCN-History</code> + <code>QMS-Master/10-Change-Control</code></td></tr>
-<tr><td><code>Customer-Audit-Master-List</code></td><td>AuditId, Customer, AuditType, Status, OpeningDate, ClosureDate</td><td><code>Customer-Account/{Cust}/06-Customer-Audit/{YYYY}/</code></td></tr>
-<tr><td><code>Customer-Portal-Evidence-Log</code></td><td>Direction (In/Out), Portal (Ariba/Coupa/myASML/TPS), DocType, Customer, UploadId, Timestamp</td><td>Inbound copy stored in PO-Index/.../00-Source; Outbound staging in luồng công việc library</td></tr>
+<tr><td><code>NCR-Master-List</code></td><td>NcrId, Trạng thái, JobNum, Chi tiếtNo, Khách hàngID, Severity, Chủ sở hữuVai trò, OpenedDate, ClosedDate</td><td><code>Job-Dossiers/{YYYY}/{Job}/09-NCR-CAPA-Deviation/...</code></td></tr>
+<tr><td><code>CAPA-Master-List</code></td><td>CapaId, Source (NCR/Đánh giá/Complaint/MR), RootCauseTrạng thái, EffectivenessDate, Chủ sở hữuVai trò</td><td>Trỏ tới NCR-Master-List + đánh giá/complaint sources</td></tr>
+<tr><td><code>Calibration-Due-List</code></td><td>Thiết bị đoId, Thiết bị đoType, LastCalDate, DueDate, Trạng thái, Chủ sở hữu</td><td><code>Asset-Master/Gages/{GageID}/02-Calibration-Certificates/...</code></td></tr>
+<tr><td><code>PM-Schedule-Master</code></td><td>MachineId, PmType (Daily/Weekly/Monthly/Annual), DueDate, LastDone, Chủ sở hữu</td><td><code>Asset-Master/Machines/{MachineID}/04-PM-Records/...</code></td></tr>
+<tr><td><code>Cert-Expiry-Watch-90d</code></td><td>EmpId, CertCode, ExpiryDate, DaysToExpiry, Chủ sở hữuSupervisor</td><td><code>Training-Master/07-Cert-Master-Register-per-Employee/...</code></td></tr>
+<tr><td><code>ECO-Master-List</code></td><td>EcoId, Trạng thái, AffectedChi tiếtNo, Driver (Khách hàng/Internal), Chủ sở hữu, BoardDate</td><td><code>Part-REV-Master/.../07-PCN-History</code> + <code>QMS-Master/10-Change-Control</code></td></tr>
+<tr><td><code>Customer-Audit-Master-List</code></td><td>Đánh giáId, Khách hàng, Đánh giáType, Trạng thái, OpeningDate, ClosureDate</td><td><code>Customer-Account/{Cust}/06-Customer-Audit/{YYYY}/</code></td></tr>
+<tr><td><code>Customer-Portal-Evidence-Log</code></td><td>Direction (In/Out), Cổng (Ariba/Coupa/myASML/TPS), DocType, Khách hàng, UploadId, Timestamp</td><td>Inbound bản sao stored in PO-Index/.../00-Source; Outbound staging in luồng công việc thư viện</td></tr>
 </tbody>
 </table>
-<p>Power Automate flow tự động đồng bộ List metadata với file event ở canonical path. List chỉ có metadata + link; không host file copy.</p>
+<p>Power Automate flow tự động đồng bộ List siêu dữ liệu với Tệp event ở canonical đường dẫn. List chỉ có siêu dữ liệu + liên kết; không host Tệp bản sao.</p>
 </section>
 
 <section class="card">
-<h2>6. Department-Reference (BIG CHANGE v3.1 → v4)</h2>
-<div class="callout"><b>Trước v4:</b> Department-Ops chiếm ~280 scenario folder × 16 dept = ~4500 folder potential (mỗi sub có 00-Current + {YYYY}). Tạo cảm giác "phòng ban có everything" — nhưng evidence transactional thực ra thuộc Job/Part/Asset axis, nên Department-Ops vô tình duplicate.</div>
-<div class="ok-callout"><b>v4 Department-Reference:</b> Mỗi DEP-{CODE} chỉ giữ <b>8 sub fixed</b>: SOPs + Forms + KPI + MR-Inputs + Risk + Audit-Findings + Org-Chart + Reference-Material. <em>Tổng 16 dept × 8 = 128 folder</em> (so với ~4500). Evidence transactional KHÔNG ở đây — link tới Job/Part/Asset/Account paths qua luồng công việc lists.</div>
+<h2>6. Phòng ban-Reference (BIG THAY ĐỔI v3.1 → v4)</h2>
+<div class="callout"><b>Trước v4:</b> Phòng ban-Ops chiếm ~280 thư mục tình huống × 16 dept = ~4500 thư mục potential (mỗi sub có 00-Hiện tại + {YYYY}). Tạo cảm giác "phòng ban có everything" — nhưng bằng chứng transactional thực ra thuộc Job/Chi tiết/Asset axis, nên Phòng ban-Ops vô tình duplicate.</div>
+<div class="ok-callout"><b>v4 Phòng ban-Reference:</b> Mỗi DEP-{CODE} chỉ giữ <b>8 sub fixed</b>: SOPs + Biểu mẫus + KPI + MR-Inputs + Risk + Đánh giá-Findings + Org-Chart + Reference-Vật liệu. <em>Tổng 16 dept × 8 = 128 thư mục</em> (so với ~4500). Bằng chứng transactional KHÔNG ở đây — liên kết tới Job/Chi tiết/Asset/Account đường dẫns qua luồng công việc lists.</div>
 <pre class="tree">
 HESEM-Records/Department-Reference/DEP-{CODE}/
 ├── 01-SOPs-and-Work-Instructions           [DCC-controlled procedures]
@@ -353,43 +353,43 @@ HESEM-Records/Department-Reference/DEP-{CODE}/
 16 depts: EXEC, QMS, QA, METRO, ENG, PRO, SP, MNT, SCM, SCS,
           FIN, HR, EHS, IT, ERP, LEGAL
 </pre>
-<p>Operator/QA/Buyer làm việc thực tế trong Job-Dossiers + Part-REV-Master + Asset-Master + Customer-Account + Supplier-Account. Department-Reference chỉ vào khi cần SOP / cập nhật KPI / chuẩn bị MR pack.</p>
+<p>Người vận hành/QA/Buyer làm việc thực tế trong Job-Dossiers + Chi tiết-REV-Master + Asset-Master + Khách hàng-Account + Nhà cung cấp-Account. Phòng ban-Reference chỉ vào khi cần SOP / cập nhật KPI / chuẩn bị MR pack.</p>
 </section>
 
 <section class="card">
 <h2>7. Permission model integration với ANNEX-142</h2>
 <p>Permission scope theo trục mới:</p>
 <table>
-<thead><tr><th>Trục / Library</th><th>Entra ID group access</th><th>Sensitivity label</th></tr></thead>
+<thead><tr><th>Trục / Thư viện</th><th>Entra ID group truy cập</th><th>Nhãn độ nhạy</th></tr></thead>
 <tbody>
-<tr><td><code>Job-Dossiers/{YYYY}/{Job}-{PartNo}-{Rev}/</code></td><td><code>SG-Customer-{OEM}-Members</code> + dept members touching the job</td><td>Inherits L3 Customer-Confidential ; SP gates L4 if export-controlled</td></tr>
-<tr><td><code>Part-REV-Master/{OEM}/{PartNo}/{Rev}/01-Engineering-Baseline-Customer-Source/</code></td><td><code>SG-IP-Customer-{OEM}-Eng-NDA-Signed</code> ONLY</td><td>L4 Restricted Customer-NDA + watermark + DLP block external</td></tr>
-<tr><td><code>Asset-Master/Gages/{GageID}/02-Calibration-Certificates/</code></td><td><code>SG-DEP-METRO-Members</code> + read-access to QA + Production</td><td>L2 Internal</td></tr>
+<tr><td><code>Job-Dossiers/{YYYY}/{Job}-{PartNo}-{Rev}/</code></td><td><code>SG-Customer-{OEM}-Members</code> + dept members touching the job</td><td>Inherits L3 Khách hàng-Confidential ; SP cổngs L4 if export-kiểm soátled</td></tr>
+<tr><td><code>Part-REV-Master/{OEM}/{PartNo}/{Rev}/01-Engineering-Baseline-Customer-Source/</code></td><td><code>SG-IP-Customer-{OEM}-Eng-NDA-Signed</code> CHỈ</td><td>L4 Restricted Khách hàng-NDA + watermark + DLP block external</td></tr>
+<tr><td><code>Asset-Master/Gages/{GageID}/02-Calibration-Certificates/</code></td><td><code>SG-DEP-METRO-Members</code> + read-truy cập to QA + Production</td><td>L2 Internal</td></tr>
 <tr><td><code>Customer-Account/{Customer}/02-NDA-MSA-LTA-Contracts-Executed/</code></td><td><code>SG-DEP-LEGAL</code> + <code>SG-DEP-SCS-Lead</code> + <code>SG-DEP-EXEC</code></td><td>L3 Confidential</td></tr>
 <tr><td><code>HESEM-People/Employee-Records/.../08-Medical-Restricted/</code></td><td><code>SG-HR-Medical-Custodians</code> (3-person named)</td><td>L3 Highly-Confidential PII (LC30)</td></tr>
-<tr><td><code>HESEM-Records/Compliance-Master/13-Trade-Secret-Register-Restricted/</code></td><td><code>SG-Legal-Trade-Secret-Custodians</code> named-only</td><td>L4 Restricted (audit yearly)</td></tr>
-<tr><td><code>HESEM-Digital/OT-Vault/01-CNC-Controller-Param-Backup/</code></td><td><code>SG-OT-Admin</code> + <code>SG-IT-SOC</code> only; air-gap workstation enforced</td><td>L4 Restricted-Cyber</td></tr>
+<tr><td><code>HESEM-Records/Compliance-Master/13-Trade-Secret-Register-Restricted/</code></td><td><code>SG-Legal-Trade-Secret-Custodians</code> named-chỉ</td><td>L4 Restricted (đánh giá yearly)</td></tr>
+<tr><td><code>HESEM-Digital/OT-Vault/01-CNC-Controller-Param-Backup/</code></td><td><code>SG-OT-Admin</code> + <code>SG-IT-SOC</code> chỉ; air-gap workstation enforced</td><td>L4 Restricted-Cyber</td></tr>
 </tbody>
 </table>
-<p>Information Barriers giữa 4 OEM giờ áp ở mức library-folder trên <code>Job-Dossiers</code> + <code>Part-REV-Master</code> + <code>Customer-Account</code> + <code>Customer-Reference</code> — KHÔNG cần site riêng cho IB (đơn giản hơn admin).</p>
+<p>Inbiểu mẫuation Barriers giữa 4 OEM giờ áp ở mức thư viện-thư mục trên <code>Job-Dossiers</code> + <code>Part-REV-Master</code> + <code>Customer-Account</code> + <code>Customer-Reference</code> — KHÔNG cần không gian riêng cho IB (đơn giản hơn admin).</p>
 </section>
 
 <section class="card">
-<h2>8. Migration v3.1 → v4 plan</h2>
+<h2>8. Migration v3.1 → v4 kế hoạch</h2>
 <table>
-<thead><tr><th>Step</th><th>Action</th><th>Owner</th><th>Status</th></tr></thead>
+<thead><tr><th>Step</th><th>Action</th><th>Chủ sở hữu</th><th>Trạng thái</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Wipe blueprint folder + rewrite <code>build_blueprint.py</code> theo v4 architecture</td><td>QMS</td><td>✓ Done — 597 directories built</td></tr>
-<tr><td>2</td><td>Drop 3 sites overlap v3.1: HESEM-ESG-Compliance, HESEM-Engineering-IP, HESEM-People-Competency. Promote 06-Archive → HESEM-Archive.</td><td>QMS</td><td>✓ Done</td></tr>
-<tr><td>3</td><td>Drop Department-Ops/DEP-XXX/02-Operations scenario folders. Replace with Department-Reference (8 sub × 16 dept)</td><td>QMS</td><td>✓ Done</td></tr>
-<tr><td>4</td><td>Build new SSOT axes: PO-Index, Customer-Account, Supplier-Account, Asset-Master (per Tool/Fixture/Gage/Machine)</td><td>QMS</td><td>✓ Done</td></tr>
-<tr><td>5</td><td>Write ANNEX-144 (file này) — v4 SSOT 3-axis architecture</td><td>QMS</td><td>✓ Done</td></tr>
-<tr><td>6</td><td>Patch ANNEX-133 §2 (5 sites clean), §5 (Job-Dossiers 14 gates), §8 (Department-Reference 8 sub)</td><td>QMS</td><td>Next</td></tr>
-<tr><td>7</td><td>Patch ANNEX-131 SiteCodeCodes + LibraryCodes v4</td><td>QMS</td><td>Next</td></tr>
+<tr><td>1</td><td>Wipe Bản thiết kế thư mục + rewrite <code>build_blueprint.py</code> theo v4 Kiến trúc</td><td>QMS</td><td>✓ Done — 597 directories built</td></tr>
+<tr><td>2</td><td>Drop 3 không gians overlap v3.1: HESEM-ESG-Compliance, HESEM-Engineering-IP, HESEM-People-Competency. Promote 06-Archive → HESEM-Archive.</td><td>QMS</td><td>✓ Done</td></tr>
+<tr><td>3</td><td>Drop Phòng ban-Ops/DEP-XXX/02-Operations thư mục tình huốngs. Replace with Phòng ban-Reference (8 sub × 16 dept)</td><td>QMS</td><td>✓ Done</td></tr>
+<tr><td>4</td><td>Build new SSOT axes: PO-Index, Khách hàng-Account, Nhà cung cấp-Account, Asset-Master (per Dao cụ/Đồ gá/Thiết bị đo/Machine)</td><td>QMS</td><td>✓ Done</td></tr>
+<tr><td>5</td><td>Write ANNEX-144 (Tệp này) — v4 SSOT 3-axis Kiến trúc</td><td>QMS</td><td>✓ Done</td></tr>
+<tr><td>6</td><td>Patch ANNEX-133 §2 (5 không gians làm sạch), §5 (Job-Dossiers 14 cổngs), §8 (Phòng ban-Reference 8 sub)</td><td>QMS</td><td>Next</td></tr>
+<tr><td>7</td><td>Patch ANNEX-131 Không gianCodeCodes + Thư việnCodes v4</td><td>QMS</td><td>Next</td></tr>
 <tr><td>8</td><td>Mark ANNEX-143 as <em>superseded by ANNEX-144</em> (keep ANNEX-143 readable as v3.1 historical reference)</td><td>QMS</td><td>Next</td></tr>
-<tr><td>9</td><td>Register ANNEX-144 trong dcc_document_header trên VPS</td><td>DCC</td><td>Next</td></tr>
+<tr><td>9</td><td>Sổ đăng ký ANNEX-144 trong dcc_document_header trên VPS</td><td>DCC</td><td>Next</td></tr>
 <tr><td>10</td><td>Deploy + Chrome verify</td><td>IT</td><td>Next</td></tr>
-<tr><td>11</td><td>(Future) Provisioning script ANNEX-134 update theo v4 site list</td><td>IT</td><td>Pending</td></tr>
+<tr><td>11</td><td>(Future) Provisioning script ANNEX-134 update theo v4 không gian list</td><td>IT</td><td>Pending</td></tr>
 <tr><td>12</td><td>(Future) SharePoint List schema thiết kế chi tiết cho 13 luồng công việc lists</td><td>QMS + IT</td><td>Pending — sẽ thành ANNEX-145</td></tr>
 </tbody>
 </table>
@@ -398,19 +398,19 @@ HESEM-Records/Department-Reference/DEP-{CODE}/
 <section class="card">
 <h2>9. Tham chiếu + Supersession</h2>
 <ul class="tight">
-<li><b>Blueprint source-of-truth:</b> <code>tools/m365-provisioning/build_blueprint.py</code> (v4)</li>
+<li><b>Bản thiết kế source-of-truth:</b> <code>tools/m365-provisioning/build_blueprint.py</code> (v4)</li>
 <li><b>Tree manifest:</b> <code>tools/m365-provisioning/blueprint/_TREE.txt</code> (regenerated 2026-05-16)</li>
-<li><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> — metadata + list schema (sẽ patch v4)</li>
-<li><a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a> — flow + approval + sharing</li>
-<li><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> — site topology (sẽ patch §2, §5, §8 cho v4)</li>
+<li><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> — siêu dữ liệu + list schema (sẽ patch v4)</li>
+<li><a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a> — flow + phê duyệt + sharing</li>
+<li><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> — không gian topology (sẽ patch §2, §5, §8 cho v4)</li>
 <li><a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> — provisioning automation</li>
-<li><a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a> — file plan retention</li>
-<li><a href="annex-139-m365-ip-and-restricted-library-internal-blueprint.html">ANNEX-139</a> — IP/restricted library internal</li>
+<li><a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a> — Tệp kế hoạch retention</li>
+<li><a href="annex-139-m365-ip-and-restricted-library-internal-blueprint.html">ANNEX-139</a> — IP/restricted thư viện internal</li>
 <li><a href="annex-141-semi-equipment-parts-cnc-supplier-compliance.html">ANNEX-141</a> — semi compliance + Pack-6</li>
 <li><a href="annex-142-m365-permission-model-for-semi-supplier-audit.html">ANNEX-142</a> — permission model</li>
-<li><b style="color:#c92a2a;"><a href="annex-143-department-role-scenario-file-master-matrix.html">ANNEX-143</a> — Department × Scenario matrix (v3.1) → SUPERSEDED BY ANNEX-144 (v4)</b></li>
+<li><b style="color:#c92a2a;"><a href="annex-143-department-role-scenario-file-master-matrix.html">ANNEX-143</a> — Phòng ban × Tình huống Ma trận (v3.1) → SUPERSEDED BY ANNEX-144 (v4)</b></li>
 </ul>
-<div class="warn-callout"><b>SUPERSESSION:</b> ANNEX-144 (v4 SSOT 3-axis) thay thế ANNEX-143 (v3.1 Department × Scenario). ANNEX-143 vẫn giữ lại làm <em>historical reference</em> để giải thích vì sao chuyển model — KHÔNG dùng làm hướng dẫn vận hành. Mọi tham chiếu mới phải link tới ANNEX-144.</div>
+<div class="warn-callout"><b>SUPERSESSION:</b> ANNEX-144 (v4 SSOT 3-axis) thay thế ANNEX-143 (v3.1 Phòng ban × Tình huống). ANNEX-143 vẫn giữ lại làm <em>historical reference</em> để giải thích vì sao chuyển model — KHÔNG dùng làm hướng dẫn vận hành. Mọi tham chiếu mới phải liên kết tới ANNEX-144.</div>
 </section>
 
 <section class="card">
@@ -418,7 +418,7 @@ HESEM-Records/Department-Reference/DEP-{CODE}/
 <table>
 <thead><tr><th>Rev</th><th>Ngày</th><th>Người</th><th>Mô tả</th></tr></thead>
 <tbody>
-<tr><td>V0</td><td>2026-05-16</td><td>QMS</td><td>Bản đầu tiên: thay thế ANNEX-143 v3.1 (Department × Scenario) bằng v4 (3-axis Job × Part × Asset + Account + Reference). Wipe + rebuild blueprint 2129 → 597 directories. Drop 3 site overlap (ESG-Compliance, Engineering-IP, People-Competency). Department-Ops shrink từ ~280 scenario × 16 dept → 8 sub × 16 dept fixed. Ký bởi CEO + QMS Manager sau khi user feedback chỉ ra SSOT vi phạm nghiêm trọng trong v3.1.</td></tr>
+<tr><td>V0</td><td>2026-05-16</td><td>QMS</td><td>Bản đầu tiên: thay thế ANNEX-143 v3.1 (Phòng ban × Tình huống) bằng v4 (3-axis Job × Chi tiết × Asset + Account + Reference). Wipe + rebuild Bản thiết kế 2129 → 597 directories. Drop 3 không gian overlap (ESG-Compliance, Engineering-IP, People-Competency). Phòng ban-Ops shrink từ ~280 Tình huống × 16 dept → 8 sub × 16 dept fixed. Ký bởi CEO + QMS Quản lý sau khi user feedback chỉ ra SSOT vi phạm nghiêm trọng trong v3.1.</td></tr>
 </tbody>
 </table>
 </section>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WI-517 - Setup Chuyển công đoạn Smed Công việc tiêu chuẩn hoá | HESEM MOM</title>
+<title>WI-517 - Chuẩn bị máy Chuyển công đoạn Smed Công việc tiêu chuẩn hoá | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap — computes absolute URLs from location.pathname so the
  * stylesheet + renderer load correctly regardless of how the document is
@@ -55,17 +55,17 @@ ul.tight li { margin: 4px 0; }
      data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;WI-517&quot;,&quot;title&quot;:&quot;Setup Chuyển công đoạn Smed Công việc tiêu chuẩn hoá&quot;,&quot;subtitle&quot;:&quot;Setup, changeover, SMED standard work theo họ máy, checkpoint ready-to-run và handoff sau setup.&quot;,&quot;doc_type&quot;:&quot;WI&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
       
 
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi setup job mới, đổi Part/Rev, đổi fixture, đổi machine, đổi logic setup hoặc restart sau bất thường làm thay điều kiện chạy. Đây là POU-WI tại máy và bench setup; matrix family máy và role boundary tra tại <a href="../../references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>.</div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi chuẩn bị máy job mới, đổi Chi tiết/Rev, đổi đồ gá, đổi machine, đổi logic chuẩn bị máy hoặc restart sau bất thường làm thay điều kiện chạy. Đây là POU-WI tại máy và bench chuẩn bị máy; Ma trận family máy và Vai trò boundary tra tại <a href="../../references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>.</div>
       
 
       <section id="wi-s1" class="wi-section">
         <h2>1. Mục đích</h2>
         <ul class="tight">
-          <li>Đưa máy vào trạng thái ready-to-run bằng đúng released set, đúng fixture, đúng ToolID và đúng WCS.</li>
-          <li>Chặn sai rev, sai setup, sai offset và sai điều kiện máy trước khi sang bước pre-run.</li>
-          <li>Tạo bằng chứng setup đủ rõ để người sau nhận máy không phải đoán ý người setup trước.</li>
+          <li>Đưa máy vào trạng thái ready-to-run bằng đúng đã phát hành set, đúng đồ gá, đúng Dao cụID và đúng WCS.</li>
+          <li>Chặn sai rev, sai chuẩn bị máy, sai offset và sai điều kiện máy trước khi sang bước pre-run.</li>
+          <li>Tạo bằng chứng chuẩn bị máy đủ rõ để người sau nhận máy không phải đoán ý người chuẩn bị máy trước.</li>
         </ul>
-        <div class="callout-danger"><strong>STOP</strong><br>Dừng setup ngay khi không chứng minh được nguồn released của program, fixture không đúng ID, ToolID thiếu hoặc nghi ngờ, WCS không ổn định, probe không tin cậy hoặc machine còn cảnh báo ảnh hưởng chất lượng.</div>
+        <div class="callout-danger"><strong>STOP</strong><br>Dừng chuẩn bị máy ngay khi không chứng minh được nguồn đã phát hành của program, đồ gá không đúng ID, Dao cụID thiếu hoặc nghi ngờ, WCS không ổn định, probe không tin cậy hoặc machine còn cảnh báo ảnh hưởng chất lượng.</div>
       </section>
 
       <section id="wi-s2" class="wi-section">
@@ -76,7 +76,7 @@ ul.tight li { margin: 4px 0; }
             <ul class="tight">
               <li><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Kỹ thuật viên setup)"><span class="entity-code role-code">SET</span></a>, <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="entity-code role-code">WKM</span></a>, <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a> và người hỗ trợ kỹ thuật.</li>
               <li>Các family máy CNC trong tuyến job-order của HESEM.</li>
-              <li>Các tình huống new setup, chuyển công đoạn, machine transfer và restart sau bất thường.</li>
+              <li>Các tình huống new chuẩn bị máy, chuyển công đoạn, machine transfer và restart sau bất thường.</li>
             </ul>
           </div>
           <div class="card">
@@ -84,7 +84,7 @@ ul.tight li { margin: 4px 0; }
             <ul class="tight">
               <li>Quick-check trước Cycle Start tại <a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>.</li>
               <li>Mẫu đầu tiên hoặc FAI tại <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>.</li>
-              <li>Authority matrix, escalation ladder hoặc family topology trong annex.</li>
+              <li>Authority Ma trận, escalation ladder hoặc family topology trong annex.</li>
             </ul>
           </div>
         </div>
@@ -103,24 +103,24 @@ ul.tight li { margin: 4px 0; }
             </thead>
             <tbody>
               <tr>
-                <td>Released set</td>
-                <td>Phiếu công nghệ, phiếu setup, danh mục dao cụ, program released và plan đo đang hiệu lực.</td>
+                <td>Đã phát hành set</td>
+                <td>Phiếu công nghệ, phiếu chuẩn bị máy, danh mục dao cụ, program đã phát hành và kế hoạch đo đang hiệu lực.</td>
                 <td>Tra nguồn và boundary tại <a href="../../references/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html">ANNEX-301</a> và <a href="../../references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>.</td>
               </tr>
               <tr>
-                <td>Fixture và phần cứng gá</td>
-                <td>Fixture ID, jaw, collet, clamp, fastener, spacer và mọi phần cứng cần cho setup hiện tại.</td>
-                <td>Phải nhận diện đúng family máy và đúng part orientation.</td>
+                <td>Đồ gá và phần cứng gá</td>
+                <td>Đồ gá ID, jaw, collet, clamp, fastener, spacer và mọi phần cứng cần cho chuẩn bị máy hiện tại.</td>
+                <td>Phải nhận diện đúng family máy và đúng chi tiết orientation.</td>
               </tr>
               <tr>
-                <td>Tool pack</td>
-                <td>Dao, insert, holder, preset data, ToolID, backup tool khi cần.</td>
-                <td>Không dùng tool không truy xuất được trạng thái.</td>
+                <td>Dao cụ pack</td>
+                <td>Dao, insert, tạm giữer, preset data, Dao cụID, backup dao cụ khi cần.</td>
+                <td>Không dùng dao cụ không truy xuất được trạng thái.</td>
               </tr>
               <tr>
-                <td>Record</td>
-                <td><a href="../../../forms/frm-500-production/FRM-514_SMED_Changeover_Record.xlsx" download>FRM-514</a> và record setup liên quan.</td>
-                <td>FRM-511 dùng ở mẫu đầu tiên, không dùng thay cho setup record.</td>
+                <td>Hồ sơ</td>
+                <td><a href="../../../forms/frm-500-production/FRM-514_SMED_Changeover_Record.xlsx" download>FRM-514</a> và hồ sơ chuẩn bị máy liên quan.</td>
+                <td>FRM-511 dùng ở mẫu đầu tiên, không dùng thay cho chuẩn bị máy hồ sơ.</td>
               </tr>
             </tbody>
           </table>
@@ -131,12 +131,12 @@ ul.tight li { margin: 4px 0; }
         <h2>4. Điều kiện tiên quyết</h2>
         <ul class="tight">
           <li>Machine không có cảnh báo mở ảnh hưởng chất lượng hoặc an toàn.</li>
-          <li>Program và phiếu setup chứng minh được đúng Job, đúng Part/Rev và đúng nguồn phát hành.</li>
-          <li>Fixture, ToolID, probe, WCS và vật liệu đã sẵn ở point-of-use trước khi đưa máy vào setup chính.</li>
-          <li>Gage hoặc phương pháp đo cho part đầu đã sẵn sàng nếu setup này dẫn tới mẫu đầu tiên ngay sau đó.</li>
+          <li>Program và phiếu chuẩn bị máy chứng minh được đúng Job, đúng Chi tiết/Rev và đúng nguồn phát hành.</li>
+          <li>Đồ gá, Dao cụID, probe, WCS và vật liệu đã sẵn ở point-of-use trước khi đưa máy vào chuẩn bị máy chính.</li>
+          <li>Thiết bị đo hoặc phương pháp đo cho chi tiết đầu đã sẵn sàng nếu chuẩn bị máy này dẫn tới mẫu đầu tiên ngay sau đó.</li>
           <li>Nếu family máy có add-on kiểm soát riêng thì phải tra trước ở <a href="../../references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>.</li>
         </ul>
-        <div class="callout-warning"><strong>HOLD</strong><br>Nếu một điều kiện tiên quyết chưa đạt, không được “setup tạm trước rồi sửa hồ sơ sau”. Phải dừng tại chỗ và sửa điều kiện gốc trước khi tiếp tục.</div>
+        <div class="callout-warning"><strong>TẠM GIỮ</strong><br>Nếu một điều kiện tiên quyết chưa đạt, không được “chuẩn bị máy tạm trước rồi sửa hồ sơ sau”. Phải dừng tại chỗ và sửa điều kiện gốc trước khi tiếp tục.</div>
       </section>
 
       <section id="wi-s5" class="wi-section">
@@ -155,38 +155,38 @@ ul.tight li { margin: 4px 0; }
             <tbody>
               <tr>
                 <td>1</td>
-                <td>Chuẩn bị toàn bộ kit ngoài máy gồm released set, fixture, ToolID và record setup trước khi dừng máy để chuyển công đoạn.</td>
+                <td>Chuẩn bị toàn bộ kit ngoài máy gồm đã phát hành set, đồ gá, Dao cụID và hồ sơ chuẩn bị máy trước khi dừng máy để chuyển công đoạn.</td>
                 <td>Ly do: giảm thời gian nội bộ và tránh thiếu đồ khi máy đã dừng.</td>
                 <td>Mọi hạng mục chính đã có sẵn tại point-of-use.</td>
-                <td>Giữ máy ở trạng thái chờ setup và bổ sung kit còn thiếu.</td>
+                <td>Giữ máy ở trạng thái chờ chuẩn bị máy và bổ sung kit còn thiếu.</td>
               </tr>
               <tr>
                 <td>2</td>
-                <td>Đối chiếu program, phiếu setup, danh mục dao cụ và phiếu công nghệ để xác nhận cùng một Job, cùng Part/Rev và cùng released set.</td>
-                <td>Ly do: chặn sai rev ngay từ đầu setup.</td>
+                <td>Đối chiếu program, phiếu chuẩn bị máy, danh mục dao cụ và phiếu công nghệ để xác nhận cùng một Job, cùng Chi tiết/Rev và cùng đã phát hành set.</td>
+                <td>Ly do: chặn sai rev ngay từ đầu chuẩn bị máy.</td>
                 <td>Không còn lệch giữa tài liệu và dữ liệu tại máy.</td>
-                <td>Dừng setup và báo <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a> hoặc <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="entity-code role-code">WKM</span></a>.</td>
+                <td>Dừng chuẩn bị máy và báo <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a> hoặc <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="entity-code role-code">WKM</span></a>.</td>
               </tr>
               <tr>
                 <td>3</td>
-                <td>Gắn fixture, jaw hoặc collet đúng ID và đúng orientation theo phiếu setup.</td>
+                <td>Gắn đồ gá, jaw hoặc collet đúng ID và đúng orientation theo phiếu chuẩn bị máy.</td>
                 <td>Ly do: tránh sai hướng gá gây scrap hoặc va chạm.</td>
-                <td>Fixture ID và orientation nhìn thấy rõ, kẹp chắc và sạch.</td>
-                <td>Tháo ra, làm sạch, xác minh lại hoặc đổi đúng fixture.</td>
+                <td>Đồ gá ID và orientation nhìn thấy rõ, kẹp chắc và sạch.</td>
+                <td>Tháo ra, làm sạch, xác minh lại hoặc đổi đúng đồ gá.</td>
               </tr>
               <tr>
                 <td>4</td>
-                <td>Nạp tool pack đúng ToolID, đúng holder và đúng preset data cho setup hiện tại.</td>
-                <td>Ly do: sai ToolID dẫn tới sai đường dao và sai kích thước.</td>
-                <td>ToolID, holder và tuổi dao còn dùng được cho part đầu.</td>
-                <td>Giữ setup và thay tool hoặc dữ liệu preset đúng.</td>
+                <td>Nạp dao cụ pack đúng Dao cụID, đúng tạm giữer và đúng preset data cho chuẩn bị máy hiện tại.</td>
+                <td>Ly do: sai Dao cụID dẫn tới sai đường dao và sai kích thước.</td>
+                <td>Dao cụID, tạm giữer và tuổi dao còn dùng được cho chi tiết đầu.</td>
+                <td>Giữ chuẩn bị máy và thay dao cụ hoặc dữ liệu preset đúng.</td>
               </tr>
               <tr>
                 <td>5</td>
-                <td>Thiết lập WCS, probe zero hoặc offset baseline đúng logic của setup hiện tại.</td>
+                <td>Thiết lập WCS, probe zero hoặc offset mốc chuẩn đúng logic của chuẩn bị máy hiện tại.</td>
                 <td>Ly do: WCS sai là lỗi gốc của nhiều va chạm và sai vị trí.</td>
-                <td>WCS và offset baseline ổn định, giải thích được nguồn gốc.</td>
-                <td>Dừng setup và kiểm lại probe, datum hoặc fixture origin.</td>
+                <td>WCS và offset mốc chuẩn ổn định, giải thích được nguồn gốc.</td>
+                <td>Dừng chuẩn bị máy và kiểm lại probe, datum hoặc đồ gá origin.</td>
               </tr>
               <tr>
                 <td>6</td>
@@ -197,22 +197,22 @@ ul.tight li { margin: 4px 0; }
               </tr>
               <tr>
                 <td>7</td>
-                <td>Ghi FRM-514 với trạng thái machine, ToolID, fixture, WCS và các điểm còn cần chú ý.</td>
-                <td>Ly do: người nhận máy phải đọc được tình trạng setup thật.</td>
-                <td>FRM-514 đủ trường và khớp với setup tại máy.</td>
-                <td>Hoàn tất record trước khi bàn giao hoặc trước khi sang bước tiếp theo.</td>
+                <td>Ghi FRM-514 với trạng thái machine, Dao cụID, đồ gá, WCS và các điểm còn cần chú ý.</td>
+                <td>Ly do: người nhận máy phải đọc được tình trạng chuẩn bị máy thật.</td>
+                <td>FRM-514 đủ trường và khớp với chuẩn bị máy tại máy.</td>
+                <td>Hoàn tất hồ sơ trước khi bàn giao hoặc trước khi sang bước tiếp theo.</td>
               </tr>
               <tr>
                 <td>8</td>
                 <td>Bàn giao machine sang <a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a> để kiểm nhanh trước Cycle Start.</td>
                 <td>Ly do: ready-to-run chưa đồng nghĩa được phép cắt phôi.</td>
-                <td>Người nhận biết rõ setup state và trigger của bước kế tiếp.</td>
+                <td>Người nhận biết rõ chuẩn bị máy trạng thái và trigger của bước kế tiếp.</td>
                 <td>Không cho chạy máy nếu WI-519 chưa được mở.</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Kết thúc WI-517, máy đã sẵn sàng về mặt setup nhưng vẫn phải đi qua quick-check pre-run và mẫu đầu tiên theo đúng tuyến tài liệu trước khi mở lô.</div>
+        <div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Kết thúc WI-517, máy đã sẵn sàng về mặt chuẩn bị máy nhưng vẫn phải đi qua quick-check pre-run và mẫu đầu tiên theo đúng tuyến tài liệu trước khi mở lô.</div>
       </section>
 
       <section id="wi-s6" class="wi-section">
@@ -230,20 +230,20 @@ ul.tight li { margin: 4px 0; }
             <tbody>
               <tr>
                 <td><a href="../../../forms/frm-500-production/FRM-514_SMED_Changeover_Record.xlsx" download>FRM-514</a></td>
-                <td>Trạng thái chuyển công đoạn, machine, fixture, ToolID, WCS và điểm cần theo dõi.</td>
-                <td>Hồ sơ Job hoặc thư mục setup có kiểm soát.</td>
+                <td>Trạng thái chuyển công đoạn, machine, đồ gá, Dao cụID, WCS và điểm cần theo dõi.</td>
+                <td>Hồ sơ Job hoặc thư mục chuẩn bị máy có kiểm soát.</td>
                 <td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Kỹ thuật viên setup)"><span class="entity-code role-code">SET</span></a></td>
               </tr>
               <tr>
-                <td>Released set link</td>
-                <td>Link tới phiếu setup, danh mục dao cụ, phiếu công nghệ và program đúng revision.</td>
+                <td>Đã phát hành set liên kết</td>
+                <td>Liên kết tới phiếu chuẩn bị máy, danh mục dao cụ, phiếu công nghệ và program đúng revision.</td>
                 <td>SSOT của Job.</td>
                 <td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a> / <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Kỹ thuật viên setup)"><span class="entity-code role-code">SET</span></a></td>
               </tr>
               <tr>
                 <td>Nhật ký bất thường</td>
-                <td>Điểm HOLD, lỗi setup, nghi ngờ machine hoặc chạy kiểm chứng fail.</td>
-                <td>Hold log hoặc record của Job.</td>
+                <td>Điểm TẠM GIỮ, lỗi chuẩn bị máy, nghi ngờ machine hoặc chạy kiểm chứng fail.</td>
+                <td>Tạm giữ log hoặc hồ sơ của Job.</td>
                 <td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="entity-code role-code">WKM</span></a> / <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></td>
               </tr>
             </tbody>

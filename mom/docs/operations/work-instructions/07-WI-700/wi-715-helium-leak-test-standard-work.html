@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WI-715 - Helium Leak Test Công việc tiêu chuẩn hoá | HESEM MOM</title>
+<title>WI-715 - Helium Rò rỉ Test Công việc tiêu chuẩn hoá | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap — computes absolute URLs from location.pathname so the
  * stylesheet + renderer load correctly regardless of how the document is
@@ -55,17 +55,17 @@ ul.tight li { margin: 4px 0; }
      data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;WI-715&quot;,&quot;title&quot;:&quot;Helium Leak Test Công việc tiêu chuẩn hoá&quot;,&quot;subtitle&quot;:&quot;Thử kín helium, thiết lập phép thử, đọc kết quả, phản ứng khi FAIL và khóa evidence leak-test.&quot;,&quot;doc_type&quot;:&quot;WI&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
       
 
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho mọi Job hoặc assembly có yêu cầu helium leak test, leak integrity hoặc vacuum integrity được ghi trên bản vẽ, phiếu công nghệ, PO, CSR hoặc hồ sơ Job đã phát hành. Đây là POU-WI tại điểm test; nguồn acceptance và source hierarchy phải tra tại ANNEX-608 trước khi thao tác.</div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho mọi Job hoặc assembly có yêu cầu helium rò rỉ test, rò rỉ integrity hoặc vacuum integrity được ghi trên bản vẽ, phiếu công nghệ, PO, CSR hoặc hồ sơ Job đã phát hành. Đây là POU-WI tại điểm test; nguồn acceptance và source hierarchy phải tra tại ANNEX-608 trước khi thao tác.</div>
       
 
       <section id="wi-s1" class="wi-section">
         <h2>1. Mục đích</h2>
         <ul class="tight">
           <li>Chặn việc test khi chưa có nguồn acceptance rõ hoặc dùng sai phương pháp so với yêu cầu Job.</li>
-          <li>Giữ một chuỗi bằng chứng đủ để truy lại part nào đã test, test bằng gì và theo limit nào.</li>
-          <li>Bảo đảm part semiconductor hoặc vacuum chỉ được release khi kết quả leak test đáng tin cậy và đã khóa vào hồ sơ Job.</li>
+          <li>Giữ một chuỗi bằng chứng đủ để truy lại chi tiết nào đã test, test bằng gì và theo limit nào.</li>
+          <li>Bảo đảm chi tiết semiconductor hoặc vacuum chỉ được phát hành khi kết quả rò rỉ test đáng tin cậy và đã khóa vào hồ sơ Job.</li>
         </ul>
-        <div class="callout-danger"><strong>STOP</strong><br>Nếu chưa xác định được leak limit, phương pháp test, cấu hình gá hoặc revision nguồn yêu cầu, phải dừng trước khi đưa part vào máy. Không lấy limit từ Job cũ, email rời, trí nhớ cá nhân hoặc “mức thường dùng”.</div>
+        <div class="callout-danger"><strong>STOP</strong><br>Nếu chưa xác định được rò rỉ limit, phương pháp test, cấu hình gá hoặc revision nguồn yêu cầu, phải dừng trước khi đưa chi tiết vào máy. Không lấy limit từ Job cũ, email rời, trí nhớ cá nhân hoặc “mức thường dùng”.</div>
       </section>
 
       <section id="wi-s2" class="wi-section">
@@ -74,17 +74,17 @@ ul.tight li { margin: 4px 0; }
           <div class="card">
             <h3>Áp dụng cho</h3>
             <ul class="tight">
-              <li><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a>, <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="entity-code role-code">QCL</span></a> và <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Kỹ sư chất lượng)"><span class="entity-code role-code">QE</span></a> khi thực hiện hoặc xác nhận leak test.</li>
-              <li>Part, sub-assembly hoặc chamber component có yêu cầu helium leak, vacuum integrity hoặc leak-rate acceptance.</li>
-              <li>Cả trường hợp test tại lab nội bộ và trường hợp phải khóa evidence trước khi outsource hoặc witness test.</li>
+              <li><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a>, <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="entity-code role-code">QCL</span></a> và <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Kỹ sư chất lượng)"><span class="entity-code role-code">QE</span></a> khi thực hiện hoặc xác nhận rò rỉ test.</li>
+              <li>Chi tiết, sub-assembly hoặc chamber component có yêu cầu helium rò rỉ, vacuum integrity hoặc rò rỉ-rate acceptance.</li>
+              <li>Cả trường hợp test tại lab nội bộ và trường hợp phải khóa bằng chứng trước khi outsource hoặc witness test.</li>
             </ul>
           </div>
           <div class="card">
             <h3>Không thay cho</h3>
             <ul class="tight">
-              <li>Source hierarchy và rule khóa yêu cầu trong hồ sơ Job tại <a href="../../references/06-ANNEX-600/annex-608-semi-standards-and-csr-matrix.html">ANNEX-608</a>.</li>
-              <li>Rule bề mặt, vacuum compatibility hoặc cleanliness tại <a href="../../references/06-ANNEX-600/annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a>.</li>
-              <li>Thao tác làm sạch, vệ sinh và đóng gói hoặc clean-build tại <a href="wi-712-ultrasonic-cleaning-standard-work.html">WI-712</a>, <a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a> và <a href="wi-716-vacuum-compatible-clean-build-and-bagging.html">WI-716</a>.</li>
+              <li>Source hierarchy và quy tắc khóa yêu cầu trong hồ sơ Job tại <a href="../../references/06-ANNEX-600/annex-608-semi-standards-and-csr-matrix.html">ANNEX-608</a>.</li>
+              <li>Quy tắc bề mặt, vacuum compatibility hoặc làm sạchchuyềnss tại <a href="../../references/06-ANNEX-600/annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a>.</li>
+              <li>Thao tác làm sạch, vệ sinh và đóng gói hoặc làm sạch-build tại <a href="wi-712-ultrasonic-cleaning-standard-work.html">WI-712</a>, <a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a> và <a href="wi-716-vacuum-compatible-clean-build-and-bagging.html">WI-716</a>.</li>
             </ul>
           </div>
         </div>
@@ -109,18 +109,18 @@ ul.tight li { margin: 4px 0; }
               </tr>
               <tr>
                 <td>Thiết bị test</td>
-                <td>Leak detector, nguồn khí, gá test, fitting, nắp bịt, O-ring và phụ kiện đúng cấu hình.</td>
+                <td>Rò rỉ detector, nguồn khí, gá test, fitting, nắp bịt, O-ring và phụ kiện đúng cấu hình.</td>
                 <td>Chỉ dùng thiết bị còn hiệu lực kiểm soát.</td>
               </tr>
               <tr>
-                <td>Record test</td>
-                <td>Record leak test của Job, log thiết bị và <a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx" download>FRM-413</a> khi part bị giữ.</td>
-                <td>Không dùng giấy nháp hoặc ảnh chat thay cho record.</td>
+                <td>Hồ sơ test</td>
+                <td>Hồ sơ rò rỉ test của Job, log thiết bị và <a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx" download>FRM-413</a> khi chi tiết bị giữ.</td>
+                <td>Không dùng giấy nháp hoặc ảnh chat thay cho hồ sơ.</td>
               </tr>
               <tr>
                 <td>Điều kiện tiền xử lý</td>
-                <td>Part đã được làm sạch, clean-build hoặc đóng bịt theo yêu cầu Job trước khi test.</td>
-                <td>Tra WI liên quan nếu Job là clean hoặc vacuum-critical.</td>
+                <td>Chi tiết đã được làm sạch, làm sạch-build hoặc đóng bịt theo yêu cầu Job trước khi test.</td>
+                <td>Tra WI liên quan nếu Job là làm sạch hoặc vacuum-critical.</td>
               </tr>
             </tbody>
           </table>
@@ -131,12 +131,12 @@ ul.tight li { margin: 4px 0; }
         <h2>4. Điều kiện tiên quyết</h2>
         <ul class="tight">
           <li>Limit chấp nhận, phương pháp test và cấu hình gá của Job đã được khóa rõ trong hồ sơ Job.</li>
-          <li>Part đã hoàn tất công đoạn trước test, sạch trạng thái và có truy xuất nguồn gốc rõ theo lot hoặc serial.</li>
-          <li>Thiết bị leak detector còn trong hiệu lực kiểm soát và đã pass pre-use check.</li>
+          <li>Chi tiết đã hoàn tất công đoạn trước test, sạch trạng thái và có truy xuất nguồn gốc rõ theo lot hoặc serial.</li>
+          <li>Thiết bị rò rỉ detector còn trong hiệu lực kiểm soát và đã pass pre-use check.</li>
           <li>Nền máy, điều kiện khí và môi trường test đã ổn định để không gây false pass hoặc false fail.</li>
-          <li>Người thao tác biết ai có quyền gỡ HOLD nếu kết quả không đạt hoặc không chắc chắn.</li>
+          <li>Người thao tác biết ai có quyền gỡ TẠM GIỮ nếu kết quả không đạt hoặc không chắc chắn.</li>
         </ul>
-        <div class="callout-warning"><strong>HOLD</strong><br>Nếu part cần helium leak nhưng hiện trường đang muốn thay bằng bubble test, pressure decay hoặc phương pháp khác, phải dừng và xin cập nhật nguồn phát hành trước. Không được tự quy đổi phương pháp.</div>
+        <div class="callout-warning"><strong>TẠM GIỮ</strong><br>Nếu chi tiết cần helium rò rỉ nhưng hiện trường đang muốn thay bằng bubble test, pressure decay hoặc phương pháp khác, phải dừng và xin cập nhật nguồn phát hành trước. Không được tự quy đổi phương pháp.</div>
       </section>
 
       <section id="wi-s5" class="wi-section">
@@ -144,26 +144,26 @@ ul.tight li { margin: 4px 0; }
 
         <div class="step-block">
           <h3>Bước 1: Xác định nguồn acceptance của Job</h3>
-          <p>Xác định đúng tài liệu nguồn và đúng revision quy định leak limit, phương pháp test và cấu hình áp dụng cho part đang xử lý.</p>
-          <div class="note-soft">Lý do: cùng là helium leak nhưng mỗi Job có thể khác limit, khác mode và khác điều kiện gá.</div>
+          <p>Xác định đúng tài liệu nguồn và đúng revision quy định rò rỉ limit, phương pháp test và cấu hình áp dụng cho chi tiết đang xử lý.</p>
+          <div class="note-soft">Lý do: cùng là helium rò rỉ nhưng mỗi Job có thể khác limit, khác mode và khác điều kiện gá.</div>
         </div>
 
         <div class="step-block">
-          <h3>Bước 2: Nhận diện part cần test</h3>
-          <p>Nhận diện đúng Part number, revision, lot hoặc serial của part trước khi đưa vào khu test.</p>
-          <div class="note-soft">Lý do: test đúng kỹ thuật nhưng nhầm part vẫn là lỗi release nghiêm trọng.</div>
+          <h3>Bước 2: Nhận diện chi tiết cần test</h3>
+          <p>Nhận diện đúng Chi tiết number, revision, lot hoặc serial của chi tiết trước khi đưa vào khu test.</p>
+          <div class="note-soft">Lý do: test đúng kỹ thuật nhưng nhầm chi tiết vẫn là lỗi phát hành nghiêm trọng.</div>
         </div>
 
         <div class="step-block">
-          <h3>Bước 3: Xác nhận điều kiện tiền xử lý của part</h3>
-          <p>Xác nhận part đã sạch, đã bịt đúng cổng, đã lắp đúng phụ kiện và đang ở cấu hình test đã phát hành.</p>
-          <div class="note-soft">Lý do: cấu hình part sai sẽ làm sai kết quả leak test ngay từ đầu.</div>
+          <h3>Bước 3: Xác nhận điều kiện tiền xử lý của chi tiết</h3>
+          <p>Xác nhận chi tiết đã sạch, đã bịt đúng cổng, đã lắp đúng phụ kiện và đang ở cấu hình test đã phát hành.</p>
+          <div class="note-soft">Lý do: cấu hình chi tiết sai sẽ làm sai kết quả rò rỉ test ngay từ đầu.</div>
         </div>
 
         <div class="step-block">
           <h3>Bước 4: Kiểm tra thiết bị trước sử dụng</h3>
-          <p>Kiểm tra leak detector, nguồn khí, fitting và trạng thái hiệu lực kiểm soát của toàn bộ thiết bị trước khi cài đặt test.</p>
-          <div class="note-soft">Lý do: thiết bị không ổn định làm mất giá trị toàn bộ record test.</div>
+          <p>Kiểm tra rò rỉ detector, nguồn khí, fitting và trạng thái hiệu lực kiểm soát của toàn bộ thiết bị trước khi cài đặt test.</p>
+          <div class="note-soft">Lý do: thiết bị không ổn định làm mất giá trị toàn bộ hồ sơ test.</div>
         </div>
 
         <div class="step-block">
@@ -179,24 +179,24 @@ ul.tight li { margin: 4px 0; }
         </div>
 
         <div class="step-block">
-          <h3>Bước 7: Chạy leak test</h3>
-          <p>Chạy leak test đúng trình tự thao tác đã phát hành cho Job và giữ nguyên cấu hình trong suốt lượt test.</p>
+          <h3>Bước 7: Chạy rò rỉ test</h3>
+          <p>Chạy rò rỉ test đúng trình tự thao tác đã phát hành cho Job và giữ nguyên cấu hình trong suốt lượt test.</p>
           <div class="note-soft">Lý do: thay đổi giữa chừng làm kết quả không còn so sánh được với limit chấp nhận.</div>
         </div>
 
         <div class="step-block">
-          <h3>Bước 8: Ghi HOLD khi kết quả không đạt hoặc không chắc chắn</h3>
-          <p>Ghi HOLD ngay cho part khi giá trị đo vượt limit hoặc khi nghi ngờ kết quả do gá, nền hoặc thiết bị chưa tin cậy.</p>
-          <div class="note-soft">Lý do: part nghi ngờ phải bị chặn trước khi ai đó xem đó là pass.</div>
+          <h3>Bước 8: Ghi TẠM GIỮ khi kết quả không đạt hoặc không chắc chắn</h3>
+          <p>Ghi TẠM GIỮ ngay cho chi tiết khi giá trị đo vượt limit hoặc khi nghi ngờ kết quả do gá, nền hoặc thiết bị chưa tin cậy.</p>
+          <div class="note-soft">Lý do: chi tiết nghi ngờ phải bị chặn trước khi ai đó xem đó là pass.</div>
         </div>
 
         <div class="step-block">
           <h3>Bước 9: Khóa bằng chứng vào hồ sơ Job</h3>
-          <p>Khóa record test, ID thiết bị, người thao tác, ngày giờ, lot hoặc serial part và kết luận pass hoặc hold vào hồ sơ Job trước khi bàn giao.</p>
-          <div class="note-soft">Lý do: khách hàng và auditor phải truy lại được toàn bộ điều kiện test từ chính hồ sơ Job.</div>
+          <p>Khóa hồ sơ test, ID thiết bị, người thao tác, ngày giờ, lot hoặc serial chi tiết và kết luận pass hoặc tạm giữ vào hồ sơ Job trước khi bàn giao.</p>
+          <div class="note-soft">Lý do: khách hàng và đánh giáor phải truy lại được toàn bộ điều kiện test từ chính hồ sơ Job.</div>
         </div>
 
-        <div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Kết thúc WI-715, mỗi part đã test có kết luận pass hoặc hold dựa trên đúng nguồn acceptance, đúng phương pháp và một bộ bằng chứng đủ để truy lại mà không cần giải thích miệng.</div>
+        <div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Kết thúc WI-715, mỗi chi tiết đã test có kết luận pass hoặc tạm giữ dựa trên đúng nguồn acceptance, đúng phương pháp và một bộ bằng chứng đủ để truy lại mà không cần giải thích miệng.</div>
       </section>
 
       <section id="wi-s6" class="wi-section">
@@ -213,21 +213,21 @@ ul.tight li { margin: 4px 0; }
             </thead>
             <tbody>
               <tr>
-                <td>Leak test record của Job</td>
-                <td>Part hoặc serial, leak rate, limit chấp nhận, mode test, ngày giờ và kết luận pass hoặc hold.</td>
-                <td>SSOT của Job hoặc record system được kiểm soát.</td>
+                <td>Rò rỉ test hồ sơ của Job</td>
+                <td>Chi tiết hoặc serial, rò rỉ rate, limit chấp nhận, mode test, ngày giờ và kết luận pass hoặc tạm giữ.</td>
+                <td>SSOT của Job hoặc hồ sơ system được kiểm soát.</td>
                 <td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a></td>
               </tr>
               <tr>
                 <td>Thiết bị pre-use log</td>
                 <td>ID thiết bị, trạng thái pre-use, tình trạng hiệu lực kiểm soát và ghi chú bất thường.</td>
-                <td>Log thiết bị leak detector.</td>
+                <td>Log thiết bị rò rỉ detector.</td>
                 <td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="entity-code role-code">QCL</span></a></td>
               </tr>
               <tr>
                 <td><a href="../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx" download>FRM-413</a></td>
-                <td>Lý do giữ part, nghi ngờ về setup hoặc thiết bị, điều kiện gỡ hold và quyết định xử lý.</td>
-                <td>Hold log có link về Job liên quan.</td>
+                <td>Lý do giữ chi tiết, nghi ngờ về chuẩn bị máy hoặc thiết bị, điều kiện gỡ tạm giữ và quyết định xử lý.</td>
+                <td>Tạm giữ log có liên kết về Job liên quan.</td>
                 <td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></td>
               </tr>
             </tbody>
@@ -249,7 +249,7 @@ ul.tight li { margin: 4px 0; }
             <tbody>
               <tr>
                 <td>ANNEX-608</td>
-                <td>SEMI standards and CSR matrix</td>
+                <td>SEMI standards and CSR Ma trận</td>
                 <td><a href="../../references/06-ANNEX-600/annex-608-semi-standards-and-csr-matrix.html">Mở ANNEX-608</a></td>
               </tr>
               <tr>
@@ -259,22 +259,22 @@ ul.tight li { margin: 4px 0; }
               </tr>
               <tr>
                 <td>SOP-702</td>
-                <td>Nhiễm bẩn control and cleanliness</td>
+                <td>Nhiễm bẩn kiểm soát and làm sạchchuyềnss</td>
                 <td><a href="../../sops/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">Mở SOP-702</a></td>
               </tr>
               <tr>
                 <td>WI-712</td>
-                <td>Ultrasonic cleaning công việc tiêu chuẩn hoá</td>
+                <td>Ultrasonic làm sạching công việc tiêu chuẩn hoá</td>
                 <td><a href="wi-712-ultrasonic-cleaning-standard-work.html">Mở WI-712</a></td>
               </tr>
               <tr>
                 <td>WI-714</td>
-                <td>Clean packaging, handling and preservation</td>
+                <td>Làm sạch packaging, handling and preservation</td>
                 <td><a href="wi-714-clean-packaging-handling-and-preservation.html">Mở WI-714</a></td>
               </tr>
               <tr>
                 <td>WI-716</td>
-                <td>Vacuum compatible clean-build and bagging</td>
+                <td>Vacuum compatible làm sạch-build and bagging</td>
                 <td><a href="wi-716-vacuum-compatible-clean-build-and-bagging.html">Mở WI-716</a></td>
               </tr>
             </tbody>
