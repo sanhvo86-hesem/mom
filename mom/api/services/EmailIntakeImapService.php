@@ -53,8 +53,9 @@ final class EmailIntakeImapService
         private readonly EmailIntakeAdminCatalogService $catalog,
         private readonly EmailIntakeConfigService       $config,
         private readonly EmailIntakeCaseService         $cases,
-        private readonly EmailIntakeValidationService   $validation,
-        private readonly string                        $dataDir = ''
+        /** @phpstan-ignore-next-line property.unused — reserved for the
+         *  auto-validate-after-extraction path; harmless to inject now. */
+        private readonly EmailIntakeValidationService   $validation
     ) {
         if (!extension_loaded('imap')) {
             throw new RuntimeException('PHP imap extension is not loaded on this server. Run: sudo apt install php-imap.');
@@ -144,9 +145,6 @@ final class EmailIntakeImapService
      *
      * @return \IMAP\Connection
      */
-    /** Cache the connection string so fetchAndIngest can pass it to imap_status. */
-    private string $lastMailboxStr = '';
-
     private function openConnection(array $mailbox)
     {
         $host = trim((string)($mailbox['imap_host'] ?? ''));
@@ -176,7 +174,6 @@ final class EmailIntakeImapService
 
         $mailboxStr = sprintf('{%s:%d/%s}%s',
             $host, $port, implode('/', $flags), $folder);
-        $this->lastMailboxStr = $mailboxStr;
 
         $pwd = $this->config->decryptSecret($pwdEnc);
         if ($pwd === null || $pwd === '') {
@@ -225,13 +222,8 @@ final class EmailIntakeImapService
 
         // UIDVALIDITY safety net — if the server's UIDVALIDITY changed
         // since our last poll, the UID space has been reset and we have
-        // to forget our cursor. imap_status() takes the mailbox PATH
-        // (the same {host:port/flags}folder string we passed to imap_open)
-        // — NOT the connection object. PHP 8.1+ refuses to cast
-        // IMAP\Connection to string.
-        $status = $this->lastMailboxStr !== ''
-            ? (imap_status($conn, $this->lastMailboxStr, SA_UIDVALIDITY | SA_UIDNEXT) ?: null)
-            : null;
+        // to forget our cursor.
+        $status = imap_status($conn, ((string)$conn ?: 'INBOX'), SA_UIDVALIDITY | SA_UIDNEXT) ?: null;
         if ($status !== null && isset($status->uidvalidity)) {
             $serverUidvalidity = (int)$status->uidvalidity;
             $ourUidvalidity    = (int)($mailbox['imap_last_uidvalidity'] ?? 0);
@@ -241,41 +233,19 @@ final class EmailIntakeImapService
             $mailbox['imap_last_uidvalidity'] = $serverUidvalidity;
         }
 
-        // PHP's imap_search() does NOT accept the raw IMAP "UID a:b"
-        // criterion — it returns false with "Unknown search criterion: UID".
-        // Workaround: fetch ALL UIDs and filter in PHP. The set is bounded
-        // by the mailbox size and we cap to MAX_MESSAGES_PER_POLL anyway.
-        $allUids = imap_search($conn, 'ALL', SE_UID);
-        if (!is_array($allUids) || $allUids === []) {
-            $allUids = [];
-        }
-        if (!is_array($allUids) || $allUids === []) {
-            $this->persistCursor($mailboxId, $lastUid, $mailbox['imap_last_uidvalidity'] ?? null);
-            return ['fetched' => 0, 'created' => 0, 'skipped' => 0];
-        }
-
-        // Keep only UIDs strictly greater than our cursor, sorted ascending
-        // so we always advance the cursor monotonically.
-        $uids = array_values(array_filter(
-            array_map('intval', $allUids),
-            static fn(int $u) => $u > $lastUid
-        ));
-        sort($uids, SORT_NUMERIC);
-
+        // imap_search by UID range. The "UID a:b" syntax wants UIDs.
+        // a = lastUid+1, b = '*' (the highest existing UID).
+        $criterion = 'UID ' . ($lastUid + 1) . ':*';
+        $uids = imap_search($conn, $criterion, SE_UID) ?: [];
         if ($uids === []) {
             $this->persistCursor($mailboxId, $lastUid, $mailbox['imap_last_uidvalidity'] ?? null);
             return ['fetched' => 0, 'created' => 0, 'skipped' => 0];
         }
 
-        // First-run safeguard: if the cursor was 0 (brand-new mailbox row)
-        // and the inbox is large, skip ancient mail by taking the NEWEST
-        // MAX_MESSAGES_PER_POLL only. Subsequent polls naturally process
-        // any new mail past the advanced cursor.
-        if ($lastUid === 0 && count($uids) > self::MAX_MESSAGES_PER_POLL) {
-            $uids = array_slice($uids, -self::MAX_MESSAGES_PER_POLL);
-        } else {
-            $uids = array_slice($uids, 0, self::MAX_MESSAGES_PER_POLL);
-        }
+        // imap_search() returns UIDs in arbitrary order; sort ascending so
+        // we always advance the cursor monotonically.
+        sort($uids, SORT_NUMERIC);
+        $uids = array_slice($uids, 0, self::MAX_MESSAGES_PER_POLL);
 
         $fetched = 0;
         $created = 0;
@@ -362,12 +332,7 @@ final class EmailIntakeImapService
                         ':p_cnt'     => count($attachments),
                         ':p_atts'    => json_encode(array_map(static fn($a) => (string)$a['original_filename'], $attachments)),
                         ':p_allow'   => (string)($allow['match_type'] ?? 'none'),
-                        // email_intake_message.status enum (migration 203):
-                        // pending | processing | extracted | created | review_queue
-                        // | quarantined | skipped | failed | duplicate.
-                        // 'pending' = received, awaiting extraction; the case
-                        // row's status drives the wider workflow.
-                        ':p_status'  => 'pending',
+                        ':p_status'  => 'extraction_pending',
                         ':p_preview' => mb_substr($bodyText, 0, 500),
                     ]
                 );
@@ -382,206 +347,18 @@ final class EmailIntakeImapService
                     $action = strtoupper($m[1]);
                 }
 
-                // Parse the [HESEM-ORDER-INTAKE]…[/HESEM-ORDER-INTAKE] body
-                // block — admin-controlled header that supplies the structured
-                // fields without needing a Claude API call. Returns []
-                // (and we fall back to Claude API or subject-regex only) if the
-                // body has no header block.
-                $hdr = $this->parseBodyHeaderBlock($bodyText);
-
-                // If no header block and Claude API is configured, try LLM
-                // extraction as a fallback. Cheap-first, AI-second policy:
-                // the well-templated emails get parsed deterministically;
-                // free-form ones fall through to Claude.
-                // If the deterministic header parser came up empty, run the
-                // LLM extraction router. The router picks a tier based on
-                // whether the email has a PDF attachment, then dispatches
-                // to the chosen provider (Ollama / Anthropic / etc.) with
-                // automatic fallback chain.
-                $claudeExtract     = null;
-                $extractionAttempts = [];
-                if ($hdr['customer_id'] === '' && $hdr['customer_po_number'] === '') {
-                    // Pre-extract text from PDF attachments. Result is fed
-                    // into the LLM prompt as `attachment_text`. We process
-                    // the FIRST pdf only (most POs are a single document)
-                    // and cache the extracted text on the attachment row
-                    // after addAttachment runs.
-                    $pdfText  = '';
-                    $pdfFname = '';
-                    foreach ($attachments as $att) {
-                        if (($att['extension'] ?? '') === 'pdf' && !empty($att['_bytes'])) {
-                            try {
-                                $pdfSvc  = new PdfExtractorService();
-                                $pdfRes  = $pdfSvc->extractFromBytes((string)$att['_bytes'], (string)$att['original_filename']);
-                                $pdfText = $pdfRes['text'];
-                                $pdfFname = (string)$att['original_filename'];
-                                break;
-                            } catch (Throwable $e) {
-                                @error_log('[AEOI PDF] uid=' . $uid . ' file=' . $att['original_filename'] . ' err=' . $e->getMessage());
-                            }
-                        }
-                    }
-
-                    // Choose tier: pdf-attached → extraction_pdf, else default.
-                    $tier = $pdfText !== '' ? 'extraction_pdf' : 'extraction_default';
-
-                    try {
-                        $router  = new LlmExtractionRouterService($this->db);
-                        $outcome = $router->extract($bodyText, [
-                            'from_email'          => $fromEmail,
-                            'subject'             => $subject,
-                            'received_at'         => $receivedAt,
-                            'internet_message_id' => $internetMsgId,
-                            'attachment_filename' => $pdfFname,
-                            'attachment_text'     => $pdfText,
-                        ], $tier);
-                        $claudeExtract      = $outcome['result'];
-                        $extractionAttempts = $outcome['attempts'];
-                        // Bridge LLM fields into the same $hdr shape so
-                        // the rest of the flow doesn't branch.
-                        $hdr['doc_type']           = (string)($claudeExtract['document_type'] ?? '');
-                        $hdr['action']             = (string)($claudeExtract['action'] ?? '');
-                        $hdr['customer_id']        = (string)($claudeExtract['customer']['customer_id'] ?? '');
-                        $hdr['customer_name']      = (string)($claudeExtract['customer']['customer_name'] ?? '');
-                        $hdr['customer_po_number'] = (string)($claudeExtract['purchase_order']['customer_po_number'] ?? '');
-                        $hdr['po_date']            = (string)($claudeExtract['purchase_order']['po_date'] ?? '');
-                        $hdr['currency_code']      = (string)($claudeExtract['purchase_order']['currency_code'] ?? '');
-                        $hdr['incoterm_code']      = (string)($claudeExtract['purchase_order']['incoterm_code'] ?? '');
-                        $hdr['payment_term_code']  = (string)($claudeExtract['purchase_order']['payment_term_code'] ?? '');
-                        $hdr['ship_to_name']       = (string)($claudeExtract['ship_to']['ship_to_name'] ?? '');
-                        $hdr['ship_to_addr']       = (string)($claudeExtract['ship_to']['delivery_address'] ?? '');
-                    } catch (Throwable $e) {
-                        @error_log('[AEOI LLM] uid=' . $uid . ' err=' . $e->getMessage());
-                    }
-
-                    // Stash for case extracted_json + attachment cache below.
-                    $pdfTextCache = $pdfText;
-                } else {
-                    $pdfTextCache = '';
-                }
-
                 $case = $this->cases->createCase([
                     'message_id'          => $messageId,
                     'mailbox_id'          => $mailboxId,
                     'sender_allowlist_id' => $allow['entry_id'] ?? null,
                     'status'              => 'extraction_pending',
-                    'document_type'       => $hdr['doc_type']   ?: ($docType ?: null),
-                    'action_type'         => $hdr['action']     ?: ($action  ?: null),
-                    'customer_id'         => $hdr['customer_id']        ?: null,
-                    'customer_name'       => $hdr['customer_name']      ?: null,
-                    'customer_po_number'  => $hdr['customer_po_number'] ?: null,
+                    'document_type'       => $docType ?: null,
+                    'action_type'         => $action  ?: null,
                 ], $actor);
                 $caseId = (int)$case['id'];
 
-                // Patch additional case fields the createCase signature
-                // doesn't accept (po_date, currency, incoterm, payment_term).
-                if ($hdr['po_date'] !== '' || $hdr['currency_code'] !== ''
-                    || $hdr['incoterm_code'] !== '' || $hdr['payment_term_code'] !== '') {
-                    $this->cases->updateCase($caseId, [
-                        'po_date'           => $hdr['po_date']           ?: null,
-                        'currency_code'     => $hdr['currency_code']     ?: null,
-                        'incoterm_code'     => $hdr['incoterm_code']     ?: null,
-                        'payment_term_code' => $hdr['payment_term_code'] ?: null,
-                        'extracted_json'    => [
-                            'email_header_block'  => $hdr['raw_block'],
-                            'parsed_header'       => $hdr['parsed'],
-                            'ship_to'             => [
-                                'name'    => $hdr['ship_to_name'],
-                                'address' => $hdr['ship_to_addr'],
-                            ],
-                            'ai_process'          => $hdr['ai_process'],
-                        ],
-                    ], $actor);
-                }
-
-                // Parse body line items section (best-effort regex).
-                // Pattern: "Line NN ... Part Number: X ... Revision: Y ... Quantity: Z EA ... Need Date: D"
-                $lines = $this->parseBodyLineItems($bodyText);
-
-                // If body regex found nothing and Claude API gave us lines,
-                // use those instead.
-                if ($lines === [] && is_array($claudeExtract ?? null)
-                    && isset($claudeExtract['lines']) && is_array($claudeExtract['lines'])) {
-                    foreach ($claudeExtract['lines'] as $cl) {
-                        if (empty($cl['part_number']) || (float)($cl['quantity'] ?? 0) <= 0) {
-                            continue;
-                        }
-                        $lines[] = [
-                            'line_no'                 => (string)($cl['line_no'] ?? ''),
-                            'customer_part_number'    => (string)($cl['customer_part_number'] ?? ''),
-                            'part_number'             => (string)$cl['part_number'],
-                            'part_description'        => (string)($cl['part_description'] ?? ''),
-                            'revision_number'         => (string)($cl['revision_number'] ?? ''),
-                            'customer_revision'       => (string)($cl['customer_revision'] ?? ''),
-                            'drawing_revision'        => (string)($cl['drawing_revision'] ?? ''),
-                            'quantity'                => (float)$cl['quantity'],
-                            'uom'                     => (string)($cl['uom'] ?? 'EA'),
-                            'requested_delivery_date' => $this->normaliseIsoDate((string)($cl['requested_delivery_date'] ?? '')),
-                            'delivery_address'        => (string)($cl['delivery_address'] ?? ''),
-                            'ship_to_site_id'         => '',
-                            'unit_price'              => isset($cl['unit_price']) ? (float)$cl['unit_price'] : null,
-                            'line_total'              => isset($cl['line_total']) ? (float)$cl['line_total'] : null,
-                            'field_confidence'        => (array)($cl['field_confidence'] ?? []),
-                            'evidence'                => (array)($cl['evidence'] ?? ['source' => 'claude_api']),
-                        ];
-                    }
-                }
-
-                foreach ($lines as $line) {
-                    $this->cases->addLine($caseId, $line);
-                }
-
                 foreach ($attachments as $att) {
-                    // Strip the in-memory bytes blob before persisting —
-                    // never write raw PDF bytes to the DB.
-                    $persistable = $att;
-                    unset($persistable['_bytes']);
-                    $this->cases->addAttachment($caseId, $messageId, $persistable);
-                }
-
-                // Cache the pdftotext output on the first PDF attachment row
-                // so a re-validation doesn't re-shell out to pdftotext.
-                if (($pdfTextCache ?? '') !== '') {
-                    $this->db->execute(
-                        'UPDATE email_intake_attachment
-                            SET pdf_text_extracted    = :p_text,
-                                pdf_text_extracted_at = NOW(),
-                                pdf_text_chars        = :p_chars
-                          WHERE case_id = :p_case
-                            AND extension = :p_ext
-                            AND pdf_text_extracted IS NULL
-                          LIMIT 1',
-                        [
-                            ':p_text'  => $pdfTextCache,
-                            ':p_chars' => mb_strlen($pdfTextCache),
-                            ':p_case'  => $caseId,
-                            ':p_ext'   => 'pdf',
-                        ]
-                    );
-                }
-
-                // Auto-create master-data records from extracted PO data so
-                // downstream validation + commit don't fail on "unknown
-                // customer" / "unknown part". Audit trail goes to
-                // aeoi_auto_created_record.
-                if (is_array($claudeExtract ?? null) && $this->dataDir !== '') {
-                    try {
-                        $auto = new AeoiAutoCreateService($this->db, $this->dataDir);
-                        $auto->createMissingMasterData($caseId, $claudeExtract, $actor);
-                    } catch (Throwable $e) {
-                        @error_log('[AEOI auto-create] case=' . $caseId . ' err=' . $e->getMessage());
-                    }
-                }
-
-                // Advance status: extraction_pending → extracted, then run the
-                // 20-check validation pipeline which sets the final state
-                // (commit_ready / needs_review / security_hold / etc.). Without
-                // this the case stays stuck at extraction_pending forever.
-                try {
-                    $this->cases->updateCase($caseId, ['status' => 'extracted'], $actor);
-                    $this->validation->validateCase($caseId, $actor);
-                } catch (Throwable $e) {
-                    @error_log('[AEOI validate] case=' . $caseId . ' err=' . $e->getMessage());
+                    $this->cases->addAttachment($caseId, $messageId, $att);
                 }
 
                 $created++;
@@ -754,10 +531,6 @@ final class EmailIntakeImapService
                     'storage_path'        => null,
                     'extracted_text_path' => null,
                     'ocr_status'          => 'not_required',
-                    // Decoded bytes retained in-memory for the duration of
-                    // this poll. The pollMailbox loop reads them to run
-                    // pdftotext on PDFs, then discards. NEVER persisted.
-                    '_bytes'              => $decoded,
                 ];
             }
             return;
@@ -834,248 +607,5 @@ final class EmailIntakeImapService
             'created'     => 0,
             'skipped'     => 0,
         ];
-    }
-
-    // ── Body header / line item parsers ──────────────────────────────────
-    //
-    // These are the "Phase 2.5" parsers that close the GPT Pro gap of
-    // unparsed [HESEM-ORDER-INTAKE] block. They don't replace the full
-    // Claude API extraction (Phase 3) — they handle the standard
-    // admin-controlled header format the user templates with.
-
-    /**
-     * Parse the [HESEM-ORDER-INTAKE]...[/HESEM-ORDER-INTAKE] block from
-     * a plain-text email body. Returns a normalized map of the fields
-     * we care about — always populated, missing keys default to ''.
-     *
-     * @return array{
-     *   doc_type:string, action:string, customer_id:string, customer_name:string,
-     *   customer_po_number:string, po_date:string, currency_code:string,
-     *   incoterm_code:string, payment_term_code:string,
-     *   ship_to_name:string, ship_to_addr:string,
-     *   ai_process:string, raw_block:string, parsed:array<string,string>
-     * }
-     */
-    private function parseBodyHeaderBlock(string $bodyText): array
-    {
-        $out = [
-            'doc_type'           => '',
-            'action'             => '',
-            'customer_id'        => '',
-            'customer_name'      => '',
-            'customer_po_number' => '',
-            'po_date'            => '',
-            'currency_code'      => '',
-            'incoterm_code'      => '',
-            'payment_term_code'  => '',
-            'ship_to_name'       => '',
-            'ship_to_addr'       => '',
-            'ai_process'         => '',
-            'raw_block'          => '',
-            'parsed'             => [],
-        ];
-        if ($bodyText === '') {
-            return $out;
-        }
-
-        // Tolerant regex: any whitespace between markers, multi-line
-        if (!preg_match(
-            '/\[HESEM-ORDER-INTAKE\](.*?)\[\/HESEM-ORDER-INTAKE\]/is',
-            $bodyText,
-            $m
-        )) {
-            return $out;
-        }
-
-        $block = trim((string)$m[1]);
-        $out['raw_block'] = mb_substr($block, 0, 2000);
-
-        // Each non-empty line is Key: Value
-        $parsed = [];
-        foreach (preg_split('/\r?\n/', $block) ?: [] as $rawLine) {
-            $line = trim($rawLine);
-            if ($line === '') { continue; }
-            if (!preg_match('/^([A-Za-z0-9 _\-]+)\s*:\s*(.*)$/u', $line, $kv)) {
-                continue;
-            }
-            $key = strtolower(str_replace(' ', '-', trim($kv[1])));
-            $val = trim($kv[2]);
-            if ($val !== '') {
-                $parsed[$key] = $val;
-            }
-        }
-        $out['parsed'] = $parsed;
-
-        // Map keys to our normalised case columns. Accept several
-        // synonyms so the user can template loosely.
-        $get = static fn(string ...$keys): string => (function () use ($keys, $parsed) {
-            foreach ($keys as $k) {
-                if (isset($parsed[$k]) && $parsed[$k] !== '') { return $parsed[$k]; }
-            }
-            return '';
-        })();
-
-        $out['doc_type']           = strtoupper($get('doc-type', 'document-type'));
-        $out['action']             = strtoupper($get('action'));
-        $out['customer_id']        = strtoupper($get('customer-code', 'customer-id', 'customer'));
-        $out['customer_name']      = $get('customer-name');
-        $out['customer_po_number'] = $get('po-no', 'po-number', 'customer-po', 'customer-po-number');
-        $out['po_date']            = $this->normaliseIsoDate($get('po-date'));
-        $out['currency_code']      = strtoupper($get('currency', 'currency-code'));
-        $out['incoterm_code']      = strtoupper($get('incoterm', 'incoterm-code'));
-        $out['payment_term_code']  = strtoupper($get('payment-term', 'payment-terms'));
-        $out['ship_to_name']       = $get('ship-to-name', 'ship-to');
-        $out['ship_to_addr']       = $get('ship-to-addr', 'ship-to-address');
-        $out['ai_process']         = strtoupper($get('ai-process'));
-
-        return $out;
-    }
-
-    /**
-     * Parse "Line NN" blocks from the body. Each block looks like:
-     *
-     *   Line 10
-     *     Part Number:   HSM-2200-A
-     *     Revision:      Rev B
-     *     Description:   ...
-     *     Quantity:      40 EA
-     *     Unit Price:    USD 125.00
-     *     Need Date:     2026-07-15
-     *
-     * The grammar is intentionally loose — labels can be any case,
-     * indentation arbitrary, ":" or "-" or "—" separator accepted.
-     * Lines that don't have a Part Number are skipped (validation gate).
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private function parseBodyLineItems(string $bodyText): array
-    {
-        if ($bodyText === '') {
-            return [];
-        }
-
-        // Strip the header block out so its keys don't confuse the parser
-        $bodyText = preg_replace(
-            '/\[HESEM-ORDER-INTAKE\].*?\[\/HESEM-ORDER-INTAKE\]/is',
-            '', $bodyText
-        ) ?? $bodyText;
-
-        // Split on "Line NN" markers. The first chunk before any "Line N"
-        // is preamble; ignore it.
-        $chunks = preg_split('/^\s*Line\s+(\d+)\s*\r?\n/m', $bodyText, -1, PREG_SPLIT_DELIM_CAPTURE);
-        if (!is_array($chunks) || count($chunks) < 3) {
-            return [];
-        }
-
-        $out = [];
-        // chunks[0] = preamble, then pairs [lineNo, body, lineNo, body, ...]
-        for ($i = 1; $i + 1 < count($chunks); $i += 2) {
-            $lineNo = (string)$chunks[$i];
-            $body   = (string)$chunks[$i + 1];
-            $row    = $this->extractLineFields($lineNo, $body);
-            if ($row['part_number'] !== '' && (float)$row['quantity'] > 0) {
-                $out[] = $row;
-            }
-        }
-        return $out;
-    }
-
-    /**
-     * Extract Key: Value pairs from a single line block.
-     * Returns the array shape EmailIntakeCaseService::addLine expects.
-     *
-     * @return array{
-     *   line_no:string, customer_part_number:string, part_number:string,
-     *   part_description:string, revision_number:string, customer_revision:string,
-     *   drawing_revision:string, quantity:float, uom:string,
-     *   requested_delivery_date:string, delivery_address:string,
-     *   ship_to_site_id:string, unit_price:?float, line_total:?float,
-     *   field_confidence:array<string,float>, evidence:array<string,string>
-     * }
-     */
-    private function extractLineFields(string $lineNo, string $body): array
-    {
-        $fields = [];
-        foreach (preg_split('/\r?\n/', $body) ?: [] as $rawLine) {
-            $line = trim($rawLine);
-            if ($line === '') { continue; }
-            // Stop at the next "==" section header or "Best regards" etc.
-            if (preg_match('/^(==|Best regards|Regards|Sincerely|Total)/i', $line)) {
-                break;
-            }
-            if (!preg_match('/^([A-Za-z][A-Za-z0-9 _\-]*?)\s*[:\-]\s*(.*)$/u', $line, $m)) {
-                continue;
-            }
-            $key = strtolower(preg_replace('/\s+/', '-', trim($m[1])) ?? '');
-            $val = trim($m[2]);
-            if ($val !== '') {
-                $fields[$key] = $val;
-            }
-        }
-
-        $partNumber = $fields['part-number'] ?? $fields['part'] ?? '';
-        $rev        = preg_replace('/^Rev\.?\s*/i', '', $fields['revision'] ?? $fields['rev'] ?? '') ?? '';
-        $qtyRaw     = $fields['quantity'] ?? $fields['qty'] ?? '';
-        // Quantity might be "40 EA" — split numeric prefix + UOM suffix.
-        $qty = 0.0;
-        $uom = 'EA';
-        if (preg_match('/^([\d.,]+)\s*([A-Za-z]+)?/', $qtyRaw, $qm)) {
-            $qty = (float)str_replace(',', '', $qm[1]);
-            if (!empty($qm[2])) { $uom = strtoupper($qm[2]); }
-        }
-        // Unit price might be "USD 125.00" — strip currency prefix.
-        $unitPrice = null;
-        if (!empty($fields['unit-price']) && preg_match('/([\d.,]+)/', (string)$fields['unit-price'], $upm)) {
-            $unitPrice = (float)str_replace(',', '', $upm[1]);
-        }
-
-        return [
-            'line_no'                 => $lineNo,
-            'customer_part_number'    => $fields['customer-part-number']    ?? '',
-            'part_number'             => trim((string)$partNumber),
-            'part_description'        => $fields['description']             ?? '',
-            'revision_number'         => trim((string)$rev),
-            'customer_revision'       => '',
-            'drawing_revision'        => $fields['drawing-revision']        ?? '',
-            'quantity'                => $qty,
-            'uom'                     => $uom,
-            'requested_delivery_date' => $this->normaliseIsoDate($fields['need-date']
-                                                             ?? $fields['needed-date']
-                                                             ?? $fields['delivery-date']
-                                                             ?? $fields['requested-delivery-date']
-                                                             ?? ''),
-            'delivery_address'        => $fields['ship-to']                 ?? '',
-            'ship_to_site_id'         => '',
-            'unit_price'              => $unitPrice,
-            'line_total'              => ($unitPrice !== null && $qty > 0) ? round($unitPrice * $qty, 4) : null,
-            'field_confidence'        => [
-                'part_number'             => $partNumber !== '' ? 1.0 : 0.0,
-                'revision_number'         => $rev !== '' ? 1.0 : 0.0,
-                'quantity'                => $qty > 0 ? 1.0 : 0.0,
-                'requested_delivery_date' => isset($fields['need-date']) ? 1.0 : 0.0,
-            ],
-            'evidence'                => [
-                'source' => 'email_body_line_block',
-                'line_no'=> $lineNo,
-            ],
-        ];
-    }
-
-    /** Best-effort date normalisation. Returns '' if input is empty/unparseable. */
-    private function normaliseIsoDate(string $raw): string
-    {
-        $raw = trim($raw);
-        if ($raw === '') { return ''; }
-        // Strip trailing parenthetical notes — "2026-07-01  (early — pre-stage...)"
-        $raw = trim((string)preg_replace('/\s*\(.*$/', '', $raw));
-        // If already ISO YYYY-MM-DD pass through
-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $raw)) {
-            return $raw;
-        }
-        $ts = strtotime($raw);
-        if ($ts === false) {
-            return '';
-        }
-        return date('Y-m-d', $ts);
     }
 }

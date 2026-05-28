@@ -66,7 +66,8 @@ class EmailIntakeController extends BaseController
     private function catalog(): EmailIntakeAdminCatalogService
     {
         if ($this->catalogSvc === null) {
-            $this->catalogSvc = new EmailIntakeAdminCatalogService($this->db());
+            // Inject EmailIntakeConfigService so IMAP passwords can be encrypted.
+            $this->catalogSvc = new EmailIntakeAdminCatalogService($this->db(), $this->svc());
         }
         return $this->catalogSvc;
     }
@@ -610,6 +611,40 @@ class EmailIntakeController extends BaseController
             $this->success(['deleted' => true, 'id' => $id]);
         } catch (Throwable $e) {
             $this->error('mailbox_delete_failed', 400, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST admin_email_intake_mailbox_poll
+     *
+     * Trigger an IMAP poll for a single mailbox row. Useful for "test
+     * connection" + "fetch latest now" from the admin UI without waiting
+     * for the cron heartbeat.
+     */
+    public function mailboxPoll(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $id   = (int)($body['id'] ?? 0);
+        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
+        try {
+            $row = $this->catalog()->getMailboxWithSecret($id);
+            $imap = new \MOM\Api\Services\EmailIntakeImapService(
+                $this->db(), $this->catalog(), $this->svc(),
+                $this->caseSvc(), $this->validation()
+            );
+            $result = $imap->pollMailbox($row, $this->actor($user));
+            $this->auditLog('admin_email_intake_mailbox_poll', [
+                'mailbox_id' => $id,
+                'status'     => $result['status'] ?? null,
+                'fetched'    => $result['fetched'] ?? 0,
+                'created'    => $result['created'] ?? 0,
+            ]);
+            $this->success(['result' => $result]);
+        } catch (Throwable $e) {
+            $this->error('mailbox_poll_failed', 400, $e->getMessage());
         }
     }
 

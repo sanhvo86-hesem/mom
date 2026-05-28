@@ -807,6 +807,9 @@
           + '<td>' + active + '</td>'
           + '<td style="font-size:11px;color:var(--text-3,#6b7280)">' + fmtDt(m.last_scan_at) + (m.last_status ? '<br>'+escHtml(m.last_status) : '') + '</td>'
           + '<td style="white-space:nowrap">'
+          + ((m.provider==='gmail_imap' || m.provider==='generic_imap')
+              ? '<button onclick="aeoi.pollMailbox('+m.id+')" class="hm-btn hm-btn-xs" title="Quét IMAP ngay" style="background:var(--brand-primary,#2563eb);color:#fff">▶ Poll</button> '
+              : '')
           + '<button onclick="aeoi.openMailboxForm('+m.id+')" class="hm-btn hm-btn-xs" title="Sửa">✏</button> '
           + '<button onclick="aeoi.toggleMailbox('+m.id+','+(m.enabled?'false':'true')+')" class="hm-btn hm-btn-xs" title="' + (m.enabled?'Tắt':'Bật') + '">' + (m.enabled?'⏸':'▶') + '</button> '
           + '<button onclick="aeoi.deleteMailbox('+m.id+')" class="hm-btn hm-btn-xs" style="color:var(--danger-1,#ef4444)" title="Xóa">🗑</button>'
@@ -1243,21 +1246,110 @@
     },
     openMailboxForm: function(id){
       var existing = id ? (STATE.mailboxes||[]).find(function(m){return m.id===id;}) : null;
-      var addr   = prompt('Mailbox address (vd: orders@hesemeng.com):', existing ? existing.mailbox_address : '');
-      if(addr==null) return;
-      var folder = prompt('Folder path (vd: Inbox/AI-Order-Intake):', existing ? existing.folder_path : 'Inbox/AI-Order-Intake');
-      if(folder==null) return;
-      var provider = prompt('Provider (outlook_local | microsoft_graph | manual_upload):', existing ? existing.provider : 'outlook_local');
-      if(provider==null) return;
-      var payload = {
-        mailbox_address: addr, folder_path: folder, provider: provider,
-        enabled: true, read_body: true, read_attachments: true,
+      // Step 1: pick provider type. Different providers need different fields.
+      var providerLabels = {
+        gmail_imap:      'Gmail (IMAP + App Password) — KHUYẾN NGHỊ cho test',
+        generic_imap:    'IMAP server bất kỳ (Yahoo, Zoho, server riêng…)',
+        outlook_local:   'Outlook Desktop trên Windows (PowerShell worker)',
+        microsoft_graph: 'Microsoft 365 (Graph API) — chưa triển khai',
+        manual_upload:   'Upload thủ công file .eml/.msg',
       };
+      var provDefault = existing ? existing.provider : 'gmail_imap';
+      var provChoice = prompt(
+        'Chọn loại dịch vụ mail:\n\n' +
+        '  gmail_imap      = Gmail (IMAP + App Password) ★\n' +
+        '  generic_imap    = IMAP server bất kỳ\n' +
+        '  outlook_local   = Outlook Desktop (PowerShell worker)\n' +
+        '  microsoft_graph = M365 Graph API (chưa triển khai)\n' +
+        '  manual_upload   = Upload thủ công\n\n' +
+        'Nhập một trong các giá trị trên:',
+        provDefault
+      );
+      if(!provChoice) return;
+      provChoice = provChoice.trim().toLowerCase();
+      if(!providerLabels[provChoice]){
+        alert('Loại dịch vụ không hợp lệ: ' + provChoice);
+        return;
+      }
+
+      // Step 2: common fields
+      var addr = prompt('Mailbox address (email đầy đủ):', existing ? existing.mailbox_address : '');
+      if(addr==null) return;
+      var folder = prompt(
+        provChoice==='gmail_imap'   ? 'Tên folder Gmail (Inbox, hoặc label-name. Mặc định: INBOX):' :
+        provChoice==='generic_imap' ? 'IMAP folder name (mặc định: INBOX):' :
+                                       'Folder path (vd: Inbox/AI-Order-Intake):',
+        existing ? existing.folder_path : (provChoice==='outlook_local' ? 'Inbox/AI-Order-Intake' : 'INBOX')
+      );
+      if(folder==null) return;
+
+      var payload = {
+        mailbox_address: addr.trim().toLowerCase(),
+        folder_path:     folder.trim(),
+        provider:        provChoice,
+        enabled:         true,
+        read_body:       true,
+        read_attachments:true,
+      };
+
+      // Step 3: IMAP-only fields
+      if(provChoice==='gmail_imap' || provChoice==='generic_imap'){
+        var host = provChoice==='gmail_imap'
+          ? (existing && existing.imap_host ? existing.imap_host : 'imap.gmail.com')
+          : prompt('IMAP host:', existing ? (existing.imap_host||'') : '');
+        if(provChoice==='generic_imap' && !host) return;
+        var port = provChoice==='gmail_imap'
+          ? 993
+          : parseInt(prompt('IMAP port (993=SSL, 143=STARTTLS):', existing ? (existing.imap_port||993) : 993), 10);
+        var enc  = provChoice==='gmail_imap'
+          ? 'ssl'
+          : (prompt('Encryption (ssl|starttls|none):', existing ? (existing.imap_encryption||'ssl') : 'ssl') || 'ssl');
+        var user = prompt('IMAP username (thường là full email):', existing ? (existing.imap_username||addr) : addr);
+        if(user==null) return;
+        var pwdHint = existing && existing.imap_password_configured
+          ? '(để trống = giữ password cũ, hoặc nhập mới để đổi)'
+          : (provChoice==='gmail_imap'
+              ? 'Nhập App Password 16 ký tự từ Google Account → Security → 2-Step Verification → App passwords:'
+              : 'Nhập IMAP password:');
+        var pwd  = prompt(pwdHint, '');
+        if(pwd==null) return;
+        payload.imap_host       = host;
+        payload.imap_port       = port;
+        payload.imap_encryption = enc;
+        payload.imap_username   = user;
+        if(pwd !== '') payload.imap_password = pwd;
+      }
+
       if(id){ payload.id = id; }
       var action = id ? 'admin_email_intake_mailbox_update' : 'admin_email_intake_mailbox_create';
       apiCall(action, payload, function(res){
-        if(res.ok) aeoi.loadMailboxes();
-        else alert('Lỗi: ' + (res.error||''));
+        if(res.ok){
+          aeoi.loadMailboxes();
+          if(!id && (provChoice==='gmail_imap' || provChoice==='generic_imap')){
+            if(confirm('Mailbox đã tạo. Chạy thử kết nối IMAP ngay bây giờ?')){
+              aeoi.pollMailbox((res.mailbox||{}).id);
+            }
+          }
+        } else {
+          alert('Lỗi: ' + (res.error||'') + (res.detail ? '\n\n' + res.detail : ''));
+        }
+      });
+    },
+    pollMailbox: function(id){
+      apiCall('admin_email_intake_mailbox_poll', {id:id}, function(res){
+        if(res.ok && res.result){
+          var r = res.result;
+          alert('Kết quả poll mailbox:\n\n' +
+                'Status: ' + r.status + '\n' +
+                'Note: ' + (r.note||'OK') + '\n' +
+                'Fetched: ' + (r.fetched||0) + '\n' +
+                'Created cases: ' + (r.created||0) + '\n' +
+                'Skipped: ' + (r.skipped||0) + '\n' +
+                'Duration: ' + (r.duration_ms||0) + 'ms');
+          aeoi.loadMailboxes();
+        } else {
+          alert('Lỗi: ' + (res.error||'') + (res.detail ? '\n\n' + res.detail : ''));
+        }
       });
     },
     toggleMailbox: function(id, enabled){

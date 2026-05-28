@@ -777,6 +777,7 @@ const migrationDomainDefaults = new Map([
   ['203_email_intake_infrastructure.sql', 'system_infrastructure'],
   ['204_email_intake_harden_defaults.sql', 'system_infrastructure'],
   ['205_email_intake_order_case_upgrade.sql', 'system_infrastructure'],
+  ['206_email_intake_imap_provider.sql', 'system_infrastructure'],
 ]);
 
 const tableDomainOverrides = {
