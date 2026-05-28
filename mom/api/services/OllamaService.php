@@ -38,8 +38,13 @@ use RuntimeException;
 final class OllamaService
 {
     public const DEFAULT_BASE_URL = 'http://127.0.0.1:11434';
-    public const DEFAULT_MODEL    = 'llama3.1:8b';
-    private const TIMEOUT_SECONDS = 90;
+    public const DEFAULT_MODEL    = 'llama3.2:3b';
+    // 240s = enough margin for 3B model on 4-vCPU CPU-only VPS doing
+    // JSON-mode extraction with our schema (typical 100-180s end-to-end).
+    private const TIMEOUT_SECONDS = 240;
+    // Keep model loaded in Ollama RAM for 30 min after each call so the
+    // next extraction doesn't pay the cold-load tax (~30s for 3B).
+    private const KEEP_ALIVE      = '30m';
     private const SCHEMA_VERSION  = 'he-sem-email-intake-extraction-v1';
 
     public function __construct(
@@ -94,15 +99,16 @@ final class OllamaService
         $userPrompt   = $this->buildUserPrompt($bodyText, $context);
 
         $payload = [
-            'model'    => $this->model,
-            'stream'   => false,
-            'format'   => 'json',
-            'options'  => [
+            'model'      => $this->model,
+            'stream'     => false,
+            'format'     => 'json',
+            'keep_alive' => self::KEEP_ALIVE,
+            'options'    => [
                 'temperature' => 0.0,
                 'top_p'       => 0.95,
                 'num_ctx'     => 8192,
             ],
-            'messages' => [
+            'messages'   => [
                 ['role' => 'system', 'content' => $systemPrompt],
                 ['role' => 'user',   'content' => $userPrompt],
             ],
