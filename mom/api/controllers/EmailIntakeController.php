@@ -1209,16 +1209,15 @@ class EmailIntakeController extends BaseController
             ], $worker['worker_id']);
             $caseId = (int)$case['id'];
 
-            // Backfill the message row with the case_id-derived so_number
-            // slot via the standard message status flow (so_number stays
-            // empty until a Sales Order is committed; we just mark the
-            // message as 'extraction_pending' so the message log shows it
-            // is being processed).
+            // Mark message as 'processing' — the email_intake_message.status
+            // enum (migration 203) is pending | processing | extracted |
+            // created | review_queue | quarantined | skipped | failed |
+            // duplicate. 'extraction_pending' is a CASE-level status only.
             $this->db()->execute(
                 'UPDATE email_intake_message
                     SET status = :p_status, updated_at = NOW()
                   WHERE id = :p_id',
-                [':p_status' => 'extraction_pending', ':p_id' => $messageId]
+                [':p_status' => 'processing', ':p_id' => $messageId]
             );
 
             // Persist attachments
