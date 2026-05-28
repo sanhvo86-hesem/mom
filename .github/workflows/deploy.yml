@@ -167,11 +167,12 @@ jobs:
 
       - name: KPI integrity drift test (guard self-test)
         # (P12 hardening) Mutates temporary registry/document copies across
-        # the required fake-drift scenarios: missing CDR, staged scored-core
-        # metric, Cpk without sample policy, missing LAM row, disabled bonus
-        # simulation-only flag, stale ANNEX-125 15-KPI wording, non-runtime
-        # rewardable metric, and composite weights != 100. Catches guard
-        # regressions before they let a real drift slip through.
+        # the 8 required fake-drift scenarios: missing linked CDR, translated
+        # canonical code in ANNEX, staged metric made rewardable, runtime
+        # metric without calculator, Cpk without sample policy, LAM linked
+        # metric without canonical row, composite weights != 100, and a role
+        # active scorecard item that turns a staged metric into reward input.
+        # Catches guard regressions before they let a real drift slip through.
         run: php mom/tools/release/check_kpi_integrity_drift_test.php
 
       - name: Migration drift check (offline)

@@ -98,7 +98,7 @@ const ROLES = {
   production_director:          {level:1,approve:true,admin:false,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:false,label:"Giám Đốc Sản Xuất",labelEn:"Production Director",color:"var(--purple-light,#6d28d9)",icon:"🎖️",dept:"EXE"},
   // ═══ PRODUCTION (PRO) ═══
   cnc_workshop_manager:         {level:2,approve:false,admin:false,canEditDocs:true,canCreateDocs:false,canViewActivity:false,canExportUsers:false,label:"Quản Đốc Xưởng CNC",labelEn:"CNC Workshop Manager",color:"var(--green-dark,#059669)",icon:"🏭",dept:"PRO"},
-  shift_leader:                 {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Trưởng Ca",labelEn:"Shift Leader",color:"var(--green-dark,#16a34a)",icon:"📋",dept:"PRO"},
+  shift_leader:                 {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Trưởng Ca",labelEn:"Shift Supervisor",color:"var(--green-dark,#16a34a)",icon:"📋",dept:"PRO"},
   setup_technician:             {level:4,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Kỹ Thuật Viên Setup",labelEn:"Setup Technician",color:"var(--green-light,#22c55e)",icon:"🛠️",dept:"PRO"},
   cnc_operator:                 {level:4,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Thợ Vận Hành CNC",labelEn:"CNC Operator",color:"#4ade80",icon:"🔩",dept:"PRO"},
   deburr_team_lead:             {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Trưởng Nhóm Deburr",labelEn:"Deburr Team Lead",color:"var(--green-light,#10b981)",icon:"🧽",dept:"PRO"},
@@ -108,35 +108,35 @@ const ROLES = {
   cleaning_packaging_technician:{level:4,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Kỹ Thuật Viên Vệ Sinh & Đóng Gói",labelEn:"Cleaning Packaging Technician",color:"#2dd4bf",icon:"✨",dept:"PRO"},
   maintenance_technician:       {level:4,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Kỹ Thuật Viên Bảo Trì",labelEn:"Maintenance Technician",color:"#71717a",icon:"🔧",dept:"PRO"},
   // ═══ ENGINEERING (ENG) ═══
-  engineering_lead:             {level:2,approve:false,admin:false,canEditDocs:true,canCreateDocs:false,canViewActivity:false,canExportUsers:false,label:"Trưởng Phòng Kỹ Thuật",labelEn:"Engineering Lead / Manager",color:"#0369a1",icon:"⚙️",dept:"ENG"},
+  engineering_lead:             {level:2,approve:false,admin:false,canEditDocs:true,canCreateDocs:false,canViewActivity:false,canExportUsers:false,label:"Trưởng Phòng Kỹ Thuật",labelEn:"Engineering Manager",color:"#0369a1",icon:"⚙️",dept:"ENG"},
   process_engineer:             {level:3,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Kỹ Sư Quy Trình",labelEn:"Process Engineer",color:"#0284c7",icon:"🧠",dept:"ENG"},
   cam_nc_programmer:            {level:3,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Lập Trình CAM/NC",labelEn:"CAM/NC Programmer",color:"var(--cyan-light,#0891b2)",icon:"💻",dept:"ENG"},
   // ═══ QUALITY (QA) ═══
-  qa_manager:                   {level:1,approve:true,admin:true,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:true,label:"Trưởng Phòng Chất Lượng",labelEn:"QA Manager",color:"var(--red-light,#dc2626)",icon:"🛡️",dept:"QA"},
+  qa_manager:                   {level:1,approve:true,admin:true,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:true,label:"Trưởng Phòng Chất Lượng",labelEn:"Quality Manager",color:"var(--red-light,#dc2626)",icon:"🛡️",dept:"QA"},
   quality_engineer:             {level:3,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Kỹ Sư Chất Lượng",labelEn:"Quality Engineer",color:"#e11d48",icon:"🔬",dept:"QA"},
-  qc_inspector:                 {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"QC / Lập Trình CMM",labelEn:"QC Inspector / CMM Programmer-Operator",color:"#f43f5e",icon:"🔍",dept:"QA"},
-  qms_engineer:                 {level:2,approve:false,admin:false,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:false,label:"Kỹ Sư QMS / Document Controller",labelEn:"QMS Engineer",color:"#be123c",icon:"📋",dept:"QA"},
-  internal_auditor:             {level:2,approve:false,admin:false,canEditDocs:false,canViewActivity:true,canExportUsers:false,label:"Chuyên Viên Đánh Giá Nội Bộ",labelEn:"Internal Auditor (Outsource)",color:"#9f1239",icon:"📊",dept:"QA"},
+  qc_inspector:                 {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"QC / Lập Trình CMM",labelEn:"QC Inspector / CMM Programmer",color:"#f43f5e",icon:"🔍",dept:"QA"},
+  qms_engineer:                 {level:2,approve:false,admin:false,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:false,label:"Kỹ Sư QMS / Document Controller",labelEn:"QMS Engineer / Document Controller",color:"#be123c",icon:"📋",dept:"QA"},
+  internal_auditor:             {level:2,approve:false,admin:false,canEditDocs:false,canViewActivity:true,canExportUsers:false,label:"Chuyên Viên Đánh Giá Nội Bộ",labelEn:"Internal Audit Specialist",color:"#9f1239",icon:"📊",dept:"QA"},
   // ═══ SUPPLY CHAIN (SCM) ═══
   supply_chain_manager:         {level:2,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Trưởng Phòng Cung Ứng",labelEn:"Supply Chain Manager",color:"#84cc16",icon:"🛒",dept:"SCM"},
-  buyer:                        {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Nhân Viên Mua Hàng",labelEn:"Buyer / Purchasing",color:"#a3e635",icon:"🛍️",dept:"SCM"},
+  buyer:                        {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Nhân Viên Mua Hàng",labelEn:"Purchasing Officer",color:"#a3e635",icon:"🛍️",dept:"SCM"},
   warehouse_clerk:              {level:4,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Nhân Viên Kho",labelEn:"Warehouse Clerk",color:"#65a30d",icon:"📦",dept:"SCM"},
-  tool_storekeeper:             {level:4,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Thủ Kho Dụng Cụ",labelEn:"Tool Crib / Tool Storekeeper",color:"#4d7c0f",icon:"🧰",dept:"SCM"},
-  logistics_coordinator:        {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Nhân Viên Xuất Nhập Khẩu",labelEn:"Import-Export Staff",color:"var(--green-dark,#16a34a)",icon:"🚚",dept:"SCM"},
+  tool_storekeeper:             {level:4,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Thủ Kho Dụng Cụ",labelEn:"Tool Storekeeper",color:"#4d7c0f",icon:"🧰",dept:"SCM"},
+  logistics_coordinator:        {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Nhân Viên Xuất Nhập Khẩu",labelEn:"Import-Export Coordinator",color:"var(--green-dark,#16a34a)",icon:"🚚",dept:"SCM"},
   // ═══ SALES (SAL) ═══
   estimator:                    {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Nhân Viên Báo Giá",labelEn:"Estimator",color:"var(--amber-light,#f59e0b)",icon:"📊",dept:"SAL"},
-  customer_service:             {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Dịch Vụ Khách Hàng",labelEn:"Customer Service",color:"#fbbf24",icon:"🤝",dept:"SAL"},
+  customer_service:             {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Dịch Vụ Khách Hàng",labelEn:"Customer Service Officer",color:"#fbbf24",icon:"🤝",dept:"SAL"},
   // ═══ FINANCE (FIN) ═══
   finance_manager:              {level:2,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Trưởng Phòng Tài Chính",labelEn:"Finance Manager",color:"#a21caf",icon:"🏦",dept:"FIN"},
   gl_payroll_accountant:        {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Kế Toán Tổng Hợp & Lương",labelEn:"General Ledger & Payroll Accountant",color:"#c026d3",icon:"💰",dept:"FIN"},
   ap_ar_accountant:             {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Kế Toán Công Nợ",labelEn:"AP/AR & Payments Accountant",color:"#d946ef",icon:"💳",dept:"FIN"},
   // ═══ HR ═══
-  hr_manager:                   {level:2,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Trưởng Phòng Nhân Sự",labelEn:"HR Manager",color:"var(--purple-light,#8b5cf6)",icon:"👥",dept:"HR"},
+  hr_manager:                   {level:2,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Trưởng Phòng Nhân Sự",labelEn:"Human Resources Manager",color:"var(--purple-light,#8b5cf6)",icon:"👥",dept:"HR"},
   // ═══ EHS ═══
   ehs_specialist:               {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Chuyên Viên An Toàn - Môi Trường",labelEn:"EHS Specialist",color:"#ea580c",icon:"🦺",dept:"EHS"},
   // ═══ IT ═══
-  it_admin:                     {level:2,approve:false,admin:true,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:true,label:"Quản Trị Hệ Thống IT",labelEn:"IT Admin",color:"var(--purple-light,#6366f1)",icon:"🖥️",dept:"IT"},
-  epicor_admin:                 {level:3,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Quản Trị Epicor ERP",labelEn:"Epicor System Administrator",color:"var(--purple-light,#4f46e5)",icon:"⚡",dept:"IT"}
+  it_admin:                     {level:2,approve:false,admin:true,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:true,label:"Quản Trị Hệ Thống IT",labelEn:"IT Systems Administrator",color:"var(--purple-light,#6366f1)",icon:"🖥️",dept:"IT"},
+  epicor_admin:                 {level:3,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Quản Trị Epicor ERP",labelEn:"Epicor ERP Administrator",color:"var(--purple-light,#4f46e5)",icon:"⚡",dept:"IT"}
 };
 
 // SSOT default role for newly created users (admin "Tạo người dùng" modal
@@ -196,7 +196,7 @@ const DEFAULT_DEPT_TITLES = {
   ],
   PRO:[
     'CNC Workshop Manager',
-    'Shift Leader',
+    'Shift Supervisor',
     'Setup Technician',
     'CNC Operator',
     'Deburr Team Lead',
@@ -207,28 +207,28 @@ const DEFAULT_DEPT_TITLES = {
     'Maintenance Technician'
   ],
   ENG:[
-    'Engineering Lead / Manager',
+    'Engineering Manager',
     'Process Engineer',
     'CAM/NC Programmer'
   ],
   QA:[
-    'QA Manager',
+    'Quality Manager',
     'Quality Engineer',
-    'QC Inspector / CMM Programmer-Operator',
-    'QMS Engineer',
-    'Internal Auditor (Outsource)'
+    'QC Inspector / CMM Programmer',
+    'QMS Engineer / Document Controller',
+    'Internal Audit Specialist'
   ],
   SCM:[
     'Supply Chain Manager',
-    'Buyer / Purchasing',
+    'Purchasing Officer',
     'Warehouse Clerk',
-    'Tool Crib / Tool Storekeeper',
-    'Import-Export Staff',
+    'Tool Storekeeper',
+    'Import-Export Coordinator',
     'Material Planning and Inventory Control Specialist'
   ],
   SAL:[
     'Estimator',
-    'Customer Service'
+    'Customer Service Officer'
   ],
   FIN:[
     'Finance Manager',
@@ -236,14 +236,14 @@ const DEFAULT_DEPT_TITLES = {
     'AP/AR & Payments Accountant'
   ],
   HR:[
-    'HR Manager'
+    'Human Resources Manager'
   ],
   EHS:[
     'EHS Specialist'
   ],
   IT:[
-    'IT Admin',
-    'Epicor System Administrator'
+    'IT Systems Administrator',
+    'Epicor ERP Administrator'
   ],
   GEN:[
     'Trainee / Intern'
@@ -256,7 +256,7 @@ let TITLES = [...DEFAULT_TITLES];
 
 // V9 migration: clear stale session cache BEFORE loading
 (function(){
-  const QMS_VER = 'v10.4';
+  const QMS_VER = 'v10.5';
   try {
     if(sessionStorage.getItem('hesem_qms_version') !== QMS_VER){
       sessionStorage.removeItem('hesem_departments');

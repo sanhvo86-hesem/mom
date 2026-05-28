@@ -8,8 +8,8 @@ declare(strict_types=1);
  * ────────────────────────────────────────────────────────────────────────────
  * Mutates temporary registry / document copies only, then invokes the real
  * check_kpi_integrity.php guard via KPI_INTEGRITY_* env overrides. Exit 0
- * means the CI guard caught every fake drift and the untouched registry still
- * passes afterwards.
+ * means the CI guard caught all 8 required Prompt 12 fake drifts and the
+ * untouched registry/document set still passes afterwards.
  */
 
 $base       = dirname(__DIR__, 2);          // -> repo .../mom/mom
@@ -186,19 +186,49 @@ $expectP0('01.remove_gate_cdr', static function (array &$mut) use ($mutateMetric
     });
 }, 'gate_control_metric requires linked_cdr');
 
-// 2. Put staged metric in scored core / executive scorecard.
-$expectP0('02.staged_in_scored_core', static function (array &$mut): void {
-    foreach ($mut['annex122_governance_kpis'] ?? [] as $row) {
-        if (is_array($row) && (($row['calculation_status'] ?? '') === 'staged_data_contract')) {
-            $mut['executive_scorecard'][] = strtoupper((string) $row['canonical_code']);
-            return;
-        }
-    }
-    throw new RuntimeException('drift_test: no staged governance metric found');
-}, 'P0.9.C executive_scorecard');
+// 2. Rename a canonical code in ANNEX to Vietnamese.
+$tmpAnnex125 = tempnam(sys_get_temp_dir(), 'kpi_drift_annex125_');
+if ($tmpAnnex125 === false) {
+    throw new RuntimeException('drift_test: cannot create temp ANNEX-125 file');
+}
+$annex125Drifted = str_replace(
+    'CHECK_DIM_REPORT_ON_SHIP',
+    'CHECK_DIM_REPORT_ON_GIAO HÀNG',
+    (string) file_get_contents($annex125Fp),
+    $replaceCount
+);
+if ($replaceCount < 1) {
+    throw new RuntimeException('drift_test: CHECK_DIM_REPORT_ON_SHIP not found in ANNEX-125');
+}
+file_put_contents($tmpAnnex125, $annex125Drifted);
+$expectP0('02.annex_translated_canonical_code', static function (array &$mut): void {
+    // Registry stays unchanged; only the temp ANNEX-125 drifts.
+}, 'doc canonical/translation drift', ['KPI_INTEGRITY_ANNEX125' => $tmpAnnex125]);
+@unlink($tmpAnnex125);
 
-// 3. Add SPC/Cpk metric without sample_policy.
-$expectP0('03.cpk_without_sample_policy', static function (array &$mut) use ($baseFakeMetric): void {
+// 3. Mark a staged metric rewardable.
+$expectP0('03.staged_metric_rewardable', static function (array &$mut) use ($mutateMetric): void {
+    $mutateMetric($mut, 'DOWNTIME_IMPACT', static function (array &$row): void {
+        $row['calculation_status'] = 'staged_data_contract';
+        $row['reward_mode'] = 'bonus_pool_candidate';
+        $row['reward_eligible'] = true;
+    });
+}, "reward_mode 'bonus_pool_candidate' requires calculation_status=runtime_calculated");
+
+// 4. Add runtime metric without calc function.
+$expectP0('04.runtime_metric_without_calculator', static function (array &$mut) use ($baseFakeMetric): void {
+    $mut['proposed_operating_metrics'][] = $baseFakeMetric([
+        'canonical_code' => 'FAKE_RUNTIME_NO_CALC_P12',
+        'calculation_status' => 'runtime_calculated',
+        'lifecycle_status' => 'approved',
+        'data_contract_gap' => '',
+        'target_graduation_condition' => '',
+    ]);
+    $mut['runtime_calculated_metrics'][] = 'FAKE_RUNTIME_NO_CALC_P12';
+}, 'KpiEngine::getCalculator() does not wire a calculator');
+
+// 5. Add SPC/Cpk metric without sample_policy.
+$expectP0('05.cpk_without_sample_policy', static function (array &$mut) use ($baseFakeMetric): void {
     $mut['proposed_operating_metrics'][] = $baseFakeMetric([
         'canonical_code' => 'FAKE_CPK_NO_SAMPLE_P12',
         'metric_subtype' => 'spc_capability_metric',
@@ -208,42 +238,13 @@ $expectP0('03.cpk_without_sample_policy', static function (array &$mut) use ($ba
     ]);
 }, 'spc_capability_metric requires sample_policy.min_n_score');
 
-// 4. Remove one LAM linked metric row while profile still references it.
-$expectP0('04.remove_lam_metric_row', static function (array &$mut) use ($removeMetricEverywhere): void {
+// 6. Remove one LAM linked metric row while profile still references it.
+$expectP0('06.remove_lam_metric_row', static function (array &$mut) use ($removeMetricEverywhere): void {
     $removeMetricEverywhere($mut, 'CHECK_DIM_REPORT_ON_SHIP');
 }, "linked_metric 'CHECK_DIM_REPORT_ON_SHIP' does not resolve");
 
-// 5. Disable simulation-only bonus model.
-$expectP0('05.bonus_simulation_disabled', static function (array &$mut): void {
-    $mut['bonus_simulation_model']['simulation_only'] = false;
-}, 'bonus_simulation_model.simulation_only MUST be true');
-
-// 6. Reintroduce old ANNEX-125 15-KPI wording while registry is LEAN-7.
-$tmpAnnex125 = tempnam(sys_get_temp_dir(), 'kpi_drift_annex125_');
-if ($tmpAnnex125 === false) {
-    throw new RuntimeException('drift_test: cannot create temp ANNEX-125 file');
-}
-file_put_contents(
-    $tmpAnnex125,
-    (string) file_get_contents($annex125Fp)
-        . "\n<!-- fake drift: Scorecard lãnh đạo 15 KPI CNC-EXEC-BSC-15-2026 -->\n",
-);
-$expectP0('06.annex125_old_15_kpi', static function (array &$mut): void {
-    // Registry stays unchanged; only the ANNEX-125 temp file drifts.
-}, 'P0.20 BSC docs drift', ['KPI_INTEGRITY_ANNEX125' => $tmpAnnex125]);
-@unlink($tmpAnnex125);
-
-// 7. Mark a non-runtime metric rewardable.
-$expectP0('07.non_runtime_rewardable', static function (array &$mut) use ($mutateMetric): void {
-    $mutateMetric($mut, 'DOWNTIME_IMPACT', static function (array &$row): void {
-        $row['calculation_status'] = 'staged_data_contract';
-        $row['reward_mode'] = 'bonus_pool_candidate';
-        $row['reward_eligible'] = true;
-    });
-}, "reward_mode 'bonus_pool_candidate' requires calculation_status=runtime_calculated");
-
-// 8. Composite readiness component weights sum to 90.
-$expectP0('08.composite_weight_90', static function (array &$mut) use ($baseFakeMetric): void {
+// 7. Composite readiness component weights sum to 90.
+$expectP0('07.composite_weight_90', static function (array &$mut) use ($baseFakeMetric): void {
     $mut['proposed_operating_metrics'][] = $baseFakeMetric([
         'canonical_code' => 'FAKE_COMPOSITE_WEIGHT_90_P12',
         'metric_subtype' => 'composite_readiness_index',
@@ -256,6 +257,34 @@ $expectP0('08.composite_weight_90', static function (array &$mut) use ($baseFake
         ],
     ]);
 }, 'composite_weighted_score component weights must sum to 100');
+
+// 8. Add role active scorecard item with staged reward.
+$expectP0('08.role_active_scorecard_staged_reward', static function (array &$mut): void {
+    $roles = &$mut['jd_kpi_scorecards']['roles'];
+    if (!is_array($roles)) {
+        throw new RuntimeException('drift_test: jd_kpi_scorecards.roles missing');
+    }
+    foreach ($roles as &$role) {
+        if (!is_array($role) || !is_array($role['active_scorecard'] ?? null) || $role['active_scorecard'] === []) {
+            continue;
+        }
+        $cloned = $role['active_scorecard'][0];
+        if (!is_array($cloned)) {
+            continue;
+        }
+        $cloned['kpi_code'] = 'CURRENT_CONSTRAINT_RESOURCE';
+        $cloned['role_measure_code'] = 'FAKE_P12_STAGE_REWARD_ROLE';
+        $cloned['measure_name_vi'] = 'Chỉ số staged giả lập reward Prompt 12';
+        $cloned['scorecard_contributes_to_reward'] = true;
+        $cloned['scorecard_scoring_status'] = 'active_runtime';
+        $cloned['manual_governed_override'] = false;
+        $role['active_scorecard'][] = $cloned;
+        unset($role);
+        return;
+    }
+    unset($role);
+    throw new RuntimeException('drift_test: no active_scorecard available for fake drift');
+}, 'P0.7.4 JD scorecard');
 
 // Prove the untouched registry/document set still passes after temp mutations.
 [$cleanCode, $cleanOut] = $runGuard($registry);

@@ -66,6 +66,8 @@ declare(strict_types=1);
  *      de-templated with target/checklist/action/controllability/attribution,
  *      frontline/support roles must not carry unfair outcome measures, and
  *      JD documents must hydrate scorecards from the registry renderer.
+ *  20. Audit-facing docs reintroduce translated canonical codes or known
+ *      machine-translation defects that make the KPI system non-audit-ready.
  *
  * P1 findings (warn, do not block)
  * ────────────────────────────────
@@ -98,6 +100,10 @@ $raciMasterFp = $envPath('KPI_INTEGRITY_CDR_MATRIX', $base . '/docs/system/organ
 $annex128Fp = $envPath('KPI_INTEGRITY_ANNEX128', $annexDir . '/annex-128-kpi-system-matrix-and-document-usage.html');
 $annex125Fp = $envPath('KPI_INTEGRITY_ANNEX125', $annexDir . '/annex-125-cnc-performance-operating-system.html');
 $annex129Fp = $envPath('KPI_INTEGRITY_ANNEX129', $annexDir . '/annex-129-bsc-kpi-operating-mechanism-assessment.html');
+$annex126Fp = $annexDir . '/annex-126-hoshin-strategy-deployment-and-catchball.html';
+$annex127Fp = $annexDir . '/annex-127-kpi-authority-registry-and-operational-metrics.html';
+$annex119Fp = $annexDir . '/annex-119-change-roadmap-and-priority-register.html';
+$wi202Fp    = $base . '/docs/operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html';
 $engineFp   = $envPath('KPI_INTEGRITY_ENGINE', $base . '/api/services/KpiEngine.php');
 $routesFp   = $envPath('KPI_INTEGRITY_ROUTES', $base . '/api/routes/core-routes.php');
 $adminJsFp  = $envPath('KPI_INTEGRITY_ADMIN_JS', $base . '/scripts/portal/00o-admin-kpi-registry.js');
@@ -533,6 +539,34 @@ if (!str_contains($annex125, '7 core') || !str_contains($annex125, 'driver panel
 }
 if (!str_contains($annex129, 'BSC là layer 2')) {
     $p0[] = "P0.20 BSC docs drift: ANNEX-129 must state BSC là layer 2.";
+}
+$auditFacingDocs = [
+    'ANNEX-119' => readText($annex119Fp),
+    'ANNEX-122' => $annex122,
+    'ANNEX-125' => $annex125,
+    'ANNEX-126' => readText($annex126Fp),
+    'ANNEX-127' => readText($annex127Fp),
+    'ANNEX-128' => $annex128,
+    'ANNEX-129' => $annex129,
+    'WI-202'    => readText($wi202Fp),
+];
+$forbiddenDocTokens = [
+    'CHECK_DIM_REPORT_ON_GIAO HÀNG' => 'CHECK_DIM_REPORT_ON_SHIP',
+    'DOC_HỒ SƠ_RETENTION_10Y' => 'DOC_RECORD_RETENTION_10Y',
+    'PROCESS_CHANGE_PHÊ DUYỆT_RATE' => 'PROCESS_CHANGE_APPROVAL_RATE',
+    'SUPPLIER_RBA_COMPLIANCE_BẰNG CHỨNG' => 'SUPPLIER_RBA_COMPLIANCE_EVIDENCE',
+    'Balanced Thẻ điểm' => 'Balanced Scorecard',
+    'OPC UA máy Tools' => 'OPC UA Machine Tools',
+    'giao hàngments' => 'lô giao hàng',
+    'sub-nhà cung cấp' => 'nhà cung cấp phụ',
+    'đặc biệt-quy trình' => 'quy trình đặc biệt',
+];
+foreach ($auditFacingDocs as $docName => $docText) {
+    foreach ($forbiddenDocTokens as $token => $replacement) {
+        if (str_contains($docText, $token)) {
+            $p0[] = "P0.20 doc canonical/translation drift: $docName contains forbidden token '$token'; use '$replacement'.";
+        }
+    }
 }
 foreach ((array) ($scorecardModel['strategic_driver_panel'] ?? []) as $driver) {
     if (!is_array($driver)) {
