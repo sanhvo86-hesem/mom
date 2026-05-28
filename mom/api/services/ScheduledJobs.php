@@ -1088,7 +1088,60 @@ final class ScheduledJobs
                 'error_detail' => 'M365MailboxService not yet provisioned — pending sprint 2.',
             ], 'skipped');
 
-            $svc->updateNextPollAt();
+            // IMAP polling — only attempt if php-imap is loaded.
+            $imapSummary = [
+                'mailboxes' => 0, 'fetched' => 0, 'created' => 0,
+                'skipped' => 0, 'errors' => 0,
+            ];
+            if (!empty($imapMailboxIds) && extension_loaded('imap')) {
+                require_once __DIR__ . '/EmailIntakeImapService.php';
+                require_once __DIR__ . '/EmailIntakeCaseService.php';
+                require_once __DIR__ . '/EmailIntakeValidationService.php';
+
+                $caseSvc = new \MOM\Api\Services\EmailIntakeCaseService($this->db);
+                $vSvc    = new \MOM\Api\Services\EmailIntakeValidationService(
+                    $this->db, $caseSvc, $configSvc
+                );
+                $imapSvc = new \MOM\Api\Services\EmailIntakeImapService(
+                    $this->db, $catalog, $configSvc, $caseSvc, $vSvc, $this->dataDir
+                );
+
+                foreach ($imapMailboxIds as $mid) {
+                    $imapSummary['mailboxes']++;
+                    try {
+                        $row = $catalog->getMailboxWithSecret($mid);
+                        $r   = $imapSvc->pollMailbox($row, 'system.cron.aeoi');
+                        $imapSummary['fetched'] += (int)($r['fetched'] ?? 0);
+                        $imapSummary['created'] += (int)($r['created'] ?? 0);
+                        $imapSummary['skipped'] += (int)($r['skipped'] ?? 0);
+                        if (($r['status'] ?? '') === 'failed') {
+                            $imapSummary['errors']++;
+                        }
+                    } catch (Throwable $e) {
+                        $imapSummary['errors']++;
+                        $catalog->recordMailboxScan($mid, 'poll_failed', $e->getMessage());
+                    }
+                }
+            }
+
+            $detail = "Heartbeat: $heartbeatCount local-Outlook; "
+                    . "IMAP: {$imapSummary['mailboxes']} mailboxes, "
+                    . "fetched {$imapSummary['fetched']}, created {$imapSummary['created']}, "
+                    . "skipped {$imapSummary['skipped']}, errors {$imapSummary['errors']}.";
+
+            $configSvc->closePollRun($runId, [
+                'found'        => $imapSummary['fetched'],
+                'processed'    => $imapSummary['created'] + $imapSummary['skipped'],
+                'skipped'      => $imapSummary['skipped'],
+                'quarantined'  => 0,
+                'created'      => $imapSummary['created'],
+                'review'       => $imapSummary['created'], // every new case starts as needs-review
+                'errors'       => $imapSummary['errors'],
+                'duration_ms'  => (int)((microtime(true) - $start) * 1000),
+                'api_calls'    => $imapSummary['mailboxes'],
+                'error_detail' => $detail,
+            ], $imapSummary['errors'] > 0 ? 'completed' : 'completed');
+            $configSvc->updateNextPollAt();
 
             return [
                 'status'         => 'skipped',

@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Api\Services\EmailIntakeConfigService;
+use MOM\Api\Services\EmailIntakeValidationService;
+use MOM\Api\Services\EmailIntakeWorkerAuthService;
+use MOM\Api\Services\LlmExtractionRouterService;
+use MOM\Services\CustomerPurchaseOrderService;
+use MOM\Services\OrderService;
 use Throwable;
 
 /**
@@ -33,6 +38,21 @@ use Throwable;
 class EmailIntakeController extends BaseController
 {
     private ?EmailIntakeConfigService $configSvc = null;
+    private ?EmailIntakeAdminCatalogService $catalogSvc = null;
+    private ?EmailIntakeWorkerAuthService $workerAuthSvc = null;
+    private ?EmailIntakeCaseService $caseSvc = null;
+    private ?EmailIntakeValidationService $validationSvc = null;
+    private ?EmailIntakeCommitService $commitSvc = null;
+    private ?LlmExtractionRouterService $llmRouterSvc = null;
+
+    private function db(): \MOM\Database\Connection
+    {
+        $conn = $this->data->getConnection();
+        if ($conn === null) {
+            throw new \RuntimeException('Database not available (JSON_ONLY mode). Email Intake requires PostgreSQL.');
+        }
+        return $conn;
+    }
 
     private function svc(): EmailIntakeConfigService
     {
@@ -44,6 +64,137 @@ class EmailIntakeController extends BaseController
             $this->configSvc = new EmailIntakeConfigService($conn);
         }
         return $this->configSvc;
+    }
+
+    private function catalog(): EmailIntakeAdminCatalogService
+    {
+        if ($this->catalogSvc === null) {
+            // Inject EmailIntakeConfigService so IMAP passwords can be encrypted.
+            $this->catalogSvc = new EmailIntakeAdminCatalogService($this->db(), $this->svc());
+        }
+        return $this->catalogSvc;
+    }
+
+    private function workerAuth(): EmailIntakeWorkerAuthService
+    {
+        if ($this->workerAuthSvc === null) {
+            $this->workerAuthSvc = new EmailIntakeWorkerAuthService($this->db());
+        }
+        return $this->workerAuthSvc;
+    }
+
+    private function caseSvc(): EmailIntakeCaseService
+    {
+        if ($this->caseSvc === null) {
+            $this->caseSvc = new EmailIntakeCaseService($this->db());
+        }
+        return $this->caseSvc;
+    }
+
+    private function validation(): EmailIntakeValidationService
+    {
+        if ($this->validationSvc === null) {
+            $this->validationSvc = new EmailIntakeValidationService(
+                $this->db(),
+                $this->caseSvc(),
+                $this->svc()
+            );
+        }
+        return $this->validationSvc;
+    }
+
+    private function commit(): EmailIntakeCommitService
+    {
+        if ($this->commitSvc === null) {
+            $this->commitSvc = new EmailIntakeCommitService(
+                $this->caseSvc(),
+                new CustomerPurchaseOrderService($this->dataDir),
+                new OrderService($this->dataDir)
+            );
+        }
+        return $this->commitSvc;
+    }
+
+    private function actor(array $user): string
+    {
+        return (string)($user['username'] ?? $user['user'] ?? 'unknown');
+    }
+
+    private function llmRouter(): LlmExtractionRouterService
+    {
+        if ($this->llmRouterSvc === null) {
+            $this->llmRouterSvc = new LlmExtractionRouterService($this->db());
+        }
+        return $this->llmRouterSvc;
+    }
+
+    // ── LLM Model routing (migration 207) ────────────────────────────────
+
+    public function llmProvidersList(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        try {
+            $this->success(['providers' => $this->llmRouter()->listProvidersForUi()]);
+        } catch (Throwable $e) {
+            $this->error('llm_providers_failed', 500, $e->getMessage());
+        }
+    }
+
+    public function llmRulesList(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        try {
+            $this->success(['rules' => $this->llmRouter()->listRulesForUi()]);
+        } catch (Throwable $e) {
+            $this->error('llm_rules_failed', 500, $e->getMessage());
+        }
+    }
+
+    public function llmRuleSave(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $this->requireCsrf();
+        try {
+            $row = $this->llmRouter()->saveRule($this->jsonBody(), $this->actor($user));
+            $this->auditLog('admin_email_intake_llm_rule_save', [
+                'scope_type'  => $row['scope_type']  ?? null,
+                'scope_value' => $row['scope_value'] ?? null,
+            ]);
+            $this->success(['rule' => $row, 'saved' => true]);
+        } catch (Throwable $e) {
+            $this->error('llm_rule_save_failed', 400, $e->getMessage());
+        }
+    }
+
+    public function llmRuleDelete(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $id   = (int)($body['routing_id'] ?? $body['id'] ?? 0);
+        if ($id <= 0) { $this->error('missing_id', 400, 'routing_id is required.'); }
+        try {
+            $this->llmRouter()->deleteRule($id);
+            $this->auditLog('admin_email_intake_llm_rule_delete', ['routing_id' => $id]);
+            $this->success(['deleted' => true, 'routing_id' => $id]);
+        } catch (Throwable $e) {
+            $this->error('llm_rule_delete_failed', 400, $e->getMessage());
+        }
+    }
+
+    public function llmHealth(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        try {
+            $this->success(['health' => $this->llmRouter()->healthAll()]);
+        } catch (Throwable $e) {
+            $this->error('llm_health_failed', 500, $e->getMessage());
+        }
     }
 
     // ── Config ────────────────────────────────────────────────────────────
@@ -436,6 +587,69 @@ class EmailIntakeController extends BaseController
             $this->success(['deleted' => true, 'id' => $id]);
         } catch (Throwable $e) {
             $this->error('mailbox_delete_failed', 400, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST admin_email_intake_mailbox_poll
+     *
+     * Trigger an IMAP poll for a single mailbox row. Useful for "test
+     * connection" + "fetch latest now" from the admin UI without waiting
+     * for the cron heartbeat.
+     */
+    public function mailboxPoll(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $id   = (int)($body['id'] ?? 0);
+        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
+        // Open a poll_run record so admin can see the manual poll in
+        // "Nhật ký poll" — without this, only cron-driven polls show up
+        // in the log and admins lose visibility into manual triggers.
+        $runId  = $this->svc()->openPollRun('manual', $this->actor($user));
+        $start  = microtime(true);
+        try {
+            $row = $this->catalog()->getMailboxWithSecret($id);
+            $imap = new \MOM\Api\Services\EmailIntakeImapService(
+                $this->db(), $this->catalog(), $this->svc(),
+                $this->caseSvc(), $this->validation(), $this->dataDir
+            );
+            $result = $imap->pollMailbox($row, $this->actor($user));
+
+            $this->svc()->closePollRun($runId, [
+                'found'        => (int)($result['fetched'] ?? 0),
+                'processed'    => (int)($result['fetched'] ?? 0),
+                'skipped'      => (int)($result['skipped'] ?? 0),
+                'quarantined'  => 0,
+                'created'      => (int)($result['created'] ?? 0),
+                'review'       => (int)($result['created'] ?? 0),
+                'errors'       => ($result['status'] ?? '') === 'failed' ? 1 : 0,
+                'duration_ms'  => (int)((microtime(true) - $start) * 1000),
+                'api_calls'    => 1,
+                'error_detail' => $result['note'] ?? null,
+            ], ($result['status'] ?? 'failed') === 'failed' ? 'failed' : 'completed');
+            $this->svc()->updateNextPollAt();
+
+            $this->auditLog('admin_email_intake_mailbox_poll', [
+                'mailbox_id' => $id,
+                'run_id'     => $runId,
+                'status'     => $result['status'] ?? null,
+                'fetched'    => $result['fetched'] ?? 0,
+                'created'    => $result['created'] ?? 0,
+            ]);
+            $this->success(['result' => array_merge($result, ['run_id' => $runId])]);
+        } catch (Throwable $e) {
+            // Close the run as failed so the admin sees the failure in the log
+            try {
+                $this->svc()->closePollRun($runId, [
+                    'errors'       => 1,
+                    'duration_ms'  => (int)((microtime(true) - $start) * 1000),
+                    'error_detail' => $e->getMessage(),
+                ], 'failed');
+            } catch (Throwable) { /* avoid masking the original error */ }
+            $this->error('mailbox_poll_failed', 400, $e->getMessage());
         }
     }
 
