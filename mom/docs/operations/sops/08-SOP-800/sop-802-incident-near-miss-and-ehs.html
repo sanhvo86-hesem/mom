@@ -55,7 +55,7 @@
 </div>
 </div>
 <div class="note-blue"><b>Vị trí trong hệ thống 8 cổng (G0→G7):</b> SOP này vận hành xuyên suốt G0→G7 như một lớp bảo vệ con người và điều kiện vận hành, đồng thời giao tiếp trực tiếp với tính liên tục hoạt động, năng lực và CAPA khi sự cố ảnh hưởng hệ thống.<br/>→ Xem <a href="../../references/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để đối chiếu với cơ chế điều hành theo cổng kiểm soát.</div>
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng trong W0-W12 của chương trình triển khai QMS hiện hành: W0 để mở sổ ghi sự cố, W3 để diễn tập QA pilot, W5-W8 để quản trị sự cố trong go-live, W9-W10 để EHS nhận trực ca Đợt 3 và W11-W12 để cập nhật bài học/bàn giao vận hành thường xuyên.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng trong W0-W12 của chương trình triển khai QMS hiện hành: W0 để mở sổ ghi sự cố, W3 để diễn tập QA vận hành thử, W5-W8 để quản trị sự cố trong đưa vào vận hành, W9-W10 để EHS nhận trực ca Đợt 3 và W11-W12 để cập nhật bài học/bàn giao vận hành thường xuyên.</div>
 <div class="toc">
 <div class="toc-title">Mục lục</div>
 <div class="toc-grid">
@@ -96,14 +96,14 @@
 <p>Tài liệu này được dùng trong chương trình triển khai QMS hiện hành (lịch nguồn: <code>mom/data/config/deploy/program.bootstrap.json</code>) để mở sổ ghi sự cố, diễn tập phản ứng EHS, kiểm trực ca và bàn giao bài học. EHS, HR, AREA_LEADS và QA dùng SOP-802 cùng <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W03.html">TRN-DEP-W03</a>, <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W08.html">TRN-DEP-W08</a>, <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W10.html">TRN-DEP-W10</a> và <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W12.html">TRN-DEP-W12</a>. Mọi sự cố hoặc suýt xảy ra sự cố trong triển khai phải có người trực, thời điểm báo cáo, severity, điều kiện mở lại và bài học đưa về đào tạo hoặc CAPA khi cần.</p>
 <div class="table-card"><table class="matrix-table"><thead><tr><th>Tuần</th><th>Pha · trụ</th><th>Cổng kiểm liên quan</th><th>Cách dùng tài liệu này</th><th>Bằng chứng đóng cổng</th></tr></thead><tbody>
 <tr><td>W0</td><td>P0 · gov</td><td>P0-05</td><td>EHS mở sổ ghi sự cố và nhịp leo thang cho chương trình W0-W12, có người trực cho từng ca triển khai.</td><td><code>issues.json</code>, roster trực và kênh báo cáo.</td></tr>
-<tr><td>W3</td><td>P2 · pilot</td><td>P2-03</td><td>QA/EHS diễn tập sự cố Mức 3 giả lập trong pilot, đo báo cáo trong 24 h và đóng đúng SLA.</td><td><code>drills.json</code>, <code>issues.json</code>, FRM-811/FRM-181.</td></tr>
-<tr><td>W5-W8</td><td>P3 · golive</td><td>P3-01 + P3-03</td><td>AREA_LEADS báo cáo sự cố trong 24 h, EHS xác nhận Sev-1 = 0 hoặc có containment trước phiên điều hành.</td><td><code>issues.json</code>, MTTR ảnh chụp trạng thái, action log.</td></tr>
+<tr><td>W3</td><td>P2 · vận hành thử</td><td>P2-03</td><td>QA/EHS diễn tập sự cố Mức 3 giả lập trong vận hành thử, đo báo cáo trong 24 h và đóng đúng SLA.</td><td><code>drills.json</code>, <code>issues.json</code>, FRM-811/FRM-181.</td></tr>
+<tr><td>W5-W8</td><td>P3 · golive</td><td>P3-01 + P3-03</td><td>AREA_LEADS báo cáo sự cố trong 24 h, EHS xác nhận Sev-1 = 0 hoặc có containment trước phiên điều hành.</td><td><code>issues.json</code>, MTTR snapshot, action log.</td></tr>
 <tr><td>W9-W10</td><td>P3 · train + golive</td><td>P1-03</td><td>EHS Specialist nhận trực ca cho Đợt 3; người dẫn dắt EHS được đào tạo về báo cáo, cô lập hiện trường và mở lại khu vực.</td><td><code>training_records</code>, roster EHS và checklist OJT.</td></tr>
 <tr><td>W11-W12</td><td>P4 · doc + gov</td><td>P4-03 + P4-04</td><td>EHS cập nhật bài học, rà xu hướng sự cố và bàn giao nhịp theo dõi thường xuyên cho EHS Quản lý.</td><td>Biên bản bàn giao, <code>dcc_document_revision</code> và lesson log.</td></tr>
 </tbody></table></div>
 <h2 class="h2" id="p10-kpi">11. KPI điều hành phải theo dõi</h2>
 <div class="metric-grid">
-<div class="metric-card"><strong>KPI-DEP-02</strong><p>Đóng phiếu việc đúng hạn ≥95%; mọi sự cố phải có chủ sở hữu, hạn đóng, điều kiện mở lại và bằng chứng hiệu lực.</p></div>
+<div class="metric-card"><strong>KPI-DEP-02</strong><p>Đóng phiếu việc đúng hạn ≥95%; mọi sự cố phải có người chịu trách nhiệm, hạn đóng, điều kiện mở lại và bằng chứng hiệu lực.</p></div>
 <div class="metric-card"><strong>KPI-DEP-07</strong><p>MTTR sự cố Mức 1 ≤24 h; đo từ timestamp mở issue đến containment/khôi phục đã xác nhận.</p></div>
 <div class="metric-card"><strong>KPI-TRN-01</strong><p>Hoàn thành đào tạo ≥90% cho người dẫn dắt EHS/AREA_LEADS trong Đợt 3 trước khi tự trực ca.</p></div>
 </div>

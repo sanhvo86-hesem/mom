@@ -71,7 +71,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
      data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-703&quot;,&quot;title&quot;:&quot;Warehouse Vị trí FIFO Rules&quot;,&quot;subtitle&quot;:&quot;Tài liệu tham chiếu / chuẩn bổ trợ cho quy tắc vị trí kho, zoning, fifo/fefo, staging và cycle count.&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
 
 <div class="note">
-<strong>ÁP DỤNG KHI</strong><br>Dùng khi tạo mới vị trí, thay đổi zoning, put-away, relocation, overflow, cycle count, inventory adjustment hoặc Rà soát FIFO/FEFO/shelf-life.</div>
+<strong>ÁP DỤNG KHI</strong><br>Dùng khi tạo mới vị trí, thay đổi zoning, put-away, relocation, overflow, cycle count, inventory adjustment hoặc rà soát FIFO/FEFO/shelf-life.</div>
 
 <section class="annex-section"><h2>1. Mục đích và nguyên tắc điều khiển</h2>
 <p>ANNEX này là chuẩn vận hành bắt buộc để quản lý vị trí kho, zoning, nhãn vị trí, staging, put-away, relocation, FIFO/FEFO, shelf-life, cycle count và điều chỉnh tồn. Warehouse, IQC, Production, Kế hoạchning và <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> PHẢI dùng cùng một logic vị trí, cùng một quy tắc nhận diện trạng thái và cùng một nguồn dữ liệu. Epicor là Nguồn chuẩn cho giao dịch tồn. M365 là SSOT cho bằng chứng điều chỉnh, biên bản đếm và hồ sơ điều tra.</p>
@@ -127,8 +127,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr>
 <td>RET</td>
 <td>Hàng trả về / chờ quyết định</td>
-<td>Return từ Production, return từ giao hàng-prep, khách hàng return chưa xử lý</td>
-<td>Không nhập lại RM/FG khi chưa Rà soát</td>
+<td>Return từ Production, return từ ship-prep, customer return chưa xử lý</td>
+<td>Không nhập lại RM/FG khi chưa rà soát</td>
 <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td>
 <td>Phải có mã nguyên nhân và Người bàn giao</td>
 </tr>
@@ -277,7 +277,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tr>
 <tr>
 <td>Vật tư trả về từ Production</td>
-<td>Phải vào RET hoặc zone được chỉ định; không nhập thẳng lại RM nếu chưa Rà soát quantity, label, condition, nhiễm bẩn risk và truy xuất nguồn gốc.</td>
+<td>Phải vào RET hoặc zone được chỉ định; không nhập thẳng lại RM nếu chưa rà soát quantity, label, condition, nhiễm bẩn risk và truy xuất nguồn gốc.</td>
 </tr>
 <tr>
 <td>Mixed box / chi tiếtial box</td>
@@ -342,7 +342,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr>
 <td>90–180 ngày</td>
 <td>Vàng nhạt</td>
-<td>Kế hoạchning Rà soát cho job có thời gian dẫn (thời gian giao) dài; không mua mới nếu tồn hiện tại đủ dùng.</td>
+<td>Planning rà soát cho job có thời gian dẫn (thời gian giao) dài; không mua mới nếu tồn hiện tại đủ dùng.</td>
 </tr>
 <tr>
 <td>30–89 ngày</td>
@@ -371,7 +371,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <th>Nhóm</th>
 <th>Tiêu chí</th>
 <th>Tần suất tối thiểu</th>
-<th>Yêu cầu witness / Rà soát</th>
+<th>Yêu cầu witness / rà soát</th>
 </tr></thead>
 <tbody>
 <tr>
@@ -385,7 +385,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <td>B</td>
 <td>Giá trị trung bình, dùng thường xuyên, có ảnh hưởng kế hoạch sản xuất</td>
 <td>Hàng tháng</td>
-<td>WHS thực hiện, <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a> Rà soát.</td>
+<td>WHS thực hiện, <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a> rà soát.</td>
 </tr>
 <tr>
 <td>C</td>
@@ -397,13 +397,13 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </table></div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr>
-<th>Trigger đếm bổ sung</th>
+<th>Điều kiện kích hoạt đếm bổ sung</th>
 <th>Hành động</th>
 </tr></thead>
 <tbody>
 <tr>
 <td>Negative stock / stock on hand âm</td>
-<td>Dừng vấn đề tại vị trí liên quan; recount 100%; Rà soát giao dịch Cần nhất.</td>
+<td>Dừng vấn đề tại vị trí liên quan; recount 100%; rà soát giao dịch Cần nhất.</td>
 </tr>
 <tr>
 <td>Pick không tìm thấy hàng</td>
@@ -484,11 +484,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="kpi-box">
 <strong>Cổng/kiểm soát chỉ số 1</strong><br>Inventory accuracy theo zone và toàn kho phải được theo dõi theo tháng.</div>
 <div class="kpi-box">
-<strong>Cổng/kiểm soát chỉ số 2</strong><br>Tỷ lệ no-vị trí, mixed lot, expired stock và overdue OVR phải được Rà soát tại họp tầng hằng ngày/tuần.</div>
+<strong>Gate/control metric 2</strong><br>Tỷ lệ no-vị trí, mixed lot, expired stock và overdue OVR phải được rà soát tại họp tầng hằng ngày/tuần.</div>
 <div class="kpi-box">
 <strong>Cổng/kiểm soát chỉ số 3</strong><br>Số giờ đóng điều tra lệch tồn và số lần pick fail do sai vị trí phải lên bảng điều khiển.</div>
 <div class="kpi-box">
-<strong>Governance quy tắc</strong><br><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a> Rà soát tối thiểu tháng một lần các vị trí vi phạm lặp lại. Good catch được ghi nhận; lệch lặp lại mở hành động khắc phục/retraining. Kỷ luật chỉ áp dụng khi cố ý bypass FIFO/vị trí cổng hoặc làm sai bằng chứng.</div>
+<strong>Governance rule</strong><br><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a> rà soát tối thiểu tháng một lần các vị trí vi phạm lặp lại. Good catch được ghi nhận; lệch lặp lại mở hành động khắc phục/retraining. Kỷ luật chỉ áp dụng khi cố ý bypass FIFO/vị trí gate hoặc làm sai bằng chứng.</div>
 </div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr>

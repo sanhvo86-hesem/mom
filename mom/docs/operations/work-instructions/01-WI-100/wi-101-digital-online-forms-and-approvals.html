@@ -79,9 +79,9 @@ ul.tight li { margin: 4px 0; }
           <div class="card">
             <h3>Không thay cho</h3>
             <ul class="tight">
-              <li>Giao dịch chuẩn trên Epicor như job trạng thái, inventory movement, PO, pack hoặc giao hàngment confirm.</li>
-              <li>Quy tắc kiến trúc M365, source kiểm soát và deploy boundary tại các annex M365 chuyên biệt.</li>
-              <li>WI kỹ thuật khác như đồng bộ Git hoặc offchuyền recovery chi tiết ngoài phạm vi thao tác biểu mẫu.</li>
+              <li>Giao dịch chuẩn trên Epicor như job trạng thái, inventory movement, PO, pack hoặc shipment confirm.</li>
+              <li>Rule kiến trúc M365, source control và deploy boundary tại các annex M365 chuyên biệt.</li>
+              <li>WI kỹ thuật khác như sync Git hoặc offline recovery chi tiết ngoài phạm vi thao tác biểu mẫu.</li>
             </ul>
           </div>
         </div>
@@ -147,13 +147,13 @@ ul.tight li { margin: 4px 0; }
 
         <div class="step-block">
           <h3>Bước 2: Mở đúng biểu mẫu đã phát hành</h3>
-          <p>Mở biểu mẫu từ cổng hoặc thư viện phát hành đang hiệu lực thay vì dùng bản tải cục bộ hoặc liên kết chia sẻ cá nhân.</p>
-          <div class="note-soft">Lý do: chỉ biểu mẫu đã phát hành mới bảo đảm schema, field và luồng công việc đúng.</div>
+          <p>Mở biểu mẫu từ portal hoặc thư viện phát hành đang hiệu lực thay vì dùng bản tải cục bộ hoặc link chia sẻ cá nhân.</p>
+          <div class="note-soft">Lý do: chỉ biểu mẫu đã phát hành mới bảo đảm schema, field và luồng xử lý đúng.</div>
         </div>
 
         <div class="step-block">
           <h3>Bước 3: Xác nhận ranh giới dữ liệu</h3>
-          <p>Xác nhận dữ liệu nào phải ghi ở Epicor, dữ liệu nào là bằng chứng trên M365 và dữ liệu nào chỉ là definition trong source-kiểm soátled thư viện.</p>
+          <p>Xác nhận dữ liệu nào phải ghi ở Epicor, dữ liệu nào là bằng chứng trên M365 và dữ liệu nào chỉ là definition trong source-controlled library.</p>
           <div class="note-soft">Lý do: ranh giới sai sẽ tạo hai nguồn sự thật cho cùng một nghiệp vụ.</div>
         </div>
 
@@ -164,9 +164,9 @@ ul.tight li { margin: 4px 0; }
         </div>
 
         <div class="step-block">
-          <h3>Bước 5: Gắn Bằng chứngUrl đúng SSOT</h3>
+          <h3>Bước 5: Gắn EvidenceUrl đúng SSOT</h3>
           <p>Gắn đường dẫn bằng chứng về đúng SSOT hoặc thư mục hồ sơ đã kiểm soát trước khi submit các bước có bằng chứng bắt buộc.</p>
-          <div class="note-soft">Lý do: bằng chứng nằm ngoài SSOT sẽ không đủ giá trị đánh giá.</div>
+          <div class="note-soft">Lý do: bằng chứng nằm ngoài SSOT sẽ không đủ giá trị audit.</div>
         </div>
 
         <div class="step-block">
@@ -188,12 +188,12 @@ ul.tight li { margin: 4px 0; }
         </div>
 
         <div class="step-block">
-          <h3>Bước 9: Backfill sau offchuyền</h3>
-          <p>Nếu phải dùng fallback offchuyền, backfill đầy đủ hồ sơ và bằng chứng lên hệ thống ngay khi nền tảng số phục hồi.</p>
-          <div class="note-soft">Lý do: offchuyền chỉ là chế độ tạm, không được trở thành nguồn hồ sơ song song lâu dài.</div>
+          <h3>Bước 9: Backfill sau offline</h3>
+          <p>Nếu phải dùng fallback offline, backfill đầy đủ record và bằng chứng lên hệ thống ngay khi nền tảng số phục hồi.</p>
+          <div class="note-soft">Lý do: offline chỉ là chế độ tạm, không được trở thành nguồn hồ sơ song song lâu dài.</div>
         </div>
 
-        <div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Kết thúc WI-101, mỗi biểu mẫu số có hồ sơ hợp lệ, phê duyệt history đúng tuyến và bằng chứng truy lại được trong SSOT mà không lẫn với giao dịch SoR trên Epicor.</div>
+        <div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Kết thúc WI-101, mỗi biểu mẫu số có record hợp lệ, approval history đúng tuyến và bằng chứng truy lại được trong SSOT mà không lẫn với giao dịch SoR trên Epicor.</div>
       </section>
 
       <section id="wi-s6" class="wi-section">
@@ -210,20 +210,20 @@ ul.tight li { margin: 4px 0; }
             </thead>
             <tbody>
               <tr>
-                <td>Biểu mẫu hồ sơ</td>
-                <td>Dữ liệu submit, timestamp, người tạo và trạng thái hồ sơ.</td>
-                <td>SharePoint List hoặc hệ thống biểu mẫu đang hiệu lực.</td>
-                <td>Chủ sở hữu của biểu mẫu</td>
+                <td>Form record</td>
+                <td>Dữ liệu submit, timestamp, người tạo và trạng thái record.</td>
+                <td>SharePoint List hoặc hệ thống form đang hiệu lực.</td>
+                <td>Người chịu trách nhiệm của form</td>
               </tr>
               <tr>
                 <td>Phê duyệt history</td>
                 <td>Người duyệt, thời gian duyệt, quyết định và bình luận.</td>
-                <td>Phê duyệt log hoặc SSOT của luồng công việc.</td>
-                <td>QMS / biểu mẫu chủ sở hữu</td>
+                <td>Approval log hoặc SSOT của luồng xử lý.</td>
+                <td>QMS / form người chịu trách nhiệm</td>
               </tr>
               <tr>
                 <td>Gói bằng chứng</td>
-                <td>Bằng chứngUrl, Tệp scan, ảnh, PDF ảnh chụp trạng thái hoặc hồ sơ đính kèm đúng SSOT.</td>
+                <td>EvidenceUrl, file scan, ảnh, PDF snapshot hoặc hồ sơ đính kèm đúng SSOT.</td>
                 <td>Thư mục bằng chứng trên M365 theo naming convention.</td>
                 <td>Người submit</td>
               </tr>
@@ -277,7 +277,7 @@ ul.tight li { margin: 4px 0; }
               </tr>
               <tr>
                 <td>ANNEX-137</td>
-                <td>Quy ước đặt tên bằng chứng và hồ sơ</td>
+                <td>Bằng chứng and records naming convention</td>
                 <td><a href="../../references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-137-evidence-and-records-naming-convention.html">Mở ANNEX-137</a></td>
               </tr>
               <tr>

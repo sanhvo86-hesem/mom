@@ -64,14 +64,14 @@
      data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;WI-106&quot;,&quot;title&quot;:&quot;Kế hoạch tổng thể triển khai QMS W0-W12&quot;,&quot;subtitle&quot;:&quot;Kế hoạch điều hành 12 tuần từ W0 ký tài liệu nền đến W12 bàn giao vận hành thường xuyên&quot;,&quot;doc_type&quot;:&quot;WI&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-05-14&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;released&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
 
 
-<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho chương trình triển khai QMS W0-W12 bắt đầu ngày 2026-05-14, bao gồm ký tài liệu nền, công bố QMS, chốt handbooks/JD/RACI, QA pilot, go-live theo đợt, hypercare, cập nhật tài liệu hậu triển khai và bàn giao sang vận hành thường xuyên.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho chương trình triển khai QMS W0-W12 bắt đầu ngày 2026-05-14, bao gồm ký tài liệu nền, công bố QMS, chốt handbooks/JD/RACI, QA vận hành thử, đưa vào vận hành theo đợt, chăm sóc sau triển khai, cập nhật tài liệu hậu triển khai và bàn giao sang vận hành thường xuyên.</div>
 
 <div class="hero">
  
- <p>Tài liệu này là kế hoạch điều hành duy nhất cho lịch W0-W12 hiện hành. W0 ngày 2026-05-14 chỉ là buổi ký hiệu lực 3 tài liệu nền WI-105, WI-106 và ANNEX-114 của tổ điều hành thu hẹp; W1 ngày 2026-05-16 mới là buổi công bố chính thức tới đại diện phòng ban. Mỗi tuần phải có mục tiêu, tài liệu bắt buộc, cổng code, playbook và bằng chứng kết thúc rõ.</p>
+ <p>Tài liệu này là kế hoạch điều hành duy nhất cho lịch W0-W12 hiện hành. W0 ngày 2026-05-14 chỉ là buổi ký hiệu lực 3 tài liệu nền WI-105, WI-106 và ANNEX-114 của tổ điều hành thu hẹp; W1 ngày 2026-05-16 mới là buổi công bố chính thức tới đại diện phòng ban. Mỗi tuần phải có mục tiêu, tài liệu bắt buộc, gate code, kịch bản triển khai và bằng chứng kết thúc rõ.</p>
 </div>
 
-<div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong><br>Chương trình chỉ được công nhận triển khai thành công khi từng tuần W0-W12 có bằng chứng đạt cổng, không còn Sev-1 mở ở phạm vi đang go-live, người dùng tự tra cứu đúng trong ngưỡng, bảng điều khiển có nguồn dữ liệu rõ và mọi thay đổi tài liệu đi qua DCC/source-kiểm soát thay vì sửa nóng ngoài luồng.</div>
+<div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong><br>Chương trình chỉ được công nhận triển khai thành công khi từng tuần W0-W12 có bằng chứng đạt gate, không còn Sev-1 mở ở phạm vi đang đưa vào vận hành, người dùng tự tra cứu đúng trong ngưỡng, dashboard có nguồn dữ liệu rõ và mọi thay đổi tài liệu đi qua DCC/source-control thay vì sửa nóng ngoài luồng.</div>
 
 <div class="section">
  <h2>0. Nguồn điều hành đang có hiệu lực</h2>
@@ -87,18 +87,18 @@
  <tbody>
  <tr>
  <td><strong>Module Lịch Triển Khai</strong><br><small><code>program.bootstrap.json</code></small></td>
- <td>Lịch W0-W12, ngày, mục tiêu, cổng code, deliverable, tài liệu bắt buộc và playbook từng tuần.</td>
- <td>Đây là lịch nguồn của master kế hoạch; mọi bảng hoặc tài liệu phụ phải khớp lịch này.</td>
+ <td>Lịch W0-W12, ngày, mục tiêu, gate code, deliverable, tài liệu bắt buộc và kịch bản triển khai từng tuần.</td>
+ <td>Đây là lịch nguồn của master plan; mọi bảng hoặc tài liệu phụ phải khớp lịch này.</td>
  </tr>
  <tr>
  <td><strong>Module Sẵn Sàng Phòng Ban</strong><br><small><code>readiness.json</code> / <code>readiness.bootstrap.json</code></small></td>
- <td>Trạng thái từng phòng ban: rà tài liệu, đào tạo, M365, Champion, pilot và go-live.</td>
- <td>Không nâng cổng chỉ bằng nhận xét trong họp nếu readiness chưa có trạng thái kiểm soát.</td>
+ <td>Trạng thái từng phòng ban: rà tài liệu, đào tạo, M365, Champion, vận hành thử và đưa vào vận hành.</td>
+ <td>Không nâng gate chỉ bằng nhận xét trong họp nếu mức sẵn sàng chưa có trạng thái kiểm soát.</td>
  </tr>
  <tr>
  <td><strong>Module Sự Cố &amp; Đào Tạo</strong><br><small><code>issues.json</code>, <code>audit_events</code>, <code>training_records</code></small></td>
- <td>Sự cố triển khai, vết kiểm toán, đào tạo/OJT và bằng chứng đóng cổng.</td>
- <td>Sev-1/Sev-2 phải có chủ sở hữu, hạn, quyết định tạm dừng/đi tiếp và bằng chứng đóng.</td>
+ <td>Sự cố triển khai, vết kiểm toán, đào tạo/OJT và bằng chứng đóng gate.</td>
+ <td>Sev-1/Sev-2 phải có người chịu trách nhiệm, hạn, quyết định tạm dừng/đi tiếp và bằng chứng đóng.</td>
  </tr>
  <tr>
  <td><strong>Module Kiểm Soát Tài Liệu</strong><br><small><code>dcc_document_header</code>, <code>scan_cache.json</code>, cổng DCC</small></td>
@@ -229,25 +229,25 @@
  <li>Chọn người dẫn dắt phòng và người dự phòng theo vai trò, không ghi đè bằng danh sách chat.</li>
  <li>Mở khóa huấn luyện buổi 1 cho người dẫn dắt theo <code>TRN-DEP-W02</code>.</li>
  </ul>
- <div class="mini-note"><b>Điều kiện qua cổng:</b> RACI/JD/handbook có ký nhận, readiness có Champion/backup và đào tạo người dẫn dắt có bằng chứng.</div>
+ <div class="mini-note"><b>Điều kiện qua cổng:</b> RACI/JD/handbook có ký nhận, mức sẵn sàng có Champion/backup và đào tạo người dẫn dắt có bằng chứng.</div>
  </div>
  <div class="milestone-card">
- <h3>Pha 2 — QA pilot và cổng Đi/Không đi</h3>
+ <h3>Pha 2 — QA vận hành thử và cổng Đi/Không đi</h3>
  <span class="tag">W3-W4 · 2026-05-30 đến 2026-06-06</span>
  <ul class="tight">
  <li>QA chạy song song SOP-605, WI-201 và DRL-E2E tối thiểu 3 ngày.</li>
- <li>Diễn tập tra cứu ≥10 lượt, sai phiên bản, truy vết và đóng vấn đề pilot.</li>
+ <li>Diễn tập tra cứu ≥10 lượt, sai phiên bản, truy vết và đóng vấn đề vận hành thử.</li>
  <li>W4 ký quyết định Đi/Không đi cho Đợt 2 bằng ANNEX-114 và ANNEX-117.</li>
  </ul>
  <div class="mini-note"><b>Điều kiện qua cổng:</b> không Sev-1/Sev-2 mở, trung vị tra cứu ≤180 giây và quyết định Đi/Không đi có vết kiểm toán.</div>
  </div>
  <div class="milestone-card">
- <h3>Pha 3 — Go-live theo đợt</h3>
+ <h3>Pha 3 — Đưa vào vận hành theo đợt</h3>
  <span class="tag">W5-W9 · 2026-06-13 đến 2026-07-11</span>
  <ul class="tight">
- <li>W5-W6: Chuỗi cung ứng + Kinh doanh vận hành chính thức, Rà soát Đợt 2 và chuẩn bị Sản xuất.</li>
+ <li>W5-W6: Chuỗi cung ứng + Kinh doanh vận hành chính thức, rà soát Đợt 2 và chuẩn bị Sản xuất.</li>
  <li>W7-W8: Sản xuất + Kỹ thuật vận hành chính thức, trực 24/5 và kiểm hồ sơ Job Order đầu tiên.</li>
- <li>W9: Nhân sự, Tài chính, IT, EHS và ERP vào Đợt 3 trong khi Sản xuất kết thúc hypercare.</li>
+ <li>W9: Nhân sự, Tài chính, IT, EHS và ERP vào Đợt 3 trong khi Sản xuất kết thúc chăm sóc sau triển khai.</li>
  </ul>
  <div class="mini-note"><b>Điều kiện qua cổng:</b> Sev-1 = 0 theo phạm vi, người dùng mở đúng tài liệu ≥95% ở khu vực rủi ro cao và fallback đã kiểm thử.</div>
  </div>
@@ -286,10 +286,10 @@
  <td>Cổng P0/P1 có bằng chứng, người dẫn dắt và backup đã được chỉ định theo vai trò.</td>
  </tr>
  <tr>
- <td>QA pilot</td>
+ <td>QA vận hành thử</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)"><span class="entity-code dept-code">D-QUAL</span></a></span></td>
  <td>W3-W4 · 2026-05-30 đến 2026-06-06</td>
- <td>SOP-605, WI-201, DRL-E2E sẵn sàng; issues/readiness đã mở; người dẫn dắt QA đã được đào tạo.</td>
+ <td>SOP-605, WI-201, DRL-E2E sẵn sàng; sổ sự cố và mức sẵn sàng đã mở; người dẫn dắt QA đã được đào tạo.</td>
  <td>Chạy song song đạt, ≥10 lượt drill tra cứu, không Sev-1/Sev-2 mở và CEO/QMS ký Đi/Không đi Đợt 2.</td>
  </tr>
  <tr>
@@ -311,13 +311,13 @@
  <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-finance-handbook.html" title="Finance Department (Phòng Tài chính)"><span class="entity-code dept-code">D-FIN</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phòng Nhân sự)"><span class="entity-code dept-code">D-HR</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phòng EHS)"><span class="entity-code dept-code">D-EHS</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bộ phận quản trị ERP)"><span class="entity-code dept-code">D-ERP</span></a></span></td>
  <td>W9-W10 · 2026-07-11 đến 2026-07-18</td>
  <td>Đợt Sản xuất không Sev-1 mở, người dẫn dắt Đợt 3 và backup đã được đề cử/đào tạo.</td>
- <td>bảng điều khiển truy cập Rà soát đạt, KPI tra cứu ≥95%, đào tạo ≥90%, phủ người dẫn dắt 100%.</td>
+ <td>Rà soát quyền truy cập bảng điều khiển đạt, KPI tra cứu ≥95%, đào tạo ≥90%, phủ người dẫn dắt 100%.</td>
  </tr>
  <tr>
  <td>Bàn giao</td>
  <td>Tổ điều hành + đại diện phòng ban</td>
  <td>W11-W12 · 2026-07-25 đến 2026-08-01</td>
- <td>Bài học đã chốt, danh sách tài liệu cần cập nhật có chủ sở hữu, QR/video cần làm mới có phạm vi.</td>
+ <td>Bài học đã chốt, danh sách tài liệu cần cập nhật có người chịu trách nhiệm, QR/video cần làm mới có phạm vi.</td>
  <td>≥10 tài liệu hậu triển khai được phát hành, QR mới dán ≥95% tại 7 khu vực và biên bản bàn giao được ký.</td>
  </tr>
  </tbody>
@@ -352,19 +352,19 @@
  <td>Trưởng phòng đi sâu handbook/JD/RACI với đội của mình; người dẫn dắt và backup được chỉ định</td>
  <td>RACI-master-Ma trận, Authority-Ma trận, JD và handbooks có ký nhận</td>
  <td>Quyền truy cập sẵn sàng theo vai trò; không dùng tài khoản chung để chứng minh pass</td>
- <td>Readiness cập nhật theo phòng ban, Champion pass và bằng chứng huấn luyện buổi 1</td>
+ <td>Mức sẵn sàng cập nhật theo phòng ban, Champion pass và bằng chứng huấn luyện buổi 1</td>
  </tr>
  <tr>
  <td>Pha 2 / W3-W4</td>
  <td>Đầu mối triển khai bám hiện trường, giám sát viên kèm cặp và đội thí điểm hỗ trợ</td>
  <td>QA chạy song song SOP-605, WI-201, DRL-E2E; diễn tập sai phiên bản và truy vết</td>
- <td>Issues/readiness hoạt động, đường hoàn nguyên được diễn tập theo ANNEX-114/118</td>
- <td>KPI pilot, tuổi tồn sự cố, trung vị tra cứu ≤180 giây và quyết định Đi/Không đi</td>
+ <td>Sổ sự cố và mức sẵn sàng hoạt động, đường hoàn nguyên được diễn tập theo ANNEX-114/118</td>
+ <td>KPI vận hành thử, tuổi tồn sự cố, trung vị tra cứu ≤180 giây và quyết định Đi/Không đi</td>
  </tr>
  <tr>
  <td>Pha 3 / W5-W9</td>
  <td>Đào tạo ôn lại theo đợt, lịch trực trung tâm điều hành và hỗ trợ tăng cường</td>
- <td>Sổ tay vận hành chính thức, playbook <code>TRN-DEP-W05..W09</code>, phiếu Đi/Không đi, leo thang và bàn giao ca</td>
+ <td>Sổ tay vận hành chính thức, kịch bản triển khai <code>TRN-DEP-W05..W09</code>, phiếu Đi/Không đi, leo thang và bàn giao ca</td>
  <td>Bảng điều khiển môi trường chính thức, thời điểm làm mới gần nhất, rà quyền truy cập và cảnh báo ngoại lệ</td>
  <td>Mức độ chấp nhận sử dụng, thời gian hoàn tất thay đổi, tỷ lệ đóng sự cố, độ đúng của tuyến hồ sơ và số lần phải dừng triển khai</td>
  </tr>
@@ -419,7 +419,7 @@
  <div class="metric-card">
  <div class="value">≥90%</div>
  <div class="label">KPI-TRN-01 hoàn thành đào tạo</div>
- <div class="mini-note">Tính theo người dùng trong đợt, có OJT/attendance/competence bằng chứng.</div>
+ <div class="mini-note">Tính theo người dùng trong đợt, có bằng chứng OJT, điểm danh và năng lực.</div>
  </div>
  <div class="metric-card">
  <div class="value">≤10%</div>
@@ -447,8 +447,8 @@
  <ul class="tight">
  <li>Người dùng không truy được hồ sơ cần thiết để tiếp tục công việc hoặc phát hành hàng.</li>
  <li>Phát hiện sai phiên bản, sai tuyến hồ sơ hoặc sai vị trí lưu có nguy cơ vượt qua cổng kiểm soát.</li>
- <li>DCC header hoặc cổng không xác nhận được tài liệu bắt buộc của tuần đang xét.</li>
- <li>Playbook <code>TRN-DEP-Wxx</code>, readiness, issue log hoặc đánh giá event của tuần không có bằng chứng cập nhật.</li>
+ <li>DCC header hoặc portal không xác nhận được tài liệu bắt buộc của tuần đang xét.</li>
+ <li>Kịch bản triển khai <code>TRN-DEP-Wxx</code>, mức sẵn sàng, nhật ký sự cố hoặc sự kiện kiểm toán của tuần không có bằng chứng cập nhật.</li>
  <li>Bảng điều hành hiển thị số không đáng tin và không có nguồn thay thế được công bố.</li>
  <li>Quyền ở môi trường chính thức sai dẫn tới lộ dữ liệu hoặc chặn người dùng bắt buộc.</li>
  <li>Thay đổi chỉ tồn tại ở máy chủ/môi trường chạy hoặc Tệp cá nhân, chưa qua source-kiểm soát/deploy boundary theo ANNEX-136.</li>

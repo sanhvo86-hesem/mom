@@ -206,12 +206,12 @@ ul.tight li {margin:4px 0;}
 
 <!-- .page-body -->
 
-<section class="wi-section" data-operating-rule="true" id="wi-s6"><h2>6. Quy tắc điều hành — Alert / Action / Monitoring-gap trigger classes</h2>
+<section class="wi-section" data-operating-rule="true" id="wi-s6"><h2>6. Quy tắc điều hành — Alert / Action / Monitoring-gap điều kiện kích hoạt classes</h2>
 <div style="background:#FEF9C3;border-left: 3px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em">
 <strong>Tham chiếu:</strong> Chi tiết đầy đủ xem <a href="../../references/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Quy tắc vị trí kho, zoning, FIFO/FEFO, staging và cycle count</a>. WI này tóm tắt các quy tắc chính để thao tác nhanh tại hiện trường.</div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr>
-<th>Trigger class</th>
+<th>Điều kiện kích hoạt class</th>
 <th>Khi nào dùng</th>
 <th>Phản ứng tối thiểu</th>
 <th>mặc định stock trạng thái</th>
@@ -220,8 +220,8 @@ ul.tight li {margin:4px 0;}
 <tr>
 <td>T1 — Alert drift</td>
 <td>Reading chạm vùng cảnh báo nhưng chưa vượt action limit, chưa có affected stock đặc biệt.</td>
-<td>Ghi nhật ký, xác nhận sensor/door/load, tăng tần suất đọc trong ca và Rà soát nguyên nhân Cần.</td>
-<td>Watch; chưa TẠM GIỮ nếu risk thấp và không có class nhạy.</td>
+<td>Ghi nhật ký, xác nhận sensor/door/load, tăng tần suất đọc trong ca và rà soát nguyên nhân Cần.</td>
+<td>Watch; chưa HOLD nếu risk thấp và không có class nhạy.</td>
 </tr>
 <tr>
 <td>T2 — Action excursion</td>
@@ -233,7 +233,7 @@ ul.tight li {margin:4px 0;}
 <td>T3 — Monitoring gap / data uncertainty</td>
 <td>Logger hỏng, mất kết nối, mất điện, quên đọc hoặc reading không tin cậy.</td>
 <td>Ghi rõ thời gian gap, manual backup, phạm vi stock chịu rủi ro và độ tin cậy của dữ liệu thay thế.</td>
-<td>Ít nhất Watch; với S2/S3/S4 mặc định TẠM GIỮ cho affected stock cho đến khi có Rà soát.</td>
+<td>Ít nhất Watch; với S2/S3/S4 mặc định HOLD cho affected stock cho đến khi có rà soát.</td>
 </tr>
 <tr>
 <td>T4 — Làm sạch / restricted storage breach</td>
@@ -244,7 +244,7 @@ ul.tight li {margin:4px 0;}
 <tr>
 <td>T5 — Repeated excursion / chronic trạng thái</td>
 <td>Lặp alert/action cùng cơ chế trong nhiều ca hoặc nhiều kỳ.</td>
-<td>Mở hành động phòng ngừa / CI, xem xét resource cổng kiểm soát, báo Người phụ trách trong Rà soát kỳ.</td>
+<td>Mở hành động phòng ngừa / CI, xem xét resource cổng kiểm soát, báo Người phụ trách trong rà soát kỳ.</td>
 <td>Không chỉ "nhắc lại"; phải có Người phụ trách khắc phục hệ thống.</td>
 </tr>
 </tbody>

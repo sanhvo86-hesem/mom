@@ -65,7 +65,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
      data-dcc-logo="../../../../assets/hesem-logo.svg"
      data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;WI-601&quot;,&quot;title&quot;:&quot;Visual Inspection and Defect Classification&quot;,&quot;subtitle&quot;:&quot;Hướng dẫn chất lượng&quot;,&quot;doc_type&quot;:&quot;WI&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
  
- <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng tại Incoming, IPQC, Cuối cùng, khiếu nại Rà soát, bao vây Rà soát hoặc bất kỳ cổng kiểm soát nào cần quyết định defect class bằng ngoại quan.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng tại Incoming, IPQC, Final, khiếu nại rà soát, bao vây rà soát hoặc bất kỳ cổng kiểm soát nào cần quyết định defect class bằng ngoại quan.</div>
  
  
 <div class="section"><h2>1. Mục đích, ranh giới và điều kiện quan sát</h2>
@@ -105,8 +105,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>5. Ghi nhận, tạm giữ và KPI</h2>
 <div class="two-col">
-<div class="card"><h3>Bằng chứng tối thiểu</h3><ul class="tight" style="padding-left:18px;"><li>Mã Job/WO, chi tiết/rev, lot/qty, công đoạn, Người kiểm, thời gian.</li><li>Ảnh lỗi đủ thấy vị trí và mức độ.</li><li>khuyết tật class, quyết định chấp nhận/từ chối/tạm giữ, phạm vi ảnh hưởng.</li><li>Liên kết tới NCR/ngăn chặn nếu có.</li></ul></div>
-<div class="card"><h3>TẠM GIỮ bắt buộc</h3><ul class="tight" style="padding-left:18px;"><li>Không xác định được khuyết tật class hoặc tiêu chí chuẩn.</li><li>Lỗi quan trọng / nghiêm trọng/lớn / nghiêm trọng ở bề mặt chức năng, làm sạch, chân không, gas đường dẫn hoặc khách hàng-tiện mặt đầu (facing).</li><li>Thiếu truy vết, thiếu cert, sai label, nghi nhầm chi tiết/rev.</li><li>Phát hiện lỗi lặp có xu hướng tăng nhưng chưa khoanh được nguyên nhân.</li></ul></div>
+<div class="card"><h3>Bằng chứng tối thiểu</h3><ul class="tight" style="padding-left:18px;"><li>Mã Job/WO, part/rev, lot/qty, công đoạn, Người kiểm, thời gian.</li><li>Ảnh lỗi đủ thấy vị trí và mức độ.</li><li>khuyết tật class, quyết định chấp nhận/từ chối/hold, phạm vi ảnh hưởng.</li><li>Liên kết tới NCR/ngăn chặn nếu có.</li></ul></div>
+<div class="card"><h3>TẠM GIỮ bắt buộc</h3><ul class="tight" style="padding-left:18px;"><li>Không xác định được khuyết tật class hoặc tiêu chí chuẩn.</li><li>Lỗi quan trọng / nghiêm trọng/lớn / nghiêm trọng ở bề mặt chức năng, clean, chân không, gas path hoặc khách hàng-tiện mặt đầu (facing).</li><li>Thiếu truy vết, thiếu cert, sai label, nghi nhầm part/rev.</li><li>Phát hiện lỗi lặp có xu hướng tăng nhưng chưa khoanh được nguyên nhân.</li></ul></div>
 </div>
 <div class="kpi-grid">
 <div class="kpi-box"><strong>KPI-WI601-01</strong><br>Tỷ lệ thoát / bỏ qua do trực quan khuyết tật phát hiện sau cổng kiểm soát cuối.</div>

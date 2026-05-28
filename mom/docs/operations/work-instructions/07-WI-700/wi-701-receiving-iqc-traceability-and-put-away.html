@@ -52,7 +52,7 @@ ul.tight li { margin: 4px 0; }
      data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;WI-701&quot;,&quot;title&quot;:&quot;Nhận hàng IQC Truy xuất nguồn gốc and Put Away&quot;,&quot;subtitle&quot;:&quot;Nhận hàng, IQC, truy xuất và put-away Đợt 2/Sản xuất theo chương trình W0-W12.&quot;,&quot;doc_type&quot;:&quot;WI&quot;,&quot;revision&quot;:&quot;V1&quot;,&quot;effective_date&quot;:&quot;2026-05-14&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;released&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
       
 
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng trong W2 để chốt JD SCM/QA cho nhận hàng, W3 để pilot QA chạy WI-701 với một lô IQC mẫu, W5-W6 để Đợt 2 nhận hàng theo chuẩn mới, W7-W8 để Đợt Sản xuất vận hành full receiving/IQC/put-away, và W11 để cập nhật bảng kiểm theo bài học.</div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng trong W2 để chốt JD SCM/QA cho nhận hàng, W3 để QA vận hành thử chạy WI-701 với một lô IQC mẫu, W5-W6 để Đợt 2 nhận hàng theo chuẩn mới, W7-W8 để Đợt Sản xuất vận hành full receiving/IQC/put-away, và W11 để cập nhật bảng kiểm theo bài học.</div>
       
 
       <section id="wi-s1" class="wi-section">
@@ -234,21 +234,21 @@ ul.tight li { margin: 4px 0; }
 
 <div class="section" id="w0w12-map">
  <h2 class="h2">6A. Bản đồ W0-W12</h2>
- <p>WI-701 là hướng dẫn tại điểm nhận hàng của chương trình W0-W12. Nó được dùng khi lô vật tư, outsource return hoặc vật tư khách cấp đi vào Đợt 2 và Đợt Sản xuất; mọi lô phải có trạng thái, ID truy ngược, vị trí và bằng chứng IQC rõ trước khi cấp phát. Lịch nguồn vẫn là <code>mom/data/config/deploy/program.bootstrap.json</code>; WI-701 không thay SOP-401, không thay WI-201 và không thay bảng điều khiển. Người thao tác phải mở playbook tuần đúng, ghi bằng chứng vào hồ sơ nhận hàng và không đưa lô vào kho sử dụng khi cổng còn thiếu.</p>
+ <p>WI-701 là hướng dẫn tại điểm nhận hàng của chương trình W0-W12. Nó được dùng khi lô vật tư, outsource return hoặc vật tư khách cấp đi vào Đợt 2 và Đợt Sản xuất; mọi lô phải có trạng thái, ID truy ngược, vị trí và bằng chứng IQC rõ trước khi cấp phát. Lịch nguồn vẫn là <code>mom/data/config/deploy/program.bootstrap.json</code>; WI-701 không thay SOP-401, không thay WI-201 và không thay dashboard. Người thao tác phải mở kịch bản tuần đúng, ghi bằng chứng vào hồ sơ nhận hàng và không đưa lô vào kho sử dụng khi gate còn thiếu.</p>
  <div class="table-card">
  <table class="matrix-table">
  <thead><tr><th>Tuần</th><th>Pha · trụ</th><th>Cổng kiểm liên quan</th><th>Cách dùng tài liệu này</th><th>Bằng chứng đóng cổng</th></tr></thead>
  <tbody>
  <tr>
  <td>W3</td>
- <td>P2 · pilot</td>
+ <td>P2 · vận hành thử</td>
  <td>P2-02</td>
  <td>IQC chạy song song WI-701 + WI-201 với một lô mẫu; diễn tập truy ngược ít nhất 10 lượt theo <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W03.html">TRN-DEP-W03</a>.</td>
  <td><code>drills.json</code>, FRM-701, FRM-413 nếu giữ lô.</td>
  </tr>
  <tr>
  <td>W5-W6</td>
- <td>P3 · golive + pilot</td>
+ <td>P3 · golive + vận hành thử</td>
  <td>P3-02 + P3-04</td>
  <td>Đợt 2 nhận hàng theo chuẩn mới: mọi lô có ID truy ngược đúng, chứng từ sạch và put-away đúng FIFO/vị trí.</td>
  <td><code>audit_events</code>, receiving log, IQC bằng chứng.</td>
@@ -270,7 +270,7 @@ ul.tight li { margin: 4px 0; }
  </tbody>
  </table>
  </div>
- <p class="note">Mỗi hàng trong bản đồ này phải được xác nhận bằng bằng chứng có đường dẫn hoặc bản ghi kiểm soát. Nếu playbook tuần, cổng code, KPI hoặc hồ sơ chứng minh không khớp nhau, trạng thái của tuần đó giữ ở cảnh báo đỏ cho đến khi chủ sở hữu chức năng cập nhật <code>issues.json</code>, xác nhận lại <code>readiness.json</code> và ghi quyết định vào đánh giá log. Không dùng ảnh chụp màn hình rời, email riêng hoặc lời xác nhận miệng để thay thế bằng chứng đóng cổng.</p>
+ <p class="note">Mỗi hàng trong bản đồ này phải được xác nhận bằng bằng chứng có đường dẫn hoặc bản ghi kiểm soát. Nếu kịch bản tuần, gate code, KPI hoặc hồ sơ chứng minh không khớp nhau, trạng thái của tuần đó giữ ở cảnh báo đỏ cho đến khi người chịu trách nhiệm chức năng cập nhật <code>issues.json</code>, xác nhận lại <code>readiness.json</code> và ghi quyết định vào nhật ký kiểm toán. Không dùng ảnh chụp màn hình rời, email riêng hoặc lời xác nhận miệng để thay thế bằng chứng đóng gate.</p>
 </div>
 
 <div class="section" id="deploy-kpi-dock">
@@ -280,7 +280,7 @@ ul.tight li { margin: 4px 0; }
  <div class="metric-card"><div class="value">KPI-DEP-02</div><div class="label">≥95% phiếu việc IQC đóng đúng hạn; mục tiêu xử lý trong 24 giờ ở W7-W8.</div></div>
  <div class="metric-card"><div class="value">KPI-DEP-07</div><div class="label">MTTR Sev-1 liên quan receiving/IQC ≤24 giờ.</div></div>
  </div>
- <p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code> trong ngày, gắn severity theo mức ảnh hưởng, leo thang theo <a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>, cập nhật <code>readiness.json</code> và chỉ đóng khi có bằng chứng chủ sở hữu đã xử lý nguyên nhân gốc.</p>
+ <p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code> trong ngày, gắn severity theo mức ảnh hưởng, leo thang theo <a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>, cập nhật <code>readiness.json</code> và chỉ đóng khi có bằng chứng người chịu trách nhiệm đã xử lý nguyên nhân gốc.</p>
 </div>
 
 <div class="section" id="deploy-no-go">
@@ -288,7 +288,7 @@ ul.tight li { margin: 4px 0; }
  <div class="note-warn">
  <ul class="tight">
  <li>Không công nhận <code>P3-04</code> khi >5% lô không có ID truy ngược, thiếu vị trí hoặc không nối được FRM-701 với giao dịch nhận hàng.</li>
- <li>Không khóa <code>P3-03</code> khi <code>KPI-DEP-02 &lt;85%</code> ở IQC hoặc lô TẠM GIỮ chưa có chủ sở hữu trong <code>issues.json</code>.</li>
+ <li>Không khóa <code>P3-03</code> khi <code>KPI-DEP-02 &lt;85%</code> ở IQC hoặc lô HOLD chưa có người chịu trách nhiệm trong <code>issues.json</code>.</li>
  <li>Không cho put-away vào vị trí dùng nếu chứng chỉ, lot/heat hoặc trạng thái IQC chưa sạch; lô đó phải giữ bằng FRM-413.</li>
  </ul>
  </div>

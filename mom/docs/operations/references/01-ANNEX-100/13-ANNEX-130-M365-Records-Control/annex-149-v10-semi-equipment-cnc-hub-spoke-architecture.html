@@ -73,15 +73,15 @@
 <table>
 <thead><tr><th>#</th><th>Không gian</th><th>IB mode</th><th>Default nhãn độ nhạy</th><th>Vai trò</th></tr></thead>
 <tbody>
-<tr><td>1</td><td><b>HESEM-Hub</b></td><td>Open</td><td>HESEM-Internal</td><td>Navigation + cross-khách hàng KPI rollups (aggrecổngd). Không chứa IP.</td></tr>
-<tr><td>2</td><td><b>HESEM-AMAT</b></td><td><b>Explicit</b></td><td>Khách hàng:AMAT-Confidential (encrypted)</td><td>IB segment = SG-KHÁCH HÀNG-AMAT. Toàn bộ artifacts AMAT.</td></tr>
-<tr><td>3</td><td><b>HESEM-LAM</b></td><td><b>Explicit</b></td><td>Khách hàng:LAM-Confidential (encrypted)</td><td>IB segment = SG-KHÁCH HÀNG-LAM.</td></tr>
-<tr><td>4</td><td><b>HESEM-ASML</b></td><td><b>Explicit</b></td><td>Khách hàng:ASML-Confidential (encrypted)</td><td>IB segment = SG-KHÁCH HÀNG-ASML.</td></tr>
-<tr><td>5</td><td><b>HESEM-TEL</b></td><td><b>Explicit</b></td><td>Khách hàng:TEL-Confidential (encrypted)</td><td>IB segment = SG-KHÁCH HÀNG-TEL.</td></tr>
-<tr><td>6</td><td><b>HESEM-Internal-Workspace</b></td><td>Open</td><td>HESEM-IP-Confidential</td><td>1 không gian duy nhất chứa 16 dept thư viện (Private+Shared) — không cần IB segment giữa các phòng.</td></tr>
-<tr><td>7</td><td><b>HESEM-Quality-QMS</b></td><td>Open</td><td>HESEM-Internal</td><td>Canonical compliance (ISO/AS9100/RBA/AS6174/PDPL/ITAR) + Standards thư viện (SEMI/ASTM/SAE/ISO/IPC/JEDEC).</td></tr>
-<tr><td>8</td><td><b>HESEM-Engineering-IP</b></td><td>Open</td><td>HESEM-IP-Confidential (DKE inside)</td><td>HESEM trade-secret chỉ. DKE thư viện cho crown jewels (quá trình recipes, CAD masters).</td></tr>
-<tr><td>9</td><td><b>HESEM-Archive</b></td><td>Open</td><td>per-thư mục retention label</td><td>Long-term retention với Purview disposition Rà soát queue.</td></tr>
+<tr><td>1</td><td><b>HESEM-Hub</b></td><td>Open</td><td>HESEM-Internal</td><td>Navigation + cross-customer KPI rollups (aggregated). Không chứa IP.</td></tr>
+<tr><td>2</td><td><b>HESEM-AMAT</b></td><td><b>Explicit</b></td><td>Customer:AMAT-Confidential (encrypted)</td><td>IB segment = SG-CUSTOMER-AMAT. Toàn bộ artifacts AMAT.</td></tr>
+<tr><td>3</td><td><b>HESEM-LAM</b></td><td><b>Explicit</b></td><td>Customer:LAM-Confidential (encrypted)</td><td>IB segment = SG-CUSTOMER-LAM.</td></tr>
+<tr><td>4</td><td><b>HESEM-ASML</b></td><td><b>Explicit</b></td><td>Customer:ASML-Confidential (encrypted)</td><td>IB segment = SG-CUSTOMER-ASML.</td></tr>
+<tr><td>5</td><td><b>HESEM-TEL</b></td><td><b>Explicit</b></td><td>Customer:TEL-Confidential (encrypted)</td><td>IB segment = SG-CUSTOMER-TEL.</td></tr>
+<tr><td>6</td><td><b>HESEM-Internal-Workspace</b></td><td>Open</td><td>HESEM-IP-Confidential</td><td>1 site duy nhất chứa 16 dept library (Private+Shared) — không cần IB segment giữa các phòng.</td></tr>
+<tr><td>7</td><td><b>HESEM-Quality-QMS</b></td><td>Open</td><td>HESEM-Internal</td><td>Canonical compliance (ISO/AS9100/RBA/AS6174/PDPL/ITAR) + Standards library (SEMI/ASTM/SAE/ISO/IPC/JEDEC).</td></tr>
+<tr><td>8</td><td><b>HESEM-Engineering-IP</b></td><td>Open</td><td>HESEM-IP-Confidential (DKE inside)</td><td>HESEM trade-secret only. DKE library cho crown jewels (process recipes, CAD masters).</td></tr>
+<tr><td>9</td><td><b>HESEM-Archive</b></td><td>Open</td><td>per-folder retention label</td><td>Long-term retention với Purview disposition rà soát queue.</td></tr>
 </tbody>
 </table>
 <p class="tight">Six IB block policies (mọi cặp khách hàng đối lập nhau): AMAT↔LAM, AMAT↔ASML, AMAT↔TEL, LAM↔ASML, LAM↔TEL, ASML↔TEL.</p>
@@ -106,37 +106,37 @@
 <table>
 <thead><tr><th>Zone</th><th>Lifecycle</th><th>Mục đích</th></tr></thead>
 <tbody>
-<tr><td><span class="code">00-Khách hàng-Source-IP/</span></td><td><b>READ-CHỈ, không 3-trạng thái</b></td><td>Artifacts khách hàng tạo (drawings, 3D models, specifications, ECN-in, khách hàng SQM). Sản phẩm authoring của khách hàng, HESEM chỉ custody.</td></tr>
-<tr><td><span class="code">10-HESEM-Engineering/</span></td><td><b>3-trạng thái</b> (1-Working/2-In-Rà soát/3-Đã phát hành)</td><td>HESEM-authored derivatives: BOM internal, CAM, router, inspection kế hoạch, FAI mốc chuẩn, WI, dao cụing, ECN internal response.</td></tr>
-<tr><td><span class="code">20-PO-Lots/{YYYY}/{PO}/{Lot}/</span></td><td>Single-pass per lot</td><td>Per-lot 11-thư mục dossier + khách hàng-delta.</td></tr>
-<tr><td><span class="code">30-SCAR-8D/</span></td><td>4-trạng thái (Open/Containment/RCA-CA/Closed) qua 9 D-stage</td><td>Yêu cầu hành động khắc phục nhà cung cấp 8D biểu mẫuat.</td></tr>
-<tr><td><span class="code">40-Khách hàng-Đánh giás/</span></td><td>Per-đánh giá</td><td>Khách hàng-issued đánh giá findings + CAPA.</td></tr>
-<tr><td><span class="code">50-Compliance-Khách hàngSpecific/</span></td><td>Mirror (R3)</td><td>Mirror canonical ở Quality-QMS không gian. Khách hàng cổng yêu cầu retrạng thái per-khách hàng.</td></tr>
-<tr><td><span class="code">60-Scorecards/</span></td><td>Per-Quarter</td><td>Khách hàng-issued nhà cung cấp scorecards.</td></tr>
-<tr><td><span class="code">70-ECN-Acknowledgements/</span></td><td>SharePoint List (chính) + thư mục PDF bằng chứng</td><td>Đánh giá trail "Lot 47 giao hàng đúng new rev không?".</td></tr>
-<tr><td><span class="code">80-Cổng-Exports/</span></td><td>Single-pass</td><td>Docs HESEM export từ cổng khách hàng (Ariba/MyLam/Nhà cung cấpNet/TEL-cổng).</td></tr>
-<tr><td><span class="code">90-Inbox/</span></td><td>Hash-archived chain-of-custody</td><td>Mọi inbound Tệp hash-archived ngay khi nhận.</td></tr>
+<tr><td><span class="code">00-Customer-Source-IP/</span></td><td><b>READ-ONLY, không 3-state</b></td><td>Artifacts khách hàng tạo (drawings, 3D models, specifications, ECN-in, customer SQM). Sản phẩm authoring của khách hàng, HESEM chỉ custody.</td></tr>
+<tr><td><span class="code">10-HESEM-Engineering/</span></td><td><b>3-state</b> (1-Working/2-In-Rà soát/3-Released)</td><td>HESEM-authored derivatives: BOM internal, CAM, router, inspection plan, FAI baseline, WI, tooling, ECN internal response.</td></tr>
+<tr><td><span class="code">20-PO-Lots/{YYYY}/{PO}/{Lot}/</span></td><td>Single-pass per lot</td><td>Per-lot 11-folder dossier + customer-delta.</td></tr>
+<tr><td><span class="code">30-SCAR-8D/</span></td><td>4-state (Open/Containment/RCA-CA/Closed) qua 9 D-stage</td><td>Supplier Corrective Action Request 8D format.</td></tr>
+<tr><td><span class="code">40-Customer-Audits/</span></td><td>Per-audit</td><td>Customer-issued audit findings + CAPA.</td></tr>
+<tr><td><span class="code">50-Compliance-CustomerSpecific/</span></td><td>Mirror (R3)</td><td>Mirror canonical ở Quality-QMS site. Customer portal yêu cầu restate per-customer.</td></tr>
+<tr><td><span class="code">60-Scorecards/</span></td><td>Per-Quarter</td><td>Customer-issued supplier scorecards.</td></tr>
+<tr><td><span class="code">70-ECN-Acknowledgements/</span></td><td>SharePoint List (chính) + folder PDF bằng chứng</td><td>Audit trail "Lot 47 ship đúng new rev không?".</td></tr>
+<tr><td><span class="code">80-Portal-Exports/</span></td><td>Single-pass</td><td>Docs HESEM export từ portal khách hàng (Ariba/MyLam/SupplierNet/TEL-portal).</td></tr>
+<tr><td><span class="code">90-Inbox/</span></td><td>Hash-archived chain-of-custody</td><td>Mọi inbound file hash-archived ngay khi nhận.</td></tr>
 </tbody>
 </table>
 
-<h3>3.1 — Khách hàng-source vs HESEM-derived: phân định rạch ròi</h3>
-<p>Đây là correction lớn so với v7-v8 (vốn áp 3-trạng thái cho cả drawing khách): drawing/3D model/spec của khách hàng <b>không có Working/In-Rà soát/Đã phát hành phía HESEM</b> vì khách hàng đã phát hành rồi mới gửi đến. HESEM chỉ làm read-chỉ custodian. Pattern PLM industry-standard (Teamcenter Aware, Windchill Receive, Aras Khách hàng-Sourced Item) xác nhận.</p>
+<h3>3.1 — Customer-source vs HESEM-derived: phân định rạch ròi</h3>
+<p>Đây là correction lớn so với v7-v8 (vốn áp 3-state cho cả drawing khách): drawing/3D model/spec của khách hàng <b>không có Working/In-Rà soát/Released phía HESEM</b> vì khách hàng đã release rồi mới gửi đến. HESEM chỉ làm read-only custodian. Pattern PLM industry-standard (Teamcenter Aware, Windchill Receive, Aras Customer-Sourced Item) xác nhận.</p>
 <table>
 <thead><tr><th>Loại artifact</th><th>nguồn</th><th>Pattern</th></tr></thead>
 <tbody>
-<tr><td>Khách hàng drawing (PDF/DWG)</td><td>Khách hàng</td><td><b>Read-chỉ sibling-rev thư mục</b>. New rev = new thư mục <span class="code">{Rev}_{ReceiptDate}/</span>.</td></tr>
-<tr><td>Khách hàng 3D model (STEP/IGES)</td><td>Khách hàng</td><td>Same as drawing.</td></tr>
-<tr><td>Khách hàng specification (AMAT 0250-xxxxx, ASML GSA, etc.)</td><td>Khách hàng</td><td>Same as drawing.</td></tr>
-<tr><td>Khách hàng ECN-Inbound</td><td>Khách hàng</td><td>Read-chỉ, keyed by ECN-No.</td></tr>
-<tr><td>Khách hàng SQM (Nhà cung cấp Quality Manual)</td><td>Khách hàng (NDA)</td><td>Read-chỉ, NDA-cổngd thư viện.</td></tr>
-<tr><td>HESEM internal BOM</td><td>HESEM</td><td><b>3-trạng thái</b> (1-Working/2-In-Rà soát/3-Đã phát hành).</td></tr>
-<tr><td>HESEM CAM (NC programs)</td><td>HESEM</td><td>3-trạng thái.</td></tr>
-<tr><td>HESEM router / quá trình kế hoạch</td><td>HESEM</td><td>3-trạng thái.</td></tr>
-<tr><td>HESEM inspection kế hoạch + balloon</td><td>HESEM</td><td>3-trạng thái.</td></tr>
-<tr><td>HESEM FAI mốc chuẩn (đã phát hành)</td><td>HESEM</td><td>3-trạng thái (3-Đã phát hành = mốc chuẩn).</td></tr>
-<tr><td>HESEM WI / shop-floor</td><td>HESEM</td><td>3-trạng thái.</td></tr>
-<tr><td>HESEM dao cụing/đồ gá design</td><td>HESEM</td><td>3-trạng thái.</td></tr>
-<tr><td>HESEM ECN-Internal-Response</td><td>HESEM</td><td>3-trạng thái (assessment to khách hàng ECN).</td></tr>
+<tr><td>Customer drawing (PDF/DWG)</td><td>Khách hàng</td><td><b>Read-only sibling-rev folder</b>. New rev = new folder <span class="code">{Rev}_{ReceiptDate}/</span>.</td></tr>
+<tr><td>Customer 3D model (STEP/IGES)</td><td>Khách hàng</td><td>Same as drawing.</td></tr>
+<tr><td>Customer specification (AMAT 0250-xxxxx, ASML GSA, etc.)</td><td>Khách hàng</td><td>Same as drawing.</td></tr>
+<tr><td>Customer ECN-Inbound</td><td>Khách hàng</td><td>Read-only, keyed by ECN-No.</td></tr>
+<tr><td>Customer SQM (Supplier Quality Manual)</td><td>Khách hàng (NDA)</td><td>Read-only, NDA-gated library.</td></tr>
+<tr><td>HESEM internal BOM</td><td>HESEM</td><td><b>3-state</b> (1-Working/2-In-Rà soát/3-Released).</td></tr>
+<tr><td>HESEM CAM (NC programs)</td><td>HESEM</td><td>3-state.</td></tr>
+<tr><td>HESEM router / process plan</td><td>HESEM</td><td>3-state.</td></tr>
+<tr><td>HESEM inspection plan + balloon</td><td>HESEM</td><td>3-state.</td></tr>
+<tr><td>HESEM FAI baseline (released)</td><td>HESEM</td><td>3-state (3-Released = baseline).</td></tr>
+<tr><td>HESEM WI / shop-floor</td><td>HESEM</td><td>3-state.</td></tr>
+<tr><td>HESEM tooling/fixture design</td><td>HESEM</td><td>3-state.</td></tr>
+<tr><td>HESEM ECN-Internal-Response</td><td>HESEM</td><td>3-state (assessment to customer ECN).</td></tr>
 </tbody>
 </table>
 
@@ -144,24 +144,24 @@
 <p>Câu hỏi: <em>"có trường hợp nào tên thư mục chứa trạng thái SSOT, Liên kết để người dùng dễ nhớ và làm bằng chứng đánh giá?"</em></p>
 <p>Khảo sát các pattern industry-standard:</p>
 <ul class="tight">
-<li><b>PLM hệ thống (Teamcenter, Windchill, Aras)</b> — encode <b>trạng thái ở siêu dữ liệu vault</b>, không phải thư mục name. Nhưng workspace view vẫn có thư mục rõ vai trò: "Đã phát hành", "In-Work", "Under-Rà soát".</li>
-<li><b>Tier-1 contract manufacturers (Heico, Moog, Onto, Kế hoạchsee)</b> — quan sát thấy dùng prefix thư mục để encode trạng thái: <span class="code">_Đã phát hành-Read-Chỉ/</span>, <span class="code">_Working/</span>, <span class="code">_Approved-Frozen/</span>.</li>
-<li><b>Microsoft 365 Hồ sơ Management</b> — best practice là Nhãn độ nhạy làm Vai trò encoding, nhưng thư mục name encoding trạng thái cũng được chấp nhận và đánh giá-friendly.</li>
-<li><b>ISO 9001:2015 §7.5.3.1</b> — emphasizes "kiểm soát of thay đổis (version kiểm soát)" — thư mục name encoding là một implementation hợp lệ.</li>
+<li><b>PLM hệ thống (Teamcenter, Windchill, Aras)</b> — encode <b>state ở metadata vault</b>, không phải folder name. Nhưng workspace view vẫn có folder rõ vai trò: "Released", "In-Work", "Under-Rà soát".</li>
+<li><b>Tier-1 contract manufacturers (Heico, Moog, Onto, Plansee)</b> — quan sát thấy dùng prefix folder để encode state: <span class="code">_Released-Read-Only/</span>, <span class="code">_Working/</span>, <span class="code">_Approved-Frozen/</span>.</li>
+<li><b>Microsoft 365 Records Management</b> — best practice là Sensitivity Label làm role encoding, nhưng folder name encoding state cũng được chấp nhận và audit-friendly.</li>
+<li><b>ISO 9001:2015 §7.5.3.1</b> — emphasizes "control of changes (version control)" — folder name encoding là một implementation hợp lệ.</li>
 </ul>
 <p>Quyết định v10:</p>
 <ul class="tight">
-<li>Dùng <b>prefix số 2 chữ số</b> cho zone đỉnh: <span class="code">00-</span>/<span class="code">10-</span>/<span class="code">20-</span>/<span class="code">30-</span>... — đảm bảo thứ tự alphabetical đúng luồng công việc.</li>
-<li>Zone name CHỨA Vai trò rõ ràng: <span class="code">00-Khách hàng-Source-IP</span>, <span class="code">10-HESEM-Engineering</span>, <span class="code">20-PO-Lots</span>, <span class="code">50-Compliance-Khách hàngSpecific</span> (mirror, không phải SSOT).</li>
-<li>3-trạng thái ở ngăn dưới chi tiết-rev: <span class="code">1-Working/</span>, <span class="code">2-In-Rà soát/</span>, <span class="code">3-Đã phát hành/</span>.</li>
+<li>Dùng <b>prefix số 2 chữ số</b> cho zone đỉnh: <span class="code">00-</span>/<span class="code">10-</span>/<span class="code">20-</span>/<span class="code">30-</span>... — đảm bảo thứ tự alphabetical đúng luồng xử lý.</li>
+<li>Zone name CHỨA role rõ ràng: <span class="code">00-Customer-Source-IP</span>, <span class="code">10-HESEM-Engineering</span>, <span class="code">20-PO-Lots</span>, <span class="code">50-Compliance-CustomerSpecific</span> (mirror, không phải SSOT).</li>
+<li>3-state ở ngăn dưới part-rev: <span class="code">1-Working/</span>, <span class="code">2-In-Rà soát/</span>, <span class="code">3-Released/</span>.</li>
 <li>Suffix <span class="code">-NDA-Vault</span>, <span class="code">-Mirror</span>, <span class="code">-DKE</span> đánh dấu vai trò sensitive.</li>
 <li>KHÔNG dùng Tệpname tag <span class="code">[SSOT]</span>/<span class="code">[LIÊN KẾT]</span> bên trong tên Tệp — đây không phải industry-standard và làm rối Tệpname khi upload cổng khách hàng (ASCII-chỉ, no special chars).</li>
 </ul>
 </section>
 
 <section class="card">
-<h2>4. Per-lot dossier — 11-thư mục common minimum + khách hàng-delta</h2>
-<p>Tổng hợp từ Agent 1 (AMAT 25-deliverable) + Agent 2 (LAM/ASML/TEL common minimum) + Agent 3 (SEMI bằng chứng map). Mỗi lot có 11 thư mục cố định + 1 thư mục delta riêng theo khách hàng:</p>
+<h2>4. Per-lot dossier — 11-folder common minimum + customer-delta</h2>
+<p>Tổng hợp từ Agent 1 (AMAT 25-deliverable) + Agent 2 (LAM/ASML/TEL common minimum) + Agent 3 (SEMI bằng chứng map). Mỗi lot có 11 folder cố định + 1 folder delta riêng theo khách hàng:</p>
 <table>
 <thead><tr><th>#</th><th>Thư mục</th><th>Nội dung</th><th>Standard backing</th></tr></thead>
 <tbody>
@@ -184,10 +184,10 @@
 <table>
 <thead><tr><th>Khách hàng</th><th>Làm sạchchuyềnss regime</th><th>Delta deliverables (in 12-Khách hàng-Delta/)</th><th>Cổng channel</th></tr></thead>
 <tbody>
-<tr><td><b>AMAT</b></td><td>0250-xxxxx workmangiao hàng/làm sạchchuyềnss + IEST-STD-CC1246</td><td>Source Inspection (SI) sign-off, AMAT-templated FAIR Biểu mẫu 1/2/3, 0250-xxxxx-spec làm sạchchuyềnss cert</td><td>SAP Ariba + Secure Transfer + email</td></tr>
-<tr><td><b>LAM</b></td><td>LAM-PCC (Precision Làm sạch &amp; Certify) internal — Ra≤0.4µm chamber-facing</td><td>PCC làm sạchchuyềnss cert, ASTM E595 outgassing, LAM-templated FAI</td><td>MyLam extranet + SAP/Ariba Network</td></tr>
-<tr><td><b>ASML</b></td><td><b>GSA Grade 1/2/4</b> (chỉ OEM with public numeric grades) — Grade 2 default cho vacuum/DUV</td><td>GSA-Grade-{1|2|4}-Phát hành Cert, AS9102 FAI + Grade-phát hành đánh giá, IPC-1782 laser-mark serial, packaging triple-bag (Grade 1)</td><td>Nhà cung cấpNet + Nhà cung cấp Identities IdP</td></tr>
-<tr><td><b>TEL</b></td><td>TEL internal + SEMI F-series + Shoryushin</td><td>Shoryushin (初流審) first-flow inspection report, STQA score artifacts, TSSA RBA bằng chứng</td><td>TEL cổng (BC-Web/TEL-Net) + EDI SAP-VAN</td></tr>
+<tr><td><b>AMAT</b></td><td>0250-xxxxx workmanship/cleanliness + IEST-STD-CC1246</td><td>Source Inspection (SI) sign-off, AMAT-templated FAIR Form 1/2/3, 0250-xxxxx-spec cleanliness cert</td><td>SAP Ariba + Secure Transfer + email</td></tr>
+<tr><td><b>LAM</b></td><td>LAM-PCC (Precision Clean &amp; Certify) internal — Ra≤0.4µm chamber-facing</td><td>PCC cleanliness cert, ASTM E595 outgassing, LAM-templated FAI</td><td>MyLam extranet + SAP/Ariba Network</td></tr>
+<tr><td><b>ASML</b></td><td><b>GSA Grade 1/2/4</b> (only OEM with public numeric grades) — Grade 2 default cho vacuum/DUV</td><td>GSA-Grade-{1|2|4}-Release Cert, AS9102 FAI + Grade-release audit, IPC-1782 laser-mark serial, packaging triple-bag (Grade 1)</td><td>SupplierNet + Supplier Identities IdP</td></tr>
+<tr><td><b>TEL</b></td><td>TEL internal + SEMI F-series + Shoryushin</td><td>Shoryushin (初流審) first-flow inspection report, STQA score artifacts, TSSA RBA bằng chứng</td><td>TEL portal (BC-Web/TEL-Net) + EDI SAP-VAN</td></tr>
 </tbody>
 </table>
 
@@ -200,11 +200,11 @@
 <table>
 <thead><tr><th>Tham chiếu trước</th><th>SCOPE THẬT</th><th>Đúng phải dùng</th></tr></thead>
 <tbody>
-<tr><td><span class="code">SEMI T7</span> = "vật liệu/lot tracing"</td><td>T7 = back-surface 2D marking of <b>silicon wafers</b> 300/450mm. KHÔNG dùng cho CNC piece-chi tiết.</td><td><b>SEMI T20 / T21 / T22</b> + ISO 9001 lot-kiểm soát system</td></tr>
-<tr><td><span class="code">SEMI F60</span> = "high purity gas systems"</td><td>F60 = <b>ESCA/XPS test method</b> đánh giá chromium-rich passive layer 316L.</td><td>F1 (rò rỉ) + F19 (surface) + F20 (316L grade) + F78 (weld) + F81 (visual)</td></tr>
-<tr><td><span class="code">SEMI F70</span> = "liquid chemical distribution"</td><td>F70 = <b>chi tiếticle test method</b> cho gas delivery systems.</td><td>LCDS = <b>F57</b> (polymers) + <b>F41 / F108</b> (system qual)</td></tr>
+<tr><td><span class="code">SEMI T7</span> = "material/lot tracing"</td><td>T7 = back-surface 2D marking of <b>silicon wafers</b> 300/450mm. KHÔNG dùng cho CNC piece-part.</td><td><b>SEMI T20 / T21 / T22</b> + ISO 9001 lot-control system</td></tr>
+<tr><td><span class="code">SEMI F60</span> = "high purity gas systems"</td><td>F60 = <b>ESCA/XPS test method</b> đánh giá chromium-rich passive layer 316L.</td><td>F1 (leak) + F19 (surface) + F20 (316L grade) + F78 (weld) + F81 (visual)</td></tr>
+<tr><td><span class="code">SEMI F70</span> = "liquid chemical distribution"</td><td>F70 = <b>particle test method</b> cho gas delivery systems.</td><td>LCDS = <b>F57</b> (polymers) + <b>F41 / F108</b> (system qual)</td></tr>
 <tr><td><span class="code">SEMI F78</span> = "gas distribution components spec"</td><td>F78 = <b>GTA welding practice</b> autogenous butt-joint. Paired với F81 visual.</td><td>F78 + F81 (cùng nhau cho weld bằng chứng)</td></tr>
-<tr><td><span class="code">SEMI E155</span> = "pedestal assembly"</td><td>E155 = <b>MotionNet fieldbus comms</b>. Không có SEMI standard nào tên pedestal.</td><td>Khách hàng-specific drawings + F19/F20/F60 cho wetted surfaces</td></tr>
+<tr><td><span class="code">SEMI E155</span> = "pedestal assembly"</td><td>E155 = <b>MotionNet fieldbus comms</b>. Không có SEMI standard nào tên pedestal.</td><td>Customer-specific drawings + F19/F20/F60 cho wetted surfaces</td></tr>
 </tbody>
 </table>
 <p>Standards thư viện v10 reorganized at <span class="code">HESEM-Quality-QMS/02-Standards-Thư viện-External-Origin/</span>:</p>
@@ -218,28 +218,28 @@
 </section>
 
 <section class="card">
-<h2>6. luồng công việc-Lists v10 — 17 SharePoint Lists (schema)</h2>
-<p>luồng công việc-Lists là SharePoint <b>Lists</b> (không phải thư mục). Lưu ở <span class="code">HESEM-Quality-QMS/04-luồng công việc-Lists-Danh mục/</span>. Bản v10 thêm 1 List mới (L17 ECN-Acknowledgements) so với v8.</p>
+<h2>6. Luồng xử lý-Lists v10 — 17 SharePoint Lists (schema)</h2>
+<p>Luồng xử lý-Lists là SharePoint <b>Lists</b> (không phải folder). Lưu ở <span class="code">HESEM-Quality-QMS/04-Luồng xử lý-Lists-Catalog/</span>. Bản v10 thêm 1 List mới (L17 ECN-Acknowledgements) so với v8.</p>
 <table>
 <thead><tr><th>ID</th><th>danh sách</th><th>Key columns</th></tr></thead>
 <tbody>
-<tr><td>L01</td><td>NCR-Master</td><td>NCR-ID, OpenedDate, Severity, Khách hàng, Chi tiết#, NCR-Type, Trạng thái, MRB-Required, Disposition, CAPA-ID</td></tr>
-<tr><td>L02</td><td>CAPA-Master</td><td>CAPA-ID, Source(NCR/Đánh giá/Khách hàng), OpenedDate, RootCause, Action, EffectivityDate, Verifier, EffectivenessRating</td></tr>
-<tr><td>L03</td><td>SCAR-8D-Master</td><td>SCAR-No, Khách hàng, Chi tiết#, OpenDate, D-Stage-Hiện tại, D-Stage-Due, Closure-Date, OEM-Verified</td></tr>
-<tr><td>L04</td><td>ECN-Master</td><td>ECN-No, Khách hàng, Chi tiết#, OldRev, NewRev, ECN-Source, ImpactedPOs, ScrapExposure-USD</td></tr>
-<tr><td>L05</td><td>PCN-Master</td><td>PCN-No, Quá trìnhAffected, ProposedThay đổi, RiskAssessment, ImplementationDate</td></tr>
-<tr><td>L06</td><td>FAI-Master</td><td>FAI-ID, Chi tiết#, Rev, Trigger, AS9102-Biểu mẫu, FAI-Date, SI-Required, SI-Date, FAI-Engineer</td></tr>
-<tr><td>L07</td><td>Khách hàng-Đánh giá-Master</td><td>Đánh giá-ID, Khách hàng, Đánh giáorOrg, Đánh giáDate, Scope, FindingsCount, CAPA-IDs, Closure</td></tr>
-<tr><td>L08</td><td>Internal-Đánh giá-Master</td><td>Đánh giá-ID, Scope, LeadĐánh giáor, Đánh giáDate, FindingsCount, CAPA-IDs</td></tr>
+<tr><td>L01</td><td>NCR-Master</td><td>NCR-ID, OpenedDate, Severity, Customer, Part#, NCR-Type, Trạng thái, MRB-Required, Disposition, CAPA-ID</td></tr>
+<tr><td>L02</td><td>CAPA-Master</td><td>CAPA-ID, Source(NCR/Audit/Customer), OpenedDate, RootCause, Action, EffectivityDate, Verifier, EffectivenessRating</td></tr>
+<tr><td>L03</td><td>SCAR-8D-Master</td><td>SCAR-No, Customer, Part#, OpenDate, D-Stage-Current, D-Stage-Due, Closure-Date, OEM-Verified</td></tr>
+<tr><td>L04</td><td>ECN-Master</td><td>ECN-No, Customer, Part#, OldRev, NewRev, ECN-Source, ImpactedPOs, ScrapExposure-USD</td></tr>
+<tr><td>L05</td><td>PCN-Master</td><td>PCN-No, ProcessAffected, ProposedChange, RiskAssessment, ImplementationDate</td></tr>
+<tr><td>L06</td><td>FAI-Master</td><td>FAI-ID, Part#, Rev, Điều kiện kích hoạt, AS9102-Form, FAI-Date, SI-Required, SI-Date, FAI-Engineer</td></tr>
+<tr><td>L07</td><td>Customer-Audit-Master</td><td>Audit-ID, Customer, AuditorOrg, AuditDate, Scope, FindingsCount, CAPA-IDs, Closure</td></tr>
+<tr><td>L08</td><td>Internal-Audit-Master</td><td>Audit-ID, Scope, LeadAuditor, AuditDate, FindingsCount, CAPA-IDs</td></tr>
 <tr><td>L09</td><td>Calibration-Due-Master</td><td>Asset-ID, LastCal, NextDueDate, CalAuthority, OutOfTolerance</td></tr>
-<tr><td>L10</td><td>PM-Schedule-Master</td><td>Asset-ID, PM-Type, NextDueDate, Chủ sở hữu, OEE-Impact</td></tr>
-<tr><td>L11</td><td>Cert-Expiry-Master</td><td>Cert-Type, Tạm giữer, ExpiryDate, RenewalChủ sở hữu, AlertLeadTime</td></tr>
-<tr><td>L12</td><td>Khách hàng-Cổng-Bằng chứng-Master</td><td>Cổng, Bằng chứngType, UploadedDate, AcknowledgedBy-Khách hàng</td></tr>
-<tr><td>L13</td><td>Action-Tracker-Master</td><td>Action-ID, Chủ sở hữu, DueDate, Source(Meeting/Đánh giá/Rà soát), Trạng thái</td></tr>
-<tr><td>L14</td><td>Job-Master</td><td>Job#, Khách hàng, Chi tiết#, Rev, PO#, OpenedDate, Trạng thái, Phát hànhs, Giao hàngs, Tạm giữs</td></tr>
-<tr><td>L15</td><td>Chi tiết-Master</td><td>Chi tiết#, Khách hàng, ActiveRev, FAI-Done, FAI-Date, SI-Required, AS9102-Trigger</td></tr>
-<tr><td>L16</td><td>Nhà cung cấp-CMRT-Master</td><td>Nhà cung cấp, CMRT-Year, FilingDate, Conbiểu mẫuanceScore</td></tr>
-<tr><td><b>L17</b></td><td><b>ECN-Acknowledgements (NEW)</b></td><td>Khách hàng, ECN#, OldRev, NewRev, ReceivedDate, AckedDate, FirstEffectivePO, FirstEffectiveLot, ClosureBằng chứngURL, AckSignerName, AckSignerSignature</td></tr>
+<tr><td>L10</td><td>PM-Schedule-Master</td><td>Asset-ID, PM-Type, NextDueDate, Người chịu trách nhiệm, OEE-Impact</td></tr>
+<tr><td>L11</td><td>Cert-Expiry-Master</td><td>Cert-Type, Holder, ExpiryDate, RenewalOwner, AlertLeadTime</td></tr>
+<tr><td>L12</td><td>Customer-Portal-Bằng chứng-Master</td><td>Portal, EvidenceType, UploadedDate, AcknowledgedBy-Customer</td></tr>
+<tr><td>L13</td><td>Action-Tracker-Master</td><td>Action-ID, Người chịu trách nhiệm, DueDate, Source(Meeting/Audit/Rà soát), Trạng thái</td></tr>
+<tr><td>L14</td><td>Job-Master</td><td>Job#, Customer, Part#, Rev, PO#, OpenedDate, Trạng thái, Releases, Ships, Holds</td></tr>
+<tr><td>L15</td><td>Part-Master</td><td>Part#, Customer, ActiveRev, FAI-Done, FAI-Date, SI-Required, AS9102-Điều kiện kích hoạt</td></tr>
+<tr><td>L16</td><td>Supplier-CMRT-Master</td><td>Supplier, CMRT-Year, FilingDate, ConformanceScore</td></tr>
+<tr><td><b>L17</b></td><td><b>ECN-Acknowledgements (NEW)</b></td><td>Customer, ECN#, OldRev, NewRev, ReceivedDate, AckedDate, FirstEffectivePO, FirstEffectiveLot, ClosureEvidenceURL, AckSignerName, AckSignerSignature</td></tr>
 </tbody>
 </table>
 </section>
@@ -255,22 +255,22 @@
 <table>
 <thead><tr><th>Dept</th><th># Bespoke thư mụcs</th><th>Highlight thư mụcs</th></tr></thead>
 <tbody>
-<tr><td>EXEC</td><td>11</td><td>Strategy-OKR, Board-PreRead, Capital-Decisions, Crisis-WarRoom, MgmtRà soát-Prep, Risk-Sổ đăng ký-Working</td></tr>
-<tr><td>QMS</td><td>9</td><td>Kiểm soátled-Doc-Pipechuyền, Internal-Đánh giá-WorkArea, MgmtRà soát-Quarterly, MOC-Queue, RBA-Compliance, ISO-Surveillance-Prep, CAPA-Effectiveness</td></tr>
-<tr><td>QA</td><td>11</td><td>NCR-Disposition-Active, NCR-Intake-Pre-Biểu mẫualization, FAI-Programme, In-Quá trình-Sampling-Kế hoạch, Khách hàng-Đánh giá-WarRoom, SCAR-Coordination, MRB-Active, Outgoing-Inspection</td></tr>
-<tr><td>METRO</td><td>10</td><td>Calibration-Active-Queue, CMM-Programs-Thư viện, Gauge-RnR-MSA, Phòng sạch-Lab-Daily-Ops, NPI-First-Article-Metrology</td></tr>
-<tr><td>ENG</td><td>13</td><td>NPI-Project, Drawing-Markup-Pre-Phát hành, CAM-Development-Sandbox, FMEA-Drafts, Reverse-Engineering, Trade-Secret-Recipe-Drafts, NPI-Lessons-Learned</td></tr>
-<tr><td>PRO</td><td>11</td><td>Production-Schedule-Active, Routing-Active-WO, Excursion-Pre-NCR-Ledger, Chuẩn bị máy-Sheet-Thư viện, Yield-Scrap-Daily, Cell-Perbiểu mẫuance, Cell-Improvement-Kaizen</td></tr>
-<tr><td>SP</td><td>9</td><td>Surface-Treatment-Daily, EP-Passivation-Batch, Anodize-Batch, Heat-Treat-Pyrometry, NDT-Daily-Inspection, Welding-WPS-Người vận hành-Log</td></tr>
-<tr><td>MNT</td><td>10</td><td>PM-Schedule-Active, Breakdown-Response, Asset-Daily-Readiness, Spare-Chi tiếts-Crib, Predictive-Maintenance-Sensor-Data, OEE-Workspace</td></tr>
-<tr><td>SCM</td><td>14</td><td>Strategic-Sourcing, Operational-Buyer-Queue, Nhà cung cấp-Intelligence, Nhà cung cấp-Onboarding-Pipechuyền, AS6174-Counterfeit-ASL-Workspace, Sub-Tier-Đánh giá-Coord, Mill-FlowDown-Thư viện</td></tr>
-<tr><td>SCS</td><td>10</td><td>Khách hàng-Account-Kế hoạchs, Opportunity-Pipechuyền, Quote-Pricing, Account-Team-Ghi chú, OEM-Cổng-Onboarding-Workstream, Win-Loss-Lessons-Learned</td></tr>
-<tr><td>FIN</td><td>14</td><td>Close-Calendar-Active, AP/AR-Queue, Vendor/Khách hàng-Master-Thay đổi, Bank-Recon, Treasury-Cash-Forecast, Capex-Phê duyệt, Đánh giá-PBC</td></tr>
-<tr><td>HR</td><td>18</td><td>Onboarding-Pre-Hire, Employee-Hồ sơ, Perbiểu mẫuance/Compensation-Cycle, Recruiting, Training, RBA-Working-Hours, RBA-Pulse, PDPL-DataSubject, Exit-Offboarding</td></tr>
-<tr><td>EHS</td><td>8</td><td>Incident-Intake-Pre-Biểu mẫualization, Near-Miss-Ledger, Risk-Assessment-ISO45001, Aspects-Impact-ISO14001, Permit-To-Work-Daily</td></tr>
-<tr><td>IT</td><td>14</td><td>Helpdesk-Ticket-Queue, New-Hire-IT-Onboarding, Patch-Calendar, Backup-Verification, SOC-Alert-Triage, Cyber-Incident-Pre-Biểu mẫual, Endpoint-Compliance</td></tr>
-<tr><td>ERP</td><td>12</td><td>MDCR-Working-Set, Epicor-User-Request-Queue, OEM-Cổng-Credentials-Vault-Privileged, luồng công việc-Logic-Thay đổi-Queue, ERP-Upgrade-Patching</td></tr>
-<tr><td>LEGAL</td><td>12</td><td>Contract-Drafting, NDA-Thư viện, IP-Trade-Secret-Sổ đăng ký-Working, Litigation-Tạm giữ-Pre-Filing, PDPL-Sổ đăng ký, Export-Kiểm soát-ITAR-EAR</td></tr>
+<tr><td>EXEC</td><td>11</td><td>Strategy-OKR, Board-PreRead, Capital-Decisions, Crisis-WarRoom, MgmtReview-Prep, Risk-Register-Working</td></tr>
+<tr><td>QMS</td><td>9</td><td>Controlled-Doc-Pipeline, Internal-Audit-WorkArea, MgmtReview-Quarterly, MOC-Queue, RBA-Compliance, ISO-Surveillance-Prep, CAPA-Effectiveness</td></tr>
+<tr><td>QA</td><td>11</td><td>NCR-Disposition-Active, NCR-Intake-Pre-Formalization, FAI-Programme, In-Process-Sampling-Plan, Customer-Audit-WarRoom, SCAR-Coordination, MRB-Active, Outgoing-Inspection</td></tr>
+<tr><td>METRO</td><td>10</td><td>Calibration-Active-Queue, CMM-Programs-Library, Gauge-RnR-MSA, Cleanroom-Lab-Daily-Ops, NPI-First-Article-Metrology</td></tr>
+<tr><td>ENG</td><td>13</td><td>NPI-Project, Drawing-Markup-Pre-Release, CAM-Development-Sandbox, FMEA-Drafts, Reverse-Engineering, Trade-Secret-Recipe-Drafts, NPI-Lessons-Learned</td></tr>
+<tr><td>PRO</td><td>11</td><td>Production-Schedule-Active, Routing-Active-WO, Excursion-Pre-NCR-Ledger, Setup-Sheet-Library, Yield-Scrap-Daily, Cell-Performance, Cell-Improvement-Kaizen</td></tr>
+<tr><td>SP</td><td>9</td><td>Surface-Treatment-Daily, EP-Passivation-Batch, Anodize-Batch, Heat-Treat-Pyrometry, NDT-Daily-Inspection, Welding-WPS-Operator-Log</td></tr>
+<tr><td>MNT</td><td>10</td><td>PM-Schedule-Active, Breakdown-Response, Asset-Daily-Mức sẵn sàng, Spare-Parts-Crib, Predictive-Maintenance-Sensor-Data, OEE-Workspace</td></tr>
+<tr><td>SCM</td><td>14</td><td>Strategic-Sourcing, Operational-Buyer-Queue, Supplier-Intelligence, Supplier-Onboarding-Pipeline, AS6174-Counterfeit-ASL-Workspace, Sub-Tier-Audit-Coord, Mill-FlowDown-Library</td></tr>
+<tr><td>SCS</td><td>10</td><td>Customer-Account-Plans, Opportunity-Pipeline, Quote-Pricing, Account-Team-Notes, OEM-Portal-Onboarding-Workstream, Win-Loss-Lessons-Learned</td></tr>
+<tr><td>FIN</td><td>14</td><td>Close-Calendar-Active, AP/AR-Queue, Vendor/Customer-Master-Change, Bank-Recon, Treasury-Cash-Forecast, Capex-Approval, Audit-PBC</td></tr>
+<tr><td>HR</td><td>18</td><td>Onboarding-Pre-Hire, Employee-Records, Performance/Compensation-Cycle, Recruiting, Training, RBA-Working-Hours, RBA-Pulse, PDPL-DataSubject, Exit-Offboarding</td></tr>
+<tr><td>EHS</td><td>8</td><td>Incident-Intake-Pre-Formalization, Near-Miss-Ledger, Risk-Assessment-ISO45001, Aspects-Impact-ISO14001, Permit-To-Work-Daily</td></tr>
+<tr><td>IT</td><td>14</td><td>Helpdesk-Ticket-Queue, New-Hire-IT-Onboarding, Patch-Calendar, Backup-Verification, SOC-Alert-Triage, Cyber-Incident-Pre-Formal, Endpoint-Compliance</td></tr>
+<tr><td>ERP</td><td>12</td><td>MDCR-Working-Set, Epicor-User-Request-Queue, OEM-Portal-Credentials-Vault-Privileged, Luồng xử lý-Logic-Change-Queue, ERP-Upgrade-Patching</td></tr>
+<tr><td>LEGAL</td><td>12</td><td>Contract-Drafting, NDA-Library, IP-Trade-Secret-Register-Working, Litigation-Hold-Pre-Filing, PDPL-Register, Export-Control-ITAR-EAR</td></tr>
 </tbody>
 </table>
 <p>Tổng bespoke thư mụcs: <b>186</b>. Tham chiếu chi tiết: <span class="code">_reports/v9-dept-workspace-tailored/agent-1..4.md</span>.</p>
@@ -279,15 +279,15 @@
 <section class="card">
 <h2>8. SSOT Precedence Quy tắcs R0-R8</h2>
 <ol class="tight">
-<li><b>R0 — Khách hàng-source IP isolation:</b> NO HESEM-IP under <span class="code">{Khách hàng}/00-Khách hàng-Source-IP/</span>. NO khách hàng-source artifacts under <span class="code">{Khách hàng}/10-HESEM-Engineering/</span>. Boundary enforced by Power Automate + label default + DLP.</li>
-<li><b>R1 — New revision = new sibling:</b> Trong <span class="code">00-Khách hàng-Source-IP/</span>, new rev = sibling thư mục. Never overwrite/edit/delete.</li>
-<li><b>R2 — 3-Đã phát hành write-blocked:</b> Trong <span class="code">10-HESEM-Engineering/</span>, <span class="code">3-Đã phát hành/</span> được write-block sau Power Automate promotion. Chỉ DCC superseding mới được thay.</li>
-<li><b>R3 — Canonical compliance lives in QMS:</b> ISO certs / RBA SAQ / CMRT / RoHS / REACH lưu MỘT NƠI ở <span class="code">HESEM-Quality-QMS/01-Compliance-Canonical/</span>. Khách hàng-spoke <span class="code">50-Compliance-Khách hàngSpecific/</span> là MIRROR.</li>
-<li><b>R4 — luồng công việc-Lists là SharePoint Lists, không phải thư mục:</b> L01-L17. Thư mục bằng chứng chỉ là attachment.</li>
-<li><b>R5 — Dept-Private không chứa khách hàng-IP:</b> DEP-{Code}/1-Private/ chỉ chứa dept-internal drafts. Khách hàng-IP phải ở khách hàng-spoke không gian.</li>
-<li><b>R6 — Hub không chứa IP:</b> HESEM-Hub navigation chỉ. Cross-khách hàng KPI rollups phải aggrecổngd (không per-khách hàng detail).</li>
-<li><b>R7 — Archive disposition Rà soáter-cổngd:</b> Không bao giờ auto-destroy. Disposition Rà soát queue → approved destroy queue.</li>
-<li><b>R8 — DKE cho crown jewels chỉ:</b> <span class="code">HESEM-Engineering-IP/01-Quá trình-Recipes-Master-DKE/</span>. DKE phá vỡ Copilot/search by design — reserved cho quá trình recipes, CAD masters, special-quá trình biểu mẫuulations.</li>
+<li><b>R0 — Customer-source IP isolation:</b> NO HESEM-IP under <span class="code">{Customer}/00-Customer-Source-IP/</span>. NO customer-source artifacts under <span class="code">{Customer}/10-HESEM-Engineering/</span>. Boundary enforced by Power Automate + label default + DLP.</li>
+<li><b>R1 — New revision = new sibling:</b> Trong <span class="code">00-Customer-Source-IP/</span>, new rev = sibling folder. Never overwrite/edit/delete.</li>
+<li><b>R2 — 3-Released write-blocked:</b> Trong <span class="code">10-HESEM-Engineering/</span>, <span class="code">3-Released/</span> được write-block sau Power Automate promotion. Chỉ DCC superseding mới được thay.</li>
+<li><b>R3 — Canonical compliance lives in QMS:</b> ISO certs / RBA SAQ / CMRT / RoHS / REACH lưu MỘT NƠI ở <span class="code">HESEM-Quality-QMS/01-Compliance-Canonical/</span>. Customer-spoke <span class="code">50-Compliance-CustomerSpecific/</span> là MIRROR.</li>
+<li><b>R4 — Luồng xử lý-Lists là SharePoint Lists, không phải folder:</b> L01-L17. Folder bằng chứng chỉ là attachment.</li>
+<li><b>R5 — Dept-Private không chứa customer-IP:</b> DEP-{Code}/1-Private/ chỉ chứa dept-internal drafts. Customer-IP phải ở customer-spoke site.</li>
+<li><b>R6 — Hub không chứa IP:</b> HESEM-Hub navigation only. Cross-customer KPI rollups phải aggregated (không per-customer detail).</li>
+<li><b>R7 — Archive disposition reviewer-gated:</b> Không bao giờ auto-destroy. Disposition rà soát queue → approved destroy queue.</li>
+<li><b>R8 — DKE cho crown jewels only:</b> <span class="code">HESEM-Engineering-IP/01-Process-Recipes-Master-DKE/</span>. DKE phá vỡ Copilot/search by design — reserved cho process recipes, CAD masters, special-process formulations.</li>
 </ol>
 </section>
 
@@ -329,10 +329,10 @@
 </tbody>
 </table> <h3>10.1 — Operational guardrails</h3>
 <ul class="tight">
-<li><b>Quarterly IB compliance report</b> qua <span class="code">Get-SPOIBPoliciesReport</span> — flag không gians bị drift segment membergiao hàng.</li>
-<li><b>Quarterly DLP report Rà soát</b> — flag label-mismatch upload attempts.</li>
-<li><b>Annual SQEP simulation</b> — provision test user "AMAT-chỉ" và "LAM-chỉ"; attempt cross-khách hàng truy cập trong Teams/SP/search/Copilot; hồ sơ bằng chứng.</li>
-<li><b>Joiner-Mover-Leaver hook</b> — mọi thay đổi trong SG-KHÁCH HÀNG-* membergiao hàng trigger 24h IB re-evaluation + Purview đánh giá event.</li>
+<li><b>Quarterly IB compliance report</b> qua <span class="code">Get-SPOIBPoliciesReport</span> — flag sites bị drift segment membership.</li>
+<li><b>Quarterly DLP report rà soát</b> — flag label-mismatch upload attempts.</li>
+<li><b>Annual SQEP simulation</b> — provision test user "AMAT-only" và "LAM-only"; attempt cross-customer access trong Teams/SP/search/Copilot; record bằng chứng.</li>
+<li><b>Joiner-Mover-Leaver hook</b> — mọi change trong SG-CUSTOMER-* membership điều kiện kích hoạt 24h IB re-evaluation + Purview sự kiện kiểm toán.</li>
 </ul>
 </section> <section class="card">
 <h2>11. Build statistics</h2>
@@ -356,13 +356,13 @@
 <table>
 <thead><tr><th>Vòng</th><th>Quyết định chính</th><th>Lý do reject</th></tr></thead>
 <tbody>
-<tr><td>v4 (ANNEX-143/144)</td><td>3-axis Job × Chi tiết × Asset</td><td>Còn nest, không peer-level chuẩn PLM</td></tr>
-<tr><td>v5 (ANNEX-145)</td><td>Stress-test fixes + 16 luồng công việc-Lists schema</td><td>Vẫn 1 không gian, khách hàng-keyed bên trong</td></tr>
-<tr><td>v6 (ANNEX-146)</td><td>6 không gian khách hàng-IP-segrecổngd</td><td>User reject — "tôi không cần hesem lam, hesem asml"</td></tr>
-<tr><td>v7 (ANNEX-147)</td><td>1 không gian làm việc thống nhất, khách hàng-keyed thư mục</td><td>Tốt cho navigation, KHÔNG đủ NDA isolation (chưa biết IB chỉ bind không gian-level)</td></tr>
-<tr><td>v8 (ANNEX-148)</td><td>PLM 3-trạng thái cho mọi authored content; Chi tiết-Master + Job-Dossier peer-level</td><td>Đẹp về PLM industry pattern, nhưng vẫn 1 không gian multi-khách hàng</td></tr>
-<tr><td>v9 (drafted)</td><td>v8 + Phòng ban-Workspace bespoke per-dept</td><td>Hoàn thiện dept side, nhưng khách hàng-IP isolation vẫn chưa giải</td></tr>
-<tr><td><b>v10 (ANNEX-149)</b></td><td><b>Hub-Spoke + IB Explicit</b>; khách hàng-source vs HESEM-derived tách rạch ròi; SEMI standards corrected; per-lot 11-thư mục dossier + khách hàng-delta; 17 luồng công việc-Lists</td><td>—</td></tr>
+<tr><td>v4 (ANNEX-143/144)</td><td>3-axis Job × Part × Asset</td><td>Còn nest, không peer-level chuẩn PLM</td></tr>
+<tr><td>v5 (ANNEX-145)</td><td>Stress-test fixes + 16 Luồng xử lý-Lists schema</td><td>Vẫn 1 site, customer-keyed bên trong</td></tr>
+<tr><td>v6 (ANNEX-146)</td><td>6 site customer-IP-segregated</td><td>User reject — "tôi không cần hesem lam, hesem asml"</td></tr>
+<tr><td>v7 (ANNEX-147)</td><td>1 unified workspace, customer-keyed folder</td><td>Tốt cho navigation, KHÔNG đủ NDA isolation (chưa biết IB chỉ bind site-level)</td></tr>
+<tr><td>v8 (ANNEX-148)</td><td>PLM 3-state cho mọi authored content; Part-Master + Job-Dossier peer-level</td><td>Đẹp về PLM industry pattern, nhưng vẫn 1 site multi-customer</td></tr>
+<tr><td>v9 (drafted)</td><td>v8 + Department-Workspace bespoke per-dept</td><td>Hoàn thiện dept side, nhưng customer-IP isolation vẫn chưa giải</td></tr>
+<tr><td><b>v10 (ANNEX-149)</b></td><td><b>Hub-Spoke + IB Explicit</b>; customer-source vs HESEM-derived tách rạch ròi; SEMI standards corrected; per-lot 11-folder dossier + customer-delta; 17 Luồng xử lý-Lists</td><td>—</td></tr>
 </tbody>
 </table>
 <div class="warn-callout"><strong>Lưu ý vận hành:</strong> v10 là pre-production design. Trước khi provision tenant Microsoft 365 E5, cần (a) đặt hàng E5 license cho ~200 user, (b) thiết lập 14 security group (SG-ALL-HESEM + 16 SG-DEP-* + 4 SG-KHÁCH HÀNG-* + 4 SG-KHÁCH HÀNG-*-DKE-APPROVERS + Vai trò groups), (c) cấu hình 10 nhãn độ nhạy, (d) áp 6 IB block chính sách. Powershell provisioning script ở <span class="code">dao cụs/m365-provisioning/Provision-HesemTenant.ps1</span>.</div>

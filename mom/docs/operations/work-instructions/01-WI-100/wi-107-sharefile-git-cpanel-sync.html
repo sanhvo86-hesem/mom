@@ -134,8 +134,8 @@
  <tr><th>Bước</th><th>Hành động bắt buộc</th><th>Bằng chứng</th></tr>
  </thead>
  <tbody>
- <tr><td>1</td><td>Soạn/chỉnh source trong worktree local đang đồng bộ.</td><td>Thay đổid Tệps</td></tr>
- <tr><td>2</td><td>Kiểm tra diff, loại môi trường chạy noise khỏi commit.</td><td>Làm sạch git trạng thái</td></tr>
+ <tr><td>1</td><td>Soạn/chỉnh source trong worktree local đang sync.</td><td>Changed files</td></tr>
+ <tr><td>2</td><td>Kiểm tra diff, loại runtime noise khỏi commit.</td><td>Clean git trạng thái</td></tr>
  <tr><td>3</td><td><span class="code">git add</span> → <span class="code">git commit</span> → <span class="code">git push</span>.</td><td>CommitId</td></tr>
  <tr><td>4</td><td>Đăng ký phát hành manifest theo <a href="../../references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a>.</td><td>Manifest URL</td></tr>
  <tr><td>5</td><td>Máy chủ người vận hành pull đúng commit/tag, chạy smoke test, lưu deploy receipt.</td><td>Deploy receipt</td></tr>
@@ -152,11 +152,11 @@
  <tr><th>Bước</th><th>Hành động bắt buộc</th><th>Bằng chứng</th></tr>
  </thead>
  <tbody>
- <tr><td>1</td><td>Khi sửa trực tiếp trên máy chủ, mở reverse-đồng bộ intake ngay.</td><td>ReverseĐồng bộId</td></tr>
- <tr><td>2</td><td>Commit và push thay đổi từ máy chủ về Git remote.</td><td>CommitId</td></tr>
- <tr><td>3</td><td>Local admin endpoint pull về worktree đang đồng bộ.</td><td>Local pull log</td></tr>
- <tr><td>4</td><td>Kiểm tra SharePoint đồng bộ hoàn tất.</td><td>Đồng bộ complete bằng chứng</td></tr>
- <tr><td>5</td><td>Đóng reverse-đồng bộ Sổ đăng ký.</td><td>Close-out hồ sơ</td></tr>
+ <tr><td>1</td><td>Khi sửa trực tiếp trên server, mở reverse-sync intake ngay.</td><td>ReverseSyncId</td></tr>
+ <tr><td>2</td><td>Commit và push thay đổi từ server về Git remote.</td><td>CommitId</td></tr>
+ <tr><td>3</td><td>Local admin endpoint pull về worktree đang sync.</td><td>Local pull log</td></tr>
+ <tr><td>4</td><td>Kiểm tra SharePoint sync hoàn tất.</td><td>Sync complete bằng chứng</td></tr>
+ <tr><td>5</td><td>Đóng reverse-sync register.</td><td>Close-out record</td></tr>
  </tbody>
  </table>
  </div>
@@ -171,12 +171,12 @@
  <tr><th>Đường dẫn / nhóm dữ liệu</th><th>Quy tắc</th></tr>
  </thead>
  <tbody>
- <tr><td><span class="code">mom/qms-data/biểu mẫu-luồng công việc/</span></td><td>Môi trường chạy luồng công việc binaries, archives và working trạng thái. Không commit vào source thư viện.</td></tr>
- <tr><td><span class="code">mom/qms-data/sessions/</span></td><td>Session môi trường chạy. Không đồng bộ, không commit.</td></tr>
- <tr><td><span class="code">mom/qms-data/ratelimit/</span></td><td>Rate-limit trạng thái. Không đồng bộ, không commit.</td></tr>
- <tr><td><span class="code">mom/qms-data/php_error.log</span></td><td>Môi trường chạy log. Không commit.</td></tr>
- <tr><td><span class="code">mom/qms-data/scan_cache.json</span></td><td>Môi trường chạy cache. Không commit.</td></tr>
- <tr><td><span class="code">mom/qms-data/config/users.json</span> và secret-bearing config</td><td>Xem như môi trường chạy/máy chủ-chỉ kiểm soát data; không dùng như kiểm soátled source artifact nếu chưa có kiến trúc secret kiểm soát riêng được duyệt.</td></tr>
+ <tr><td><span class="code">mom/qms-data/form-luồng xử lý/</span></td><td>Runtime luồng xử lý binaries, archives và working state. Không commit vào source library.</td></tr>
+ <tr><td><span class="code">mom/qms-data/sessions/</span></td><td>Session runtime. Không sync, không commit.</td></tr>
+ <tr><td><span class="code">mom/qms-data/ratelimit/</span></td><td>Rate-limit state. Không sync, không commit.</td></tr>
+ <tr><td><span class="code">mom/qms-data/php_error.log</span></td><td>Runtime log. Không commit.</td></tr>
+ <tr><td><span class="code">mom/qms-data/scan_cache.json</span></td><td>Runtime cache. Không commit.</td></tr>
+ <tr><td><span class="code">mom/qms-data/config/users.json</span> và secret-bearing config</td><td>Xem như runtime/server-only control data; không dùng như controlled source artifact nếu chưa có kiến trúc secret control riêng được duyệt.</td></tr>
  </tbody>
  </table>
  </div>
@@ -185,32 +185,32 @@
  <div class="section">
  <h2>8. Onchuyền biểu mẫus boundary</h2>
  <ul>
- <li>Biểu mẫu definition, đã phát hành schema, source template và supporting source code đi theo source cycle của WI-107.</li>
- <li>Biểu mẫu submissions, phê duyệts, operational responses và hồ sơ payload đi về hồ sơ libraries hoặc môi trường chạy hồ sơ areas theo <a href="wi-101-digital-online-forms-and-approvals.html">WI-101</a>.</li>
- <li>luồng công việc môi trường chạy Tệps trong <span class="code">qms-data/biểu mẫu-luồng công việc</span> không được coi là source artifact.</li>
+ <li>Form definition, released schema, source template và supporting source code đi theo source cycle của WI-107.</li>
+ <li>Form submissions, approvals, operational responses và record payload đi về records libraries hoặc runtime record areas theo <a href="wi-101-digital-online-forms-and-approvals.html">WI-101</a>.</li>
+ <li>Luồng xử lý runtime files trong <span class="code">qms-data/form-luồng xử lý</span> không được coi là source artifact.</li>
  </ul>
  </div>
 
  <div class="section">
- <h2>9. Bằng chứng bắt buộc cho mỗi phát hành</h2>
+ <h2>9. Bằng chứng bắt buộc cho mỗi release</h2>
  <ul>
  <li>CommitId và GitRef</li>
  <li>Phát hành manifest</li>
  <li>Deploy receipt</li>
  <li>Smoke test hoặc point-of-use verification</li>
- <li>Rollback readiness</li>
- <li>Reverse-đồng bộ close-out nếu có hotfix</li>
+ <li>Rollback mức sẵn sàng</li>
+ <li>Reverse-sync close-out nếu có hotfix</li>
  </ul>
  </div>
 
  <div class="section">
- <h2>10. Không được go-live khi</h2>
+ <h2>10. Không được đưa vào vận hành khi</h2>
  <ul>
  <li>Worktree local chưa tách khỏi git-dir</li>
- <li>Source thư viện vẫn mở external sharing</li>
- <li>Môi trường chạy noise còn bị stage vào commit</li>
+ <li>Source library vẫn mở external sharing</li>
+ <li>Runtime noise còn bị stage vào commit</li>
  <li>Deploy không truy được manifest và smoke bằng chứng</li>
- <li>Máy chủ hotfix chưa có reverse-đồng bộ close-out</li>
+ <li>Server hotfix chưa có reverse-sync close-out</li>
  </ul>
  </div>
 

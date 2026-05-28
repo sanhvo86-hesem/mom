@@ -71,15 +71,15 @@ Người dùng phản hồi 4 vấn đề nghiêm trọng với v5:
 <ol class="tight">
 <li><b>Thư mục naming over-engineered</b>: tên như <code>06-FAI-Last-Released-Baseline-Reference-Only</code> không doanh nghiệp CNC nào trên thế giới dùng. Industry chuẩn dùng tên ngắn 1-2 từ: Drawings, BOM, CAM, Engineering, Manufacturing, Kế hoạchning, PO, Purchasing, Quality, Reports, Specification, Archive.</li>
 <li><b>Production-Run-Axis vô dụng</b>: HESEM không có multi-OEM consolidated runs, axis này pre-allocated cho future hypothesis không xảy ra.</li>
-<li><b>MOM đã là SSOT cho SOPs/Manual/chính sách/RACI/WI/ANNEX/Training</b>: QMS-Master/01-Quality-chính sách-and-Manual thư mục trong M365 = DUPLICATE. M365 phải chỉ chứa <em>transactional bằng chứng</em>, không lưu kiểm soátled docs đã có trong MOM.</li>
-<li><b>Câu hỏi cơ bản về permission</b>: nên nhiều không gian hay ít không gian? Có nên gộp khách hàng data vào HESEM-Hồ sơ không?</li>
+<li><b>MOM đã là SSOT cho SOPs/Manual/Policy/RACI/WI/ANNEX/Training</b>: QMS-Master/01-Quality-Policy-and-Manual folder trong M365 = DUPLICATE. M365 phải chỉ chứa <em>transactional bằng chứng</em>, không lưu controlled docs đã có trong MOM.</li>
+<li><b>Câu hỏi cơ bản về permission</b>: nên nhiều site hay ít site? Có nên gộp customer data vào HESEM-Records không?</li>
 </ol>
 </div> <div class="ok-callout"><strong>v6 = ĐẬP ĐI XÂY LẠI từ đầu</strong> theo 4 nguyên tắc:
 <ol class="tight">
-<li><b>Industry-vocabulary thư mục names</b> (Drawings, BOM, CAM, Quality... — như shop floor toàn cầu dùng).</li>
-<li><b>Khách hàng-IP segregation tại cấp KHÔNG GIAN</b> (4 khách hàng không gians + Shared + Internal = 6 không gians). Inbiểu mẫuation Barriers ở cấp không gian là cách M365 enforce mạnh nhất.</li>
-<li><b>MOM = SSOT cho kiểm soátled docs</b> (Manual/chính sách/SOP/WI/RACI/ANNEX/Training curriculum). M365 chỉ lưu transactional bằng chứng (Jobs, POs, FAI, NCR, cal certs).</li>
-<li><b>Bỏ Production-Run-Axis</b>. Bỏ Multi-Job-Bằng chứng ở cấp không gian → đặt trong per-khách hàng không gian (CAPA/8D cross-Job vẫn thuộc 1 khách hàng).</li>
+<li><b>Industry-vocabulary folder names</b> (Drawings, BOM, CAM, Quality... — như shop floor toàn cầu dùng).</li>
+<li><b>Customer-IP segregation tại cấp SITE</b> (4 customer sites + Shared + Internal = 6 sites). Information Barriers ở cấp site là cách M365 enforce mạnh nhất.</li>
+<li><b>MOM = SSOT cho controlled docs</b> (Manual/Policy/SOP/WI/RACI/ANNEX/Training curriculum). M365 chỉ lưu transactional bằng chứng (Jobs, POs, FAI, NCR, cal certs).</li>
+<li><b>Bỏ Production-Run-Axis</b>. Bỏ Multi-Job-Bằng chứng ở cấp site → đặt trong per-customer site (CAPA/8D cross-Job vẫn thuộc 1 customer).</li>
 </ol>
 </div>
 
@@ -90,10 +90,10 @@ Người dùng phản hồi 4 vấn đề nghiêm trọng với v5:
 <table>
 <thead><tr><th>Option</th><th>Mô tả</th><th>Phân quyền</th><th>Pros</th><th>Cons</th><th>Phù hợp HESEM?</th></tr></thead>
 <tbody>
-<tr><td>A. 1 không gian, thư viện-level perm</td><td>Tất cả vào 1 không gian, phân quyền cấp thư viện</td><td>Permission inheritance phức tạp</td><td>Đơn giản admin</td><td>IB scope ở thư viện = dễ vỡ, đánh giá khó chứng minh, single point of failure</td><td>❌ KHÔNG (200 nv + 4 OEM IP segregation)</td></tr>
-<tr><td>B. 5 không gians by function (v4/v5 đã thử)</td><td>HESEM-Hồ sơ/Job-Bằng chứng/People/Digital/Archive</td><td>IB ở thư mục-level trong Job-Bằng chứng</td><td>luồng công việc-Lists có thể dùng cross-cut</td><td>Khách hàng IP trộn vào 1 không gian Job-Bằng chứng → AMAT engineer accidentally thấy LAM = hợp đồng</td><td>❌ KHÔNG (rủi ro IB cross-khách hàng)</td></tr>
-<tr><td><b style="color:#2b8a3e;">C. 6 không gians by SECURITY DOMAIN (v6 NEW)</b></td><td>4 khách hàng không gians + Shared + Internal</td><td>IB ở cấp KHÔNG GIAN — perfect IP segregation</td><td>Khách hàng đánh giáor login → chỉ thấy 1 không gian. AMAT engineer NDA → SG-Khách hàng-AMAT → không thấy LAM cả ở M365 search</td><td>Cần handle cross-khách hàng data (commodity chi tiếts, nhà cung cấps) qua Shared không gian</td><td>✓ <b>YES — industry standard cho tier-1 semicon CNC nhà cung cấp</b></td></tr>
-<tr><td>D. 10+ không gians by Phòng ban</td><td>HESEM-QA/Production/Engineering/...</td><td>Per-dept chủ sở hữu</td><td>Dept chủ sở hữugiao hàng rõ</td><td>Cross-dept luồng công việc (NCR span QA+Production+Eng) bị break; 200 nv không cần phức tạp vậy</td><td>❌ KHÔNG (over-engineered cho 200 nv)</td></tr>
+<tr><td>A. 1 site, library-level perm</td><td>Tất cả vào 1 site, phân quyền cấp library</td><td>Permission inheritance phức tạp</td><td>Đơn giản admin</td><td>IB scope ở library = dễ vỡ, audit khó chứng minh, single point of failure</td><td>❌ KHÔNG (200 nv + 4 OEM IP segregation)</td></tr>
+<tr><td>B. 5 sites by function (v4/v5 đã thử)</td><td>HESEM-Records/Job-Bằng chứng/People/Digital/Archive</td><td>IB ở folder-level trong Job-Bằng chứng</td><td>Luồng xử lý-Lists có thể dùng cross-cut</td><td>Customer IP trộn vào 1 site Job-Bằng chứng → AMAT engineer accidentally thấy LAM = hợp đồng</td><td>❌ KHÔNG (rủi ro IB cross-customer)</td></tr>
+<tr><td><b style="color:#2b8a3e;">C. 6 sites by SECURITY DOMAIN (v6 NEW)</b></td><td>4 customer sites + Shared + Internal</td><td>IB ở cấp SITE — perfect IP segregation</td><td>Customer auditor login → chỉ thấy 1 site. AMAT engineer NDA → SG-Customer-AMAT → không thấy LAM cả ở M365 search</td><td>Cần handle cross-customer data (commodity parts, suppliers) qua Shared site</td><td>✓ <b>YES — industry standard cho tier-1 semicon CNC supplier</b></td></tr>
+<tr><td>D. 10+ sites by department</td><td>HESEM-QA/Production/Engineering/...</td><td>Per-dept người chịu trách nhiệm</td><td>Dept ownership rõ</td><td>Cross-dept luồng xử lý (NCR span QA+Production+Eng) bị break; 200 nv không cần phức tạp vậy</td><td>❌ KHÔNG (over-engineered cho 200 nv)</td></tr>
 </tbody>
 </table>
 <div class="ok-callout"><b>Verdict:</b> Option C (6 không gians by security domain) là <em>industry standard</em> cho tier-1 semicon CNC nhà cung cấp kích cỡ HESEM (Onto Innovation, Cohu, Moog Aerospace dùng pattern tương tự). 4 khách hàng không gian cho IB segregation + 1 Shared cho cross-khách hàng + 1 Internal cho PII/IT/Legal.</div>
@@ -101,10 +101,10 @@ Người dùng phản hồi 4 vấn đề nghiêm trọng với v5:
 <h3>1.2 Có nên gộp khách hàng data vào HESEM-Hồ sơ không?</h3>
 <div class="callout"><b>KHÔNG.</b> 4 lý do:
 <ol class="tight">
-<li><b>IP legal segregation:</b> AMAT MSA + LAM MSA đều có điều khoản "nhà cung cấp shall not commingle our IP with competitor IP". Trộn vào 1 không gian = vi phạm hợp đồng.</li>
-<li><b>IB enforcement weakness:</b> IB ở cấp không gian là Microsoft-recommended; IB ở cấp thư mục/thư viện cần custom DLP quy tắc + permission inheritance break + đánh giá log riêng — fragile.</li>
-<li><b>Đánh giá boundary:</b> AMAT đánh giáor login → guest invite vào "HESEM-AMAT" không gian → tự nhiên không thấy LAM/ASML/TEL. Nếu trộn vào HESEM-Hồ sơ, phải scope guest truy cập đến từng thư mục = error-prone.</li>
-<li><b>Operational clarity:</b> Engineer làm AMAT account login → mở HESEM-AMAT là rõ ngay. Trộn → phải nhớ "tôi đang ở thư mục nào?" → click nhầm.</li>
+<li><b>IP legal segregation:</b> AMAT MSA + LAM MSA đều có điều khoản "supplier shall not commingle our IP with competitor IP". Trộn vào 1 site = vi phạm hợp đồng.</li>
+<li><b>IB enforcement weakness:</b> IB ở cấp site là Microsoft-recommended; IB ở cấp folder/library cần custom DLP rule + permission inheritance break + nhật ký kiểm toán riêng — fragile.</li>
+<li><b>Audit boundary:</b> AMAT auditor login → guest invite vào "HESEM-AMAT" site → tự nhiên không thấy LAM/ASML/TEL. Nếu trộn vào HESEM-Records, phải scope guest access đến từng folder = error-prone.</li>
+<li><b>Operational clarity:</b> Engineer làm AMAT account login → mở HESEM-AMAT là rõ ngay. Trộn → phải nhớ "tôi đang ở folder nào?" → click nhầm.</li>
 </ol>
 </div>
 
@@ -112,12 +112,12 @@ Người dùng phản hồi 4 vấn đề nghiêm trọng với v5:
 <div class="warn-callout"><b>v5 BUG đã sửa trong v6:</b> v5 tạo thư mục <code>QMS-Master/01-Quality-Policy-and-Manual/</code>, <code>Department-Reference/{DEP}/01-SOPs-and-Work-Instructions/</code> v.v. — những thư mục này là <b>duplicate</b> của MOM `mom/docs/system/` + `mom/docs/operations/` + `mom/docs/training/`.<br><br>
 <b>v6 SSOT boundary quy tắc:</b>
 <ul class="tight">
-<li><b>MOM (eqms.hesemeng.com)</b> = SSOT cho: Quality Manual, Quality chính sách, SOPs, Work Instructions, RACI Ma trận, ANNEX docs, Training curriculum, DCC document Sổ đăng ký, Biểu mẫu templates spec, Org chart + position Sổ đăng ký, JD canonical.</li>
-<li><b>M365</b> = SSOT cho: <em>transactional bằng chứng</em> — Jobs, POs, FAI execution, NCR/CAPA hồ sơ, Cal certs, Đánh giá findings, CMRT responses, khách hàng correspondence, nhà cung cấp đánh giá reports.</li>
-<li><b>Cross-liên kết quy tắc:</b> Khi cần reference SOP từ M365 hồ sơ (vd Job-Dossier liên kết tới SOP for Chuẩn bị máy), dùng <em>hyperliên kết tới MOM URL</em>, KHÔNG bản sao SOP PDF sang M365.</li>
+<li><b>MOM (eqms.hesemeng.com)</b> = SSOT cho: Quality Manual, Quality Policy, SOPs, Work Instructions, RACI matrix, ANNEX docs, Training curriculum, DCC document register, Form templates spec, Org chart + position register, JD canonical.</li>
+<li><b>M365</b> = SSOT cho: <em>transactional bằng chứng</em> — Jobs, POs, FAI execution, NCR/CAPA records, Cal certs, Audit findings, CMRT responses, customer correspondence, supplier audit reports.</li>
+<li><b>Cross-link rule:</b> Khi cần reference SOP từ M365 record (vd Job-Dossier link tới SOP for Setup), dùng <em>hyperlink tới MOM URL</em>, KHÔNG copy SOP PDF sang M365.</li>
 </ul>
 </div>
-<p>v6 đã loại tất cả thư mục duplicate-of-MOM. Phòng ban-Reference không gian bị bỏ hoàn toàn (16 dept × 8 sub = 128 thư mục duplicate-of-MOM đã xoá). QMS-Master shrink xuống chỉ giữ thứ MOM không có (Risk Sổ đăng ký bằng chứng, Internal Đánh giá findings per cycle, MR pack per quarter, ECO queue master).</p>
+<p>v6 đã loại tất cả folder duplicate-of-MOM. Department-Reference site bị bỏ hoàn toàn (16 dept × 8 sub = 128 folder duplicate-of-MOM đã xoá). QMS-Master shrink xuống chỉ giữ thứ MOM không có (Risk Register bằng chứng, Internal Audit findings per cycle, MR pack per quarter, ECO queue master).</p>
 </section>
 
 <section class="card">
@@ -125,13 +125,13 @@ Người dùng phản hồi 4 vấn đề nghiêm trọng với v5:
 <table>
 <thead><tr><th>Không gian</th><th>Mục đích</th><th>IB segment</th><th>Default permission</th><th>Cross-không gian reference</th></tr></thead>
 <tbody>
-<tr><td><b>HESEM-AMAT</b></td><td>AMAT IP + Jobs + POs + Đánh giás + Contracts</td><td>Khách hàng-AMAT</td><td>SG-Cust-AMAT-Members (HESEM employees với NDA AMAT)</td><td>References HESEM-Shared/Nhà cung cấps/* + Assets/* + Compliance/*</td></tr>
-<tr><td><b>HESEM-LAM</b></td><td>LAM IP + Jobs + POs + Đánh giás + Contracts</td><td>Khách hàng-LAM</td><td>SG-Cust-LAM-Members</td><td>Như trên</td></tr>
-<tr><td><b>HESEM-ASML</b></td><td>ASML IP + Jobs + POs + Đánh giás + Contracts</td><td>Khách hàng-ASML</td><td>SG-Cust-ASML-Members</td><td>Như trên</td></tr>
-<tr><td><b>HESEM-TEL</b></td><td>TEL IP + Jobs + POs + Đánh giás + Contracts</td><td>Khách hàng-TEL</td><td>SG-Cust-TEL-Members</td><td>Như trên</td></tr>
-<tr><td><b>HESEM-Shared</b></td><td>Nhà cung cấps, Assets, Compliance (CMRT/UFLPA/ESG roll-up), Training (Cert master), Lot-Trace, Chi tiếts-HESEM-Owned (commodity), Internal-Đánh giá, Management-Rà soát</td><td>(none — all HESEM employees)</td><td>Read by default; write per dept SG (DEP-METRO writes Assets/Thiết bị đos, DEP-HR-Training writes Training/, etc.)</td><td>Cross-liên kết IN từ all 4 khách hàng không gians</td></tr>
-<tr><td><b>HESEM-Internal</b></td><td>HR (Employee PII), IT (System hồ sơ), OT (CNC backup, post-nhà xử lý — air-gapped), Legal (contracts non-khách hàng + Insurance + Litigation + IP), Executive (BOD + Strategy + ERM)</td><td>Strict per thư viện</td><td>HR=SG-HR chỉ; IT=SG-IT chỉ; OT=SG-OT+IT-SOC chỉ; Legal=SG-Legal chỉ; Executive=SG-BOD+Exec chỉ</td><td>None (internal data, no khách hàng cross-liên kết)</td></tr>
-<tr><td><b>HESEM-Archive</b></td><td>Closed-Year-Archive, Superseded, Legal-Tạm giữ, Locked-Job-Pack-Cuối cùng, Retention-Schedule, Disposition-Log</td><td>Read-chỉ</td><td>Read = all HESEM; write = QMS + Legal chỉ</td><td>Inherits source Mức nhạy cảm (frozen)</td></tr>
+<tr><td><b>HESEM-AMAT</b></td><td>AMAT IP + Jobs + POs + Audits + Contracts</td><td>Customer-AMAT</td><td>SG-Cust-AMAT-Members (HESEM employees với NDA AMAT)</td><td>References HESEM-Shared/Suppliers/* + Assets/* + Compliance/*</td></tr>
+<tr><td><b>HESEM-LAM</b></td><td>LAM IP + Jobs + POs + Audits + Contracts</td><td>Customer-LAM</td><td>SG-Cust-LAM-Members</td><td>Như trên</td></tr>
+<tr><td><b>HESEM-ASML</b></td><td>ASML IP + Jobs + POs + Audits + Contracts</td><td>Customer-ASML</td><td>SG-Cust-ASML-Members</td><td>Như trên</td></tr>
+<tr><td><b>HESEM-TEL</b></td><td>TEL IP + Jobs + POs + Audits + Contracts</td><td>Customer-TEL</td><td>SG-Cust-TEL-Members</td><td>Như trên</td></tr>
+<tr><td><b>HESEM-Shared</b></td><td>Suppliers, Assets, Compliance (CMRT/UFLPA/ESG roll-up), Training (Cert master), Lot-Trace, Parts-HESEM-Owned (commodity), Internal-Audit, Management-Rà soát</td><td>(none — all HESEM employees)</td><td>Read by default; write per dept SG (DEP-METRO writes Assets/Gages, DEP-HR-Training writes Training/, etc.)</td><td>Cross-link IN từ all 4 customer sites</td></tr>
+<tr><td><b>HESEM-Internal</b></td><td>HR (Employee PII), IT (System records), OT (CNC backup, post-processor — air-gapped), Legal (contracts non-customer + Insurance + Litigation + IP), Executive (BOD + Strategy + ERM)</td><td>Strict per library</td><td>HR=SG-HR only; IT=SG-IT only; OT=SG-OT+IT-SOC only; Legal=SG-Legal only; Executive=SG-BOD+Exec only</td><td>None (internal data, no customer cross-link)</td></tr>
+<tr><td><b>HESEM-Archive</b></td><td>Closed-Year-Archive, Superseded, Legal-Hold, Locked-Job-Pack-Final, Retention-Schedule, Disposition-Log</td><td>Read-only</td><td>Read = all HESEM; write = QMS + Legal only</td><td>Inherits source sensitivity (frozen)</td></tr>
 </tbody>
 </table>
 <div class="ok-callout"><b>Tổng 7 không gian</b> (6 chính + Archive) — làm sạcher mental model: <em>"việc của AMAT thì vào HESEM-AMAT, việc của LAM vào HESEM-LAM..."</em>. Người vận hành/QA/Buyer mở không gian tương ứng khách hàng là xong, không cần điều hướng phức tạp.</div>
@@ -176,7 +176,7 @@ HESEM-{OEM}/
 ├── POs/                              # Customer Purchase Orders
 │   └── {YYYY}/PO-{Num}/
 │       ├── Source                    # PO PDF pulled from portal
-│       ├── Review                    # internal contract review
+│       ├── Rà soát                    # internal contract rà soát
 │       ├── Acknowledgement           # OA back to customer
 │       ├── Linked-Jobs               # which Jobs spawned by this PO
 │       ├── PCN-Inbound
@@ -197,7 +197,7 @@ HESEM-{OEM}/
 │   ├── Audits/{YYYY}
 │   ├── Bulletins/{YYYY}
 │   └── Demand-Forecast/{YYYY}
-├── Multi-Job-Evidence/               # cross-Job evidence for THIS customer
+├── Multi-Job-Bằng chứng/               # cross-Job bằng chứng for THIS customer
 │   ├── CAPA-Cross-Job/{ID}
 │   ├── 8D-Field-Failure/{ID}
 │   ├── Banned-Substance/{ID}
@@ -231,7 +231,7 @@ HESEM-Shared/
 │                                     Specification, FAI, ECN,
 │                                     Cross-OEM-Usage, Trade-Secret, Archive}
 ├── Lot-Trace/{Heat-Lots, Process-Lots, Finished-Lots}/{LotID}
-├── Quality/{Internal-Audits/{YYYY}, Management-Review/{YYYY},
+├── Quality/{Internal-Audits/{YYYY}, Management-Rà soát/{YYYY},
 │            Risk-Register, Improvement-Kaizen, FOD-Program,
 │            Counterfeit-Prevention}
 ├── Compliance/{Export-Classification, UFLPA-Map, Banned-Substance-Library,
@@ -271,7 +271,7 @@ HESEM-Internal/
 │   ├── Kinematic-XML
 │   ├── DNC-Server-Config
 │   ├── CAD-CAM-License-Backup/{YYYY}
-│   ├── OT-Incident-Playbook
+│   ├── OT-Incident-Kịch bản triển khai
 │   └── Air-Gap-Workstation-Config
 ├── Legal/                               # SG-Legal only
 │   └── {Contracts-General, Insurance-Policies, Litigation-Hold,
@@ -308,7 +308,7 @@ HESEM-Internal/
 <tr><td><code>Department-Reference/{DEP}/01-SOPs-and-Work-Instructions</code></td><td><em>(REMOVED — MOM is SSOT)</em></td></tr>
 <tr><td><code>Department-Reference/{DEP}/02-Forms-Templates</code></td><td><em>(REMOVED — MOM is SSOT)</em></td></tr>
 <tr><td><code>QMS-Master/01-Quality-Policy-and-Manual</code></td><td><em>(REMOVED — MOM is SSOT)</em></td></tr>
-<tr><td><code>Training-Master/01-Course-Catalog</code></td><td><em>(Danh mục stays MOM; chỉ Cert bằng chứng in M365)</em></td></tr>
+<tr><td><code>Training-Master/01-Course-Catalog</code></td><td><em>(catalog stays MOM; only Cert bằng chứng in M365)</em></td></tr>
 <tr><td><code>Production-Run-Axis/</code></td><td><em>(DROPPED — not used in practice)</em></td></tr>
 <tr><td><code>Multi-Job-Evidence/</code> (không gian-level)</td><td><code>HESEM-{OEM}/Multi-Job-Evidence/</code> (per-khách hàng)</td></tr>
 <tr><td><code>Customer-Account/{OEM}</code></td><td><code>HESEM-{OEM}/Customer/</code> (now its own không gian, khách hàng = không gian name)</td></tr>
@@ -332,12 +332,12 @@ HESEM-Internal/
 <tr><td>—</td><td>—</td><td>—</td></tr>
 <tr style="background:#ebfbee;"><td>FAI execution PDF (filled in for Job J260315)</td><td><b>M365</b> HESEM-AMAT/Jobs/2026/J260315/Quality/FAI-Execution/</td><td>Transactional bằng chứng per-Job</td></tr>
 <tr style="background:#ebfbee;"><td>NCR PDF (filled for NCR-2026-0043)</td><td><b>M365</b> HESEM-AMAT/Jobs/2026/J260315/Quality/NCR/{NcrId}/</td><td>Transactional bằng chứng per-Job</td></tr>
-<tr style="background:#ebfbee;"><td>Cal cert (issued for THIẾT BỊ ĐO-CMM-001 in 2026)</td><td><b>M365</b> HESEM-Shared/Assets/Thiết bị đos/CMM-001/Calibration/2026/</td><td>Asset bằng chứng</td></tr>
-<tr style="background:#ebfbee;"><td>Khách hàng PO (received from AMAT)</td><td><b>M365</b> HESEM-AMAT/POs/2026/PO-79101/Source/</td><td>Inbound transactional</td></tr>
-<tr style="background:#ebfbee;"><td>Đánh giá findings report (internal đánh giá IA-2026-005)</td><td><b>M365</b> HESEM-Shared/Quality/Internal-Đánh giás/2026/</td><td>Đánh giá bằng chứng</td></tr>
-<tr style="background:#ebfbee;"><td>CMRT response from Nhà cung cấp S047 for 2026</td><td><b>M365</b> HESEM-Shared/Nhà cung cấps/S047/CMRT-EMRT/2026/</td><td>Nhà cung cấp bằng chứng</td></tr>
-<tr style="background:#ebfbee;"><td>Employee perbiểu mẫuance Rà soát (per emp E0247)</td><td><b>M365</b> HESEM-Internal/HR/Employees/E0247-Name/05-Perbiểu mẫuance/</td><td>PII hồ sơ</td></tr>
-<tr style="background:#ebfbee;"><td>CNC kiểm soátler param backup (Machine M-CNC-014, 2026)</td><td><b>M365</b> HESEM-Internal/OT/CNC-Param-Backup/M-CNC-014/2026/</td><td>OT artifact</td></tr>
+<tr style="background:#ebfbee;"><td>Cal cert (issued for GAGE-CMM-001 in 2026)</td><td><b>M365</b> HESEM-Shared/Assets/Gages/CMM-001/Calibration/2026/</td><td>Asset bằng chứng</td></tr>
+<tr style="background:#ebfbee;"><td>Customer PO (received from AMAT)</td><td><b>M365</b> HESEM-AMAT/POs/2026/PO-79101/Source/</td><td>Inbound transactional</td></tr>
+<tr style="background:#ebfbee;"><td>Audit findings report (internal audit IA-2026-005)</td><td><b>M365</b> HESEM-Shared/Quality/Internal-Audits/2026/</td><td>Audit bằng chứng</td></tr>
+<tr style="background:#ebfbee;"><td>CMRT response from Supplier S047 for 2026</td><td><b>M365</b> HESEM-Shared/Suppliers/S047/CMRT-EMRT/2026/</td><td>Supplier bằng chứng</td></tr>
+<tr style="background:#ebfbee;"><td>Employee performance rà soát (per emp E0247)</td><td><b>M365</b> HESEM-Internal/HR/Employees/E0247-Name/05-Performance/</td><td>PII record</td></tr>
+<tr style="background:#ebfbee;"><td>CNC controller param backup (Machine M-CNC-014, 2026)</td><td><b>M365</b> HESEM-Internal/OT/CNC-Param-Backup/M-CNC-014/2026/</td><td>OT artifact</td></tr>
 </tbody>
 </table>
 <div class="ok-callout"><b>Decision quy tắc khi tạo Tệp:</b>
@@ -375,7 +375,7 @@ HESEM-Internal/
 <li><code>SG-Cust-AMAT-Members</code> ↔ <code>SG-Cust-LAM-Members</code>: IB segment riêng. AMAT engineer không thấy LAM trong M365 search/share/Teams.</li>
 <li><code>SG-Cust-AMAT</code> ↔ <code>SG-Cust-ASML</code>: cũng IB riêng.</li>
 <li>Tất cả 4 OEM IB pairwise segregation (6 cặp).</li>
-<li><b>Multi-khách hàng engineer</b> (rare): phải có NDA của mỗi OEM, sign explicit consent log, đánh giá log mọi cross-không gian truy cập — vẫn không thấy được search results trộn.</li>
+<li><b>Multi-customer engineer</b> (rare): phải có NDA của mỗi OEM, sign explicit consent log, nhật ký kiểm toán mọi cross-site access — vẫn không thấy được search results trộn.</li>
 </ul>
 </div>
 </section>
@@ -385,11 +385,11 @@ HESEM-Internal/
 <table>
 <thead><tr><th>Tình huống</th><th>v5 (5 không gians IB-thư mục)</th><th>v6 (6 không gians IB-không gian)</th></tr></thead>
 <tbody>
-<tr><td>AMAT engineer search "chamber"</td><td>Thấy results từ AMAT + LAM + ASML nếu thư mục permission inheritance vỡ (rủi ro)</td><td>Chỉ thấy AMAT (IB không gian-level enforce trên M365 search engine)</td></tr>
-<tr><td>AMAT đánh giáor login (guest)</td><td>Cần scope guest tới thư mụcs cụ thể; sai 1 click = thấy LAM</td><td>Invite vào HESEM-AMAT không gian = không bao giờ thấy LAM cả ở navigation</td></tr>
-<tr><td>QA Quản lý close NCR-2026-0043 (LAM Job)</td><td>Vào HESEM-Hồ sơ/Phòng ban-Ops/DEP-QA/.../09-NCR/{YYYY}/...</td><td>Vào HESEM-LAM/Jobs/2026/J260315/Quality/NCR/{ID}/ — 1 click</td></tr>
-<tr><td>Người vận hành mở traveler J260315</td><td>Vào HESEM-Job-Bằng chứng/Job-Dossiers/{YYYY}/.../Chuẩn bị máy-Sheets...</td><td>Vào HESEM-LAM/Jobs/2026/J260315/Manufacturing/ — 1 click</td></tr>
-<tr><td>Buyer issue sub-PO cho nhà cung cấp S047</td><td>Vào DEP-SCM/02-Operations/.../05-PO-Subcontract...</td><td>Vào HESEM-Shared/Nhà cung cấps/S047/Sub-PO-History/ HOẶC HESEM-LAM/Jobs/.../Purchasing/</td></tr>
+<tr><td>AMAT engineer search "chamber"</td><td>Thấy results từ AMAT + LAM + ASML nếu folder permission inheritance vỡ (rủi ro)</td><td>Chỉ thấy AMAT (IB site-level enforce trên M365 search engine)</td></tr>
+<tr><td>AMAT auditor login (guest)</td><td>Cần scope guest tới folders cụ thể; sai 1 click = thấy LAM</td><td>Invite vào HESEM-AMAT site = không bao giờ thấy LAM cả ở navigation</td></tr>
+<tr><td>QA Manager close NCR-2026-0043 (LAM Job)</td><td>Vào HESEM-Records/Department-Ops/DEP-QA/.../09-NCR/{YYYY}/...</td><td>Vào HESEM-LAM/Jobs/2026/J260315/Quality/NCR/{ID}/ — 1 click</td></tr>
+<tr><td>Operator mở traveler J260315</td><td>Vào HESEM-Job-Bằng chứng/Job-Dossiers/{YYYY}/.../Setup-Sheets...</td><td>Vào HESEM-LAM/Jobs/2026/J260315/Manufacturing/ — 1 click</td></tr>
+<tr><td>Buyer issue sub-PO cho supplier S047</td><td>Vào DEP-SCM/02-Operations/.../05-PO-Subcontract...</td><td>Vào HESEM-Shared/Suppliers/S047/Sub-PO-History/ HOẶC HESEM-LAM/Jobs/.../Purchasing/</td></tr>
 <tr><td>Maintenance Tech log PM cho M-CNC-014</td><td>DEP-MNT/02-Operations/.../03-PM-Work-Order...</td><td>HESEM-Shared/Assets/Machines/M-CNC-014/PM/2026/ — single canonical</td></tr>
 </tbody>
 </table>
@@ -407,8 +407,8 @@ HESEM-Internal/
 <tr><td>5</td><td>Mark ANNEX-144 + 145 = SUPERSEDED-BY-ANNEX-146</td><td>Next</td></tr>
 <tr><td>6</td><td>Sổ đăng ký ANNEX-146 trong dcc_document_header</td><td>Next</td></tr>
 <tr><td>7</td><td>Commit + push + deploy + Chrome verify</td><td>Next</td></tr>
-<tr><td>8</td><td>(Future) Provisioning script tạo 6 không gians + IB segments + permission groups</td><td>Pending</td></tr>
-<tr><td>9</td><td>(Future) luồng công việc-Lists (16 List trong ANNEX-145 §5) provisioned ở không gian nào? Quyết định: NCR/CAPA/8D Lists ở per-khách hàng không gian (cross-Job within khách hàng); Calibration-Due, PM-Schedule, Cert-Expiry ở HESEM-Shared</td><td>Pending — sửa ANNEX-145</td></tr>
+<tr><td>8</td><td>(Future) Provisioning script tạo 6 sites + IB segments + permission groups</td><td>Pending</td></tr>
+<tr><td>9</td><td>(Future) Luồng xử lý-Lists (16 List trong ANNEX-145 §5) provisioned ở site nào? Quyết định: NCR/CAPA/8D Lists ở per-customer site (cross-Job within customer); Calibration-Due, PM-Schedule, Cert-Expiry ở HESEM-Shared</td><td>Pending — sửa ANNEX-145</td></tr>
 </tbody>
 </table>
 </section> <section class="card">
@@ -416,7 +416,7 @@ HESEM-Internal/
 <ul class="tight">
 <li><b>v6 Bản thiết kế:</b> <code>tools/m365-provisioning/build_blueprint.py</code> + <code>blueprint/_TREE.txt</code> (672 directories)</li>
 <li><a href="annex-144-ssot-3-axis-job-part-asset-architecture.html"><b>ANNEX-144 (v4) → SUPERSEDED-BY ANNEX-146 (v6)</b></a></li>
-<li><a href="annex-145-v5-stress-test-fixes-and-workflow-lists-schema.html"><b>ANNEX-145 (v5) → SUPERSEDED-BY ANNEX-146 (v6) cho site architecture</b></a>. <em>Tuy nhiên §5 luồng công việc-Lists schema vẫn áp dụng — chỉ đổi không gian target (per-khách hàng cho NCR/CAPA/8D, Shared cho Calibration/PM/Cert).</em></li>
+<li><a href="annex-145-v5-stress-test-fixes-and-workflow-lists-schema.html"><b>ANNEX-145 (v5) → SUPERSEDED-BY ANNEX-146 (v6) cho site architecture</b></a>. <em>Tuy nhiên §5 Luồng xử lý-Lists schema vẫn áp dụng — chỉ đổi site target (per-customer cho NCR/CAPA/8D, Shared cho Calibration/PM/Cert).</em></li>
 <li><a href="annex-143-department-role-scenario-file-master-matrix.html">ANNEX-143 (v3.1)</a> — historical</li>
 <li><a href="annex-142-m365-permission-model-for-semi-supplier-audit.html">ANNEX-142</a> — permission model + IB (v6 cập nhật cấp không gian)</li>
 <li><a href="annex-141-semi-equipment-parts-cnc-supplier-compliance.html">ANNEX-141</a> — Pack-6 (v6 implement trong HESEM-{OEM}/Jobs/.../Giao hàngping/Làm sạchchuyềnss-Pack-6/)</li>
@@ -426,7 +426,7 @@ HESEM-Internal/
 <table>
 <thead><tr><th>Rev</th><th>Ngày</th><th>Người</th><th>Mô tả</th></tr></thead>
 <tbody>
-<tr><td>V0</td><td>2026-05-17</td><td>QMS</td><td>Đập đi xây lại từ đầu sau user feedback v5: (1) thư mục name over-engineered → vocabulary công nghiệp ngắn gọn (Drawings/BOM/CAM/Quality/...), (2) bỏ Production-Run-Axis, (3) MOM là SSOT cho kiểm soátled docs — M365 chỉ chứa transactional bằng chứng, (4) 6 không gians by SECURITY DOMAIN cho IP segregation (4 OEM không gians + Shared + Internal + Archive) thay vì 5 không gians by function trộn khách hàng data của v5. IB ở cấp không gian = bulletproof. Tổng Bản thiết kế: 750 (v5) → 672 (v6, -10% vì xoá duplicate-of-MOM thư mụcs).</td></tr>
+<tr><td>V0</td><td>2026-05-17</td><td>QMS</td><td>Đập đi xây lại từ đầu sau user feedback v5: (1) folder name over-engineered → vocabulary công nghiệp ngắn gọn (Drawings/BOM/CAM/Quality/...), (2) bỏ Production-Run-Axis, (3) MOM là SSOT cho controlled docs — M365 chỉ chứa transactional bằng chứng, (4) 6 sites by SECURITY DOMAIN cho IP segregation (4 OEM sites + Shared + Internal + Archive) thay vì 5 sites by function trộn customer data của v5. IB ở cấp site = bulletproof. Tổng blueprint: 750 (v5) → 672 (v6, -10% vì xoá duplicate-of-MOM folders).</td></tr>
 </tbody>
 </table>
 </section> </div></div></div></div>
