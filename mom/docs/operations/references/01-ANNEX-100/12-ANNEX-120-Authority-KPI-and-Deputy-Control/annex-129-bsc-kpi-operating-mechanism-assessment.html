@@ -152,8 +152,8 @@ td,th{vertical-align:top}
 <tr><td>Health Indicator</td><td>Trend/awareness.</td><td>Không score.</td><td>Không reward, không discipline.</td></tr>
 </tbody>
 </table></div>
-<div class="note"><b>Ngưỡng định lượng và căn cứ.</b> Ngưỡng xanh/vàng/đỏ của mỗi KPI nằm trong KPI Authority Registry (<span class="code">annex122_governance_kpis[].threstạm giữs</span>), kèm trường <span class="code">threstạm giữs.basis</span> ghi căn cứ: benchmark ngành gia công CNC, lịch sử <span class="code">kpi_ảnh chụp trạng tháis</span>, hoặc cam kết hợp đồng khách hàng. KPI dạng aging (NCR/ECO/WIP) tính theo số ngày kể từ ngày MỞ đối tượng để chống dồn đóng cuối kỳ cho số đẹp. KPI dạng tỷ lệ mang <span class="code">biểu mẫuula.min_sample</span>; dưới cỡ mẫu tối thiểu, KPI hiển thị "không đủ dữ liệu", không tô xanh/đỏ và không dùng cho đánh giá.</div>
-<div class="note"><b>Khen thưởng, cải tiến và khắc phục công bằng.</b> KPI xanh bền vững từ ba kỳ liên tiếp được ghi nhận cho đội nhóm và đưa vào xem xét của lãnh đạo. KPI đỏ KHÔNG dẫn tới phạt cá nhân: trước tiên mở CAPA, điều chỉnh nguồn lực, đào tạo hoặc hiệu chỉnh Hoshin, đồng thời phân định đỏ do hệ thống hay do tuân thủ. KPI chỉ được gắn khen thưởng khi chủ KPI kiểm soát được kết quả, có counter-chỉ số chiều ngược và có bằng chứng truy vết; mỗi KPI đỏ phải tách <span class="code">breakdown</span> theo nguyên nhân, phần do bộ phận khác được quy về người phụ trách tương ứng theo <span class="code">attribution_quy tắc</span> trong registry.</div>
+<div class="note"><b>Ngưỡng định lượng và căn cứ.</b> Ngưỡng xanh/vàng/đỏ của mỗi KPI nằm trong KPI Authority Registry (<span class="code">annex122_governance_kpis[].thresholds</span>), kèm trường <span class="code">thresholds.basis</span> ghi căn cứ: benchmark ngành gia công CNC, lịch sử <span class="code">kpi_snapshots</span>, hoặc cam kết hợp đồng khách hàng. KPI dạng aging (NCR/ECO/WIP) tính theo số ngày kể từ ngày MỞ đối tượng để chống dồn đóng cuối kỳ cho số đẹp. KPI dạng tỷ lệ mang <span class="code">formula.min_sample</span>; dưới cỡ mẫu tối thiểu, KPI hiển thị "không đủ dữ liệu", không tô xanh/đỏ và không dùng cho đánh giá.</div>
+<div class="note"><b>Khen thưởng, cải tiến và khắc phục công bằng.</b> KPI xanh bền vững từ ba kỳ liên tiếp được ghi nhận cho đội nhóm và đưa vào xem xét của lãnh đạo. KPI đỏ KHÔNG dẫn tới phạt cá nhân: trước tiên mở CAPA, điều chỉnh nguồn lực, đào tạo hoặc hiệu chỉnh Hoshin, đồng thời phân định đỏ do hệ thống hay do tuân thủ. KPI chỉ được gắn khen thưởng khi chủ KPI kiểm soát được kết quả, có counter-chỉ số chiều ngược và có bằng chứng truy vết; mỗi KPI đỏ phải tách <span class="code">breakdown</span> theo nguyên nhân, phần do bộ phận khác được quy về người phụ trách tương ứng theo <span class="code">attribution_rules</span> trong registry.</div>
 </div>
 
 <div class="section">
@@ -176,7 +176,7 @@ td,th{vertical-align:top}
 <li>ANNEX-127 phải liên kết ANNEX-129 trong nhóm tài liệu liên kết.</li>
 <li>ANNEX-125 phải xem ANNEX-129 là tài liệu đánh giá BSC/KPI Vận hành mechanism.</li>
 <li>ANNEX-128 phải được regenerate để thống kê ANNEX-129 và mọi KPI/chỉ số được nhắc trong tài liệu này.</li>
-<li>bảng điều khiển hoặc API mới không được thêm KPI nếu chưa đọc <span class="code">thay đổi_kiểm soát_Chính sách</span> từ <span class="code">GET /api/kpi/Danh mục</span>.</li>
+<li>bảng điều khiển hoặc API mới không được thêm KPI nếu chưa đọc <span class="code">change_control_policy</span> từ <span class="code">GET /api/kpi/Danh mục</span>.</li>
 </ul>
 </div> <div class="section">
 <h2>10. Tài liệu liên kết</h2>

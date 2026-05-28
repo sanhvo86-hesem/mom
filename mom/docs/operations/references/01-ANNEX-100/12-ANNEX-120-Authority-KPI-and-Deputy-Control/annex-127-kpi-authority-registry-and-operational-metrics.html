@@ -114,7 +114,7 @@ td,th{vertical-align:top}
 
 <div class="section">
 <h2>6. Đánh giá tổng thể tài liệu HTML</h2>
-<p>Đánh giá ngày 2026-04-18 quét toàn bộ <span class="code">mom/docs</span> bằng script <span class="code">dao cụs/scripts/kpi/đánh giá-html-kpis.php</span>. Report chi tiết nằm tại <span class="code">_reports/kpi/report-kpi-html-đánh giá-2026-04-18.json</span>. Đánh giá bổ sung về đánh giá, ghi nhận và kỷ luật nằm tại <span class="code">_reports/kpi/report-kpi-perbiểu mẫuance-governance-2026-04-18.json</span>.</p>
+<p>Đánh giá ngày 2026-04-18 quét toàn bộ <span class="code">mom/docs</span> bằng script <span class="code">tools/scripts/kpi/audit-html-kpis.php</span>. Report chi tiết nằm tại <span class="code">_reports/kpi/report-kpi-html-audit-2026-04-18.json</span>. Đánh giá bổ sung về đánh giá, ghi nhận và kỷ luật nằm tại <span class="code">_reports/kpi/report-kpi-performance-governance-2026-04-18.json</span>.</p>
 <div class="table-card"><table class="table">
 <thead><tr><th>Chỉ số đánh giá</th><th>Kết quả</th><th>Nhận định kiểm soát</th></tr></thead>
 <tbody>
@@ -177,11 +177,11 @@ td,th{vertical-align:top}
 </ul>
 
 <h3>7.4 Chỉ số Vận hành contract</h3>
-<p>Mỗi chỉ số trong <span class="code">GET /api/kpi/Danh mục</span> phải trả lời đủ 6 câu: đo để quyết định gì, muốn kéo hành vi nào, kết quả kỳ vọng là gì, ai sở hữu, bằng chứng ở đâu, lệch thì consequence nào. Nếu thiếu các câu này thì chỉ số chỉ được xem là staged hoặc health indicator, chưa đủ điều kiện dùng làm KPI chính thức.</p>
+<p>Mỗi chỉ số trong <span class="code">GET /api/kpi/catalog</span> phải trả lời đủ 6 câu: đo để quyết định gì, muốn kéo hành vi nào, kết quả kỳ vọng là gì, ai sở hữu, bằng chứng ở đâu, lệch thì consequence nào. Nếu thiếu các câu này thì chỉ số chỉ được xem là staged hoặc health indicator, chưa đủ điều kiện dùng làm KPI chính thức.</p>
 <div class="table-card"><table class="table">
 <thead><tr><th>Nhóm field</th><th>Field bắt buộc</th><th>Ý nghĩa kiểm soát</th></tr></thead>
 <tbody>
-<tr><td>Semantics</td><td><span class="code">chỉ số_type</span>, <span class="code">usage_types</span>, <span class="code">result_type</span>, <span class="code">is_official_kpi</span></td><td>Phân biệt KPI chính thức, Vận hành chỉ số, cổng chỉ số, Vai trò measure và health indicator.</td></tr>
+<tr><td>Semantics</td><td><span class="code">metric_type</span>, <span class="code">usage_types</span>, <span class="code">result_type</span>, <span class="code">is_official_kpi</span></td><td>Phân biệt KPI chính thức, Vận hành chỉ số, cổng chỉ số, Vai trò measure và health indicator.</td></tr>
 <tr><td>Intent</td><td><span class="code">strategic_intent</span>, <span class="code">motive</span>, <span class="code">expected_result</span>, <span class="code">decision_purpose</span></td><td>Khóa ý đồ quản trị, động cơ hành vi mong muốn và quyết định phải phát sinh.</td></tr>
 <tr><td>Evaluation</td><td><span class="code">evaluation_use</span>, <span class="code">evaluation_scope</span>, <span class="code">rating_method</span>, <span class="code">review_forum</span></td><td>Chỉ metric có evaluation use được duyệt mới được gọi KPI.</td></tr>
 <tr><td>Bằng chứng</td><td><span class="code">data_contract</span>, <span class="code">calculation_status</span>, <span class="code">source_table_or_record</span>, <span class="code">evidence_record</span>, <span class="code">lineage_rule</span></td><td>Cho biết backend tính được chưa, nguồn nào là bằng chứng, số có đáng tin đến mức nào và truy vết về authority nào.</td></tr>
