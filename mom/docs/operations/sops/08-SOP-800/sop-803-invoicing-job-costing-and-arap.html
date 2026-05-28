@@ -116,14 +116,14 @@
 <td>P3 · golive + pilot</td>
 <td>P3-03</td>
 <td>Đợt Sản xuất chạy job costing live cho mọi Job Order; ô tài chính trên bảng điều khiển phải cập nhật đúng hạn ≥95%.</td>
-<td><code>readiness.json</code>, bảng điều khiển ảnh chụp trạng thái, WIP/Job Cost report.</td>
+<td><code>readiness.json</code>, bảng điều khiển snapshot, WIP/Job Cost report.</td>
 </tr>
 <tr>
 <td>W9-W10</td>
 <td>P3/P4 · golive + dash</td>
 <td>P3-01 + P4-02</td>
-<td>Finance nhận trực ca Đợt 3, soát quyền và ký cam kết cập nhật dữ liệu tài chính theo nhịp bảng điều khiển quản trị.</td>
-<td>Access rà soát log, <code>readiness.json</code>, biên bản W10.</td>
+<td>Finance nhận trực ca Đợt 3, soát quyền và ký cam kết cập nhật dữ liệu tài chính theo nhịp bảng điều khiển governance.</td>
+<td>Access review log, <code>readiness.json</code>, biên bản W10.</td>
 </tr>
 <tr>
 <td>W11</td>
@@ -151,8 +151,8 @@
 <div class="note-warn">
 <ul class="tight">
 <li>Không cho Đợt 2 đi tiếp khi hóa đơn đầu tiên lệch Job Costing &gt;3% hoặc thiếu bằng chứng FRM-821 trong <code>audit_events</code>.</li>
-<li>Không khóa <code>P4-02</code> khi Finance chưa ký cam kết nhịp cập nhật bảng điều khiển tài chính hoặc còn quyền truy cập ngoài vai trò trong access rà soát.</li>
-<li>Không đóng job khi chi phí nhà cung cấp, WIP, tranh chấp AR hoặc điều chỉnh ghi có còn treo mà chưa có chủ sở hữu và ngày xử lý tiếp theo.</li>
+<li>Không khóa <code>P4-02</code> khi Finance chưa ký cam kết nhịp cập nhật bảng điều khiển tài chính hoặc còn quyền truy cập ngoài vai trò trong access review.</li>
+<li>Không đóng job khi chi phí nhà cung cấp, WIP, tranh chấp AR hoặc điều chỉnh ghi có còn treo mà chưa có owner và ngày xử lý tiếp theo.</li>
 </ul>
 </div>
 </div>

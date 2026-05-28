@@ -47,7 +47,7 @@
 <tbody>
 <tr><td><b>L1 Identity</b></td><td>Microsoft Entra ID (Azure AD)</td><td>Groups + PIM eligible + Conditional Access policies</td></tr>
 <tr><td><b>L2 Data Classification</b></td><td>Microsoft Purview Sensitivity Labels</td><td>7 label theo audience + encryption + watermark</td></tr>
-<tr><td><b>L3 Data Loss Prevention</b></td><td>Microsoft Purview DLP</td><td>8 chính sách chặn leak cross-khách hàng, ITAR/EAR, HIO banned</td></tr>
+<tr><td><b>L3 Data Loss Prevention</b></td><td>Microsoft Purview DLP</td><td>8 chính sách chặn leak cross-customer, ITAR/EAR, HIO banned</td></tr>
 <tr><td><b>L4 Information Barriers</b></td><td>Microsoft Purview Information Barriers</td><td>4 segment cứng AMAT/LAM/ASML/TEL — không cross-talk Teams/SharePoint/OneDrive</td></tr>
 <tr><td><b>L5 lưu giữ &amp; Hồ sơ</b></td><td>Microsoft Purview Hồ sơ Management</td><td>lưu giữ labels R3/R7/R10/R15/R-Life + declare-as-hồ sơ + regulatory hồ sơ</td></tr>
 <tr><td><b>L6 Audit &amp; eDiscovery</b></td><td>Microsoft Purview Audit + eDiscovery Premium</td><td>Unified audit log 10 năm + eDiscovery hold + chain-of-custody export</td></tr>
@@ -55,10 +55,12 @@
 <tr><td><b>L8 SIEM</b></td><td>Microsoft Sentinel</td><td>SIEM tích hợp Entra + M365 + Defender; 2 năm hot + 7 năm archive</td></tr>
 </tbody>
 </table>
-<div class="keyline"><strong>License plan:</strong> 20-30 user lõi (admin, DCC, QA director, PCN approver, sale lead 4 OEM, Compliance officer) = <b>M365 E5</b>; 100-150 employee thường = <b>M365 E3 + E5 Compliance add-on</b>; 20-30 factory operator view-only = <b>M365 F3</b>. Cộng Entra P2 cho 30 user lõi (PIM + Identity Protection + Entitlement Management). Ước tính tổng ~$105K/năm cho HESEM 150-user. So với mất AMAT nhà cung cấp status = $2-5M revenue/năm → ROI rõ ràng.</div>
-</section> <section class="card">
-<h2>2. Entra ID Group mô hình</h2>
-<h3>2.1. Quy ước đặt tên bắt buộc (đặt trong Entra ID Groups → Naming chính sách)</h3>
+<div class="keyline"><strong>License plan:</strong> 20-30 user lõi (admin, DCC, QA director, PCN approver, sale lead 4 OEM, Compliance officer) = <b>M365 E5</b>; 100-150 employee thường = <b>M365 E3 + E5 Compliance add-on</b>; 20-30 factory operator view-only = <b>M365 F3</b>. Cộng Entra P2 cho 30 user lõi (PIM + Identity Protection + Entitlement Management). Ước tính tổng ~$105K/năm cho HESEM 150-user. So với mất AMAT supplier status = $2-5M revenue/năm → ROI rõ ràng.</div>
+</section>
+
+<section class="card">
+<h2>2. Entra ID Group Model</h2>
+<h3>2.1. Naming convention bắt buộc (đặt trong Entra ID Groups → Naming chính sách)</h3>
 <p><span class="code">{Type}-{Scope}-{Purpose}[-{Modifier}]</span></p>
 <ul class="tight">
 <li><span class="code">SG-</span> Security Group (assigned)</li>
@@ -76,7 +78,7 @@
 <tr><td><span class="code">SG-Customer-LAM-Members</span></td><td>Assigned</td><td>Tương tự, người phục vụ LAM</td><td>Segment LAM</td></tr>
 <tr><td><span class="code">SG-Customer-ASML-Members</span></td><td>Assigned</td><td>Người được clear cho ASML EUV (NDA + đào tạo UHV/HIO)</td><td>Segment ASML</td></tr>
 <tr><td><span class="code">SG-Customer-TEL-Members</span></td><td>Assigned</td><td>Người phục vụ TEL (có thể trùng AMAT cho non-conflicting roles)</td><td>Segment TEL</td></tr>
-<tr><td><span class="code">SG-Role-DocumentController</span></td><td>Assigned</td><td>DCC team (2-3 người)</td><td>Edit Controlled tài liệu</td></tr>
+<tr><td><span class="code">SG-Role-DocumentController</span></td><td>Assigned</td><td>DCC team (2-3 người)</td><td>Edit Controlled Documents</td></tr>
 <tr><td><span class="code">SG-Role-PCN-Approver</span></td><td>Assigned</td><td>QA Director + Engineering Manager</td><td>Approve PCN trong luồng công việc</td></tr>
 <tr><td><span class="code">SG-Role-ITAR-Cleared</span></td><td>Assigned</td><td>Người đã ký NDA + US person where required</td><td>DLP exception cho EAR/ITAR drawings</td></tr>
 <tr><td><span class="code">SG-Role-Compliance-Officer</span></td><td>Assigned</td><td>QA Manager + IT Manager + 1 director</td><td>Audit cross-khách hàng, eDiscovery, sensitive label management</td></tr>
@@ -95,10 +97,12 @@
 <li>Require justification + ticket number</li>
 <li>Notification gửi Compliance Officer khi activation</li>
 </ul>
-</section> <section class="card">
+</section>
+
+<section class="card">
 <h2>3. Conditional Access — 8 chính sách bắt buộc</h2>
 <table>
-<thead><tr><th>chính sách</th><th>Target</th><th>trạng thái</th><th>kiểm soát</th></tr></thead>
+<thead><tr><th>chính sách</th><th>Target</th><th>Condition</th><th>Control</th></tr></thead>
 <tbody>
 <tr><td><span class="code">CA01-Block-Legacy-Auth</span></td><td>All users</td><td>Client app = legacy (POP, IMAP, SMTP basic)</td><td>Block</td></tr>
 <tr><td><span class="code">CA02-Require-MFA-AllUsers</span></td><td>All users (trừ break-glass)</td><td>Mọi sign-in</td><td>Require MFA (Authenticator hoặc FIDO2 key)</td></tr>
@@ -143,11 +147,13 @@
 <tr><td><span class="code">R-Contract-Customer</span></td><td>Theo MSA (thường 7y post-termination)</td><td>Delete sau rà soát</td><td>khách hàng contract, NDA, nhà cung cấp agreement</td></tr>
 </tbody>
 </table>
-<div class="ok-callout"><strong>Event-based lưu giữ setup:</strong> Trong Purview Hồ sơ Management → Events → tạo event type <span class="code">ProductEOL</span>. Khi khách hàng (AMAT/LAM/ASML/TEL) gửi end-of-life notice qua portal → DCC manually trigger event qua Graph API (KHÔNG auto-trigger để tránh xóa nhầm). Files có label <span class="code">R-Life-of-Product+10</span> bắt đầu countdown 10 năm.</div>
-</section> <section class="card">
+<div class="ok-callout"><strong>Event-based retention setup:</strong> Trong Purview Records Management → Events → tạo event type <span class="code">ProductEOL</span>. Khi customer (AMAT/LAM/ASML/TEL) gửi end-of-life notice qua portal → DCC manually trigger event qua Graph API (KHÔNG auto-trigger để tránh xóa nhầm). Files có label <span class="code">R-Life-of-Product+10</span> bắt đầu countdown 10 năm.</div>
+</section>
+
+<section class="card">
 <h2>6. DLP Policies — 10 chính sách semi-specific</h2>
 <table>
-<thead><tr><th>#</th><th>chính sách</th><th>trạng thái</th><th>Action</th></tr></thead>
+<thead><tr><th>#</th><th>chính sách</th><th>Condition</th><th>Action</th></tr></thead>
 <tbody>
 <tr><td>1</td><td><span class="code">DLP-Block-AMAT-Drawing-External</span></td><td>Sensitivity = <span class="code">Confidential-Customer-AMAT</span> và recipient external và domain NOT IN <span class="code">amat.com</span></td><td>Block + notify + admin alert</td></tr>
 <tr><td>2</td><td><span class="code">DLP-Block-CrossCustomer-Leak</span></td><td>File label = AMAT và uploaded to LAM/ASML/TEL không gian (hoặc ngược lại)</td><td>Block + audit log + alert Compliance</td></tr>
@@ -188,12 +194,12 @@
 <tbody>
 <tr><td>D-7</td><td>AMAT account manager mở ticket → Compliance Officer tạo Access bộ hồ sơ <span class="code">AP-Audit-AMAT-2026Q2-Onkhông gian</span> trong Entra Entitlement Management. Tags: auditor name, audit scope (3 part numbers + period), expected end date.</td><td>AM + Compliance</td></tr>
 <tr><td>D-5</td><td>Auditor email request access link → 2 approver duyệt (AM + Compliance Officer, separation of duty) → guest account tạo trong tenant, gán <span class="code">SG-EXT-Auditor-AMAT-2026Q2</span>, expiry 7 ngày sau end date.</td><td>Compliance</td></tr>
-<tr><td>D-3</td><td>DCC chuẩn bị thư viện <span class="code">Audit-Response-AMAT-2026Q2</span> (sub-không gian của khách hàng-AMAT-Không gian) → copy/link tài liệu cần show (3 part numbers' FAI/PCN/RMA) → áp label <span class="code">Confidential-Customer-AMAT</span> + watermark dynamic <span class="code">${User.Name} ${Date}</span>.</td><td>DCC</td></tr>
+<tr><td>D-3</td><td>DCC chuẩn bị library <span class="code">Audit-Response-AMAT-2026Q2</span> (sub-site của Customer-AMAT-Site) → copy/link tài liệu cần show (3 part numbers' FAI/PCN/RMA) → áp label <span class="code">Confidential-Customer-AMAT</span> + watermark dynamic <span class="code">${User.Name} ${Date}</span>.</td><td>DCC</td></tr>
 <tr><td>D-1</td><td>Gửi guest invitation link (Entra B2B), bắt buộc MFA, conditional access chính sách <span class="code">CA04-Block-Guest-Download</span> apply → view-only Office Web, no download, no print, no sync, session 1h idle timeout.</td><td>IT</td></tr>
-<tr><td>D0 → D+5</td><td>Auditor login → mọi action ghi Unified Audit Log: FileAccessed, FilePrà soáted, SearchPerformed. Download attempt sẽ bị block (logged as FileDownloaded blocked).</td><td>Auditor (logged)</td></tr>
-<tr><td>D+6</td><td>Access bộ hồ sơ auto-expire 24h sau end date → guest deactivated. Notification gửi AM + Compliance.</td><td>Auto</td></tr>
-<tr><td>D+7</td><td>Compliance export Unified Audit Log filtered theo guest UPN → lưu <span class="code">Audit-Bằng chứng-Thư viện/AMAT-2026Q2/audit-trail.csv</span> với label <span class="code">R10-PCN-Customer</span>.</td><td>Compliance</td></tr>
-<tr><td>D+30</td><td>Access Rà soát xác nhận guest đã offboard hoàn toàn → delete guest account khỏi tenant.</td><td>Compliance</td></tr>
+<tr><td>D0 → D+5</td><td>Auditor login → mọi action ghi Unified Audit Log: FileAccessed, FilePreviewed, SearchPerformed. Download attempt sẽ bị block (logged as FileDownloaded blocked).</td><td>Auditor (logged)</td></tr>
+<tr><td>D+6</td><td>Access package auto-expire 24h sau end date → guest deactivated. Notification gửi AM + Compliance.</td><td>Auto</td></tr>
+<tr><td>D+7</td><td>Compliance export Unified Audit Log filtered theo guest UPN → lưu <span class="code">Audit-Evidence-Library/AMAT-2026Q2/audit-trail.csv</span> với label <span class="code">R10-PCN-Customer</span>.</td><td>Compliance</td></tr>
+<tr><td>D+30</td><td>Access Review xác nhận guest đã offboard hoàn toàn → delete guest account khỏi tenant.</td><td>Compliance</td></tr>
 </tbody>
 </table>
 <div class="ok-callout"><strong>Dynamic watermark:</strong> SharePoint trực tuyến hỗ trợ qua sensitivity label content marking với variable <span class="code">${User.Name}</span> + <span class="code">${Date}</span>. Mọi trang khi auditor prà soát Office Web đều có watermark với username họ — không thể chối nếu screenshot leak.</div>
@@ -216,19 +222,21 @@
 <h3>10.1. Onboarding nhân viên mới (semi context)</h3>
 <ol class="tight">
 <li>HR creates user trong Entra ID với <span class="code">employeeType</span> + <span class="code">department</span> attribute → DG-* groups tự fill</li>
-<li>HR ký NDA — DCC theo dõi expiry (R-Contract-khách hàng label)</li>
-<li>đào tạo: ESD + Cleanroom + Workmangiao hàng (semi-specific) — hồ sơ vào đào tạo-Hồ sơ thư viện với cert</li>
-<li>IT cấp M365 license (F3/E3/E5 theo vai trò)</li>
-<li>Manager request thêm vào <span class="code">SG-Customer-{OEM}-Members</span> nếu phục vụ OEM cụ thể — qua Access bộ hồ sơ request → phê duyệt</li>
+<li>HR ký NDA — DCC theo dõi expiry (R-Contract-Customer label)</li>
+<li>Training: ESD + Cleanroom + Workmanship (semi-specific) — record vào Training-Records library với cert</li>
+<li>IT cấp M365 license (F3/E3/E5 theo role)</li>
+<li>Manager request thêm vào <span class="code">SG-Customer-{OEM}-Members</span> nếu phục vụ OEM cụ thể — qua Access Package request → approval</li>
 <li>Information Barrier chính sách tự apply trong vòng 24h</li>
-</ol> <h3>10.2. Offboarding (CRITICAL — chống mất drawing)</h3>
+</ol>
+
+<h3>10.2. Offboarding (CRITICAL — chống mất drawing)</h3>
 <ol class="tight">
 <li>HR notify Disable date (D-day) — D-7 alert IT + Manager</li>
-<li>Manager xác định chủ sở hữu chuyển giao OneDrive + Outlook</li>
-<li>D-day -1: Compliance Officer rà soát user's OneDrive cho drawing/IP — nếu có Confidential+ file ở OneDrive personal → ép migrate sang SharePoint không gian có lưu giữ</li>
+<li>Manager xác định owner chuyển giao OneDrive + Outlook</li>
+<li>D-day -1: Compliance Officer review user's OneDrive cho drawing/IP — nếu có Confidential+ file ở OneDrive personal → ép migrate sang SharePoint site có retention</li>
 <li>D-day 00:00: Entra Lifecycle luồng công việc tự động: (1) disable account, (2) revoke session tokens (Entra "Revoke sessions"), (3) remove from all groups, (4) transfer OneDrive delegate to manager 30 ngày, (5) litigation hold mailbox 7 năm</li>
-<li>D-day +30: rà soát final, archive mailbox, delete account khỏi tenant active danh sách</li>
-<li>D-day +90: Access Rà soát confirm zero residual permission</li>
+<li>D-day +30: review final, archive mailbox, delete account khỏi tenant active list</li>
+<li>D-day +90: Access Review confirm zero residual permission</li>
 </ol>
 </section> <section class="card">
 <h2>11. 12 Anti-pattern để TRÁNH</h2>
@@ -252,7 +260,7 @@
 </section> <section class="card">
 <h2>12. Tài liệu liên kết</h2>
 <ul class="tight">
-<li><a href="annex-141-semi-equipment-parts-cnc-supplier-compliance.html">ANNEX-141</a> — Semi-Equipment Parts CNC nhà cung cấp Compliance (thư mục + luồng công việc)</li>
+<li><a href="annex-141-semi-equipment-parts-cnc-supplier-compliance.html">ANNEX-141</a> — Semi-Equipment Parts CNC Supplier Compliance (folder + luồng công việc)</li>
 <li><a href="annex-130-m365-eqms-ssot-boundary-and-cross-reference-policy.html">ANNEX-130</a> — SSOT 3 tầng (sẽ patch để bổ sung Information Barriers segment trong AP-09 anti-pattern)</li>
 <li><a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a> — Phê duyệt/sharing luồng (cross-ref guest audit access luồng tại §G)</li>
 <li><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> — Không gian topology (đăng ký 4 khách hàng-{OEM}-Không gian + 1 Customers-Hub + 1 HESEM-ESG-Compliance KHÔNG GIAN 5)</li>

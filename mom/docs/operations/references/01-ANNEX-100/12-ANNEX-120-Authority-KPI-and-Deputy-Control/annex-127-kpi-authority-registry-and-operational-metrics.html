@@ -50,7 +50,12 @@ td,th{vertical-align:top}
      data-dcc-doc-code="ANNEX-127"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-127&quot;,&quot;title&quot;:&quot;KPI Authority Registry and Operational Metrics&quot;,&quot;subtitle&quot;:&quot;Sổ đăng ký mã KPI/metric chuẩn, alias legacy và trạng thái dùng cho code/dashboard&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div> <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng để kiểm soát mã KPI chuẩn, alias legacy, KPI hiện hữu trong ANNEX-122 và các metric CNC đề xuất trước khi đưa vào bảng điều khiển hoặc KpiEngine.</div> <div class="section">
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-127&quot;,&quot;title&quot;:&quot;KPI Authority Registry and Operational Metrics&quot;,&quot;subtitle&quot;:&quot;Sổ đăng ký mã KPI/metric chuẩn, alias legacy và trạng thái dùng cho code/dashboard&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
+
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng để kiểm soát mã KPI chuẩn, alias legacy, KPI hiện hữu trong ANNEX-122 và các metric CNC đề xuất trước khi đưa vào bảng điều khiển hoặc KpiEngine.</div>
+
+
+<div class="section">
 <h2>1. Nguồn chuẩn</h2>
 <div class="callout">
 <p><b>Registry chính thức:</b> <span class="code">mom/data/registry/kpi-authority-registry.json</span> · <a href="../../../../../portal.html#admin/kpi-registry">Admin Console KPI Registry</a></p>
@@ -100,9 +105,9 @@ td,th{vertical-align:top}
 <tbody>
 <tr><td>1. Định nghĩa</td><td>Mã chuẩn, tên KPI, mục đích quyết định, higher/lower is better.</td><td>QMS + chủ sở hữu</td></tr>
 <tr><td>2. Công thức</td><td>Tử số, mẫu số, filter, kỳ tính, xử lý ngoại lệ, đơn vị.</td><td>QMS + Analytics</td></tr>
-<tr><td>3. Nguồn dữ liệu</td><td>Bảng/cột, hệ nguồn, chủ sở hữu dữ liệu, làm mới cadence, truy xuất link.</td><td>Chủ sở hữu dữ liệu</td></tr>
-<tr><td>4. Bằng chứng</td><td>Form, log, hồ sơ hoặc ảnh chụp trạng thái chứng minh số liệu.</td><td>QMS/QA khi liên quan chất lượng</td></tr>
-<tr><td>5. môi trường chạy</td><td>Test, migration/seed nếu cần, bảng điều khiển contract, rollback behavior.</td><td>Engineering chủ sở hữu</td></tr>
+<tr><td>3. Nguồn dữ liệu</td><td>Bảng/cột, hệ nguồn, owner dữ liệu, refresh cadence, trace link.</td><td>Chủ sở hữu dữ liệu</td></tr>
+<tr><td>4. Evidence</td><td>Form, log, record hoặc snapshot chứng minh số liệu.</td><td>QMS/QA khi liên quan chất lượng</td></tr>
+<tr><td>5. Runtime</td><td>Test, migration/seed nếu cần, bảng điều khiển contract, rollback behavior.</td><td>Engineering owner</td></tr>
 </tbody>
 </table></div>
 </div> <div class="section">
@@ -119,30 +124,32 @@ td,th{vertical-align:top}
 <tr><td>môi trường chạy KPI backend hiện có</td><td>19 metric</td><td>Chỉ 19 metric được KpiEngine tính trực tiếp.</td></tr>
 </tbody>
 </table></div>
-<div class="callout"><b>Kết luận audit:</b> số lượng KPI trong tài liệu không thiếu; vấn đề chính là thiếu phân tầng authority, backend coverage và consequence logic rõ ràng. Từ thời điểm áp dụng annex này, tài liệu hiện trường/JD/đào tạo không được tự tạo KPI chính thức nếu chưa map registry và chưa có mục đích đánh giá.</div>
-</div> <div class="section">
-<h2>7. Quy tắc hiệu suất quản trị</h2>
-<div class="callout danger"><b>Nguyên tắc khóa:</b> Không dùng để đánh giá thì không gọi KPI. Nếu chỉ dùng để theo dõi, điều hành ca/ngày, giữ cổng chất lượng hoặc nhắc hành động thì đặt là metric, kiểm soát metric, gate metric, chỉ số theo vai trò hoặc health indicator.</div>
-<div class="callout danger"><b>Nguyên tắc change-kiểm soát:</b> Khi thêm, đổi tên, đổi target/ngưỡng, đổi trọng số, đổi chủ sở hữu, đổi công thức/backend hoặc di chuyển vị trí sử dụng của KPI/metric, phải cập nhật đồng thời registry KPI, ANNEX-128 KPI Ma trận hệ thống và tất cả SOP/WI/ANNEX/JD/đào tạo liên quan. Nếu ANNEX-128 và tài liệu liên quan chưa cập nhật, thay đổi KPI chưa hoàn tất và chưa được dùng cho bảng điều khiển, đánh giá, ghi nhận, thưởng, hành động khắc phục hoặc kỷ luật.</div>
+<div class="callout"><b>Kết luận audit:</b> số lượng KPI trong tài liệu không thiếu; vấn đề chính là thiếu phân tầng authority, backend coverage và consequence logic rõ ràng. Từ thời điểm áp dụng annex này, tài liệu hiện trường/JD/training không được tự tạo KPI chính thức nếu chưa map registry và chưa có mục đích đánh giá.</div>
+</div>
+
+<div class="section">
+<h2>7. Quy tắc performance governance</h2>
+<div class="callout danger"><b>Nguyên tắc khóa:</b> Không dùng để đánh giá thì không gọi KPI. Nếu chỉ dùng để theo dõi, điều hành ca/ngày, giữ cổng chất lượng hoặc nhắc hành động thì đặt là metric, control metric, gate metric, role measure hoặc health indicator.</div>
+<div class="callout danger"><b>Nguyên tắc change-control:</b> Khi thêm, đổi tên, đổi target/ngưỡng, đổi trọng số, đổi owner, đổi công thức/backend hoặc di chuyển vị trí sử dụng của KPI/metric, phải cập nhật đồng thời registry KPI, ANNEX-128 KPI System Matrix và tất cả SOP/WI/ANNEX/JD/training liên quan. Nếu ANNEX-128 và tài liệu liên quan chưa cập nhật, thay đổi KPI chưa hoàn tất và chưa được dùng cho bảng điều khiển, đánh giá, ghi nhận, thưởng, hành động khắc phục hoặc kỷ luật.</div>
 <div class="table-card"><table class="table">
 <thead><tr><th>Phát hiện audit</th><th>Kết quả</th><th>Việc phải làm</th></tr></thead>
 <tbody>
 <tr><td>File HTML được quét</td><td>413 file</td><td>Giữ report như bằng chứng kiểm soát tài liệu.</td></tr>
 <tr><td>File có KPI/metric có ngữ cảnh KPI</td><td>297 file</td><td>Không tự xem toàn bộ là KPI chính thức; phải qua registry.</td></tr>
-<tr><td>Thiếu từ khóa đánh giá/rà soát</td><td>19 file</td><td>Hoặc bổ sung evaluation use, hoặc đổi tên thành metric/kiểm soát indicator.</td></tr>
+<tr><td>Thiếu từ khóa đánh giá/review</td><td>19 file</td><td>Hoặc bổ sung evaluation use, hoặc đổi tên thành metric/control indicator.</td></tr>
 <tr><td>Thiếu ghi nhận/khen thưởng</td><td>101 file</td><td>Định nghĩa recognition rule ở chính sách trung tâm; không nhất thiết mỗi WI lặp lại.</td></tr>
-<tr><td>Thiếu kỷ luật/corrective-action</td><td>13 file</td><td>Bổ sung quy tắc coaching, CAPA, chuyển cấp, discipline rào chắn.</td></tr>
-<tr><td>Thiếu toàn bộ people-quản trị signal</td><td>0 file</td><td>Đã xử lý nhóm rủi ro cao: SOP-203, WI-511, WI-514, WI-515, đào tạo competency template và competency metrics.</td></tr>
-<tr><td>Row KPI/target thiếu people-quản trị tại dòng</td><td>75 row</td><td>Dùng chính sách trung tâm để map hoặc đổi nhãn row thành vai trò/kiểm soát metric.</td></tr>
+<tr><td>Thiếu kỷ luật/corrective-action</td><td>13 file</td><td>Bổ sung quy tắc coaching, CAPA, escalation, discipline rào chắn.</td></tr>
+<tr><td>Thiếu toàn bộ people-governance signal</td><td>0 file</td><td>Đã xử lý nhóm rủi ro cao: SOP-203, WI-511, WI-514, WI-515, training competency template và competency metrics.</td></tr>
+<tr><td>Row KPI/target thiếu people-governance tại dòng</td><td>75 row</td><td>Dùng chính sách trung tâm để map hoặc đổi nhãn row thành role/control metric.</td></tr>
 </tbody>
 </table></div> <h3>7.1 Kế hoạch sửa chữa sau audit HTML</h3>
 <div class="table-card"><table class="table">
 <thead><tr><th>Đợt</th><th>Phạm vi</th><th>Quy tắc sửa</th><th>Bằng chứng đóng</th></tr></thead>
 <tbody>
-<tr><td>Wave 1 - đã cập nhật</td><td>SOP-203, WI-511, WI-514, WI-515, đào tạo competency template và competency metrics.</td><td>Đổi nhãn KPI local thành gate/kiểm soát metric hoặc vai trò hiệu suất measure; bổ sung rà soát, recognition, hành động khắc phục và discipline rào chắn.</td><td>Audit còn 0 file thiếu toàn bộ people-quản trị signal.</td></tr>
-<tr><td>Wave 2 - row-level cleanup</td><td>75 dòng bảng KPI/target còn thiếu quản trị tại dòng, chủ yếu competency levels/modules và vài ANNEX/WI.</td><td>Trong đào tạo dùng "vai trò hiệu suất Measure"; trong SOP/WI dùng "Chỉ số kiểm soát cổng" hoặc "Chỉ số vận hành"; chỉ giữ chữ KPI khi dòng map được canonical registry, target, chủ sở hữu, rating và consequence.</td><td>Row findings trong report giảm theo từng batch; không cần thêm thưởng/phạt vào mọi dòng nếu tài liệu trỏ về chính sách trung tâm.</td></tr>
-<tr><td>Wave 3 - template/generator</td><td>đào tạo modules C01-C19, competency level pages, phòng ban handbook và WI có cùng cấu trúc.</td><td>Sửa template sinh HTML để tự chèn block quản trị chuẩn; tránh vá thủ công 100+ file lặp lại.</td><td>File mới sinh lại không tạo thêm KPI giả; audit không tăng missing_all.</td></tr>
-<tr><td>Wave 4 - registry/API gate</td><td>KPI danh mục, bảng điều khiển và generic CRUD.</td><td>Không cho tạo KPI ngoài registry; metric chưa có evaluation/consequence chỉ được trả là staged/health indicator, không dùng payout.</td><td><span class="code">GET /api/kpi/catalog</span> trả đủ classification, thẻ điểm, data contract và consequence.</td></tr>
+<tr><td>Wave 1 - đã cập nhật</td><td>SOP-203, WI-511, WI-514, WI-515, training competency template và competency metrics.</td><td>Đổi nhãn KPI local thành gate/control metric hoặc role performance measure; bổ sung review, recognition, hành động khắc phục và discipline rào chắn.</td><td>Audit còn 0 file thiếu toàn bộ people-governance signal.</td></tr>
+<tr><td>Wave 2 - row-level cleanup</td><td>75 dòng bảng KPI/target còn thiếu governance tại dòng, chủ yếu competency levels/modules và vài ANNEX/WI.</td><td>Trong training dùng "Role Performance Measure"; trong SOP/WI dùng "Gate Control Metric" hoặc "Operating Metric"; chỉ giữ chữ KPI khi dòng map được canonical registry, target, owner, rating và consequence.</td><td>Row findings trong report giảm theo từng batch; không cần thêm thưởng/phạt vào mọi dòng nếu tài liệu trỏ về chính sách trung tâm.</td></tr>
+<tr><td>Wave 3 - template/generator</td><td>Training modules C01-C19, competency level pages, department handbook và WI có cùng cấu trúc.</td><td>Sửa template sinh HTML để tự chèn block governance chuẩn; tránh vá thủ công 100+ file lặp lại.</td><td>File mới sinh lại không tạo thêm KPI giả; audit không tăng missing_all.</td></tr>
+<tr><td>Wave 4 - registry/API gate</td><td>KPI catalog, bảng điều khiển và generic CRUD.</td><td>Không cho tạo KPI ngoài registry; metric chưa có evaluation/consequence chỉ được trả là staged/health indicator, không dùng payout.</td><td><span class="code">GET /api/kpi/catalog</span> trả đủ classification, scorecard, data contract và consequence.</td></tr>
 </tbody>
 </table></div> <h3>7.2 Phân loại bắt buộc</h3>
 <div class="table-card"><table class="table">
@@ -175,8 +182,10 @@ td,th{vertical-align:top}
 <tr><td>Thẻ điểm</td><td><span class="code">thẻ điểm_weight_pct</span>, <span class="code">thẻ điểm_unit</span>, <span class="code">thẻ điểm_target</span>, <span class="code">thẻ điểm_scoring_status</span>, <span class="code">thẻ điểm_contributes_to_reward</span></td><td>Tách target/unit thẻ điểm khỏi target/unit môi trường chạy. Metric staged có thể hiển thị để điều hành nhưng chưa dùng payout.</td></tr>
 <tr><td>Consequence</td><td><span class="code">consequence</span>, <span class="code">counter_metric</span>, <span class="code">anti_gaming_guardrail</span>, <span class="code">controllability_scope</span></td><td>Chống dùng số thô để thưởng/phạt sai người và chống gaming.</td></tr>
 </tbody>
-</table></div> <h3>7.5 Trọng số, ngưỡng định lượng và reward gate</h3>
-<p>Thẻ điểm lãnh đạo dùng mô hình <span class="code">CNC-EXEC-BSC-LEAN-7+DRIVERS-2026</span>. Tổng weight của 7 <span class="code">scored_core</span> bằng 100%. Strategic driver panel và gate blocker có thể hiển thị trên bảng điều khiển lãnh đạo để hướng hành động, cap hoặc chặn recognition, nhưng không cộng điểm và không payout khi chưa được nâng cấp bằng data contract, change kiểm soát và pilot phê duyệt. Mỗi scored core có target, ngưỡng xanh/vàng/đỏ, criteria đánh giá, reward rule, blocking conditions và scoring status trong registry. Tài liệu khác chỉ được tham chiếu, không tự tạo trọng số riêng.</p>
+</table></div>
+
+<h3>7.5 Trọng số, ngưỡng định lượng và reward gate</h3>
+<p>Scorecard lãnh đạo dùng model <span class="code">CNC-EXEC-BSC-LEAN-7+DRIVERS-2026</span>. Tổng weight của 7 <span class="code">scored_core</span> bằng 100%. Strategic driver panel và gate blocker có thể hiển thị trên bảng điều khiển lãnh đạo để hướng hành động, cap hoặc chặn recognition, nhưng không cộng điểm và không payout khi chưa được nâng cấp bằng data contract, change control và pilot approval. Mỗi scored core có target, ngưỡng xanh/vàng/đỏ, criteria đánh giá, reward rule, blocking conditions và scoring status trong registry. Tài liệu khác chỉ được tham chiếu, không tự tạo trọng số riêng.</p>
 <div class="table-card"><table class="table">
 <thead><tr><th>Thành phần</th><th>Quy tắc</th><th>Ý nghĩa thực chiến</th></tr></thead>
 <tbody>
@@ -188,44 +197,56 @@ td,th{vertical-align:top}
 <tr><td>Discipline</td><td>Kỷ luật chỉ xét hành vi có bằng chứng trong phạm vi kiểm soát cá nhân.</td><td>Không phạt người vận hành vì outcome hệ thống ngoài tầm kiểm soát.</td></tr>
 </tbody>
 </table></div>
-</div> <div class="section">
+</div>
+
+<div class="section">
 <h2>8. Quy tắc bảng điều khiển</h2>
 <ul class="tight">
-<li>bảng điều khiển lãnh đạo chỉ có 7 scored core cộng điểm. Driver panel được hiển thị riêng và phải gắn nhãn visible-only/cap/block; CEO không được tự mở rộng thành KPI điểm nếu chưa có data contract và change kiểm soát.</li>
+<li>bảng điều khiển lãnh đạo chỉ có 7 scored core cộng điểm. Driver panel được hiển thị riêng và phải gắn nhãn visible-only/cap/block; CEO không được tự mở rộng thành KPI điểm nếu chưa có data contract và change control.</li>
 <li>bảng điều khiển quản lý có thể dùng toàn bộ ANNEX-122 và KPI staged đã có data contract.</li>
 <li>Metric hiện trường được phép nhiều hơn, nhưng phải ghi rõ là metric thao tác, không phải KPI công ty.</li>
-<li>Khi mã seed, bảng điều khiển hoặc báo cáo cũ dùng alias, hệ thống phải map về mã chuẩn trước khi lưu ảnh chụp trạng thái mới.</li>
+<li>Khi mã seed, bảng điều khiển hoặc báo cáo cũ dùng alias, hệ thống phải map về mã chuẩn trước khi lưu snapshot mới.</li>
 <li>Không dùng mã <span class="code">CCR</span> cho complaint trong tài liệu mới; <span class="code">CCR</span> chỉ nên dùng cho critical constraint resource nếu cần.</li>
 </ul>
 </div> <div class="section">
 <h2>9. Benchmark anchors chính thức</h2>
 <ul class="tight small">
-<li>ISA-95 tách Level 3 MOM/MES khỏi Level 4 ERP; KPI bảng điều khiển phải là read mô hình, không thay execution truth: <a href="https://www.isa.org/standards-and-publications/isa-standards/isa-95-standard">ISA-95 Standard</a>.</li>
-<li>NIST Baldrige xem hiệu suất measurement là hệ tích hợp để planning, rà soát và cải tiến, không chỉ là báo cáo số: <a href="https://www.nist.gov/baldrige/baldrige-criteria-commentary">Baldrige Criteria Commentary</a>.</li>
-<li>NIST Baldrige gắn workforce hiệu suất management với compensation, recognition, development, safety và engagement; vì vậy KPI phải có rào chắn trước khi dùng cho người: <a href="https://www.nist.gov/system/files/documents/2023/01/19/2023-2024-Baldrige-Criteria-Business-Nonprofit-Commentary.pdf">Baldrige Criteria Commentary PDF</a>.</li>
-<li>MTConnect cung cấp semantic mô hình cho dữ liệu máy; dùng để cấp tín hiệu máy/OEE nhưng phải contextualize theo job/operation/gate: <a href="https://www.mtconnect.org/standard-download20181">MTConnect Standard</a>.</li>
-<li>SAP production chất lượng KPI tách Availability, hiệu suất, chất lượng và OEE; SAP planning KPI nhìn resource idle, load, setup, năng lực và utilization: <a href="https://help.sap.com/docs/SAP_PROFITABILITY_PERFORMANCE_MANAGEMENT/7fa13890d47b4c69bbb62175e84e4aa8/894ac627ba26422eb92a9cd17db846e8.html">SAP Production Quality KPIs</a> / <a href="https://help.sap.com/docs/SAP_S4HANA_ON-PREMISE/f899ce30af9044299d573ea30b533f1c/55a4997f55b0455aa8239f6b50175097.html">SAP Monitor Kế hoạch sản xuất Performance</a>.</li>
-<li>SAP SuccessFactors tách goal/hiệu suất rating, calibration, continuous feedback và variable pay thành các luồng công việc có quyền và bước duyệt riêng: <a href="https://help.sap.com/docs/successfactors-performance-and-goals/implementing-and-managing-performance-management/rating-options">Performance Rating Options</a> / <a href="https://help.sap.com/docs/successfactors-performance-and-goals/implementing-and-managing-calibration/overview-of-calibration">Calibration</a> / <a href="https://help.sap.com/docs/successfactors-compensation/implementing-and-managing-variable-pay/configuring-rating-source-for-non-assignment-based-rating-programs">Variable Pay Rating Source</a>.</li>
-<li>Microsoft Viva Goals nhấn mạnh OKR check-in, chủ sở hữu, cadence và data integration; OKR phù hợp cho dự án cải tiến 60-90 ngày, không thay hệ KPI/QMS chính: <a href="https://learn.microsoft.com/en-us/viva/goals/viva-goals-healthy-okr-program/check-in-okrs-overview">Check in and update OKRs</a>.</li>
-<li>Siemens Opcenter OEE nhấn mạnh time mô hình, reason tree, máy state, thời gian dừng máy và hành động khắc phục; đây là hướng cần cho CNC bottleneck/OEE layer: <a href="https://www.siemens.com/en-us/products/opcenter/execution/foundation-oee/">Siemens Opcenter Execution Foundation OEE</a>.</li>
+<li>ISA-95 tách Level 3 MOM/MES khỏi Level 4 ERP; KPI bảng điều khiển phải là read model, không thay execution truth: <a href="https://www.isa.org/standards-and-publications/isa-standards/isa-95-standard">ISA-95 Standard</a>.</li>
+<li>NIST Baldrige xem performance measurement là hệ tích hợp để planning, review và cải tiến, không chỉ là báo cáo số: <a href="https://www.nist.gov/baldrige/baldrige-criteria-commentary">Baldrige Criteria Commentary</a>.</li>
+<li>NIST Baldrige gắn workforce performance management với compensation, recognition, development, safety và engagement; vì vậy KPI phải có rào chắn trước khi dùng cho người: <a href="https://www.nist.gov/system/files/documents/2023/01/19/2023-2024-Baldrige-Criteria-Business-Nonprofit-Commentary.pdf">Baldrige Criteria Commentary PDF</a>.</li>
+<li>MTConnect cung cấp semantic model cho dữ liệu máy; dùng để cấp tín hiệu machine/OEE nhưng phải contextualize theo job/operation/gate: <a href="https://www.mtconnect.org/standard-download20181">MTConnect Standard</a>.</li>
+<li>SAP production quality KPI tách Availability, Performance, Quality và OEE; SAP planning KPI nhìn resource idle, load, setup, capacity và utilization: <a href="https://help.sap.com/docs/SAP_PROFITABILITY_PERFORMANCE_MANAGEMENT/7fa13890d47b4c69bbb62175e84e4aa8/894ac627ba26422eb92a9cd17db846e8.html">SAP Production Quality KPIs</a> / <a href="https://help.sap.com/docs/SAP_S4HANA_ON-PREMISE/f899ce30af9044299d573ea30b533f1c/55a4997f55b0455aa8239f6b50175097.html">SAP Monitor Kế hoạch sản xuất Performance</a>.</li>
+<li>SAP SuccessFactors tách goal/performance rating, calibration, continuous feedback và variable pay thành các luồng công việc có quyền và bước duyệt riêng: <a href="https://help.sap.com/docs/successfactors-performance-and-goals/implementing-and-managing-performance-management/rating-options">Performance Rating Options</a> / <a href="https://help.sap.com/docs/successfactors-performance-and-goals/implementing-and-managing-calibration/overview-of-calibration">Calibration</a> / <a href="https://help.sap.com/docs/successfactors-compensation/implementing-and-managing-variable-pay/configuring-rating-source-for-non-assignment-based-rating-programs">Variable Pay Rating Source</a>.</li>
+<li>Microsoft Viva Goals nhấn mạnh OKR check-in, owner, cadence và data integration; OKR phù hợp cho dự án cải tiến 60-90 ngày, không thay hệ KPI/QMS chính: <a href="https://learn.microsoft.com/en-us/viva/goals/viva-goals-healthy-okr-program/check-in-okrs-overview">Check in and update OKRs</a>.</li>
+<li>Siemens Opcenter OEE nhấn mạnh time model, reason tree, machine state, thời gian dừng máy và hành động khắc phục; đây là hướng cần cho CNC bottleneck/OEE layer: <a href="https://www.siemens.com/en-us/products/opcenter/execution/foundation-oee/">Siemens Opcenter Execution Foundation OEE</a>.</li>
 </ul>
 </div> <div class="section">
 <h2>10. API/backend coverage rule</h2>
 <div class="table-card"><table class="table">
 <thead><tr><th>API</th><th>Vai trò</th><th>Quy tắc</th></tr></thead>
 <tbody>
-<tr><td><span class="code">GET /api/kpi/catalog</span></td><td>Trả registry, alias, nhóm tài liệu, backend coverage, hiệu suất-quản trị chính sách, thẻ điểm vận hành mô hình và per-metric vận hành contract.</td><td>Dùng trước khi thêm bảng điều khiển/widget mới hoặc gọi một chỉ số là KPI; bắt buộc kiểm tra <span class="code">metric_type</span>, <span class="code">evaluation_use</span>, <span class="code">is_official_kpi</span>, <span class="code">thẻ điểm_weight_pct</span>, <span class="code">quantitative_thresholds</span> và <span class="code">calculation_status</span>.</td></tr>
-<tr><td><span class="code">change_control_policy</span></td><td>Quy tắc bắt buộc khi chỉnh hoặc thêm KPI/metric.</td><td>Mọi thay đổi KPI/metric phải đi kèm cập nhật registry, ANNEX-128, tài liệu nguồn/liên quan, API/data contract nếu ảnh hưởng backend và bằng chứng audit. Không có cập nhật ma trận thì không được coi là thay đổi hợp lệ.</td></tr>
-<tr><td><span class="code">GET /api/kpi/{metricCode}</span></td><td>Tính KPI môi trường chạy.</td><td>Chỉ trả số cho metric thuộc <span class="code">runtime_calculated_metrics</span>.</td></tr>
-<tr><td><span class="code">GET /api/kpi/{metricCode}/trend</span></td><td>Xu hướng KPI môi trường chạy.</td><td>Known non-môi trường chạy metric phải trả trạng thái thiếu data contract, không trả số giả.</td></tr>
-<tr><td><span class="code">check_kpi_integrity.php</span></td><td>Guard CI chống drift hệ KPI, chạy trong <span class="code">.github/luồng công việcs/deploy.yml</span> cùng nhóm với <span class="code">check_raci_integrity.php</span>.</td><td>Chặn deploy (P0) khi: mã KPI ANNEX-122 lệch registry; thiếu trường bắt buộc (formula/thresholds/chủ sở hữu_role/data_source/calculation_status/decision_action); <span class="code">runtime_calculated</span> chưa nối <span class="code">KpiEngine::getCalculator()</span>; trùng <span class="code">canonical_code</span>; alias trỏ mã lạ; gate <span class="code">linked_cdr</span> không có trong RACI-MASTER-ma trận; cổng G0-G7 thiếu metric; <span class="code">reward_eligible</span> thiếu counter/blocker; metric staged bị gắn thưởng; tuyến công nghệ/API hoặc Console raw JSON lệch guard.</td></tr>
+<tr><td><span class="code">GET /api/kpi/catalog</span></td><td>Trả registry, alias, nhóm tài liệu, backend coverage, performance-governance chính sách, scorecard operating model và per-metric operating contract.</td><td>Dùng trước khi thêm bảng điều khiển/widget mới hoặc gọi một chỉ số là KPI; bắt buộc kiểm tra <span class="code">metric_type</span>, <span class="code">evaluation_use</span>, <span class="code">is_official_kpi</span>, <span class="code">scorecard_weight_pct</span>, <span class="code">quantitative_thresholds</span> và <span class="code">calculation_status</span>.</td></tr>
+<tr><td><span class="code">change_control_policy</span></td><td>Quy tắc bắt buộc khi chỉnh hoặc thêm KPI/metric.</td><td>Mọi thay đổi KPI/metric phải đi kèm cập nhật registry, ANNEX-128, tài liệu nguồn/liên quan, API/data contract nếu ảnh hưởng backend và evidence audit. Không có cập nhật matrix thì không được coi là thay đổi hợp lệ.</td></tr>
+<tr><td><span class="code">GET /api/kpi/{metricCode}</span></td><td>Tính KPI runtime.</td><td>Chỉ trả số cho metric thuộc <span class="code">runtime_calculated_metrics</span>.</td></tr>
+<tr><td><span class="code">GET /api/kpi/{metricCode}/trend</span></td><td>Xu hướng KPI runtime.</td><td>Known non-runtime metric phải trả trạng thái thiếu data contract, không trả số giả.</td></tr>
+<tr><td><span class="code">check_kpi_integrity.php</span></td><td>Guard CI chống drift hệ KPI, chạy trong <span class="code">.github/workflows/deploy.yml</span> cùng nhóm với <span class="code">check_raci_integrity.php</span>.</td><td>Chặn deploy (P0) khi: mã KPI ANNEX-122 lệch registry; thiếu trường bắt buộc (formula/thresholds/owner_role/data_source/calculation_status/decision_action); <span class="code">runtime_calculated</span> chưa nối <span class="code">KpiEngine::getCalculator()</span>; trùng <span class="code">canonical_code</span>; alias trỏ mã lạ; gate <span class="code">linked_cdr</span> không có trong RACI-MASTER-MATRIX; cổng G0-G7 thiếu metric; <span class="code">reward_eligible</span> thiếu counter/blocker; metric staged bị gắn thưởng; route/API hoặc Console raw JSON lệch guard.</td></tr>
 </tbody>
 </table></div>
-<div class="callout danger"><b>Không được làm:</b> thêm metric vào bảng điều khiển bằng cách để KpiEngine tự sinh definition, hoặc sửa/thêm KPI trong một tài liệu mà không cập nhật ANNEX-128 và các tài liệu liên quan. Metric mới phải qua data contract, migration/seed nếu cần, test và rà soát QMS/Analytics.</div>
-</div> <div class="section">
+<div class="callout danger"><b>Không được làm:</b> thêm metric vào bảng điều khiển bằng cách để KpiEngine tự sinh definition, hoặc sửa/thêm KPI trong một tài liệu mà không cập nhật ANNEX-128 và các tài liệu liên quan. Metric mới phải qua data contract, migration/seed nếu cần, test và review QMS/Analytics.</div>
+</div>
+
+<div class="section">
 <h2>10b. Cập nhật P05–P10 (2026-05-24)</h2>
 <p>Chương trình LAM 10× từ <span class="code">P05</span> đến <span class="code">P10</span> hoàn thành 2026-05-24. Tóm tắt tác động lên registry và Admin Console:</p>
-<ul> <li><b>P05 graduate môi trường chạy:</b> 2 metric chuyển từ proposed → môi trường chạy tính tự động — <span class="code">FAI_FIRST_PASS</span> và <span class="code">IN_PROCESS_REJECT_RATE</span> (engine MES + QA event stream).</li> <li><b>Phantom rewrite:</b> 3 metric đổi nguồn về <span class="code">mes_oee_snapshots</span> — <span class="code">OEE</span>, <span class="code">MACHINE_UTILIZATION</span>, <span class="code">SETUP_TO_RUN_RATIO</span> — xoá phantom JSON formula cũ.</li> <li><b>Reward / attribution:</b> 6 reward rule mới + attribution template thẻ điểm + dung sai trọng số ±5% trên thẻ điểm tầng.</li> <li><b>Hợp đồng bảng điều khiển / input:</b> bổ sung <span class="code">dashboard_render_contract</span> (card_classes: executive, daily_ops, gate, vai trò, backlog) và <span class="code">manual_input_contract</span> (input_status_enum, reward_gate.chính sách, validation). Render trong Admin Console <em>KPI Registry</em> ở các tab Data Contracts, Hồ sơ Khách và Audit/Drift.</li> <li><b>Separation of Duties:</b> endpoint mới <span class="code">kpi_input_approve</span> tách quyền nhập số khỏi quyền duyệt số (người nhập ≠ người duyệt).</li> <li><b>CI guard:</b> các kiểm tra <span class="code">P0.6.X / P0.7.X / P0.8.X / P0.9.X</span> chạy trong <span class="code">check_kpi_integrity.php</span> bảo vệ registry khỏi drift schema.</li> <li><b>VN rewrite:</b> 39 metric đã được viết lại chú giải kỹ thuật Việt + bổ sung trường <span class="code">intent_vi</span> mô tả ý đồ kinh doanh; Admin Console render <span class="code">intent_vi</span> dưới <span class="code">name_vi</span> của chỉ số đối trọng.</li> <li><b>CDR accountable:</b> mỗi gate metric ghi thêm <span class="code">cdr_accountable_role</span> và <span class="code">chủ sở hữu_alignment_note</span> để chỉ rõ quyết định Right A khi nhiều vai trò cùng tham gia.</li>
+<ul>
+  <li><b>P05 graduate runtime:</b> 2 metric chuyển từ proposed → runtime tính tự động — <span class="code">FAI_FIRST_PASS</span> và <span class="code">IN_PROCESS_REJECT_RATE</span> (engine MES + QA event stream).</li>
+  <li><b>Phantom rewrite:</b> 3 metric đổi nguồn về <span class="code">mes_oee_snapshots</span> — <span class="code">OEE</span>, <span class="code">MACHINE_UTILIZATION</span>, <span class="code">SETUP_TO_RUN_RATIO</span> — xoá phantom JSON formula cũ.</li>
+  <li><b>Reward / attribution:</b> 6 reward rule mới + attribution template scorecard + dung sai trọng số ±5% trên scorecard tier.</li>
+  <li><b>Hợp đồng bảng điều khiển / input:</b> bổ sung <span class="code">dashboard_render_contract</span> (card_classes: executive, daily_ops, gate, role, backlog) và <span class="code">manual_input_contract</span> (input_status_enum, reward_gate.chính sách, validation). Render trong Admin Console <em>KPI Registry</em> ở các tab Data Contracts, Hồ sơ Khách và Audit/Drift.</li>
+  <li><b>Separation of Duties:</b> endpoint mới <span class="code">kpi_input_approve</span> tách quyền nhập số khỏi quyền duyệt số (người nhập ≠ người duyệt).</li>
+  <li><b>CI guard:</b> các kiểm tra <span class="code">P0.6.X / P0.7.X / P0.8.X / P0.9.X</span> chạy trong <span class="code">check_kpi_integrity.php</span> bảo vệ registry khỏi drift schema.</li>
+  <li><b>VN rewrite:</b> 39 metric đã được viết lại chú giải kỹ thuật Việt + bổ sung trường <span class="code">intent_vi</span> mô tả ý đồ kinh doanh; Admin Console render <span class="code">intent_vi</span> dưới <span class="code">name_vi</span> của counter metric.</li>
+  <li><b>CDR accountable:</b> mỗi gate metric ghi thêm <span class="code">cdr_accountable_role</span> và <span class="code">owner_alignment_note</span> để chỉ rõ Decision Right A khi nhiều role cùng tham gia.</li>
 </ul>
 <p><b>Cập nhật P04 LAM gate coverage:</b> khai báo hiện hành chứa <span class="code">LAM_SEMSYSCO.gate_coverage.G3</span> cho vật liệu cert, IQC, kit readiness, truy xuất label, đặc biệt quy trình và sub-tầng flowdown; <span class="code">G5</span> cho in-quy trình reject, IPQC characteristic completeness, SPC reaction, CMM queue, NCR containment và in-quy trình gage validity. Tất cả là gate/blocker-only; chỉ <span class="code">IN_PROCESS_REJECT_RATE</span> đã môi trường chạy thật, các metric còn lại staged hoặc được kiểm soát thủ công với điều kiện graduation rõ.</p>
 <p>Bằng chứng thay đổi được giữ trong gói audit nội bộ. Số đếm, lifecycle staged/môi trường chạy/manual và coverage gate phải lấy từ <a href="../../../../../portal.html#admin/kpi-registry">Admin Console KPI Registry</a> hoặc ANNEX-128 sinh từ registry; ANNEX-122 §4–§6 giữ định nghĩa cascade, §9 gate table đồng bộ từ registry.</p>

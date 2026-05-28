@@ -71,9 +71,9 @@
 <p><span class="tag">Nhịp: năm/quý</span><span class="tag">Chủ trì: CEO</span><span class="tag">Bằng chứng: X-ma trận</span></p>
 </div>
 <div class="card">
-<h3>Layer 2 - BSC thẻ điểm quý/tháng</h3>
+<h3>Layer 2 - BSC scorecard quý/tháng</h3>
 <p>Giữ BSC làm lớp 2: bản đồ kết quả theo bốn góc nhìn tài chính, khách hàng, vận hành nội bộ và con người/hệ thống. KPI cấp lãnh đạo có 7 scored core; các chỉ số dẫn/driver nằm ở panel riêng để tránh bảng điều khiển nhiễu và tránh nhầm với KPI điểm.</p>
-<p><span class="tag">Nhịp: tháng/quý</span><span class="tag">Chủ trì: CEO/QMS/FIN</span><span class="tag">Bằng chứng: thẻ điểm ảnh chụp trạng thái</span></p>
+<p><span class="tag">Nhịp: tháng/quý</span><span class="tag">Chủ trì: CEO/QMS/FIN</span><span class="tag">Bằng chứng: scorecard snapshot</span></p>
 </div>
 <div class="card">
 <h3>Layer 3 - TOC weekly tại điểm thắt cổ chai</h3>
@@ -102,13 +102,13 @@
 <div class="table-card"><table class="table">
 <thead><tr><th>KPI chuẩn</th><th>Trọng số</th><th>Trạng thái tính điểm</th><th>Target / ngưỡng</th><th>Chủ bằng chứng / nguồn</th><th>Ghi nhận / blocker</th></tr></thead>
 <tbody>
-<tr><td><span class="code">OTD</span></td><td>18%</td><td>active_runtime</td><td>≥95%; yellow 90-94.99%; red &lt;90%</td><td>PD/CS; giao hàng + được phê duyệt promise date</td><td>Eligible only when complaint, FPY và giao hàng-bộ hồ sơ blockers are clean.</td></tr>
-<tr><td><span class="code">COMPLAINT_RATE</span></td><td>14%</td><td>manual_governed</td><td>≤1 khiếu nại/100 lô giao hàng hoặc theo ppm contract đã được phê duyệt; có customer escape thì mặc định là đỏ</td><td>QA/CS; hồ sơ complaint EQMS + bằng chứng containment</td><td>Containment quá hạn hoặc customer escape sẽ chặn ghi nhận.</td></tr>
-<tr><td><span class="code">FPY</span></td><td>14%</td><td>active_runtime</td><td>≥98%; yellow 95-97.99%; red &lt;95%</td><td>QA/OPS; tập lô kiểm đạt ngay lần đầu</td><td>Inspection bypass hoặc khách hàng escape blocks recognition.</td></tr>
-<tr><td><span class="code">COPQ</span></td><td>14%</td><td>manual_governed</td><td>≤2% sales; red &gt;4%</td><td>QA/Finance; COPQ cost buckets + sales close</td><td>Cost exclusion hoặc repeat NCR red blocks recognition.</td></tr>
-<tr><td><span class="code">PLAN_ADHERENCE</span></td><td>14%</td><td>active_runtime</td><td>≥90%; red &lt;80%</td><td>PPL/PD; job_orders plan adherence bằng chứng</td><td>lệnh gấp gaming hoặc unapproved resequence blocks recognition.</td></tr>
-<tr><td><span class="code">WIP_AGING</span></td><td>12%</td><td>active_runtime</td><td>≤5% aged WIP; red &gt;10%</td><td>PPL/PD; job_orders age + bằng chứng người phụ trách hold</td><td>Parking work outside released WIP hoặc age reset without bằng chứng blocks recognition.</td></tr>
-<tr><td><span class="code">MATERIAL_AVAILABILITY_PLAN</span></td><td>14%</td><td>active_runtime</td><td>≥95%; red &lt;85%</td><td>SCM/PPL/QA; job_orders readiness vật liệu cùng cert/CoC, IQC, traceability, quy trình đặc biệt, kit và tool/fixture/gage blockers</td><td>Không được xanh nếu vật liệu có mặt vật lý nhưng blocker cert/IQC/traceability/kit/gage còn mở.</td></tr>
+<tr><td><span class="code">OTD</span></td><td>18%</td><td>active_runtime</td><td>≥95%; yellow 90-94.99%; red &lt;90%</td><td>PD/CS; shipment + approved promise date</td><td>Eligible only when complaint, FPY and ship-packet blockers are clean.</td></tr>
+<tr><td><span class="code">COMPLAINT_RATE</span></td><td>14%</td><td>manual_governed</td><td>≤1/100 shipments or approved ppm contract; major escape is red</td><td>QA/CS; EQMS complaint + containment evidence</td><td>Containment overdue or major escape blocks recognition.</td></tr>
+<tr><td><span class="code">FPY</span></td><td>14%</td><td>active_runtime</td><td>≥98%; yellow 95-97.99%; red &lt;95%</td><td>QA/OPS; tập lô kiểm đạt ngay lần đầu</td><td>Inspection bypass or customer escape blocks recognition.</td></tr>
+<tr><td><span class="code">COPQ</span></td><td>14%</td><td>manual_governed</td><td>≤2% sales; red &gt;4%</td><td>QA/Finance; COPQ cost buckets + sales close</td><td>Cost exclusion or repeat NCR red blocks recognition.</td></tr>
+<tr><td><span class="code">PLAN_ADHERENCE</span></td><td>14%</td><td>active_runtime</td><td>≥90%; red &lt;80%</td><td>PPL/PD; job_orders plan adherence evidence</td><td>lệnh gấp gaming or unapproved resequence blocks recognition.</td></tr>
+<tr><td><span class="code">WIP_AGING</span></td><td>12%</td><td>active_runtime</td><td>≤5% aged WIP; red &gt;10%</td><td>PPL/PD; job_orders age + bằng chứng người phụ trách hold</td><td>Parking work outside released WIP or age reset without evidence blocks recognition.</td></tr>
+<tr><td><span class="code">MATERIAL_AVAILABILITY_PLAN</span></td><td>14%</td><td>active_runtime</td><td>≥95%; red &lt;85%</td><td>SCM/PPL/QA; job_orders material readiness plus cert/CoC, IQC, traceability, special-process, kit and tool/fixture/gage blockers</td><td>Cannot be green when material is physically present but cert/IQC/traceability/kit/gage blocker is open.</td></tr>
 </tbody>
 </table></div>
 <div class="table-card"><table class="table">
@@ -153,18 +153,6 @@
 <div class="card"><h3>Hiện trường</h3><p>Metric thao tác theo ca/ngày để bảo vệ flow, chất lượng và safety; không mặc định trở thành KPI đánh giá.</p></div>
 </div>
 <div class="callout warn">Không mở rộng bảng điều khiển bằng cách thêm số tùy ý. Mọi KPI mới phải đi qua ANNEX-127 và có data contract trước khi đưa vào hệ thống tính tự động.</div>
-</div> <div class="section">
-<h2>6. Pilot 90 ngày trước rollout/thưởng</h2>
-<div class="callout"><b>Quy tắc cứng:</b> Pilot 90 ngày là bắt buộc cho hồ sơ LAM/SEMSYSCO trước khi claim full rollout, claim customer-grade CTQ/Cpk hoặc bật thưởng tiền. Trong pilot, scorecard chỉ dùng để điều hành, corrective action và hiệu chuẩn; không dùng để chi tiền hoặc kỷ luật tự động.</div>
-<div class="grid-2">
-<div class="card">
-<h3>Phạm vi pilot</h3>
-<ul class="tight">
-<li>Chọn 1 value stream / customer profile: <span class="code">LAM_SEMSYSCO</span>.</li>
-<li>Giữ 7 scored core: <span class="code">OTD</span>, <span class="code">COMPLAINT_RATE</span>, <span class="code">FPY</span>, <span class="code">COPQ</span>, <span class="code">PLAN_ADHERENCE</span>, <span class="code">WIP_AGING</span>, <span class="code">MATERIAL_AVAILABILITY_PLAN</span>.</li>
-<li>Dùng driver panel để bảo vệ flow/chất lượng: constraint, CMM queue, material-cert-IQC, traceability, special process, check-dimension, 3D/8D.</li>
-<li>Giữ LAM evidence gates và CTQ/Cpk pilot bundle ở trạng thái evidence-first; chỉ graduate khi có bằng chứng.</li>
-</ul>
 </div>
 <div class="card">
 <h3>Trường bắt buộc trên bảng pilot</h3>
