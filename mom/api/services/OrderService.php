@@ -363,6 +363,28 @@ final class OrderService
     }
 
     /**
+     * Generic linked-forms accessor used by the order detail panel.
+     * Accepts any of so/jo/wo so the SO/JO/WO inspector can render
+     * its Linked Evidence section regardless of node type. Sorted newest
+     * first.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getLinkedFormsByOrder(string $orderType, string $orderId): array
+    {
+        $type = strtolower(trim($orderType));
+        if (!in_array($type, ['so', 'jo', 'wo'], true) || trim($orderId) === '') {
+            return [];
+        }
+        $links = $this->getLinkedFormsForOrder($this->readStore(), $type, trim($orderId));
+        usort(
+            $links,
+            static fn(array $a, array $b): int => strcmp((string)($b['linked_at'] ?? ''), (string)($a['linked_at'] ?? '')),
+        );
+        return $links;
+    }
+
+    /**
      * Get dashboard statistics for orders.
      *
      * @return array<string, mixed>

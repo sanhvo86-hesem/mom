@@ -606,6 +606,23 @@ for runtime_dir in sessions ratelimit cache; do
     find "$runtime_path" -type f -exec chmod 660 {} +
 done
 
+# Mixed-owner runtime stores: the JSON file lives in git as an empty .gitkeep
+# sentinel, but PHP-FPM creates and rewrites the canonical *.json beside it
+# (OrderService, CustomerPurchaseOrderService, EmailIntakeImapService all do
+# atomic write-then-rename). Keep deploy as owner so the .gitkeep stays
+# trackable, but mark the directory g+ws so www-data can create new files
+# and inherit the group. Without this every fresh deploy throws
+# "Failed to write orders.json" / "Failed to write customer_purchase_orders.json"
+# (incident 2026-05-28: Customer POs tab returned 500 after deploy wiped
+# previous chmod). Add a new runtime dir here whenever a service starts
+# writing under mom/data/<dir>.
+for runtime_dir in orders commercial private private/email-intake private/email-intake/attachments; do
+    runtime_path="$SITE_DIR/mom/data/$runtime_dir"
+    [ -d "$runtime_path" ] || mkdir -p "$runtime_path"
+    chown "$DEPLOY_USER:$WEB_GROUP" "$runtime_path"
+    chmod 2775 "$runtime_path"
+done
+
 # Controlled-document content is an application-managed surface, not immutable
 # code. The editor, archive, and derived locale artifacts all write beside the
 # source documents, so only these content trees stay group-writable for the
