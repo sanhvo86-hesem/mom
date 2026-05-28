@@ -56,7 +56,6 @@
     { id:'header_rules', label:'Header Rules',         icon:'📑' },
     { id:'templates',    label:'Template KH',          icon:'🎯' },
     { id:'workers',      label:'Worker Tokens',        icon:'🔑' },
-    { id:'llm_model',    label:'LLM Model',           icon:'🤖' },
     { id:'logic',        label:'Cơ chế vận hành',     icon:'⚙️' },
     { id:'security',     label:'Bảo mật',             icon:'🔒' },
     { id:'notify',       label:'Thông báo',           icon:'🔔' },
@@ -143,7 +142,6 @@
       case 'header_rules': return _sectionHeaderRules();
       case 'templates':    return _sectionTemplates();
       case 'workers':      return _sectionWorkers();
-      case 'llm_model':    return _sectionLlmModel();
       case 'logic':        return _sectionLogic();
       case 'security':     return _sectionSecurity();
       case 'notify':       return _sectionNotify();
@@ -809,9 +807,6 @@
           + '<td>' + active + '</td>'
           + '<td style="font-size:11px;color:var(--text-3,#6b7280)">' + fmtDt(m.last_scan_at) + (m.last_status ? '<br>'+escHtml(m.last_status) : '') + '</td>'
           + '<td style="white-space:nowrap">'
-          + ((m.provider==='gmail_imap' || m.provider==='generic_imap')
-              ? '<button onclick="aeoi.pollMailbox('+m.id+')" class="hm-btn hm-btn-xs" title="Quét IMAP ngay" style="background:var(--brand-primary,#2563eb);color:#fff">▶ Poll</button> '
-              : '')
           + '<button onclick="aeoi.openMailboxForm('+m.id+')" class="hm-btn hm-btn-xs" title="Sửa">✏</button> '
           + '<button onclick="aeoi.toggleMailbox('+m.id+','+(m.enabled?'false':'true')+')" class="hm-btn hm-btn-xs" title="' + (m.enabled?'Tắt':'Bật') + '">' + (m.enabled?'⏸':'▶') + '</button> '
           + '<button onclick="aeoi.deleteMailbox('+m.id+')" class="hm-btn hm-btn-xs" style="color:var(--danger-1,#ef4444)" title="Xóa">🗑</button>'
@@ -934,7 +929,7 @@
       + _cardHead('📦 Intake Cases', 'Các case đã tạo từ AI. Tab "AI Intake Queue" trong M2-Orders module là nơi sales/planning xử lý chi tiết. Đây là view tổng quát của admin.')
       + '<div style="display:flex;gap:8px;margin-bottom:10px">'
       + '<button onclick="aeoi.loadCases(0)" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
-      + '<button onclick="aeoi.openOrdersAiQueue()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">Mở Intake Queue đầy đủ →</button>'
+      + '<a href="?module=M2-orders&tab=ai-intake-queue" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;text-decoration:none">Mở Intake Queue đầy đủ →</a>'
       + '</div>';
     if(data.items.length===0){
       html += '<div class="hm-empty">Chưa có case nào.</div>';
@@ -954,7 +949,7 @@
           + '</tr>';
       });
       html += '</tbody></table></div>';
-      html += _pagination(data.offset, data.total, 50, 'aeoi.loadCases');
+      html += _pager(data.offset, 50, data.total, 'aeoi.loadCases');
     }
     html += '</div>';
     return html;
@@ -1248,110 +1243,21 @@
     },
     openMailboxForm: function(id){
       var existing = id ? (STATE.mailboxes||[]).find(function(m){return m.id===id;}) : null;
-      // Step 1: pick provider type. Different providers need different fields.
-      var providerLabels = {
-        gmail_imap:      'Gmail (IMAP + App Password) — KHUYẾN NGHỊ cho test',
-        generic_imap:    'IMAP server bất kỳ (Yahoo, Zoho, server riêng…)',
-        outlook_local:   'Outlook Desktop trên Windows (PowerShell worker)',
-        microsoft_graph: 'Microsoft 365 (Graph API) — chưa triển khai',
-        manual_upload:   'Upload thủ công file .eml/.msg',
-      };
-      var provDefault = existing ? existing.provider : 'gmail_imap';
-      var provChoice = prompt(
-        'Chọn loại dịch vụ mail:\n\n' +
-        '  gmail_imap      = Gmail (IMAP + App Password) ★\n' +
-        '  generic_imap    = IMAP server bất kỳ\n' +
-        '  outlook_local   = Outlook Desktop (PowerShell worker)\n' +
-        '  microsoft_graph = M365 Graph API (chưa triển khai)\n' +
-        '  manual_upload   = Upload thủ công\n\n' +
-        'Nhập một trong các giá trị trên:',
-        provDefault
-      );
-      if(!provChoice) return;
-      provChoice = provChoice.trim().toLowerCase();
-      if(!providerLabels[provChoice]){
-        alert('Loại dịch vụ không hợp lệ: ' + provChoice);
-        return;
-      }
-
-      // Step 2: common fields
-      var addr = prompt('Mailbox address (email đầy đủ):', existing ? existing.mailbox_address : '');
+      var addr   = prompt('Mailbox address (vd: orders@hesemeng.com):', existing ? existing.mailbox_address : '');
       if(addr==null) return;
-      var folder = prompt(
-        provChoice==='gmail_imap'   ? 'Tên folder Gmail (Inbox, hoặc label-name. Mặc định: INBOX):' :
-        provChoice==='generic_imap' ? 'IMAP folder name (mặc định: INBOX):' :
-                                       'Folder path (vd: Inbox/AI-Order-Intake):',
-        existing ? existing.folder_path : (provChoice==='outlook_local' ? 'Inbox/AI-Order-Intake' : 'INBOX')
-      );
+      var folder = prompt('Folder path (vd: Inbox/AI-Order-Intake):', existing ? existing.folder_path : 'Inbox/AI-Order-Intake');
       if(folder==null) return;
-
+      var provider = prompt('Provider (outlook_local | microsoft_graph | manual_upload):', existing ? existing.provider : 'outlook_local');
+      if(provider==null) return;
       var payload = {
-        mailbox_address: addr.trim().toLowerCase(),
-        folder_path:     folder.trim(),
-        provider:        provChoice,
-        enabled:         true,
-        read_body:       true,
-        read_attachments:true,
+        mailbox_address: addr, folder_path: folder, provider: provider,
+        enabled: true, read_body: true, read_attachments: true,
       };
-
-      // Step 3: IMAP-only fields
-      if(provChoice==='gmail_imap' || provChoice==='generic_imap'){
-        var host = provChoice==='gmail_imap'
-          ? (existing && existing.imap_host ? existing.imap_host : 'imap.gmail.com')
-          : prompt('IMAP host:', existing ? (existing.imap_host||'') : '');
-        if(provChoice==='generic_imap' && !host) return;
-        var port = provChoice==='gmail_imap'
-          ? 993
-          : parseInt(prompt('IMAP port (993=SSL, 143=STARTTLS):', existing ? (existing.imap_port||993) : 993), 10);
-        var enc  = provChoice==='gmail_imap'
-          ? 'ssl'
-          : (prompt('Encryption (ssl|starttls|none):', existing ? (existing.imap_encryption||'ssl') : 'ssl') || 'ssl');
-        var user = prompt('IMAP username (thường là full email):', existing ? (existing.imap_username||addr) : addr);
-        if(user==null) return;
-        var pwdHint = existing && existing.imap_password_configured
-          ? '(để trống = giữ password cũ, hoặc nhập mới để đổi)'
-          : (provChoice==='gmail_imap'
-              ? 'Nhập App Password 16 ký tự từ Google Account → Security → 2-Step Verification → App passwords:'
-              : 'Nhập IMAP password:');
-        var pwd  = prompt(pwdHint, '');
-        if(pwd==null) return;
-        payload.imap_host       = host;
-        payload.imap_port       = port;
-        payload.imap_encryption = enc;
-        payload.imap_username   = user;
-        if(pwd !== '') payload.imap_password = pwd;
-      }
-
       if(id){ payload.id = id; }
       var action = id ? 'admin_email_intake_mailbox_update' : 'admin_email_intake_mailbox_create';
       apiCall(action, payload, function(res){
-        if(res.ok){
-          aeoi.loadMailboxes();
-          if(!id && (provChoice==='gmail_imap' || provChoice==='generic_imap')){
-            if(confirm('Mailbox đã tạo. Chạy thử kết nối IMAP ngay bây giờ?')){
-              aeoi.pollMailbox((res.mailbox||{}).id);
-            }
-          }
-        } else {
-          alert('Lỗi: ' + (res.error||'') + (res.detail ? '\n\n' + res.detail : ''));
-        }
-      });
-    },
-    pollMailbox: function(id){
-      apiCall('admin_email_intake_mailbox_poll', {id:id}, function(res){
-        if(res.ok && res.result){
-          var r = res.result;
-          alert('Kết quả poll mailbox:\n\n' +
-                'Status: ' + r.status + '\n' +
-                'Note: ' + (r.note||'OK') + '\n' +
-                'Fetched: ' + (r.fetched||0) + '\n' +
-                'Created cases: ' + (r.created||0) + '\n' +
-                'Skipped: ' + (r.skipped||0) + '\n' +
-                'Duration: ' + (r.duration_ms||0) + 'ms');
-          aeoi.loadMailboxes();
-        } else {
-          alert('Lỗi: ' + (res.error||'') + (res.detail ? '\n\n' + res.detail : ''));
-        }
+        if(res.ok) aeoi.loadMailboxes();
+        else alert('Lỗi: ' + (res.error||''));
       });
     },
     toggleMailbox: function(id, enabled){
@@ -1441,209 +1347,19 @@
         _refreshSection();
       });
     },
-
-    /* LLM Model routing */
-    loadLlmConfig: function(forceProbe){
-      STATE.llm = STATE.llm || {providers: [], rules: [], health: {}};
-      var pending = 2 + (forceProbe ? 1 : 0);
-      function done(){ if(--pending === 0) _refreshSection(); }
-      apiCall('admin_email_intake_llm_providers_list', {}, function(res){
-        STATE.llm.providers = (res.ok && res.providers) ? res.providers : [];
-        done();
-      });
-      apiCall('admin_email_intake_llm_rules_list', {}, function(res){
-        STATE.llm.rules = (res.ok && res.rules) ? res.rules : [];
-        done();
-      });
-      if(forceProbe){
-        apiCall('admin_email_intake_llm_health', {}, function(res){
-          STATE.llm.health = (res.ok && res.health) ? res.health : {};
-          done();
-        });
-      } else if(!STATE.llm.healthLoaded){
-        // fetch in background, then refresh
-        apiCall('admin_email_intake_llm_health', {}, function(res){
-          STATE.llm.health = (res.ok && res.health) ? res.health : {};
-          STATE.llm.healthLoaded = true;
-          if(STATE.activeSection === 'llm_model') _refreshSection();
-        });
-      }
-    },
-
-    openLlmRuleForm: function(){
-      var el = document.getElementById('aeoi-llm-rule-modal');
-      if(!el){
-        document.body.insertAdjacentHTML('beforeend', _llmRuleModal());
-        el = document.getElementById('aeoi-llm-rule-modal');
-      }
-      // Populate provider dropdown
-      var provSel = document.getElementById('aeoi-llm-primary-provider');
-      provSel.innerHTML = (STATE.llm.providers || []).map(function(p){
-        return '<option value="' + escHtml(p.provider_key) + '">' + escHtml(p.display_name) + '</option>';
-      }).join('');
-      document.getElementById('aeoi-llm-rule-title').textContent = '🤖 Thêm LLM Routing Rule';
-      document.getElementById('aeoi-llm-routing-id').value = '';
-      document.getElementById('aeoi-llm-scope-type').value = 'global_default';
-      document.getElementById('aeoi-llm-scope-value').value = '*';
-      document.getElementById('aeoi-llm-priority').value = '100';
-      document.getElementById('aeoi-llm-enabled').checked = true;
-      document.getElementById('aeoi-llm-description').value = '';
-      document.getElementById('aeoi-llm-fallback-rows').innerHTML = '';
-      document.getElementById('aeoi-llm-rule-err').style.display = 'none';
-      aeoi._llmOnProviderChange('primary');
-      el.style.display = 'flex';
-    },
-
-    editLlmRule: function(routingId){
-      var rule = (STATE.llm.rules || []).find(function(r){ return r.routing_id == routingId; });
-      if(!rule) return;
-      aeoi.openLlmRuleForm();
-      document.getElementById('aeoi-llm-rule-title').textContent = '🤖 Sửa LLM Routing Rule #' + routingId;
-      document.getElementById('aeoi-llm-routing-id').value = routingId;
-      document.getElementById('aeoi-llm-scope-type').value = rule.scope_type;
-      document.getElementById('aeoi-llm-scope-value').value = rule.scope_value;
-      document.getElementById('aeoi-llm-priority').value = rule.priority || 100;
-      document.getElementById('aeoi-llm-enabled').checked = !!rule.is_enabled;
-      document.getElementById('aeoi-llm-description').value = rule.description || '';
-      document.getElementById('aeoi-llm-primary-provider').value = rule.primary_provider;
-      aeoi._llmOnProviderChange('primary');
-      setTimeout(function(){
-        document.getElementById('aeoi-llm-primary-model').value = rule.primary_model || '';
-      }, 30);
-      var rowsEl = document.getElementById('aeoi-llm-fallback-rows');
-      rowsEl.innerHTML = '';
-      (rule.fallback_chain || []).forEach(function(step){ aeoi._llmAddFallback(step.provider, step.model); });
-    },
-
-    closeLlmRuleForm: function(){
-      var el = document.getElementById('aeoi-llm-rule-modal');
-      if(el) el.style.display = 'none';
-    },
-
-    _llmOnScopeTypeChange: function(){
-      var st  = aeoi._val('aeoi-llm-scope-type');
-      var val = document.getElementById('aeoi-llm-scope-value');
-      var hint = document.getElementById('aeoi-llm-scope-hint');
-      if(st === 'global_default'){
-        val.value = '*'; val.disabled = true;
-        hint.textContent = 'global_default scope is fixed to "*".';
-      } else {
-        val.disabled = false;
-        if(st === 'tier'){
-          if(['extraction_default','extraction_pdf','extraction_complex'].indexOf(val.value) < 0) val.value = 'extraction_default';
-          hint.textContent = 'tier: extraction_default | extraction_pdf | extraction_complex';
-        } else if(st === 'doc_pattern'){
-          hint.textContent = 'Glob: e.g. PO_CHANGE* (use * and ? wildcards)';
-        } else {
-          hint.textContent = 'Exact doc_type code: CUSTOMER_PO | PO_CHANGE | PO_CANCEL | EXPEDITE';
-        }
-      }
-    },
-
-    _llmOnProviderChange: function(which){
-      var providerKey = aeoi._val('aeoi-llm-primary-provider');
-      var prov = (STATE.llm.providers || []).find(function(p){ return p.provider_key === providerKey; });
-      var modelSel = document.getElementById('aeoi-llm-primary-model');
-      if(!modelSel) return;
-      var models = prov ? (prov.models || []) : [];
-      modelSel.innerHTML = models.length === 0
-        ? '<option value="">(default)</option>'
-        : models.map(function(m){ return '<option value="' + escHtml(m) + '">' + escHtml(m) + '</option>'; }).join('');
-    },
-
-    _llmAddFallback: function(provider, model){
-      var rowsEl = document.getElementById('aeoi-llm-fallback-rows');
-      var idx = rowsEl.children.length;
-      var rowId = 'aeoi-llm-fb-' + idx;
-      var providerOptions = (STATE.llm.providers || []).map(function(p){
-        return '<option value="' + escHtml(p.provider_key) + '"' + (p.provider_key === provider ? ' selected' : '') + '>' + escHtml(p.display_name) + '</option>';
-      }).join('');
-      var row = document.createElement('div');
-      row.id = rowId;
-      row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:center;margin-bottom:4px';
-      row.innerHTML = ''
-        + '<select class="aeoi-llm-fb-provider" style="padding:5px;border:1px solid var(--border-1,#e5e7eb);border-radius:4px;font-size:12px">' + providerOptions + '</select>'
-        + '<input type="text" class="aeoi-llm-fb-model" placeholder="model id" value="' + escHtml(model||'') + '" style="padding:5px;border:1px solid var(--border-1,#e5e7eb);border-radius:4px;font-size:12px;font-family:monospace">'
-        + '<button onclick="document.getElementById(\'' + rowId + '\').remove()" class="hm-btn hm-btn-sm" style="color:#dc2626">✕</button>';
-      rowsEl.appendChild(row);
-    },
-
-    submitLlmRuleForm: function(){
-      var routingId = aeoi._val('aeoi-llm-routing-id');
-      var payload = {
-        scope_type:       aeoi._val('aeoi-llm-scope-type'),
-        scope_value:      aeoi._val('aeoi-llm-scope-value').trim() || '*',
-        primary_provider: aeoi._val('aeoi-llm-primary-provider'),
-        primary_model:    aeoi._val('aeoi-llm-primary-model').trim() || null,
-        priority:         parseInt(aeoi._val('aeoi-llm-priority')) || 100,
-        is_enabled:       aeoi._checked('aeoi-llm-enabled'),
-        description:      aeoi._val('aeoi-llm-description').trim() || null,
-        fallback_chain:   []
-      };
-      if(routingId) payload.routing_id = parseInt(routingId);
-      var rows = document.querySelectorAll('#aeoi-llm-fallback-rows > div');
-      rows.forEach(function(row){
-        var p = row.querySelector('.aeoi-llm-fb-provider').value;
-        var m = row.querySelector('.aeoi-llm-fb-model').value.trim();
-        if(p) payload.fallback_chain.push({provider: p, model: m});
-      });
-      var errEl = document.getElementById('aeoi-llm-rule-err');
-      apiCall('admin_email_intake_llm_rule_save', payload, function(res){
-        if(!res.ok){
-          if(errEl){ errEl.textContent = 'Lỗi: ' + (res.error||'unknown') + ' — ' + (res.detail||''); errEl.style.display = 'block'; }
-          return;
-        }
-        aeoi.closeLlmRuleForm();
-        STATE.llm = null;
-        aeoi.loadLlmConfig();
-      });
-    },
-
-    deleteLlmRule: function(routingId, label){
-      if(!confirm('Xóa rule "' + label + '"?')) return;
-      apiCall('admin_email_intake_llm_rule_delete', {routing_id: routingId}, function(res){
-        if(!res.ok){ alert('Lỗi: ' + (res.error||'')); return; }
-        STATE.llm = null;
-        aeoi.loadLlmConfig();
-      });
-    },
-
     openWorkerForm: function(){
-      var el = document.getElementById('aeoi-worker-modal');
-      if(!el){
-        document.body.insertAdjacentHTML('beforeend', _workerCreateModal());
-        el = document.getElementById('aeoi-worker-modal');
-      }
-      var wid  = document.getElementById('aeoi-worker-id');
-      var wnm  = document.getElementById('aeoi-worker-name');
-      var werr = document.getElementById('aeoi-worker-err');
-      if(wid)  wid.value = '';
-      if(wnm)  wnm.value = '';
-      if(werr){ werr.style.display = 'none'; werr.textContent = ''; }
-      el.style.display = 'flex';
-      if(wid) wid.focus();
-    },
-    closeWorkerForm: function(){
-      var el = document.getElementById('aeoi-worker-modal');
-      if(el) el.style.display = 'none';
-    },
-    submitWorkerForm: function(){
-      var wid = (aeoi._val('aeoi-worker-id')||'').trim();
-      var wnm = (aeoi._val('aeoi-worker-name')||'').trim();
-      var werr = document.getElementById('aeoi-worker-err');
-      if(!wid || !/^[A-Za-z0-9_\-]{3,80}$/.test(wid)){
-        if(werr){ werr.textContent = 'Worker ID phải là 3-80 ký tự alphanumeric / _ / -'; werr.style.display='block'; }
-        return;
-      }
+      var workerId = prompt('Worker ID (vd: AIW-LOCAL-001):', '');
+      if(!workerId) return;
+      var workerName = prompt('Worker name (mô tả ngắn):', '');
+      if(workerName===null) return;
       apiCall('admin_email_intake_worker_token_create', {
-        worker_id: wid, worker_name: wnm, enabled: true,
+        worker_id: workerId, worker_name: workerName, enabled: true,
       }, function(res){
-        if(!res.ok){
-          if(werr){ werr.textContent = 'Lỗi: ' + (res.error||'unknown'); werr.style.display='block'; }
-          return;
-        }
-        aeoi.closeWorkerForm();
-        aeoi._showWorkerSecret(res.token && res.token.worker_id ? res.token.worker_id : wid, res.raw_secret||'');
+        if(!res.ok){ alert('Lỗi: ' + (res.error||'')); return; }
+        // Show raw secret ONCE
+        alert('Token created!\n\nWorker ID: ' + res.token.worker_id +
+              '\n\nRAW SECRET (lưu ngay, sẽ không xem lại được):\n\n' + res.raw_secret +
+              '\n\nSecret notice: ' + (res.secret_notice||''));
         aeoi.loadWorkers();
       });
     },
@@ -1651,45 +1367,9 @@
       if(!confirm('Rotate secret? Worker hiện tại sẽ KHÔNG dùng được cho đến khi cập nhật secret file.')) return;
       apiCall('admin_email_intake_worker_token_rotate', {id:id}, function(res){
         if(!res.ok){ alert('Lỗi: ' + (res.error||'')); return; }
-        aeoi._showWorkerSecret(res.token && res.token.worker_id ? res.token.worker_id : ('id='+id), res.raw_secret||'');
+        alert('Token rotated!\n\nNEW SECRET (lưu ngay):\n\n' + res.raw_secret);
         aeoi.loadWorkers();
       });
-    },
-    _showWorkerSecret: function(workerId, secret){
-      var el = document.getElementById('aeoi-worker-secret-modal');
-      if(!el){
-        document.body.insertAdjacentHTML('beforeend', _workerSecretModal());
-        el = document.getElementById('aeoi-worker-secret-modal');
-      }
-      var idEl  = document.getElementById('aeoi-worker-secret-id');
-      var valEl = document.getElementById('aeoi-worker-secret-val');
-      var msgEl = document.getElementById('aeoi-worker-secret-msg');
-      if(idEl)  idEl.textContent  = workerId;
-      if(valEl) valEl.textContent = secret;
-      if(msgEl) msgEl.textContent = '';
-      el.style.display = 'flex';
-    },
-    closeWorkerSecret: function(){
-      var el = document.getElementById('aeoi-worker-secret-modal');
-      if(el) el.style.display = 'none';
-      // Wipe the secret from DOM after close so it can't be re-read via devtools
-      var valEl = document.getElementById('aeoi-worker-secret-val');
-      if(valEl) valEl.textContent = '';
-    },
-    copyWorkerSecret: function(){
-      var valEl = document.getElementById('aeoi-worker-secret-val');
-      var msgEl = document.getElementById('aeoi-worker-secret-msg');
-      var secret = valEl ? valEl.textContent : '';
-      if(!secret){ if(msgEl) msgEl.textContent = 'Không có secret để copy'; return; }
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(secret).then(function(){
-          if(msgEl) msgEl.textContent = '✓ Đã copy vào clipboard';
-        }, function(){
-          if(msgEl) msgEl.textContent = '✗ Không copy được (browser block)';
-        });
-      } else {
-        if(msgEl) msgEl.textContent = '✗ Browser không hỗ trợ clipboard API';
-      }
     },
     toggleWorker: function(id, enable){
       var action = enable ? 'admin_email_intake_worker_token_enable' : 'admin_email_intake_worker_token_disable';
@@ -1700,18 +1380,24 @@
     },
 
     loadCases: function(offset){
-      // window.apiCall URL-encodes the action, so we can't smuggle &-delimited
-      // query params through the `action` argument. For the admin-tab overview
-      // we just fetch the first 50 (server default) and let the full
-      // Orders > AI Intake Queue tab handle real pagination.
-      apiCall('ai_order_intake_case_list', {}, function(res){
-        if(res && res.ok){
-          STATE.cases = {items:res.cases||[], total:res.total||0, offset:0};
-        } else {
-          STATE.cases = {items:[], total:0, offset:0};
-        }
-        _refreshSection();
-      });
+      // The case_list endpoint reads limit/offset from $_GET query string.
+      // The apiCall shim doesn't append query params for GET, so we use
+      // the raw window.apiCall (Promise) with the action including the
+      // pagination — server-side AdminController routes parse the action
+      // before the '?' anyway.
+      offset = offset || 0;
+      if(typeof window.apiCall === 'function'){
+        window.apiCall('ai_order_intake_case_list&limit=50&offset=' + offset, null, 'GET')
+          .then(function(res){
+            if(res && res.ok){
+              STATE.cases = {items:res.cases||[], total:res.total||0, offset:offset};
+            }
+            _refreshSection();
+          }).catch(function(err){
+            STATE.cases = {items:[], total:0, offset:0};
+            _refreshSection();
+          });
+      }
     },
   };
 

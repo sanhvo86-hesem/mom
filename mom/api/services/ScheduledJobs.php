@@ -1076,7 +1076,7 @@ final class ScheduledJobs
             }
 
             $start = microtime(true);
-            $runId = $configSvc->openPollRun($triggeredBy, $triggeredByActor);
+            $runId = $configSvc->openPollRun('cron', 'system.cron');
 
             // We support two operating modes:
             //   • outlook_local_push  → the local Windows worker submits envelopes
@@ -1091,97 +1091,48 @@ final class ScheduledJobs
             //                            skipped with a clear reason so admins
             //                            can see in the poll log why nothing
             //                            happened.
-            // The poll job now handles two provider families:
-            //   • outlook_local                          → heartbeat only;
-            //                                              real ingest comes
-            //                                              from the PowerShell
-            //                                              worker push.
-            //   • gmail_imap, generic_imap               → real IMAP poll
-            //                                              via EmailIntakeImapService.
-            // microsoft_graph remains reserved for a future commit.
+            // Currently the only supported runtime is outlook_local_push —
+            // microsoft_graph polling will be added in a follow-up commit when
+            // the Graph credentials path is wired in. Until then this cron
+            // entry is a heartbeat: it confirms config is healthy and touches
+            // last_scan_at on each enabled mailbox so admins see the schedule
+            // is alive. The actual envelope ingest happens via the
+            // POST /aeoi_worker_email_envelope endpoint from the PowerShell
+            // worker running on the Windows machine.
             $mailboxes      = $catalog->listEnabledMailboxes();
             $heartbeatCount = 0;
-            $imapMailboxIds = [];
             foreach ($mailboxes as $mbx) {
-                $prov = (string)($mbx['provider'] ?? '');
-                if ($prov === 'outlook_local') {
+                if (($mbx['provider'] ?? '') === 'outlook_local') {
                     $catalog->recordMailboxScan(
                         (int)$mbx['id'],
                         'heartbeat',
                         'Local worker schedule active; envelopes arrive via push endpoint.'
                     );
                     $heartbeatCount++;
-                } elseif (in_array($prov, ['gmail_imap', 'generic_imap'], true)) {
-                    $imapMailboxIds[] = (int)$mbx['id'];
                 }
             }
-
-            // IMAP polling — only attempt if php-imap is loaded.
-            $imapSummary = [
-                'mailboxes' => 0, 'fetched' => 0, 'created' => 0,
-                'skipped' => 0, 'errors' => 0,
-            ];
-            if (!empty($imapMailboxIds) && extension_loaded('imap')) {
-                require_once __DIR__ . '/EmailIntakeImapService.php';
-                require_once __DIR__ . '/EmailIntakeCaseService.php';
-                require_once __DIR__ . '/EmailIntakeValidationService.php';
-
-                $caseSvc = new \MOM\Api\Services\EmailIntakeCaseService($this->db);
-                $vSvc    = new \MOM\Api\Services\EmailIntakeValidationService(
-                    $this->db, $caseSvc, $configSvc
-                );
-                $imapSvc = new \MOM\Api\Services\EmailIntakeImapService(
-                    $this->db, $catalog, $configSvc, $caseSvc, $vSvc, $this->dataDir
-                );
-
-                foreach ($imapMailboxIds as $mid) {
-                    $imapSummary['mailboxes']++;
-                    try {
-                        $row = $catalog->getMailboxWithSecret($mid);
-                        $r   = $imapSvc->pollMailbox($row, 'system.cron.aeoi');
-                        $imapSummary['fetched'] += (int)($r['fetched'] ?? 0);
-                        $imapSummary['created'] += (int)($r['created'] ?? 0);
-                        $imapSummary['skipped'] += (int)($r['skipped'] ?? 0);
-                        if (($r['status'] ?? '') === 'failed') {
-                            $imapSummary['errors']++;
-                        }
-                    } catch (Throwable $e) {
-                        $imapSummary['errors']++;
-                        $catalog->recordMailboxScan($mid, 'poll_failed', $e->getMessage());
-                    }
-                }
-            }
-
-            $detail = "Heartbeat: $heartbeatCount local-Outlook; "
-                    . "IMAP: {$imapSummary['mailboxes']} mailboxes, "
-                    . "fetched {$imapSummary['fetched']}, created {$imapSummary['created']}, "
-                    . "skipped {$imapSummary['skipped']}, errors {$imapSummary['errors']}.";
 
             $configSvc->closePollRun($runId, [
-                'found'        => $imapSummary['fetched'],
-                'processed'    => $imapSummary['created'] + $imapSummary['skipped'],
-                'skipped'      => $imapSummary['skipped'],
+                'found'        => 0,
+                'processed'    => 0,
+                'skipped'      => 0,
                 'quarantined'  => 0,
-                'created'      => $imapSummary['created'],
-                'review'       => $imapSummary['created'], // every new case starts as needs-review
-                'errors'       => $imapSummary['errors'],
+                'created'      => 0,
+                'review'       => 0,
+                'errors'       => 0,
                 'duration_ms'  => (int)((microtime(true) - $start) * 1000),
-                'api_calls'    => $imapSummary['mailboxes'],
-                'error_detail' => $detail,
-            ], $imapSummary['errors'] > 0 ? 'completed' : 'completed');
+                'api_calls'    => 0,
+                'error_detail' => "Heartbeat for $heartbeatCount local-Outlook mailbox(es).",
+            ], 'completed');
             $configSvc->updateNextPollAt();
 
             return [
-                'status'              => 'completed',
-                'mode'                => 'mixed',
-                'run_id'              => $runId,
-                'mailboxes_heartbeat' => $heartbeatCount,
-                'mailboxes_imap'      => $imapSummary['mailboxes'],
-                'fetched'             => $imapSummary['fetched'],
-                'orders_created'      => $imapSummary['created'],
-                'skipped'             => $imapSummary['skipped'],
-                'errors'              => $imapSummary['errors'],
-                'note'                => $detail,
+                'status'         => 'completed',
+                'mode'           => 'outlook_local_push',
+                'run_id'         => $runId,
+                'mailboxes_seen' => $heartbeatCount,
+                'orders_created' => 0,
+                'note'           => 'Local Outlook worker pushes envelopes via /aeoi_worker_email_envelope.',
             ];
         });
     }

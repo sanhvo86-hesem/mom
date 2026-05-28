@@ -28,10 +28,7 @@ final class EmailIntakeAdminCatalogService
     private const T_HEADER   = 'email_intake_header_rule';
     private const T_TEMPLATE = 'email_intake_customer_template';
 
-    public function __construct(
-        private readonly Connection $db,
-        private readonly ?EmailIntakeConfigService $config = null
-    ) {}
+    public function __construct(private readonly Connection $db) {}
 
     // ── Mailboxes ────────────────────────────────────────────────────────
 
@@ -55,9 +52,7 @@ final class EmailIntakeAdminCatalogService
         return $this->db->query(
             'SELECT id, mailbox_address, provider, folder_path,
                     read_body, read_attachments,
-                    move_after_processed, processed_folder_path, error_folder_path,
-                    imap_host, imap_port, imap_encryption, imap_username,
-                    imap_validate_cert, imap_last_uid, imap_last_uidvalidity
+                    move_after_processed, processed_folder_path, error_folder_path
                FROM ' . self::T_MAILBOX . '
               WHERE enabled = true
               ORDER BY lower(mailbox_address), lower(folder_path)'
@@ -81,17 +76,8 @@ final class EmailIntakeAdminCatalogService
         if ($folder === '') {
             throw new RuntimeException('folder_path is required.');
         }
-        if (!in_array($prov, ['outlook_local', 'microsoft_graph', 'manual_upload',
-                              'gmail_imap', 'generic_imap', 'exchange_ews'], true)) {
-            throw new RuntimeException('provider must be outlook_local | microsoft_graph | manual_upload | gmail_imap | generic_imap | exchange_ews.');
-        }
-        // IMAP providers must have host + port + username + password
-        if (in_array($prov, ['gmail_imap', 'generic_imap'], true)) {
-            foreach (['imap_host', 'imap_port', 'imap_username', 'imap_password'] as $req) {
-                if (empty($data[$req])) {
-                    throw new RuntimeException("$req is required for $prov provider.");
-                }
-            }
+        if (!in_array($prov, ['outlook_local', 'microsoft_graph', 'manual_upload'], true)) {
+            throw new RuntimeException('provider must be outlook_local, microsoft_graph or manual_upload.');
         }
 
         $existing = $this->db->queryOne(
@@ -103,47 +89,26 @@ final class EmailIntakeAdminCatalogService
             throw new RuntimeException('A mailbox row with this address + folder already exists.');
         }
 
-        // Encrypt IMAP password if supplied
-        $imapPwdEnc = null;
-        if (!empty($data['imap_password']) && is_string($data['imap_password'])) {
-            if ($this->config === null) {
-                throw new RuntimeException('Cannot encrypt IMAP password — EmailIntakeConfigService not injected.');
-            }
-            $imapPwdEnc = $this->config->encryptSecret($data['imap_password']);
-        }
-
         $row = $this->db->queryOne(
             'INSERT INTO ' . self::T_MAILBOX . '
                 (mailbox_address, provider, folder_path, enabled,
                  read_body, read_attachments, move_after_processed,
-                 processed_folder_path, error_folder_path,
-                 imap_host, imap_port, imap_encryption, imap_username,
-                 imap_password_enc, imap_validate_cert,
-                 created_by, updated_by)
+                 processed_folder_path, error_folder_path, created_by, updated_by)
              VALUES (:p_addr, :p_prov, :p_folder, :p_enabled,
                      :p_read_body, :p_read_att, :p_move,
-                     :p_proc, :p_err,
-                     :p_imap_host, :p_imap_port, :p_imap_enc, :p_imap_user,
-                     :p_imap_pwd, :p_imap_validate,
-                     :p_actor, :p_actor)
+                     :p_proc, :p_err, :p_actor, :p_actor)
              RETURNING id',
             [
-                ':p_addr'         => $addr,
-                ':p_prov'         => $prov,
-                ':p_folder'       => $folder,
-                ':p_enabled'      => isset($data['enabled']) ? ($data['enabled'] ? 'true' : 'false') : 'true',
-                ':p_read_body'    => isset($data['read_body']) ? ($data['read_body'] ? 'true' : 'false') : 'true',
-                ':p_read_att'     => isset($data['read_attachments']) ? ($data['read_attachments'] ? 'true' : 'false') : 'true',
-                ':p_move'         => isset($data['move_after_processed']) ? ($data['move_after_processed'] ? 'true' : 'false') : 'false',
-                ':p_proc'         => trim((string)($data['processed_folder_path'] ?? '')) ?: null,
-                ':p_err'          => trim((string)($data['error_folder_path'] ?? '')) ?: null,
-                ':p_imap_host'    => trim((string)($data['imap_host'] ?? '')) ?: null,
-                ':p_imap_port'    => isset($data['imap_port']) && $data['imap_port'] !== '' ? (int)$data['imap_port'] : null,
-                ':p_imap_enc'     => trim((string)($data['imap_encryption'] ?? '')) ?: null,
-                ':p_imap_user'    => trim((string)($data['imap_username'] ?? '')) ?: null,
-                ':p_imap_pwd'     => $imapPwdEnc,
-                ':p_imap_validate'=> isset($data['imap_validate_cert']) ? ($data['imap_validate_cert'] ? 'true' : 'false') : 'true',
-                ':p_actor'        => $actor,
+                ':p_addr'      => $addr,
+                ':p_prov'      => $prov,
+                ':p_folder'    => $folder,
+                ':p_enabled'   => isset($data['enabled']) ? ($data['enabled'] ? 'true' : 'false') : 'true',
+                ':p_read_body' => isset($data['read_body']) ? ($data['read_body'] ? 'true' : 'false') : 'true',
+                ':p_read_att'  => isset($data['read_attachments']) ? ($data['read_attachments'] ? 'true' : 'false') : 'true',
+                ':p_move'      => isset($data['move_after_processed']) ? ($data['move_after_processed'] ? 'true' : 'false') : 'false',
+                ':p_proc'      => trim((string)($data['processed_folder_path'] ?? '')) ?: null,
+                ':p_err'       => trim((string)($data['error_folder_path'] ?? '')) ?: null,
+                ':p_actor'     => $actor,
             ]
         );
         return $this->getMailbox((int)$row['id']);
@@ -156,8 +121,6 @@ final class EmailIntakeAdminCatalogService
             'mailbox_address','provider','folder_path','enabled',
             'read_body','read_attachments','move_after_processed',
             'processed_folder_path','error_folder_path',
-            'imap_host','imap_port','imap_encryption','imap_username',
-            'imap_validate_cert',
         ];
         $sets   = ['updated_at = NOW()', 'updated_by = :p_actor'];
         $params = [':p_actor' => $actor];
@@ -167,10 +130,8 @@ final class EmailIntakeAdminCatalogService
                 continue;
             }
             $val = $data[$col];
-            if (in_array($col, ['enabled','read_body','read_attachments','move_after_processed','imap_validate_cert'], true)) {
+            if (in_array($col, ['enabled','read_body','read_attachments','move_after_processed'], true)) {
                 $val = $val ? 'true' : 'false';
-            } elseif ($col === 'imap_port') {
-                $val = ($val === '' || $val === null) ? null : (int)$val;
             } elseif ($col === 'mailbox_address' && is_string($val)) {
                 $val = strtolower(trim($val));
                 if ($val !== '' && !filter_var($val, FILTER_VALIDATE_EMAIL)) {
@@ -182,15 +143,6 @@ final class EmailIntakeAdminCatalogService
             }
             $sets[]            = "$col = :p_$col";
             $params[":p_$col"] = $val;
-        }
-
-        // imap_password is encrypted on the way in — never stored in plaintext
-        if (!empty($data['imap_password']) && is_string($data['imap_password'])) {
-            if ($this->config === null) {
-                throw new RuntimeException('Cannot encrypt IMAP password — EmailIntakeConfigService not injected.');
-            }
-            $sets[] = 'imap_password_enc = :p_imap_pwd';
-            $params[':p_imap_pwd'] = $this->config->encryptSecret($data['imap_password']);
         }
 
         if (count($sets) < 2) {
@@ -214,24 +166,6 @@ final class EmailIntakeAdminCatalogService
     }
 
     public function getMailbox(int $id): array
-    {
-        $row = $this->db->queryOne(
-            'SELECT * FROM ' . self::T_MAILBOX . ' WHERE id = :p_id',
-            [':p_id' => $id]
-        );
-        if (!$row) {
-            throw new RuntimeException('Mailbox not found: ' . $id);
-        }
-        // Virtual field — never send the encrypted password back to the
-        // frontend, but tell the UI whether one is stored so it knows to
-        // render the field as "(đã lưu — nhập mới để đổi)".
-        $row['imap_password_configured'] = !empty($row['imap_password_enc']);
-        return $row;
-    }
-
-    /** Internal accessor: returns the row including imap_password_enc for
-     *  the IMAP service to decrypt. NEVER expose this via the controller. */
-    public function getMailboxWithSecret(int $id): array
     {
         $row = $this->db->queryOne(
             'SELECT * FROM ' . self::T_MAILBOX . ' WHERE id = :p_id',

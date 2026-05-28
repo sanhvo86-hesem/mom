@@ -10,7 +10,6 @@ use MOM\Api\Services\EmailIntakeCommitService;
 use MOM\Api\Services\EmailIntakeConfigService;
 use MOM\Api\Services\EmailIntakeValidationService;
 use MOM\Api\Services\EmailIntakeWorkerAuthService;
-use MOM\Api\Services\LlmExtractionRouterService;
 use MOM\Services\CustomerPurchaseOrderService;
 use MOM\Services\OrderService;
 use Throwable;
@@ -46,7 +45,6 @@ class EmailIntakeController extends BaseController
     private ?EmailIntakeCaseService $caseSvc = null;
     private ?EmailIntakeValidationService $validationSvc = null;
     private ?EmailIntakeCommitService $commitSvc = null;
-    private ?LlmExtractionRouterService $llmRouterSvc = null;
 
     private function db(): \MOM\Database\Connection
     {
@@ -68,8 +66,7 @@ class EmailIntakeController extends BaseController
     private function catalog(): EmailIntakeAdminCatalogService
     {
         if ($this->catalogSvc === null) {
-            // Inject EmailIntakeConfigService so IMAP passwords can be encrypted.
-            $this->catalogSvc = new EmailIntakeAdminCatalogService($this->db(), $this->svc());
+            $this->catalogSvc = new EmailIntakeAdminCatalogService($this->db());
         }
         return $this->catalogSvc;
     }
@@ -117,83 +114,6 @@ class EmailIntakeController extends BaseController
     private function actor(array $user): string
     {
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
-    }
-
-    private function llmRouter(): LlmExtractionRouterService
-    {
-        if ($this->llmRouterSvc === null) {
-            $this->llmRouterSvc = new LlmExtractionRouterService($this->db());
-        }
-        return $this->llmRouterSvc;
-    }
-
-    // ── LLM Model routing (migration 207) ────────────────────────────────
-
-    public function llmProvidersList(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        try {
-            $this->success(['providers' => $this->llmRouter()->listProvidersForUi()]);
-        } catch (Throwable $e) {
-            $this->error('llm_providers_failed', 500, $e->getMessage());
-        }
-    }
-
-    public function llmRulesList(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        try {
-            $this->success(['rules' => $this->llmRouter()->listRulesForUi()]);
-        } catch (Throwable $e) {
-            $this->error('llm_rules_failed', 500, $e->getMessage());
-        }
-    }
-
-    public function llmRuleSave(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        try {
-            $row = $this->llmRouter()->saveRule($this->jsonBody(), $this->actor($user));
-            $this->auditLog('admin_email_intake_llm_rule_save', [
-                'scope_type'  => $row['scope_type']  ?? null,
-                'scope_value' => $row['scope_value'] ?? null,
-            ]);
-            $this->success(['rule' => $row, 'saved' => true]);
-        } catch (Throwable $e) {
-            $this->error('llm_rule_save_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function llmRuleDelete(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['routing_id'] ?? $body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'routing_id is required.'); }
-        try {
-            $this->llmRouter()->deleteRule($id);
-            $this->auditLog('admin_email_intake_llm_rule_delete', ['routing_id' => $id]);
-            $this->success(['deleted' => true, 'routing_id' => $id]);
-        } catch (Throwable $e) {
-            $this->error('llm_rule_delete_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function llmHealth(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        try {
-            $this->success(['health' => $this->llmRouter()->healthAll()]);
-        } catch (Throwable $e) {
-            $this->error('llm_health_failed', 500, $e->getMessage());
-        }
     }
 
     // ── Config ────────────────────────────────────────────────────────────
@@ -693,69 +613,6 @@ class EmailIntakeController extends BaseController
         }
     }
 
-    /**
-     * POST admin_email_intake_mailbox_poll
-     *
-     * Trigger an IMAP poll for a single mailbox row. Useful for "test
-     * connection" + "fetch latest now" from the admin UI without waiting
-     * for the cron heartbeat.
-     */
-    public function mailboxPoll(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        // Open a poll_run record so admin can see the manual poll in
-        // "Nhật ký poll" — without this, only cron-driven polls show up
-        // in the log and admins lose visibility into manual triggers.
-        $runId  = $this->svc()->openPollRun('manual', $this->actor($user));
-        $start  = microtime(true);
-        try {
-            $row = $this->catalog()->getMailboxWithSecret($id);
-            $imap = new \MOM\Api\Services\EmailIntakeImapService(
-                $this->db(), $this->catalog(), $this->svc(),
-                $this->caseSvc(), $this->validation(), $this->dataDir
-            );
-            $result = $imap->pollMailbox($row, $this->actor($user));
-
-            $this->svc()->closePollRun($runId, [
-                'found'        => (int)($result['fetched'] ?? 0),
-                'processed'    => (int)($result['fetched'] ?? 0),
-                'skipped'      => (int)($result['skipped'] ?? 0),
-                'quarantined'  => 0,
-                'created'      => (int)($result['created'] ?? 0),
-                'review'       => (int)($result['created'] ?? 0),
-                'errors'       => ($result['status'] ?? '') === 'failed' ? 1 : 0,
-                'duration_ms'  => (int)((microtime(true) - $start) * 1000),
-                'api_calls'    => 1,
-                'error_detail' => $result['note'] ?? null,
-            ], ($result['status'] ?? 'failed') === 'failed' ? 'failed' : 'completed');
-            $this->svc()->updateNextPollAt();
-
-            $this->auditLog('admin_email_intake_mailbox_poll', [
-                'mailbox_id' => $id,
-                'run_id'     => $runId,
-                'status'     => $result['status'] ?? null,
-                'fetched'    => $result['fetched'] ?? 0,
-                'created'    => $result['created'] ?? 0,
-            ]);
-            $this->success(['result' => array_merge($result, ['run_id' => $runId])]);
-        } catch (Throwable $e) {
-            // Close the run as failed so the admin sees the failure in the log
-            try {
-                $this->svc()->closePollRun($runId, [
-                    'errors'       => 1,
-                    'duration_ms'  => (int)((microtime(true) - $start) * 1000),
-                    'error_detail' => $e->getMessage(),
-                ], 'failed');
-            } catch (Throwable) { /* avoid masking the original error */ }
-            $this->error('mailbox_poll_failed', 400, $e->getMessage());
-        }
-    }
-
     // ── Catalog: Header rules ────────────────────────────────────────────
 
     public function headerRuleList(): never
@@ -976,12 +833,8 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, [
-            'admin','it_admin',
-            'ceo','general_director','production_director',
-            'sales_manager','customer_service',
-            'planning_manager','production_planner',
-            'engineering_manager','quality_manager','supply_chain_manager',
-            'cnc_workshop_manager','estimator',
+            'admin','it_admin','sales_manager','customer_service',
+            'planning_manager','production_planner','engineering_manager','quality_manager',
         ]);
         $limit  = max(1, min(200, (int)($this->query('limit') ?? 50)));
         $offset = max(0, (int)($this->query('offset') ?? 0));
@@ -1006,12 +859,8 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, [
-            'admin','it_admin',
-            'ceo','general_director','production_director',
-            'sales_manager','customer_service',
-            'planning_manager','production_planner',
-            'engineering_manager','quality_manager','supply_chain_manager',
-            'cnc_workshop_manager','estimator',
+            'admin','it_admin','sales_manager','customer_service',
+            'planning_manager','production_planner','engineering_manager','quality_manager',
         ]);
         $id = (int)($this->query('id') ?? 0);
         if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
@@ -1026,8 +875,7 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, [
-            'admin','ceo','general_director',
-            'sales_manager','customer_service','engineering_manager','planning_manager',
+            'admin','sales_manager','customer_service','engineering_manager','planning_manager',
         ]);
         $this->requireCsrf();
         $body = $this->jsonBody();
@@ -1046,9 +894,7 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, [
-            'admin','ceo','general_director','production_director',
-            'sales_manager','customer_service',
-            'engineering_manager','planning_manager','quality_manager',
+            'admin','sales_manager','customer_service','engineering_manager','planning_manager','quality_manager',
         ]);
         $this->requireCsrf();
         $body = $this->jsonBody();
@@ -1067,9 +913,7 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, [
-            'admin','ceo','general_director','production_director',
-            'sales_manager','customer_service',
-            'engineering_manager','planning_manager','quality_manager',
+            'admin','sales_manager','customer_service','engineering_manager','planning_manager','quality_manager',
         ]);
         $this->requireCsrf();
         $body   = $this->jsonBody();
@@ -1089,9 +933,7 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, [
-            'admin','ceo','general_director','production_director',
-            'sales_manager','customer_service',
-            'engineering_manager','planning_manager','quality_manager',
+            'admin','sales_manager','customer_service','engineering_manager','planning_manager','quality_manager',
         ]);
         $this->requireCsrf();
         $body   = $this->jsonBody();
@@ -1110,9 +952,7 @@ class EmailIntakeController extends BaseController
     public function caseCommitCustomerPo(): never
     {
         $user = $this->requireAuth();
-        $this->requireAnyRole($user, [
-            'admin','ceo','general_director','sales_manager','customer_service',
-        ]);
+        $this->requireAnyRole($user, ['admin','sales_manager','customer_service']);
         $this->requireCsrf();
         $body = $this->jsonBody();
         $id   = (int)($body['id'] ?? 0);
@@ -1132,9 +972,7 @@ class EmailIntakeController extends BaseController
     public function caseCommitSalesOrder(): never
     {
         $user = $this->requireAuth();
-        $this->requireAnyRole($user, [
-            'admin','ceo','general_director','sales_manager','customer_service',
-        ]);
+        $this->requireAnyRole($user, ['admin','sales_manager','customer_service']);
         $this->requireCsrf();
         $body = $this->jsonBody();
         $id   = (int)($body['id'] ?? 0);
@@ -1263,66 +1101,8 @@ class EmailIntakeController extends BaseController
                 $action = strtoupper($m[1]);
             }
 
-            // De-dupe: an internet_message_id we've already seen returns the
-            // existing case instead of creating a new one. This is the same
-            // safety net Phase 1's email_intake_message ledger gives us.
-            $msgKey = $internetMsg !== '' ? $internetMsg : ($mailboxId . ':' . $providerMsg);
-            $existing = $this->db()->queryOne(
-                'SELECT m.id AS msg_id, c.id AS case_id, c.intake_no
-                   FROM email_intake_message m
-                   LEFT JOIN email_intake_case c ON c.message_id = m.id
-                  WHERE m.graph_message_id = :p_key',
-                [':p_key' => $msgKey]
-            );
-            if ($existing) {
-                $this->auditLog('aeoi_worker_envelope_duplicate', [
-                    'worker'    => $worker['worker_id'],
-                    'message_id'=> (int)$existing['msg_id'],
-                    'case_id'   => $existing['case_id'] ? (int)$existing['case_id'] : null,
-                ]);
-                $this->success([
-                    'ok'        => true,
-                    'action'    => 'duplicate',
-                    'case_id'   => $existing['case_id'] ? (int)$existing['case_id'] : null,
-                    'intake_no' => $existing['intake_no'] ?? null,
-                    'reason'    => 'message_already_processed',
-                ]);
-            }
-
-            // Persist the Phase 1 email_intake_message row first. The case's
-            // message_id FK points back here so the message log + poll log
-            // views show the full lifecycle.
-            $msgRow = $this->db()->queryOne(
-                'INSERT INTO email_intake_message
-                    (graph_message_id, internet_message_id, received_at,
-                     from_email, from_name, subject,
-                     has_attachments, attachment_count, attachment_names,
-                     allowlist_match, status, body_preview)
-                 VALUES (:p_key, :p_imid, :p_recv,
-                         :p_from, :p_name, :p_subj,
-                         :p_has, :p_cnt, :p_atts,
-                         :p_allow, :p_status, :p_preview)
-                 RETURNING id',
-                [
-                    ':p_key'     => $msgKey,
-                    ':p_imid'    => $internetMsg ?: null,
-                    ':p_recv'    => $receivedAt,
-                    ':p_from'    => $fromEmail,
-                    ':p_name'    => trim((string)($body['from_name'] ?? '')) ?: null,
-                    ':p_subj'    => $subject,
-                    ':p_has'     => count($atts) > 0 ? 'true' : 'false',
-                    ':p_cnt'     => count($atts),
-                    ':p_atts'    => json_encode(array_map(static fn($a) => (string)($a['filename'] ?? ''), $atts)),
-                    ':p_allow'   => (string)($allow['match_type'] ?? 'none'),
-                    ':p_status'  => 'extracted',
-                    ':p_preview' => mb_substr(trim((string)($body['body_text'] ?? '')), 0, 500),
-                ]
-            );
-            $messageId = (int)$msgRow['id'];
-
-            // Create the intake case linked to the message row
+            // Create the intake case
             $case = $this->caseSvc()->createCase([
-                'message_id'          => $messageId,
                 'mailbox_id'          => $mailboxId,
                 'sender_allowlist_id' => $allow['entry_id'] ?? null,
                 'status'              => 'extraction_pending',
@@ -1331,24 +1111,13 @@ class EmailIntakeController extends BaseController
             ], $worker['worker_id']);
             $caseId = (int)$case['id'];
 
-            // Mark message as 'processing' — the email_intake_message.status
-            // enum (migration 203) is pending | processing | extracted |
-            // created | review_queue | quarantined | skipped | failed |
-            // duplicate. 'extraction_pending' is a CASE-level status only.
-            $this->db()->execute(
-                'UPDATE email_intake_message
-                    SET status = :p_status, updated_at = NOW()
-                  WHERE id = :p_id',
-                [':p_status' => 'processing', ':p_id' => $messageId]
-            );
-
             // Persist attachments
             foreach ($atts as $att) {
                 $sha256 = trim((string)($att['sha256'] ?? ''));
                 if ($sha256 === '' || !preg_match('/^[a-f0-9]{64}$/i', $sha256)) {
                     continue;
                 }
-                $this->caseSvc()->addAttachment($caseId, $messageId, [
+                $this->caseSvc()->addAttachment($caseId, null, [
                     'original_filename' => (string)($att['filename'] ?? 'unknown'),
                     'safe_filename'     => (string)($att['safe_filename'] ?? $att['filename'] ?? 'unknown'),
                     'mime_type'         => trim((string)($att['mime_type'] ?? '')) ?: null,
