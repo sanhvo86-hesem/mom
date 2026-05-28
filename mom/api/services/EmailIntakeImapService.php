@@ -232,10 +232,33 @@ final class EmailIntakeImapService
             $mailbox['imap_last_uidvalidity'] = $serverUidvalidity;
         }
 
-        // imap_search by UID range. The "UID a:b" syntax wants UIDs.
-        // a = lastUid+1, b = '*' (the highest existing UID).
-        $criterion = 'UID ' . ($lastUid + 1) . ':*';
-        $uids = imap_search($conn, $criterion, SE_UID) ?: [];
+        // PHP's imap_search() does NOT accept the raw IMAP "UID a:b"
+        // criterion — it returns false with "Unknown search criterion: UID".
+        // Workaround: fetch ALL UIDs and filter in PHP. The set is bounded
+        // by the mailbox size and we cap to MAX_MESSAGES_PER_POLL anyway.
+        $allUids = imap_search($conn, 'ALL', SE_UID);
+        @error_log(sprintf('[AEOI IMAP] mbx=%d lastUid=%d searchResult=%s errors=%s',
+            $mailboxId,
+            $lastUid,
+            is_array($allUids) ? ('array(' . count($allUids) . ')') : var_export($allUids, true),
+            json_encode(imap_errors() ?: [])
+        ));
+        if (!is_array($allUids) || $allUids === []) {
+            $allUids = [];
+        }
+        if (!is_array($allUids) || $allUids === []) {
+            $this->persistCursor($mailboxId, $lastUid, $mailbox['imap_last_uidvalidity'] ?? null);
+            return ['fetched' => 0, 'created' => 0, 'skipped' => 0];
+        }
+
+        // Keep only UIDs strictly greater than our cursor, sorted ascending
+        // so we always advance the cursor monotonically.
+        $uids = array_values(array_filter(
+            array_map('intval', $allUids),
+            static fn(int $u) => $u > $lastUid
+        ));
+        sort($uids, SORT_NUMERIC);
+
         if ($uids === []) {
             $this->persistCursor($mailboxId, $lastUid, $mailbox['imap_last_uidvalidity'] ?? null);
             return ['fetched' => 0, 'created' => 0, 'skipped' => 0];
