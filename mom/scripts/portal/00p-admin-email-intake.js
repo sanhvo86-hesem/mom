@@ -930,11 +930,20 @@
 
   function _sectionCases(){
     var data = STATE.cases || { items:[], total:0, offset:0 };
+    // The full M2-orders ai-intake-queue view lives behind the template-demo
+    // page, which is admin-only. Only surface the link to users who can
+    // reach that page; otherwise the click would force a redirect to
+    // Dashboard with a "no permission" toast.
+    var canOpenFullQueue = (typeof window.canUserAccessModule === 'function')
+      ? !!window.canUserAccessModule('template-demo')
+      : false;
     var html = '<div class="aeoi-card">'
-      + _cardHead('📦 Intake Cases', 'Các case đã tạo từ AI. Tab "AI Intake Queue" trong M2-Orders module là nơi sales/planning xử lý chi tiết. Đây là view tổng quát của admin.')
+      + _cardHead('📦 Intake Cases', 'Các case đã tạo từ AI. ' + (canOpenFullQueue ? 'Tab "AI Intake Queue" trong M2-Orders module là nơi sales/planning xử lý chi tiết. Đây là view tổng quát của admin.' : 'Admin quản lý case trực tiếp tại đây. Full Queue view dành cho IT/dev.'))
       + '<div style="display:flex;gap:8px;margin-bottom:10px">'
       + '<button onclick="aeoi.loadCases(0)" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
-      + '<button onclick="aeoi.openOrdersAiQueue()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">Mở Intake Queue đầy đủ →</button>'
+      + (canOpenFullQueue
+          ? '<button onclick="aeoi.openOrdersAiQueue()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">Mở Intake Queue đầy đủ →</button>'
+          : '')
       + '</div>';
     if(data.items.length===0){
       html += '<div class="hm-empty">Chưa có case nào.</div>';
