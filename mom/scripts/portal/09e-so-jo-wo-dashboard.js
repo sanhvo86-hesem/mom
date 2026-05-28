@@ -831,6 +831,382 @@ var AiIntakeQueue = (function(){
   return { init: init, openCase: openCase, closeDrawer: closeDrawer };
 })();
 
+/* ════════════════════════════════════════════════════════════════════
+ * PR #4 — Customer POs list view
+ * Reuses customer_purchase_order_list endpoint (registered in
+ * mom/api/routes/operations-routes.php). Shows all CPOs with source
+ * filter (AI Intake vs Manual).
+ * ════════════════════════════════════════════════════════════════════ */
+var OrdersCpoView = (function(){
+  var state = { rows: [], loading: false, filterSource: '', errorMsg: '' };
+
+  function apiGet(action, payload){
+    if (typeof window.apiCall !== 'function') return Promise.resolve({ ok:false, error:'apiCall_unavailable' });
+    return window.apiCall(action, payload || {}, 'GET')
+      .then(function(r){ return r || { ok:false, error:'empty' }; })
+      .catch(function(e){ return { ok:false, error:String(e && e.message || e) }; });
+  }
+
+  function fmtMoney(v){
+    var n = Number(v || 0);
+    if (!isFinite(n)) return '-';
+    return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  }
+
+  function statusBadge(s){
+    var tone = {
+      received:    { bg:'#fef3c7', fg:'#92400e' },
+      confirmed:   { bg:'#d1fae5', fg:'#065f46' },
+      in_progress: { bg:'#dbeafe', fg:'#1e40af' },
+      completed:   { bg:'#bbf7d0', fg:'#14532d' },
+      cancelled:   { bg:'#fecaca', fg:'#991b1b' }
+    }[s] || { bg:'#f3f4f6', fg:'#374151' };
+    return '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:'+tone.bg+';color:'+tone.fg+'">' + _esc(s || '?') + '</span>';
+  }
+
+  function _render(){
+    var mount = document.getElementById('orders-cpo-mount');
+    if (!mount) return;
+
+    var rows = state.rows || [];
+    var filtered = rows.filter(function(c){
+      if (state.filterSource === 'ai_email') return (c.source === 'ai_order_intake');
+      if (state.filterSource === 'manual')   return (c.source !== 'ai_order_intake');
+      return true;
+    });
+
+    var totalValue = 0;
+    var aiCount = 0;
+    rows.forEach(function(c){
+      (c.lines || []).forEach(function(l){
+        var lt = Number(l.line_total != null ? l.line_total : Number(l.qty || 0) * Number(l.unit_price || 0));
+        if (isFinite(lt)) totalValue += lt;
+      });
+      if (c.source === 'ai_order_intake') aiCount++;
+    });
+
+    var html = ''
+      // KPI
+      + '<div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap">'
+      +   _kpiCard(_t('Tổng CPO', 'Total CPOs'), String(rows.length), 'var(--text-1,#111)')
+      +   _kpiCard(_t('Từ AI Intake', 'From AI Intake'), String(aiCount), 'var(--brand-primary,#2563eb)')
+      +   _kpiCard(_t('Tổng giá trị', 'Total value'), fmtMoney(totalValue), 'var(--green-dark,#0f766e)')
+      + '</div>'
+      // Filter
+      + '<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">'
+      +   '<label style="font-size:12px;color:var(--text-2,#374151)">' + _t('Nguồn:', 'Source:') + '</label>'
+      +   '<select id="cpo-filter-source" style="padding:4px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:4px;font-size:12px">'
+      +     '<option value="">' + _t('Tất cả', 'All') + '</option>'
+      +     '<option value="ai_email"' + (state.filterSource==='ai_email'?' selected':'') + '>🤖 AI Email Intake</option>'
+      +     '<option value="manual"' + (state.filterSource==='manual'?' selected':'') + '>👤 Manual</option>'
+      +   '</select>'
+      +   '<button id="cpo-refresh" style="margin-left:auto;padding:6px 12px;background:var(--brand-primary,#2563eb);color:#fff;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer">'
+      +     _t('🔄 Làm mới', '🔄 Refresh')
+      +   '</button>'
+      + '</div>';
+
+    if (state.loading) {
+      html += '<div style="padding:48px;text-align:center;color:var(--text-3,#6b7280)">⏳ ' + _t('Đang tải...', 'Loading...') + '</div>';
+    } else if (state.errorMsg) {
+      html += '<div style="padding:24px;background:#fef3c7;border:1px solid #fcd34d;border-radius:6px;color:#92400e">'
+        + '<div style="font-weight:700;margin-bottom:6px">⚠️ ' + _t('Không thể tải danh sách Customer PO', 'Could not load Customer POs') + '</div>'
+        + '<div style="font-size:12px">' + _esc(state.errorMsg) + '</div>'
+        + (state.errorDetail === 'org_id_required'
+            ? '<div style="font-size:12px;margin-top:8px;color:#78350f">' + _t('Phiên đăng nhập của bạn chưa được gán Tổ chức (org_id). Liên hệ Admin để cấu hình tenant scoping cho tài khoản.', 'Your session has no Organization (org_id). Contact Admin to configure tenant scoping for your account.') + '</div>'
+            : '')
+        + '</div>';
+    } else if (filtered.length === 0) {
+      html += '<div style="padding:48px;text-align:center;color:var(--text-3,#6b7280);background:#fff;border-radius:6px;border:1px solid var(--border-1,#e5e7eb)">'
+        + '📭 ' + (rows.length === 0
+            ? _t('Chưa có Customer PO nào. AEOI commit hoặc tạo manual sẽ hiện ở đây.', 'No Customer POs yet. They will appear here after AEOI commit or manual create.')
+            : _t('Không có CPO nào khớp bộ lọc.', 'No CPOs match the filter.'))
+        + '</div>';
+    } else {
+      html += '<div style="background:#fff;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;overflow:hidden">'
+        + '<table style="width:100%;border-collapse:collapse;font-size:12px">'
+        + '<thead style="background:var(--surface-2,#f9fafb)"><tr>'
+        +   _th('CPO ID') + _th(_t('Khách', 'Customer')) + _th('PO #')
+        +   _th(_t('Trạng thái', 'Status')) + _th(_t('Lines', 'Lines'), 'right')
+        +   _th(_t('Giá trị', 'Value'), 'right') + _th(_t('Nhận', 'Received'))
+        +   _th(_t('Nguồn', 'Source')) + _th(_t('AEOI Case', 'AEOI Case'))
+        + '</tr></thead><tbody>'
+        + filtered.map(function(c){
+            var lineCount = (c.lines || []).length;
+            var lineValue = 0;
+            (c.lines || []).forEach(function(l){
+              var lt = Number(l.line_total != null ? l.line_total : Number(l.qty || 0) * Number(l.unit_price || 0));
+              if (isFinite(lt)) lineValue += lt;
+            });
+            var rcv = c.received_at ? new Date(c.received_at).toLocaleString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric' }) : '-';
+            var srcBadge = c.source === 'ai_order_intake'
+              ? '<span style="display:inline-block;padding:2px 6px;border-radius:8px;font-size:10px;background:#dbeafe;color:#1e40af">🤖 AI</span>'
+              : '<span style="display:inline-block;padding:2px 6px;border-radius:8px;font-size:10px;background:#f3f4f6;color:#374151">👤 Manual</span>';
+            var intakeRef = c.source_record_id
+              ? '<span style="font-family:ui-monospace,monospace;font-size:11px;color:var(--brand-primary,#2563eb)">' + _esc(c.source_record_id) + '</span>'
+              : '<span style="color:var(--text-3,#6b7280)">-</span>';
+            return '<tr style="border-bottom:1px solid #f3f4f6">'
+              + _td(_esc(c.customer_po_id || '-'), 'font-family:ui-monospace,monospace;font-weight:600')
+              + _td(_esc(c.customer_id || '-') + (c.customer_name ? '<div style="font-size:10px;color:var(--text-3,#6b7280)">' + _esc(c.customer_name) + '</div>' : ''))
+              + _td(_esc(c.customer_po_number || '-'), 'font-family:ui-monospace,monospace')
+              + _td(statusBadge(c.po_status))
+              + _td(String(lineCount), 'text-align:right')
+              + _td(fmtMoney(lineValue), 'text-align:right;font-weight:600')
+              + _td(_esc(rcv), 'font-size:11px;color:var(--text-3,#6b7280)')
+              + _td(srcBadge)
+              + _td(intakeRef)
+              + '</tr>';
+          }).join('')
+        + '</tbody></table></div>';
+    }
+
+    mount.innerHTML = html;
+
+    var fs = document.getElementById('cpo-filter-source');
+    if (fs) fs.onchange = function(){ state.filterSource = fs.value; _render(); };
+    var rb = document.getElementById('cpo-refresh');
+    if (rb) rb.onclick = init;
+  }
+
+  function init(){
+    state.loading = true;
+    state.errorMsg = '';
+    state.errorDetail = '';
+    _render();
+    apiGet('customer_purchase_order_list', { limit: 200 }).then(function(res){
+      state.loading = false;
+      if (res && res.ok) {
+        state.rows = res.customer_purchase_orders || res.purchase_orders || res.cpos || res.data || res.items || [];
+        state.errorMsg = '';
+      } else {
+        state.rows = [];
+        state.errorMsg = (res && (res.error || res.message)) || 'unknown_error';
+        state.errorDetail = (res && (res.detail || res.error)) || '';
+        console.error('[OrdersCpoView] list failed:', res);
+      }
+      _render();
+    });
+  }
+
+  return { init: init };
+})();
+
+/* ════════════════════════════════════════════════════════════════════
+ * PR #4 — Security Quarantine
+ * Email-level security holds (SPF/DKIM fail, suspicious sender, dangerous
+ * attachment). Reviewer can release (creates case) or block (denylist).
+ * ════════════════════════════════════════════════════════════════════ */
+var OrdersQuarantineView = (function(){
+  var state = { rows: [], loading: false, showResolved: false };
+
+  function apiGet(action, payload){
+    if (typeof window.apiCall !== 'function') return Promise.resolve({ ok:false, error:'apiCall_unavailable' });
+    return window.apiCall(action, payload || {}, 'GET')
+      .then(function(r){ return r || { ok:false, error:'empty' }; })
+      .catch(function(e){ return { ok:false, error:String(e && e.message || e) }; });
+  }
+  function apiPost(action, payload){
+    if (typeof window.apiCall !== 'function') return Promise.resolve({ ok:false, error:'apiCall_unavailable' });
+    return window.apiCall(action, payload || {}, 'POST')
+      .then(function(r){ return r || { ok:false, error:'empty' }; })
+      .catch(function(e){ return { ok:false, error:String(e && e.message || e) }; });
+  }
+
+  function _render(){
+    var mount = document.getElementById('orders-quar-mount');
+    if (!mount) return;
+    var rows = state.rows || [];
+    var html = ''
+      + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">'
+      +   '<div style="font-size:14px;font-weight:700;color:var(--text-1,#111)">🔒 ' + _t('Hàng chờ kiểm duyệt bảo mật', 'Security Review Queue') + '</div>'
+      +   '<div style="font-size:12px;color:var(--text-3,#6b7280)">' + String(rows.length) + ' ' + _t('mục', 'items') + '</div>'
+      +   '<button id="quar-refresh" style="margin-left:auto;padding:6px 12px;background:var(--brand-primary,#2563eb);color:#fff;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer">'
+      +     _t('🔄 Làm mới', '🔄 Refresh')
+      +   '</button>'
+      +   '<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2,#374151);cursor:pointer">'
+      +     '<input type="checkbox" id="quar-show-resolved"' + (state.showResolved?' checked':'') + '> ' + _t('Hiện đã xử lý', 'Show resolved')
+      +   '</label>'
+      + '</div>';
+
+    if (state.loading) {
+      html += '<div style="padding:48px;text-align:center;color:var(--text-3,#6b7280)">⏳ ' + _t('Đang tải...', 'Loading...') + '</div>';
+    } else if (rows.length === 0) {
+      html += '<div style="padding:48px;text-align:center;color:var(--green-dark,#065f46);background:#ecfdf5;border:1px solid #a7f3d0;border-radius:6px">'
+        + '✅ ' + _t('Không có email nào cần kiểm duyệt. Hệ thống an toàn.', 'No emails awaiting review. System is clean.')
+        + '</div>';
+    } else {
+      html += '<div style="background:#fff;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;overflow:hidden">'
+        + '<table style="width:100%;border-collapse:collapse;font-size:12px">'
+        + '<thead style="background:var(--surface-2,#f9fafb)"><tr>'
+        +   _th(_t('Sender', 'Sender')) + _th(_t('Subject', 'Subject'))
+        +   _th(_t('Lý do', 'Reason')) + _th(_t('Severity', 'Severity'))
+        +   _th(_t('Action', 'Action'))
+        + '</tr></thead><tbody>'
+        + rows.map(function(r){
+            var sev = r.severity || 'medium';
+            var sevColor = { high:'#dc2626', medium:'#f59e0b', low:'#6b7280' }[sev] || '#6b7280';
+            var resolved = r.review_action && r.review_action !== 'pending';
+            return '<tr style="border-bottom:1px solid #f3f4f6;' + (resolved?'opacity:.6':'') + '">'
+              + _td(_esc(r.sender_email || r.from_email || '?'), 'font-family:ui-monospace,monospace;font-size:11px')
+              + _td(_esc(r.subject || ''), 'font-size:11px')
+              + _td(_esc(r.reason_code || ''), 'font-size:11px;color:var(--text-2,#374151)')
+              + _td('<span style="color:' + sevColor + ';font-weight:600;text-transform:uppercase;font-size:10px">' + _esc(sev) + '</span>')
+              + _td(resolved
+                  ? '<span style="font-size:11px;color:var(--text-3,#6b7280)">' + _esc(r.review_action) + '</span>'
+                  : '<div style="display:flex;gap:4px">'
+                    + '<button data-quar-action="allow" data-quar-id="' + _esc(r.id) + '" style="padding:4px 8px;background:#10b981;color:#fff;border:none;border-radius:3px;font-size:10px;cursor:pointer">✓ ' + _t('Cho phép', 'Allow') + '</button>'
+                    + '<button data-quar-action="block" data-quar-id="' + _esc(r.id) + '" style="padding:4px 8px;background:#dc2626;color:#fff;border:none;border-radius:3px;font-size:10px;cursor:pointer">✗ ' + _t('Block', 'Block') + '</button>'
+                    + '<button data-quar-action="ignore" data-quar-id="' + _esc(r.id) + '" style="padding:4px 8px;background:#6b7280;color:#fff;border:none;border-radius:3px;font-size:10px;cursor:pointer">— ' + _t('Bỏ qua', 'Ignore') + '</button>'
+                    + '</div>')
+              + '</tr>';
+          }).join('')
+        + '</tbody></table></div>';
+    }
+    mount.innerHTML = html;
+
+    var rb = document.getElementById('quar-refresh');
+    if (rb) rb.onclick = init;
+    var sr = document.getElementById('quar-show-resolved');
+    if (sr) sr.onchange = function(){ state.showResolved = sr.checked; init(); };
+
+    Array.prototype.forEach.call(document.querySelectorAll('[data-quar-action]'), function(btn){
+      btn.onclick = function(){
+        var id = btn.getAttribute('data-quar-id');
+        var act = btn.getAttribute('data-quar-action');
+        var notes = prompt(_t('Ghi chú (tùy chọn):', 'Notes (optional):'), '');
+        apiPost('admin_email_intake_quarantine_action', { id: Number(id), action: act, notes: notes || '' }).then(function(res){
+          if (res && res.ok) init();
+          else alert(_t('Lỗi: ', 'Error: ') + ((res && res.error) || 'unknown'));
+        });
+      };
+    });
+  }
+
+  function init(){
+    state.loading = true;
+    _render();
+    apiGet('admin_email_intake_quarantine_get', { all: state.showResolved ? 1 : 0 }).then(function(res){
+      state.loading = false;
+      state.rows = (res && res.ok) ? (res.items || res.quarantine || []) : [];
+      _render();
+    });
+  }
+
+  return { init: init };
+})();
+
+/* ════════════════════════════════════════════════════════════════════
+ * PR #4 — Logs & Diagnostics
+ * Poll run history + message log + recent errors.
+ * ════════════════════════════════════════════════════════════════════ */
+var OrdersLogsView = (function(){
+  var state = { pollLog: [], msgLog: [], loading: false };
+
+  function apiGet(action, payload){
+    if (typeof window.apiCall !== 'function') return Promise.resolve({ ok:false, error:'apiCall_unavailable' });
+    return window.apiCall(action, payload || {}, 'GET')
+      .then(function(r){ return r || { ok:false, error:'empty' }; })
+      .catch(function(e){ return { ok:false, error:String(e && e.message || e) }; });
+  }
+
+  function _render(){
+    var mount = document.getElementById('orders-logs-mount');
+    if (!mount) return;
+    var html = ''
+      + '<div style="display:flex;gap:10px;margin-bottom:14px;align-items:center">'
+      +   '<div style="font-size:14px;font-weight:700">📑 ' + _t('Nhật ký & chẩn đoán', 'Logs & Diagnostics') + '</div>'
+      +   '<button id="logs-refresh" style="margin-left:auto;padding:6px 12px;background:var(--brand-primary,#2563eb);color:#fff;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer">'
+      +     _t('🔄 Làm mới', '🔄 Refresh')
+      +   '</button>'
+      + '</div>';
+
+    // Poll log section
+    html += '<details open style="background:#fff;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;margin-bottom:12px"><summary style="padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer">📊 ' + _t('Nhật ký Poll', 'Poll Runs') + ' (' + state.pollLog.length + ')</summary><div style="padding:0 14px 14px 14px">';
+    if (state.pollLog.length === 0) {
+      html += '<div style="padding:14px;color:var(--text-3,#6b7280);font-size:12px">' + _t('Chưa có poll run.', 'No poll runs yet.') + '</div>';
+    } else {
+      html += '<table style="width:100%;border-collapse:collapse;font-size:11px">'
+        + '<thead><tr style="background:var(--surface-2,#f9fafb)">'
+        + _th(_t('Lúc', 'When')) + _th(_t('Bởi', 'By')) + _th(_t('Trigger', 'Trigger'))
+        + _th(_t('Fetched', 'Fetched'), 'right') + _th(_t('Created', 'Created'), 'right')
+        + _th(_t('Skipped', 'Skipped'), 'right') + _th(_t('Errors', 'Errors'), 'right')
+        + _th(_t('Trạng thái', 'Status'))
+        + '</tr></thead><tbody>'
+        + state.pollLog.slice(0, 50).map(function(p){
+            var when = p.started_at ? new Date(p.started_at).toLocaleString('vi-VN') : '-';
+            var stColor = { completed:'#065f46', partial:'#92400e', failed:'#991b1b', skipped:'#374151' }[p.status] || '#374151';
+            return '<tr style="border-bottom:1px solid #f3f4f6">'
+              + _td(_esc(when), 'font-size:10px')
+              + _td(_esc(p.triggered_by_actor || p.triggered_by || '-'), 'font-size:10px')
+              + _td(_esc(p.triggered_by || '-'))
+              + _td(String(p.found || 0), 'text-align:right')
+              + _td(String(p.created || 0), 'text-align:right')
+              + _td(String(p.skipped || 0), 'text-align:right')
+              + _td(String(p.errors || 0), 'text-align:right;color:' + (p.errors > 0 ? '#dc2626' : '#374151'))
+              + _td('<span style="color:' + stColor + ';font-weight:600">' + _esc(p.status || '?') + '</span>')
+              + '</tr>';
+          }).join('')
+        + '</tbody></table>';
+    }
+    html += '</div></details>';
+
+    // Message log
+    html += '<details style="background:#fff;border:1px solid var(--border-1,#e5e7eb);border-radius:6px"><summary style="padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer">📧 ' + _t('Nhật ký email', 'Email log') + ' (' + state.msgLog.length + ')</summary><div style="padding:0 14px 14px 14px">';
+    if (state.msgLog.length === 0) {
+      html += '<div style="padding:14px;color:var(--text-3,#6b7280);font-size:12px">' + _t('Chưa có email.', 'No emails yet.') + '</div>';
+    } else {
+      html += '<table style="width:100%;border-collapse:collapse;font-size:11px">'
+        + '<thead><tr style="background:var(--surface-2,#f9fafb)">'
+        + _th('From') + _th('Subject') + _th(_t('Trạng thái', 'Status')) + _th(_t('Nhận', 'Received'))
+        + '</tr></thead><tbody>'
+        + state.msgLog.slice(0, 50).map(function(m){
+            var recv = m.received_at ? new Date(m.received_at).toLocaleString('vi-VN') : '-';
+            return '<tr style="border-bottom:1px solid #f3f4f6">'
+              + _td(_esc(m.from_email || '-'), 'font-size:10px;font-family:ui-monospace,monospace')
+              + _td(_esc((m.subject || '').slice(0, 70)), 'font-size:10px')
+              + _td(_esc(m.status || '-'), 'font-size:10px')
+              + _td(_esc(recv), 'font-size:10px')
+              + '</tr>';
+          }).join('')
+        + '</tbody></table>';
+    }
+    html += '</div></details>';
+
+    mount.innerHTML = html;
+    var rb = document.getElementById('logs-refresh');
+    if (rb) rb.onclick = init;
+  }
+
+  function init(){
+    state.loading = true;
+    _render();
+    Promise.all([
+      apiGet('admin_email_intake_poll_log', { limit: 50 }),
+      apiGet('admin_email_intake_message_log', { limit: 50 })
+    ]).then(function(results){
+      state.loading = false;
+      state.pollLog = (results[0] && results[0].ok && (results[0].items || results[0].poll_runs)) || [];
+      state.msgLog  = (results[1] && results[1].ok && (results[1].items || results[1].messages)) || [];
+      _render();
+    });
+  }
+
+  return { init: init };
+})();
+
+/* Shared helpers used by all three views above. */
+function _kpiCard(label, value, color){
+  return '<div style="flex:1;min-width:120px;padding:12px 14px;background:#fff;border:1px solid var(--border-1,#e5e7eb);border-radius:8px">'
+    + '<div style="font-size:11px;color:var(--text-3,#6b7280);font-weight:500">' + _esc(label) + '</div>'
+    + '<div style="font-size:22px;font-weight:700;color:' + color + ';margin-top:4px">' + _esc(value) + '</div>'
+    + '</div>';
+}
+function _th(label, align){
+  return '<th style="padding:8px 12px;font-size:11px;text-align:' + (align || 'left') + ';text-transform:uppercase;letter-spacing:.5px;color:var(--text-2,#374151);font-weight:600">' + _esc(label) + '</th>';
+}
+function _td(content, extraStyle){
+  return '<td style="padding:8px 12px;' + (extraStyle || '') + '">' + content + '</td>';
+}
+
 function _renderAiIntakeShell(){
   // Static skeleton — populated by AiIntakeQueue._bindAi() once data loads.
   // The three mount-points are filled in by:
@@ -859,12 +1235,33 @@ function _render(){
     return;
   }
 
-  if (_activeTab !== 'so-jo-wo') {
-    // Placeholder tabs (PR #4-5 fill these in)
-    h += _renderTabPlaceholder(_activeTab);
+  if (_activeTab === 'customer-pos') {
+    // PR #4 — Customer POs list
+    h += '<div id="orders-cpo-mount" style="padding:16px"></div>';
     h += '</div>';
     _container.innerHTML = h;
     _bind();
+    OrdersCpoView.init();
+    return;
+  }
+
+  if (_activeTab === 'quarantine') {
+    // PR #4 — Security Quarantine
+    h += '<div id="orders-quar-mount" style="padding:16px"></div>';
+    h += '</div>';
+    _container.innerHTML = h;
+    _bind();
+    OrdersQuarantineView.init();
+    return;
+  }
+
+  if (_activeTab === 'logs') {
+    // PR #4 — Logs & Diagnostics
+    h += '<div id="orders-logs-mount" style="padding:16px"></div>';
+    h += '</div>';
+    _container.innerHTML = h;
+    _bind();
+    OrdersLogsView.init();
     return;
   }
 
