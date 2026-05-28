@@ -2175,25 +2175,35 @@
       el.style.display = 'flex';
       CASE_DETAIL = { id: caseId, case:null, lines:[], attachments:[], checks:[], message:{}, loading:true };
       _renderCaseDetail();
-      // Fetch fresh detail
-      apiCall('ai_order_intake_case_detail', {id: caseId}, function(res){
+      // The local apiCall() wrapper derives GET/POST from the action
+      // suffix and case_detail doesn't match the GET regex. Call the
+      // global window.apiCall directly with explicit GET so jsonBody()
+      // can read the id (POST body parsing is unreliable on some FPM
+      // configs without the right Content-Type header).
+      var p = window.apiCall('ai_order_intake_case_detail', {id: caseId}, 'GET');
+      p.then(function(res){
         if(!res || !res.ok){
           var bodyEl = document.getElementById('aeoi-case-body');
           if(bodyEl) bodyEl.innerHTML = '<div style="color:#dc2626">Lỗi tải case: ' + escHtml(res && res.error || 'unknown') + '</div>';
           return;
         }
-        // The detail endpoint returns { case, lines, attachments, checks, message } OR a nested 'detail' object.
-        var d = res.detail || res;
+        // case_detail returns {ok, case} where case has lines,
+        // attachments, validation_checks as nested arrays.
+        var c = res.case || (res.detail && res.detail.case) || res;
         CASE_DETAIL = {
-          id: caseId,
-          case:        d.case        || d,           // some installs return flat
-          lines:       d.lines       || d.case_lines || [],
-          attachments: d.attachments || [],
-          checks:      d.checks      || d.validation_checks || [],
-          message:     d.message     || d.email_message || {},
+          id:          caseId,
+          case:        c,
+          lines:       Array.isArray(c.lines) ? c.lines : [],
+          attachments: Array.isArray(c.attachments) ? c.attachments : [],
+          checks:      Array.isArray(c.validation_checks) ? c.validation_checks
+                          : (Array.isArray(c.checks) ? c.checks : []),
+          message:     c.message || c.email_message || {},
           loading:     false,
         };
         _renderCaseDetail();
+      }).catch(function(e){
+        var bodyEl = document.getElementById('aeoi-case-body');
+        if(bodyEl) bodyEl.innerHTML = '<div style="color:#dc2626">Lỗi: ' + escHtml(String(e && e.message || e)) + '</div>';
       });
     },
     closeCaseDetail: function(){
