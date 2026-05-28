@@ -78,7 +78,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertSame(35, $catalog['counts']['runtime_calculated_metrics'] ?? null);
         $this->assertSame(32, $catalog['counts']['dashboard_core_kpis'] ?? null);
         $this->assertSame(46, $catalog['counts']['gate_control_metrics'] ?? null);
-        $this->assertSame(139, $catalog['counts']['proposed_operating_metrics'] ?? null);
+        $this->assertSame(142, $catalog['counts']['proposed_operating_metrics'] ?? null);
         $this->assertSame(
             'CTQ-CAPABILITY-POLICY-LAM-SEMSYSCO-2026-05',
             $catalog['ctq_capability_policy']['policy_id'] ?? null,
@@ -172,7 +172,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertSame('runtime_calculated', $metricsByCode['CUSTOMER_ACCEPTED_8D_CLOSURE_RATE']['calculation_status'] ?? null);
         $this->assertSame('manual_governed', $metricsByCode['FINAL_RELEASE_RFT']['calculation_status'] ?? null);
         $this->assertSame('manual_governed', $metricsByCode['CHECK_DIM_REPORT_ON_SHIP']['calculation_status'] ?? null);
-        $this->assertSame('staged_data_contract', $metricsByCode['CURRENT_CONSTRAINT_RESOURCE']['calculation_status'] ?? null);
+        $this->assertSame('manual_governed', $metricsByCode['CURRENT_CONSTRAINT_RESOURCE']['calculation_status'] ?? null);
         $this->assertSame('staged_data_contract', $metricsByCode['CONSTRAINT_STARVED_TIME']['calculation_status'] ?? null);
         $this->assertSame('staged_data_contract', $metricsByCode['CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS']['calculation_status'] ?? null);
         $this->assertFalse($metricsByCode['CURRENT_CONSTRAINT_RESOURCE']['scorecard_contributes_to_reward'] ?? true);

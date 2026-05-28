@@ -259,6 +259,7 @@ final class KpiRegistryAdminServiceMetricControlTest extends TestCase
             ],
             'owner_role' => 'QA',
             'evidence_source' => 'service test evidence',
+            'decision_action' => 'Service test decision action when red.',
             'data_contract_gap' => 'service test staged source gap',
             'target_graduation_condition' => 'service test graduation condition',
             'counter_metric' => [
