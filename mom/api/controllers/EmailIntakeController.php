@@ -406,6 +406,38 @@ class EmailIntakeController extends BaseController
         }
     }
 
+    /**
+     * POST admin_email_intake_master_toggle
+     * Master kill-switch for the entire AEOI module (Migration 212).
+     * Body: { enabled: true|false }
+     * Returns: { master_enabled: bool, saved: true }
+     */
+    public function masterToggle(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $this->requireCsrf();
+
+        $body = $this->jsonBody();
+        if (!array_key_exists('enabled', $body)) {
+            $this->error('missing_enabled', 400, 'Body must include {enabled: bool}.');
+        }
+        $enabled = (bool)$body['enabled'];
+
+        try {
+            $updated = $this->svc()->setMasterEnabled($enabled, $user['username'] ?? 'unknown');
+            $this->auditLog('admin_email_intake_master_toggle', [
+                'enabled' => $enabled,
+            ]);
+            $this->success([
+                'master_enabled' => (bool)($updated['aeoi_master_enabled'] ?? true),
+                'saved'          => true,
+            ]);
+        } catch (Throwable $e) {
+            $this->error('email_intake_master_toggle_failed', 500, $e->getMessage());
+        }
+    }
+
     // ── Allowlist ─────────────────────────────────────────────────────────
 
     /**

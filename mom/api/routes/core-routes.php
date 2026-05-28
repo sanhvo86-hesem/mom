@@ -151,6 +151,7 @@ return static function (Router $router, string $dataDir): void {
     $router->actions([
         'admin_email_intake_config_get'         => [EmailIntakeController::class, 'configGet'],
         'admin_email_intake_config_save'        => [EmailIntakeController::class, 'configSave'],
+        'admin_email_intake_master_toggle'      => [EmailIntakeController::class, 'masterToggle'],
         'admin_email_intake_allowlist_get'      => [EmailIntakeController::class, 'allowlistGet'],
         'admin_email_intake_allowlist_add'      => [EmailIntakeController::class, 'allowlistAdd'],
         'admin_email_intake_allowlist_update'   => [EmailIntakeController::class, 'allowlistUpdate'],

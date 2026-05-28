@@ -111,8 +111,22 @@
 
   /* ── Full re-render ──────────────────────────────────────────────────── */
   function _render(container){
+    // Cache the container DOM node so callbacks like toggleMaster can
+    // re-render without needing the caller to pass it back in.
+    if (container) {
+      STATE.container = container;
+    } else if (STATE.container) {
+      container = STATE.container;
+    } else {
+      return;
+    }
     var cfg = STATE.config || {};
     var enabled = !!cfg.enabled;
+    // Migration 212 — master kill-switch defaults TRUE so legacy installs
+    // (where the column was missing) read as enabled.
+    var masterEnabled = (cfg.aeoi_master_enabled === undefined || cfg.aeoi_master_enabled === null)
+      ? true
+      : !!cfg.aeoi_master_enabled;
 
     var html = '<div class="aeoi-root" style="font-size:13px;color:var(--text-1,#111)">';
 
@@ -126,11 +140,17 @@
           + '<div style="display:flex;gap:8px;align-items:center;flex-shrink:0">'
           + '<span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;'
           + (enabled ? 'background:var(--green-bg,#d1fae5);color:var(--green-1,#065f46)' : 'background:var(--surface-2,#f3f4f6);color:var(--text-3,#6b7280)')
-          + '">' + (enabled ? '● Đang hoạt động' : '○ Đã tắt') + '</span>'
-          + '<button onclick="aeoi.triggerPoll()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none" title="Kích hoạt quét email thủ công">▶ Chạy ngay</button>'
-          + '<button onclick="aeoi.openTestParse()" class="hm-btn hm-btn-sm" style="background:var(--surface-2,#f3f4f6);color:var(--text-1,#111)" title="Kiểm tra phân tích email mẫu">🧪 Test phân tích</button>'
+          + '">' + (enabled ? '● Cron poll bật' : '○ Cron poll tắt') + '</span>'
+          + '<button onclick="aeoi.triggerPoll()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none" title="Kích hoạt quét email thủ công" ' + (masterEnabled ? '' : 'disabled') + '>▶ Chạy ngay</button>'
+          + '<button onclick="aeoi.openTestParse()" class="hm-btn hm-btn-sm" style="background:var(--surface-2,#f3f4f6);color:var(--text-1,#111)" title="Kiểm tra phân tích email mẫu" ' + (masterEnabled ? '' : 'disabled') + '>🧪 Test phân tích</button>'
           + '</div>'
           + '</div>';
+
+    // ── Master kill-switch banner (Migration 212)
+    // Prominent ON/OFF toggle for the entire AEOI module. When OFF: cron
+    // poll skips, frontend Orders queue (PR #2-3) disables operator
+    // actions, this admin page still allows settings edits.
+    html += _masterToggleBanner(masterEnabled);
 
     // ── Section tabs
     html += '<div style="display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--border-1,#e5e7eb);margin-bottom:16px;padding-bottom:0">';
@@ -182,6 +202,42 @@
    * master enable toggle, and the legacy global M365 tenant config
    * kept for backward compatibility with mailboxes that still point
    * at the singleton intake_mailbox. */
+  /* Migration 212 — master kill-switch banner.
+   * Rendered immediately after the header bar so it's the first thing
+   * the admin sees. Big visual on/off pill, big toggle button. When OFF
+   * the banner is amber (warning), explains downstream impact, and the
+   * "Chạy ngay" / "Test phân tích" buttons above are already disabled
+   * via the masterEnabled check in _render(). */
+  function _masterToggleBanner(masterEnabled){
+    var on = !!masterEnabled;
+    var bg     = on ? 'var(--green-bg,#d1fae5)' : 'var(--warning-bg,#fef3c7)';
+    var border = on ? 'var(--green-1,#10b981)' : 'var(--warning-1,#f59e0b)';
+    var ico    = on ? '🟢' : '🟡';
+    var title  = on ? 'Module đang BẬT' : 'Module đang TẮT (paused)';
+    var subtxt = on
+      ? 'Cron poll quét email theo chu kỳ. Worker push được chấp nhận. Reviewer có thể approve / commit case.'
+      : 'Cron poll bị tắt. Worker push bị reject. Case hiện có trong queue KHÔNG approve / commit được. Bật lại để tiếp tục vận hành.';
+    var btnLabel = on ? '⏸ Tắt module' : '▶ Bật module';
+    var btnBg    = on ? 'var(--warning-1,#f59e0b)' : 'var(--green-1,#10b981)';
+    var confirmMsg = on
+      ? 'Tắt module AI Order Intake? Cron poll sẽ dừng + reviewer không approve được case mới đến khi bật lại.'
+      : 'Bật lại module AI Order Intake? Cron poll sẽ chạy theo chu kỳ đã cấu hình.';
+    return '<div style="display:flex;align-items:center;gap:14px;padding:12px 16px;'
+      + 'border:1px solid ' + border + ';border-left:4px solid ' + border + ';'
+      + 'background:' + bg + ';border-radius:6px;margin-bottom:16px">'
+      + '<div style="font-size:24px;line-height:1">' + ico + '</div>'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="font-size:13px;font-weight:700;color:var(--text-1,#111)">' + title + '</div>'
+      + '<div style="font-size:11px;color:var(--text-2,#374151);margin-top:2px">' + subtxt + '</div>'
+      + '</div>'
+      + '<button onclick="if(confirm(' + JSON.stringify(confirmMsg) + ')){aeoi.toggleMaster(' + (!on) + ')}" '
+      + 'class="hm-btn hm-btn-sm" '
+      + 'style="background:' + btnBg + ';color:#fff;border:none;font-weight:600;padding:6px 14px">'
+      + btnLabel
+      + '</button>'
+      + '</div>';
+  }
+
   function _moduleSettingsCard(){
     var cfg = STATE.config || {};
     return '<div class="aeoi-card">'
@@ -1525,6 +1581,25 @@
       apiCall('admin_email_intake_trigger', {}, function(res){
         if(res.ok) alert('✓ ' + (res.message || 'Đã kích hoạt. Xem nhật ký poll để theo dõi.'));
         else alert('✗ ' + (res.error||'Lỗi kích hoạt'));
+      });
+    },
+
+    /* Master kill-switch toggle (Migration 212).
+     * Confirmation already handled by the banner button onclick. */
+    toggleMaster: function(enabled){
+      apiCall('admin_email_intake_master_toggle', { enabled: !!enabled }, function(res){
+        if (res && res.ok) {
+          // Refresh config + full re-render so the banner colour + the
+          // "Chạy ngay" / "Test phân tích" buttons re-evaluate disabled.
+          apiCall('admin_email_intake_config_get', {}, function(getRes){
+            if (getRes && getRes.ok) {
+              STATE.config = getRes.config || {};
+              if (STATE.container) _render(STATE.container);
+            }
+          });
+        } else {
+          alert('✗ ' + ((res && res.error) || 'Lỗi cập nhật master toggle'));
+        }
       });
     },
 
