@@ -997,8 +997,9 @@ function previewDropdown(){
 }
 
 function previewNav(){
-  return previewBox('Preview navigation',
-    '<div style="max-width:260px;padding:10px;border-radius:var(--radius-lg);background:var(--brand);display:grid;gap:6px">'
+  return previewBox(L('Xem trước điều hướng','Preview navigation'),
+    '<div class="nav-section" style="max-width:260px">'
+    + '<div class="nav-section-title">'+L('Điều hướng','Navigation')+'</div>'
     + '<button type="button" class="nav-item active"><span class="icon">🏠</span><span>Dashboard</span></button>'
     + '<button type="button" class="nav-item"><span class="icon">📋</span><span>Dispatch</span><span class="badge">12</span></button>'
     + '<button type="button" class="nav-item"><span class="icon">📊</span><span>Reports</span></button>'
@@ -4761,7 +4762,19 @@ function renderComponents(){
     + slider('Font size', '--nav-item-font-size', 'components.nav.fontSize', 11, 16, 13, 'px')
     + slider('Icon size', '--nav-item-icon-size', 'components.nav.iconSize', 12, 24, 16, 'px')
     + slider(T('gap'), '--nav-item-gap', 'components.nav.gap', 4, 16, 10, 'px')
-    + slider('Border radius', '--nav-item-radius', 'components.nav.radius', 0, 16, 8, 'px')
+    + slider('Border radius', '--nav-item-radius', 'components.nav.radius', 0, 20, 14, 'px')
+    + '<div style="margin:14px 0 8px;font-size:11px;font-weight:700;color:var(--text-secondary);letter-spacing:.04em;text-transform:uppercase">📦 '+L('Thẻ nhóm mục','Section Card')+'</div>'
+    + slider(L('Bo góc nhóm','Section radius'), '--nav-section-radius', 'components.nav.sectionRadius', 8, 24, 14, 'px')
+    + slider(L('Khoảng cách trong nhóm','Section gap'), '--nav-section-gap', 'components.nav.sectionGap', 2, 12, 8, 'px')
+    + slider(L('Đậm màu xanh nhóm','Section blue tint'), '--nav-section-blue-pct', 'components.nav.sectionBluePct', 0, 30, 10, '%')
+    + '<div style="margin:14px 0 8px;font-size:11px;font-weight:700;color:var(--text-secondary);letter-spacing:.04em;text-transform:uppercase">🎨 '+L('Màu nền mục','Item BG Color')+'</div>'
+    + colorPick(L('Bình thường','Normal'), '--nav-item-bg', 'components.nav.bgNormal', '#e8f0f9')
+    + colorPick(L('Rê chuột','Hover'), '--nav-item-bg-hover', 'components.nav.bgHover', '#dbeafe')
+    + colorPick(L('Đang chọn','Active'), '--nav-item-bg-active', 'components.nav.bgActive', '#1565c0')
+    + '<div style="margin:14px 0 8px;font-size:11px;font-weight:700;color:var(--text-secondary);letter-spacing:.04em;text-transform:uppercase">📝 '+L('Màu chữ mục','Item Text Color')+'</div>'
+    + colorPick(L('Bình thường','Normal'), '--nav-item-color', 'components.nav.colorNormal', '#475569')
+    + colorPick(L('Rê chuột','Hover'), '--nav-item-color-hover', 'components.nav.colorHover', '#1565c0')
+    + colorPick(L('Đang chọn','Active'), '--nav-item-color-active', 'components.nav.colorActive', '#ffffff')
     + previewNav()
   , false, statusChip('full', L('Shared nav item', 'Shared nav item')));
 
