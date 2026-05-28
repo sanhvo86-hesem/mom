@@ -18,6 +18,10 @@ function _api(action, payload, method){
 function _toast(msg, type){ if(typeof showToast==='function') return showToast(msg, type); var box=document.createElement('div'); box.className='sj-toast '+(type||'info'); box.textContent=msg; document.body.appendChild(box); requestAnimationFrame(function(){ box.classList.add('show'); }); setTimeout(function(){ box.classList.remove('show'); setTimeout(function(){ if(box.parentNode) box.remove(); },180); },3200); }
 function _fmtDate(v){ if(!v) return ''; var d=new Date(v); return isNaN(d.getTime())?String(v):String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
 function _fmtDateTime(v){ if(!v) return ''; var d=new Date(v); return isNaN(d.getTime())?String(v):_fmtDate(v)+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+function _shouldWarnMissingRegistry(regKey){
+  if(!window.HmRegistry || typeof HmRegistry.shouldWarnMissingStatusSet !== 'function') return true;
+  return HmRegistry.shouldWarnMissingStatusSet(regKey);
+}
 
 /* ── constants ────────────────────────────────────────── */
 var STYLE_ID = 'pp-styles';
@@ -36,7 +40,7 @@ var STATUS = (function(){
     var opts = HmRegistry.statusSet('dpp_status');
     if(opts && opts.length) opts.forEach(function(o){ map[o.value] = { vi:o.label, en:o.labelEn||o.label, color:o.color||'#6b7280' }; });
   }
-  if(!Object.keys(map).length) console.warn('[DPP] Registry key "dpp_status" trống — status options sẽ bị thiếu.');
+  if(!Object.keys(map).length && _shouldWarnMissingRegistry('dpp_status')) console.warn('[DPP] Registry key "dpp_status" trống — status options sẽ bị thiếu.');
   return map;
 })();
 
@@ -47,7 +51,7 @@ var EVENT_TYPES = (function(){
     var opts = HmRegistry.statusSet('passport_event_type');
     if(opts && opts.length) opts.forEach(function(o){ map[o.value] = { vi:o.label, en:o.labelEn||o.label, icon:o.icon||'' }; });
   }
-  if(!Object.keys(map).length) console.warn('[DPP] Registry key "passport_event_type" trống — event types sẽ bị thiếu.');
+  if(!Object.keys(map).length && _shouldWarnMissingRegistry('passport_event_type')) console.warn('[DPP] Registry key "passport_event_type" trống — event types sẽ bị thiếu.');
   return map;
 })();
 
@@ -58,7 +62,7 @@ var DOC_TYPES = (function(){
     var opts = HmRegistry.statusSet('cert_doc_type');
     if(opts && opts.length) opts.forEach(function(o){ map[o.value] = { vi:o.label, en:o.labelEn||o.label }; });
   }
-  if(!Object.keys(map).length) console.warn('[DPP] Registry key "cert_doc_type" trống — document types sẽ bị thiếu.');
+  if(!Object.keys(map).length && _shouldWarnMissingRegistry('cert_doc_type')) console.warn('[DPP] Registry key "cert_doc_type" trống — document types sẽ bị thiếu.');
   return map;
 })();
 

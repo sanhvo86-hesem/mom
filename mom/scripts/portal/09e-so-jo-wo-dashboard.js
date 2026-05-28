@@ -25,7 +25,7 @@ var STATUS = (function(){
         opts.forEach(function(o){ result[key][o.value] = {vi:o.label, en:o.labelEn||o.label, color:o.color}; });
       }
     }
-    if(!Object.keys(result[key]).length){
+    if(!Object.keys(result[key]).length && (!window.HmRegistry || (typeof HmRegistry.shouldWarnMissingStatusSet === 'function' ? HmRegistry.shouldWarnMissingStatusSet(regKey) : true))){
       console.warn('[SO-JO-WO] Registry key "' + regKey + '" trống hoặc chưa tải — dropdown sẽ bị thiếu dữ liệu.');
     }
   }

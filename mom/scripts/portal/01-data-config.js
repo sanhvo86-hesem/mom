@@ -1709,7 +1709,7 @@ async function refreshDccOverlayFromServer(options={}){
           const res = await fetch(url, {credentials: 'same-origin', headers: {'Accept': 'application/json'}, cache: 'no-store'});
           if (!res.ok) {
             // 401/403 just means the user isn't logged in yet — don't spam the console.
-            if (res.status !== 401 && res.status !== 403) {
+            if (res.status !== 401 && res.status !== 403 && res.status !== 429) {
               console.warn('[DCC] overlay fetch HTTP ' + res.status);
             }
             return;

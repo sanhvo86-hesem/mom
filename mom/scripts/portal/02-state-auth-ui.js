@@ -91,6 +91,84 @@ function portalRouteFromHash(){
   }
 }
 
+function adminTabHashSlug(tabId){
+  const raw = String(tabId || 'users').trim() || 'users';
+  const aliases = {
+    kpi_registry: 'kpi-registry',
+    raci_matrix: 'raci-matrix',
+    metadata_studio: 'metadata-studio',
+    version_control: 'version-control',
+    module_access: 'module-access',
+    manual_runtime: 'manual-runtime',
+    data_sources: 'data-sources',
+    decision_thresholds: 'decision-thresholds',
+    translation_module: 'translation-module',
+    email_intake: 'email-intake',
+    portal_display: 'portal-display',
+    iam_console: 'iam-console',
+    ai_control: 'ai-control',
+    doc_visualizer: 'doc-visualizer',
+    dept_title: 'dept-title'
+  };
+  return aliases[raw] || raw.replace(/_/g, '-');
+}
+
+function syncAdminRouteHash(tabId, replace){
+  try{
+    const targetTab = canUserAccessAdminTab(tabId) ? tabId : firstAccessibleAdminTab();
+    const nextHash = '#admin/' + adminTabHashSlug(targetTab);
+    if(String(window.location.hash || '') === nextHash) return;
+    if(replace && window.history && typeof window.history.replaceState === 'function'){
+      window.history.replaceState(null, '', nextHash);
+      return;
+    }
+    window.location.hash = nextHash;
+  }catch(e){}
+}
+
+function switchAdminTab(nextTab, options){
+  const opts = options || {};
+  const targetTab = canUserAccessAdminTab(nextTab) ? nextTab : firstAccessibleAdminTab();
+  const changed = adminTab !== targetTab;
+  adminTab = targetTab;
+  if(opts.syncHash !== false){
+    syncAdminRouteHash(adminTab, !!opts.replaceHash);
+  }
+  if(opts.render !== false && currentPage === 'admin' && (changed || !opts.skipRenderIfSame)){
+    renderAdmin();
+  }
+  return adminTab;
+}
+
+window.switchAdminTab = switchAdminTab;
+
+function primePortalViewBeforeBoot(){
+  const hashRoute = portalRouteFromHash();
+  if(!hashRoute || hashRoute.page !== 'admin' || !canUserAccessModule('admin')){
+    return false;
+  }
+  const targetTab = canUserAccessAdminTab(hashRoute.adminTab) ? hashRoute.adminTab : firstAccessibleAdminTab();
+  currentPage = 'admin';
+  adminTab = targetTab;
+  syncPortalScrollMode('admin', adminTab);
+  syncAdminRouteHash(adminTab, true);
+  try{
+    document.querySelectorAll('#content > .page').forEach(p => p.classList.remove('active'));
+    const viewer = document.getElementById('doc-viewer');
+    if(viewer) viewer.classList.remove('active');
+    const adminPage = document.getElementById('page-admin');
+    if(adminPage){
+      adminPage.classList.add('active');
+      adminPage.innerHTML = '<div class="hm-empty">' + (lang==='en' ? 'Loading admin workspace...' : 'Đang tải khu vực quản trị...') + '</div>';
+    }
+    const bcEl = document.getElementById('header-breadcrumb');
+    if(bcEl){
+      bcEl.innerHTML = '<span>HESEM MOM</span><span style="margin:0 4px">›</span><span class="current">admin</span>';
+    }
+  }catch(e){}
+  return true;
+}
+
 function persistPortalViewState(reason='update'){
   try{
     const viewer = document.getElementById('doc-viewer');
@@ -121,7 +199,7 @@ async function restorePortalViewAfterBoot(){
   const hashRoute = portalRouteFromHash();
   if(hashRoute && hashRoute.page === 'admin'){
     if(canUserAccessModule('admin')){
-      adminTab = canUserAccessAdminTab(hashRoute.adminTab) ? hashRoute.adminTab : firstAccessibleAdminTab();
+      switchAdminTab(hashRoute.adminTab, {syncHash:true, replaceHash:true, render:false});
       navigateTo('admin', undefined, true);
       return true;
     }
@@ -179,6 +257,16 @@ window.__hesemPortalBeforeHardReload = function(){
 };
 window.__hesemPortalPersistViewState = persistPortalViewState;
 window.__hesemPortalRestoreViewAfterBoot = restorePortalViewAfterBoot;
+
+window.addEventListener('hashchange', function(){
+  const hashRoute = portalRouteFromHash();
+  if(!hashRoute || hashRoute.page !== 'admin') return;
+  if(!canUserAccessModule('admin')) return;
+  switchAdminTab(hashRoute.adminTab, {syncHash:false, render: currentPage === 'admin', skipRenderIfSame:true});
+  if(currentPage !== 'admin'){
+    navigateTo('admin', undefined, true);
+  }
+});
 
 function clearPendingAuthTimer(){
   if(pendingAuthTimer){
@@ -2921,6 +3009,7 @@ async function showApp(){
   document.getElementById('dd-name').textContent = currentUser.name;
   document.getElementById('dd-title').textContent = (lang==='en'?(r.labelEn||currentUser.title):currentUser.title) + ' · ' + currentUser.dept;
   document.getElementById('dd-access').textContent = lang==='en'?(r.labelEn||r.label):r.label;
+  primePortalViewBeforeBoot();
 
   const docsLoaded = await loadDocsFromServer();
   if(!docsLoaded){
@@ -3242,7 +3331,7 @@ function syncPortalScrollMode(page, tabId){
 function navigateTo(page, filter, bypassGuard){
   if(page === 'vps-control'){
     if(canUserAccessModule('admin') && canUserAccessAdminTab('infrastructure')){
-      adminTab = 'infrastructure';
+      switchAdminTab('infrastructure', {syncHash:false, render:false});
       page = 'admin';
       filter = undefined;
     }else{
@@ -3255,7 +3344,7 @@ function navigateTo(page, filter, bypassGuard){
       page = firstAccessiblePortalModule();
       filter = undefined;
     }else if(!canUserAccessAdminTab(adminTab)){
-      adminTab = firstAccessibleAdminTab();
+      switchAdminTab(firstAccessibleAdminTab(), {syncHash:false, render:false});
     }
   }
   if(page !== 'admin' && !canUserAccessModule(page)){
@@ -3276,6 +3365,7 @@ function navigateTo(page, filter, bypassGuard){
   teardownCurrentPageModule();
   currentPage = page;
   if(page==='admin') loadUsersFromServerIfAdmin();
+  if(page==='admin') syncAdminRouteHash(adminTab, true);
   if(filter !== undefined) currentFilter = filter;
   if(page==='documents' && filter !== undefined) currentFolderPath = []; // Reset folder path on category change
   syncPortalScrollMode(page, page === 'admin' ? adminTab : '');
@@ -11178,7 +11268,7 @@ function renderAdminTabNavigation(){
     if(!items.length) return '';
     const buttons = items.map(meta => {
       const badge = adminTabBadgeValue(meta.id);
-      return `<button class="admin-tab-v2 ${adminTab===meta.id?'active':''}" onclick="adminTab='${meta.id}';renderAdmin()">
+      return `<button class="admin-tab-v2 ${adminTab===meta.id?'active':''}" onclick="switchAdminTab('${meta.id}')">
         <span class="admin-tab-icon">${escapeHtml(meta.icon || '•')}</span>
         <span class="admin-tab-label">${escapeHtml(adminTabLabel(meta))}</span>
         ${badge !== '' ? `<span class="tab-badge">${escapeHtml(String(badge))}</span>` : ''}
@@ -11214,6 +11304,10 @@ function renderAdmin(){
   if(!canUserAccessModule('admin')){
     document.getElementById('page-admin').innerHTML='<div style="text-align:center;padding:60px;color:var(--text-3)">\u26A0 '+T('no_docs')+'</div>';
     return;
+  }
+  const hashRoute = portalRouteFromHash();
+  if(hashRoute && hashRoute.page === 'admin' && canUserAccessAdminTab(hashRoute.adminTab)){
+    adminTab = hashRoute.adminTab;
   }
   if(!canUserAccessAdminTab(adminTab)){
     adminTab = firstAccessibleAdminTab();

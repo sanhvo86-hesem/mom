@@ -18,6 +18,10 @@ function _api(action, payload, method){
 function _toast(msg, type){ if(typeof showToast==='function') return showToast(msg, type); var box=document.createElement('div'); box.className='sj-toast '+(type||'info'); box.textContent=msg; document.body.appendChild(box); requestAnimationFrame(function(){ box.classList.add('show'); }); setTimeout(function(){ box.classList.remove('show'); setTimeout(function(){ if(box.parentNode) box.remove(); },180); },3200); }
 function _fmtDate(v){ if(!v) return ''; var d=new Date(v); return isNaN(d.getTime())?String(v):String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
 function _daysBetween(from, to){ if(!from) return 0; var a=new Date(from), b=to?new Date(to):new Date(); return Math.max(0, Math.round((b-a)/(86400000))); }
+function _shouldWarnMissingRegistry(regKey){
+  if(!window.HmRegistry || typeof HmRegistry.shouldWarnMissingStatusSet !== 'function') return true;
+  return HmRegistry.shouldWarnMissingStatusSet(regKey);
+}
 
 /* ── constants ────────────────────────────────────────── */
 var STYLE_ID = 'qeh-styles';
@@ -37,7 +41,7 @@ var EXC_TYPES = (function(){
     var opts = HmRegistry.statusSet('exception_type_catalog');
     if(opts && opts.length) opts.forEach(function(o){ map[o.value] = {vi:o.label, en:o.labelEn||o.label, icon:o.icon||'', color:o.color||'#6b7280'}; });
   }
-  if(!Object.keys(map).length) console.warn('[QEH] Registry key "exception_type_catalog" trống — exception types sẽ bị thiếu.');
+  if(!Object.keys(map).length && _shouldWarnMissingRegistry('exception_type_catalog')) console.warn('[QEH] Registry key "exception_type_catalog" trống — exception types sẽ bị thiếu.');
   return map;
 })();
 
@@ -48,7 +52,7 @@ var SEVERITY = (function(){
     var opts = HmRegistry.statusSet('severity');
     if(opts && opts.length) opts.forEach(function(o){ map[o.value] = {vi:o.label, en:o.labelEn||o.label, color:o.color||'#6b7280'}; });
   }
-  if(!Object.keys(map).length) console.warn('[QEH] Registry key "severity" trống — severity options sẽ bị thiếu.');
+  if(!Object.keys(map).length && _shouldWarnMissingRegistry('severity')) console.warn('[QEH] Registry key "severity" trống — severity options sẽ bị thiếu.');
   return map;
 })();
 
@@ -59,7 +63,7 @@ var STATUS = (function(){
     var opts = HmRegistry.statusSet('exception_status');
     if(opts && opts.length) opts.forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn||o.label,color:o.color||'#6b7280'}; });
   }
-  if(!Object.keys(map).length) console.warn('[QEH] Registry key "exception_status" trống — status options sẽ bị thiếu.');
+  if(!Object.keys(map).length && _shouldWarnMissingRegistry('exception_status')) console.warn('[QEH] Registry key "exception_status" trống — status options sẽ bị thiếu.');
   return map;
 })();
 
@@ -70,7 +74,7 @@ var MRB_DISPOSITIONS = (function(){
     var opts = HmRegistry.statusSet('mrb_disposition');
     if(opts && opts.length) opts.forEach(function(o){ map[o.value] = {vi:o.label, en:o.labelEn||o.label, color:o.color||'#6b7280'}; });
   }
-  if(!Object.keys(map).length) console.warn('[QEH] Registry key "mrb_disposition" trống — disposition options sẽ bị thiếu.');
+  if(!Object.keys(map).length && _shouldWarnMissingRegistry('mrb_disposition')) console.warn('[QEH] Registry key "mrb_disposition" trống — disposition options sẽ bị thiếu.');
   return map;
 })();
 

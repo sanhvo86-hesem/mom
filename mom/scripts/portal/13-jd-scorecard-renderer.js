@@ -122,6 +122,8 @@ function _render(role) {
   var optional = role.optional_rotate || [];
   var doNotUse = role.do_not_use || [];
   var blockers = role.role_blockers || [];
+  var fairnessNotes = role.fairness_notes || '';
+  var activeCountJust = role.active_count_justification || '';
   var total = 0;
   var rows = items.map(function (it) {
     total += (parseInt(it.weight, 10) || 0);
@@ -164,6 +166,8 @@ function _render(role) {
     '<div><b>Nhóm xoay vòng tùy chọn</b><br>' + _list(optional) + '</div>' +
     '<div><b>Không được dùng</b><br>' + _list(doNotUse) + '</div>' +
     '<div><b>Blocker theo vai trò</b><br>' + _list(blockers) + '</div>' +
+    '<div><b>Ghi chú fairness</b><br>' + (fairnessNotes ? _esc(fairnessNotes) : '<span class="jd-sc-muted">—</span>') + '</div>' +
+    '<div><b>Lý do giữ số active</b><br>' + (activeCountJust ? _esc(activeCountJust) : '<span class="jd-sc-muted">—</span>') + '</div>' +
     '</div>';
   return '<p class="jd-scorecard-note">Thẻ điểm KPI đang áp dụng cho chức danh ' +
       '<b>' + _esc(role.jd_title_vi || role.role_code) + '</b> — đồng bộ trực tiếp từ ' +

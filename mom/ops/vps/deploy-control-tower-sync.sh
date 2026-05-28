@@ -290,7 +290,7 @@ run_dcc_batch_migrate() {
   fi
   echo "==> Re-apply DCC header standardisation across mom/docs/**"
   run_remote_cmd "set -e; cd '${APP_DIR}'; \
-    DB_PASS=\$(grep -h '^env\\\\[DB_PASS\\\\]' /etc/php/*/fpm/pool.d/*.conf 2>/dev/null | head -n1 | sed -E 's/.*=\\\\s*//') ; \
+    DB_PASS=\$(awk '/^[[:space:]]*env\\[DB_PASS\\][[:space:]]*=/{sub(/^[^=]*=[[:space:]]*/, \"\"); gsub(/^[[:space:]]+|[[:space:]]+$/, \"\"); print; exit}' /etc/php/*/fpm/pool.d/*.conf 2>/dev/null) ; \
     if [ -z \"\$DB_PASS\" ]; then echo '[dcc-batch] DB_PASS env not found in PHP-FPM pool, skipping' >&2; exit 0; fi; \
     DB_PASS=\"\$DB_PASS\" php mom/tools/dcc-batch/migrate.php 2>&1 | tail -15"
 }

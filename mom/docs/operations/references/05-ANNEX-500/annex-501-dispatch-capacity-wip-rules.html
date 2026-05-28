@@ -78,9 +78,11 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường</th><th>Yêu cầu tối thiểu</th><th>Chủ sở hữu</th></tr></thead><tbody>
 <tr><td>Constraint ID</td><td>Mã máy/cell/quy trình/person/tool/CMM đang giới hạn throughput.</td><td>PPL / WKM</td></tr>
 <tr><td>Constraint type</td><td>máy, setup, fixture, gage/CMM, operator skill, vật liệu, outsource, QA phát hành hoặc phát hành kỹ thuật.</td><td>PPL</td></tr>
+<tr><td>Approved by / changed at</td><td>Mọi đổi constraint trong ngày phải có người phê duyệt, thời điểm đổi, reason code và bằng chứng; không được backdate im lặng.</td><td>PD</td></tr>
 <tr><td>Drum plan</td><td>Danh sách job được phép cấp vào ràng buộc trong tuần/ca, có thứ tự chạy và due time.</td><td>PPL / WKM</td></tr>
 <tr><td>Buffer status</td><td>Đỏ/vàng/xanh theo giờ cover hoặc số job ready trước ràng buộc.</td><td>SL / PPL</td></tr>
 <tr><td>Lost constraint hours</td><td>Thời gian ràng buộc mất do thiếu setup, tool, fixture, gage, QA, program, vật liệu hoặc quyết định.</td><td>WKM</td></tr>
+<tr><td>Escalation / hold link</td><td>Mã escalation, mã hold hoặc release-risk liên quan đến constraint hiện tại.</td><td>PPL / QA</td></tr>
 <tr><td>Recovery action</td><td>Hành động, chủ sở hữu, due time và bằng chứng đóng.</td><td>Chủ sở hữu được giao</td></tr>
 <tr><td>Rà soát cadence</td><td>Tối thiểu hằng tuần; hằng ngày nếu buffer đỏ hoặc có P0/P1.</td><td>PD / PPL</td></tr>
 </tbody></table></div> <h3>1A.2 Metric bắt buộc cho Lean/TOC</h3>
@@ -89,7 +91,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td><span class="code">BOTTLENECK_BUFFER_STATUS</span></td><td>Buffer trước constraint chỉ tính job thật sự ready.</td><td>Không tô xanh khi job còn thiếu vật liệu, cert/CoC, IQC, traceability, đặc biệt quy trình, kit, setup, tool, fixture, gage, FAI hoặc QA phát hành.</td></tr>
 <tr><td><span class="code">CONSTRAINT_LOST_HOURS</span>, <span class="code">CONSTRAINT_STARVED_TIME</span></td><td>Giờ constraint mất hoặc đói việc vì blocker.</td><td>Gán chủ sở hữu/due theo cause breakdown trong cùng ca; ưu tiên clear blocker cho constraint trước khi tăng WIP ở chỗ khác.</td></tr>
 <tr><td><span class="code">CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS</span></td><td>Phát hiện tối ưu cục bộ khi nguồn lực phụ vẫn chạy trong lúc constraint idle.</td><td>Dừng local optimization, chuyển người/tool/gage/CMM/vật liệu sang constraint hoặc ghi rõ lý do không thể chuyển.</td></tr>
-<tr><td><span class="code">CMM_QUEUE_AGING</span>, <span class="code">FAI_QUEUE_AGING</span>, <span class="code">FINAL_INSPECTION_QUEUE_AGING</span>, <span class="code">QC_HOLD_SLA</span>, <span class="code">INSPECTION_PLAN_ADHERENCE</span></td><td>Queue chất lượng có thể là constraint thật.</td><td>Hiển thị queue age, oldest job, chủ sở hữu, due và phát hành trạng thái; không bypass FAI/CMM/final inspection để làm đẹp OTD.</td></tr>
+<tr><td><span class="code">CMM_QUEUE_AGING</span>, <span class="code">FAI_QUEUE_AGING</span>, <span class="code">FINAL_INSPECTION_QUEUE_AGING</span>, <span class="code">QC_HOLD_SLA</span>, <span class="code">INSPECTION_PLAN_ADHERENCE</span></td><td>Queue chất lượng có thể là constraint thật.</td><td>Phải hiện queue entry time, oldest job/lot, chủ sở hữu, hold reason, due action, promise-risk hoặc profile rủi ro và blocker category; không bypass FAI/CMM/final inspection để làm đẹp OTD.</td></tr>
 <tr><td><span class="code">MATERIAL_AVAILABILITY_PLAN</span></td><td>Readiness kết hợp cho vật lý vật liệu, cert/CoC, IQC, traceability, đặc biệt quy trình, kit trước constraint và tool/fixture/gage.</td><td>vật liệu status không được xanh nếu cert/IQC/traceability/kit/gage blocker còn mở.</td></tr>
 </tbody></table></div> <h3>1A.3 Drum-buffer-rope rule</h3>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thành phần TOC</th><th>Áp dụng trong CNC</th><th>Rule điều hành</th></tr></thead><tbody>

@@ -114,11 +114,11 @@
 <div class="table-card"><table class="table">
 <thead><tr><th>Strategic driver panel</th><th>Vai trò</th><th>Quy tắc</th></tr></thead>
 <tbody>
-<tr><td><span class="code">CURRENT_CONSTRAINT_RESOURCE</span>, <span class="code">OEE_BOTTLENECK</span>, <span class="code">BOTTLENECK_BUFFER_STATUS</span>, <span class="code">CONSTRAINT_LOST_HOURS</span>, <span class="code">CONSTRAINT_STARVED_TIME</span>, <span class="code">CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS</span></td><td>TOC daily/weekly bảo vệ đúng điểm thắt cổ chai: máy/cell, CMM, setup, CAM, QC/final inspection, deburr/cleaning/bộ hồ sơ giao hàng, nhà cung cấp/vật liệu hoặc outsource.</td><td>Không biến thành payout KPI cho toàn xưởng; staged driver phải hiện người phụ trách, hạn hành động, phân rã nguyên nhân và không render số như môi trường chạy.</td></tr>
-<tr><td><span class="code">FAI_FIRST_PASS</span>, <span class="code">FINAL_RELEASE_RFT</span>, <span class="code">CMM_QUEUE_AGING</span>, <span class="code">FAI_QUEUE_AGING</span>, <span class="code">FINAL_INSPECTION_QUEUE_AGING</span>, <span class="code">QC_HOLD_SLA</span>, <span class="code">INSPECTION_PLAN_ADHERENCE</span></td><td>Zero-defect, hàng đợi CMM/QC, FAI đạt ngay lần đầu, final phát hành đúng ngay lần đầu, QC hold và tuân thủ kế hoạch kiểm tra.</td><td>Hiển thị để hành động; manual/staged metric không cộng điểm và không được dùng để bypass cổng kiểm soát.</td></tr>
+<tr><td><span class="code">CURRENT_CONSTRAINT_RESOURCE</span>, <span class="code">OEE_BOTTLENECK</span>, <span class="code">BOTTLENECK_BUFFER_STATUS</span>, <span class="code">CONSTRAINT_LOST_HOURS</span>, <span class="code">CONSTRAINT_STARVED_TIME</span>, <span class="code">CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS</span></td><td>TOC daily/weekly bảo vệ đúng điểm thắt cổ chai: máy/cell, CMM, setup, CAM, QC/final inspection, deburr/cleaning/bộ hồ sơ giao hàng, nhà cung cấp/vật liệu hoặc outsource.</td><td>Không biến thành payout KPI cho toàn xưởng; driver phải dựa trên active constraint register có người phê duyệt, action due và evidence link. Nếu còn staged/manual thì chỉ hiện trạng thái, top reason, owner action và không hiển thị như số runtime.</td></tr>
+<tr><td><span class="code">FAI_FIRST_PASS</span>, <span class="code">FINAL_RELEASE_RFT</span>, <span class="code">CMM_QUEUE_AGING</span>, <span class="code">FAI_QUEUE_AGING</span>, <span class="code">FINAL_INSPECTION_QUEUE_AGING</span>, <span class="code">QC_HOLD_SLA</span>, <span class="code">INSPECTION_PLAN_ADHERENCE</span></td><td>Zero-defect, hàng đợi CMM/QC, FAI đạt ngay lần đầu, final phát hành đúng ngay lần đầu, QC hold và tuân thủ kế hoạch kiểm tra.</td><td>Hiển thị để hành động; queue card phải có queue entry, oldest job/lot, hold reason, due action, risk class và evidence link. Manual/staged metric không cộng điểm và không được dùng để bypass cổng kiểm soát.</td></tr>
 <tr><td><span class="code">CHECK_DIM_REPORT_ON_SHIP</span>, <span class="code">GAGE_VALID_FOR_RELEASE</span>, <span class="code">NCR_3D_RESPONSE_SLA</span>, <span class="code">NCR_8D_UPDATE_SLA</span></td><td>Bằng chứng cứng LAM/khách hàng: CDR theo lô giao, thiết bị đo còn hiệu lực, 3D/8D đúng SLA.</td><td>Có thể cap/block recognition trong phạm vi liên quan, không cộng điểm thẻ điểm.</td></tr>
 <tr><td><span class="code">MATERIAL_CERT_VERIFICATION_COMPLETENESS</span>, <span class="code">IQC_RELEASE_ON_TIME</span>, <span class="code">LAM_MATERIAL_KIT_READY_TO_PLAN</span>, <span class="code">TRACEABILITY_LABEL_VERIFIED</span>, <span class="code">SPECIAL_PROCESS_REQUIREMENT_CLEAR</span>, <span class="code">SUBTIER_REQUIREMENT_FLOWDOWN</span></td><td>G3: mức sẵn sàng vật liệu/IQC/cert/traceability/quy trình đặc biệt cho LAM/SEMSYSCO.</td><td>Cổng kiểm soát chặn/hold-phát hành; staged hoặc manual-governed driver không được gọi là bonus KPI và có thể cap vật liệu thẻ điểm khi bằng chứng thiếu.</td></tr>
-<tr><td><span class="code">IPQC_CHARACTERISTIC_COMPLETENESS</span>, <span class="code">SPC_SIGNAL_REACTION_TIME</span>, <span class="code">CMM_QUEUE_AGING</span>, <span class="code">NCR_CONTAINMENT_ON_TIME</span>, <span class="code">GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT</span></td><td>G5: bằng chứng IPQC/SPC/CMM/containment/gage cho zero-defect.</td><td>Giữ công đoạn hoặc chuyển cấp; không payout từ metric cổng kiểm soát, không tô xanh nếu bằng chứng thiếu.</td></tr>
+<tr><td><span class="code">IPQC_CHARACTERISTIC_COMPLETENESS</span>, <span class="code">SPC_SIGNAL_REACTION_TIME</span>, <span class="code">CMM_QUEUE_AGING</span>, <span class="code">NCR_CONTAINMENT_ON_TIME</span>, <span class="code">GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT</span>, <span class="code">GAGE_VALID_FOR_CTQ_MEASUREMENT</span>, <span class="code">CTQ_OUT_OF_SPEC_EVENT_COUNT</span>, <span class="code">CTQ_SPECIAL_CAUSE_OPEN_ACTIONS</span></td><td>G5: bằng chứng IPQC/SPC/CMM/containment/gage và trạng thái CTQ đặc biệt cho zero-defect.</td><td>Giữ công đoạn hoặc chuyển cấp; không payout từ metric cổng kiểm soát, không tô xanh nếu bằng chứng thiếu hoặc còn special cause mở.</td></tr>
 <tr><td><span class="code">CRITICAL_ROLE_BACKUP_COVERAGE</span>, <span class="code">SUPPLIER_READINESS</span></td><td>Capability và nhà cung cấp readiness bổ trợ.</td><td>Dùng để quyết định nguồn lực; staged driver không được gọi là bonus KPI.</td></tr>
 </tbody>
 </table></div>
@@ -135,14 +135,58 @@
 <tr><td>Nghiên cứu khả thi RFQ</td><td>G0 · <span class="code">RFQ_FEASIBILITY_STUDY_COMPLETENESS</span></td><td>Feasibility checklist có đủ manufacturability, vật liệu, tolerance, luật/quy định, processability và nhà cung cấp phụ trước báo giá.</td><td>Chặn handoff báo giá; EST + ENGM hoàn tất feasibility trước báo giá.</td></tr>
 <tr><td>Kế hoạch kiểm tra</td><td>G2 · <span class="code">INSPECTION_PLAN_COMPLETENESS</span></td><td>Inspection plan có đặc tính, thiết bị, thông số, sampling và người duyệt.</td><td>Hold G2; QA yêu cầu hoàn tất inspection plan trước vật liệu call-off.</td></tr>
 <tr><td>CDR / check-dimension report</td><td>G6 · <span class="code">CHECK_DIM_REPORT_ON_SHIP</span></td><td>Lô có yêu cầu CDR phải đính kèm báo cáo trước giao hàng, gồm part, revision, check dimension, thiết bị, tolerance, kết quả đo, ngày và chữ ký người kiểm.</td><td>Block CoC/giao hàng phát hành; QA/CPS hoàn tất CDR trước giao.</td></tr>
+<tr><td>CTQ master + sample policy</td><td>CTQ capability review · <span class="code">CTQ_MEASUREMENT_COMPLETENESS</span>, <span class="code">CTQ_SAMPLE_POLICY_STATUS</span>, <span class="code">INSUFFICIENT_CPK_DATA_STATUS</span></td><td>Mọi CTQ phải có characteristic_id, part/revision, operation, balloon/check-dimension number, spec, sample policy và bằng chứng đo đủ trước khi diễn giải capability.</td><td>Không được hiện Cpk số hoặc claim customer-grade; QA giữ trạng thái capability ở insufficient/provisional cho đến khi bổ sung đủ evidence.</td></tr>
+<tr><td>Thiết bị đo CTQ + tái xác nhận sau thay đổi</td><td>G1/G5 · <span class="code">POST_CHANGE_CPK_REVALIDATION</span>, <span class="code">GAGE_VALID_FOR_CTQ_MEASUREMENT</span></td><td>Thay đổi ảnh hưởng CTQ phải reset sample window; mọi phép đo CTQ dùng cho Cpk/SPC/CDR phải có gage hợp lệ tại thời điểm đo.</td><td>Hold gate/capability claim; QA/MCS mở revalidation hoặc đo lại trước khi dùng evidence với khách hàng.</td></tr>
+<tr><td>CTQ vượt spec / special cause còn mở</td><td>G5 · <span class="code">CTQ_OUT_OF_SPEC_EVENT_COUNT</span>, <span class="code">CTQ_SPECIAL_CAUSE_OPEN_ACTIONS</span></td><td>Không còn CTQ vượt spec chưa contain/disposition và không còn special cause action mở trên characteristic đang ảnh hưởng lô hoặc capability claim.</td><td>Giữ công đoạn hoặc block customer-grade claim; WKM/QA phải hoàn tất reaction, containment và closure evidence trước khi phát hành.</td></tr>
 <tr><td>Thiết bị đo còn hiệu lực</td><td>G4/G6 · <span class="code">GAGE_VALID_FOR_RELEASE</span></td><td>Gage còn hiệu chuẩn, đúng phạm vi, có status mark và không hỏng/hết hạn khi dùng phát hành.</td><td>phát hành invalid; mở CAPA và thông báo khách nếu ảnh hưởng LAM.</td></tr>
 <tr><td>NCR 3D/8D SLA</td><td>Cổng kiểm soát complaint · <span class="code">NCR_3D_RESPONSE_SLA</span>, <span class="code">NCR_8D_UPDATE_SLA</span></td><td>3D/4D/8D gửi đúng hạn, có containment, người phụ trách và khách hàng acceptance khi cần.</td><td>Escalate QA/CEO; không ghi nhận thẻ điểm liên quan khi containment hoặc update quá hạn.</td></tr>
-<tr><td>Lưu hồ sơ 10 năm</td><td>Cổng kiểm soát hồ sơ · <span class="code">DOC_RECORD_RETENTION_10Y</span></td><td>Hồ sơ LAM/SEMSYSCO được lưu đủ 10 năm hoặc theo yêu cầu khách hàng cao hơn.</td><td>Chặn đóng hồ sơ; QMS mở hồ sơ lưu giữ và xác nhận kho lưu.</td></tr>
+<tr><td>Mức độ nghiêm trọng complaint / customer NCR</td><td>Severity review · <span class="code">CUSTOMER_NCR_SEVERITY_SCORE</span>, <span class="code">NO_LATE_NO_NCR_COUNTER</span>, <span class="code">NO_CONTAINMENT_COUNTER</span>, <span class="code">REPEAT_ROOT_CAUSE_ESCAPE_RATE</span>, <span class="code">CUSTOMER_NOTIFICATION_LT</span></td><td>Phải phân biệt nội bộ-contained, near-miss, minor, major, critical, late/no NCR, no notification, no containment, repeat root cause, special release missing và falsified record.</td><td>Block bonus simulation đúng phạm vi; không được phạt người vì họ mở NCR nội bộ trung thực hoặc báo near-miss đúng quy định.</td></tr>
+<tr><td>Lưu hồ sơ 10 năm</td><td>Cổng kiểm soát hồ sơ · <span class="code">DOC_RECORD_RETENTION_10Y</span></td><td>Hồ sơ LAM/SEMSYSCO được lưu đủ 10 năm hoặc theo yêu cầu khách hàng cao hơn.</td><td>Chặn đóng hồ sơ; QMS mở hồ sơ lưu giữ và xác nhận tình trạng lưu kho hồ sơ.</td></tr>
 <tr><td>Phê duyệt thay đổi sản phẩm/quy trình</td><td>G1/G7 · <span class="code">PROCESS_CHANGE_APPROVAL_RATE</span></td><td>Product/quy trình change có phê duyệt khách hàng/nội bộ trước khi áp dụng.</td><td>Hold phát hành; QA/ENGM/CS xin phê duyệt trước khi sản xuất/giao.</td></tr>
 <tr><td>Phát hành đặc biệt và marking</td><td>G7 · <span class="code">SPECIAL_RELEASE_COMPLIANCE</span>, <span class="code">SPECIAL_RELEASE_MARKING_COMPLIANCE</span></td><td>Deviation/phát hành đặc biệt có văn bản chấp thuận và load carrier marking đúng yêu cầu.</td><td>Block giao hàng; CPS/QA bổ sung phê duyệt và marking bằng chứng.</td></tr>
+<tr><td>Audit pack của lô hàng LAM</td><td>G7 · <span class="code">LAM_EVIDENCE_PACK_COMPLETENESS</span>, <span class="code">LAM_EVIDENCE_PACK_BLOCKER_COUNT</span></td><td>Truy xuất được bộ hồ sơ theo <span class="code">shipment_id</span> hoặc <span class="code">batch_release_id</span> với <span class="code">packet_id</span>, <span class="code">packet_hash</span>, trạng thái cổng, source links, retention metadata, missing evidence list = 0 và blocker_count = 0.</td><td>Giữ G7; QA/QMS/DCC phải hoàn tất missing section, source link, retention path và retrieval drill trước khi kết luận pass.</td></tr>
 <tr><td>Subtier flowdown</td><td>G3 · <span class="code">SUBTIER_REQUIREMENT_FLOWDOWN</span></td><td>Nhà cung cấp/gia công ngoài nhận đúng CSR, inspection, đặc biệt quy trình và bằng chứng requirement.</td><td>Hold PO/subcontract phát hành; SCM lấy attestation trước khi dùng kết quả.</td></tr>
 <tr><td>RBA / Lam Supplier Code</td><td>Cổng kiểm soát nhà cung cấp · <span class="code">SUPPLIER_RBA_COMPLIANCE_EVIDENCE</span></td><td>Có self-đánh giá, cam kết RBA/compliance và quyền audit khi áp dụng.</td><td>Escalate SCM/QA; không tính nhà cung cấp readiness xanh nếu thiếu bằng chứng.</td></tr>
 <tr><td>Kế hoạch dự phòng</td><td>Cổng kiểm soát continuity · <span class="code">CONTINGENCY_PLAN_READINESS_LAM</span></td><td>Contingency plan còn hiệu lực, có drill log và người phụ trách cho rủi ro cung ứng/chất lượng/giao hàng.</td><td>Mở continuity action; không đóng readiness nếu plan stale hoặc chưa drill.</td></tr>
+</tbody>
+</table></div>
+</div> <div class="section">
+<h2>4A. Mô hình audit pack LAM/SEMSYSCO</h2>
+<p>Mỗi lô hàng hoặc lần phát hành cuối thuộc hồ sơ <span class="code">LAM_SEMSYSCO</span> phải có một audit pack truy xuất được trong vài phút, không phụ thuộc trí nhớ cá nhân. Đơn vị truy xuất tối thiểu là <span class="code">order_id</span>, <span class="code">job_id</span>, <span class="code">shipment_id</span> hoặc <span class="code">batch_release_id</span>, và phải truy ngược tới <span class="code">packet_id</span>/<span class="code">packet_hash</span> của <span class="code">mes_trusted_release_record</span>.</p>
+<div class="table-card"><table class="table">
+<thead><tr><th>Thành phần audit pack</th><th>Yêu cầu bắt buộc</th><th>Nguồn truy xuất ưu tiên</th></tr></thead>
+<tbody>
+<tr><td>Khóa truy xuất</td><td><span class="code">order_id</span>, <span class="code">job_id</span>, <span class="code">shipment_id</span>, <span class="code">batch_release_id</span>, <span class="code">customer_profile_code</span>, part/revision, <span class="code">packet_id</span>, <span class="code">packet_hash</span>, người phát hành, thời điểm phát hành.</td><td><span class="code">GET /api/trusted-release-record/detail</span>, <span class="code">GET /api/trusted-release-record/provenance</span></td></tr>
+<tr><td>Section hồ sơ</td><td>CSR acknowledgement, RFQ feasibility, inspection plan, FAI, CTQ/check-dimension, gage calibration, material cert/CoC/IQC/traceability, IPQC/CMM, ship packet, special release nếu có, process change approval nếu có, subtier flowdown nếu có, NCR/8D nếu có, retention status, audit trail.</td><td><span class="code">GET /v1/eqms/batch-release/{id}/release-package</span>, <span class="code">ComplianceReportService::generateEvidencePackage</span></td></tr>
+<tr><td>Trạng thái hiển thị</td><td>Phải render được trạng thái cổng G0-G7, missing evidence list, blocker flags, source record links, retention status và audit trail. Không được chỉ hiện “green” mà thiếu danh sách phần còn thiếu.</td><td>Audit pack view có in/xuất được; panel phải fail-closed khi thiếu source links hoặc retention metadata.</td></tr>
+<tr><td>Retention</td><td>Lưu tối thiểu 10 năm, owner là QMS, có export copy được kiểm soát, có hash bất biến nếu hệ authority hỗ trợ, và có log drill truy xuất.</td><td><span class="code">DOC_RECORD_RETENTION_10Y</span> + metadata của trusted release packet + sổ DCC/QMS.</td></tr>
+<tr><td>Waiver / NA</td><td>Nếu một section không áp dụng, phải có bằng chứng NA hoặc waiver được lưu tại CDR liên kết. Không cho phép bỏ trống rồi tự hiểu là “không cần”.</td><td><span class="code">linked_cdr</span> + exception reference trong register manual-governed.</td></tr>
+</tbody>
+</table></div>
+<div class="callout"><b>Quy tắc retrieval:</b> QA hoặc DCC phải truy xuất được bộ hồ sơ shipment LAM trong vòng vài phút trước auditor bằng khóa lô hàng hoặc <span class="code">packet_id</span>. Nếu không truy được, hệ phải coi là <span class="code">LAM_EVIDENCE_PACK_COMPLETENESS</span> chưa đạt dù file rời rạc vẫn tồn tại.</div>
+</div> <div class="section">
+<h2>4B. Quy tắc CTQ / Cpk / SPC</h2>
+<div class="table-card"><table class="table">
+<thead><tr><th>Chủ đề</th><th>Quy tắc cứng</th><th>Ý nghĩa vận hành</th></tr></thead>
+<tbody>
+<tr><td>Dữ liệu tối thiểu để nói về capability</td><td>Phải có <span class="code">characteristic_id</span>, part/revision, operation, balloon/check-dimension number, spec type, LSL/USL hoặc one-sided spec, nominal, phương pháp đo, gage type và cửa sổ mẫu.</td><td>Thiếu một mắt xích thì chỉ được nói “chưa đủ dữ liệu”, không được diễn giải Cpk.</td></tr>
+<tr><td>Chính sách mẫu</td><td><span class="code">n &lt; 25</span> = insufficient_data, ẩn Cpk số. <span class="code">25-49</span> = provisional nội bộ. <span class="code">50-99</span> = internal capability. <span class="code">n ≥ 100</span> chỉ là customer-grade candidate khi ổn định, gage hợp lệ và đã tái xác nhận sau thay đổi.</td><td>Chặn thói quen lấy vài mẫu đẹp rồi gọi là “Cpk xanh”.</td></tr>
+<tr><td>Ổn định quá trình</td><td>Còn <span class="code">CTQ_SPECIAL_CAUSE_OPEN_ACTIONS</span> hoặc <span class="code">SPC_SIGNAL_REACTION_TIME</span> chưa verified thì trạng thái capability phải bị hạ xuống unstable/blocked dù Cpk nhìn đẹp.</td><td>Capability chỉ có ý nghĩa khi quá trình đang ổn định thật, không phải chỉ đẹp trên bảng tính.</td></tr>
+<tr><td>Vượt spec</td><td>Còn <span class="code">CTQ_OUT_OF_SPEC_EVENT_COUNT</span> chưa contain/disposition thì không được release hoặc claim customer-grade cho characteristic bị ảnh hưởng.</td><td>Không được lấy trung bình đẹp để che một điểm CTQ đã vượt spec.</td></tr>
+<tr><td>Gage validity</td><td><span class="code">GAGE_VALID_FOR_CTQ_MEASUREMENT</span> là bắt buộc. Thiết bị đo không hợp lệ làm vô hiệu bằng chứng Cpk/SPC/CDR ở characteristic đó.</td><td>Không cho phép “có số đo nhưng hệ đo không đáng tin”.</td></tr>
+<tr><td>Thay đổi sau baseline</td><td>Mọi thay đổi product/process/program/gage/method ảnh hưởng CTQ phải đi qua <span class="code">POST_CHANGE_CPK_REVALIDATION</span> trước khi claim capability với khách hàng.</td><td>Ngăn việc mang Cpk của quy trình cũ sang cho revision hoặc route mới.</td></tr>
+</tbody>
+</table></div>
+</div> <div class="section">
+<h2>4C. Quy tắc severity / 8D / bonus simulation</h2>
+<div class="table-card"><table class="table">
+<thead><tr><th>Chủ đề</th><th>Quy tắc cứng</th><th>Ý nghĩa vận hành</th></tr></thead>
+<tbody>
+<tr><td>Báo cáo trung thực</td><td><span class="code">internal_contained</span> và <span class="code">near_miss</span> không được bị dùng như critical escape. Mục tiêu là mở NCR/containment sớm, không đẩy con người vào hành vi giấu lỗi.</td><td>Hệ phải thưởng cho tính trung thực trong phát hiện sớm, không phải chỉ thưởng cho bảng số đẹp.</td></tr>
+<tr><td>Late/no NCR và thiếu thông báo khách</td><td>Nếu complaint/escape không được mở NCR đúng lúc hoặc không có <span class="code">customer_notification_sent_at</span> đúng clock, mô hình severity phải coi đó là hard gate dữ liệu/chăm sóc khách hàng.</td><td>Ngăn việc giữ <span class="code">COMPLAINT_RATE</span> đẹp bằng cách xử lý qua email/miệng ngoài EQMS.</td></tr>
+<tr><td>Containment và repeat root cause</td><td><span class="code">NO_CONTAINMENT_COUNTER</span> và <span class="code">REPEAT_ROOT_CAUSE_ESCAPE_RATE</span> phải được review cùng 3D/4D/8D. Repeat cùng root-cause family không được xóa sạch chỉ vì đổi tên nguyên nhân.</td><td>Chặn behavior “đóng 8D nhanh nhưng containment/CAPA không thật”.</td></tr>
+<tr><td>Special release / deviation</td><td>Khi deviation cần special release mà thiếu reference/approval, severity phải bị nâng thành hard gate như một customer escape nghiêm trọng.</td><td>Ngăn phát hành bằng verbal approval hoặc concession không truy được.</td></tr>
+<tr><td>Bonus simulation only</td><td>Mọi metric complaint severity chỉ được vào <span class="code">bonus_simulation_model</span>; không cho payout thật trong pilot, và hard gate luôn thắng điểm số.</td><td>Không dùng complaint KPI để ép người che vấn đề hoặc tự động kỷ luật cá nhân.</td></tr>
 </tbody>
 </table></div>
 </div> <div class="section">
@@ -161,9 +205,14 @@
 <h3>Phạm vi pilot</h3>
 <ul class="tight">
 <li>Chọn 1 value stream / customer profile: <span class="code">LAM_SEMSYSCO</span>.</li>
+<li>Cửa sổ pilot chuẩn: <b>90 ngày</b>, baseline hiện tại dùng mốc <span class="code">2026-06-01 -> 2026-08-29</span>.</li>
+<li>Nhóm part family đại diện: manifold nhôm độ chính xác cao, carrier inox dung sai chặt, rework/revision critical low-volume.</li>
+<li>Work center trong pilot: CNC 3-axis, CNC 5-axis, CMM, final inspection, ship release.</li>
+<li>Vai trò bắt buộc có mặt trong roster pilot: CS, ENGM, PPL, SCM, WKM, OPE, QA, QC, MCS, CPS, QMS, DCC.</li>
 <li>Giữ 7 scored core: <span class="code">OTD</span>, <span class="code">COMPLAINT_RATE</span>, <span class="code">FPY</span>, <span class="code">COPQ</span>, <span class="code">PLAN_ADHERENCE</span>, <span class="code">WIP_AGING</span>, <span class="code">MATERIAL_AVAILABILITY_PLAN</span>.</li>
 <li>Dùng driver panel để bảo vệ flow/chất lượng: constraint, CMM queue, material-cert-IQC, traceability, special process, check-dimension, 3D/8D.</li>
 <li>Giữ LAM evidence gates và CTQ/Cpk pilot bundle ở trạng thái evidence-first; chỉ graduate khi có bằng chứng.</li>
+<li>Metric loại trừ khỏi thành công pilot/thưởng: OEE tổng quát, gross-margin job family, KPI EHS không liên quan release, metric đào tạo trang trí.</li>
 </ul>
 </div>
 <div class="card">
@@ -181,8 +230,11 @@
 <h3>Nhịp rà soát</h3>
 <ul class="tight">
 <li>Hằng ngày: tier review để containment, owner/action và blocker removal.</li>
-<li>Hằng tuần: TOC/quality review để chốt constraint hiện tại, CMM/material/quality bottleneck và metric cần prune hoặc graduate.</li>
-<li>Hằng tháng: management review để rà data confidence, burden của role scorecard, dấu hiệu reward gaming và quyết định giữ/cắt scope pilot.</li>
+<li>Hằng tuần: TOC/constraint review để chốt constraint hiện tại, CMM/material/quality bottleneck, resequence approval và metric cần prune hoặc graduate.</li>
+<li>Hằng tuần: LAM evidence review để soát G0-G7, ship packet, check-dimension, process-change approval, special release và retrieval drill.</li>
+<li>Hằng tháng: BSC review để nhìn 7 scored core, driver signal quality, data confidence trend và quyết định giữ/cắt scope pilot.</li>
+<li>Hằng tháng: QMS/CEO calibration để rà reward gaming, burden của role scorecard, CTQ/Cpk maturity và giữ cứng reward freeze.</li>
+<li>Kết thúc mỗi chặng học: retrospective để bỏ metric quan liêu, workaround và friction không tạo ra quyết định tốt hơn.</li>
 <li>Ngày 90: go/no-go review có kết luận rollout, kéo dài pilot hoặc rollback.</li>
 </ul>
 </div>
@@ -196,9 +248,11 @@
 <li>Complaint / 8D workflow hoạt động bằng timestamp và acceptance evidence.</li>
 <li>Có ít nhất 1 CTQ/Cpk pilot bundle chứng minh sample-policy discipline.</li>
 <li>Role scorecard dễ hiểu, không quá tải và không xuất hiện reward gaming.</li>
+<li>Mỗi metric trong pilot được phân loại rõ: <b>production-ready</b>, <b>audit-ready</b>, <b>needs another pilot</b>, <b>retired/merged</b> hoặc <b>not reward eligible</b>.</li>
 </ul>
 </div>
 </div>
+<div class="callout warn"><b>Reward freeze:</b> mọi dashboard/panel liên quan severity hoặc thưởng phải hiển thị watermark <span class="code">SIMULATION ONLY - 90-DAY PILOT / NO PAYOUT / NO AUTO DISCIPLINE</span>. Hard gate luôn thắng điểm số.</div>
 <div class="callout warn"><b>Guardrail chống quan liêu:</b> metric nào không đổi quyết định giao hàng, chất lượng, flow, CTQ, compliance hoặc risk control trong 30 ngày thì phải prune, chuyển learning-only hoặc giải trình rõ trong monthly review.</div>
 </div> <div class="section">
 <h2>7. Benchmark anchors</h2>

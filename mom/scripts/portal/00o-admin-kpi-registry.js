@@ -444,9 +444,89 @@ function _profileOptions(selected){
 	  var thresholdN = parseFloat(thresholds.min_sample);
 	  return !isNaN(thresholdN) && thresholdN > 0;
 	}
+	function _hasCtqSpecSource(row){
+	  var dataSource = row.data_source || {};
+	  if(!dataSource || typeof dataSource !== 'object') return false;
+	  return !!String(dataSource.ctq_spec_contract || dataSource.ctq_spec_source || dataSource.spec_source || '').trim();
+	}
+	function _validCanonicalCode(raw){
+	  var code = String(raw || '').trim();
+	  return /^[A-Z0-9_]+$/.test(code) && !/(^|_)(GIAO|HANG|HO_SO|PHE_DUYET|BANG_CHUNG)(_|$)/.test(code);
+	}
+	function _dynamicFieldGroups(row){
+	  var contract = ((_state.config || {}).admin_console_contract || {});
+	  var groups = contract.dynamic_field_groups || {};
+	  var subtype = String((row && row.metric_subtype) || '');
+	  var intent = String((row && row.control_intent) || '');
+	  var scoring = String((row && row.scoring_model_detail) || '');
+	  var reward = String((row && row.reward_mode) || '');
+	  var out = [];
+	  var push = function(key, label){
+	    var fields = groups[key];
+	    if(Array.isArray(fields) && fields.length){
+	      out.push({ key:key, label:label, fields:fields });
+	    }
+	  };
+	  push('generic_identity', _t('Định danh chung', 'Generic identity'));
+	  if(subtype === 'gate_control_metric') push('gate_control_metric', _t('Nhóm trường cổng', 'Gate fields'));
+	  if(subtype === 'spc_capability_metric' || scoring === 'spec_limit_capability' || scoring === 'spc_control_chart'){
+	    push('spc_capability_metric', _t('Nhóm trường CTQ/Cpk/SPC', 'CTQ/Cpk/SPC fields'));
+	  }
+	  if(subtype === 'composite_readiness_index' || scoring === 'composite_weighted_score'){
+	    push('composite_readiness_index', _t('Nhóm trường composite', 'Composite fields'));
+	  }
+	  if(intent === 'customer_specific_requirement'){
+	    push('customer_specific_requirement', _t('Nhóm trường yêu cầu khách hàng', 'Customer-specific fields'));
+	  }
+	  if(['bonus_pool_candidate','team_reward_candidate','role_review_input'].indexOf(reward) >= 0){
+	    push('reward_control', _t('Nhóm trường thưởng/công bằng', 'Reward/fairness fields'));
+	  }
+	  if(subtype === 'role_performance_measure'){
+	    push('role_performance_measure', _t('Nhóm trường vai trò', 'Role fields'));
+	  }
+	  return out;
+	}
+	function _dynamicValidationRules(row){
+	  var contract = ((_state.config || {}).admin_console_contract || {});
+	  var rules = contract.dynamic_validation_rules || {};
+	  var subtype = String((row && row.metric_subtype) || '');
+	  var intent = String((row && row.control_intent) || '');
+	  var reward = String((row && row.reward_mode) || '');
+	  var active = [];
+	  var add = function(key){
+	    if(Array.isArray(rules[key]) && rules[key].length){
+	      active.push({ key:key, rules:rules[key] });
+	    }
+	  };
+	  if(subtype) add(subtype);
+	  if(intent) add(intent);
+	  if(reward) add(reward);
+	  return active;
+	}
+	function _renderDynamicRequirementBoard(row){
+	  var groups = _dynamicFieldGroups(row);
+	  var rules = _dynamicValidationRules(row);
+	  if(!groups.length && !rules.length) return '';
+	  var groupHtml = groups.map(function(g){
+	    return '<div class="kc-prof-card"><div class="kc-prof-head"><span class="kc-code">' + _esc(g.key) +
+	      '</span><span class="kc-prof-name">' + _esc(g.label) + '</span></div><div class="kc-pill-list">' +
+	      g.fields.map(function(f){ return '<span class="kc-pill">' + _esc(f) + '</span>'; }).join(' ') + '</div></div>';
+	  }).join('');
+	  var ruleHtml = rules.map(function(r){
+	    return '<div class="kc-prof-card"><div class="kc-prof-head"><span class="kc-code">' + _esc(r.key) +
+	      '</span><span class="kc-prof-name">' + _t('Luật đang kích hoạt', 'Active rules') + '</span></div><ul class="kc-prof-evidence">' +
+	      r.rules.map(function(rule){ return '<li>' + _esc(rule) + '</li>'; }).join('') + '</ul></div>';
+	  }).join('');
+	  return '<div class="kc-dynamic-board"><div class="kc-eyebrow">' +
+	    _t('Trường bắt buộc đang kích hoạt', 'Active required fields') + '</div>' +
+	    '<div class="kc-prof-grid">' + groupHtml + ruleHtml + '</div></div>';
+	}
 	function _mcoRowErrors(row, requireComplete){
 	  var e = [];
+	  var rawCode = String(row.canonical_code || '').trim();
+	  var code = rawCode.toUpperCase();
 	  var subtype = row.metric_subtype || '';
+	  var intent = row.control_intent || '';
 	  var scoring = row.scoring_model_detail || '';
 	  var reward = row.reward_mode || '';
 	  var status = row.calculation_status || 'staged_data_contract';
@@ -467,7 +547,12 @@ function _profileOptions(selected){
 	    if(row.calibration_required === false) e.push(_t('Quỹ thưởng không được tắt yêu cầu hiệu chuẩn.', 'Bonus pool calibration cannot be disabled.'));
 	  }
 	  if(requireComplete){
-	    if(!String(row.canonical_code || '').trim()) e.push(_t('Thiếu canonical_code.', 'Missing canonical_code.'));
+	    if(!rawCode) e.push(_t('Thiếu canonical_code.', 'Missing canonical_code.'));
+	    else {
+	      if(!_validCanonicalCode(code)) e.push(_t('canonical_code chỉ được dùng A-Z, 0-9 và dấu gạch dưới _.', 'canonical_code must use only A-Z, 0-9, and _.'));
+	      if(/[^\x00-\x7F]/.test(rawCode)) e.push(_t('canonical_code không được chứa tiếng Việt có dấu hoặc ký tự dịch thuật.', 'canonical_code must not contain accented or translated characters.'));
+	      if(/\s/.test(rawCode)) e.push(_t('canonical_code không được có khoảng trắng.', 'canonical_code must not contain spaces.'));
+	    }
 	    if(!String(row.name || row.name_vi || '').trim()) e.push(_t('Thiếu tên chỉ số.', 'Missing metric name.'));
 	    ['metric_subtype','control_intent','measurement_data_type','scoring_model_detail',
 	     'evaluation_use','reward_mode','lifecycle_status','owner_role','evidence_source',
@@ -480,9 +565,19 @@ function _profileOptions(selected){
 	    }
 	    if(subtype !== 'health_indicator' && !_splitList(row.blocking_conditions).length)
 	      e.push(_t('Thiếu blocking_conditions.', 'Missing blocking conditions.'));
+	    if(['official_kpi','operating_metric'].indexOf(subtype) >= 0 && !String(row.decision_action || '').trim())
+	      e.push(_t('Thiếu decision_action.', 'Missing decision_action.'));
+	    if(subtype === 'official_kpi'){
+	      var gpReq = parseFloat(row.green_point != null ? row.green_point : ((row.thresholds || {}).green_point));
+	      var ypReq = parseFloat(row.yellow_point != null ? row.yellow_point : ((row.thresholds || {}).yellow_point));
+	      if(isNaN(gpReq) || isNaN(ypReq))
+	        e.push(_t('KPI chính thức thiếu ngưỡng green/yellow.', 'Official KPI missing green/yellow thresholds.'));
+	    }
 	  }
 	  if(subtype === 'health_indicator' && reward && reward !== 'not_rewardable')
 	    e.push(_t('Chỉ báo sức khỏe chỉ được reward_mode=not_rewardable.', 'Health indicator must be not_rewardable.'));
+	  if(subtype === 'health_indicator' && (row.reward_eligible || row.scorecard_contributes_to_reward || row.scorecard_role === 'scored_core'))
+	    e.push(_t('Chỉ báo sức khỏe không được scorecard-scored hoặc rewardable.', 'Health indicator cannot be scorecard-scored or rewardable.'));
 	  if(subtype === 'gate_control_metric'){
 	    ['gate','gate_pass_condition','hold_release_rule','evidence_source'].forEach(function(k){
 	      if(!String(row[k] || '').trim()) e.push(_t('Cổng thiếu ', 'Gate missing ') + k + '.');
@@ -492,10 +587,32 @@ function _profileOptions(selected){
 	      e.push(_t('Chỉ số cổng chỉ được dùng reward_mode=blocker_only hoặc not_rewardable.', 'Gate must be blocker_only/not_rewardable.'));
 	  }
 	  if(subtype === 'role_performance_measure'){
+	    if(!_splitList(row.role_assignments).length && !String(row.owner_role || '').trim())
+	      e.push(_t('Chỉ số vai trò thiếu role_assignments hoặc owner_role.', 'Role measure missing role_assignments or owner_role.'));
 	    if(!String(row.controllability_scope || '').trim())
 	      e.push(_t('Chỉ số vai trò thiếu controllability_scope.', 'Role measure missing controllability_scope.'));
 	    if(!String(row.action_when_red || row.decision_action || '').trim())
 	      e.push(_t('Chỉ số vai trò thiếu action_when_red.', 'Role measure missing action_when_red.'));
+	  }
+	  if(subtype === 'counter_metric' && !String((row.counter_metric || {}).intent || row.anti_gaming_intent || row.paired_metric || row.parent_metric || '').trim())
+	    e.push(_t('Chỉ số đối trọng thiếu parent metric hoặc anti-gaming intent.', 'Counter metric missing parent metric or anti-gaming intent.'));
+	  if(code === 'INSUFFICIENT_CPK_DATA_STATUS'){
+	    if(subtype !== 'health_indicator') e.push(_t('INSUFFICIENT_CPK_DATA_STATUS phải là health_indicator.', 'INSUFFICIENT_CPK_DATA_STATUS must be a health_indicator.'));
+	    if(reward && reward !== 'not_rewardable') e.push(_t('INSUFFICIENT_CPK_DATA_STATUS không được rewardable.', 'INSUFFICIENT_CPK_DATA_STATUS must not be rewardable.'));
+	  }
+	  if(code === 'POST_CHANGE_CPK_REVALIDATION' && String(row.gate || '').toUpperCase() !== 'G1')
+	    e.push(_t('POST_CHANGE_CPK_REVALIDATION phải thuộc gate G1.', 'POST_CHANGE_CPK_REVALIDATION must stay on gate G1.'));
+	  if(code === 'GAGE_VALID_FOR_CTQ_MEASUREMENT' && String(row.gate || '').toUpperCase() !== 'G5')
+	    e.push(_t('GAGE_VALID_FOR_CTQ_MEASUREMENT phải thuộc gate G5.', 'GAGE_VALID_FOR_CTQ_MEASUREMENT must stay on gate G5.'));
+	  if(['CTQ_OUT_OF_SPEC_EVENT_COUNT','CTQ_SPECIAL_CAUSE_OPEN_ACTIONS'].indexOf(code) >= 0){
+	    if(subtype !== 'gate_control_metric') e.push(_t(code + ' phải là gate_control_metric.', code + ' must be a gate_control_metric.'));
+	    if(String(row.gate || '').toUpperCase() !== 'G5') e.push(_t(code + ' phải thuộc gate G5.', code + ' must stay on gate G5.'));
+	  }
+	  if(intent === 'customer_specific_requirement'){
+	    if(!String(row.lam_profile_link || row.customer_profile_link || row.applicability_rule || row.data_contract_gap || '').trim())
+	      e.push(_t('Chỉ số theo yêu cầu khách hàng thiếu profile/applicability/gap.', 'Customer-specific metric missing profile/applicability/gap.'));
+	    if(requireComplete && !_splitList(row.required_evidence).length)
+	      e.push(_t('Chỉ số theo yêu cầu khách hàng thiếu required_evidence.', 'Customer-specific metric missing required_evidence.'));
 	  }
 	  if(subtype === 'spc_capability_metric' || scoring === 'spc_control_chart' || scoring === 'spec_limit_capability'){
 	    var minN = parseInt(row.sample_min_n_score || ((row.sample_policy || {}).min_n_score), 10);
@@ -510,10 +627,13 @@ function _profileOptions(selected){
 	    if(!stableRequired) e.push(_t('Cpk/SPC phải yêu cầu stability_required.', 'Cpk/SPC must require stability.'));
 	    if(!gageRequired) e.push(_t('Cpk/SPC phải yêu cầu gage_validity_required.', 'Cpk/SPC must require gage validity.'));
 	    if(reward && reward !== 'not_rewardable') e.push(_t('Cpk/SPC đang chờ dữ liệu/thử nghiệm không được tính thưởng.', 'Cpk/SPC staged/pilot cannot be rewardable.'));
+	    if(status === 'runtime_calculated' && !_hasCtqSpecSource(row))
+	      e.push(_t('Cpk runtime thiếu CTQ spec source.', 'Runtime Cpk is missing CTQ spec source.'));
 	  }
 	  if(subtype === 'composite_readiness_index' || scoring === 'composite_weighted_score'){
 	    var total = _componentWeightTotal(row.components || '');
-	    if(total == null) e.push(_t('Chỉ số tổng hợp thiếu trọng số component.', 'Composite missing component weights.'));
+	    if(total == null && !String(row.data_contract_gap || '').trim())
+	      e.push(_t('Chỉ số tổng hợp thiếu component weights hoặc data_contract_gap.', 'Composite missing component weights or data_contract_gap.'));
 	    else if(Math.abs(total - 100) > 0.01) e.push(_t('Tổng trọng số component phải bằng 100%.', 'Composite weights must equal 100%.'));
 	  }
 	  if(scoring === 'rag_3_band'){
@@ -525,6 +645,10 @@ function _profileOptions(selected){
 	    e.push(_t('Mô hình đạt/không đạt thiếu điều kiện đạt.', 'Binary pass/fail missing pass condition.'));
 	  if(scoring === 'blocker_only' && !_splitList(row.blocking_conditions).length && !String(row.hold_release_rule || '').trim())
 	    e.push(_t('Chế độ chỉ chặn thiếu điều kiện chặn hoặc hold_release_rule.', 'Blocker-only missing blocker/hold rule.'));
+	  if(scoring === 'evidence_completeness_score' && !String(row.evidence_source || '').trim() && !_splitList(row.required_evidence).length)
+	    e.push(_t('Điểm đầy đủ bằng chứng thiếu evidence_source hoặc required_evidence.', 'Evidence completeness score missing evidence_source or required_evidence.'));
+	  if(scoring === 'event_severity_score' && !_splitList(row.blocking_conditions).length && !String((row.counter_metric || {}).intent || row.anti_gaming_intent || '').trim())
+	    e.push(_t('Điểm mức độ sự kiện thiếu severity/blocking matrix.', 'Event severity score missing severity/blocking matrix.'));
 	  return _uniqueMessages(e);
 	}
 	function _mcoAddErrors(a){ return _mcoRowErrors(a || {}, true); }
@@ -772,6 +896,11 @@ function _renderCustomerProfiles(){
     var linked = p.linked_metrics || [];
     var gateCov = p.gate_coverage || {};
     var evidence = p.evidence_pack_required || [];
+    var evidenceMetrics = p.evidence_pack_metric_links || [];
+    var evidenceKeys = p.evidence_pack_record_keys || [];
+    var evidenceSections = p.evidence_pack_sections || [];
+    var retention = p.retention_requirements || {};
+    var auditPackView = p.audit_pack_view || {};
     var custCodes = applies.customer_codes || [];
     var status = String(p.status || '');
     var statusBadge = '<span class="kc-pill' + (status === 'active' ? ' kc-pill--accent' : '') + '">' + _esc(_statusVi(status || 'unset') || status || 'chưa đặt') + '</span>';
@@ -810,6 +939,22 @@ function _renderCustomerProfiles(){
     var evidenceRows = evidence.map(function(e){
       return '<li>' + _esc(e) + '</li>';
     }).join('');
+    var evidenceMetricRows = evidenceMetrics.map(function(e){
+      var ok = libCodes[String(e).toUpperCase()];
+      return '<span class="kc-pill' + (ok ? ' kc-pill--accent' : '') + '">' + _esc(e) + '</span>';
+    }).join('');
+    var recordKeyRows = evidenceKeys.map(function(e){ return '<li>' + _esc(e) + '</li>'; }).join('');
+    var sectionRows = evidenceSections.map(function(e){ return '<li>' + _esc(e) + '</li>'; }).join('');
+    var retentionRows = Object.keys(retention).map(function(k){
+      var v = retention[k];
+      var disp = Array.isArray(v) ? v.join(', ') : String(v);
+      return '<div class="kc-prof-req"><span class="kc-prof-req-key">' + _esc(k) + '</span><span class="kc-prof-req-val">' + _esc(disp) + '</span></div>';
+    }).join('');
+    var auditViewRows = Object.keys(auditPackView).map(function(k){
+      var v = auditPackView[k];
+      var disp = Array.isArray(v) ? v.join(', ') : String(v);
+      return '<div class="kc-prof-req"><span class="kc-prof-req-key">' + _esc(k) + '</span><span class="kc-prof-req-val">' + _esc(disp) + '</span></div>';
+    }).join('');
 
     var unresolved = linked.filter(function(lc){ return !libCodes[String(lc).toUpperCase()]; });
     var unresolvedBlock = unresolved.length
@@ -836,6 +981,16 @@ function _renderCustomerProfiles(){
         '<div class="kc-prof-gate-grid">' + gateRows + '</div></details>' +
       (evidence.length ? '<details><summary>' + _t('Bộ bằng chứng bắt buộc', 'Required evidence pack') +
         ' (' + evidence.length + ')</summary><ul class="kc-prof-evidence">' + evidenceRows + '</ul></details>' : '') +
+      (evidenceMetrics.length ? '<details><summary>' + _t('Metric evidence pack', 'Evidence-pack metric links') +
+        ' (' + evidenceMetrics.length + ')</summary><div class="kc-pill-list">' + evidenceMetricRows + '</div></details>' : '') +
+      (evidenceKeys.length ? '<details><summary>' + _t('Khóa truy xuất audit pack', 'Audit-pack record keys') +
+        ' (' + evidenceKeys.length + ')</summary><ul class="kc-prof-evidence">' + recordKeyRows + '</ul></details>' : '') +
+      (evidenceSections.length ? '<details><summary>' + _t('Section bắt buộc của audit pack', 'Required audit-pack sections') +
+        ' (' + evidenceSections.length + ')</summary><ul class="kc-prof-evidence">' + sectionRows + '</ul></details>' : '') +
+      (Object.keys(retention).length ? '<details><summary>' + _t('Retention requirements', 'Retention requirements') +
+        '</summary><div class="kc-prof-req-grid">' + retentionRows + '</div></details>' : '') +
+      (Object.keys(auditPackView).length ? '<details><summary>' + _t('Audit pack view spec', 'Audit-pack view spec') +
+        '</summary><div class="kc-prof-req-grid">' + auditViewRows + '</div></details>' : '') +
       '</article>';
   }).join('');
 
@@ -1097,10 +1252,16 @@ function _renderRegistryContracts(){
     var sections = acc.wizard_sections || [];
     var blocked = acc.blocked_save_fields || [];
     var savePolicy = acc.save_policy || {};
+    var fieldGroups = acc.dynamic_field_groups || {};
     var saveRows = Object.keys(savePolicy).map(function(k){
       return '<div class="kc-prof-req">' +
         '<span class="kc-prof-req-key">' + _esc(k) + '</span>' +
         '<span class="kc-prof-req-val">' + _esc(savePolicy[k]) + '</span></div>';
+    }).join('');
+    var groupRows = Object.keys(fieldGroups).map(function(k){
+      return '<div class="kc-prof-gate-row">' +
+        '<span class="kc-prof-gate-key">' + _esc(k) + '</span>' +
+        '<span class="kc-prof-gate-vals">' + _esc((fieldGroups[k] || []).join(' · ')) + '</span></div>';
     }).join('');
     var dyn = acc.dynamic_validation_rules || {};
     var dynRows = Object.keys(dyn).map(function(k){
@@ -1121,6 +1282,10 @@ function _renderRegistryContracts(){
       (saveRows
         ? '<details open><summary>' + _t('Chính sách lưu', 'Save policy') + '</summary>' +
           '<div class="kc-prof-req-grid">' + saveRows + '</div></details>'
+        : '') +
+      (groupRows
+        ? '<details><summary>' + _t('Nhóm trường động', 'Dynamic field groups') + '</summary>' +
+          '<div class="kc-prof-gate-grid">' + groupRows + '</div></details>'
         : '') +
       (dynRows
         ? '<details><summary>' + _t('Luật kiểm tra động', 'Dynamic validation rules') + '</summary>' +
@@ -1187,6 +1352,14 @@ function _customerNcrEventRuleVi(text){
   var hardGates = (bonus.hard_gates || []).map(function(g){
     return '<span class="kc-pill kc-pill--accent">' + _esc(g) + '</span>';
   }).join(' ');
+  var deductionRows = (bonus.severity_deductions || []).map(function(row){
+    return [
+      row.severity || '—',
+      row.deduction_pct != null ? String(row.deduction_pct) + '%' : '—',
+      row.scope || '—',
+      row.note || '—'
+    ];
+  });
   var dashFields = (dash.row_fields || dash.required_cards || []).map(function(f){
     return '<span class="kc-pill">' + _esc(f) + '</span>';
   }).join(' ');
@@ -1196,6 +1369,9 @@ function _customerNcrEventRuleVi(text){
   var contractTable = reqFields.length
     ? _simpleTable(['Trường','Bảng','Cột','Bằng chứng'], reqFields)
     : '<div class="hm-empty">' + _t('Chưa khai báo hợp đồng dữ liệu.', 'No data contract declared.') + '</div>';
+  var deductionTable = deductionRows.length
+    ? _simpleTable(['Severity','Khấu trừ mô phỏng','Phạm vi','Ghi chú'], deductionRows)
+    : '<div class="hm-empty">' + _t('Chưa khai báo severity deductions.', 'No severity deductions declared.') + '</div>';
 
   return '<section class="kc-panel"><div class="kc-panel-head"><h3>' +
     _t('Mức độ nghiêm trọng NCR khách hàng và 8D', 'Customer NCR severity & 8D') +
@@ -1209,6 +1385,7 @@ function _customerNcrEventRuleVi(text){
       '<div class="kc-prof-meta"><b>' + _esc(bonus.payout_formula || '') + '</b></div>' +
       '<div class="kc-prof-meta">' + _esc(bonus.scope_rule || '') + '</div>' +
       '<div class="kc-pill-list">' + hardGates + '</div>' +
+      deductionTable +
       '<div class="kc-mini">' + _esc(bonus.no_real_payout_rule || '') + '</div></details>' +
     '<details><summary>' + _t('Hợp đồng hiển thị bảng điều khiển', 'Dashboard contract') + '</summary>' +
       '<div class="kc-pill-list">' + dashFields + '</div>' +
@@ -1216,12 +1393,13 @@ function _customerNcrEventRuleVi(text){
     '</section>';
 	}
 
-	function _renderCtqCapability(){
+function _renderCtqCapability(){
 	  var cfg = _state.config || {};
 	  var policy = cfg.ctq_capability_policy || {};
 	  var chars = cfg.ctq_characteristics || {};
 	  var contract = cfg.ctq_data_contract || {};
 	  var sampleBands = policy.sample_bands || {};
+	  var stateFields = policy.spc_state_fields || {};
 	  var metrics = (contract.metrics || []).map(function(code){
 	    var row = ((_state.config || {}).library || []).filter(function(r){
 	      return String(r.canonical_code).toUpperCase() === String(code).toUpperCase();
@@ -1252,6 +1430,9 @@ function _customerNcrEventRuleVi(text){
 	  var contractFields = (contract.required_fields || []).map(function(f){
 	    return [f.field || '', f.source || '', f.reason || ''];
 	  });
+	  var stateRows = Object.keys(stateFields).map(function(k){
+	    return [k, stateFields[k] || ''];
+	  });
 	  return '<section class="kc-panel"><div class="kc-panel-head"><h3>' +
 	    _t('Năng lực CTQ / Cpk / SPC', 'CTQ / Cpk / SPC capability') +
 	    '</h3><span class="kc-pill kc-pill--accent">' + _esc(contract.status || 'staged_data_contract') + '</span></div>' +
@@ -1262,12 +1443,77 @@ function _customerNcrEventRuleVi(text){
 	      (metrics.length ? _simpleTable(['Chỉ số','Trạng thái','Subtype','min_n','customer_n','Bằng chứng'], metrics) : '<div class="hm-empty">—</div>') + '</details>' +
 	    '<details><summary>' + _t('Trường bắt buộc của đặc tính CTQ', 'CTQ characteristic required fields') + '</summary>' +
 	      '<div class="kc-pill-list">' + reqFields + '</div><div class="kc-mini">' + _esc(chars.staged_gap || '') + '</div></details>' +
+	    '<details><summary>' + _t('Trạng thái SPC/Capability tối thiểu', 'Minimum SPC/capability states') + '</summary>' +
+	      (stateRows.length ? _simpleTable(['Trạng thái','Ý nghĩa'], stateRows) : '<div class="hm-empty">—</div>') + '</details>' +
 	    '<details><summary>' + _t('Trường hợp đồng dữ liệu tính tự động', 'Runtime data contract fields') + '</summary>' +
 	      (contractFields.length ? _simpleTable(['Trường','Nguồn','Lý do'], contractFields) : '<div class="hm-empty">—</div>') + '</details>' +
 	    '<div class="kc-warn">' + _t('Cpk không được xanh khi n<25; mức 25-49 chỉ là nội bộ tạm thời, không dùng cho thưởng hoặc cam kết khách hàng; mức khách hàng chỉ được dùng khi n≥100, quá trình ổn định, thiết bị đo hợp lệ và đã tái xác nhận sau thay đổi.',
 	      'Cpk cannot be green when n<25; 25-49 provisional is not reward/claim eligible; customer-grade requires n>=100 + stability + valid gage + post-change revalidation.') + '</div>' +
 	    '</section>';
 	}
+
+function _renderPilotGovernance(review){
+  var data = review || {};
+  var cfg = _state.config || {};
+  var program = cfg.pilot_governance_program || {};
+  var scope = data.pilot_scope || program.pilot_scope || {};
+  var freeze = data.reward_freeze_controls || program.reward_freeze_controls || {};
+  var dash = data.pilot_dashboard_contract || program.pilot_dashboard_contract || {};
+  var rows = data.metric_rows || [];
+  if(!program || !program.program_id) return '';
+  var scopeLines = [
+    ['Profile', scope.customer_profile || '—'],
+    ['Window', [((data.pilot_window || {}).start_date || '—'), ((data.pilot_window || {}).end_date || '—'), String(((data.pilot_window || {}).duration_days || '—')) + ' ngày'].join(' -> ')],
+    ['Part families', (scope.part_families || []).join(', ') || '—'],
+    ['Work centers', (scope.work_centers || []).join(', ') || '—'],
+    ['Roles', (scope.roles_in_scope || []).join(', ') || '—'],
+    ['Excluded metrics', (scope.excluded_metrics || []).join(', ') || '—']
+  ];
+  var scopeTable = _simpleTable(['Hạng mục','Nội dung'], scopeLines);
+  var success = (scope.success_criteria || []).map(function(item){
+    return '<li>' + _esc(item) + '</li>';
+  }).join('');
+  var cadenceRows = (data.review_cadence || []).map(function(item){
+    return [
+      item.forum || '—',
+      item.purpose || '—',
+      (item.required_outputs || []).join(' | ') || '—'
+    ];
+  });
+  var dashboardFields = (dash.required_fields || []).map(function(f){
+    return '<span class="kc-pill">' + _esc(f) + '</span>';
+  }).join(' ');
+  var metricRows = rows.map(function(item){
+    return [
+      item.metric_code || '—',
+      item.metric_status_runtime_manual_staged || '—',
+      item.data_confidence_level || '—',
+      item.owner_role || '—',
+      item.review_forum || '—',
+      item.graduation_decision_after_pilot || '—'
+    ];
+  });
+  return '<section class="kc-panel"><div class="kc-panel-head"><h3>' +
+    _t('Pilot governance 90 ngày', '90-day pilot governance') +
+    '</h3><span class="kc-pill kc-pill--accent">' + _esc(program.status || 'pilot') + '</span></div>' +
+    '<div class="kc-mini"><b>' + _esc(program.program_id || '') + '</b></div>' +
+    '<div class="kc-warn" style="margin-top:8px">' + _esc(program.reward_freeze_rule || '') + '</div>' +
+    '<div class="kc-mini" style="margin-top:8px"><b>watermark:</b> ' + _esc(freeze.bonus_simulation_watermark || '—') + '</div>' +
+    '<details open><summary>' + _t('Phạm vi pilot', 'Pilot scope') + '</summary>' + scopeTable +
+      (success ? '<div class="kc-mini" style="margin-top:8px"><b>' + _t('Tiêu chí thành công', 'Success criteria') + ':</b></div><ul class="tight">' + success + '</ul>' : '') +
+    '</details>' +
+    '<details open><summary>' + _t('Nhịp review', 'Review cadence') + '</summary>' +
+      (cadenceRows.length ? _simpleTable(['Forum','Mục đích','Output bắt buộc'], cadenceRows) : '<div class="hm-empty">—</div>') +
+    '</details>' +
+    '<details><summary>' + _t('Hợp đồng bảng pilot', 'Pilot dashboard contract') + '</summary>' +
+      '<div class="kc-pill-list">' + dashboardFields + '</div>' +
+      '<div class="kc-mini"><b>pilot_report_path:</b> ' + _esc(dash.pilot_report_path || '—') + '</div>' +
+    '</details>' +
+    '<details><summary>' + _t('Ma trận review theo metric', 'Per-metric review matrix') + '</summary>' +
+      (metricRows.length ? _simpleTable(['Metric','Trạng thái','Data confidence','Owner','Forum','Exit'], metricRows) : '<div class="hm-empty">—</div>') +
+    '</details>' +
+    '</section>';
+}
 
 function _renderOverview(){
   var cfg = _state.config || {};
@@ -1298,7 +1544,7 @@ function _renderOverview(){
       findings.slice(0, 8).map(_findingRow).join('') + '</div>';
   }
   html += '</section>';
-  return html + _renderIntegrityPanels(views);
+  return html + _renderPilotGovernance(views.pilot_governance_review || {}) + _renderIntegrityPanels(views) + _renderRegistryContracts();
 }
 
 function _renderIntegrityPanels(views){
@@ -1306,11 +1552,22 @@ function _renderIntegrityPanels(views){
   var keys = Object.keys(panels);
   if(!keys.length) return '';
   var labels = {
+    world_class_readiness_cockpit:_t('World-class readiness cockpit', 'World-class readiness cockpit'),
+    lam_gate_coverage:_t('Bao phủ cổng LAM', 'LAM gate coverage'),
+    lam_evidence_pack_readiness:_t('Độ sẵn sàng evidence pack LAM', 'LAM evidence-pack readiness'),
+    pilot_governance_readiness:_t('Độ sẵn sàng pilot governance', 'Pilot governance readiness'),
+    ctq_cpk_backlog:_t('Backlog CTQ/Cpk', 'CTQ/Cpk backlog'),
+    customer_ncr_severity_8d:_t('NCR khách hàng / 8D', 'Customer NCR / 8D'),
+    driver_panel_maturity:_t('Maturity driver panel', 'Driver panel maturity'),
+    role_scorecard_fairness:_t('Fairness thẻ điểm vai trò', 'Role scorecard fairness'),
+    data_contract_backlog:_t('Backlog hợp đồng dữ liệu', 'Data contract backlog'),
+    audit_facing_docs_health:_t('Sức khỏe tài liệu audit-facing', 'Audit-facing docs health'),
     bsc_model:_t('Mô hình BSC', 'BSC model'),
     lam_profile:_t('Bao phủ LAM', 'LAM coverage'),
     cpk_sample_policy:_t('Chính sách mẫu Cpk', 'Cpk sample policy'),
     severity_bonus_simulation:_t('Mức độ nghiêm trọng / mô phỏng thưởng', 'Severity / bonus simulation'),
-    annex128_matrix:_t('Độ mới ANNEX-128', 'ANNEX-128 freshness')
+    annex128_matrix:_t('Độ mới ANNEX-128', 'ANNEX-128 freshness'),
+    lean_flow_driver_panel:_t('Lean/TOC driver panel', 'Lean/TOC driver panel')
   };
   var compact = function(v){
     if(Array.isArray(v)) return v.length ? v.join(', ') : '—';
@@ -1420,6 +1677,8 @@ function _renderJdScorecards(){
         optional_count:(role.optional_rotate || []).length, do_not_use_count:(role.do_not_use || []).length,
         role_blocker_count:(role.role_blockers || []).length,
         controllability_scope:role.controllability_scope || '',
+        active_count_justification:role.active_count_justification || '',
+        fairness_notes:role.fairness_notes || '',
         warning:role.not_automatic_reward_or_discipline_warning || '' };
     });
   }
@@ -1427,11 +1686,12 @@ function _renderJdScorecards(){
     _esc(roles.length) + ' vai trò</span></div>' +
     '<div class="kc-warn">' + _t('Thẻ điểm vai trò chỉ là dữ liệu đầu vào cho kèm cặp, OJT và rà soát; không được tự động thưởng hoặc kỷ luật từ một chỉ số vai trò đơn lẻ.',
       'Role scorecards are coaching/OJT/review inputs only; no automatic reward or discipline from a single role measure.') + '</div>' +
-    _simpleTable(['Vai trò','JD','Đang dùng','Trọng số','Dự tuyển','Tùy chọn','Không dùng','Điều kiện chặn','Phạm vi kiểm soát'], roles.map(function(r){
+    _simpleTable(['Vai trò','JD','Đang dùng','Trọng số','Dự tuyển','Tùy chọn','Không dùng','Điều kiện chặn','Phạm vi kiểm soát','Ghi chú fairness / lý do giữ số active'], roles.map(function(r){
+      var notes = [r.fairness_notes || '', r.active_count_justification || ''].filter(Boolean).join(' | ');
       return [r.role_code, r.jd_title_vi || '', r.active_measure_count || 0,
         (r.active_weight_total == null ? '—' : r.active_weight_total + '%'),
         r.candidate_count || 0, r.optional_count || 0, r.do_not_use_count || 0,
-        r.role_blocker_count || 0, r.controllability_scope || '—'];
+        r.role_blocker_count || 0, r.controllability_scope || '—', notes || '—'];
     })) + '</section>';
 }
 
@@ -1467,7 +1727,7 @@ function _renderAuditDrift(){
     _esc(String(integrity.status || 'pass').toLowerCase()) + '">' + _esc(integrity.status || 'PASS') +
     '</span></div>' + (rows.length ? _simpleTable(['P','Phát hiện','Đối tượng','Thông điệp'], rows)
       : '<div class="hm-empty">' + _t('Không có phát hiện kiểm tra toàn vẹn đang hiển thị.', 'No integrity finding to show.') + '</div>') +
-    '</section>';
+    '</section>' + _renderIntegrityPanels(views) + _renderRegistryContracts();
 }
 
 function _findingRow(f){
@@ -1679,6 +1939,7 @@ function _renderScorecard(){
 /* ── Add-KPI form ──────────────────────────────────────────────────── */
 function _afSet(key, value){
 	  if(!_state.addForm) return;
+	  if(key === 'canonical_code') value = String(value || '').toUpperCase();
 	  _state.addForm[key] = value;
 	  if(key === 'group'){
 	    /* gate / proposed metrics carry no tier */
@@ -1814,6 +2075,7 @@ function _renderAddForm(){
     wizStrip +
     '<div class="kc-alert error" id="kc-add-errors" ' + (errors.length ? '' : 'hidden') + '>' +
       errors.slice(0, 6).map(_esc).join('<br>') + '</div>' +
+    _renderDynamicRequirementBoard(a) +
     '<div class="kc-warn">' + _t('Chỉ số mới luôn ở trạng thái chờ dữ liệu/thử nghiệm: chưa có luồng tính chính thức, chưa có công thức được duyệt và chưa được tính thưởng cho tới khi hợp đồng dữ liệu được duyệt.',
       'New metrics stay staged/pilot: no runtime, no authoritative formula, no reward until an approved data contract exists.') + '</div>' +
     section('1', _t('Ý đồ kiểm soát', 'Intent'),
@@ -2082,6 +2344,12 @@ function _renderUnifiedMcoEditCard(m, section, inline){
   html += '<div class="kc-card-head"><div><span class="kc-code">' + c(code) + '</span> ' +
     '<span class="kc-card-name">' + c(_val(m,section,'name_vi') || _val(m,section,'name') || code) + '</span></div>' +
     _calcBadge(status) + '</div>';
+  html += _renderDynamicRequirementBoard({
+    metric_subtype:subtype,
+    control_intent:_val(m,section,'control_intent') || m.control_intent || '',
+    scoring_model_detail:scoring,
+    reward_mode:_val(m,section,'reward_mode') || m.reward_mode || ''
+  });
   html += '<div class="kc-warn kc-card-note">' +
     _t('Hộp biên tập này dùng cùng 8 phần với luồng tạo KPI mới. Mọi trường được lưu qua lớp thay đổi vận hành và danh sách cho phép ở dịch vụ máy chủ, không lưu bằng JSON thô trong giao diện.',
       'This editor uses the same 8 sections as new KPI creation; fields save through the runtime overlay and backend allowlist, not JS hardcode.') +
@@ -2392,6 +2660,8 @@ function _styleBlock(){
     'margin-left:2px;letter-spacing:.2px}' +
   '.kc-warn{font-size:11px;color:var(--warning);background:var(--warning-soft);' +
     'border-radius:6px;padding:5px 8px}' +
+  '.kc-dynamic-board{display:flex;flex-direction:column;gap:8px;padding:10px;border:1px dashed var(--accent);' +
+    'border-radius:10px;background:var(--accent-soft)}' +
   '.kc-card-note{line-height:1.35}' +
   '.kc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}' +
   '.kc-f{display:flex;flex-direction:column;gap:3px}' +
@@ -2571,9 +2841,14 @@ function _styleBlock(){
 	      + mcoErrors.slice(0, 4).join(' | ');
 	    _render(); return;
 	  }
-	  var code = String(a.canonical_code || '').toUpperCase().replace(/[^A-Z0-9_]/g, '');
+	  var code = String(a.canonical_code || '').trim().toUpperCase();
   if(!code){
     _state.error = _t('Cần nhập mã KPI hợp lệ (A–Z, 0–9, _).', 'Enter a valid KPI code (A–Z, 0–9, _).');
+    _render(); return;
+  }
+  if(!_validCanonicalCode(code) || /\s/.test(String(a.canonical_code || '')) || /[^\x00-\x7F]/.test(String(a.canonical_code || ''))){
+    _state.error = _t('Mã KPI là canonical code bất biến: chỉ được dùng A-Z, 0-9, _, không có dấu tiếng Việt hoặc khoảng trắng.',
+      'KPI code is an immutable canonical code: only A-Z, 0-9, _, with no accented characters or spaces.');
     _render(); return;
   }
   if(_libRows().some(function(r){ return String(r.canonical_code).toUpperCase() === code; })){

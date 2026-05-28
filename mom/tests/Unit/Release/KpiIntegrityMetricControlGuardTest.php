@@ -82,6 +82,60 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
         );
     }
 
+    public function testRejectsCustomerSpecificMetricWithoutProfileOrApplicability(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['proposed_operating_metrics'][] = self::baseFakeMetric([
+                    'canonical_code' => 'FAKE_CUSTOMER_SPEC_NO_PROFILE_P03',
+                    'metric_subtype' => 'operating_metric',
+                    'control_intent' => 'customer_specific_requirement',
+                    'measurement_data_type' => 'percent_ratio',
+                    'scoring_model_detail' => 'evidence_completeness_score',
+                    'required_evidence' => ['csr_ack_record'],
+                    'data_contract_gap' => '',
+                    'target_graduation_condition' => 'Profile and applicability approved.',
+                    'lam_profile_link' => '',
+                    'customer_profile_link' => '',
+                    'applicability_rule' => '',
+                ]);
+            },
+            'customer_specific_requirement requires customer/profile applicability or staged data-contract gap',
+        );
+    }
+
+    public function testRejectsRoleMeasureWithoutControllability(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['proposed_operating_metrics'][] = self::baseFakeMetric([
+                    'canonical_code' => 'FAKE_ROLE_NO_CONTROL_P03',
+                    'metric_subtype' => 'role_performance_measure',
+                    'control_intent' => 'continuous_improvement',
+                    'measurement_data_type' => 'percent_ratio',
+                    'scoring_model_detail' => 'rag_3_band',
+                    'role_assignments' => [
+                        ['role' => 'QC', 'assignment_type' => 'role_measure_active', 'weight_pct' => 100],
+                    ],
+                    'controllability_scope' => '',
+                ]);
+            },
+            'role_performance_measure requires controllability_scope',
+        );
+    }
+
+    public function testRejectsCanonicalCodeWithTranslatedCharacters(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'CHECK_DIM_REPORT_ON_SHIP', static function (array &$row): void {
+                    $row['canonical_code'] = 'CHECK_DIM_REPORT_ON_GIAO_HANG';
+                });
+            },
+            "canonical_code 'CHECK_DIM_REPORT_ON_GIAO_HANG' must use only A-Z, 0-9, _",
+        );
+    }
+
     public function testRejectsSubtypeWithoutControlIntent(): void
     {
         $this->assertFakeDriftRejected(
@@ -102,6 +156,52 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
             },
             'customer_requirement_profiles LAM_SEMSYSCO: gate_coverage.G3 must not be empty',
         );
+    }
+
+    public function testRejectsLamEvidencePackLinkToUnknownMetric(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['customer_requirement_profiles']['profiles']['LAM_SEMSYSCO']['evidence_pack_metric_links'][] = 'FAKE_UNKNOWN_EVIDENCE_METRIC';
+            },
+            "customer_requirement_profiles LAM_SEMSYSCO: evidence_pack_metric_links references unknown metric 'FAKE_UNKNOWN_EVIDENCE_METRIC'.",
+        );
+    }
+
+    public function testRejectsRetentionMetricWithoutOwner(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'DOC_RECORD_RETENTION_10Y', static function (array &$row): void {
+                    unset($row['retention_owner']);
+                });
+            },
+            'Prompt 11 DOC_RECORD_RETENTION_10Y: retention_owner must not be empty.',
+        );
+    }
+
+    public function testRejectsAdminConsoleServiceWithoutDynamicFieldGroup(): void
+    {
+        $repoRoot = dirname(__DIR__, 4);
+        $service = $repoRoot . '/mom/api/services/KpiRegistryAdminService.php';
+        $tmp = tempnam(sys_get_temp_dir(), 'kpi-admin-service-p10-');
+        self::assertIsString($tmp);
+        file_put_contents(
+            $tmp,
+            str_replace("'reward_control' => ['reward_mode', 'attribution_rule', 'counter_metric.intent', 'blocking_conditions', 'sample_policy.min_n_score'],", '', (string) file_get_contents($service)),
+        );
+
+        try {
+            $this->assertFakeDriftRejected(
+                static function (array &$registry): void {
+                    // Registry remains intact; service contract drifts.
+                },
+                'dynamic_field_groups.reward_control is missing from service source',
+                ['KPI_INTEGRITY_ADMIN_SERVICE' => $tmp],
+            );
+        } finally {
+            @unlink($tmp);
+        }
     }
 
     public function testRejectsLamG5MetricMissingGateRow(): void
@@ -136,6 +236,26 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
                 $registry['bonus_simulation_model']['simulation_only'] = false;
             },
             'bonus_simulation_model.simulation_only MUST be true',
+        );
+    }
+
+    public function testRejectsPilotRewardFreezeDrift(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['pilot_governance_program']['reward_freeze_controls']['monetary_payout_allowed'] = true;
+            },
+            'pilot_governance_program.reward_freeze_controls.monetary_payout_allowed must remain false',
+        );
+    }
+
+    public function testRejectsPilotScopeUnknownMetric(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['pilot_governance_program']['pilot_scope']['strategic_driver_panel'][] = 'FAKE_PILOT_SCOPE_UNKNOWN_METRIC_P14';
+            },
+            "pilot_governance_program pilot scope references unknown metric 'FAKE_PILOT_SCOPE_UNKNOWN_METRIC_P14'",
         );
     }
 
@@ -289,6 +409,28 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
         );
     }
 
+    public function testRejectsMissingPrompt06InsufficientCpkMetric(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::removeMetric($registry, 'INSUFFICIENT_CPK_DATA_STATUS');
+            },
+            "Prompt 06 required metric 'INSUFFICIENT_CPK_DATA_STATUS' missing",
+        );
+    }
+
+    public function testRejectsCtqOutOfSpecMetricOutsideG5(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'CTQ_OUT_OF_SPEC_EVENT_COUNT', static function (array &$row): void {
+                    $row['gate'] = 'G6';
+                });
+            },
+            'Prompt 06 CTQ_OUT_OF_SPEC_EVENT_COUNT: must be a G5 gate_control_metric.',
+        );
+    }
+
     public function testRejectsPrompt07RuntimeMetricStillCarryingStagedGap(): void
     {
         $this->assertFakeDriftRejected(
@@ -385,6 +527,71 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
         );
     }
 
+    public function testRejectsPrompt08MissingConstraintRegisterContract(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                unset($registry['lean_flow_operating_model']['constraint_register_contract']);
+            },
+            'Prompt 08 lean_flow_operating_model: missing constraint_register_contract.contract_id.',
+        );
+    }
+
+    public function testRejectsPrompt08ManualGovernedMetricWithoutPrimaryEndpoint(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'SUBTIER_REQUIREMENT_FLOWDOWN', static function (array &$row): void {
+                    unset($row['primary_endpoint']);
+                });
+            },
+            'manual_governed metric must declare primary_endpoint=GET /api/kpi/SUBTIER_REQUIREMENT_FLOWDOWN',
+        );
+    }
+
+    public function testRejectsPrompt08DashboardContractMissingGraduationField(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['dashboard_render_contract']['required_fields_per_card'] = array_values(array_filter(
+                    $registry['dashboard_render_contract']['required_fields_per_card'] ?? [],
+                    static fn(string $field): bool => $field !== 'target_graduation_condition',
+                ));
+            },
+            "dashboard_render_contract.required_fields_per_card: missing 'target_graduation_condition'.",
+        );
+    }
+
+    public function testRejectsPrompt08CpkManualContractMissingSampleBand(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'CPK_PRODUCT_MIN_CTQ', static function (array &$row): void {
+                    $row['manual_input_contract']['fields'] = array_values(array_filter(
+                        $row['manual_input_contract']['fields'] ?? [],
+                        static fn(string $field): bool => $field !== 'sample_size_band',
+                    ));
+                });
+            },
+            "manual_input_contract drift — missing token 'sample_size_band'.",
+        );
+    }
+
+    public function testRejectsPrompt07CmmQueueContractMissingOwnerRoleField(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'CMM_QUEUE_AGING', static function (array &$row): void {
+                    $row['manual_input_contract']['fields'] = array_values(array_filter(
+                        $row['manual_input_contract']['fields'] ?? [],
+                        static fn(string $field): bool => $field !== 'owner_role',
+                    ));
+                });
+            },
+            "Prompt 07 CMM_QUEUE_AGING: manual_input_contract.fields missing 'owner_role'.",
+        );
+    }
+
     public function testRejectsPrompt09GenericRoleMeasureText(): void
     {
         $this->assertFakeDriftRejected(
@@ -393,6 +600,17 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
                     = 'Role accountable only for the evidence and actions inside the JD authority boundary; upstream blockers must be logged and escalated.';
             },
             'generic template controllability text was not de-templated',
+        );
+    }
+
+    public function testRejectsPrompt09BlocklistedGenericChecklistText(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['jd_kpi_scorecards']['roles']['BUY']['active_scorecard'][0]['formula_or_checklist']
+                    = 'Checklist: verify released work package, complete record, and close handover.';
+            },
+            "formula_or_checklist still contains generic blocklisted text 'verify released work package'.",
         );
     }
 
@@ -413,6 +631,16 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
                 unset($registry['jd_kpi_scorecards']['roles']['QC']['role_blockers']);
             },
             'missing role_blockers for controllability/fairness governance',
+        );
+    }
+
+    public function testRejectsPrompt09SupportRoleCountWithoutJustification(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                unset($registry['jd_kpi_scorecards']['roles']['ITA']['active_count_justification']);
+            },
+            "role_category 'support_specialist' has 4 active items; policy max 3 requires active_count_justification.",
         );
     }
 

@@ -406,6 +406,17 @@ function statusSet(setKey){
   return opts[setKey].options || [];
 }
 
+function hasStatusSet(setKey){
+  var opts = _statusMap(_cache['status-options']);
+  if(!opts || !opts[setKey]) return false;
+  return Array.isArray(opts[setKey].options) && opts[setKey].options.length > 0;
+}
+
+function shouldWarnMissingStatusSet(setKey){
+  if(!_initialized || !_cache['status-options']) return false;
+  return !hasStatusSet(setKey);
+}
+
 /**
  * Get all status set keys.
  * @returns {Array<string>}
@@ -968,6 +979,8 @@ window.HmRegistry = {
   // Status
   status: status,
   statusSet: statusSet,
+  hasStatusSet: hasStatusSet,
+  shouldWarnMissingStatusSet: shouldWarnMissingStatusSet,
   statusSetKeys: statusSetKeys,
   badge: badge,
 
