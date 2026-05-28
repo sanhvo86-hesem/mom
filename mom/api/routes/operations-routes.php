@@ -84,6 +84,15 @@ return static function (Router $router, string $dataDir): void {
         'customer_purchase_order_create' => [CustomerPurchaseOrderController::class, 'createPurchaseOrder'],
         'customer_purchase_order_transition' => [CustomerPurchaseOrderController::class, 'transitionPurchaseOrder'],
     ]);
+
+    // Orders v3 — workspace-oriented endpoints for the new frontend.
+    // Keeps the legacy order_* actions untouched. See
+    // _reports/aeoi-orders-redesign/02-V3-ARCHITECTURE.md for context.
+    $router->actions([
+        'orders_v3_my_permissions' => [OrdersV3Controller::class, 'myPermissions'],
+        'orders_v3_today'          => [OrdersV3Controller::class, 'today'],
+        'orders_v3_intake_list'    => [OrdersV3Controller::class, 'intakeList'],
+    ]);
     
     // Supplier Quality Management
     // @deprecated — Shimmed to LegacyQualityShimController → EQMS v4.0 supplier surface.

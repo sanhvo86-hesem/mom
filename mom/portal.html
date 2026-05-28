@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="./styles/online-forms.css?v=20260409b">
 <link rel="stylesheet" href="./styles/so-jo-wo-dashboard.css">
 <link rel="stylesheet" href="./styles/order-management.css">
+<link rel="stylesheet" href="./styles/orders-v3.css?v=20260528a">
 <link rel="stylesheet" href="./styles/quality-exception.css">
 <link rel="stylesheet" href="./styles/supplier-quality.css">
 <link rel="stylesheet" href="./styles/quoting.css">
@@ -369,6 +370,17 @@
 <script charset="UTF-8" src="./scripts/portal/09c-record-id-generator.js"></script>
 <script charset="UTF-8" src="./scripts/portal/09d-upload-verify.js"></script>
 <script charset="UTF-8" src="./scripts/portal/09e-so-jo-wo-dashboard.js?v=20260411m"></script>
+<!-- Orders v3 — feature-flagged rebuild. Enable via:
+       localStorage.setItem('orders_v3', '1'); location.reload();
+     Falls through to 09e (above) when disabled. See
+     _reports/aeoi-orders-redesign/02-V3-ARCHITECTURE.md -->
+<script charset="UTF-8" src="./scripts/portal/09v3-orders-tokens.js?v=20260528a"></script>
+<script charset="UTF-8" src="./scripts/portal/09v3-orders-api.js?v=20260528a"></script>
+<script charset="UTF-8" src="./scripts/portal/09v3-orders-components.js?v=20260528a"></script>
+<script charset="UTF-8" src="./scripts/portal/09v3-orders-shell.js?v=20260528a"></script>
+<script charset="UTF-8" src="./scripts/portal/09v3-workspace-today.js?v=20260528a"></script>
+<script charset="UTF-8" src="./scripts/portal/09v3-workspace-intake.js?v=20260528a"></script>
+<script charset="UTF-8" src="./scripts/portal/09v3-workspace-stubs.js?v=20260528a"></script>
 <script charset="UTF-8" src="./scripts/portal/34-purchasing-workspace.js?v=20260409a"></script>
 <script charset="UTF-8" src="./scripts/portal/11-e-signature.js?v=20260405x"></script>
 <script charset="UTF-8" src="./scripts/portal/12-searchable-input.js"></script>
