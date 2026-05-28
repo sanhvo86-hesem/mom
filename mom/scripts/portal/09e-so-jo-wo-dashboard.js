@@ -397,13 +397,470 @@ function _renderTabPlaceholder(tabId){
     + '</div>';
 }
 
+/* ════════════════════════════════════════════════════════════════════
+ * PR #3 — AI Intake Queue (full implementation)
+ *
+ * Lives in this file so we don't introduce a new <script> tag in the
+ * forbidden portal.html. Designed per Linear-style queue pattern from
+ * the design spec: list table + slide-in drawer detail.
+ *
+ * Module namespace AiIntakeQueue keeps this self-contained — its
+ * functions don't collide with the Order Control Tower's existing
+ * _render, _refresh, _bind, etc.
+ * ════════════════════════════════════════════════════════════════════ */
+var AiIntakeQueue = (function(){
+  var state = {
+    cases: [],
+    selected: null,
+    filterStatus: '',
+    filterSource: '',
+    drawerOpen: false,
+    masterEnabled: true,
+    loading: false
+  };
+
+  function fmtMoney(v){
+    var n = Number(v || 0);
+    if (!isFinite(n)) return '-';
+    return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  }
+
+  function statusBadge(s){
+    var tone = {
+      needs_review:       { bg:'#fef3c7', fg:'#92400e' },
+      approved:           { bg:'#d1fae5', fg:'#065f46' },
+      commit_ready:       { bg:'#d1fae5', fg:'#065f46' },
+      committed_cpo:      { bg:'#bbf7d0', fg:'#14532d' },
+      committed_so:       { bg:'#86efac', fg:'#14532d' },
+      rejected:           { bg:'#fecaca', fg:'#991b1b' },
+      security_hold:      { bg:'#fecaca', fg:'#991b1b' },
+      duplicate_hold:     { bg:'#fed7aa', fg:'#9a3412' },
+      engineering_review: { bg:'#e9d5ff', fg:'#6b21a8' },
+      commercial_review:  { bg:'#dbeafe', fg:'#1e40af' },
+      planning_review:    { bg:'#c7d2fe', fg:'#3730a3' },
+      quality_review:     { bg:'#a5f3fc', fg:'#0e7490' },
+      extraction_pending: { bg:'#f3f4f6', fg:'#374151' },
+      error:              { bg:'#fecaca', fg:'#991b1b' }
+    }[s] || { bg:'#f3f4f6', fg:'#374151' };
+    return '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:'+tone.bg+';color:'+tone.fg+'">' + _esc(s || '?') + '</span>';
+  }
+
+  function sourceBadge(extracted){
+    // ai_order_intake cases all come from email, but show subtle badge
+    return '<span title="From AI Email Intake" style="display:inline-block;font-size:11px;color:#6b7280">🤖 AI</span>';
+  }
+
+  function _renderKpiHeader(){
+    var byStatus = {};
+    (state.cases || []).forEach(function(c){
+      var s = c.status || '?';
+      byStatus[s] = (byStatus[s] || 0) + 1;
+    });
+    var total = state.cases.length;
+    var pending = (byStatus.needs_review || 0) + (byStatus.commercial_review || 0)
+                 + (byStatus.engineering_review || 0) + (byStatus.planning_review || 0);
+    var hold = (byStatus.security_hold || 0) + (byStatus.duplicate_hold || 0);
+    var committed = (byStatus.committed_cpo || 0) + (byStatus.committed_so || 0);
+    // listCases projection returns first-line fields only (part_number,
+    // revision_number, quantity, uom on the case row) — full line_total
+    // sums require getCase(). For the KPI we approximate by computing
+    // first-line qty × unit_price, but most cases ship with unit_price
+    // only after extraction, so the KPI is often $0 here. Real total
+    // shows in the per-case drawer where we call getCase().
+    var totalValue = 0;
+    (state.cases || []).forEach(function(c){
+      var qty   = Number(c.quantity   || 0);
+      var price = Number(c.unit_price || 0);
+      var lt = qty * price;
+      if (isFinite(lt) && lt > 0) totalValue += lt;
+    });
+    function card(label, value, color){
+      return '<div style="flex:1;min-width:120px;padding:12px 14px;background:#fff;border:1px solid var(--border-1,#e5e7eb);border-radius:8px">'
+        + '<div style="font-size:11px;color:var(--text-3,#6b7280);font-weight:500">' + _esc(label) + '</div>'
+        + '<div style="font-size:22px;font-weight:700;color:' + color + ';margin-top:4px">' + _esc(value) + '</div>'
+        + '</div>';
+    }
+    return '<div style="display:flex;gap:12px;padding:12px 16px;background:var(--surface-2,#f9fafb);flex-wrap:wrap">'
+      + card(_t('Tổng case', 'Total cases'), String(total), 'var(--text-1,#111)')
+      + card(_t('Chờ duyệt', 'Pending review'), String(pending), 'var(--amber-light,#b9691f)')
+      + card(_t('Bị giữ', 'On hold'), String(hold), 'var(--red-light,#b42318)')
+      + card(_t('Đã commit', 'Committed'), String(committed), 'var(--green-dark,#0f766e)')
+      + card(_t('Tổng giá trị', 'Total value'), fmtMoney(totalValue), 'var(--brand-primary,#2563eb)')
+      + '</div>';
+  }
+
+  function _renderFilters(){
+    var statuses = ['', 'needs_review', 'approved', 'committed_cpo', 'committed_so',
+                    'security_hold', 'duplicate_hold', 'engineering_review',
+                    'commercial_review', 'rejected'];
+    var statusOpts = statuses.map(function(s){
+      var label = s ? s : _t('Tất cả', 'All');
+      var sel = state.filterStatus === s ? ' selected' : '';
+      return '<option value="' + s + '"' + sel + '>' + _esc(label) + '</option>';
+    }).join('');
+    return '<div style="display:flex;gap:8px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--border-1,#e5e7eb);align-items:center;flex-wrap:wrap">'
+      + '<label style="font-size:12px;color:var(--text-2,#374151)">' + _t('Trạng thái:', 'Status:') + '</label>'
+      + '<select id="aiq-filter-status" style="padding:4px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:4px;font-size:12px">' + statusOpts + '</select>'
+      + '<button id="aiq-refresh" style="margin-left:auto;padding:6px 12px;background:var(--brand-primary,#2563eb);color:#fff;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer">'
+      + _t('🔄 Làm mới', '🔄 Refresh')
+      + '</button>'
+      + '</div>';
+  }
+
+  function _renderList(){
+    var cases = state.cases || [];
+    var filtered = cases.filter(function(c){
+      if (state.filterStatus && c.status !== state.filterStatus) return false;
+      return true;
+    });
+    if (state.loading) {
+      return '<div style="padding:48px;text-align:center;color:var(--text-3,#6b7280)">⏳ ' + _t('Đang tải...', 'Loading...') + '</div>';
+    }
+    if (filtered.length === 0) {
+      return '<div style="padding:48px;text-align:center;color:var(--text-3,#6b7280)">'
+        + '📭 ' + _t('Chưa có case nào khớp bộ lọc.', 'No cases match the current filter.')
+        + '</div>';
+    }
+    var rows = filtered.map(function(c){
+      var sel = state.selected && state.selected.id === c.id;
+      var blockers = c.blocking_codes;
+      if (typeof blockers === 'string') { try { blockers = JSON.parse(blockers); } catch(e) { blockers = []; } }
+      blockers = Array.isArray(blockers) ? blockers : [];
+      var blockerBadge = blockers.length > 0
+        ? '<span style="display:inline-block;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:600;background:#fecaca;color:#991b1b;margin-left:4px">✗' + blockers.length + '</span>'
+        : '';
+      var conf = c.overall_confidence ? Number(c.overall_confidence).toFixed(2) : '-';
+      var rcv = c.created_at ? new Date(c.created_at).toLocaleString('vi-VN', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : '-';
+      return '<tr data-aiq-case-id="' + _esc(c.id) + '" style="cursor:pointer;border-bottom:1px solid var(--border-1,#e5e7eb);background:' + (sel ? '#dbeafe' : '#fff') + '">'
+        + '<td style="padding:8px 12px;font-size:12px;font-family:ui-monospace,monospace">' + _esc(c.intake_no || '?') + blockerBadge + '</td>'
+        + '<td style="padding:8px 12px">' + statusBadge(c.status) + '</td>'
+        + '<td style="padding:8px 12px;font-size:12px">' + _esc(c.customer_id || '-') + '</td>'
+        + '<td style="padding:8px 12px;font-size:12px;font-family:ui-monospace,monospace">' + _esc(c.customer_po_number || '-') + '</td>'
+        + '<td style="padding:8px 12px;font-size:12px;text-align:right">' + _esc(c.line_count || 0) + '</td>'
+        + '<td style="padding:8px 12px;font-size:12px;text-align:right">' + _esc(conf) + '</td>'
+        + '<td style="padding:8px 12px;font-size:11px;color:var(--text-3,#6b7280)">' + _esc(rcv) + '</td>'
+        + '<td style="padding:8px 12px;font-size:11px">' + sourceBadge(c) + '</td>'
+        + '</tr>';
+    }).join('');
+    return '<div style="background:#fff;flex:1;overflow:auto"><table style="width:100%;border-collapse:collapse">'
+      + '<thead style="position:sticky;top:0;background:var(--surface-2,#f9fafb);z-index:1">'
+      + '<tr style="border-bottom:2px solid var(--border-1,#e5e7eb)">'
+      + '<th style="padding:8px 12px;font-size:11px;text-align:left;text-transform:uppercase;letter-spacing:.5px;color:var(--text-2,#374151);font-weight:600">' + _t('Intake #', 'Intake #') + '</th>'
+      + '<th style="padding:8px 12px;font-size:11px;text-align:left;text-transform:uppercase;letter-spacing:.5px;color:var(--text-2,#374151);font-weight:600">' + _t('Trạng thái', 'Status') + '</th>'
+      + '<th style="padding:8px 12px;font-size:11px;text-align:left;text-transform:uppercase;letter-spacing:.5px;color:var(--text-2,#374151);font-weight:600">' + _t('Khách', 'Customer') + '</th>'
+      + '<th style="padding:8px 12px;font-size:11px;text-align:left;text-transform:uppercase;letter-spacing:.5px;color:var(--text-2,#374151);font-weight:600">' + _t('PO #', 'PO #') + '</th>'
+      + '<th style="padding:8px 12px;font-size:11px;text-align:right;text-transform:uppercase;letter-spacing:.5px;color:var(--text-2,#374151);font-weight:600">' + _t('Lines', 'Lines') + '</th>'
+      + '<th style="padding:8px 12px;font-size:11px;text-align:right;text-transform:uppercase;letter-spacing:.5px;color:var(--text-2,#374151);font-weight:600">' + _t('Conf', 'Conf') + '</th>'
+      + '<th style="padding:8px 12px;font-size:11px;text-align:left;text-transform:uppercase;letter-spacing:.5px;color:var(--text-2,#374151);font-weight:600">' + _t('Nhận', 'Received') + '</th>'
+      + '<th style="padding:8px 12px;font-size:11px;text-align:left;text-transform:uppercase;letter-spacing:.5px;color:var(--text-2,#374151);font-weight:600">' + _t('Source', 'Source') + '</th>'
+      + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+  }
+
+  function _renderDrawer(){
+    if (!state.drawerOpen || !state.selected) return '';
+    var c = state.selected;
+    var blockers = c.blocking_codes;
+    if (typeof blockers === 'string') { try { blockers = JSON.parse(blockers); } catch(e) { blockers = []; } }
+    blockers = Array.isArray(blockers) ? blockers : [];
+    var warnings = c.warning_codes;
+    if (typeof warnings === 'string') { try { warnings = JSON.parse(warnings); } catch(e) { warnings = []; } }
+    warnings = Array.isArray(warnings) ? warnings : [];
+
+    var isTerminal = ['committed_cpo','committed_so','rejected','closed'].indexOf(c.status) >= 0;
+    var canApprove = c.status === 'needs_review' && blockers.length === 0;
+    var canCommitCpo = c.status === 'approved' && !c.committed_customer_po_id;
+    var canCommitSo = (c.status === 'approved' || c.status === 'committed_cpo') && !c.committed_so_number;
+
+    function btn(label, action, enabled, color){
+      var bg = enabled ? color : '#e5e7eb';
+      var fg = enabled ? '#fff' : '#9ca3af';
+      var dis = enabled ? '' : 'disabled';
+      return '<button data-aiq-action="' + action + '" ' + dis + ' style="padding:8px 14px;background:' + bg + ';color:' + fg + ';border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:' + (enabled ? 'pointer' : 'not-allowed') + '">' + _esc(label) + '</button>';
+    }
+
+    var lines = c.lines || [];
+    var attachments = c.attachments || [];
+
+    // Chain breadcrumb
+    var chain = '<div style="padding:10px 16px;background:var(--surface-2,#f9fafb);font-size:11px;color:var(--text-2,#374151);border-bottom:1px solid var(--border-1,#e5e7eb)">'
+      + '📧 Email → 📦 Case ' + _esc(c.intake_no) + ' '
+      + (c.committed_customer_po_id ? ' → 📋 ' + _esc(c.committed_customer_po_id) : ' → 📋 CPO')
+      + (c.committed_so_number ? ' → 🛒 ' + _esc(c.committed_so_number) : ' → 🛒 SO')
+      + ' → 🏭 JO → ⚙ WO'
+      + '</div>';
+
+    return '<aside id="aiq-drawer" style="position:fixed;top:0;right:0;width:520px;max-width:90vw;height:100vh;background:#fff;box-shadow:-4px 0 20px rgba(0,0,0,.15);z-index:1000;display:flex;flex-direction:column">'
+      + '<header style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border-1,#e5e7eb)">'
+      +   '<div><div style="font-size:14px;font-weight:700">📦 ' + _esc(c.intake_no || '?') + '</div>'
+      +   '<div style="font-size:11px;color:var(--text-3,#6b7280);margin-top:2px">' + statusBadge(c.status) + '</div></div>'
+      +   '<button id="aiq-drawer-close" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-3,#6b7280)">×</button>'
+      + '</header>'
+      + chain
+      + '<div style="flex:1;overflow:auto;padding:16px;font-size:12px">'
+      // Customer + PO
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">'
+      +   '<div><div style="font-size:10px;color:var(--text-3,#6b7280);text-transform:uppercase;letter-spacing:.5px">' + _t('Khách hàng', 'Customer') + '</div><div style="font-weight:600">' + _esc(c.customer_id || '-') + '</div><div style="font-size:11px;color:var(--text-2,#374151)">' + _esc(c.customer_name || '') + '</div></div>'
+      +   '<div><div style="font-size:10px;color:var(--text-3,#6b7280);text-transform:uppercase;letter-spacing:.5px">PO #</div><div style="font-weight:600;font-family:ui-monospace,monospace">' + _esc(c.customer_po_number || '-') + '</div></div>'
+      +   '<div><div style="font-size:10px;color:var(--text-3,#6b7280);text-transform:uppercase;letter-spacing:.5px">' + _t('Loại', 'Type') + '</div><div>' + _esc(c.document_type || '-') + ' / ' + _esc(c.action_type || '-') + '</div></div>'
+      +   '<div><div style="font-size:10px;color:var(--text-3,#6b7280);text-transform:uppercase;letter-spacing:.5px">' + _t('Tin cậy', 'Confidence') + '</div><div style="font-weight:600">' + _esc(c.overall_confidence ? Number(c.overall_confidence).toFixed(2) : '-') + '</div></div>'
+      + '</div>'
+      // Blockers banner
+      + (blockers.length > 0
+          ? '<div style="padding:8px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;margin-bottom:12px;font-size:12px;color:#991b1b"><strong>✗ ' + blockers.length + ' blocker(s):</strong> ' + _esc(blockers.join(', ')) + '</div>'
+          : warnings.length > 0
+            ? '<div style="padding:8px 12px;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;margin-bottom:12px;font-size:12px;color:#92400e"><strong>⚠ ' + warnings.length + ' warning(s):</strong> ' + _esc(warnings.join(', ')) + '</div>'
+            : '<div style="padding:8px 12px;background:#d1fae5;border:1px solid #a7f3d0;border-radius:6px;margin-bottom:12px;font-size:12px;color:#065f46">✓ ' + _t('Không có blocker hay warning.', 'No blockers or warnings.') + '</div>')
+      // Committed info
+      + (c.committed_customer_po_id || c.committed_so_number
+          ? '<div style="padding:10px 12px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:6px;margin-bottom:12px;font-size:12px">'
+            + (c.committed_customer_po_id ? '<div>📋 <strong>Customer PO:</strong> <span style="font-family:ui-monospace,monospace">' + _esc(c.committed_customer_po_id) + '</span></div>' : '')
+            + (c.committed_so_number      ? '<div style="margin-top:4px">🛒 <strong>Sales Order:</strong> <span style="font-family:ui-monospace,monospace">' + _esc(c.committed_so_number) + '</span></div>' : '')
+          + '</div>'
+          : '')
+      // Lines
+      + '<h4 style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-2,#374151);margin:12px 0 6px 0">📦 ' + _t('Lines', 'Lines') + ' (' + lines.length + ')</h4>'
+      + (lines.length > 0
+          ? '<table style="width:100%;font-size:11px;border-collapse:collapse">'
+            + '<thead><tr style="background:var(--surface-2,#f9fafb)"><th style="padding:6px;text-align:left">#</th><th style="padding:6px;text-align:left">Part</th><th style="padding:6px;text-align:left">Rev</th><th style="padding:6px;text-align:right">Qty</th><th style="padding:6px;text-align:right">Price</th></tr></thead>'
+            + '<tbody>' + lines.map(function(l){
+                return '<tr style="border-bottom:1px solid #f3f4f6"><td style="padding:6px">' + _esc(l.line_no) + '</td><td style="padding:6px;font-family:ui-monospace,monospace">' + _esc(l.part_number) + '</td><td style="padding:6px">' + _esc(l.revision_number) + '</td><td style="padding:6px;text-align:right">' + _esc(l.quantity) + ' ' + _esc(l.uom || '') + '</td><td style="padding:6px;text-align:right">' + _esc(l.unit_price != null ? Number(l.unit_price).toFixed(2) : '-') + '</td></tr>';
+              }).join('') + '</tbody></table>'
+          : '<div style="color:var(--text-3,#6b7280);font-size:11px">' + _t('Không có line.', 'No lines.') + '</div>')
+      // Attachments
+      + '<h4 style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-2,#374151);margin:14px 0 6px 0">📎 ' + _t('Đính kèm', 'Attachments') + ' (' + attachments.length + ')</h4>'
+      + (attachments.length > 0
+          ? '<div>' + attachments.map(function(a){
+              var kb = a.file_size_bytes ? Math.round(a.file_size_bytes / 1024) + ' KB' : '?';
+              return '<div style="padding:6px;font-size:11px"><span style="font-family:ui-monospace,monospace">' + _esc(a.original_filename) + '</span> · <span style="color:var(--text-3,#6b7280)">' + kb + ' · ' + _esc(a.mime_type || '') + '</span></div>';
+            }).join('') + '</div>'
+          : '<div style="color:var(--text-3,#6b7280);font-size:11px">' + _t('Không có attachment.', 'No attachments.') + '</div>')
+      + '</div>'
+      // Actions sticky footer
+      + '<footer style="display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border-1,#e5e7eb);background:#fff">'
+      +   btn(_t('🔄 Re-validate', '🔄 Re-validate'), 'revalidate', !isTerminal, '#6b7280')
+      +   btn(_t('✗ Reject', '✗ Reject'), 'reject', !isTerminal && c.status !== 'rejected', '#dc2626')
+      +   '<div style="flex:1"></div>'
+      +   btn(_t('✓ Approve', '✓ Approve'), 'approve', canApprove, '#10b981')
+      +   btn(_t('Commit CPO', 'Commit CPO'), 'commit_cpo', canCommitCpo, '#8b5cf6')
+      +   btn(_t('Commit SO', 'Commit SO'), 'commit_so', canCommitSo, '#8b5cf6')
+      + '</footer>'
+      + '</aside>';
+  }
+
+  /* Wrappers around the Promise-returning window.apiCall.
+   * window.apiCall URL-encodes the action argument so we cannot pass
+   * &-delimited query strings through the action — params must come
+   * via the payload object (which apiCall serializes to the query
+   * string for GET methods).
+   */
+  function apiGet(action, payload){
+    if (typeof window.apiCall !== 'function') {
+      return Promise.resolve({ ok: false, error: 'apiCall_unavailable' });
+    }
+    return window.apiCall(action, payload || {}, 'GET')
+      .then(function(r){ return r || { ok: false, error: 'empty' }; })
+      .catch(function(e){ return { ok: false, error: String(e && e.message || e) }; });
+  }
+  function apiPost(action, payload){
+    if (typeof window.apiCall !== 'function') {
+      return Promise.resolve({ ok: false, error: 'apiCall_unavailable' });
+    }
+    return window.apiCall(action, payload || {}, 'POST')
+      .then(function(r){ return r || { ok: false, error: 'empty' }; })
+      .catch(function(e){ return { ok: false, error: String(e && e.message || e) }; });
+  }
+
+  function loadList(){
+    state.loading = true;
+    _bindAi();
+    apiGet('ai_order_intake_case_list', { limit: 100, offset: 0 }).then(function(res){
+      state.loading = false;
+      if (res && res.ok) {
+        state.cases = res.cases || (res.data && res.data.items) || res.items || [];
+      } else {
+        state.cases = [];
+        console.error('[AiIntakeQueue] list_cases failed:', res);
+      }
+      _bindAi();
+    });
+  }
+
+  function loadCaseDetail(caseId, cb){
+    apiGet('ai_order_intake_case_detail', { id: caseId }).then(function(res){
+      if (res && res.ok && res.case) {
+        cb(res.case);
+      } else {
+        alert(_t('Lỗi tải chi tiết case: ', 'Failed to load case detail: ') + ((res && res.error) || 'unknown'));
+      }
+    });
+  }
+
+  function openCase(caseId){
+    loadCaseDetail(caseId, function(detail){
+      state.selected = detail;
+      state.drawerOpen = true;
+      _bindAi();
+    });
+  }
+
+  function closeDrawer(){
+    state.drawerOpen = false;
+    state.selected = null;
+    _bindAi();
+  }
+
+  function _bindAi(){
+    // Re-render the dynamic regions
+    var kpiMount = document.getElementById('aiq-kpi-mount');
+    if (kpiMount) kpiMount.innerHTML = _renderKpiHeader();
+    var filterMount = document.getElementById('aiq-filter-mount');
+    if (filterMount) filterMount.innerHTML = _renderFilters();
+    var listMount = document.getElementById('aiq-list-mount');
+    if (listMount) listMount.innerHTML = _renderList();
+
+    // Drawer
+    var existing = document.getElementById('aiq-drawer');
+    if (existing) existing.remove();
+    if (state.drawerOpen) {
+      document.body.insertAdjacentHTML('beforeend', _renderDrawer());
+      var closeBtn = document.getElementById('aiq-drawer-close');
+      if (closeBtn) closeBtn.onclick = closeDrawer;
+      // Wire action buttons
+      var drawer = document.getElementById('aiq-drawer');
+      if (drawer) {
+        Array.prototype.forEach.call(drawer.querySelectorAll('[data-aiq-action]'), function(btn){
+          if (btn.disabled) return;
+          btn.onclick = function(){ _doAction(btn.getAttribute('data-aiq-action')); };
+        });
+      }
+    }
+
+    // Row click handlers
+    Array.prototype.forEach.call(document.querySelectorAll('[data-aiq-case-id]'), function(tr){
+      tr.onclick = function(){ openCase(Number(tr.getAttribute('data-aiq-case-id'))); };
+    });
+
+    // Filter + refresh handlers
+    var fs = document.getElementById('aiq-filter-status');
+    if (fs) fs.onchange = function(){ state.filterStatus = fs.value; _bindAi(); };
+    var rf = document.getElementById('aiq-refresh');
+    if (rf) rf.onclick = loadList;
+  }
+
+  function _doAction(action){
+    if (!state.selected) return;
+    var caseId = state.selected.id;
+
+    function reload(){
+      loadList();
+      loadCaseDetail(caseId, function(d){ state.selected = d; _bindAi(); });
+    }
+
+    if (action === 'revalidate') {
+      apiPost('ai_order_intake_case_validate', { id: caseId }).then(function(res){
+        if (res && res.ok) reload();
+        else alert(_t('Re-validate lỗi: ', 'Re-validate failed: ') + ((res && res.error) || 'unknown'));
+      });
+      return;
+    }
+    if (action === 'reject') {
+      var reason = prompt(_t('Lý do từ chối:', 'Rejection reason:'), '');
+      if (reason === null || reason.trim() === '') return;
+      apiPost('ai_order_intake_case_reject', { id: caseId, reason: reason }).then(function(res){
+        if (res && res.ok) reload();
+        else alert(_t('Reject lỗi: ', 'Reject failed: ') + ((res && res.error) || 'unknown'));
+      });
+      return;
+    }
+    if (action === 'approve') {
+      if (!confirm(_t('Approve case này?', 'Approve this case?'))) return;
+      var why = prompt(_t('Lý do approve (tùy chọn):', 'Approval reason (optional):'), '');
+      apiPost('ai_order_intake_case_approve', { id: caseId, reason: why || '' }).then(function(res){
+        if (res && res.ok) reload();
+        else alert(_t('Approve lỗi: ', 'Approve failed: ') + ((res && res.error) || 'unknown'));
+      });
+      return;
+    }
+    if (action === 'commit_cpo') {
+      if (!confirm(_t('Commit Customer PO? Action không undo được.', 'Commit Customer PO? Cannot be undone.'))) return;
+      apiPost('ai_order_intake_commit_cpo', { id: caseId }).then(function(res){
+        if (res && res.ok) {
+          alert('✓ CPO: ' + (res.customer_po_id || res.cpo_id || res.target_ref || 'committed'));
+          reload();
+        } else alert(_t('Commit CPO lỗi: ', 'Commit CPO failed: ') + ((res && res.error) || 'unknown'));
+      });
+      return;
+    }
+    if (action === 'commit_so') {
+      if (!confirm(_t('Commit Sales Order? Action không undo được.', 'Commit Sales Order? Cannot be undone.'))) return;
+      apiPost('ai_order_intake_commit_so', { id: caseId }).then(function(res){
+        if (res && res.ok) {
+          alert('✓ SO: ' + (res.so_number || res.target_ref || 'committed'));
+          reload();
+        } else alert(_t('Commit SO lỗi: ', 'Commit SO failed: ') + ((res && res.error) || 'unknown'));
+      });
+      return;
+    }
+  }
+
+  function init(){
+    loadList();
+    // Keyboard shortcuts: only when not typing in input/select/textarea
+    if (!window._aiqKeyBound) {
+      window._aiqKeyBound = true;
+      document.addEventListener('keydown', function(ev){
+        if (_activeTab !== 'ai-intake') return;
+        var t = ev.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+        if (ev.key === 'Escape' && state.drawerOpen) { closeDrawer(); return; }
+        if (ev.key === 'r' && state.drawerOpen) { _doAction('reject'); return; }
+        if (ev.key === 'e' && state.drawerOpen) { _doAction('approve'); return; }
+        // j/k navigation
+        if (ev.key === 'j' || ev.key === 'k') {
+          var filtered = state.cases.filter(function(c){
+            return !state.filterStatus || c.status === state.filterStatus;
+          });
+          var idx = state.selected ? filtered.findIndex(function(c){ return c.id === state.selected.id; }) : -1;
+          var next = ev.key === 'j' ? Math.min(filtered.length - 1, idx + 1) : Math.max(0, idx - 1);
+          if (filtered[next]) openCase(filtered[next].id);
+        }
+      });
+    }
+  }
+
+  return { init: init, openCase: openCase, closeDrawer: closeDrawer };
+})();
+
+function _renderAiIntakeShell(){
+  // Static skeleton — populated by AiIntakeQueue._bindAi() once data loads.
+  // The three mount-points are filled in by:
+  //   #aiq-kpi-mount    → _renderKpiHeader()  (cards from state.cases)
+  //   #aiq-filter-mount → _renderFilters()    (status select + refresh)
+  //   #aiq-list-mount   → _renderList()       (table)
+  return '<div style="display:flex;flex-direction:column;height:calc(100vh - 220px);background:#fff;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;overflow:hidden">'
+    + '<div id="aiq-kpi-mount"></div>'
+    + '<div id="aiq-filter-mount"></div>'
+    + '<div id="aiq-list-mount" style="flex:1;overflow:auto"></div>'
+    + '</div>';
+}
+
 function _render(){
   var h='<div class="sj-wrap">';
   // PR #2 — top-level tabs
   h += _renderOrdersTabStrip();
 
+  if (_activeTab === 'ai-intake') {
+    // PR #3 — AI Intake Queue (full implementation)
+    h += _renderAiIntakeShell();
+    h += '</div>';
+    _container.innerHTML = h;
+    _bind();
+    AiIntakeQueue.init();
+    return;
+  }
+
   if (_activeTab !== 'so-jo-wo') {
-    // Placeholder tabs (PR #3-5 fill these in)
+    // Placeholder tabs (PR #4-5 fill these in)
     h += _renderTabPlaceholder(_activeTab);
     h += '</div>';
     _container.innerHTML = h;
