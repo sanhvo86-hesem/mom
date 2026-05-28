@@ -7,6 +7,7 @@ $root = dirname(__DIR__, 3);
 
 require_once $root . '/mom/api/services/FileHelper.php';
 require_once $root . '/mom/api/services/RaciControlRegistryService.php';
+require_once $root . '/mom/api/services/ScenarioRegistryService.php';
 require_once $root . '/mom/api/services/AuthorityWorkflowGuardService.php';
 
 use MOM\Api\Services\AuthorityWorkflowGuardService;

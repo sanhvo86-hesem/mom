@@ -43,6 +43,20 @@ final class AuthorityWorkflowGuardService
             }
         }
 
+        $scenario = new ScenarioRegistryService($this->rootDir, $this->dataDir);
+        $scenarioConfig = $scenario->load();
+        $scenarios = is_array($scenarioConfig['scenarios'] ?? null) ? $scenarioConfig['scenarios'] : [];
+        $scenarioById = [];
+        foreach ($scenarios as $scenarioRow) {
+            if (!is_array($scenarioRow)) {
+                continue;
+            }
+            $scenarioId = strtoupper(trim((string)($scenarioRow['scenario_id'] ?? '')));
+            if ($scenarioId !== '') {
+                $scenarioById[$scenarioId] = $scenarioRow;
+            }
+        }
+
         foreach ($rows as $row) {
             if (!is_array($row)) {
                 continue;
@@ -60,8 +74,15 @@ final class AuthorityWorkflowGuardService
             if ($this->arrayOfStrings($row['approver_roles'] ?? null) === []) {
                 $issues[] = ['severity' => 'P0', 'path' => $id, 'message' => 'Workflow transition has no approver roles.'];
             }
+            if ($this->arrayOfStrings($row['release_roles'] ?? null) === []) {
+                $issues[] = ['severity' => 'P0', 'path' => $id, 'message' => 'Workflow transition has no release roles.'];
+            }
             if ($this->arrayOfStrings($row['sod_rules'] ?? null) === []) {
                 $issues[] = ['severity' => 'P0', 'path' => $id, 'message' => 'Workflow transition has no SoD rules.'];
+            }
+            $requiredCdr = strtoupper(trim((string)($row['required_cdr'] ?? '')));
+            if ($requiredCdr === '' || $requiredCdr !== $cdr) {
+                $issues[] = ['severity' => 'P0', 'path' => $id, 'message' => 'Workflow transition required_cdr drifted from cdr.'];
             }
             $outage = is_array($row['outage_fallback'] ?? null) ? $row['outage_fallback'] : [];
             if (($outage['allowed'] ?? false) && empty($outage['requires_replay'])) {
@@ -70,6 +91,36 @@ final class AuthorityWorkflowGuardService
             if (in_array('m365', $this->arrayOfStrings($row['channels'] ?? null), true)
                 && $this->arrayOfStrings($row['approver_roles'] ?? null) === []) {
                 $issues[] = ['severity' => 'P0', 'path' => $id, 'message' => 'M365 channel present without business approver roles.'];
+            }
+
+            $scenarioIds = $this->arrayOfStrings($row['scenario_ids'] ?? null);
+            if ($scenarioIds === []) {
+                $issues[] = ['severity' => 'P0', 'path' => $id, 'message' => 'Workflow transition has no mapped scenario playbook.'];
+                continue;
+            }
+
+            $gate = strtoupper(trim((string)($row['gate'] ?? '')));
+            $matchedScenario = false;
+            foreach ($scenarioIds as $scenarioId) {
+                if (!isset($scenarioById[$scenarioId])) {
+                    $issues[] = ['severity' => 'P0', 'path' => $id, 'message' => sprintf('Workflow transition references unknown scenario %s.', $scenarioId)];
+                    continue;
+                }
+                $scenarioRow = $scenarioById[$scenarioId];
+                $scenarioCdrs = $this->arrayOfStrings($scenarioRow['cdr'] ?? null);
+                $scenarioGates = $this->arrayOfStrings($scenarioRow['gate'] ?? null);
+                if (!in_array($cdr, $scenarioCdrs, true)) {
+                    $issues[] = ['severity' => 'P0', 'path' => $id, 'message' => sprintf('Scenario %s does not cover workflow CDR %s.', $scenarioId, $cdr)];
+                    continue;
+                }
+                if ($gate !== '' && !in_array($gate, $scenarioGates, true)) {
+                    $issues[] = ['severity' => 'P0', 'path' => $id, 'message' => sprintf('Scenario %s does not cover workflow gate %s.', $scenarioId, $gate)];
+                    continue;
+                }
+                $matchedScenario = true;
+            }
+            if (!$matchedScenario) {
+                $issues[] = ['severity' => 'P0', 'path' => $id, 'message' => 'Workflow transition has no valid scenario coverage for its gate and CDR.'];
             }
         }
 

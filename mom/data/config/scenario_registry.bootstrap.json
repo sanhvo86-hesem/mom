@@ -4403,6 +4403,153 @@
       "deputy_rule": "ANNEX-123"
     },
     {
+      "scenario_id": "SCN-G3-SCHEDULE-BREAKGLASS",
+      "category": "PRODUCTION_G3",
+      "title": "Phá băng lịch để cứu lệnh khách chiến lược",
+      "trigger": [
+        "Khách chiến lược kéo ngày giao sớm hoặc lệnh ưu tiên phát sinh làm xung đột lịch đã khóa."
+      ],
+      "early_warning": [
+        "Dispatch impact crosses committed ship window.",
+        "Planner or QA flags evidence gap before releasing a new sequence."
+      ],
+      "gate": [
+        "G3"
+      ],
+      "cdr": [
+        "C3"
+      ],
+      "severity": "P1",
+      "production_mode": "HOLD_UNTIL_DECISION",
+      "first_15_minutes": [
+        "WKM khóa thay đổi thứ tự chạy cho đến khi FRM-502 ghi rõ lệnh bị ảnh hưởng.",
+        "PPL lập impact list gồm lệnh bị trễ, công đoạn CTQ và mức ảnh hưởng cam kết giao hàng.",
+        "QA xác nhận không nhả lệnh mới nếu missing evidence hoặc đổi ưu tiên làm đứt traceability/handover.",
+        "CS chỉ được thông báo khách hàng sau khi C3 đủ authority; nếu đổi promise đã xác nhận thì mở A6 song song."
+      ],
+      "can_continue_conditions": [
+        "Required evidence complete",
+        "Authority release signed",
+        "Updated dispatch sequence communicated to all affected shifts"
+      ],
+      "must_hold_conditions": [
+        "Missing required evidence",
+        "Authority unresolved",
+        "Customer commitment impact not yet assessed"
+      ],
+      "raci": {
+        "a_process": "PPL",
+        "proposer": [
+          "WKM"
+        ],
+        "verifier": [
+          "QA"
+        ],
+        "responsible": [
+          "WKM",
+          "CS",
+          "PD",
+          "QA"
+        ],
+        "consulted": [
+          "CS",
+          "PD",
+          "QA"
+        ],
+        "informed": [
+          "CEO"
+        ]
+      },
+      "authority": {
+        "release_authority": [
+          "PPL",
+          "PD"
+        ],
+        "hold_authority": [
+          "SL",
+          "WKM"
+        ],
+        "deputy_rule": "ANNEX-123"
+      },
+      "evidence_required": [
+        "FRM-502",
+        "SOP-201",
+        "FRM-212",
+        "event_log",
+        "traceability_snapshot",
+        "dispatch_impact_review"
+      ],
+      "system_transactions": [
+        "MOM.dispatch.control",
+        "Epicor.job.priority",
+        "MOM.control.event",
+        "audit.log"
+      ],
+      "communication": {
+        "internal": "Tier escalation within 15 minutes",
+        "customer": "CS only after C3 authority signs and commercial promise impact is confirmed"
+      },
+      "sla": {
+        "containment": "15min",
+        "disposition": "4h",
+        "customer_update": "4h"
+      },
+      "exit_criteria": [
+        "Containment complete",
+        "Authority release signed",
+        "Updated dispatch sequence communicated to all affected shifts"
+      ],
+      "capa_trigger": [
+        "repeat",
+        "escape",
+        "systemic cause"
+      ],
+      "training_card": true,
+      "linked_docs": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "SOP-503"
+      ],
+      "linked_cdrs": [
+        "C3"
+      ],
+      "linked_rows": [
+        "g3-c3-ph-duy-t-ph-b-ng-l-ch-i-u-ti-n-kh-n-c-p"
+      ],
+      "role_overlay": "workshop",
+      "area": "Sản xuất",
+      "a_process": "PPL",
+      "proposer": [
+        "WKM"
+      ],
+      "verifier": [
+        "QA"
+      ],
+      "responsible": [
+        "WKM",
+        "CS",
+        "PD",
+        "QA"
+      ],
+      "consulted": [
+        "CS",
+        "PD",
+        "QA"
+      ],
+      "informed": [
+        "CEO"
+      ],
+      "release_authority": [
+        "PPL",
+        "PD"
+      ],
+      "hold_authority": [
+        "SL",
+        "WKM"
+      ],
+      "deputy_rule": "ANNEX-123"
+    },
+    {
       "scenario_id": "SCN-G3-MISSING-SET-SL",
       "category": "PRODUCTION_G3",
       "title": "Thiếu SET hoặc SL trong ca",
@@ -13871,6 +14018,150 @@
       "deputy_rule": "ANNEX-123"
     },
     {
+      "scenario_id": "SCN-G3-OUTSOURCE-INCOMING-VERIFICATION-FAIL",
+      "category": "MATERIAL_SUPPLIER_G2",
+      "title": "Hàng outsource về nhưng FRM-411 hoặc cert không đạt",
+      "trigger": [
+        "Lô gia công ngoài về nhưng FRM-411, cert hoặc điều kiện kỹ thuật đầu vào không khớp."
+      ],
+      "early_warning": [
+        "Incoming verification reveals cert or CTQ mismatch before put-away.",
+        "QA or SCM identifies unresolved supplier evidence before release."
+      ],
+      "gate": [
+        "G3"
+      ],
+      "cdr": [
+        "E4"
+      ],
+      "severity": "P1",
+      "production_mode": "HOLD_UNTIL_DECISION",
+      "first_15_minutes": [
+        "QA/IQC mở HOLD ngay trên lot và chặn nhập tiếp vào WIP.",
+        "SCM khoá giao dịch nhận hàng hoặc phát vật tư cho đến khi FRM-411 và cert được làm rõ.",
+        "ENGM xác nhận CTQ nào bị ảnh hưởng và có cần mở NCR song song không.",
+        "PPL cập nhật impact lệnh đang chờ công đoạn outsource để tránh release sai thứ tự."
+      ],
+      "can_continue_conditions": [
+        "Required evidence complete",
+        "Authority release signed",
+        "Incoming disposition and traceability records updated"
+      ],
+      "must_hold_conditions": [
+        "Missing required evidence",
+        "Authority unresolved",
+        "Supplier or quality disposition not closed"
+      ],
+      "raci": {
+        "a_process": "SCM",
+        "proposer": [
+          "QA"
+        ],
+        "verifier": [
+          "QA"
+        ],
+        "responsible": [
+          "QA",
+          "SCM"
+        ],
+        "consulted": [
+          "ENGM",
+          "PPL",
+          "WKM"
+        ],
+        "informed": [
+          "PD",
+          "CEO"
+        ]
+      },
+      "authority": {
+        "release_authority": [
+          "SCM"
+        ],
+        "hold_authority": [
+          "SL",
+          "WKM"
+        ],
+        "deputy_rule": "ANNEX-123"
+      },
+      "evidence_required": [
+        "FRM-404",
+        "FRM-411",
+        "SOP-201",
+        "event_log",
+        "traceability_snapshot",
+        "incoming_cert_scan"
+      ],
+      "system_transactions": [
+        "MOM.dispatch.control",
+        "Epicor.po.status",
+        "MOM.control.event",
+        "audit.log"
+      ],
+      "communication": {
+        "internal": "Tier escalation within 30 minutes",
+        "customer": "CS only after QA and SCM align disposition when customer impact exists"
+      },
+      "sla": {
+        "containment": "15min",
+        "disposition": "24h",
+        "escalation": "48h"
+      },
+      "exit_criteria": [
+        "Containment complete",
+        "Authority release signed",
+        "Incoming disposition and traceability records updated"
+      ],
+      "capa_trigger": [
+        "repeat",
+        "escape",
+        "systemic cause"
+      ],
+      "training_card": true,
+      "linked_docs": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "SOP-401",
+        "SOP-402"
+      ],
+      "linked_cdrs": [
+        "E4"
+      ],
+      "linked_rows": [
+        "g3-e4-ph-duy-t-giao-gia-c-ng-ngo-i-v-x-c-minh-u-v-o"
+      ],
+      "role_overlay": "supply_chain",
+      "area": "Vật tư/Nhà cung cấp",
+      "a_process": "SCM",
+      "proposer": [
+        "QA"
+      ],
+      "verifier": [
+        "QA"
+      ],
+      "responsible": [
+        "QA",
+        "SCM"
+      ],
+      "consulted": [
+        "ENGM",
+        "PPL",
+        "WKM"
+      ],
+      "informed": [
+        "PD",
+        "CEO"
+      ],
+      "release_authority": [
+        "SCM"
+      ],
+      "hold_authority": [
+        "SL",
+        "WKM"
+      ],
+      "deputy_rule": "ANNEX-123"
+    },
+    {
       "scenario_id": "SCN-G2-SUPPLIER-LATE-ON-CRITICAL-LOT",
       "category": "MATERIAL_SUPPLIER_G2",
       "title": "Nhà cung cấp trễ trên lot CTQ",
@@ -18295,6 +18586,131 @@
         "Epicor.quality.status",
         "MOM.quality.escape",
         "Epicor.customer_notification"
+      ]
+    },
+    {
+      "drill_id": "DRL-025",
+      "scenario_id": "SCN-G3-SCHEDULE-BREAKGLASS",
+      "title": "Phá băng lịch để cứu lệnh khách chiến lược",
+      "area": "Sản xuất",
+      "roles_participating": [
+        "CS",
+        "PD",
+        "PPL",
+        "QA",
+        "WKM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "SOP-503",
+        "SOP-201"
+      ],
+      "expected_first_15_minutes": [
+        "WKM khóa thay đổi thứ tự chạy cho đến khi FRM-502 ghi rõ toàn bộ lệnh bị ảnh hưởng.",
+        "PPL lập impact list cho ngày giao, CTQ và các ca đang chạy.",
+        "QA xác nhận lot nào phải giữ nếu đổi sequence làm đứt handover hoặc traceability.",
+        "CS không được hứa lại ngày giao trước khi C3 đủ authority; nếu đổi promise đã xác nhận thì mở A6 song song."
+      ],
+      "expected_cdr_authority_lookup": [
+        "C3"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Authority unresolved",
+          "Customer commitment impact not yet assessed"
+        ],
+        "release_authority": [
+          "PPL",
+          "PD"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-502",
+        "SOP-201",
+        "FRM-212",
+        "dispatch_impact_review",
+        "event_log"
+      ],
+      "common_wrong_answer": "Đẩy lệnh VIP vào máy ngay và để CS hứa khách trước khi lượng hóa lệnh bị trễ cùng authority C3.",
+      "pass_fail_rubric": [
+        "Khóa sequence và containment đúng trước khi đổi lịch",
+        "Tra đúng authority C3 và mở A6 song song khi đổi promise",
+        "Ghi đủ impact, evidence và escalation"
+      ],
+      "debrief_questions": [
+        "Ở điểm nào người điều độ dễ nhảy cóc authority vì áp lực khách chiến lược?",
+        "Nếu PD vắng thì rule phó nào được kích hoạt trước khi release?",
+        "Lot nào phải hold nếu traceability hoặc handover chưa theo kịp sequence mới?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.dispatch.control",
+        "Epicor.job.priority",
+        "MOM.control.event",
+        "audit.log"
+      ]
+    },
+    {
+      "drill_id": "DRL-026",
+      "scenario_id": "SCN-G3-OUTSOURCE-INCOMING-VERIFICATION-FAIL",
+      "title": "Hàng outsource về nhưng FRM-411 hoặc cert không đạt",
+      "area": "Vật tư/Nhà cung cấp",
+      "roles_participating": [
+        "ENGM",
+        "PPL",
+        "QA",
+        "SCM",
+        "WKM"
+      ],
+      "documents_to_open": [
+        "RACI-MASTER-MATRIX",
+        "AUTHORITY-MATRIX",
+        "SOP-401",
+        "SOP-402"
+      ],
+      "expected_first_15_minutes": [
+        "QA/IQC mở HOLD ngay trên lot và chặn nhập tiếp vào WIP.",
+        "SCM khóa giao dịch nhận hàng hoặc cấp phát cho đến khi FRM-411 và cert khớp.",
+        "ENGM xác nhận CTQ nào bị ảnh hưởng và có cần NCR song song không.",
+        "PPL cập nhật impact lệnh đang chờ công đoạn outsource để tránh release nhầm."
+      ],
+      "expected_cdr_authority_lookup": [
+        "E4"
+      ],
+      "expected_hold_release": {
+        "hold": [
+          "Missing required evidence",
+          "Authority unresolved",
+          "Supplier or quality disposition not closed"
+        ],
+        "release_authority": [
+          "SCM"
+        ]
+      },
+      "evidence_to_create": [
+        "FRM-404",
+        "FRM-411",
+        "SOP-201",
+        "incoming_cert_scan",
+        "event_log"
+      ],
+      "common_wrong_answer": "Cho nhập kho hoặc cấp lệnh tiếp chỉ vì nhà cung cấp hứa gửi cert bổ sung sau.",
+      "pass_fail_rubric": [
+        "Hold đúng ngay tại điểm nhận hàng outsource",
+        "Tra đúng E4 và khóa release cho tới khi disposition rõ",
+        "Ghi đủ cert, FRM-411 và impact tới lệnh chờ"
+      ],
+      "debrief_questions": [
+        "Điểm nào dễ nhầm giữa E3 gửi đi outsource và E4 xác nhận đầu vào khi hàng về?",
+        "Nếu lot đã cấp phát nhầm một phần thì escalation nào phải mở thêm?",
+        "Khi supplier phản hồi muộn, transaction nào phải replay để phục hồi traceability?"
+      ],
+      "system_transaction_simulation": [
+        "MOM.dispatch.control",
+        "Epicor.po.status",
+        "MOM.control.event",
+        "audit.log"
       ]
     }
   ]

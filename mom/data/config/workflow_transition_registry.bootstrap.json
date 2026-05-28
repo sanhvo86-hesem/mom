@@ -181,8 +181,8 @@
       ]
     },
     {
-      "id": "material_release",
-      "label": "Material release",
+      "id": "schedule_breakglass_release",
+      "label": "Urgent schedule reprioritization",
       "gate": "G3",
       "cdr": "C3",
       "source_state": "READY_FOR_REVIEW",
@@ -224,7 +224,7 @@
         "Proposer cannot self-verify where verifier role exists.",
         "System permission does not replace business authority."
       ],
-      "audit_event": "workflow.material_release.release",
+      "audit_event": "workflow.schedule_breakglass_release.release",
       "timeout_escalation": {
         "timeout": "24h",
         "to": "PD"
@@ -234,7 +234,9 @@
         "requires_incident_number": true,
         "requires_replay": true
       },
-      "scenario_ids": []
+      "scenario_ids": [
+        "SCN-G3-SCHEDULE-BREAKGLASS"
+      ]
     },
     {
       "id": "fai_release",
@@ -658,8 +660,8 @@
       ]
     },
     {
-      "id": "customer_concession",
-      "label": "Customer concession",
+      "id": "outsource_incoming_release",
+      "label": "Outsource incoming verification",
       "gate": "G3",
       "cdr": "E4",
       "source_state": "DISPOSITION_PENDING",
@@ -701,7 +703,7 @@
         "Proposer cannot self-verify where verifier role exists.",
         "System permission does not replace business authority."
       ],
-      "audit_event": "workflow.customer_concession.approve",
+      "audit_event": "workflow.outsource_incoming_release.approve",
       "timeout_escalation": {
         "timeout": "24h",
         "to": "PD"
@@ -711,7 +713,9 @@
         "requires_incident_number": true,
         "requires_replay": true
       },
-      "scenario_ids": []
+      "scenario_ids": [
+        "SCN-G3-OUTSOURCE-INCOMING-VERIFICATION-FAIL"
+      ]
     },
     {
       "id": "supplier_deviation",
