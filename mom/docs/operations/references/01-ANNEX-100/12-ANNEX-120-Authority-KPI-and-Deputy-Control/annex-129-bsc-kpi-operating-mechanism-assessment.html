@@ -59,7 +59,7 @@ td,th{vertical-align:top}
 <div class="section">
 <h2>1. Kết luận điều hành</h2>
 <div class="callout">
-<b>Kết luận:</b> BSC phù hợp cho công ty gia công CNC nếu chỉ dùng làm bản đồ kết quả cấp lãnh đạo và được đặt trong hệ điều hành Hoshin + TOC + Lean Daily Management + QMS/MES evidence. Không dùng BSC như danh sách KPI phẳng và không đổi hệ chính sang OKR. OKR chỉ dùng cho dự án cải tiến có hạn 60-90 ngày.
+<b>Kết luận:</b> BSC phù hợp cho công ty gia công CNC nếu chỉ dùng làm bản đồ kết quả cấp lãnh đạo và được đặt trong hệ điều hành Hoshin + TOC + Lean Daily Management + QMS/MES bằng chứng. Không dùng BSC như danh sách KPI phẳng và không đổi hệ chính sang OKR. OKR chỉ dùng cho dự án cải tiến có hạn 60-90 ngày.
 </div>
 <div class="callout warn">
 <b>Ranh giới BSC:</b> BSC là layer 2 của hệ điều hành hiệu suất, không phải toàn bộ hệ điều hành. BSC chỉ tổng hợp kết quả theo bốn góc nhìn tài chính, khách hàng, vận hành nội bộ và con người/hệ thống; quyết định thực thi vẫn đi qua Hoshin, TOC, Lean Daily Management và bằng chứng cổng kiểm soát QMS/MES.
@@ -78,14 +78,14 @@ td,th{vertical-align:top}
 <div class="table-card"><table class="table">
 <thead><tr><th>Nguồn đối sánh</th><th>Điểm chuẩn vận hành</th><th>Áp dụng cho HESEM CNC</th></tr></thead>
 <tbody>
-<tr><td><a href="https://www.nist.gov/baldrige/baldrige-criteria-commentary">NIST Baldrige</a></td><td>Measurement phải là hệ tích hợp cho planning, review, fact-based decision và improvement.</td><td>KPI không được đứng một mình; mỗi KPI phải có review forum, người phụ trách hành động và link về Hoshin/Xem xét của lãnh đạo.</td></tr>
-<tr><td><a href="https://help.sap.com/docs/PRODUCT_ID/d62221e75a7c47f7bb2ae71ffa3e4b1b/5255e3fd032c45b8a5ad2d0294937ccb.html">SAP Strategy Management KPI</a></td><td>KPI scorecard cần Actual, Target, Score, Trend và Gap Performance; status dựa trên ngưỡng đã định nghĩa.</td><td>Registry phải giữ target/ngưỡng, score, trend và gap; không dùng số không target làm KPI.</td></tr>
+<tr><td><a href="https://www.nist.gov/baldrige/baldrige-criteria-commentary">NIST Baldrige</a></td><td>Measurement phải là hệ tích hợp cho planning, rà soát, fact-based decision và improvement.</td><td>KPI không được đứng một mình; mỗi KPI phải có rà soát forum, người phụ trách hành động và link về Hoshin/Xem xét của lãnh đạo.</td></tr>
+<tr><td><a href="https://help.sap.com/docs/PRODUCT_ID/d62221e75a7c47f7bb2ae71ffa3e4b1b/5255e3fd032c45b8a5ad2d0294937ccb.html">SAP Strategy Management KPI</a></td><td>KPI scorecard cần Actual, Target, Score, Trend và Gap Performance; trạng thái dựa trên ngưỡng đã định nghĩa.</td><td>Registry phải giữ target/ngưỡng, score, trend và gap; không dùng số không target làm KPI.</td></tr>
 <tr><td><a href="https://www.isa.org/standards-and-publications/isa-standards/isa-95-standard">ISA-95</a></td><td>Level 3 MOM/MES và Level 4 ERP có ranh giới dữ liệu rõ; mục tiêu là giảm rủi ro, chi phí và lỗi tích hợp.</td><td>KPI dashboard là read model; execution truth vẫn thuộc MOM/MES/QMS write path.</td></tr>
-<tr><td><a href="https://www.siemens.com/en-us/products/opcenter/execution/foundation-oee/">Siemens Opcenter OEE</a></td><td>OEE cần machine status, availability, performance, quality, reason tree, thời gian dừng máy và hành động khắc phục.</td><td>OEE_BOTTLENECK chỉ được nâng lên scorecard khi có active constraint, reason-code loss tree và corrective-action loop.</td></tr>
+<tr><td><a href="https://www.siemens.com/en-us/products/opcenter/execution/foundation-oee/">Siemens Opcenter OEE</a></td><td>OEE cần machine trạng thái, availability, performance, quality, reason tree, thời gian dừng máy và hành động khắc phục.</td><td>OEE_BOTTLENECK chỉ được nâng lên scorecard khi có active constraint, reason-code loss tree và corrective-action loop.</td></tr>
 <tr><td><a href="https://www.siemens.com/en-us/products/opcenter/manufacturing-intelligence/">Siemens Opcenter Intelligence</a></td><td>KPI dashboard phải cho phép drilldown từ strategic view về IoT/MOM/OT context và hành động sửa chữa.</td><td>Dashboard lãnh đạo phải drill về job, operation, work center, hold reason, NCR/CAPA và action log.</td></tr>
 <tr><td><a href="https://tulip.co/production-management/manufacturing-dashboards/">Tulip Manufacturing Dashboards</a></td><td>Dashboard thực chiến lấy dữ liệu từ người, máy, sensor; giúp phản ứng nhanh với điểm thắt cổ chai và issue dựa trên actual data.</td><td>Lean daily board phải lấy dữ liệu theo ca/ngày và tạo action, không chỉ báo cáo tháng.</td></tr>
-<tr><td><a href="https://support.tulip.co/docs/quality-events-in-the-frontline-qms">Tulip Frontline QMS</a></td><td>Quality event cần phát hiện sớm, cô lập lỗi, gia công lại/scrap workflow, CAPA và real-time quality improvement.</td><td>Metric chất lượng phải nối với defect/NCR/CAPA/MRB/cổng kiểm tra trước khi dùng cho reward hoặc discipline.</td></tr>
-<tr><td><a href="https://learn.microsoft.com/en-us/viva/goals/configure-okr-model">Microsoft Viva Goals</a></td><td>OKR có người phụ trách, key result, initiative, progress, actual-vs-expected status và rule cấu hình.</td><td>OKR chỉ dùng cho initiative cải tiến; key result phải map về KPI/metric đã được phê duyệt trong registry.</td></tr>
+<tr><td><a href="https://support.tulip.co/docs/quality-events-in-the-frontline-qms">Tulip Frontline QMS</a></td><td>Quality event cần phát hiện sớm, cô lập lỗi, gia công lại/scrap luồng xử lý, CAPA và real-time quality improvement.</td><td>Metric chất lượng phải nối với defect/NCR/CAPA/MRB/cổng kiểm tra trước khi dùng cho reward hoặc discipline.</td></tr>
+<tr><td><a href="https://learn.microsoft.com/en-us/viva/goals/configure-okr-model">Microsoft Viva Goals</a></td><td>OKR có người phụ trách, key result, initiative, progress, actual-vs-expected trạng thái và rule cấu hình.</td><td>OKR chỉ dùng cho initiative cải tiến; key result phải map về KPI/metric đã được phê duyệt trong registry.</td></tr>
 </tbody>
 </table></div>
 </div>
@@ -95,10 +95,10 @@ td,th{vertical-align:top}
 <div class="table-card"><table class="table">
 <thead><tr><th>Thành phần</th><th>Đánh giá</th><th>Rủi ro còn lại</th><th>Cập nhật cần hoàn tất</th></tr></thead>
 <tbody>
-<tr><td>ANNEX-125 CNC Performance Operating System</td><td>Đúng hướng: đã tách 5 lớp Hoshin, BSC, TOC, Daily Management và QMS/MES evidence.</td><td>Nếu người dùng đọc riêng BSC có thể hiểu scorecard là hệ chính thay vì dashboard kết quả.</td><td>ANNEX-129 khóa lại rằng BSC chỉ là layer 2 và phải gắn Hoshin/TOC/Daily/QMS evidence.</td></tr>
+<tr><td>ANNEX-125 CNC Performance Operating System</td><td>Đúng hướng: đã tách 5 lớp Hoshin, BSC, TOC, Daily Management và QMS/MES bằng chứng.</td><td>Nếu người dùng đọc riêng BSC có thể hiểu scorecard là hệ chính thay vì dashboard kết quả.</td><td>ANNEX-129 khóa lại rằng BSC chỉ là layer 2 và phải gắn Hoshin/TOC/Daily/QMS bằng chứng.</td></tr>
 <tr><td>ANNEX-126 Hoshin/Catchball</td><td>Có X-Matrix, target, weight, counter-metric, consequence và data confidence.</td><td>OKR có thể bị dùng song song ngoài registry nếu không có cổng kiểm soát.</td><td>OKR chỉ được dùng khi link về X-Matrix và key result dùng metric được duyệt.</td></tr>
 <tr><td>ANNEX-127 KPI Authority Registry</td><td>Đã có registry, alias, data contract, performance governance, reward/discipline rào chắn và change-control policy.</td><td>Backend còn metric staged/candidate; không được payout tự động.</td><td>KPI mới phải cập nhật registry, ANNEX-128 và tài liệu liên quan trong cùng change.</td></tr>
-<tr><td>ANNEX-128 KPI System Matrix</td><td>Đã thống kê tài liệu, số lần dùng, target/ngưỡng, classification và data/evaluation status.</td><td>Matrix phải được rerun sau mỗi lần thêm/sửa KPI, nếu không sẽ drift.</td><td>Rerun audit script sau mọi KPI/metric change và giữ report làm evidence.</td></tr>
+<tr><td>ANNEX-128 KPI System Matrix</td><td>Đã thống kê tài liệu, số lần dùng, target/ngưỡng, classification và data/evaluation trạng thái.</td><td>Matrix phải được rerun sau mỗi lần thêm/sửa KPI, nếu không sẽ drift.</td><td>Rerun audit script sau mọi KPI/metric change và giữ report làm bằng chứng.</td></tr>
 <tr><td>KpiEngine/API</td><td>Runtime metric được kiểm soát; non-runtime known metric trả trạng thái thiếu data contract.</td><td>Dashboard phụ có thể gọi KPI ngầm từ controller/domain riêng nếu không đi qua catalog.</td><td>Dashboard mới phải gọi <span class="code">GET /api/kpi/catalog</span> trước khi hiển thị KPI chính thức.</td></tr>
 <tr><td>SOP/WI/Training/JD</td><td>Đã phân loại lại các chỉ số vận hành hiện trường thành metric cổng kiểm soát/control metric hoặc role measure khi không đủ điều kiện làm KPI chính thức.</td><td>Template training và row-level wording vẫn cần kiểm soát khi sinh tài liệu mới.</td><td>Template/generator phải dùng nhãn KPI/metric theo ANNEX-127, không tự tạo KPI local.</td></tr>
 </tbody>
@@ -111,11 +111,11 @@ td,th{vertical-align:top}
 <thead><tr><th>Bước</th><th>Cơ chế</th><th>Output cần có</th><th>Không được làm</th></tr></thead>
 <tbody>
 <tr><td>1. Strategy/Hoshin</td><td>Chọn 3-5 mục tiêu đột phá, xác định người phụ trách, nguồn lực, rủi ro và X-Matrix.</td><td>Hoshin packet + X-Matrix.</td><td>Không thêm KPI vì "muốn theo dõi thêm" nếu không có quyết định quản trị.</td></tr>
-<tr><td>2. KPI design</td><td>Định nghĩa intent, motive, expected result, decision purpose, formula, chủ KPI và evidence.</td><td>Registry entry hoặc update.</td><td>Không gọi KPI nếu chỉ là số health/tracking.</td></tr>
-<tr><td>3. Data contract</td><td>Khóa source, numerator, denominator, filter, period, exception, lineage và confidence.</td><td>Data contract + backend status.</td><td>Không tính tự động nếu thiếu source/evidence hoặc còn manual không kiểm soát.</td></tr>
+<tr><td>2. KPI design</td><td>Định nghĩa intent, motive, expected result, decision purpose, formula, chủ KPI và bằng chứng.</td><td>Registry entry hoặc update.</td><td>Không gọi KPI nếu chỉ là số health/tracking.</td></tr>
+<tr><td>3. Data contract</td><td>Khóa source, numerator, denominator, filter, period, exception, lineage và confidence.</td><td>Data contract + backend trạng thái.</td><td>Không tính tự động nếu thiếu source/bằng chứng hoặc còn manual không kiểm soát.</td></tr>
 <tr><td>4. Scorecard placement</td><td>Đưa KPI vào đúng layer: executive, department, TOC weekly, daily, cổng kiểm soát hoặc role measure.</td><td>ANNEX-128 matrix + related docs.</td><td>Không đặt cùng một metric thành KPI ở nhiều tầng với target khác nhau mà không có mapping.</td></tr>
-<tr><td>5. Visual management</td><td>Hiển thị RAG, trend, gap, hành động của người phụ trách và blocker.</td><td>Dashboard/board có link evidence.</td><td>Không hiển thị màu xanh nếu data confidence chưa đủ hoặc blocker đang mở.</td></tr>
-<tr><td>6. Review cadence</td><td>Ca/ngày/tuần/tháng/quý theo layer; mỗi yellow/red có người phụ trách, hạn và action.</td><td>Action log, review minutes.</td><td>Không review KPI bằng tranh luận cảm tính khi không có evidence.</td></tr>
+<tr><td>5. Visual management</td><td>Hiển thị RAG, trend, gap, hành động của người phụ trách và blocker.</td><td>Dashboard/board có link bằng chứng.</td><td>Không hiển thị màu xanh nếu data confidence chưa đủ hoặc blocker đang mở.</td></tr>
+<tr><td>6. Rà soát cadence</td><td>Ca/ngày/tuần/tháng/quý theo layer; mỗi yellow/red có người phụ trách, hạn và action.</td><td>Action log, rà soát minutes.</td><td>Không rà soát KPI bằng tranh luận cảm tính khi không có bằng chứng.</td></tr>
 <tr><td>7. Hành động khắc phục</td><td>Yellow/red kích hoạt coaching, RCA, CAPA, resource escalation, công việc tiêu chuẩn hoá hoặc training.</td><td>CAPA/kaizen/training/resource decision.</td><td>Không phạt người vì outcome ngoài controllability phạm vi.</td></tr>
 <tr><td>8. Calibration/reward</td><td>HR/QMS/CEO calibration trước mọi ghi nhận tiền/điểm; kiểm tra counter-metric và blocker.</td><td>Calibration record + reward decision.</td><td>Không tự động payout từ một KPI đơn lẻ.</td></tr>
 <tr><td>9. Change control</td><td>Mọi thay đổi KPI cập nhật registry, ANNEX-128 và tài liệu liên quan trong cùng controlled change.</td><td>Audit rerun + matrix updated.</td><td>Không sửa target/weight trong một tài liệu mà matrix không đổi.</td></tr>
@@ -128,11 +128,11 @@ td,th{vertical-align:top}
 <div class="table-card"><table class="table">
 <thead><tr><th>Thời điểm</th><th>Mục tiêu quản trị</th><th>KPI/metric phù hợp</th><th>Forum</th><th>Bằng chứng</th></tr></thead>
 <tbody>
-<tr><td>Theo sự kiện</td><td>Giữ lại / phát hành đúng cổng kiểm soát.</td><td>Setup đạt ngay lần đầu, FAI đạt ngay lần đầu, ship packet completeness, LAM G3 material/IQC/cert/traceability readiness, LAM G5 IPQC/SPC/CMM/containment/gage validity.</td><td>Cổng kiểm soát QA/QC/OPS.</td><td>Form, inspection record, release pack, sự kiện gán profile, cert/IQC/trace/gage evidence.</td></tr>
-<tr><td>Theo ca/ngày</td><td>Phản ứng nhanh khi lệch.</td><td>In-process reject, IPQC characteristic completeness, CMM queue aging, NCR containment, thời gian dừng máy reason, WIP red queue, thiếu gage/fixture, action aging.</td><td>Tier 1/2 daily board.</td><td>Action log, MES/WIP snapshot, NCR/hold record, IPQC/SPC/CMM queue evidence.</td></tr>
-<tr><td>Theo tuần</td><td>Bảo vệ điểm thắt cổ chai và dòng chảy.</td><td>OEE tại điểm thắt cổ chai, constraint lost hours, buffer red/yellow/green, WIP before constraint.</td><td>TOC weekly review.</td><td>Constraint register, schedule, machine state, reason tree.</td></tr>
-<tr><td>Theo tháng</td><td>Điều hành BSC và nguồn lực.</td><td>7 scored core: OTD, COMPLAINT_RATE, FPY, COPQ, PLAN_ADHERENCE, WIP_AGING, MATERIAL_AVAILABILITY_PLAN; driver panel hiển thị-only cho FAI, final release, CMM/QC queue, constraint, LAM CDR/8D, IQC/material, role backup và supplier readiness.</td><td>Management scorecard review.</td><td>Scorecard snapshot, finance close, EQMS, HR/training record.</td></tr>
-<tr><td>Theo quý/năm</td><td>Điều chỉnh Hoshin và strategy.</td><td>Executive scorecard bundle, customer/supplier trend, strategic project progress.</td><td>Xem xét của lãnh đạo / Hoshin review.</td><td>X-Matrix, MR minutes, risk/opportunity log.</td></tr>
+<tr><td>Theo sự kiện</td><td>Giữ lại / phát hành đúng cổng kiểm soát.</td><td>Setup đạt ngay lần đầu, FAI đạt ngay lần đầu, ship packet completeness, LAM G3 material/IQC/cert/traceability mức sẵn sàng, LAM G5 IPQC/SPC/CMM/containment/gage validity.</td><td>Cổng kiểm soát QA/QC/OPS.</td><td>Form, inspection record, bộ hồ sơ phát hành, sự kiện gán profile, cert/IQC/trace/gage bằng chứng.</td></tr>
+<tr><td>Theo ca/ngày</td><td>Phản ứng nhanh khi lệch.</td><td>In-process reject, IPQC characteristic completeness, CMM queue aging, NCR containment, thời gian dừng máy reason, WIP red queue, thiếu gage/fixture, action aging.</td><td>Tier 1/2 daily board.</td><td>Action log, MES/WIP snapshot, NCR/hold record, IPQC/SPC/CMM queue bằng chứng.</td></tr>
+<tr><td>Theo tuần</td><td>Bảo vệ điểm thắt cổ chai và dòng chảy.</td><td>OEE tại điểm thắt cổ chai, constraint lost hours, buffer red/yellow/green, WIP before constraint.</td><td>TOC weekly rà soát.</td><td>Constraint register, schedule, machine state, reason tree.</td></tr>
+<tr><td>Theo tháng</td><td>Điều hành BSC và nguồn lực.</td><td>7 scored core: OTD, COMPLAINT_RATE, FPY, COPQ, PLAN_ADHERENCE, WIP_AGING, MATERIAL_AVAILABILITY_PLAN; driver panel hiển thị-only cho FAI, final release, CMM/QC queue, constraint, LAM CDR/8D, IQC/material, role backup và supplier mức sẵn sàng.</td><td>Management scorecard rà soát.</td><td>Scorecard snapshot, finance close, EQMS, HR/training record.</td></tr>
+<tr><td>Theo quý/năm</td><td>Điều chỉnh Hoshin và strategy.</td><td>Executive scorecard bundle, customer/supplier trend, strategic project progress.</td><td>Xem xét của lãnh đạo / Hoshin rà soát.</td><td>X-Matrix, MR minutes, risk/opportunity log.</td></tr>
 </tbody>
 </table></div>
 </div>
@@ -141,11 +141,11 @@ td,th{vertical-align:top}
 <h2>6. Quy tắc BSC cho CNC</h2>
 <div class="grid-2">
 <div class="card"><h3>Tài chính</h3><p>Không chỉ doanh thu/lợi nhuận. Cần gross margin theo họ công việc, COPQ, expedite cost và throughput per constraint hour để tránh chạy nhiều nhưng lỗ.</p></div>
-<div class="card"><h3>Khách hàng</h3><p>OTD và complaint/escape phải đi chung. Không thưởng OTD nếu giao đúng hạn bằng cách bypass inspection, ship thiếu evidence hoặc tạo customer escape.</p></div>
+<div class="card"><h3>Khách hàng</h3><p>OTD và complaint/escape phải đi chung. Không thưởng OTD nếu giao đúng hạn bằng cách bypass inspection, ship thiếu bằng chứng hoặc tạo customer escape.</p></div>
 <div class="card"><h3>Vận hành nội bộ</h3><p>FPY, setup đạt ngay lần đầu, FAI đạt ngay lần đầu, OEE tại điểm thắt cổ chai, WIP aging và repeat NCR là driver quan trọng hơn OEE toàn xưởng chung chung.</p></div>
 <div class="card"><h3>Con người/hệ thống</h3><p>Critical-role certification, deputy coverage, toàn vẹn dữ liệu và cổng kiểm soát safety bảo vệ năng lực vận hành dài hạn.</p></div>
 </div>
-<div class="callout warn"><b>Quy tắc:</b> Scorecard lãnh đạo dùng <span class="code">CNC-EXEC-BSC-LEAN-7+DRIVERS-2026</span>: 7 scored core cộng điểm, strategic driver panel hiển thị-only, blocker cổng kiểm soát chặn/cap recognition. Không đưa mọi metric chi tiết lên CEO dashboard như KPI điểm; metric TOC weekly, Lean daily hoặc cổng kiểm soát QMS/MES chỉ được đưa vào driver panel khi có người phụ trách, evidence và nhãn không cộng điểm.</div>
+<div class="callout warn"><b>Quy tắc:</b> Scorecard lãnh đạo dùng <span class="code">CNC-EXEC-BSC-LEAN-7+DRIVERS-2026</span>: 7 scored core cộng điểm, strategic driver panel hiển thị-only, blocker cổng kiểm soát chặn/cap recognition. Không đưa mọi metric chi tiết lên CEO dashboard như KPI điểm; metric TOC weekly, Lean daily hoặc cổng kiểm soát QMS/MES chỉ được đưa vào driver panel khi có người phụ trách, bằng chứng và nhãn không cộng điểm.</div>
 </div>
 
 <div class="section">
@@ -154,7 +154,7 @@ td,th{vertical-align:top}
 <thead><tr><th>Loại KPI</th><th>Ngưỡng thực chiến</th><th>Scoring</th><th>Rào chắn</th></tr></thead>
 <tbody>
 <tr><td>Outcome KPI</td><td>Xanh/vàng/đỏ theo target registry; cần trend và gap.</td><td>Stretch 110, green 100, yellow 50, red 0.</td><td>Không reward nếu counter-metric safety/quality/toàn vẹn dữ liệu đỏ.</td></tr>
-<tr><td>Driver KPI</td><td>Dùng leading threshold để can thiệp trước khi outcome đỏ.</td><td>Visible-only trong driver panel; chỉ thành scored core sau change control và pilot approval.</td><td>Không cộng điểm hoặc payout nếu chỉ là candidate_data_contract, manual_governed hoặc chưa có reward approval.</td></tr>
+<tr><td>Driver KPI</td><td>Dùng leading threshold để can thiệp trước khi outcome đỏ.</td><td>Visible-only trong driver panel; chỉ thành scored core sau change control và phê duyệt vận hành thử.</td><td>Không cộng điểm hoặc payout nếu chỉ là candidate_data_contract, manual_governed hoặc chưa có reward approval.</td></tr>
 <tr><td>Metric cổng kiểm soát</td><td>Đạt/không đạt, quá hạn hoặc số lượng theo cổng kiểm soát.</td><td>Không cộng điểm; chỉ giữ lại / phát hành hoặc block reward.</td><td>Kỷ luật chỉ khi bypass/gian dối/tái phạm sau coaching.</td></tr>
 <tr><td>Role Performance Measure</td><td>Theo competency/JD/OJT level.</td><td>Dùng cho năng lực và phân quyền.</td><td>Không biến thành KPI công ty nếu chưa map registry.</td></tr>
 <tr><td>Health Indicator</td><td>Trend/awareness.</td><td>Không score.</td><td>Không reward, không discipline.</td></tr>
@@ -175,7 +175,7 @@ td,th{vertical-align:top}
 <tr><td>Ai kiểm soát được?</td><td>Người phụ trách có quyền và nguồn lực xử lý.</td><td>Không dùng cho cá nhân hoặc thưởng/phạt.</td></tr>
 <tr><td>Bằng chứng ở đâu?</td><td>ERP/MOM/MES/EQMS/form/training record và trace link.</td><td>Không runtime calculation.</td></tr>
 <tr><td>Counter-metric là gì?</td><td>Safety, quality, customer, toàn vẹn dữ liệu hoặc blocker cổng kiểm soát.</td><td>Không được reward.</td></tr>
-<tr><td>ANNEX-128 đã cập nhật chưa?</td><td>Matrix có tài liệu, số lần dùng, target, classification, data/evaluation status.</td><td>Change chưa hoàn tất.</td></tr>
+<tr><td>ANNEX-128 đã cập nhật chưa?</td><td>Matrix có tài liệu, số lần dùng, target, classification, data/evaluation trạng thái.</td><td>Change chưa hoàn tất.</td></tr>
 </tbody>
 </table></div>
 </div>

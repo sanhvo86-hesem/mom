@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANNEX-137 - Evidence and Records Naming Convention | HESEM MOM</title>
+<title>ANNEX-137 - Bằng chứng and Records Naming Convention | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap — computes absolute URLs from location.pathname so the
  * stylesheet + renderer load correctly regardless of how the document is
@@ -131,7 +131,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <div class="pattern-box">FRM-631_V2.1_NCR-2026-043_20260327_0830-NVA.xlsx<br>FRM-631_V2.1_NCR-2026-043_20260327_0830-NVA.pdf<br>FRM-302_V3.2_JOB-2026-0042-OP10_20260327_0900-SET1.xlsx<br>FRM-641_V1.0_CAPA-2026-008_20260327_1400-QA1.xlsx<br>FRM-601_V2.0_CAL-MICR-005_20260327_0800-QC1.xlsx<br>FRM-802_V1.1_TRN-2026-015_20260327_1330-HR1.xlsx<br>FRM-911_V1.0_MR-2026-Q1_20260327_0900-QMS1.xlsx<br>FRM-504_V1.0_PRO-SHIFT-A_20260327_0600-SL1.pdf</div>
 
  <!-- PATTERN 2 -->
- <h3>3.2 Pattern 2 — Evidence gắn Job (Job Evidence)</h3>
+ <h3>3.2 Pattern 2 — Bằng chứng gắn Job (Job Bằng chứng)</h3>
  <div class="pattern-box">{RecordType}_{JobNum}_{PartRev}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}</div>
  <div class="table-card">
  <table class="table">
@@ -147,7 +147,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tr><td><code>{RecordType}</code></td><td>Luôn</td><td>Mã loại hồ sơ (xem Section 4)</td><td>CMM</td></tr>
  <tr><td><code>{JobNum}</code></td><td>Luôn</td><td>Mã lệnh công việc</td><td>JOB-2026-0042</td></tr>
  <tr><td><code>{PartRev}</code></td><td>Luôn</td><td>Part number + revision + operation (nếu cần)</td><td>714XXXX-REVA-OP10</td></tr>
- <tr><td><code>{YYYYMMDD}</code></td><td>Luôn</td><td>Ngày tạo evidence</td><td>20260327</td></tr>
+ <tr><td><code>{YYYYMMDD}</code></td><td>Luôn</td><td>Ngày tạo bằng chứng</td><td>20260327</td></tr>
  <tr><td><code>{HHMM}-{UserID}</code></td><td>Luôn</td><td>Giờ phút + mã người tạo</td><td>0900-QC1</td></tr>
  <tr><td><code>.{ext}</code></td><td>Luôn</td><td>Extension gốc</td><td>.csv</td></tr>
  </tbody>
@@ -184,7 +184,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <div class="pattern-box">NC_714XXXX-REVA_OP10_5AX_V3.nc<br>NC_714XXXX-REVA_OP20_TURN_V3.nc<br>CAM_714XXXX-REVA_OP10_5AX_V3.mcam<br>CAM_714XXXX-REVA_OP20_TURN_V3.f3d<br>SETUP_714XXXX-REVA_OP10_5AX_V3.xlsx<br>INSP_714XXXX-REVA_ALL_CMM_V2.dcc<br>MODEL_714XXXX-REVA_ALL_V1.step<br>DWG_714XXXX-REVA_ALL_V1.pdf<br>FIXTURE_714XXXX-REVA_OP10_5AX_V1.pdf<br>SIM_714XXXX-REVA_OP10_5AX_V3.mp4<br>CTRL-PLAN_714XXXX-REVA_ALL_V2.xlsx</div>
 
  <!-- PATTERN 4 -->
- <h3>3.4 Pattern 4 — Evidence không gắn Job (Non-job Evidence)</h3>
+ <h3>3.4 Pattern 4 — Bằng chứng không gắn Job (Non-job Bằng chứng)</h3>
  <div class="pattern-box">{RecordType}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}</div>
  <div class="table-card">
  <table class="table">
@@ -199,7 +199,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tbody>
  <tr><td><code>{RecordType}</code></td><td>Luôn</td><td>Mã loại hồ sơ (xem Section 4)</td><td>REPORT</td></tr>
  <tr><td><code>{scope}</code></td><td>Luôn</td><td>Phạm vi (xem Section 5)</td><td>AUD-2026-IA03</td></tr>
- <tr><td><code>{YYYYMMDD}</code></td><td>Luôn</td><td>Ngày tạo evidence</td><td>20260327</td></tr>
+ <tr><td><code>{YYYYMMDD}</code></td><td>Luôn</td><td>Ngày tạo bằng chứng</td><td>20260327</td></tr>
  <tr><td><code>{HHMM}-{UserID}</code></td><td>Luôn</td><td>Giờ phút + mã người tạo</td><td>0900-QMS1</td></tr>
  <tr><td><code>.{ext}</code></td><td>Luôn</td><td>Extension gốc</td><td>.pdf</td></tr>
  </tbody>
@@ -280,7 +280,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <div class="section">
  <h2>4. RecordType Code Dictionary</h2>
 
- <h3>4.1 Hồ sơ công việc Evidence</h3>
+ <h3>4.1 Hồ sơ công việc Bằng chứng</h3>
  <div class="table-card">
  <table class="table">
  <thead>
@@ -292,7 +292,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </thead>
  <tbody>
  <tr><td><code>PO</code></td><td>Purchase Order</td><td>Scan PO khách hàng</td></tr>
- <tr><td><code>CR</code></td><td>Contract Review</td><td>Kết quả xem xét hợp đồng</td></tr>
+ <tr><td><code>CR</code></td><td>Rà soát hợp đồng</td><td>Kết quả xem xét hợp đồng</td></tr>
  <tr><td><code>MTR</code></td><td>Material Test Report</td><td>Mill cert, heat cert, CoA</td></tr>
  <tr><td><code>IQC</code></td><td>Incoming <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a> Result</td><td>Kết quả kiểm tra đầu vào</td></tr>
  <tr><td><code>TRV</code></td><td>Phiếu công nghệ / Router</td><td>Scan phiếu theo dõi sản xuất</td></tr>
@@ -303,9 +303,9 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tr><td><code>SHIP-LABEL</code></td><td>Shipping Label / SSCC</td><td>Nhãn vận chuyển</td></tr>
  <tr><td><code>POD</code></td><td>Proof of Delivery</td><td>Bằng chứng giao hàng</td></tr>
  <tr><td><code>CONCESSION</code></td><td>Deviation / Waiver</td><td>Phê duyệt nhượng bộ</td></tr>
- <tr><td><code>REWORK</code></td><td>Gia công lại Evidence</td><td>Bằng chứng làm lại + tái kiểm</td></tr>
+ <tr><td><code>REWORK</code></td><td>Gia công lại Bằng chứng</td><td>Bằng chứng làm lại + tái kiểm</td></tr>
  <tr><td><code>CUST-APPR</code></td><td>Customer Approval</td><td>Email/doc khách hàng phê duyệt</td></tr>
- <tr><td><code>PROVEOUT</code></td><td>Chạy kiểm chứng Evidence</td><td>Ghi chú chạy thử đầu tiên</td></tr>
+ <tr><td><code>PROVEOUT</code></td><td>Chạy kiểm chứng Bằng chứng</td><td>Ghi chú chạy thử đầu tiên</td></tr>
  <tr><td><code>OFFSET-LOG</code></td><td>Offset Change Log</td><td>Log thay đổi offset máy</td></tr>
  <tr><td><code>TOOL-WEAR</code></td><td>Mòn dao Record</td><td>Ghi nhận mòn dao</td></tr>
  <tr><td><code>DOWNTIME</code></td><td>Thời gian dừng máy Record</td><td>Ghi nhận dừng máy</td></tr>
@@ -350,7 +350,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tr><td><code>SETUP</code></td><td>Phiếu setup + Danh mục dao cụ (FRM-302)</td></tr>
  <tr><td><code>INSP</code></td><td>Inspection Program</td></tr>
  <tr><td><code>FIXTURE</code></td><td>Fixture / Jig Bản vẽ</td></tr>
- <tr><td><code>SIM</code></td><td>Simulation Evidence</td></tr>
+ <tr><td><code>SIM</code></td><td>Simulation Bằng chứng</td></tr>
  <tr><td><code>CTRL-PLAN</code></td><td>Kế hoạch kiểm soát</td></tr>
  </tbody>
  </table>
@@ -388,7 +388,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </tr>
  </thead>
  <tbody>
- <tr><td><code>OJT</code></td><td>On-the-Job Training evidence</td></tr>
+ <tr><td><code>OJT</code></td><td>On-the-Job Training bằng chứng</td></tr>
  <tr><td><code>GATE-TEST</code></td><td>Competency gate test result</td></tr>
  <tr><td><code>CERT-SCAN</code></td><td>Certificate scan (external)</td></tr>
  <tr><td><code>SIGNOFF</code></td><td>Wet signature sign-off sheet</td></tr>
@@ -712,7 +712,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tr><td>Tên file không có date segment (<code>YYYYMMDD</code>)</td><td><strong>REJECT</strong></td></tr>
  <tr><td>Filled form không có <code>V{ver}</code></td><td><strong>REJECT</strong></td></tr>
  <tr><td>Filled form version khác current active version</td><td><strong>FLAG OBSOLETE</strong></td></tr>
- <tr><td>Job evidence không có <code>JOB-{YYYY}-{nnnn}</code></td><td><strong>REJECT</strong></td></tr>
+ <tr><td>Job bằng chứng không có <code>JOB-{YYYY}-{nnnn}</code></td><td><strong>REJECT</strong></td></tr>
  <tr><td>Engineering baseline không có <code>V{ver}</code></td><td><strong>REJECT</strong></td></tr>
  <tr><td>File trùng tên đã tồn tại (cùng tên, cùng folder)</td><td><strong>REJECT</strong></td></tr>
  <tr><td>Tên file &gt; 120 ký tự</td><td><strong>WARN</strong></td></tr>
@@ -742,7 +742,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </tr>
  </thead>
  <tbody>
- <tr><td>1</td><td>Mở HESEM-Job-Evidence → Job-Dossiers → 2026</td><td>5s</td></tr>
+ <tr><td>1</td><td>Mở HESEM-Job-Bằng chứng → Job-Dossiers → 2026</td><td>5s</td></tr>
  <tr><td>2</td><td>Tìm folder <code>JOB-2026-0042_714XXXX-REVA</code></td><td>5s</td></tr>
  <tr><td>3</td><td>Lọc metadata theo Gate = G4-FAI hoặc tìm <code>FRM-311</code></td><td>5s</td></tr>
  <tr><td>4</td><td>Thấy <code>FRM-311_V1.0_JOB-2026-0042_20260327_0900-QC1.xlsx</code><br>→ biết đây là FAI form V1.0, được điền ngày 27/03/2026 lúc 09:00 bởi QC1</td><td>ngay</td></tr>
@@ -793,13 +793,13 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tr><td><a href="../../../sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td><td>Engineering Release, Baseline Package and Job Snapshot Control</td><td>Kiểm soát engineering baseline và version release</td></tr>
  <tr><td><a href="../../../work-instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a></td><td>SharePoint record sites, libraries and permissions</td><td>Thiết lập site hồ sơ, thư viện và quyền truy cập có kiểm soát</td></tr>
  <tr><td><a href="../../../work-instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a></td><td>M365 SharePoint local sync, Git and server deployment control</td><td>Kiểm soát local sync, Git và boundary triển khai hệ thống</td></tr>
- <tr><td><a href="../../../work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Job dossier evidence pack and record completeness</td><td>Gói bằng chứng theo job và kiểm tra tính đầy đủ của hồ sơ</td></tr>
+ <tr><td><a href="../../../work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Job dossier bộ bằng chứng and record completeness</td><td>Gói bằng chứng theo job và kiểm tra tính đầy đủ của hồ sơ</td></tr>
  <tr><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></td><td>M365 Records metadata, list schema and register catalog</td><td>Schema metadata và danh mục list trên SharePoint</td></tr>
  <tr><td><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></td><td>M365 Records site topology, library and folder blueprint</td><td>Cấu trúc site, thư viện và thư mục trên SharePoint</td></tr>
  <tr><td><a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td><td>M365 operational records file plan by department, role and job</td><td>File plan chi tiết theo phòng ban, vai trò và job gate</td></tr>
  <tr><td><a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></td><td>M365 SharePoint-Git-Server source sync, promotion and runtime boundary</td><td>Ranh giới đồng bộ source giữa SharePoint, Git và server</td></tr>
  <tr><td>core-standards/14</td><td>M365 SharePoint Architecture</td><td>Kiến trúc SharePoint tổng thể</td></tr>
- <tr><td>core-standards/15</td><td>Evidence and Records Naming</td><td>Tài liệu nguồn cho ANNEX-137 này</td></tr>
+ <tr><td>core-standards/15</td><td>Bằng chứng and Records Naming</td><td>Tài liệu nguồn cho ANNEX-137 này</td></tr>
  </tbody>
  </table>
  </div>

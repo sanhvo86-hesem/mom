@@ -79,7 +79,7 @@
  <tr><td>Source library path</td><td><span class="code">HESEM-Digital/QMS-Source-Control/01-Controlled-Source/eqms.hesemeng.com/</span></td><td>Đây là nguồn SharePoint duy nhất được phép đồng bộ xuống máy local.</td></tr>
  <tr><td>Local synced worktree</td><td><span class="code">%UserProfile%\HESEM Engineering\HESEM-Digital - QMS-Source-Control\01-Controlled-Source\eqms.hesemeng.com\</span></td><td>Đây là nơi người dùng làm việc với source content đã được kiểm soát.</td></tr>
  <tr><td>Local git-dir</td><td><span class="code">C:\HESEM-Git\eqms.hesemeng.com.git\</span></td><td>Phải đặt ngoài vùng sync; không được nằm trong worktree.</td></tr>
- <tr><td>Server worktree</td><td><span class="code">/var/www/eqms.hesemeng.com/</span></td><td>Worktree runtime trên VPS (host PHP 8.5 + nginx + PostgreSQL + Redis + RabbitMQ). Chỉ dùng cho deploy runtime; không phải nơi biên tập chính. Hồ sơ runtime mutate (state JSON, audit log, snapshot dữ liệu) nằm tại <span class="code">/var/www/data-private/</span> — tách khỏi worktree theo CLAUDE.md §VPS deployment policy.</td></tr>
+ <tr><td>Server worktree</td><td><span class="code">/var/www/eqms.hesemeng.com/</span></td><td>Worktree runtime trên VPS (host PHP 8.5 + nginx + PostgreSQL + Redis + RabbitMQ). Chỉ dùng cho deploy runtime; không phải nơi biên tập chính. Hồ sơ runtime mutate (state JSON, nhật ký kiểm toán, snapshot dữ liệu) nằm tại <span class="code">/var/www/data-private/</span> — tách khỏi worktree theo CLAUDE.md §VPS deployment policy.</td></tr>
  </tbody>
  </table>
  </div>
@@ -116,10 +116,10 @@ Git metadata
  <tr><th>Rule</th><th>Yêu cầu</th></tr>
  </thead>
  <tbody>
- <tr><td>Named endpoint</td><td>Mỗi máy được phép sync source library phải có EndpointID, owner, OS, vị trí và approver trong register nội bộ.</td></tr>
+ <tr><td>Named endpoint</td><td>Mỗi máy được phép sync source library phải có EndpointID, người chịu trách nhiệm, OS, vị trí và approver trong register nội bộ.</td></tr>
  <tr><td>One endpoint, one primary writer</td><td>Mỗi worktree chỉ có một người chịu trách nhiệm chính. Không dùng shared desktop hoặc generic account làm máy biên tập chính.</td></tr>
  <tr><td>No unregistered sync</td><td>Không cho người dùng tự bấm sync source library trên máy chưa được duyệt.</td></tr>
- <tr><td>Periodic review</td><td>Hàng quý phải rà lại các endpoint đang được sync và loại bỏ máy cũ, máy nghỉ việc hoặc máy đã đổi owner.</td></tr>
+ <tr><td>Periodic rà soát</td><td>Hàng quý phải rà lại các endpoint đang được sync và loại bỏ máy cũ, máy nghỉ việc hoặc máy đã đổi người chịu trách nhiệm.</td></tr>
  </tbody>
  </table>
  </div>
@@ -160,7 +160,7 @@ Git metadata
  <tr><th>Nhóm dữ liệu</th><th>Xử lý</th></tr>
  </thead>
  <tbody>
- <tr><td>Runtime workflow binaries, sessions, ratelimit, caches</td><td>Giữ ở server hoặc runtime path; không sync vào worktree.</td></tr>
+ <tr><td>Runtime luồng xử lý binaries, sessions, ratelimit, caches</td><td>Giữ ở server hoặc runtime path; không sync vào worktree.</td></tr>
  <tr><td>Secrets, keys, server-only credentials</td><td>Giữ ở server-only protected path; không đặt trong source library.</td></tr>
  <tr><td>Submission payload, approvals, operational record data</td><td>Phải route về records libraries hoặc runtime record area; không đưa vào source worktree.</td></tr>
  <tr><td>.git internals</td><td>Đặt ở git-dir riêng ngoài vùng sync.</td></tr>
@@ -192,10 +192,10 @@ Git metadata
  </div>
 
  <div class="section">
- <h2>10. Không được go-live khi</h2>
+ <h2>10. Không được đưa vào vận hành khi</h2>
  <ul>
  <li>Worktree còn chứa <span class="code">.git</span> trong vùng sync</li>
- <li>Không xác định được endpoint owner</li>
+ <li>Không xác định được endpoint người chịu trách nhiệm</li>
  <li>Source library đang mở external sharing</li>
  <li>Chưa chứng minh được vòng local sync → Git → server → local sync</li>
  </ul>

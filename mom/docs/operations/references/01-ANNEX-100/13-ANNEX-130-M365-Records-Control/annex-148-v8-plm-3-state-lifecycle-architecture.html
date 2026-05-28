@@ -46,7 +46,7 @@
 
 <h1>v8 PLM 3-State Lifecycle Architecture</h1>
 
-<div class="callout"><strong>BỐI CẢNH:</strong> Sau 7 vòng đập-xây-lại (v4→v8), v8 đạt PLM/MES industry standard cho contract CNC manufacturer scale 200-500 nhân viên. Quan trọng nhất: Part-Master (engineering vault) và Job-Dossier (execution evidence) là <b>2 trục ngang hàng</b> — không nest. Mọi authored content theo <b>3-state lifecycle</b> (Working → In-Review → Released) chuẩn PLM (Teamcenter/Windchill/Aras pattern). Tổng blueprint: 747 (v7) → <b>1180 directories (v8.1)</b> due to 3-state expansion + new Finance + Incident-Investigation libraries.</div>
+<div class="callout"><strong>BỐI CẢNH:</strong> Sau 7 vòng đập-xây-lại (v4→v8), v8 đạt PLM/MES industry standard cho contract CNC manufacturer scale 200-500 nhân viên. Quan trọng nhất: Part-Master (engineering vault) và Job-Dossier (execution bằng chứng) là <b>2 trục ngang hàng</b> — không nest. Mọi authored content theo <b>3-state lifecycle</b> (Working → In-Rà soát → Released) chuẩn PLM (Teamcenter/Windchill/Aras pattern). Tổng blueprint: 747 (v7) → <b>1180 directories (v8.1)</b> due to 3-state expansion + new Finance + Incident-Investigation libraries.</div>
 
 <section class="card">
 <h2>1. Top-level 3 sites — Architecture overview</h2>
@@ -64,7 +64,7 @@
 <h2>2. PLM Pattern — Part-Master và Job-Dossier ngang hàng (case study research)</h2>
 
 <div class="ok-callout"><b>Industry standard (Teamcenter/Windchill/Aras Innovator/Epicor/IFS):</b><br>
-PLM systems separate <b>Engineering data</b> (Part Master = drawings/CAM/inspection/FAI baseline — frozen on rev release) from <b>Manufacturing data</b> (Work Order/Job = execution evidence — live during production, frozen on Job close).
+PLM systems separate <b>Engineering data</b> (Part Master = drawings/CAM/inspection/FAI baseline — frozen on rev release) from <b>Manufacturing data</b> (Work Order/Job = execution bằng chứng — live during production, frozen on Job close).
 <ul class="tight">
 <li>Part Master is engineering source-of-truth; multiple Jobs reference it</li>
 <li>Job-Dossier consumes Part Master via <b>snapshot reference</b> (modern-link), not file copy</li>
@@ -78,8 +78,8 @@ Part-Master/
 ├── {CustomerCode}/                          (AMAT|LAM|ASML|TEL|HESEM-Owned)
 │   └── {PartNumber}/
 │       └── {Rev}/                           (A|B|C|A01|...)
-│           ├── 00-Status                    Active|Frozen-by-PCN|Superseded
-│           ├── 01-Drawing/{1-Working/{Initials}, 2-In-Review, 3-Released}
+│           ├── 00-Trạng thái                    Active|Frozen-by-PCN|Superseded
+│           ├── 01-Drawing/{1-Working/{Initials}, 2-In-Rà soát, 3-Released}
 │           ├── 02-Model-3D/{1-W, 2-IR, 3-R}
 │           ├── 03-BOM/{1-W, 2-IR, 3-R}
 │           ├── 04-CAM/{1-W, 2-IR, 3-R}
@@ -94,14 +94,14 @@ Part-Master/
 │           └── 99-Superseded                (old Rev moves here on new release)
 </pre>
 
-<h3>2.2 Job-Dossier structure (workflow gate order corrected)</h3>
+<h3>2.2 Job-Dossier structure (luồng xử lý gate order corrected)</h3>
 <pre class="tree">
 Job-Dossier/
 ├── {CustomerCode}/
 │   └── {YYYY}/
 │       └── {JobNumber}/
 │           ├── 00-Job-Admin                 (PO ref, schedule, traveler header)
-│           ├── 01-Engineering-Release       ← release pack pulled from Part-Master
+│           ├── 01-Engineering-Release       ← bộ hồ sơ phát hành pulled from Part-Master
 │           │   └── _release-manifest.json   (snapshot version refs + modern-links)
 │           ├── 02-Material-Receiving        (mill cert, IQC, heat-lot mapping)
 │           ├── 03-Job-Setup                 (machine setup, fixture, NC load)
@@ -131,10 +131,10 @@ Job-Dossier/
 <table>
 <thead><tr><th>Variant</th><th>States</th><th>Use case</th><th>Examples</th></tr></thead>
 <tbody>
-<tr><td><b>3-state default</b></td><td>1-Working → 2-In-Review → 3-Released</td><td>Standard authoring với approval gate</td><td>CAM, Drawing, BOM, CAPA RCA, Audit response, Monthly Close, Internal Audit, Risk Register</td></tr>
-<tr><td><b>4-state contract</b></td><td>1-Working → 2-In-Review → 3-Pending-Signature → 4-Executed</td><td>Counterparty signing required</td><td>NDA, MSA, LTA, Quality-Agreement, Employment Contract, Insurance Policy</td></tr>
-<tr><td><b>4-state customer-outbound</b></td><td>1-Working → 2-In-Review → 3-Submitted-to-Customer → 4-Customer-Approved</td><td>Customer must approve/respond</td><td>Quote, PCN-Outbound, FAI-Execution submission, 8D-Final-Response, Concession-Deviation, APSL submission, Open-Book Costing</td></tr>
-<tr><td><b>2-state Intake</b></td><td>_Intake/{Op}-{TS} → formal-ID/</td><td>Event-driven (immediate evidence drop)</td><td>NCR (pre-NCR# photo), Incident (EHS/safety/cyber first response)</td></tr>
+<tr><td><b>3-state default</b></td><td>1-Working → 2-In-Rà soát → 3-Released</td><td>Standard authoring với approval gate</td><td>CAM, Drawing, BOM, CAPA RCA, Audit response, Monthly Close, Internal Audit, Risk Register</td></tr>
+<tr><td><b>4-state contract</b></td><td>1-Working → 2-In-Rà soát → 3-Pending-Signature → 4-Executed</td><td>Counterparty signing required</td><td>NDA, MSA, LTA, Quality-Agreement, Employment Contract, Insurance Policy</td></tr>
+<tr><td><b>4-state customer-outbound</b></td><td>1-Working → 2-In-Rà soát → 3-Submitted-to-Customer → 4-Customer-Approved</td><td>Customer must approve/respond</td><td>Quote, PCN-Outbound, FAI-Execution submission, 8D-Final-Response, Concession-Deviation, APSL submission, Open-Book Costing</td></tr>
+<tr><td><b>2-state Intake</b></td><td>_Intake/{Op}-{TS} → formal-ID/</td><td>Event-driven (immediate bằng chứng drop)</td><td>NCR (pre-NCR# photo), Incident (EHS/safety/cyber first response)</td></tr>
 <tr><td><b>Single-pass</b></td><td>Released only</td><td>External receive, no authoring</td><td>Customer drawing inbound, supplier cal cert, traveler from Epicor, master log entries</td></tr>
 </tbody>
 </table>
@@ -157,7 +157,7 @@ Job-Dossier/
 <tr><td>DEP-IT</td><td>HESEM-Internal/IT/{SOC-Incident, DR-BCP-Drill, Vulnerability-Patch, Vendor-Security}</td><td>3-state per incident/drill/plan</td></tr>
 <tr><td>DEP-LEGAL</td><td>HESEM-Internal/Legal/{Contracts-General, Insurance, Litigation, IP-Patents, IP-Trademarks}</td><td>4-state contract + 4-state IP filing (NOIP) + 4-state litigation</td></tr>
 <tr><td>DEP-EXEC</td><td>HESEM-Internal/Executive/{Strategy, ERM, BOD-Pack, BOD-Minutes, Investor-Updates}</td><td>3-state + special BOD-Pack 3-state (Pre-BOD-Distribution) + 4-state (Investor-Updates)</td></tr>
-<tr><td>DEP-QMS</td><td>Quality/{Internal-Audits, Management-Review, Risk-Register}</td><td>3-state</td></tr>
+<tr><td>DEP-QMS</td><td>Quality/{Internal-Audits, Management-Rà soát, Risk-Register}</td><td>3-state</td></tr>
 </tbody>
 </table>
 </section>
@@ -167,14 +167,14 @@ Job-Dossier/
 <table>
 <thead><tr><th>State</th><th>Permission</th><th>Sensitivity</th></tr></thead>
 <tbody>
-<tr><td><code>1-Working/{Initials}/</code></td><td>Edit = Author + Sr Peer mentor; Read = SG-DEP-{Owner}</td><td>Inherits site default (Internal)</td></tr>
-<tr><td><code>2-In-Review/</code></td><td>Read = SG-DEP-{Owner}; Comment = Reviewer; Approve = SG-{ApproverRole}</td><td>Internal</td></tr>
+<tr><td><code>1-Working/{Initials}/</code></td><td>Edit = Author + Sr Peer mentor; Read = SG-DEP-{Người chịu trách nhiệm}</td><td>Inherits site default (Internal)</td></tr>
+<tr><td><code>2-In-Review/</code></td><td>Read = SG-DEP-{Người chịu trách nhiệm}; Comment = Reviewer; Approve = SG-{ApproverRole}</td><td>Internal</td></tr>
 <tr><td><code>3-Released/</code></td><td>Read = all HESEM (or scoped); <b>Write BLOCKED</b> via retention label</td><td>Final (Customer-Confidential nếu áp dụng)</td></tr>
 <tr><td><code>3-Pending-Signature/</code> (contract)</td><td>Read = Sales + Legal + named counterparty; Edit = Legal</td><td>Customer-Confidential</td></tr>
 <tr><td><code>4-Executed/</code> (contract)</td><td>Read = Sales/Legal/Exec; <b>Write blocked</b>; retention 10+ years</td><td>Customer-Confidential</td></tr>
-<tr><td><code>3-Submitted-to-Customer/</code></td><td>Read = submission team; <b>Write blocked</b>; audit log submission event</td><td>Customer-Confidential</td></tr>
+<tr><td><code>3-Submitted-to-Customer/</code></td><td>Read = submission team; <b>Write blocked</b>; nhật ký kiểm toán submission event</td><td>Customer-Confidential</td></tr>
 <tr><td><code>4-Customer-Approved/</code></td><td>Read = all involved; <b>Frozen</b> với customer approval letter attached</td><td>Customer-Confidential</td></tr>
-<tr><td><code>_Intake/{Op}-{TS}/</code></td><td>Edit = Reporter; Read = SG-DEP-{Owner}-Triage; 4h SLA cleanup vào formal-ID</td><td>Internal</td></tr>
+<tr><td><code>_Intake/{Op}-{TS}/</code></td><td>Edit = Reporter; Read = SG-DEP-{Người chịu trách nhiệm}-Triage; 4h SLA cleanup vào formal-ID</td><td>Internal</td></tr>
 </tbody>
 </table>
 </section>
@@ -182,41 +182,41 @@ Job-Dossier/
 <section class="card">
 <h2>6. Power Automate flows</h2>
 <table>
-<thead><tr><th>Flow</th><th>Trigger</th><th>Action</th></tr></thead>
+<thead><tr><th>Flow</th><th>Điều kiện kích hoạt</th><th>Action</th></tr></thead>
 <tbody>
-<tr><td><b>Promote 2-In-Review → 3-Released</b></td><td>Approval form YES</td><td>Move files, set retention label read-only, generate <code>_release-note.md</code>, update Workflow-Lists, notify downstream</td></tr>
-<tr><td><b>Promote 1-Working → 2-In-Review</b></td><td>"Submit for Review" custom button</td><td>Validate completeness, move files, notify reviewer</td></tr>
+<tr><td><b>Promote 2-In-Rà soát → 3-Released</b></td><td>Approval form YES</td><td>Move files, set retention label read-only, generate <code>_release-note.md</code>, update Luồng xử lý-Lists, notify downstream</td></tr>
+<tr><td><b>Promote 1-Working → 2-In-Rà soát</b></td><td>"Submit for Rà soát" custom button</td><td>Validate completeness, move files, notify reviewer</td></tr>
 <tr><td><b>NCR Intake → Formalize</b></td><td>QA Engineer creates NCR# in NCR-Master-List</td><td>Move <code>_Intake/{Op}-{TS}/*</code> → <code>NCR-{Id}/00-Source-Evidence/</code></td></tr>
 <tr><td><b>Job Engineering-Release snapshot</b></td><td>Job opened in Epicor → webhook</td><td>Read Part-Master/.../3-Released/ versions, generate <code>_release-manifest.json</code> trong Job-Dossier/.../01-Engineering-Release/</td></tr>
 <tr><td><b>Contract Executed promotion</b></td><td>Counterparty signed file uploaded</td><td>Move 3-Pending-Signature → 4-Executed, lock retention, update Customer-Account master log</td></tr>
-<tr><td><b>Customer-submission tracker</b></td><td>File moved to 3-Submitted-to-Customer</td><td>Log to Customer-Portal-Evidence-Log; SLA timer for customer response</td></tr>
-<tr><td><b>Stale 1-Working cleanup</b></td><td>Quarterly cron</td><td>Files >90d untouched → alert owner + auto-archive to <code>_archive/</code></td></tr>
-<tr><td><b>Job-Closure</b></td><td>Job status = Closed in Epicor</td><td>Move Job-Dossier → HESEM-Archive/Locked-Job-Pack-Final; rewrite Canonical-Path on all linked Workflow-List rows</td></tr>
+<tr><td><b>Customer-submission tracker</b></td><td>File moved to 3-Submitted-to-Customer</td><td>Log to Customer-Portal-Bằng chứng-Log; SLA timer for customer response</td></tr>
+<tr><td><b>Stale 1-Working cleanup</b></td><td>Quarterly cron</td><td>Files >90d untouched → alert người chịu trách nhiệm + auto-archive to <code>_archive/</code></td></tr>
+<tr><td><b>Job-Closure</b></td><td>Job trạng thái = Closed in Epicor</td><td>Move Job-Dossier → HESEM-Archive/Locked-Job-Pack-Final; rewrite Canonical-Path on all linked Luồng xử lý-List rows</td></tr>
 </tbody>
 </table>
 </section>
 
 <section class="card">
-<h2>7. 16 Workflow-Lists schema (SharePoint Lists, NOT folders)</h2>
+<h2>7. 16 Luồng xử lý-Lists schema (SharePoint Lists, NOT folders)</h2>
 <table>
 <thead><tr><th>#</th><th>List</th><th>Key columns</th><th>Canonical-Path target</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Job-Master-List</td><td>JobNum (PK), CustomerCode, PartNo+Rev (lookup), POId, Status, OpenedDate, PlannedShipDate, ActualShipDate, OwnerCellLead</td><td>Job-Dossier/{Cust}/{YYYY}/{JobNum}/</td></tr>
-<tr><td>2</td><td>Part-Master-List</td><td>PartNo (PK), Rev, CustomerCode, Status (Active/Frozen-by-PCN/Superseded), LastFAI-Date, ReleasedDate</td><td>Part-Master/{Cust}/{PartNo}/{Rev}/</td></tr>
+<tr><td>1</td><td>Job-Master-List</td><td>JobNum (PK), CustomerCode, PartNo+Rev (lookup), POId, Trạng thái, OpenedDate, PlannedShipDate, ActualShipDate, OwnerCellLead</td><td>Job-Dossier/{Cust}/{YYYY}/{JobNum}/</td></tr>
+<tr><td>2</td><td>Part-Master-List</td><td>PartNo (PK), Rev, CustomerCode, Trạng thái (Active/Frozen-by-PCN/Superseded), LastFAI-Date, ReleasedDate</td><td>Part-Master/{Cust}/{PartNo}/{Rev}/</td></tr>
 <tr><td>3</td><td>NCR-Master-List</td><td>NcrId (PK), JobNum, CustomerCode, PartNo+Rev, Severity, OwnerRole, OpenedDate, ClosedDate, LinkedCapaId</td><td>Job-Dossier/.../10-Quality-Events/NCR/NCR-{Id}/</td></tr>
 <tr><td>4</td><td>CAPA-Master-List</td><td>CapaId (PK), Source, Scope (Single-Job/Multi-Job), Linked-NCRs (multi-lookup), EffectivenessDate</td><td>Quality/CAPA-Master/{CapaId}/</td></tr>
 <tr><td>5</td><td>8D-SCAR-Master-List</td><td>8dId (PK), CustomerCode, D-Phase, OwnerRole, SubmittedDate, CustomerClosureDate</td><td>Quality/8D-SCAR-Master/{8dId}/</td></tr>
-<tr><td>6</td><td>ECO-Master-List</td><td>EcoId (PK), AffectedPartNo+Rev, Driver (Internal/Customer-PCN), Status, Approver, BoardDate</td><td>Part-Master/.../08-ECN-PCN-History/ECN-{Id}/</td></tr>
-<tr><td>7</td><td>PCN-Master-List</td><td>PcnId (PK), Direction (Inbound/Outbound), CustomerCode, AffectedPartNo+Rev, Status</td><td>Customer-Account/.../PCN-{Inbound/Outbound} + Part-Master/.../08</td></tr>
-<tr><td>8</td><td>FAI-Master-List</td><td>FaiId (PK), PartNo+Rev, CustomerCode, JobNum (if execution), FaiType, FaiDate, Witnessed (Y/N), Status</td><td>Part-Master/.../07-FAI-Baseline + Job-Dossier/.../05-FAI-Execution</td></tr>
-<tr><td>9</td><td>Customer-Audit-Master-List</td><td>AuditId (PK), CustomerCode, AuditType, Status, OpeningDate, ClosureDate</td><td>Customer-Account/{Cust}/Audits/{YYYY}/</td></tr>
-<tr><td>10</td><td>Internal-Audit-Master-List</td><td>AuditId (PK), Scope, Auditor, Status, OpeningDate, ClosureDate</td><td>Quality/Internal-Audits/{YYYY}/</td></tr>
-<tr><td>11</td><td>Calibration-Due-List</td><td>GageId (PK), GageType, LastCalDate, DueDate, Status, Owner</td><td>Asset-Master/Gages/{Id}/02-Calibration/{YYYY}/</td></tr>
-<tr><td>12</td><td>PM-Schedule-Master</td><td>MachineId/LineId (PK), PmType (Daily/Weekly/Monthly/Annual), DueDate, LastDone, Owner</td><td>Asset-Master/Machines+Lines/{Id}/PM/{YYYY}/</td></tr>
+<tr><td>6</td><td>ECO-Master-List</td><td>EcoId (PK), AffectedPartNo+Rev, Driver (Internal/Customer-PCN), Trạng thái, Approver, BoardDate</td><td>Part-Master/.../08-ECN-PCN-History/ECN-{Id}/</td></tr>
+<tr><td>7</td><td>PCN-Master-List</td><td>PcnId (PK), Direction (Inbound/Outbound), CustomerCode, AffectedPartNo+Rev, Trạng thái</td><td>Customer-Account/.../PCN-{Inbound/Outbound} + Part-Master/.../08</td></tr>
+<tr><td>8</td><td>FAI-Master-List</td><td>FaiId (PK), PartNo+Rev, CustomerCode, JobNum (if execution), FaiType, FaiDate, Witnessed (Y/N), Trạng thái</td><td>Part-Master/.../07-FAI-Baseline + Job-Dossier/.../05-FAI-Execution</td></tr>
+<tr><td>9</td><td>Customer-Audit-Master-List</td><td>AuditId (PK), CustomerCode, AuditType, Trạng thái, OpeningDate, ClosureDate</td><td>Customer-Account/{Cust}/Audits/{YYYY}/</td></tr>
+<tr><td>10</td><td>Internal-Audit-Master-List</td><td>AuditId (PK), Scope, Auditor, Trạng thái, OpeningDate, ClosureDate</td><td>Quality/Internal-Audits/{YYYY}/</td></tr>
+<tr><td>11</td><td>Calibration-Due-List</td><td>GageId (PK), GageType, LastCalDate, DueDate, Trạng thái, Người chịu trách nhiệm</td><td>Asset-Master/Gages/{Id}/02-Calibration/{YYYY}/</td></tr>
+<tr><td>12</td><td>PM-Schedule-Master</td><td>MachineId/LineId (PK), PmType (Daily/Weekly/Monthly/Annual), DueDate, LastDone, Người chịu trách nhiệm</td><td>Asset-Master/Machines+Lines/{Id}/PM/{YYYY}/</td></tr>
 <tr><td>13</td><td>Cert-Expiry-Watch-90d</td><td>EmpId, CertCode, ExpiryDate, DaysToExpiry, OwnerSupervisor</td><td>Training/Cert-Master-Register/</td></tr>
-<tr><td>14</td><td>Customer-Portal-Evidence-Log</td><td>Direction (In/Out), Portal, DocType, CustomerCode, UploadId, Timestamp</td><td>PO-Index/.../00-Source + Customer-Account master logs</td></tr>
-<tr><td>15</td><td>Action-Tracker-Master</td><td>ActionId, Source, OwnerRole, DueDate, Status</td><td>(cross-cutting)</td></tr>
-<tr><td>16</td><td>Supplier-CMRT-Master-List</td><td>SupplierId, Year, ResponseDate, Status (Pending/Received/Validated/Roll-Up-Done)</td><td>Supplier-Master/{Sup}/10-CMRT-EMRT/{YYYY}/</td></tr>
+<tr><td>14</td><td>Customer-Portal-Bằng chứng-Log</td><td>Direction (In/Out), Portal, DocType, CustomerCode, UploadId, Timestamp</td><td>PO-Index/.../00-Source + Customer-Account master logs</td></tr>
+<tr><td>15</td><td>Action-Tracker-Master</td><td>ActionId, Source, OwnerRole, DueDate, Trạng thái</td><td>(cross-cutting)</td></tr>
+<tr><td>16</td><td>Supplier-CMRT-Master-List</td><td>SupplierId, Year, ResponseDate, Trạng thái (Pending/Received/Validated/Roll-Up-Done)</td><td>Supplier-Master/{Sup}/10-CMRT-EMRT/{YYYY}/</td></tr>
 </tbody>
 </table>
 </section>
@@ -234,14 +234,14 @@ HESEM-Internal/Finance/
 ├── Open-Book-Customer-Costing-Restricted/{OEM}/        4-state customer-outbound (per OEM)
 └── Customer-Scorecard-Response/{OEM}/{YYYY}/            4-state customer-outbound
 </pre>
-<p>Trước v8 chưa có Finance library trong M365 (Finance data ở Epicor). v8 thêm cho authored content: Monthly Close pack, External Audit response, Capex business case, Open-Book Customer Costing (restricted, MFN clause trigger).</p>
+<p>Trước v8 chưa có Finance library trong M365 (Finance data ở Epicor). v8 thêm cho authored content: Monthly Close pack, External Audit response, Capex business case, Open-Book Customer Costing (restricted, MFN clause điều kiện kích hoạt).</p>
 
 <h3>8.2 Quality/Incident-Investigation/ (NEW)</h3>
 <pre class="tree">
 Quality/Incident-Investigation/
 ├── _Intake/{ReporterInitials}-{Timestamp}/             2-state Intake (first-response)
 └── _TEMPLATES/INC-{Id}/                                 Formalized after Incident ID assigned
-    ├── 00-Source-Evidence
+    ├── 00-Source-Bằng chứng
     ├── 01-Classification-EHS-Cyber-Safety               (categorize)
     ├── 02-Immediate-Containment
     ├── 03-Root-Cause-Investigation/{1-W, 2-IR, 3-R}     3-state
@@ -294,7 +294,7 @@ Asset-Master/Lines/{LineCode}/
 <li><b>v8 blueprint:</b> <code>tools/m365-provisioning/build_blueprint.py</code></li>
 <li><b>v8 tree:</b> <code>tools/m365-provisioning/blueprint/_TREE.txt</code> (1180 directories)</li>
 <li><a href="annex-144-ssot-3-axis-job-part-asset-architecture.html">ANNEX-144 (v4)</a> → SUPERSEDED</li>
-<li><a href="annex-145-v5-stress-test-fixes-and-workflow-lists-schema.html">ANNEX-145 (v5)</a> → SUPERSEDED cho site architecture; §5 Workflow-Lists schema ratified và extended trong v8 §7</li>
+<li><a href="annex-145-v5-stress-test-fixes-and-workflow-lists-schema.html">ANNEX-145 (v5)</a> → SUPERSEDED cho site architecture; §5 Luồng xử lý-Lists schema ratified và extended trong v8 §7</li>
 <li><a href="annex-146-v6-customer-ip-segregated-6-site-architecture.html">ANNEX-146 (v6)</a> → SUPERSEDED</li>
 <li><a href="annex-147-v7-unified-workspace-customer-keyed-architecture.html">ANNEX-147 (v7)</a> → SUPERSEDED; PLM Part-Master/Job-Dossier split là evolution chính của v8</li>
 <li><a href="annex-141-semi-equipment-parts-cnc-supplier-compliance.html">ANNEX-141</a> — Pack-6 implement trong Job-Dossier/.../08-Final-QC/Cleanliness-Pack-6/</li>
@@ -307,7 +307,7 @@ Asset-Master/Lines/{LineCode}/
 <table>
 <thead><tr><th>Rev</th><th>Ngày</th><th>Người</th><th>Mô tả</th></tr></thead>
 <tbody>
-<tr><td>V0</td><td>2026-05-18</td><td>QMS</td><td>v8.1 — PLM 3-state lifecycle architecture. Part-Master và Job-Dossier ngang hàng (Teamcenter/Windchill pattern). 5 lifecycle variants (3-state, 4-state contract, 4-state customer-outbound, 2-state Intake, single-pass) áp dụng universal cho 13 phòng ban. NEW HESEM-Internal/Finance library. NEW Quality/Incident-Investigation. NEW Asset-Master/Lines category (NADCAP AC7108). 16 Workflow-Lists schemas formalized. Workflow gate order corrected (Engineering-Release → Material-Receiving → Job-Setup). Tổng 1180 directories (vs 747 v7, +58%) do 3-state expansion + new libraries.</td></tr>
+<tr><td>V0</td><td>2026-05-18</td><td>QMS</td><td>v8.1 — PLM 3-state lifecycle architecture. Part-Master và Job-Dossier ngang hàng (Teamcenter/Windchill pattern). 5 lifecycle variants (3-state, 4-state contract, 4-state customer-outbound, 2-state Intake, single-pass) áp dụng universal cho 13 phòng ban. NEW HESEM-Internal/Finance library. NEW Quality/Incident-Investigation. NEW Asset-Master/Lines category (NADCAP AC7108). 16 Luồng xử lý-Lists schemas formalized. Luồng xử lý gate order corrected (Engineering-Release → Material-Receiving → Job-Setup). Tổng 1180 directories (vs 747 v7, +58%) do 3-state expansion + new libraries.</td></tr>
 </tbody>
 </table>
 </section>

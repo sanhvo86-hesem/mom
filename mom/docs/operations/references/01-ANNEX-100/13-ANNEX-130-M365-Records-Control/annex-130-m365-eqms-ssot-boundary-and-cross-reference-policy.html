@@ -80,7 +80,7 @@
  <div class="section">
  <h2>1. Mục đích, phạm vi và bối cảnh phát sinh</h2>
  <p style="margin:8px 0;">ANNEX-131 đến ANNEX-136 đã thiết lập khung sườn đầy đủ cho nơi lưu hồ sơ M365: schema metadata (ANNEX-131), flow approval (ANNEX-132), cây thư mục (ANNEX-133), provisioning automation (ANNEX-134), file plan chi tiết theo phòng ban và job (ANNEX-135) và ranh giới source/runtime (ANNEX-136). ANNEX-139 bổ sung cấu trúc nội bộ cho IP và restricted library. Nhưng vẫn còn một khoảng trống chưa được giải quyết tường minh: <strong>khi cùng một loại hồ sơ phát sinh nhiều bằng chứng nằm ở nhiều thư viện cùng lúc, ranh giới SSOT giữa các vị trí được xác định ra sao và làm thế nào để bảo đảm version control không bị phá vỡ.</strong></p>
- <p style="margin:8px 0;">Ví dụ điển hình là NCR-2026-043: cùng một sự kiện không phù hợp có thể tạo ra (a) bản ghi cấu trúc trong cơ sở dữ liệu EQMS Portal (bảng <span class="code">eqms_ncr_records</span> với <span class="code">ncr_number</span>, <span class="code">disposition</span>, <span class="code">status</span>), (b) file PDF báo cáo đã ký nằm trong <span class="path">Quality-Records/04-NCR/2026/</span>, (c) bằng chứng phát sinh theo job nằm trong <span class="path">Job-Dossiers/J2026-042/09_NCR-CAPA-Deviation/</span>, (d) bảng điều hành nội bộ của phòng QA nằm trong <span class="path">Department-Ops/DEP-QA/02-Operations/04-NCR-and-CAPA-Reaction/</span>. Bốn vị trí. Bốn vai trò khác nhau. ANNEX này định nghĩa rõ vai trò, ranh giới và cơ chế cross-reference giữa chúng.</p>
+ <p style="margin:8px 0;">Ví dụ điển hình là NCR-2026-043: cùng một sự kiện không phù hợp có thể tạo ra (a) bản ghi cấu trúc trong cơ sở dữ liệu EQMS Portal (bảng <span class="code">eqms_ncr_records</span> với <span class="code">ncr_number</span>, <span class="code">disposition</span>, <span class="code">trạng thái</span>), (b) file PDF báo cáo đã ký nằm trong <span class="path">Quality-Records/04-NCR/2026/</span>, (c) bằng chứng phát sinh theo job nằm trong <span class="path">Job-Dossiers/J2026-042/09_NCR-CAPA-Deviation/</span>, (d) bảng điều hành nội bộ của phòng QA nằm trong <span class="path">Department-Ops/DEP-QA/02-Operations/04-NCR-and-CAPA-Reaction/</span>. Bốn vị trí. Bốn vai trò khác nhau. ANNEX này định nghĩa rõ vai trò, ranh giới và cơ chế cross-reference giữa chúng.</p>
  <div class="keyline"><strong>Phạm vi áp dụng:</strong> mọi loại hồ sơ có thể tồn tại đồng thời ở (1) EQMS Portal database, (2) M365 SSOT library cấp công ty và (3) một hoặc nhiều vị trí cross-reference trong Job-Dossiers, Department-Ops, Employee-Records hoặc System-Records. Bao gồm nhưng không giới hạn ở: NCR, CAPA, FAI, khiếu nại khách hàng, hiệu chuẩn, MSA, audit, đào tạo, năng lực, concession, deviation, supplier quality event.</p>
  <div class="keyline" style="background:#fffaf0;"><strong>Kết quả bắt buộc:</strong> mỗi loại hồ sơ có đúng một SoT cho dữ liệu cấu trúc (EQMS Portal hoặc Epicor), đúng một SSOT cho file gốc (M365 thư viện chuẩn), và mọi vị trí khác chỉ giữ cross-reference cùng với bằng chứng riêng biệt không trùng lặp. Không có hai bản copy của cùng một file. Không có hai bản ghi cấu trúc của cùng một số NCR/CAPA/FAI. Mọi tham chiếu cross-site đều phải resolve được sau 10 năm.</div>
  </div>
@@ -88,16 +88,16 @@
 
  <div class="section">
  <h2>2. Mô hình SSOT ba tầng EQMS-M365</h2>
- <p style="margin:8px 0;">HESEM vận hành một kiến trúc dữ liệu ba lớp dành cho hồ sơ chất lượng và vận hành. ANNEX-131 §2 đã xác lập ranh giới giữa Epicor (SoR giao dịch) và M365 (SSOT hồ sơ). ANNEX này bổ sung tầng thứ ba — EQMS Portal — là hệ thống dữ liệu có cấu trúc dành riêng cho luồng làm việc chất lượng (workflow), không phải giao dịch tài chính/sản xuất của Epicor, cũng không phải file tài liệu của M365.</p>
+ <p style="margin:8px 0;">HESEM vận hành một kiến trúc dữ liệu ba lớp dành cho hồ sơ chất lượng và vận hành. ANNEX-131 §2 đã xác lập ranh giới giữa Epicor (SoR giao dịch) và M365 (SSOT hồ sơ). ANNEX này bổ sung tầng thứ ba — EQMS Portal — là hệ thống dữ liệu có cấu trúc dành riêng cho luồng làm việc chất lượng (luồng xử lý), không phải giao dịch tài chính/sản xuất của Epicor, cũng không phải file tài liệu của M365.</p>
  <div class="figure-box">
  <p style="margin:0;"><strong>Sơ đồ ba tầng:</strong></p>
  <pre class="decision-tree" style="white-space:pre;">
                  ┌─────────────────────────────────────────────────────────┐
                  │   TIER 1 — EQMS Portal Database (MOM)                   │
-                 │   ↳ Structured workflow data SSOT                       │
+                 │   ↳ Structured luồng xử lý data SSOT                       │
                  │   ↳ eqms_ncr_records, eqms_capa_records, fai_records    │
-                 │   ↳ Số NCR, status, disposition, linked jobs, audit log │
-                 │   ↳ Owner: QA + Application admin                       │
+                 │   ↳ Số NCR, trạng thái, disposition, linked jobs, nhật ký kiểm toán │
+                 │   ↳ Người chịu trách nhiệm: QA + Application admin                       │
                  └────────────┬────────────────────────────────────────────┘
                               │  (push file PDF + metadata)
                               ▼
@@ -106,7 +106,7 @@
                  │   ↳ File SSOT cho PDF báo cáo, biểu mẫu đã ký, ảnh, ZIP │
                  │   ↳ Quality-Records/04-NCR/{YYYY}/NCR-{YYYY}-{NNN}.pdf  │
                  │   ↳ Có retention label (RET-QMS-NCR, 10 năm)            │
-                 │   ↳ Owner: QA / QMS                                     │
+                 │   ↳ Người chịu trách nhiệm: QA / QMS                                     │
                  └────────────┬────────────────────────────────────────────┘
                               │  (cross-reference qua NCR-Number key)
                               ▼
@@ -123,23 +123,23 @@
 
  <h3>2.1. Tier 1 — EQMS Portal (Structured Data SSOT)</h3>
  <div class="tier-card">
- <p style="margin:0 0 6px;"><span class="tier-tag tier-1">TIER 1</span> &nbsp;<strong>Vai trò:</strong> hệ thống dữ liệu có cấu trúc cho mọi trường workflow liên quan đến NCR, CAPA, FAI và các record series tương đương.</p>
+ <p style="margin:0 0 6px;"><span class="tier-tag tier-1">TIER 1</span> &nbsp;<strong>Vai trò:</strong> hệ thống dữ liệu có cấu trúc cho mọi trường luồng xử lý liên quan đến NCR, CAPA, FAI và các record series tương đương.</p>
  <p style="margin:6px 0;"><strong>Vị trí vật lý:</strong> PostgreSQL database của HESEM MOM portal. Bảng chính: <span class="code">eqms_ncr_records</span>, <span class="code">eqms_capa_records</span>, <span class="code">nonconformance_dispositions</span>, <span class="code">corrective_action_tasks</span>, <span class="code">corrective_action_verifications</span>, <span class="code">fqc_inspections</span>, <span class="code">oqc_inspections</span>, <span class="code">msa_studies</span>, <span class="code">spc_observations</span>, <span class="code">concessions</span>, <span class="code">deviations</span>.</p>
- <p style="margin:6px 0;"><strong>Lý do tồn tại:</strong> SharePoint List có giới hạn về indexing, validation, state machine và audit log. Một NCR có state machine 8 bậc (draft → submitted → under_review → mrb_review → disposition_set → rework_in_progress → closed) với các invariant không thể đóng nếu thiếu disposition evidence. SharePoint không thực thi được loại invariant này. EQMS Portal có controller riêng (<span class="code">EqmsNcrController</span>, <span class="code">EqmsCapaController</span>) thực thi state transition, role-based write control, audit log và linked-record integrity.</p>
+ <p style="margin:6px 0;"><strong>Lý do tồn tại:</strong> SharePoint List có giới hạn về indexing, validation, state machine và nhật ký kiểm toán. Một NCR có state machine 8 bậc (draft → submitted → under_review → mrb_review → disposition_set → rework_in_progress → closed) với các invariant không thể đóng nếu thiếu disposition bằng chứng. SharePoint không thực thi được loại invariant này. EQMS Portal có controller riêng (<span class="code">EqmsNcrController</span>, <span class="code">EqmsCapaController</span>) thực thi state transition, role-based write control, nhật ký kiểm toán và linked-record integrity.</p>
  <p style="margin:6px 0;"><strong>Loại trường được sở hữu bởi Tier 1:</strong></p>
  <ul>
  <li><span class="code">ncr_number</span>, <span class="code">capa_number</span>, <span class="code">fai_number</span> — natural key, auto-sequenced</li>
- <li><span class="code">status</span>, <span class="code">disposition</span>, <span class="code">severity</span>, <span class="code">source</span>, <span class="code">assigned_to</span></li>
+ <li><span class="code">trạng thái</span>, <span class="code">disposition</span>, <span class="code">severity</span>, <span class="code">source</span>, <span class="code">assigned_to</span></li>
  <li><span class="code">linked_jobs</span>, <span class="code">linked_capa_id</span>, <span class="code">linked_complaint_id</span>, <span class="code">linked_supplier_id</span></li>
- <li><span class="code">created_at</span>, <span class="code">submitted_at</span>, <span class="code">disposed_at</span>, <span class="code">closed_at</span> — temporal evidence theo ALCOA+</li>
+ <li><span class="code">created_at</span>, <span class="code">submitted_at</span>, <span class="code">disposed_at</span>, <span class="code">closed_at</span> — temporal bằng chứng theo ALCOA+</li>
  <li><span class="code">root_cause_analysis</span>, <span class="code">action_plan</span> (JSONB), <span class="code">effectiveness_verification</span></li>
  <li>Audit trail per row qua bảng <span class="code">audit_events</span> với user, action, before/after value, timestamp</li>
  </ul>
  <p style="margin:6px 0;"><strong>Endpoint chuẩn (REST):</strong> <span class="code">POST /api/v1/eqms/ncr/query</span>, <span class="code">POST /api/v1/eqms/ncr/{id}/transition</span>, <span class="code">POST /api/v1/eqms/capa/query</span>, <span class="code">POST /api/v1/eqms/capa/{id}/transition</span>. Mọi truy vấn trending, MR input, supplier quality view, KPI dashboard đều lấy từ tầng này.</p>
  <p style="margin:6px 0;"><strong>Quy tắc cứng:</strong></p>
  <ol>
- <li>Không bao giờ tái tạo các trường thuộc Tier 1 dưới dạng SharePoint column độc lập. Nếu cần hiển thị status/disposition ở M365, phải fetch qua API tại thời điểm hiển thị hoặc qua Power Automate flow đồng bộ một chiều EQMS → M365.</li>
- <li>Không bao giờ chỉnh sửa status/disposition trực tiếp trong SharePoint metadata. Mọi state transition phải đi qua EQMS controller để giữ audit log nguyên vẹn.</li>
+ <li>Không bao giờ tái tạo các trường thuộc Tier 1 dưới dạng SharePoint column độc lập. Nếu cần hiển thị trạng thái/disposition ở M365, phải fetch qua API tại thời điểm hiển thị hoặc qua Power Automate flow đồng bộ một chiều EQMS → M365.</li>
+ <li>Không bao giờ chỉnh sửa trạng thái/disposition trực tiếp trong SharePoint metadata. Mọi state transition phải đi qua EQMS controller để giữ nhật ký kiểm toán nguyên vẹn.</li>
  <li>EQMS Portal không lưu file PDF, ảnh hay tài liệu đính kèm dạng blob trong database. Mọi attachment phải push sang Tier 2 và lưu URL trong cột <span class="code">evidence_url</span>.</li>
  </ol>
  </div>
@@ -154,7 +154,7 @@
  <li>PDF báo cáo CAPA 8D đã ký (xuất từ EQMS Portal sau effectiveness verification)</li>
  <li>PDF báo cáo FAI / Form 1-2-3 AS9102 đã ký (xuất từ FAI module hoặc tải lên thủ công nếu là FAIR của customer)</li>
  <li>PDF biểu mẫu đã ký bằng tay (FRM-205, FRM-801, FRM-805…) khi không có biểu mẫu trực tuyến tương ứng</li>
- <li>Ảnh containment, ảnh deviation, ảnh rework — chỉ khi là evidence chính thức cho NCR cấp công ty (không phải ảnh job-specific working)</li>
+ <li>Ảnh containment, ảnh deviation, ảnh rework — chỉ khi là bằng chứng chính thức cho NCR cấp công ty (không phải ảnh job-specific working)</li>
  <li>Gói tài liệu phát hành cho khách hàng (Customer-released pack) — đã được niêm phong</li>
  </ul>
  <p style="margin:6px 0;"><strong>Đặc tính bắt buộc:</strong></p>
@@ -165,17 +165,17 @@
  <li>Mọi file phải có <strong>Source_System = "EQMS"</strong> nếu file đến từ EQMS Portal (giúp truy ngược về bản ghi cấu trúc).</li>
  <li>Mọi file phải có <strong>System_Record_Key</strong> = NCR-Number / CAPA-Number / FAI-Number để binding cross-tier.</li>
  </ol>
- <p style="margin:6px 0;"><strong>Đường đi chuẩn EQMS → M365 Tier 2:</strong> sau khi NCR được disposition_set và signed bởi MRB chair trong EQMS Portal, controller tự động (i) sinh PDF báo cáo, (ii) upload qua Microsoft Graph API vào <span class="path">Quality-Records/04-NCR/{YYYY}/NCR-{YYYY}-{NNN}.pdf</span>, (iii) ghi <span class="code">evidence_url</span> ngược về EQMS record, (iv) trigger Power Automate apply retention label, (v) ghi audit_events entry "ncr.evidence.pushed" với SHA-256 hash của PDF.</p>
+ <p style="margin:6px 0;"><strong>Đường đi chuẩn EQMS → M365 Tier 2:</strong> sau khi NCR được disposition_set và signed bởi MRB chair trong EQMS Portal, controller tự động (i) sinh PDF báo cáo, (ii) upload qua Microsoft Graph API vào <span class="path">Quality-Records/04-NCR/{YYYY}/NCR-{YYYY}-{NNN}.pdf</span>, (iii) ghi <span class="code">evidence_url</span> ngược về EQMS record, (iv) điều kiện kích hoạt Power Automate apply retention label, (v) ghi audit_events entry "ncr.bằng chứng.pushed" với SHA-256 hash của PDF.</p>
  </div>
 
  <h3>2.3. Tier 3 — Cross-Reference Pointers (Job/Department/Employee Context)</h3>
  <div class="tier-card">
  <p style="margin:0 0 6px;"><span class="tier-tag tier-3">TIER 3</span> &nbsp;<strong>Vai trò:</strong> vùng context giúp người dùng đứng từ một job, một phòng ban, một nhân viên có thể tìm thấy mọi hồ sơ liên quan — nhưng không tự duy trì SSOT của các hồ sơ đó.</p>
- <p style="margin:6px 0;"><strong>Vị trí vật lý:</strong> SharePoint Online site <span class="code">HESEM-Job-Evidence</span> (Job-Dossiers, Customer-Received, Tooling-Fixture-Gage, Part-REV-Master), site <span class="code">HESEM-Records</span> phần Department-Ops, site <span class="code">HESEM-People</span> (Employee-Records, HR-Operations) và site <span class="code">HESEM-Digital</span> (System-Records, QMS-Source-Control).</p>
+ <p style="margin:6px 0;"><strong>Vị trí vật lý:</strong> SharePoint Online site <span class="code">HESEM-Job-Bằng chứng</span> (Job-Dossiers, Customer-Received, Tooling-Fixture-Gage, Part-REV-Master), site <span class="code">HESEM-Records</span> phần Department-Ops, site <span class="code">HESEM-People</span> (Employee-Records, HR-Operations) và site <span class="code">HESEM-Digital</span> (System-Records, QMS-Source-Control).</p>
  <p style="margin:6px 0;"><strong>Loại nội dung được phép ở Tier 3:</strong></p>
  <ul>
  <li><strong>Cross-reference metadata</strong>: cột <span class="code">NCR_Refs</span>, <span class="code">CAPA_Refs</span>, <span class="code">FAI_Refs</span> trong content type của Document Set hoặc folder metadata; entry trong SharePoint List <span class="code">NCR-Cross-Reference</span></li>
- <li><strong>Job-specific working evidence</strong> không phải SSOT chính thức: ảnh containment thô chụp tại line, video rework, ghi chú handwritten của operator, biên bản họp daily tier — những thứ phát sinh trong context của job đó và không có đời sống độc lập</li>
+ <li><strong>Job-specific working bằng chứng</strong> không phải SSOT chính thức: ảnh containment thô chụp tại line, video rework, ghi chú handwritten của operator, biên bản họp daily tier — những thứ phát sinh trong context của job đó và không có đời sống độc lập</li>
  <li><strong>Working pack</strong> của phòng ban (dashboard snapshot, internal tracker, action log) — chứ không phải bản chính thức của NCR/CAPA</li>
  <li><strong>SharePoint shortcut</strong> trỏ về Tier 2 — <strong>chỉ làm navigation aid, không phải bằng chứng compliance</strong></li>
  </ul>
@@ -183,14 +183,14 @@
  <div class="danger-line">
  <ul style="margin:0;">
  <li>❌ Bản copy physical của file PDF báo cáo NCR/CAPA/FAI từ Tier 2 (kể cả đã được stamp "UNCONTROLLED WHEN PRINTED")</li>
- <li>❌ Bản ghi cấu trúc song song của số NCR/CAPA/FAI với status/disposition tự duy trì (vi phạm Tier 1 ownership)</li>
+ <li>❌ Bản ghi cấu trúc song song của số NCR/CAPA/FAI với trạng thái/disposition tự duy trì (vi phạm Tier 1 ownership)</li>
  <li>❌ File đã ký bởi MRB chair, QA Manager, CEO — đây luôn là Tier 2 SSOT</li>
  <li>❌ Customer-released pack, certificate of conformance đã phát hành — đây là Tier 2</li>
  </ul>
  </div>
  <p style="margin:6px 0;"><strong>Quy tắc cứng cho mọi entry Tier 3:</strong></p>
  <ol>
- <li>Phải có cột <span class="code">Record_Authority = "Cross-Reference"</span> hoặc <span class="code">"Job-Evidence"</span>.</li>
+ <li>Phải có cột <span class="code">Record_Authority = "Cross-Reference"</span> hoặc <span class="code">"Job-Bằng chứng"</span>.</li>
  <li>Phải có cột <span class="code">SSOT_Reference_Key</span> trỏ về Tier 1 (NCR-Number) hoặc Tier 2 (file SSOT path / SharePoint ItemID).</li>
  <li>Phải có cột <span class="code">Last_Verified_Date</span> ghi ngày link/reference được verify lần cuối (Power Automate weekly job).</li>
  <li>Không bao giờ có cùng filename với file SSOT trong Tier 2 (chống nhầm khi search trả về cả hai).</li>
@@ -201,7 +201,7 @@
 
  <div class="section">
  <h2>3. Quy tắc cứng vận hành ba tầng</h2>
- <p style="margin:8px 0;">Các quy tắc dưới đây là không thể vi phạm. Bất kỳ flow tự động, hành vi người dùng hoặc thiết kế list nào dẫn đến vi phạm phải bị block ở giai đoạn UAT và là điều kiện no-go-live theo ANNEX-132 §11.</p>
+ <p style="margin:8px 0;">Các quy tắc dưới đây là không thể vi phạm. Bất kỳ flow tự động, hành vi người dùng hoặc thiết kế list nào dẫn đến vi phạm phải bị block ở giai đoạn UAT và là điều kiện no-đưa vào vận hành theo ANNEX-132 §11.</p>
  <div class="table-card">
  <table class="table">
  <thead>
@@ -216,13 +216,13 @@
  <tr><td><span class="code">SSOT-R01</span></td><td>Mỗi record series chính thức (NCR, CAPA, FAI, Customer Complaint, Training, MSA…) có đúng một Tier 1 SoT và đúng một Tier 2 file SSOT.</td><td>Toàn hệ thống</td><td>Schema enforcement trong EQMS controller + content type guard trong M365 library</td></tr>
  <tr><td><span class="code">SSOT-R02</span></td><td>Số NCR/CAPA/FAI được cấp DUY NHẤT bởi EQMS Portal (auto-sequence). Không được điền tay trong SharePoint metadata.</td><td>Tier 1 → Tier 2 → Tier 3</td><td>EQMS controller cấp số; M365 List validation rule reject input không khớp regex <span class="code">^(NCR|CAPA|FAI)-\d{4}-\d{3,5}$</span></td></tr>
  <tr><td><span class="code">SSOT-R03</span></td><td>File PDF báo cáo chính thức chỉ tồn tại ở đúng một path trong Tier 2. Mọi vị trí khác (Tier 3) chỉ chứa cross-reference metadata, không chứa physical file.</td><td>Tier 2 ↔ Tier 3</td><td>Power Automate guard: reject upload nếu filename match pattern NCR/CAPA/FAI SSOT và destination không phải Tier 2</td></tr>
- <tr><td><span class="code">SSOT-R04</span></td><td>Cập nhật status/disposition của NCR/CAPA chỉ được thực hiện qua EQMS state-transition endpoint. Cập nhật trực tiếp trong SharePoint metadata bị reject.</td><td>Tier 1</td><td>EQMS endpoint authoritative; SharePoint Source_System field readonly cho user, chỉ flow EQMS có quyền ghi</td></tr>
- <tr><td><span class="code">SSOT-R05</span></td><td>Mỗi file ở Tier 2 phải có đúng một retention label áp tại cấp library default, không vá thủ công từng file.</td><td>Tier 2</td><td>Library default retention label policy thông qua Microsoft Purview; auto-apply policy review hàng tháng</td></tr>
+ <tr><td><span class="code">SSOT-R04</span></td><td>Cập nhật trạng thái/disposition của NCR/CAPA chỉ được thực hiện qua EQMS state-transition endpoint. Cập nhật trực tiếp trong SharePoint metadata bị reject.</td><td>Tier 1</td><td>EQMS endpoint authoritative; SharePoint Source_System field readonly cho user, chỉ flow EQMS có quyền ghi</td></tr>
+ <tr><td><span class="code">SSOT-R05</span></td><td>Mỗi file ở Tier 2 phải có đúng một retention label áp tại cấp library default, không vá thủ công từng file.</td><td>Tier 2</td><td>Library default retention label policy thông qua Microsoft Purview; auto-apply policy rà soát hàng tháng</td></tr>
  <tr><td><span class="code">SSOT-R06</span></td><td>Mỗi entry cross-reference ở Tier 3 phải có giá trị <span class="code">SSOT_Reference_Key</span> hợp lệ và resolve được. Entry orphan (key trỏ vào file không tồn tại) bị flag.</td><td>Tier 3</td><td>Weekly Power Automate verification job; orphan entry vào báo cáo Records Integrity</td></tr>
  <tr><td><span class="code">SSOT-R07</span></td><td>Khi rename hoặc move file ở Tier 2, hệ thống tự động cập nhật <span class="code">SSOT_Reference_Key</span> ở mọi Tier 3 reference qua background flow.</td><td>Tier 2 → Tier 3</td><td>SharePoint webhook + Power Automate; nếu webhook fail, file move bị abort</td></tr>
- <tr><td><span class="code">SSOT-R08</span></td><td>Cross-site shortcut SharePoint không được coi là evidence compliance. Mọi cross-tier link phải đi qua <span class="code">NCR-Cross-Reference</span> List với Document ID + path resolution.</td><td>Tier 2 ↔ Tier 3</td><td>Purview documentation xác nhận shortcuts không kế thừa retention label; List item là evidence record</td></tr>
+ <tr><td><span class="code">SSOT-R08</span></td><td>Cross-site shortcut SharePoint không được coi là bằng chứng compliance. Mọi cross-tier link phải đi qua <span class="code">NCR-Cross-Reference</span> List với Document ID + path resolution.</td><td>Tier 2 ↔ Tier 3</td><td>Purview documentation xác nhận shortcuts không kế thừa retention label; List item là bằng chứng record</td></tr>
  <tr><td><span class="code">SSOT-R09</span></td><td>Khi cùng một NCR được liên kết tới nhiều job, một bản ghi Tier 1 + một file Tier 2 + nhiều cross-reference entry Tier 3 (one-to-many). Không tạo nhiều bản ghi Tier 1 cho cùng một sự kiện.</td><td>Tier 1</td><td>Linked_Jobs là array trong EQMS schema; UI block tạo NCR mới nếu đã có NCR cùng nguyên nhân gốc và linked_jobs trùng</td></tr>
- <tr><td><span class="code">SSOT-R10</span></td><td>Job-Dossier có thể chứa file ảnh, video, ghi chú phát sinh trong job — nhưng nếu trở thành evidence chính thức cho NCR/CAPA/FAI thì phải promote lên Tier 2 và để lại cross-reference, không lưu hai bản.</td><td>Tier 3 → Tier 2</td><td>Promotion flow trong ANNEX-132 §7; PromotionState = Promoted khi đã chuyển</td></tr>
+ <tr><td><span class="code">SSOT-R10</span></td><td>Job-Dossier có thể chứa file ảnh, video, ghi chú phát sinh trong job — nhưng nếu trở thành bằng chứng chính thức cho NCR/CAPA/FAI thì phải promote lên Tier 2 và để lại cross-reference, không lưu hai bản.</td><td>Tier 3 → Tier 2</td><td>Promotion flow trong ANNEX-132 §7; PromotionState = Promoted khi đã chuyển</td></tr>
  </tbody>
  </table>
  </div>
@@ -240,7 +240,7 @@
  │   ├─ Có  → Stop. Lưu trong Epicor. M365 chỉ snapshot nếu cần (ANNEX-131 §7).
  │   └─ Không → Q2.
  │
- ├─ Q2. Nó có phải là bản ghi workflow chất lượng có state machine (NCR, CAPA, FAI, Complaint)?
+ ├─ Q2. Nó có phải là bản ghi luồng xử lý chất lượng có state machine (NCR, CAPA, FAI, Complaint)?
  │   ├─ Có  → TIER 1: tạo trong EQMS Portal.
  │   │       Sau khi disposition_set/signed → tự động push file PDF sang TIER 2.
  │   │       Tiếp tục Q5 để xác định cross-reference ở TIER 3.
@@ -254,8 +254,8 @@
  ├─ Q4. Nó có phải là bằng chứng vận hành theo job/lot/phòng ban?
  │   ├─ Có  → Q4a. Bằng chứng cho gate nào của job?
  │   │           ├─ G0..G7 → Job-Dossiers/{YYYY}/{JobNum}/{0X_GX_GateName}/
- │   │           ├─ NCR/CAPA evidence riêng cho job → 09_NCR-CAPA-Deviation
- │   │           │   (chỉ working evidence; KHÔNG file SSOT của NCR)
+ │   │           ├─ NCR/CAPA bằng chứng riêng cho job → 09_NCR-CAPA-Deviation
+ │   │           │   (chỉ working bằng chứng; KHÔNG file SSOT của NCR)
  │   │           └─ Archive after close → 99_Archive-Locked
  │   │       Hoặc bằng chứng phòng ban (không gắn job cụ thể)?
  │   │           → Department-Ops/DEP-{CODE}/{appropriate-branch}/
@@ -280,7 +280,7 @@
  <div class="success-line"><strong>Ví dụ áp dụng — NCR-2026-043 phát sinh khi gia công job J2026-042:</strong>
  <ol style="margin:6px 0;">
  <li>Q2 = Có → Tạo bản ghi trong EQMS Portal với linked_jobs = ["J2026-042"]. Số NCR = NCR-2026-043 do server cấp.</li>
- <li>Sau MRB review và disposition_set → EQMS tự push PDF báo cáo vào <span class="path">Quality-Records/04-NCR/2026/NCR-2026-043.pdf</span> với retention label RET-QMS-NCR.</li>
+ <li>Sau MRB rà soát và disposition_set → EQMS tự push PDF báo cáo vào <span class="path">Quality-Records/04-NCR/2026/NCR-2026-043.pdf</span> với retention label RET-QMS-NCR.</li>
  <li>Q5 = Có 1 job → Tạo entry trong <span class="code">NCR-Cross-Reference</span> List: NCR_Number=NCR-2026-043, Job_Number=J2026-042, SSOT_Path=Quality-Records/04-NCR/2026/NCR-2026-043.pdf, Last_Verified_Date=auto.</li>
  <li>Job-Dossier/J2026-042/09_NCR-CAPA-Deviation/ chỉ chứa: rework photos thô, deviation note của shift leader, video reflow, concession-request form working draft. KHÔNG chứa NCR-2026-043.pdf.</li>
  <li>Department-Ops/DEP-QA/03-Registers-and-Logs/00-Current/ có view live của NCR Register lấy từ EQMS API, không copy file.</li>
@@ -308,14 +308,14 @@
  <td><strong>NCR</strong> (Non-Conformance Report)</td>
  <td>EQMS <span class="code">eqms_ncr_records</span> + <span class="code">nonconformance_dispositions</span></td>
  <td><span class="path">Quality-Records/04-NCR/{YYYY}/NCR-{YYYY}-{NNN}.pdf</span></td>
- <td>(a) <span class="path">Job-Dossiers/.../09_NCR-CAPA-Deviation/</span> — chỉ working evidence + NCR_Refs metadata; (b) <span class="path">Department-Ops/DEP-QA/03-Registers-and-Logs/00-Current/</span> — live view từ EQMS API; (c) <span class="code">NCR-Cross-Reference</span> SharePoint List</td>
+ <td>(a) <span class="path">Job-Dossiers/.../09_NCR-CAPA-Deviation/</span> — chỉ working bằng chứng + NCR_Refs metadata; (b) <span class="path">Department-Ops/DEP-QA/03-Registers-and-Logs/00-Current/</span> — live view từ EQMS API; (c) <span class="code">NCR-Cross-Reference</span> SharePoint List</td>
  <td>RET-QMS-NCR (10 năm sau JobClosedDate)</td>
  </tr>
  <tr>
  <td><strong>CAPA</strong> (Corrective and Preventive Action)</td>
  <td>EQMS <span class="code">eqms_capa_records</span> + <span class="code">corrective_action_tasks</span> + <span class="code">corrective_action_verifications</span></td>
  <td><span class="path">Quality-Records/05-CAPA/{YYYY}/CAPA-{YYYY}-{NNN}.pdf</span></td>
- <td>(a) <span class="path">Job-Dossiers/.../09_NCR-CAPA-Deviation/</span> — chỉ CAPA_Refs metadata + job-specific implementation evidence; (b) <span class="path">Department-Ops/DEP-QMS/04-Projects-and-Improvement/{YYYY}/</span> — CAPA project tracking; (c) <span class="code">CAPA-Cross-Reference</span> SharePoint List</td>
+ <td>(a) <span class="path">Job-Dossiers/.../09_NCR-CAPA-Deviation/</span> — chỉ CAPA_Refs metadata + job-specific implementation bằng chứng; (b) <span class="path">Department-Ops/DEP-QMS/04-Projects-and-Improvement/{YYYY}/</span> — CAPA project tracking; (c) <span class="code">CAPA-Cross-Reference</span> SharePoint List</td>
  <td>RET-QMS-CAPA (10 năm sau EffectivenessVerifiedDate)</td>
  </tr>
  <tr>
@@ -356,7 +356,7 @@
  </tbody>
  </table>
  </div>
- <div class="keyline"><strong>Nguyên tắc đọc bảng:</strong> nếu bạn đang chuẩn bị lưu một file thuộc một trong 7 loại trên, mở bảng này, xác định Tier 2 path. Nếu file là bản chính thức đã ký — đó là nơi duy nhất chứa nó. Mọi vị trí khác chỉ được đánh cross-reference, không lưu file. Nếu file là evidence riêng theo job/dept/employee — có thể lưu ở một trong các Tier 3 path nhưng phải khác filename và phải có cột Record_Authority = "Cross-Reference" hoặc "Job-Evidence".</div>
+ <div class="keyline"><strong>Nguyên tắc đọc bảng:</strong> nếu bạn đang chuẩn bị lưu một file thuộc một trong 7 loại trên, mở bảng này, xác định Tier 2 path. Nếu file là bản chính thức đã ký — đó là nơi duy nhất chứa nó. Mọi vị trí khác chỉ được đánh cross-reference, không lưu file. Nếu file là bằng chứng riêng theo job/dept/employee — có thể lưu ở một trong các Tier 3 path nhưng phải khác filename và phải có cột Record_Authority = "Cross-Reference" hoặc "Job-Bằng chứng".</div>
  </div>
 
 
@@ -368,7 +368,7 @@
  <div class="figure-box">
  <p style="margin:0;"><strong>Site host:</strong> <span class="code">HESEM-Records</span> (cùng site với Tier 2 SSOT, để cross-reference luôn cùng compliance boundary)</p>
  <p style="margin:4px 0 0;"><strong>List name:</strong> <span class="code">NCR-Cross-Reference</span>, <span class="code">CAPA-Cross-Reference</span>, <span class="code">FAI-Cross-Reference</span>, <span class="code">Complaint-Cross-Reference</span> (mỗi record series một List)</p>
- <p style="margin:4px 0 0;"><strong>Owner:</strong> QA (Tier 1 owner) — read access cho mọi production role, write access chỉ cho EQMS service account và QA Manager</p>
+ <p style="margin:4px 0 0;"><strong>Người chịu trách nhiệm:</strong> QA (Tier 1 người chịu trách nhiệm) — read access cho mọi production role, write access chỉ cho EQMS service account và QA Manager</p>
  <p style="margin:4px 0 0;"><strong>Retention label:</strong> bằng với retention label của Tier 2 SSOT (RET-QMS-NCR / RET-QMS-CAPA / RET-QMS-FAI) — đảm bảo cross-reference sống đủ lâu để tra cứu cùng vòng đời SSOT</p>
  </div>
 
@@ -386,7 +386,7 @@
  <tr><td><span class="code">Tier2_FileName</span></td><td>Tên file SSOT</td><td>Single line text</td><td>No</td><td>Tên file chính thức, ví dụ <span class="code">NCR-2026-043.pdf</span>.</td></tr>
  <tr><td><span class="code">Tier2_ItemGuid</span></td><td>SharePoint Item GUID</td><td>Single line text</td><td>Yes</td><td>GUID của file trong SharePoint, lấy qua Graph API. Giúp resolve qua webhook khi file move.</td></tr>
  <tr><td><span class="code">Tier2_FileHash</span></td><td>SHA-256 hash</td><td>Single line text</td><td>No</td><td>Hash của file PDF tại thời điểm Tier 2 push. Dùng để verify file không bị thay đổi ngoài flow.</td></tr>
- <tr><td><span class="code">CurrentStatus</span></td><td>Trạng thái hiện tại</td><td>Choice</td><td>Yes</td><td>Mirror status từ EQMS qua daily sync flow. Read-only ở SharePoint, write chỉ qua EQMS API.</td></tr>
+ <tr><td><span class="code">CurrentStatus</span></td><td>Trạng thái hiện tại</td><td>Choice</td><td>Yes</td><td>Mirror trạng thái từ EQMS qua daily sync flow. Read-only ở SharePoint, write chỉ qua EQMS API.</td></tr>
  <tr><td><span class="code">CurrentDisposition</span></td><td>Disposition hiện tại</td><td>Choice</td><td>No</td><td>Mirror disposition từ EQMS. Read-only ở SharePoint.</td></tr>
  <tr><td><span class="code">LinkedJobs</span></td><td>Job liên quan</td><td>Multi-value text</td><td>No</td><td>Mảng JobNum, ví dụ <span class="code">["J2026-042","J2026-051"]</span>. Sync từ EQMS linked_jobs array.</td></tr>
  <tr><td><span class="code">LinkedCustomerId</span></td><td>Khách hàng liên quan</td><td>Single line text</td><td>Yes</td><td>Mã khách hàng để cho phép supplier quality view filter.</td></tr>
@@ -400,9 +400,9 @@
 
  <h3>6.3. Quy trình tạo và cập nhật entry</h3>
  <ol>
- <li><strong>Tạo (EQMS Portal trigger):</strong> Khi NCR được submit trong EQMS, controller gọi Power Automate webhook <span class="code">/webhooks/eqms-ncr-created</span>. Flow tạo entry trong NCR-Cross-Reference với CurrentStatus="submitted", LinkStatus="OK", Tier2_FileName=null (chưa có file).</li>
+ <li><strong>Tạo (EQMS Portal điều kiện kích hoạt):</strong> Khi NCR được submit trong EQMS, controller gọi Power Automate webhook <span class="code">/webhooks/eqms-ncr-created</span>. Flow tạo entry trong NCR-Cross-Reference với CurrentStatus="submitted", LinkStatus="OK", Tier2_FileName=null (chưa có file).</li>
  <li><strong>Push file (Tier 1 → Tier 2):</strong> Khi NCR đạt trạng thái disposition_set, controller (i) sinh PDF, (ii) upload qua Graph API vào Tier 2 path, (iii) cập nhật entry NCR-Cross-Reference với Tier2_FileName + Tier2_ItemGuid + Tier2_FileHash.</li>
- <li><strong>Status sync (định kỳ):</strong> Daily Power Automate job query EQMS <span class="code">/api/v1/eqms/ncr/query</span> lấy tất cả NCR thay đổi trong 24h gần nhất, update CurrentStatus + CurrentDisposition cho entry tương ứng.</li>
+ <li><strong>Trạng thái sync (định kỳ):</strong> Daily Power Automate job query EQMS <span class="code">/api/v1/eqms/ncr/query</span> lấy tất cả NCR thay đổi trong 24h gần nhất, update CurrentStatus + CurrentDisposition cho entry tương ứng.</li>
  <li><strong>Link verification (định kỳ):</strong> Weekly Power Automate job duyệt mọi entry, dùng Graph API resolve Tier2_ItemGuid. Nếu file không tồn tại → set LinkStatus=BROKEN, alert QA Manager. Nếu hash thay đổi → set LinkStatus=STALE, alert.</li>
  <li><strong>Job dossier binding:</strong> Khi tạo Job-Dossier, flow CreateJobDossier (ANNEX-134) query NCR-Cross-Reference theo LinkedJobs chứa JobNum, lấy mọi entry và inject vào Job-Dossier metadata <span class="code">NCR_Refs</span>. Đồng thời append URL của Job-Dossier folder vào JobDossierLinks của mỗi entry.</li>
  <li><strong>Migration / backfill:</strong> Cho record series cũ chưa có cross-reference, batch script duyệt Tier 2 library, tạo entry với CreatedBySystem=Migration. Verify từng entry trước khi đóng migration.</li>
@@ -421,7 +421,7 @@
  <p style="margin:8px 0 6px;"><strong>"Verify mọi cross-reference đang trỏ về file Tier 2 tồn tại":</strong></p>
  <pre class="pseudo"><span class="kw">FOR EACH</span> entry <span class="kw">IN</span> NCR-Cross-Reference:
   resp = Graph.GetItem(siteUrl=entry.Tier2_SiteUrl, guid=entry.Tier2_ItemGuid)
-  <span class="kw">IF</span> resp.status == 404:
+  <span class="kw">IF</span> resp.trạng thái == 404:
     entry.LinkStatus = <span class="str">"BROKEN"</span>
     <span class="kw">SEND</span> alert <span class="kw">TO</span> qa-manager@hesem
   <span class="kw">ELIF</span> resp.fileHash != entry.Tier2_FileHash:
@@ -445,7 +445,7 @@
 
  <div class="anti-pattern">
  <p style="margin:0;"><strong>AP-02 — Tạo SharePoint column NCR_Status/NCR_Disposition trong Job-Dossier metadata để "tiện tra cứu".</strong></p>
- <p style="margin:4px 0 0; font-size:13px;"><em>Hiện tượng:</em> Phòng QA thấy bất tiện khi phải mở EQMS Portal để xem status, nên tạo column "NCR Status" trong Document Set metadata và bảo operator cập nhật bằng tay. <em>Hậu quả:</em> phá vỡ Tier 1 SoT; SharePoint column và EQMS database divergence; vi phạm SSOT-R04. <em>Detection:</em> Content type review hàng quý; bất kỳ column trùng tên với EQMS schema field bị flag.</p>
+ <p style="margin:4px 0 0; font-size:13px;"><em>Hiện tượng:</em> Phòng QA thấy bất tiện khi phải mở EQMS Portal để xem trạng thái, nên tạo column "NCR Trạng thái" trong Document Set metadata và bảo operator cập nhật bằng tay. <em>Hậu quả:</em> phá vỡ Tier 1 SoT; SharePoint column và EQMS database divergence; vi phạm SSOT-R04. <em>Detection:</em> Content type rà soát hàng quý; bất kỳ column trùng tên với EQMS schema field bị flag.</p>
  </div>
 
  <div class="anti-pattern">
@@ -460,7 +460,7 @@
 
  <div class="anti-pattern">
  <p style="margin:0;"><strong>AP-05 — Power Automate two-way sync giữa Quality-Records và Job-Dossier.</strong></p>
- <p style="margin:4px 0 0; font-size:13px;"><em>Hiện tượng:</em> Để "tiện đồng bộ", phòng IT cấu hình flow Power Automate 2-way sync file NCR giữa hai library. <em>Hậu quả:</em> conflict resolution undefined; rename tạo duplicate (Microsoft Q&amp;A xác nhận); silent failure khi không có error handling; vi phạm SSOT-R03. <em>Detection:</em> Flow review trước UAT; 2-way sync trên Tier 2 SSOT library là điều kiện no-go-live.</p>
+ <p style="margin:4px 0 0; font-size:13px;"><em>Hiện tượng:</em> Để "tiện đồng bộ", phòng IT cấu hình flow Power Automate 2-way sync file NCR giữa hai library. <em>Hậu quả:</em> conflict resolution undefined; rename tạo duplicate (Microsoft Q&amp;A xác nhận); silent failure khi không có error handling; vi phạm SSOT-R03. <em>Detection:</em> Flow rà soát trước UAT; 2-way sync trên Tier 2 SSOT library là điều kiện no-đưa vào vận hành.</p>
  </div>
 
  <div class="anti-pattern">
@@ -470,7 +470,7 @@
 
  <div class="anti-pattern">
  <p style="margin:0;"><strong>AP-07 — Đặt file PDF NCR trong Department-Ops/DEP-QA/02-Operations/ để "QA tự quản lý".</strong></p>
- <p style="margin:4px 0 0; font-size:13px;"><em>Hiện tượng:</em> Phòng QA giữ file NCR trong working area của phòng thay vì đẩy lên Quality-Records cấp công ty. <em>Hậu quả:</em> không có retention label cấp công ty; auditor không thấy NCR khi review Quality-Records; ANNEX-133 §15 sai chỗ; vi phạm SSOT-R03. <em>Detection:</em> ANNEX-133 §15 periodic check; QA-Owners group không có quyền upload file matching NCR pattern vào Department-Ops.</p>
+ <p style="margin:4px 0 0; font-size:13px;"><em>Hiện tượng:</em> Phòng QA giữ file NCR trong working area của phòng thay vì đẩy lên Quality-Records cấp công ty. <em>Hậu quả:</em> không có retention label cấp công ty; auditor không thấy NCR khi rà soát Quality-Records; ANNEX-133 §15 sai chỗ; vi phạm SSOT-R03. <em>Detection:</em> ANNEX-133 §15 periodic check; QA-Owners group không có quyền upload file matching NCR pattern vào Department-Ops.</p>
  </div>
 
  <div class="anti-pattern">
@@ -501,12 +501,12 @@
  <tr><th>Clause</th><th>Nội dung clause</th><th>Áp dụng tại ANNEX-130</th></tr>
  </thead>
  <tbody>
- <tr><td><span class="legal-clause">7.5.2 Creating and updating</span></td><td>Khi tạo và cập nhật documented information, tổ chức phải đảm bảo identification, format, review and approval phù hợp.</td><td>SSOT-R02 (auto-sequence number), Tier 1 state machine ensure review/approval before disposition_set.</td></tr>
+ <tr><td><span class="legal-clause">7.5.2 Creating and updating</span></td><td>Khi tạo và cập nhật documented information, tổ chức phải đảm bảo identification, format, rà soát and approval phù hợp.</td><td>SSOT-R02 (auto-sequence number), Tier 1 state machine ensure rà soát/approval before disposition_set.</td></tr>
  <tr><td><span class="legal-clause">7.5.3.1 Control of documented information</span></td><td>Documented information phải được control để: (a) có sẵn và phù hợp để dùng khi cần; (b) được bảo vệ khỏi loss of confidentiality, improper use, loss of integrity.</td><td>Tier 2 retention label (availability 10+ năm); Tier 1 audit trail per row (integrity); Three-tier permission model (confidentiality).</td></tr>
  <tr><td><span class="legal-clause">7.5.3.2 Distribution, access, retrieval and use</span></td><td>Để control documented information, tổ chức phải address (a) distribution, access, retrieval and use; (b) storage and preservation including legibility; (c) control of changes including version control; (d) retention and disposition.</td><td>Cross-Reference Register pattern (§6) giải quyết retrieval và use across sites; SSOT-R03 và SSOT-R07 giải quyết version control; SSOT-R05 giải quyết retention.</td></tr>
- <tr><td><span class="legal-clause">8.7 Control of nonconforming outputs</span></td><td>Tổ chức phải ensure outputs không phù hợp được nhận diện và control; phải retain documented information mô tả nonconformity, action taken, concession obtained, authority deciding the action.</td><td>Tier 1 NCR module với state machine và disposition tracking; Tier 2 PDF báo cáo lưu evidence của decision authority.</td></tr>
- <tr><td><span class="legal-clause">9.3 Management review</span></td><td>Top management phải review QMS để ensure suitability, adequacy, effectiveness; inputs include nonconformities, corrective actions, monitoring.</td><td>Tier 1 EQMS Portal cho trending query làm MR input; không thể đạt được nếu NCR phân tán trong job dossiers (lý do central SSOT bắt buộc).</td></tr>
- <tr><td><span class="legal-clause">10.2 Nonconformity and corrective action</span></td><td>Tổ chức phải retain documented information as evidence of (a) nature of nonconformities, action taken; (b) results of any corrective action.</td><td>Tier 1 NCR + CAPA linkage; Tier 2 PDF báo cáo; retention bằng vòng đời quality record.</td></tr>
+ <tr><td><span class="legal-clause">8.7 Control of nonconforming outputs</span></td><td>Tổ chức phải ensure outputs không phù hợp được nhận diện và control; phải retain documented information mô tả nonconformity, action taken, concession obtained, authority deciding the action.</td><td>Tier 1 NCR module với state machine và disposition tracking; Tier 2 PDF báo cáo lưu bằng chứng của decision authority.</td></tr>
+ <tr><td><span class="legal-clause">9.3 Management rà soát</span></td><td>Top management phải rà soát QMS để ensure suitability, adequacy, effectiveness; inputs include nonconformities, corrective actions, monitoring.</td><td>Tier 1 EQMS Portal cho trending query làm MR input; không thể đạt được nếu NCR phân tán trong job dossiers (lý do central SSOT bắt buộc).</td></tr>
+ <tr><td><span class="legal-clause">10.2 Nonconformity and corrective action</span></td><td>Tổ chức phải retain documented information as bằng chứng of (a) nature of nonconformities, action taken; (b) results of any corrective action.</td><td>Tier 1 NCR + CAPA linkage; Tier 2 PDF báo cáo; retention bằng vòng đời quality record.</td></tr>
  </tbody>
  </table>
  </div>
@@ -519,8 +519,8 @@
  </thead>
  <tbody>
  <tr><td><span class="legal-clause">7.5.3.2 (a-d)</span></td><td>Identical với ISO 9001:2015 §7.5.3.2 nhưng aerospace customer thường cộng thêm retention requirement 10-30 năm và traceability đầy đủ.</td><td>Tier 2 retention label cấu hình theo customer contract; FAI retention 30 năm aerospace mặc định.</td></tr>
- <tr><td><span class="legal-clause">8.5.1 (g-h)</span></td><td>Shop traveler / routing document phải chứa hoặc reference evidence of operations performed and results, including NCR numbers for rejected quantities.</td><td>Job-Dossier traveler ghi NCR_Number trong reject line; NCR full record ở Tier 2 (industry standard practice từ Elsmar Cove consensus).</td></tr>
- <tr><td><span class="legal-clause">8.5.6 Control of changes</span></td><td>Changes during production phải traceable với authorized sign-off; documented in traveler or referenced change record.</td><td>EQMS state-transition audit log; Tier 1 invariant không cho close NCR thiếu disposition evidence.</td></tr>
+ <tr><td><span class="legal-clause">8.5.1 (g-h)</span></td><td>Shop traveler / routing document phải chứa hoặc reference bằng chứng of operations performed and results, including NCR numbers for rejected quantities.</td><td>Job-Dossier traveler ghi NCR_Number trong reject line; NCR full record ở Tier 2 (industry standard practice từ Elsmar Cove consensus).</td></tr>
+ <tr><td><span class="legal-clause">8.5.6 Control of changes</span></td><td>Changes during production phải traceable với authorized sign-off; documented in traveler or referenced change record.</td><td>EQMS state-transition nhật ký kiểm toán; Tier 1 invariant không cho close NCR thiếu disposition bằng chứng.</td></tr>
  <tr><td><span class="legal-clause">8.7.2</span></td><td>Tổ chức phải retain documented information mô tả nonconformance, actions taken, concessions obtained, authority deciding the concession.</td><td>Tier 1 đầy đủ data; Tier 2 PDF có sign-off từ MRB chair; Tier 3 KHÔNG được tự duy trì authority (chỉ cross-reference).</td></tr>
  <tr><td><span class="legal-clause">AS9102 Form 1-2-3</span></td><td>FAI report standard với Form 1 (Part Number Accountability), Form 2 (Product Accountability), Form 3 (Characteristic Accountability). Phải cross-reference tới applicable NCR numbers.</td><td>FAI-Cross-Reference List có column LinkedNCRs để binding FAI Form 3 characteristic tới NCR.</td></tr>
  </tbody>
@@ -564,7 +564,7 @@
  </thead>
  <tbody>
  <tr><td><span class="legal-clause">9. Audit Trails</span></td><td>Consideration should be given, based on a risk assessment, to building into the system the creation of a record of all GMP-relevant changes and deletions. The audit trail must be available and convertible to a generally intelligible form and regularly reviewed.</td><td>Audit trail Tier 1 + Tier 2 + Tier 3 đồng bộ; export qua Power BI Records Integrity dashboard.</td></tr>
- <tr><td><span class="legal-clause">17. Archiving</span></td><td>Data may be archived. Data should be checked for accessibility, readability and integrity. If relevant changes are to be made to the system, then the ability to retrieve the data should be ensured and tested.</td><td>Quarterly reconciliation script (§9); migration verification; retention policy review trước mỗi M365 site rename hay collection split.</td></tr>
+ <tr><td><span class="legal-clause">17. Archiving</span></td><td>Data may be archived. Data should be checked for accessibility, readability and integrity. If relevant changes are to be made to the system, then the ability to retrieve the data should be ensured and tested.</td><td>Quarterly reconciliation script (§9); migration verification; retention policy rà soát trước mỗi M365 site rename hay collection split.</td></tr>
  </tbody>
  </table>
  </div>
@@ -581,7 +581,7 @@
  <tr><td><strong>L</strong>egible</td><td>Data đọc được, persistent, không tẩy xoá.</td><td>PDF/A format cho Tier 2 file; major versioning bật; Preservation Hold Library cho deleted file.</td></tr>
  <tr><td><strong>C</strong>ontemporaneous</td><td>Data ghi tại thời điểm sự kiện xảy ra.</td><td>EQMS state transition timestamp tự động; không cho backdate.</td></tr>
  <tr><td><strong>O</strong>riginal</td><td>Bản gốc hoặc certified true copy.</td><td>Tier 2 PDF là bản gốc; không có "copy" ở Tier 3 (chỉ reference).</td></tr>
- <tr><td><strong>A</strong>ccurate</td><td>Đúng dữ liệu thực tế, không sửa sai âm thầm.</td><td>State transition validated; SSOT-R04 không cho sửa status ngoài EQMS.</td></tr>
+ <tr><td><strong>A</strong>ccurate</td><td>Đúng dữ liệu thực tế, không sửa sai âm thầm.</td><td>State transition validated; SSOT-R04 không cho sửa trạng thái ngoài EQMS.</td></tr>
  <tr><td><strong>+</strong>Complete</td><td>Đủ tất cả data cần thiết, không có khoảng trống.</td><td>Required field validation; NCR không close thiếu disposition.</td></tr>
  <tr><td><strong>+</strong>Consistent</td><td>Data nhất quán across systems và across time.</td><td>Three-tier model loại bỏ inconsistency between EQMS, M365 SSOT và cross-references.</td></tr>
  <tr><td><strong>+</strong>Enduring</td><td>Data bền vững qua thời gian retention.</td><td>Retention label áp ở library default (SSOT-R05); shortcuts KHÔNG dùng cho enduring data.</td></tr>
@@ -611,14 +611,14 @@
 
  <div class="section">
  <h2>9. Implementation logic cho automation (pseudocode + flow spec)</h2>
- <p style="margin:8px 0;">Phần này cung cấp specs cho team automation triển khai. Mỗi flow có trigger, input, action, output và error handling.</p>
+ <p style="margin:8px 0;">Phần này cung cấp specs cho team automation triển khai. Mỗi flow có điều kiện kích hoạt, input, action, output và error handling.</p>
 
  <h3>9.1. Flow: EQMS-NCR-Created → Cross-Reference Entry</h3>
  <div class="figure-box">
- <pre class="pseudo"><span class="com"># Trigger: EQMS Portal webhook POST /webhooks/eqms-ncr-created</span>
+ <pre class="pseudo"><span class="com"># Điều kiện kích hoạt: EQMS Portal webhook POST /webhooks/eqms-ncr-created</span>
 <span class="com"># Khi NCR mới được submit trong EQMS, controller emit event</span>
 
-<span class="kw">ON</span> webhook POST {ncr_id, ncr_number, status, linked_jobs, customer_id}:
+<span class="kw">ON</span> webhook POST {ncr_id, ncr_number, trạng thái, linked_jobs, customer_id}:
   entry = SharePointList.CreateItem(<span class="str">"NCR-Cross-Reference"</span>, {
     RecordNumber:       ncr_number,        <span class="com"># NCR-2026-043</span>
     Tier1_RecordId:     ncr_id,            <span class="com"># 42 (Postgres PK)</span>
@@ -627,7 +627,7 @@
     Tier2_FileName:     null,              <span class="com"># chưa có file</span>
     Tier2_ItemGuid:     null,
     Tier2_FileHash:     null,
-    CurrentStatus:      status,            <span class="com"># submitted</span>
+    CurrentStatus:      trạng thái,            <span class="com"># submitted</span>
     LinkedJobs:         linked_jobs,
     LinkedCustomerId:   customer_id,
     CreatedBySystem:    <span class="str">"EQMS"</span>,
@@ -645,7 +645,7 @@
 
  <h3>9.2. Flow: EQMS-NCR-Signed → Push PDF to Tier 2</h3>
  <div class="figure-box">
- <pre class="pseudo"><span class="com"># Trigger: EQMS Portal khi NCR đạt trạng thái disposition_set</span>
+ <pre class="pseudo"><span class="com"># Điều kiện kích hoạt: EQMS Portal khi NCR đạt trạng thái disposition_set</span>
 <span class="com">#         với chữ ký MRB chair</span>
 
 <span class="kw">ON</span> ncr.disposition_set {ncr_id, ncr_number, year}:
@@ -680,8 +680,8 @@
     CurrentStatus:   <span class="str">"disposition_set"</span>
   })
 
-  <span class="com"># Ghi audit event ngược về EQMS</span>
-  EQMS.AuditLog(ncr_id, <span class="str">"evidence.pushed"</span>, {
+  <span class="com"># Ghi sự kiện kiểm toán ngược về EQMS</span>
+  EQMS.AuditLog(ncr_id, <span class="str">"bằng chứng.pushed"</span>, {
     path:  target_path,
     hash:  pdf_hash,
     actor: <span class="str">"system.eqms-push"</span>
@@ -690,13 +690,13 @@
 
  <h3>9.3. Flow: Weekly Link Verification</h3>
  <div class="figure-box">
- <pre class="pseudo"><span class="com"># Trigger: Power Automate scheduled flow, Sunday 02:00 ICT</span>
+ <pre class="pseudo"><span class="com"># Điều kiện kích hoạt: Power Automate scheduled flow, Sunday 02:00 ICT</span>
 
 <span class="kw">ON</span> schedule weekly:
   broken_count = 0
   stale_count = 0
 
-  <span class="kw">FOR EACH</span> entry <span class="kw">IN</span> SharePointList.Query(<span class="str">"NCR-Cross-Reference"</span>, status: <span class="str">"OK"</span>):
+  <span class="kw">FOR EACH</span> entry <span class="kw">IN</span> SharePointList.Query(<span class="str">"NCR-Cross-Reference"</span>, trạng thái: <span class="str">"OK"</span>):
 
     <span class="kw">IF</span> entry.Tier2_ItemGuid <span class="kw">IS</span> null:
       <span class="kw">CONTINUE</span>  <span class="com"># chưa có file (NCR submitted nhưng chưa signed)</span>
@@ -706,7 +706,7 @@
       guid: entry.Tier2_ItemGuid
     )
 
-    <span class="kw">IF</span> resp.status == 404:
+    <span class="kw">IF</span> resp.trạng thái == 404:
       entry.LinkStatus = <span class="str">"BROKEN"</span>
       entry.LastVerifiedDate = NOW()
       broken_count += 1
@@ -751,7 +751,7 @@
 
   <span class="com"># Set metadata của Document Set</span>
   Graph.UpdateDocumentSet(
-    site: <span class="str">"HESEM-Job-Evidence"</span>,
+    site: <span class="str">"HESEM-Job-Bằng chứng"</span>,
     path: <span class="str">"Job-Dossiers/"</span> + year + <span class="str">"/"</span> + job_number,
     metadata: {
       NCR_Refs:  ncr_refs.map(r =&gt; r.RecordNumber),
@@ -761,18 +761,18 @@
   )
 
   <span class="com"># Append URL Job-Dossier vào mọi entry để truy ngược</span>
-  job_url = <span class="str">"https://hesem.sharepoint.com/sites/HESEM-Job-Evidence/Job-Dossiers/"</span> + ...
+  job_url = <span class="str">"https://hesem.sharepoint.com/sites/HESEM-Job-Bằng chứng/Job-Dossiers/"</span> + ...
   <span class="kw">FOR EACH</span> ref <span class="kw">IN</span> (ncr_refs + capa_refs + fai_refs):
     SharePointList.AppendToMultiValue(ref.list, ref.id, <span class="str">"JobDossierLinks"</span>, job_url)</pre>
  </div>
 
  <h3>9.5. Flow: Anti-Pattern Detection (Upload Guard)</h3>
  <div class="figure-box">
- <pre class="pseudo"><span class="com"># Trigger: SharePoint webhook on file upload trong Job-Dossiers</span>
+ <pre class="pseudo"><span class="com"># Điều kiện kích hoạt: SharePoint webhook on file upload trong Job-Dossiers</span>
 <span class="com"># Reject upload nếu file match Tier 2 SSOT pattern</span>
 
 <span class="kw">ON</span> sharepoint.file_uploaded {site, library, folder, filename}:
-  <span class="kw">IF</span> site == <span class="str">"HESEM-Job-Evidence"</span> <span class="kw">AND</span> library == <span class="str">"Job-Dossiers"</span>:
+  <span class="kw">IF</span> site == <span class="str">"HESEM-Job-Bằng chứng"</span> <span class="kw">AND</span> library == <span class="str">"Job-Dossiers"</span>:
 
     <span class="kw">IF</span> folder.endswith(<span class="str">"09_NCR-CAPA-Deviation"</span>):
       <span class="kw">IF</span> Regex.Match(filename, <span class="str">"^NCR-\d{4}-\d{3,5}\.pdf$"</span>):
@@ -817,9 +817,9 @@
  <h3>10.1. Phase 1 — Audit hiện trạng (tuần 1-2)</h3>
  <ul>
  <li>Chạy PowerShell script enumerate mọi file trong <span class="path">Job-Dossiers/.../09_NCR-CAPA-Deviation/</span> và <span class="path">Job-Dossiers/.../05_G4-FAI-First-Article/</span>.</li>
- <li>Phân loại file: (a) physical copy của Tier 2 SSOT, (b) job-specific evidence hợp lệ, (c) reference duplicate có thể xoá.</li>
+ <li>Phân loại file: (a) physical copy của Tier 2 SSOT, (b) job-specific bằng chứng hợp lệ, (c) reference duplicate có thể xoá.</li>
  <li>Output: báo cáo Excel với cột Job, Folder, FileName, Hash, MatchesTier2 (Y/N), Action (Move/Keep/Delete/Promote).</li>
- <li><strong>Exit criteria:</strong> báo cáo phê duyệt bởi QA Manager + IT Lead; không file nào ở status "Unknown".</li>
+ <li><strong>Exit criteria:</strong> báo cáo phê duyệt bởi QA Manager + IT Lead; không file nào ở trạng thái "Unknown".</li>
  </ul>
 
  <h3>10.2. Phase 2 — Cross-Reference List backfill (tuần 3-4)</h3>
@@ -840,11 +840,11 @@
  <li>Ghi audit_events: action="ap-01-remediation", before=path-Tier3, after=null.</li>
  </ul></li>
  <li>Với mỗi file "reference duplicate" có thể xoá: xoá thẳng + audit.</li>
- <li>Với mỗi file "job-specific evidence" còn lại: rename để chắc chắn không match Tier 2 SSOT pattern (vd. <span class="code">rework-photos-J2026-042-shift-A.zip</span> thay vì <span class="code">NCR-2026-043-evidence.pdf</span>).</li>
+ <li>Với mỗi file "job-specific bằng chứng" còn lại: rename để chắc chắn không match Tier 2 SSOT pattern (vd. <span class="code">rework-photos-J2026-042-shift-A.zip</span> thay vì <span class="code">NCR-2026-043-bằng chứng.pdf</span>).</li>
  <li><strong>Exit criteria:</strong> SharePoint search query <span class="code">filename:NCR-* AND library:Job-Dossiers</span> trả về 0 kết quả. Tương tự cho CAPA và FAI.</li>
  </ul>
 
- <h3>10.4. Phase 4 — Enforcement go-live (tuần 9-10)</h3>
+ <h3>10.4. Phase 4 — Enforcement đưa vào vận hành (tuần 9-10)</h3>
  <ul>
  <li>Deploy upload guard flow (§9.5) — block mọi upload mới vi phạm AP-01, AP-04, AP-09.</li>
  <li>Deploy weekly verification flow (§9.3).</li>
@@ -862,16 +862,16 @@
  <div class="table-card">
  <table class="table">
  <thead>
- <tr><th>Hạng mục</th><th>Owner chính</th><th>Đồng kiểm</th><th>Chu kỳ rà soát</th></tr>
+ <tr><th>Hạng mục</th><th>Người chịu trách nhiệm chính</th><th>Đồng kiểm</th><th>Chu kỳ rà soát</th></tr>
  </thead>
  <tbody>
  <tr><td>Doctrine ba tầng và quy tắc cứng (§2-§3)</td><td>QA Manager</td><td>QMS Engineer, D-IT Lead</td><td>Hàng năm + khi có chuẩn mới (ISO/AS9100 amendment)</td></tr>
- <tr><td>Decision tree (§4) và record matrix (§5)</td><td>QMS Engineer</td><td>QA Manager, D-IT, mỗi dept owner</td><td>Mỗi 6 tháng + khi thêm record series mới vào EQMS</td></tr>
- <tr><td>Cross-Reference List schema (§6)</td><td>D-IT Lead</td><td>QA Manager, EQMS module owner</td><td>Khi thay đổi schema EQMS hoặc thêm tier mới</td></tr>
+ <tr><td>Decision tree (§4) và record matrix (§5)</td><td>QMS Engineer</td><td>QA Manager, D-IT, mỗi dept người chịu trách nhiệm</td><td>Mỗi 6 tháng + khi thêm record series mới vào EQMS</td></tr>
+ <tr><td>Cross-Reference List schema (§6)</td><td>D-IT Lead</td><td>QA Manager, EQMS module người chịu trách nhiệm</td><td>Khi thay đổi schema EQMS hoặc thêm tier mới</td></tr>
  <tr><td>Anti-patterns (§7)</td><td>QA Manager</td><td>QMS Engineer, internal audit</td><td>Mỗi quý — bổ sung pattern mới phát hiện trong audit</td></tr>
  <tr><td>Legal basis matrix (§8)</td><td>QA Manager (QMR)</td><td>External certification body liaison</td><td>Khi chuẩn áp dụng được update (ISO revision, customer contract change)</td></tr>
- <tr><td>Implementation logic (§9)</td><td>D-IT Lead / Application owner</td><td>QA, automation team</td><td>Mỗi release của EQMS hoặc M365 automation</td></tr>
- <tr><td>Remediation status (§10)</td><td>QA Manager + D-IT joint</td><td>QMS, internal audit</td><td>Weekly trong remediation, sau đó hàng quý</td></tr>
+ <tr><td>Implementation logic (§9)</td><td>D-IT Lead / Application người chịu trách nhiệm</td><td>QA, automation team</td><td>Mỗi release của EQMS hoặc M365 automation</td></tr>
+ <tr><td>Remediation trạng thái (§10)</td><td>QA Manager + D-IT joint</td><td>QMS, internal audit</td><td>Weekly trong remediation, sau đó hàng quý</td></tr>
  </tbody>
  </table>
  </div>
@@ -879,7 +879,7 @@
  <h3>11.1. Quy trình thay đổi ANNEX-130</h3>
  <ol>
  <li>Mọi đề xuất sửa đổi mở qua DCC (document change control) với change reason rõ ràng.</li>
- <li>Review impact tới ANNEX-131 (metadata schema), ANNEX-133 (folder paths), ANNEX-134 (provisioning), ANNEX-135 (file plan), ANNEX-139 (IP/restricted).</li>
+ <li>Rà soát impact tới ANNEX-131 (metadata schema), ANNEX-133 (folder paths), ANNEX-134 (provisioning), ANNEX-135 (file plan), ANNEX-139 (IP/restricted).</li>
  <li>Phê duyệt bởi QA Manager (QMR). Nếu thay đổi ảnh hưởng đến retention hoặc legal basis → bổ sung phê duyệt CEO.</li>
  <li>Phát hành version mới với release note rõ ràng; legacy version giữ trong DCC archive 10 năm.</li>
  </ol>
@@ -909,7 +909,7 @@
  <tr><td><span class="code">ANNEX-135</span> — File Plan by Department Role và Job</td><td>§2 ISO 15489/23081 basis; §3 phân luồng OfficialRecord vs ReferenceReceived vs WorkingTransitory</td></tr>
  <tr><td><span class="code">ANNEX-136</span> — Source-Git-Server-Runtime Boundary</td><td>Ranh giới controlled source vs runtime; ANNEX-130 không áp dụng cho QMS-Source-Control</td></tr>
  <tr><td><span class="code">ANNEX-139</span> — IP và Restricted Library Internal Blueprint</td><td>Part-REV-Master/04-FAI-Baseline-Pack là Tier 2 baseline cho FAI (§5 record matrix row 3)</td></tr>
- <tr><td>EQMS module</td><td><span class="code">EqmsNcrController.php</span>, <span class="code">EqmsCapaController.php</span>, contract objects trong <span class="path">mom/contracts/objects/quality_improvement--*/</span></td><td>Tier 1 implementation; state machine; audit log</td></tr>
+ <tr><td>EQMS module</td><td><span class="code">EqmsNcrController.php</span>, <span class="code">EqmsCapaController.php</span>, contract objects trong <span class="path">mom/contracts/objects/quality_improvement--*/</span></td><td>Tier 1 implementation; state machine; nhật ký kiểm toán</td></tr>
  <tr><td>DCC standard</td><td><span class="code">dcc-document-header.standard.md</span> + <span class="code">dcc_document_header</span> table</td><td>Document Control Center áp cho mọi controlled document, bao gồm ANNEX này</td></tr>
  <tr><td>SOP liên quan</td><td>SOP-101 (Document Control), SOP-104 (Change Control), SOP-105 (Nonconformance Management), SOP-106 (CAPA), SOP-108 (Audit), SOP-111 (Calibration), SOP-112 (Training)</td><td>SOP cấp dưới phải align với ANNEX-130 doctrine; conflict resolution → ANNEX là chuẩn cao hơn</td></tr>
  <tr><td>External standards</td><td>ISO 9001:2015, AS9100 Rev D, IATF 16949:2016, FDA 21 CFR Part 11, EU GMP Annex 11, ISO 15489-1, ISO 23081-1</td><td>Cơ sở pháp lý (§8); reference khi audit hỏi căn cứ</td></tr>
@@ -922,11 +922,11 @@
  <div class="section">
  <h2>Phụ lục A — Glossary ngắn</h2>
  <ul>
- <li><strong>SoT (Source of Truth):</strong> hệ thống chứa bản ghi dữ liệu cấu trúc gốc. Trong HESEM: Epicor cho giao dịch, EQMS Portal cho workflow chất lượng.</li>
+ <li><strong>SoT (Source of Truth):</strong> hệ thống chứa bản ghi dữ liệu cấu trúc gốc. Trong HESEM: Epicor cho giao dịch, EQMS Portal cho luồng xử lý chất lượng.</li>
  <li><strong>SSOT (Single Source of Truth):</strong> chỉ định duy nhất "vị trí có thẩm quyền" cho một loại bằng chứng. Có thể là một record trong database (Tier 1) hoặc một file trong library (Tier 2).</li>
  <li><strong>Cross-Reference:</strong> liên kết giữa các tier hoặc giữa các record series khác nhau. Không phải SSOT; chỉ trỏ về SSOT.</li>
  <li><strong>Tier 1 / 2 / 3:</strong> ba lớp dữ liệu được định nghĩa trong §2 của ANNEX này.</li>
- <li><strong>EQMS Portal:</strong> ứng dụng HESEM MOM, PostgreSQL backend, bảng <span class="code">eqms_*</span> cho quality workflow.</li>
+ <li><strong>EQMS Portal:</strong> ứng dụng HESEM MOM, PostgreSQL backend, bảng <span class="code">eqms_*</span> cho quality luồng xử lý.</li>
  <li><strong>Cross-Reference Register:</strong> SharePoint List làm connector tissue giữa các tier; thay thế Document ID Service không hoạt động cross-site.</li>
  <li><strong>Link-not-copy:</strong> nguyên tắc của ANNEX-131 §2 — chỉ lưu liên kết, không sao chép file. ANNEX-130 mở rộng nguyên tắc này với cross-reference register cụ thể.</li>
  <li><strong>ALCOA+:</strong> chuẩn data integrity 9 nguyên tắc (Attributable, Legible, Contemporaneous, Original, Accurate + Complete, Consistent, Enduring, Available).</li>

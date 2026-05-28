@@ -48,11 +48,11 @@
 
 <h1>Department × Role × Scenario × File Master Matrix</h1>
 
-<div class="callout"><strong>BỐI CẢNH:</strong> Phiên bản v2 (ANNEX-131..142 trước 2026-05-16) đã đặt nền tảng cấu trúc M365 nhưng <b>quá generic</b>: <code>HESEM-Records</code> phân theo mệnh đề ISO (Internal-Audit, Mgmt-Review), <code>HESEM-Job-Evidence</code> chỉ part-centric, <code>HESEM-People</code> HR-centric. Hệ quả: <em>người dùng tạo file xong không biết bỏ đâu — folder trở thành nghĩa địa</em>. ANNEX-143 v3 dựng lại bằng cách <b>mô phỏng đầy đủ nghiệp vụ thực chiến của xưởng CNC bán dẫn</b> (RFQ→Quote→PO→DFM→NPI→FAIR→Production→Special-Process→Pack-6→Ship→8D→CAPA), liệt kê <b>mỗi file class do role nào tạo, ai duyệt, ai đọc, retention bao lâu, sensitivity label nào</b>, rồi mới quyết định folder/library trong M365.</div>
+<div class="callout"><strong>BỐI CẢNH:</strong> Phiên bản v2 (ANNEX-131..142 trước 2026-05-16) đã đặt nền tảng cấu trúc M365 nhưng <b>quá generic</b>: <code>HESEM-Records</code> phân theo mệnh đề ISO (Internal-Audit, Mgmt-Rà soát), <code>HESEM-Job-Evidence</code> chỉ part-centric, <code>HESEM-People</code> HR-centric. Hệ quả: <em>người dùng tạo file xong không biết bỏ đâu — folder trở thành nghĩa địa</em>. ANNEX-143 v3 dựng lại bằng cách <b>mô phỏng đầy đủ nghiệp vụ thực chiến của xưởng CNC bán dẫn</b> (RFQ→Quote→PO→DFM→NPI→FAIR→Production→Special-Process→Pack-6→Ship→8D→CAPA), liệt kê <b>mỗi file class do role nào tạo, ai duyệt, ai đọc, retention bao lâu, sensitivity label nào</b>, rồi mới quyết định folder/library trong M365.</div>
 
 <div class="warn-callout"><strong>THAY ĐỔI v3 (2026-05-16):</strong>
 <ol class="tight">
-<li><b>XÓA SITE 6 HESEM-Customer-Portals.</b> HESEM là <em>consumer</em> portal của khách (Ariba/Coupa/myASML/TPS) — KHÔNG host portal. Evidence pull/push chuyển sang <code>QMS-Governance/19-Customer-Portal-Evidence/</code> + scenario <code>DEP-SCS/01-RFQ-Intake-and-Portal-Pull</code> + <code>DEP-ERP/08-Portal-Pull-Push-Evidence-Log</code>.</li>
+<li><b>XÓA SITE 6 HESEM-Customer-Portals.</b> HESEM là <em>consumer</em> portal của khách (Ariba/Coupa/myASML/TPS) — KHÔNG host portal. Bằng chứng pull/push chuyển sang <code>QMS-Governance/19-Customer-Portal-Evidence/</code> + scenario <code>DEP-SCS/01-RFQ-Intake-and-Portal-Pull</code> + <code>DEP-ERP/08-Portal-Pull-Push-Evidence-Log</code>.</li>
 <li><b>Mở rộng 12 → 16 phòng ban</b>: thêm <code>DEP-METRO</code> (Metrology+Calibration), <code>DEP-SP</code> (Special Process), <code>DEP-MNT</code> (Maintenance+Facility), <code>DEP-LEGAL</code> (Legal+Corporate Secretary).</li>
 <li><b>Mỗi dept Operations đào sâu</b>: từ 5–7 ops generic → 10–25 scenario thực chiến. Tổng 283 Operations + 101 Registers + 69 Interfaces = ~453 scenario folder.</li>
 <li><b>Tổng directory blueprint</b>: 1270 → <b>2022</b> directories.</li>
@@ -62,7 +62,7 @@
 <section class="card">
 <h2>1. Câu hỏi phản biện khắt khe trước khi quy hoạch</h2>
 <ol class="tight">
-<li><b>Tại sao folder "evidence/record" v2 lại sơ sài?</b> Vì phân theo <em>mệnh đề tiêu chuẩn</em>, không phản ánh <em>luồng nghiệp vụ</em>. Tiêu chuẩn không tạo file — phòng ban làm việc tạo file.</li>
+<li><b>Tại sao folder "bằng chứng/record" v2 lại sơ sài?</b> Vì phân theo <em>mệnh đề tiêu chuẩn</em>, không phản ánh <em>luồng nghiệp vụ</em>. Tiêu chuẩn không tạo file — phòng ban làm việc tạo file.</li>
 <li><b>Một file (vd FAIR) do bao nhiêu phòng/role chạm tới?</b> Sales Eng kích RFQ → Eng Mgr release drawing → CMM Op đo → QA Eng tổng hợp → Quality Mgr ký → Sales Coordinator upload portal AMAT. <b>6 role × 4 phòng ban</b> chạm vào 1 file. Folder phải chứa vết của tất cả 6 chạm này, không chỉ "FAIR/{PartNo}".</li>
 <li><b>Sao customer portal cũ sai?</b> Hiểu lầm: HESEM nghĩ phải dựng portal cho khách. Thực tế: AMAT có Ariba, LAM có Coupa/Ariba, ASML có myASML, TEL có TPS — HESEM <em>đăng nhập</em> portal của họ, kéo RFQ về, push CoC lên. HESEM lưu vết "đã pull" + "đã push" như audit-trail, không cần publish portal riêng.</li>
 <li><b>Department × Role × Scenario sinh ra bao nhiêu file class?</b> 16 dept × ~10 role × ~3-5 scenario/role = ~600-800 file class. Mỗi file class cần 1 storage path canonical.</li>
@@ -118,9 +118,9 @@ DEP-EXEC = bố trí ngang với CEO (BOD pack, Strategy, ERM, Insurance, M&amp;
 </tbody>
 </table>
 
-<div class="ok-callout"><b>v3 đã XÓA SITE 6 HESEM-Customer-Portals.</b> Customer portal evidence (pull + push) lưu tại:
+<div class="ok-callout"><b>v3 đã XÓA SITE 6 HESEM-Customer-Portals.</b> Customer portal bằng chứng (pull + push) lưu tại:
 <ul class="tight">
-<li><code>HESEM-Records/QMS-Governance/19-Customer-Portal-Evidence/{Inbound|Outbound-Staging|Submission-Receipts}/{YYYY}/</code> — central evidence vault</li>
+<li><code>HESEM-Records/QMS-Governance/19-Customer-Portal-Evidence/{Inbound|Outbound-Staging|Submission-Receipts}/{YYYY}/</code> — central bằng chứng vault</li>
 <li><code>HESEM-Records/Department-Ops/DEP-SCS/02-Operations/{Current,YYYY}/01-RFQ-Intake-and-Portal-Pull/</code> — Sales pull</li>
 <li><code>HESEM-Records/Department-Ops/DEP-SCS/02-Operations/{Current,YYYY}/04-Quote-Submission-and-Portal-Upload/</code> — Sales push</li>
 <li><code>HESEM-Records/Department-Ops/DEP-SCM/05-Interfaces-and-Released-Packs/{Current,YYYY}/04-Customer-Portal-ASN-Upload-Evidence/</code> — Logistics push</li>
@@ -140,20 +140,20 @@ DEP-EXEC = bố trí ngang với CEO (BOD pack, Strategy, ERM, Insurance, M&amp;
 <tbody>
 <tr><td>01-Quality-Planning-PFD-PFMEA-CP</td><td>QA Eng + Mfg Eng + Process Eng</td><td>PFD, PFMEA (AIAG-VDA), Control Plan, Work Instruction</td><td>Life + 11y</td><td>L3</td></tr>
 <tr><td>02-IQC-Receiving-Inspection</td><td>IQC Inspector, QA Eng, SQE</td><td>IQC Sampling Plan, IQC Report, Hold/Release Tag, Reject Memo, Heat-lot Trace</td><td>11y</td><td>L2</td></tr>
-<tr><td>03-IPQC-In-Process-Inspection</td><td>IPQC Inspector, QA Eng</td><td>IPQC Sheet (Power Apps), SPC raw, X-bar R chart, OOC trigger</td><td>11y</td><td>L2</td></tr>
+<tr><td>03-IPQC-In-Process-Inspection</td><td>IPQC Inspector, QA Eng</td><td>IPQC Sheet (Power Apps), SPC raw, X-bar R chart, OOC điều kiện kích hoạt</td><td>11y</td><td>L2</td></tr>
 <tr><td>04-OQC-Final-Inspection-and-CoC</td><td>FQC Inspector, QA Mgr, Cleanliness Tech</td><td>OQC Report, Visual Photo Pack, Cleanliness Test, CoC, Packing Inspection</td><td>Life + 11y</td><td>L3</td></tr>
-<tr><td>05-FAI-AS9102-and-Customer-Forms</td><td>FAI Eng, QA Eng, Quality Mgr, CMM Prog, Customer SQE</td><td>FAI Trigger, Balloon Drawing, AS9102 Form 1/2/3, AMAT-FAI / LAM-FAR / ASML-DPRR / TEL-FAI, CMM .prg + raw, Ra report, Material/Hardness, SP Cert, Witness Schedule, FAI Pkg PDF, Customer Approval Letter</td><td>Life + 11y</td><td>L3 Customer-NDA</td></tr>
+<tr><td>05-FAI-AS9102-and-Customer-Forms</td><td>FAI Eng, QA Eng, Quality Mgr, CMM Prog, Customer SQE</td><td>FAI Điều kiện kích hoạt, Balloon Drawing, AS9102 Form 1/2/3, AMAT-FAI / LAM-FAR / ASML-DPRR / TEL-FAI, CMM .prg + raw, Ra report, Material/Hardness, SP Cert, Witness Schedule, FAI Pkg PDF, Customer Approval Letter</td><td>Life + 11y</td><td>L3 Customer-NDA</td></tr>
 <tr><td>06-NCR-Initiation-Containment</td><td>Inspector, QA Eng, QA Mgr</td><td>NCR (MOM-mirrored), Containment Action</td><td>11y</td><td>L2</td></tr>
 <tr><td>07-MRB-Disposition-UAI-Rework-Scrap</td><td>MRB members (QA+Eng+Mfg+Customer), CQO</td><td>MRB Minutes, Disposition Memo, Customer Concession (UAI), Rework Instruction, Scrap Auth, COPQ Calc</td><td>11y</td><td>L3</td></tr>
-<tr><td>08-CAPA-RCA-Effectiveness</td><td>CAPA Owner, QA Eng, QA Mgr, CQO</td><td>CAPA Init, 5Why/Fishbone, CA Plan, Effectiveness 30/60/90d, Closure</td><td>11y</td><td>L2</td></tr>
+<tr><td>08-CAPA-RCA-Effectiveness</td><td>CAPA Người chịu trách nhiệm, QA Eng, QA Mgr, CQO</td><td>CAPA Init, 5Why/Fishbone, CA Plan, Effectiveness 30/60/90d, Closure</td><td>11y</td><td>L2</td></tr>
 <tr><td>09-Customer-Complaint-8D-SCAR</td><td>Customer-Audit Coord, 8D Champion, QA Mgr, CQO, Customer</td><td>Complaint Intake (AMAT QN/LAM SCAR/ASML SPR/TEL QFR), 8D D1–D8, Containment Sweep, RCA, CA+Read-across, Effectiveness, Submission, Acceptance</td><td>Life + 11y</td><td>L3 Customer-NDA</td></tr>
-<tr><td>10-Internal-Audit-Cycle</td><td>Internal Auditor, QA Mgr, CQO</td><td>Annual Plan, Notice, Checklist, Evidence Pack, Findings, Auditee CA, Effectiveness, Closure</td><td>7y</td><td>L2</td></tr>
-<tr><td>11-Customer-Audit-Preparation-Response</td><td>Customer-Audit Coord, QA Mgr, CQO, Customer, Compliance</td><td>Announcement, Self-Assessment, Prep Kit, NDA/Export-Screen, In-Audit Evidence, Minutes, Findings, CAPA Response, Effectiveness, Closure</td><td>Life + 11y</td><td>L3 Customer-NDA</td></tr>
+<tr><td>10-Internal-Audit-Cycle</td><td>Internal Auditor, QA Mgr, CQO</td><td>Annual Plan, Notice, Checklist, Bằng chứng Pack, Findings, Auditee CA, Effectiveness, Closure</td><td>7y</td><td>L2</td></tr>
+<tr><td>11-Customer-Audit-Preparation-Response</td><td>Customer-Audit Coord, QA Mgr, CQO, Customer, Compliance</td><td>Announcement, Self-Assessment, Prep Kit, NDA/Export-Screen, In-Audit Bằng chứng, Minutes, Findings, CAPA Response, Effectiveness, Closure</td><td>Life + 11y</td><td>L3 Customer-NDA</td></tr>
 <tr><td>12-Supplier-Audit-and-SCAR</td><td>Supplier Auditor, SQE, QA Mgr</td><td>Supplier Audit Plan/Report/Findings/CAPA, APSL Process-Cert Letter</td><td>11y</td><td>L2</td></tr>
 <tr><td>13-FOD-Prevention-NAS412</td><td>QA Eng, Area Supervisor, Operator</td><td>FOD Prevention Plan (qms-pro-FOD-001), Walkdown Log, Incident, Tool Accountability</td><td>11y</td><td>L1</td></tr>
 <tr><td>14-Counterfeit-Prevention-AS6174</td><td>QA Eng, SQE, IQC, Compliance</td><td>CTF Procedure, Authorized Distributor List, High-Risk Material Watch, Suspect Incident</td><td>Perm</td><td>L4 Export</td></tr>
 <tr><td>15-SPC-and-Capability-Cpk-Studies</td><td>QA Eng, Mfg Eng, Customer (on request)</td><td>SPC Chart, Cpk Report, OCAP, MSA GR&amp;R</td><td>Life + 11y</td><td>L3</td></tr>
-<tr><td>16-OOC-OOS-OCAP-Reaction</td><td>QA Eng, IPQC, Operator</td><td>OOC Trigger Log, OCAP Document, OCAP Execution, Reaction Plan Effectiveness</td><td>11y</td><td>L2</td></tr>
+<tr><td>16-OOC-OOS-OCAP-Reaction</td><td>QA Eng, IPQC, Operator</td><td>OOC Điều kiện kích hoạt Log, OCAP Document, OCAP Execution, Reaction Plan Effectiveness</td><td>11y</td><td>L2</td></tr>
 <tr><td>17-Customer-Scorecard-and-Response</td><td>Customer-Audit Coord, QA Eng, QA Mgr, CQO</td><td>SC Receipt, Gap Analysis, Response/Improvement Plan</td><td>Life + 11y</td><td>L3 Customer-NDA</td></tr>
 <tr><td>18-Quality-KPI-PPM-OTD-Dashboard</td><td>QA Mgr, CQO</td><td>KPI Definition, Monthly Report PDF, Power BI live (HESEM-Quality workspace)</td><td>11y</td><td>L2</td></tr>
 <tr><td>19-Witness-Test-Coordination</td><td>QA Eng, QA Mgr, Customer rep</td><td>Witness Notification, Plan, Day Log (dual-sign), Findings</td><td>Life + 11y</td><td>L3 Customer-NDA</td></tr>
@@ -190,7 +190,7 @@ DEP-EXEC = bố trí ngang với CEO (BOD pack, Strategy, ERM, Insurance, M&amp;
 <tbody>
 <tr><td>02-Customer-CAD-Drawing-Receipt-Controlled-Copy</td><td>Customer CAD bundle (STEP/IGES/DWG/MBD), Drawing Receipt Log (sha256), Controlled Copy PDF, Superseded marker</td><td>L4 Customer-NDA</td><td>DLP-locked, watermark, no external share, no unmanaged-device download</td></tr>
 <tr><td>06-CAM-Programs-and-Posted-NC-Files</td><td>MasterCAM/NX/Esprit/PowerMill source (.mcam/.prt/.spf), Posted .nc, Tool list, Vericut validation, Cycle-time estimate</td><td>L3</td><td>Hash signed before DNC release</td></tr>
-<tr><td>10-NPI-Gate-Cycle-G0-to-G5</td><td>Charter, PFD, PFMEA, Control Plan, MSA, Cpk, FAIR, Ballooned drawing, CMM/Ra/Material certs, Gate-review minutes G0–G5</td><td>L3 Customer-NDA</td><td>AS9102 forms 1/2/3</td></tr>
+<tr><td>10-NPI-Gate-Cycle-G0-to-G5</td><td>Charter, PFD, PFMEA, Control Plan, MSA, Cpk, FAIR, Ballooned drawing, CMM/Ra/Material certs, Gate-rà soát minutes G0–G5</td><td>L3 Customer-NDA</td><td>AS9102 forms 1/2/3</td></tr>
 <tr><td>13-ECO-Engineering-Change-Order-Cycle</td><td>ECO Request, Impact Assessment, Redline, Board Approval, Implementation Plan, Cut-in Record, Closure</td><td>L3</td><td>Customer-driven CN + internal-driven</td></tr>
 <tr><td>14-PCN-Outbound-Process-Change-Notice</td><td>PCN Init, Risk Analysis, Validation Protocol+Report, Customer Notification, Customer Approval, Implementation</td><td>L3 Customer-NDA</td><td>≥90-day advance notice cho 4 OEM</td></tr>
 <tr><td>16-Reverse-Engineering-RE-Authorization</td><td>RE Authorization (legal), Sample-Part Receipt, 3D Scan (ATOS/GOM/CT), Reconstructed CAD, Material Analysis, Validation</td><td>L4 Customer-NDA</td><td>No RE work without authorization gate</td></tr>
@@ -207,7 +207,7 @@ DEP-EXEC = bố trí ngang với CEO (BOD pack, Strategy, ERM, Insurance, M&amp;
 <tr><td>01-Dispatch-and-Work-Order-Release</td><td>WO Release Packet PDF</td><td>L3 Customer</td><td>Mirror MOM ERP; immutable after release</td></tr>
 <tr><td>02-Traveler-Print-and-Job-Folder-Pull</td><td>Traveler (paper + PDF), Drawing pack stamped CONTROLLED COPY</td><td>L3 Customer</td><td>Each op = signature box</td></tr>
 <tr><td>04-Setup-and-First-Piece-Approval</td><td>Setup Sheet, Setup-FAI Mini, First-Piece Photo (4+ angles EXIF), Probing report</td><td>L3</td><td>Mandatory hold, no run-on without QA sign</td></tr>
-<tr><td>09-Shift-Handover-Day-Night</td><td>SH Log, Cross-Shift Quality Note, Traveler annotation (counter-sign), Machine State Snapshot</td><td>L1/L2</td><td>Open WOs, machine state, holds</td></tr>
+<tr><td>09-Shift-Bàn giao-Day-Night</td><td>SH Log, Cross-Shift Quality Note, Traveler annotation (counter-sign), Machine State Snapshot</td><td>L1/L2</td><td>Open WOs, machine state, holds</td></tr>
 <tr><td>11-OEE-Throughput-and-KPI-Daily</td><td>OEE feed (MES/MTConnect 15-min bucket), Daily PBI dashboard PDF, Weekly Scrap+Rework, Throughput vs Plan, Monthly KPI Pack</td><td>L2/L3</td><td>Trimmed customer-share version separate</td></tr>
 <tr><td>14-Tool-Crash-Investigation</td><td>Crash Report, 8D Investigation</td><td>L2</td><td>Triggers PM + part containment</td></tr>
 <tr><td>15-Subcontracted-Operation-Routing</td><td>Outbound Manifest (cleanliness-grade), Sub PO + Spec Letter, Sub CoC return, Receiving Inspection post-sub</td><td>L3 Customer</td><td>Lot split/chain of custody</td></tr>
@@ -227,7 +227,7 @@ DEP-EXEC = bố trí ngang với CEO (BOD pack, Strategy, ERM, Insurance, M&amp;
 <tr><td>09 Outgassing</td><td>Sample Pull, Pre-Mass (microbalance), Vacuum Bake Run (125°C/24h/5×10⁻⁶ torr), TML/CVCM Calc, Outgassing CoC</td><td>ASTM E595, TML≤1%, CVCM≤0.1%</td></tr>
 <tr><td>10 He-Leak</td><td>Setup, Leak Detector Cal (Pfeiffer/Inficon annual), Run Record (rate, ramp curve), Pass/Fail Result, He-Leak CoC</td><td>≤1e-9 mbar·L/s</td></tr>
 <tr><td>11 Surface Roughness Mapping</td><td>Ra Plan per drawing, Ra Profilometer Data, Mapping Report, Profilometer Cal Cert</td><td>ASML F19 ≤0.13μm</td></tr>
-<tr><td>12 Bath Trend / CAPA Trigger</td><td>Daily Bath Trend (LIMS), Weekly Bath Trend Report, Control-Limit Excursion Notification (quarantine trigger), CAPA Record (8D)</td><td>Excursion = CAPA trigger</td></tr>
+<tr><td>12 Bath Trend / CAPA Điều kiện kích hoạt</td><td>Daily Bath Trend (LIMS), Weekly Bath Trend Report, Control-Limit Excursion Notification (quarantine điều kiện kích hoạt), CAPA Record (8D)</td><td>Excursion = CAPA điều kiện kích hoạt</td></tr>
 <tr><td>14 Subcon Special Process Liaison</td><td>APSL Approval Letter (per OEM AMAT/LAM/ASML/TEL), Scope Letter, Annual Sub Audit, Sub-tier CoC + Test Data Pull, Receiving Verification</td><td>Customer-flowdown</td></tr>
 <tr><td>15 Banned-Substance XRF Grade-1 ASML HIO</td><td>Banned-Substance Decl per lot, XRF Verify Result, Grade-1 Compliance Statement, Material Substitution Request</td><td>ASML HIO list (Pb/Zn/Mg/P/Sn/Cd/Hg)</td></tr>
 </tbody>
@@ -257,12 +257,12 @@ DEP-EXEC = bố trí ngang với CEO (BOD pack, Strategy, ERM, Insurance, M&amp;
 <thead><tr><th>Scenario folder</th><th>File class</th><th>Portal interaction</th></tr></thead>
 <tbody>
 <tr><td>01-RFQ-Intake-and-Portal-Pull</td><td>Source Packet pulled from Ariba/Coupa/myASML/TPS (sha256), Portal Pull Log CSV, RFQ Intake Form</td><td>HESEM = CONSUMER</td></tr>
-<tr><td>02-04 Quote Cycle</td><td>Routing Slip, DFM Analysis, Cost Roll-up, MVB Memo, Internal Review, Quote Draft, Quote Final (PDF), Portal Upload Evidence</td><td>Upload to portal response form</td></tr>
-<tr><td>06-Customer-PO-Receipt-Contract-Review</td><td>PO received (sha256), Contract Review Checklist, PO Discrepancy Log</td><td>Pulled from portal</td></tr>
-<tr><td>07-Order-Acknowledgement-and-S2E-Handoff</td><td>OA (uploaded to portal), Sales→Eng Handoff Packet</td><td>Push to portal</td></tr>
-<tr><td>08-LTA-Frame-Agreement-Pricing-Schedule</td><td>LTA Draft (customer template), Flowdown Clause Extract, Pricing Schedule (Annex A), Quarterly Review Minutes, Signed LTA, Amendments, Obligation Register</td><td>—</td></tr>
+<tr><td>02-04 Quote Cycle</td><td>Routing Slip, DFM Analysis, Cost Roll-up, MVB Memo, Internal Rà soát, Quote Draft, Quote Final (PDF), Portal Upload Bằng chứng</td><td>Upload to portal response form</td></tr>
+<tr><td>06-Customer-PO-Receipt-Contract-Rà soát</td><td>PO received (sha256), Rà soát hợp đồng Checklist, PO Discrepancy Log</td><td>Pulled from portal</td></tr>
+<tr><td>07-Order-Acknowledgement-and-S2E-Bàn giao</td><td>OA (uploaded to portal), Sales→Eng Bàn giao Packet</td><td>Push to portal</td></tr>
+<tr><td>08-LTA-Frame-Agreement-Pricing-Schedule</td><td>LTA Draft (customer template), Flowdown Clause Extract, Pricing Schedule (Annex A), Quarterly Rà soát Minutes, Signed LTA, Amendments, Obligation Register</td><td>—</td></tr>
 <tr><td>10 NDA + Master Supply / Quality / Logistics Agreement</td><td>NDA Draft + Redline + Executed, NDA-Bound Personnel Ack, MSA + QA + LSA</td><td>—</td></tr>
-<tr><td>13 Customer Complaint Intake + Ack</td><td>Complaint Packet (AMAT QN / LAM SCAR / ASML SPR / TEL QFR), 24h Ack, Sales→Quality Handoff</td><td>Pull + Push portal</td></tr>
+<tr><td>13 Customer Complaint Intake + Ack</td><td>Complaint Packet (AMAT QN / LAM SCAR / ASML SPR / TEL QFR), 24h Ack, Sales→Quality Bàn giao</td><td>Pull + Push portal</td></tr>
 </tbody>
 </table>
 
@@ -272,7 +272,7 @@ DEP-EXEC = bố trí ngang với CEO (BOD pack, Strategy, ERM, Insurance, M&amp;
 
 <h3>4.IT — IT + OT (19 scenario)</h3>
 <p>Roles: IT Manager, System Admin, Network Admin, M365 Admin (Entra ID + Purview + Sentinel), IAM Admin, OT/Industrial-Network Admin (DNC, MTConnect, NX/CAM server, CMM server), Cyber/Security Officer (SOC), Helpdesk Tech, App Admin (ERP/MES/PLM/EQMS).</p>
-<p><b>Scenario nổi bật:</b> 02 Entra PIM Privileged Access (JIT activation log + quarterly review); 06 SOC Sentinel Incident (triage → containment → recovery → PIR → breach notice if data-impact); 10 CNC Controller Param Backup (Fanuc/Siemens param + PLC ladder); 11 CNC Firmware Update + Customer Notify (AMAT/LAM cap-impact assessment, post-update geom re-verify); 13 Customer Portal Credential Rotation (Ariba/Coupa/myASML/TPS — 90d rotate, secrets trong Azure Key Vault, registry-only ref trong SP); 15 Network Diagram Purdue OT Segmentation; 18 Vendor Security Questionnaire.</p>
+<p><b>Scenario nổi bật:</b> 02 Entra PIM Privileged Access (JIT activation log + quarterly rà soát); 06 SOC Sentinel Incident (triage → containment → recovery → PIR → breach notice if data-impact); 10 CNC Controller Param Backup (Fanuc/Siemens param + PLC ladder); 11 CNC Firmware Update + Customer Notify (AMAT/LAM cap-impact assessment, post-update geom re-verify); 13 Customer Portal Credential Rotation (Ariba/Coupa/myASML/TPS — 90d rotate, secrets trong Azure Key Vault, registry-only ref trong SP); 15 Network Diagram Purdue OT Segmentation; 18 Vendor Security Questionnaire.</p>
 
 <h3>4.HR — HR + Training (22 scenario)</h3>
 <p>Roles: HR Director, HR Manager, HRBP (per dept), Recruiter, Onboarding Specialist, C&amp;B Analyst, Payroll Officer, T&amp;D Manager, T&amp;D Coordinator, Internal Trainer, Competency Auditor, HR Compliance Officer (RBA + VN Labor Code).</p>
@@ -284,7 +284,7 @@ DEP-EXEC = bố trí ngang với CEO (BOD pack, Strategy, ERM, Insurance, M&amp;
 
 <h3>4.FIN — Finance (22 scenario)</h3>
 <p>Roles: CFO, Finance Controller, Accounting Manager, AR/AP Analyst, GL Accountant, Tax Officer, Treasury Specialist, Cost Accountant, Internal Auditor (financial).</p>
-<p><b>Scenario nổi bật:</b> 01 Job Costing Estimate→Actual; 03 Monthly Close (TB→P&amp;L/BS/CF); 05 AR VAT E-Invoice (VN Decree 123); 09 AP Payment Run Bank File (Highly Confidential, DLP block external); 11..14 Tax (VAT monthly, CIT annual, PIT, FCT foreign contractor); 15..17 Treasury (Daily Cash, FX Hedge USD↔VND, Bank Covenant); 21 External Audit PBC + Mgmt Rep Letter; 22 Customer Open-Book Costing (Restricted, MFN trigger if leaked cross-customer); 23 Transfer Pricing Local+Master File (Decree 132).</p>
+<p><b>Scenario nổi bật:</b> 01 Job Costing Estimate→Actual; 03 Monthly Close (TB→P&amp;L/BS/CF); 05 AR VAT E-Invoice (VN Decree 123); 09 AP Payment Run Bank File (Highly Confidential, DLP block external); 11..14 Tax (VAT monthly, CIT annual, PIT, FCT foreign contractor); 15..17 Treasury (Daily Cash, FX Hedge USD↔VND, Bank Covenant); 21 External Audit PBC + Mgmt Rep Letter; 22 Customer Open-Book Costing (Restricted, MFN điều kiện kích hoạt if leaked cross-customer); 23 Transfer Pricing Local+Master File (Decree 132).</p>
 
 <h3>4.QMS, 4.EXEC, 4.ERP, 4.LEGAL</h3>
 <p>Chi tiết trong file blueprint <code>tools/m365-provisioning/blueprint/_TREE.txt</code>. Tổng 16 dept × ~28 scenario trung bình = 453 scenario.</p>
@@ -293,21 +293,21 @@ DEP-EXEC = bố trí ngang với CEO (BOD pack, Strategy, ERM, Insurance, M&amp;
 <section class="card">
 <h2>5. Cross-Department Flow Map (one file = nhiều phòng chạm)</h2>
 <table>
-<thead><tr><th>Flow</th><th>Trigger</th><th>Artifact</th><th>Source path</th><th>Target consumer</th><th>Mechanism</th></tr></thead>
+<thead><tr><th>Flow</th><th>Điều kiện kích hoạt</th><th>Artifact</th><th>Source path</th><th>Target consumer</th><th>Mechanism</th></tr></thead>
 <tbody>
-<tr><td>Sales → Engineering</td><td>PO accepted</td><td>S2E Handoff Packet (PO+OA+quote+drawing pointer+flowdown+schedule)</td><td>DEP-SCS/.../07-Order-Ack-and-S2E-Handoff</td><td>DEP-ENG/Interfaces/.../04-S2E-Handoff</td><td>Power Automate auto-zip on PO accept</td></tr>
-<tr><td>Engineering → Quality</td><td>NPI gate G2 passed</td><td>E2Q (Control Plan, PFMEA, FAI template prefilled, CMM .prg, cleanliness plan)</td><td>DEP-ENG/.../05-E2Q-Handoff</td><td>DEP-QA/.../11-PFMEA-Control-Plan + 5-FAI</td><td>Modern-link, no copy</td></tr>
+<tr><td>Sales → Engineering</td><td>PO accepted</td><td>S2E Bàn giao Packet (PO+OA+quote+drawing pointer+flowdown+schedule)</td><td>DEP-SCS/.../07-Order-Ack-and-S2E-Bàn giao</td><td>DEP-ENG/Interfaces/.../04-S2E-Bàn giao</td><td>Power Automate auto-zip on PO accept</td></tr>
+<tr><td>Engineering → Quality</td><td>NPI gate G2 passed</td><td>E2Q (Control Plan, PFMEA, FAI template prefilled, CMM .prg, cleanliness plan)</td><td>DEP-ENG/.../05-E2Q-Bàn giao</td><td>DEP-QA/.../11-PFMEA-Control-Plan + 5-FAI</td><td>Modern-link, no copy</td></tr>
 <tr><td>Engineering → Procurement</td><td>ECO approved with material change</td><td>Material spec + ASL entry + CMRT request</td><td>DEP-ENG/.../13-ECO + 17-Subcon-Process-Spec</td><td>DEP-SCM/.../03-APSL + 24-CMRT-Flowdown</td><td>Modern-link</td></tr>
 <tr><td>Production → Quality</td><td>First-piece complete</td><td>FAI Mini + Photo + Probing report</td><td>DEP-PRO/.../04-Setup-and-First-Piece</td><td>DEP-QA/.../05-FAI</td><td>MES interlock, no run-on without QA sign</td></tr>
 <tr><td>Production → Maintenance</td><td>Breakdown ticket</td><td>Downtime Impact Notice + RTS Cert</td><td>DEP-PRO/.../14-Tool-Crash + .../05-Production-to-Maintenance-Ticket</td><td>DEP-MNT/.../07-Breakdown-Ticket-RCA</td><td>CMMS link, MES gate</td></tr>
 <tr><td>Special-Process → Quality</td><td>Lot completed all SP ops</td><td>Pack-6 Bundle (LPC+IC+NVR+FTIR+Ra+Dim+Visual+Heleak-Outgas)</td><td>DEP-SP/.../14 Pack-6 + 5 dept Interface</td><td>DEP-QA/.../04-OQC-CoC + 5-Cleanliness-Pack-6</td><td>Pack-6 cover sheet cross-refs source files</td></tr>
-<tr><td>Quality → Customer</td><td>FAI submitted / 8D response / CoC released</td><td>FAI Pkg / 8D Final / CoC + Pack-6</td><td>DEP-QA/Interfaces/03-FAI / 04-CoC / 05-Pack6</td><td>Portal upload (Ariba/Coupa/myASML/TPS) via DEP-SCS</td><td>Submission receipt screenshot stored at QMS-Gov/19-Customer-Portal-Evidence/Submission-Receipts</td></tr>
+<tr><td>Quality → Customer</td><td>FAI submitted / 8D response / CoC released</td><td>FAI Pkg / 8D Final / CoC + Pack-6</td><td>DEP-QA/Interfaces/03-FAI / 04-CoC / 05-Pack6</td><td>Portal upload (Ariba/Coupa/myASML/TPS) via DEP-SCS</td><td>Submission receipt screenshot stored at QMS-Gov/19-Customer-Portal-Bằng chứng/Submission-Receipts</td></tr>
 <tr><td>Compliance → Procurement</td><td>Updated flowdown clause (ASML HIO bulletin, RoHS rev)</td><td>Clause Library update + Supplier Notify</td><td>DEP-EHS/.../23-Banned-Substance + DEP-SCM/.../25-Banned-Substance-Flowdown</td><td>DEP-SCM Buyer team</td><td>SP clause library single-source modern-link</td></tr>
 <tr><td>HR → Quality</td><td>Operator cert issued/expires</td><td>Cert Card + OJT Record + Customer-Specific Approval</td><td>DEP-HR/.../11-Critical-Cert + 12-Customer-Training</td><td>DEP-QA dispatch gating + Customer audit pack</td><td>Power Automate on file create/expiry + competency auditor sign</td></tr>
 <tr><td>HR ↔ IT</td><td>Hire/termination</td><td>Access Request + Revocation Checklist</td><td>DEP-HR/.../04-Onboarding + DEP-IT/.../01-IAM</td><td>IAM Admin + Sysadmin</td><td>Termination triggers Purview hold + customer-portal credential rotation</td></tr>
 <tr><td>Maintenance → Quality</td><td>OOT detected on gage</td><td>OOT Notice + Impact Analysis</td><td>DEP-METRO/.../05-OOT-Impact</td><td>DEP-QA/.../06-NCR (if part-affected)</td><td>Reverse-trace to parts, customer notify if scope</td></tr>
-<tr><td>IT → Legal → Customer</td><td>Cyber incident with data impact</td><td>Breach Notice (DPA-triggered)</td><td>DEP-IT/.../06-SOC + DEP-LEGAL/.../09-Litigation</td><td>Customer DPA contact</td><td>Sec Officer + Legal review, CEO sign</td></tr>
-<tr><td>EHS/ESG → Sales</td><td>Customer ESG survey received</td><td>Survey response pack</td><td>DEP-EHS/.../20-Customer-ESG-Survey</td><td>Submitted via portal by DEP-SCS</td><td>Modern-link to underlying carbon/UFLPA evidence</td></tr>
+<tr><td>IT → Legal → Customer</td><td>Cyber incident with data impact</td><td>Breach Notice (DPA-triggered)</td><td>DEP-IT/.../06-SOC + DEP-LEGAL/.../09-Litigation</td><td>Customer DPA contact</td><td>Sec Officer + Legal rà soát, CEO sign</td></tr>
+<tr><td>EHS/ESG → Sales</td><td>Customer ESG survey received</td><td>Survey response pack</td><td>DEP-EHS/.../20-Customer-ESG-Survey</td><td>Submitted via portal by DEP-SCS</td><td>Modern-link to underlying carbon/UFLPA bằng chứng</td></tr>
 <tr><td>Finance → BOD</td><td>Monthly close completed</td><td>FS Pack + Mgmt Commentary</td><td>DEP-FIN/.../04-FS</td><td>DEP-EXEC/.../05-BOD-Pack</td><td>Highly Confidential, named access</td></tr>
 <tr><td>Legal → All</td><td>NDA executed / Contract renewed</td><td>Contract template + clause update</td><td>DEP-LEGAL/.../01-12 contract scenarios</td><td>All depts via modern-link single source</td><td>Contract Register Master = canonical index</td></tr>
 </tbody>
@@ -316,7 +316,7 @@ DEP-EXEC = bố trí ngang với CEO (BOD pack, Strategy, ERM, Insurance, M&amp;
 </section>
 
 <section class="card">
-<h2>6. Cleanliness Pack 6 — Evidence Bundle Flow (semicon-critical)</h2>
+<h2>6. Cleanliness Pack 6 — Bằng chứng Bundle Flow (semicon-critical)</h2>
 <p>Pack-6 là bundle 8-element bắt buộc cho mỗi shipment chamber/ESC/end-effector/gas-distribution: LPC + IC + NVR + FTIR + Ra + Dim + Visual + (Heleak hoặc Outgas tùy loại). Pack-6 cover sheet cross-ref 8 source file ở các dept khác nhau:</p>
 <table>
 <thead><tr><th>Element</th><th>Source dept folder</th><th>Source role</th><th>Lưu tại</th></tr></thead>
@@ -345,7 +345,7 @@ DEP-EXEC = bố trí ngang với CEO (BOD pack, Strategy, ERM, Insurance, M&amp;
 <tr><td><code>DEP-ENG/.../02-Customer-CAD-Drawing-Receipt-Controlled-Copy</code></td><td><code>SG-IP-Customer-{OEM}-Eng-NDA-Signed</code> ONLY (no inheritance)</td><td>L4 Restricted-ExportControlled + watermark + DLP block</td></tr>
 <tr><td><code>HESEM-People/Employee-Records/.../05-Medical-and-Fit-to-Work-Restricted</code></td><td><code>SG-HR-Medical-Custodians</code> only (3-person named access)</td><td>L3 Highly-Confidential PII (LC30)</td></tr>
 <tr><td><code>HESEM-Records/QMS-Governance/19-Customer-Portal-Evidence/</code></td><td><code>SG-DEP-SCS-Members</code> + <code>SG-DEP-ERP-Members</code> + Internal Auditor (Read)</td><td>L2</td></tr>
-<tr><td><code>DEP-FIN/.../22-Customer-Open-Book-Costing-Restricted</code></td><td><code>SG-Finance-OpenBook-{Customer}</code> per-customer split (NO aggregate group)</td><td>L4 Restricted (MFN clause trigger)</td></tr>
+<tr><td><code>DEP-FIN/.../22-Customer-Open-Book-Costing-Restricted</code></td><td><code>SG-Finance-OpenBook-{Customer}</code> per-customer split (NO aggregate group)</td><td>L4 Restricted (MFN clause điều kiện kích hoạt)</td></tr>
 <tr><td><code>DEP-LEGAL/.../09-Litigation-Case-File-and-Hold</code></td><td><code>SG-Legal-Litigation-Hold</code> named-only + external counsel guest</td><td>L4 Highly-Confidential Privileged</td></tr>
 <tr><td><code>HESEM-Digital/System-Records/...</code></td><td><code>SG-IT-Admin</code> + <code>SG-IT-SOC</code> only</td><td>L4 Restricted-Cyber</td></tr>
 <tr><td><code>DEP-EXEC/.../05-BOD-Cycle</code></td><td><code>SG-BOD-Members</code> + Corp Secretary; encryption + access expiry</td><td>L4 Highly-Confidential Board</td></tr>
@@ -365,15 +365,15 @@ Bắt đầu: File X được tạo bởi role R.
 │   └─ Không → tiếp Q2
 │
 ├─ Q2: File có là Customer IP (drawing/spec/PCN inbound) không?
-│   ├─ Có → HESEM-Job-Evidence/Customer-Received/01-By-Customer/{OEM}/...
+│   ├─ Có → HESEM-Job-Bằng chứng/Customer-Received/01-By-Customer/{OEM}/...
 │   └─ Không → tiếp Q3
 │
 ├─ Q3: File gắn với 1 Job-Number cụ thể không?
-│   ├─ Có → HESEM-Job-Evidence/Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Rev}/{gate}/
+│   ├─ Có → HESEM-Job-Bằng chứng/Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Rev}/{gate}/
 │   └─ Không → tiếp Q4
 │
 ├─ Q4: File gắn với 1 PartNo nhưng chưa rõ Job nào?
-│   ├─ Có → HESEM-Job-Evidence/Part-REV-Master/{OEM}/{PartNo}/REV-{Rev}/{ANNEX-139 §2 sub}/
+│   ├─ Có → HESEM-Job-Bằng chứng/Part-REV-Master/{OEM}/{PartNo}/REV-{Rev}/{ANNEX-139 §2 sub}/
 │   └─ Không → tiếp Q5
 │
 ├─ Q5: File thuộc 1 dept cụ thể, mục đích vận hành?
@@ -400,7 +400,7 @@ Bắt đầu: File X được tạo bởi role R.
 │   ├─ Có → HESEM-Records/Training-Records/0X-Folder/{YYYY}/
 │   └─ Không → tiếp Q11
 │
-├─ Q11: File là ESG / Compliance evidence (RBA, CMRT, UFLPA, GHG)?
+├─ Q11: File là ESG / Compliance bằng chứng (RBA, CMRT, UFLPA, GHG)?
 │   ├─ Có → HESEM-ESG-Compliance/0X-Folder/{YYYY}/
 │   └─ Không → tiếp Q12
 │
@@ -418,7 +418,7 @@ Bắt đầu: File X được tạo bởi role R.
 <section class="card">
 <h2>9. Migration plan v2 → v3</h2>
 <table>
-<thead><tr><th>Bước</th><th>Hành động</th><th>Trạng thái 2026-05-16</th><th>Owner</th></tr></thead>
+<thead><tr><th>Bước</th><th>Hành động</th><th>Trạng thái 2026-05-16</th><th>Người chịu trách nhiệm</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Xóa HESEM-Customer-Portals khỏi blueprint + ANNEX-133/142</td><td>✓ Đã xóa folder, đã patch build_blueprint.py, sẽ patch ANNEX-133 §2</td><td>QMS</td></tr>
 <tr><td>2</td><td>Thêm 4 dept mới (METRO, SP, MNT, LEGAL) vào DEPARTMENTS dict</td><td>✓ Đã thêm</td><td>QMS</td></tr>
@@ -441,7 +441,7 @@ Bắt đầu: File X được tạo bởi role R.
 <section class="card">
 <h2>10. Glossary + Department Code Map</h2>
 <table>
-<thead><tr><th>Code</th><th>Tên đầy đủ</th><th># Scenario</th><th>Owner role</th><th>Người ký pack đi ra ngoài</th></tr></thead>
+<thead><tr><th>Code</th><th>Tên đầy đủ</th><th># Scenario</th><th>Người chịu trách nhiệm role</th><th>Người ký pack đi ra ngoài</th></tr></thead>
 <tbody>
 <tr><td>DEP-EXEC</td><td>Executive + BOD support</td><td>17</td><td>Corp Secretary</td><td>CEO / Chairman</td></tr>
 <tr><td>DEP-QMS</td><td>QMS + DCC (Document Control)</td><td>19</td><td>QA Manager (DCC role)</td><td>QA Manager</td></tr>
@@ -491,11 +491,11 @@ Bắt đầu: File X được tạo bởi role R.
 <li>Tất cả file PII (Personnel, Payroll, Medical) chỉ tồn tại trong <code>HESEM-People/Employee-Records/</code> — không bị copy ra dept folder khác.</li>
 <li>File Customer IP (CAD/spec/PCN) chỉ tồn tại trong <code>HESEM-Job-Evidence/Customer-Received/01-By-Customer/{OEM}/</code> hoặc <code>Part-REV-Master/{OEM}/{PartNo}/{Rev}/01-Engineering-Baseline-Source/</code> — đã DLP-locked theo ANNEX-142.</li>
 <li>Cross-dept file consumption qua modern-link, không copy — verify bằng SharePoint admin report "external sharing + internal link count".</li>
-<li>Portal evidence (Inbound + Outbound + Receipts) đã có vết tại <code>QMS-Governance/19-Customer-Portal-Evidence/</code> — KHÔNG có file customer-facing tại <code>HESEM-Customer-Portals/</code> (site này đã bị xóa v3).</li>
+<li>Portal bằng chứng (Inbound + Outbound + Receipts) đã có vết tại <code>QMS-Governance/19-Customer-Portal-Evidence/</code> — KHÔNG có file customer-facing tại <code>HESEM-Customer-Portals/</code> (site này đã bị xóa v3).</li>
 <li>Information Barriers segment AMAT/LAM/ASML/TEL hoạt động — verify bằng test "user AMAT search 'LAM' → 0 result".</li>
 <li>16 dept đều có <code>06-Working-Transitory-and-Draft/ROLE-{RoleCode}/</code> với policy 90d auto-clear — verify Purview retention report.</li>
 <li>Pack-6 cover sheet cross-ref 8 source file — mỗi link click ra được file gốc.</li>
-<li>Customer audit pack (export đi ra ngoài) chỉ tồn tại tại <code>05-Interfaces-and-Released-Packs/</code> của dept owner; KHÔNG có ad-hoc folder export khác.</li>
+<li>Customer audit pack (export đi ra ngoài) chỉ tồn tại tại <code>05-Interfaces-and-Released-Packs/</code> của dept người chịu trách nhiệm; KHÔNG có ad-hoc folder export khác.</li>
 <li>Retention label đã apply đúng class — verify Purview "Items with retention label by location" report.</li>
 </ol>
 </section>

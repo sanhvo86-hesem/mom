@@ -48,7 +48,7 @@ ul.tight li { margin: 4px 0; }
 <div class="page">
 <div class="page-body">
 <div class="dcc-header" data-dcc-bootstrap='{"header":{"doc_code":"WI-201","title":"Thực thi cổng chất lượng, điểm giữ và phát hành","subtitle":"Thực thi G0-G7, hold point và release evidence theo chương trình W0-W12.","doc_type":"WI","revision":"V1","effective_date":"2026-05-14","owner_role_code":"QA","approver_role_code":"CEO","iso_clause":null,"status":"released"},"labels":{"doc_id":{"short":"Mã","long":"Mã tài liệu","sort":10},"revision":{"short":"PB","long":"Phiên bản","sort":20},"effective_date":{"short":"HL","long":"Ngày hiệu lực","sort":30},"owner":{"short":"CSH","long":"Chủ sở hữu","sort":40},"approver":{"short":"Duyệt","long":"Người phê duyệt","sort":50}}}' data-dcc-doc-code="WI-201" data-dcc-locale="vi" data-dcc-logo="../../../../assets/hesem-logo.svg"></div>
-<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng trong W3-W4 để QA pilot chạy song song SOP-605 + WI-201, W5-W6 khi Đợt 2 áp cổng G0-G3, W7-W8 khi Sản xuất + Kỹ thuật áp G3-G7 đầy đủ và W11 khi cập nhật bài học. Mọi quyết định ĐẠT, TẠM GIỮ, phát hành hoặc bàn giao phải gắn gate code P2-01/P2-03/P2-04/P3-01/P3-03/P3-04/P4-03 và bằng chứng trong issues.json, drills.json, readiness.json hoặc dcc_document_revision.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng trong W3-W4 để QA vận hành thử chạy song song SOP-605 + WI-201, W5-W6 khi Đợt 2 áp cổng G0-G3, W7-W8 khi Sản xuất + Kỹ thuật áp G3-G7 đầy đủ và W11 khi cập nhật bài học. Mọi quyết định ĐẠT, TẠM GIỮ, phát hành hoặc bàn giao phải gắn gate code P2-01/P2-03/P2-04/P3-01/P3-03/P3-04/P4-03 và bằng chứng trong issues.json, drills.json, mức sẵn sàng.json hoặc dcc_document_revision.</div>
 <section class="wi-section" id="wi-s1">
 <h2>1. Mục đích</h2>
 <ul class="tight">
@@ -299,7 +299,7 @@ ul.tight li { margin: 4px 0; }
 </section>
 <section class="wi-section section" id="wi-s8">
 <h2>8. Bản đồ W0-W12</h2>
-<p>Tài liệu này được dùng trong chương trình triển khai QMS hiện hành (lịch nguồn: <code>mom/data/config/deploy/program.bootstrap.json</code>). Mỗi dòng dưới đây nối WI-201 với tuần triển khai, gate code, trụ điều hành và playbook <code>TRN-DEP-Wxx</code>; người giữ cổng không được thay bằng checklist riêng ngoài hồ sơ DCC.</p>
+<p>Tài liệu này được dùng trong chương trình triển khai QMS hiện hành (lịch nguồn: <code>mom/data/config/deploy/program.bootstrap.json</code>). Mỗi dòng dưới đây nối WI-201 với tuần triển khai, gate code, trụ điều hành và kịch bản triển khai <code>TRN-DEP-Wxx</code>; người giữ cổng không được thay bằng checklist riêng ngoài hồ sơ DCC.</p>
 <div class="table-card">
 <table class="table matrix-table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead>
@@ -344,7 +344,7 @@ ul.tight li { margin: 4px 0; }
 <td>W11 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W11.html">TRN-DEP-W11</a></td>
 <td>P4 · <code>doc</code></td>
 <td><code>P4-03</code></td>
-<td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="role-code">QMS</span></a> cập nhật WI-201 bằng bài học pilot/đợt; mọi thay đổi tiêu chí G0-G7 phải đi qua DCC, không sửa riêng trên bản in hoặc bảng ca.</td>
+<td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="role-code">QMS</span></a> cập nhật WI-201 bằng bài học vận hành thử/đợt; mọi thay đổi tiêu chí G0-G7 phải đi qua DCC, không sửa riêng trên bản in hoặc bảng ca.</td>
 <td><code>dcc_document_revision</code>, action log bài học W11</td>
 </tr>
 </tbody>
@@ -363,7 +363,7 @@ ul.tight li { margin: 4px 0; }
 <section class="wi-section section" id="wi-s10">
 <h2>10. Điều kiện NO-GO cho cổng chất lượng</h2>
 <ul class="tight">
-<li>Không công nhận <code>P2-01</code> khi QA pilot còn bất kỳ Sev-1/Sev-2 mở, hoặc khi chạy song song dưới 5 ngày làm việc không có <code>drills.json</code>.</li>
+<li>Không công nhận <code>P2-01</code> khi QA vận hành thử còn bất kỳ Sev-1/Sev-2 mở, hoặc khi chạy song song dưới 5 ngày làm việc không có <code>drills.json</code>.</li>
 <li>Không cho Đợt 2 đi tiếp tại <code>P2-04</code> khi bằng chứng G0-G7 thiếu chữ ký thẩm quyền trong <code>mgmt-reviews.json</code>.</li>
 <li>Không khóa <code>P3-04</code> khi <code>KPI-FLD-01 &lt; 95%</code> trong 3 ngày liên tiếp của đợt đang chạy.</li>
 <li>Không đóng <code>P4-03</code> khi bài học W11 chưa tạo dòng <code>dcc_document_revision</code> cho WI-201 hoặc còn action quá hạn trên <code>issues.json</code>.</li>

@@ -101,7 +101,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>Material ready</td><td>Đủ qty, đúng lot/heat/condition, reservation hoặc staging đã xác nhận</td><td>Gắn HR01-MAT; không xếp vào vị trí chạy</td></tr>
 <tr><td>Setup / tool / fixture ready</td><td>Có phiếu setup, danh mục dao cụ, chạy kiểm chứng plan, fixture/jaw đúng</td><td>Gắn HR03-TOL; dời lịch hoặc chuyển sang cell khác nếu hợp lệ</td></tr>
 <tr><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> / cổng kiểm soát ready</td><td>QPL, CTQ plan, mẫu đầu / FAI / leak / clean cổng kiểm soát đã rõ Người nhận</td><td>Gắn HR04-QA; không phát hành chạy mù</td></tr>
-<tr><td>Machine / capacity ready</td><td>Machine không down/hard hold; queued hours sau khi thêm job vẫn trong cap</td><td>Dừng phát hành thêm; review resequence hoặc rebalance</td></tr>
+<tr><td>Machine / capacity ready</td><td>Machine không down/hard hold; queued hours sau khi thêm job vẫn trong cap</td><td>Dừng phát hành thêm; rà soát resequence hoặc rebalance</td></tr>
 <tr><td>Outsource / downstream coupling ready</td><td>Job không đẩy nghẽn sang công đoạn sau hoặc outsource chưa có slot</td><td>Giữ lại hoặc phát hành có điều kiện kèm quyết định rõ</td></tr>
 </tbody></table></div>
 </div>
@@ -174,7 +174,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 
 <div class="section"><h2>11. Kích hoạt bắt buộc phải mở escalation trong ngày</h2>
-<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Kích hoạt</th><th>Escalation tối thiểu</th><th>Evidence phải có</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Kích hoạt</th><th>Escalation tối thiểu</th><th>Bằng chứng phải có</th></tr></thead><tbody>
 <tr><td>P0 không thể vào máy trong khung đã cam kết</td><td>L1 ngay; lên L2 nếu ảnh hưởng ship trong ngày</td><td>Hot-job note, người chịu trách nhiệm, job bị lùi và plan khôi phục</td></tr>
 <tr><td>nút thắt / điểm nghẽn cell vượt WIP cap hoặc trong hàng đợi giờ vượt 1 Ngày hữu dụng</td><td>L1</td><td>Ảnh chụp trạng thái hàng đợi, nguyên nhân và quyết định clear</td></tr>
 <tr><td>Outsource trả lại trễ nhưng lộ trình gia công sau đó đã khóa khe / vị trí</td><td>L1</td><td>ETA mới, quyết định cân bằng lại/một phần/hold</td></tr>

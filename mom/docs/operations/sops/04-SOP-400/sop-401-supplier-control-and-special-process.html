@@ -103,19 +103,19 @@
 <td>W2</td>
 <td>P1 · gov + doc</td>
 <td>P1-01</td>
-<td>SCM chốt JD, RACI, owner AVL và người dẫn dắt Đợt 2; mọi quyền phát hành nguồn phải nối về SOP-401.</td>
-<td>Biên bản W2, RACI sign-off, supplier owner list.</td>
+<td>SCM chốt JD, RACI, người chịu trách nhiệm AVL và người dẫn dắt Đợt 2; mọi quyền phát hành nguồn phải nối về SOP-401.</td>
+<td>Biên bản W2, RACI sign-off, supplier người chịu trách nhiệm list.</td>
 </tr>
 <tr>
 <td>W4</td>
-<td>P2 · pilot + gov</td>
+<td>P2 · vận hành thử + gov</td>
 <td>P2-04</td>
 <td>SCM + QA đối chiếu AVL với chuẩn ANNEX trước quyết định Đợt 2; không mở G1 cho nguồn ngoài AVL.</td>
-<td><code>readiness.json</code>, AVL review log.</td>
+<td><code>readiness.json</code>, AVL rà soát log.</td>
 </tr>
 <tr>
 <td>W5-W6</td>
-<td>P3 · golive + pilot</td>
+<td>P3 · golive + vận hành thử</td>
 <td>P3-02 + P3-04</td>
 <td>Đợt 2 kiểm đơn nhận hàng, PO, chứng chỉ và tài liệu đặc biệt; lệch chứng từ hoặc nguồn phải ghi vào issue trong ngày.</td>
 <td><code>audit_events</code>, <code>issues.json</code>, receiving packet.</td>
@@ -137,7 +137,7 @@
 </tbody>
 </table>
 </div>
-<p class="note">Mỗi hàng trong bản đồ này phải được xác nhận bằng bằng chứng có đường dẫn hoặc bản ghi kiểm soát. Nếu playbook tuần, gate code, KPI hoặc hồ sơ chứng minh không khớp nhau, trạng thái của tuần đó giữ ở cảnh báo đỏ cho đến khi owner chức năng cập nhật <code>issues.json</code>, xác nhận lại <code>readiness.json</code> và ghi quyết định vào audit log. Không dùng ảnh chụp màn hình rời, email riêng hoặc lời xác nhận miệng để thay thế bằng chứng đóng gate.</p>
+<p class="note">Mỗi hàng trong bản đồ này phải được xác nhận bằng bằng chứng có đường dẫn hoặc bản ghi kiểm soát. Nếu kịch bản tuần, gate code, KPI hoặc hồ sơ chứng minh không khớp nhau, trạng thái của tuần đó giữ ở cảnh báo đỏ cho đến khi người chịu trách nhiệm chức năng cập nhật <code>issues.json</code>, xác nhận lại <code>readiness.json</code> và ghi quyết định vào nhật ký kiểm toán. Không dùng ảnh chụp màn hình rời, email riêng hoặc lời xác nhận miệng để thay thế bằng chứng đóng gate.</p>
 </div>
 <div class="section" id="deploy-kpi-dock">
 <h2 class="h2">6B. KPI điều hành phải theo dõi</h2>
@@ -146,7 +146,7 @@
 <div class="metric-card"><div class="value">KPI-DEP-02</div><div class="label">≥95% phiếu việc nguồn cung hoặc SCAR đóng đúng hạn.</div></div>
 <div class="metric-card"><div class="value">KPI-DEP-03</div><div class="label">Tỉ lệ thay đổi thất bại ≤10%; cảnh báo khi nguồn thay đổi gây lỗi &gt;15%.</div></div>
 </div>
-<p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code> trong ngày, gắn severity theo mức ảnh hưởng, leo thang theo <a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>, cập nhật <code>readiness.json</code> và chỉ đóng khi có bằng chứng owner đã xử lý nguyên nhân gốc.</p>
+<p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code> trong ngày, gắn severity theo mức ảnh hưởng, leo thang theo <a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>, cập nhật <code>readiness.json</code> và chỉ đóng khi có bằng chứng người chịu trách nhiệm đã xử lý nguyên nhân gốc.</p>
 </div>
 <div class="section" id="deploy-no-go">
 <h2 class="h2">6C. Điều kiện NO-GO theo W0-W12</h2>

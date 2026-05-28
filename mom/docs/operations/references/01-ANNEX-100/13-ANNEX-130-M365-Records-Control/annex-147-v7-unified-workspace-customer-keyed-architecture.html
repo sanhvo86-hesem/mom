@@ -54,7 +54,7 @@ v6 tách 4 customer-OEM site riêng (HESEM-AMAT, -LAM, -ASML, -TEL) — tưởng
 <li><b>3 sites duy nhất</b>: HESEM-Workspace (transactional), HESEM-Internal (PII/IT/OT/Legal/Exec), HESEM-Archive (long-term retention).</li>
 <li><b>CustomerCode là top-level folder</b> trong Workspace/Customers/{Code}/. Permission via folder inheritance + SG-Cust-{Code} groups.</li>
 <li><b>Industry vocabulary</b>: Drawings, BOM, CAM, Inspection, Specification, FAI, ECN, Planning, Purchasing, Manufacturing, Quality, Shipping, Reports.</li>
-<li><b>MOM = SSOT cho controlled docs</b> (Manual/Policy/SOP/WI/RACI/ANNEX/Training/JD/Forms). M365 chỉ chứa transactional evidence.</li>
+<li><b>MOM = SSOT cho controlled docs</b> (Manual/Policy/SOP/WI/RACI/ANNEX/Training/JD/Forms). M365 chỉ chứa transactional bằng chứng.</li>
 <li><b>IB ở folder level</b> (không site) — đủ mạnh cho contract CM thông thường, đơn giản admin.</li>
 <li><b>Adding new customer = create folder</b>, không cần tạo site/IB segment mới.</li>
 </ol>
@@ -69,7 +69,7 @@ v6 tách 4 customer-OEM site riêng (HESEM-AMAT, -LAM, -ASML, -TEL) — tưởng
 <tr><td>Thêm khách hàng mới</td><td>Tạo site mới + provision IB + setup group + training member + thêm vào nav</td><td>Tạo folder <code>Customers/{NewCode}/</code> + tạo SG-Cust-{NewCode} group, xong</td></tr>
 <tr><td>Cross-customer report</td><td>Multi-site query phức tạp</td><td>Single-site query với filter Customer column</td></tr>
 <tr><td>Customer audit access</td><td>Guest invite vào site (clean nhưng phức tạp setup)</td><td>Guest invite scope tới folder Customers/{Code}/ (sharing link)</td></tr>
-<tr><td>Workflow-Lists scope</td><td>Per-site (NCR-List trong site nào? duplicate?)</td><td>Single-site Lists với Customer column filter</td></tr>
+<tr><td>Luồng xử lý-Lists scope</td><td>Per-site (NCR-List trong site nào? duplicate?)</td><td>Single-site Lists với Customer column filter</td></tr>
 <tr><td>IB enforcement</td><td>Site-level (bulletproof nhưng over-engineering cho 200 nv)</td><td>Folder-level (đủ mạnh, Microsoft supported)</td></tr>
 <tr><td>Industry parallel</td><td>Hiếm — multi-site pattern thường ở enterprise &gt;2000 nv</td><td>Standard — contract CNC manufacturer 200-500 nv (Moog/Heico/Onto)</td></tr>
 <tr><td>Scaling</td><td>Mỗi customer mới = 6→7→8 sites; non-linear admin growth</td><td>Linear: customer mới = 1 folder + 1 group</td></tr>
@@ -182,7 +182,7 @@ HESEM-Workspace/
 │   └── {Heat-Lots, Process-Lots, Finished-Lots}/_TEMPLATES/{LotID}
 ├── Quality/                                # cross-customer internal
 │   ├── Internal-Audits/{YYYY}
-│   ├── Management-Review/{YYYY}
+│   ├── Management-Rà soát/{YYYY}
 │   ├── Risk-Register
 │   ├── Improvement-Kaizen
 │   ├── FOD-Program
@@ -236,7 +236,7 @@ HESEM-Internal/                             # strict named-only permission
 │   ├── Kinematic-XML
 │   ├── DNC-Server-Config
 │   ├── CAD-CAM-License-Backup/{YYYY}
-│   ├── OT-Incident-Playbook
+│   ├── OT-Incident-Kịch bản triển khai
 │   └── Air-Gap-Workstation-Config
 ├── Legal/                                  # SG-Legal-Custodians
 │   └── {Contracts-General, Insurance-Policies, Litigation-Hold,
@@ -266,7 +266,7 @@ HESEM-Archive/                              # frozen records
 <tr><td><code>SG-Cust-LAM-Members</code></td><td><code>Customers/LAM/</code> + Shared</td><td>IB folder tag <code>Customer-LAM</code></td></tr>
 <tr><td><code>SG-Cust-ASML-Members</code></td><td><code>Customers/ASML/</code> + Shared</td><td>IB folder tag <code>Customer-ASML</code></td></tr>
 <tr><td><code>SG-Cust-TEL-Members</code></td><td><code>Customers/TEL/</code> + Shared</td><td>IB folder tag <code>Customer-TEL</code></td></tr>
-<tr><td><code>SG-Multi-Customer-Eng</code> (engineer làm nhiều account)</td><td>Multiple Customers/{Code}/ folders</td><td>Cross-folder access audit log; Purview activity report</td></tr>
+<tr><td><code>SG-Multi-Customer-Eng</code> (engineer làm nhiều account)</td><td>Multiple Customers/{Code}/ folders</td><td>Cross-folder access nhật ký kiểm toán; Purview activity report</td></tr>
 <tr><td><code>SG-DEP-SCM-Members</code></td><td>Suppliers/ (Edit), Customers/.../Purchasing/ (Read all customers)</td><td>n/a (cross-customer by job)</td></tr>
 <tr><td><code>SG-DEP-METRO-Members</code></td><td>Assets/Gages/ (Edit), Customers/.../Inspection/ (Read all)</td><td>n/a (cross-customer cal cert apply)</td></tr>
 <tr><td><code>SG-DEP-HR-Training-Coord</code></td><td>Training/ (Edit), Customers/.../Customer-Audit-People-Pack (Read)</td><td>n/a</td></tr>
@@ -296,14 +296,14 @@ HESEM-Archive/                              # frozen records
 <tr><td>Form templates (FRM-xxx blank)</td><td><b>MOM</b> mom/docs/forms/</td><td>Blank templates</td></tr>
 <tr><td>Job Descriptions (38 canonical)</td><td><b>MOM</b> mom/docs/system/organization/03-Job-Descriptions/</td><td>DCC-controlled</td></tr>
 <tr><td>Org chart + position register</td><td><b>MOM</b></td><td>—</td></tr>
-<tr><td colspan="3" style="background:#ebfbee;text-align:center;"><b>— Transactional evidence (M365 below) —</b></td></tr>
-<tr><td>FAI execution PDF (filled for Job J260315)</td><td><b>M365</b> Customers/AMAT/04-Jobs/2026/J260315/Quality/FAI-Execution/</td><td>Per-Job evidence</td></tr>
-<tr><td>NCR PDF (NCR-2026-0043)</td><td><b>M365</b> Customers/AMAT/04-Jobs/2026/J260315/Quality/NCR/</td><td>Per-Job evidence</td></tr>
-<tr><td>Cal cert (Gage GAGE-CMM-001 in 2026)</td><td><b>M365</b> Assets/Gages/CMM-001/Calibration/2026/</td><td>Asset evidence</td></tr>
+<tr><td colspan="3" style="background:#ebfbee;text-align:center;"><b>— Transactional bằng chứng (M365 below) —</b></td></tr>
+<tr><td>FAI execution PDF (filled for Job J260315)</td><td><b>M365</b> Customers/AMAT/04-Jobs/2026/J260315/Quality/FAI-Execution/</td><td>Per-Job bằng chứng</td></tr>
+<tr><td>NCR PDF (NCR-2026-0043)</td><td><b>M365</b> Customers/AMAT/04-Jobs/2026/J260315/Quality/NCR/</td><td>Per-Job bằng chứng</td></tr>
+<tr><td>Cal cert (Gage GAGE-CMM-001 in 2026)</td><td><b>M365</b> Assets/Gages/CMM-001/Calibration/2026/</td><td>Asset bằng chứng</td></tr>
 <tr><td>Customer PO (AMAT-PO-79101)</td><td><b>M365</b> Customers/AMAT/03-POs/2026/PO-79101/Source/</td><td>Inbound transactional</td></tr>
-<tr><td>Internal audit IA-2026-005</td><td><b>M365</b> Quality/Internal-Audits/2026/</td><td>Audit evidence</td></tr>
-<tr><td>Supplier S047 CMRT 2026</td><td><b>M365</b> Suppliers/S047/CMRT-EMRT/2026/</td><td>Supplier evidence</td></tr>
-<tr><td>Employee performance review</td><td><b>M365</b> HESEM-Internal/HR/Employees/{EmpID}/05-Performance/</td><td>PII record</td></tr>
+<tr><td>Internal audit IA-2026-005</td><td><b>M365</b> Quality/Internal-Audits/2026/</td><td>Audit bằng chứng</td></tr>
+<tr><td>Supplier S047 CMRT 2026</td><td><b>M365</b> Suppliers/S047/CMRT-EMRT/2026/</td><td>Supplier bằng chứng</td></tr>
+<tr><td>Employee performance rà soát</td><td><b>M365</b> HESEM-Internal/HR/Employees/{EmpID}/05-Performance/</td><td>PII record</td></tr>
 <tr><td>CNC controller param backup</td><td><b>M365</b> HESEM-Internal/OT/CNC-Param-Backup/{ID}/{YYYY}/</td><td>OT artifact</td></tr>
 </tbody>
 </table>
@@ -342,7 +342,7 @@ HESEM-Archive/                              # frozen records
 <section class="card">
 <h2>8. v6 → v7 Migration plan</h2>
 <table>
-<thead><tr><th>Phase</th><th>Action</th><th>Status</th></tr></thead>
+<thead><tr><th>Phase</th><th>Action</th><th>Trạng thái</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Wipe blueprint + rewrite build_blueprint.py v7 (3 sites)</td><td>✓ Done (747 dirs)</td></tr>
 <tr><td>2</td><td>Write ANNEX-147 (file này) — v7 industry-standard architecture</td><td>✓ Done</td></tr>
@@ -351,7 +351,7 @@ HESEM-Archive/                              # frozen records
 <tr><td>5</td><td>Commit + push + deploy + Chrome verify</td><td>Next</td></tr>
 <tr><td>6</td><td>(Future) Update ANNEX-142 permission model — folder-level IB spec</td><td>Pending</td></tr>
 <tr><td>7</td><td>(Future) PowerShell script provision 3 sites + IB tags + SG groups</td><td>Pending</td></tr>
-<tr><td>8</td><td>(Future) 16 Workflow-Lists provisioned in HESEM-Workspace (with Customer column filter)</td><td>Pending — sửa ANNEX-145 §5</td></tr>
+<tr><td>8</td><td>(Future) 16 Luồng xử lý-Lists provisioned in HESEM-Workspace (with Customer column filter)</td><td>Pending — sửa ANNEX-145 §5</td></tr>
 </tbody>
 </table>
 </section>
@@ -362,7 +362,7 @@ HESEM-Archive/                              # frozen records
 <li><b>v7 blueprint:</b> <code>tools/m365-provisioning/build_blueprint.py</code></li>
 <li><b>v7 tree:</b> <code>tools/m365-provisioning/blueprint/_TREE.txt</code> (747 directories)</li>
 <li><a href="annex-144-ssot-3-axis-job-part-asset-architecture.html"><b>ANNEX-144 (v4)</b></a> → SUPERSEDED</li>
-<li><a href="annex-145-v5-stress-test-fixes-and-workflow-lists-schema.html"><b>ANNEX-145 (v5)</b></a> → SUPERSEDED cho site architecture; <em>§5 Workflow-Lists schema vẫn áp dụng (now scoped to single HESEM-Workspace site với Customer column filter)</em></li>
+<li><a href="annex-145-v5-stress-test-fixes-and-workflow-lists-schema.html"><b>ANNEX-145 (v5)</b></a> → SUPERSEDED cho site architecture; <em>§5 Luồng xử lý-Lists schema vẫn áp dụng (now scoped to single HESEM-Workspace site với Customer column filter)</em></li>
 <li><a href="annex-146-v6-customer-ip-segregated-6-site-architecture.html"><b>ANNEX-146 (v6)</b></a> → SUPERSEDED. v6 multi-site model retained as <em>alternative pattern for enterprise &gt;500 nv với 10+ customer khắt khe IP segregation</em>.</li>
 <li><a href="annex-142-m365-permission-model-for-semi-supplier-audit.html">ANNEX-142</a> — permission model (cần update với folder-level IB spec cho v7)</li>
 <li><a href="annex-141-semi-equipment-parts-cnc-supplier-compliance.html">ANNEX-141</a> — Pack-6 (implement trong Customers/{Code}/04-Jobs/.../Shipping/Cleanliness-Pack-6/)</li>

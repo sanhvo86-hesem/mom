@@ -123,7 +123,7 @@
  <div class="step-box">
  <h3>Bước 4.3 - Kiểm tra ranh giới</h3>
  <ol>
- <li>Chạy <span class="code">git status</span> trong worktree.</li>
+ <li>Chạy <span class="code">git trạng thái</span> trong worktree.</li>
  <li>Xác nhận thư mục worktree không có <span class="code">.git</span>.</li>
  <li>Xác nhận <span class="code">git rev-parse --git-dir</span> trỏ về <span class="code">C:\HESEM-Git\...</span>.</li>
  </ol>
@@ -135,11 +135,11 @@
  <div class="table-card">
  <table class="table">
  <thead>
- <tr><th>Bước</th><th>Hành động bắt buộc</th><th>Evidence</th></tr>
+ <tr><th>Bước</th><th>Hành động bắt buộc</th><th>Bằng chứng</th></tr>
  </thead>
  <tbody>
  <tr><td>1</td><td>Soạn/chỉnh source trong worktree local đang sync.</td><td>Changed files</td></tr>
- <tr><td>2</td><td>Kiểm tra diff, loại runtime noise khỏi commit.</td><td>Clean git status</td></tr>
+ <tr><td>2</td><td>Kiểm tra diff, loại runtime noise khỏi commit.</td><td>Clean git trạng thái</td></tr>
  <tr><td>3</td><td><span class="code">git add</span> → <span class="code">git commit</span> → <span class="code">git push</span>.</td><td>CommitId</td></tr>
  <tr><td>4</td><td>Đăng ký release manifest theo <a href="../../references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a>.</td><td>Manifest URL</td></tr>
  <tr><td>5</td><td>Server operator pull đúng commit/tag, chạy smoke test, lưu deploy receipt.</td><td>Deploy receipt</td></tr>
@@ -153,13 +153,13 @@
  <div class="table-card">
  <table class="table">
  <thead>
- <tr><th>Bước</th><th>Hành động bắt buộc</th><th>Evidence</th></tr>
+ <tr><th>Bước</th><th>Hành động bắt buộc</th><th>Bằng chứng</th></tr>
  </thead>
  <tbody>
  <tr><td>1</td><td>Khi sửa trực tiếp trên server, mở reverse-sync intake ngay.</td><td>ReverseSyncId</td></tr>
  <tr><td>2</td><td>Commit và push thay đổi từ server về Git remote.</td><td>CommitId</td></tr>
  <tr><td>3</td><td>Local admin endpoint pull về worktree đang sync.</td><td>Local pull log</td></tr>
- <tr><td>4</td><td>Kiểm tra SharePoint sync hoàn tất.</td><td>Sync complete evidence</td></tr>
+ <tr><td>4</td><td>Kiểm tra SharePoint sync hoàn tất.</td><td>Sync complete bằng chứng</td></tr>
  <tr><td>5</td><td>Đóng reverse-sync register.</td><td>Close-out record</td></tr>
  </tbody>
  </table>
@@ -175,7 +175,7 @@
  <tr><th>Path / nhóm dữ liệu</th><th>Quy tắc</th></tr>
  </thead>
  <tbody>
- <tr><td><span class="code">mom/qms-data/form-workflow/</span></td><td>Runtime workflow binaries, archives và working state. Không commit vào source library.</td></tr>
+ <tr><td><span class="code">mom/qms-data/form-luồng xử lý/</span></td><td>Runtime luồng xử lý binaries, archives và working state. Không commit vào source library.</td></tr>
  <tr><td><span class="code">mom/qms-data/sessions/</span></td><td>Session runtime. Không sync, không commit.</td></tr>
  <tr><td><span class="code">mom/qms-data/ratelimit/</span></td><td>Rate-limit state. Không sync, không commit.</td></tr>
  <tr><td><span class="code">mom/qms-data/php_error.log</span></td><td>Runtime log. Không commit.</td></tr>
@@ -191,29 +191,29 @@
  <ul>
  <li>Form definition, released schema, source template và supporting source code đi theo source cycle của WI-107.</li>
  <li>Form submissions, approvals, operational responses và record payload đi về records libraries hoặc runtime record areas theo <a href="wi-101-digital-online-forms-and-approvals.html">WI-101</a>.</li>
- <li>Workflow runtime files trong <span class="code">qms-data/form-workflow</span> không được coi là source artifact.</li>
+ <li>Luồng xử lý runtime files trong <span class="code">qms-data/form-luồng xử lý</span> không được coi là source artifact.</li>
  </ul>
  </div>
 
  <div class="section">
- <h2>9. Evidence bắt buộc cho mỗi release</h2>
+ <h2>9. Bằng chứng bắt buộc cho mỗi release</h2>
  <ul>
  <li>CommitId và GitRef</li>
  <li>Release manifest</li>
  <li>Deploy receipt</li>
  <li>Smoke test hoặc point-of-use verification</li>
- <li>Rollback readiness</li>
+ <li>Rollback mức sẵn sàng</li>
  <li>Reverse-sync close-out nếu có hotfix</li>
  </ul>
  </div>
 
  <div class="section">
- <h2>10. Không được go-live khi</h2>
+ <h2>10. Không được đưa vào vận hành khi</h2>
  <ul>
  <li>Worktree local chưa tách khỏi git-dir</li>
  <li>Source library vẫn mở external sharing</li>
  <li>Runtime noise còn bị stage vào commit</li>
- <li>Deploy không truy được manifest và smoke evidence</li>
+ <li>Deploy không truy được manifest và smoke bằng chứng</li>
  <li>Server hotfix chưa có reverse-sync close-out</li>
  </ul>
  </div>
