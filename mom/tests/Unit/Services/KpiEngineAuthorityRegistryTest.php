@@ -77,7 +77,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
 
         $this->assertSame(35, $catalog['counts']['runtime_calculated_metrics'] ?? null);
         $this->assertSame(32, $catalog['counts']['dashboard_core_kpis'] ?? null);
-        $this->assertSame(42, $catalog['counts']['gate_control_metrics'] ?? null);
+        $this->assertSame(46, $catalog['counts']['gate_control_metrics'] ?? null);
         $this->assertSame(139, $catalog['counts']['proposed_operating_metrics'] ?? null);
         $this->assertSame(
             'CTQ-CAPABILITY-POLICY-LAM-SEMSYSCO-2026-05',

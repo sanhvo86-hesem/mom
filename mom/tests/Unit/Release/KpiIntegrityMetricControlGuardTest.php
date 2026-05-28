@@ -225,7 +225,7 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
                     unset($row['lam_profile_link']);
                 });
             },
-            'Gate IPQC_CHARACTERISTIC_COMPLETENESS: LAM G3/G5 metric must declare lam_profile_link=LAM_SEMSYSCO',
+            'Gate IPQC_CHARACTERISTIC_COMPLETENESS: LAM gate metric must declare lam_profile_link=LAM_SEMSYSCO',
         );
     }
 
