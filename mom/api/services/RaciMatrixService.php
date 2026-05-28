@@ -282,6 +282,33 @@ final class RaciMatrixService
         return ['config' => $config, 'updated_documents' => $published];
     }
 
+    /**
+     * Build the expected published HTML for the RACI master and each managed
+     * SOP/JD document without writing files. Used by integrity guards so CI
+     * can compare published docs with deterministic source rendering.
+     *
+     * @param array<string, mixed>|null $config
+     * @return array<string, string>
+     */
+    public function previewPublication(?array $config = null): array
+    {
+        $config ??= $this->load();
+        $this->validate($config);
+
+        $preview = [];
+        $preview[self::RACI_MASTER_RELATIVE_PATH] = $this->renderRaciMasterMatrix($config);
+        foreach ($this->managedDocPaths() as $path) {
+            $rendered = $this->renderManagedDocument($path, $config);
+            if ($rendered === null) {
+                continue;
+            }
+            $relative = ltrim(str_replace($this->rootDir, '', $path), '/');
+            $preview[$relative] = $rendered;
+        }
+
+        return $preview;
+    }
+
     /* ── Normalisation ──────────────────────────────────────────────────── */
 
     /**
@@ -467,17 +494,7 @@ final class RaciMatrixService
         if ($html === false) {
             throw new RuntimeException('raci_matrix_master_not_readable');
         }
-        // Regenerate all four RACI-MASTER-MATRIX RACI regions in one read-modify-write.
-        $updated = $html;
-        $updated = $this->replaceRegionIfPresent($updated, self::GATE_REGION,
-            $this->buildGateBlock($config['rows']));
-        $updated = $this->replaceRegionIfPresent($updated, 'RACI-VALUESTREAM',
-            $this->buildSimpleBlock($config['value_stream'] ?? []));
-        $updated = $this->replaceRegionIfPresent($updated, 'RACI-DOCLEVEL',
-            $this->buildSimpleBlock($config['document_level'] ?? []));
-        $updated = $this->replaceRegionIfPresent($updated, 'RACI-SUPPORT',
-            $this->buildSimpleBlock($config['support'] ?? []));
-
+        $updated = $this->renderRaciMasterMatrix($config, $html);
         if ($updated === $html) {
             return ['doc_code' => 'RACI-MASTER-MATRIX', 'path' => self::RACI_MASTER_RELATIVE_PATH,
                     'previous_revision' => '', 'new_revision' => '', 'changed' => 'no'];
@@ -520,15 +537,56 @@ final class RaciMatrixService
         if ($html === false) {
             return null;
         }
+        $rendered = $this->renderManagedDocument($path, $config, $html);
+        if ($rendered === null || $rendered === $html) {
+            return null;
+        }
+        $rev = $this->bumpRevision($rendered);
+        if (@file_put_contents($path, $rev['html'], LOCK_EX) === false) {
+            throw new RuntimeException('raci_matrix_managed_doc_not_writable:' . basename($path));
+        }
+        $rel = ltrim(str_replace($this->rootDir, '', $path), '/');
+        return ['doc_code' => strtoupper(basename($path, '.html')), 'path' => $rel,
+                'previous_revision' => $rev['previous_revision'],
+                'new_revision' => $rev['new_revision'], 'changed' => 'yes'];
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    private function renderRaciMasterMatrix(array $config, ?string $html = null): string
+    {
+        $html ??= @file_get_contents($this->rootDir . '/' . self::RACI_MASTER_RELATIVE_PATH) ?: '';
+        if ($html === '') {
+            throw new RuntimeException('raci_matrix_master_not_readable');
+        }
+
+        $updated = $html;
+        $updated = $this->replaceRegionIfPresent($updated, self::GATE_REGION, $this->buildGateBlock($config['rows']));
+        $updated = $this->replaceRegionIfPresent($updated, 'RACI-VALUESTREAM', $this->buildSimpleBlock($config['value_stream'] ?? []));
+        $updated = $this->replaceRegionIfPresent($updated, 'RACI-DOCLEVEL', $this->buildSimpleBlock($config['document_level'] ?? []));
+        $updated = $this->replaceRegionIfPresent($updated, 'RACI-SUPPORT', $this->buildSimpleBlock($config['support'] ?? []));
+
+        return $updated;
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    private function renderManagedDocument(string $path, array $config, ?string $html = null): ?string
+    {
+        $html ??= @file_get_contents($path) ?: '';
+        if ($html === '') {
+            return null;
+        }
+
         $hasMatrix = str_contains($html, '<!-- RACI-MATRIX:START');
-        $hasRoles  = str_contains($html, '<!-- RACI-ROLES:START');
+        $hasRoles = str_contains($html, '<!-- RACI-ROLES:START');
         if (!$hasMatrix && !$hasRoles) {
             return null;
         }
-        $original = $html;
 
-        // RACI-MATRIX region — JD interface table (verbatim) or SOP gate
-        // projection. Exactly one per managed document.
+        $rendered = $html;
         if ($hasMatrix) {
             $p = $this->markerParams($html);
             $jdStore = is_array($config['jd_interface'] ?? null) ? $config['jd_interface'] : [];
@@ -537,32 +595,24 @@ final class RaciMatrixService
             } else {
                 $block = $this->buildRegionTable($p['kind'], $p['key'], $config['rows']);
             }
-            $r = $this->replaceManagedRegion($html, $block);
-            if ($r !== null) { $html = $r; }
+            $replaced = $this->replaceManagedRegion($rendered, $block);
+            if ($replaced !== null) {
+                $rendered = $replaced;
+            }
         }
 
-        // RACI-ROLES region — SOP §4 "Vai trò, quyền hạn & RACI" content,
-        // emitted verbatim from the sop_roles store.
         if ($hasRoles) {
             $slug = $this->rolesMarkerSlug($html);
             $roleStore = is_array($config['sop_roles'] ?? null) ? $config['sop_roles'] : [];
             if ($slug !== '' && isset($roleStore[$slug]['html'])) {
-                $r = $this->replaceRolesRegion($html, (string)$roleStore[$slug]['html']);
-                if ($r !== null) { $html = $r; }
+                $replaced = $this->replaceRolesRegion($rendered, (string)$roleStore[$slug]['html']);
+                if ($replaced !== null) {
+                    $rendered = $replaced;
+                }
             }
         }
 
-        if ($html === $original) {
-            return null;
-        }
-        $rev = $this->bumpRevision($html);
-        if (@file_put_contents($path, $rev['html'], LOCK_EX) === false) {
-            throw new RuntimeException('raci_matrix_managed_doc_not_writable:' . basename($path));
-        }
-        $rel = ltrim(str_replace($this->rootDir, '', $path), '/');
-        return ['doc_code' => strtoupper(basename($path, '.html')), 'path' => $rel,
-                'previous_revision' => $rev['previous_revision'],
-                'new_revision' => $rev['new_revision'], 'changed' => 'yes'];
+        return $rendered;
     }
 
     /** @return array<int, string> */
@@ -677,7 +727,8 @@ final class RaciMatrixService
 
     private function plainText(string $html): string
     {
-        return trim((string)preg_replace('/<[^>]+>/u', '', $html));
+        $spaced = preg_replace('/<[^>]+>/u', ' ', $html);
+        return trim((string)preg_replace('/\s+/u', ' ', (string)$spaced));
     }
 
     /* ── Region replacement ─────────────────────────────────────────────── */

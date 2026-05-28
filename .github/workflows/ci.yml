@@ -219,4 +219,18 @@ jobs:
             echo "FAIL: DCC compliance ($COMPLIANT) dropped below baseline (389)." >&2
             exit 1
           fi
+
+  raci-integrity:
+    name: RACI Integrity
+    runs-on: ubuntu-latest
+    needs: repo-boundary
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+      - name: RACI master integrity
+        run: php mom/tools/release/check_raci_integrity.php
+      - name: RACI derivative integrity
+        run: php mom/tools/release/check_raci_derivatives.php
           echo "PASS: DCC compliance $COMPLIANT ≥ 389."

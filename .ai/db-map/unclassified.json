@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 785,
-        "generated_at": "2026-05-25T01:19:17+00:00"
+        "table_count": 802,
+        "generated_at": "2026-05-28T04:09:05+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -43,6 +43,42 @@
                 {
                     "col": "attested_by",
                     "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
+        "aeoi_auto_created_record": {
+            "defined_in": "207_aeoi_llm_routing.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "case_id",
+                    "ref": "email_intake_case(id)"
+                }
+            ],
+            "contract": null
+        },
+        "aeoi_llm_routing": {
+            "defined_in": "207_aeoi_llm_routing.sql",
+            "extended_in": [],
+            "primary_key": "routing_id",
+            "foreign_keys": [
+                {
+                    "col": "primary_provider",
+                    "ref": "translation_provider_config(provider_key)"
+                }
+            ],
+            "contract": null
+        },
+        "aeoi_master_data_suggestion": {
+            "defined_in": "211_aeoi_master_data_suggestions.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "case_id",
+                    "ref": "email_intake_case(id)"
                 }
             ],
             "contract": null
@@ -2210,6 +2246,174 @@
             ],
             "primary_key": "signature_id",
             "foreign_keys": [],
+            "contract": null
+        },
+        "email_intake_attachment": {
+            "defined_in": "205_email_intake_order_case_upgrade.sql",
+            "extended_in": [
+                "207_aeoi_llm_routing.sql"
+            ],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "case_id",
+                    "ref": "email_intake_case(id)"
+                },
+                {
+                    "col": "message_id",
+                    "ref": "email_intake_message(id)"
+                }
+            ],
+            "contract": null
+        },
+        "email_intake_case": {
+            "defined_in": "205_email_intake_order_case_upgrade.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "message_id",
+                    "ref": "email_intake_message(id)"
+                },
+                {
+                    "col": "extraction_id",
+                    "ref": "email_intake_extraction(id)"
+                },
+                {
+                    "col": "mailbox_id",
+                    "ref": "email_intake_mailbox(id)"
+                },
+                {
+                    "col": "sender_allowlist_id",
+                    "ref": "email_intake_sender_allowlist(id)"
+                },
+                {
+                    "col": "header_rule_id",
+                    "ref": "email_intake_header_rule(id)"
+                },
+                {
+                    "col": "template_id",
+                    "ref": "email_intake_customer_template(id)"
+                }
+            ],
+            "contract": null
+        },
+        "email_intake_case_line": {
+            "defined_in": "205_email_intake_order_case_upgrade.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "case_id",
+                    "ref": "email_intake_case(id)"
+                }
+            ],
+            "contract": null
+        },
+        "email_intake_commit_log": {
+            "defined_in": "205_email_intake_order_case_upgrade.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "case_id",
+                    "ref": "email_intake_case(id)"
+                }
+            ],
+            "contract": null
+        },
+        "email_intake_config": {
+            "defined_in": "203_email_intake_infrastructure.sql",
+            "extended_in": [
+                "211_aeoi_master_data_suggestions.sql"
+            ],
+            "primary_key": "id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "email_intake_customer_template": {
+            "defined_in": "205_email_intake_order_case_upgrade.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "email_intake_extraction": {
+            "defined_in": "203_email_intake_infrastructure.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "message_id",
+                    "ref": "email_intake_message(id)"
+                }
+            ],
+            "contract": null
+        },
+        "email_intake_header_rule": {
+            "defined_in": "205_email_intake_order_case_upgrade.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "email_intake_mailbox": {
+            "defined_in": "205_email_intake_order_case_upgrade.sql",
+            "extended_in": [
+                "206_email_intake_imap_provider.sql"
+            ],
+            "primary_key": "id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "email_intake_message": {
+            "defined_in": "203_email_intake_infrastructure.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "poll_run_id",
+                    "ref": "email_intake_poll_run(id)"
+                }
+            ],
+            "contract": null
+        },
+        "email_intake_poll_run": {
+            "defined_in": "203_email_intake_infrastructure.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "email_intake_quarantine": {
+            "defined_in": "203_email_intake_infrastructure.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "message_id",
+                    "ref": "email_intake_message(id)"
+                }
+            ],
+            "contract": null
+        },
+        "email_intake_sender_allowlist": {
+            "defined_in": "203_email_intake_infrastructure.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "email_intake_validation_check": {
+            "defined_in": "205_email_intake_order_case_upgrade.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "case_id",
+                    "ref": "email_intake_case(id)"
+                }
+            ],
             "contract": null
         },
         "emergency_change_controls": {
