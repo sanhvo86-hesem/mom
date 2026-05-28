@@ -1263,8 +1263,8 @@ var VISUAL_THEMES = [
 ];
 
 function normalizeSubTab(subTab){
-  var aliases = { overview:'templates', typography:'tokens', colors:'tokens', layout:'tokens', a11y:'accessibility', export:'analytics', exports:'analytics' };
-  var valid = { templates:1, tokens:1, components:1, effects:1, accessibility:1, analytics:1, governance:1, advanced:1, standard:1 };
+  var aliases = { overview:'templates', typography:'tokens', colors:'tokens', layout:'tokens', a11y:'accessibility', export:'analytics', exports:'analytics', sample:'module-sample', samples:'module-sample' };
+  var valid = { templates:1, tokens:1, components:1, effects:1, accessibility:1, analytics:1, governance:1, advanced:1, standard:1, 'module-sample':1 };
   var resolved = aliases[subTab] || subTab || 'templates';
   return valid[resolved] ? resolved : 'templates';
 }
@@ -3946,7 +3946,12 @@ function render(el, subTab, currentLang){
     {key:'analytics',    icon:'📊', label:L('Xuất & Phân tích','Export & Analytics')},
     {key:'governance',   icon:'🛡️', label:T('governance')},
     {key:'advanced',     icon:'🧩', label:T('advanced')},
-    {key:'standard',     icon:'📖', label:L('Chuẩn thiết kế','Design Standard')}
+    {key:'standard',     icon:'📖', label:L('Chuẩn thiết kế','Design Standard')},
+    /* Module Sample — SSOT showcase of every reusable v3 component
+       (button, tab, kpi, table, chip, drawer, toolbar, …). Every new
+       frontend module must consume tokens validated here. Renderer
+       lives in 00c-admin-appearance-module-sample.js. */
+    {key:'module-sample',icon:'🎛️', label:L('Module Sample','Module Sample')}
   ];
 
   var h = '<div style="max-width:min(100%,1120px);margin:0 auto">';
@@ -3976,7 +3981,13 @@ function render(el, subTab, currentLang){
     analytics:    renderAnalytics(),
     governance:   renderGovernance(),
     advanced:     renderAdvanced(),
-    standard:     renderStandard()
+    standard:     renderStandard(),
+    /* Module Sample — defers to the separately loaded renderer; if
+       the bundle is missing for any reason, render a helpful note
+       instead of crashing the Appearance tab. */
+    'module-sample': (typeof window._renderAdmModuleSampleHtml === 'function'
+                        ? window._renderAdmModuleSampleHtml(L)
+                        : '<div style="padding:24px;color:var(--text-secondary)">Module Sample renderer chưa được load. Kiểm tra portal.html có nạp 00c-admin-appearance-module-sample.js chưa.</div>')
   };
   tabs.forEach(function(t){
     var active = _subTab === t.key;

@@ -215,6 +215,10 @@
   function mount(container){
     if (!container) return;
     state.container = container;
+    // Flip the body class so orders-v3.css can override the global
+    // #page-orders padding. Without this the shell sits inside the
+    // legacy 24px gutter and looks like floating cards on white.
+    if (document.body) document.body.classList.add('orders-v3-active');
     container.innerHTML = renderShellSkeleton(null);
 
     // boot permissions, then route
@@ -232,6 +236,7 @@
     unmountActive();
     window.removeEventListener('hashchange', onHashChange);
     if (state.container) state.container.innerHTML = '';
+    if (document.body) document.body.classList.remove('orders-v3-active');
     state.container = null;
     state.activeWorkspace = null;
     state.booted = false;

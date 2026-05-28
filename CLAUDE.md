@@ -137,6 +137,37 @@ motion durations, or any other visual token in JS, inline style, or HTML.**
   `_admGraphicsMarkChange` are preserved as aliases that delegate to
   `GraphicsAuthority.tokens.stage()` / `draft.recordChange()`. Do not call
   them in new code; use the namespaced API.
+- **Module Sample is the canonical SSOT for reusable frontend components.**
+  Tab path: Admin → Mặt phẳng điều khiển đồ họa → Module Sample
+  (script: `00c-admin-appearance-module-sample.js`, renderer:
+  `window._renderAdmModuleSampleHtml`). It hosts every reusable component
+  (Button, Tab, KPI tile, Chip, Toolbar, Table, Panel, Drawer, Empty,
+  Loading, Toast) with the exact tokens that control each one. **When
+  building a new frontend module, START HERE.** Every component you use
+  must already appear in Module Sample. If it doesn't, you have three
+  obligations in this order:
+  1. Add a row to `graphics_token_catalog` for any new visual parameter
+     (new migration in `mom/database/migrations/`, follow the pattern of
+     migration 213 — `213_graphics_orders_v3_tokens.sql`).
+  2. Add the token key to the relevant `graphics_component_contract`
+     `overridable_tokens` array.
+  3. Add a section to `00c-admin-appearance-module-sample.js` so the
+     component shows up in the Module Sample tab with its token list.
+  Only after those three steps may the new component appear in a real
+  module. Components that fail to align with their siblings (unequal
+  heights in a toolbar, mismatched paddings, free-floating hex literals)
+  must be reported and fixed BEFORE they ship — the answer is never
+  "add a one-off CSS rule in the module's own stylesheet."
+- **Control-height triad.** The single biggest source of visual drift was
+  buttons/tabs/inputs computing their own heights from per-component
+  padding. Three tokens fix this: `control.height.sm` (28px),
+  `control.height.md` (36px), `control.height.lg` (44px). Every
+  interactive control must adopt one of the three via the CSS variable
+  `--o3-control-h-{sm|md|lg}` (or the equivalent in any future module's
+  token prefix). When a toolbar contains a chip-button, a search input,
+  and a primary button, they must all use `control.height.md`. If you
+  build a component whose height doesn't snap to this triad, audit the
+  Graphics Authority for an explanation and update the token if needed.
 
 ## MANDATORY: HMV4 Wave 1 Frontend Slice Program
 
