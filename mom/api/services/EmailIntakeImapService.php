@@ -144,6 +144,9 @@ final class EmailIntakeImapService
      *
      * @return \IMAP\Connection
      */
+    /** Cache the connection string so fetchAndIngest can pass it to imap_status. */
+    private string $lastMailboxStr = '';
+
     private function openConnection(array $mailbox)
     {
         $host = trim((string)($mailbox['imap_host'] ?? ''));
@@ -173,6 +176,7 @@ final class EmailIntakeImapService
 
         $mailboxStr = sprintf('{%s:%d/%s}%s',
             $host, $port, implode('/', $flags), $folder);
+        $this->lastMailboxStr = $mailboxStr;
 
         $pwd = $this->config->decryptSecret($pwdEnc);
         if ($pwd === null || $pwd === '') {
@@ -221,8 +225,13 @@ final class EmailIntakeImapService
 
         // UIDVALIDITY safety net — if the server's UIDVALIDITY changed
         // since our last poll, the UID space has been reset and we have
-        // to forget our cursor.
-        $status = imap_status($conn, ((string)$conn ?: 'INBOX'), SA_UIDVALIDITY | SA_UIDNEXT) ?: null;
+        // to forget our cursor. imap_status() takes the mailbox PATH
+        // (the same {host:port/flags}folder string we passed to imap_open)
+        // — NOT the connection object. PHP 8.1+ refuses to cast
+        // IMAP\Connection to string.
+        $status = $this->lastMailboxStr !== ''
+            ? (imap_status($conn, $this->lastMailboxStr, SA_UIDVALIDITY | SA_UIDNEXT) ?: null)
+            : null;
         if ($status !== null && isset($status->uidvalidity)) {
             $serverUidvalidity = (int)$status->uidvalidity;
             $ourUidvalidity    = (int)($mailbox['imap_last_uidvalidity'] ?? 0);
