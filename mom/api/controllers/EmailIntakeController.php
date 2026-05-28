@@ -221,8 +221,14 @@ class EmailIntakeController extends BaseController
                     'M365 connection is not configured. Set Tenant ID and Mailbox first.');
             }
 
-            $runId = $this->svc()->openPollRun('manual', $user['username'] ?? 'unknown');
-            $this->auditLog('admin_email_intake_trigger', ['run_id' => $runId]);
+            // Manual "Chạy ngay" triggers the same code path as the cron
+            // (ScheduledJobs::runEmailInboxPoll). That handles both
+            // outlook_local heartbeats AND gmail_imap / generic_imap polls
+            // across every enabled mailbox row, opens its own poll_run record,
+            // and returns aggregate counts.
+            require_once dirname(__DIR__) . '/services/ScheduledJobs.php';
+            $jobs = new \MOM\Services\ScheduledJobs($this->dataDir, $this->db());
+            $result = $jobs->runEmailInboxPoll('manual', $this->actor($user));
 
             // Close immediately as a stub — real processing delegated to
             // M365MailboxService which runs as a background job (sprint 2).

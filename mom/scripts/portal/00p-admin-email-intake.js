@@ -482,6 +482,47 @@
     return html;
   }
 
+  /* ── Worker create modal ──────────────────────────────────────────────── */
+  function _workerCreateModal(){
+    return '<div id="aeoi-worker-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center" data-modal-display="flex">'
+      + '<div style="background:var(--surface-0,#fff);border-radius:12px;padding:24px;width:480px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.2)">'
+      + '<div style="font-size:14px;font-weight:700;margin-bottom:12px">🔑 Tạo Worker Token</div>'
+      + '<div style="display:grid;gap:10px">'
+      + '<div><label style="font-size:11px;font-weight:600;color:var(--text-2,#374151);display:block;margin-bottom:3px">Worker ID <span style="color:#dc2626">*</span></label>'
+      + '<input id="aeoi-worker-id" placeholder="vd: AIW-LOCAL-001" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px;box-sizing:border-box;font-family:monospace">'
+      + '<div style="font-size:10px;color:var(--text-3,#6b7280);margin-top:2px">3-80 ký tự alphanumeric / underscore / dash. Duy nhất toàn hệ thống.</div></div>'
+      + '<div><label style="font-size:11px;font-weight:600;color:var(--text-2,#374151);display:block;margin-bottom:3px">Worker name (mô tả)</label>'
+      + '<input id="aeoi-worker-name" placeholder="vd: Outlook desktop laptop của Bích" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px;box-sizing:border-box"></div>'
+      + '</div>'
+      + '<div id="aeoi-worker-err" style="display:none;color:#dc2626;font-size:12px;margin-top:8px"></div>'
+      + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">'
+      + '<button onclick="aeoi.closeWorkerForm()" class="hm-btn hm-btn-sm">Hủy</button>'
+      + '<button onclick="aeoi.submitWorkerForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">Tạo</button>'
+      + '</div></div></div>';
+  }
+
+  /* ── Worker secret display modal (shows raw secret ONCE after create/rotate) */
+  function _workerSecretModal(){
+    return '<div id="aeoi-worker-secret-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center" data-modal-display="flex">'
+      + '<div style="background:var(--surface-0,#fff);border-radius:12px;padding:24px;width:540px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.25)">'
+      + '<div style="font-size:14px;font-weight:700;margin-bottom:8px;color:#92400e">⚠ Raw secret — HIỂN THỊ MỘT LẦN DUY NHẤT</div>'
+      + '<div style="font-size:12px;color:var(--text-2,#374151);margin-bottom:10px">Lưu ngay vào secret file của worker. Sau khi đóng modal sẽ KHÔNG xem lại được. '
+      + 'Nếu mất, phải rotate qua nút 🔄 trong bảng worker tokens.</div>'
+      + '<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;padding:10px;margin-bottom:8px">'
+      + '<div style="font-size:11px;font-weight:600;color:#78350f;margin-bottom:4px">Worker ID</div>'
+      + '<div id="aeoi-worker-secret-id" style="font-family:monospace;font-size:13px;color:#78350f"></div></div>'
+      + '<div style="background:#fee2e2;border:1px solid #dc2626;border-radius:6px;padding:10px">'
+      + '<div style="font-size:11px;font-weight:600;color:#7f1d1d;margin-bottom:4px">Raw secret</div>'
+      + '<div style="display:flex;gap:8px;align-items:center">'
+      + '<code id="aeoi-worker-secret-val" style="flex:1;font-family:monospace;font-size:13px;color:#7f1d1d;background:#fff;padding:6px 8px;border-radius:4px;word-break:break-all"></code>'
+      + '<button onclick="aeoi.copyWorkerSecret()" class="hm-btn hm-btn-sm" style="background:#dc2626;color:#fff;border:none;white-space:nowrap">📋 Copy</button>'
+      + '</div></div>'
+      + '<div id="aeoi-worker-secret-msg" style="font-size:11px;color:#10b981;margin-top:6px;height:14px"></div>'
+      + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">'
+      + '<button onclick="aeoi.closeWorkerSecret()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">Đã lưu, đóng</button>'
+      + '</div></div></div>';
+  }
+
   /* ── Test parse modal ─────────────────────────────────────────────────── */
   function _testParseModal(){
     return '<div id="aeoi-test-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center" data-modal-display="flex">'
@@ -780,12 +821,29 @@
       if(resEl) resEl.innerHTML = '<div style="color:var(--text-3,#6b7280);font-size:12px">Đang phân tích...</div>';
       apiCall('admin_email_intake_test_parse', {email_body: body, attachment_text: aeoi._val('aeoi-test-att')}, function(res){
         if(!resEl) return;
-        if(res.ok){
-          resEl.innerHTML = '<div style="background:var(--surface-2,#f3f4f6);border-radius:8px;padding:10px;font-size:11px;font-family:monospace;white-space:pre-wrap">'
-            + escHtml(JSON.stringify(res, null, 2)) + '</div>';
-        } else {
+        if(!res.ok){
           resEl.innerHTML = '<div style="color:var(--danger-1,#ef4444);font-size:12px">Lỗi: ' + escHtml(res.error||'') + '</div>';
+          return;
         }
+        var html = '';
+        var claudeErr = String(res.claude_error || '');
+        if(claudeErr.indexOf('credit balance is too low') >= 0){
+          html += '<div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:10px;margin-bottom:8px;font-size:12px;color:#78350f;border-radius:4px">'
+            + '<strong>⚠ Anthropic API hết credit.</strong> Header parser deterministic vẫn hoạt động bình thường, nhưng phần Claude fallback cho email không có block <code>[HESEM-ORDER-INTAKE]</code> sẽ bị disable cho đến khi nạp credit. '
+            + 'Nạp tại <a href="https://console.anthropic.com/settings/billing" target="_blank" rel="noopener" style="color:#b45309;text-decoration:underline">console.anthropic.com/settings/billing</a>.'
+            + '</div>';
+        } else if(claudeErr && res.claude_configured){
+          html += '<div style="background:#fee2e2;border-left:4px solid #dc2626;padding:10px;margin-bottom:8px;font-size:12px;color:#7f1d1d;border-radius:4px">'
+            + '<strong>⚠ Claude API lỗi:</strong> ' + escHtml(claudeErr.substring(0, 300))
+            + '</div>';
+        } else if(!res.claude_configured){
+          html += '<div style="background:#dbeafe;border-left:4px solid #2563eb;padding:10px;margin-bottom:8px;font-size:12px;color:#1e3a8a;border-radius:4px">'
+            + 'ℹ <strong>Claude API chưa cấu hình</strong> — set <code>ANTHROPIC_API_KEY</code> env var trong php-fpm pool để bật fallback.'
+            + '</div>';
+        }
+        html += '<div style="background:var(--surface-2,#f3f4f6);border-radius:8px;padding:10px;font-size:11px;font-family:monospace;white-space:pre-wrap;max-height:400px;overflow:auto">'
+          + escHtml(JSON.stringify(res, null, 2)) + '</div>';
+        resEl.innerHTML = html;
       });
     },
 
@@ -936,18 +994,41 @@
       });
     },
     openWorkerForm: function(){
-      var workerId = prompt('Worker ID (vd: AIW-LOCAL-001):', '');
-      if(!workerId) return;
-      var workerName = prompt('Worker name (mô tả ngắn):', '');
-      if(workerName===null) return;
+      var el = document.getElementById('aeoi-worker-modal');
+      if(!el){
+        document.body.insertAdjacentHTML('beforeend', _workerCreateModal());
+        el = document.getElementById('aeoi-worker-modal');
+      }
+      var wid  = document.getElementById('aeoi-worker-id');
+      var wnm  = document.getElementById('aeoi-worker-name');
+      var werr = document.getElementById('aeoi-worker-err');
+      if(wid)  wid.value = '';
+      if(wnm)  wnm.value = '';
+      if(werr){ werr.style.display = 'none'; werr.textContent = ''; }
+      el.style.display = 'flex';
+      if(wid) wid.focus();
+    },
+    closeWorkerForm: function(){
+      var el = document.getElementById('aeoi-worker-modal');
+      if(el) el.style.display = 'none';
+    },
+    submitWorkerForm: function(){
+      var wid = (aeoi._val('aeoi-worker-id')||'').trim();
+      var wnm = (aeoi._val('aeoi-worker-name')||'').trim();
+      var werr = document.getElementById('aeoi-worker-err');
+      if(!wid || !/^[A-Za-z0-9_\-]{3,80}$/.test(wid)){
+        if(werr){ werr.textContent = 'Worker ID phải là 3-80 ký tự alphanumeric / _ / -'; werr.style.display='block'; }
+        return;
+      }
       apiCall('admin_email_intake_worker_token_create', {
-        worker_id: workerId, worker_name: workerName, enabled: true,
+        worker_id: wid, worker_name: wnm, enabled: true,
       }, function(res){
-        if(!res.ok){ alert('Lỗi: ' + (res.error||'')); return; }
-        // Show raw secret ONCE
-        alert('Token created!\n\nWorker ID: ' + res.token.worker_id +
-              '\n\nRAW SECRET (lưu ngay, sẽ không xem lại được):\n\n' + res.raw_secret +
-              '\n\nSecret notice: ' + (res.secret_notice||''));
+        if(!res.ok){
+          if(werr){ werr.textContent = 'Lỗi: ' + (res.error||'unknown'); werr.style.display='block'; }
+          return;
+        }
+        aeoi.closeWorkerForm();
+        aeoi._showWorkerSecret(res.token && res.token.worker_id ? res.token.worker_id : wid, res.raw_secret||'');
         aeoi.loadWorkers();
       });
     },
@@ -955,9 +1036,45 @@
       if(!confirm('Rotate secret? Worker hiện tại sẽ KHÔNG dùng được cho đến khi cập nhật secret file.')) return;
       apiCall('admin_email_intake_worker_token_rotate', {id:id}, function(res){
         if(!res.ok){ alert('Lỗi: ' + (res.error||'')); return; }
-        alert('Token rotated!\n\nNEW SECRET (lưu ngay):\n\n' + res.raw_secret);
+        aeoi._showWorkerSecret(res.token && res.token.worker_id ? res.token.worker_id : ('id='+id), res.raw_secret||'');
         aeoi.loadWorkers();
       });
+    },
+    _showWorkerSecret: function(workerId, secret){
+      var el = document.getElementById('aeoi-worker-secret-modal');
+      if(!el){
+        document.body.insertAdjacentHTML('beforeend', _workerSecretModal());
+        el = document.getElementById('aeoi-worker-secret-modal');
+      }
+      var idEl  = document.getElementById('aeoi-worker-secret-id');
+      var valEl = document.getElementById('aeoi-worker-secret-val');
+      var msgEl = document.getElementById('aeoi-worker-secret-msg');
+      if(idEl)  idEl.textContent  = workerId;
+      if(valEl) valEl.textContent = secret;
+      if(msgEl) msgEl.textContent = '';
+      el.style.display = 'flex';
+    },
+    closeWorkerSecret: function(){
+      var el = document.getElementById('aeoi-worker-secret-modal');
+      if(el) el.style.display = 'none';
+      // Wipe the secret from DOM after close so it can't be re-read via devtools
+      var valEl = document.getElementById('aeoi-worker-secret-val');
+      if(valEl) valEl.textContent = '';
+    },
+    copyWorkerSecret: function(){
+      var valEl = document.getElementById('aeoi-worker-secret-val');
+      var msgEl = document.getElementById('aeoi-worker-secret-msg');
+      var secret = valEl ? valEl.textContent : '';
+      if(!secret){ if(msgEl) msgEl.textContent = 'Không có secret để copy'; return; }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(secret).then(function(){
+          if(msgEl) msgEl.textContent = '✓ Đã copy vào clipboard';
+        }, function(){
+          if(msgEl) msgEl.textContent = '✗ Không copy được (browser block)';
+        });
+      } else {
+        if(msgEl) msgEl.textContent = '✗ Browser không hỗ trợ clipboard API';
+      }
     },
     toggleWorker: function(id, enable){
       var action = enable ? 'admin_email_intake_worker_token_enable' : 'admin_email_intake_worker_token_disable';

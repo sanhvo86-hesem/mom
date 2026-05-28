@@ -1056,9 +1056,9 @@ final class ScheduledJobs
      * are provisioned in sprint 2. This stub logs a skipped run with the
      * reason so the audit table populates correctly from day 1.
      */
-    public function runEmailInboxPoll(): array
+    public function runEmailInboxPoll(string $triggeredBy = 'cron', string $triggeredByActor = 'system.cron'): array
     {
-        return $this->executeJob('email_inbox_poll', function (): array {
+        return $this->executeJob('email_inbox_poll', function () use ($triggeredBy, $triggeredByActor): array {
             require_once __DIR__ . '/EmailIntakeConfigService.php';
 
             $svc = new \MOM\Api\Services\EmailIntakeConfigService($this->db);
@@ -1075,7 +1075,7 @@ final class ScheduledJobs
             }
 
             $start = microtime(true);
-            $runId = $svc->openPollRun('cron', 'system.cron');
+            $runId = $configSvc->openPollRun($triggeredBy, $triggeredByActor);
 
             // M365MailboxService + OrderEmailParserService not yet provisioned (sprint 2).
             // Close as skipped so the poll log stays clean.
