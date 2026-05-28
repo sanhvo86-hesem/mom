@@ -51,6 +51,7 @@
   /* ── Section tab labels ──────────────────────────────────────────────── */
   var SECTIONS = [
     { id:'connection',   label:'Kết nối M365',       icon:'🔗' },
+    { id:'mailboxes',    label:'Mailbox & Folder',    icon:'📬' },
     { id:'allowlist',    label:'Email cho phép',      icon:'✅' },
     { id:'header_rules', label:'Header Rules',         icon:'📑' },
     { id:'templates',    label:'Template KH',          icon:'🎯' },
@@ -59,6 +60,7 @@
     { id:'logic',        label:'Cơ chế vận hành',     icon:'⚙️' },
     { id:'security',     label:'Bảo mật',             icon:'🔒' },
     { id:'notify',       label:'Thông báo',           icon:'🔔' },
+    { id:'cases',        label:'Intake Cases',         icon:'📦' },
     { id:'poll_log',     label:'Nhật ký poll',        icon:'📋' },
     { id:'msg_log',      label:'Nhật ký email',       icon:'📨' },
     { id:'quarantine',   label:'Kiểm duyệt',          icon:'🚨' },
