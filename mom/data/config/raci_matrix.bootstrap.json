@@ -1377,64 +1377,64 @@
     {
       "cells": [
         "Rà soát chu kỳ RACI và thẩm quyền",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span> / <span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-heads\">FUNC_HEADS</a></span>",
-        "<a href=\"authority-matrix.html\">AUTHORITY-MATRIX</a> · <a href=\"annex-123-deputy-backup-matrix.html\">ANNEX-123</a>"
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span> / <span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"role-and-department-bundles.html#bundle-func-heads\">FUNC_HEADS</a></span>",
+        "<a href=\"authority-matrix.html\">AUTHORITY-MATRIX</a> · <a href=\"../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html\">ANNEX-123</a>"
       ]
     },
     {
       "cells": [
         "Đồng bộ quyền hệ thống với RACI",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html\">ITA</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html\">ESA</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span> / <span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-owners\">FUNC_OWNERS</a></span>",
-        "<a href=\"../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html\">SOP-106</a> · <a href=\"../../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx\">FRM-141</a>"
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/10-JD-IT/jd-it-admin.html\">ITA</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html\">ESA</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span> / <span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"role-and-department-bundles.html#bundle-func-owners\">FUNC_OWNERS</a></span>",
+        "<a href=\"../../../operations/sops/01-SOP-100/sop-106-change-and-configuration-management.html\">SOP-106</a> · <a href=\"../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx\">FRM-141</a>"
       ]
     },
     {
       "cells": [
         "Rà soát chu kỳ KPI và đầu vào xem xét của lãnh đạo",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-owners\">FUNC_OWNERS</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
-        "<a href=\"annex-122-kpi-cascade-dictionary.html\">ANNEX-122</a> · <a href=\"../../../sops/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html\">SOP-102</a>"
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"role-and-department-bundles.html#bundle-func-owners\">FUNC_OWNERS</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
+        "<a href=\"../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html\">ANNEX-122</a> · <a href=\"../../../operations/sops/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html\">SOP-102</a>"
       ]
     },
     {
       "cells": [
         "Kiểm tra năng lực sau khi đổi vai trò RACI",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html\">HR</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-heads\">FUNC_HEADS</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
-        "<a href=\"annex-123-deputy-backup-matrix.html#d4\">ANNEX-123 d4</a> · <a href=\"../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html\">SOP-106</a>"
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/08-JD-HR/jd-hr-manager.html\">HR</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"role-and-department-bundles.html#bundle-func-heads\">FUNC_HEADS</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
+        "<a href=\"../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html#d4\">ANNEX-123 d4</a> · <a href=\"../../../operations/sops/01-SOP-100/sop-106-change-and-configuration-management.html\">SOP-106</a>"
       ]
     },
     {
       "cells": [
         "Rà soát phó vai trò trọng yếu",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html\">HR</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-direct-line-mgrs\">DIRECT_LINE_MGRS</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
-        "<a href=\"annex-123-deputy-backup-matrix.html\">ANNEX-123</a> · <a href=\"../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx\">FRM-504</a>"
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/08-JD-HR/jd-hr-manager.html\">HR</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"role-and-department-bundles.html#bundle-direct-line-mgrs\">DIRECT_LINE_MGRS</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
+        "<a href=\"../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html\">ANNEX-123</a> · <a href=\"../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx\">FRM-504</a>"
       ]
     },
     {
       "cells": [
         "Thu hồi và đánh giá tác động hồi tố khi thiết bị đo lệch chuẩn",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html\">MET</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html\">PE</a></span>",
-        "<a href=\"../../../sops/06-SOP-600/sop-601-calibration-and-gage-control.html\">SOP-601</a> · <a href=\"../../../../forms/frm-600-inspection/FRM-601_Calibration_Log.xlsx\">FRM-601</a>"
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html\">MET</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html\">PE</a></span>",
+        "<a href=\"../../../operations/sops/06-SOP-600/sop-601-calibration-and-gage-control.html\">SOP-601</a> · <a href=\"../../../forms/frm-600-inspection/FRM-601_Calibration_Log.xlsx\">FRM-601</a>"
       ]
     },
     {
       "cells": [
         "Phê duyệt chấp nhận MSA / Gage R&R cho hệ thống đo đặc tính trọng yếu",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html\">QE</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html\">PE</a></span>",
-        "<a href=\"../../../sops/06-SOP-600/sop-602-measurement-system-analysis-msagr-r.html\">SOP-602</a> · <a href=\"../../../../forms/frm-600-inspection/FRM-611_GRR_Study_Form.xlsx\">FRM-611</a>"
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html\">QE</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html\">PE</a></span>",
+        "<a href=\"../../../operations/sops/06-SOP-600/sop-602-measurement-system-analysis-msagr-r.html\">SOP-602</a> · <a href=\"../../../forms/frm-600-inspection/FRM-611_GRR_Study_Form.xlsx\">FRM-611</a>"
       ]
     }
   ],
@@ -1442,110 +1442,110 @@
     {
       "cells": [
         "<a href=\"authority-matrix.html\">AUTHORITY-MATRIX Ma trận thẩm quyền</a>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-heads\">FUNC_HEADS</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"role-and-department-bundles.html#bundle-func-heads\">FUNC_HEADS</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
         "Người ký quyết định CDR"
       ]
     },
     {
       "cells": [
         "<a href=\"raci-master-matrix.html\">RACI-MASTER-MATRIX — Ma trận RACI tổng thể</a>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-owners\">FUNC_OWNERS</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
-        "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html\">CS</a> / <a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html\">EST</a> / <a class=\"entity-link role-link\" href=\"../../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html\">ENG</a> / <a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html\">PPL</a> / <a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html\">WKM</a> / <a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a> / <a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html\">SCM</a> / <a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html\">HR</a> / <a class=\"entity-link role-link\" href=\"../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html\">IT</a> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html\">PD</a></span>"
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"role-and-department-bundles.html#bundle-func-owners\">FUNC_OWNERS</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
+        "<a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html\">CS</a> / <a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/06-JD-Sales/jd-estimator.html\">EST</a> / <a class=\"entity-link role-link\" href=\"../02-Department-Handbooks/dept-engineering-handbook.html\">ENG</a> / <a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-production-planner.html\">PPL</a> / <a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html\">WKM</a> / <a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a> / <a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html\">SCM</a> / <a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/08-JD-HR/jd-hr-manager.html\">HR</a> / <a class=\"entity-link role-link\" href=\"../02-Department-Handbooks/dept-it-handbook.html\">IT</a> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-production-director.html\">PD</a></span>"
       ]
     },
     {
       "cells": [
-        "<a href=\"annex-123-deputy-backup-matrix.html\">ANNEX-123 Ma trận phó và dự phòng</a>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html\">HR</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-direct-line-mgrs\">DIRECT_LINE_MGRS</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
+        "<a href=\"../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html\">ANNEX-123 Ma trận phó và dự phòng</a>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/08-JD-HR/jd-hr-manager.html\">HR</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"role-and-department-bundles.html#bundle-direct-line-mgrs\">DIRECT_LINE_MGRS</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
         "Vai trò trọng yếu và phó được kích hoạt"
       ]
     },
     {
       "cells": [
-        "<a href=\"../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html\">SOP-201 Chuỗi đơn hàng từ RFQ đến thu tiền</a>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html\">CS</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html\">EST</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html\">PPL</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
+        "<a href=\"../../../operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html\">SOP-201 Chuỗi đơn hàng từ RFQ đến thu tiền</a>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html\">CS</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/06-JD-Sales/jd-estimator.html\">EST</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-production-planner.html\">PPL</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
         "<a href=\"raci-master-matrix.html#r5gate\">G0</a> / <a href=\"raci-master-matrix.html#r5gate\">G2</a> / <a href=\"raci-master-matrix.html#r5gate\">G3</a>"
       ]
     },
     {
       "cells": [
-        "<a href=\"../../../sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html\">SOP-301 DFM, báo giá và lập kế hoạch gia công</a>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html\">ENG</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html\">EST</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html\">PPL</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
+        "<a href=\"../../../operations/sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html\">SOP-301 DFM, báo giá và lập kế hoạch gia công</a>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../02-Department-Handbooks/dept-engineering-handbook.html\">ENG</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/06-JD-Sales/jd-estimator.html\">EST</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-production-planner.html\">PPL</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
         "<a href=\"raci-master-matrix.html#r5gate\">G1</a>"
       ]
     },
     {
       "cells": [
-        "<a href=\"../../../sops/03-SOP-300/sop-302-first-article-inspection-fai.html\">SOP-302 Kiểm tra FAI</a>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html\">QCL</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html\">ENG</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html\">WKM</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
+        "<a href=\"../../../operations/sops/03-SOP-300/sop-302-first-article-inspection-fai.html\">SOP-302 Kiểm tra FAI</a>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html\">QCL</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../02-Department-Handbooks/dept-engineering-handbook.html\">ENG</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html\">WKM</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
         "<a href=\"raci-master-matrix.html#r5gate\">G4</a>"
       ]
     },
     {
       "cells": [
-        "<a href=\"../../../sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html\">SOP-303 Phát hành kỹ thuật, gói nền và ảnh chụp lệnh</a>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html\">ENG</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html\">PE</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html\">PPL</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
+        "<a href=\"../../../operations/sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html\">SOP-303 Phát hành kỹ thuật, gói nền và ảnh chụp lệnh</a>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../02-Department-Handbooks/dept-engineering-handbook.html\">ENG</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html\">PE</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-production-planner.html\">PPL</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
         "<a href=\"raci-master-matrix.html#r5gate\">G1</a> / <a href=\"raci-master-matrix.html#r5gate\">G3</a>"
       ]
     },
     {
       "cells": [
-        "<a href=\"../../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html\">SOP-504 Phát hành chương trình, cài đặt máy, chi tiết đầu tiên và chuyển việc</a>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html\">WKM</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html\">PPL</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html\">ENG</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html\">PD</a></span>",
+        "<a href=\"../../../operations/sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html\">SOP-504 Phát hành chương trình, cài đặt máy, chi tiết đầu tiên và chuyển việc</a>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html\">WKM</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-production-planner.html\">PPL</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../02-Department-Handbooks/dept-engineering-handbook.html\">ENG</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-production-director.html\">PD</a></span>",
         "<a href=\"raci-master-matrix.html#r5gate\">G3</a>"
       ]
     },
     {
       "cells": [
-        "<a href=\"../../../sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html\">SOP-605 Kiểm cuối, CoC và phát hành giao hàng</a>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html\">QCL</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html\">SCM</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html\">CS</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
+        "<a href=\"../../../operations/sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html\">SOP-605 Kiểm cuối, CoC và phát hành giao hàng</a>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html\">QCL</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html\">SCM</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html\">CS</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
         "<a href=\"raci-master-matrix.html#r5gate\">G6</a> / <a href=\"raci-master-matrix.html#r5gate\">G7</a>"
       ]
     },
     {
       "cells": [
-        "<a href=\"../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html\">SOP-606 NCR, CAPA và phản ứng IPQC</a>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html\">QE</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html\">WKM</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html\">ENG</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html\">SCM</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
+        "<a href=\"../../../operations/sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html\">SOP-606 NCR, CAPA và phản ứng IPQC</a>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html\">QE</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html\">WKM</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../02-Department-Handbooks/dept-engineering-handbook.html\">ENG</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html\">SCM</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
         "<a href=\"raci-master-matrix.html#r5gate\">G5</a> / kiểm soát hỗ trợ"
       ]
     },
     {
       "cells": [
-        "<a href=\"../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html\">SOP-106 Quản lý thay đổi và cấu hình</a>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html\">ITA</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html\">ESA</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-heads\">FUNC_HEADS</a></span>",
-        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
+        "<a href=\"../../../operations/sops/01-SOP-100/sop-106-change-and-configuration-management.html\">SOP-106 Quản lý thay đổi và cấu hình</a>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html\">QMS</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/10-JD-IT/jd-it-admin.html\">ITA</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html\">ESA</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link bundle-link\" href=\"role-and-department-bundles.html#bundle-func-heads\">FUNC_HEADS</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span>",
         "<a href=\"authority-matrix.html#cdr-F1\">F1</a> / <a href=\"authority-matrix.html#cdr-F2\">F2</a> / <a href=\"authority-matrix.html#cdr-B3\">B3</a>"
       ]
     }
@@ -1556,7 +1556,7 @@
         "G0",
         "<a href=\"authority-matrix.html#cdr-A2\">A2</a>",
         "Phê duyệt báo giá theo bậc giá trị",
-        "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
+        "<a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "C",
         "Thẩm định biên gộp và cấu trúc chi phí."
       ]
@@ -1566,7 +1566,7 @@
         "G0",
         "<a href=\"authority-matrix.html#cdr-A3\">A3</a>",
         "Phê duyệt chiết khấu / điều kiện thương mại ngoại lệ",
-        "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
+        "<a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "C",
         "Đánh giá tác động biên lợi nhuận."
       ]
@@ -1576,7 +1576,7 @@
         "G0",
         "<a href=\"authority-matrix.html#cdr-A4\">A4</a>",
         "Phê duyệt điều kiện thanh toán ngoại lệ",
-        "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
+        "<a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "C",
         "Đánh giá rủi ro tín dụng và dòng tiền."
       ]
@@ -1586,7 +1586,7 @@
         "G0",
         "<a href=\"authority-matrix.html#cdr-A5\">A5</a>",
         "Chấp thuận đơn hàng và xem xét hợp đồng",
-        "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
+        "<a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "C",
         "Xác nhận điều kiện tín dụng/thanh toán của khách trước khi cam kết."
       ]
@@ -1596,7 +1596,7 @@
         "G0",
         "<a href=\"authority-matrix.html#cdr-A6\">A6</a>",
         "CCR ảnh hưởng giá / lịch / phạm vi",
-        "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
+        "<a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "C",
         "Tác động biên lợi nhuận khi đổi giá."
       ]
@@ -1606,7 +1606,7 @@
         "G2",
         "<a href=\"authority-matrix.html#cdr-C1\">C1</a>",
         "Phát hành kế hoạch đưa lệnh xuống xưởng",
-        "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html\">MNT</a>",
+        "<a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html\">MNT</a>",
         "C",
         "Cửa sổ bảo trì kế hoạch ảnh hưởng năng lực điều phối."
       ]
@@ -1616,7 +1616,7 @@
         "G2",
         "<a href=\"authority-matrix.html#cdr-E1\">E1</a>",
         "Phê duyệt PO theo bậc giá trị",
-        "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
+        "<a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "I",
         "Cam kết chi tiền phải được tài chính nắm."
       ]
@@ -1626,7 +1626,7 @@
         "G2",
         "<a href=\"authority-matrix.html#cdr-E5\">E5</a>",
         "Phê duyệt đơn mua khẩn / vật tư khẩn",
-        "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
+        "<a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "I",
         "Tác động dòng tiền tức thời."
       ]
@@ -1636,7 +1636,7 @@
         "G3",
         "<a href=\"authority-matrix.html#cdr-C4\">C4</a>",
         "Phê duyệt thay đổi cài đặt máy ngoài kế hoạch",
-        "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html\">MNT</a>",
+        "<a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html\">MNT</a>",
         "C",
         "Tình trạng máy và rủi ro cơ khí."
       ]
@@ -1646,7 +1646,7 @@
         "G3",
         "<a href=\"authority-matrix.html#cdr-C7\">C7</a>",
         "Phục hồi tiến độ sau dừng máy hoặc va chạm máy",
-        "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html\">MNT</a>",
+        "<a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html\">MNT</a>",
         "R",
         "Sửa chữa và phục hồi máy là việc của bảo trì."
       ]
@@ -1656,7 +1656,7 @@
         "G3",
         "<a href=\"authority-matrix.html#cdr-E5\">E5</a>",
         "Phê duyệt đơn mua khẩn / vật tư khẩn",
-        "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
+        "<a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "I",
         "Tác động dòng tiền."
       ]
@@ -1666,7 +1666,7 @@
         "G3",
         "<a href=\"authority-matrix.html#cdr-F4\">F4</a>",
         "Phê duyệt ứng phó sự cố EHS và dừng việc vì an toàn",
-        "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html\">MNT</a>",
+        "<a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html\">MNT</a>",
         "C",
         "Tham vấn khi sự cố liên quan thiết bị."
       ]
@@ -1676,7 +1676,7 @@
         "G5",
         "<a href=\"authority-matrix.html#cdr-D9\">D9</a>",
         "Phê duyệt xử lý phế phẩm theo bậc giá trị",
-        "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
+        "<a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "C",
         "Giá trị ghi giảm tài sản."
       ]
@@ -1686,7 +1686,7 @@
         "G7",
         "<a href=\"authority-matrix.html#cdr-A7\">A7</a>",
         "CCR muộn ảnh hưởng giá / lịch / phạm vi",
-        "<a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
+        "<a class=\"entity-link role-link\" href=\"../03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html\">FIN</a>",
         "C",
         "Tác động biên lợi nhuận khi đổi giá ở giai đoạn giao hàng."
       ]
