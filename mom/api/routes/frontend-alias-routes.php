@@ -116,7 +116,7 @@ return static function (Router $router, string $dataDir): void {
         'order_so_update_status' => [OrderController::class, 'transition'],
         'order_jo_update_status' => [OrderController::class, 'transition'],
         'order_wo_update_status' => [OrderController::class, 'transition'],
-        'order_get_linked_forms' => [OrderController::class, 'getHierarchy'],
+        'order_get_linked_forms' => [OrderController::class, 'listLinkedForms'],
     ]);
 
     // Module 13: master-data-control.js alias

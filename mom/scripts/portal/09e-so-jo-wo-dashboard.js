@@ -1435,7 +1435,7 @@ function _showDetail(id,type){
 function _loadLinkedFormsPanel(orderId, orderType) {
   var panel = document.getElementById(_id + '-linked-forms-panel');
   if (!panel) return;
-  fetch('api.php?action=order_get_linked_forms&order_type=' + encodeURIComponent(orderType) + '&order_id=' + encodeURIComponent(orderId), {
+  fetch('api/index.php?action=order_get_linked_forms&order_type=' + encodeURIComponent(orderType) + '&order_id=' + encodeURIComponent(orderId), {
     method: 'GET', credentials: 'include',
     headers: typeof csrfToken !== 'undefined' && csrfToken ? { 'X-CSRF-Token': csrfToken } : {}
   }).then(function(r) { return r.json(); }).then(function(res) {
