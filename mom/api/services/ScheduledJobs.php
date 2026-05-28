@@ -1068,8 +1068,20 @@ final class ScheduledJobs
             if (!($config['enabled'] ?? false)) {
                 return [
                     'status'       => 'skipped',
-                    'reason'       => 'Email Order Intake is disabled in admin config.',
+                    'reason'       => 'Email Order Intake is disabled in admin config (config.enabled=false).',
                     'run_id'       => null,
+                    'orders_created' => 0,
+                ];
+            }
+            // Migration 212 master kill-switch — checked separately so the
+            // admin can pause AEOI without touching the per-cron 'enabled'
+            // flag (e.g. when an LLM provider is rate-limiting and we want
+            // to drain the queue instead of producing more failed cases).
+            if (!($config['aeoi_master_enabled'] ?? true)) {
+                return [
+                    'status'         => 'skipped',
+                    'reason'         => 'AEOI master switch is OFF (admin paused the module).',
+                    'run_id'         => null,
                     'orders_created' => 0,
                 ];
             }

@@ -64,6 +64,7 @@ final class EmailIntakeConfigService
     {
         $allowed = [
             'm365_tenant_id','m365_client_id','intake_mailbox','enabled',
+            'aeoi_master_enabled',
             'poll_interval_minutes',
             'require_attachment','allowed_attachment_types','subject_filter_regex',
             'extraction_scope','max_attachments_per_email',
@@ -115,6 +116,52 @@ final class EmailIntakeConfigService
         $this->db->execute($sql, $params);
 
         return $this->loadConfig();
+    }
+
+    /**
+     * Master kill-switch toggle (Migration 212). One-call helper isolated
+     * from saveConfig() so the toggle endpoint is small + the audit log
+     * line is unambiguous.
+     *
+     * Returns the updated row.
+     */
+    public function setMasterEnabled(bool $enabled, string $actor): array
+    {
+        $this->db->execute(
+            'UPDATE ' . self::CONFIG_TABLE . '
+                SET aeoi_master_enabled = :p_enabled,
+                    updated_at          = NOW(),
+                    updated_by          = :p_actor
+              WHERE id = :p_id',
+            [
+                ':p_enabled' => $enabled ? 'true' : 'false',
+                ':p_actor'   => $actor,
+                ':p_id'      => self::CONFIG_ID,
+            ]
+        );
+        return $this->loadConfig();
+    }
+
+    /**
+     * Lightweight read for callers that only need the master flag without
+     * decoding the whole config row. Defaults to TRUE on any DB error so
+     * a transient outage doesn't accidentally pause production polling.
+     */
+    public function isMasterEnabled(): bool
+    {
+        try {
+            $row = $this->db->queryOne(
+                'SELECT aeoi_master_enabled FROM ' . self::CONFIG_TABLE
+                . ' WHERE id = :p_id',
+                [':p_id' => self::CONFIG_ID]
+            );
+            if (!$row) return true;
+            $v = $row['aeoi_master_enabled'];
+            // Postgres returns 't'/'f' or true/false depending on driver settings.
+            return $v === true || $v === 't' || $v === '1' || $v === 1;
+        } catch (\Throwable) {
+            return true;
+        }
     }
 
     // ── Allowlist ─────────────────────────────────────────────────────────
