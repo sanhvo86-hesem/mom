@@ -14,6 +14,20 @@ var _tableSort = { key:'risk', dir:'asc' };
 var _dragItem = null;
 var _filters = { search:'', type:'all', band:'all', phase:'all' };
 var _lastRefreshAt = '';
+/* PR #2 (Orders module redesign) — top-level tab between five views.
+ * The default 'so-jo-wo' tab preserves the original Order Control Tower.
+ * Other tabs are wired here as placeholder shells that subsequent PRs
+ * (#3 AI Intake Queue, #4 Customer POs + Quarantine, #5 SO badge +
+ * chain breadcrumb) fill in. Keeping the tab state in this module
+ * avoids touching frozen 02-state-auth-ui.js. */
+var _activeTab = 'so-jo-wo';
+var ORDERS_TABS = [
+  { id:'so-jo-wo',     icon:'🛒', labelVi:'Đơn hàng SO/JO/WO',  labelEn:'SO / JO / WO',          status:'ready' },
+  { id:'customer-pos', icon:'📋', labelVi:'Customer POs',        labelEn:'Customer POs',          status:'coming' },
+  { id:'ai-intake',    icon:'🤖', labelVi:'AI Intake Queue',     labelEn:'AI Intake Queue',       status:'coming' },
+  { id:'quarantine',   icon:'🔒', labelVi:'Security Quarantine', labelEn:'Security Quarantine',   status:'coming' },
+  { id:'logs',         icon:'📑', labelVi:'Logs & Diagnostics',  labelEn:'Logs & Diagnostics',    status:'coming' }
+];
 
 /* STATUS — đọc từ HmRegistry → 'so_status', 'jo_status', 'wo_status' (single source of truth) */
 var STATUS = (function(){
@@ -320,8 +334,84 @@ function _renderFoundationMini(){ var groups=_foundationSnapshot(); return '<sec
 function _renderFilters(){ return '<section class="sj-panel sj-filter-panel"><div class="sj-panel-body"><div class="sj-filter-row"><div class="sj-search-wrap"><input id="'+_id+'-global-search" class="sj-input sj-search" value="'+_esc(_filters.search)+'" placeholder="'+_t('Tìm SO / JO / WO, khách hàng, part, gate, ngoại lệ...','Search SO / JO / WO, customer, part, gate, exception...')+'"></div><select id="'+_id+'-type-filter" class="sj-input sj-filter-select"><option value="all">'+_t('Tất cả loại','All types')+'</option><option value="so"'+(_filters.type==='so'?' selected':'')+'>SO</option><option value="jo"'+(_filters.type==='jo'?' selected':'')+'>JO</option><option value="wo"'+(_filters.type==='wo'?' selected':'')+'>WO</option></select><select id="'+_id+'-phase-filter" class="sj-input sj-filter-select"><option value="all">'+_t('Tất cả phase','All phases')+'</option>'+['commercial','engineering','planning','execution','quality','fulfillment','exception','closed','cancelled'].map(function(key){ var meta=_phaseMeta(key); return '<option value="'+key+'"'+(_filters.phase===key?' selected':'')+'>'+_esc(_t(meta.vi,meta.en))+'</option>'; }).join('')+'</select><div class="sj-chip-group">'+[{ key:'all', labelVi:'Tất cả', labelEn:'All' },{ key:'critical', labelVi:'Chặn', labelEn:'Blocked' },{ key:'warning', labelVi:'Theo dõi', labelEn:'Watch' },{ key:'ready', labelVi:'Ổn định', labelEn:'Stable' }].map(function(item){ return '<button type="button" class="sj-chip-filter'+(_filters.band===item.key?' active':'')+'" data-band="'+item.key+'">'+_esc(_t(item.labelVi,item.labelEn))+'</button>'; }).join('')+'</div><div class="sj-filter-meta">'+_esc(_filteredRows().length)+' '+_esc(_t('bản ghi phù hợp','matching records'))+'</div></div></div></section>'; }
 function _renderView(){ if(_view==='table') return _renderTableView(); if(_view==='pipeline') return _renderDispatchView(); return _renderPortfolioView(); }
 
+/* PR #2 Orders shell — top-level tab strip + 5 tab content branches.
+ * Renders ABOVE the existing Order Control Tower so SO/JO/WO behaviour
+ * is untouched. Other tabs are placeholders that subsequent PRs fill in. */
+function _renderOrdersTabStrip(){
+  var h = '<nav class="orders-tabs" style="display:flex;gap:0;border-bottom:1px solid var(--border-1,#e5e7eb);background:var(--surface-1,#fff);padding:0 16px;margin:0 0 0 0;align-items:flex-end">';
+  ORDERS_TABS.forEach(function(t){
+    var active = _activeTab === t.id;
+    var dot = t.status === 'coming'
+      ? '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--amber-light,#f59e0b);margin-left:6px;vertical-align:middle" title="Coming soon"></span>'
+      : '';
+    h += '<button type="button" data-orders-tab="' + t.id + '" '
+       + 'style="padding:10px 16px;border:none;background:none;cursor:pointer;'
+       + 'border-bottom:' + (active ? '2px solid var(--brand-primary,#2563eb)' : '2px solid transparent') + ';'
+       + 'color:' + (active ? 'var(--brand-primary,#2563eb)' : 'var(--text-2,#374151)') + ';'
+       + 'font-weight:' + (active ? '700' : '500') + ';font-size:13px;white-space:nowrap">'
+       + t.icon + ' ' + _esc(_t(t.labelVi, t.labelEn))
+       + dot
+       + '</button>';
+  });
+  h += '</nav>';
+  return h;
+}
+
+function _renderTabPlaceholder(tabId){
+  var t = ORDERS_TABS.find(function(x){ return x.id === tabId; }) || {};
+  var msgMap = {
+    'customer-pos': {
+      vi: 'Danh sách Customer PO — đang được implement trong PR #4.',
+      en: 'Customer PO listing — coming in PR #4.',
+      desc_vi: 'Sẽ hiển thị tất cả Customer Purchase Orders, bao gồm CPO tạo từ AI Email Intake (badge 🤖) và CPO tạo manual. Filter theo customer, source, status, value, ngày nhận. Click row → mở CPO detail với danh sách SO/JO liên kết.',
+      desc_en: 'Will list every Customer Purchase Order including AI-Intake-sourced ones (badge 🤖) and manual ones. Filter by customer, source, status, value, received date. Click row → CPO detail with linked SO/JOs.'
+    },
+    'ai-intake': {
+      vi: 'AI Intake Queue — đang được implement trong PR #3.',
+      en: 'AI Intake Queue — coming in PR #3.',
+      desc_vi: 'Queue duyệt case từ AEOI module. List bên trái + drawer detail bên phải. Keyboard triage (j/k/Enter/e/r/Cmd+K). Check matrix 6/6 đèn xanh trước khi cho Approve. Bulk approve cho case 0 blockers.',
+      desc_en: 'Review queue for cases produced by AEOI. Left list + right drawer. Keyboard triage. 6-check matrix gates Approve. Bulk approve for zero-blocker cases.'
+    },
+    'quarantine': {
+      vi: 'Security Quarantine — đang được implement trong PR #4.',
+      en: 'Security Quarantine — coming in PR #4.',
+      desc_vi: 'Hàng đợi review email bị flag suspicious (SPF/DKIM fail, sender lạ, attachment nguy hiểm). Reviewer release → tạo normal case, hoặc block → add sender vào denylist + ghi audit.',
+      desc_en: 'Review queue for flagged-suspicious emails (SPF/DKIM fail, unknown senders, dangerous attachments). Reviewer can release → create normal case, or block → denylist sender + audit event.'
+    },
+    'logs': {
+      vi: 'Logs & Diagnostics — đang được implement trong PR #4.',
+      en: 'Logs & Diagnostics — coming in PR #4.',
+      desc_vi: 'Poll run history, message log (email_intake_message), error breakdown by reason_code. Dashboard sức khỏe cho AI Ops lead.',
+      desc_en: 'Poll run history, message log, error breakdown by reason_code. Health dashboard for the AI Ops lead.'
+    }
+  };
+  var info = msgMap[tabId] || { vi: 'Coming soon.', en: 'Coming soon.', desc_vi: '', desc_en: '' };
+  return '<div style="padding:48px 24px;text-align:center;background:var(--surface-2,#f9fafb);min-height:240px">'
+    + '<div style="font-size:48px;line-height:1;margin-bottom:12px">' + (t.icon || '🚧') + '</div>'
+    + '<h2 style="font-size:18px;font-weight:700;color:var(--text-1,#111);margin:0 0 8px 0">' + _esc(_t(t.labelVi || '', t.labelEn || '')) + '</h2>'
+    + '<p style="font-size:13px;color:var(--text-2,#374151);margin:0 0 12px 0">' + _esc(_t(info.vi, info.en)) + '</p>'
+    + '<p style="font-size:12px;color:var(--text-3,#6b7280);max-width:640px;margin:0 auto 16px auto;line-height:1.6">' + _esc(_t(info.desc_vi, info.desc_en)) + '</p>'
+    + '<a href="#admin/email-intake" style="display:inline-block;padding:8px 16px;background:var(--brand-primary,#2563eb);color:#fff;text-decoration:none;border-radius:6px;font-size:12px;font-weight:600">'
+    + _t('Mở Admin Settings AI Order Intake →', 'Open AEOI Admin Settings →')
+    + '</a>'
+    + '</div>';
+}
+
 function _render(){
   var h='<div class="sj-wrap">';
+  // PR #2 — top-level tabs
+  h += _renderOrdersTabStrip();
+
+  if (_activeTab !== 'so-jo-wo') {
+    // Placeholder tabs (PR #3-5 fill these in)
+    h += _renderTabPlaceholder(_activeTab);
+    h += '</div>';
+    _container.innerHTML = h;
+    _bind();
+    return;
+  }
+
+  // ── SO/JO/WO tab — preserves existing Order Control Tower exactly
   h+='<header class="sj-topbar"><div class="sj-title-group"><small class="sj-eyebrow">'+_t('Order Control Tower','Order Control Tower')+'</small><h1>'+_t('Quản lý đơn hàng tích hợp','Integrated Order Management')+'</h1><p>'+_t('Bám promise/commit thương mại, readiness kỹ thuật, launch gate MES và bộ chứng từ giao hàng trên cùng một mặt điều hành.','Track commercial promise and commit, engineering readiness, MES launch gates, and shipment documents in one operating surface.')+'</p></div><div class="sj-toolbar"><div class="sj-toolbar-note">'+_t('Lần làm mới','Refreshed')+': <strong>'+_esc(_lastRefreshAt?_fmtDateTime(_lastRefreshAt):'-')+'</strong></div><div class="sj-actions"><button type="button" class="sj-btn" id="'+_id+'-refresh">'+_t('Làm mới','Refresh')+'</button>'+(_canAccessPurchasing()?'<button type="button" class="sj-btn subtle" id="'+_id+'-open-po">'+_t('PO / IQC','PO / IQC')+'</button>':'')+( _permission('so','create')?'<button type="button" class="sj-btn accent" id="'+_id+'-new-so">+ SO</button>':'' )+( _permission('jo','create')?'<button type="button" class="sj-btn accent-2" id="'+_id+'-new-jo">+ JO</button>':'' )+( _permission('wo','create')?'<button type="button" class="sj-btn accent-3" id="'+_id+'-new-wo">+ WO</button>':'' )+'</div><div class="sj-switch"><button class="'+(_view==='hierarchy'?'active':'')+'" data-view="hierarchy">'+_t('Chuỗi đơn','Portfolio')+'</button><button class="'+(_view==='pipeline'?'active':'')+'" data-view="pipeline">'+_t('Điều phối','Dispatch')+'</button><button class="'+(_view==='table'?'active':'')+'" data-view="table">'+_t('Đăng ký','Register')+'</button></div></div></header>';
   h+='<section class="sj-overview"><div class="sj-overview-main">'+_renderMetricDeck()+'</div><div class="sj-overview-side">'+_renderPhaseBoard()+_renderGovernanceBoard()+'</div></section>';
   h+='<section class="sj-layout"><aside class="sj-aside">'+_renderExceptionRadar()+_renderFoundationMini()+'</aside><main class="sj-workspace">'+_renderFilters()+_renderView()+'</main></section>';
@@ -767,6 +857,22 @@ function _showEdit(type, data){
   };
 }
 function _bind(){
+  // PR #2 — top-level tab strip click handler (binds before legacy IDs
+  // so navigation works on placeholder tabs too).
+  Array.prototype.forEach.call(_container.querySelectorAll('[data-orders-tab]'), function(btn){
+    btn.onclick = function(){
+      var next = btn.getAttribute('data-orders-tab');
+      if (!next || next === _activeTab) return;
+      _activeTab = next;
+      _render();
+    };
+  });
+  // For placeholder tabs (non SO/JO/WO), short-circuit the rest of the
+  // bindings — the placeholder doesn't render the legacy IDs the code
+  // below queries for.
+  if (_activeTab !== 'so-jo-wo') {
+    return;
+  }
   var md=document.getElementById(_id+'-md'); if(md) md.onclick=function(){ if(typeof window._mdOpenControl==='function') window._mdOpenControl('customers', {scope:'order_foundation'}); };
   var foundations=document.getElementById(_id+'-foundations'); if(foundations) foundations.onclick=_showFoundations;
   var refresh=document.getElementById(_id+'-refresh'); if(refresh) refresh.onclick=_refresh;
