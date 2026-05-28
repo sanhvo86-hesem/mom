@@ -4,14 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
-use MOM\Api\Services\EmailIntakeAdminCatalogService;
-use MOM\Api\Services\EmailIntakeCaseService;
-use MOM\Api\Services\EmailIntakeCommitService;
 use MOM\Api\Services\EmailIntakeConfigService;
-use MOM\Api\Services\EmailIntakeValidationService;
-use MOM\Api\Services\EmailIntakeWorkerAuthService;
-use MOM\Services\CustomerPurchaseOrderService;
-use MOM\Services\OrderService;
 use Throwable;
 
 /**
@@ -40,81 +33,17 @@ use Throwable;
 class EmailIntakeController extends BaseController
 {
     private ?EmailIntakeConfigService $configSvc = null;
-    private ?EmailIntakeAdminCatalogService $catalogSvc = null;
-    private ?EmailIntakeWorkerAuthService $workerAuthSvc = null;
-    private ?EmailIntakeCaseService $caseSvc = null;
-    private ?EmailIntakeValidationService $validationSvc = null;
-    private ?EmailIntakeCommitService $commitSvc = null;
-
-    private function db(): \MOM\Database\Connection
-    {
-        $conn = $this->data->getConnection();
-        if ($conn === null) {
-            throw new \RuntimeException('Database not available (JSON_ONLY mode). Email Intake requires PostgreSQL.');
-        }
-        return $conn;
-    }
 
     private function svc(): EmailIntakeConfigService
     {
         if ($this->configSvc === null) {
-            $this->configSvc = new EmailIntakeConfigService($this->db());
+            $conn = $this->data->getConnection();
+            if ($conn === null) {
+                throw new \RuntimeException('Database not available (JSON_ONLY mode). Email Intake requires PostgreSQL.');
+            }
+            $this->configSvc = new EmailIntakeConfigService($conn);
         }
         return $this->configSvc;
-    }
-
-    private function catalog(): EmailIntakeAdminCatalogService
-    {
-        if ($this->catalogSvc === null) {
-            // Inject EmailIntakeConfigService so IMAP passwords can be encrypted.
-            $this->catalogSvc = new EmailIntakeAdminCatalogService($this->db(), $this->svc());
-        }
-        return $this->catalogSvc;
-    }
-
-    private function workerAuth(): EmailIntakeWorkerAuthService
-    {
-        if ($this->workerAuthSvc === null) {
-            $this->workerAuthSvc = new EmailIntakeWorkerAuthService($this->db());
-        }
-        return $this->workerAuthSvc;
-    }
-
-    private function caseSvc(): EmailIntakeCaseService
-    {
-        if ($this->caseSvc === null) {
-            $this->caseSvc = new EmailIntakeCaseService($this->db());
-        }
-        return $this->caseSvc;
-    }
-
-    private function validation(): EmailIntakeValidationService
-    {
-        if ($this->validationSvc === null) {
-            $this->validationSvc = new EmailIntakeValidationService(
-                $this->db(),
-                $this->caseSvc(),
-                $this->svc()
-            );
-        }
-        return $this->validationSvc;
-    }
-
-    private function commit(): EmailIntakeCommitService
-    {
-        if ($this->commitSvc === null) {
-            $this->commitSvc = new EmailIntakeCommitService(
-                $this->caseSvc(),
-                new CustomerPurchaseOrderService($this->dataDir),
-                new OrderService($this->dataDir)
-            );
-        }
-        return $this->commitSvc;
-    }
-
-    private function actor(array $user): string
-    {
-        return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
     // ── Config ────────────────────────────────────────────────────────────
@@ -146,7 +75,6 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
-        $this->requireCsrf();
 
         $body = $this->jsonBody();
         if (empty($body)) {
@@ -193,7 +121,6 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
-        $this->requireCsrf();
 
         $body = $this->jsonBody();
         $type  = trim((string)($body['entry_type'] ?? ''));
@@ -228,7 +155,6 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
-        $this->requireCsrf();
 
         $body = $this->jsonBody();
         $id   = (int)($body['id'] ?? 0);
@@ -255,7 +181,6 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
-        $this->requireCsrf();
 
         $body = $this->jsonBody();
         $id   = (int)($body['id'] ?? 0);
@@ -284,7 +209,6 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
-        $this->requireCsrf();
 
         try {
             $config = $this->svc()->loadConfig();
@@ -292,30 +216,27 @@ class EmailIntakeController extends BaseController
                 $this->error('intake_disabled', 409,
                     'Email Order Intake is disabled. Enable it in Connection Settings first.');
             }
+            if (empty($config['m365_tenant_id']) || empty($config['intake_mailbox'])) {
+                $this->error('intake_not_configured', 409,
+                    'M365 connection is not configured. Set Tenant ID and Mailbox first.');
+            }
 
-            // Manual "Chạy ngay" triggers the same code path as the cron
-            // (ScheduledJobs::runEmailInboxPoll). That handles both
-            // outlook_local heartbeats AND gmail_imap / generic_imap polls
-            // across every enabled mailbox row, opens its own poll_run record,
-            // and returns aggregate counts.
-            require_once dirname(__DIR__) . '/services/ScheduledJobs.php';
-            $jobs = new \MOM\Services\ScheduledJobs($this->dataDir, $this->db());
-            $result = $jobs->runEmailInboxPoll('manual', $this->actor($user));
+            $runId = $this->svc()->openPollRun('manual', $user['username'] ?? 'unknown');
+            $this->auditLog('admin_email_intake_trigger', ['run_id' => $runId]);
 
-            $this->auditLog('admin_email_intake_trigger', [
-                'actor'   => $user['username'] ?? 'unknown',
-                'result'  => array_intersect_key($result, array_flip([
-                    'status','mode','run_id','mailboxes_imap','fetched','orders_created','errors',
-                ])),
-            ]);
+            // Close immediately as a stub — real processing delegated to
+            // M365MailboxService which runs as a background job (sprint 2).
+            $this->svc()->closePollRun($runId, [
+                'found' => 0, 'processed' => 0, 'skipped' => 0,
+                'quarantined' => 0, 'created' => 0, 'review' => 0,
+                'errors' => 0, 'duration_ms' => 0, 'api_calls' => 0,
+                'error_detail' => 'M365MailboxService not yet provisioned — scheduled for sprint 2.',
+            ], 'skipped');
 
             $this->success([
-                'status'  => $result['status'] ?? 'completed',
-                'mode'    => $result['mode']   ?? 'mixed',
-                'run_id'  => $result['run_id'] ?? null,
-                'fetched' => $result['fetched'] ?? 0,
-                'created' => $result['orders_created'] ?? 0,
-                'note'    => $result['note']   ?? null,
+                'run_id'  => $runId,
+                'status'  => 'queued',
+                'message' => 'Poll queued. M365 connection service will be available in sprint 2.',
             ]);
         } catch (Throwable $e) {
             $this->error('trigger_failed', 500, $e->getMessage());
@@ -334,7 +255,6 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
-        $this->requireCsrf();
 
         $body      = $this->jsonBody();
         $emailBody = trim((string)($body['email_body'] ?? ''));
@@ -342,116 +262,16 @@ class EmailIntakeController extends BaseController
             $this->error('missing_email_body', 400, 'email_body is required.');
         }
 
-        // Reflective dry-run: run both the body-header parser AND the
-        // LLM extraction router (multi-provider with fallback chain),
-        // return both side-by-side without writing to the DB. Lets
-        // admins iterate on the email template + sanity-check the LLM
-        // response shape before going live.
-        require_once __DIR__ . '/../services/EmailIntakeImapService.php';
-        require_once __DIR__ . '/../services/OrderEmailParserService.php';
-
-        // Cheap path: invoke the body-header parser via reflection.
-        $hdrParserResult = $this->runBodyHeaderParse($emailBody);
-
-        // LLM path — routes through the tier configured in aeoi_llm_routing
-        // so the test mirrors what the live IMAP poll would do. If the
-        // caller passed attachment_text, we use the extraction_pdf tier;
-        // otherwise extraction_default. Same logic as IMAP poll.
-        $attachmentText = (string)($body['attachment_text'] ?? '');
-        $tier           = $attachmentText !== '' ? 'extraction_pdf' : 'extraction_default';
-
-        $llmResult   = null;
-        $llmError    = null;
-        $llmProvider = null;
-        $llmModel    = null;
-        $llmAttempts = [];
-        $claudeConfigured = \MOM\Api\Services\OrderEmailParserService::isConfigured();
-
-        if (empty($body['skip_claude'])) {
-            try {
-                $outcome = $this->llmRouter()->extract($emailBody, [
-                    'from_email'          => (string)($body['from_email'] ?? 'test@example.com'),
-                    'subject'             => (string)($body['subject']    ?? '(test parse)'),
-                    'attachment_filename' => (string)($body['attachment_filename'] ?? ''),
-                    'attachment_text'     => $attachmentText,
-                ], $tier);
-                $llmResult   = $outcome['result'];
-                $llmProvider = $outcome['provider'];
-                $llmModel    = $outcome['model'];
-                $llmAttempts = $outcome['attempts'];
-            } catch (\Throwable $e) {
-                $llmError = $e->getMessage();
-            }
-        }
-
-        // Surface a credit-too-low hint in a structured field so the UI
-        // can show a clean banner. The legacy claude_error / claude_result
-        // keys stay populated for back-compat with the existing test_parse
-        // modal renderer.
-        $creditTooLow = $llmError !== null
-            && (str_contains($llmError, 'credit balance is too low')
-             || str_contains($llmError, 'credit_balance_too_low'));
-
+        // Stub response — OrderEmailParserService (Claude API) provisioned in sprint 2.
         $this->success([
-            'dry_run'           => true,
-            'tier_used'         => $tier,
-            'header_block'      => $hdrParserResult,
-            'claude_configured' => $claudeConfigured,
-            'claude_result'     => $llmResult,       // legacy field name kept for UI compat
-            'claude_error'      => $llmError,
-            'llm_provider'      => $llmProvider,
-            'llm_model'         => $llmModel,
-            'llm_attempts'      => $llmAttempts,
-            'credit_too_low'    => $creditTooLow,
-            'received'          => [
-                'email_body_length'   => strlen($emailBody),
-                'has_attachment_text' => $attachmentText !== '',
+            'dry_run'  => true,
+            'result'   => null,
+            'message'  => 'Test parse will be available when OrderEmailParserService (Claude API) is provisioned in sprint 2.',
+            'received' => [
+                'email_body_length'      => strlen($emailBody),
+                'has_attachment_text'    => !empty($body['attachment_text']),
             ],
         ]);
-    }
-
-    /** Light wrapper that calls the public body-header parser shape via a
-     *  throwaway IMAP service instance so testParse stays decoupled. */
-    private function runBodyHeaderParse(string $bodyText): array
-    {
-        // The parser is a pure-function instance method; we don't need a
-        // real DB/IMAP connection for it. Reflection avoids exposing it
-        // as a public API on the service.
-        $svc = new class {
-            public function parse(string $body): array
-            {
-                $out = [
-                    'doc_type' => '', 'action' => '', 'customer_id' => '',
-                    'customer_name' => '', 'customer_po_number' => '',
-                    'po_date' => '', 'currency_code' => '',
-                    'incoterm_code' => '', 'payment_term_code' => '',
-                    'ship_to_name' => '', 'ship_to_addr' => '',
-                    'ai_process' => '', 'parsed' => [],
-                ];
-                if (!preg_match('/\[HESEM-ORDER-INTAKE\](.*?)\[\/HESEM-ORDER-INTAKE\]/is', $body, $m)) {
-                    return $out;
-                }
-                foreach (preg_split('/\r?\n/', trim((string)$m[1])) ?: [] as $line) {
-                    if (preg_match('/^([A-Za-z0-9 _\-]+)\s*:\s*(.*)$/u', trim($line), $kv)) {
-                        $out['parsed'][strtolower(str_replace(' ', '-', trim($kv[1])))] = trim($kv[2]);
-                    }
-                }
-                $p = $out['parsed'];
-                $out['doc_type']           = strtoupper($p['doc-type'] ?? '');
-                $out['action']             = strtoupper($p['action'] ?? '');
-                $out['customer_id']        = strtoupper($p['customer-code'] ?? '');
-                $out['customer_po_number'] = $p['po-no'] ?? '';
-                $out['po_date']            = $p['po-date'] ?? '';
-                $out['currency_code']      = strtoupper($p['currency'] ?? '');
-                $out['incoterm_code']      = strtoupper($p['incoterm'] ?? '');
-                $out['payment_term_code']  = strtoupper($p['payment-term'] ?? '');
-                $out['ship_to_name']       = $p['ship-to-name'] ?? '';
-                $out['ship_to_addr']       = $p['ship-to-addr'] ?? '';
-                $out['ai_process']         = strtoupper($p['ai-process'] ?? '');
-                return $out;
-            }
-        };
-        return $svc->parse($bodyText);
     }
 
     // ── Log viewers ───────────────────────────────────────────────────────
@@ -529,7 +349,6 @@ class EmailIntakeController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
-        $this->requireCsrf();
 
         $body   = $this->jsonBody();
         $qid    = (int)($body['id']     ?? 0);
@@ -549,722 +368,6 @@ class EmailIntakeController extends BaseController
             $this->success(['reviewed' => true, 'id' => $qid, 'action' => $action]);
         } catch (Throwable $e) {
             $this->error('quarantine_action_failed', 400, $e->getMessage());
-        }
-    }
-
-    // ── Catalog: Mailboxes ───────────────────────────────────────────────
-
-    public function mailboxList(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        try {
-            $items = $this->catalog()->listMailboxes();
-            $this->success(['mailboxes' => $items, 'total' => count($items)]);
-        } catch (Throwable $e) {
-            $this->error('mailbox_list_failed', 500, $e->getMessage());
-        }
-    }
-
-    public function mailboxCreate(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        try {
-            $row = $this->catalog()->createMailbox($this->jsonBody(), $this->actor($user));
-            $this->auditLog('admin_email_intake_mailbox_create', ['mailbox_id' => $row['id'] ?? null]);
-            $this->success(['mailbox' => $row, 'added' => true]);
-        } catch (Throwable $e) {
-            $this->error('mailbox_create_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function mailboxUpdate(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $row = $this->catalog()->updateMailbox($id, $body, $this->actor($user));
-            $this->auditLog('admin_email_intake_mailbox_update', ['mailbox_id' => $id]);
-            $this->success(['mailbox' => $row, 'updated' => true]);
-        } catch (Throwable $e) {
-            $this->error('mailbox_update_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function mailboxDelete(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $this->catalog()->deleteMailbox($id);
-            $this->auditLog('admin_email_intake_mailbox_delete', ['mailbox_id' => $id]);
-            $this->success(['deleted' => true, 'id' => $id]);
-        } catch (Throwable $e) {
-            $this->error('mailbox_delete_failed', 400, $e->getMessage());
-        }
-    }
-
-    /**
-     * POST admin_email_intake_mailbox_poll
-     *
-     * Trigger an IMAP poll for a single mailbox row. Useful for "test
-     * connection" + "fetch latest now" from the admin UI without waiting
-     * for the cron heartbeat.
-     */
-    public function mailboxPoll(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $row = $this->catalog()->getMailboxWithSecret($id);
-            $imap = new \MOM\Api\Services\EmailIntakeImapService(
-                $this->db(), $this->catalog(), $this->svc(),
-                $this->caseSvc(), $this->validation()
-            );
-            $result = $imap->pollMailbox($row, $this->actor($user));
-            $this->auditLog('admin_email_intake_mailbox_poll', [
-                'mailbox_id' => $id,
-                'status'     => $result['status'] ?? null,
-                'fetched'    => $result['fetched'] ?? 0,
-                'created'    => $result['created'] ?? 0,
-            ]);
-            $this->success(['result' => $result]);
-        } catch (Throwable $e) {
-            $this->error('mailbox_poll_failed', 400, $e->getMessage());
-        }
-    }
-
-    // ── Catalog: Header rules ────────────────────────────────────────────
-
-    public function headerRuleList(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        try {
-            $items = $this->catalog()->listHeaderRules();
-            $this->success(['header_rules' => $items, 'total' => count($items)]);
-        } catch (Throwable $e) {
-            $this->error('header_rule_list_failed', 500, $e->getMessage());
-        }
-    }
-
-    public function headerRuleCreate(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        try {
-            $row = $this->catalog()->createHeaderRule($this->jsonBody(), $this->actor($user));
-            $this->auditLog('admin_email_intake_header_rule_create', ['rule_id' => $row['id'] ?? null]);
-            $this->success(['header_rule' => $row, 'added' => true]);
-        } catch (Throwable $e) {
-            $this->error('header_rule_create_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function headerRuleUpdate(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $row = $this->catalog()->updateHeaderRule($id, $body, $this->actor($user));
-            $this->auditLog('admin_email_intake_header_rule_update', ['rule_id' => $id]);
-            $this->success(['header_rule' => $row, 'updated' => true]);
-        } catch (Throwable $e) {
-            $this->error('header_rule_update_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function headerRuleDelete(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $this->catalog()->deleteHeaderRule($id);
-            $this->auditLog('admin_email_intake_header_rule_delete', ['rule_id' => $id]);
-            $this->success(['deleted' => true, 'id' => $id]);
-        } catch (Throwable $e) {
-            $this->error('header_rule_delete_failed', 400, $e->getMessage());
-        }
-    }
-
-    // ── Catalog: Customer templates ──────────────────────────────────────
-
-    public function templateList(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        try {
-            $items = $this->catalog()->listCustomerTemplates();
-            $this->success(['templates' => $items, 'total' => count($items)]);
-        } catch (Throwable $e) {
-            $this->error('template_list_failed', 500, $e->getMessage());
-        }
-    }
-
-    public function templateCreate(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        try {
-            $row = $this->catalog()->createCustomerTemplate($this->jsonBody(), $this->actor($user));
-            $this->auditLog('admin_email_intake_template_create', ['template_id' => $row['id'] ?? null]);
-            $this->success(['template' => $row, 'added' => true]);
-        } catch (Throwable $e) {
-            $this->error('template_create_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function templateUpdate(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $row = $this->catalog()->updateCustomerTemplate($id, $body, $this->actor($user));
-            $this->auditLog('admin_email_intake_template_update', ['template_id' => $id]);
-            $this->success(['template' => $row, 'updated' => true]);
-        } catch (Throwable $e) {
-            $this->error('template_update_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function templateDelete(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $this->catalog()->deleteCustomerTemplate($id);
-            $this->auditLog('admin_email_intake_template_delete', ['template_id' => $id]);
-            $this->success(['deleted' => true, 'id' => $id]);
-        } catch (Throwable $e) {
-            $this->error('template_delete_failed', 400, $e->getMessage());
-        }
-    }
-
-    // ── Worker tokens (Admin) ────────────────────────────────────────────
-
-    public function workerTokenList(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        try {
-            $items = $this->workerAuth()->listTokens();
-            $this->success(['tokens' => $items, 'total' => count($items)]);
-        } catch (Throwable $e) {
-            $this->error('worker_token_list_failed', 500, $e->getMessage());
-        }
-    }
-
-    public function workerTokenCreate(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        try {
-            $result = $this->workerAuth()->createToken($this->jsonBody(), $this->actor($user));
-            $this->auditLog('admin_email_intake_worker_token_create', [
-                'worker_id' => $result['token']['worker_id'] ?? null,
-            ]);
-            // Raw secret is returned ONCE
-            $this->success([
-                'token'        => $result['token'],
-                'raw_secret'   => $result['secret'],
-                'secret_notice'=> 'This raw secret is shown ONCE. Save it now into the worker secret file; it will never be retrievable again.',
-            ]);
-        } catch (Throwable $e) {
-            $this->error('worker_token_create_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function workerTokenRotate(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $result = $this->workerAuth()->rotateToken($id, $this->actor($user));
-            $this->auditLog('admin_email_intake_worker_token_rotate', ['token_id' => $id]);
-            $this->success([
-                'token'      => $result['token'],
-                'raw_secret' => $result['secret'],
-                'secret_notice' => 'New secret is shown ONCE.',
-            ]);
-        } catch (Throwable $e) {
-            $this->error('worker_token_rotate_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function workerTokenDisable(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $row = $this->workerAuth()->disableToken($id, $this->actor($user));
-            $this->auditLog('admin_email_intake_worker_token_disable', ['token_id' => $id]);
-            $this->success(['token' => $row, 'disabled' => true]);
-        } catch (Throwable $e) {
-            $this->error('worker_token_disable_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function workerTokenEnable(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $row = $this->workerAuth()->enableToken($id, $this->actor($user));
-            $this->auditLog('admin_email_intake_worker_token_enable', ['token_id' => $id]);
-            $this->success(['token' => $row, 'enabled' => true]);
-        } catch (Throwable $e) {
-            $this->error('worker_token_enable_failed', 400, $e->getMessage());
-        }
-    }
-
-    // ── Intake cases (review queue) ──────────────────────────────────────
-
-    public function caseList(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAnyRole($user, [
-            'admin','it_admin','sales_manager','customer_service',
-            'planning_manager','production_planner','engineering_manager','quality_manager',
-        ]);
-        $limit  = max(1, min(200, (int)($this->query('limit') ?? 50)));
-        $offset = max(0, (int)($this->query('offset') ?? 0));
-        $filters = [];
-        foreach (['status','customer_id','customer_po_number','part_number',
-                  'revision_number','received_from','received_to','min_confidence'] as $k) {
-            $v = $this->query($k);
-            if ($v !== null && $v !== '') {
-                $filters[$k] = $v;
-            }
-        }
-        try {
-            $result = $this->caseSvc()->listCases($filters, $limit, $offset);
-            $this->success(['cases' => $result['items'], 'total' => $result['total'],
-                            'limit' => $result['limit'], 'offset' => $result['offset']]);
-        } catch (Throwable $e) {
-            $this->error('case_list_failed', 500, $e->getMessage());
-        }
-    }
-
-    public function caseDetail(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAnyRole($user, [
-            'admin','it_admin','sales_manager','customer_service',
-            'planning_manager','production_planner','engineering_manager','quality_manager',
-        ]);
-        $id = (int)($this->query('id') ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $this->success(['case' => $this->caseSvc()->getCase($id)]);
-        } catch (Throwable $e) {
-            $this->error('case_detail_failed', 404, $e->getMessage());
-        }
-    }
-
-    public function caseUpdate(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAnyRole($user, [
-            'admin','sales_manager','customer_service','engineering_manager','planning_manager',
-        ]);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $row = $this->caseSvc()->updateCase($id, $body, $this->actor($user));
-            $this->auditLog('admin_email_intake_case_update', ['case_id' => $id, 'fields' => array_keys($body)]);
-            $this->success(['case' => $row, 'updated' => true]);
-        } catch (Throwable $e) {
-            $this->error('case_update_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function caseValidate(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAnyRole($user, [
-            'admin','sales_manager','customer_service','engineering_manager','planning_manager','quality_manager',
-        ]);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $row = $this->validation()->validateCase($id, $this->actor($user));
-            $this->auditLog('admin_email_intake_case_validate', ['case_id' => $id, 'status' => $row['status'] ?? null]);
-            $this->success(['case' => $row, 'validated' => true]);
-        } catch (Throwable $e) {
-            $this->error('case_validate_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function caseApprove(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAnyRole($user, [
-            'admin','sales_manager','customer_service','engineering_manager','planning_manager','quality_manager',
-        ]);
-        $this->requireCsrf();
-        $body   = $this->jsonBody();
-        $id     = (int)($body['id'] ?? 0);
-        $reason = isset($body['reason']) ? (string)$body['reason'] : null;
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $row = $this->caseSvc()->setStatus($id, 'approved', $this->actor($user), $reason);
-            $this->auditLog('admin_email_intake_case_approve', ['case_id' => $id]);
-            $this->success(['case' => $row, 'approved' => true]);
-        } catch (Throwable $e) {
-            $this->error('case_approve_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function caseReject(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAnyRole($user, [
-            'admin','sales_manager','customer_service','engineering_manager','planning_manager','quality_manager',
-        ]);
-        $this->requireCsrf();
-        $body   = $this->jsonBody();
-        $id     = (int)($body['id'] ?? 0);
-        $reason = isset($body['reason']) ? (string)$body['reason'] : null;
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $row = $this->caseSvc()->setStatus($id, 'rejected', $this->actor($user), $reason);
-            $this->auditLog('admin_email_intake_case_reject', ['case_id' => $id, 'reason' => $reason]);
-            $this->success(['case' => $row, 'rejected' => true]);
-        } catch (Throwable $e) {
-            $this->error('case_reject_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function caseCommitCustomerPo(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAnyRole($user, ['admin','sales_manager','customer_service']);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $cpo = $this->commit()->commitCustomerPo($id, $this->actor($user));
-            $this->auditLog('admin_email_intake_commit_cpo', [
-                'case_id'         => $id,
-                'customer_po_id'  => $cpo['customer_po_id'] ?? null,
-            ]);
-            $this->success(['case_id' => $id, 'customer_po' => $cpo, 'committed' => true]);
-        } catch (Throwable $e) {
-            $this->error('case_commit_cpo_failed', 400, $e->getMessage());
-        }
-    }
-
-    public function caseCommitSalesOrder(): never
-    {
-        $user = $this->requireAuth();
-        $this->requireAnyRole($user, ['admin','sales_manager','customer_service']);
-        $this->requireCsrf();
-        $body = $this->jsonBody();
-        $id   = (int)($body['id'] ?? 0);
-        if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
-        try {
-            $so = $this->commit()->commitSalesOrder($id, $this->actor($user));
-            $this->auditLog('admin_email_intake_commit_so', [
-                'case_id'   => $id,
-                'so_number' => $so['so_number'] ?? null,
-            ]);
-            $this->success(['case_id' => $id, 'sales_order' => $so, 'committed' => true]);
-        } catch (Throwable $e) {
-            $this->error('case_commit_so_failed', 400, $e->getMessage());
-        }
-    }
-
-    // ── Worker HMAC endpoints ────────────────────────────────────────────
-
-    private function verifyWorker(string $rawBody): array
-    {
-        $method  = $this->method();
-        $path    = (string)($_SERVER['REQUEST_URI'] ?? '');
-        $remote  = $this->clientIp();
-        $headers = [];
-        foreach ($_SERVER as $k => $v) {
-            if (strncmp($k, 'HTTP_', 5) === 0) {
-                $name = strtolower(str_replace('_', '-', substr($k, 5)));
-                $headers[$name] = (string)$v;
-            }
-        }
-        try {
-            return $this->workerAuth()->verifyRequest($method, $path, $rawBody, $headers, $remote);
-        } catch (Throwable $e) {
-            $this->auditLog('aeoi_worker_auth_failed', ['code' => $e->getMessage(), 'remote' => $remote]);
-            $this->error($e->getMessage(), 401, 'Worker authentication failed.');
-        }
-    }
-
-    public function workerConfig(): never
-    {
-        $rawBody = file_get_contents('php://input') ?: '';
-        $worker  = $this->verifyWorker($rawBody);
-        try {
-            $cfg = $this->svc()->loadConfig();
-            $mboxes = $this->catalog()->listEnabledMailboxes();
-            $headers= $this->catalog()->listHeaderRules();
-            $templates = $this->catalog()->listCustomerTemplates();
-
-            $this->success([
-                'ok'                     => true,
-                'worker_id'              => $worker['worker_id'],
-                'enabled'                => (bool)($cfg['enabled'] ?? false),
-                'polling_interval_minutes' => (int)($cfg['poll_interval_minutes'] ?? 120),
-                'runtime_mode'           => 'outlook_local_push',
-                'mailboxes'              => array_map(static fn($m) => [
-                    'mailbox_id'           => (int)$m['id'],
-                    'mailbox_address'      => (string)$m['mailbox_address'],
-                    'provider'             => (string)$m['provider'],
-                    'folder_path'          => (string)$m['folder_path'],
-                    'read_body'            => (bool)$m['read_body'],
-                    'read_attachments'     => (bool)$m['read_attachments'],
-                    'move_after_processed' => (bool)$m['move_after_processed'],
-                ], $mboxes),
-                'header_rules'           => array_filter($headers, static fn($h) => !empty($h['enabled'])),
-                'templates'              => array_filter($templates, static fn($t) => !empty($t['enabled'])),
-                'limits' => [
-                    'max_email_age_days'        => 14,
-                    'max_attachment_mb'         => 25,
-                    'allowed_attachment_types'  => $cfg['allowed_attachment_types'] ?? ['pdf','xlsx','docx'],
-                ],
-            ]);
-        } catch (Throwable $e) {
-            $this->error('worker_config_failed', 500, $e->getMessage());
-        }
-    }
-
-    /**
-     * Worker submits an email envelope. The backend revalidates the
-     * scope (mailbox + folder + sender), persists the message + any
-     * attachments, and creates an intake case in status
-     * `extraction_pending`. The worker is expected to submit the AI
-     * extraction result via workerSubmitExtractionResult next.
-     */
-    public function workerSubmitEmailEnvelope(): never
-    {
-        $rawBody = file_get_contents('php://input') ?: '';
-        $worker  = $this->verifyWorker($rawBody);
-        $body    = json_decode($rawBody, true) ?: [];
-
-        $mailboxId   = (int)($body['mailbox_id'] ?? 0);
-        $providerMsg = trim((string)($body['provider_message_id'] ?? ''));
-        $internetMsg = trim((string)($body['internet_message_id'] ?? ''));
-        $fromEmail   = strtolower(trim((string)($body['from_email'] ?? '')));
-        $subject     = (string)($body['subject'] ?? '');
-        $receivedAt  = trim((string)($body['received_at'] ?? '')) ?: date('c');
-        $atts        = is_array($body['attachments'] ?? null) ? $body['attachments'] : [];
-
-        if ($mailboxId <= 0 || ($providerMsg === '' && $internetMsg === '')) {
-            $this->error('missing_fields', 400, 'mailbox_id and (provider_message_id or internet_message_id) are required.');
-        }
-
-        try {
-            // Verify mailbox row enabled
-            $mbx = $this->catalog()->getMailbox($mailboxId);
-            if (!$mbx['enabled']) {
-                $this->error('mailbox_disabled', 403, 'Mailbox row is disabled.');
-            }
-
-            // Verify sender allowlist
-            $allow = $this->svc()->isEmailAllowed($fromEmail);
-            if (!$allow['allowed']) {
-                $this->auditLog('aeoi_worker_sender_rejected', [
-                    'worker'  => $worker['worker_id'],
-                    'from'    => $fromEmail,
-                ]);
-                $this->success(['ok' => true, 'action' => 'ignored', 'reason' => 'sender_not_allowed']);
-            }
-
-            // Best-effort document_type / action_type heuristic from subject
-            $docType = '';
-            $action  = '';
-            if (preg_match('/\[(CUSTOMER_PO|PO_CHANGE|PO_CANCEL|EXPEDITE)\]/i', $subject, $m)) {
-                $docType = strtoupper($m[1]);
-            }
-            if (preg_match('/\[(NEW|CHANGE|CANCEL|EXPEDITE)\]/i', $subject, $m)) {
-                $action = strtoupper($m[1]);
-            }
-
-            // Create the intake case
-            $case = $this->caseSvc()->createCase([
-                'mailbox_id'          => $mailboxId,
-                'sender_allowlist_id' => $allow['entry_id'] ?? null,
-                'status'              => 'extraction_pending',
-                'document_type'       => $docType ?: null,
-                'action_type'         => $action  ?: null,
-            ], $worker['worker_id']);
-            $caseId = (int)$case['id'];
-
-            // Persist attachments
-            foreach ($atts as $att) {
-                $sha256 = trim((string)($att['sha256'] ?? ''));
-                if ($sha256 === '' || !preg_match('/^[a-f0-9]{64}$/i', $sha256)) {
-                    continue;
-                }
-                $this->caseSvc()->addAttachment($caseId, null, [
-                    'original_filename' => (string)($att['filename'] ?? 'unknown'),
-                    'safe_filename'     => (string)($att['safe_filename'] ?? $att['filename'] ?? 'unknown'),
-                    'mime_type'         => trim((string)($att['mime_type'] ?? '')) ?: null,
-                    'extension'         => strtolower(pathinfo((string)($att['filename'] ?? ''), PATHINFO_EXTENSION)),
-                    'file_size_bytes'   => (int)($att['size_bytes'] ?? 0),
-                    'sha256'            => strtolower($sha256),
-                    'storage_path'      => null,
-                    'extracted_text_path' => null,
-                    'ocr_status'        => 'not_required',
-                ]);
-            }
-
-            // Update mailbox last_scan
-            $this->catalog()->recordMailboxScan($mailboxId, 'completed', null);
-
-            $this->auditLog('aeoi_worker_envelope_accepted', [
-                'worker'    => $worker['worker_id'],
-                'case_id'   => $caseId,
-                'intake_no' => $case['intake_no'] ?? null,
-                'from'      => $fromEmail,
-                'subj_hash' => hash('sha256', $subject),
-                'att_count' => count($atts),
-            ]);
-
-            $this->success([
-                'ok'        => true,
-                'action'    => 'case_created',
-                'case_id'   => $caseId,
-                'intake_no' => $case['intake_no'] ?? null,
-                'status'    => 'extraction_pending',
-            ]);
-        } catch (Throwable $e) {
-            $this->error('worker_envelope_failed', 500, $e->getMessage());
-        }
-    }
-
-    /**
-     * Worker submits the Claude extraction result for a previously
-     * created intake case. We validate the schema_version then run
-     * EmailIntakeValidationService and update the case.
-     */
-    public function workerSubmitExtractionResult(): never
-    {
-        $rawBody = file_get_contents('php://input') ?: '';
-        $worker  = $this->verifyWorker($rawBody);
-        $body    = json_decode($rawBody, true) ?: [];
-
-        $caseId  = (int)($body['case_id'] ?? 0);
-        $version = (string)($body['schema_version'] ?? '');
-        $extract = is_array($body['extracted'] ?? null) ? $body['extracted'] : null;
-
-        if ($caseId <= 0 || $extract === null || $version === '') {
-            $this->error('missing_fields', 400, 'case_id, schema_version and extracted are required.');
-        }
-        if ($version !== 'he-sem-email-intake-extraction-v1') {
-            $this->error('unsupported_schema_version', 400, 'Unsupported schema_version: ' . $version);
-        }
-
-        try {
-            // Store the extraction into the case
-            $update = [
-                'id'                 => $caseId,
-                'document_type'      => $extract['document_type'] ?? null,
-                'action_type'        => $extract['action']        ?? null,
-                'customer_id'        => $extract['customer']['customer_id']   ?? null,
-                'customer_name'      => $extract['customer']['customer_name'] ?? null,
-                'customer_po_number' => $extract['purchase_order']['customer_po_number'] ?? null,
-                'po_date'            => $extract['purchase_order']['po_date']            ?? null,
-                'currency_code'      => $extract['purchase_order']['currency_code']      ?? null,
-                'incoterm_code'      => $extract['purchase_order']['incoterm_code']      ?? null,
-                'payment_term_code'  => $extract['purchase_order']['payment_term_code']  ?? null,
-                'overall_confidence' => $extract['overall_confidence']                   ?? null,
-                'field_confidence'   => $extract['field_confidence'] ?? [],
-                'extracted_json'     => $extract,
-            ];
-            $this->caseSvc()->updateCase($caseId, $update, $worker['worker_id']);
-
-            // Persist per-line rows (re-create from extraction)
-            foreach ((array)($extract['lines'] ?? []) as $line) {
-                if (empty($line['part_number']) || (float)($line['quantity'] ?? 0) <= 0) {
-                    continue;
-                }
-                $this->caseSvc()->addLine($caseId, [
-                    'line_no'              => $line['line_no'] ?? '',
-                    'customer_part_number' => $line['customer_part_number'] ?? '',
-                    'part_number'          => $line['part_number'],
-                    'part_description'     => $line['part_description'] ?? '',
-                    'revision_number'      => $line['revision_number'] ?? '',
-                    'customer_revision'    => $line['customer_revision'] ?? '',
-                    'drawing_revision'     => $line['drawing_revision'] ?? '',
-                    'quantity'             => (float)($line['quantity'] ?? 0),
-                    'uom'                  => $line['uom'] ?? 'EA',
-                    'requested_delivery_date' => $line['requested_delivery_date'] ?? '',
-                    'delivery_address'     => $line['delivery_address'] ?? '',
-                    'unit_price'           => $line['unit_price'] ?? null,
-                    'line_total'           => $line['line_total'] ?? null,
-                    'field_confidence'     => $line['field_confidence'] ?? [],
-                    'evidence'             => $line['evidence'] ?? [],
-                ]);
-            }
-
-            // Run validation pipeline
-            $row = $this->validation()->validateCase($caseId, $worker['worker_id']);
-
-            $this->auditLog('aeoi_worker_extraction_accepted', [
-                'worker'  => $worker['worker_id'],
-                'case_id' => $caseId,
-                'status'  => $row['status'] ?? null,
-            ]);
-            $this->success(['ok' => true, 'case' => $row]);
-        } catch (Throwable $e) {
-            $this->error('worker_extraction_failed', 500, $e->getMessage());
         }
     }
 }

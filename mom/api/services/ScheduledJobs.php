@@ -1056,132 +1056,45 @@ final class ScheduledJobs
      * are provisioned in sprint 2. This stub logs a skipped run with the
      * reason so the audit table populates correctly from day 1.
      */
-    public function runEmailInboxPoll(string $triggeredBy = 'cron', string $triggeredByActor = 'system.cron'): array
+    public function runEmailInboxPoll(): array
     {
-        return $this->executeJob('email_inbox_poll', function () use ($triggeredBy, $triggeredByActor): array {
+        return $this->executeJob('email_inbox_poll', function (): array {
             require_once __DIR__ . '/EmailIntakeConfigService.php';
-            require_once __DIR__ . '/EmailIntakeAdminCatalogService.php';
 
-            $configSvc = new \MOM\Api\Services\EmailIntakeConfigService($this->db);
-            $catalog   = new \MOM\Api\Services\EmailIntakeAdminCatalogService($this->db);
+            $svc = new \MOM\Api\Services\EmailIntakeConfigService($this->db);
 
-            $config = $configSvc->loadConfig();
+            // Check enabled flag before opening a run record
+            $config = $svc->loadConfig();
             if (!($config['enabled'] ?? false)) {
                 return [
-                    'status'         => 'skipped',
-                    'reason'         => 'Email Order Intake is disabled in admin config.',
-                    'run_id'         => null,
+                    'status'       => 'skipped',
+                    'reason'       => 'Email Order Intake is disabled in admin config.',
+                    'run_id'       => null,
                     'orders_created' => 0,
                 ];
             }
 
             $start = microtime(true);
-            $runId = $configSvc->openPollRun('cron', 'system.cron');
+            $runId = $svc->openPollRun('cron', 'system.cron');
 
-            // We support two operating modes:
-            //   • outlook_local_push  → the local Windows worker submits envelopes
-            //                            on its own schedule. The cron job here is
-            //                            a heartbeat only: it confirms config is
-            //                            healthy and updates last_scan timestamps
-            //                            for the configured mailbox rows. The
-            //                            actual emails are processed by the
-            //                            POST /aeoi_worker_email_envelope endpoint.
-            //   • microsoft_graph     → would poll the Graph API directly. NOT
-            //                            implemented yet; the run is marked
-            //                            skipped with a clear reason so admins
-            //                            can see in the poll log why nothing
-            //                            happened.
-            // The poll job now handles two provider families:
-            //   • outlook_local                          → heartbeat only;
-            //                                              real ingest comes
-            //                                              from the PowerShell
-            //                                              worker push.
-            //   • gmail_imap, generic_imap               → real IMAP poll
-            //                                              via EmailIntakeImapService.
-            // microsoft_graph remains reserved for a future commit.
-            $mailboxes      = $catalog->listEnabledMailboxes();
-            $heartbeatCount = 0;
-            $imapMailboxIds = [];
-            foreach ($mailboxes as $mbx) {
-                $prov = (string)($mbx['provider'] ?? '');
-                if ($prov === 'outlook_local') {
-                    $catalog->recordMailboxScan(
-                        (int)$mbx['id'],
-                        'heartbeat',
-                        'Local worker schedule active; envelopes arrive via push endpoint.'
-                    );
-                    $heartbeatCount++;
-                } elseif (in_array($prov, ['gmail_imap', 'generic_imap'], true)) {
-                    $imapMailboxIds[] = (int)$mbx['id'];
-                }
-            }
+            // M365MailboxService + OrderEmailParserService not yet provisioned (sprint 2).
+            // Close as skipped so the poll log stays clean.
+            $svc->closePollRun($runId, [
+                'found' => 0, 'processed' => 0, 'skipped' => 0,
+                'quarantined' => 0, 'created' => 0, 'review' => 0,
+                'errors' => 0,
+                'duration_ms' => (int)((microtime(true) - $start) * 1000),
+                'api_calls'   => 0,
+                'error_detail' => 'M365MailboxService not yet provisioned — pending sprint 2.',
+            ], 'skipped');
 
-            // IMAP polling — only attempt if php-imap is loaded.
-            $imapSummary = [
-                'mailboxes' => 0, 'fetched' => 0, 'created' => 0,
-                'skipped' => 0, 'errors' => 0,
-            ];
-            if (!empty($imapMailboxIds) && extension_loaded('imap')) {
-                require_once __DIR__ . '/EmailIntakeImapService.php';
-                require_once __DIR__ . '/EmailIntakeCaseService.php';
-                require_once __DIR__ . '/EmailIntakeValidationService.php';
-
-                $caseSvc = new \MOM\Api\Services\EmailIntakeCaseService($this->db);
-                $vSvc    = new \MOM\Api\Services\EmailIntakeValidationService(
-                    $this->db, $caseSvc, $configSvc
-                );
-                $imapSvc = new \MOM\Api\Services\EmailIntakeImapService(
-                    $this->db, $catalog, $configSvc, $caseSvc, $vSvc
-                );
-
-                foreach ($imapMailboxIds as $mid) {
-                    $imapSummary['mailboxes']++;
-                    try {
-                        $row = $catalog->getMailboxWithSecret($mid);
-                        $r   = $imapSvc->pollMailbox($row, 'system.cron.aeoi');
-                        $imapSummary['fetched'] += (int)($r['fetched'] ?? 0);
-                        $imapSummary['created'] += (int)($r['created'] ?? 0);
-                        $imapSummary['skipped'] += (int)($r['skipped'] ?? 0);
-                        if (($r['status'] ?? '') === 'failed') {
-                            $imapSummary['errors']++;
-                        }
-                    } catch (Throwable $e) {
-                        $imapSummary['errors']++;
-                        $catalog->recordMailboxScan($mid, 'poll_failed', $e->getMessage());
-                    }
-                }
-            }
-
-            $detail = "Heartbeat: $heartbeatCount local-Outlook; "
-                    . "IMAP: {$imapSummary['mailboxes']} mailboxes, "
-                    . "fetched {$imapSummary['fetched']}, created {$imapSummary['created']}, "
-                    . "skipped {$imapSummary['skipped']}, errors {$imapSummary['errors']}.";
-
-            $configSvc->closePollRun($runId, [
-                'found'        => $imapSummary['fetched'],
-                'processed'    => $imapSummary['created'] + $imapSummary['skipped'],
-                'skipped'      => $imapSummary['skipped'],
-                'quarantined'  => 0,
-                'created'      => $imapSummary['created'],
-                'review'       => $imapSummary['created'], // every new case starts as needs-review
-                'errors'       => $imapSummary['errors'],
-                'duration_ms'  => (int)((microtime(true) - $start) * 1000),
-                'api_calls'    => $imapSummary['mailboxes'],
-                'error_detail' => $detail,
-            ], $imapSummary['errors'] > 0 ? 'completed' : 'completed');
-            $configSvc->updateNextPollAt();
+            $svc->updateNextPollAt();
 
             return [
-                'status'              => 'completed',
-                'mode'                => 'mixed',
-                'run_id'              => $runId,
-                'mailboxes_heartbeat' => $heartbeatCount,
-                'mailboxes_imap'      => $imapSummary['mailboxes'],
-                'fetched'             => $imapSummary['fetched'],
-                'orders_created'      => $imapSummary['created'],
-                'skipped'             => $imapSummary['skipped'],
-                'errors'              => $imapSummary['errors'],
-                'note'                => $detail,
+                'status'         => 'skipped',
+                'run_id'         => $runId,
+                'orders_created' => 0,
+                'note'           => 'M365 connection service will be provisioned in sprint 2.',
             ];
         });
     }

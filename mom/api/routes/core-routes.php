@@ -161,40 +161,8 @@ return static function (Router $router, string $dataDir): void {
         'admin_email_intake_message_log'        => [EmailIntakeController::class, 'messageLog'],
         'admin_email_intake_quarantine_get'     => [EmailIntakeController::class, 'quarantineGet'],
         'admin_email_intake_quarantine_action'  => [EmailIntakeController::class, 'quarantineAction'],
-        // AEOI Phase 2 — catalog CRUD
-        'admin_email_intake_mailbox_list'        => [EmailIntakeController::class, 'mailboxList'],
-        'admin_email_intake_mailbox_create'      => [EmailIntakeController::class, 'mailboxCreate'],
-        'admin_email_intake_mailbox_update'      => [EmailIntakeController::class, 'mailboxUpdate'],
-        'admin_email_intake_mailbox_delete'      => [EmailIntakeController::class, 'mailboxDelete'],
-        'admin_email_intake_mailbox_poll'        => [EmailIntakeController::class, 'mailboxPoll'],
-        'admin_email_intake_header_rule_list'    => [EmailIntakeController::class, 'headerRuleList'],
-        'admin_email_intake_header_rule_create'  => [EmailIntakeController::class, 'headerRuleCreate'],
-        'admin_email_intake_header_rule_update'  => [EmailIntakeController::class, 'headerRuleUpdate'],
-        'admin_email_intake_header_rule_delete'  => [EmailIntakeController::class, 'headerRuleDelete'],
-        'admin_email_intake_template_list'       => [EmailIntakeController::class, 'templateList'],
-        'admin_email_intake_template_create'     => [EmailIntakeController::class, 'templateCreate'],
-        'admin_email_intake_template_update'     => [EmailIntakeController::class, 'templateUpdate'],
-        'admin_email_intake_template_delete'     => [EmailIntakeController::class, 'templateDelete'],
-        'admin_email_intake_worker_token_list'   => [EmailIntakeController::class, 'workerTokenList'],
-        'admin_email_intake_worker_token_create' => [EmailIntakeController::class, 'workerTokenCreate'],
-        'admin_email_intake_worker_token_rotate' => [EmailIntakeController::class, 'workerTokenRotate'],
-        'admin_email_intake_worker_token_disable'=> [EmailIntakeController::class, 'workerTokenDisable'],
-        'admin_email_intake_worker_token_enable' => [EmailIntakeController::class, 'workerTokenEnable'],
-        // AEOI Phase 2 — case lifecycle (Orders > AI Intake Queue tab uses these)
-        'ai_order_intake_case_list'              => [EmailIntakeController::class, 'caseList'],
-        'ai_order_intake_case_detail'            => [EmailIntakeController::class, 'caseDetail'],
-        'ai_order_intake_case_update'            => [EmailIntakeController::class, 'caseUpdate'],
-        'ai_order_intake_case_validate'          => [EmailIntakeController::class, 'caseValidate'],
-        'ai_order_intake_case_approve'           => [EmailIntakeController::class, 'caseApprove'],
-        'ai_order_intake_case_reject'            => [EmailIntakeController::class, 'caseReject'],
-        'ai_order_intake_commit_cpo'             => [EmailIntakeController::class, 'caseCommitCustomerPo'],
-        'ai_order_intake_commit_so'              => [EmailIntakeController::class, 'caseCommitSalesOrder'],
-        // AEOI Phase 2 — worker HMAC endpoints (no session auth, no CSRF)
-        'aeoi_worker_config'                     => [EmailIntakeController::class, 'workerConfig'],
-        'aeoi_worker_email_envelope'             => [EmailIntakeController::class, 'workerSubmitEmailEnvelope'],
-        'aeoi_worker_extraction_result'          => [EmailIntakeController::class, 'workerSubmitExtractionResult'],
     ]);
-
+    
     // Dictionary
     $router->actions([
         'dict_list'   => [DictController::class, 'list'],

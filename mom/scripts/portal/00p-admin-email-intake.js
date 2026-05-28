@@ -19,20 +19,7 @@
   'use strict';
 
   /* ── Helpers ──────────────────────────────────────────────────────────── */
-  /* Wrap window.apiCall (async, returns Promise) into callback-style.
-   * Detects GET vs POST: actions ending in _get / _list / _log / _queue / _check use GET. */
-  function apiCall(action, data, cb){
-    if(typeof window.apiCall !== 'function'){ return cb({ok:false, error:'apiCall not available'}); }
-    var isGet = /(_get|_list|_log|_queue|_check)$/.test(action);
-    var method = isGet ? 'GET' : 'POST';
-    var payload = isGet ? null : (data || {});
-    var p;
-    try { p = window.apiCall(action, payload, method); }
-    catch(e){ return cb({ok:false, error:String(e && e.message || e)}); }
-    if(!p || typeof p.then !== 'function'){ return cb({ok:false, error:'apiCall did not return a Promise'}); }
-    p.then(function(res){ cb(res || {ok:false, error:'empty_response'}); })
-     .catch(function(err){ cb({ok:false, error:String(err && err.message || err)}); });
-  }
+  var apiCall = window.apiCall || function(action, data, cb){ cb({ok:false, error:'apiCall not available'}); };
   var escHtml = window.escapeHtml || function(s){ return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);}); };
   var fmtDt   = function(s){ if(!s) return '—'; try{ return new Date(s).toLocaleString('vi-VN',{timeZone:'Asia/Ho_Chi_Minh',hour12:false}); } catch(e){ return s; } };
   var fmtDate = function(s){ if(!s) return '—'; try{ return new Date(s).toLocaleDateString('vi-VN'); } catch(e){ return s; } };
@@ -51,15 +38,10 @@
   /* ── Section tab labels ──────────────────────────────────────────────── */
   var SECTIONS = [
     { id:'connection',   label:'Kết nối M365',       icon:'🔗' },
-    { id:'mailboxes',    label:'Mailbox & Folder',    icon:'📬' },
     { id:'allowlist',    label:'Email cho phép',      icon:'✅' },
-    { id:'header_rules', label:'Header Rules',         icon:'📑' },
-    { id:'templates',    label:'Template KH',          icon:'🎯' },
-    { id:'workers',      label:'Worker Tokens',        icon:'🔑' },
     { id:'logic',        label:'Cơ chế vận hành',     icon:'⚙️' },
     { id:'security',     label:'Bảo mật',             icon:'🔒' },
     { id:'notify',       label:'Thông báo',           icon:'🔔' },
-    { id:'cases',        label:'Intake Cases',         icon:'📦' },
     { id:'poll_log',     label:'Nhật ký poll',        icon:'📋' },
     { id:'msg_log',      label:'Nhật ký email',       icon:'📨' },
     { id:'quarantine',   label:'Kiểm duyệt',          icon:'🚨' },
@@ -136,19 +118,14 @@
 
   function _renderSection(id){
     switch(id){
-      case 'connection':   return _sectionConnection();
-      case 'mailboxes':    return _sectionMailboxes();
-      case 'allowlist':    return _sectionAllowlist();
-      case 'header_rules': return _sectionHeaderRules();
-      case 'templates':    return _sectionTemplates();
-      case 'workers':      return _sectionWorkers();
-      case 'logic':        return _sectionLogic();
-      case 'security':     return _sectionSecurity();
-      case 'notify':       return _sectionNotify();
-      case 'cases':        return _sectionCases();
-      case 'poll_log':     return _sectionPollLog();
-      case 'msg_log':      return _sectionMsgLog();
-      case 'quarantine':   return _sectionQuarantine();
+      case 'connection': return _sectionConnection();
+      case 'allowlist':  return _sectionAllowlist();
+      case 'logic':      return _sectionLogic();
+      case 'security':   return _sectionSecurity();
+      case 'notify':     return _sectionNotify();
+      case 'poll_log':   return _sectionPollLog();
+      case 'msg_log':    return _sectionMsgLog();
+      case 'quarantine': return _sectionQuarantine();
       default: return '';
     }
   }
@@ -267,74 +244,6 @@
     return html;
   }
 
-  /* ── 2.5. LLM Model routing ──────────────────────────────────────────── */
-  function _sectionLlmModel(){
-    if(!STATE.llm){ aeoi.loadLlmConfig(); return '<div class="hm-empty">Đang tải cấu hình LLM...</div>'; }
-    var rules     = STATE.llm.rules || [];
-    var providers = STATE.llm.providers || [];
-    var health    = STATE.llm.health || {};
-
-    // Provider health summary cards
-    var healthHtml = '';
-    providers.forEach(function(p){
-      var h = health[p.provider_key] || {};
-      var ok = !!h.ok;
-      var dot = ok ? '🟢' : (h.message ? '🔴' : '⚪');
-      healthHtml += '<div style="background:var(--surface-2,#f3f4f6);border-radius:8px;padding:10px;font-size:11px">'
-        + '<div style="font-weight:600">' + dot + ' ' + escHtml(p.display_name) + '</div>'
-        + '<div style="color:var(--text-3,#6b7280);margin-top:2px">' + escHtml(p.provider_kind) + ' • ' + (p.models ? p.models.length : 0) + ' model(s)</div>'
-        + '<div style="color:' + (ok?'#10b981':'#dc2626') + ';margin-top:4px;font-size:10px">' + escHtml((h.message||'no health probe').substring(0,120)) + '</div>'
-        + '</div>';
-    });
-
-    var rulesHtml = '<table class="aeoi-tbl" style="width:100%;border-collapse:collapse;font-size:12px;margin-top:10px">'
-      + '<thead><tr style="background:var(--surface-2,#f3f4f6)">'
-      + '<th style="padding:6px;text-align:left;font-weight:600">Scope</th>'
-      + '<th style="padding:6px;text-align:left;font-weight:600">Primary Provider</th>'
-      + '<th style="padding:6px;text-align:left;font-weight:600">Primary Model</th>'
-      + '<th style="padding:6px;text-align:left;font-weight:600">Fallback chain</th>'
-      + '<th style="padding:6px;text-align:left;font-weight:600">Priority</th>'
-      + '<th style="padding:6px;text-align:left;font-weight:600">Status</th>'
-      + '<th style="padding:6px;text-align:left;font-weight:600">Hành động</th>'
-      + '</tr></thead><tbody>';
-
-    rules.forEach(function(r){
-      var chain = (r.fallback_chain || []).map(function(s){ return s.provider + (s.model ? ':' + s.model : ''); }).join(' → ');
-      rulesHtml += '<tr style="border-bottom:1px solid var(--border-1,#e5e7eb)">'
-        + '<td style="padding:6px"><span style="font-family:monospace;background:var(--surface-2,#f3f4f6);padding:2px 6px;border-radius:4px">' + escHtml(r.scope_type) + '</span><br><span style="font-size:11px">' + escHtml(r.scope_value) + '</span></td>'
-        + '<td style="padding:6px;font-family:monospace">' + escHtml(r.primary_provider) + '</td>'
-        + '<td style="padding:6px;font-family:monospace">' + escHtml(r.primary_model || '—') + '</td>'
-        + '<td style="padding:6px;font-size:11px;color:var(--text-3,#6b7280)">' + escHtml(chain || '—') + '</td>'
-        + '<td style="padding:6px">' + r.priority + '</td>'
-        + '<td style="padding:6px">' + (r.is_enabled ? '<span style="color:#10b981">● Bật</span>' : '<span style="color:#9ca3af">○ Tắt</span>') + '</td>'
-        + '<td style="padding:6px">'
-        +   '<button onclick="aeoi.editLlmRule(' + r.routing_id + ')" class="hm-btn hm-btn-sm" title="Sửa">✏️</button> '
-        +   '<button onclick="aeoi.deleteLlmRule(' + r.routing_id + ', \'' + escHtml(r.scope_type) + ':' + escHtml(r.scope_value) + '\')" class="hm-btn hm-btn-sm" style="color:#dc2626" title="Xóa">🗑️</button>'
-        + '</td></tr>';
-    });
-    rulesHtml += '</tbody></table>';
-    if(rules.length === 0){
-      rulesHtml = '<div style="padding:20px;text-align:center;color:var(--text-3,#6b7280);font-size:12px;background:var(--surface-2,#f3f4f6);border-radius:8px;margin-top:10px">Chưa có rule nào. Hệ thống sẽ fall back về Anthropic API nếu được cấu hình.</div>';
-    }
-
-    return '<div class="aeoi-card">'
-      + _cardHead('🤖 LLM Model Routing', 'Định tuyến extraction qua nhiều LLM. Resolution order: doc_code > doc_pattern > tier > global_default. Mỗi rule có chain fallback nếu primary fail.')
-      + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:14px">' + healthHtml + '</div>'
-      + '<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">'
-      +   '<button onclick="aeoi.openLlmRuleForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Thêm Rule</button>'
-      +   '<button onclick="aeoi.loadLlmConfig(true)" class="hm-btn hm-btn-sm">🔄 Tải lại + Health probe</button>'
-      +   '<span style="font-size:11px;color:var(--text-3,#6b7280)">' + rules.length + ' rule(s)</span>'
-      + '</div>'
-      + rulesHtml
-      + '<div style="margin-top:14px;padding:10px;background:#dbeafe;border-left:3px solid #2563eb;border-radius:4px;font-size:11px;color:#1e3a8a">'
-      +   'ℹ <strong>Tier scopes:</strong>'
-      +   '<br>• <code>extraction_default</code> — email body when deterministic header parser empty'
-      +   '<br>• <code>extraction_pdf</code> — email có PDF attachment cần pdftotext + LLM extract'
-      +   '<br>• <code>extraction_complex</code> — multi-page PO, change orders, expedites'
-      + '</div>'
-      + '</div>';
-  }
-
   /* ── 3. Cơ chế vận hành ──────────────────────────────────────────────── */
   function _sectionLogic(){
     var cfg = STATE.config || {};
@@ -348,8 +257,8 @@
            ['review_queue','Review queue — không tạo, chờ admin duyệt']],
           cfg.auto_create_mode||'draft')
 
-      + _fieldNum('Ngưỡng tin cậy AI (0.00–1.00)', 'aeoi-confidence', cfg.confidence_threshold||0.95,
-          'Độ tin cậy tối thiểu để tạo draft order. Dưới ngưỡng → review_queue.', 0, 1, 0.05)
+      + _fieldNum('Ngưỡng tin cậy AI (0.00–1.00)', 'aeoi-confidence', cfg.confidence_threshold||0.75,
+          'Độ tin cậy tối thiểu để tự động tạo SO. Dưới ngưỡng → review_queue.', 0, 1, 0.05)
 
       + _fieldSelect('Khớp part number', 'aeoi-part-match',
           [['exact','Exact — phải khớp chính xác với items table'],
@@ -370,10 +279,8 @@
           'Giới hạn số file AI xử lý mỗi email. File thứ N+1 trở đi bỏ qua.', 1, 10)
 
       + '</div>'
-      + '<div style="margin-top:10px;padding:8px 12px;border-left:3px solid var(--warning-1,#f59e0b);background:var(--warning-bg,#fef3c7);font-size:11px;color:var(--text-2,#374151)">'
-      + '⚠ <strong>Quan trọng:</strong> AI chỉ tạo Customer PO / draft Sales Order. JO/WO phải được tạo qua workflow gốc khi SO đạt trạng thái <code>engineering_ready</code> / <code>in_production</code> và part/revision đã release. Không có chế độ auto-cascade JO từ email.'
-      + '</div>'
       + '<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+      + _checkbox('aeoi-cascade-jo', 'Tự động tạo JO từ SO vừa tạo', !!cfg.auto_cascade_jo)
       + _checkbox('aeoi-biz-hours', 'Chỉ xử lý trong giờ làm việc', !!cfg.business_hours_only)
       + '</div>'
       + '<div id="aeoi-biz-hours-detail" style="margin-top:10px;' + (!cfg.business_hours_only ? 'display:none' : '') + ';display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">'
@@ -393,8 +300,9 @@
       + '<div class="aeoi-grid2">'
 
       + _fieldSelect('Chế độ kiểm tra allowlist', 'aeoi-allowlist-enforcement',
-          [['strict','Strict — chỉ email/domain trong danh sách mới được xử lý (KHUYẾN NGHỊ)'],
-           ['domain_only','Domain only — chỉ cần @domain khớp là đủ']],
+          [['strict','Strict — chỉ email/domain trong danh sách mới được xử lý'],
+           ['domain_only','Domain only — chỉ cần @domain khớp là đủ'],
+           ['off','Tắt — tất cả người gửi được chấp nhận (KHÔNG khuyến nghị)']],
           cfg.allowlist_enforcement||'strict')
 
       + _fieldNum('Giới hạn đơn hàng/chu kỳ', 'aeoi-max-orders', cfg.max_orders_per_poll||50,
@@ -574,101 +482,6 @@
     return html;
   }
 
-  /* ── Worker create modal ──────────────────────────────────────────────── */
-  function _workerCreateModal(){
-    return '<div id="aeoi-worker-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center" data-modal-display="flex">'
-      + '<div style="background:var(--surface-0,#fff);border-radius:12px;padding:24px;width:480px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.2)">'
-      + '<div style="font-size:14px;font-weight:700;margin-bottom:12px">🔑 Tạo Worker Token</div>'
-      + '<div style="display:grid;gap:10px">'
-      + '<div><label style="font-size:11px;font-weight:600;color:var(--text-2,#374151);display:block;margin-bottom:3px">Worker ID <span style="color:#dc2626">*</span></label>'
-      + '<input id="aeoi-worker-id" placeholder="vd: AIW-LOCAL-001" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px;box-sizing:border-box;font-family:monospace">'
-      + '<div style="font-size:10px;color:var(--text-3,#6b7280);margin-top:2px">3-80 ký tự alphanumeric / underscore / dash. Duy nhất toàn hệ thống.</div></div>'
-      + '<div><label style="font-size:11px;font-weight:600;color:var(--text-2,#374151);display:block;margin-bottom:3px">Worker name (mô tả)</label>'
-      + '<input id="aeoi-worker-name" placeholder="vd: Outlook desktop laptop của Bích" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px;box-sizing:border-box"></div>'
-      + '</div>'
-      + '<div id="aeoi-worker-err" style="display:none;color:#dc2626;font-size:12px;margin-top:8px"></div>'
-      + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">'
-      + '<button onclick="aeoi.closeWorkerForm()" class="hm-btn hm-btn-sm">Hủy</button>'
-      + '<button onclick="aeoi.submitWorkerForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">Tạo</button>'
-      + '</div></div></div>';
-  }
-
-  /* ── Worker secret display modal (shows raw secret ONCE after create/rotate) */
-  function _workerSecretModal(){
-    return '<div id="aeoi-worker-secret-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center" data-modal-display="flex">'
-      + '<div style="background:var(--surface-0,#fff);border-radius:12px;padding:24px;width:540px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.25)">'
-      + '<div style="font-size:14px;font-weight:700;margin-bottom:8px;color:#92400e">⚠ Raw secret — HIỂN THỊ MỘT LẦN DUY NHẤT</div>'
-      + '<div style="font-size:12px;color:var(--text-2,#374151);margin-bottom:10px">Lưu ngay vào secret file của worker. Sau khi đóng modal sẽ KHÔNG xem lại được. '
-      + 'Nếu mất, phải rotate qua nút 🔄 trong bảng worker tokens.</div>'
-      + '<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;padding:10px;margin-bottom:8px">'
-      + '<div style="font-size:11px;font-weight:600;color:#78350f;margin-bottom:4px">Worker ID</div>'
-      + '<div id="aeoi-worker-secret-id" style="font-family:monospace;font-size:13px;color:#78350f"></div></div>'
-      + '<div style="background:#fee2e2;border:1px solid #dc2626;border-radius:6px;padding:10px">'
-      + '<div style="font-size:11px;font-weight:600;color:#7f1d1d;margin-bottom:4px">Raw secret</div>'
-      + '<div style="display:flex;gap:8px;align-items:center">'
-      + '<code id="aeoi-worker-secret-val" style="flex:1;font-family:monospace;font-size:13px;color:#7f1d1d;background:#fff;padding:6px 8px;border-radius:4px;word-break:break-all"></code>'
-      + '<button onclick="aeoi.copyWorkerSecret()" class="hm-btn hm-btn-sm" style="background:#dc2626;color:#fff;border:none;white-space:nowrap">📋 Copy</button>'
-      + '</div></div>'
-      + '<div id="aeoi-worker-secret-msg" style="font-size:11px;color:#10b981;margin-top:6px;height:14px"></div>'
-      + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">'
-      + '<button onclick="aeoi.closeWorkerSecret()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">Đã lưu, đóng</button>'
-      + '</div></div></div>';
-  }
-
-  /* ── LLM rule create/edit modal ───────────────────────────────────────── */
-  function _llmRuleModal(){
-    return '<div id="aeoi-llm-rule-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center" data-modal-display="flex">'
-      + '<div style="background:var(--surface-0,#fff);border-radius:12px;padding:24px;width:640px;max-width:95vw;max-height:90vh;overflow:auto;box-shadow:0 8px 32px rgba(0,0,0,.2)">'
-      + '<div style="font-size:14px;font-weight:700;margin-bottom:12px" id="aeoi-llm-rule-title">🤖 Thêm LLM Routing Rule</div>'
-      + '<div style="display:grid;gap:10px">'
-
-      + '<div style="display:grid;grid-template-columns:1fr 2fr;gap:10px">'
-      +   '<div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Scope type</label>'
-      +   '<select id="aeoi-llm-scope-type" onchange="aeoi._llmOnScopeTypeChange()" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px">'
-      +     '<option value="global_default">global_default</option>'
-      +     '<option value="tier">tier</option>'
-      +     '<option value="doc_pattern">doc_pattern</option>'
-      +     '<option value="doc_code">doc_code</option>'
-      +   '</select></div>'
-      +   '<div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Scope value</label>'
-      +   '<input id="aeoi-llm-scope-value" placeholder="*" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px;font-family:monospace">'
-      +   '<div id="aeoi-llm-scope-hint" style="font-size:10px;color:var(--text-3,#6b7280);margin-top:2px">global_default: "*". tier: extraction_default | extraction_pdf | extraction_complex.</div></div>'
-      + '</div>'
-
-      + '<div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Primary provider <span style="color:#dc2626">*</span></label>'
-      +   '<select id="aeoi-llm-primary-provider" onchange="aeoi._llmOnProviderChange(\'primary\')" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px"></select></div>'
-
-      + '<div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Primary model</label>'
-      +   '<select id="aeoi-llm-primary-model" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px"></select></div>'
-
-      + '<div>'
-      +   '<div style="display:flex;justify-content:space-between;align-items:center">'
-      +     '<label style="font-size:11px;font-weight:600">Fallback chain (thử theo thứ tự nếu primary fail)</label>'
-      +     '<button onclick="aeoi._llmAddFallback()" class="hm-btn hm-btn-sm">+ Thêm fallback</button>'
-      +   '</div>'
-      +   '<div id="aeoi-llm-fallback-rows" style="margin-top:6px"></div>'
-      + '</div>'
-
-      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
-      +   '<div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Priority</label>'
-      +     '<input id="aeoi-llm-priority" type="number" value="100" min="0" max="9999" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px"></div>'
-      +   '<div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Trạng thái</label>'
-      +     '<label style="display:flex;align-items:center;gap:6px;padding:6px 0;font-size:12px"><input type="checkbox" id="aeoi-llm-enabled" checked> Enabled</label></div>'
-      + '</div>'
-
-      + '<div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Mô tả</label>'
-      +   '<textarea id="aeoi-llm-description" rows="2" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px;resize:vertical" placeholder="Vì sao chọn provider+model này..."></textarea></div>'
-
-      + '<input type="hidden" id="aeoi-llm-routing-id" value="">'
-      + '</div>'
-
-      + '<div id="aeoi-llm-rule-err" style="display:none;color:#dc2626;font-size:12px;margin-top:8px"></div>'
-      + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">'
-      +   '<button onclick="aeoi.closeLlmRuleForm()" class="hm-btn hm-btn-sm">Hủy</button>'
-      +   '<button onclick="aeoi.submitLlmRuleForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">Lưu</button>'
-      + '</div></div></div>';
-  }
-
   /* ── Test parse modal ─────────────────────────────────────────────────── */
   function _testParseModal(){
     return '<div id="aeoi-test-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center" data-modal-display="flex">'
@@ -777,187 +590,6 @@
       + '</div>';
   }
 
-  /* ── Sprint A-D new sections ──────────────────────────────────────────── */
-
-  function _sectionMailboxes(){
-    var rows = STATE.mailboxes || [];
-    var html = '<div class="aeoi-card">'
-      + _cardHead('📬 Mailbox & Folder', 'Danh sách mailbox/folder AI worker được phép đọc. Worker chỉ scan các row enabled bên dưới.')
-      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
-      + '<button onclick="aeoi.openMailboxForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Thêm Mailbox</button>'
-      + '<button onclick="aeoi.loadMailboxes()" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
-      + '</div>';
-    if(rows.length===0){
-      html += '<div class="hm-empty">Chưa có mailbox nào. Bấm "Thêm Mailbox" để cấu hình.</div>';
-    } else {
-      html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
-        + '<th>#</th><th>Mailbox</th><th>Provider</th><th>Folder</th><th>Đọc body</th><th>Đính kèm</th><th>Trạng thái</th><th>Scan gần nhất</th><th>Hành động</th>'
-        + '</tr></thead><tbody>';
-      rows.forEach(function(m,i){
-        var active = m.enabled
-          ? '<span style="color:var(--green-1,#065f46);font-size:11px">● Bật</span>'
-          : '<span style="color:var(--text-3,#6b7280);font-size:11px">○ Tắt</span>';
-        html += '<tr style="' + (!m.enabled ? 'opacity:0.5' : '') + '">'
-          + '<td>'+(i+1)+'</td>'
-          + '<td style="font-family:monospace;font-weight:600">' + escHtml(m.mailbox_address) + '</td>'
-          + '<td><span style="font-size:10px;padding:1px 6px;background:var(--surface-2,#f3f4f6);border-radius:4px">' + escHtml(m.provider) + '</span></td>'
-          + '<td style="font-family:monospace;font-size:11px">' + escHtml(m.folder_path) + '</td>'
-          + '<td>' + (m.read_body ? '✓' : '—') + '</td>'
-          + '<td>' + (m.read_attachments ? '✓' : '—') + '</td>'
-          + '<td>' + active + '</td>'
-          + '<td style="font-size:11px;color:var(--text-3,#6b7280)">' + fmtDt(m.last_scan_at) + (m.last_status ? '<br>'+escHtml(m.last_status) : '') + '</td>'
-          + '<td style="white-space:nowrap">'
-          + ((m.provider==='gmail_imap' || m.provider==='generic_imap')
-              ? '<button onclick="aeoi.pollMailbox('+m.id+')" class="hm-btn hm-btn-xs" title="Quét IMAP ngay" style="background:var(--brand-primary,#2563eb);color:#fff">▶ Poll</button> '
-              : '')
-          + '<button onclick="aeoi.openMailboxForm('+m.id+')" class="hm-btn hm-btn-xs" title="Sửa">✏</button> '
-          + '<button onclick="aeoi.toggleMailbox('+m.id+','+(m.enabled?'false':'true')+')" class="hm-btn hm-btn-xs" title="' + (m.enabled?'Tắt':'Bật') + '">' + (m.enabled?'⏸':'▶') + '</button> '
-          + '<button onclick="aeoi.deleteMailbox('+m.id+')" class="hm-btn hm-btn-xs" style="color:var(--danger-1,#ef4444)" title="Xóa">🗑</button>'
-          + '</td></tr>';
-      });
-      html += '</tbody></table></div>';
-    }
-    html += '</div>';
-    return html;
-  }
-
-  function _sectionHeaderRules(){
-    var rows = STATE.headerRules || [];
-    var html = '<div class="aeoi-card">'
-      + _cardHead('📑 Header Rules', 'Quy tắc nhận diện email đầu vào. Worker prefilter theo subject_prefix; backend revalidate body markers + required fields.')
-      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
-      + '<button onclick="aeoi.openHeaderRuleForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Thêm Rule</button>'
-      + '<button onclick="aeoi.loadHeaderRules()" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
-      + '</div>';
-    if(rows.length===0){
-      html += '<div class="hm-empty">Chưa có header rule.</div>';
-    } else {
-      html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
-        + '<th>#</th><th>Tên rule</th><th>Subject prefix</th><th>Markers</th><th>Doc types</th><th>Actions</th><th>Trạng thái</th><th>Thiếu header → </th><th>Hành động</th>'
-        + '</tr></thead><tbody>';
-      rows.forEach(function(r,i){
-        html += '<tr style="'+(!r.enabled?'opacity:0.5':'')+'">'
-          + '<td>'+(i+1)+'</td>'
-          + '<td style="font-weight:600">' + escHtml(r.rule_name) + '</td>'
-          + '<td style="font-family:monospace;font-size:11px">' + escHtml(r.subject_prefix||'—') + '</td>'
-          + '<td style="font-family:monospace;font-size:10px">' + escHtml(r.body_start_marker) + '<br>' + escHtml(r.body_end_marker) + '</td>'
-          + '<td style="font-size:10px">' + (r.allowed_doc_types||[]).map(escHtml).join(', ') + '</td>'
-          + '<td style="font-size:10px">' + (r.allowed_actions||[]).map(escHtml).join(', ') + '</td>'
-          + '<td>' + (r.enabled?'● Bật':'○ Tắt') + '</td>'
-          + '<td style="font-size:10px">' + escHtml(r.missing_header_action) + '</td>'
-          + '<td style="white-space:nowrap">'
-          + '<button onclick="aeoi.openHeaderRuleForm('+r.id+')" class="hm-btn hm-btn-xs">✏</button> '
-          + '<button onclick="aeoi.deleteHeaderRule('+r.id+')" class="hm-btn hm-btn-xs" style="color:var(--danger-1,#ef4444)">🗑</button>'
-          + '</td></tr>';
-      });
-      html += '</tbody></table></div>';
-    }
-    html += '</div>';
-    return html;
-  }
-
-  function _sectionTemplates(){
-    var rows = STATE.templates || [];
-    var html = '<div class="aeoi-card">'
-      + _cardHead('🎯 Template Khách hàng', 'Field hints AI dùng để định vị PO number, part number, revision, qty, ngày giao... theo từng khách + định dạng file.')
-      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
-      + '<button onclick="aeoi.openTemplateForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Thêm Template</button>'
-      + '<button onclick="aeoi.loadTemplates()" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
-      + '</div>';
-    if(rows.length===0){
-      html += '<div class="hm-empty">Chưa có template.</div>';
-    } else {
-      html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
-        + '<th>#</th><th>Khách</th><th>Tên template</th><th>Doc type</th><th>File</th><th>Min confidence</th><th>Trạng thái</th><th>Hành động</th>'
-        + '</tr></thead><tbody>';
-      rows.forEach(function(t,i){
-        html += '<tr style="'+(!t.enabled?'opacity:0.5':'')+'">'
-          + '<td>'+(i+1)+'</td>'
-          + '<td style="font-weight:600">' + escHtml(t.customer_id) + '</td>'
-          + '<td>' + escHtml(t.template_name) + '</td>'
-          + '<td><span style="font-size:10px;padding:1px 6px;background:var(--surface-2,#f3f4f6);border-radius:4px">' + escHtml(t.document_type) + '</span></td>'
-          + '<td>' + escHtml(t.file_type) + '</td>'
-          + '<td style="font-size:11px">overall ≥ ' + t.min_confidence_overall + '<br>field ≥ ' + t.min_confidence_required_field + '</td>'
-          + '<td>' + (t.enabled?'● Bật':'○ Tắt') + '</td>'
-          + '<td style="white-space:nowrap">'
-          + '<button onclick="aeoi.openTemplateForm('+t.id+')" class="hm-btn hm-btn-xs">✏</button> '
-          + '<button onclick="aeoi.deleteTemplate('+t.id+')" class="hm-btn hm-btn-xs" style="color:var(--danger-1,#ef4444)">🗑</button>'
-          + '</td></tr>';
-      });
-      html += '</tbody></table></div>';
-    }
-    html += '</div>';
-    return html;
-  }
-
-  function _sectionWorkers(){
-    var rows = STATE.workerTokens || [];
-    var html = '<div class="aeoi-card">'
-      + _cardHead('🔑 Worker Tokens (HMAC)', 'Credentials cho local Outlook worker. Secret hiển thị 1 LẦN duy nhất khi tạo hoặc rotate — lưu ngay vào file C:\\HESEM\\secrets\\.')
-      + '<div style="padding:8px 12px;border-left:3px solid var(--warning-1,#f59e0b);background:var(--warning-bg,#fef3c7);margin-bottom:10px;font-size:11px">'
-      + '⚠ Tải PowerShell worker từ <code>tools/ai-order-intake/outlook-order-intake-worker.ps1</code> và làm theo <code>windows-task-scheduler-setup.md</code>.'
-      + '</div>'
-      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
-      + '<button onclick="aeoi.openWorkerForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Tạo Worker Token</button>'
-      + '<button onclick="aeoi.loadWorkers()" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
-      + '</div>';
-    if(rows.length===0){
-      html += '<div class="hm-empty">Chưa có worker token.</div>';
-    } else {
-      html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
-        + '<th>#</th><th>Worker ID</th><th>Tên</th><th>Trạng thái</th><th>IP allowlist</th><th>Lần dùng cuối</th><th>Hành động</th>'
-        + '</tr></thead><tbody>';
-      rows.forEach(function(w,i){
-        html += '<tr style="'+(!w.enabled?'opacity:0.5':'')+'">'
-          + '<td>'+(i+1)+'</td>'
-          + '<td style="font-family:monospace;font-weight:600">' + escHtml(w.worker_id) + '</td>'
-          + '<td>' + escHtml(w.worker_name||'—') + '</td>'
-          + '<td>' + (w.enabled?'● Bật':'○ Tắt') + '</td>'
-          + '<td style="font-size:10px;font-family:monospace">' + ((w.ip_allowlist||[]).length ? (w.ip_allowlist||[]).map(escHtml).join(', ') : '—') + '</td>'
-          + '<td style="font-size:11px;color:var(--text-3,#6b7280)">' + fmtDt(w.last_used_at) + (w.last_used_ip ? '<br>'+escHtml(w.last_used_ip) : '') + '</td>'
-          + '<td style="white-space:nowrap">'
-          + '<button onclick="aeoi.rotateWorker('+w.id+')" class="hm-btn hm-btn-xs" title="Rotate secret">🔄</button> '
-          + '<button onclick="aeoi.toggleWorker('+w.id+','+(w.enabled?'false':'true')+')" class="hm-btn hm-btn-xs" title="' + (w.enabled?'Tắt':'Bật') + '">' + (w.enabled?'⏸':'▶') + '</button>'
-          + '</td></tr>';
-      });
-      html += '</tbody></table></div>';
-    }
-    html += '</div>';
-    return html;
-  }
-
-  function _sectionCases(){
-    var data = STATE.cases || { items:[], total:0, offset:0 };
-    var html = '<div class="aeoi-card">'
-      + _cardHead('📦 Intake Cases', 'Các case đã tạo từ AI. Tab "AI Intake Queue" trong M2-Orders module là nơi sales/planning xử lý chi tiết. Đây là view tổng quát của admin.')
-      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
-      + '<button onclick="aeoi.loadCases(0)" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
-      + '<a href="?module=M2-orders&tab=ai-intake-queue" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;text-decoration:none">Mở Intake Queue đầy đủ →</a>'
-      + '</div>';
-    if(data.items.length===0){
-      html += '<div class="hm-empty">Chưa có case nào.</div>';
-    } else {
-      html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
-        + '<th>#</th><th>Intake</th><th>Trạng thái</th><th>Khách</th><th>PO khách</th><th>Confidence</th><th>Tạo lúc</th>'
-        + '</tr></thead><tbody>';
-      data.items.forEach(function(c,i){
-        html += '<tr>'
-          + '<td>'+(data.offset+i+1)+'</td>'
-          + '<td style="font-family:monospace;font-weight:600">' + escHtml(c.intake_no) + '</td>'
-          + '<td><span style="font-size:10px;padding:1px 6px;background:var(--surface-2,#f3f4f6);border-radius:4px">' + escHtml(c.status) + '</span></td>'
-          + '<td>' + escHtml(c.customer_id||'—') + '</td>'
-          + '<td style="font-family:monospace">' + escHtml(c.customer_po_number||'—') + '</td>'
-          + '<td style="text-align:right">' + (c.overall_confidence!=null ? Number(c.overall_confidence).toFixed(2) : '—') + '</td>'
-          + '<td style="font-size:11px">' + fmtDt(c.created_at) + '</td>'
-          + '</tr>';
-      });
-      html += '</tbody></table></div>';
-      html += _pager(data.offset, 50, data.total, 'aeoi.loadCases');
-    }
-    html += '</div>';
-    return html;
-  }
-
   /* ── Public API (window.aeoi) ─────────────────────────────────────────── */
   window.aeoi = {
     _msgStatus: '',
@@ -966,16 +598,10 @@
       STATE.activeSection = id;
       var el = document.getElementById('aeoi-section-content');
       if(!el) return;
-      // Lazy-load each section's data
-      if(id==='mailboxes'    && !STATE.mailboxes)    aeoi.loadMailboxes();
-      if(id==='header_rules' && !STATE.headerRules)  aeoi.loadHeaderRules();
-      if(id==='templates'    && !STATE.templates)    aeoi.loadTemplates();
-      if(id==='workers'      && !STATE.workerTokens) aeoi.loadWorkers();
-      if(id==='cases'        && !STATE.cases)        aeoi.loadCases(0);
+      // Lazy-load log sections
       if(id==='poll_log' && STATE.pollLog.items.length===0) aeoi.loadPollLog(0);
       if(id==='msg_log'  && STATE.msgLog.items.length===0)  aeoi.loadMsgLog(0,'');
       if(id==='quarantine' && STATE.quarantine.items.length===0) aeoi.loadQuarantine(0);
-      if(id==='llm_model'  && !STATE.llm)            aeoi.loadLlmConfig();
       el.innerHTML = _renderSection(id);
       _bindSection();
       // Update tab highlight
@@ -1029,12 +655,12 @@
     saveLogic: function(){
       var payload = {
         auto_create_mode:       aeoi._val('aeoi-auto-create-mode'),
-        confidence_threshold:   parseFloat(aeoi._val('aeoi-confidence'))||0.95,
+        confidence_threshold:   parseFloat(aeoi._val('aeoi-confidence'))||0.75,
         part_match_mode:        aeoi._val('aeoi-part-match'),
         missing_field_action:   aeoi._val('aeoi-missing-field'),
         duplicate_check_days:   parseInt(aeoi._val('aeoi-dup-days'))||30,
         max_attachments_per_email: parseInt(aeoi._val('aeoi-max-att'))||3,
-        auto_cascade_jo:        false,  // forbidden per migration 204; UI no longer exposes
+        auto_cascade_jo:        aeoi._checked('aeoi-cascade-jo'),
         business_hours_only:    aeoi._checked('aeoi-biz-hours'),
         business_hours_start:   aeoi._val('aeoi-biz-start'),
         business_hours_end:     aeoi._val('aeoi-biz-end'),
@@ -1135,30 +761,6 @@
     },
 
     /* Test parse */
-    /* Navigate from admin AEOI to the M2-orders ai-intake-queue tab.
-     * The portal uses navigateTo(page) for module routing; a plain
-     * <a href> with ?module= bypasses the SPA router and forces a
-     * full page reload, which drops the auth session and bounces the
-     * user back to login. Use the JS API instead. */
-    openOrdersAiQueue: function(){
-      try {
-        if (typeof window.navigateTo === 'function') {
-          // template-demo page hosts the M2-orders module
-          window.navigateTo('template-demo');
-          // Defer tab activation a tick so the module schema mounts first.
-          setTimeout(function(){
-            if (window.HmModuleRouter && typeof window.HmModuleRouter.setActiveTab === 'function') {
-              window.HmModuleRouter.setActiveTab('ai-intake-queue');
-            }
-          }, 300);
-          return;
-        }
-      } catch(e) { /* fall through */ }
-      // Last-resort fallback: open in a new tab so we don't kill the
-      // current session in the active tab.
-      window.open(window.location.pathname + '#template-demo', '_blank');
-    },
-
     openTestParse: function(){
       var el = document.getElementById('aeoi-test-modal');
       if(!el){
@@ -1178,29 +780,12 @@
       if(resEl) resEl.innerHTML = '<div style="color:var(--text-3,#6b7280);font-size:12px">Đang phân tích...</div>';
       apiCall('admin_email_intake_test_parse', {email_body: body, attachment_text: aeoi._val('aeoi-test-att')}, function(res){
         if(!resEl) return;
-        if(!res.ok){
+        if(res.ok){
+          resEl.innerHTML = '<div style="background:var(--surface-2,#f3f4f6);border-radius:8px;padding:10px;font-size:11px;font-family:monospace;white-space:pre-wrap">'
+            + escHtml(JSON.stringify(res, null, 2)) + '</div>';
+        } else {
           resEl.innerHTML = '<div style="color:var(--danger-1,#ef4444);font-size:12px">Lỗi: ' + escHtml(res.error||'') + '</div>';
-          return;
         }
-        var html = '';
-        var claudeErr = String(res.claude_error || '');
-        if(claudeErr.indexOf('credit balance is too low') >= 0){
-          html += '<div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:10px;margin-bottom:8px;font-size:12px;color:#78350f;border-radius:4px">'
-            + '<strong>⚠ Anthropic API hết credit.</strong> Header parser deterministic vẫn hoạt động bình thường, nhưng phần Claude fallback cho email không có block <code>[HESEM-ORDER-INTAKE]</code> sẽ bị disable cho đến khi nạp credit. '
-            + 'Nạp tại <a href="https://console.anthropic.com/settings/billing" target="_blank" rel="noopener" style="color:#b45309;text-decoration:underline">console.anthropic.com/settings/billing</a>.'
-            + '</div>';
-        } else if(claudeErr && res.claude_configured){
-          html += '<div style="background:#fee2e2;border-left:4px solid #dc2626;padding:10px;margin-bottom:8px;font-size:12px;color:#7f1d1d;border-radius:4px">'
-            + '<strong>⚠ Claude API lỗi:</strong> ' + escHtml(claudeErr.substring(0, 300))
-            + '</div>';
-        } else if(!res.claude_configured){
-          html += '<div style="background:#dbeafe;border-left:4px solid #2563eb;padding:10px;margin-bottom:8px;font-size:12px;color:#1e3a8a;border-radius:4px">'
-            + 'ℹ <strong>Claude API chưa cấu hình</strong> — set <code>ANTHROPIC_API_KEY</code> env var trong php-fpm pool để bật fallback.'
-            + '</div>';
-        }
-        html += '<div style="background:var(--surface-2,#f3f4f6);border-radius:8px;padding:10px;font-size:11px;font-family:monospace;white-space:pre-wrap;max-height:400px;overflow:auto">'
-          + escHtml(JSON.stringify(res, null, 2)) + '</div>';
-        resEl.innerHTML = html;
       });
     },
 
@@ -1235,261 +820,6 @@
         if(res.ok) aeoi.loadQuarantine(STATE.quarantine.offset||0);
         else alert('Lỗi: ' + (res.error||''));
       });
-    },
-
-    // ── Sprint A-D loaders ──────────────────────────────────────────────
-    loadMailboxes: function(){
-      apiCall('admin_email_intake_mailbox_list', {}, function(res){
-        STATE.mailboxes = (res.ok && res.mailboxes) ? res.mailboxes : [];
-        _refreshSection();
-      });
-    },
-    openMailboxForm: function(id){
-      var existing = id ? (STATE.mailboxes||[]).find(function(m){return m.id===id;}) : null;
-      // Step 1: pick provider type. Different providers need different fields.
-      var providerLabels = {
-        gmail_imap:      'Gmail (IMAP + App Password) — KHUYẾN NGHỊ cho test',
-        generic_imap:    'IMAP server bất kỳ (Yahoo, Zoho, server riêng…)',
-        outlook_local:   'Outlook Desktop trên Windows (PowerShell worker)',
-        microsoft_graph: 'Microsoft 365 (Graph API) — chưa triển khai',
-        manual_upload:   'Upload thủ công file .eml/.msg',
-      };
-      var provDefault = existing ? existing.provider : 'gmail_imap';
-      var provChoice = prompt(
-        'Chọn loại dịch vụ mail:\n\n' +
-        '  gmail_imap      = Gmail (IMAP + App Password) ★\n' +
-        '  generic_imap    = IMAP server bất kỳ\n' +
-        '  outlook_local   = Outlook Desktop (PowerShell worker)\n' +
-        '  microsoft_graph = M365 Graph API (chưa triển khai)\n' +
-        '  manual_upload   = Upload thủ công\n\n' +
-        'Nhập một trong các giá trị trên:',
-        provDefault
-      );
-      if(!provChoice) return;
-      provChoice = provChoice.trim().toLowerCase();
-      if(!providerLabels[provChoice]){
-        alert('Loại dịch vụ không hợp lệ: ' + provChoice);
-        return;
-      }
-
-      // Step 2: common fields
-      var addr = prompt('Mailbox address (email đầy đủ):', existing ? existing.mailbox_address : '');
-      if(addr==null) return;
-      var folder = prompt(
-        provChoice==='gmail_imap'   ? 'Tên folder Gmail (Inbox, hoặc label-name. Mặc định: INBOX):' :
-        provChoice==='generic_imap' ? 'IMAP folder name (mặc định: INBOX):' :
-                                       'Folder path (vd: Inbox/AI-Order-Intake):',
-        existing ? existing.folder_path : (provChoice==='outlook_local' ? 'Inbox/AI-Order-Intake' : 'INBOX')
-      );
-      if(folder==null) return;
-
-      var payload = {
-        mailbox_address: addr.trim().toLowerCase(),
-        folder_path:     folder.trim(),
-        provider:        provChoice,
-        enabled:         true,
-        read_body:       true,
-        read_attachments:true,
-      };
-
-      // Step 3: IMAP-only fields
-      if(provChoice==='gmail_imap' || provChoice==='generic_imap'){
-        var host = provChoice==='gmail_imap'
-          ? (existing && existing.imap_host ? existing.imap_host : 'imap.gmail.com')
-          : prompt('IMAP host:', existing ? (existing.imap_host||'') : '');
-        if(provChoice==='generic_imap' && !host) return;
-        var port = provChoice==='gmail_imap'
-          ? 993
-          : parseInt(prompt('IMAP port (993=SSL, 143=STARTTLS):', existing ? (existing.imap_port||993) : 993), 10);
-        var enc  = provChoice==='gmail_imap'
-          ? 'ssl'
-          : (prompt('Encryption (ssl|starttls|none):', existing ? (existing.imap_encryption||'ssl') : 'ssl') || 'ssl');
-        var user = prompt('IMAP username (thường là full email):', existing ? (existing.imap_username||addr) : addr);
-        if(user==null) return;
-        var pwdHint = existing && existing.imap_password_configured
-          ? '(để trống = giữ password cũ, hoặc nhập mới để đổi)'
-          : (provChoice==='gmail_imap'
-              ? 'Nhập App Password 16 ký tự từ Google Account → Security → 2-Step Verification → App passwords:'
-              : 'Nhập IMAP password:');
-        var pwd  = prompt(pwdHint, '');
-        if(pwd==null) return;
-        payload.imap_host       = host;
-        payload.imap_port       = port;
-        payload.imap_encryption = enc;
-        payload.imap_username   = user;
-        if(pwd !== '') payload.imap_password = pwd;
-      }
-
-      if(id){ payload.id = id; }
-      var action = id ? 'admin_email_intake_mailbox_update' : 'admin_email_intake_mailbox_create';
-      apiCall(action, payload, function(res){
-        if(res.ok){
-          aeoi.loadMailboxes();
-          if(!id && (provChoice==='gmail_imap' || provChoice==='generic_imap')){
-            if(confirm('Mailbox đã tạo. Chạy thử kết nối IMAP ngay bây giờ?')){
-              aeoi.pollMailbox((res.mailbox||{}).id);
-            }
-          }
-        } else {
-          alert('Lỗi: ' + (res.error||'') + (res.detail ? '\n\n' + res.detail : ''));
-        }
-      });
-    },
-    pollMailbox: function(id){
-      apiCall('admin_email_intake_mailbox_poll', {id:id}, function(res){
-        if(res.ok && res.result){
-          var r = res.result;
-          alert('Kết quả poll mailbox:\n\n' +
-                'Status: ' + r.status + '\n' +
-                'Note: ' + (r.note||'OK') + '\n' +
-                'Fetched: ' + (r.fetched||0) + '\n' +
-                'Created cases: ' + (r.created||0) + '\n' +
-                'Skipped: ' + (r.skipped||0) + '\n' +
-                'Duration: ' + (r.duration_ms||0) + 'ms');
-          aeoi.loadMailboxes();
-        } else {
-          alert('Lỗi: ' + (res.error||'') + (res.detail ? '\n\n' + res.detail : ''));
-        }
-      });
-    },
-    toggleMailbox: function(id, enabled){
-      apiCall('admin_email_intake_mailbox_update', {id:id, enabled:enabled}, function(res){
-        if(res.ok) aeoi.loadMailboxes();
-        else alert('Lỗi: ' + (res.error||''));
-      });
-    },
-    deleteMailbox: function(id){
-      if(!confirm('Xóa mailbox này? Không thể hoàn tác.')) return;
-      apiCall('admin_email_intake_mailbox_delete', {id:id}, function(res){
-        if(res.ok) aeoi.loadMailboxes();
-        else alert('Lỗi: ' + (res.error||''));
-      });
-    },
-
-    loadHeaderRules: function(){
-      apiCall('admin_email_intake_header_rule_list', {}, function(res){
-        STATE.headerRules = (res.ok && res.header_rules) ? res.header_rules : [];
-        _refreshSection();
-      });
-    },
-    openHeaderRuleForm: function(id){
-      var existing = id ? (STATE.headerRules||[]).find(function(r){return r.id===id;}) : null;
-      var name = prompt('Tên rule:', existing ? existing.rule_name : 'HESEM Standard Order Intake Header');
-      if(name==null) return;
-      var subject = prompt('Subject prefix (rỗng = bỏ qua):', existing ? (existing.subject_prefix||'') : '[HESEM-ORDER-INTAKE]');
-      if(subject==null) return;
-      var payload = {
-        rule_name: name, subject_prefix: subject||null, enabled: true,
-        body_start_marker: '[HESEM-ORDER-INTAKE]',
-        body_end_marker:   '[/HESEM-ORDER-INTAKE]',
-      };
-      if(id){ payload.id = id; }
-      var action = id ? 'admin_email_intake_header_rule_update' : 'admin_email_intake_header_rule_create';
-      apiCall(action, payload, function(res){
-        if(res.ok) aeoi.loadHeaderRules();
-        else alert('Lỗi: ' + (res.error||''));
-      });
-    },
-    deleteHeaderRule: function(id){
-      if(!confirm('Xóa header rule?')) return;
-      apiCall('admin_email_intake_header_rule_delete', {id:id}, function(res){
-        if(res.ok) aeoi.loadHeaderRules();
-        else alert('Lỗi: ' + (res.error||''));
-      });
-    },
-
-    loadTemplates: function(){
-      apiCall('admin_email_intake_template_list', {}, function(res){
-        STATE.templates = (res.ok && res.templates) ? res.templates : [];
-        _refreshSection();
-      });
-    },
-    openTemplateForm: function(id){
-      var existing = id ? (STATE.templates||[]).find(function(t){return t.id===id;}) : null;
-      var custId = prompt('Customer ID:', existing ? existing.customer_id : '');
-      if(custId==null) return;
-      var name = prompt('Template name:', existing ? existing.template_name : '');
-      if(name==null) return;
-      var docType = prompt('Document type (CUSTOMER_PO | PO_CHANGE | PO_CANCEL | EXPEDITE):', existing ? existing.document_type : 'CUSTOMER_PO');
-      if(docType==null) return;
-      var fileType = prompt('File type (pdf | xlsx | docx):', existing ? existing.file_type : 'pdf');
-      if(fileType==null) return;
-      var payload = {
-        customer_id: custId, template_name: name,
-        document_type: docType, file_type: fileType, enabled: true,
-      };
-      if(id){ payload.id = id; }
-      var action = id ? 'admin_email_intake_template_update' : 'admin_email_intake_template_create';
-      apiCall(action, payload, function(res){
-        if(res.ok) aeoi.loadTemplates();
-        else alert('Lỗi: ' + (res.error||''));
-      });
-    },
-    deleteTemplate: function(id){
-      if(!confirm('Xóa template?')) return;
-      apiCall('admin_email_intake_template_delete', {id:id}, function(res){
-        if(res.ok) aeoi.loadTemplates();
-        else alert('Lỗi: ' + (res.error||''));
-      });
-    },
-
-    loadWorkers: function(){
-      apiCall('admin_email_intake_worker_token_list', {}, function(res){
-        STATE.workerTokens = (res.ok && res.tokens) ? res.tokens : [];
-        _refreshSection();
-      });
-    },
-    openWorkerForm: function(){
-      var workerId = prompt('Worker ID (vd: AIW-LOCAL-001):', '');
-      if(!workerId) return;
-      var workerName = prompt('Worker name (mô tả ngắn):', '');
-      if(workerName===null) return;
-      apiCall('admin_email_intake_worker_token_create', {
-        worker_id: workerId, worker_name: workerName, enabled: true,
-      }, function(res){
-        if(!res.ok){ alert('Lỗi: ' + (res.error||'')); return; }
-        // Show raw secret ONCE
-        alert('Token created!\n\nWorker ID: ' + res.token.worker_id +
-              '\n\nRAW SECRET (lưu ngay, sẽ không xem lại được):\n\n' + res.raw_secret +
-              '\n\nSecret notice: ' + (res.secret_notice||''));
-        aeoi.loadWorkers();
-      });
-    },
-    rotateWorker: function(id){
-      if(!confirm('Rotate secret? Worker hiện tại sẽ KHÔNG dùng được cho đến khi cập nhật secret file.')) return;
-      apiCall('admin_email_intake_worker_token_rotate', {id:id}, function(res){
-        if(!res.ok){ alert('Lỗi: ' + (res.error||'')); return; }
-        alert('Token rotated!\n\nNEW SECRET (lưu ngay):\n\n' + res.raw_secret);
-        aeoi.loadWorkers();
-      });
-    },
-    toggleWorker: function(id, enable){
-      var action = enable ? 'admin_email_intake_worker_token_enable' : 'admin_email_intake_worker_token_disable';
-      apiCall(action, {id:id}, function(res){
-        if(res.ok) aeoi.loadWorkers();
-        else alert('Lỗi: ' + (res.error||''));
-      });
-    },
-
-    loadCases: function(offset){
-      // The case_list endpoint reads limit/offset from $_GET query string.
-      // The apiCall shim doesn't append query params for GET, so we use
-      // the raw window.apiCall (Promise) with the action including the
-      // pagination — server-side AdminController routes parse the action
-      // before the '?' anyway.
-      offset = offset || 0;
-      if(typeof window.apiCall === 'function'){
-        window.apiCall('ai_order_intake_case_list&limit=50&offset=' + offset, null, 'GET')
-          .then(function(res){
-            if(res && res.ok){
-              STATE.cases = {items:res.cases||[], total:res.total||0, offset:offset};
-            }
-            _refreshSection();
-          }).catch(function(err){
-            STATE.cases = {items:[], total:0, offset:0};
-            _refreshSection();
-          });
-      }
     },
   };
 
