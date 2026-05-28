@@ -638,7 +638,13 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
     {
         $this->assertFakeDriftRejected(
             static function (array &$registry): void {
-                unset($registry['jd_kpi_scorecards']['roles']['ITA']['active_count_justification']);
+                $card = &$registry['jd_kpi_scorecards']['roles']['ITA'];
+                while (count($card['active_scorecard']) < 4) {
+                    $copy = $card['active_scorecard'][0];
+                    $copy['role_measure_code'] = 'ITA_FAKE_EXTRA_' . count($card['active_scorecard']);
+                    $card['active_scorecard'][] = $copy;
+                }
+                unset($card['active_count_justification']);
             },
             "role_category 'support_specialist' has 4 active items; policy max 3 requires active_count_justification.",
         );
