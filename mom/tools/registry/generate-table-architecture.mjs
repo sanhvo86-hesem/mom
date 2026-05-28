@@ -775,9 +775,6 @@ const migrationDomainDefaults = new Map([
   ['196_kpi_manual_inputs.sql', 'bi_datawarehouse'],
   ['198_customer_ncr_severity_contract.sql', 'quality_management'],
   ['203_email_intake_infrastructure.sql', 'system_infrastructure'],
-  ['204_email_intake_harden_defaults.sql', 'system_infrastructure'],
-  ['205_email_intake_order_case_upgrade.sql', 'system_infrastructure'],
-  ['206_email_intake_imap_provider.sql', 'system_infrastructure'],
 ]);
 
 const tableDomainOverrides = {
