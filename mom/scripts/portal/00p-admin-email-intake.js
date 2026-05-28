@@ -821,6 +821,166 @@
         else alert('Lỗi: ' + (res.error||''));
       });
     },
+
+    // ── Sprint A-D loaders ──────────────────────────────────────────────
+    loadMailboxes: function(){
+      apiCall('admin_email_intake_mailbox_list', {}, function(res){
+        STATE.mailboxes = (res.ok && res.mailboxes) ? res.mailboxes : [];
+        _refreshSection();
+      });
+    },
+    openMailboxForm: function(id){
+      var existing = id ? (STATE.mailboxes||[]).find(function(m){return m.id===id;}) : null;
+      var addr   = prompt('Mailbox address (vd: orders@hesemeng.com):', existing ? existing.mailbox_address : '');
+      if(addr==null) return;
+      var folder = prompt('Folder path (vd: Inbox/AI-Order-Intake):', existing ? existing.folder_path : 'Inbox/AI-Order-Intake');
+      if(folder==null) return;
+      var provider = prompt('Provider (outlook_local | microsoft_graph | manual_upload):', existing ? existing.provider : 'outlook_local');
+      if(provider==null) return;
+      var payload = {
+        mailbox_address: addr, folder_path: folder, provider: provider,
+        enabled: true, read_body: true, read_attachments: true,
+      };
+      if(id){ payload.id = id; }
+      var action = id ? 'admin_email_intake_mailbox_update' : 'admin_email_intake_mailbox_create';
+      apiCall(action, payload, function(res){
+        if(res.ok) aeoi.loadMailboxes();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+    toggleMailbox: function(id, enabled){
+      apiCall('admin_email_intake_mailbox_update', {id:id, enabled:enabled}, function(res){
+        if(res.ok) aeoi.loadMailboxes();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+    deleteMailbox: function(id){
+      if(!confirm('Xóa mailbox này? Không thể hoàn tác.')) return;
+      apiCall('admin_email_intake_mailbox_delete', {id:id}, function(res){
+        if(res.ok) aeoi.loadMailboxes();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+
+    loadHeaderRules: function(){
+      apiCall('admin_email_intake_header_rule_list', {}, function(res){
+        STATE.headerRules = (res.ok && res.header_rules) ? res.header_rules : [];
+        _refreshSection();
+      });
+    },
+    openHeaderRuleForm: function(id){
+      var existing = id ? (STATE.headerRules||[]).find(function(r){return r.id===id;}) : null;
+      var name = prompt('Tên rule:', existing ? existing.rule_name : 'HESEM Standard Order Intake Header');
+      if(name==null) return;
+      var subject = prompt('Subject prefix (rỗng = bỏ qua):', existing ? (existing.subject_prefix||'') : '[HESEM-ORDER-INTAKE]');
+      if(subject==null) return;
+      var payload = {
+        rule_name: name, subject_prefix: subject||null, enabled: true,
+        body_start_marker: '[HESEM-ORDER-INTAKE]',
+        body_end_marker:   '[/HESEM-ORDER-INTAKE]',
+      };
+      if(id){ payload.id = id; }
+      var action = id ? 'admin_email_intake_header_rule_update' : 'admin_email_intake_header_rule_create';
+      apiCall(action, payload, function(res){
+        if(res.ok) aeoi.loadHeaderRules();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+    deleteHeaderRule: function(id){
+      if(!confirm('Xóa header rule?')) return;
+      apiCall('admin_email_intake_header_rule_delete', {id:id}, function(res){
+        if(res.ok) aeoi.loadHeaderRules();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+
+    loadTemplates: function(){
+      apiCall('admin_email_intake_template_list', {}, function(res){
+        STATE.templates = (res.ok && res.templates) ? res.templates : [];
+        _refreshSection();
+      });
+    },
+    openTemplateForm: function(id){
+      var existing = id ? (STATE.templates||[]).find(function(t){return t.id===id;}) : null;
+      var custId = prompt('Customer ID:', existing ? existing.customer_id : '');
+      if(custId==null) return;
+      var name = prompt('Template name:', existing ? existing.template_name : '');
+      if(name==null) return;
+      var docType = prompt('Document type (CUSTOMER_PO | PO_CHANGE | PO_CANCEL | EXPEDITE):', existing ? existing.document_type : 'CUSTOMER_PO');
+      if(docType==null) return;
+      var fileType = prompt('File type (pdf | xlsx | docx):', existing ? existing.file_type : 'pdf');
+      if(fileType==null) return;
+      var payload = {
+        customer_id: custId, template_name: name,
+        document_type: docType, file_type: fileType, enabled: true,
+      };
+      if(id){ payload.id = id; }
+      var action = id ? 'admin_email_intake_template_update' : 'admin_email_intake_template_create';
+      apiCall(action, payload, function(res){
+        if(res.ok) aeoi.loadTemplates();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+    deleteTemplate: function(id){
+      if(!confirm('Xóa template?')) return;
+      apiCall('admin_email_intake_template_delete', {id:id}, function(res){
+        if(res.ok) aeoi.loadTemplates();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+
+    loadWorkers: function(){
+      apiCall('admin_email_intake_worker_token_list', {}, function(res){
+        STATE.workerTokens = (res.ok && res.tokens) ? res.tokens : [];
+        _refreshSection();
+      });
+    },
+    openWorkerForm: function(){
+      var workerId = prompt('Worker ID (vd: AIW-LOCAL-001):', '');
+      if(!workerId) return;
+      var workerName = prompt('Worker name (mô tả ngắn):', '');
+      if(workerName===null) return;
+      apiCall('admin_email_intake_worker_token_create', {
+        worker_id: workerId, worker_name: workerName, enabled: true,
+      }, function(res){
+        if(!res.ok){ alert('Lỗi: ' + (res.error||'')); return; }
+        // Show raw secret ONCE
+        alert('Token created!\n\nWorker ID: ' + res.token.worker_id +
+              '\n\nRAW SECRET (lưu ngay, sẽ không xem lại được):\n\n' + res.raw_secret +
+              '\n\nSecret notice: ' + (res.secret_notice||''));
+        aeoi.loadWorkers();
+      });
+    },
+    rotateWorker: function(id){
+      if(!confirm('Rotate secret? Worker hiện tại sẽ KHÔNG dùng được cho đến khi cập nhật secret file.')) return;
+      apiCall('admin_email_intake_worker_token_rotate', {id:id}, function(res){
+        if(!res.ok){ alert('Lỗi: ' + (res.error||'')); return; }
+        alert('Token rotated!\n\nNEW SECRET (lưu ngay):\n\n' + res.raw_secret);
+        aeoi.loadWorkers();
+      });
+    },
+    toggleWorker: function(id, enable){
+      var action = enable ? 'admin_email_intake_worker_token_enable' : 'admin_email_intake_worker_token_disable';
+      apiCall(action, {id:id}, function(res){
+        if(res.ok) aeoi.loadWorkers();
+        else alert('Lỗi: ' + (res.error||''));
+      });
+    },
+
+    loadCases: function(offset){
+      // window.apiCall URL-encodes the action, so we can't smuggle &-delimited
+      // query params through the `action` argument. For the admin-tab overview
+      // we just fetch the first 50 (server default) and let the full
+      // Orders > AI Intake Queue tab handle real pagination.
+      apiCall('ai_order_intake_case_list', {}, function(res){
+        if(res && res.ok){
+          STATE.cases = {items:res.cases||[], total:res.total||0, offset:0};
+        } else {
+          STATE.cases = {items:[], total:0, offset:0};
+        }
+        _refreshSection();
+      });
+    },
   };
 
   /* ── Bind dynamic checkbox watchers ─────────────────────────────────── */
