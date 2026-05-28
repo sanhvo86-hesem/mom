@@ -88,6 +88,11 @@ final class RepoBoundaryScanner
         // visible on GitHub. Same allowlist policy as the prompt pack
         // itself; mirrored by .gitignore "!_reports/kpi/".
         '#^_reports/kpi/.*$#',
+        // RACI V3 prompt-pack audit artifacts — controlled governance
+        // evidence generated intentionally for repo-visible re-audit,
+        // acceptance, and release hardening. Mirrors the same repo-level
+        // precedent already used for KPI and deploy playbook artifact sets.
+        '#^_reports/raci-v3/.*$#',
     ];
 
     /**
