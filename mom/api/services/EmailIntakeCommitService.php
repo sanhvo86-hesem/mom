@@ -182,6 +182,13 @@ final class EmailIntakeCommitService
         $totalValue = 0.0;
         $lines      = [];
 
+        // Generate so_number — OrderService::createSalesOrder requires it
+        // and does not auto-allocate. Pattern: SO-{YYYY}-{intake_no_seq}
+        // where intake_no_seq is derived from the case's intake_no to keep
+        // the SO traceable to its origin AEOI case.
+        $intakeSeq = preg_match('/(\d+)$/', (string)($case['intake_no'] ?? ''), $m) ? $m[1] : (string)$caseId;
+        $soNumber  = sprintf('SO-%s-%s', date('Y'), str_pad($intakeSeq, 4, '0', STR_PAD_LEFT));
+
         foreach ($case['lines'] as $idx => $line) {
             $qty       = (float)($line['quantity'] ?? 0);
             $unitPrice = (float)($line['unit_price'] ?? 0);
@@ -210,6 +217,7 @@ final class EmailIntakeCommitService
         }
 
         return [
+            'so_number'           => $soNumber,
             'customer_id'         => (string)$case['customer_id'],
             'customer_name'       => (string)($case['customer_name'] ?? ''),
             'customer_po_id'      => (string)($case['committed_customer_po_id'] ?? ''),
@@ -225,6 +233,10 @@ final class EmailIntakeCommitService
             'payment_term_code'   => (string)($case['payment_term_code'] ?? ''),
             'shipping_method_code'=> (string)($extracted['purchase_order']['shipping_method_code'] ?? ''),
             'special_requirements'=> (string)($extracted['purchase_order']['special_requirements'] ?? ''),
+            'source'              => 'ai_order_intake',
+            'source_system'       => 'AEOI',
+            'source_record_id'    => (string)($case['intake_no'] ?? ''),
+            'notes'               => 'Auto-created from AEOI case ' . ($case['intake_no'] ?? $caseId),
             'lines'               => $lines,
         ];
     }
