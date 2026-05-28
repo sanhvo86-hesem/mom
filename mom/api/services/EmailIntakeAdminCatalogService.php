@@ -222,10 +222,14 @@ final class EmailIntakeAdminCatalogService
         if (!$row) {
             throw new RuntimeException('Mailbox not found: ' . $id);
         }
-        // Virtual field — never send the encrypted password back to the
-        // frontend, but tell the UI whether one is stored so it knows to
-        // render the field as "(đã lưu — nhập mới để đổi)".
+        // Virtual field — tell the UI whether a password is stored so it
+        // can render the field as "(đã lưu — nhập mới để đổi)".
         $row['imap_password_configured'] = !empty($row['imap_password_enc']);
+        // SECURITY: strip the encrypted password ciphertext from any
+        // response that leaves this service. The plaintext only lives in
+        // memory during decryptSecret() inside the IMAP service.
+        // getMailboxWithSecret() bypasses this for internal use only.
+        unset($row['imap_password_enc']);
         return $row;
     }
 

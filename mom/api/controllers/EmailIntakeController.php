@@ -109,10 +109,14 @@ class EmailIntakeController extends BaseController
     private function commit(): EmailIntakeCommitService
     {
         if ($this->commitSvc === null) {
+            // Inject ValidationService so commits re-run validation when
+            // the case has been edited after the last validation pass
+            // (per GPT Pro audit P0-10).
             $this->commitSvc = new EmailIntakeCommitService(
                 $this->caseSvc(),
                 new CustomerPurchaseOrderService($this->dataDir),
-                new OrderService($this->dataDir)
+                new OrderService($this->dataDir),
+                $this->validation()
             );
         }
         return $this->commitSvc;
@@ -425,14 +429,66 @@ class EmailIntakeController extends BaseController
             $this->error('missing_email_body', 400, 'email_body is required.');
         }
 
-        // Stub response — OrderEmailParserService (Claude API) provisioned in sprint 2.
+        require_once __DIR__ . '/../services/EmailIntakeHeaderRuleService.php';
+        require_once __DIR__ . '/../services/OrderEmailParserService.php';
+
+        // Step 1: deterministic header parser (same code path as IMAP poll +
+        // worker push — guaranteed identical because both call the shared
+        // EmailIntakeHeaderRuleService).
+        $hdrSvc = new \MOM\Api\Services\EmailIntakeHeaderRuleService($this->db());
+        $headerBlock = $hdrSvc->parseHeaderBlock($emailBody);
+        $lineItems   = $hdrSvc->parseLineItems($emailBody);
+
+        // Step 2: LLM extraction router (multi-provider with fallback chain).
+        // Pick tier the same way IMAP poll does: extraction_pdf when an
+        // attachment_text was provided, else extraction_default.
+        $attachmentText = (string)($body['attachment_text'] ?? '');
+        $tier           = $attachmentText !== '' ? 'extraction_pdf' : 'extraction_default';
+
+        $llmResult   = null;
+        $llmError    = null;
+        $llmProvider = null;
+        $llmModel    = null;
+        $llmAttempts = [];
+        $claudeConfigured = \MOM\Api\Services\OrderEmailParserService::isConfigured();
+
+        if (empty($body['skip_claude'])) {
+            try {
+                $outcome = $this->llmRouter()->extract($emailBody, [
+                    'from_email'          => (string)($body['from_email'] ?? 'test@example.com'),
+                    'subject'             => (string)($body['subject']    ?? '(test parse)'),
+                    'attachment_filename' => (string)($body['attachment_filename'] ?? ''),
+                    'attachment_text'     => $attachmentText,
+                ], $tier);
+                $llmResult   = $outcome['result'];
+                $llmProvider = $outcome['provider'];
+                $llmModel    = $outcome['model'];
+                $llmAttempts = $outcome['attempts'];
+            } catch (Throwable $e) {
+                $llmError = $e->getMessage();
+            }
+        }
+
+        // Friendly classification for the UI banner.
+        $creditTooLow = $llmError !== null
+            && (str_contains($llmError, 'credit balance is too low')
+             || str_contains($llmError, 'credit_balance_too_low'));
+
         $this->success([
-            'dry_run'  => true,
-            'result'   => null,
-            'message'  => 'Test parse will be available when OrderEmailParserService (Claude API) is provisioned in sprint 2.',
-            'received' => [
-                'email_body_length'      => strlen($emailBody),
-                'has_attachment_text'    => !empty($body['attachment_text']),
+            'dry_run'           => true,
+            'tier_used'         => $tier,
+            'header_block'      => $headerBlock,
+            'header_lines'      => $lineItems,
+            'claude_configured' => $claudeConfigured,
+            'claude_result'     => $llmResult,       // legacy key kept for UI compat
+            'claude_error'      => $llmError,
+            'llm_provider'      => $llmProvider,
+            'llm_model'         => $llmModel,
+            'llm_attempts'      => $llmAttempts,
+            'credit_too_low'    => $creditTooLow,
+            'received'          => [
+                'email_body_length'   => strlen($emailBody),
+                'has_attachment_text' => $attachmentText !== '',
             ],
         ]);
     }
@@ -981,9 +1037,54 @@ class EmailIntakeController extends BaseController
         $reason = isset($body['reason']) ? (string)$body['reason'] : null;
         if ($id <= 0) { $this->error('missing_id', 400, 'id is required.'); }
         try {
+            // ── Approval governance ──────────────────────────────────────
+            // Load the case first so we can apply policy gates BEFORE
+            // setting status. Per GPT Pro audit P0-09: approval must NOT
+            // bypass validation.
+            $caseRow = $this->caseSvc()->getCase($id);
+            $currentStatus = (string)($caseRow['status'] ?? '');
+
+            // 1. Hard-block approval from terminal-hold or terminal states.
+            $blocked = ['security_hold', 'duplicate_hold', 'error', 'rejected'];
+            if (in_array($currentStatus, $blocked, true)) {
+                $this->error(
+                    'approval_blocked_by_state', 409,
+                    "Cannot approve case in '$currentStatus' state. Resolve the hold first."
+                );
+            }
+
+            // 2. Re-run the validation pipeline so a freshly edited case
+            //    is scored against the latest blocker rules. The outcome
+            //    is written back to the case row (status + blocking_codes
+            //    + warning_codes + validation_json).
+            $validated = $this->validation()->validateCase($id, $this->actor($user));
+
+            // 3. Hard-block if there are unresolved blockers.
+            $blockers = (array)($validated['blocking_codes'] ?? []);
+            if ($blockers !== []) {
+                $this->error(
+                    'approval_blocked_by_validation', 409,
+                    'Cannot approve — unresolved blockers: ' . implode(', ', $blockers)
+                );
+            }
+
+            // 4. Require a reason when warnings are present so the
+            //    approver acknowledges what they're overriding.
+            $warnings = (array)($validated['warning_codes'] ?? []);
+            if ($warnings !== [] && ($reason === null || trim($reason) === '')) {
+                $this->error(
+                    'approval_reason_required', 400,
+                    'A reason is required when approving despite warnings: ' . implode(', ', $warnings)
+                );
+            }
+
             $row = $this->caseSvc()->setStatus($id, 'approved', $this->actor($user), $reason);
-            $this->auditLog('admin_email_intake_case_approve', ['case_id' => $id]);
-            $this->success(['case' => $row, 'approved' => true]);
+            $this->auditLog('admin_email_intake_case_approve', [
+                'case_id'    => $id,
+                'had_warnings' => $warnings !== [],
+                'reason'     => $reason,
+            ]);
+            $this->success(['case' => $row, 'approved' => true, 'cleared_warnings' => $warnings]);
         } catch (Throwable $e) {
             $this->error('case_approve_failed', 400, $e->getMessage());
         }
