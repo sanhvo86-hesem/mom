@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Api\Services\EmailIntakeAdminCatalogService;
+use MOM\Api\Services\EmailIntakeCaseService;
+use MOM\Api\Services\EmailIntakeCommitService;
 use MOM\Api\Services\EmailIntakeConfigService;
 use MOM\Api\Services\EmailIntakeValidationService;
 use MOM\Api\Services\EmailIntakeWorkerAuthService;

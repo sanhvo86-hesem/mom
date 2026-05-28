@@ -1075,18 +1075,21 @@ final class ScheduledJobs
             }
 
             $start = microtime(true);
-            $runId = $configSvc->openPollRun($triggeredBy, $triggeredByActor);
+            $runId = $svc->openPollRun($triggeredBy, $triggeredByActor);
 
-            // M365MailboxService + OrderEmailParserService not yet provisioned (sprint 2).
-            // Close as skipped so the poll log stays clean.
-            $svc->closePollRun($runId, [
-                'found' => 0, 'processed' => 0, 'skipped' => 0,
-                'quarantined' => 0, 'created' => 0, 'review' => 0,
-                'errors' => 0,
-                'duration_ms' => (int)((microtime(true) - $start) * 1000),
-                'api_calls'   => 0,
-                'error_detail' => 'M365MailboxService not yet provisioned — pending sprint 2.',
-            ], 'skipped');
+            require_once __DIR__ . '/EmailIntakeAdminCatalogService.php';
+            $catalog = new \MOM\Api\Services\EmailIntakeAdminCatalogService($this->db, $svc);
+
+            $imapMailboxIds = array_column(
+                array_filter(
+                    $catalog->listEnabledMailboxes(),
+                    static fn(array $m): bool => ($m['provider'] ?? '') === 'imap'
+                ),
+                'id'
+            );
+
+            // M365 local-Outlook heartbeat not yet provisioned (sprint 2).
+            $heartbeatCount = 0;
 
             // IMAP polling — only attempt if php-imap is loaded.
             $imapSummary = [
@@ -1100,10 +1103,10 @@ final class ScheduledJobs
 
                 $caseSvc = new \MOM\Api\Services\EmailIntakeCaseService($this->db);
                 $vSvc    = new \MOM\Api\Services\EmailIntakeValidationService(
-                    $this->db, $caseSvc, $configSvc
+                    $this->db, $caseSvc, $svc
                 );
                 $imapSvc = new \MOM\Api\Services\EmailIntakeImapService(
-                    $this->db, $catalog, $configSvc, $caseSvc, $vSvc, $this->dataDir
+                    $this->db, $catalog, $svc, $caseSvc, $vSvc, $this->dataDir
                 );
 
                 foreach ($imapMailboxIds as $mid) {
@@ -1129,19 +1132,19 @@ final class ScheduledJobs
                     . "fetched {$imapSummary['fetched']}, created {$imapSummary['created']}, "
                     . "skipped {$imapSummary['skipped']}, errors {$imapSummary['errors']}.";
 
-            $configSvc->closePollRun($runId, [
+            $svc->closePollRun($runId, [
                 'found'        => $imapSummary['fetched'],
                 'processed'    => $imapSummary['created'] + $imapSummary['skipped'],
                 'skipped'      => $imapSummary['skipped'],
                 'quarantined'  => 0,
                 'created'      => $imapSummary['created'],
-                'review'       => $imapSummary['created'], // every new case starts as needs-review
+                'review'       => $imapSummary['created'],
                 'errors'       => $imapSummary['errors'],
                 'duration_ms'  => (int)((microtime(true) - $start) * 1000),
                 'api_calls'    => $imapSummary['mailboxes'],
                 'error_detail' => $detail,
             ], $imapSummary['errors'] > 0 ? 'completed' : 'completed');
-            $configSvc->updateNextPollAt();
+            $svc->updateNextPollAt();
 
             return [
                 'status'         => 'skipped',
