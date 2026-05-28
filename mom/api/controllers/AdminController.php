@@ -2381,12 +2381,15 @@ class AdminController extends BaseController
             if (str_starts_with($msg, 'kpi_registry_threshold_incomplete')
                 || str_starts_with($msg, 'kpi_registry_reward_without_counter')
                 || str_starts_with($msg, 'kpi_registry_duplicate_code')
+                || str_starts_with($msg, 'kpi_registry_invalid_code')
                 || str_starts_with($msg, 'kpi_registry_invalid_cadence')
                 || str_starts_with($msg, 'kpi_registry_threshold_order')
                 || str_starts_with($msg, 'kpi_registry_added_missing_code')
+                || str_starts_with($msg, 'kpi_registry_added_invalid_code')
                 || str_starts_with($msg, 'kpi_registry_added_missing_contract')
                 || str_starts_with($msg, 'kpi_registry_added_code_conflict')
                 || str_starts_with($msg, 'kpi_registry_mco_')
+                || str_starts_with($msg, 'kpi_registry_customer_profile_')
                 || str_starts_with($msg, 'kpi_registry_missing_code')) {
                 $this->error('kpi_registry_invalid', 422, 'Vi phạm quy tắc KPI: ' . $msg);
             }

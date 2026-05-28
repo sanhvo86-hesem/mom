@@ -20,7 +20,18 @@ $base = dirname(__DIR__, 2);   // .../mom
 $root = dirname($base);        // repo root (contains mom/)
 $data = $base . '/data';
 
-require $base . '/vendor/autoload.php';
+$autoloaded = false;
+foreach ([$base . '/vendor/autoload.php', $root . '/vendor/autoload.php'] as $autoload) {
+    if (is_file($autoload)) {
+        require_once $autoload;
+        $autoloaded = true;
+        break;
+    }
+}
+if (!$autoloaded) {
+    require_once $base . '/api/services/KpiEngine.php';
+    require_once $base . '/api/services/KpiRegistryAdminService.php';
+}
 
 use MOM\Api\Services\KpiRegistryAdminService;
 

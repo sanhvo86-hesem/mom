@@ -10,9 +10,9 @@
 --
 --   We extend the existing provider CHECK constraint to accept three new
 --   values:
---     • gmail_imap   — Gmail with 2FA + App Password over IMAP4rev1/SSL
---     • generic_imap — any IMAP4rev1 server (host + port + encryption)
---     • exchange_ews — reserved for on-prem Exchange (not implemented yet)
+--     - gmail_imap   — Gmail with 2FA + App Password over IMAP4rev1/SSL
+--     - generic_imap — any IMAP4rev1 server (host + port + encryption)
+--     - exchange_ews — reserved for on-prem Exchange (not implemented yet)
 --
 --   We add seven new optional columns to email_intake_mailbox to carry the
 --   IMAP connection details. These are NULL for outlook_local rows so
@@ -30,16 +30,14 @@
 --   2-hour cycle.
 --
 -- Standards:
---   ISO 9001 §7.5.3 (control of documented information — provider
---   credentials are documented + access-controlled),
---   ISO 27001 A.10.1 (cryptographic controls — secrets at rest),
+--   ISO 9001 section 7.5.3 (control of documented information),
+--   ISO 27001 A.10.1 (cryptographic controls),
 --   RFC 9051 (IMAP4rev2).
 -- Date: 2026-05-27
 -- ============================================================================
 
 BEGIN;
 
--- 1. Extend provider enum (drop + recreate the CHECK constraint).
 ALTER TABLE email_intake_mailbox
     DROP CONSTRAINT IF EXISTS email_intake_mailbox_provider_check;
 
@@ -54,7 +52,6 @@ ALTER TABLE email_intake_mailbox
         'exchange_ews'
     ));
 
--- 2. Add IMAP-specific columns. All nullable so outlook_local rows stay valid.
 ALTER TABLE email_intake_mailbox
     ADD COLUMN IF NOT EXISTS imap_host             VARCHAR(255),
     ADD COLUMN IF NOT EXISTS imap_port             INTEGER,
@@ -84,7 +81,6 @@ COMMENT ON COLUMN email_intake_mailbox.imap_last_uid
 COMMENT ON COLUMN email_intake_mailbox.imap_last_uidvalidity
     IS 'IMAP UIDVALIDITY value from the previous poll. If the server returns a different value, the UID space has reset and we must re-scan from UID 1.';
 
--- 3. Helpful index for the poll job (find enabled rows by provider).
 CREATE INDEX IF NOT EXISTS idx_email_intake_mailbox_provider_enabled
     ON email_intake_mailbox (provider, enabled);
 

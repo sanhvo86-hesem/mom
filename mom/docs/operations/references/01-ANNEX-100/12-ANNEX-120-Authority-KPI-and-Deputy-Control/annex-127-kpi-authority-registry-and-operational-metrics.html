@@ -61,28 +61,24 @@ td,th{vertical-align:top}
 <p><b>Registry chính thức:</b> <span class="code">mom/data/registry/kpi-authority-registry.json</span> · <a href="../../../../../portal.html#admin/kpi-registry">Admin Console KPI Registry</a></p>
 <p>Registry này không thay thế ANNEX-122. ANNEX-122 giữ nội dung KPI cascade hiện hữu; registry khóa mã chuẩn, alias legacy và trạng thái chỉ số để code/bảng điều khiển không tự sinh định nghĩa mới ngoài thẩm quyền. Số lượng, trạng thái lifecycle và hồ sơ khách hàng hiện hành phải xem trong Admin Console KPI hoặc ANNEX-128 sinh từ registry, không chép cứng vào phần mô tả.</p>
 </div>
-<div class="callout danger"><b>Chặn drift:</b> KpiEngine chỉ được auto-Sổ đăng ký các chỉ số trong danh sách môi trường chạy approved sau khi normalize alias. KPI đề xuất như OEE_BOTTLENECK hoặc THROUGHPUT_PER_CONSTRAINT_HOUR phải có data contract trước khi tính tự động.</div>
-</div>
-
-<div class="section">
+<div class="callout danger"><b>Chặn drift:</b> KpiEngine chỉ được auto-register các metric trong danh sách runtime đã được phê duyệt sau khi normalize alias. KPI đề xuất như OEE_BOTTLENECK hoặc THROUGHPUT_PER_CONSTRAINT_HOUR phải có data contract trước khi tính tự động.</div>
+</div> <div class="section">
 <h2>2. Alias legacy bắt buộc</h2>
 <div class="table-card"><table class="table">
 <thead><tr><th>Alias cũ</th><th>Mã chuẩn</th><th>Lý do</th></tr></thead>
 <tbody>
-<tr><td>SCRAP</td><td>SCRAP_RATE</td><td>Tránh song song giữa seed data và môi trường chạy chỉ số.</td></tr>
-<tr><td>CAPA-CLOSE</td><td>CAPA_CLOSURE</td><td>Chuẩn hóa biểu mẫuat underscore cho chỉ số môi trường chạy.</td></tr>
+<tr><td>SCRAP</td><td>SCRAP_RATE</td><td>Tránh song song giữa seed data và runtime metric.</td></tr>
+<tr><td>CAPA-CLOSE</td><td>CAPA_CLOSURE</td><td>Chuẩn hóa format underscore cho runtime metric.</td></tr>
 <tr><td>CAL-COMP</td><td>CAL_COMPLIANCE</td><td>Khớp với mã tính trong KpiEngine.</td></tr>
 <tr><td>TRN-COMP</td><td>TRAINING_COMP</td><td>Khớp với mã tính trong KpiEngine.</td></tr>
 <tr><td>CCR</td><td>COMPLAINT_RATE</td><td>Không dùng CCR cho complaint vì CCR cũng dễ bị hiểu là critical constraint resource trong TOC.</td></tr>
-<tr><td>SQI</td><td>NHÀ CUNG CẤP_QUAL</td><td>Chuẩn hóa chất lượng nhà cung cấp chỉ số.</td></tr>
-<tr><td>UTIL</td><td>MACHINE_UTIL</td><td>Khớp môi trường chạy utilization chỉ số.</td></tr>
-<tr><td>CHUẨN BỊ MÁY</td><td>CHUẨN BỊ MÁY_RATIO</td><td>Khớp môi trường chạy thời gian chuẩn bị máy ratio chỉ số.</td></tr>
+<tr><td>SQI</td><td>SUPPLIER_QUAL</td><td>Chuẩn hóa chất lượng nhà cung cấp metric.</td></tr>
+<tr><td>UTIL</td><td>MACHINE_UTIL</td><td>Khớp runtime utilization metric.</td></tr>
+<tr><td>SETUP</td><td>SETUP_RATIO</td><td>Khớp runtime setup ratio metric.</td></tr>
 </tbody>
 </table></div>
-</div>
-
-<div class="section">
-<h2>3. Bộ môi trường chạy hiện hữu được giữ</h2>
+</div> <div class="section">
+<h2>3. Bộ runtime hiện hữu được giữ</h2>
 <p>Các KPI sau đang được KpiEngine tính trực tiếp và được giữ nguyên. Không đổi công thức trong tài liệu này.</p>
 <div class="grid-2">
 <div class="card"><span class="tag">Delivery</span><span class="tag">OTD</span><span class="tag">PUT_THRU</span><span class="tag">INV_TURNS</span></div>
@@ -96,10 +92,11 @@ td,th{vertical-align:top}
 <div class="table-card"><table class="table">
 <thead><tr><th>Layer</th><th>KPI/chỉ số bổ sung</th><th>Trạng thái</th><th>Điều kiện nâng cấp</th></tr></thead>
 <tbody>
-<tr><td>Executive BSC</td><td>7 scored core: OTD, COMPLAINT_RATE, FPY, COPQ, KẾ HOẠCH_ADHERENCE, WIP_AGING, VẬT LIỆU_AVAILABILITY_KẾ HOẠCH. Driver panel: FAI_FIRST_PASS, CUỐI CÙNG_PHÁT HÀNH_RFT, INSPECTION_QUEUE_AGING, OEE_BOTTLENECK, CONSTRAINT_LOST_HOURS, CHECK_DIM_REPORT_ON_GIAO HÀNG, THIẾT BỊ ĐO_VALID_FOR_PHÁT HÀNH, NCR_3D_RESPONSE_SLA, NCR_8D_UPDATE_SLA, LAM G3 vật liệu/IQC/traceability readiness, LAM G5 IPQC/SPC/CMM/containment/thiết bị đo validity, CRITICAL_VAI TRÒ_BACKUP_COVERAGE, NHÀ CUNG CẤP_READINESS.</td><td>Scorecard kiểm soátled</td><td>Chỉ scored core cộng điểm. Driver panel hiển thị để hành động/cap/block, không payout khi chưa có data contract và pilot phê duyệt.</td></tr>
-<tr><td>TOC weekly</td><td>BOTTLENECK_BUFFER_TRẠNG THÁI, THROUGHPUT_PER_CONSTRAINT_HOUR, CONSTRAINT_LOST_HOURS, WIP_BEFORE_CONSTRAINT</td><td>Staged data contract</td><td>Có constraint Sổ đăng ký, machine/job context và buffer quy tắc.</td></tr>
-<tr><td>Lean daily</td><td>IN_QUÁ TRÌNH_REJECT_RATE, IPQC_CHARACTERISTIC_COMPLETENESS, SPC_SIGNAL_REACTION_TIME, CMM_QUEUE_AGING, NCR_CONTAINMENT_ON_TIME, THIẾT BỊ ĐO_VALID_FOR_IN_QUÁ TRÌNH_MEASUREMENT, CYCLE_TIME_VARIANCE, MTBF, MTTR, thời gian dừng máy reason pareto</td><td>Môi trường chạy + staged/manual governed mix</td><td>Có hiện trường source, reason code, tạm giữ/phát hành bằng chứng và action log; staged/manual chỉ số không được dùng reward.</td></tr>
-<tr><td>QMS/MES event</td><td>FAI_FIRST_PASS, CHUẨN BỊ MÁY_FIRST_PASS, CAPA_EFFECTIVENESS, cổng tính đầy đủ bằng chứng</td><td>Bằng chứng kiểm soátled</td><td>Có biểu mẫu/cổng hồ sơ và quyền QA/QMS rõ.</td></tr>
+<tr><td>Executive BSC</td><td>7 scored core: OTD, COMPLAINT_RATE, FPY, COPQ, PLAN_ADHERENCE, WIP_AGING, MATERIAL_AVAILABILITY_PLAN. Driver panel: FAI_FIRST_PASS, FINAL_RELEASE_RFT, INSPECTION_QUEUE_AGING, OEE_BOTTLENECK, CONSTRAINT_LOST_HOURS, CHECK_DIM_REPORT_ON_SHIP, LAM_EVIDENCE_PACK_COMPLETENESS, GAGE_VALID_FOR_RELEASE, NCR_3D_RESPONSE_SLA, NCR_8D_UPDATE_SLA, LAM G3 material/IQC/traceability readiness, LAM G5 IPQC/SPC/CMM/containment/gage validity, CRITICAL_ROLE_BACKUP_COVERAGE, SUPPLIER_READINESS.</td><td>Scorecard được kiểm soát</td><td>Chỉ scored core cộng điểm. Driver panel hiển thị để hành động/cap/block, không payout khi chưa có data contract và pilot phê duyệt.</td></tr>
+<tr><td>TOC weekly</td><td>BOTTLENECK_BUFFER_STATUS, THROUGHPUT_PER_CONSTRAINT_HOUR, CONSTRAINT_LOST_HOURS, WIP_BEFORE_CONSTRAINT</td><td>Staged data contract</td><td>Có constraint sổ đăng ký, máy/job context, reason taxonomy lost/starved và action loop owner/due/evidence.</td></tr>
+<tr><td>Lean daily</td><td>IN_PROCESS_REJECT_RATE, IPQC_CHARACTERISTIC_COMPLETENESS, SPC_SIGNAL_REACTION_TIME, CMM_QUEUE_AGING, NCR_CONTAINMENT_ON_TIME, GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT, CYCLE_TIME_VARIANCE, MTBF, MTTR, thời gian dừng máy theo reason pareto</td><td>Runtime + staged/manual governed mix</td><td>Có queue entry, oldest job/lot, hold reason, due action, hold/phát hành bằng chứng và action log; staged/manual metric không được dùng reward.</td></tr>
+<tr><td>CTQ capability</td><td>CPK_PRODUCT_MIN_CTQ, CPK_COVERAGE_RATE, CTQ_MEASUREMENT_COMPLETENESS, CTQ_SAMPLE_POLICY_STATUS, INSUFFICIENT_CPK_DATA_STATUS, GAGE_VALID_FOR_CTQ_MEASUREMENT, POST_CHANGE_CPK_REVALIDATION, CTQ_OUT_OF_SPEC_EVENT_COUNT, CTQ_SPECIAL_CAUSE_OPEN_ACTIONS</td><td>Staged numeric capability + manual-governed evidence gates</td><td>Chỉ metric evidence/manual-governed được phép hiển thị hoặc chặn khi chưa có runtime join; numeric Cpk bị ẩn khi n&lt;25 hoặc khi quá trình/gage/revalidation chưa đạt.</td></tr>
+<tr><td>QMS/MES event</td><td>FAI_FIRST_PASS, SETUP_FIRST_PASS, CAPA_EFFECTIVENESS, LAM_EVIDENCE_PACK_BLOCKER_COUNT, gate tính đầy đủ bằng chứng</td><td>Bằng chứng controlled</td><td>Có form/gate hồ sơ, packet/source-link retrieval và quyền QA/QMS/DCC rõ.</td></tr>
 </tbody>
 </table></div>
 </div> <div class="section">
@@ -109,9 +106,33 @@ td,th{vertical-align:top}
 <tbody>
 <tr><td>1. Định nghĩa</td><td>Mã chuẩn, tên KPI, mục đích quyết định, higher/lower is better.</td><td>QMS + chủ sở hữu</td></tr>
 <tr><td>2. Công thức</td><td>Tử số, mẫu số, filter, kỳ tính, xử lý ngoại lệ, đơn vị.</td><td>QMS + Analytics</td></tr>
-<tr><td>3. Nguồn dữ liệu</td><td>Bảng/cột, hệ nguồn, chủ sở hữu dữ liệu, refresh cadence, trace liên kết.</td><td>Chủ sở hữu dữ liệu</td></tr>
-<tr><td>4. Bằng chứng</td><td>Biểu mẫu, log, hồ sơ hoặc ảnh chụp trạng thái chứng minh số liệu.</td><td>QMS/QA khi liên quan chất lượng</td></tr>
-<tr><td>5. Môi trường chạy</td><td>Test, migration/seed nếu cần, bảng điều khiển contract, rollback behavior.</td><td>Engineering chủ sở hữu</td></tr>
+<tr><td>3. Nguồn dữ liệu</td><td>Bảng/cột, hệ nguồn, chủ sở hữu dữ liệu, làm mới cadence, truy xuất link.</td><td>Chủ sở hữu dữ liệu</td></tr>
+<tr><td>4. Bằng chứng</td><td>Form, log, hồ sơ hoặc ảnh chụp trạng thái chứng minh số liệu.</td><td>QMS/QA khi liên quan chất lượng</td></tr>
+<tr><td>5. Runtime</td><td>Test, migration/seed nếu cần, dashboard contract, rollback behavior.</td><td>Engineering chủ sở hữu</td></tr>
+</tbody>
+</table></div>
+</div> <div class="section">
+<h2>5A. Quy tắc authority cho CTQ / Cpk / SPC</h2>
+<div class="callout"><b>Authority rule:</b> Cpk không phải KPI RAG thông thường. Khi <span class="code">n &lt; 25</span>, khi còn <span class="code">CTQ_OUT_OF_SPEC_EVENT_COUNT</span>, khi còn <span class="code">CTQ_SPECIAL_CAUSE_OPEN_ACTIONS</span>, khi <span class="code">GAGE_VALID_FOR_CTQ_MEASUREMENT</span> không đạt, hoặc khi <span class="code">POST_CHANGE_CPK_REVALIDATION</span> chưa hoàn tất, hệ chỉ được render trạng thái insufficient/provisional/blocked và không được claim customer-grade với khách hàng.</div>
+<div class="table-card"><table class="table">
+<thead><tr><th>Metric</th><th>Authority hiện tại</th><th>Quy tắc dùng</th></tr></thead>
+<tbody>
+<tr><td><span class="code">CPK_PRODUCT_MIN_CTQ</span>, <span class="code">CPK_COVERAGE_RATE</span></td><td>Staged data contract</td><td>Giữ trong pilot review, chỉ dùng sau khi QA xác minh CTQ master, sample band, ổn định và gage validity.</td></tr>
+<tr><td><span class="code">CTQ_MEASUREMENT_COMPLETENESS</span>, <span class="code">CTQ_SAMPLE_POLICY_STATUS</span>, <span class="code">INSUFFICIENT_CPK_DATA_STATUS</span></td><td>Manual-governed</td><td>Dùng maker-checker review để chặn claim capability sai khi chưa đủ characteristic, sample policy hoặc sample window.</td></tr>
+<tr><td><span class="code">GAGE_VALID_FOR_CTQ_MEASUREMENT</span>, <span class="code">POST_CHANGE_CPK_REVALIDATION</span></td><td>Manual-governed gate control</td><td>Chặn release hoặc customer-grade claim khi gage/revalidation chưa đủ.</td></tr>
+<tr><td><span class="code">CTQ_OUT_OF_SPEC_EVENT_COUNT</span>, <span class="code">CTQ_SPECIAL_CAUSE_OPEN_ACTIONS</span></td><td>Manual-governed gate control</td><td>Bảo vệ quy tắc “no customer-grade claim while CTQ is out of spec or unstable”.</td></tr>
+</tbody>
+</table></div>
+</div> <div class="section">
+<h2>5B. Quy tắc authority cho complaint severity / 8D / bonus simulation</h2>
+<div class="callout"><b>Authority rule:</b> Khiếu nại khách hàng là domain có rủi ro gaming rất cao. <span class="code">COMPLAINT_RATE</span> chỉ là một góc nhìn outcome; quyền chặn và mô phỏng thưởng phải đi qua <span class="code">CUSTOMER_NCR_SEVERITY_SCORE</span>, <span class="code">NO_LATE_NO_NCR_COUNTER</span>, <span class="code">NO_CONTAINMENT_COUNTER</span>, <span class="code">REPEAT_ROOT_CAUSE_ESCAPE_RATE</span>, <span class="code">CUSTOMER_NOTIFICATION_LT</span> và bốn metric runtime 3D/4D/8D/accepted closure.</div>
+<div class="table-card"><table class="table">
+<thead><tr><th>Metric / lớp dữ liệu</th><th>Authority hiện tại</th><th>Quy tắc dùng</th></tr></thead>
+<tbody>
+<tr><td><span class="code">CUSTOMER_NCR_SEVERITY_SCORE</span>, <span class="code">CUSTOMER_NCR_EVENTS_M</span>, <span class="code">NO_LATE_NO_NCR_COUNTER</span>, <span class="code">NO_CONTAINMENT_COUNTER</span>, <span class="code">REPEAT_ROOT_CAUSE_ESCAPE_RATE</span>, <span class="code">CUSTOMER_NOTIFICATION_LT</span>, <span class="code">TRAINING_AS_CAPA_COUNTER</span></td><td>Manual-governed / simulation-only</td><td>Chỉ dùng cho management review, bonus simulation và blocker calibration; không payout, không auto-discipline.</td></tr>
+<tr><td><span class="code">NCR_3D_RESPONSE_SLA</span>, <span class="code">NCR_4D_PRELIMINARY_SLA</span>, <span class="code">NCR_8D_UPDATE_SLA</span>, <span class="code">CUSTOMER_ACCEPTED_8D_CLOSURE_RATE</span></td><td>Runtime-calculated</td><td>Dùng factual timestamp từ <span class="code">eqms_complaints</span>; thiếu timestamp hoặc acceptance evidence phải hiện trạng thái thiếu bằng chứng, không tô xanh giả.</td></tr>
+<tr><td><span class="code">bonus_simulation_model</span></td><td>Simulation-only</td><td><span class="code">simulation_only = true</span>, hard gate thắng điểm số, và phạm vi deduction chỉ áp trên scope bị ảnh hưởng trừ khi finding là critical/systemic.</td></tr>
+<tr><td><span class="code">customer_ncr_severity_matrix</span></td><td>QMS authority</td><td>Phải phân biệt rõ internal-contained/near-miss với major/critical, và có row riêng cho late/no NCR, no customer notification, no containment, unauthorized change, special release missing, expired gage và falsified record.</td></tr>
 </tbody>
 </table></div>
 </div>
@@ -122,21 +143,19 @@ td,th{vertical-align:top}
 <div class="table-card"><table class="table">
 <thead><tr><th>Chỉ số đánh giá</th><th>Kết quả</th><th>Nhận định kiểm soát</th></tr></thead>
 <tbody>
-<tr><td>HTML được quét</td><td>413 Tệp</td><td>Đã bao phủ app-served QMS content.</td></tr>
-<tr><td>Tệp có nhắc KPI/chỉ số</td><td>335 Tệp</td><td>KPI language rất rộng, không thể xem mọi nhắc tới KPI là KPI authority.</td></tr>
-<tr><td>Số lần xuất hiện từ KPI</td><td>1,944</td><td>Nhiều nội dung là đào tạo, JD, SOP/WI và hướng dẫn cổng.</td></tr>
-<tr><td>Ứng viên row KPI/chỉ số</td><td>1,537 row</td><td>Cần phân loại lại thành governance KPI, cổng chỉ số, operational chỉ số, Vai trò measure.</td></tr>
-<tr><td>Likely operational KPI IDs</td><td>59 mã</td><td>Nhiều mã là local document ID, không phải canonical code.</td></tr>
-<tr><td>Môi trường chạy KPI backend hiện có</td><td>19 chỉ số</td><td>Chỉ 19 chỉ số được KpiEngine tính trực tiếp.</td></tr>
+<tr><td>HTML được quét</td><td>413 file</td><td>Đã bao phủ app-served QMS content.</td></tr>
+<tr><td>File có nhắc KPI/metric</td><td>335 file</td><td>KPI language rất rộng, không thể xem mọi nhắc tới KPI là KPI authority.</td></tr>
+<tr><td>Số lần xuất hiện từ KPI</td><td>1,944</td><td>Nhiều nội dung là đào tạo, JD, SOP/WI và hướng dẫn gate.</td></tr>
+<tr><td>Ứng viên row KPI/metric</td><td>1,537 row</td><td>Cần phân loại lại thành quản trị KPI, gate metric, operational metric, chỉ số theo vai trò.</td></tr>
+<tr><td>Likely operational KPI IDs</td><td>59 mã</td><td>Nhiều mã là local tài liệu ID, không phải canonical code.</td></tr>
+<tr><td>Runtime KPI backend hiện có</td><td>19 metric</td><td>Chỉ 19 metric được KpiEngine tính trực tiếp.</td></tr>
 </tbody>
 </table></div>
-<div class="callout"><b>Kết luận đánh giá:</b> số lượng KPI trong tài liệu không thiếu; vấn đề chính là thiếu phân tầng authority, backend coverage và consequence logic rõ ràng. Từ thời điểm áp dụng annex này, tài liệu hiện trường/JD/training không được tự tạo KPI chính thức nếu chưa map registry và chưa có mục đích đánh giá.</div>
-</div>
-
-<div class="section">
-<h2>7. Quy tắc perbiểu mẫuance governance</h2>
-<div class="callout danger"><b>Nguyên tắc khóa:</b> Không dùng để đánh giá thì không gọi KPI. Nếu chỉ dùng để theo dõi, điều hành ca/ngày, giữ cổng chất lượng hoặc nhắc hành động thì đặt là chỉ số, kiểm soát chỉ số, cổng chỉ số, Vai trò measure hoặc health indicator.</div>
-<div class="callout danger"><b>Nguyên tắc thay đổi-kiểm soát:</b> Khi thêm, đổi tên, đổi target/ngưỡng, đổi trọng số, đổi chủ sở hữu, đổi công thức/backend hoặc di chuyển vị trí sử dụng của KPI/chỉ số, phải cập nhật đồng thời registry KPI, ANNEX-128 KPI System Ma trận và tất cả SOP/WI/ANNEX/JD/training liên quan. Nếu ANNEX-128 và tài liệu liên quan chưa cập nhật, thay đổi KPI chưa hoàn tất và chưa được dùng cho bảng điều khiển, đánh giá, ghi nhận, thưởng, hành động khắc phục hoặc kỷ luật.</div>
+<div class="callout"><b>Kết luận audit:</b> số lượng KPI trong tài liệu không thiếu; vấn đề chính là thiếu phân tầng authority, backend coverage và consequence logic rõ ràng. Từ thời điểm áp dụng annex này, tài liệu hiện trường/JD/đào tạo không được tự tạo KPI chính thức nếu chưa map registry và chưa có mục đích đánh giá.</div>
+</div> <div class="section">
+<h2>7. Quy tắc hiệu suất quản trị</h2>
+<div class="callout danger"><b>Nguyên tắc khóa:</b> Không dùng để đánh giá thì không gọi KPI. Nếu chỉ dùng để theo dõi, điều hành ca/ngày, giữ cổng chất lượng hoặc nhắc hành động thì đặt là metric, kiểm soát metric, gate metric, chỉ số theo vai trò hoặc health indicator.</div>
+<div class="callout danger"><b>Nguyên tắc kiểm soát thay đổi:</b> Khi thêm, đổi tên, đổi target/ngưỡng, đổi trọng số, đổi chủ sở hữu, đổi công thức/backend hoặc di chuyển vị trí sử dụng của KPI/metric, phải cập nhật đồng thời registry KPI, ANNEX-128 KPI Ma trận hệ thống và tất cả SOP/WI/ANNEX/JD/đào tạo liên quan. Nếu ANNEX-128 và tài liệu liên quan chưa cập nhật, thay đổi KPI chưa hoàn tất và chưa được dùng cho bảng điều khiển, đánh giá, ghi nhận, thưởng, hành động khắc phục hoặc kỷ luật.</div>
 <div class="table-card"><table class="table">
 <thead><tr><th>Phát hiện đánh giá</th><th>Kết quả</th><th>Việc phải làm</th></tr></thead>
 <tbody>
@@ -187,10 +206,10 @@ td,th{vertical-align:top}
 <tbody>
 <tr><td>Semantics</td><td><span class="code">chỉ số_type</span>, <span class="code">usage_types</span>, <span class="code">result_type</span>, <span class="code">is_official_kpi</span></td><td>Phân biệt KPI chính thức, Vận hành chỉ số, cổng chỉ số, Vai trò measure và health indicator.</td></tr>
 <tr><td>Intent</td><td><span class="code">strategic_intent</span>, <span class="code">motive</span>, <span class="code">expected_result</span>, <span class="code">decision_purpose</span></td><td>Khóa ý đồ quản trị, động cơ hành vi mong muốn và quyết định phải phát sinh.</td></tr>
-<tr><td>Evaluation</td><td><span class="code">evaluation_use</span>, <span class="code">evaluation_scope</span>, <span class="code">rating_method</span>, <span class="code">Rà soát_forum</span></td><td>Chỉ chỉ số có evaluation use được duyệt mới được gọi KPI.</td></tr>
-<tr><td>Bằng chứng</td><td><span class="code">data_contract</span>, <span class="code">calculation_trạng thái</span>, <span class="code">source_table_or_hồ sơ</span>, <span class="code">bằng chứng_hồ sơ</span>, <span class="code">chuyềnage_quy tắc</span></td><td>Cho biết backend tính được chưa, nguồn nào là bằng chứng, số có đáng tin đến mức nào và truy vết về authority nào.</td></tr>
-<tr><td>Scorecard</td><td><span class="code">scorecard_weight_pct</span>, <span class="code">scorecard_unit</span>, <span class="code">scorecard_target</span>, <span class="code">scorecard_scoring_trạng thái</span>, <span class="code">scorecard_contributes_to_reward</span></td><td>Tách target/unit scorecard khỏi target/unit môi trường chạy. Chỉ số staged có thể hiển thị để điều hành nhưng chưa dùng payout.</td></tr>
-<tr><td>Consequence</td><td><span class="code">consequence</span>, <span class="code">counter_chỉ số</span>, <span class="code">anti_gaming_guardrail</span>, <span class="code">kiểm soátlability_scope</span></td><td>Chống dùng số thô để thưởng/phạt sai người và chống gaming.</td></tr>
+<tr><td>Evaluation</td><td><span class="code">evaluation_use</span>, <span class="code">evaluation_scope</span>, <span class="code">rating_method</span>, <span class="code">review_forum</span></td><td>Chỉ metric có evaluation use được duyệt mới được gọi KPI.</td></tr>
+<tr><td>Bằng chứng</td><td><span class="code">data_contract</span>, <span class="code">calculation_status</span>, <span class="code">source_table_or_record</span>, <span class="code">evidence_record</span>, <span class="code">lineage_rule</span></td><td>Cho biết backend tính được chưa, nguồn nào là bằng chứng, số có đáng tin đến mức nào và truy vết về authority nào.</td></tr>
+<tr><td>Thẻ điểm</td><td><span class="code">scorecard_weight_pct</span>, <span class="code">scorecard_unit</span>, <span class="code">scorecard_target</span>, <span class="code">scorecard_scoring_status</span>, <span class="code">scorecard_contributes_to_reward</span></td><td>Tách target/unit thẻ điểm khỏi target/unit runtime. Metric staged có thể hiển thị để điều hành nhưng chưa dùng payout.</td></tr>
+<tr><td>Consequence</td><td><span class="code">consequence</span>, <span class="code">counter_metric</span>, <span class="code">anti_gaming_guardrail</span>, <span class="code">controllability_scope</span></td><td>Chống dùng số thô để thưởng/phạt sai người và chống gaming.</td></tr>
 </tbody>
 </table></div>
 
@@ -207,9 +226,8 @@ td,th{vertical-align:top}
 <tr><td>Discipchuyền</td><td>Kỷ luật chỉ xét hành vi có bằng chứng trong phạm vi kiểm soát cá nhân.</td><td>Không phạt người vận hành vì outcome hệ thống ngoài tầm kiểm soát.</td></tr>
 </tbody>
 </table></div>
-</div>
-
-<div class="section">
+<div class="callout warn"><b>Pilot governance authority:</b> trước khi rollout hoặc bật payout, registry phải giữ khối <span class="code">pilot_governance_program</span> với cửa sổ 90 ngày, part family/work center/role trong scope, cadence <span class="code">daily_tier_review</span> / <span class="code">weekly_toc_constraint_review</span> / <span class="code">weekly_lam_evidence_review</span> / <span class="code">monthly_bsc_review</span> / <span class="code">monthly_qms_ceo_calibration</span> / <span class="code">pilot_retrospective</span> / <span class="code">day_90_go_no_go</span>, và watermark <span class="code">SIMULATION ONLY - 90-DAY PILOT / NO PAYOUT / NO AUTO DISCIPLINE</span>.</div>
+</div> <div class="section">
 <h2>8. Quy tắc bảng điều khiển</h2>
 <ul class="tight">
 <li>bảng điều khiển lãnh đạo chỉ có 7 scored core cộng điểm. Driver panel được hiển thị riêng và phải gắn nhãn visible-chỉ/cap/block; CEO không được tự mở rộng thành KPI điểm nếu chưa có data contract và thay đổi kiểm soát.</li>
@@ -237,11 +255,11 @@ td,th{vertical-align:top}
 <div class="table-card"><table class="table">
 <thead><tr><th>API</th><th>Vai trò</th><th>Quy tắc</th></tr></thead>
 <tbody>
-<tr><td><span class="code">GET /api/kpi/Danh mục</span></td><td>Trả registry, alias, nhóm tài liệu, backend coverage, perbiểu mẫuance-governance chính sách, scorecard Vận hành model và per-chỉ số Vận hành contract.</td><td>Dùng trước khi thêm bảng điều khiển/widget mới hoặc gọi một chỉ số là KPI; bắt buộc kiểm tra <span class="code">chỉ số_type</span>, <span class="code">evaluation_use</span>, <span class="code">is_official_kpi</span>, <span class="code">scorecard_weight_pct</span>, <span class="code">quantitative_threstạm giữs</span> và <span class="code">calculation_trạng thái</span>.</td></tr>
-<tr><td><span class="code">thay đổi_kiểm soát_Chính sách</span></td><td>Quy tắc bắt buộc khi chỉnh hoặc thêm KPI/chỉ số.</td><td>Mọi thay đổi KPI/chỉ số phải đi kèm cập nhật registry, ANNEX-128, tài liệu nguồn/liên quan, API/data contract nếu ảnh hưởng backend và bằng chứng đánh giá. Không có cập nhật Ma trận thì không được coi là thay đổi hợp lệ.</td></tr>
-<tr><td><span class="code">GET /api/kpi/{chỉ sốCode}</span></td><td>Tính KPI môi trường chạy.</td><td>Chỉ trả số cho chỉ số thuộc <span class="code">môi trường chạy_calculated_chỉ số</span>.</td></tr>
-<tr><td><span class="code">GET /api/kpi/{chỉ sốCode}/trend</span></td><td>Xu hướng KPI môi trường chạy.</td><td>Known non-môi trường chạy chỉ số phải trả trạng thái thiếu data contract, không trả số giả.</td></tr>
-<tr><td><span class="code">check_kpi_integrity.php</span></td><td>Guard CI chống drift hệ KPI, chạy trong <span class="code">.github/Luồng công việcs/deploy.yml</span> cùng nhóm với <span class="code">check_raci_integrity.php</span>.</td><td>Chặn deploy (P0) khi: mã KPI ANNEX-122 lệch registry; thiếu trường bắt buộc (biểu mẫuula/threstạm giữs/chủ sở hữu_Vai trò/data_source/calculation_trạng thái/decision_action); <span class="code">môi trường chạy_calculated</span> chưa nối <span class="code">KpiEngine::getCalculator()</span>; trùng <span class="code">canonical_code</span>; alias trỏ mã lạ; cổng <span class="code">liên kếted_cdr</span> không có trong RACI-MASTER-MA TRẬN; cổng G0-G7 thiếu chỉ số; <span class="code">reward_eligible</span> thiếu counter/blocker; chỉ số staged bị gắn thưởng; route/API hoặc Console raw JSON lệch guard.</td></tr>
+<tr><td><span class="code">GET /api/kpi/catalog</span></td><td>Trả registry, alias, nhóm tài liệu, backend coverage, chính sách hiệu suất và hợp đồng vận hành theo từng metric.</td><td>Dùng trước khi thêm bảng điều khiển/widget mới hoặc gọi một chỉ số là KPI; bắt buộc kiểm tra <span class="code">metric_type</span>, <span class="code">evaluation_use</span>, <span class="code">is_official_kpi</span>, <span class="code">scorecard_weight_pct</span>, <span class="code">quantitative_thresholds</span> và <span class="code">calculation_status</span>.</td></tr>
+<tr><td><span class="code">change_control_policy</span></td><td>Quy tắc bắt buộc khi chỉnh hoặc thêm KPI/metric.</td><td>Mọi thay đổi KPI/metric phải đi kèm cập nhật registry, ANNEX-128, tài liệu nguồn/liên quan, API/data contract nếu ảnh hưởng backend và bằng chứng audit. Không có cập nhật ma trận thì không được coi là thay đổi hợp lệ.</td></tr>
+<tr><td><span class="code">GET /api/kpi/{metricCode}</span></td><td>Tính KPI runtime.</td><td>Chỉ trả số cho metric thuộc <span class="code">runtime_calculated_metrics</span>.</td></tr>
+<tr><td><span class="code">GET /api/kpi/{metricCode}/trend</span></td><td>Xu hướng KPI runtime.</td><td>Known non-runtime metric phải trả trạng thái thiếu data contract, không trả số giả.</td></tr>
+<tr><td><span class="code">check_kpi_integrity.php</span></td><td>Guard CI chống drift hệ KPI, chạy trong <span class="code">.github/workflows/deploy.yml</span> cùng nhóm với <span class="code">check_raci_integrity.php</span>.</td><td>Chặn deploy (P0) khi: mã KPI ANNEX-122 lệch registry; thiếu trường bắt buộc (formula/thresholds/owner_role/data_source/calculation_status/decision_action); <span class="code">runtime_calculated</span> chưa nối <span class="code">KpiEngine::getCalculator()</span>; trùng <span class="code">canonical_code</span>; alias trỏ mã lạ; gate <span class="code">linked_cdr</span> không có trong RACI-MASTER-ma trận; cổng G0-G7 thiếu metric; <span class="code">reward_eligible</span> thiếu counter/blocker; metric staged bị gắn thưởng; tuyến công nghệ/API hoặc Console raw JSON lệch guard.</td></tr>
 </tbody>
 </table></div>
 <div class="callout danger"><b>Không được làm:</b> thêm chỉ số vào bảng điều khiển bằng cách để KpiEngine tự sinh definition, hoặc sửa/thêm KPI trong một tài liệu mà không cập nhật ANNEX-128 và các tài liệu liên quan. Chỉ số mới phải qua data contract, migration/seed nếu cần, test và Rà soát QMS/Analytics.</div>
@@ -250,21 +268,11 @@ td,th{vertical-align:top}
 <div class="section">
 <h2>10b. Cập nhật P05–P10 (2026-05-24)</h2>
 <p>Chương trình LAM 10× từ <span class="code">P05</span> đến <span class="code">P10</span> hoàn thành 2026-05-24. Tóm tắt tác động lên registry và Admin Console:</p>
-<ul>
-  <li><b>P05 graduate môi trường chạy:</b> 2 chỉ số chuyển từ proposed → môi trường chạy tính tự động — <span class="code">FAI_FIRST_PASS</span> và <span class="code">IN_QUÁ TRÌNH_REJECT_RATE</span> (engine MES + QA event stream).</li>
-  <li><b>Phantom rewrite:</b> 3 chỉ số đổi nguồn về <span class="code">mes_oee_ảnh chụp trạng tháis</span> — <span class="code">OEE</span>, <span class="code">MACHINE_UTILIZATION</span>, <span class="code">CHUẨN BỊ MÁY_TO_RUN_RATIO</span> — xoá phantom JSON biểu mẫuula cũ.</li>
-  <li><b>Reward / attribution:</b> 6 reward quy tắc mới + attribution template scorecard + dung sai trọng số ±5% trên scorecard tier.</li>
-  <li><b>Hợp đồng bảng điều khiển / input:</b> bổ sung <span class="code">Bảng điều khiển_render_contract</span> (card_classes: executive, daily_ops, cổng, Vai trò, backlog) và <span class="code">manual_input_contract</span> (input_trạng thái_enum, reward_cổng.chính sách, validation). Render trong Admin Console <em>KPI Registry</em> ở các tab Data Contracts, Hồ sơ Khách và Đánh giá/Drift.</li>
-  <li><b>Separation of Duties:</b> endpoint mới <span class="code">kpi_input_approve</span> tách quyền nhập số khỏi quyền duyệt số (người nhập ≠ người duyệt).</li>
-  <li><b>CI guard:</b> các kiểm tra <span class="code">P0.6.X / P0.7.X / P0.8.X / P0.9.X</span> chạy trong <span class="code">check_kpi_integrity.php</span> bảo vệ registry khỏi drift schema.</li>
-  <li><b>VN rewrite:</b> 39 chỉ số đã được viết lại chú giải kỹ thuật Việt + bổ sung trường <span class="code">intent_vi</span> mô tả ý đồ kinh doanh; Admin Console render <span class="code">intent_vi</span> dưới <span class="code">name_vi</span> của counter chỉ số.</li>
-  <li><b>CDR accountable:</b> mỗi cổng chỉ số ghi thêm <span class="code">cdr_accountable_Vai trò</span> và <span class="code">chủ sở hữu_alignment_Ghi chú</span> để chỉ rõ Decision Right A khi nhiều Vai trò cùng tham gia.</li>
+<ul> <li><b>P05 graduate runtime:</b> 2 metric chuyển từ proposed → runtime tính tự động — <span class="code">FAI_FIRST_PASS</span> và <span class="code">IN_PROCESS_REJECT_RATE</span> (engine MES + QA event stream).</li> <li><b>Phantom rewrite:</b> 3 metric đổi nguồn về <span class="code">mes_oee_snapshots</span> — <span class="code">OEE</span>, <span class="code">MACHINE_UTILIZATION</span>, <span class="code">SETUP_TO_RUN_RATIO</span> — xoá phantom JSON formula cũ.</li> <li><b>Reward / attribution:</b> 6 reward rule mới + attribution template thẻ điểm + dung sai trọng số ±5% trên thẻ điểm tầng.</li> <li><b>Hợp đồng bảng điều khiển / input:</b> bổ sung <span class="code">dashboard_render_contract</span> (card_classes: executive, daily_ops, gate, role, backlog) và <span class="code">manual_input_contract</span> (input_status_enum, reward_gate_policy, validation). Render trong Admin Console <em>KPI Registry</em> ở các tab Data Contracts, Hồ sơ Khách và Audit/Drift.</li> <li><b>Separation of Duties:</b> endpoint mới <span class="code">kpi_input_approve</span> tách quyền nhập số khỏi quyền duyệt số (người nhập ≠ người duyệt).</li> <li><b>CI guard:</b> các kiểm tra <span class="code">P0.6.X / P0.7.X / P0.8.X / P0.9.X</span> chạy trong <span class="code">check_kpi_integrity.php</span> bảo vệ registry khỏi drift schema.</li> <li><b>VN rewrite:</b> 39 metric đã được viết lại chú giải kỹ thuật Việt + bổ sung trường <span class="code">intent_vi</span> mô tả ý đồ kinh doanh; Admin Console render <span class="code">intent_vi</span> dưới <span class="code">name_vi</span> của chỉ số đối trọng.</li> <li><b>CDR accountable:</b> mỗi gate metric ghi thêm <span class="code">cdr_accountable_role</span> và <span class="code">owner_alignment_note</span> để chỉ rõ quyết định Right A khi nhiều vai trò cùng tham gia.</li>
 </ul>
-<p><b>Cập nhật P04 LAM cổng coverage:</b> khai báo hiện hành chứa <span class="code">LAM_SEMSYSCO.cổng_coverage.G3</span> cho vật liệu cert, IQC, kit readiness, trace label, công đoạn đặc biệt và sub-tier flowdown; <span class="code">G5</span> cho in-quá trình reject, IPQC characteristic completeness, SPC reaction, CMM queue, NCR containment và in-quá trình thiết bị đo validity. Tất cả là cổng/blocker-chỉ; chỉ <span class="code">IN_QUÁ TRÌNH_REJECT_RATE</span> đã môi trường chạy thật, các chỉ số còn lại staged hoặc được kiểm soát thủ công với điều kiện graduation rõ.</p>
-<p>Bằng chứng thay đổi được giữ trong gói đánh giá nội bộ. Số đếm, lifecycle staged/môi trường chạy/manual và coverage cổng phải lấy từ <a href="../../../../../portal.html#admin/kpi-registry">Admin Console KPI Registry</a> hoặc ANNEX-128 sinh từ registry; ANNEX-122 §4–§6 giữ định nghĩa cascade, §9 cổng table đồng bộ từ registry.</p>
-</div>
-
-<div class="section">
+<p><b>Cập nhật P04 LAM gate coverage:</b> khai báo hiện hành chứa <span class="code">LAM_SEMSYSCO.gate_coverage.G3</span> cho vật liệu cert, IQC, kit readiness, truy xuất label, quy trình đặc biệt và sub-tier flowdown; <span class="code">G5</span> cho in-process reject, IPQC characteristic completeness, SPC reaction, CMM queue, NCR containment và in-process gage validity. Tất cả là gate/blocker-only; chỉ <span class="code">IN_PROCESS_REJECT_RATE</span> đã runtime thật, các metric còn lại staged hoặc manual-governed với điều kiện graduation rõ.</p>
+<p>Bằng chứng thay đổi được giữ trong gói audit nội bộ. Số đếm, lifecycle staged/runtime/manual và coverage gate phải lấy từ <a href="../../../../../portal.html#admin/kpi-registry">Admin Console KPI Registry</a> hoặc ANNEX-128 sinh từ registry; ANNEX-122 §4–§6 giữ định nghĩa cascade, §9 gate table đồng bộ từ registry.</p>
+</div> <div class="section">
 <h2>11. Tài liệu liên kết</h2>
 <div class="table-card"><table class="table">
 <thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead>

@@ -16,6 +16,10 @@ function _api(action, payload, method){
 }
 function _toast(msg, type){ if(typeof showToast==='function') return showToast(msg, type); var box=document.createElement('div'); box.className='sj-toast '+(type||'info'); box.textContent=msg; document.body.appendChild(box); requestAnimationFrame(function(){ box.classList.add('show'); }); setTimeout(function(){ box.classList.remove('show'); setTimeout(function(){ if(box.parentNode) box.remove(); },180); },3200); }
 function _fmtDate(v){ if(!v) return ''; var d=new Date(v); return isNaN(d.getTime())?String(v):String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
+function _shouldWarnMissingRegistry(regKey){
+  if(!window.HmRegistry || typeof HmRegistry.shouldWarnMissingStatusSet !== 'function') return true;
+  return HmRegistry.shouldWarnMissingStatusSet(regKey);
+}
 function _openPurchasingIncoming(item){
   var ctx = { targetTab:'receiving' };
   var record = item && typeof item === 'object' ? item : {};
@@ -42,7 +46,7 @@ function _buildRegistryOptions(regKey){
       html += '<option value="'+_esc(o.value)+'">'+_esc(_t(o.label, o.labelEn||o.label))+'</option>';
     });
   }
-  if(html.indexOf('value="') === html.lastIndexOf('value="')) console.warn('[SQ] Registry key "'+regKey+'" trống — select sẽ không có options.');
+  if(html.indexOf('value="') === html.lastIndexOf('value="') && _shouldWarnMissingRegistry(regKey)) console.warn('[SQ] Registry key "'+regKey+'" trống — select sẽ không có options.');
   return html;
 }
 
@@ -64,7 +68,7 @@ var RATING = (function(){
     var opts = HmRegistry.statusSet('supplier_rating');
     if(opts && opts.length) opts.forEach(function(o){ map[o.value] = {vi:o.label, en:o.labelEn||o.label, color:o.color||'#6b7280'}; });
   }
-  if(!Object.keys(map).length) console.warn('[SQ] Registry key "supplier_rating" trống — rating options sẽ bị thiếu.');
+  if(!Object.keys(map).length && _shouldWarnMissingRegistry('supplier_rating')) console.warn('[SQ] Registry key "supplier_rating" trống — rating options sẽ bị thiếu.');
   return map;
 })();
 
@@ -75,7 +79,7 @@ var SCAR_STATUS = (function(){
     var opts = HmRegistry.statusSet('scar_status');
     if(opts && opts.length) opts.forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn||o.label,color:o.color||'#6b7280'}; });
   }
-  if(!Object.keys(map).length) console.warn('[SQ] Registry key "scar_status" trống — SCAR status options sẽ bị thiếu.');
+  if(!Object.keys(map).length && _shouldWarnMissingRegistry('scar_status')) console.warn('[SQ] Registry key "scar_status" trống — SCAR status options sẽ bị thiếu.');
   return map;
 })();
 
@@ -86,7 +90,7 @@ var AUDIT_STATUS = (function(){
     var opts = HmRegistry.statusSet('supplier_audit_status');
     if(opts && opts.length) opts.forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn||o.label,color:o.color||'#6b7280'}; });
   }
-  if(!Object.keys(map).length) console.warn('[SQ] Registry key "supplier_audit_status" trống — audit status options sẽ bị thiếu.');
+  if(!Object.keys(map).length && _shouldWarnMissingRegistry('supplier_audit_status')) console.warn('[SQ] Registry key "supplier_audit_status" trống — audit status options sẽ bị thiếu.');
   return map;
 })();
 
@@ -97,7 +101,7 @@ var INSPECTION_STATUS = (function(){
     var opts = HmRegistry.statusSet('incoming_inspection_status');
     if(opts && opts.length) opts.forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn||o.label,color:o.color||'#6b7280'}; });
   }
-  if(!Object.keys(map).length) console.warn('[SQ] Registry key "incoming_inspection_status" trống — inspection status sẽ bị thiếu.');
+  if(!Object.keys(map).length && _shouldWarnMissingRegistry('incoming_inspection_status')) console.warn('[SQ] Registry key "incoming_inspection_status" trống — inspection status sẽ bị thiếu.');
   return map;
 })();
 

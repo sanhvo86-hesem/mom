@@ -3646,6 +3646,7 @@ final class KpiEngine
         $defaults = is_array($registry['metric_governance_defaults'] ?? null)
             ? $registry['metric_governance_defaults']
             : [];
+        $overlayUpdatedAt = $this->stringField($registry, 'runtime_overlay_updated_at');
 
         foreach ($catalog as $code => &$metric) {
             $override = array_merge($scorecardItems[$code] ?? [], $overrides[$code] ?? []);
@@ -3704,6 +3705,15 @@ final class KpiEngine
 	            $this->applyConsequence($metric, $override, $metricType, $defaults);
 	            $this->applyScorecardRules($metric, $override);
 	            $this->applyMetricControlSummary($metric);
+                $metric['data_confidence'] = (string) ($metric['data_confidence_level'] ?? $calculationStatus);
+                $metric['owner'] = (string) ($metric['owner_role'] ?? '');
+                $metric['min_sample'] = is_array($metric['sample_policy'] ?? null)
+                    && is_numeric($metric['sample_policy']['min_n_score'] ?? null)
+                    ? (int) $metric['sample_policy']['min_n_score'] : null;
+                $metric['last_updated'] = $this->stringField($override, 'last_updated');
+                if ($metric['last_updated'] === '' && $overlayUpdatedAt !== '') {
+                    $metric['last_updated'] = $overlayUpdatedAt;
+                }
 	        }
 	        unset($metric);
 	    }

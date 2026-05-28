@@ -62,6 +62,8 @@ final class KpiRegistryAdminService
         'weekly' => 'Tuần', 'monthly' => 'Tháng',
     ];
     private const VALID_CADENCE = ['per-event', 'daily', 'weekly', 'monthly'];
+    private const VALID_CANONICAL_CODE_PATTERN = '/^[A-Z0-9_]+$/';
+    private const FORBIDDEN_CANONICAL_CODE_PATTERN = '/(^|_)(GIAO|HANG|HO_SO|PHE_DUYET|BANG_CHUNG)(_|$)/';
 
     /**
      * MCS-EXT-1 — Metric Control Schema extension allowed values.
@@ -186,7 +188,12 @@ final class KpiRegistryAdminService
 
         // KPI Library — every metric flattened with its classification so the
         // Console can browse and filter across all groups.
-        $library = $this->buildLibrary($governance, $gate, $proposed);
+        $library = $this->buildLibrary(
+            $governance,
+            $gate,
+            $proposed,
+            is_array($overlay) ? (string) ($overlay['updated_at'] ?? '') : '',
+        );
         $views = $this->buildConsoleViews($library, $effectiveSeed);
 
         // Console-added KPIs + retired codes already in the overlay. The
@@ -242,6 +249,8 @@ final class KpiRegistryAdminService
                 ? $seed['ctq_capability_policy'] : new \stdClass(),
             'ctq_data_contract' => is_array($seed['ctq_data_contract'] ?? null)
                 ? $seed['ctq_data_contract'] : new \stdClass(),
+            'lean_flow_operating_model' => is_array($seed['lean_flow_operating_model'] ?? null)
+                ? $seed['lean_flow_operating_model'] : new \stdClass(),
             // P08 — dashboard render + manual input contracts are exposed to
             // the portal so dashboards and the manual-input form honor the
             // same governance rules (no staged value leak, reward gate on
@@ -652,6 +661,7 @@ final class KpiRegistryAdminService
         if ($code === '') {
             $code = '(missing-code)';
         }
+        $this->assertCanonicalCode($code, 'kpi_registry_mco_invalid_code');
 
         $subtype = $this->sanitizeEnum($row['metric_subtype'] ?? '', self::EXT_METRIC_SUBTYPES);
         $intent = $this->sanitizeEnum($row['control_intent'] ?? '', self::EXT_CONTROL_INTENT);
@@ -712,6 +722,16 @@ final class KpiRegistryAdminService
             if ($subtype !== 'health_indicator' && !$this->hasNonEmptyList($row['blocking_conditions'] ?? null)) {
                 throw new RuntimeException('kpi_registry_mco_missing_blocking_conditions:' . $code);
             }
+            if (in_array($subtype, ['official_kpi', 'operating_metric'], true)
+                && !$this->hasText($row, 'decision_action')) {
+                throw new RuntimeException('kpi_registry_mco_missing_decision_action:' . $code);
+            }
+            if ($subtype === 'official_kpi') {
+                $thresholds = is_array($row['thresholds'] ?? null) ? $row['thresholds'] : [];
+                if (!is_numeric($thresholds['green_point'] ?? null) || !is_numeric($thresholds['yellow_point'] ?? null)) {
+                    throw new RuntimeException('kpi_registry_mco_official_thresholds_missing:' . $code);
+                }
+            }
         }
 
         if ($subtype === 'health_indicator') {
@@ -736,6 +756,30 @@ final class KpiRegistryAdminService
             }
             if (!in_array($rewardMode, ['blocker_only', 'not_rewardable'], true)) {
                 throw new RuntimeException('kpi_registry_mco_gate_invalid_reward_mode:' . $code);
+            }
+        }
+        if ($calcStatus === 'manual_governed') {
+            $manual = $row['manual_input_contract'] ?? null;
+            if ((string) ($row['backend_status'] ?? '') !== 'manual_governed') {
+                throw new RuntimeException('kpi_registry_mco_manual_governed_missing_backend_status:' . $code);
+            }
+            if ((string) ($row['primary_endpoint'] ?? '') !== 'GET /api/kpi/' . $code) {
+                throw new RuntimeException('kpi_registry_mco_manual_governed_missing_primary_endpoint:' . $code);
+            }
+            if (!is_array($manual)) {
+                throw new RuntimeException('kpi_registry_mco_manual_governed_missing_contract:' . $code);
+            }
+            if (!$this->hasText($manual, 'form')) {
+                throw new RuntimeException('kpi_registry_mco_manual_governed_missing_form:' . $code);
+            }
+            if (!$this->hasNonEmptyList($manual['fields'] ?? null)) {
+                throw new RuntimeException('kpi_registry_mco_manual_governed_missing_fields:' . $code);
+            }
+            if (trim((string) ($manual['verification'] ?? '')) === '') {
+                throw new RuntimeException('kpi_registry_mco_manual_governed_missing_verification:' . $code);
+            }
+            if (!$this->hasText($manual, 'reward_gate')) {
+                throw new RuntimeException('kpi_registry_mco_manual_governed_missing_reward_gate:' . $code);
             }
         }
 
@@ -764,6 +808,10 @@ final class KpiRegistryAdminService
             && !$this->hasText($row, 'data_contract_gap')) {
             throw new RuntimeException('kpi_registry_mco_customer_specific_missing_profile:' . $code);
         }
+        if ($intent === 'customer_specific_requirement' && $requireComplete
+            && !$this->hasNonEmptyList($row['required_evidence'] ?? null)) {
+            throw new RuntimeException('kpi_registry_mco_customer_specific_missing_required_evidence:' . $code);
+        }
 
         if ($subtype === 'spc_capability_metric' || in_array($scoring, ['spc_control_chart', 'spec_limit_capability'], true)) {
             $sample = $row['sample_policy'] ?? null;
@@ -773,6 +821,7 @@ final class KpiRegistryAdminService
             }
             $this->validateSpcCapabilityContract($row, $code, $sample);
         }
+        $this->validateCtqBundleContract($row, $code);
 
         if ($subtype === 'composite_readiness_index' || $scoring === 'composite_weighted_score') {
             $weightTotal = $this->componentWeightTotal($row['components'] ?? null);
@@ -830,6 +879,45 @@ final class KpiRegistryAdminService
             }
         } elseif (!$this->hasText($row, 'data_contract_gap')) {
             throw new RuntimeException('kpi_registry_mco_capability_staged_gap_required:' . $code);
+        }
+    }
+
+    /**
+     * Prompt 05 CTQ bundle enforcement. These rows cannot drift into generic
+     * metrics once the LAM capability module depends on them for real gates.
+     *
+     * @param array<string, mixed> $row
+     */
+    private function validateCtqBundleContract(array $row, string $code): void
+    {
+        if ($code === 'INSUFFICIENT_CPK_DATA_STATUS') {
+            if ((string) ($row['metric_subtype'] ?? '') !== 'health_indicator') {
+                throw new RuntimeException('kpi_registry_ctq_bundle_insufficient_must_be_health:' . $code);
+            }
+            if (strtolower(trim((string) ($row['reward_mode'] ?? ''))) !== 'not_rewardable') {
+                throw new RuntimeException('kpi_registry_ctq_bundle_insufficient_rewardable:' . $code);
+            }
+        }
+
+        if (in_array($code, ['CTQ_OUT_OF_SPEC_EVENT_COUNT', 'CTQ_SPECIAL_CAUSE_OPEN_ACTIONS'], true)) {
+            if ((string) ($row['metric_subtype'] ?? '') !== 'gate_control_metric') {
+                throw new RuntimeException('kpi_registry_ctq_bundle_gate_subtype_required:' . $code);
+            }
+            if (strtoupper(trim((string) ($row['gate'] ?? ''))) !== 'G5') {
+                throw new RuntimeException('kpi_registry_ctq_bundle_gate_g5_required:' . $code);
+            }
+            if (!$this->hasText($row, 'lam_profile_link')) {
+                throw new RuntimeException('kpi_registry_ctq_bundle_profile_link_required:' . $code);
+            }
+        }
+
+        if ($code === 'POST_CHANGE_CPK_REVALIDATION'
+            && strtoupper(trim((string) ($row['gate'] ?? ''))) !== 'G1') {
+            throw new RuntimeException('kpi_registry_ctq_bundle_post_change_gate_g1_required:' . $code);
+        }
+        if ($code === 'GAGE_VALID_FOR_CTQ_MEASUREMENT'
+            && strtoupper(trim((string) ($row['gate'] ?? ''))) !== 'G5') {
+            throw new RuntimeException('kpi_registry_ctq_bundle_gage_gate_g5_required:' . $code);
         }
     }
 
@@ -1029,10 +1117,10 @@ final class KpiRegistryAdminService
      * @param array<int, array<string, mixed>> $proposed
      * @return array<int, array<string, mixed>>
      */
-    private function buildLibrary(array $governance, array $gate, array $proposed): array
+    private function buildLibrary(array $governance, array $gate, array $proposed, string $overlayUpdatedAt = ''): array
     {
         $lib = [];
-        $push = function (array $row, string $group) use (&$lib): void {
+        $push = function (array $row, string $group) use (&$lib, $overlayUpdatedAt): void {
             $t = is_array($row['thresholds'] ?? null) ? $row['thresholds'] : [];
             $code = (string) ($row['canonical_code'] ?? '');
             $status = (string) ($row['calculation_status'] ?? ($row['status'] ?? ''));
@@ -1052,6 +1140,9 @@ final class KpiRegistryAdminService
                 'retired' => 'retired',
                 default => 'staged_data_contract',
             };
+            $counterMetric = is_array($row['counter_metric'] ?? null) ? $row['counter_metric'] : null;
+            $samplePolicy = is_array($row['sample_policy'] ?? null) ? $row['sample_policy'] : null;
+            $dataConfidence = (string) ($row['data_confidence_level'] ?? $status);
             $lib[] = [
                 'canonical_code'     => $code,
                 'local_id'           => $row['local_id'] ?? null,
@@ -1063,6 +1154,7 @@ final class KpiRegistryAdminService
                 'tier'               => $row['tier'] ?? null,
                 'process'            => (string) ($row['process'] ?? 'unclassified'),
                 'category'           => (string) ($row['category'] ?? 'internal'),
+                'cadence'            => (string) ($row['cadence'] ?? ''),
                 'gate'               => $row['gate'] ?? null,
                 'linked_cdr'         => is_array($row['linked_cdr'] ?? null) ? $row['linked_cdr'] : [],
                 'gate_pass_condition'=> $row['gate_pass_condition'] ?? '',
@@ -1071,14 +1163,24 @@ final class KpiRegistryAdminService
                 'data_contract_status' => $dataContractStatus,
                 'runtime_endpoint'   => $runtimeEndpoint,
                 'input_endpoint'     => $inputEndpoint,
+                'primary_endpoint'   => (string) ($row['primary_endpoint'] ?? ($runtimeEndpoint ?: 'GET /api/kpi/catalog')),
                 'data_contract_gap'  => (string) ($row['data_contract_gap'] ?? ''),
                 'target_graduation_condition' => (string) ($row['target_graduation_condition'] ?? ''),
                 'evidence_source'    => (string) ($row['evidence_source'] ?? ''),
                 'blocking_conditions'=> is_array($row['blocking_conditions'] ?? null) ? $row['blocking_conditions'] : [],
                 'owner_role'         => $row['owner_role'] ?? null,
+                'owner'              => (string) ($row['owner_role'] ?? ''),
                 'data_stewardship_role' => $row['data_stewardship_role'] ?? null,
+                'data_confidence'    => $dataConfidence,
+                'data_confidence_level' => $dataConfidence,
+                'last_updated'       => (string) ($row['last_updated'] ?? ($overlayUpdatedAt !== '' ? $overlayUpdatedAt : null)),
                 'applicable_jds'     => is_array($row['applicable_jds'] ?? null) ? $row['applicable_jds'] : [],
-                'counter_metric'     => $row['counter_metric'] ?? null,
+                'counter_metric'     => $counterMetric,
+                'counter_metric_status' => [
+                    'status' => $counterMetric !== null ? 'present' : 'missing',
+                    'code' => is_array($counterMetric) ? (string) ($counterMetric['code'] ?? '') : '',
+                    'intent' => is_array($counterMetric) ? (string) ($counterMetric['intent'] ?? '') : '',
+                ],
                 'purpose'            => $row['purpose'] ?? '',
                 'decision_action'    => $row['decision_action'] ?? '',
                 'action_reference'   => $row['action_reference'] ?? '',
@@ -1097,7 +1199,9 @@ final class KpiRegistryAdminService
                 'paired_metric'         => (string) ($row['paired_metric'] ?? ''),
                 'attribution_rule'      => (string) ($row['attribution_rule'] ?? ''),
                 'lifecycle_status'      => (string) ($row['lifecycle_status'] ?? ''),
-                'sample_policy'         => is_array($row['sample_policy'] ?? null) ? $row['sample_policy'] : null,
+                'sample_policy'         => $samplePolicy,
+                'min_sample'            => is_array($samplePolicy) && is_numeric($samplePolicy['min_n_score'] ?? null)
+                    ? (int) $samplePolicy['min_n_score'] : null,
                 'usage_contexts'        => is_array($row['usage_contexts'] ?? null) ? $row['usage_contexts'] : [],
                 'role_assignments'      => is_array($row['role_assignments'] ?? null) ? $row['role_assignments'] : [],
                 // P03 — link a metric to a customer requirement profile (e.g. LAM_SEMSYSCO).
@@ -1109,6 +1213,14 @@ final class KpiRegistryAdminService
                 'action_when_red'       => (string) ($row['action_when_red'] ?? ''),
                 'components'            => is_array($row['components'] ?? null) ? $row['components'] : [],
                 'required_evidence'     => is_array($row['required_evidence'] ?? null) ? $row['required_evidence'] : [],
+                'manual_input_contract' => is_array($row['manual_input_contract'] ?? null) ? $row['manual_input_contract'] : null,
+                'manual_input_status'   => null,
+                'backend_status'        => (string) ($row['backend_status'] ?? ''),
+                'retention_years'       => is_numeric($row['retention_years'] ?? null) ? (int) $row['retention_years'] : null,
+                'retention_owner'       => (string) ($row['retention_owner'] ?? ''),
+                'staged_gap_status'     => ($status === 'runtime_calculated' || $status === 'manual_governed' || $status === 'manual')
+                    ? 'closed'
+                    : ((string) ($row['data_contract_gap'] ?? '') !== '' ? 'declared' : 'missing'),
             ];
         };
         foreach ($governance as $r) {
@@ -1268,6 +1380,24 @@ final class KpiRegistryAdminService
                 'customer_specific_requirement' => [
                     'Bắt buộc có profile link hoặc applicability rule.',
                 ],
+                'flow_constraint' => [
+                    'Driver TOC phải có data_contract_gap và target_graduation_condition rõ ràng.',
+                    'CURRENT_CONSTRAINT_RESOURCE phải có manual_input_contract với constraint_id/resource_type/resource_code/approved_by/action_due_at/evidence_reference.',
+                    'Constraint driver không được rewardable hoặc scorecard_contributes_to_reward=true khi chưa runtime.',
+                ],
+                'wip_queue_control' => [
+                    'Queue driver phải khai queue_entry/oldest item/owner/hold reason/action due/promise risk/blocker category trong contract dữ liệu hoặc nhập tay.',
+                    'Queue driver staged/manual không được hiển thị như số runtime trên bảng điều hành.',
+                ],
+            ],
+            'dynamic_field_groups' => [
+                'generic_identity' => ['canonical_code', 'name', 'name_vi', 'process', 'category', 'owner_role', 'cadence'],
+                'gate_control_metric' => ['gate', 'linked_cdr', 'gate_pass_condition', 'hold_release_rule', 'required_evidence', 'evidence_source'],
+                'spc_capability_metric' => ['sample_policy.min_n_score', 'sample_policy.internal_n', 'sample_policy.customer_grade_n', 'sample_policy.stability_required', 'sample_policy.gage_validity_required', 'required_evidence', 'evidence_source'],
+                'composite_readiness_index' => ['components', 'components.weight_pct', 'data_contract_gap', 'target_graduation_condition'],
+                'customer_specific_requirement' => ['lam_profile_link', 'customer_profile_link', 'applicability_rule', 'required_evidence'],
+                'reward_control' => ['reward_mode', 'attribution_rule', 'counter_metric.intent', 'blocking_conditions', 'sample_policy.min_n_score'],
+                'role_performance_measure' => ['role_assignments', 'controllability_scope', 'action_when_red', 'owner_role'],
             ],
         ];
     }
@@ -1375,10 +1505,44 @@ final class KpiRegistryAdminService
 
         $bscPanel = $this->bscIntegrityPanel($seed, $library);
         $lamPanel = $this->lamCoveragePanel($seed);
+        $evidencePackPanel = $this->lamEvidencePackPanel($seed, $library);
+        $pilotGovernanceReview = $this->pilotGovernanceReview($seed, $library);
+        $pilotGovernancePanel = is_array($pilotGovernanceReview['panel'] ?? null)
+            ? $pilotGovernanceReview['panel'] : [];
         $cpkPanel = $this->cpkPolicyPanel($library);
         $severityPanel = $this->severityBonusPanel($seed, $library);
         $annex128Panel = $this->annex128Panel($seed);
-        foreach ([$bscPanel, $lamPanel, $cpkPanel, $severityPanel, $annex128Panel] as $panel) {
+        $leanFlowPanel = $this->leanFlowPanel($seed, $library);
+        $roleFairnessPanel = $this->roleFairnessPanel($roles);
+        $dataContractBacklogPanel = $this->dataContractBacklogPanel($library);
+        $auditDocsPanel = $this->auditFacingDocsHealthPanel($seed, $annex128Panel);
+        $worldClassPanel = $this->worldClassReadinessPanel(
+            $library,
+            $bscPanel,
+            $lamPanel,
+            $evidencePackPanel,
+            $pilotGovernancePanel,
+            $cpkPanel,
+            $severityPanel,
+            $leanFlowPanel,
+            $roleFairnessPanel,
+            $dataContractBacklogPanel,
+            $auditDocsPanel,
+        );
+        foreach ([
+            $bscPanel,
+            $lamPanel,
+            $evidencePackPanel,
+            $pilotGovernancePanel,
+            $cpkPanel,
+            $severityPanel,
+            $annex128Panel,
+            $leanFlowPanel,
+            $roleFairnessPanel,
+            $dataContractBacklogPanel,
+            $auditDocsPanel,
+            $worldClassPanel,
+        ] as $panel) {
             foreach (($panel['findings'] ?? []) as $finding) {
                 if (is_array($finding)) {
                     $findings[] = $finding;
@@ -1436,18 +1600,706 @@ final class KpiRegistryAdminService
                 $library,
                 static fn(array $row): bool => ($row['group'] ?? '') === 'gate',
             ))),
+            'pilot_governance_review' => $pilotGovernanceReview,
             'integrity_status' => [
                 'status' => $integrity,
                 'finding_count' => count($findings),
                 'findings' => array_slice($findings, 0, 200),
             ],
             'integrity_panels' => [
+                'world_class_readiness_cockpit' => $worldClassPanel,
+                'lam_gate_coverage' => $lamPanel,
+                'lam_evidence_pack_readiness' => $evidencePackPanel,
+                'pilot_governance_readiness' => $pilotGovernancePanel,
+                'ctq_cpk_backlog' => $cpkPanel,
+                'customer_ncr_severity_8d' => $severityPanel,
+                'driver_panel_maturity' => $leanFlowPanel,
+                'role_scorecard_fairness' => $roleFairnessPanel,
+                'data_contract_backlog' => $dataContractBacklogPanel,
+                'audit_facing_docs_health' => $auditDocsPanel,
                 'bsc_model' => $bscPanel,
-                'lam_profile' => $lamPanel,
-                'cpk_sample_policy' => $cpkPanel,
-                'severity_bonus_simulation' => $severityPanel,
                 'annex128_matrix' => $annex128Panel,
             ],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $seed
+     * @param array<int, array<string, mixed>> $library
+     * @return array<string, mixed>
+     */
+    private function pilotGovernanceReview(array $seed, array $library): array
+    {
+        $program = is_array($seed['pilot_governance_program'] ?? null)
+            ? $seed['pilot_governance_program'] : [];
+        $findings = [];
+        if ($program === []) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'PILOT_GOVERNANCE_PROGRAM_MISSING',
+                'metric_code' => 'pilot_governance_program',
+                'message' => 'Pilot governance program is missing.',
+            ];
+
+            return [
+                'panel' => [
+                    'status' => 'FAIL',
+                    'program_id' => '',
+                    'scope_metric_count' => 0,
+                    'review_forum_count' => 0,
+                    'status_summary' => [],
+                    'decision_summary' => [],
+                    'findings' => $findings,
+                ],
+                'program_id' => '',
+                'pilot_window' => [],
+                'reward_freeze_controls' => [],
+                'metric_rows' => [],
+                'findings' => $findings,
+            ];
+        }
+
+        $scope = is_array($program['pilot_scope'] ?? null) ? $program['pilot_scope'] : [];
+        $window = is_array($scope['pilot_window'] ?? null) ? $scope['pilot_window'] : [];
+        $freeze = is_array($program['reward_freeze_controls'] ?? null) ? $program['reward_freeze_controls'] : [];
+        $dashboard = is_array($program['pilot_dashboard_contract'] ?? null) ? $program['pilot_dashboard_contract'] : [];
+        $reviewContract = is_array($program['pilot_metric_review_contract'] ?? null) ? $program['pilot_metric_review_contract'] : [];
+        $cadence = is_array($program['review_cadence'] ?? null) ? $program['review_cadence'] : [];
+        $overrides = is_array($seed['metric_governance_overrides'] ?? null) ? $seed['metric_governance_overrides'] : [];
+
+        if ((string) ($scope['customer_profile'] ?? '') !== 'LAM_SEMSYSCO') {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'PILOT_SCOPE_PROFILE_DRIFT',
+                'metric_code' => 'pilot_scope.customer_profile',
+                'message' => 'Pilot scope must remain customer_profile=LAM_SEMSYSCO.',
+            ];
+        }
+        if ((int) ($window['duration_days'] ?? 0) !== 90) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'PILOT_WINDOW_NOT_90_DAYS',
+                'metric_code' => 'pilot_scope.pilot_window',
+                'message' => 'Pilot window must declare duration_days=90.',
+            ];
+        }
+        foreach (['start_date', 'end_date'] as $dateKey) {
+            if (!is_string($window[$dateKey] ?? null) || trim((string) $window[$dateKey]) === '') {
+                $findings[] = [
+                    'priority' => 'P0',
+                    'code' => 'PILOT_WINDOW_DATE_MISSING',
+                    'metric_code' => 'pilot_scope.pilot_window.' . $dateKey,
+                    'message' => 'Pilot window must declare start_date and end_date.',
+                ];
+            }
+        }
+        foreach (['part_families', 'work_centers', 'roles_in_scope', 'gates_in_scope', 'excluded_metrics', 'success_criteria'] as $field) {
+            if (!is_array($scope[$field] ?? null) || $scope[$field] === []) {
+                $findings[] = [
+                    'priority' => 'P0',
+                    'code' => 'PILOT_SCOPE_FIELD_MISSING',
+                    'metric_code' => 'pilot_scope.' . $field,
+                    'message' => "Pilot scope must declare non-empty '$field'.",
+                ];
+            }
+        }
+
+        foreach ([
+            'monetary_payout_allowed',
+            'payroll_impact_allowed',
+            'automatic_discipline_allowed',
+        ] as $flag) {
+            if (($freeze[$flag] ?? true) !== false) {
+                $findings[] = [
+                    'priority' => 'P0',
+                    'code' => 'PILOT_REWARD_FREEZE_FLAG_DRIFT',
+                    'metric_code' => 'reward_freeze_controls.' . $flag,
+                    'message' => "Pilot reward-freeze control '$flag' must remain false.",
+                ];
+            }
+        }
+        $watermark = strtoupper(trim((string) ($freeze['bonus_simulation_watermark'] ?? '')));
+        foreach (['SIMULATION ONLY', 'PILOT', 'NO PAYOUT'] as $token) {
+            if (!str_contains($watermark, $token)) {
+                $findings[] = [
+                    'priority' => 'P0',
+                    'code' => 'PILOT_REWARD_WATERMARK_THIN',
+                    'metric_code' => 'reward_freeze_controls.bonus_simulation_watermark',
+                    'message' => "Pilot reward watermark must contain '$token'.",
+                ];
+            }
+        }
+
+        $requiredDashboardFields = [
+            'metric_code',
+            'metric_status_runtime_manual_staged',
+            'data_confidence_level',
+            'owner_role',
+            'owner_action',
+            'owner_action_due_date',
+            'blocker_status',
+            'counter_metric_status',
+            'evidence_completeness_status',
+            'pilot_learning_notes',
+        ];
+        $dashboardFields = is_array($dashboard['required_fields'] ?? null) ? $dashboard['required_fields'] : [];
+        foreach ($requiredDashboardFields as $field) {
+            if (!in_array($field, $dashboardFields, true)) {
+                $findings[] = [
+                    'priority' => 'P0',
+                    'code' => 'PILOT_DASHBOARD_FIELD_MISSING',
+                    'metric_code' => $field,
+                    'message' => "Pilot dashboard contract is missing required field '$field'.",
+                ];
+            }
+        }
+        if (trim((string) ($dashboard['pilot_report_path'] ?? '')) === '') {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'PILOT_REPORT_PATH_MISSING',
+                'metric_code' => 'pilot_dashboard_contract.pilot_report_path',
+                'message' => 'Pilot dashboard contract must declare pilot_report_path.',
+            ];
+        }
+
+        $requiredReviewFields = [
+            'metric_code',
+            'metric_status_runtime_manual_staged',
+            'data_confidence_level',
+            'known_gaps',
+            'owner_role',
+            'review_forum',
+            'graduation_decision_after_pilot',
+        ];
+        $reviewFields = is_array($reviewContract['required_fields'] ?? null) ? $reviewContract['required_fields'] : [];
+        foreach ($requiredReviewFields as $field) {
+            if (!in_array($field, $reviewFields, true)) {
+                $findings[] = [
+                    'priority' => 'P0',
+                    'code' => 'PILOT_REVIEW_FIELD_MISSING',
+                    'metric_code' => $field,
+                    'message' => "Pilot metric review contract is missing required field '$field'.",
+                ];
+            }
+        }
+
+        $requiredForums = [
+            'daily_tier_review',
+            'weekly_toc_constraint_review',
+            'weekly_lam_evidence_review',
+            'monthly_bsc_review',
+            'monthly_qms_ceo_calibration',
+            'pilot_retrospective',
+            'day_90_go_no_go',
+        ];
+        $forumNames = [];
+        foreach ($cadence as $row) {
+            if (is_array($row)) {
+                $forum = trim((string) ($row['forum'] ?? ''));
+                if ($forum !== '') {
+                    $forumNames[] = $forum;
+                }
+            }
+        }
+        foreach ($requiredForums as $forum) {
+            if (!in_array($forum, $forumNames, true)) {
+                $findings[] = [
+                    'priority' => 'P0',
+                    'code' => 'PILOT_REVIEW_FORUM_MISSING',
+                    'metric_code' => $forum,
+                    'message' => "Pilot review cadence is missing forum '$forum'.",
+                ];
+            }
+        }
+
+        $byCode = [];
+        foreach ($library as $row) {
+            $code = strtoupper((string) ($row['canonical_code'] ?? ''));
+            if ($code !== '') {
+                $byCode[$code] = $row;
+            }
+        }
+
+        $scopeCodes = [];
+        foreach (['scored_core', 'strategic_driver_panel', 'lam_evidence_gates', 'ctq_cpk_pilot_bundle', 'customer_quality_simulation'] as $bucket) {
+            foreach ((array) ($scope[$bucket] ?? []) as $code) {
+                $canon = strtoupper(trim((string) $code));
+                if ($canon !== '' && !in_array($canon, $scopeCodes, true)) {
+                    $scopeCodes[] = $canon;
+                }
+            }
+        }
+
+        $statusSummary = [];
+        $decisionSummary = [];
+        $metricRows = [];
+        foreach ($scopeCodes as $code) {
+            $row = $byCode[$code] ?? null;
+            if ($row === null) {
+                $findings[] = [
+                    'priority' => 'P0',
+                    'code' => 'PILOT_SCOPE_REFERENCES_UNKNOWN_METRIC',
+                    'metric_code' => $code,
+                    'message' => 'Pilot scope references a metric that is missing from the library.',
+                ];
+            }
+            $status = $row === null ? 'missing_metric' : (string) ($row['calculation_status'] ?? 'unknown');
+            $owner = $row === null ? '' : trim((string) ($row['owner_role'] ?? ''));
+            if ($row !== null && $owner === '') {
+                $findings[] = [
+                    'priority' => 'P1',
+                    'code' => 'PILOT_METRIC_OWNER_MISSING',
+                    'metric_code' => $code,
+                    'message' => 'Pilot metric is missing owner_role.',
+                ];
+            }
+            $knownGaps = $row === null
+                ? 'Metric row is missing from the library.'
+                : trim((string) ($row['data_contract_gap'] ?? ''));
+            if ($knownGaps === '') {
+                $knownGaps = $status === 'runtime_calculated'
+                    ? 'Runtime authority is available; continue pilot proof and drift monitoring.'
+                    : 'No explicit gap note declared.';
+            }
+            $confidence = $this->pilotConfidenceLevelForStatus($status);
+            $reviewForum = $this->pilotReviewForumForCode($code, $scope, $overrides);
+            $decision = $this->pilotGraduationDecision($code, $row, $scope);
+
+            $metricRows[] = [
+                'metric_code' => $code,
+                'metric_status_runtime_manual_staged' => $status,
+                'data_confidence_level' => $confidence,
+                'known_gaps' => $knownGaps,
+                'owner_role' => $owner !== '' ? $owner : 'MISSING_OWNER',
+                'review_forum' => $reviewForum,
+                'graduation_decision_after_pilot' => $decision,
+            ];
+            $statusSummary[$status] = ($statusSummary[$status] ?? 0) + 1;
+            $decisionSummary[$decision] = ($decisionSummary[$decision] ?? 0) + 1;
+        }
+
+        return [
+            'panel' => [
+                'status' => $this->panelStatusFromFindings($findings),
+                'program_id' => (string) ($program['program_id'] ?? ''),
+                'pilot_window' => $window,
+                'scope_metric_count' => count($scopeCodes),
+                'review_forum_count' => count($forumNames),
+                'status_summary' => $statusSummary,
+                'decision_summary' => $decisionSummary,
+                'findings' => $findings,
+            ],
+            'program_id' => (string) ($program['program_id'] ?? ''),
+            'profile' => (string) ($scope['customer_profile'] ?? ''),
+            'pilot_window' => $window,
+            'reward_freeze_controls' => $freeze,
+            'pilot_scope' => $scope,
+            'pilot_dashboard_contract' => $dashboard,
+            'review_cadence' => $cadence,
+            'status_summary' => $statusSummary,
+            'decision_summary' => $decisionSummary,
+            'metric_rows' => $metricRows,
+            'findings' => $findings,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $scope
+     * @param array<string, mixed> $overrides
+     */
+    private function pilotReviewForumForCode(string $code, array $scope, array $overrides): string
+    {
+        $override = is_array($overrides[$code] ?? null) ? $overrides[$code] : [];
+        $reviewForum = trim((string) ($override['review_forum'] ?? ''));
+        if ($reviewForum !== '') {
+            return $reviewForum;
+        }
+
+        foreach ([
+            'lam_evidence_gates' => 'weekly_lam_evidence_review',
+            'ctq_cpk_pilot_bundle' => 'monthly_qms_ceo_calibration',
+            'customer_quality_simulation' => 'weekly_lam_evidence_review + monthly_qms_ceo_calibration',
+            'strategic_driver_panel' => 'weekly_toc_constraint_review',
+            'scored_core' => 'monthly_bsc_review',
+        ] as $bucket => $forum) {
+            if (in_array($code, (array) ($scope[$bucket] ?? []), true)) {
+                return $forum;
+            }
+        }
+
+        return 'monthly_bsc_review';
+    }
+
+    /**
+     * @param array<string, mixed>|null $row
+     * @param array<string, mixed> $scope
+     */
+    private function pilotGraduationDecision(string $code, ?array $row, array $scope): string
+    {
+        if ($row === null) {
+            return 'needs_another_pilot';
+        }
+
+        $status = (string) ($row['calculation_status'] ?? '');
+        if (in_array($status, ['staged_data_contract', 'data_contract_required', 'missing_metric'], true)) {
+            return 'not_reward_eligible';
+        }
+        if ($status === 'manual' || $status === 'manual_governed') {
+            return in_array($code, (array) ($scope['lam_evidence_gates'] ?? []), true)
+                ? 'audit_ready'
+                : 'needs_another_pilot';
+        }
+        if ($status === 'runtime_calculated') {
+            if (in_array($code, (array) ($scope['scored_core'] ?? []), true)) {
+                return 'production_ready';
+            }
+            if (in_array($code, (array) ($scope['customer_quality_simulation'] ?? []), true)) {
+                return 'not_reward_eligible';
+            }
+            return 'audit_ready';
+        }
+
+        return 'needs_another_pilot';
+    }
+
+    private function pilotConfidenceLevelForStatus(string $status): string
+    {
+        return match ($status) {
+            'runtime_calculated' => '5/5 authority-ready for pilot decision making',
+            'manual_governed' => '3/5 controlled but still depends on maker-checker and review cadence',
+            'manual' => '2/5 visible only after verification; not reward-eligible',
+            'staged_data_contract', 'data_contract_required' => '1/5 learning-only until data contract is graduated',
+            'missing_metric' => '0/5 pilot scope references a missing metric',
+            default => '1/5 unknown confidence until governance clarifies the state',
+        };
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $roles
+     * @return array<string, mixed>
+     */
+    private function roleFairnessPanel(array $roles): array
+    {
+        $countDrift = [];
+        $missingNotes = [];
+        $activeCandidate = [];
+        foreach ($roles as $role) {
+            $roleCode = (string) ($role['role_code'] ?? '');
+            $recommended = (int) ($role['recommended_active_count'] ?? 0);
+            $activeCount = (int) ($role['active_measure_count'] ?? 0);
+            if ($recommended > 0 && $activeCount > $recommended
+                && trim((string) ($role['active_count_justification'] ?? '')) === '') {
+                $countDrift[] = $roleCode;
+            }
+            $fairnessNotes = $role['fairness_notes'] ?? null;
+            if ((is_array($fairnessNotes) && $fairnessNotes === [])
+                || (!is_array($fairnessNotes) && trim((string) $fairnessNotes) === '')) {
+                $missingNotes[] = $roleCode;
+            }
+            if ((int) ($role['candidate_count'] ?? 0) > 0 && $activeCount >= $recommended && $recommended > 0) {
+                $activeCandidate[] = $roleCode;
+            }
+        }
+        $findings = [];
+        if ($countDrift !== []) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'ROLE_FAIRNESS_COUNT_JUSTIFICATION_MISSING',
+                'metric_code' => implode(',', $countDrift),
+                'message' => 'Role scorecards exceed recommended active count without a fairness justification.',
+            ];
+        }
+        if ($missingNotes !== []) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'ROLE_FAIRNESS_NOTES_MISSING',
+                'metric_code' => implode(',', $missingNotes),
+                'message' => 'Role scorecards are missing fairness_notes that explain controllability and review use.',
+            ];
+        }
+
+        return [
+            'status' => $this->panelStatusFromFindings($findings),
+            'role_count' => count($roles),
+            'roles_missing_fairness_notes' => $missingNotes,
+            'roles_missing_count_justification' => $countDrift,
+            'roles_with_candidate_backlog' => $activeCandidate,
+            'findings' => $findings,
+        ];
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $library
+     * @return array<string, mixed>
+     */
+    private function dataContractBacklogPanel(array $library): array
+    {
+        $stagedCodes = [];
+        $missingGap = [];
+        $manualMissingVerification = [];
+        foreach ($library as $row) {
+            $code = (string) ($row['canonical_code'] ?? '');
+            $status = (string) ($row['calculation_status'] ?? '');
+            if (in_array($status, ['staged_data_contract', 'data_contract_required'], true)) {
+                $stagedCodes[] = $code;
+                if (trim((string) ($row['data_contract_gap'] ?? '')) === ''
+                    || trim((string) ($row['target_graduation_condition'] ?? '')) === '') {
+                    $missingGap[] = $code;
+                }
+            }
+            if ($status === 'manual_governed') {
+                $manual = is_array($row['manual_input_contract'] ?? null) ? $row['manual_input_contract'] : [];
+                if (trim((string) ($manual['verification'] ?? '')) === '') {
+                    $manualMissingVerification[] = $code;
+                }
+            }
+        }
+        $findings = [];
+        if ($missingGap !== []) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'DATA_CONTRACT_BACKLOG_MISSING_GAP',
+                'metric_code' => implode(',', $missingGap),
+                'message' => 'Staged metrics must declare both data_contract_gap and target_graduation_condition.',
+            ];
+        }
+        if ($manualMissingVerification !== []) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'MANUAL_GOVERNED_VERIFICATION_GAP',
+                'metric_code' => implode(',', $manualMissingVerification),
+                'message' => 'Manual-governed metrics are missing verification guidance in manual_input_contract.',
+            ];
+        }
+
+        return [
+            'status' => $this->panelStatusFromFindings($findings),
+            'staged_metric_count' => count($stagedCodes),
+            'staged_gap_codes' => $missingGap,
+            'manual_governed_missing_verification' => $manualMissingVerification,
+            'findings' => $findings,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $seed
+     * @param array<string, mixed> $annex128Panel
+     * @return array<string, mixed>
+     */
+    private function auditFacingDocsHealthPanel(array $seed, array $annex128Panel): array
+    {
+        $docs = [
+            'ANNEX-122' => $this->rootDir . '/' . self::ANNEX122_RELATIVE,
+            'ANNEX-125' => $this->rootDir . '/mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html',
+            'ANNEX-126' => $this->rootDir . '/mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-126-hoshin-strategy-deployment-and-catchball.html',
+            'ANNEX-127' => $this->rootDir . '/mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-127-kpi-authority-registry-and-operational-metrics.html',
+            'ANNEX-128' => $this->rootDir . '/' . self::ANNEX128_RELATIVE,
+            'ANNEX-129' => $this->rootDir . '/mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-129-bsc-kpi-operating-mechanism-assessment.html',
+            'WI-202' => $this->rootDir . '/mom/docs/operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html',
+        ];
+        $forbiddenTokens = [
+            'CHECK_DIM_REPORT_ON_GIAO HÀNG',
+            'DOC_HỒ SƠ_RETENTION_10Y',
+            'PROCESS_CHANGE_PHÊ DUYỆT_RATE',
+            'Balanced Thẻ điểm',
+            'OPC UA máy Tools',
+            'giao hàngments',
+            'sub-nhà cung cấp',
+            'đặc biệt-quy trình',
+        ];
+        $filesPresent = 0;
+        $tokenHits = [];
+        foreach ($docs as $label => $path) {
+            if (!is_file($path)) {
+                continue;
+            }
+            $filesPresent++;
+            $html = (string) file_get_contents($path);
+            foreach ($forbiddenTokens as $token) {
+                if (stripos($html, $token) !== false) {
+                    $tokenHits[] = $label . ':' . $token;
+                }
+            }
+        }
+        $findings = [];
+        if ($tokenHits !== []) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'AUDIT_DOC_CANONICAL_TOKEN_DRIFT',
+                'metric_code' => implode(',', $tokenHits),
+                'message' => 'Audit-facing documents still contain forbidden translated code or machine-translated wording.',
+            ];
+        }
+        foreach (($annex128Panel['findings'] ?? []) as $finding) {
+            if (is_array($finding)) {
+                $findings[] = $finding;
+            }
+        }
+
+        return [
+            'status' => $this->panelStatusFromFindings($findings),
+            'checked_document_count' => $filesPresent,
+            'registry_version' => (string) ($seed['version'] ?? ''),
+            'forbidden_token_hits' => $tokenHits,
+            'findings' => $findings,
+        ];
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $library
+     * @param array<string, mixed> ...$panels
+     * @return array<string, mixed>
+     */
+    private function worldClassReadinessPanel(array $library, array ...$panels): array
+    {
+        $runtime = 0;
+        $manual = 0;
+        $staged = 0;
+        foreach ($library as $row) {
+            $status = (string) ($row['calculation_status'] ?? '');
+            if ($status === 'runtime_calculated') {
+                $runtime++;
+            } elseif ($status === 'manual_governed' || $status === 'manual') {
+                $manual++;
+            } elseif (in_array($status, ['staged_data_contract', 'data_contract_required'], true)) {
+                $staged++;
+            }
+        }
+        $panelStatuses = [];
+        $findings = [];
+        foreach ($panels as $panel) {
+            $panelStatuses[] = (string) ($panel['status'] ?? 'PASS');
+            foreach ((array) ($panel['findings'] ?? []) as $finding) {
+                if (is_array($finding) && in_array((string) ($finding['priority'] ?? ''), ['P0', 'P1'], true)) {
+                    $findings[] = $finding;
+                }
+            }
+        }
+        $findings = array_slice($findings, 0, 20);
+
+        return [
+            'status' => $this->panelStatusFromFindings($findings),
+            'runtime_metric_count' => $runtime,
+            'manual_governed_count' => $manual,
+            'staged_metric_count' => $staged,
+            'panel_statuses' => $panelStatuses,
+            'findings' => $findings,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $seed
+     * @param array<int, array<string, mixed>> $library
+     * @return array<string, mixed>
+     */
+    private function leanFlowPanel(array $seed, array $library): array
+    {
+        $leanFlow = is_array($seed['lean_flow_operating_model'] ?? null) ? $seed['lean_flow_operating_model'] : [];
+        $findings = [];
+        if ($leanFlow === []) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'LEAN_FLOW_MODEL_MISSING',
+                'metric_code' => 'lean_flow_operating_model',
+                'message' => 'Lean/TOC driver operating model is missing.',
+            ];
+            return [
+                'status' => $this->panelStatusFromFindings($findings),
+                'findings' => $findings,
+            ];
+        }
+
+        $known = [];
+        foreach ($library as $row) {
+            $code = strtoupper((string) ($row['canonical_code'] ?? ''));
+            if ($code !== '') {
+                $known[$code] = $row;
+            }
+        }
+
+        $constraintStatuses = [];
+        foreach ((array) ($leanFlow['required_constraint_metrics'] ?? []) as $code) {
+            $code = strtoupper((string) $code);
+            $row = $known[$code] ?? null;
+            if (!is_array($row)) {
+                $findings[] = [
+                    'priority' => 'P0',
+                    'code' => 'LEAN_FLOW_CONSTRAINT_METRIC_MISSING',
+                    'metric_code' => $code,
+                    'message' => 'Required constraint metric is missing from the KPI library.',
+                ];
+                continue;
+            }
+            $constraintStatuses[$code] = (string) ($row['calculation_status'] ?? '');
+            if (($row['cadence'] ?? '') === 'monthly') {
+                $findings[] = [
+                    'priority' => 'P1',
+                    'code' => 'LEAN_FLOW_CONSTRAINT_MONTHLY_CADENCE',
+                    'metric_code' => $code,
+                    'message' => 'Constraint driver cadence drifted to monthly; it must support daily/weekly action loops.',
+                ];
+            }
+        }
+
+        $queueStatuses = [];
+        foreach ((array) ($leanFlow['cmm_qc_queue_metrics'] ?? []) as $code) {
+            $code = strtoupper((string) $code);
+            $row = $known[$code] ?? null;
+            if (!is_array($row)) {
+                $findings[] = [
+                    'priority' => 'P0',
+                    'code' => 'LEAN_FLOW_QUEUE_METRIC_MISSING',
+                    'metric_code' => $code,
+                    'message' => 'Required queue/control metric is missing from the KPI library.',
+                ];
+                continue;
+            }
+            $queueStatuses[$code] = (string) ($row['calculation_status'] ?? '');
+        }
+
+        $contractIds = [];
+        foreach (['constraint_register_contract', 'queue_aging_contract', 'constraint_loss_contract', 'action_loop_contract'] as $field) {
+            $row = is_array($leanFlow[$field] ?? null) ? $leanFlow[$field] : [];
+            $contractIds[$field] = (string) ($row['contract_id'] ?? '');
+            if ($row === [] || trim((string) ($row['contract_id'] ?? '')) === '') {
+                $findings[] = [
+                    'priority' => 'P0',
+                    'code' => 'LEAN_FLOW_CONTRACT_MISSING',
+                    'metric_code' => $field,
+                    'message' => 'Lean/TOC operating model is missing a required contract block or contract_id.',
+                ];
+                continue;
+            }
+            if (!is_array($row['required_fields'] ?? null) || $row['required_fields'] === []) {
+                $findings[] = [
+                    'priority' => 'P0',
+                    'code' => 'LEAN_FLOW_CONTRACT_REQUIRED_FIELDS_MISSING',
+                    'metric_code' => $field,
+                    'message' => 'Lean/TOC contract must declare required_fields.',
+                ];
+            }
+        }
+
+        $forums = is_array($leanFlow['review_forums'] ?? null) ? $leanFlow['review_forums'] : [];
+        if (count($forums) < 3) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'LEAN_FLOW_REVIEW_FORUMS_THIN',
+                'metric_code' => 'review_forums',
+                'message' => 'Lean/TOC operating model should declare daily Tier 1, daily Tier 2 and weekly TOC review forums.',
+            ];
+        }
+
+        return [
+            'status' => $this->panelStatusFromFindings($findings),
+            'model_id' => (string) ($leanFlow['model_id'] ?? ''),
+            'constraint_metric_statuses' => $constraintStatuses,
+            'queue_metric_statuses' => $queueStatuses,
+            'review_forum_count' => count($forums),
+            'contract_ids' => $contractIds,
+            'linked_outcome_metrics' => is_array($leanFlow['linked_outcome_metrics'] ?? null)
+                ? $leanFlow['linked_outcome_metrics'] : [],
+            'findings' => $findings,
         ];
     }
 
@@ -1573,6 +2425,133 @@ final class KpiRegistryAdminService
     }
 
     /**
+     * @param array<string, mixed> $seed
+     * @param array<int, array<string, mixed>> $library
+     * @return array<string, mixed>
+     */
+    private function lamEvidencePackPanel(array $seed, array $library): array
+    {
+        $profiles = $seed['customer_requirement_profiles']['profiles'] ?? [];
+        $profile = is_array($profiles['LAM_SEMSYSCO'] ?? null) ? $profiles['LAM_SEMSYSCO'] : [];
+        $metricLinks = is_array($profile['evidence_pack_metric_links'] ?? null) ? $profile['evidence_pack_metric_links'] : [];
+        $recordKeys = is_array($profile['evidence_pack_record_keys'] ?? null) ? $profile['evidence_pack_record_keys'] : [];
+        $sections = is_array($profile['evidence_pack_sections'] ?? null) ? $profile['evidence_pack_sections'] : [];
+        $retention = is_array($profile['retention_requirements'] ?? null) ? $profile['retention_requirements'] : [];
+        $viewSpec = is_array($profile['audit_pack_view'] ?? null) ? $profile['audit_pack_view'] : [];
+
+        $known = [];
+        foreach ($library as $row) {
+            $code = strtoupper((string) ($row['canonical_code'] ?? ''));
+            if ($code !== '') {
+                $known[$code] = $row;
+            }
+        }
+
+        $missingMetrics = [];
+        $metricStatuses = [];
+        foreach ($metricLinks as $code) {
+            $up = strtoupper((string) $code);
+            $row = $known[$up] ?? null;
+            if (!is_array($row)) {
+                $missingMetrics[] = $up;
+                continue;
+            }
+            $metricStatuses[$up] = [
+                'calculation_status' => (string) ($row['calculation_status'] ?? ''),
+                'group' => (string) ($row['group'] ?? ''),
+                'primary_endpoint' => (string) ($row['primary_endpoint'] ?? ''),
+            ];
+        }
+
+        $findings = [];
+        if ($profile === []) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'LAM_EVIDENCE_PACK_PROFILE_MISSING',
+                'metric_code' => 'LAM_SEMSYSCO',
+                'message' => 'LAM/Semsysco evidence-pack profile block is missing.',
+            ];
+        }
+        if ($metricLinks === []) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'LAM_EVIDENCE_PACK_METRIC_LINKS_EMPTY',
+                'metric_code' => 'LAM_SEMSYSCO',
+                'message' => 'LAM/Semsysco evidence pack must declare metric links used for shipment audit retrieval.',
+            ];
+        }
+        if ($missingMetrics !== []) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'LAM_EVIDENCE_PACK_METRIC_MISSING',
+                'metric_code' => implode(',', $missingMetrics),
+                'message' => 'LAM/Semsysco evidence-pack metric links include unknown canonical codes.',
+            ];
+        }
+        if (count($recordKeys) < 6) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'LAM_EVIDENCE_PACK_RECORD_KEYS_THIN',
+                'metric_code' => 'evidence_pack_record_keys',
+                'message' => 'LAM/Semsysco evidence pack should declare record keys for order/job/shipment/profile/part/revision and immutable packet lookup.',
+            ];
+        }
+        if (count($sections) < 8) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'LAM_EVIDENCE_PACK_SECTION_THIN',
+                'metric_code' => 'evidence_pack_sections',
+                'message' => 'LAM/Semsysco evidence pack should declare the required audit sections end-to-end.',
+            ];
+        }
+        if ((int) ($retention['retention_years'] ?? 0) < 10 || trim((string) ($retention['retention_owner_role'] ?? '')) === '') {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'LAM_EVIDENCE_PACK_RETENTION_GAP',
+                'metric_code' => 'retention_requirements',
+                'message' => 'LAM/Semsysco evidence pack must declare retention_years >= 10 and a retention_owner_role.',
+            ];
+        }
+        if ((int) ($retention['retrieval_sla_minutes'] ?? 0) <= 0) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'LAM_EVIDENCE_PACK_RETRIEVAL_SLA_MISSING',
+                'metric_code' => 'retention_requirements',
+                'message' => 'Audit retrieval SLA in minutes must be declared for LAM/Semsysco evidence packs.',
+            ];
+        }
+        if (!is_array($viewSpec['primary_views'] ?? null) || $viewSpec['primary_views'] === []) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'LAM_EVIDENCE_PACK_PRIMARY_VIEW_MISSING',
+                'metric_code' => 'audit_pack_view',
+                'message' => 'Audit-pack view spec should declare printable/exportable primary views or endpoints.',
+            ];
+        }
+        if (!is_array($viewSpec['required_status_panels'] ?? null) || $viewSpec['required_status_panels'] === []) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'LAM_EVIDENCE_PACK_STATUS_PANEL_MISSING',
+                'metric_code' => 'audit_pack_view',
+                'message' => 'Audit-pack view spec should declare required status panels for gate status, blockers, source links, retention, and audit trail.',
+            ];
+        }
+
+        return [
+            'status' => $this->panelStatusFromFindings($findings),
+            'profile_id' => (string) ($profile['profile_id'] ?? 'LAM_SEMSYSCO'),
+            'metric_link_count' => count($metricLinks),
+            'metric_statuses' => $metricStatuses,
+            'missing_metric_links' => $missingMetrics,
+            'record_key_count' => count($recordKeys),
+            'section_count' => count($sections),
+            'retention_requirements' => $retention,
+            'audit_pack_view' => $viewSpec,
+            'findings' => $findings,
+        ];
+    }
+
+    /**
      * @param array<int, array<string, mixed>> $library
      * @return array<string, mixed>
      */
@@ -1621,10 +2600,33 @@ final class KpiRegistryAdminService
         $severity = is_array($seed['customer_ncr_severity_matrix'] ?? null) ? $seed['customer_ncr_severity_matrix'] : [];
         $required = [
             'CUSTOMER_NCR_SEVERITY_SCORE',
+            'CUSTOMER_NCR_EVENTS_M',
+            'DEFECTIVE_ORDER_RATE_M',
+            'NO_LATE_NO_NCR_COUNTER',
+            'NO_CONTAINMENT_COUNTER',
+            'REPEAT_ROOT_CAUSE_ESCAPE_RATE',
+            'CUSTOMER_NOTIFICATION_LT',
             'NCR_3D_RESPONSE_SLA',
             'NCR_4D_PRELIMINARY_SLA',
             'NCR_8D_UPDATE_SLA',
             'CUSTOMER_ACCEPTED_8D_CLOSURE_RATE',
+            'TRAINING_AS_CAPA_COUNTER',
+        ];
+        $requiredLevels = [
+            'internal_contained',
+            'near_miss',
+            'minor',
+            'major',
+            'critical',
+            'repeat_same_root_cause',
+            'late_or_no_ncr',
+            'no_customer_notification',
+            'no_containment',
+            'unauthorized_change',
+            'ship_deviation_without_special_release',
+            'special_release_missing',
+            'expired_gage_used_for_release',
+            'falsified_record',
         ];
         $known = [];
         foreach ($library as $row) {
@@ -1634,6 +2636,11 @@ final class KpiRegistryAdminService
             }
         }
         $missing = array_values(array_filter($required, static fn(string $code): bool => !isset($known[$code])));
+        $severityLevels = array_values(array_filter(
+            array_keys($severity),
+            static fn(string $key): bool => !in_array($key, ['matrix_id', 'authority', 'usage_rule'], true),
+        ));
+        $missingLevels = array_values(array_filter($requiredLevels, static fn(string $key): bool => !in_array($key, $severityLevels, true)));
         $findings = [];
         if (($bonus['simulation_only'] ?? null) !== true) {
             $findings[] = [
@@ -1651,6 +2658,14 @@ final class KpiRegistryAdminService
                 'message' => 'Customer NCR severity matrix is missing.',
             ];
         }
+        if ($missingLevels !== []) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'CUSTOMER_NCR_SEVERITY_LEVEL_MISSING',
+                'metric_code' => implode(',', $missingLevels),
+                'message' => 'Customer NCR severity matrix is missing required controlled levels.',
+            ];
+        }
         if ($missing !== []) {
             $findings[] = [
                 'priority' => 'P1',
@@ -1662,9 +2677,10 @@ final class KpiRegistryAdminService
         return [
             'status' => $this->panelStatusFromFindings($findings),
             'simulation_only' => (bool) ($bonus['simulation_only'] ?? false),
-            'severity_levels' => array_keys($severity),
+            'severity_levels' => $severityLevels,
             'required_metric_count' => count($required),
             'missing_required_metrics' => $missing,
+            'missing_severity_levels' => $missingLevels,
             'findings' => $findings,
         ];
     }
@@ -1812,6 +2828,7 @@ final class KpiRegistryAdminService
                 'do_not_use_count' => is_array($role['do_not_use'] ?? null) ? count($role['do_not_use']) : 0,
                 'role_blocker_count' => is_array($role['role_blockers'] ?? null) ? count($role['role_blockers']) : 0,
                 'controllability_scope' => (string) ($role['controllability_scope'] ?? ''),
+                'active_count_justification' => (string) ($role['active_count_justification'] ?? ''),
                 'attribution_rules' => is_array($role['attribution_rules'] ?? null) ? $role['attribution_rules'] : [],
                 'warning' => (string) ($role['not_automatic_reward_or_discipline_warning'] ?? ''),
                 'fairness_notes' => is_array($role['fairness_notes'] ?? null)
@@ -1837,6 +2854,7 @@ final class KpiRegistryAdminService
             if ($code === '') {
                 throw new RuntimeException('kpi_registry_missing_code');
             }
+            $this->assertCanonicalCode($codeKey, 'kpi_registry_invalid_code');
             if (isset($seen[$codeKey])) {
                 throw new RuntimeException('kpi_registry_duplicate_code:' . $codeKey);
             }
@@ -2083,6 +3101,7 @@ final class KpiRegistryAdminService
             }
 
             $profiles[$profileCode] = [
+                'profile_id' => $this->plainText((string) ($profile['profile_id'] ?? $profileCode)),
                 'profile_name' => $this->plainText((string) ($profile['profile_name'] ?? '')),
                 'profile_name_vi' => $this->plainText((string) ($profile['profile_name_vi'] ?? '')),
                 'status' => $this->plainText((string) ($profile['status'] ?? 'active')),
@@ -2096,6 +3115,42 @@ final class KpiRegistryAdminService
             $evidence = $this->sanitizeStringList($profile['evidence_pack_required'] ?? []);
             if ($evidence !== []) {
                 $profiles[$profileCode]['evidence_pack_required'] = $evidence;
+            }
+            $evidenceMetricLinks = $this->sanitizeStringList($profile['evidence_pack_metric_links'] ?? []);
+            if ($evidenceMetricLinks !== []) {
+                $profiles[$profileCode]['evidence_pack_metric_links'] = $evidenceMetricLinks;
+            }
+            $recordKeys = $this->sanitizeStringList($profile['evidence_pack_record_keys'] ?? []);
+            if ($recordKeys !== []) {
+                $profiles[$profileCode]['evidence_pack_record_keys'] = $recordKeys;
+            }
+            $sections = $this->sanitizeStringList($profile['evidence_pack_sections'] ?? []);
+            if ($sections !== []) {
+                $profiles[$profileCode]['evidence_pack_sections'] = $sections;
+            }
+            if (is_array($profile['retention_requirements'] ?? null)) {
+                $retention = $profile['retention_requirements'];
+                $profiles[$profileCode]['retention_requirements'] = [
+                    'record_class' => $this->plainText((string) ($retention['record_class'] ?? '')),
+                    'retention_years' => max(0, (int) ($retention['retention_years'] ?? 0)),
+                    'retention_owner_role' => $this->plainText((string) ($retention['retention_owner_role'] ?? '')),
+                    'storage_authority' => $this->plainText((string) ($retention['storage_authority'] ?? '')),
+                    'retrieval_sla_minutes' => max(0, (int) ($retention['retrieval_sla_minutes'] ?? 0)),
+                    'immutable_hash_required' => (bool) ($retention['immutable_hash_required'] ?? false),
+                    'export_copy_required' => (bool) ($retention['export_copy_required'] ?? false),
+                    'authority_endpoints' => $this->sanitizeStringList($retention['authority_endpoints'] ?? []),
+                ];
+            }
+            if (is_array($profile['audit_pack_view'] ?? null)) {
+                $view = $profile['audit_pack_view'];
+                $profiles[$profileCode]['audit_pack_view'] = [
+                    'printable_exportable' => (bool) ($view['printable_exportable'] ?? false),
+                    'primary_views' => $this->sanitizeStringList($view['primary_views'] ?? []),
+                    'required_status_panels' => $this->sanitizeStringList($view['required_status_panels'] ?? []),
+                    'required_links' => $this->sanitizeStringList($view['required_links'] ?? []),
+                    'audit_trail_required' => (bool) ($view['audit_trail_required'] ?? false),
+                    'missing_evidence_must_render' => (bool) ($view['missing_evidence_must_render'] ?? false),
+                ];
             }
             if (is_array($profile['activation_flow'] ?? null)) {
                 $profiles[$profileCode]['activation_flow'] = $this->sanitizeStringList($profile['activation_flow']);
@@ -2118,6 +3173,7 @@ final class KpiRegistryAdminService
             throw new RuntimeException('kpi_registry_customer_profiles_empty');
         }
         $codes = [];
+        $gateRows = [];
         $collect = static function (array $rows) use (&$codes): void {
             foreach ($rows as $row) {
                 if (is_array($row)) {
@@ -2131,6 +3187,14 @@ final class KpiRegistryAdminService
         $collect($governance);
         $collect($gate);
         $collect(is_array($seed['proposed_operating_metrics'] ?? null) ? $seed['proposed_operating_metrics'] : []);
+        foreach ($gate as $row) {
+            if (is_array($row)) {
+                $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+                if ($code !== '') {
+                    $gateRows[$code] = $row;
+                }
+            }
+        }
         foreach ((array) ($seed['runtime_calculated_metrics'] ?? []) as $code) {
             $codes[strtoupper((string) $code)] = true;
         }
@@ -2138,6 +3202,9 @@ final class KpiRegistryAdminService
         foreach ($profiles as $code => $profile) {
             if (!is_array($profile)) {
                 throw new RuntimeException('kpi_registry_customer_profile_not_object:' . $code);
+            }
+            if (trim((string) ($profile['profile_id'] ?? $code)) === '') {
+                throw new RuntimeException('kpi_registry_customer_profile_missing_profile_id:' . $code);
             }
             if (trim((string) ($profile['profile_name'] ?? '')) === ''
                 && trim((string) ($profile['profile_name_vi'] ?? '')) === '') {
@@ -2149,10 +3216,83 @@ final class KpiRegistryAdminService
             if (!is_array($profile['quality_requirements'] ?? null)) {
                 throw new RuntimeException('kpi_registry_customer_profile_missing_quality_requirements:' . $code);
             }
+            $linkedMetrics = array_values(array_map(
+                static fn($value): string => strtoupper(trim((string) $value)),
+                (array) ($profile['linked_metrics'] ?? [])
+            ));
+            if ($linkedMetrics === []) {
+                throw new RuntimeException('kpi_registry_customer_profile_missing_linked_metrics:' . $code);
+            }
             foreach ((array) ($profile['linked_metrics'] ?? []) as $linked) {
                 $linkedCode = strtoupper(trim((string) $linked));
                 if ($linkedCode !== '' && !isset($codes[$linkedCode])) {
                     throw new RuntimeException('kpi_registry_customer_profile_unknown_metric:' . $code . ':' . $linkedCode);
+                }
+            }
+            $gateCoverage = is_array($profile['gate_coverage'] ?? null) ? $profile['gate_coverage'] : [];
+            foreach ($gateCoverage as $gateName => $metricCodes) {
+                $gate = strtoupper(trim((string) $gateName));
+                $list = array_values(array_filter(array_map(
+                    static fn($value): string => strtoupper(trim((string) $value)),
+                    (array) $metricCodes
+                )));
+                foreach ($list as $metricCode) {
+                    if (!isset($codes[$metricCode])) {
+                        throw new RuntimeException('kpi_registry_customer_profile_unknown_gate_metric:' . $code . ':' . $gate . ':' . $metricCode);
+                    }
+                    if (!in_array($metricCode, $linkedMetrics, true)) {
+                        throw new RuntimeException('kpi_registry_customer_profile_gate_metric_not_linked:' . $code . ':' . $gate . ':' . $metricCode);
+                    }
+                    $gateRow = $gateRows[$metricCode] ?? null;
+                    if (!is_array($gateRow)) {
+                        throw new RuntimeException('kpi_registry_customer_profile_gate_metric_missing_row:' . $code . ':' . $gate . ':' . $metricCode);
+                    }
+                    if (strtoupper(trim((string) ($gateRow['gate'] ?? ''))) !== $gate) {
+                        throw new RuntimeException('kpi_registry_customer_profile_gate_metric_gate_mismatch:' . $code . ':' . $gate . ':' . $metricCode);
+                    }
+                    if (trim((string) ($gateRow['lam_profile_link'] ?? '')) !== $code) {
+                        throw new RuntimeException('kpi_registry_customer_profile_gate_metric_profile_mismatch:' . $code . ':' . $gate . ':' . $metricCode);
+                    }
+                }
+            }
+            if ($code === 'LAM_SEMSYSCO') {
+                foreach (['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'] as $gate) {
+                    $list = array_values(array_filter(array_map(
+                        static fn($value): string => strtoupper(trim((string) $value)),
+                        (array) ($gateCoverage[$gate] ?? [])
+                    )));
+                    if ($list === []) {
+                        throw new RuntimeException('kpi_registry_customer_profile_lam_empty_gate:' . $gate);
+                    }
+                }
+                if ($this->sanitizeStringList($profile['evidence_pack_required'] ?? []) === []) {
+                    throw new RuntimeException('kpi_registry_customer_profile_lam_missing_evidence_pack');
+                }
+                $evidenceMetricLinks = $this->sanitizeStringList($profile['evidence_pack_metric_links'] ?? []);
+                if ($evidenceMetricLinks === []) {
+                    throw new RuntimeException('kpi_registry_customer_profile_lam_missing_evidence_metric_links');
+                }
+                foreach ($evidenceMetricLinks as $metricCode) {
+                    if (!isset($codes[strtoupper($metricCode)])) {
+                        throw new RuntimeException('kpi_registry_customer_profile_unknown_evidence_metric:' . $code . ':' . strtoupper($metricCode));
+                    }
+                }
+                if ($this->sanitizeStringList($profile['evidence_pack_record_keys'] ?? []) === []) {
+                    throw new RuntimeException('kpi_registry_customer_profile_lam_missing_evidence_record_keys');
+                }
+                if ($this->sanitizeStringList($profile['evidence_pack_sections'] ?? []) === []) {
+                    throw new RuntimeException('kpi_registry_customer_profile_lam_missing_evidence_sections');
+                }
+                $retention = is_array($profile['retention_requirements'] ?? null) ? $profile['retention_requirements'] : [];
+                if ((int) ($retention['retention_years'] ?? 0) < 10
+                    || trim((string) ($retention['retention_owner_role'] ?? '')) === ''
+                    || (int) ($retention['retrieval_sla_minutes'] ?? 0) <= 0) {
+                    throw new RuntimeException('kpi_registry_customer_profile_lam_retention_requirements_invalid');
+                }
+                $viewSpec = is_array($profile['audit_pack_view'] ?? null) ? $profile['audit_pack_view'] : [];
+                if ($this->sanitizeStringList($viewSpec['primary_views'] ?? []) === []
+                    || $this->sanitizeStringList($viewSpec['required_status_panels'] ?? []) === []) {
+                    throw new RuntimeException('kpi_registry_customer_profile_lam_audit_pack_view_invalid');
                 }
             }
         }
@@ -2333,8 +3473,12 @@ final class KpiRegistryAdminService
      */
     private function sanitizeAddedKpi(array $patch): array
     {
-        $code = strtoupper(trim((string) ($patch['canonical_code'] ?? '')));
-        $code = preg_replace('/[^A-Z0-9_]/', '', $code) ?? '';
+        $rawCode = strtoupper(trim((string) ($patch['canonical_code'] ?? '')));
+        $code = preg_replace('/[^A-Z0-9_]/', '', $rawCode) ?? '';
+        if ($rawCode === '' || $rawCode !== $code) {
+            throw new RuntimeException('kpi_registry_added_invalid_code:' . $rawCode);
+        }
+        $this->assertCanonicalCode($code, 'kpi_registry_added_invalid_code');
 
         $t   = is_array($patch['thresholds'] ?? null) ? $patch['thresholds'] : [];
         $dir = (string) ($t['direction'] ?? 'higher_is_better');
@@ -2454,6 +3598,15 @@ final class KpiRegistryAdminService
         return $row;
     }
 
+    private function assertCanonicalCode(string $code, string $errorPrefix): void
+    {
+        if ($code === ''
+            || preg_match(self::VALID_CANONICAL_CODE_PATTERN, $code) !== 1
+            || preg_match(self::FORBIDDEN_CANONICAL_CODE_PATTERN, $code) === 1) {
+            throw new RuntimeException($errorPrefix . ':' . $code);
+        }
+    }
+
     // ── Statistics ───────────────────────────────────────────────────────
 
     /**
@@ -2569,7 +3722,7 @@ final class KpiRegistryAdminService
      */
     private function renderGovernanceTable(array $rows): string
     {
-        $head = '<div class="table-card"><table class="table" style="table-layout:fixed">'
+        $head = '<div class="table-card"><table class="table annex122-wide-table annex122-governance-table" style="table-layout:fixed">'
             . '<colgroup><col style="width:15%"><col style="width:18%">'
             . '<col style="width:16%"><col style="width:12%"><col style="width:14%">'
             . '<col style="width:10%"><col style="width:15%"></colgroup>'
@@ -2588,7 +3741,7 @@ final class KpiRegistryAdminService
      */
     private function renderGateControlTable(array $rows): string
     {
-        $head = '<div class="table-card"><table class="table" style="table-layout:fixed">'
+        $head = '<div class="table-card"><table class="table annex122-wide-table annex122-gate-table" style="table-layout:fixed">'
             . '<colgroup><col style="width:7%"><col style="width:8%">'
             . '<col style="width:17%"><col style="width:22%"><col style="width:9%">'
             . '<col style="width:8%"><col style="width:8%"><col style="width:7%">'
@@ -2637,11 +3790,11 @@ final class KpiRegistryAdminService
 
         return '<tr data-gate-metric="' . $e($localId) . '"><td><span class="badge-soft">'
             . $e($g['gate'] ?? '') . '</span></td><td class="kpi-gate-code">'
-            . str_replace('-', '<br>', $e($localId)) . '</td><td>' . $metric . '</td><td>'
+            . str_replace('-', '<br>', $e($localId)) . '</td><td class="annex122-metric-cell">' . $metric . '</td><td>'
             . $e($g['gate_pass_condition'] ?? '') . '</td><td class="center">' . $cdrCell
             . '</td><td class="nowrap">' . $e($target) . '</td><td>'
             . $this->roleLink((string) ($g['owner_role'] ?? '')) . '</td><td>'
-            . $e($cadence) . '</td><td>' . $evidence . '</td></tr>';
+            . $e($cadence) . '</td><td class="annex122-evidence-cell">' . $evidence . '</td></tr>';
     }
 
     /**
@@ -2727,10 +3880,10 @@ final class KpiRegistryAdminService
         $kpiCell = '<b>' . $e($k['name_vi'] ?? '') . '</b><br><span class="role-code">' . $e($code)
             . '</span> <span class="mini-note">' . $e($k['name'] ?? '') . '</span>';
 
-        return '<tr data-kpi-code="' . $e($code) . '"><td>' . $kpiCell . '</td>'
-            . '<td>' . $formula . '</td><td>' . $thresholds . '</td>'
-            . '<td>' . $owner . '</td><td>' . $src . '</td><td>' . $cadenceCell . '</td>'
-            . '<td>' . $decision . '</td></tr>';
+        return '<tr data-kpi-code="' . $e($code) . '"><td class="annex122-metric-cell">' . $kpiCell . '</td>'
+            . '<td class="annex122-formula-cell">' . $formula . '</td><td>' . $thresholds . '</td>'
+            . '<td>' . $owner . '</td><td class="annex122-source-cell">' . $src . '</td><td>' . $cadenceCell . '</td>'
+            . '<td class="annex122-decision-cell">' . $decision . '</td></tr>';
     }
 
     private function renderDataSourceSummary(mixed $source): string

@@ -24,6 +24,11 @@ declare(strict_types=1);
  *   2. ALWAYS: every file follows NNN_snake_case_name.sql with a 3-digit
  *      zero-padded prefix.
  *
+ *   2b. ALWAYS: approved historical prefix collisions may be allow-listed in
+ *       mom/data/registry/migration-prefix-collision-ledger.json. This is for
+ *       immutable production-history collisions only; any new or mismatched
+ *       collision still reports drift.
+ *
  *   3. DB-AWARE (if DB env present): every migration_id in schema_migrations
  *      has a matching NNN_*.sql file in the repo. Missing file = drift.
  *
@@ -53,6 +58,7 @@ const EXIT_INTERNAL = 2;
 $strict = in_array('--strict', $argv, true);
 $quiet = in_array('--quiet', $argv, true);
 
+$repoRoot = dirname(__DIR__, 3);
 $migrationsDir = '';
 foreach ($argv as $arg) {
     if (str_starts_with($arg, '--migrations-dir=')) {
@@ -60,9 +66,9 @@ foreach ($argv as $arg) {
     }
 }
 if ($migrationsDir === '') {
-    $repoRoot = dirname(__DIR__, 3);
     $migrationsDir = $repoRoot . '/mom/database/migrations';
 }
+$collisionLedgerPath = $repoRoot . '/mom/data/registry/migration-prefix-collision-ledger.json';
 
 if (!is_dir($migrationsDir)) {
     fwrite(STDERR, "FATAL: migrations directory not found: {$migrationsDir}\n");
@@ -87,6 +93,26 @@ sort($files);
 $findings = [];
 $repoByPrefix = []; // NNN -> [filename, ...]
 $repoById = [];    // migration_id -> filename
+$approvedCollisions = [];
+
+if (is_file($collisionLedgerPath)) {
+    $raw = file_get_contents($collisionLedgerPath);
+    $decoded = is_string($raw) ? json_decode($raw, true) : null;
+    $entries = is_array($decoded['approved_prefix_collisions'] ?? null)
+        ? $decoded['approved_prefix_collisions']
+        : [];
+    foreach ($entries as $entry) {
+        $prefix = (string)($entry['prefix'] ?? '');
+        $filesForPrefix = array_values(array_filter(
+            array_map('strval', is_array($entry['files'] ?? null) ? $entry['files'] : []),
+            static fn(string $file): bool => $file !== ''
+        ));
+        sort($filesForPrefix);
+        if ($prefix !== '' && $filesForPrefix !== []) {
+            $approvedCollisions[$prefix] = $filesForPrefix;
+        }
+    }
+}
 
 foreach ($files as $file) {
     if (!preg_match('/^(\d{3})_([a-z0-9_]+)\.sql$/', $file, $m)) {
@@ -105,6 +131,15 @@ foreach ($files as $file) {
 
 foreach ($repoByPrefix as $prefix => $list) {
     if (count($list) > 1) {
+        $sortedList = $list;
+        sort($sortedList);
+        $approved = isset($approvedCollisions[$prefix]) && $approvedCollisions[$prefix] === $sortedList;
+        if ($approved) {
+            if (!$quiet) {
+                fwrite(STDOUT, "INFO: approved_historical_prefix_collision NNN={$prefix}: " . implode(', ', $sortedList) . "\n");
+            }
+            continue;
+        }
         // P2 (info): same NNN with distinct names is ambiguous but not destructive —
         // both migrations run in alphabetical order. Distinct from duplicate_id (P0)
         // which would have the same id and is genuinely irresolvable.
