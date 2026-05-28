@@ -395,12 +395,31 @@ final class EmailIntakeValidationService
         $blockers = array_values(array_unique($blockers));
         $warnings = array_values(array_unique($warnings));
 
-        $status = 'commit_ready';
-        if (!empty($cfg['enabled']) === false || ($cfg['auto_create_mode'] ?? 'review_queue') === 'review_queue') {
-            $status = 'needs_review';
-        }
-        if ($blockers) {
-            $status = $this->mapStatus($blockers);
+        // Bug fix 2026-05-28: validateCase MUST NOT overwrite terminal /
+        // committed statuses. Previously a re-validation triggered by
+        // EmailIntakeCommitService::refreshValidation between Commit CPO
+        // and Commit SO was resetting status back to 'needs_review' (when
+        // auto_create_mode='review_queue'), which then blocked the SO
+        // commit at assertCommitReady. These statuses represent a decision
+        // already made by a human or by an upstream commit step — the
+        // validator should ONLY refresh blockers/warnings, not the
+        // workflow state.
+        $currentStatus = (string)($case['status'] ?? '');
+        $preserveStatuses = [
+            'approved', 'rejected',
+            'committed_cpo', 'committed_so', 'committed_jo', 'committed_wo',
+            'closed', 'security_hold',
+        ];
+        if (in_array($currentStatus, $preserveStatuses, true)) {
+            $status = $currentStatus;
+        } else {
+            $status = 'commit_ready';
+            if (!empty($cfg['enabled']) === false || ($cfg['auto_create_mode'] ?? 'review_queue') === 'review_queue') {
+                $status = 'needs_review';
+            }
+            if ($blockers) {
+                $status = $this->mapStatus($blockers);
+            }
         }
 
         $outcome = [

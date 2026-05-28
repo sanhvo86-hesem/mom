@@ -105,6 +105,25 @@ mom/data/
 !mom/data/
 mom/data/*
 !mom/data/registry/
+
+# Keep empty runtime directories so VPS deploy doesn't lose them on a
+# fresh git reset/clone. .gitkeep is a 0-byte sentinel; actual runtime
+# data inside these directories stays gitignored.
+!mom/data/orders/
+mom/data/orders/*
+!mom/data/orders/.gitkeep
+!mom/data/commercial/
+mom/data/commercial/*
+!mom/data/commercial/.gitkeep
+!mom/data/private/
+mom/data/private/*
+!mom/data/private/.gitkeep
+!mom/data/private/email-intake/
+mom/data/private/email-intake/*
+!mom/data/private/email-intake/.gitkeep
+!mom/data/private/email-intake/attachments/
+mom/data/private/email-intake/attachments/*
+!mom/data/private/email-intake/attachments/.gitkeep
 mom/data/registry/*
 !mom/data/registry/endpoint-catalog-index.json
 !mom/data/registry/kpi-authority-registry.json
