@@ -47,6 +47,7 @@ class EmailIntakeController extends BaseController
     private ?EmailIntakeValidationService $validationSvc = null;
     private ?EmailIntakeCommitService $commitSvc = null;
     private ?LlmExtractionRouterService $llmRouterSvc = null;
+    private ?\MOM\Api\Services\EmailIntakeHeaderRuleService $headerRulesSvc = null;
 
     private function db(): \MOM\Database\Connection
     {
@@ -141,6 +142,151 @@ class EmailIntakeController extends BaseController
             $this->llmRouterSvc = new LlmExtractionRouterService($this->db());
         }
         return $this->llmRouterSvc;
+    }
+
+    /**
+     * Lazy header-rule service. Shared with the IMAP path so both ingress
+     * routes (cron + worker push) enforce identical header policy.
+     */
+    private function headerRules(): \MOM\Api\Services\EmailIntakeHeaderRuleService
+    {
+        if ($this->headerRulesSvc === null) {
+            require_once __DIR__ . '/../services/EmailIntakeHeaderRuleService.php';
+            $this->headerRulesSvc = new \MOM\Api\Services\EmailIntakeHeaderRuleService($this->db());
+        }
+        return $this->headerRulesSvc;
+    }
+
+    /**
+     * Normalize a folder path so the comparison "submitted == configured"
+     * is robust against slash style and casing drift across mail providers
+     * (Gmail uses "[Gmail]/All Mail", Outlook uses "Inbox\Orders", etc.).
+     */
+    private function normalizeFolderPath(string $path): string
+    {
+        $path = trim($path);
+        if ($path === '') return '';
+        $path = str_replace('\\', '/', $path);
+        $path = preg_replace('#/{2,}#', '/', $path) ?? $path;
+        $path = rtrim($path, '/');
+        return strtolower($path);
+    }
+
+    /**
+     * Allowed attachment extensions per AEOI policy. Anything else is rejected
+     * regardless of mime type because dangerous binaries can be renamed.
+     *
+     * @return array<int,string>
+     */
+    private function allowedAttachmentExts(): array
+    {
+        $cfg = $this->svc()->loadConfig();
+        $defaults = ['pdf', 'xlsx', 'docx', 'csv'];
+        $exts = $cfg['allowed_attachment_types'] ?? $defaults;
+        if (!is_array($exts) || $exts === []) {
+            return $defaults;
+        }
+        return array_values(array_map('strtolower', $exts));
+    }
+
+    private const DANGEROUS_ATTACHMENT_EXTS = [
+        'exe', 'bat', 'cmd', 'ps1', 'vbs', 'js', 'msi', 'dll',
+        'jar', 'scr', 'com', 'sh', 'php', 'phtml', 'cgi', 'pl',
+    ];
+
+    /**
+     * Persist attachment bytes to private storage under
+     * `<dataDir>/private/email-intake/attachments/{case_id}/{sha256}_{safe}`
+     * and return the storage_path (relative to dataDir) for the DB row.
+     *
+     * Returns null when bytes cannot be persisted (caller should still
+     * record the attachment metadata so reviewers see the filename).
+     *
+     * @param array<string,mixed> $att Must contain raw `_bytes` (binary string)
+     *        OR `content_base64` (base64 string). Plus filename / sha256.
+     */
+    private function persistAttachmentBytes(int $caseId, array $att): ?string
+    {
+        $bytes = (string)($att['_bytes'] ?? '');
+        if ($bytes === '' && isset($att['content_base64'])) {
+            $decoded = base64_decode((string)$att['content_base64'], true);
+            if ($decoded !== false) {
+                $bytes = $decoded;
+            }
+        }
+        if ($bytes === '') {
+            return null;
+        }
+
+        $ext = strtolower((string)($att['extension']
+            ?? pathinfo((string)($att['original_filename'] ?? ''), PATHINFO_EXTENSION)));
+        if (in_array($ext, self::DANGEROUS_ATTACHMENT_EXTS, true)) {
+            // Caller will mark this as a blocker — never write the bytes.
+            return null;
+        }
+
+        $sha = strtolower((string)($att['sha256'] ?? ''));
+        if (!preg_match('/^[a-f0-9]{64}$/', $sha)) {
+            $sha = hash('sha256', $bytes);
+        } else {
+            // Verify the submitted hash matches the bytes we will store.
+            $serverSha = hash('sha256', $bytes);
+            if (!hash_equals($sha, $serverSha)) {
+                return null;
+            }
+        }
+
+        $safe = preg_replace('/[^A-Za-z0-9._-]+/', '_',
+            (string)($att['safe_filename'] ?? $att['original_filename'] ?? 'attachment'));
+        $safe = substr((string)$safe, 0, 80) ?: 'attachment';
+
+        $baseDir = rtrim($this->dataDir, '/') . '/private/email-intake/attachments/' . $caseId;
+        if (!is_dir($baseDir) && !@mkdir($baseDir, 0750, true) && !is_dir($baseDir)) {
+            return null;
+        }
+
+        $fname = $sha . '_' . $safe;
+        $abs   = $baseDir . '/' . $fname;
+        if (file_put_contents($abs, $bytes, LOCK_EX) === false) {
+            return null;
+        }
+        @chmod($abs, 0640);
+
+        // Return path relative to dataDir so DB doesn't pin to an absolute
+        // filesystem location.
+        return 'private/email-intake/attachments/' . $caseId . '/' . $fname;
+    }
+
+    /**
+     * P0-07 — look up whether this sha256 was previously persisted for any
+     * other case. If yes, returns [case_id, intake_no, attachment_id] so the
+     * caller can mark the current case duplicate_hold.
+     *
+     * @return array{case_id:int,intake_no:string,attachment_id:int}|null
+     */
+    private function findDuplicateAttachment(string $sha256, int $excludeCaseId): ?array
+    {
+        $sha256 = strtolower(trim($sha256));
+        if (!preg_match('/^[a-f0-9]{64}$/', $sha256)) {
+            return null;
+        }
+        $row = $this->db()->queryOne(
+            'SELECT a.id AS attachment_id, a.case_id, c.intake_no
+               FROM email_intake_attachment a
+               JOIN email_intake_case c ON c.id = a.case_id
+              WHERE a.sha256 = :p_sha AND a.case_id <> :p_case
+              ORDER BY a.id ASC
+              LIMIT 1',
+            [':p_sha' => $sha256, ':p_case' => $excludeCaseId]
+        );
+        if (!$row) {
+            return null;
+        }
+        return [
+            'case_id'        => (int)$row['case_id'],
+            'intake_no'      => (string)($row['intake_no'] ?? ''),
+            'attachment_id'  => (int)$row['attachment_id'],
+        ];
     }
 
     // ── LLM Model routing (migration 207) ────────────────────────────────
@@ -1256,6 +1402,34 @@ class EmailIntakeController extends BaseController
                 $this->error('mailbox_disabled', 403, 'Mailbox row is disabled.');
             }
 
+            // P0-03: enforce scope — worker token alone is not enough; the
+            // submitted message must come from the mailbox + folder the row
+            // declares. Without this, a compromised or mis-configured worker
+            // could forward arbitrary emails from any other folder/account.
+            $payloadMailbox = strtolower(trim((string)($body['mailbox_address'] ?? '')));
+            $payloadFolder  = $this->normalizeFolderPath((string)($body['folder_path'] ?? ''));
+            $configMailbox  = strtolower((string)($mbx['mailbox_address'] ?? ''));
+            $configFolder   = $this->normalizeFolderPath((string)($mbx['folder_path'] ?? ''));
+            if ($payloadMailbox === '' || $payloadMailbox !== $configMailbox) {
+                $this->auditLog('aeoi_worker_mailbox_scope_rejected', [
+                    'worker'        => $worker['worker_id'],
+                    'mailbox_id'    => $mailboxId,
+                    'payload_match' => $payloadMailbox === $configMailbox,
+                ]);
+                $this->error('mailbox_scope_not_allowed', 403,
+                    'Submitted mailbox_address does not match the configured row.');
+            }
+            if ($payloadFolder === '' || $payloadFolder !== $configFolder) {
+                $this->auditLog('aeoi_worker_folder_scope_rejected', [
+                    'worker'      => $worker['worker_id'],
+                    'mailbox_id'  => $mailboxId,
+                    'config'      => $configFolder,
+                    'payload'     => $payloadFolder,
+                ]);
+                $this->error('folder_scope_not_allowed', 403,
+                    'Submitted folder_path does not match the configured row.');
+            }
+
             // Verify sender allowlist
             $allow = $this->svc()->isEmailAllowed($fromEmail);
             if (!$allow['allowed']) {
@@ -1266,13 +1440,59 @@ class EmailIntakeController extends BaseController
                 $this->success(['ok' => true, 'action' => 'ignored', 'reason' => 'sender_not_allowed']);
             }
 
-            // Best-effort document_type / action_type heuristic from subject
-            $docType = '';
-            $action  = '';
-            if (preg_match('/\[(CUSTOMER_PO|PO_CHANGE|PO_CANCEL|EXPEDITE)\]/i', $subject, $m)) {
+            // P0-04: replace the legacy subject-regex heuristic with the
+            // shared EmailIntakeHeaderRuleService used by the IMAP path so
+            // both ingress paths enforce identical policy. The header rule
+            // outcome dictates whether we create a case, hold it, or
+            // ignore the message.
+            $bodyText      = (string)($body['body_text'] ?? '');
+            $hdr           = $this->headerRules()->parseHeaderBlock($bodyText);
+            $matchedRule   = $this->headerRules()->matchRule($subject, $bodyText);
+            $policyOutcome = 'allow_llm_fallback';
+            $policyReason  = 'no header rule matched the email';
+            if ($matchedRule !== null) {
+                $check = $this->headerRules()->validateParsedHeader($matchedRule, $hdr);
+                $policyOutcome = (string)($check['outcome'] ?? 'allow_llm_fallback');
+                $policyReason  = (string)($check['reason']  ?? 'header check produced no reason');
+            } else {
+                // P0-05: if any enabled header rule exists, refuse to silently
+                // LLM-fallback — that bypasses the admin-controlled gate.
+                $enabledRules = (int)($this->db()->queryOne(
+                    'SELECT COUNT(*) AS n FROM email_intake_header_rule WHERE enabled = TRUE',
+                    []
+                )['n'] ?? 0);
+                if ($enabledRules > 0) {
+                    $policyOutcome = 'security_hold';
+                    $policyReason  = 'header rules are configured but none matched the email';
+                }
+            }
+
+            if ($policyOutcome === 'ignore') {
+                $this->auditLog('aeoi_worker_header_ignored', [
+                    'worker' => $worker['worker_id'],
+                    'reason' => $policyReason,
+                ]);
+                $this->success(['ok' => true, 'action' => 'ignored', 'reason' => $policyReason]);
+            }
+            if ($policyOutcome === 'reject') {
+                $this->auditLog('aeoi_worker_header_rejected', [
+                    'worker' => $worker['worker_id'],
+                    'reason' => $policyReason,
+                ]);
+                $this->success(['ok' => true, 'action' => 'rejected', 'reason' => $policyReason]);
+            }
+
+            // Derive document_type / action_type from the parsed header rather
+            // than the subject regex. Falls back to a tight subject regex
+            // ONLY if the header section was missing AND the rule said it was
+            // OK to LLM-fallback — otherwise the case is created in
+            // security_hold below.
+            $docType = (string)($hdr['doc_type']    ?? '');
+            $action  = (string)($hdr['action_type'] ?? '');
+            if ($docType === '' && preg_match('/\[(CUSTOMER_PO|PO_CHANGE|PO_CANCEL|EXPEDITE)\]/i', $subject, $m)) {
                 $docType = strtoupper($m[1]);
             }
-            if (preg_match('/\[(NEW|CHANGE|CANCEL|EXPEDITE)\]/i', $subject, $m)) {
+            if ($action === '' && preg_match('/\[(NEW|CHANGE|CANCEL|EXPEDITE)\]/i', $subject, $m)) {
                 $action = strtoupper($m[1]);
             }
 
@@ -1333,16 +1553,34 @@ class EmailIntakeController extends BaseController
             );
             $messageId = (int)$msgRow['id'];
 
+            // Header policy may demand the case enter the queue in
+            // security_hold immediately (admin rules dictated this even
+            // though the worker submission passed scope + sender checks).
+            $initialStatus = $policyOutcome === 'security_hold'
+                ? 'security_hold'
+                : 'extraction_pending';
+
             // Create the intake case linked to the message row
             $case = $this->caseSvc()->createCase([
                 'message_id'          => $messageId,
                 'mailbox_id'          => $mailboxId,
+                'header_rule_id'      => $matchedRule['id'] ?? null,
                 'sender_allowlist_id' => $allow['entry_id'] ?? null,
-                'status'              => 'extraction_pending',
+                'status'              => $initialStatus,
                 'document_type'       => $docType ?: null,
                 'action_type'         => $action  ?: null,
             ], $worker['worker_id']);
             $caseId = (int)$case['id'];
+
+            if ($policyOutcome === 'security_hold') {
+                $this->caseSvc()->recordCheck($caseId, [
+                    'check_code' => 'header_policy',
+                    'severity'   => 'blocker',
+                    'result'     => 'fail',
+                    'message'    => $policyReason,
+                    'details'    => ['outcome' => 'security_hold'],
+                ]);
+            }
 
             // Mark message as 'processing' — the email_intake_message.status
             // enum (migration 203) is pending | processing | extracted |
@@ -1355,22 +1593,80 @@ class EmailIntakeController extends BaseController
                 [':p_status' => 'processing', ':p_id' => $messageId]
             );
 
-            // Persist attachments
+            // Persist attachments (P0-06 + P0-07).
+            $allowedExts = $this->allowedAttachmentExts();
+            $duplicateRefs = [];
+            $dangerousAtts = [];
             foreach ($atts as $att) {
-                $sha256 = trim((string)($att['sha256'] ?? ''));
-                if ($sha256 === '' || !preg_match('/^[a-f0-9]{64}$/i', $sha256)) {
+                $sha256 = strtolower(trim((string)($att['sha256'] ?? '')));
+                if ($sha256 === '' || !preg_match('/^[a-f0-9]{64}$/', $sha256)) {
                     continue;
                 }
+                $filename = (string)($att['filename'] ?? 'unknown');
+                $ext      = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+                // Dangerous extension → never write, mark blocker.
+                if (in_array($ext, self::DANGEROUS_ATTACHMENT_EXTS, true)) {
+                    $dangerousAtts[] = $filename;
+                    continue;
+                }
+                // Allowed-list filter (PDF/XLSX/DOCX/CSV by default).
+                if ($allowedExts !== [] && !in_array($ext, $allowedExts, true)) {
+                    // Allowed-list mismatch is recorded as a skipped attachment,
+                    // not a blocker — admin may have a narrow policy.
+                    continue;
+                }
+
+                // P0-07: detect duplicate before persisting metadata so we can
+                // flag the new case as duplicate_hold and link to the original.
+                $dup = $this->findDuplicateAttachment($sha256, $caseId);
+
+                $rawAtt = [
+                    '_bytes'            => $att['_bytes']         ?? null,
+                    'content_base64'    => $att['content_base64'] ?? null,
+                    'sha256'            => $sha256,
+                    'extension'         => $ext,
+                    'original_filename' => $filename,
+                    'safe_filename'     => (string)($att['safe_filename'] ?? $filename),
+                ];
+                $storagePath = $this->persistAttachmentBytes($caseId, $rawAtt);
+
                 $this->caseSvc()->addAttachment($caseId, $messageId, [
-                    'original_filename' => (string)($att['filename'] ?? 'unknown'),
-                    'safe_filename'     => (string)($att['safe_filename'] ?? $att['filename'] ?? 'unknown'),
-                    'mime_type'         => trim((string)($att['mime_type'] ?? '')) ?: null,
-                    'extension'         => strtolower(pathinfo((string)($att['filename'] ?? ''), PATHINFO_EXTENSION)),
-                    'file_size_bytes'   => (int)($att['size_bytes'] ?? 0),
-                    'sha256'            => strtolower($sha256),
-                    'storage_path'      => null,
+                    'original_filename'   => $filename,
+                    'safe_filename'       => (string)($att['safe_filename'] ?? $filename),
+                    'mime_type'           => trim((string)($att['mime_type'] ?? '')) ?: null,
+                    'extension'           => $ext,
+                    'file_size_bytes'     => (int)($att['size_bytes'] ?? 0),
+                    'sha256'              => $sha256,
+                    'storage_path'        => $storagePath,
                     'extracted_text_path' => null,
-                    'ocr_status'        => 'not_required',
+                    'ocr_status'          => $storagePath === null ? 'pending' : 'not_required',
+                ]);
+                if ($dup) {
+                    $duplicateRefs[] = $dup;
+                }
+            }
+
+            if ($dangerousAtts !== []) {
+                $this->caseSvc()->setStatus($caseId, 'security_hold', $worker['worker_id'],
+                    'dangerous_attachment_extension');
+                $this->caseSvc()->recordCheck($caseId, [
+                    'check_code' => 'attachment_dangerous',
+                    'severity'   => 'blocker',
+                    'result'     => 'fail',
+                    'message'    => 'Attachment with dangerous extension blocked: '
+                                  . implode(', ', $dangerousAtts),
+                    'details'    => ['filenames' => $dangerousAtts],
+                ]);
+            } elseif ($duplicateRefs !== []) {
+                $this->caseSvc()->setStatus($caseId, 'duplicate_hold', $worker['worker_id'],
+                    'duplicate_attachment_detected');
+                $this->caseSvc()->recordCheck($caseId, [
+                    'check_code' => 'attachment_duplicate',
+                    'severity'   => 'blocker',
+                    'result'     => 'fail',
+                    'message'    => 'Attachment sha256 already recorded against another case.',
+                    'details'    => ['existing' => $duplicateRefs],
                 ]);
             }
 

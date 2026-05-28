@@ -97,11 +97,15 @@ final class EmailIntakeImapService
 
         try {
             $result = $this->fetchAndIngest($conn, $mailbox, $actor);
-            $this->catalog->recordMailboxScan($mailboxId, 'completed',
-                sprintf('Fetched %d, created %d, skipped %d.',
-                    $result['fetched'], $result['created'], $result['skipped']));
+            $note = sprintf(
+                'Fetched %d, created %d, skipped %d, errors %d (cursor preserved on errors).',
+                $result['fetched'], $result['created'], $result['skipped'],
+                $result['errors'] ?? 0
+            );
+            $finalStatus = ($result['errors'] ?? 0) > 0 ? 'partial' : 'completed';
+            $this->catalog->recordMailboxScan($mailboxId, $finalStatus, $note);
             return array_merge(
-                $this->mkResult($mailboxId, 'completed', null, $startTime),
+                $this->mkResult($mailboxId, $finalStatus, $note, $startTime),
                 $result
             );
         } catch (Throwable $e) {
@@ -127,11 +131,17 @@ final class EmailIntakeImapService
                 continue;
             }
             $totals['mailboxes']++;
-            $full = $this->catalog->getMailbox((int)$m['id']);
+            // P0-02: pollMailbox requires imap_password_enc to open the
+            // IMAP connection. getMailbox() strips that field for API safety
+            // (P0-03), so we MUST use getMailboxWithSecret() here. Using
+            // getMailbox() previously caused every polled mailbox to throw
+            // "missing IMAP password" silently.
+            $full = $this->catalog->getMailboxWithSecret((int)$m['id']);
             $r = $this->pollMailbox($full, $actor);
             $totals['fetched'] += (int)($r['fetched'] ?? 0);
             $totals['created'] += (int)($r['created'] ?? 0);
             $totals['skipped'] += (int)($r['skipped'] ?? 0);
+            $totals['errors']  += (int)($r['errors']  ?? 0);
             if (($r['status'] ?? '') === 'failed') {
                 $totals['errors']++;
             }
@@ -288,9 +298,10 @@ final class EmailIntakeImapService
             $uids = array_slice($uids, 0, self::MAX_MESSAGES_PER_POLL);
         }
 
-        $fetched = 0;
-        $created = 0;
-        $skipped = 0;
+        $fetched    = 0;
+        $created    = 0;
+        $skipped    = 0;
+        $errors     = 0;
         $maxSeenUid = $lastUid;
 
         foreach ($uids as $uid) {
@@ -410,16 +421,33 @@ final class EmailIntakeImapService
                 //   reject             → skip with explicit reject log
                 //   allow_llm_fallback → fall through to the LLM router
                 //
-                // If no rule matches at all, we fall back to the legacy
-                // behaviour (LLM router on empty header) for backward compat
-                // with the original Phase 1 demo flow.
-                $policyOutcome    = 'allow_llm_fallback';
-                $policyReason     = 'no header rule matched the email';
-                $matchedRule      = $this->headerRules()->matchRule($subject, $bodyText);
+                // P0-05: production default is fail-closed. If admin has set
+                // up at least one enabled header rule and none matches, we
+                // CANNOT silently LLM-fallback — that bypasses the gate.
+                // Only allow the legacy LLM fallback when:
+                //   - no enabled header rule exists at all (greenfield install
+                //     where admin hasn't configured rules yet), OR
+                //   - the matched rule explicitly says allow_llm_fallback, OR
+                //   - the dev flag email_intake_config.aeoi_dev_allow_llm_fallback
+                //     is set (not exposed in admin UI; for local dev only).
+                $matchedRule = $this->headerRules()->matchRule($subject, $bodyText);
                 if ($matchedRule !== null) {
                     $check = $this->headerRules()->validateParsedHeader($matchedRule, $hdr);
-                    $policyOutcome = $check['outcome'];
-                    $policyReason  = $check['reason'];
+                    $policyOutcome = (string)($check['outcome'] ?? 'security_hold');
+                    $policyReason  = (string)($check['reason']  ?? 'header check produced no reason');
+                } else {
+                    $enabledRules = (int)($this->db->queryOne(
+                        'SELECT COUNT(*) AS n FROM email_intake_header_rule WHERE enabled = TRUE',
+                        []
+                    )['n'] ?? 0);
+                    if ($enabledRules === 0) {
+                        // Greenfield install — admin has not configured rules.
+                        $policyOutcome = 'allow_llm_fallback';
+                        $policyReason  = 'no enabled header rule on this install';
+                    } else {
+                        $policyOutcome = 'security_hold';
+                        $policyReason  = 'header rules are configured but none matched the email';
+                    }
                 }
 
                 if ($policyOutcome === 'ignore') {
@@ -470,16 +498,75 @@ final class EmailIntakeImapService
                     // Choose tier: pdf-attached → extraction_pdf, else default.
                     $tier = $pdfText !== '' ? 'extraction_pdf' : 'extraction_default';
 
+                    // P1-03: look up the customer template matching this
+                    // sender/document type/file type so the LLM gets the
+                    // admin-curated hints. At this point $hdr['customer_id']
+                    // is empty by the outer if-guard, so we lean on the
+                    // sender allowlist's customer_id linkage when available.
+                    $tmplCustomerId = (string)($allow['customer_id'] ?? '');
+                    $tmplDocType    = $hdr['doc_type'] !== ''
+                                        ? $hdr['doc_type']
+                                        : ($docType !== '' ? $docType : 'CUSTOMER_PO');
+                    $tmplFileType   = $pdfText !== '' ? 'pdf' : 'email';
+                    $customerTemplate = null;
+                    if ($tmplCustomerId !== '') {
+                        $customerTemplate = $this->db->queryOne(
+                            'SELECT id, template_name,
+                                    po_number_hints, part_number_hints,
+                                    revision_hints, quantity_hints,
+                                    delivery_date_hints, ship_to_hints,
+                                    unit_price_hints, line_table_required,
+                                    min_confidence_overall, min_confidence_required_field
+                               FROM email_intake_customer_template
+                              WHERE enabled = TRUE
+                                AND customer_id   = :p_cust
+                                AND document_type = :p_doc
+                                AND (file_type = :p_ft OR file_type = \'any\')
+                              ORDER BY (file_type = :p_ft) DESC, id DESC
+                              LIMIT 1',
+                            [
+                                ':p_cust' => $tmplCustomerId,
+                                ':p_doc'  => $tmplDocType,
+                                ':p_ft'   => $tmplFileType,
+                            ]
+                        );
+                    }
+                    $tmplHints = [];
+                    if ($customerTemplate) {
+                        foreach (['po_number_hints','part_number_hints','revision_hints',
+                                  'quantity_hints','delivery_date_hints','ship_to_hints',
+                                  'unit_price_hints'] as $k) {
+                            $decoded = is_string($customerTemplate[$k] ?? null)
+                                ? (json_decode((string)$customerTemplate[$k], true) ?: [])
+                                : (is_array($customerTemplate[$k] ?? null) ? $customerTemplate[$k] : []);
+                            if ($decoded !== []) {
+                                $tmplHints[$k] = $decoded;
+                            }
+                        }
+                        if (!empty($customerTemplate['line_table_required'])) {
+                            $tmplHints['line_table_required'] = true;
+                        }
+                    }
+
                     try {
                         $router  = new LlmExtractionRouterService($this->db);
-                        $outcome = $router->extract($bodyText, [
+                        $context = [
                             'from_email'          => $fromEmail,
                             'subject'             => $subject,
                             'received_at'         => $receivedAt,
                             'internet_message_id' => $internetMsgId,
                             'attachment_filename' => $pdfFname,
                             'attachment_text'     => $pdfText,
-                        ], $tier);
+                        ];
+                        if ($customerTemplate) {
+                            $context['customer_template'] = [
+                                'template_id'   => (int)$customerTemplate['id'],
+                                'template_name' => (string)$customerTemplate['template_name'],
+                                'customer_id'   => $tmplCustomerId,
+                                'hints'         => $tmplHints,
+                            ];
+                        }
+                        $outcome = $router->extract($bodyText, $context, $tier);
                         $claudeExtract      = $outcome['result'];
                         $extractionAttempts = $outcome['attempts'];
                         // Bridge LLM fields into the same $hdr shape so
@@ -548,12 +635,85 @@ final class EmailIntakeImapService
                     $this->cases->addLine($caseId, $line);
                 }
 
+                // P0-06: persist attachment bytes to private storage so the
+                // reviewer can re-download the source PO during case review,
+                // and so audit trails have the original file (not just a
+                // sha256). P0-07: detect duplicate sha256 BEFORE addAttachment
+                // so we can flip the case to duplicate_hold instead of
+                // silently sharing the row with another case.
+                $duplicateRefs = [];
+                $dangerousAtts = [];
                 foreach ($attachments as $att) {
-                    // Strip the in-memory bytes blob before persisting —
-                    // never write raw PDF bytes to the DB.
                     $persistable = $att;
+                    $bytes = $persistable['_bytes'] ?? '';
                     unset($persistable['_bytes']);
+
+                    $ext = strtolower((string)($persistable['extension']
+                        ?? pathinfo((string)($persistable['original_filename'] ?? ''), PATHINFO_EXTENSION)));
+                    $dangerous = [
+                        'exe','bat','cmd','ps1','vbs','js','msi','dll',
+                        'jar','scr','com','sh','php','phtml','cgi','pl',
+                    ];
+                    if (in_array($ext, $dangerous, true)) {
+                        $dangerousAtts[] = (string)($persistable['original_filename'] ?? '');
+                        continue;
+                    }
+
+                    // Duplicate detection across cases.
+                    $sha = strtolower((string)($persistable['sha256'] ?? ''));
+                    if ($sha !== '') {
+                        $dupRow = $this->db->queryOne(
+                            'SELECT a.id AS attachment_id, a.case_id, c.intake_no
+                               FROM email_intake_attachment a
+                               JOIN email_intake_case c ON c.id = a.case_id
+                              WHERE a.sha256 = :p_sha AND a.case_id <> :p_case
+                              ORDER BY a.id ASC LIMIT 1',
+                            [':p_sha' => $sha, ':p_case' => $caseId]
+                        );
+                        if ($dupRow) {
+                            $duplicateRefs[] = [
+                                'case_id'       => (int)$dupRow['case_id'],
+                                'intake_no'     => (string)($dupRow['intake_no'] ?? ''),
+                                'attachment_id' => (int)$dupRow['attachment_id'],
+                            ];
+                        }
+                    }
+
+                    $persistable['storage_path'] = $this->persistAttachmentBytes(
+                        $caseId,
+                        (string)$bytes,
+                        $sha,
+                        (string)($persistable['original_filename'] ?? 'attachment'),
+                        $ext
+                    );
+                    $persistable['ocr_status'] = $persistable['storage_path'] === null
+                        ? 'pending'
+                        : 'not_required';
+
                     $this->cases->addAttachment($caseId, $messageId, $persistable);
+                }
+
+                if ($dangerousAtts !== []) {
+                    $this->cases->setStatus($caseId, 'security_hold', $actor,
+                        'dangerous_attachment_extension');
+                    $this->cases->recordCheck($caseId, [
+                        'check_code' => 'attachment_dangerous',
+                        'severity'   => 'blocker',
+                        'result'     => 'fail',
+                        'message'    => 'Attachment with dangerous extension blocked: '
+                                      . implode(', ', $dangerousAtts),
+                        'details'    => ['filenames' => $dangerousAtts],
+                    ]);
+                } elseif ($duplicateRefs !== []) {
+                    $this->cases->setStatus($caseId, 'duplicate_hold', $actor,
+                        'duplicate_attachment_detected');
+                    $this->cases->recordCheck($caseId, [
+                        'check_code' => 'attachment_duplicate',
+                        'severity'   => 'blocker',
+                        'result'     => 'fail',
+                        'message'    => 'Attachment sha256 already recorded against another case.',
+                        'details'    => ['existing' => $duplicateRefs],
+                    ]);
                 }
 
                 // Cache the pdftotext output on the first PDF attachment row
@@ -622,29 +782,37 @@ final class EmailIntakeImapService
                 $created++;
                 if ($uid > $maxSeenUid) { $maxSeenUid = $uid; }
             } catch (Throwable $e) {
-                @error_log('[AEOI IMAP] uid=' . $uid . ' err=' . $e->getMessage());
-                $skipped++;
-                if ($uid > $maxSeenUid) { $maxSeenUid = $uid; }
+                // P0-08: do NOT advance maxSeenUid past an unhandled exception.
+                // If the failure is transient (DB hiccup, IMAP timeout mid-
+                // fetch), advancing the cursor would silently drop the email
+                // — the next poll would never see it again. Leave it for retry.
+                @error_log('[AEOI IMAP] uid=' . $uid . ' err=' . $e->getMessage()
+                    . ' (cursor NOT advanced; will retry next poll)');
+                $errors++;
             }
         }
 
-        $this->persistCursor($mailboxId, $maxSeenUid, $mailbox['imap_last_uidvalidity'] ?? null);
-        return ['fetched' => $fetched, 'created' => $created, 'skipped' => $skipped];
+        // P0-09: persistCursor now records the actual fetched count so the
+        // mailbox row's imap_messages_fetched column matches reality. The
+        // previous code incremented by 1 per cursor save (poll-run count).
+        $this->persistCursor($mailboxId, $maxSeenUid, $mailbox['imap_last_uidvalidity'] ?? null, $fetched);
+        return ['fetched' => $fetched, 'created' => $created, 'skipped' => $skipped, 'errors' => $errors];
     }
 
-    private function persistCursor(int $mailboxId, int $newUid, mixed $uidValidity): void
+    private function persistCursor(int $mailboxId, int $newUid, mixed $uidValidity, int $fetched = 0): void
     {
         $this->db->execute(
             'UPDATE email_intake_mailbox
                 SET imap_last_uid         = :p_uid,
                     imap_last_uidvalidity = :p_uidv,
-                    imap_messages_fetched = imap_messages_fetched + 1,
+                    imap_messages_fetched = imap_messages_fetched + :p_fetched,
                     updated_at            = NOW()
               WHERE id = :p_id',
             [
-                ':p_uid'  => $newUid,
-                ':p_uidv' => $uidValidity !== null ? (int)$uidValidity : null,
-                ':p_id'   => $mailboxId,
+                ':p_uid'     => $newUid,
+                ':p_uidv'    => $uidValidity !== null ? (int)$uidValidity : null,
+                ':p_fetched' => max(0, $fetched),
+                ':p_id'      => $mailboxId,
             ]
         );
     }
@@ -869,6 +1037,48 @@ final class EmailIntakeImapService
             'created'     => 0,
             'skipped'     => 0,
         ];
+    }
+
+    /**
+     * P0-06: write attachment bytes to private storage and return the
+     * storage_path (relative to dataDir). Returns null when bytes can't
+     * be persisted — the caller still records the metadata row so the
+     * reviewer sees the filename + sha256.
+     */
+    private function persistAttachmentBytes(
+        int    $caseId,
+        string $bytes,
+        string $sha256,
+        string $filename,
+        string $ext
+    ): ?string {
+        if ($bytes === '') return null;
+
+        // Verify hash matches bytes when both are provided.
+        if (preg_match('/^[a-f0-9]{64}$/', $sha256)) {
+            if (!hash_equals($sha256, hash('sha256', $bytes))) {
+                return null;
+            }
+        } else {
+            $sha256 = hash('sha256', $bytes);
+        }
+
+        $safe = preg_replace('/[^A-Za-z0-9._-]+/', '_', $filename);
+        $safe = substr((string)$safe, 0, 80) ?: 'attachment';
+
+        $baseDir = rtrim($this->dataDir, '/') . '/private/email-intake/attachments/' . $caseId;
+        if (!is_dir($baseDir) && !@mkdir($baseDir, 0750, true) && !is_dir($baseDir)) {
+            return null;
+        }
+
+        $fname = $sha256 . '_' . $safe;
+        $abs   = $baseDir . '/' . $fname;
+        if (file_put_contents($abs, $bytes, LOCK_EX) === false) {
+            return null;
+        }
+        @chmod($abs, 0640);
+
+        return 'private/email-intake/attachments/' . $caseId . '/' . $fname;
     }
 
 }

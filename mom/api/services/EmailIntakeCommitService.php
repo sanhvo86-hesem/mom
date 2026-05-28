@@ -286,7 +286,19 @@ final class EmailIntakeCommitService
                 // Reload the case so blockers/warnings reflect the new run.
                 return $this->cases->getCase($caseId);
             } catch (\Throwable $e) {
-                @error_log('[AEOI commit] validation rerun failed for case ' . $caseId . ': ' . $e->getMessage());
+                // P0-16: commit must fail-closed. Previously the catch logged
+                // and returned the STALE case, which let a commit proceed
+                // against pre-edit blockers (or skip them entirely). A commit
+                // is the moment the AI side touches Sales Order / CPO data,
+                // so a validation rerun failure is itself a commit blocker.
+                @error_log('[AEOI commit] validation rerun failed for case '
+                    . $caseId . ': ' . $e->getMessage());
+                throw new RuntimeException(
+                    'Validation rerun failed; commit blocked. Underlying error: '
+                    . $e->getMessage(),
+                    0,
+                    $e
+                );
             }
         }
         return $case;
