@@ -152,6 +152,17 @@ final class EmailIntakeAdminCatalogService
     /** Patch-style update; only the supplied fields change. */
     public function updateMailbox(int $id, array $data, string $actor): array
     {
+        // P1-01: revalidate the FINAL state after merging the patch with the
+        // existing row. The pre-patch field-by-field validation let a user
+        // switch provider to gmail_imap without setting host/password.
+        $existing = $this->db->queryOne(
+            'SELECT * FROM ' . self::T_MAILBOX . ' WHERE id = :p_id',
+            [':p_id' => $id]
+        );
+        if (!$existing) {
+            throw new RuntimeException('Mailbox not found: ' . $id);
+        }
+
         $allowed = [
             'mailbox_address','provider','folder_path','enabled',
             'read_body','read_attachments','move_after_processed',
@@ -162,6 +173,8 @@ final class EmailIntakeAdminCatalogService
         $sets   = ['updated_at = NOW()', 'updated_by = :p_actor'];
         $params = [':p_actor' => $actor];
 
+        // Build the merged final state for validation.
+        $merged = $existing;
         foreach ($allowed as $col) {
             if (!array_key_exists($col, $data)) {
                 continue;
@@ -169,29 +182,41 @@ final class EmailIntakeAdminCatalogService
             $val = $data[$col];
             if (in_array($col, ['enabled','read_body','read_attachments','move_after_processed','imap_validate_cert'], true)) {
                 $val = $val ? 'true' : 'false';
+                $merged[$col] = $val === 'true';
             } elseif ($col === 'imap_port') {
                 $val = ($val === '' || $val === null) ? null : (int)$val;
+                $merged[$col] = $val;
             } elseif ($col === 'mailbox_address' && is_string($val)) {
                 $val = strtolower(trim($val));
                 if ($val !== '' && !filter_var($val, FILTER_VALIDATE_EMAIL)) {
                     throw new RuntimeException('mailbox_address must be a valid email.');
                 }
+                $merged[$col] = $val;
             } elseif (is_string($val)) {
                 $val = trim($val);
                 if ($val === '') { $val = null; }
+                $merged[$col] = $val;
+            } else {
+                $merged[$col] = $val;
             }
             $sets[]            = "$col = :p_$col";
             $params[":p_$col"] = $val;
         }
 
         // imap_password is encrypted on the way in — never stored in plaintext
-        if (!empty($data['imap_password']) && is_string($data['imap_password'])) {
+        $pwdSupplied = !empty($data['imap_password']) && is_string($data['imap_password']);
+        if ($pwdSupplied) {
             if ($this->config === null) {
                 throw new RuntimeException('Cannot encrypt IMAP password — EmailIntakeConfigService not injected.');
             }
             $sets[] = 'imap_password_enc = :p_imap_pwd';
             $params[':p_imap_pwd'] = $this->config->encryptSecret($data['imap_password']);
+            $merged['imap_password_enc'] = $params[':p_imap_pwd'];
         }
+
+        // Final-state validation — catches "switched provider but forgot to
+        // supply IMAP credentials" and similar drift.
+        $this->validateMailboxState($merged, $id);
 
         if (count($sets) < 2) {
             return $this->getMailbox($id);
@@ -205,8 +230,81 @@ final class EmailIntakeAdminCatalogService
         return $this->getMailbox($id);
     }
 
+    /**
+     * Verify a fully-merged mailbox row is valid. Used by both create and
+     * update so we never persist a half-configured row.
+     *
+     * @param array<string,mixed> $row
+     */
+    private function validateMailboxState(array $row, ?int $selfId = null): void
+    {
+        $prov = (string)($row['provider'] ?? '');
+        if (!in_array($prov, ['outlook_local', 'microsoft_graph', 'manual_upload',
+                              'gmail_imap', 'generic_imap', 'exchange_ews'], true)) {
+            throw new RuntimeException('provider must be one of: outlook_local, microsoft_graph, manual_upload, gmail_imap, generic_imap, exchange_ews.');
+        }
+        $addr = strtolower(trim((string)($row['mailbox_address'] ?? '')));
+        if (!filter_var($addr, FILTER_VALIDATE_EMAIL)) {
+            throw new RuntimeException('mailbox_address must be a valid email.');
+        }
+        $folder = trim((string)($row['folder_path'] ?? ''));
+        if ($folder === '') {
+            throw new RuntimeException('folder_path is required.');
+        }
+
+        // Uniqueness check excluding self.
+        $params = [':p_addr' => $addr, ':p_folder' => strtolower($folder)];
+        $sql = 'SELECT id FROM ' . self::T_MAILBOX
+            . ' WHERE lower(mailbox_address) = :p_addr AND lower(folder_path) = :p_folder';
+        if ($selfId !== null) {
+            $sql .= ' AND id <> :p_self';
+            $params[':p_self'] = $selfId;
+        }
+        $clash = $this->db->queryOne($sql, $params);
+        if ($clash) {
+            throw new RuntimeException('A mailbox row with this address + folder already exists.');
+        }
+
+        if (in_array($prov, ['gmail_imap', 'generic_imap'], true)) {
+            if (trim((string)($row['imap_host'] ?? '')) === '') {
+                throw new RuntimeException('imap_host is required for ' . $prov . ' provider.');
+            }
+            $port = (int)($row['imap_port'] ?? 0);
+            if ($port < 1 || $port > 65535) {
+                throw new RuntimeException('imap_port must be between 1 and 65535 for ' . $prov . ' provider.');
+            }
+            if (trim((string)($row['imap_username'] ?? '')) === '') {
+                throw new RuntimeException('imap_username is required for ' . $prov . ' provider.');
+            }
+            if (empty($row['imap_password_enc'])) {
+                throw new RuntimeException('imap_password is required for ' . $prov . ' provider (and must be re-supplied on provider switch).');
+            }
+            $enc = strtolower(trim((string)($row['imap_encryption'] ?? 'ssl')));
+            if (!in_array($enc, ['ssl', 'tls', 'starttls', 'none'], true)) {
+                throw new RuntimeException('imap_encryption must be ssl | tls | starttls | none.');
+            }
+        }
+    }
+
     public function deleteMailbox(int $id): void
     {
+        // P1-02: soft-disable when the mailbox is referenced by any case so we
+        // never drop the audit trail. Hard-delete only when nothing references
+        // the row (i.e. it never produced a case).
+        $linked = (int)($this->db->queryOne(
+            'SELECT COUNT(*) AS n FROM email_intake_case WHERE mailbox_id = :p_id',
+            [':p_id' => $id]
+        )['n'] ?? 0);
+        if ($linked > 0) {
+            $this->db->execute(
+                'UPDATE ' . self::T_MAILBOX
+                . ' SET enabled = FALSE, updated_at = NOW() WHERE id = :p_id',
+                [':p_id' => $id]
+            );
+            throw new RuntimeException(
+                'Mailbox has ' . $linked . ' linked case(s); disabled instead of deleted to preserve audit trail.'
+            );
+        }
         $this->db->execute(
             'DELETE FROM ' . self::T_MAILBOX . ' WHERE id = :p_id',
             [':p_id' => $id]

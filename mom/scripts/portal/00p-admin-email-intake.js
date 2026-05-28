@@ -120,8 +120,8 @@
     html += '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">'
           + '<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">'
           + '<span style="font-size:22px">📥</span>'
-          + '<div><div style="font-size:15px;font-weight:700;color:var(--text-1,#111)">AI Order Intake — Tiếp Nhận Đơn Hàng Tự Động</div>'
-          + '<div style="font-size:11px;color:var(--text-3,#6b7280)">Đọc email Outlook → trích xuất SO/WO/PO/part number → tạo đơn hàng tự động</div>'
+          + '<div><div style="font-size:15px;font-weight:700;color:var(--text-1,#111)">AI Order Intake — Tiếp nhận PO khách hàng có kiểm soát</div>'
+          + '<div style="font-size:11px;color:var(--text-3,#6b7280)">Đọc email/folder được cấp phép, trích xuất Customer PO, tạo Intake Case và chờ review trước khi commit CPO/SO.</div>'
           + '</div></div>'
           + '<div style="display:flex;gap:8px;align-items:center;flex-shrink:0">'
           + '<span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;'
@@ -363,29 +363,26 @@
   function _sectionLogic(){
     var cfg = STATE.config || {};
     return '<div class="aeoi-card">'
-      + _cardHead('⚙️ Cơ chế xử lý & vận hành', 'Kiểm soát cách AI tạo đơn hàng từ email đã trích xuất')
+      + _cardHead('⚙️ Cơ chế xử lý & vận hành', 'Production khuyến nghị: chế độ Review queue, ngưỡng tin cậy ≥0.95, part match Exact, missing field Block. Các option khác chỉ dùng cho dev/lab.')
       + '<div class="aeoi-grid2">'
 
       + _fieldSelect('Chế độ tạo đơn hàng', 'aeoi-auto-create-mode',
-          [['draft','Draft — tạo SO ở trạng thái nháp, cần xác nhận thủ công'],
-           ['confirmed','Confirmed — tạo SO đã xác nhận ngay lập tức'],
-           ['review_queue','Review queue — không tạo, chờ admin duyệt']],
-          cfg.auto_create_mode||'draft')
+          [['review_queue','Review queue — không tạo gì, chờ admin duyệt (KHUYẾN NGHỊ — production)'],
+           ['draft','Draft — tạo SO ở trạng thái nháp, cần xác nhận thủ công (advanced)']],
+          cfg.auto_create_mode||'review_queue')
 
       + _fieldNum('Ngưỡng tin cậy AI (0.00–1.00)', 'aeoi-confidence', cfg.confidence_threshold||0.95,
-          'Độ tin cậy tối thiểu để tạo draft order. Dưới ngưỡng → review_queue.', 0, 1, 0.05)
+          'Độ tin cậy tối thiểu để case không bị blocker low_confidence. Khuyến nghị ≥0.95.', 0.50, 1, 0.05)
 
       + _fieldSelect('Khớp part number', 'aeoi-part-match',
-          [['exact','Exact — phải khớp chính xác với items table'],
-           ['fuzzy','Fuzzy — cho phép gần đúng (Levenshtein ≤2)'],
-           ['review_if_no_match','Review nếu không khớp — tạo SO nhưng đánh dấu cần xem lại']],
+          [['exact','Exact — phải khớp chính xác với master data (KHUYẾN NGHỊ)'],
+           ['review_if_no_match','Review nếu không khớp — case sẽ giữ ở needs_review']],
           cfg.part_match_mode||'exact')
 
       + _fieldSelect('Xử lý trường thiếu', 'aeoi-missing-field',
-          [['block','Block — không tạo SO nếu thiếu trường bắt buộc'],
-           ['flag','Flag — tạo SO nhưng đánh dấu cần bổ sung'],
-           ['create_with_blanks','Tạo với trường trống — điền sau']],
-          cfg.missing_field_action||'flag')
+          [['block','Block — case không thể approve khi thiếu trường bắt buộc (KHUYẾN NGHỊ)'],
+           ['flag','Flag — cho approve nhưng đánh dấu cần bổ sung']],
+          cfg.missing_field_action||'block')
 
       + _fieldNum('Cửa sổ kiểm tra trùng (ngày)', 'aeoi-dup-days', cfg.duplicate_check_days||30,
           'Nếu đã có SO với customer_po_number giống nhau trong N ngày → bỏ qua như trùng lặp.', 0, 365)

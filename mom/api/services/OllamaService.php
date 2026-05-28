@@ -199,12 +199,27 @@ EOT;
         $bodyText = mb_substr($bodyText, 0, 16000);
         $attTxt   = mb_substr($attTxt,   0, 16000);
 
+        // P1-03: feed customer-template hints to the model. Hints are
+        // admin-curated regex / phrase markers per customer that improve
+        // extraction quality for that customer's PO format.
+        $hintsBlock = '';
+        $tmpl = is_array($context['customer_template'] ?? null) ? $context['customer_template'] : null;
+        if ($tmpl !== null && is_array($tmpl['hints'] ?? null) && $tmpl['hints'] !== []) {
+            $lines = ['', 'CUSTOMER TEMPLATE HINTS (admin-curated for customer ' . ($tmpl['customer_id'] ?? '?') . ')'];
+            foreach ($tmpl['hints'] as $field => $patterns) {
+                if (!is_array($patterns) || $patterns === []) continue;
+                $clean = array_slice(array_map('strval', $patterns), 0, 8);
+                $lines[] = '- ' . $field . ': ' . implode(' | ', $clean);
+            }
+            $hintsBlock = "\n" . implode("\n", $lines) . "\n";
+        }
+
         return <<<PROMPT
 EMAIL METADATA
 From:               {$from}
 Subject:            {$subj}
 Received:           {$recv}
-
+{$hintsBlock}
 EMAIL BODY
 ---
 {$bodyText}

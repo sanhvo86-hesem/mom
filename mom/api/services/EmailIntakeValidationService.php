@@ -103,9 +103,25 @@ final class EmailIntakeValidationService
             $this->pass($caseId, 'email_scope_allowed', 'info', 'No mailbox link (manual/test source).');
         }
 
-        // 3. sender_allowed
-        $fromEmail = (string)($case['extracted_json']['email']['from_email'] ?? '');
-        if ($fromEmail !== '') {
+        // 3. sender_allowed — P0-12: source-of-truth is the email_intake_message
+        // row (what IMAP/worker actually received), NOT the extracted_json. LLM
+        // extraction can lie or be missing; the message row cannot.
+        $fromEmail = '';
+        if (!empty($case['message_id'])) {
+            $msgRow = $this->db->queryOne(
+                'SELECT from_email FROM email_intake_message WHERE id = :p_id',
+                [':p_id' => (int)$case['message_id']]
+            );
+            $fromEmail = strtolower(trim((string)($msgRow['from_email'] ?? '')));
+        }
+        if ($fromEmail === '') {
+            $fromEmail = strtolower(trim((string)($case['extracted_json']['email']['from_email'] ?? '')));
+        }
+        if ($fromEmail === '') {
+            $blockers[] = 'sender_missing';
+            $this->fail($caseId, 'sender_allowed', 'blocker',
+                'No sender email recorded on the case (neither message row nor extraction).');
+        } else {
             $allow = $this->config->isEmailAllowed($fromEmail);
             if (!$allow['allowed']) {
                 $blockers[] = 'sender_not_allowed';
@@ -115,33 +131,78 @@ final class EmailIntakeValidationService
             }
         }
 
-        // 4. header_valid — light check: ensure document_type and action are set.
-        if (empty($case['document_type']) || empty($case['action_type'])) {
+        // 4. header_valid — P0-13: full check using EmailIntakeHeaderRuleService
+        // when a header_rule_id is attached. Falls back to the legacy
+        // document_type/action_type presence check when no rule is configured.
+        if (!empty($case['header_rule_id']) && !empty($case['message_id'])) {
+            try {
+                require_once __DIR__ . '/EmailIntakeHeaderRuleService.php';
+                $hdrSvc = new EmailIntakeHeaderRuleService($this->db);
+                $bodyRow = $this->db->queryOne(
+                    'SELECT body_preview, subject FROM email_intake_message WHERE id = :p_id',
+                    [':p_id' => (int)$case['message_id']]
+                );
+                $body = (string)($bodyRow['body_preview'] ?? '');
+                $subj = (string)($bodyRow['subject']      ?? '');
+                $rule = $this->db->queryOne(
+                    'SELECT * FROM email_intake_header_rule WHERE id = :p_id',
+                    [':p_id' => (int)$case['header_rule_id']]
+                );
+                if ($rule) {
+                    $hdr   = $hdrSvc->parseHeaderBlock($body);
+                    $check = $hdrSvc->validateParsedHeader($rule, $hdr);
+                    $headerOk = in_array((string)($check['outcome'] ?? ''), ['ok','allow_llm_fallback'], true);
+                    if (!$headerOk) {
+                        $blockers[] = 'missing_or_invalid_header';
+                        $this->fail($caseId, 'header_valid', 'blocker',
+                            'Header rule check returned ' . ($check['outcome'] ?? '?') . ': '
+                            . ($check['reason'] ?? '(no reason)'));
+                    } else {
+                        $this->pass($caseId, 'header_valid', 'info',
+                            'Header rule "' . ($rule['name'] ?? $rule['id']) . '" → ' . ($check['outcome'] ?? 'ok'));
+                    }
+                }
+                unset($subj);
+            } catch (\Throwable $e) {
+                $blockers[] = 'header_check_failed';
+                $this->fail($caseId, 'header_valid', 'blocker', 'Header recheck failed: ' . $e->getMessage());
+            }
+        } elseif (empty($case['document_type']) || empty($case['action_type'])) {
             $blockers[] = 'missing_or_invalid_header';
             $this->fail($caseId, 'header_valid', 'blocker', 'document_type or action_type missing.');
         } else {
             $this->pass($caseId, 'header_valid', 'info', "{$case['document_type']} / {$case['action_type']}.");
         }
 
-        // 5. attachment_valid — sha256 uniqueness already enforced at DB; we
-        //    verify each row has a non-empty hash and an allowed extension.
+        // 5. attachment_valid — P0-14: when require_attachment is true and the
+        // doc type is a Customer PO family, missing attachments is a blocker
+        // (the LLM cannot extract from headers alone for production orders).
         $allowedExt = array_map('strtolower', $cfg['allowed_attachment_types'] ?? ['pdf','xlsx','docx']);
-        $attachIssues = [];
-        foreach ($case['attachments'] as $att) {
-            $ext = strtolower(trim((string)($att['extension'] ?? '')));
-            if ($ext === '' || !in_array($ext, $allowedExt, true)) {
-                $attachIssues[] = "{$att['original_filename']} (.{$ext})";
-            }
-            if (trim((string)($att['sha256'] ?? '')) === '') {
-                $attachIssues[] = "{$att['original_filename']} (missing sha256)";
-            }
-        }
-        if ($attachIssues) {
-            $blockers[] = 'unsupported_attachment';
+        $attachCount  = count((array)($case['attachments'] ?? []));
+        $needsAttach  = ($cfg['require_attachment'] ?? true)
+            && in_array((string)$case['document_type'], ['CUSTOMER_PO','PO_CHANGE'], true);
+        if ($needsAttach && $attachCount === 0) {
+            $blockers[] = 'missing_attachment';
             $this->fail($caseId, 'attachment_valid', 'blocker',
-                'Unsupported or unhashed attachment(s): ' . implode(', ', $attachIssues));
+                'Customer PO requires at least one attachment (PDF/XLSX/DOCX).');
         } else {
-            $this->pass($caseId, 'attachment_valid', 'info', count($case['attachments']) . ' attachment(s) ok.');
+            $attachIssues = [];
+            foreach ((array)($case['attachments'] ?? []) as $att) {
+                $ext = strtolower(trim((string)($att['extension'] ?? '')));
+                if ($ext === '' || !in_array($ext, $allowedExt, true)) {
+                    $attachIssues[] = "{$att['original_filename']} (.{$ext})";
+                }
+                if (trim((string)($att['sha256'] ?? '')) === '') {
+                    $attachIssues[] = "{$att['original_filename']} (missing sha256)";
+                }
+            }
+            if ($attachIssues) {
+                $blockers[] = 'unsupported_attachment';
+                $this->fail($caseId, 'attachment_valid', 'blocker',
+                    'Unsupported or unhashed attachment(s): ' . implode(', ', $attachIssues));
+            } else {
+                $this->pass($caseId, 'attachment_valid', 'info', "$attachCount attachment(s) ok.");
+            }
         }
 
         // 6. customer_po_number_required
@@ -155,26 +216,31 @@ final class EmailIntakeValidationService
                 : 'Not required for this document_type.');
         }
 
-        // 7. customer_match — look up canonical customer_status from customers table
-        if (!empty($case['customer_id'])) {
+        // 7. customer_match — P0-11: an empty customer_id is itself a blocker.
+        // The LLM might extract a blank customer_id and the gate used to skip
+        // the check entirely, letting the case pass with an unknown party.
+        $customerId = trim((string)($case['customer_id'] ?? ''));
+        if ($customerId === '') {
+            $blockers[] = 'unknown_customer';
+            $this->fail($caseId, 'customer_match', 'blocker',
+                'customer_id is missing from the extraction.');
+        } else {
             try {
                 $cust = $this->db->queryOne(
                     'SELECT customer_id, customer_status FROM customers WHERE customer_id = :p_id',
-                    [':p_id' => (string)$case['customer_id']]
+                    [':p_id' => $customerId]
                 );
                 if (!$cust) {
                     $blockers[] = 'unknown_customer';
-                    $this->fail($caseId, 'customer_match', 'blocker', "Customer {$case['customer_id']} not in master data.");
+                    $this->fail($caseId, 'customer_match', 'blocker', "Customer {$customerId} not in master data.");
                 } elseif (strtolower((string)($cust['customer_status'] ?? 'active')) !== 'active') {
                     $blockers[] = 'customer_not_active';
                     $this->fail($caseId, 'customer_match', 'blocker',
-                        "Customer {$case['customer_id']} customer_status='{$cust['customer_status']}' (must be 'active').");
+                        "Customer {$customerId} customer_status='{$cust['customer_status']}' (must be 'active').");
                 } else {
-                    $this->pass($caseId, 'customer_match', 'info', "Customer {$case['customer_id']} active.");
+                    $this->pass($caseId, 'customer_match', 'info', "Customer {$customerId} active.");
                 }
             } catch (\Throwable $e) {
-                // customers table query failed — block the case, don't soft-pass.
-                // A silent warning previously masked is_active vs customer_status drift.
                 $blockers[] = 'customer_lookup_failed';
                 $this->fail($caseId, 'customer_match', 'blocker',
                     'customers lookup failed: ' . $e->getMessage());
@@ -286,11 +352,20 @@ final class EmailIntakeValidationService
                 $warnings[] = 'delivery_date_in_past';
                 $this->pass($caseId, 'delivery_date_valid', 'warning', "$lineLabel delivery date is in the past.");
             }
-            // delivery_address
+            // delivery_address — P0-15: default policy is block.
+            // ship-to is critical for an order; downgrade to warning ONLY when
+            // policy explicitly says delivery_address_missing_policy=warn.
             $addr = trim((string)($line['delivery_address'] ?? ''));
             if ($addr === '') {
-                $warnings[] = 'unknown_ship_to_address';
-                $this->pass($caseId, 'delivery_address_match', 'warning', "$lineLabel missing delivery_address.");
+                $policy = strtolower((string)($cfg['delivery_address_missing_policy'] ?? 'block'));
+                if ($policy === 'warn') {
+                    $warnings[] = 'unknown_ship_to_address';
+                    $this->pass($caseId, 'delivery_address_match', 'warning', "$lineLabel missing delivery_address.");
+                } else {
+                    $blockers[] = 'unknown_ship_to_address';
+                    $this->fail($caseId, 'delivery_address_match', 'blocker',
+                        "$lineLabel missing delivery_address (policy=block).");
+                }
             }
             // unit_price — only blocks SO commit (not CPO)
             if ((float)($line['unit_price'] ?? 0) <= 0) {
@@ -298,10 +373,16 @@ final class EmailIntakeValidationService
             }
         }
 
-        // 14. confidence_threshold
+        // 14. confidence_threshold — P0-10: an absent / zero overall_confidence
+        // is itself a blocker. The previous "$overall > 0 &&" guard let a
+        // missing field silently pass with the misleading message "0 ≥ 0.95".
         $minOverall = (float)($cfg['confidence_threshold'] ?? 0.95);
         $overall    = (float)($case['overall_confidence'] ?? 0);
-        if ($overall > 0 && $overall < $minOverall) {
+        if ($overall <= 0) {
+            $blockers[] = 'low_confidence';
+            $this->fail($caseId, 'confidence_threshold', 'blocker',
+                'overall_confidence missing or zero — extraction did not produce a confidence score.');
+        } elseif ($overall < $minOverall) {
             $blockers[] = 'low_confidence';
             $this->fail($caseId, 'confidence_threshold', 'blocker',
                 "Overall confidence {$overall} < threshold {$minOverall}.");

@@ -1080,16 +1080,31 @@ final class ScheduledJobs
             require_once __DIR__ . '/EmailIntakeAdminCatalogService.php';
             $catalog = new \MOM\Api\Services\EmailIntakeAdminCatalogService($this->db, $svc);
 
+            // Per migration 206 the real provider values are gmail_imap and
+            // generic_imap (not the placeholder 'imap'). Worker-based providers
+            // (outlook_local, microsoft_graph) are NOT polled by this cron — they
+            // push to /worker_submit_email_envelope on their own schedule.
+            $enabledMbx = $catalog->listEnabledMailboxes();
             $imapMailboxIds = array_column(
                 array_filter(
-                    $catalog->listEnabledMailboxes(),
-                    static fn(array $m): bool => ($m['provider'] ?? '') === 'imap'
+                    $enabledMbx,
+                    static fn(array $m): bool => in_array(
+                        ($m['provider'] ?? ''),
+                        ['gmail_imap', 'generic_imap'],
+                        true
+                    )
                 ),
                 'id'
             );
-
-            // M365 local-Outlook heartbeat not yet provisioned (sprint 2).
-            $heartbeatCount = 0;
+            // Worker-push providers don't get polled, just counted for the summary.
+            $workerProviderCount = count(array_filter(
+                $enabledMbx,
+                static fn(array $m): bool => in_array(
+                    ($m['provider'] ?? ''),
+                    ['outlook_local', 'microsoft_graph'],
+                    true
+                )
+            ));
 
             // IMAP polling — only attempt if php-imap is loaded.
             $imapSummary = [
@@ -1131,10 +1146,26 @@ final class ScheduledJobs
                 }
             }
 
-            $detail = "Heartbeat: $heartbeatCount local-Outlook; "
-                    . "IMAP: {$imapSummary['mailboxes']} mailboxes, "
-                    . "fetched {$imapSummary['fetched']}, created {$imapSummary['created']}, "
-                    . "skipped {$imapSummary['skipped']}, errors {$imapSummary['errors']}.";
+            $detail = sprintf(
+                'IMAP: %d mailboxes polled (fetched=%d, created=%d, skipped=%d, errors=%d). '
+                . 'Worker-push providers (outlook_local/microsoft_graph) enabled: %d (not polled by cron — they push).',
+                $imapSummary['mailboxes'],
+                $imapSummary['fetched'],
+                $imapSummary['created'],
+                $imapSummary['skipped'],
+                $imapSummary['errors'],
+                $workerProviderCount
+            );
+
+            // Status mapping reflects actual outcome rather than the legacy
+            // M365-sprint-2 placeholder return.
+            $runStatus = match (true) {
+                $imapSummary['errors'] > 0 && $imapSummary['created'] === 0
+                    && $imapSummary['fetched'] === 0                          => 'failed',
+                $imapSummary['errors'] > 0                                    => 'partial',
+                $imapSummary['mailboxes'] === 0 && $workerProviderCount === 0 => 'skipped',
+                default                                                      => 'completed',
+            };
 
             $svc->closePollRun($runId, [
                 'found'        => $imapSummary['fetched'],
@@ -1147,14 +1178,20 @@ final class ScheduledJobs
                 'duration_ms'  => (int)((microtime(true) - $start) * 1000),
                 'api_calls'    => $imapSummary['mailboxes'],
                 'error_detail' => $detail,
-            ], $imapSummary['errors'] > 0 ? 'completed' : 'completed');
+            ], $runStatus === 'failed' ? 'failed' : 'completed');
             $svc->updateNextPollAt();
 
             return [
-                'status'         => 'skipped',
-                'run_id'         => $runId,
-                'orders_created' => 0,
-                'note'           => 'M365 connection service will be provisioned in sprint 2.',
+                'status'              => $runStatus,
+                'mode'                => 'mixed',
+                'run_id'              => $runId,
+                'mailboxes_imap'      => $imapSummary['mailboxes'],
+                'mailboxes_worker'    => $workerProviderCount,
+                'fetched'             => $imapSummary['fetched'],
+                'orders_created'      => $imapSummary['created'],
+                'skipped'             => $imapSummary['skipped'],
+                'errors'              => $imapSummary['errors'],
+                'note'                => $detail,
             ];
         });
     }
