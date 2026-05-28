@@ -48,6 +48,8 @@ final class EmailIntakeImapService
     private const MAX_BODY_BYTES        = 1_048_576;   // 1 MB
     private const MAX_ATTACHMENT_BYTES  = 26_214_400;  // 25 MB
 
+    private ?EmailIntakeHeaderRuleService $headerRulesSvc = null;
+
     public function __construct(
         private readonly Connection                    $db,
         private readonly EmailIntakeAdminCatalogService $catalog,
@@ -59,6 +61,15 @@ final class EmailIntakeImapService
         if (!extension_loaded('imap')) {
             throw new RuntimeException('PHP imap extension is not loaded on this server. Run: sudo apt install php-imap.');
         }
+    }
+
+    /** Lazy accessor for the shared header parser. */
+    private function headerRules(): EmailIntakeHeaderRuleService
+    {
+        if ($this->headerRulesSvc === null) {
+            $this->headerRulesSvc = new EmailIntakeHeaderRuleService($this->db);
+        }
+        return $this->headerRulesSvc;
     }
 
     /**
@@ -387,20 +398,54 @@ final class EmailIntakeImapService
                 // fields without needing a Claude API call. Returns []
                 // (and we fall back to subject-regex only values) if the
                 // body has no header block.
-                $hdr = $this->parseBodyHeaderBlock($bodyText);
+                $hdr = $this->headerRules()->parseHeaderBlock($bodyText);
 
-                // If no header block and Claude API is configured, try LLM
-                // extraction as a fallback. Cheap-first, AI-second policy:
-                // the well-templated emails get parsed deterministically;
-                // free-form ones fall through to Claude.
-                // If the deterministic header parser came up empty, run the
-                // LLM extraction router. The router picks a tier based on
-                // whether the email has a PDF attachment, then dispatches
-                // to the chosen provider (Ollama / Anthropic / etc.) with
-                // automatic fallback chain.
+                // Header policy enforcement — match an enabled rule against
+                // (subject, body) and apply its missing_header_action when
+                // required fields/markers/AI-Process aren't satisfied.
+                // Policy outcomes:
+                //   ok                 → proceed normally
+                //   ignore             → skip the email, no case
+                //   security_hold      → create case but flag for manual review
+                //   reject             → skip with explicit reject log
+                //   allow_llm_fallback → fall through to the LLM router
+                //
+                // If no rule matches at all, we fall back to the legacy
+                // behaviour (LLM router on empty header) for backward compat
+                // with the original Phase 1 demo flow.
+                $policyOutcome    = 'allow_llm_fallback';
+                $policyReason     = 'no header rule matched the email';
+                $matchedRule      = $this->headerRules()->matchRule($subject, $bodyText);
+                if ($matchedRule !== null) {
+                    $check = $this->headerRules()->validateParsedHeader($matchedRule, $hdr);
+                    $policyOutcome = $check['outcome'];
+                    $policyReason  = $check['reason'];
+                }
+
+                if ($policyOutcome === 'ignore') {
+                    @error_log('[AEOI policy] uid=' . $uid . ' IGNORE: ' . $policyReason);
+                    $skipped++;
+                    if ($uid > $maxSeenUid) { $maxSeenUid = $uid; }
+                    continue;
+                }
+                if ($policyOutcome === 'reject') {
+                    @error_log('[AEOI policy] uid=' . $uid . ' REJECT: ' . $policyReason);
+                    $skipped++;
+                    if ($uid > $maxSeenUid) { $maxSeenUid = $uid; }
+                    continue;
+                }
+
                 $claudeExtract     = null;
                 $extractionAttempts = [];
-                if ($hdr['customer_id'] === '' && $hdr['customer_po_number'] === '') {
+                // Honour the rule policy: only allow the LLM router when the
+                // header was valid (ok) OR the rule explicitly permits the
+                // LLM fallback. security_hold cases still extract but get
+                // tagged below; reject/ignore short-circuited above.
+                $allowLlmRouter = ($policyOutcome === 'ok')
+                                   || ($policyOutcome === 'security_hold')
+                                   || ($policyOutcome === 'allow_llm_fallback');
+
+                if ($allowLlmRouter && $hdr['customer_id'] === '' && $hdr['customer_po_number'] === '') {
                     // Pre-extract text from PDF attachments. Result is fed
                     // into the LLM prompt as `attachment_text`. We process
                     // the FIRST pdf only (most POs are a single document)
@@ -464,7 +509,9 @@ final class EmailIntakeImapService
                     'message_id'          => $messageId,
                     'mailbox_id'          => $mailboxId,
                     'sender_allowlist_id' => $allow['entry_id'] ?? null,
-                    'status'              => 'extraction_pending',
+                    'status'              => $policyOutcome === 'security_hold'
+                                              ? 'security_hold'
+                                              : 'extraction_pending',
                     'document_type'       => $hdr['doc_type']   ?: ($docType ?: null),
                     'action_type'         => $hdr['action']     ?: ($action  ?: null),
                     'customer_id'         => $hdr['customer_id']        ?: null,
@@ -496,7 +543,7 @@ final class EmailIntakeImapService
 
                 // Parse body line items section (best-effort regex).
                 // Pattern: "Line NN ... Part Number: X ... Revision: Y ... Quantity: Z EA ... Need Date: D"
-                $lines = $this->parseBodyLineItems($bodyText);
+                $lines = $this->headerRules()->parseLineItems($bodyText);
                 foreach ($lines as $line) {
                     $this->cases->addLine($caseId, $line);
                 }
@@ -511,16 +558,26 @@ final class EmailIntakeImapService
 
                 // Cache the pdftotext output on the first PDF attachment row
                 // so a re-validation doesn't re-shell out to pdftotext.
+                // NOTE: PostgreSQL does NOT support UPDATE ... LIMIT directly,
+                // so we drive the row id through a CTE. Picking the lowest id
+                // (ORDER BY id LIMIT 1) gives deterministic "first PDF" pick.
                 if (($pdfTextCache ?? '') !== '') {
                     $this->db->execute(
-                        'UPDATE email_intake_attachment
+                        'WITH target AS (
+                             SELECT id
+                               FROM email_intake_attachment
+                              WHERE case_id = :p_case
+                                AND extension = :p_ext
+                                AND pdf_text_extracted IS NULL
+                              ORDER BY id
+                              LIMIT 1
+                         )
+                         UPDATE email_intake_attachment AS a
                             SET pdf_text_extracted    = :p_text,
                                 pdf_text_extracted_at = NOW(),
                                 pdf_text_chars        = :p_chars
-                          WHERE case_id = :p_case
-                            AND extension = :p_ext
-                            AND pdf_text_extracted IS NULL
-                          LIMIT 1',
+                           FROM target
+                          WHERE a.id = target.id',
                         [
                             ':p_text'  => $pdfTextCache,
                             ':p_chars' => mb_strlen($pdfTextCache),
@@ -545,13 +602,21 @@ final class EmailIntakeImapService
 
                 // Advance status: extraction_pending → extracted, then run the
                 // 20-check validation pipeline which sets the final state
-                // (commit_ready / needs_review / security_hold / etc.). Without
-                // this the case stays stuck at extraction_pending forever.
-                try {
-                    $this->cases->updateCase($caseId, ['status' => 'extracted'], $actor);
-                    $this->validation->validateCase($caseId, $actor);
-                } catch (Throwable $e) {
-                    @error_log('[AEOI validate] case=' . $caseId . ' err=' . $e->getMessage());
+                // (commit_ready / needs_review / security_hold / etc.).
+                //
+                // Cases created under security_hold (header rule policy)
+                // stay at security_hold — validation does NOT auto-clear
+                // the security gate. Admin must review via the quarantine
+                // queue and explicitly release before the case proceeds.
+                if ($policyOutcome !== 'security_hold') {
+                    try {
+                        $this->cases->updateCase($caseId, ['status' => 'extracted'], $actor);
+                        $this->validation->validateCase($caseId, $actor);
+                    } catch (Throwable $e) {
+                        @error_log('[AEOI validate] case=' . $caseId . ' err=' . $e->getMessage());
+                    }
+                } else {
+                    @error_log('[AEOI policy] case=' . $caseId . ' SECURITY_HOLD: ' . $policyReason);
                 }
 
                 $created++;
@@ -806,246 +871,4 @@ final class EmailIntakeImapService
         ];
     }
 
-    // ── Body header / line item parsers ──────────────────────────────────
-    //
-    // These are the "Phase 2.5" parsers that close the GPT Pro gap of
-    // unparsed [HESEM-ORDER-INTAKE] block. They don't replace the full
-    // Claude API extraction (Phase 3) — they handle the standard
-    // admin-controlled header format the user templates with.
-
-    /**
-     * Parse the [HESEM-ORDER-INTAKE]...[/HESEM-ORDER-INTAKE] block from
-     * a plain-text email body. Returns a normalized map of the fields
-     * we care about — always populated, missing keys default to ''.
-     *
-     * @return array{
-     *   doc_type:string, action:string, customer_id:string, customer_name:string,
-     *   customer_po_number:string, po_date:string, currency_code:string,
-     *   incoterm_code:string, payment_term_code:string,
-     *   ship_to_name:string, ship_to_addr:string,
-     *   ai_process:string, raw_block:string, parsed:array<string,string>
-     * }
-     */
-    private function parseBodyHeaderBlock(string $bodyText): array
-    {
-        $out = [
-            'doc_type'           => '',
-            'action'             => '',
-            'customer_id'        => '',
-            'customer_name'      => '',
-            'customer_po_number' => '',
-            'po_date'            => '',
-            'currency_code'      => '',
-            'incoterm_code'      => '',
-            'payment_term_code'  => '',
-            'ship_to_name'       => '',
-            'ship_to_addr'       => '',
-            'ai_process'         => '',
-            'raw_block'          => '',
-            'parsed'             => [],
-        ];
-        if ($bodyText === '') {
-            return $out;
-        }
-
-        // Tolerant regex: any whitespace between markers, multi-line
-        if (!preg_match(
-            '/\[HESEM-ORDER-INTAKE\](.*?)\[\/HESEM-ORDER-INTAKE\]/is',
-            $bodyText,
-            $m
-        )) {
-            return $out;
-        }
-
-        $block = trim((string)$m[1]);
-        $out['raw_block'] = mb_substr($block, 0, 2000);
-
-        // Each non-empty line is Key: Value
-        $parsed = [];
-        foreach (preg_split('/\r?\n/', $block) ?: [] as $rawLine) {
-            $line = trim($rawLine);
-            if ($line === '') { continue; }
-            if (!preg_match('/^([A-Za-z0-9 _\-]+)\s*:\s*(.*)$/u', $line, $kv)) {
-                continue;
-            }
-            $key = strtolower(str_replace(' ', '-', trim($kv[1])));
-            $val = trim($kv[2]);
-            if ($val !== '') {
-                $parsed[$key] = $val;
-            }
-        }
-        $out['parsed'] = $parsed;
-
-        // Map keys to our normalised case columns. Accept several
-        // synonyms so the user can template loosely.
-        $get = static fn(string ...$keys): string => (function () use ($keys, $parsed) {
-            foreach ($keys as $k) {
-                if (isset($parsed[$k]) && $parsed[$k] !== '') { return $parsed[$k]; }
-            }
-            return '';
-        })();
-
-        $out['doc_type']           = strtoupper($get('doc-type', 'document-type'));
-        $out['action']             = strtoupper($get('action'));
-        $out['customer_id']        = strtoupper($get('customer-code', 'customer-id', 'customer'));
-        $out['customer_name']      = $get('customer-name');
-        $out['customer_po_number'] = $get('po-no', 'po-number', 'customer-po', 'customer-po-number');
-        $out['po_date']            = $this->normaliseIsoDate($get('po-date'));
-        $out['currency_code']      = strtoupper($get('currency', 'currency-code'));
-        $out['incoterm_code']      = strtoupper($get('incoterm', 'incoterm-code'));
-        $out['payment_term_code']  = strtoupper($get('payment-term', 'payment-terms'));
-        $out['ship_to_name']       = $get('ship-to-name', 'ship-to');
-        $out['ship_to_addr']       = $get('ship-to-addr', 'ship-to-address');
-        $out['ai_process']         = strtoupper($get('ai-process'));
-
-        return $out;
-    }
-
-    /**
-     * Parse "Line NN" blocks from the body. Each block looks like:
-     *
-     *   Line 10
-     *     Part Number:   HSM-2200-A
-     *     Revision:      Rev B
-     *     Description:   ...
-     *     Quantity:      40 EA
-     *     Unit Price:    USD 125.00
-     *     Need Date:     2026-07-15
-     *
-     * The grammar is intentionally loose — labels can be any case,
-     * indentation arbitrary, ":" or "-" or "—" separator accepted.
-     * Lines that don't have a Part Number are skipped (validation gate).
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private function parseBodyLineItems(string $bodyText): array
-    {
-        if ($bodyText === '') {
-            return [];
-        }
-
-        // Strip the header block out so its keys don't confuse the parser
-        $bodyText = preg_replace(
-            '/\[HESEM-ORDER-INTAKE\].*?\[\/HESEM-ORDER-INTAKE\]/is',
-            '', $bodyText
-        ) ?? $bodyText;
-
-        // Split on "Line NN" markers. The first chunk before any "Line N"
-        // is preamble; ignore it.
-        $chunks = preg_split('/^\s*Line\s+(\d+)\s*\r?\n/m', $bodyText, -1, PREG_SPLIT_DELIM_CAPTURE);
-        if (!is_array($chunks) || count($chunks) < 3) {
-            return [];
-        }
-
-        $out = [];
-        // chunks[0] = preamble, then pairs [lineNo, body, lineNo, body, ...]
-        for ($i = 1; $i + 1 < count($chunks); $i += 2) {
-            $lineNo = (string)$chunks[$i];
-            $body   = (string)$chunks[$i + 1];
-            $row    = $this->extractLineFields($lineNo, $body);
-            if ($row['part_number'] !== '' && (float)$row['quantity'] > 0) {
-                $out[] = $row;
-            }
-        }
-        return $out;
-    }
-
-    /**
-     * Extract Key: Value pairs from a single line block.
-     * Returns the array shape EmailIntakeCaseService::addLine expects.
-     *
-     * @return array{
-     *   line_no:string, customer_part_number:string, part_number:string,
-     *   part_description:string, revision_number:string, customer_revision:string,
-     *   drawing_revision:string, quantity:float, uom:string,
-     *   requested_delivery_date:string, delivery_address:string,
-     *   ship_to_site_id:string, unit_price:?float, line_total:?float,
-     *   field_confidence:array<string,float>, evidence:array<string,string>
-     * }
-     */
-    private function extractLineFields(string $lineNo, string $body): array
-    {
-        $fields = [];
-        foreach (preg_split('/\r?\n/', $body) ?: [] as $rawLine) {
-            $line = trim($rawLine);
-            if ($line === '') { continue; }
-            // Stop at the next "==" section header or "Best regards" etc.
-            if (preg_match('/^(==|Best regards|Regards|Sincerely|Total)/i', $line)) {
-                break;
-            }
-            if (!preg_match('/^([A-Za-z][A-Za-z0-9 _\-]*?)\s*[:\-]\s*(.*)$/u', $line, $m)) {
-                continue;
-            }
-            $key = strtolower(preg_replace('/\s+/', '-', trim($m[1])) ?? '');
-            $val = trim($m[2]);
-            if ($val !== '') {
-                $fields[$key] = $val;
-            }
-        }
-
-        $partNumber = $fields['part-number'] ?? $fields['part'] ?? '';
-        $rev        = preg_replace('/^Rev\.?\s*/i', '', $fields['revision'] ?? $fields['rev'] ?? '') ?? '';
-        $qtyRaw     = $fields['quantity'] ?? $fields['qty'] ?? '';
-        // Quantity might be "40 EA" — split numeric prefix + UOM suffix.
-        $qty = 0.0;
-        $uom = 'EA';
-        if (preg_match('/^([\d.,]+)\s*([A-Za-z]+)?/', $qtyRaw, $qm)) {
-            $qty = (float)str_replace(',', '', $qm[1]);
-            if (!empty($qm[2])) { $uom = strtoupper($qm[2]); }
-        }
-        // Unit price might be "USD 125.00" — strip currency prefix.
-        $unitPrice = null;
-        if (!empty($fields['unit-price']) && preg_match('/([\d.,]+)/', (string)$fields['unit-price'], $upm)) {
-            $unitPrice = (float)str_replace(',', '', $upm[1]);
-        }
-
-        return [
-            'line_no'                 => $lineNo,
-            'customer_part_number'    => $fields['customer-part-number']    ?? '',
-            'part_number'             => trim((string)$partNumber),
-            'part_description'        => $fields['description']             ?? '',
-            'revision_number'         => trim((string)$rev),
-            'customer_revision'       => '',
-            'drawing_revision'        => $fields['drawing-revision']        ?? '',
-            'quantity'                => $qty,
-            'uom'                     => $uom,
-            'requested_delivery_date' => $this->normaliseIsoDate($fields['need-date']
-                                                             ?? $fields['needed-date']
-                                                             ?? $fields['delivery-date']
-                                                             ?? $fields['requested-delivery-date']
-                                                             ?? ''),
-            'delivery_address'        => $fields['ship-to']                 ?? '',
-            'ship_to_site_id'         => '',
-            'unit_price'              => $unitPrice,
-            'line_total'              => ($unitPrice !== null && $qty > 0) ? round($unitPrice * $qty, 4) : null,
-            'field_confidence'        => [
-                'part_number'             => $partNumber !== '' ? 1.0 : 0.0,
-                'revision_number'         => $rev !== '' ? 1.0 : 0.0,
-                'quantity'                => $qty > 0 ? 1.0 : 0.0,
-                'requested_delivery_date' => isset($fields['need-date']) ? 1.0 : 0.0,
-            ],
-            'evidence'                => [
-                'source' => 'email_body_line_block',
-                'line_no'=> $lineNo,
-            ],
-        ];
-    }
-
-    /** Best-effort date normalisation. Returns '' if input is empty/unparseable. */
-    private function normaliseIsoDate(string $raw): string
-    {
-        $raw = trim($raw);
-        if ($raw === '') { return ''; }
-        // Strip trailing parenthetical notes — "2026-07-01  (early — pre-stage...)"
-        $raw = trim((string)preg_replace('/\s*\(.*$/', '', $raw));
-        // If already ISO YYYY-MM-DD pass through
-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $raw)) {
-            return $raw;
-        }
-        $ts = strtotime($raw);
-        if ($ts === false) {
-            return '';
-        }
-        return date('Y-m-d', $ts);
-    }
 }

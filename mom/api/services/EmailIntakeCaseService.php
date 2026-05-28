@@ -106,6 +106,12 @@ final class EmailIntakeCaseService
 
         $whereSql = $where === [] ? '' : 'WHERE ' . implode(' AND ', $where);
 
+        // Projection includes a LEFT JOIN LATERAL on the first line of
+        // each case + COUNT() aggregates for line + attachment so the M2
+        // Orders AI Intake Queue can render part/rev/qty/due without
+        // making 50 follow-up requests. Also joins email_intake_message
+        // for the from_email / received_at the case originated from.
+        // (GPT Pro audit P0-11.)
         $rows = $this->db->query(
             'SELECT c.id, c.intake_no, c.status, c.customer_id, c.customer_name,
                     c.customer_po_number, c.document_type, c.action_type,
@@ -114,8 +120,35 @@ final class EmailIntakeCaseService
                     c.created_at, c.created_by,
                     c.reviewed_by, c.reviewed_at,
                     c.approved_by, c.approved_at,
-                    c.rejected_by, c.rejected_at
-               FROM ' . self::T_CASE . ' c ' . $whereSql . '
+                    c.rejected_by, c.rejected_at,
+                    m.from_email                 AS from_email,
+                    m.subject                    AS subject,
+                    m.received_at                AS received_at,
+                    line.part_number             AS part_number,
+                    line.revision_number         AS revision_number,
+                    line.quantity                AS quantity,
+                    line.uom                     AS uom,
+                    line.requested_delivery_date AS requested_delivery_date,
+                    line.delivery_address        AS delivery_address,
+                    counts.line_count            AS line_count,
+                    counts.attachment_count      AS attachment_count
+               FROM ' . self::T_CASE . ' c
+               LEFT JOIN email_intake_message m
+                      ON m.id = c.message_id
+               LEFT JOIN LATERAL (
+                       SELECT part_number, revision_number, quantity, uom,
+                              requested_delivery_date, delivery_address
+                         FROM ' . self::T_LINE . ' l
+                        WHERE l.case_id = c.id
+                        ORDER BY (CASE WHEN l.line_no ~ \'^[0-9]+$\' THEN l.line_no::int ELSE NULL END) NULLS LAST, l.id
+                        LIMIT 1
+                  ) AS line ON TRUE
+               LEFT JOIN LATERAL (
+                       SELECT
+                          (SELECT COUNT(*) FROM ' . self::T_LINE . ' l2 WHERE l2.case_id = c.id) AS line_count,
+                          (SELECT COUNT(*) FROM ' . self::T_ATTACH . ' a WHERE a.case_id = c.id) AS attachment_count
+                  ) AS counts ON TRUE
+               ' . $whereSql . '
               ORDER BY c.created_at DESC
               LIMIT :p_limit OFFSET :p_offset',
             $params

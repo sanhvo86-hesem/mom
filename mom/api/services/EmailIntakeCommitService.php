@@ -35,7 +35,15 @@ final class EmailIntakeCommitService
     public function __construct(
         private readonly EmailIntakeCaseService $cases,
         private readonly CustomerPurchaseOrderService $cpoService,
-        private readonly OrderService $orderService
+        private readonly OrderService $orderService,
+        /**
+         * Optional — when injected, every commit call reruns the
+         * validation pipeline so a case that was edited after approve
+         * cannot bypass the latest blocker rules. Per GPT Pro audit
+         * P0-10. Backward-compatible: callers that don't inject still
+         * get the old status + blocker check.
+         */
+        private readonly ?EmailIntakeValidationService $validation = null
     ) {}
 
     /**
@@ -44,6 +52,7 @@ final class EmailIntakeCommitService
     public function commitCustomerPo(int $caseId, string $actor): array
     {
         $case = $this->cases->getCase($caseId);
+        $case = $this->refreshValidation($caseId, $case, $actor);
         $this->assertCommitReady($case, 'customer_po');
 
         if (!empty($case['committed_customer_po_id'])) {
@@ -72,6 +81,7 @@ final class EmailIntakeCommitService
     public function commitSalesOrder(int $caseId, string $actor): array
     {
         $case = $this->cases->getCase($caseId);
+        $case = $this->refreshValidation($caseId, $case, $actor);
         $this->assertCommitReady($case, 'sales_order');
 
         if (!empty($case['committed_so_number'])) {
@@ -79,6 +89,25 @@ final class EmailIntakeCommitService
         }
         if (empty($case['customer_id']) || empty($case['customer_po_number'])) {
             throw new RuntimeException('customer_id and customer_po_number are required to commit Sales Order.');
+        }
+
+        // Per-line guards specific to SO commit. CPO can tolerate a line
+        // without a revision (some customers send PO before engineering
+        // releases); SO production cannot.
+        foreach ((array)($case['lines'] ?? []) as $idx => $line) {
+            $no = $idx + 1;
+            if (trim((string)($line['part_number'] ?? '')) === '') {
+                throw new RuntimeException("Line $no missing part_number — cannot commit Sales Order.");
+            }
+            if (trim((string)($line['revision_number'] ?? '')) === '') {
+                throw new RuntimeException("Line $no missing revision_number — Sales Order requires released revision.");
+            }
+            if ((float)($line['quantity'] ?? 0) <= 0) {
+                throw new RuntimeException("Line $no quantity must be > 0.");
+            }
+            // unit_price warning is enforced via total_value > 0 below; we
+            // don't hard-block here because the case-edit UI may still be
+            // mid-correction and the line_total computation handles 0.
         }
 
         $payload = $this->buildSoPayload($case, $caseId);
@@ -224,6 +253,43 @@ final class EmailIntakeCommitService
         }
         rsort($dates);
         return $dates[0];
+    }
+
+    /**
+     * If a ValidationService was injected, re-run validation when the
+     * case has been edited since the last validation pass (or has no
+     * validation timestamp at all). Returns the freshest case row.
+     *
+     * @param array<string,mixed> $case
+     * @return array<string,mixed>
+     */
+    private function refreshValidation(int $caseId, array $case, string $actor): array
+    {
+        if ($this->validation === null) {
+            return $case;
+        }
+        $validationJson = $case['validation_json'] ?? null;
+        if (is_string($validationJson)) {
+            $validationJson = json_decode($validationJson, true);
+        }
+        $evaluatedAt = is_array($validationJson)
+            ? (string)($validationJson['evaluated_at'] ?? '')
+            : '';
+        $updatedAt = (string)($case['updated_at'] ?? '');
+
+        $needsRerun = $evaluatedAt === ''
+            || ($updatedAt !== '' && strtotime($updatedAt) > strtotime($evaluatedAt));
+
+        if ($needsRerun) {
+            try {
+                $this->validation->validateCase($caseId, $actor);
+                // Reload the case so blockers/warnings reflect the new run.
+                return $this->cases->getCase($caseId);
+            } catch (\Throwable $e) {
+                @error_log('[AEOI commit] validation rerun failed for case ' . $caseId . ': ' . $e->getMessage());
+            }
+        }
+        return $case;
     }
 
     private function assertCommitReady(array $case, string $commitType): void
