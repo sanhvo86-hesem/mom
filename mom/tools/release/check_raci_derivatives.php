@@ -3,11 +3,14 @@
 
 declare(strict_types=1);
 
-require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
+$root = dirname(__DIR__, 3);
+
+require_once $root . '/mom/api/services/FileHelper.php';
+require_once $root . '/mom/api/services/RaciMatrixService.php';
+require_once $root . '/mom/api/services/RaciDerivativeIntegrityService.php';
 
 use MOM\Api\Services\RaciDerivativeIntegrityService;
 
-$root = dirname(__DIR__, 3);
 $dataDir = $root . '/mom/data';
 
 $result = (new RaciDerivativeIntegrityService($root, $dataDir))->audit();
