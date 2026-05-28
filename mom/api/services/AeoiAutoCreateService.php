@@ -9,31 +9,33 @@ use RuntimeException;
 use Throwable;
 
 /**
- * AeoiAutoCreateService — given an LLM-extracted order payload, look up
- * the referenced customer + parts in master-data.json. Create any that
- * don't exist yet, with a clear "auto-created from AEOI case N" provenance
- * stamp. Logs every creation to aeoi_auto_created_record so QC can review.
+ * AeoiAutoCreateService — given an LLM-extracted order payload, decide
+ * whether to **suggest** new master-data records or (legacy/dev only)
+ * write them directly to `master-data.json`.
  *
- * Why we auto-create instead of failing validation:
- *   First-time customers and new revisions are normal in a job shop. If
- *   the validator rejected every PO with an unknown customer, the admin
- *   would have to manually add the customer first, then re-poll. With
- *   auto-create the PO flows through end-to-end and QC reviews the
- *   "newly created" records the next morning.
+ * Default behaviour (production, GPT Pro audit P0-06):
+ *   - For every unknown customer / part / revision discovered in the
+ *     extract, insert a row into `aeoi_master_data_suggestion` with
+ *     status='suggested'. A human reviews them via the admin UI and
+ *     explicitly applies the accepted ones to `master-data.json`.
+ *   - We do NOT mutate the master data file. The case stays linked to
+ *     the suggestion via case_id; downstream validation surfaces
+ *     unknown_customer / unknown_part as blockers until the suggestion
+ *     is applied.
  *
- * Safeguards:
- *   • Customer match is case-insensitive on customer_name OR customer_id.
- *     If either matches an existing row, we DO NOT create a duplicate.
- *   • Part match is exact on part_number (case-sensitive — part numbers
- *     are identity codes, not labels).
- *   • Every auto-created row has source='aeoi' and source_case_id=$caseId
- *     so an admin can find them via the case audit trail.
+ * Legacy/dev behaviour (only when
+ *     email_intake_config.aeoi_auto_create_master_data_dev_only = TRUE):
+ *   - Writes the new record straight into master-data.json (original
+ *     Phase 3 behaviour). Used in dev environments to demo the
+ *     end-to-end flow without bringing a reviewer into the loop. Never
+ *     turn this on in production.
  *
  * @package MOM\Api\Services
  */
 final class AeoiAutoCreateService
 {
     private const MASTER_DATA_FILE = '/master-data/master-data.json';
+    private const T_SUGGESTION     = 'aeoi_master_data_suggestion';
 
     public function __construct(
         private readonly Connection $db,
@@ -41,13 +43,140 @@ final class AeoiAutoCreateService
     ) {}
 
     /**
-     * Walk the LLM extract payload, create missing customer + parts.
-     * Returns ['created_customer' => bool, 'created_parts' => int].
+     * Walk the LLM extract payload, write missing customer + part rows
+     * to the suggestion queue (default) or directly to master-data.json
+     * (dev override). Returns counts for the audit log.
      *
-     * @param array<string,mixed> $extract  The schema-v1 extraction blob.
-     * @return array{created_customer:bool, created_parts:int, audit:list<array<string,mixed>>}
+     * @param array<string,mixed> $extract  Schema-v1 extraction blob
+     * @return array{mode:string, suggested_customer:bool, suggested_parts:int, applied:bool, audit:list<array<string,mixed>>}
      */
     public function createMissingMasterData(int $caseId, array $extract, string $actor): array
+    {
+        $devMode = $this->isDevAutoCreateEnabled();
+        if ($devMode) {
+            return $this->legacyDirectWrite($caseId, $extract, $actor);
+        }
+        return $this->writeSuggestions($caseId, $extract, $actor);
+    }
+
+    // ── Default: suggestion queue ───────────────────────────────────────
+
+    /**
+     * @param array<string,mixed> $extract
+     * @return array{mode:string, suggested_customer:bool, suggested_parts:int, applied:bool, audit:list<array<string,mixed>>}
+     */
+    private function writeSuggestions(int $caseId, array $extract, string $actor): array
+    {
+        $audit = [];
+        $customerKey   = '';
+        $suggestedCust = false;
+
+        // Customer suggestion
+        $custName = trim((string)($extract['customer']['customer_name'] ?? ''));
+        $custId   = trim((string)($extract['customer']['customer_id']   ?? ''));
+        if ($custName !== '' || $custId !== '') {
+            $existing = $this->loadCustomerByKey($custId, $custName);
+            if ($existing === null) {
+                $customerKey = $custId !== '' ? $custId : $this->slugifyCustomerId($custName);
+                $payload = [
+                    'customer_id'       => $customerKey,
+                    'customer_name'     => $custName !== '' ? $custName : $customerKey,
+                    'address_line_1'    => (string)($extract['ship_to']['delivery_address']    ?? ''),
+                    'address_city'      => (string)($extract['ship_to']['delivery_city']       ?? ''),
+                    'address_country'   => (string)($extract['ship_to']['delivery_country']    ?? ''),
+                    'address_postal'    => (string)($extract['ship_to']['delivery_postal_code']?? ''),
+                    'contact_email'     => (string)($extract['purchase_order']['buyer_email'] ?? ''),
+                    'contact_name'      => (string)($extract['purchase_order']['buyer_name']  ?? ''),
+                    'payment_term_code' => (string)($extract['purchase_order']['payment_term_code'] ?? ''),
+                    'currency_code'     => (string)($extract['purchase_order']['currency_code'] ?? ''),
+                    'incoterm_code'     => (string)($extract['purchase_order']['incoterm_code'] ?? ''),
+                ];
+                $this->insertSuggestion($caseId, 'customer', $customerKey, $payload, $actor);
+                $suggestedCust = true;
+                $audit[] = ['kind' => 'customer', 'key' => $customerKey, 'mode' => 'suggested'];
+            } else {
+                $customerKey = (string)($existing['customer_id'] ?? '');
+            }
+        }
+
+        // Part suggestions (one per line with unknown part_number)
+        $suggestedParts = 0;
+        foreach ((array)($extract['lines'] ?? []) as $ln) {
+            $pn = trim((string)($ln['part_number'] ?? ''));
+            if ($pn === '') continue;
+            if ($this->loadPart($pn) !== null) continue;
+            $rev = trim((string)($ln['revision_number'] ?? '')) ?: 'A';
+            $payload = [
+                'part_number'          => $pn,
+                'customer_id'          => $customerKey,
+                'customer_part_number' => (string)($ln['customer_part_number'] ?? ''),
+                'revision'             => $rev,
+                'description'          => (string)($ln['part_description'] ?? ''),
+                'uom'                  => (string)($ln['uom'] ?? 'EA'),
+                'status'               => 'draft',
+                'engineering_status'   => 'pending_release',
+            ];
+            $this->insertSuggestion($caseId, 'part', $pn, $payload, $actor);
+            $suggestedParts++;
+            $audit[] = ['kind' => 'part', 'key' => $pn, 'rev' => $rev, 'mode' => 'suggested'];
+        }
+
+        return [
+            'mode'               => 'suggestion_queue',
+            'suggested_customer' => $suggestedCust,
+            'suggested_parts'    => $suggestedParts,
+            'applied'            => false,
+            'audit'              => $audit,
+        ];
+    }
+
+    /**
+     * @param array<string,mixed> $payload
+     */
+    private function insertSuggestion(int $caseId, string $kind, string $key, array $payload, string $actor): void
+    {
+        // Skip if there's already an open suggestion for the same case+key.
+        $existing = $this->db->queryOne(
+            'SELECT id FROM ' . self::T_SUGGESTION
+            . " WHERE case_id = :p_case AND suggestion_type = :p_kind
+                 AND lower(suggested_key) = lower(:p_key)
+                 AND status IN ('suggested','approved')
+              LIMIT 1",
+            [':p_case' => $caseId, ':p_kind' => $kind, ':p_key' => $key]
+        );
+        if ($existing !== null) {
+            return;
+        }
+        try {
+            $this->db->execute(
+                'INSERT INTO ' . self::T_SUGGESTION . '
+                    (case_id, suggestion_type, suggested_key, suggested_payload,
+                     source, source_evidence, status, created_by)
+                 VALUES (:p_case, :p_kind, :p_key, :p_payload::jsonb,
+                         :p_src,  :p_evidence::jsonb, :p_status, :p_actor)',
+                [
+                    ':p_case'     => $caseId,
+                    ':p_kind'     => $kind,
+                    ':p_key'      => $key,
+                    ':p_payload'  => json_encode($payload),
+                    ':p_src'      => 'aeoi_imap_poll',
+                    ':p_evidence' => json_encode(['case_id' => $caseId]),
+                    ':p_status'   => 'suggested',
+                    ':p_actor'    => $actor,
+                ]
+            );
+        } catch (Throwable $e) {
+            @error_log('[AEOI suggest] failed for ' . $kind . ':' . $key . ' — ' . $e->getMessage());
+        }
+    }
+
+    // ── Legacy direct write (dev only) ──────────────────────────────────
+
+    /**
+     * @param array<string,mixed> $extract
+     * @return array{mode:string, suggested_customer:bool, suggested_parts:int, applied:bool, audit:list<array<string,mixed>>}
+     */
+    private function legacyDirectWrite(int $caseId, array $extract, string $actor): array
     {
         $audit = [];
         $createdCustomer = false;
@@ -66,23 +195,18 @@ final class AeoiAutoCreateService
             throw new RuntimeException('master-data.json is not valid JSON');
         }
 
-        // ── Customer ────────────────────────────────────────────────────
         $custName = trim((string)($extract['customer']['customer_name'] ?? ''));
         $custId   = trim((string)($extract['customer']['customer_id']   ?? ''));
         $shipTo   = $extract['ship_to'] ?? [];
 
         if ($custName !== '' || $custId !== '') {
             $customers = is_array($master['customers'] ?? null) ? $master['customers'] : [];
-            $match = $this->findCustomer($customers, $custId, $custName);
+            $match = $this->findCustomerInArray($customers, $custId, $custName);
             if ($match === null) {
-                // Build new customer record. Derive customer_id from the
-                // first 8 chars of the slugified name if LLM didn't give us
-                // one. Falls back to AEOI-<random> if name is also empty.
                 $newId = $custId !== '' ? $custId : $this->slugifyCustomerId($custName);
-                while ($this->findCustomer($customers, $newId, '')) {
+                while ($this->findCustomerInArray($customers, $newId, '')) {
                     $newId .= '-' . substr(bin2hex(random_bytes(2)), 0, 4);
                 }
-                $now = date('c');
                 $newCustomer = [
                     'customer_id'       => $newId,
                     'customer_name'     => $custName !== '' ? $custName : $newId,
@@ -98,21 +222,14 @@ final class AeoiAutoCreateService
                     'status'            => 'active',
                     'source'            => 'aeoi',
                     'source_case_id'    => $caseId,
-                    'created_at'        => $now,
+                    'created_at'        => date('c'),
                     'created_by'        => $actor,
                 ];
                 $customers[]            = $newCustomer;
                 $master['customers']    = array_values($customers);
                 $createdCustomer        = true;
-
-                $this->logAudit($caseId, 'customer', $newId, [
-                    'name'  => $custName,
-                    'addr'  => $newCustomer['address_line_1'],
-                    'terms' => $newCustomer['payment_term_code'],
-                ], $actor);
-                $audit[] = ['kind' => 'customer', 'key' => $newId, 'name' => $custName];
-
-                // Patch the case row so downstream validation sees the new id.
+                $this->logAudit($caseId, 'customer', $newId, ['name' => $custName], $actor);
+                $audit[] = ['kind' => 'customer', 'key' => $newId, 'mode' => 'direct_write_dev'];
                 if ($custId === '') {
                     $this->db->execute(
                         'UPDATE email_intake_case SET customer_id = :p_id WHERE id = :p_case',
@@ -122,48 +239,35 @@ final class AeoiAutoCreateService
             }
         }
 
-        // ── Parts (per line) ────────────────────────────────────────────
         $lines = is_array($extract['lines'] ?? null) ? $extract['lines'] : [];
         $parts = is_array($master['parts'] ?? null) ? $master['parts'] : [];
         foreach ($lines as $ln) {
             $pn = trim((string)($ln['part_number'] ?? ''));
-            if ($pn === '') {
-                continue;
-            }
-            if ($this->findPart($parts, $pn) !== null) {
-                continue;
-            }
-            $rev   = trim((string)($ln['revision_number'] ?? ''));
-            $desc  = trim((string)($ln['part_description'] ?? ''));
-            $cust  = $custId !== '' ? $custId : ($master['customers'] && end($master['customers']) ? (string)end($master['customers'])['customer_id'] : '');
-            $now   = date('c');
+            if ($pn === '') continue;
+            if ($this->findPartInArray($parts, $pn) !== null) continue;
+            $rev = trim((string)($ln['revision_number'] ?? '')) ?: 'A';
             $newPart = [
-                'part_number'         => $pn,
-                'customer_id'         => $cust,
-                'customer_part_number'=> (string)($ln['customer_part_number'] ?? ''),
-                'revision'            => $rev !== '' ? $rev : 'A',
-                'description'         => $desc,
-                'uom'                 => (string)($ln['uom'] ?? 'EA'),
-                'status'              => 'draft',
-                'engineering_status'  => 'pending_release',
-                'source'              => 'aeoi',
-                'source_case_id'      => $caseId,
-                'created_at'          => $now,
-                'created_by'          => $actor,
+                'part_number'          => $pn,
+                'customer_id'          => $custId,
+                'customer_part_number' => (string)($ln['customer_part_number'] ?? ''),
+                'revision'             => $rev,
+                'description'          => (string)($ln['part_description'] ?? ''),
+                'uom'                  => (string)($ln['uom'] ?? 'EA'),
+                'status'               => 'draft',
+                'engineering_status'   => 'pending_release',
+                'source'               => 'aeoi',
+                'source_case_id'       => $caseId,
+                'created_at'           => date('c'),
+                'created_by'           => $actor,
             ];
             $parts[] = $newPart;
             $createdParts++;
-            $this->logAudit($caseId, 'part', $pn, [
-                'rev'         => $newPart['revision'],
-                'description' => $desc,
-                'customer'    => $cust,
-            ], $actor);
-            $audit[] = ['kind' => 'part', 'key' => $pn, 'rev' => $newPart['revision']];
+            $this->logAudit($caseId, 'part', $pn, ['rev' => $rev], $actor);
+            $audit[] = ['kind' => 'part', 'key' => $pn, 'mode' => 'direct_write_dev'];
         }
         $master['parts'] = array_values($parts);
 
         if ($createdCustomer || $createdParts > 0) {
-            // Write atomically: temp file → rename.
             $tmp = $file . '.aeoi.' . bin2hex(random_bytes(3));
             $encoded = json_encode($master, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             if ($encoded === false) {
@@ -179,18 +283,65 @@ final class AeoiAutoCreateService
         }
 
         return [
-            'created_customer' => $createdCustomer,
-            'created_parts'    => $createdParts,
-            'audit'            => $audit,
+            'mode'               => 'legacy_direct_write',
+            'suggested_customer' => $createdCustomer,
+            'suggested_parts'    => $createdParts,
+            'applied'            => true,
+            'audit'              => $audit,
         ];
     }
 
-    // ── Internals ────────────────────────────────────────────────────────
+    // ── Internals ───────────────────────────────────────────────────────
+
+    private function isDevAutoCreateEnabled(): bool
+    {
+        try {
+            $row = $this->db->queryOne(
+                'SELECT aeoi_auto_create_master_data_dev_only FROM email_intake_config LIMIT 1'
+            );
+            return is_array($row) && !empty($row['aeoi_auto_create_master_data_dev_only']);
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    private function loadMaster(): ?array
+    {
+        $file = $this->dataDir . self::MASTER_DATA_FILE;
+        if (!is_file($file) || !is_readable($file)) {
+            return null;
+        }
+        $raw = file_get_contents($file);
+        if ($raw === false) return null;
+        $decoded = json_decode($raw, true);
+        return is_array($decoded) ? $decoded : null;
+    }
+
+    /**
+     * @return ?array<string,mixed>
+     */
+    private function loadCustomerByKey(string $id, string $name): ?array
+    {
+        $master = $this->loadMaster();
+        if ($master === null) return null;
+        return $this->findCustomerInArray((array)($master['customers'] ?? []), $id, $name);
+    }
+
+    /**
+     * @return ?array<string,mixed>
+     */
+    private function loadPart(string $partNumber): ?array
+    {
+        $master = $this->loadMaster();
+        if ($master === null) return null;
+        return $this->findPartInArray((array)($master['parts'] ?? []), $partNumber);
+    }
 
     /**
      * @param list<array<string,mixed>> $customers
+     * @return ?array<string,mixed>
      */
-    private function findCustomer(array $customers, string $id, string $name): ?array
+    private function findCustomerInArray(array $customers, string $id, string $name): ?array
     {
         $idLower   = strtolower($id);
         $nameLower = strtolower($name);
@@ -208,8 +359,9 @@ final class AeoiAutoCreateService
 
     /**
      * @param list<array<string,mixed>> $parts
+     * @return ?array<string,mixed>
      */
-    private function findPart(array $parts, string $partNumber): ?array
+    private function findPartInArray(array $parts, string $partNumber): ?array
     {
         foreach ($parts as $p) {
             if (is_array($p) && (string)($p['part_number'] ?? '') === $partNumber) {

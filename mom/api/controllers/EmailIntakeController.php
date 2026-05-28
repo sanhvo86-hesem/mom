@@ -97,10 +97,18 @@ class EmailIntakeController extends BaseController
     private function validation(): EmailIntakeValidationService
     {
         if ($this->validationSvc === null) {
+            // Inject MasterDataLookupService so part / revision checks
+            // hard-block when master data lookup is unavailable
+            // (per GPT Pro audit P0-07/08).
+            require_once __DIR__ . '/../services/MasterDataLookupService.php';
+            $masterLookup = new \MOM\Api\Services\MasterDataLookupService(
+                $this->dataDir, $this->db()
+            );
             $this->validationSvc = new EmailIntakeValidationService(
                 $this->db(),
                 $this->caseSvc(),
-                $this->svc()
+                $this->svc(),
+                $masterLookup
             );
         }
         return $this->validationSvc;

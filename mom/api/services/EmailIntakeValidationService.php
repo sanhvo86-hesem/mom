@@ -57,7 +57,15 @@ final class EmailIntakeValidationService
     public function __construct(
         private readonly Connection $db,
         private readonly EmailIntakeCaseService $cases,
-        private readonly EmailIntakeConfigService $config
+        private readonly EmailIntakeConfigService $config,
+        /**
+         * Optional — when injected, the part / revision check uses this
+         * service to look up the master data tables. Without it the
+         * checks degrade to "warning, lookup not wired" (legacy/demo).
+         * In production the EmailIntakeController wires this in.
+         * Per GPT Pro audit P0-07/08.
+         */
+        private readonly ?MasterDataLookupService $masterLookup = null
     ) {}
 
     /**
@@ -214,34 +222,56 @@ final class EmailIntakeValidationService
                 $blockers[] = 'invalid_quantity';
                 $this->fail($caseId, 'quantity_positive', 'blocker', "$lineLabel quantity must be > 0.");
             }
-            // part_number existence (best-effort: items table)
+            // part_number existence — checked against MasterDataLookupService.
+            // Per GPT Pro audit P0-07/08, an unavailable master-data lookup
+            // must NOT silently pass. It becomes a configuration_error
+            // blocker so the admin knows the gate is broken.
             $pn = trim((string)($line['part_number'] ?? ''));
             if ($pn === '') {
                 $blockers[] = 'unknown_part_number';
                 $this->fail($caseId, 'part_exists', 'blocker', "$lineLabel missing part_number.");
+            } elseif ($this->masterLookup === null) {
+                // No lookup wired — keep legacy behaviour (warn-only) so a
+                // bare install still works for demo. Production deploy MUST
+                // inject MasterDataLookupService.
+                $this->pass($caseId, 'part_exists', 'warning', "$lineLabel master-data lookup not wired; skipping.");
+            } elseif (!$this->masterLookup->isAvailable()) {
+                $blockers[] = 'master_data_lookup_unavailable';
+                $this->fail($caseId, 'part_exists', 'blocker',
+                    "$lineLabel master-data lookup unavailable: " . $this->masterLookup->describeAvailability());
             } else {
-                try {
-                    $part = $this->db->queryOne(
-                        'SELECT item_id, status FROM items WHERE item_id = :p_pn OR part_number = :p_pn LIMIT 1',
-                        [':p_pn' => $pn]
-                    );
-                    if (!$part) {
-                        $blockers[] = 'unknown_part_number';
-                        $this->fail($caseId, 'part_exists', 'blocker', "$lineLabel part_number $pn not found.");
-                    } elseif (isset($part['status']) && !in_array((string)$part['status'], ['active','released'], true)) {
+                $part = $this->masterLookup->findPart($pn);
+                if ($part === null) {
+                    $blockers[] = 'unknown_part_number';
+                    $this->fail($caseId, 'part_exists', 'blocker', "$lineLabel part_number $pn not found in master data.");
+                } else {
+                    $partStatus = strtolower((string)($part['status'] ?? $part['engineering_status'] ?? 'active'));
+                    if (in_array($partStatus, ['obsolete', 'superseded', 'disabled', 'on_hold'], true)) {
                         $blockers[] = 'part_not_active';
-                        $this->fail($caseId, 'part_exists', 'blocker', "$lineLabel part $pn status={$part['status']}.");
+                        $this->fail($caseId, 'part_exists', 'blocker', "$lineLabel part $pn status={$partStatus}.");
+                    } else {
+                        $this->pass($caseId, 'part_exists', 'info', "$lineLabel part $pn ok.");
                     }
-                } catch (\Throwable) {
-                    // items table missing or different shape — log warning, no block
-                    $this->pass($caseId, 'part_exists', 'warning', "$lineLabel items table not accessible; skipping.");
                 }
             }
-            // revision_required
+            // revision_required — must exist on case line AND in master data
             $rev = trim((string)($line['revision_number'] ?? ''));
             if ($rev === '') {
                 $blockers[] = 'missing_revision';
                 $this->fail($caseId, 'revision_required', 'blocker', "$lineLabel missing revision_number.");
+            } elseif ($this->masterLookup !== null && $this->masterLookup->isAvailable() && $pn !== '') {
+                $revRow = $this->masterLookup->findRevisionForPart($pn, $rev);
+                if ($revRow === null) {
+                    $blockers[] = 'revision_not_found';
+                    $this->fail($caseId, 'revision_exists_for_part', 'blocker',
+                        "$lineLabel revision $rev not found for part $pn.");
+                } elseif (!$this->masterLookup->isRevisionReleased($revRow)) {
+                    $blockers[] = 'revision_not_released';
+                    $this->fail($caseId, 'revision_released', 'blocker',
+                        "$lineLabel revision $rev for part $pn is not released — engineering must release before SO commit.");
+                } else {
+                    $this->pass($caseId, 'revision_exists_for_part', 'info', "$lineLabel rev $rev ok.");
+                }
             }
             // delivery_date_valid
             $due = trim((string)($line['requested_delivery_date'] ?? ''));

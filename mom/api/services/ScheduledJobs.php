@@ -1100,10 +1100,14 @@ final class ScheduledJobs
                 require_once __DIR__ . '/EmailIntakeImapService.php';
                 require_once __DIR__ . '/EmailIntakeCaseService.php';
                 require_once __DIR__ . '/EmailIntakeValidationService.php';
+                require_once __DIR__ . '/MasterDataLookupService.php';
 
-                $caseSvc = new \MOM\Api\Services\EmailIntakeCaseService($this->db);
+                $caseSvc      = new \MOM\Api\Services\EmailIntakeCaseService($this->db);
+                $masterLookup = new \MOM\Api\Services\MasterDataLookupService(
+                    $this->dataDir, $this->db
+                );
                 $vSvc    = new \MOM\Api\Services\EmailIntakeValidationService(
-                    $this->db, $caseSvc, $svc
+                    $this->db, $caseSvc, $svc, $masterLookup
                 );
                 $imapSvc = new \MOM\Api\Services\EmailIntakeImapService(
                     $this->db, $catalog, $svc, $caseSvc, $vSvc, $this->dataDir
