@@ -1246,5 +1246,549 @@
         }
       }
     }
-  ]
+  ],
+  "detail_role_registry": {
+    "CS": {
+      "master_role": "CS",
+      "role_code": "CS"
+    },
+    "EST": {
+      "master_role": "EST",
+      "role_code": "EST"
+    },
+    "ENG": {
+      "master_role": "ENG",
+      "role_code": "ENG"
+    },
+    "PPL": {
+      "master_role": "PPL",
+      "role_code": "PPL"
+    },
+    "WKM": {
+      "master_role": "WKM",
+      "role_code": "WKM"
+    },
+    "PD": {
+      "master_role": "PD",
+      "role_code": "PD"
+    },
+    "QA": {
+      "master_role": "QA",
+      "role_code": "QA"
+    },
+    "SCM": {
+      "master_role": "SCM",
+      "role_code": "SCM"
+    },
+    "CEO": {
+      "master_role": "CEO",
+      "role_code": "CEO"
+    },
+    "EHS": {
+      "master_role": "EHS",
+      "role_code": "EHS"
+    },
+    "HR": {
+      "master_role": "HR",
+      "role_code": "HR"
+    },
+    "IT": {
+      "master_role": "IT",
+      "role_code": "IT"
+    },
+    "ENGM": {
+      "master_role": "ENG",
+      "role_code": "ENGM"
+    },
+    "PE": {
+      "master_role": "ENG",
+      "role_code": "PE"
+    },
+    "CAM": {
+      "master_role": "ENG",
+      "role_code": "CAM"
+    },
+    "DFM": {
+      "master_role": "ENG",
+      "role_code": "DFM"
+    },
+    "TOOL": {
+      "master_role": "ENG",
+      "role_code": "TOOL"
+    },
+    "OPR": {
+      "master_role": "WKM",
+      "role_code": "OPR"
+    },
+    "SET": {
+      "master_role": "WKM",
+      "role_code": "SET"
+    },
+    "SL": {
+      "master_role": "WKM",
+      "role_code": "SL"
+    },
+    "MNT": {
+      "master_role": "WKM",
+      "role_code": "MNT"
+    },
+    "QC": {
+      "master_role": "QA",
+      "role_code": "QC"
+    },
+    "QCL": {
+      "master_role": "QA",
+      "role_code": "QCL"
+    },
+    "QE": {
+      "master_role": "QA",
+      "role_code": "QE"
+    },
+    "QMS": {
+      "master_role": "QA",
+      "role_code": "QMS"
+    },
+    "MRB": {
+      "master_role": "QA",
+      "role_code": "MRB"
+    },
+    "BUY": {
+      "master_role": "SCM",
+      "role_code": "BUY"
+    },
+    "WAR": {
+      "master_role": "SCM",
+      "role_code": "WAR"
+    },
+    "XNK": {
+      "master_role": "SCM",
+      "role_code": "XNK"
+    },
+    "SQE": {
+      "master_role": "SCM",
+      "role_code": "SQE"
+    },
+    "ITA": {
+      "master_role": "IT",
+      "role_code": "ITA"
+    },
+    "ESA": {
+      "master_role": "IT",
+      "role_code": "ESA"
+    },
+    "M365A": {
+      "master_role": "IT",
+      "role_code": "M365A"
+    },
+    "EPA": {
+      "master_role": "IT",
+      "role_code": "EPA"
+    },
+    "DISPATCH": {
+      "master_role": "PPL",
+      "role_code": "DISPATCH"
+    }
+  },
+  "quick_cards": {
+    "fai_fail": {
+      "title": "Khi FAI fail",
+      "steps": [
+        {
+          "cdr": "D2",
+          "activity": "Xử lý mẫu đầu tiên không đạt (sửa lại / loại bỏ / xin chấp thuận khách hàng)",
+          "a_process": "QA",
+          "hold_authority": [
+            "QA",
+            "QCL",
+            "SL",
+            "WKM"
+          ],
+          "release_authority": [
+            "QA"
+          ],
+          "mandatory_evidence": [
+            "FRM-311",
+            "FRM-413",
+            "SOP-302",
+            "fai_report"
+          ],
+          "escalation": {
+            "to": "CEO",
+            "condition": "Shipment risk hoặc cần concession khách hàng."
+          }
+        },
+        {
+          "cdr": "D4",
+          "activity": "Phê duyệt xử lý NCR",
+          "a_process": "QA",
+          "hold_authority": [
+            "QA",
+            "QCL",
+            "SL",
+            "WKM"
+          ],
+          "release_authority": [
+            "QA"
+          ],
+          "mandatory_evidence": [
+            "FRM-651",
+            "FRM-413",
+            "SOP-606",
+            "ncr_record"
+          ],
+          "escalation": {
+            "to": "CEO",
+            "condition": "NCR lớn/nghiêm trọng, shipment risk hoặc lặp lại."
+          }
+        },
+        {
+          "cdr": "D6",
+          "activity": "Phê duyệt nhả giữ hàng",
+          "a_process": "QA",
+          "hold_authority": [
+            "QA",
+            "QCL",
+            "SL",
+            "WKM"
+          ],
+          "release_authority": [
+            "QA"
+          ],
+          "mandatory_evidence": [
+            "FRM-413",
+            "SOP-606",
+            "disposition_record",
+            "containment_clearance"
+          ],
+          "escalation": {
+            "to": "CEO",
+            "condition": "Khách ép giao hoặc risk accepted by quality."
+          }
+        },
+        {
+          "cdr": "D7",
+          "activity": "Phê duyệt chặn giao hàng và dỡ chặn giao hàng (bao gồm phát hành CoC sau khi dỡ hold)",
+          "a_process": "QA",
+          "hold_authority": [
+            "QA",
+            "PD",
+            "CEO"
+          ],
+          "release_authority": [
+            "QA",
+            "CEO"
+          ],
+          "mandatory_evidence": [
+            "FRM-413",
+            "FRM-642",
+            "SOP-605",
+            "shipment_block_log"
+          ],
+          "escalation": {
+            "to": "CEO",
+            "condition": "Cam kết khách hàng bị ảnh hưởng hoặc yêu cầu ship khi thiếu evidence."
+          }
+        }
+      ]
+    },
+    "machine_crash": {
+      "title": "Khi máy crash",
+      "steps": [
+        {
+          "cdr": "C7",
+          "activity": "Phê duyệt phục hồi tiến độ sau dừng máy hoặc va chạm máy",
+          "a_process": "PD",
+          "hold_authority": [
+            "SL",
+            "WKM"
+          ],
+          "release_authority": [
+            "PD"
+          ],
+          "mandatory_evidence": [
+            "FRM-512",
+            "FRM-522",
+            "SOP-201"
+          ],
+          "escalation": {
+            "to": "SCM",
+            "condition": "G3 control point vượt ngưỡng, quá SLA hoặc thiếu evidence bắt buộc."
+          }
+        },
+        {
+          "cdr": "C5",
+          "activity": "Phê duyệt chuyển việc giữa máy/ca",
+          "a_process": "WKM",
+          "hold_authority": [
+            "SL",
+            "WKM"
+          ],
+          "release_authority": [
+            "WKM"
+          ],
+          "mandatory_evidence": [
+            "FRM-518",
+            "SOP-504"
+          ],
+          "escalation": {
+            "to": "PD",
+            "condition": "G3 control point vượt ngưỡng, quá SLA hoặc thiếu evidence bắt buộc."
+          }
+        },
+        {
+          "cdr": "B3",
+          "activity": "Phê duyệt lệnh thay đổi kỹ thuật (ECO)",
+          "a_process": "ENG",
+          "hold_authority": [],
+          "release_authority": [
+            "ENG"
+          ],
+          "mandatory_evidence": [
+            "FRM-102",
+            "FRM-162",
+            "SOP-106"
+          ],
+          "escalation": {
+            "to": "ENGM",
+            "condition": "G1 control point vượt ngưỡng, quá SLA hoặc thiếu evidence bắt buộc."
+          }
+        }
+      ]
+    },
+    "missing_coc": {
+      "title": "Khi thiếu CoC",
+      "steps": [
+        {
+          "cdr": "D8",
+          "activity": "Phê duyệt phát hành CoC / ký kiểm cuối",
+          "a_process": "QA",
+          "hold_authority": [
+            "QA"
+          ],
+          "release_authority": [
+            "QA"
+          ],
+          "mandatory_evidence": [
+            "FRM-641",
+            "FRM-642",
+            "SOP-605",
+            "final_inspection_record"
+          ],
+          "escalation": {
+            "to": "CEO",
+            "condition": "Khách yêu cầu ship gấp khi hồ sơ chưa đủ."
+          }
+        },
+        {
+          "cdr": "D7",
+          "activity": "Phê duyệt chặn giao hàng và dỡ chặn giao hàng (bao gồm phát hành CoC sau khi dỡ hold)",
+          "a_process": "QA",
+          "hold_authority": [
+            "QA",
+            "PD",
+            "CEO"
+          ],
+          "release_authority": [
+            "QA",
+            "CEO"
+          ],
+          "mandatory_evidence": [
+            "FRM-413",
+            "FRM-642",
+            "SOP-605",
+            "shipment_block_log"
+          ],
+          "escalation": {
+            "to": "CEO",
+            "condition": "Cam kết khách hàng bị ảnh hưởng hoặc yêu cầu ship khi thiếu evidence."
+          }
+        },
+        {
+          "cdr": "E4",
+          "activity": "Phê duyệt giao gia công ngoài và xác minh đầu vào",
+          "a_process": "SCM",
+          "hold_authority": [
+            "SL",
+            "WKM"
+          ],
+          "release_authority": [
+            "SCM"
+          ],
+          "mandatory_evidence": [
+            "FRM-404",
+            "FRM-411",
+            "SOP-201"
+          ],
+          "escalation": {
+            "to": "ENGM",
+            "condition": "G3 control point vượt ngưỡng, quá SLA hoặc thiếu evidence bắt buộc."
+          }
+        }
+      ]
+    },
+    "erp_outage": {
+      "title": "Khi ERP outage",
+      "steps": [
+        {
+          "cdr": "F2",
+          "activity": "Phê duyệt truy cập ERP khẩn cấp",
+          "a_process": "CEO",
+          "hold_authority": [
+            "ESA",
+            "CEO"
+          ],
+          "release_authority": [
+            "ESA"
+          ],
+          "mandatory_evidence": [
+            "FRM-141",
+            "SOP-106",
+            "breakglass_request",
+            "incident_reference"
+          ],
+          "escalation": {
+            "to": "CEO",
+            "condition": "ERP outage kéo dài hoặc cần manual transaction khẩn."
+          }
+        },
+        {
+          "cdr": "F1",
+          "activity": "Phê duyệt yêu cầu cấp, đổi hoặc gỡ quyền CNTT",
+          "a_process": "IT",
+          "hold_authority": [
+            "ITA",
+            "ESA"
+          ],
+          "release_authority": [
+            "ITA",
+            "ESA"
+          ],
+          "mandatory_evidence": [
+            "FRM-141",
+            "SOP-106",
+            "role_matrix",
+            "owner_approval"
+          ],
+          "escalation": {
+            "to": "ESA",
+            "condition": "Quyền trọng yếu, SoD conflict hoặc owner vắng."
+          }
+        },
+        {
+          "cdr": "F3",
+          "activity": "Kích hoạt phó / đại diện vai trò trọng yếu (FRM-504)",
+          "a_process": "HR",
+          "hold_authority": [
+            "ITA",
+            "ESA"
+          ],
+          "release_authority": [
+            "ESA"
+          ],
+          "mandatory_evidence": [
+            "FRM-504",
+            "ANNEX-123"
+          ],
+          "escalation": {
+            "to": "CEO",
+            "condition": "G3 control point vượt ngưỡng, quá SLA hoặc thiếu evidence bắt buộc."
+          }
+        }
+      ]
+    },
+    "qa_hold_expedite": {
+      "title": "Khi khách yêu cầu giao gấp nhưng QA hold",
+      "steps": [
+        {
+          "cdr": "D6",
+          "activity": "Phê duyệt nhả giữ hàng",
+          "a_process": "QA",
+          "hold_authority": [
+            "QA",
+            "QCL",
+            "SL",
+            "WKM"
+          ],
+          "release_authority": [
+            "QA"
+          ],
+          "mandatory_evidence": [
+            "FRM-413",
+            "SOP-606",
+            "disposition_record",
+            "containment_clearance"
+          ],
+          "escalation": {
+            "to": "CEO",
+            "condition": "Khách ép giao hoặc risk accepted by quality."
+          }
+        },
+        {
+          "cdr": "D7",
+          "activity": "Phê duyệt chặn giao hàng và dỡ chặn giao hàng (bao gồm phát hành CoC sau khi dỡ hold)",
+          "a_process": "QA",
+          "hold_authority": [
+            "QA",
+            "PD",
+            "CEO"
+          ],
+          "release_authority": [
+            "QA",
+            "CEO"
+          ],
+          "mandatory_evidence": [
+            "FRM-413",
+            "FRM-642",
+            "SOP-605",
+            "shipment_block_log"
+          ],
+          "escalation": {
+            "to": "CEO",
+            "condition": "Cam kết khách hàng bị ảnh hưởng hoặc yêu cầu ship khi thiếu evidence."
+          }
+        },
+        {
+          "cdr": "D13",
+          "activity": "Phê duyệt nhượng bộ khách hàng (concession có thư khách ký, chấp nhận đặc tính lệch chuẩn)",
+          "a_process": "QA",
+          "hold_authority": [
+            "QA"
+          ],
+          "release_authority": [
+            "QA",
+            "CEO"
+          ],
+          "mandatory_evidence": [
+            "FRM-413",
+            "SOP-606",
+            "customer_concession_letter",
+            "ncr_record"
+          ],
+          "escalation": {
+            "to": "CEO",
+            "condition": "Concession chạm CTQ, compliance hoặc nhiều lô."
+          }
+        },
+        {
+          "cdr": "A6",
+          "activity": "Phê duyệt yêu cầu thay đổi của khách hàng (CCR) ảnh hưởng giá / lịch / phạm vi",
+          "a_process": "CS",
+          "hold_authority": [],
+          "release_authority": [
+            "CS"
+          ],
+          "mandatory_evidence": [
+            "FRM-212",
+            "SOP-201",
+            "impact_matrix",
+            "schedule_replan"
+          ],
+          "escalation": {
+            "to": "CEO",
+            "condition": "Chạm G5-G7, CTQ, FAI, CoC hoặc shipment risk."
+          }
+        }
+      ]
+    }
+  }
 }

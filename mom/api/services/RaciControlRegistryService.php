@@ -111,7 +111,7 @@ final class RaciControlRegistryService
     private function validRoles(): array
     {
         $valid = [];
-        $overlay = FileHelper::readJson($this->dataDir . '/config/raci_role_overlays.json');
+        $overlay = FileHelper::readJson($this->dataDir . '/config/point_of_use_overlays.bootstrap.json');
         $detail = is_array($overlay['detail_role_registry'] ?? null) ? $overlay['detail_role_registry'] : [];
         foreach (array_keys($detail) as $code) {
             if (is_string($code) && $code !== '') {

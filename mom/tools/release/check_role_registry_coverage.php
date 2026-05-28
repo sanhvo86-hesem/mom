@@ -7,7 +7,7 @@ $root = dirname(__DIR__, 3);
 $dataDir = $root . '/mom/data/config';
 $issues = [];
 
-$overlay = json_decode((string)file_get_contents($dataDir . '/raci_role_overlays.json'), true);
+$overlay = json_decode((string)file_get_contents($dataDir . '/point_of_use_overlays.bootstrap.json'), true);
 $detail = is_array($overlay['detail_role_registry'] ?? null) ? $overlay['detail_role_registry'] : [];
 $validRoles = [];
 foreach (array_keys($detail) as $code) {

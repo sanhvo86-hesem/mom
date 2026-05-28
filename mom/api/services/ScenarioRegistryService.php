@@ -150,7 +150,7 @@ final class ScenarioRegistryService
      */
     private function validRoles(): array
     {
-        $overlay = FileHelper::readJson($this->dataDir . '/config/raci_role_overlays.json');
+        $overlay = FileHelper::readJson($this->dataDir . '/config/point_of_use_overlays.bootstrap.json');
         $detail = is_array($overlay['detail_role_registry'] ?? null) ? $overlay['detail_role_registry'] : [];
         $roles = [];
         foreach (array_keys($detail) as $code) {
