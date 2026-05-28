@@ -245,16 +245,7 @@ final class EmailIntakeImapService
         // criterion — it returns false with "Unknown search criterion: UID".
         // Workaround: fetch ALL UIDs and filter in PHP. The set is bounded
         // by the mailbox size and we cap to MAX_MESSAGES_PER_POLL anyway.
-        $allUids = imap_search($conn, 'ALL', SE_UID);
-        @error_log(sprintf('[AEOI IMAP] mbx=%d lastUid=%d searchResult=%s errors=%s',
-            $mailboxId,
-            $lastUid,
-            is_array($allUids) ? ('array(' . count($allUids) . ')') : var_export($allUids, true),
-            json_encode(imap_errors() ?: [])
-        ));
-        if (!is_array($allUids) || $allUids === []) {
-            $allUids = [];
-        }
+        $allUids = imap_search($conn, 'ALL', SE_UID) ?: [];
         if (!is_array($allUids) || $allUids === []) {
             $this->persistCursor($mailboxId, $lastUid, $mailbox['imap_last_uidvalidity'] ?? null);
             return ['fetched' => 0, 'created' => 0, 'skipped' => 0];
@@ -273,10 +264,15 @@ final class EmailIntakeImapService
             return ['fetched' => 0, 'created' => 0, 'skipped' => 0];
         }
 
-        // imap_search() returns UIDs in arbitrary order; sort ascending so
-        // we always advance the cursor monotonically.
-        sort($uids, SORT_NUMERIC);
-        $uids = array_slice($uids, 0, self::MAX_MESSAGES_PER_POLL);
+        // First-run safeguard: if the cursor was 0 (brand-new mailbox row)
+        // and the inbox is large, skip ancient mail by taking the NEWEST
+        // MAX_MESSAGES_PER_POLL only. Subsequent polls naturally process
+        // any new mail past the advanced cursor.
+        if ($lastUid === 0 && count($uids) > self::MAX_MESSAGES_PER_POLL) {
+            $uids = array_slice($uids, -self::MAX_MESSAGES_PER_POLL);
+        } else {
+            $uids = array_slice($uids, 0, self::MAX_MESSAGES_PER_POLL);
+        }
 
         $fetched = 0;
         $created = 0;
