@@ -62,6 +62,7 @@ final class RepoBoundaryScanner
      * @var list<string>
      */
     private const ALLOWED_CONTROLLED_GENERATED_PATTERNS = [
+        '#^mom/data/(?:audit|ratelimit|dispatch|erp|mes|orders|passports|uploads|apqp|cnc-programs|exceptions|fmea|improvement|knowledge|master-data|quotes|shifts)/\.gitkeep$#',
         '#^mom/data/registry/[^/]+\.(json|yaml)$#i',
         '#^mom/data/registry/system-contract-runtime-projections\.segments/[^/]+\.json$#i',
         '#^mom/data/schema-studio/(?:designs/workspace\.json|snapshots/workspace\.baseline\.json|policies/control-plane-defaults\.json)$#i',
