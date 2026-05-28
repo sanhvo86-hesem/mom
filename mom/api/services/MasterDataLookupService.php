@@ -20,12 +20,17 @@ use MOM\Database\Connection;
  *   data lookup is unavailable — that's a configuration_error blocker,
  *   not a "skip with warning".
  *
- * Schema tolerance:
+ * Source selection (Phase 4, 2026-05-28):
+ *   - If `USE_POSTGRES=1` AND a Connection is injected, read from PG
+ *     `customers`, `item`, `item_revisions` tables. This is the
+ *     production path.
+ *   - Else fall back to `mom/data/master-data/master-data.json`. Used by
+ *     JSON_ONLY installs (legacy + local dev).
+ *   The two paths return the same in-memory shape so callers don't care.
+ *
+ * Schema tolerance (JSON path):
  *   - customers/parts JSON files use one shape per install (we accept
  *     `customer_id`, `customerId`, `id` for the customer key).
- *   - PG `customers` / `parts` / `part_revisions` tables (where present)
- *     use snake_case columns; we don't query them yet but the service
- *     leaves the door open for a follow-up.
  *
  * @package MOM\Api\Services
  */
@@ -33,17 +38,14 @@ final class MasterDataLookupService
 {
     private const MASTER_DATA_FILE = '/master-data/master-data.json';
 
-    /** @var array<string,mixed>|null Cached file contents, null until first read. */
+    /** @var array<string,mixed>|null Cached master data, null until first load. */
     private ?array $cache = null;
+
+    /** @var string|null Which source actually populated $cache ('postgres' | 'json'). */
+    private ?string $cacheSource = null;
 
     public function __construct(
         private readonly string $dataDir,
-        /**
-         * @phpstan-ignore-next-line property.unused — reserved for the
-         *  PG-table lookup path (Phase 4). Today we only consult the
-         *  JSON master-data file; injecting the connection now keeps
-         *  the constructor stable when the DB path lands.
-         */
         private readonly ?Connection $db = null
     ) {}
 
@@ -203,9 +205,9 @@ final class MasterDataLookupService
 
     /**
      * Returns true when the lookup is functional (file readable + JSON
-     * parses + has the expected top-level keys). Used by validation to
-     * decide between "unknown_part" (blocker) vs "master_data_lookup_
-     * unavailable" (configuration_error).
+     * parses + has the expected top-level keys, OR PG tables queryable).
+     * Used by validation to decide between "unknown_part" (blocker) vs
+     * "master_data_lookup_unavailable" (configuration_error).
      */
     public function isAvailable(): bool
     {
@@ -220,16 +222,11 @@ final class MasterDataLookupService
 
     public function describeAvailability(): string
     {
-        $file = $this->dataDir . self::MASTER_DATA_FILE;
-        if (!is_file($file)) {
-            return "master-data.json not found at $file";
-        }
-        if (!is_readable($file)) {
-            return "master-data.json not readable at $file";
-        }
         try {
             $this->loadMaster();
-            return 'ok';
+            return $this->cacheSource === 'postgres'
+                ? 'ok (source=postgres)'
+                : 'ok (source=json)';
         } catch (\Throwable $e) {
             return $e->getMessage();
         }
@@ -245,6 +242,13 @@ final class MasterDataLookupService
         if ($this->cache !== null) {
             return $this->cache;
         }
+
+        if ($this->shouldUsePostgres()) {
+            $this->cache = $this->loadFromPostgres();
+            $this->cacheSource = 'postgres';
+            return $this->cache;
+        }
+
         $file = $this->dataDir . self::MASTER_DATA_FILE;
         if (!is_file($file) || !is_readable($file)) {
             throw new \RuntimeException('master-data.json not readable at ' . $file);
@@ -258,7 +262,108 @@ final class MasterDataLookupService
             throw new \RuntimeException('master-data.json is not valid JSON');
         }
         $this->cache = $decoded;
+        $this->cacheSource = 'json';
         return $decoded;
+    }
+
+    private function shouldUsePostgres(): bool
+    {
+        if ($this->db === null) {
+            return false;
+        }
+        $usePostgres = getenv('USE_POSTGRES');
+        return $usePostgres === '1' || $usePostgres === 'true';
+    }
+
+    /**
+     * Read customers/item/item_revisions from PG and shape into the
+     * same dict the JSON path returns. Empty arrays are acceptable
+     * (means no rows yet) — only a failed query is a fatal error.
+     *
+     * @return array<string,mixed>
+     */
+    private function loadFromPostgres(): array
+    {
+        if ($this->db === null) {
+            throw new \RuntimeException('loadFromPostgres called without DB connection');
+        }
+
+        $customers = $this->db->query(
+            'SELECT customer_id, customer_name, customer_status,
+                    customer_type, contact_email, payment_terms,
+                    currency_default
+               FROM customers
+              WHERE customer_status = :p_status
+              ORDER BY customer_id',
+            [':p_status' => 'active']
+        );
+
+        $items = $this->db->query(
+            'SELECT item_code, item_name, item_type, base_uom_code,
+                    status_code, product_family_code
+               FROM item
+              WHERE status_code = :p_status
+              ORDER BY item_code',
+            [':p_status' => 'active']
+        );
+
+        $revisions = $this->db->query(
+            'SELECT item_id AS part_number,
+                    rev      AS revision_number,
+                    change_type,
+                    description,
+                    valid_from,
+                    valid_to,
+                    eco_number
+               FROM item_revisions
+              WHERE deleted_at IS NULL
+              ORDER BY item_id, rev',
+            []
+        );
+
+        // Map PG columns to the same keys the JSON shape uses, so downstream
+        // findPart/findRevision logic works unchanged.
+        $partsShaped = array_map(static function (array $row): array {
+            return [
+                'part_number'      => (string)$row['item_code'],
+                'part_description' => (string)($row['item_name'] ?? ''),
+                'uom'              => (string)($row['base_uom_code'] ?? ''),
+                'status'           => (string)($row['status_code'] ?? ''),
+                'item_type'        => (string)($row['item_type'] ?? ''),
+                'product_family'   => (string)($row['product_family_code'] ?? ''),
+            ];
+        }, $items);
+
+        $revisionsShaped = array_map(static function (array $row): array {
+            $validFrom = $row['valid_from'] ?? null;
+            $validTo   = $row['valid_to']   ?? null;
+            // Released = currently in the valid window (no end date, or end is future)
+            $released = $validTo === null || $validTo === '' || strtotime((string)$validTo) > time();
+            return [
+                'part_number'     => (string)$row['part_number'],
+                'revision_number' => (string)$row['revision_number'],
+                'change_type'     => (string)($row['change_type'] ?? ''),
+                'description'     => (string)($row['description'] ?? ''),
+                'valid_from'      => $validFrom,
+                'valid_to'        => $validTo,
+                'eco_number'      => (string)($row['eco_number'] ?? ''),
+                'status'          => $released ? 'released' : 'obsolete',
+                'released'        => $released,
+            ];
+        }, $revisions);
+
+        return [
+            'customers' => $customers,
+            'parts'     => $partsShaped,
+            'revisions' => $revisionsShaped,
+            '_meta'     => [
+                'source'         => 'postgres',
+                'loaded_at'      => date(DATE_ATOM),
+                'customer_count' => count($customers),
+                'part_count'     => count($partsShaped),
+                'revision_count' => count($revisionsShaped),
+            ],
+        ];
     }
 
     /**
