@@ -43,14 +43,28 @@
     pollLog: { items:[], total:0, offset:0 },
     msgLog:  { items:[], total:0, offset:0, status:'' },
     quarantine: { items:[], total:0, offset:0 },
-    activeSection: 'connection',
+    activeSection: 'mailboxes',
     saving: false,
     loadingAllowlist: false,
   };
 
   /* ── Section tab labels ──────────────────────────────────────────────── */
+  // Tabs are ordered by the daily admin journey:
+  //   1. configure a source                                 → mailboxes
+  //   2. allow who can send to it                           → allowlist
+  //   3. fine-tune the parser (header rules, templates)
+  //   4. fine-tune the AI extraction (LLM Model)
+  //   5. wire workers, validation, security, notifications
+  //   6. operate (cases, logs, quarantine)
+  //
+  // The legacy "Kết nối M365" tab is GONE. Module-wide settings
+  // (cron interval, file types, master enable) plus provider-specific
+  // credentials (M365 tenant, IMAP host) now live inside the Mailbox
+  // & Folder tab as a single "Cài đặt module" card + per-provider
+  // wizard. This eliminates the false impression that AEOI is
+  // M365-only and removes the duplicate-config trap where M365 creds
+  // existed both globally and per-mailbox.
   var SECTIONS = [
-    { id:'connection',   label:'Kết nối M365',       icon:'🔗' },
     { id:'mailboxes',    label:'Mailbox & Folder',    icon:'📬' },
     { id:'allowlist',    label:'Email cho phép',      icon:'✅' },
     { id:'header_rules', label:'Header Rules',         icon:'📑' },
@@ -137,7 +151,6 @@
 
   function _renderSection(id){
     switch(id){
-      case 'connection':   return _sectionConnection();
       case 'mailboxes':    return _sectionMailboxes();
       case 'allowlist':    return _sectionAllowlist();
       case 'header_rules': return _sectionHeaderRules();
@@ -161,26 +174,27 @@
     _bindSection();
   }
 
-  /* ── 1. Kết nối M365 ─────────────────────────────────────────────────── */
-  function _sectionConnection(){
+  /* ── Global module settings card ─────────────────────────────────────
+   * Used to be its own "Kết nối M365" tab. Now lives inside Mailbox &
+   * Folder because the actual M365 connection lives per-mailbox (via
+   * the add-mailbox wizard), and the remaining fields here are truly
+   * MODULE-WIDE: the cron interval, the file-type allowlist, the
+   * master enable toggle, and the legacy global M365 tenant config
+   * kept for backward compatibility with mailboxes that still point
+   * at the singleton intake_mailbox. */
+  function _moduleSettingsCard(){
     var cfg = STATE.config || {};
     return '<div class="aeoi-card">'
-      + _cardHead('🔗 Kết nối Microsoft 365 (Outlook)', 'Thông tin xác thực Graph API để đọc shared mailbox')
-      + '<div class="aeoi-grid2">'
-      + _field('M365 Tenant ID', 'aeoi-tenant-id', cfg.m365_tenant_id||'', 'Tenant ID của organisation trong Azure AD', 'text')
-      + _field('Client ID (App ID)', 'aeoi-client-id', cfg.m365_client_id||'', 'App registration client_id trong Azure', 'text')
-      + _fieldPw('Client Secret', 'aeoi-client-secret', cfg.secret_configured ? '(đã lưu — nhập mới để đổi)' : '', 'Client secret của App registration. Được mã hóa AES-256 khi lưu.')
-      + _field('Shared Mailbox', 'aeoi-mailbox', cfg.intake_mailbox||'', 'VD: orders@hesemeng.com — tất cả email vào hộp thư này sẽ được xử lý', 'email')
-      + '</div>'
-      + '<div class="aeoi-grid2" style="margin-top:10px">'
-      + _fieldNum('Chu kỳ quét (phút)', 'aeoi-poll-interval', cfg.poll_interval_minutes||120, 'Mặc định 120 phút (2 tiếng). Min 15, max 1440.', 15, 1440)
-      + _fieldSelect('Phạm vi trích xuất', 'aeoi-extraction-scope', [['both','Email + Đính kèm'],['body','Chỉ nội dung email'],['attachments','Chỉ file đính kèm']], cfg.extraction_scope||'both')
-      + '</div>'
-      + '<div style="margin-top:10px">'
+      + _cardHead('⚙️ Cài đặt module', 'Cài đặt áp dụng cho toàn bộ AI Order Intake (cron, allowlist file type, master toggle). Credential M365 / IMAP cụ thể được nhập khi tạo Mailbox bên dưới.')
+      + '<div style="margin-bottom:10px">'
       + '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">'
       + '<input type="checkbox" id="aeoi-enabled" ' + (cfg.enabled ? 'checked' : '') + ' style="width:16px;height:16px"> '
       + '<span><b>Bật module AI Order Intake</b> — khi bật, cron job sẽ tự động quét mailbox theo chu kỳ đã cấu hình</span>'
       + '</label></div>'
+      + '<div class="aeoi-grid2">'
+      + _fieldNum('Chu kỳ quét (phút)', 'aeoi-poll-interval', cfg.poll_interval_minutes||120, 'Mặc định 120 phút (2 tiếng). Min 15, max 1440.', 15, 1440)
+      + _fieldSelect('Phạm vi trích xuất', 'aeoi-extraction-scope', [['both','Email + Đính kèm'],['body','Chỉ nội dung email'],['attachments','Chỉ file đính kèm']], cfg.extraction_scope||'both')
+      + '</div>'
       + '<div style="margin-top:12px">'
       + '<label style="font-size:12px;font-weight:600;color:var(--text-2,#374151);display:block;margin-bottom:6px">Loại file đính kèm được phép</label>'
       + '<div style="display:flex;gap:12px;flex-wrap:wrap">'
@@ -189,6 +203,14 @@
           return '<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="checkbox" class="aeoi-att-type" data-type="' + t + '" ' + (chk?'checked':'') + '> ' + t.toUpperCase() + '</label>';
         }).join('')
       + '</div></div>'
+      + '<details style="margin-top:12px;padding:8px 10px;background:var(--surface-2,#f3f4f6);border-radius:6px"><summary style="cursor:pointer;font-size:12px;font-weight:600">🪟 Cấu hình Microsoft 365 (Outlook) — tenant chung (advanced)</summary>'
+      + '<div style="margin-top:10px;font-size:11px;color:var(--text-3,#6b7280);margin-bottom:8px">Dùng cho provider <code>microsoft_graph</code>. Chỉ một tenant trên toàn module. Mailbox cá nhân vẫn cấu hình theo wizard bên dưới.</div>'
+      + '<div class="aeoi-grid2">'
+      + _field('M365 Tenant ID', 'aeoi-tenant-id', cfg.m365_tenant_id||'', 'Tenant ID của organisation trong Azure AD', 'text')
+      + _field('Client ID (App ID)', 'aeoi-client-id', cfg.m365_client_id||'', 'App registration client_id trong Azure', 'text')
+      + _fieldPw('Client Secret', 'aeoi-client-secret', cfg.secret_configured ? '(đã lưu — nhập mới để đổi)' : '', 'Client secret của App registration. Được mã hóa AES-256 khi lưu.')
+      + _field('Shared Mailbox (legacy)', 'aeoi-mailbox', cfg.intake_mailbox||'', 'Single shared mailbox cũ. Hiện nên dùng wizard tạo nhiều mailbox bên dưới.', 'email')
+      + '</div></details>'
       + _saveBtn('aeoi.saveConnection()')
       + '</div>';
   }
@@ -672,6 +694,180 @@
   }
 
   /* ── Test parse modal ─────────────────────────────────────────────────── */
+  /* ── Mailbox provider-first wizard ─────────────────────────────────── */
+  // WIZARD is a module-level state bag for the open mailbox wizard.
+  // null when the wizard is closed.
+  var WIZARD = null;
+
+  function _wizardModal(){
+    return '<div id="aeoi-wizard-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center" data-modal-display="flex">'
+      + '<div style="background:var(--surface-0,#fff);border-radius:12px;padding:0;width:640px;max-width:95vw;max-height:90vh;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.25);display:flex;flex-direction:column">'
+      + '<div style="padding:18px 24px;border-bottom:1px solid var(--border-1,#e5e7eb);display:flex;justify-content:space-between;align-items:center">'
+      + '<div><div id="aeoi-wz-title" style="font-size:15px;font-weight:700">📬 Thêm Mailbox mới</div>'
+      + '<div id="aeoi-wz-steps" style="font-size:11px;color:var(--text-3,#6b7280);margin-top:4px"></div></div>'
+      + '<button onclick="aeoi.closeMailboxWizard()" class="hm-btn hm-btn-sm">✕ Đóng</button>'
+      + '</div>'
+      + '<div id="aeoi-wz-body" style="padding:20px 24px;overflow-y:auto;flex:1"></div>'
+      + '<div id="aeoi-wz-footer" style="padding:14px 24px;border-top:1px solid var(--border-1,#e5e7eb);display:flex;gap:8px;justify-content:flex-end"></div>'
+      + '</div></div>';
+  }
+
+  // Render is "innerHTML the body + footer based on WIZARD.step".
+  function _renderWizard(){
+    var el = document.getElementById('aeoi-wizard-modal');
+    if(!el){
+      document.body.insertAdjacentHTML('beforeend', _wizardModal());
+      el = document.getElementById('aeoi-wizard-modal');
+    }
+    var titleEl  = document.getElementById('aeoi-wz-title');
+    var stepsEl  = document.getElementById('aeoi-wz-steps');
+    var bodyEl   = document.getElementById('aeoi-wz-body');
+    var footerEl = document.getElementById('aeoi-wz-footer');
+    if(!WIZARD || !bodyEl || !footerEl) return;
+
+    titleEl.textContent = WIZARD.id ? ('✏ Sửa Mailbox #' + WIZARD.id) : '📬 Thêm Mailbox mới';
+    var stepNames = ['Provider','Mailbox info','Credential','Test & Save'];
+    stepsEl.innerHTML = stepNames.map(function(n,i){
+      var idx = i + 1, active = idx === WIZARD.step, done = idx < WIZARD.step;
+      var col = active ? 'var(--brand-primary,#2563eb)' : (done ? '#10b981' : 'var(--text-3,#6b7280)');
+      var weight = active ? '700' : '400';
+      return '<span style="color:' + col + ';font-weight:' + weight + '">' + (done?'✓ ':'') + 'Bước ' + idx + ': ' + n + '</span>';
+    }).join('  →  ');
+
+    bodyEl.innerHTML = _renderWizardStep(WIZARD.step);
+    footerEl.innerHTML = _renderWizardFooter();
+  }
+
+  function _renderWizardStep(step){
+    if(step === 1){
+      // Provider selection — 4 cards
+      var providers = [
+        { id:'gmail_imap',      title:'Gmail IMAP',         desc:'Gmail / Google Workspace với App Password. Khuyến nghị cho khách dùng Gmail.', icon:'📧' },
+        { id:'generic_imap',    title:'Generic IMAP',       desc:'Bất kỳ IMAP server: Zoho, Fastmail, cPanel mail, Yahoo, Microsoft 365 IMAP.', icon:'📨' },
+        { id:'outlook_local',   title:'Outlook (Local Worker)', desc:'PowerShell worker chạy trên máy có Outlook desktop — không cần expose mailbox.', icon:'🖥' },
+        { id:'microsoft_graph', title:'Microsoft 365 Graph',desc:'Tenant chung (Azure AD App). Cần app registration + admin consent. Đang ở giai đoạn beta.', icon:'🪟' },
+      ];
+      return '<div style="font-size:13px;color:var(--text-2,#374151);margin-bottom:14px">Chọn loại nguồn email AI sẽ đọc. Mỗi loại có credential riêng — wizard sẽ hỏi đúng field cần thiết.</div>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+        + providers.map(function(p){
+            var selected = WIZARD.provider === p.id;
+            return '<button onclick="aeoi.wizardSelectProvider(\'' + p.id + '\')" style="text-align:left;padding:14px;border:2px solid ' + (selected ? 'var(--brand-primary,#2563eb)' : 'var(--border-1,#e5e7eb)') + ';background:' + (selected ? '#eff6ff' : '#fff') + ';border-radius:8px;cursor:pointer;font-family:inherit">'
+              + '<div style="font-size:20px">' + p.icon + '</div>'
+              + '<div style="font-size:13px;font-weight:700;margin-top:6px">' + escHtml(p.title) + (selected ? ' ✓' : '') + '</div>'
+              + '<div style="font-size:11px;color:var(--text-3,#6b7280);margin-top:4px">' + escHtml(p.desc) + '</div>'
+              + '</button>';
+          }).join('')
+        + '</div>';
+    }
+    if(step === 2){
+      // Mailbox info
+      var note = '';
+      if(WIZARD.provider==='gmail_imap')      note = 'Gmail: dùng full email (vd: orders@hesemeng.com). Folder mặc định INBOX. Dùng tên Gmail label (đổi / thành "INBOX/My-Label").';
+      else if(WIZARD.provider==='generic_imap')   note = 'Bất kỳ IMAP server. Folder tùy theo server (vd: INBOX, INBOX.Orders).';
+      else if(WIZARD.provider==='outlook_local')  note = 'Mailbox + folder phải tồn tại trên Outlook desktop của user. Worker đọc theo COM API.';
+      else if(WIZARD.provider==='microsoft_graph')note = 'Dùng UPN (vd: orders@yourcompany.onmicrosoft.com). Folder mặc định Inbox.';
+
+      return '<div style="font-size:12px;color:var(--text-3,#6b7280);margin-bottom:10px">' + escHtml(note) + '</div>'
+        + '<div class="aeoi-grid2">'
+        + _fieldInline('Mailbox address *', 'aeoi-wz-mailbox', WIZARD.mailbox, 'orders@hesemeng.com')
+        + _fieldInline('Folder / Label', 'aeoi-wz-folder',  WIZARD.folder,  'INBOX')
+        + '</div>'
+        + '<div style="margin-top:12px;display:flex;gap:14px;font-size:12px">'
+        + '<label style="cursor:pointer"><input type="checkbox" id="aeoi-wz-read-body" ' + (WIZARD.read_body?'checked':'') + '> Đọc nội dung email (body)</label>'
+        + '<label style="cursor:pointer"><input type="checkbox" id="aeoi-wz-read-attachments" ' + (WIZARD.read_attachments?'checked':'') + '> Đọc file đính kèm</label>'
+        + '</div>';
+    }
+    if(step === 3){
+      // Credential — per-provider
+      if(WIZARD.provider==='gmail_imap' || WIZARD.provider==='generic_imap'){
+        var hint = WIZARD.provider==='gmail_imap'
+          ? 'Gmail dùng App Password 16 ký tự. Vào myaccount.google.com → Security → 2-Step Verification → App passwords để tạo.'
+          : 'Nhập IMAP host / port / encryption / username / password của server bạn dùng.';
+        return '<div style="font-size:12px;color:var(--text-3,#6b7280);margin-bottom:10px">' + escHtml(hint) + '</div>'
+          + '<div class="aeoi-grid2">'
+          + _fieldInline('IMAP host *', 'aeoi-wz-host', WIZARD.imap_host, WIZARD.provider==='gmail_imap' ? 'imap.gmail.com' : 'imap.example.com')
+          + _fieldInline('Port', 'aeoi-wz-port', String(WIZARD.imap_port||993), '993')
+          + '</div>'
+          + '<div class="aeoi-grid2" style="margin-top:10px">'
+          + '<div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Encryption</label>'
+          + '<select id="aeoi-wz-encryption" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px">'
+          + '<option value="ssl" ' + (WIZARD.imap_encryption==='ssl'?'selected':'') + '>SSL/TLS (port 993)</option>'
+          + '<option value="starttls" ' + (WIZARD.imap_encryption==='starttls'?'selected':'') + '>STARTTLS (port 143)</option>'
+          + '<option value="none" ' + (WIZARD.imap_encryption==='none'?'selected':'') + '>None (không khuyến nghị)</option>'
+          + '</select></div>'
+          + _fieldInline('Username', 'aeoi-wz-username', WIZARD.imap_username || WIZARD.mailbox, 'Mặc định = mailbox address')
+          + '</div>'
+          + '<div style="margin-top:10px"><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">App Password / IMAP password *</label>'
+          + '<input type="password" id="aeoi-wz-password" placeholder="' + (WIZARD.id ? '(đã lưu — nhập mới để đổi)' : 'xxxx yyyy zzzz wwww') + '" autocomplete="new-password" style="width:100%;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:12px;font-family:monospace">'
+          + '</div>'
+          + '<div style="margin-top:12px;font-size:12px">'
+          + '<label style="cursor:pointer"><input type="checkbox" id="aeoi-wz-validate-cert" ' + (WIZARD.imap_validate_cert?'checked':'') + '> Validate TLS certificate (khuyến nghị bật trên production)</label>'
+          + '</div>';
+      }
+      if(WIZARD.provider==='microsoft_graph'){
+        var cfg = STATE.config || {};
+        var hasTenant = !!cfg.m365_tenant_id;
+        var hasClient = !!cfg.m365_client_id;
+        var hasSecret = !!cfg.secret_configured;
+        var ready = hasTenant && hasClient && hasSecret;
+        return '<div style="font-size:13px;color:var(--text-2,#374151);margin-bottom:12px">'
+          + 'Microsoft 365 dùng <b>tenant chung</b> (Azure AD App registration) ở cấp module.<br>Cấu hình ở: <b>📬 Mailbox & Folder</b> → <b>⚙️ Cài đặt module</b> → <i>Cấu hình Microsoft 365 (advanced)</i>.'
+          + '</div>'
+          + '<div style="padding:12px;background:' + (ready ? '#d1fae5' : '#fef3c7') + ';border-left:4px solid ' + (ready ? '#10b981' : '#f59e0b') + ';border-radius:4px;font-size:12px">'
+          + (ready
+              ? '✓ Tenant + Client ID + Secret đã có. Sang bước 4 để Test.'
+              : '⚠ Cần nhập M365 tenant config trước. Đóng wizard, mở phần "Cấu hình Microsoft 365 (advanced)" trong card Cài đặt module, lưu Tenant + Client ID + Secret, rồi mở wizard lại.')
+          + '<ul style="margin:8px 0 0 18px;font-size:11px">'
+          + '<li>Tenant ID: ' + (hasTenant ? '✓' : '— chưa nhập') + '</li>'
+          + '<li>Client ID: ' + (hasClient ? '✓' : '— chưa nhập') + '</li>'
+          + '<li>Client Secret: ' + (hasSecret ? '✓' : '— chưa nhập') + '</li>'
+          + '</ul></div>';
+      }
+      if(WIZARD.provider==='outlook_local'){
+        return '<div style="font-size:13px;color:var(--text-2,#374151);margin-bottom:12px">Outlook local worker không cần credential trong portal — worker chạy trên máy desktop của user và dùng COM API trực tiếp.</div>'
+          + '<div style="padding:12px;background:#dbeafe;border-left:4px solid #2563eb;border-radius:4px;font-size:12px">'
+          + 'Cần: tạo Worker Token (tab Worker Tokens) → cấu hình script PowerShell trên máy user → tick "Allow worker to read this mailbox" trong row này sau khi tạo.'
+          + '</div>';
+      }
+      return '<div style="font-size:12px;color:var(--text-3,#6b7280)">Provider chưa biết — không cần credential.</div>';
+    }
+    if(step === 4){
+      // Test & Save
+      return '<div style="font-size:13px;color:var(--text-2,#374151);margin-bottom:12px">Bước cuối — review + test connection trước khi mailbox lên production.</div>'
+        + '<div style="background:var(--surface-2,#f3f4f6);border-radius:8px;padding:12px;font-family:monospace;font-size:11px;margin-bottom:12px">'
+        + '<div><b>Provider:</b> ' + escHtml(WIZARD.provider) + '</div>'
+        + '<div><b>Mailbox:</b> ' + escHtml(WIZARD.mailbox) + '</div>'
+        + '<div><b>Folder:</b> ' + escHtml(WIZARD.folder) + '</div>'
+        + '<div><b>Đọc body:</b> ' + (WIZARD.read_body ? '✓' : '—') + '   <b>Đính kèm:</b> ' + (WIZARD.read_attachments ? '✓' : '—') + '</div>'
+        + ((WIZARD.provider==='gmail_imap' || WIZARD.provider==='generic_imap')
+            ? '<div><b>IMAP:</b> ' + escHtml(WIZARD.imap_host) + ':' + WIZARD.imap_port + ' (' + escHtml(WIZARD.imap_encryption) + ')</div>'
+              + '<div><b>Username:</b> ' + escHtml(WIZARD.imap_username || WIZARD.mailbox) + '</div>'
+            : '')
+        + '</div>'
+        + ((WIZARD.provider==='gmail_imap' || WIZARD.provider==='generic_imap')
+            ? '<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px"><button id="aeoi-wz-test-btn" onclick="aeoi.wizardTest()" class="hm-btn hm-btn-sm">▶ Test connection (poll thử)</button><span style="font-size:11px;color:var(--text-3,#6b7280)">Sẽ lưu mailbox + chạy poll thật để kiểm tra credential.</span></div>'
+            : '')
+        + '<div id="aeoi-wz-test-result"></div>';
+    }
+    return '<div>Step không hợp lệ.</div>';
+  }
+
+  function _renderWizardFooter(){
+    var step = WIZARD.step;
+    var buttons = '';
+    if(step > 1){
+      buttons += '<button onclick="aeoi.wizardPrev()" class="hm-btn hm-btn-sm">← Quay lại</button>';
+    }
+    buttons += '<button onclick="aeoi.closeMailboxWizard()" class="hm-btn hm-btn-sm">Hủy</button>';
+    if(step < 4){
+      buttons += '<button onclick="aeoi.wizardNext()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">Tiếp →</button>';
+    } else {
+      buttons += '<button onclick="aeoi.wizardSubmit()" class="hm-btn hm-btn-sm" style="background:#10b981;color:#fff;border:none">💾 Lưu Mailbox</button>';
+    }
+    return buttons;
+  }
+
+  /* ── Test parse modal ─────────────────────────────────────────────────── */
   function _testParseModal(){
     return '<div id="aeoi-test-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center" data-modal-display="flex">'
       + '<div style="background:var(--surface-0,#fff);border-radius:12px;padding:24px;width:600px;max-width:95vw;max-height:90vh;overflow:auto;box-shadow:0 8px 32px rgba(0,0,0,.2)">'
@@ -783,14 +979,34 @@
 
   function _sectionMailboxes(){
     var rows = STATE.mailboxes || [];
-    var html = '<div class="aeoi-card">'
-      + _cardHead('📬 Mailbox & Folder', 'Danh sách mailbox/folder AI worker được phép đọc. Worker chỉ scan các row enabled bên dưới.')
+
+    // Renders one "(provider) badge" with friendly label + colour.
+    var providerLabel = function(prov){
+      var map = {
+        'gmail_imap':      { l:'Gmail IMAP',           bg:'#fde7c2', fg:'#9a3412' },
+        'generic_imap':    { l:'IMAP',                 bg:'#dbeafe', fg:'#1e40af' },
+        'outlook_local':   { l:'Outlook (worker)',     bg:'#e9d5ff', fg:'#6b21a8' },
+        'microsoft_graph': { l:'Microsoft 365',        bg:'#dcfce7', fg:'#166534' },
+        'exchange_ews':    { l:'Exchange (EWS)',       bg:'#fee2e2', fg:'#991b1b' },
+        'manual_upload':   { l:'Upload tay',           bg:'#f1f5f9', fg:'#334155' },
+      };
+      var m = map[prov] || { l:prov||'unknown', bg:'#f3f4f6', fg:'#374151' };
+      return '<span style="font-size:10px;padding:2px 8px;background:' + m.bg + ';color:' + m.fg + ';border-radius:10px;font-weight:600">' + escHtml(m.l) + '</span>';
+    };
+
+    // Card 1: module-wide settings (was the Kết nối M365 tab)
+    var html = _moduleSettingsCard();
+
+    // Card 2: list of mailboxes + add wizard launcher
+    html += '<div class="aeoi-card" style="margin-top:14px">'
+      + _cardHead('📬 Danh sách Mailbox', 'Worker chỉ scan các mailbox enabled bên dưới. Mỗi mailbox khai báo provider riêng (Gmail / IMAP / Outlook local / M365).')
       + '<div style="display:flex;gap:8px;margin-bottom:10px">'
-      + '<button onclick="aeoi.openMailboxForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Thêm Mailbox</button>'
+      + '<button onclick="aeoi.openMailboxWizard()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Thêm Mailbox</button>'
       + '<button onclick="aeoi.loadMailboxes()" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
+      + '<span style="font-size:11px;color:var(--text-3,#6b7280);line-height:32px">' + rows.length + ' mailbox · ' + rows.filter(function(m){return m.enabled;}).length + ' đang bật</span>'
       + '</div>';
     if(rows.length===0){
-      html += '<div class="hm-empty">Chưa có mailbox nào. Bấm "Thêm Mailbox" để cấu hình.</div>';
+      html += '<div class="hm-empty">Chưa có mailbox nào. Bấm "+ Thêm Mailbox" để bắt đầu (sẽ hỏi từng bước: provider → mailbox → credential → test).</div>';
     } else {
       html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
         + '<th>#</th><th>Mailbox</th><th>Provider</th><th>Folder</th><th>Đọc body</th><th>Đính kèm</th><th>Trạng thái</th><th>Scan gần nhất</th><th>Hành động</th>'
@@ -802,7 +1018,7 @@
         html += '<tr style="' + (!m.enabled ? 'opacity:0.5' : '') + '">'
           + '<td>'+(i+1)+'</td>'
           + '<td style="font-family:monospace;font-weight:600">' + escHtml(m.mailbox_address) + '</td>'
-          + '<td><span style="font-size:10px;padding:1px 6px;background:var(--surface-2,#f3f4f6);border-radius:4px">' + escHtml(m.provider) + '</span></td>'
+          + '<td>' + providerLabel(m.provider) + '</td>'
           + '<td style="font-family:monospace;font-size:11px">' + escHtml(m.folder_path) + '</td>'
           + '<td>' + (m.read_body ? '✓' : '—') + '</td>'
           + '<td>' + (m.read_attachments ? '✓' : '—') + '</td>'
@@ -812,7 +1028,7 @@
           + ((m.provider==='gmail_imap' || m.provider==='generic_imap')
               ? '<button onclick="aeoi.pollMailbox('+m.id+')" class="hm-btn hm-btn-xs" title="Quét IMAP ngay" style="background:var(--brand-primary,#2563eb);color:#fff">▶ Poll</button> '
               : '')
-          + '<button onclick="aeoi.openMailboxForm('+m.id+')" class="hm-btn hm-btn-xs" title="Sửa">✏</button> '
+          + '<button onclick="aeoi.openMailboxWizard('+m.id+')" class="hm-btn hm-btn-xs" title="Sửa">✏</button> '
           + '<button onclick="aeoi.toggleMailbox('+m.id+','+(m.enabled?'false':'true')+')" class="hm-btn hm-btn-xs" title="' + (m.enabled?'Tắt':'Bật') + '">' + (m.enabled?'⏸':'▶') + '</button> '
           + '<button onclick="aeoi.deleteMailbox('+m.id+')" class="hm-btn hm-btn-xs" style="color:var(--danger-1,#ef4444)" title="Xóa">🗑</button>'
           + '</td></tr>';
@@ -1248,23 +1464,170 @@
         _refreshSection();
       });
     },
-    openMailboxForm: function(id){
+    /* Mailbox wizard — replaces the prompt() based form with a proper
+     * 4-step modal: Provider → Mailbox info → Credential → Test & Save.
+     * Per-provider field set: Gmail wants host/port/app-pwd; M365 wants
+     * tenant/client/secret (read from global config); Outlook local just
+     * needs the worker-token claim. */
+    openMailboxWizard: function(id){
       var existing = id ? (STATE.mailboxes||[]).find(function(m){return m.id===id;}) : null;
-      var addr   = prompt('Mailbox address (vd: orders@hesemeng.com):', existing ? existing.mailbox_address : '');
-      if(addr==null) return;
-      var folder = prompt('Folder path (vd: Inbox/AI-Order-Intake):', existing ? existing.folder_path : 'Inbox/AI-Order-Intake');
-      if(folder==null) return;
-      var provider = prompt('Provider (outlook_local | microsoft_graph | manual_upload):', existing ? existing.provider : 'outlook_local');
-      if(provider==null) return;
-      var payload = {
-        mailbox_address: addr, folder_path: folder, provider: provider,
-        enabled: true, read_body: true, read_attachments: true,
+      WIZARD = {
+        id: id || null,
+        step: 1,
+        provider:  existing ? existing.provider          : '',
+        mailbox:   existing ? existing.mailbox_address   : '',
+        folder:    existing ? existing.folder_path       : 'INBOX',
+        read_body: existing ? !!existing.read_body       : true,
+        read_attachments: existing ? !!existing.read_attachments : true,
+        imap_host:        existing ? (existing.imap_host || '')        : '',
+        imap_port:        existing ? (existing.imap_port || 993)       : 993,
+        imap_encryption:  existing ? (existing.imap_encryption || 'ssl') : 'ssl',
+        imap_username:    existing ? (existing.imap_username || '')    : '',
+        imap_password:    '',
+        imap_validate_cert: existing ? !!existing.imap_validate_cert : true,
+        test_result: null,
       };
-      if(id){ payload.id = id; }
-      var action = id ? 'admin_email_intake_mailbox_update' : 'admin_email_intake_mailbox_create';
+      _renderWizard();
+      var el = document.getElementById('aeoi-wizard-modal');
+      if(el) el.style.display = 'flex';
+    },
+    closeMailboxWizard: function(){
+      var el = document.getElementById('aeoi-wizard-modal');
+      if(el) el.style.display = 'none';
+      WIZARD = null;
+    },
+    wizardSelectProvider: function(p){
+      if(!WIZARD) return;
+      WIZARD.provider = p;
+      // Provider-specific defaults
+      if(p==='gmail_imap'){
+        WIZARD.imap_host = 'imap.gmail.com';
+        WIZARD.imap_port = 993;
+        WIZARD.imap_encryption = 'ssl';
+        WIZARD.folder = 'INBOX';
+      } else if(p==='generic_imap'){
+        if(!WIZARD.imap_host) WIZARD.imap_host = '';
+        if(!WIZARD.imap_port) WIZARD.imap_port = 993;
+        WIZARD.imap_encryption = WIZARD.imap_encryption || 'ssl';
+        WIZARD.folder = WIZARD.folder || 'INBOX';
+      } else if(p==='outlook_local'){
+        WIZARD.folder = WIZARD.folder || 'Inbox/AI-Order-Intake';
+      } else if(p==='microsoft_graph'){
+        WIZARD.folder = WIZARD.folder || 'Inbox';
+      }
+      _renderWizard();
+    },
+    wizardNext: function(){
+      if(!WIZARD) return;
+      // Per-step validation
+      if(WIZARD.step===1 && !WIZARD.provider){
+        alert('Vui lòng chọn 1 provider để tiếp tục.');
+        return;
+      }
+      if(WIZARD.step===2){
+        WIZARD.mailbox = (aeoi._val('aeoi-wz-mailbox')||'').trim();
+        WIZARD.folder  = (aeoi._val('aeoi-wz-folder')||'').trim() || 'INBOX';
+        WIZARD.read_body        = aeoi._checked('aeoi-wz-read-body');
+        WIZARD.read_attachments = aeoi._checked('aeoi-wz-read-attachments');
+        if(!WIZARD.mailbox){ alert('Mailbox address là bắt buộc.'); return; }
+      }
+      if(WIZARD.step===3){
+        if(WIZARD.provider==='gmail_imap' || WIZARD.provider==='generic_imap'){
+          WIZARD.imap_host       = (aeoi._val('aeoi-wz-host')||'').trim();
+          WIZARD.imap_port       = parseInt(aeoi._val('aeoi-wz-port')||'993') || 993;
+          WIZARD.imap_encryption = aeoi._val('aeoi-wz-encryption') || 'ssl';
+          WIZARD.imap_username   = (aeoi._val('aeoi-wz-username')||'').trim() || WIZARD.mailbox;
+          var pwd = aeoi._val('aeoi-wz-password');
+          if(pwd) WIZARD.imap_password = pwd;
+          WIZARD.imap_validate_cert = aeoi._checked('aeoi-wz-validate-cert');
+          if(!WIZARD.imap_host){ alert('IMAP host là bắt buộc.'); return; }
+          if(!WIZARD.id && !WIZARD.imap_password){ alert('App password / IMAP password là bắt buộc khi tạo mới.'); return; }
+        }
+        if(WIZARD.provider==='microsoft_graph'){
+          // Falls back to global config — no per-mailbox fields yet.
+        }
+      }
+      WIZARD.step = Math.min(4, WIZARD.step + 1);
+      _renderWizard();
+    },
+    wizardPrev: function(){
+      if(!WIZARD) return;
+      WIZARD.step = Math.max(1, WIZARD.step - 1);
+      _renderWizard();
+    },
+    wizardSubmit: function(){
+      if(!WIZARD) return;
+      var payload = {
+        mailbox_address: WIZARD.mailbox,
+        folder_path:     WIZARD.folder,
+        provider:        WIZARD.provider,
+        enabled:         true,
+        read_body:        WIZARD.read_body,
+        read_attachments: WIZARD.read_attachments,
+      };
+      if(WIZARD.provider==='gmail_imap' || WIZARD.provider==='generic_imap'){
+        payload.imap_host       = WIZARD.imap_host;
+        payload.imap_port       = WIZARD.imap_port;
+        payload.imap_encryption = WIZARD.imap_encryption;
+        payload.imap_username   = WIZARD.imap_username;
+        payload.imap_validate_cert = WIZARD.imap_validate_cert;
+        if(WIZARD.imap_password) payload.imap_password = WIZARD.imap_password;
+      }
+      if(WIZARD.id){ payload.id = WIZARD.id; }
+      var action = WIZARD.id ? 'admin_email_intake_mailbox_update' : 'admin_email_intake_mailbox_create';
       apiCall(action, payload, function(res){
-        if(res.ok) aeoi.loadMailboxes();
-        else alert('Lỗi: ' + (res.error||''));
+        if(res.ok){
+          aeoi.closeMailboxWizard();
+          aeoi.loadMailboxes();
+        } else {
+          alert('Lỗi lưu mailbox: ' + (res.error||'unknown') + ' — ' + (res.detail||''));
+        }
+      });
+    },
+    /* Test connection (step 4) — for IMAP providers we hit a mock probe
+     * by triggering the existing poll endpoint. Real "test only" endpoint
+     * is a follow-up; for now we just save then offer a poll. */
+    wizardTest: function(){
+      var btn = document.getElementById('aeoi-wz-test-btn');
+      var out = document.getElementById('aeoi-wz-test-result');
+      if(out){ out.innerHTML = '<div style="font-size:12px;color:var(--text-3,#6b7280)">Đang lưu mailbox + chạy poll thử...</div>'; }
+      if(btn) btn.disabled = true;
+      // Step 1: save the mailbox (so we have an id to poll)
+      var payload = {
+        mailbox_address: WIZARD.mailbox,
+        folder_path:     WIZARD.folder,
+        provider:        WIZARD.provider,
+        enabled:         true,
+        read_body:        WIZARD.read_body,
+        read_attachments: WIZARD.read_attachments,
+      };
+      if(WIZARD.provider==='gmail_imap' || WIZARD.provider==='generic_imap'){
+        payload.imap_host       = WIZARD.imap_host;
+        payload.imap_port       = WIZARD.imap_port;
+        payload.imap_encryption = WIZARD.imap_encryption;
+        payload.imap_username   = WIZARD.imap_username;
+        payload.imap_validate_cert = WIZARD.imap_validate_cert;
+        if(WIZARD.imap_password) payload.imap_password = WIZARD.imap_password;
+      }
+      if(WIZARD.id){ payload.id = WIZARD.id; }
+      var action = WIZARD.id ? 'admin_email_intake_mailbox_update' : 'admin_email_intake_mailbox_create';
+      apiCall(action, payload, function(res){
+        if(!res.ok){
+          if(out){ out.innerHTML = '<div style="color:#dc2626;font-size:12px">Lỗi lưu: ' + escHtml(res.error||'unknown') + '</div>'; }
+          if(btn) btn.disabled = false;
+          return;
+        }
+        WIZARD.id = res.mailbox && res.mailbox.id || WIZARD.id;
+        // Step 2: actually poll to verify the credential works
+        apiCall('admin_email_intake_mailbox_poll', {id: WIZARD.id}, function(poll){
+          if(btn) btn.disabled = false;
+          WIZARD.test_result = poll;
+          if(poll.ok){
+            if(out){ out.innerHTML = '<div style="color:#10b981;font-size:12px;background:#d1fae5;padding:8px;border-radius:6px">✓ Kết nối thành công. Fetched=' + (poll.fetched||0) + ' Created=' + (poll.created||0) + ' Skipped=' + (poll.skipped||0) + '</div>'; }
+          } else {
+            if(out){ out.innerHTML = '<div style="color:#dc2626;font-size:12px;background:#fee2e2;padding:8px;border-radius:6px">✗ Test failed: ' + escHtml(poll.error||'unknown') + '<br><br>Mailbox đã được lưu — có thể sửa và Test lại.</div>'; }
+          }
+        });
       });
     },
     toggleMailbox: function(id, enabled){
