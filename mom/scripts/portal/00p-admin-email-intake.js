@@ -763,6 +763,187 @@
       + '</div>';
   }
 
+  /* ── Sprint A-D new sections ──────────────────────────────────────────── */
+
+  function _sectionMailboxes(){
+    var rows = STATE.mailboxes || [];
+    var html = '<div class="aeoi-card">'
+      + _cardHead('📬 Mailbox & Folder', 'Danh sách mailbox/folder AI worker được phép đọc. Worker chỉ scan các row enabled bên dưới.')
+      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
+      + '<button onclick="aeoi.openMailboxForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Thêm Mailbox</button>'
+      + '<button onclick="aeoi.loadMailboxes()" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
+      + '</div>';
+    if(rows.length===0){
+      html += '<div class="hm-empty">Chưa có mailbox nào. Bấm "Thêm Mailbox" để cấu hình.</div>';
+    } else {
+      html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
+        + '<th>#</th><th>Mailbox</th><th>Provider</th><th>Folder</th><th>Đọc body</th><th>Đính kèm</th><th>Trạng thái</th><th>Scan gần nhất</th><th>Hành động</th>'
+        + '</tr></thead><tbody>';
+      rows.forEach(function(m,i){
+        var active = m.enabled
+          ? '<span style="color:var(--green-1,#065f46);font-size:11px">● Bật</span>'
+          : '<span style="color:var(--text-3,#6b7280);font-size:11px">○ Tắt</span>';
+        html += '<tr style="' + (!m.enabled ? 'opacity:0.5' : '') + '">'
+          + '<td>'+(i+1)+'</td>'
+          + '<td style="font-family:monospace;font-weight:600">' + escHtml(m.mailbox_address) + '</td>'
+          + '<td><span style="font-size:10px;padding:1px 6px;background:var(--surface-2,#f3f4f6);border-radius:4px">' + escHtml(m.provider) + '</span></td>'
+          + '<td style="font-family:monospace;font-size:11px">' + escHtml(m.folder_path) + '</td>'
+          + '<td>' + (m.read_body ? '✓' : '—') + '</td>'
+          + '<td>' + (m.read_attachments ? '✓' : '—') + '</td>'
+          + '<td>' + active + '</td>'
+          + '<td style="font-size:11px;color:var(--text-3,#6b7280)">' + fmtDt(m.last_scan_at) + (m.last_status ? '<br>'+escHtml(m.last_status) : '') + '</td>'
+          + '<td style="white-space:nowrap">'
+          + ((m.provider==='gmail_imap' || m.provider==='generic_imap')
+              ? '<button onclick="aeoi.pollMailbox('+m.id+')" class="hm-btn hm-btn-xs" title="Quét IMAP ngay" style="background:var(--brand-primary,#2563eb);color:#fff">▶ Poll</button> '
+              : '')
+          + '<button onclick="aeoi.openMailboxForm('+m.id+')" class="hm-btn hm-btn-xs" title="Sửa">✏</button> '
+          + '<button onclick="aeoi.toggleMailbox('+m.id+','+(m.enabled?'false':'true')+')" class="hm-btn hm-btn-xs" title="' + (m.enabled?'Tắt':'Bật') + '">' + (m.enabled?'⏸':'▶') + '</button> '
+          + '<button onclick="aeoi.deleteMailbox('+m.id+')" class="hm-btn hm-btn-xs" style="color:var(--danger-1,#ef4444)" title="Xóa">🗑</button>'
+          + '</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function _sectionHeaderRules(){
+    var rows = STATE.headerRules || [];
+    var html = '<div class="aeoi-card">'
+      + _cardHead('📑 Header Rules', 'Quy tắc nhận diện email đầu vào. Worker prefilter theo subject_prefix; backend revalidate body markers + required fields.')
+      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
+      + '<button onclick="aeoi.openHeaderRuleForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Thêm Rule</button>'
+      + '<button onclick="aeoi.loadHeaderRules()" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
+      + '</div>';
+    if(rows.length===0){
+      html += '<div class="hm-empty">Chưa có header rule.</div>';
+    } else {
+      html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
+        + '<th>#</th><th>Tên rule</th><th>Subject prefix</th><th>Markers</th><th>Doc types</th><th>Actions</th><th>Trạng thái</th><th>Thiếu header → </th><th>Hành động</th>'
+        + '</tr></thead><tbody>';
+      rows.forEach(function(r,i){
+        html += '<tr style="'+(!r.enabled?'opacity:0.5':'')+'">'
+          + '<td>'+(i+1)+'</td>'
+          + '<td style="font-weight:600">' + escHtml(r.rule_name) + '</td>'
+          + '<td style="font-family:monospace;font-size:11px">' + escHtml(r.subject_prefix||'—') + '</td>'
+          + '<td style="font-family:monospace;font-size:10px">' + escHtml(r.body_start_marker) + '<br>' + escHtml(r.body_end_marker) + '</td>'
+          + '<td style="font-size:10px">' + (r.allowed_doc_types||[]).map(escHtml).join(', ') + '</td>'
+          + '<td style="font-size:10px">' + (r.allowed_actions||[]).map(escHtml).join(', ') + '</td>'
+          + '<td>' + (r.enabled?'● Bật':'○ Tắt') + '</td>'
+          + '<td style="font-size:10px">' + escHtml(r.missing_header_action) + '</td>'
+          + '<td style="white-space:nowrap">'
+          + '<button onclick="aeoi.openHeaderRuleForm('+r.id+')" class="hm-btn hm-btn-xs">✏</button> '
+          + '<button onclick="aeoi.deleteHeaderRule('+r.id+')" class="hm-btn hm-btn-xs" style="color:var(--danger-1,#ef4444)">🗑</button>'
+          + '</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function _sectionTemplates(){
+    var rows = STATE.templates || [];
+    var html = '<div class="aeoi-card">'
+      + _cardHead('🎯 Template Khách hàng', 'Field hints AI dùng để định vị PO number, part number, revision, qty, ngày giao... theo từng khách + định dạng file.')
+      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
+      + '<button onclick="aeoi.openTemplateForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Thêm Template</button>'
+      + '<button onclick="aeoi.loadTemplates()" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
+      + '</div>';
+    if(rows.length===0){
+      html += '<div class="hm-empty">Chưa có template.</div>';
+    } else {
+      html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
+        + '<th>#</th><th>Khách</th><th>Tên template</th><th>Doc type</th><th>File</th><th>Min confidence</th><th>Trạng thái</th><th>Hành động</th>'
+        + '</tr></thead><tbody>';
+      rows.forEach(function(t,i){
+        html += '<tr style="'+(!t.enabled?'opacity:0.5':'')+'">'
+          + '<td>'+(i+1)+'</td>'
+          + '<td style="font-weight:600">' + escHtml(t.customer_id) + '</td>'
+          + '<td>' + escHtml(t.template_name) + '</td>'
+          + '<td><span style="font-size:10px;padding:1px 6px;background:var(--surface-2,#f3f4f6);border-radius:4px">' + escHtml(t.document_type) + '</span></td>'
+          + '<td>' + escHtml(t.file_type) + '</td>'
+          + '<td style="font-size:11px">overall ≥ ' + t.min_confidence_overall + '<br>field ≥ ' + t.min_confidence_required_field + '</td>'
+          + '<td>' + (t.enabled?'● Bật':'○ Tắt') + '</td>'
+          + '<td style="white-space:nowrap">'
+          + '<button onclick="aeoi.openTemplateForm('+t.id+')" class="hm-btn hm-btn-xs">✏</button> '
+          + '<button onclick="aeoi.deleteTemplate('+t.id+')" class="hm-btn hm-btn-xs" style="color:var(--danger-1,#ef4444)">🗑</button>'
+          + '</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function _sectionWorkers(){
+    var rows = STATE.workerTokens || [];
+    var html = '<div class="aeoi-card">'
+      + _cardHead('🔑 Worker Tokens (HMAC)', 'Credentials cho local Outlook worker. Secret hiển thị 1 LẦN duy nhất khi tạo hoặc rotate — lưu ngay vào file C:\\HESEM\\secrets\\.')
+      + '<div style="padding:8px 12px;border-left:3px solid var(--warning-1,#f59e0b);background:var(--warning-bg,#fef3c7);margin-bottom:10px;font-size:11px">'
+      + '⚠ Tải PowerShell worker từ <code>tools/ai-order-intake/outlook-order-intake-worker.ps1</code> và làm theo <code>windows-task-scheduler-setup.md</code>.'
+      + '</div>'
+      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
+      + '<button onclick="aeoi.openWorkerForm()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">+ Tạo Worker Token</button>'
+      + '<button onclick="aeoi.loadWorkers()" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
+      + '</div>';
+    if(rows.length===0){
+      html += '<div class="hm-empty">Chưa có worker token.</div>';
+    } else {
+      html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
+        + '<th>#</th><th>Worker ID</th><th>Tên</th><th>Trạng thái</th><th>IP allowlist</th><th>Lần dùng cuối</th><th>Hành động</th>'
+        + '</tr></thead><tbody>';
+      rows.forEach(function(w,i){
+        html += '<tr style="'+(!w.enabled?'opacity:0.5':'')+'">'
+          + '<td>'+(i+1)+'</td>'
+          + '<td style="font-family:monospace;font-weight:600">' + escHtml(w.worker_id) + '</td>'
+          + '<td>' + escHtml(w.worker_name||'—') + '</td>'
+          + '<td>' + (w.enabled?'● Bật':'○ Tắt') + '</td>'
+          + '<td style="font-size:10px;font-family:monospace">' + ((w.ip_allowlist||[]).length ? (w.ip_allowlist||[]).map(escHtml).join(', ') : '—') + '</td>'
+          + '<td style="font-size:11px;color:var(--text-3,#6b7280)">' + fmtDt(w.last_used_at) + (w.last_used_ip ? '<br>'+escHtml(w.last_used_ip) : '') + '</td>'
+          + '<td style="white-space:nowrap">'
+          + '<button onclick="aeoi.rotateWorker('+w.id+')" class="hm-btn hm-btn-xs" title="Rotate secret">🔄</button> '
+          + '<button onclick="aeoi.toggleWorker('+w.id+','+(w.enabled?'false':'true')+')" class="hm-btn hm-btn-xs" title="' + (w.enabled?'Tắt':'Bật') + '">' + (w.enabled?'⏸':'▶') + '</button>'
+          + '</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function _sectionCases(){
+    var data = STATE.cases || { items:[], total:0, offset:0 };
+    var html = '<div class="aeoi-card">'
+      + _cardHead('📦 Intake Cases', 'Các case đã tạo từ AI. Tab "AI Intake Queue" trong M2-Orders module là nơi sales/planning xử lý chi tiết. Đây là view tổng quát của admin.')
+      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
+      + '<button onclick="aeoi.loadCases(0)" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
+      + '<a href="?module=M2-orders&tab=ai-intake-queue" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;text-decoration:none">Mở Intake Queue đầy đủ →</a>'
+      + '</div>';
+    if(data.items.length===0){
+      html += '<div class="hm-empty">Chưa có case nào.</div>';
+    } else {
+      html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
+        + '<th>#</th><th>Intake</th><th>Trạng thái</th><th>Khách</th><th>PO khách</th><th>Confidence</th><th>Tạo lúc</th>'
+        + '</tr></thead><tbody>';
+      data.items.forEach(function(c,i){
+        html += '<tr>'
+          + '<td>'+(data.offset+i+1)+'</td>'
+          + '<td style="font-family:monospace;font-weight:600">' + escHtml(c.intake_no) + '</td>'
+          + '<td><span style="font-size:10px;padding:1px 6px;background:var(--surface-2,#f3f4f6);border-radius:4px">' + escHtml(c.status) + '</span></td>'
+          + '<td>' + escHtml(c.customer_id||'—') + '</td>'
+          + '<td style="font-family:monospace">' + escHtml(c.customer_po_number||'—') + '</td>'
+          + '<td style="text-align:right">' + (c.overall_confidence!=null ? Number(c.overall_confidence).toFixed(2) : '—') + '</td>'
+          + '<td style="font-size:11px">' + fmtDt(c.created_at) + '</td>'
+          + '</tr>';
+      });
+      html += '</tbody></table></div>';
+      html += _pagination(data.offset, data.total, 50, 'aeoi.loadCases');
+    }
+    html += '</div>';
+    return html;
+  }
+
   /* ── Public API (window.aeoi) ─────────────────────────────────────────── */
   window.aeoi = {
     _msgStatus: '',
@@ -829,7 +1010,7 @@
     saveLogic: function(){
       var payload = {
         auto_create_mode:       aeoi._val('aeoi-auto-create-mode'),
-        confidence_threshold:   parseFloat(aeoi._val('aeoi-confidence'))||0.75,
+        confidence_threshold:   parseFloat(aeoi._val('aeoi-confidence'))||0.95,
         part_match_mode:        aeoi._val('aeoi-part-match'),
         missing_field_action:   aeoi._val('aeoi-missing-field'),
         duplicate_check_days:   parseInt(aeoi._val('aeoi-dup-days'))||30,

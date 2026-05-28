@@ -367,10 +367,6 @@ class EmailIntakeController extends BaseController
                 $this->error('intake_disabled', 409,
                     'Email Order Intake is disabled. Enable it in Connection Settings first.');
             }
-            if (empty($config['m365_tenant_id']) || empty($config['intake_mailbox'])) {
-                $this->error('intake_not_configured', 409,
-                    'M365 connection is not configured. Set Tenant ID and Mailbox first.');
-            }
 
             // Manual "Chạy ngay" triggers the same code path as the cron
             // (ScheduledJobs::runEmailInboxPoll). That handles both
@@ -379,21 +375,22 @@ class EmailIntakeController extends BaseController
             // and returns aggregate counts.
             require_once dirname(__DIR__) . '/services/ScheduledJobs.php';
             $jobs = new \MOM\Services\ScheduledJobs($this->dataDir, $this->db());
-            $result = $jobs->runEmailInboxPoll('manual', $this->actor($user));
+            $result = $jobs->runEmailInboxPoll();
 
-            // Close immediately as a stub — real processing delegated to
-            // M365MailboxService which runs as a background job (sprint 2).
-            $this->svc()->closePollRun($runId, [
-                'found' => 0, 'processed' => 0, 'skipped' => 0,
-                'quarantined' => 0, 'created' => 0, 'review' => 0,
-                'errors' => 0, 'duration_ms' => 0, 'api_calls' => 0,
-                'error_detail' => 'M365MailboxService not yet provisioned — scheduled for sprint 2.',
-            ], 'skipped');
+            $this->auditLog('admin_email_intake_trigger', [
+                'actor'   => $user['username'] ?? 'unknown',
+                'result'  => array_intersect_key($result, array_flip([
+                    'status','mode','run_id','mailboxes_imap','fetched','orders_created','errors',
+                ])),
+            ]);
 
             $this->success([
-                'run_id'  => $runId,
-                'status'  => 'queued',
-                'message' => 'Poll queued. M365 connection service will be available in sprint 2.',
+                'status'  => $result['status'] ?? 'completed',
+                'mode'    => $result['mode']   ?? 'mixed',
+                'run_id'  => $result['run_id'] ?? null,
+                'fetched' => $result['fetched'] ?? 0,
+                'created' => $result['orders_created'] ?? 0,
+                'note'    => $result['note']   ?? null,
             ]);
         } catch (Throwable $e) {
             $this->error('trigger_failed', 500, $e->getMessage());
