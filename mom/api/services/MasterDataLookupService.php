@@ -10,22 +10,24 @@ use MOM\Database\Connection;
  * MasterDataLookupService — single read-only adapter for the part /
  * customer / revision lookups the AEOI validation pipeline needs.
  *
- * Why a dedicated service:
- *   The HESEM repo stores master data across both Postgres tables (when
- *   POSTGRES_PRIMARY mode is on) and master-data.json (legacy JSON_ONLY
- *   mode + dev installs). Different services were re-implementing the
- *   lookup with subtly different field names, and a few were silently
- *   "passing" when the table existed but had a different schema. Per
- *   GPT Pro audit P0-08, validation must NOT silently pass when master
- *   data lookup is unavailable — that's a configuration_error blocker,
- *   not a "skip with warning".
+ * Source priority:
+ *   1. POSTGRES_PRIMARY (USE_POSTGRES=1 + Connection wired) → query the
+ *      customers + items + item_revisions tables. These installs have no
+ *      master-data.json, so JSON-first would always fail-closed and keep
+ *      every AEOI case blocked on master_data_lookup_unavailable. This
+ *      was the Phase-4 follow-up to P0-08, landed 2026-05-28.
+ *   2. Otherwise → fall back to master-data.json (legacy JSON_ONLY +
+ *      dev installs).
  *
- * Schema tolerance:
- *   - customers/parts JSON files use one shape per install (we accept
- *     `customer_id`, `customerId`, `id` for the customer key).
- *   - PG `customers` / `parts` / `part_revisions` tables (where present)
- *     use snake_case columns; we don't query them yet but the service
- *     leaves the door open for a follow-up.
+ * Both paths populate the same in-memory shape so callers don't branch:
+ *   { customers: [...], parts: [...], revisions: [...] }
+ *
+ * Read-only. DataSyncMutationService is still the sole writer to
+ * master-data.json; the customers/items/item_revisions tables are
+ * written through the master-data admin UI and sync pipeline.
+ *
+ * Per GPT Pro audit P0-08, an unavailable lookup is a configuration_error
+ * blocker — never a silent pass.
  *
  * @package MOM\Api\Services
  */
@@ -33,17 +35,14 @@ final class MasterDataLookupService
 {
     private const MASTER_DATA_FILE = '/master-data/master-data.json';
 
-    /** @var array<string,mixed>|null Cached file contents, null until first read. */
+    /** @var array<string,mixed>|null Per-request cache, null until first load. */
     private ?array $cache = null;
+
+    /** Which path served the cache: 'postgres' | 'json'. Null until loadMaster() succeeds. */
+    private ?string $source = null;
 
     public function __construct(
         private readonly string $dataDir,
-        /**
-         * @phpstan-ignore-next-line property.unused — reserved for the
-         *  PG-table lookup path (Phase 4). Today we only consult the
-         *  JSON master-data file; injecting the connection now keeps
-         *  the constructor stable when the DB path lands.
-         */
         private readonly ?Connection $db = null
     ) {}
 
@@ -220,16 +219,11 @@ final class MasterDataLookupService
 
     public function describeAvailability(): string
     {
-        $file = $this->dataDir . self::MASTER_DATA_FILE;
-        if (!is_file($file)) {
-            return "master-data.json not found at $file";
-        }
-        if (!is_readable($file)) {
-            return "master-data.json not readable at $file";
-        }
         try {
             $this->loadMaster();
-            return 'ok';
+            return $this->source === 'postgres'
+                ? 'ok (postgres: customers + items + item_revisions)'
+                : 'ok (json: ' . $this->dataDir . self::MASTER_DATA_FILE . ')';
         } catch (\Throwable $e) {
             return $e->getMessage();
         }
@@ -245,6 +239,82 @@ final class MasterDataLookupService
         if ($this->cache !== null) {
             return $this->cache;
         }
+
+        // POSTGRES_PRIMARY installs hold the master data in tables, not in
+        // master-data.json. Trying disk first would always fail and gate
+        // every AEOI case on master_data_lookup_unavailable.
+        if ($this->isPostgresEnabled() && $this->db !== null) {
+            try {
+                $loaded = $this->loadMasterFromPg($this->db);
+            } catch (\Throwable $e) {
+                throw new \RuntimeException(
+                    'postgres lookup failed: ' . $e->getMessage(),
+                    0,
+                    $e
+                );
+            }
+            $this->cache  = $loaded;
+            $this->source = 'postgres';
+            return $loaded;
+        }
+
+        $loaded       = $this->loadMasterFromJson();
+        $this->cache  = $loaded;
+        $this->source = 'json';
+        return $loaded;
+    }
+
+    /**
+     * Verified live 2026-05-28: the actively-populated tables on the
+     * POSTGRES_PRIMARY install are `customers`, `items` (plural), and
+     * `item_revisions` (plural). The singular `item` / `item_revision`
+     * tables exist but are empty placeholders for a future redesign —
+     * reading them would break this lookup.
+     *
+     * item_revisions uses SCD2 (`valid_to IS NULL` ⇒ currently valid);
+     * we collapse the lifecycle into a single `status` key so
+     * isRevisionReleased() works on the row directly. An expired
+     * revision becomes "superseded" (caller treats as not_released);
+     * a current revision keeps its `change_type` as status.
+     *
+     * @return array{customers: list<array<string,mixed>>, parts: list<array<string,mixed>>, revisions: list<array<string,mixed>>}
+     */
+    private function loadMasterFromPg(Connection $db): array
+    {
+        $customers = $db->query(
+            'SELECT customer_id, customer_name, customer_status
+               FROM customers'
+        );
+        $parts = $db->query(
+            'SELECT item_id           AS part_number,
+                    description       AS part_description,
+                    item_status::text AS status,
+                    drawing_revision  AS revision
+               FROM items'
+        );
+        $revisions = $db->query(
+            "SELECT item_id AS part_number,
+                    rev     AS revision_number,
+                    CASE WHEN valid_to IS NULL
+                         THEN lower(change_type)
+                         ELSE 'superseded'
+                    END     AS status,
+                    valid_to
+               FROM item_revisions"
+        );
+
+        return [
+            'customers' => array_values($customers),
+            'parts'     => array_values($parts),
+            'revisions' => array_values($revisions),
+        ];
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private function loadMasterFromJson(): array
+    {
         $file = $this->dataDir . self::MASTER_DATA_FILE;
         if (!is_file($file) || !is_readable($file)) {
             throw new \RuntimeException('master-data.json not readable at ' . $file);
@@ -257,8 +327,16 @@ final class MasterDataLookupService
         if (!is_array($decoded)) {
             throw new \RuntimeException('master-data.json is not valid JSON');
         }
-        $this->cache = $decoded;
         return $decoded;
+    }
+
+    private function isPostgresEnabled(): bool
+    {
+        $raw = getenv('USE_POSTGRES');
+        if ($raw === false || $raw === '') {
+            return false;
+        }
+        return filter_var($raw, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) === true;
     }
 
     /**
