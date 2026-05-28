@@ -694,6 +694,152 @@
   }
 
   /* ── Test parse modal ─────────────────────────────────────────────────── */
+  /* ── Case detail modal ─────────────────────────────────────────────── */
+  // CASE_DETAIL is the state bag for the currently-open case viewer.
+  // null when closed.
+  var CASE_DETAIL = null;
+
+  function _caseDetailModal(){
+    return '<div id="aeoi-case-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:flex-start;justify-content:center;overflow-y:auto" data-modal-display="flex">'
+      + '<div style="background:var(--surface-0,#fff);border-radius:12px;padding:0;width:900px;max-width:96vw;margin:20px;box-shadow:0 8px 32px rgba(0,0,0,.25);display:flex;flex-direction:column;max-height:95vh">'
+      + '<div style="padding:14px 22px;border-bottom:1px solid var(--border-1,#e5e7eb);display:flex;justify-content:space-between;align-items:center">'
+      + '<div id="aeoi-case-title" style="font-size:15px;font-weight:700">Đang tải...</div>'
+      + '<button onclick="aeoi.closeCaseDetail()" class="hm-btn hm-btn-sm">✕ Đóng</button>'
+      + '</div>'
+      + '<div id="aeoi-case-body" style="padding:18px 22px;overflow-y:auto;flex:1"></div>'
+      + '<div id="aeoi-case-footer" style="padding:12px 22px;border-top:1px solid var(--border-1,#e5e7eb);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"></div>'
+      + '</div></div>';
+  }
+
+  function _renderCaseDetail(){
+    var titleEl  = document.getElementById('aeoi-case-title');
+    var bodyEl   = document.getElementById('aeoi-case-body');
+    var footerEl = document.getElementById('aeoi-case-footer');
+    if(!titleEl || !bodyEl || !footerEl) return;
+    if(!CASE_DETAIL){
+      bodyEl.innerHTML = '<div class="hm-empty">Đang tải...</div>';
+      return;
+    }
+    var c = CASE_DETAIL.case || {};
+    var lines       = CASE_DETAIL.lines || [];
+    var attachments = CASE_DETAIL.attachments || [];
+    var checks      = CASE_DETAIL.checks || [];
+    var message     = CASE_DETAIL.message || {};
+
+    titleEl.textContent = '📦 ' + (c.intake_no || '(no intake_no)') + ' — ' + (c.status || '?');
+
+    // ── Header section ──
+    var blockers = Array.isArray(c.blocking_codes) ? c.blocking_codes : [];
+    var warnings = Array.isArray(c.warning_codes)  ? c.warning_codes  : [];
+    var header = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;background:var(--surface-2,#f3f4f6);padding:12px;border-radius:8px;font-size:12px;margin-bottom:14px">'
+      + '<div><div style="color:var(--text-3,#6b7280);font-size:10px">Customer</div><div style="font-weight:600">' + escHtml(c.customer_id||'—') + (c.customer_name ? ' — ' + escHtml(c.customer_name) : '') + '</div></div>'
+      + '<div><div style="color:var(--text-3,#6b7280);font-size:10px">Customer PO #</div><div style="font-family:monospace;font-weight:600">' + escHtml(c.customer_po_number||'—') + '</div></div>'
+      + '<div><div style="color:var(--text-3,#6b7280);font-size:10px">Document type / Action</div><div>' + escHtml(c.document_type||'—') + ' / ' + escHtml(c.action_type||'—') + '</div></div>'
+      + '<div><div style="color:var(--text-3,#6b7280);font-size:10px">PO date / Terms</div><div>' + escHtml(c.po_date||'—') + ' / ' + escHtml(c.payment_term_code||'—') + '</div></div>'
+      + '<div><div style="color:var(--text-3,#6b7280);font-size:10px">Currency / Incoterm</div><div>' + escHtml(c.currency_code||'—') + ' / ' + escHtml(c.incoterm_code||'—') + '</div></div>'
+      + '<div><div style="color:var(--text-3,#6b7280);font-size:10px">Overall confidence</div><div>' + (c.overall_confidence!=null ? Number(c.overall_confidence).toFixed(2) : '—') + '</div></div>'
+      + '</div>';
+
+    // ── Blockers / Warnings banner ──
+    if(blockers.length > 0){
+      header += '<div style="background:#fee2e2;border-left:4px solid #dc2626;padding:10px;border-radius:4px;font-size:12px;margin-bottom:10px">'
+        + '<b style="color:#991b1b">✗ ' + blockers.length + ' blocker(s):</b> ' + escHtml(blockers.join(', '))
+        + '<div style="font-size:10px;color:#7f1d1d;margin-top:4px">Approval và Commit bị chặn cho đến khi giải quyết hết blockers.</div>'
+        + '</div>';
+    }
+    if(warnings.length > 0){
+      header += '<div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:10px;border-radius:4px;font-size:12px;margin-bottom:10px">'
+        + '<b style="color:#92400e">⚠ ' + warnings.length + ' warning(s):</b> ' + escHtml(warnings.join(', '))
+        + '<div style="font-size:10px;color:#78350f;margin-top:4px">Approve được nhưng phải nhập lý do.</div>'
+        + '</div>';
+    }
+    if(blockers.length === 0 && warnings.length === 0 && c.status !== 'extraction_pending'){
+      header += '<div style="background:#d1fae5;border-left:4px solid #10b981;padding:10px;border-radius:4px;font-size:12px;margin-bottom:10px;color:#065f46">✓ Không có blocker hay warning.</div>';
+    }
+
+    // ── Lines ──
+    var linesHtml = '<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:600;margin-bottom:6px">📦 Lines (' + lines.length + ')</div>';
+    if(lines.length === 0){
+      linesHtml += '<div class="hm-empty" style="font-size:11px">Không có line nào.</div>';
+    } else {
+      linesHtml += '<div class="aeoi-table-wrap"><table class="aeoi-table" style="width:100%;font-size:11px">'
+        + '<thead><tr><th>#</th><th>Part</th><th>Rev</th><th>Qty</th><th>UOM</th><th>Due</th><th>Ship-to</th><th>Unit price</th></tr></thead><tbody>';
+      lines.forEach(function(l, idx){
+        linesHtml += '<tr>'
+          + '<td>' + escHtml(l.line_no || (idx+1)) + '</td>'
+          + '<td style="font-family:monospace;font-weight:600">' + escHtml(l.part_number||'—') + '</td>'
+          + '<td>' + escHtml(l.revision_number||'—') + '</td>'
+          + '<td style="text-align:right">' + (l.quantity != null ? Number(l.quantity).toFixed(2) : '—') + '</td>'
+          + '<td>' + escHtml(l.uom||'EA') + '</td>'
+          + '<td>' + escHtml(l.requested_delivery_date||'—') + '</td>'
+          + '<td style="font-size:10px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escHtml(l.delivery_address||'—') + '</td>'
+          + '<td style="text-align:right">' + (l.unit_price != null ? Number(l.unit_price).toFixed(4) : '—') + '</td>'
+          + '</tr>';
+      });
+      linesHtml += '</tbody></table></div>';
+    }
+    linesHtml += '</div>';
+
+    // ── Attachments ──
+    var attachHtml = '<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:600;margin-bottom:6px">📎 Attachments (' + attachments.length + ')</div>';
+    if(attachments.length === 0){
+      attachHtml += '<div class="hm-empty" style="font-size:11px">Không có attachment.</div>';
+    } else {
+      attachHtml += '<ul style="list-style:none;padding:0;margin:0">';
+      attachments.forEach(function(a){
+        attachHtml += '<li style="font-size:11px;padding:4px 0;border-bottom:1px solid var(--border-1,#e5e7eb)">'
+          + escHtml(a.original_filename||'') + ' <span style="color:var(--text-3,#6b7280)">— ' + (a.file_size_bytes ? Math.round(a.file_size_bytes/1024) + ' KB' : '') + ' · ' + escHtml(a.mime_type||'') + (a.pdf_text_chars ? ' · pdf_text=' + a.pdf_text_chars + ' chars' : '') + '</span>'
+          + '</li>';
+      });
+      attachHtml += '</ul>';
+    }
+    attachHtml += '</div>';
+
+    // ── Email ──
+    var emailHtml = '<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:600;margin-bottom:6px">📨 Email gốc</div>';
+    if(message && (message.from_email || message.subject)){
+      emailHtml += '<div style="font-size:11px;background:var(--surface-2,#f3f4f6);padding:10px;border-radius:6px">'
+        + '<div><b>From:</b> ' + escHtml(message.from_email||'—') + '</div>'
+        + '<div><b>Subject:</b> ' + escHtml(message.subject||'—') + '</div>'
+        + '<div><b>Received:</b> ' + fmtDt(message.received_at) + '</div>'
+        + (message.body_preview ? '<details style="margin-top:6px"><summary style="cursor:pointer;font-size:11px">▶ Body preview</summary><pre style="margin-top:6px;max-height:200px;overflow:auto;background:#fff;padding:8px;border-radius:4px;font-size:10px;white-space:pre-wrap">' + escHtml(message.body_preview) + '</pre></details>' : '')
+        + '</div>';
+    } else {
+      emailHtml += '<div class="hm-empty" style="font-size:11px">Không có thông tin email gốc.</div>';
+    }
+    emailHtml += '</div>';
+
+    // ── Validation checks ──
+    var checksHtml = '<div style="margin-bottom:14px"><details><summary style="cursor:pointer;font-size:12px;font-weight:600">✅ Validation checks (' + checks.length + ')</summary>';
+    if(checks.length === 0){
+      checksHtml += '<div class="hm-empty" style="font-size:11px;margin-top:6px">Chưa chạy validation. Bấm "Re-validate" bên dưới.</div>';
+    } else {
+      checksHtml += '<ul style="list-style:none;padding:0;margin:6px 0 0 0;font-size:11px">';
+      checks.forEach(function(ck){
+        var icon = ck.severity === 'blocker' ? '✗' : (ck.severity === 'warning' ? '⚠' : '✓');
+        var col  = ck.severity === 'blocker' ? '#dc2626' : (ck.severity === 'warning' ? '#f59e0b' : '#10b981');
+        checksHtml += '<li style="padding:3px 0;color:' + col + '">' + icon + ' <code>' + escHtml(ck.check_code||'') + '</code> — ' + escHtml(ck.message||'') + '</li>';
+      });
+      checksHtml += '</ul>';
+    }
+    checksHtml += '</details></div>';
+
+    bodyEl.innerHTML = header + linesHtml + attachHtml + emailHtml + checksHtml;
+
+    // ── Footer action buttons ──
+    var hasBlockers = blockers.length > 0;
+    var status = c.status || '';
+    var canApprove = !hasBlockers && !['security_hold','duplicate_hold','error','rejected','committed_cpo','committed_so'].includes(status);
+    var canCommitCpo = !hasBlockers && ['approved','commit_ready'].includes(status);
+    var canCommitSo  = !hasBlockers && ['approved','commit_ready','committed_cpo'].includes(status);
+
+    footerEl.innerHTML = '<button onclick="aeoi.caseRevalidate()" class="hm-btn hm-btn-sm">🔄 Re-validate</button>'
+      + '<button onclick="aeoi.caseReject()" class="hm-btn hm-btn-sm" style="color:#dc2626" ' + (['rejected','committed_cpo','committed_so'].includes(status) ? 'disabled' : '') + '>✗ Reject</button>'
+      + '<button onclick="aeoi.caseApprove()" class="hm-btn hm-btn-sm" style="background:#10b981;color:#fff;border:none" ' + (canApprove ? '' : 'disabled') + '>✓ Approve</button>'
+      + '<button onclick="aeoi.caseCommitCpo()" class="hm-btn hm-btn-sm" style="background:#2563eb;color:#fff;border:none" ' + (canCommitCpo ? '' : 'disabled') + '>📝 Commit CPO</button>'
+      + '<button onclick="aeoi.caseCommitSo()" class="hm-btn hm-btn-sm" style="background:#7c3aed;color:#fff;border:none" ' + (canCommitSo ? '' : 'disabled') + '>📝 Commit SO</button>';
+  }
+
   /* ── Mailbox provider-first wizard ─────────────────────────────────── */
   // WIZARD is a module-level state bag for the open mailbox wizard.
   // null when the wizard is closed.
@@ -1146,36 +1292,65 @@
 
   function _sectionCases(){
     var data = STATE.cases || { items:[], total:0, offset:0 };
-    // The full M2-orders ai-intake-queue view lives behind the template-demo
-    // page, which is admin-only. Only surface the link to users who can
-    // reach that page; otherwise the click would force a redirect to
-    // Dashboard with a "no permission" toast.
     var canOpenFullQueue = (typeof window.canUserAccessModule === 'function')
       ? !!window.canUserAccessModule('template-demo')
       : false;
+    // Status → colour map for badges (mirrors GPT Pro audit recommendation).
+    var statusColor = {
+      'new':                    {bg:'#f3f4f6', fg:'#374151'},
+      'extraction_pending':     {bg:'#f3f4f6', fg:'#374151'},
+      'extraction_running':     {bg:'#fef3c7', fg:'#92400e'},
+      'extracted':              {bg:'#dbeafe', fg:'#1e40af'},
+      'validation_pending':     {bg:'#fef3c7', fg:'#92400e'},
+      'validation_running':     {bg:'#fef3c7', fg:'#92400e'},
+      'needs_review':           {bg:'#fef3c7', fg:'#92400e'},
+      'engineering_review':     {bg:'#f5d0fe', fg:'#86198f'},
+      'commercial_review':      {bg:'#bfdbfe', fg:'#1e3a8a'},
+      'planning_review':        {bg:'#c7d2fe', fg:'#3730a3'},
+      'quality_review':         {bg:'#bbf7d0', fg:'#166534'},
+      'security_hold':          {bg:'#fee2e2', fg:'#991b1b'},
+      'duplicate_hold':         {bg:'#fed7aa', fg:'#9a3412'},
+      'approved':               {bg:'#d1fae5', fg:'#065f46'},
+      'commit_ready':           {bg:'#a7f3d0', fg:'#065f46'},
+      'committed_cpo':          {bg:'#6ee7b7', fg:'#064e3b'},
+      'committed_so':           {bg:'#6ee7b7', fg:'#064e3b'},
+      'rejected':               {bg:'#e5e7eb', fg:'#4b5563'},
+      'error':                  {bg:'#fee2e2', fg:'#991b1b'},
+    };
+    var statusBadge = function(s){
+      var c = statusColor[s] || {bg:'#f3f4f6', fg:'#374151'};
+      return '<span style="font-size:10px;padding:2px 8px;background:' + c.bg + ';color:' + c.fg + ';border-radius:10px;font-weight:600">' + escHtml(s) + '</span>';
+    };
     var html = '<div class="aeoi-card">'
-      + _cardHead('📦 Intake Cases', 'Các case đã tạo từ AI. ' + (canOpenFullQueue ? 'Tab "AI Intake Queue" trong M2-Orders module là nơi sales/planning xử lý chi tiết. Đây là view tổng quát của admin.' : 'Admin quản lý case trực tiếp tại đây. Full Queue view dành cho IT/dev.'))
-      + '<div style="display:flex;gap:8px;margin-bottom:10px">'
+      + _cardHead('📦 Intake Cases', 'Click vào hàng để mở chi tiết, duyệt/từ chối, hoặc commit thành Customer PO / Sales Order. ' + (canOpenFullQueue ? 'Tab "AI Intake Queue" trong M2-Orders là full view dành cho sales/planning.' : ''))
+      + '<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">'
       + '<button onclick="aeoi.loadCases(0)" class="hm-btn hm-btn-sm">🔄 Tải lại</button>'
       + (canOpenFullQueue
           ? '<button onclick="aeoi.openOrdersAiQueue()" class="hm-btn hm-btn-sm" style="background:var(--brand-primary,#2563eb);color:#fff;border:none">Mở Intake Queue đầy đủ →</button>'
           : '')
+      + '<span style="font-size:11px;color:var(--text-3,#6b7280);line-height:32px">' + data.total + ' case · ' + data.items.filter(function(c){return c.status==='needs_review'||c.status==='security_hold';}).length + ' cần xử lý</span>'
       + '</div>';
     if(data.items.length===0){
-      html += '<div class="hm-empty">Chưa có case nào.</div>';
+      html += '<div class="hm-empty">Chưa có case nào. Sau khi cron poll hoặc admin "Chạy ngay" → các email khớp allowlist sẽ thành case ở đây.</div>';
     } else {
       html += '<div class="aeoi-table-wrap"><table class="aeoi-table"><thead><tr>'
-        + '<th>#</th><th>Intake</th><th>Trạng thái</th><th>Khách</th><th>PO khách</th><th>Confidence</th><th>Tạo lúc</th>'
+        + '<th>#</th><th>Intake</th><th>Trạng thái</th><th>Khách</th><th>PO khách</th><th>Lines</th><th>Confidence</th><th>Tạo lúc</th><th>Hành động</th>'
         + '</tr></thead><tbody>';
       data.items.forEach(function(c,i){
-        html += '<tr>'
+        var blockerCount = Array.isArray(c.blocking_codes) ? c.blocking_codes.length : 0;
+        var warnCount    = Array.isArray(c.warning_codes)  ? c.warning_codes.length  : 0;
+        var flags = blockerCount > 0 ? '<span style="color:#dc2626;font-size:10px">✗' + blockerCount + '</span> ' : '';
+        flags += warnCount > 0 ? '<span style="color:#f59e0b;font-size:10px">⚠' + warnCount + '</span>' : '';
+        html += '<tr style="cursor:pointer" onclick="aeoi.openCaseDetail(' + c.id + ')">'
           + '<td>'+(data.offset+i+1)+'</td>'
-          + '<td style="font-family:monospace;font-weight:600">' + escHtml(c.intake_no) + '</td>'
-          + '<td><span style="font-size:10px;padding:1px 6px;background:var(--surface-2,#f3f4f6);border-radius:4px">' + escHtml(c.status) + '</span></td>'
-          + '<td>' + escHtml(c.customer_id||'—') + '</td>'
+          + '<td style="font-family:monospace;font-weight:600">' + escHtml(c.intake_no) + (flags ? ' ' + flags : '') + '</td>'
+          + '<td>' + statusBadge(c.status) + '</td>'
+          + '<td>' + escHtml(c.customer_id||'—') + (c.customer_name ? '<br><span style="font-size:10px;color:var(--text-3,#6b7280)">' + escHtml(c.customer_name) + '</span>' : '') + '</td>'
           + '<td style="font-family:monospace">' + escHtml(c.customer_po_number||'—') + '</td>'
+          + '<td style="text-align:center;font-size:11px">' + (c.line_count || 0) + (c.attachment_count ? ' · ' + c.attachment_count + ' 📎' : '') + '</td>'
           + '<td style="text-align:right">' + (c.overall_confidence!=null ? Number(c.overall_confidence).toFixed(2) : '—') + '</td>'
           + '<td style="font-size:11px">' + fmtDt(c.created_at) + '</td>'
+          + '<td onclick="event.stopPropagation()"><button onclick="aeoi.openCaseDetail(' + c.id + ')" class="hm-btn hm-btn-xs" style="background:var(--brand-primary,#2563eb);color:#fff">📂 Mở</button></td>'
           + '</tr>';
       });
       html += '</tbody></table></div>';
@@ -1987,6 +2162,103 @@
           STATE.cases = {items:[], total:0, offset:0};
         }
         _refreshSection();
+      });
+    },
+
+    /* Case detail + action methods (P1 — order review UI) */
+    openCaseDetail: function(caseId){
+      var el = document.getElementById('aeoi-case-modal');
+      if(!el){
+        document.body.insertAdjacentHTML('beforeend', _caseDetailModal());
+        el = document.getElementById('aeoi-case-modal');
+      }
+      el.style.display = 'flex';
+      CASE_DETAIL = { id: caseId, case:null, lines:[], attachments:[], checks:[], message:{}, loading:true };
+      _renderCaseDetail();
+      // Fetch fresh detail
+      apiCall('ai_order_intake_case_detail', {id: caseId}, function(res){
+        if(!res || !res.ok){
+          var bodyEl = document.getElementById('aeoi-case-body');
+          if(bodyEl) bodyEl.innerHTML = '<div style="color:#dc2626">Lỗi tải case: ' + escHtml(res && res.error || 'unknown') + '</div>';
+          return;
+        }
+        // The detail endpoint returns { case, lines, attachments, checks, message } OR a nested 'detail' object.
+        var d = res.detail || res;
+        CASE_DETAIL = {
+          id: caseId,
+          case:        d.case        || d,           // some installs return flat
+          lines:       d.lines       || d.case_lines || [],
+          attachments: d.attachments || [],
+          checks:      d.checks      || d.validation_checks || [],
+          message:     d.message     || d.email_message || {},
+          loading:     false,
+        };
+        _renderCaseDetail();
+      });
+    },
+    closeCaseDetail: function(){
+      var el = document.getElementById('aeoi-case-modal');
+      if(el) el.style.display = 'none';
+      CASE_DETAIL = null;
+    },
+    caseRevalidate: function(){
+      if(!CASE_DETAIL || !CASE_DETAIL.id) return;
+      var id = CASE_DETAIL.id;
+      apiCall('ai_order_intake_case_validate', {id: id}, function(res){
+        if(!res || !res.ok){ alert('Validation lỗi: ' + (res && res.error || 'unknown') + (res && res.detail ? '\n' + res.detail : '')); return; }
+        // Reload detail + parent list
+        aeoi.openCaseDetail(id);
+        aeoi.loadCases(0);
+      });
+    },
+    caseApprove: function(){
+      if(!CASE_DETAIL || !CASE_DETAIL.case) return;
+      var c = CASE_DETAIL.case;
+      var warnings = Array.isArray(c.warning_codes) ? c.warning_codes : [];
+      var reason = '';
+      if(warnings.length > 0){
+        reason = prompt('Có ' + warnings.length + ' warning. Nhập lý do approve (bắt buộc):\n\n' + warnings.join(', '));
+        if(reason == null || reason.trim() === ''){ return; }
+      } else {
+        reason = prompt('Approve case ' + c.intake_no + ' — lý do (tùy chọn):', '') || '';
+      }
+      apiCall('ai_order_intake_case_approve', {id: c.id, reason: reason}, function(res){
+        if(!res || !res.ok){ alert('Approve lỗi: ' + (res && res.error || 'unknown') + (res && res.detail ? '\n' + res.detail : '')); return; }
+        aeoi.openCaseDetail(c.id);
+        aeoi.loadCases(0);
+      });
+    },
+    caseReject: function(){
+      if(!CASE_DETAIL || !CASE_DETAIL.case) return;
+      var c = CASE_DETAIL.case;
+      var reason = prompt('Reject case ' + c.intake_no + ' — lý do:', '');
+      if(reason == null || reason.trim() === ''){ return; }
+      apiCall('ai_order_intake_case_reject', {id: c.id, reason: reason}, function(res){
+        if(!res || !res.ok){ alert('Reject lỗi: ' + (res && res.error || 'unknown')); return; }
+        aeoi.openCaseDetail(c.id);
+        aeoi.loadCases(0);
+      });
+    },
+    caseCommitCpo: function(){
+      if(!CASE_DETAIL || !CASE_DETAIL.case) return;
+      var c = CASE_DETAIL.case;
+      if(!confirm('Commit Customer PO từ case ' + c.intake_no + '?\n\nCPO sẽ được tạo trong master data. Không thể hoàn tác.')) return;
+      apiCall('ai_order_intake_commit_cpo', {id: c.id}, function(res){
+        if(!res || !res.ok){ alert('Commit CPO lỗi: ' + (res && res.error || 'unknown') + (res && res.detail ? '\n' + res.detail : '')); return; }
+        alert('✓ Customer PO đã được tạo. ID: ' + (res.customer_po && (res.customer_po.customer_po_id || res.customer_po.id) || '(see master data)'));
+        aeoi.openCaseDetail(c.id);
+        aeoi.loadCases(0);
+      });
+    },
+    caseCommitSo: function(){
+      if(!CASE_DETAIL || !CASE_DETAIL.case) return;
+      var c = CASE_DETAIL.case;
+      if(!confirm('Commit Sales Order từ case ' + c.intake_no + '?\n\nSO sẽ được tạo qua workflow Orders. Yêu cầu mỗi line có part_number + revision_number + quantity > 0.')) return;
+      apiCall('ai_order_intake_commit_so', {id: c.id}, function(res){
+        if(!res || !res.ok){ alert('Commit SO lỗi: ' + (res && res.error || 'unknown') + (res && res.detail ? '\n' + res.detail : '')); return; }
+        alert('✓ Sales Order đã được tạo. SO number: ' + (res.sales_order && res.sales_order.so_number || '(see Orders module)'));
+        aeoi.openCaseDetail(c.id);
+        aeoi.loadCases(0);
       });
     },
   };
