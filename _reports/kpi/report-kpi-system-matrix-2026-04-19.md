@@ -1,6 +1,6 @@
 # KPI System Matrix Audit
 
-Generated: 2026-05-27T05:11:36+00:00
+Generated: 2026-05-27T05:33:59+00:00
 
 ## Summary
 
@@ -39,20 +39,20 @@ Luật change-control: mọi lần tạo KPI/metric, đổi tên, đổi target/
 
 | Code | Class | Docs | Uses | Target | Backend/statistical plan | Target consistency | Name consistency |
 |---|---|---:|---:|---|---|---|---|
-| `OTD` | executive_scorecard_kpi | 73 | 201 | ≥95% | runtime_calculated_with_registry_contract | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
-| `FPY` | executive_scorecard_kpi | 29 | 41 | ≥98% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
-| `COPQ` | executive_scorecard_kpi | 22 | 33 | ≤2 percent_of_sales | manual_governed_with_evidence_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
+| `OTD` | executive_scorecard_kpi | 74 | 202 | ≥95% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
+| `FPY` | executive_scorecard_kpi | 29 | 42 | ≥98% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
+| `COPQ` | executive_scorecard_kpi | 22 | 34 | ≤2 percent_of_sales | manual_governed_with_evidence_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
 | `OEE` | gate_control_metric | 21 | 47 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `MTTR` | operating_metric | 9 | 12 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `WIP_AGING` | executive_scorecard_kpi | 9 | 12 | ≤5 aged_wip_percent | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
 | `CAPA_EFFECTIVENESS` | operating_metric | 9 | 11 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `WIP_AGING` | executive_scorecard_kpi | 8 | 11 | ≤5 aged_wip_percent | runtime_calculated_with_registry_contract | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
-| `PLAN_ADHERENCE` | executive_scorecard_kpi | 7 | 13 | ≥90% | runtime_calculated_with_registry_contract | target_seen_needs_review_against_registry | canonical_or_mapped_name |
-| `COMPLAINT_RATE` | executive_scorecard_kpi | 6 | 31 | ≤1 complaints_per_100_shipments | manual_governed_with_evidence_contract | registered_target_not_repeated_in_docs | legacy_alias_seen |
+| `COMPLAINT_RATE` | executive_scorecard_kpi | 7 | 32 | ≤1 complaints_per_100_shipments | manual_governed_with_evidence_contract | target_seen_matches_registry_number | legacy_alias_seen |
+| `PLAN_ADHERENCE` | executive_scorecard_kpi | 7 | 14 | ≥90% | runtime_calculated_with_registry_contract | target_seen_needs_review_against_registry | canonical_or_mapped_name |
 | `FAI_FIRST_PASS` | operating_metric | 6 | 12 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CMM_QUEUE_AGING` | gate_control_metric | 6 | 8 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `IN_PROCESS_REJECT_RATE` | operating_metric | 5 | 7 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `MATERIAL_AVAILABILITY_PLAN` | executive_scorecard_kpi | 5 | 7 | ≥95% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
 | `IPQC_CHARACTERISTIC_COMPLETENESS` | gate_control_metric | 4 | 6 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `MATERIAL_AVAILABILITY_PLAN` | executive_scorecard_kpi | 4 | 6 | ≥95% | runtime_calculated_with_registry_contract | registered_target_not_repeated_in_docs | canonical_or_mapped_name |
 | `OEE_BOTTLENECK` | operating_metric | 4 | 6 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CONSTRAINT_LOST_HOURS` | operating_metric | 4 | 5 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `QC_HOLD_SLA` | operating_metric | 4 | 5 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |

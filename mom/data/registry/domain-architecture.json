@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-05-27T04:52:23.629Z",
+    "generatedAt": "2026-05-27T06:14:24.992Z",
     "domainCount": 49,
-    "tableCount": 880,
+    "tableCount": 889,
     "description": "Domain architecture map for HESEM QMS Portal aligned to SAP, Epicor, IFS, Oracle, and Dynamics patterns.",
     "researchReferences": [
       {
@@ -2665,12 +2665,21 @@
         "data_collection_state",
         "domain_outbox_events",
         "duplicate_detection_fingerprints",
+        "email_intake_attachment",
+        "email_intake_case",
+        "email_intake_case_line",
+        "email_intake_commit_log",
         "email_intake_config",
+        "email_intake_customer_template",
         "email_intake_extraction",
+        "email_intake_header_rule",
+        "email_intake_mailbox",
         "email_intake_message",
         "email_intake_poll_run",
         "email_intake_quarantine",
         "email_intake_sender_allowlist",
+        "email_intake_validation_check",
+        "email_intake_worker_token",
         "escalation_log",
         "escalation_rules",
         "file_attachments",
@@ -2705,6 +2714,9 @@
       ],
       "primaryWorkflows": [
         "wf_background_job",
+        "wf_email_intake_attachment",
+        "wf_email_intake_case",
+        "wf_email_intake_mailbox",
         "wf_email_intake_message",
         "wf_email_intake_poll_run",
         "wf_graphics_rollout_scope",

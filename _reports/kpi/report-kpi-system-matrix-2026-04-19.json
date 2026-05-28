@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-05-27T05:11:36+00:00",
+    "generated_at": "2026-05-27T05:33:59+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-25+p11",
@@ -58,9 +58,14 @@
                 "red_below": 90
             },
             "expected_target_text": "≥95%",
-            "total_occurrences": 201,
-            "documents_count": 73,
-            "target_values_seen": [],
+            "total_occurrences": 202,
+            "documents_count": 74,
+            "target_values_seen": [
+                "<90%",
+                "red <90%",
+                "yellow 90",
+                "≥95%"
+            ],
             "documents": [
                 {
                     "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
@@ -1139,7 +1144,7 @@
                 "red_below": 95
             },
             "expected_target_text": "≥98%",
-            "total_occurrences": 41,
+            "total_occurrences": 42,
             "documents_count": 29,
             "target_values_seen": [
                 "<95%",
@@ -1333,25 +1338,6 @@
                     "context_fit": {
                         "status": "ok",
                         "reason": "Context acceptable or informational."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html",
-                    "title": "ANNEX-125 - CNC Hệ điều hành hiệu suất | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "FPY"
-                    ],
-                    "target_values_seen": [
-                        "<95%",
-                        "red <95%",
-                        "yellow 95",
-                        "≥98%"
-                    ],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
                     }
                 },
                 {
@@ -1775,24 +1761,6 @@
                         "COPQ"
                     ],
                     "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html",
-                    "title": "ANNEX-125 - CNC Hệ điều hành hiệu suất | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "COPQ"
-                    ],
-                    "target_values_seen": [
-                        ">4%",
-                        "red >4%",
-                        "≤2%"
-                    ],
                     "context_fit": {
                         "status": "ok",
                         "reason": "Authority or scorecard document."
@@ -2438,6 +2406,182 @@
             "name_consistency": "canonical_or_mapped_name"
         },
         {
+            "code": "WIP_AGING",
+            "display_name": "WIP Aging",
+            "classification": "executive_scorecard_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "annex122_governance_kpis",
+                "dashboard_core_kpis",
+                "scorecard_operating_model",
+                "scorecard_evidence_contracts",
+                "metric_governance_overrides"
+            ],
+            "aliases": [],
+            "local_ids": [
+                "BSC-CORE-06"
+            ],
+            "backend_status": "runtime_calculated",
+            "scorecard_weight_pct": 12,
+            "scorecard_target": 5,
+            "scorecard_unit": "aged_wip_percent",
+            "scorecard_scoring_status": "active_runtime",
+            "scorecard_contributes_to_reward": true,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract",
+            "expected_thresholds": {
+                "stretch_max": 2,
+                "green_max": 5,
+                "yellow_max": 10,
+                "red_above": 10
+            },
+            "expected_target_text": "≤5 aged_wip_percent",
+            "total_occurrences": 12,
+            "documents_count": 9,
+            "target_values_seen": [
+                ">10%",
+                "red >10%",
+                "≤5%"
+            ],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-126-hoshin-strategy-deployment-and-catchball.html",
+                    "title": "ANNEX-126 - Hoshin Strategy triển khai và Catchball | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "WIP AGING",
+                        "WIP_AGING"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-129-bsc-kpi-operating-mechanism-assessment.html",
+                    "title": "ANNEX-129 - BSC và KPI Cơ chế vận hành đánh giá | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "WIP AGING",
+                        "WIP_AGING"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html",
+                    "title": "WI-202 - Điều hành hằng ngày, họp tầng, KPI và leo thang xử lý | HESEM MOM",
+                    "bucket": "work_instructions",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "WIP AGING",
+                        "WIP_AGING"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html",
+                    "title": "ANNEX-119 - Lộ trình thay đổi và Sổ đăng ký ưu tiên | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "WIP AGING"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - Từ điển KPI phân tầng | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "WIP_AGING"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html",
+                    "title": "ANNEX-125 - CNC Hệ điều hành hiệu suất | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "WIP_AGING"
+                    ],
+                    "target_values_seen": [
+                        ">10%",
+                        "red >10%",
+                        "≤5%"
+                    ],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-127-kpi-authority-registry-and-operational-metrics.html",
+                    "title": "ANNEX-127 - KPI Sổ đăng ký thẩm quyền và Chỉ số vận hành | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "WIP_AGING"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html",
+                    "title": "ANNEX-135 - Sơ đồ lưu hồ sơ tác nghiệp theo phòng ban, vai trò và job | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "WIP AGING"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html",
+                    "title": "SOP-501 - Production Planning Scheduling và điều độ kiểm soát | HESEM MOM",
+                    "bucket": "sops",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "WIP AGING"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "target_seen_matches_registry_number",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
             "code": "CAPA_EFFECTIVENESS",
             "display_name": "CAPA effectiveness after verification window",
             "classification": "operating_metric",
@@ -2592,47 +2736,52 @@
             "name_consistency": "canonical_or_mapped_name"
         },
         {
-            "code": "WIP_AGING",
-            "display_name": "WIP Aging",
+            "code": "COMPLAINT_RATE",
+            "display_name": "Customer Complaint / Escape Rate",
             "classification": "executive_scorecard_kpi",
             "registry_sources": [
                 "runtime_calculated_metrics",
+                "legacy_aliases",
                 "annex122_governance_kpis",
                 "dashboard_core_kpis",
                 "scorecard_operating_model",
                 "scorecard_evidence_contracts",
                 "metric_governance_overrides"
             ],
-            "aliases": [],
-            "local_ids": [
-                "BSC-CORE-06"
+            "aliases": [
+                "CCR",
+                "CUSTOMER_COMPLAINT_RATE"
             ],
-            "backend_status": "runtime_calculated",
-            "scorecard_weight_pct": 12,
-            "scorecard_target": 5,
-            "scorecard_unit": "aged_wip_percent",
-            "scorecard_scoring_status": "active_runtime",
+            "local_ids": [
+                "BSC-CORE-02"
+            ],
+            "backend_status": "manual_governed",
+            "scorecard_weight_pct": 14,
+            "scorecard_target": 1,
+            "scorecard_unit": "complaints_per_100_shipments",
+            "scorecard_scoring_status": "manual_governed",
             "scorecard_contributes_to_reward": true,
-            "statistical_plan_status": "runtime_calculated_with_registry_contract",
+            "statistical_plan_status": "manual_governed_with_evidence_contract",
             "expected_thresholds": {
-                "stretch_max": 2,
-                "green_max": 5,
-                "yellow_max": 10,
-                "red_above": 10
+                "stretch_max": 0,
+                "green_max": 1,
+                "yellow_max": 2,
+                "red_above": 2
             },
-            "expected_target_text": "≤5 aged_wip_percent",
-            "total_occurrences": 11,
-            "documents_count": 8,
-            "target_values_seen": [],
+            "expected_target_text": "≤1 complaints_per_100_shipments",
+            "total_occurrences": 32,
+            "documents_count": 7,
+            "target_values_seen": [
+                "≤1"
+            ],
             "documents": [
                 {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-126-hoshin-strategy-deployment-and-catchball.html",
-                    "title": "ANNEX-126 - Hoshin Strategy triển khai và Catchball | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 2,
+                    "path": "mom/docs/system/organization/04-RACI-Authority/authority-matrix.html",
+                    "title": "Ma trận thẩm quyền | HESEM MOM",
+                    "bucket": "raci_authority",
+                    "occurrences": 14,
                     "matched_terms": [
-                        "WIP AGING",
-                        "WIP_AGING"
+                        "CCR"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -2641,70 +2790,27 @@
                     }
                 },
                 {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-129-bsc-kpi-operating-mechanism-assessment.html",
-                    "title": "ANNEX-129 - BSC và KPI Cơ chế vận hành đánh giá | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 2,
+                    "path": "mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html",
+                    "title": "Ma trận RACI tổng thể | HESEM MOM",
+                    "bucket": "raci_authority",
+                    "occurrences": 7,
                     "matched_terms": [
-                        "WIP AGING",
-                        "WIP_AGING"
+                        "CCR"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
                         "status": "ok",
                         "reason": "Context acceptable or informational."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html",
-                    "title": "WI-202 - Điều hành hằng ngày, họp tầng, KPI và leo thang xử lý | HESEM MOM",
-                    "bucket": "work_instructions",
-                    "occurrences": 2,
-                    "matched_terms": [
-                        "WIP AGING",
-                        "WIP_AGING"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Context acceptable or informational."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html",
-                    "title": "ANNEX-119 - Lộ trình thay đổi và Sổ đăng ký ưu tiên | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "WIP AGING"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Context acceptable or informational."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - Từ điển KPI phân tầng | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "WIP_AGING"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
                     }
                 },
                 {
                     "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-127-kpi-authority-registry-and-operational-metrics.html",
                     "title": "ANNEX-127 - KPI Sổ đăng ký thẩm quyền và Chỉ số vận hành | HESEM MOM",
                     "bucket": "annex_references",
-                    "occurrences": 1,
+                    "occurrences": 5,
                     "matched_terms": [
-                        "WIP_AGING"
+                        "CCR",
+                        "COMPLAINT_RATE"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -2713,12 +2819,26 @@
                     }
                 },
                 {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html",
-                    "title": "ANNEX-135 - Sơ đồ lưu hồ sơ tác nghiệp theo phòng ban, vai trò và job | HESEM MOM",
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - Từ điển KPI phân tầng | HESEM MOM",
                     "bucket": "annex_references",
-                    "occurrences": 1,
+                    "occurrences": 2,
                     "matched_terms": [
-                        "WIP AGING"
+                        "COMPLAINT_RATE"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html",
+                    "title": "SOP-201 - Order Fulfillment RFQ to Cash | HESEM MOM",
+                    "bucket": "sops",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "CCR"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -2727,12 +2847,28 @@
                     }
                 },
                 {
-                    "path": "mom/docs/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html",
-                    "title": "SOP-501 - Production Planning Scheduling và điều độ kiểm soát | HESEM MOM",
-                    "bucket": "sops",
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html",
+                    "title": "ANNEX-125 - CNC Hệ điều hành hiệu suất | HESEM MOM",
+                    "bucket": "annex_references",
                     "occurrences": 1,
                     "matched_terms": [
-                        "WIP AGING"
+                        "COMPLAINT_RATE"
+                    ],
+                    "target_values_seen": [
+                        "≤1"
+                    ],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-129-bsc-kpi-operating-mechanism-assessment.html",
+                    "title": "ANNEX-129 - BSC và KPI Cơ chế vận hành đánh giá | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "COMPLAINT_RATE"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -2741,9 +2877,11 @@
                     }
                 }
             ],
-            "finding_codes": [],
-            "target_consistency": "registered_target_not_repeated_in_docs",
-            "name_consistency": "canonical_or_mapped_name"
+            "finding_codes": [
+                "LEGACY_ALIAS_USED"
+            ],
+            "target_consistency": "target_seen_matches_registry_number",
+            "name_consistency": "legacy_alias_seen"
         },
         {
             "code": "PLAN_ADHERENCE",
@@ -2775,7 +2913,7 @@
                 "red_below": 80
             },
             "expected_target_text": "≥90%",
-            "total_occurrences": 13,
+            "total_occurrences": 14,
             "documents_count": 7,
             "target_values_seen": [
                 "<80%",
@@ -2796,20 +2934,6 @@
                     "context_fit": {
                         "status": "ok",
                         "reason": "Authority or scorecard document."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html",
-                    "title": "ANNEX-119 - Lộ trình thay đổi và Sổ đăng ký ưu tiên | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "PLAN ADHERENCE"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Context acceptable or informational."
                     }
                 },
                 {
@@ -2907,138 +3031,6 @@
             ],
             "target_consistency": "target_seen_needs_review_against_registry",
             "name_consistency": "canonical_or_mapped_name"
-        },
-        {
-            "code": "COMPLAINT_RATE",
-            "display_name": "Customer Complaint / Escape Rate",
-            "classification": "executive_scorecard_kpi",
-            "registry_sources": [
-                "runtime_calculated_metrics",
-                "legacy_aliases",
-                "annex122_governance_kpis",
-                "dashboard_core_kpis",
-                "scorecard_operating_model",
-                "scorecard_evidence_contracts",
-                "metric_governance_overrides"
-            ],
-            "aliases": [
-                "CCR",
-                "CUSTOMER_COMPLAINT_RATE"
-            ],
-            "local_ids": [
-                "BSC-CORE-02"
-            ],
-            "backend_status": "manual_governed",
-            "scorecard_weight_pct": 14,
-            "scorecard_target": 1,
-            "scorecard_unit": "complaints_per_100_shipments",
-            "scorecard_scoring_status": "manual_governed",
-            "scorecard_contributes_to_reward": true,
-            "statistical_plan_status": "manual_governed_with_evidence_contract",
-            "expected_thresholds": {
-                "stretch_max": 0,
-                "green_max": 1,
-                "yellow_max": 2,
-                "red_above": 2
-            },
-            "expected_target_text": "≤1 complaints_per_100_shipments",
-            "total_occurrences": 31,
-            "documents_count": 6,
-            "target_values_seen": [
-                "≤1"
-            ],
-            "documents": [
-                {
-                    "path": "mom/docs/system/organization/04-RACI-Authority/authority-matrix.html",
-                    "title": "Ma trận thẩm quyền | HESEM MOM",
-                    "bucket": "raci_authority",
-                    "occurrences": 14,
-                    "matched_terms": [
-                        "CCR"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Context acceptable or informational."
-                    }
-                },
-                {
-                    "path": "mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html",
-                    "title": "Ma trận RACI tổng thể | HESEM MOM",
-                    "bucket": "raci_authority",
-                    "occurrences": 7,
-                    "matched_terms": [
-                        "CCR"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Context acceptable or informational."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-127-kpi-authority-registry-and-operational-metrics.html",
-                    "title": "ANNEX-127 - KPI Sổ đăng ký thẩm quyền và Chỉ số vận hành | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 5,
-                    "matched_terms": [
-                        "CCR",
-                        "COMPLAINT_RATE"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - Từ điển KPI phân tầng | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 2,
-                    "matched_terms": [
-                        "COMPLAINT_RATE"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html",
-                    "title": "SOP-201 - Order Fulfillment RFQ to Cash | HESEM MOM",
-                    "bucket": "sops",
-                    "occurrences": 2,
-                    "matched_terms": [
-                        "CCR"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Context acceptable or informational."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-129-bsc-kpi-operating-mechanism-assessment.html",
-                    "title": "ANNEX-129 - BSC và KPI Cơ chế vận hành đánh giá | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "COMPLAINT_RATE"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Context acceptable or informational."
-                    }
-                }
-            ],
-            "finding_codes": [
-                "LEGACY_ALIAS_USED"
-            ],
-            "target_consistency": "target_seen_matches_registry_number",
-            "name_consistency": "legacy_alias_seen"
         },
         {
             "code": "FAI_FIRST_PASS",
@@ -3381,6 +3373,123 @@
             "name_consistency": "canonical_or_mapped_name"
         },
         {
+            "code": "MATERIAL_AVAILABILITY_PLAN",
+            "display_name": "Material Availability for Plan",
+            "classification": "executive_scorecard_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "annex122_governance_kpis",
+                "dashboard_core_kpis",
+                "scorecard_operating_model",
+                "scorecard_evidence_contracts",
+                "metric_governance_overrides"
+            ],
+            "aliases": [],
+            "local_ids": [
+                "BSC-CORE-07"
+            ],
+            "backend_status": "runtime_calculated",
+            "scorecard_weight_pct": 14,
+            "scorecard_target": 95,
+            "scorecard_unit": "percent",
+            "scorecard_scoring_status": "active_runtime",
+            "scorecard_contributes_to_reward": true,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract",
+            "expected_thresholds": {
+                "stretch_min": 95,
+                "green_min": 95,
+                "yellow_min": 85,
+                "red_below": 85
+            },
+            "expected_target_text": "≥95%",
+            "total_occurrences": 7,
+            "documents_count": 5,
+            "target_values_seen": [
+                "<85%",
+                "red <85%",
+                "≥95%"
+            ],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - Từ điển KPI phân tầng | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 3,
+                    "matched_terms": [
+                        "MATERIAL_AVAILABILITY_PLAN"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html",
+                    "title": "ANNEX-125 - CNC Hệ điều hành hiệu suất | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "MATERIAL_AVAILABILITY_PLAN"
+                    ],
+                    "target_values_seen": [
+                        "<85%",
+                        "red <85%",
+                        "≥95%"
+                    ],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-127-kpi-authority-registry-and-operational-metrics.html",
+                    "title": "ANNEX-127 - KPI Sổ đăng ký thẩm quyền và Chỉ số vận hành | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "MATERIAL_AVAILABILITY_PLAN"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-129-bsc-kpi-operating-mechanism-assessment.html",
+                    "title": "ANNEX-129 - BSC và KPI Cơ chế vận hành đánh giá | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "MATERIAL_AVAILABILITY_PLAN"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html",
+                    "title": "WI-202 - Điều hành hằng ngày, họp tầng, KPI và leo thang xử lý | HESEM MOM",
+                    "bucket": "work_instructions",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "MATERIAL_AVAILABILITY_PLAN"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "target_seen_matches_registry_number",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
             "code": "IPQC_CHARACTERISTIC_COMPLETENESS",
             "display_name": "IPQC Characteristic Completeness",
             "classification": "gate_control_metric",
@@ -3464,101 +3573,6 @@
             ],
             "finding_codes": [],
             "target_consistency": "no_registered_target_no_local_target",
-            "name_consistency": "canonical_or_mapped_name"
-        },
-        {
-            "code": "MATERIAL_AVAILABILITY_PLAN",
-            "display_name": "Material Availability for Plan",
-            "classification": "executive_scorecard_kpi",
-            "registry_sources": [
-                "runtime_calculated_metrics",
-                "annex122_governance_kpis",
-                "dashboard_core_kpis",
-                "scorecard_operating_model",
-                "scorecard_evidence_contracts",
-                "metric_governance_overrides"
-            ],
-            "aliases": [],
-            "local_ids": [
-                "BSC-CORE-07"
-            ],
-            "backend_status": "runtime_calculated",
-            "scorecard_weight_pct": 14,
-            "scorecard_target": 95,
-            "scorecard_unit": "percent",
-            "scorecard_scoring_status": "active_runtime",
-            "scorecard_contributes_to_reward": true,
-            "statistical_plan_status": "runtime_calculated_with_registry_contract",
-            "expected_thresholds": {
-                "stretch_min": 95,
-                "green_min": 95,
-                "yellow_min": 85,
-                "red_below": 85
-            },
-            "expected_target_text": "≥95%",
-            "total_occurrences": 6,
-            "documents_count": 4,
-            "target_values_seen": [],
-            "documents": [
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - Từ điển KPI phân tầng | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 3,
-                    "matched_terms": [
-                        "MATERIAL_AVAILABILITY_PLAN"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-127-kpi-authority-registry-and-operational-metrics.html",
-                    "title": "ANNEX-127 - KPI Sổ đăng ký thẩm quyền và Chỉ số vận hành | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "MATERIAL_AVAILABILITY_PLAN"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-129-bsc-kpi-operating-mechanism-assessment.html",
-                    "title": "ANNEX-129 - BSC và KPI Cơ chế vận hành đánh giá | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "MATERIAL_AVAILABILITY_PLAN"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Context acceptable or informational."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html",
-                    "title": "WI-202 - Điều hành hằng ngày, họp tầng, KPI và leo thang xử lý | HESEM MOM",
-                    "bucket": "work_instructions",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "MATERIAL_AVAILABILITY_PLAN"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Context acceptable or informational."
-                    }
-                }
-            ],
-            "finding_codes": [],
-            "target_consistency": "registered_target_not_repeated_in_docs",
             "name_consistency": "canonical_or_mapped_name"
         },
         {
@@ -20135,8 +20149,8 @@
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html",
             "title": "ANNEX-125 - CNC Hệ điều hành hiệu suất | HESEM MOM",
             "bucket": "annex_references",
-            "metrics_count": 28,
-            "total_metric_occurrences": 30,
+            "metrics_count": 32,
+            "total_metric_occurrences": 37,
             "metrics": [
                 {
                     "code": "CMM_QUEUE_AGING",
@@ -20218,6 +20232,31 @@
                     "row_snippets": []
                 },
                 {
+                    "code": "PLAN_ADHERENCE",
+                    "display_name": "Plan Adherence / Dispatch Stability",
+                    "classification": "executive_scorecard_kpi",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "PLAN ADHERENCE",
+                        "PLAN_ADHERENCE"
+                    ],
+                    "target_values_seen": [
+                        "<80%",
+                        "red <80%",
+                        "≥90%"
+                    ],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    },
+                    "row_snippets": [
+                        {
+                            "row_index": 6,
+                            "snippet": "PLAN_ADHERENCE 14% active_runtime ≥90%; red <80% PPL/PD; job_orders plan adherence bằng chứng lệnh gấp gaming hoặc unapproved resequence blocks recognition."
+                        }
+                    ]
+                },
+                {
                     "code": "BOTTLENECK_BUFFER_STATUS",
                     "display_name": "Constraint buffer red/yellow/green status",
                     "classification": "operating_metric",
@@ -20253,6 +20292,28 @@
                     ]
                 },
                 {
+                    "code": "COMPLAINT_RATE",
+                    "display_name": "Customer Complaint / Escape Rate",
+                    "classification": "executive_scorecard_kpi",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "COMPLAINT_RATE"
+                    ],
+                    "target_values_seen": [
+                        "≤1"
+                    ],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    },
+                    "row_snippets": [
+                        {
+                            "row_index": 3,
+                            "snippet": "COMPLAINT_RATE 14% manual_governed ≤1 khiếu nại/100 lô giao hàng hoặc theo ppm contract đã được phê duyệt; có customer escape thì mặc định là đỏ QA/CS; hồ sơ complaint EQMS + bằng chứng containment Containment quá hạn hoặc customer escape sẽ chặn ghi nhận."
+                        }
+                    ]
+                },
+                {
                     "code": "CONSTRAINT_LOST_HOURS",
                     "display_name": "Lost available hours at current constraint",
                     "classification": "operating_metric",
@@ -20281,30 +20342,6 @@
                         "reason": "Authority or scorecard document."
                     },
                     "row_snippets": []
-                },
-                {
-                    "code": "COPQ",
-                    "display_name": "Cost of Poor Quality",
-                    "classification": "executive_scorecard_kpi",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "COPQ"
-                    ],
-                    "target_values_seen": [
-                        ">4%",
-                        "red >4%",
-                        "≤2%"
-                    ],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    },
-                    "row_snippets": [
-                        {
-                            "row_index": 5,
-                            "snippet": "COPQ 14% manual_governed ≤2% sales; red >4% QA/Finance; COPQ cost buckets + sales close Cost exclusion hoặc repeat NCR red blocks recognition."
-                        }
-                    ]
                 },
                 {
                     "code": "CRITICAL_ROLE_BACKUP_COVERAGE",
@@ -20425,31 +20462,6 @@
                         "reason": "Authority or scorecard document."
                     },
                     "row_snippets": []
-                },
-                {
-                    "code": "FPY",
-                    "display_name": "First Pass Yield",
-                    "classification": "executive_scorecard_kpi",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "FPY"
-                    ],
-                    "target_values_seen": [
-                        "<95%",
-                        "red <95%",
-                        "yellow 95",
-                        "≥98%"
-                    ],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    },
-                    "row_snippets": [
-                        {
-                            "row_index": 4,
-                            "snippet": "FPY 14% active_runtime ≥98%; yellow 95-97.99%; red <95% QA/OPS; tập lô kiểm đạt ngay lần đầu Inspection bypass hoặc khách hàng escape blocks recognition."
-                        }
-                    ]
                 },
                 {
                     "code": "GAGE_VALID_FOR_RELEASE",
@@ -20610,8 +20622,8 @@
                     },
                     "row_snippets": [
                         {
-                            "row_index": 6,
-                            "snippet": "PLAN_ADHERENCE 14% active_runtime ≥90%; red <80% PPL/PD; job_orders plan adherence bằng chứng lệnh gấp gaming hoặc unapproved resequence blocks recognition."
+                            "row_index": 2,
+                            "snippet": "OTD 18% active_runtime ≥95%; yellow 90-94.99%; red <90% PD/CS; giao hàng + được phê duyệt promise date Eligible only when complaint, FPY và giao hàng-bộ hồ sơ blockers are clean."
                         }
                     ]
                 },
