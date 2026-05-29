@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 844,
-        "generated_at": "2026-05-29T09:50:24+00:00"
+        "table_count": 850,
+        "generated_at": "2026-05-29T10:03:14+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -6326,6 +6326,48 @@
                     "ref": "users(user_id)"
                 }
             ],
+            "contract": null
+        },
+        "mda_ai_action_firewall_event": {
+            "defined_in": "242_mda_security_boundary_authority.sql",
+            "extended_in": [],
+            "primary_key": "mda_ai_action_firewall_event_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "mda_field_redaction_policy": {
+            "defined_in": "242_mda_security_boundary_authority.sql",
+            "extended_in": [],
+            "primary_key": "mda_field_redaction_policy_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "mda_ot_signal_trust_policy": {
+            "defined_in": "242_mda_security_boundary_authority.sql",
+            "extended_in": [],
+            "primary_key": "mda_ot_signal_trust_policy_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "mda_security_boundary_decision": {
+            "defined_in": "242_mda_security_boundary_authority.sql",
+            "extended_in": [],
+            "primary_key": "mda_security_boundary_decision_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "mda_security_boundary_policy": {
+            "defined_in": "242_mda_security_boundary_authority.sql",
+            "extended_in": [],
+            "primary_key": "mda_security_boundary_policy_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "mda_sod_exception_authority": {
+            "defined_in": "242_mda_security_boundary_authority.sql",
+            "extended_in": [],
+            "primary_key": "mda_sod_exception_authority_id",
+            "foreign_keys": [],
             "contract": null
         },
         "mdm_approval_policies": {

@@ -90,6 +90,14 @@ entities:
     allowed_commands: [workflow_transition, approval_record, e_signature_apply, evidence_attach, audit_append, outbox_publish, runtime_cutover_rehearse, runtime_restore_drill_record, runtime_wave_gate_evaluate]
     forbidden_generic_actions: [create, update, delete, transition, approve, sign]
     severity: P0
+  - root_code: MDA-SECURITY-BOUNDARY
+    canonical_name: RuntimeSecurityBoundaryAuthority
+    owner_domain: security_iam
+    table_names: [mda_security_boundary_policy, mda_field_redaction_policy, mda_sod_exception_authority, mda_ai_action_firewall_event, mda_ot_signal_trust_policy, mda_security_boundary_decision]
+    required_command_service: "MOM\\Services\\MdaRuntimeSecurityBoundaryService"
+    allowed_commands: [security_boundary_evaluate, field_redaction_policy_update, sod_exception_approve, ai_firewall_record, ot_signal_trust_approve]
+    forbidden_generic_actions: [create, update, delete, transition, approve, sign]
+    severity: P0
   - root_code: MDA-FINANCE-PERIOD
     canonical_name: FinanceCostPeriodAuthority
     owner_domain: finance

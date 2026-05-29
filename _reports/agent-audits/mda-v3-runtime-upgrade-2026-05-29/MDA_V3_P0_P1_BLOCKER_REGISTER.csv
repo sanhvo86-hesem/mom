@@ -24,7 +24,7 @@ P23-P1-007,GAP-P05-001,P1,P31,identity_user,P24 P31,user party relationship has 
 P23-P1-008,GAP-P05-002,P1,P34,manufacturing_operations,P24 P34,start gate reads one governed qualification chain,controlled for non-MES planning only,expires before MES runtime claim,open
 P23-P1-009,GAP-P05-003,P1,P27,master_data,P24 P27,commercial and supplier gates avoid implicit metadata,controlled for design only,expires before release gates,open
 P23-P1-010,GAP-P05-004,P1,P31,master_data,P24 P31,party merge is replay safe and lineage preserving,controlled for no-merge operations only,expires before duplicate merge command,open
-P23-P1-011,GAP-P05-005,P1,P32,security_iam,P24 P32,regulated paths reject missing MFA and record challenge evidence,controlled for nonregulated mode only,expires before regulated-mode claim,open
+P23-P1-011,GAP-P05-005,P1,P32,security_iam,P24 P32 P39,regulated paths reject missing MFA and record challenge evidence,P32 evidence gate and P39 privileged reauth evaluator block missing/replayed challenge at service level; command middleware persistence pending,expires before regulated-mode claim,partially_repaired
 P23-P1-012,GAP-P06-001,P1,P27,engineering_authority,P24 P27,runtime no longer guesses between item identifiers,controlled for design only,expires before item runtime authority,open
 P23-P1-013,GAP-P06-002,P1,P30,engineering_authority,P24 P30,item release and shipment PO gates read explicit approval objects,controlled for design only,expires before release package runtime,open
 P23-P1-014,GAP-P06-004,P1,P27,planning_production,P24 P27,item header no longer owns local operational settings,controlled for design only,expires before planning runtime claim,open
@@ -51,8 +51,8 @@ P23-P1-034,GAP-P14-003,P1,P34,mes_execution_frontend,P24 P34,offline stale compl
 P23-P1-035,GAP-P15-001,P1,P29,platform_backend_sre,P24 P29,zero drift and restore drill evidence per domain,controlled until cutover rehearsal,expires before POSTGRES_PRIMARY,open
 P23-P1-036,GAP-P15-002,P1,P27,platform_backend_domain_owners,P24 P27,collections round trip without fatal drift,controlled until services exist,expires before POSTGRES_PRIMARY,open
 P23-P1-037,GAP-P15-003,P1,P37,sre_frontend,P24 P37,operators see fallback and drift blockers,controlled until cutover UI,expires before POSTGRES_PRIMARY,open
-P23-P1-038,GAP-P16-001,P1,P35,security_iam_frontend,P24 P35,access aligns to one policy source,controlled for internal only,expires before regulated-mode claim,open
-P23-P1-039,GAP-P16-002,P1,P32,security_iam_quality_authority,P24 P32,override and deputy use bounded and auditable,controlled for no-exception mode only,expires before regulated-mode claim,open
+P23-P1-038,GAP-P16-001,P1,P35,security_iam_frontend,P24 P35 P39,access aligns to one policy source,P39 adds security boundary authority tables and evaluator; live PDP/catalog convergence and UI evidence remain pending,expires before regulated-mode claim,partially_repaired
+P23-P1-039,GAP-P16-002,P1,P32,security_iam_quality_authority,P24 P32 P39,override and deputy use bounded and auditable,P39 adds SoD exception authority anchor and expiry/approval service gate; live command persistence pending,expires before regulated-mode claim,partially_repaired
 P23-P1-040,GAP-P16-003,P1,P37,sre_mes_execution,P24 P37,critical security and OT failures alert within SLO,controlled for design only,expires before OT runtime proof,open
 P23-P1-041,GAP-P17-001,P1,P37,sre_platform_backend,P24 P37,critical signals visible with owners and runbooks,controlled for design only,expires before runtime proof claim,open
 P23-P1-042,GAP-P17-002,P1,P37,sre_data_governance,P24 P37,reconciliations produce evidence packages,controlled for design only,expires before audit evidence claim,open
@@ -66,3 +66,5 @@ P23-P1-049,GAP-P19-003,P1,P38,platform_architecture_domain_owners,P24 P38,critic
 P23-P1-050,GAP-P20-001,P1,P40,platform_architecture_domain_owners,P24 P40,all DoD gates pass in runtime,controlled for planning only,expires before final handoff,open
 P23-P1-051,GAP-P20-002,P1,P40,platform_architecture_platform_backend,P24 P40,backlog blockers collapse as waves complete,controlled for planning only,expires before implementation handoff,open
 P23-P1-052,GAP-P21-001,P1,P41,platform_architecture_domain_owners,P24 P41,red-team score rerun on implementation,controlled for planning only,expires before final runtime scorecard,open
+P23-P1-053,GAP-P39-001,P1,P40,security_iam_platform_backend,P40,security boundary evaluator is invoked by every governed command before mutation,P39 side-effect-free evaluator and schema anchors exist but DomainCommandGateway middleware is not wired,expires before regulated runtime claim,open
+P23-P1-054,GAP-P39-002,P1,P40,sre_security_ot,P40,security and OT trust denials persist telemetry and alert within SLO,P39 decision/event tables exist but control tower alert wiring and browser evidence are pending,expires before OT runtime proof,open
