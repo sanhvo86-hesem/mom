@@ -19,14 +19,6 @@ namespace MOM\Api\Services\Uom;
  */
 final class BcMathRounder
 {
-    private const SUPPORTED_MODES = [
-        'ROUND_HALF_EVEN',
-        'ROUND_HALF_UP',
-        'ROUND_DOWN_TRUNCATE',
-        'ROUND_UP_CEILING',
-        'ROUND_NONE',
-    ];
-
     /**
      * Round a BCMath string value to given decimal places using the named policy.
      *

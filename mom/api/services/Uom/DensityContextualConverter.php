@@ -29,7 +29,6 @@ use MOM\Database\Connection;
 final class DensityContextualConverter
 {
     private const BCMATH_SCALE = 30;
-    private const TEMP_TOLERANCE_C = 5.0;
 
     public function __construct(
         private readonly Connection $db
