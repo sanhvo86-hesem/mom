@@ -58,8 +58,21 @@ final class MeasurementValueFactory
         array  $context = [],
         array  $aiFlags = []
     ): array {
-        $siNormalised = $this->normalisedToSi($result, $toUnitRow);
-        $auditHash    = $this->computeHash($fromUnit, $magnitude, $toUnit, $rule, $displayPrecision, $result);
+        // HB-05 (V3 P03): canonical SI must be computed from the INPUT
+        // unit's affine triplet, not from the display unit's. For 100 Cel
+        // → degF the SI canonical is 373.15 K (input × si_factor + si_offset),
+        // never the display value 212. The previous normalisedToSi returned
+        // the display number whenever the display unit was affine.
+        $siNormalised  = $this->canonicalSiFromInput($magnitude, $fromUnitRow);
+        $canonicalUnit = $this->findSiBaseCode(
+            $fromUnitRow['quantity_kind_code'] ?? null
+        );
+        // HB-06 (V3 P03): hash canonical-JSON over the full evidence payload.
+        $auditHash = $this->computeEvidenceHash(
+            $fromUnit, $magnitude, $toUnit, $result,
+            $siNormalised, $canonicalUnit,
+            $rule, $displayPrecision, $roundingPolicy
+        );
 
         return [
             'input' => [
@@ -69,7 +82,8 @@ final class MeasurementValueFactory
             ],
             'normalization' => [
                 'si_value'   => $siNormalised,
-                'si_unit'    => $this->findSiBaseCode($toUnitRow['quantity_kind_code']),
+                'si_unit'    => $canonicalUnit,
+                'derivation' => 'from_input_via_affine_triplet',
             ],
             'display' => [
                 'magnitude'  => $result,
@@ -129,7 +143,11 @@ final class MeasurementValueFactory
             'offset_value' => '0',
             'reversed'     => false,
         ];
-        $auditHash = $this->computeHash($unitCode, $magnitude, $unitCode, $identityRule, 0, $magnitude);
+        $auditHash = $this->computeEvidenceHash(
+            $unitCode, $magnitude, $unitCode, $magnitude,
+            $magnitude, null,
+            $identityRule, 0, 'ROUND_HALF_EVEN'
+        );
 
         return [
             'input' => [
@@ -177,35 +195,83 @@ final class MeasurementValueFactory
     }
 
     /**
-     * Compute the deterministic SHA-256 audit hash.
-     * Input format: from_unit|magnitude|to_unit|rule_code|rule_version|scale|result
+     * Public hash recomputation used by MeasurementEvidenceVerifier.
      */
-    private function computeHash(
-        string $fromUnit,
-        string $magnitude,
-        string $toUnit,
-        array  $rule,
-        int    $scale,
-        string $result
-    ): string {
-        $payload = implode(self::HASH_SEPARATOR, [
-            $fromUnit,
-            $magnitude,
-            $toUnit,
-            $rule['rule_code'] ?? 'si_base_hop',
-            (string)$rule['rule_version'],
-            (string)$scale,
-            $result,
-        ]);
-        return hash(self::HASH_ALGORITHM, $payload);
+    public function recomputeEvidenceHash(array $envelope): string
+    {
+        $rule = $envelope['evidence'] ?? [];
+        return $this->computeEvidenceHash(
+            (string)($envelope['input']['unit_code']            ?? ''),
+            (string)($envelope['input']['magnitude']            ?? ''),
+            (string)($envelope['display']['unit_code']          ?? ''),
+            (string)($envelope['display']['magnitude']          ?? ''),
+            (string)($envelope['normalization']['si_value']     ?? ''),
+            $envelope['normalization']['si_unit']               ?? null,
+            $rule,
+            (int)   ($envelope['precision_envelope']['display_scale'] ?? 0),
+            (string)($envelope['precision_envelope']['rounding_policy'] ?? '')
+        );
     }
 
-    private function normalisedToSi(string $resultMagnitude, array $toUnitRow): string
+    /**
+     * V2 deterministic SHA-256 audit hash over canonical-JSON of full
+     * evidence payload (HB-06). Excludes recorded_at / trace_id / actor_id
+     * so replay across sessions stays meaningful.
+     */
+    private function computeEvidenceHash(
+        string  $fromUnit,
+        string  $magnitude,
+        string  $toUnit,
+        string  $result,
+        string  $siValue,
+        ?string $siUnit,
+        array   $rule,
+        int     $displayScale,
+        string  $roundingPolicy
+    ): string {
+        $payload = [
+            'from_unit'        => $fromUnit,
+            'input_magnitude'  => $magnitude,
+            'to_unit'          => $toUnit,
+            'result_magnitude' => $result,
+            'canonical_si'     => ['value' => $siValue, 'unit' => $siUnit],
+            'rule' => [
+                'code'         => $rule['rule_code']    ?? 'si_base_hop',
+                'version'      => $rule['rule_version'] ?? 0,
+                'category'     => $rule['category']     ?? null,
+                'factor'       => (string)($rule['factor']       ?? ''),
+                'offset_value' => (string)($rule['offset_value'] ?? ''),
+                'reversed'     => (bool)  ($rule['reversed']     ?? false),
+            ],
+            'precision' => [
+                'display_scale'   => $displayScale,
+                'rounding_policy' => $roundingPolicy,
+            ],
+        ];
+        return hash(
+            self::HASH_ALGORITHM,
+            json_encode(
+                $payload,
+                JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+            )
+        );
+    }
+
+    /**
+     * Canonical SI value derived from the INPUT unit's affine triplet.
+     *   si_value = magnitude × si_factor + si_offset
+     * (For a non-affine unit si_offset = 0 and the formula reduces to a
+     * pure factor multiply, which is what SI prefix conversions need.)
+     */
+    private function canonicalSiFromInput(string $magnitude, array $fromUnitRow): string
     {
-        if ($toUnitRow['is_affine'] || empty($toUnitRow['si_factor'])) {
-            return $resultMagnitude;
-        }
-        return bcmul($resultMagnitude, (string)$toUnitRow['si_factor'], self::BCMATH_SCALE_SI);
+        $factor = (string)($fromUnitRow['si_factor'] ?? '1');
+        $offset = (string)($fromUnitRow['si_offset'] ?? '0');
+        if ($factor === '') { $factor = '1'; }
+        if ($offset === '') { $offset = '0'; }
+
+        $scaled = bcmul($magnitude, $factor, self::BCMATH_SCALE_SI);
+        return bcadd($scaled, $offset, self::BCMATH_SCALE_SI);
     }
 
     /**

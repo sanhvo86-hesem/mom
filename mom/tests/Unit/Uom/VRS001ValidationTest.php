@@ -242,7 +242,11 @@ final class VRS001ValidationTest extends TestCase
         ];
         $unitRow = ['quantity_kind_code' => 'Mass', 'risk_level' => 'standard', 'si_factor' => '1', 'is_affine' => false];
 
-        $measval = $this->measvalFactory->build('1', 'KG', 'KG', '1', $rule, $unitRow, $unitRow, 2, 'ROUND_HALF_EVEN');
+        // V3 P03: fixture corrected to canonical positional order
+        // (fromUnit, magnitude, toUnit, result). The previous order
+        // accidentally worked because the old normalisedToSi used $result,
+        // not $magnitude — the HB-05 path needs a numeric $magnitude.
+        $measval = $this->measvalFactory->build('KG', '1', 'KG', '1', $rule, $unitRow, $unitRow, 2, 'ROUND_HALF_EVEN');
 
         $required = ['input', 'normalization', 'display', 'precision_envelope', 'semantic_context', 'evidence', 'digital_thread', 'ai_flags'];
         foreach ($required as $section) {
