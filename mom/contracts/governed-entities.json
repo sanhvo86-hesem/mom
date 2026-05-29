@@ -37,9 +37,9 @@
       "root_code": "MDA-ENGINEERING-RELEASE",
       "canonical_name": "EngineeringReleasePackageAuthority",
       "owner_domain": "mfg_engineering",
-      "table_names": ["bom", "bill_of_materials", "bom_version", "bom_line", "bom_components", "bom_substitute", "routings", "routing_operations", "work_definition", "work_definition_version", "operation", "operation_material", "operation_resource", "control_plans", "control_plan_characteristics", "inspection_plans", "inspection_plan", "inspection_characteristic", "setup_sheets", "setup_sheet_items", "cnc_programs", "cnc_program_versions", "mes_nc_release_packages", "engineering_release_package", "engineering_release_packages"],
-      "required_command_service": "EngineeringReleasePackage command service",
-      "allowed_commands": ["engineering_package_draft", "engineering_package_validate", "engineering_package_release", "engineering_package_supersede"],
+      "table_names": ["bom", "bill_of_materials", "bom_version", "bom_line", "bom_components", "bom_substitute", "routings", "routing_operations", "work_definition", "work_definition_version", "operation", "operation_material", "operation_resource", "control_plans", "control_plan_characteristics", "inspection_plans", "inspection_plan", "inspection_characteristic", "setup_sheets", "setup_sheet_items", "cnc_programs", "cnc_program_versions", "mes_nc_release_packages", "engineering_release_package", "engineering_release_packages", "engineering_release_package_member", "engineering_release_package_approval", "engineering_release_package_binding", "work_order_engineering_package_snapshot"],
+      "required_command_service": "EngineeringReleasePackage command service plus EngineeringReleasePackageAuthorityService for runtime gates",
+      "allowed_commands": ["engineering_package_draft", "engineering_package_validate", "engineering_package_release", "engineering_package_supersede", "engineering_package_withdraw", "engineering_package_bind_order_snapshot"],
       "forbidden_generic_actions": ["create", "update", "delete", "transition", "release", "approve"],
       "severity": "P0"
     },
