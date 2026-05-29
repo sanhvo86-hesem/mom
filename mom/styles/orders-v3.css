@@ -419,11 +419,17 @@ body.orders-v3-active #page-orders.active > .page-breadcrumb {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  /* v3-G19: padding/font-size/gap were hardcoded — Module Master
+     property catalog claimed these were editable via tokens but the
+     button never consumed the tokens. Now genuinely token-driven. */
+  gap: var(--o3-space-xs, 6px);
   height: var(--o3-control-h-standard);
-  padding: 0 12px;
-  font-size: 13px;
-  font-weight: 500;
+  /* min-height kept in sync so mobile.css (--touch-min) cannot clamp
+     the standard height larger than the user's chosen token value */
+  min-height: var(--o3-control-h-standard);
+  padding: 0 var(--o3-space-md, 12px);
+  font-size: var(--o3-font-size-md, 13px);
+  font-weight: var(--o3-font-weight-medium, 500);
   border-radius: var(--o3-radius);
   border: 1px solid var(--o3-border-default);
   background: var(--o3-surface-card);
