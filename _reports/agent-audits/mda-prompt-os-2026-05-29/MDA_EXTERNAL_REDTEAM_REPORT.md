@@ -28,3 +28,7 @@
 ## Verdict
 
 The design pack is enterprise-grade planning material, not a runtime-complete authority platform yet. Critical criteria clear the red-team threshold at design level, with remaining issues explicitly held as P2 implementation gaps rather than hidden blockers.
+
+## Packaging repair addendum
+
+Post-run integrity review found that `P08`, `P09`, and `P10` were missing `HANDOFF_PACKET` artifacts even though their design/audit/simulation/gap outputs and downstream decisions existed. That was a packaging completeness defect, not a domain-design defect. The missing handoff packets have now been restored, and the package is once again internally consistent with the sequential gate model described by the prompt OS.
