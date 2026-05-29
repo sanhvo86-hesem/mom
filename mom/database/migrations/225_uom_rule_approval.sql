@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS uom_rule_approval (
     approval_type           VARCHAR(32) NOT NULL
                             CHECK (approval_type IN ('TECHNICAL_REVIEW','APPROVAL','ESIGN_APPROVAL')),
     -- Signer fields
-    signer_id               UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    signer_id               UUID NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
     signed_at               TIMESTAMPTZ NOT NULL,
     -- E-sign content
     signature_meaning       TEXT NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS uom_ai_advisory_log (
     confidence           NUMERIC(4,3),
     trace_id             VARCHAR(256),
     human_reviewed       BOOLEAN NOT NULL DEFAULT false,
-    human_reviewer_id    UUID REFERENCES users(id) ON DELETE SET NULL,
+    human_reviewer_id    UUID REFERENCES users(user_id) ON DELETE SET NULL,
     human_decision       VARCHAR(32) CHECK (human_decision IN ('ACCEPTED','REJECTED','MODIFIED','PENDING')),
     human_reviewed_at    TIMESTAMPTZ,
     created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW()

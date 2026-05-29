@@ -83,12 +83,12 @@ final class UomDataQualityScanner
     public function scanQuarantinedAliases(): array
     {
         return $this->db->query(
-            "SELECT alias_string, source_system, first_seen_at,
-                    retry_count, last_attempt_at,
-                    EXTRACT(DAY FROM now() - first_seen_at)::int AS days_pending
+            "SELECT alias_code, context_scope, supplier_id, submitted_at,
+                    review_status, ai_suggested,
+                    EXTRACT(DAY FROM now() - submitted_at)::int AS days_pending
              FROM uom_alias_quarantine
-             WHERE resolved_at IS NULL
-             ORDER BY retry_count DESC, first_seen_at ASC
+             WHERE review_status = 'PENDING'
+             ORDER BY submitted_at ASC
              LIMIT 200",
             []
         );
@@ -274,13 +274,13 @@ final class UomDataQualityScanner
     {
         return $this->db->query(
             "SELECT u.canonical_code, u.display_label_en,
-                    COUNT(DISTINCT a.id) FILTER (WHERE a.lifecycle_status = 'active') AS alias_count,
+                    COUNT(DISTINCT a.id) FILTER (WHERE a.effective_to IS NULL OR a.effective_to >= CURRENT_DATE) AS alias_count,
                     COUNT(DISTINCT q.id)                                              AS quarantine_count
              FROM uom_unit_catalog u
              LEFT JOIN uom_alias a ON a.canonical_code = u.canonical_code
-             LEFT JOIN uom_alias_quarantine q ON q.alias_string IN (
-                 SELECT alias_string FROM uom_alias WHERE canonical_code = u.canonical_code
-             ) AND q.resolved_at IS NULL
+             LEFT JOIN uom_alias_quarantine q ON q.alias_code IN (
+                 SELECT alias_code FROM uom_alias WHERE canonical_code = u.canonical_code
+             ) AND q.review_status = 'PENDING'
              WHERE u.lifecycle_status = 'active'
              GROUP BY u.canonical_code, u.display_label_en
              ORDER BY alias_count DESC, u.canonical_code",

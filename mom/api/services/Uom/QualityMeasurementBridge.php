@@ -194,8 +194,8 @@ final class QualityMeasurementBridge
         // Try alias table for extended enum values added after migration 001
         $row = $this->db->queryOne(
             "SELECT canonical_code FROM uom_alias
-             WHERE alias_string = :a AND context_scope = 'SYSTEM'
-               AND lifecycle_status = 'active'
+             WHERE lower(alias_code) = lower(:a) AND context_scope = 'SYSTEM'
+               AND (effective_to IS NULL OR effective_to >= CURRENT_DATE)
              LIMIT 1",
             [':a' => $pgEnum]
         );

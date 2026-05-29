@@ -33,9 +33,9 @@ CREATE TABLE IF NOT EXISTS item_uom_policy (
     version                 INTEGER NOT NULL DEFAULT 1,
     lifecycle_status        VARCHAR(20) NOT NULL DEFAULT 'active'
                             CHECK (lifecycle_status IN ('draft','active','superseded','retired')),
-    approved_by             UUID REFERENCES users(id) ON DELETE SET NULL,
+    approved_by             UUID REFERENCES users(user_id) ON DELETE SET NULL,
     approved_at             TIMESTAMPTZ,
-    created_by              UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_by              UUID REFERENCES users(user_id) ON DELETE SET NULL,
     created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     notes                   TEXT,
     CONSTRAINT uq_ituom_context UNIQUE(item_id, site_id, supplier_id, customer_id, context_code, effective_from)

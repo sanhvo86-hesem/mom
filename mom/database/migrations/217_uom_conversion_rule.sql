@@ -29,12 +29,12 @@ CREATE TABLE IF NOT EXISTS uom_conversion_rule (
     effective_to         DATE,
     lifecycle_status     VARCHAR(20) NOT NULL DEFAULT 'draft'
                          CHECK (lifecycle_status IN ('draft','review','approved','deprecated')),
-    approved_by          UUID REFERENCES users(id) ON DELETE SET NULL,
+    approved_by          UUID REFERENCES users(user_id) ON DELETE SET NULL,
     approved_at          TIMESTAMPTZ,
     esign_manifest_hash  VARCHAR(256),
     risk_level           VARCHAR(20) NOT NULL DEFAULT 'low'
                          CHECK (risk_level IN ('low','medium','high','regulated')),
-    created_by           UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_by           UUID REFERENCES users(user_id) ON DELETE SET NULL,
     created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     notes                TEXT,
     CONSTRAINT uq_rule_version UNIQUE(rule_code, version),

@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS material_density_registry (
     method_code          VARCHAR(64),
     effective_from       DATE NOT NULL DEFAULT CURRENT_DATE,
     effective_to         DATE,
-    approved_by          UUID REFERENCES users(id) ON DELETE SET NULL,
+    approved_by          UUID REFERENCES users(user_id) ON DELETE SET NULL,
     approved_at          TIMESTAMPTZ,
     created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

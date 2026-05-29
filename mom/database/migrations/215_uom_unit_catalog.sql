@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS uom_unit_catalog (
     risk_level           VARCHAR(20) NOT NULL DEFAULT 'low'
                          CHECK (risk_level IN ('low','medium','high','regulated')),
     approved_at          TIMESTAMPTZ,
-    approved_by          UUID REFERENCES users(id) ON DELETE SET NULL,
+    approved_by          UUID REFERENCES users(user_id) ON DELETE SET NULL,
     retired_at           TIMESTAMPTZ,
     retired_reason       TEXT,
     created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),

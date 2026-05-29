@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS item_packaging_policy (
     effective_from          DATE NOT NULL DEFAULT CURRENT_DATE,
     effective_to            DATE,
     -- Governance
-    approved_by             UUID REFERENCES users(id) ON DELETE SET NULL,
+    approved_by             UUID REFERENCES users(user_id) ON DELETE SET NULL,
     approved_at             TIMESTAMPTZ,
-    created_by              UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_by              UUID REFERENCES users(user_id) ON DELETE SET NULL,
     created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT uq_pack_context UNIQUE(item_id, site_id, supplier_id, customer_id, effective_from)
 );

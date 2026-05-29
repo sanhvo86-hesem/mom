@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS uom_external_code_map (
     confidence           VARCHAR(20) NOT NULL CHECK (confidence IN ('VERIFIED','INFERRED','GAP')),
     source_document      VARCHAR(256) NOT NULL,
     ambiguity_note       TEXT,
-    approved_by          UUID REFERENCES users(id) ON DELETE SET NULL,
+    approved_by          UUID REFERENCES users(user_id) ON DELETE SET NULL,
     approved_at          TIMESTAMPTZ,
     created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT uq_ext_system_code UNIQUE(external_system, external_code)
