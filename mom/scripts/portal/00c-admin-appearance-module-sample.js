@@ -1376,12 +1376,16 @@
     dock = document.createElement('div');
     dock.id = 'o3-props-dock';
     dock.className = 'o3-props-dock' + (_dockCollapsed ? ' o3-props-dock--collapsed' : '');
-    /* Small bookmark-style handle ONLY appears when collapsed.
-     * When expanded, the in-header chevron (.__collapse) handles
-     * collapse. Edge bar replaced for refined UX (v3-G11). */
+    /* v3-G12: SVG icons (Lucide-style) for crisp, refined look at
+     * any DPI. Bookmark handle now on LEFT edge (panel slides in
+     * from left). Chevron-right on handle = "open me by sliding
+     * right". Chevron-left in header = "collapse left". */
+    var svgChevronRight = '<svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg>';
+    var svgChevronLeft  = '<svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 6 9 12 15 18"/></svg>';
+    var svgClose        = '<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>';
     dock.innerHTML = ''
       + '<button type="button" class="o3-props-dock__handle" aria-label="Open properties" title="Properties">'
-      +   '<span class="o3-props-dock__handle-chevron"></span>'
+      +   svgChevronRight
       + '</button>'
       + '<div class="o3-props-dock__panel">'
       +   '<header class="o3-props-dock__header">'
@@ -1389,8 +1393,8 @@
       +       '<span>⚙️</span><span data-dock-title>Properties</span>'
       +       '<span class="o3-props-dock__subtitle" data-dock-subtitle></span>'
       +     '</h3>'
-      +     '<button type="button" class="o3-props-dock__collapse" aria-label="Collapse properties" title="Collapse"></button>'
-      +     '<button type="button" class="o3-props-dock__close" aria-label="Close">×</button>'
+      +     '<button type="button" class="o3-props-dock__collapse" aria-label="Collapse properties" title="Collapse">' + svgChevronLeft + '</button>'
+      +     '<button type="button" class="o3-props-dock__close" aria-label="Close">' + svgClose + '</button>'
       +   '</header>'
       +   '<nav class="o3-props-dock__subtabs" data-dock-subtabs></nav>'
       +   '<div class="o3-props-dock__body" data-dock-body></div>'
