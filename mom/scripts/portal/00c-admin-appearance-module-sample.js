@@ -1376,8 +1376,10 @@
     dock = document.createElement('div');
     dock.id = 'o3-props-dock';
     dock.className = 'o3-props-dock' + (_dockCollapsed ? ' o3-props-dock--collapsed' : '');
+    /* Small bookmark-style handle ONLY appears when collapsed.
+     * When expanded, the in-header chevron (.__collapse) handles
+     * collapse. Edge bar replaced for refined UX (v3-G11). */
     dock.innerHTML = ''
-      // Small bookmark-style handle — only visible when collapsed.
       + '<button type="button" class="o3-props-dock__handle" aria-label="Open properties" title="Properties">'
       +   '<span class="o3-props-dock__handle-chevron"></span>'
       + '</button>'
@@ -1387,9 +1389,6 @@
       +       '<span>⚙️</span><span data-dock-title>Properties</span>'
       +       '<span class="o3-props-dock__subtitle" data-dock-subtitle></span>'
       +     '</h3>'
-      +     // Refined chevron-collapse in the header (replaces the giant
-      +     // edge handle). Click → slide the panel away; the bookmark
-      +     // handle then becomes the only way back in.
       +     '<button type="button" class="o3-props-dock__collapse" aria-label="Collapse properties" title="Collapse"></button>'
       +     '<button type="button" class="o3-props-dock__close" aria-label="Close">×</button>'
       +   '</header>'
