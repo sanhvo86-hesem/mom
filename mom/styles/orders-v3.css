@@ -84,12 +84,10 @@
   --o3-radius-lg:       var(--o3-radius-card);
 
   /* CONTROL HEIGHT — STANDARD (SSOT: control.height.standard)
-   * HESEM rule (2026-05-28): ONE size for every interactive control.
-   * No sm/lg variants. Buttons, tabs, inputs, chip-buttons, searches
-   * all snap to this single height. To request a different size,
-   * propose a new token via Authority and run simulation evidence
-   * — never hardcode a one-off height. */
-  --o3-control-h-standard: 36px;
+   * HESEM rule (2026-05-29, refined): ONE size = 32px. Research:
+   * Atlassian/Vercel 32, Linear/Notion 28, SAP 36, Bloomberg 24.
+   * 32 keeps industrial reach without feeling chunky. Migration 230. */
+  --o3-control-h-standard: 32px;
   /* Legacy aliases kept for ONE release only (migration 214 deprecates) */
   --o3-control-h-md: var(--o3-control-h-standard);
   --o3-control-h-sm: var(--o3-control-h-standard);
@@ -371,13 +369,13 @@ body.orders-v3-active #page-orders.active > .page-breadcrumb {
 .o3-chip {
   display: inline-flex;
   align-items: center;
-  gap: var(--o3-space-xs);
-  /* Height pinned via control-height-sm so chips and chip-buttons
-     sit on the same baseline as their neighbours. */
-  height: var(--o3-control-h-sm);
-  padding: 0 var(--o3-space-md);
-  font-size: var(--o3-font-size-xs);
-  font-weight: var(--o3-font-weight-semi);
+  gap: 4px;
+  /* Chips snap to the same standard height as everything else so
+     toolbar rows stay on one baseline. Atlassian/Vercel pattern. */
+  height: var(--o3-control-h-standard);
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 500;
   border-radius: var(--o3-radius-pill);
   background: var(--o3-neutral-soft);
   color: var(--o3-neutral);
@@ -421,14 +419,12 @@ body.orders-v3-active #page-orders.active > .page-breadcrumb {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--o3-space-sm);
-  /* Height pinned via control-height-md so every toolbar button sits
-     on the same baseline as the search input and chip-buttons. */
-  height: var(--o3-control-h-md);
-  padding: 0 var(--o3-space-md);
-  font-size: var(--o3-font-size-sm);
-  font-weight: var(--o3-font-weight-semi);
-  border-radius: var(--o3-radius-md);
+  gap: 6px;
+  height: var(--o3-control-h-standard);
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--o3-radius);
   border: 1px solid var(--o3-border-default);
   background: var(--o3-surface-card);
   color: var(--o3-text-strong);

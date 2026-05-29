@@ -159,16 +159,30 @@ motion durations, or any other visual token in JS, inline style, or HTML.**
   must be reported and fixed BEFORE they ship — the answer is never
   "add a one-off CSS rule in the module's own stylesheet."
 - **Single-standard control-height (one size, no variants).** HESEM SSOT
-  rule (2026-05-28, migration 223): every interactive control —
-  button, tab, input, chip-button, search — uses ONE height,
-  `control.height.standard` (36px), via the CSS variable
-  `--o3-control-h-standard`. The previous triad (sm/md/lg) is dropped;
-  legacy aliases stay alive for one release as a transitional safety
-  net. If you genuinely need a denser or larger size, propose a new
-  token via the Authority + run simulation evidence first — never
-  hardcode a one-off height. This rule eliminates an entire class of
-  visual-drift bugs (toolbars where chips, buttons and inputs end up
-  at different heights).
+  rule (refined 2026-05-29, migration 230): every interactive control
+  — button, tab, input, chip-button, search — uses ONE height,
+  `control.height.standard` = **32px**, via the CSS variable
+  `--o3-control-h-standard`. Research basis: Atlassian / Vercel 32px,
+  Linear / Notion 28px, SAP Fiori 36px (industrial touch), Bloomberg
+  24px (data-dense). 32 lands at the modern-industrial sweet spot.
+  The previous triad (sm/md/lg) is dropped; legacy aliases stay alive
+  for one release as a transitional safety net. If you genuinely need
+  a denser or larger size, propose a new token via the Authority + run
+  simulation evidence first — never hardcode a one-off height. This
+  rule eliminates an entire class of visual-drift bugs (toolbars where
+  chips, buttons and inputs end up at different heights).
+- **No Admin-only graphics — Admin uses the SAME tokens as every
+  module.** HESEM SSOT rule (2026-05-29): the old
+  "components.admin.toolbarPadding / objectMinH / cardMinH / avatarSize"
+  family was deleted because it created a parallel admin-only design
+  system. All admin toolbars / cards / canvases now use
+  `control.height.standard`, `radius.card`, `space.master`, etc. — the
+  same tokens that orders, intake, dispatch, and every other module
+  use. Test Admin renders in: Admin → Mặt phẳng đồ họa → Module
+  Sample (which renders production CSS, not admin-only CSS).
+- **Scrollbar — keep portal default.** User opted (2026-05-29) to keep
+  the original portal scrollbar color; migration 229 reverted the brief
+  amber experiment. Do not override scrollbar appearance per module.
 - **Master density — ONE knob controls all gaps.** HESEM SSOT rule
   (2026-05-29, migration 227): the entire UI density is governed by
   TWO tokens only.
@@ -189,11 +203,7 @@ motion durations, or any other visual token in JS, inline style, or HTML.**
   Vercel, Bloomberg Terminal density patterns: one master multiplier
   scales the whole UI. Admins tune density via the Graphics tab; one
   edit ripples everywhere.
-- **Scrollbar — HESEM amber, no exceptions.** The default scrollbar
-  thumb is `brand.accent` (#f9a825), track is `brand.accentLight`
-  soft. Defined globally in `master-density.css`. Do not override
-  scrollbar colors per module; if a module needs a different scrollbar,
-  flag it as a design exception requiring approval.
+- (Scrollbar rule moved above to the "keep portal default" entry.)
 - **Maximum space utilization (no orphan gutters).** Admin and module
   surfaces must dedicate every available pixel to actual work content.
   Concrete rules:
