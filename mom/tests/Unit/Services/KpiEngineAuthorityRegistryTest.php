@@ -76,7 +76,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $catalog = $engine->getMetricCatalog();
 
         $this->assertSame(35, $catalog['counts']['runtime_calculated_metrics'] ?? null);
-        $this->assertSame(32, $catalog['counts']['dashboard_core_kpis'] ?? null);
+        $this->assertSame(31, $catalog['counts']['dashboard_core_kpis'] ?? null);
         $this->assertSame(46, $catalog['counts']['gate_control_metrics'] ?? null);
         $this->assertSame(142, $catalog['counts']['proposed_operating_metrics'] ?? null);
         $this->assertSame(
@@ -115,7 +115,19 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
             'LEAN-TOC-CMM-MATERIAL-READINESS-2026-05',
             $catalog['lean_flow_operating_model']['model_id'] ?? null,
         );
+        $this->assertSame(
+            'Prompt 07 - Lean flow, TOC, CMM queue and material readiness hardening',
+            $catalog['lean_flow_operating_model']['introduced_by_prompt'] ?? null,
+        );
+        $this->assertNotContains('INSPECTION_PLAN_ADHERENCE', $catalog['lean_flow_operating_model']['cmm_qc_queue_metrics'] ?? []);
+        $this->assertContains('INSPECTION_PLAN_ADHERENCE', $catalog['lean_flow_operating_model']['queue_discipline_support_metrics'] ?? []);
+        $this->assertNotContains('INSPECTION_PLAN_ADHERENCE', $catalog['lean_flow_operating_model']['daily_board_required_signals'] ?? []);
+        $this->assertContains('needed_by_at', $catalog['lean_flow_operating_model']['queue_aging_contract']['required_fields'] ?? []);
+        $this->assertContains('completion_at', $catalog['lean_flow_operating_model']['queue_aging_contract']['required_fields'] ?? []);
+        $this->assertContains('buffer_policy', $catalog['lean_flow_operating_model']['constraint_register_contract']['required_fields'] ?? []);
+        $this->assertContains('protection_action', $catalog['lean_flow_operating_model']['constraint_register_contract']['required_fields'] ?? []);
         $this->assertSame(true, $catalog['bonus_simulation_model']['simulation_only'] ?? null);
+        $this->assertStringContainsString('HR', (string) ($catalog['bonus_simulation_model']['calibration_body'] ?? ''));
         $this->assertArrayHasKey('critical', $catalog['customer_ncr_severity_matrix'] ?? []);
         $this->assertNotEmpty($catalog['customer_ncr_data_contract']['required_fields'] ?? []);
 
@@ -148,7 +160,10 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertSame(95.0, $metricsByCode['OTD']['scorecard_target'] ?? null);
         $this->assertTrue($metricsByCode['OTD']['scorecard_higher_is_better'] ?? false);
         $this->assertSame('active_runtime', $metricsByCode['OTD']['scorecard_scoring_status'] ?? null);
-        $this->assertTrue($metricsByCode['OTD']['scorecard_contributes_to_reward'] ?? false);
+        $this->assertFalse($metricsByCode['OTD']['scorecard_contributes_to_reward'] ?? true);
+        $this->assertFalse($metricsByCode['OTD']['reward_eligible'] ?? true);
+        $this->assertTrue($metricsByCode['OTD']['reward_freeze_active'] ?? false);
+        $this->assertSame('pilot_reward_freeze_active', $metricsByCode['OTD']['consequence']['monetary_recognition_status'] ?? null);
         $this->assertSame(
             $metricsByCode['OTD']['reward_rule'] ?? null,
             $metricsByCode['OTD']['consequence']['recognition_rule'] ?? null,
@@ -173,13 +188,54 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertSame('manual_governed', $metricsByCode['FINAL_RELEASE_RFT']['calculation_status'] ?? null);
         $this->assertSame('manual_governed', $metricsByCode['CHECK_DIM_REPORT_ON_SHIP']['calculation_status'] ?? null);
         $this->assertSame('manual_governed', $metricsByCode['CURRENT_CONSTRAINT_RESOURCE']['calculation_status'] ?? null);
+        $this->assertContains('buffer_policy', $metricsByCode['CURRENT_CONSTRAINT_RESOURCE']['manual_input_contract']['fields'] ?? []);
+        $this->assertContains('protection_action', $metricsByCode['CURRENT_CONSTRAINT_RESOURCE']['manual_input_contract']['fields'] ?? []);
         $this->assertSame('staged_data_contract', $metricsByCode['CONSTRAINT_STARVED_TIME']['calculation_status'] ?? null);
         $this->assertSame('staged_data_contract', $metricsByCode['CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS']['calculation_status'] ?? null);
         $this->assertFalse($metricsByCode['CURRENT_CONSTRAINT_RESOURCE']['scorecard_contributes_to_reward'] ?? true);
         $this->assertContains('flow_constraint', $metricsByCode['CONSTRAINT_STARVED_TIME']['metric_control']['usage_contexts'] ?? []);
         $this->assertSame('staged_data_contract', $metricsByCode['FAI_QUEUE_AGING']['calculation_status'] ?? null);
         $this->assertSame('staged_data_contract', $metricsByCode['FINAL_INSPECTION_QUEUE_AGING']['calculation_status'] ?? null);
+        $this->assertContains('needed_by_at', $metricsByCode['CMM_QUEUE_AGING']['manual_input_contract']['fields'] ?? []);
+        $this->assertContains('completion_at', $metricsByCode['CMM_QUEUE_AGING']['manual_input_contract']['fields'] ?? []);
+        $this->assertContains('needed_by_at', $metricsByCode['QC_HOLD_SLA']['manual_input_contract']['fields'] ?? []);
+        $this->assertContains('completion_at', $metricsByCode['QC_HOLD_SLA']['manual_input_contract']['fields'] ?? []);
         $this->assertSame('composite_readiness_index', $metricsByCode['MATERIAL_AVAILABILITY_PLAN']['metric_control']['type']['metric_subtype'] ?? null);
+        $this->assertContains(
+            'metadata.readiness_override_evidence_reference',
+            $metricsByCode['MATERIAL_AVAILABILITY_PLAN']['readiness_component_contract']['manual_override_fields'] ?? [],
+        );
+        $this->assertStringContainsString(
+            'physical_ready=true',
+            (string) ($metricsByCode['MATERIAL_AVAILABILITY_PLAN']['readiness_block_rule'] ?? ''),
+        );
+        $this->assertSame(5, $metricsByCode['FAI_FIRST_PASS']['small_lot_review_policy']['below_n'] ?? null);
+        $this->assertSame(10, $metricsByCode['IN_PROCESS_REJECT_RATE']['small_lot_review_policy']['below_n'] ?? null);
+        $this->assertContains(
+            'GAGE_VALID_FOR_RELEASE',
+            $metricsByCode['SHIP_PACKET_COMPLETENESS']['release_dependency_contract']['required_gate_metrics'] ?? [],
+        );
+        $this->assertContains(
+            'customer_notification_status',
+            $metricsByCode['CUSTOMER_NCR_SEVERITY_SCORE']['manual_input_contract']['fields'] ?? [],
+        );
+        $this->assertContains(
+            'falsification_investigation_ref',
+            $metricsByCode['CUSTOMER_NCR_SEVERITY_SCORE']['manual_input_contract']['fields'] ?? [],
+        );
+        $this->assertSame(365, $metricsByCode['REPEAT_NCR_RATE']['repeat_detection_rule']['lookback_days'] ?? null);
+        $this->assertSame(
+            true,
+            $metricsByCode['CAPA_EFFECTIVENESS']['capa_effectiveness_rule']['training_only_not_accepted'] ?? null,
+        );
+        $this->assertSame(
+            'TRAINING_AS_CAPA_COUNTER',
+            $metricsByCode['CAPA_EFFECTIVENESS']['capa_effectiveness_rule']['linked_counter_metric'] ?? null,
+        );
+        $this->assertContains(
+            'exception_approval_ref',
+            $metricsByCode['TRAINING_AS_CAPA_COUNTER']['manual_input_contract']['fields'] ?? [],
+        );
         $this->assertNotSame('company_scorecard', $metricsByCode['SUPPLIER_READINESS']['evaluation_use'] ?? null);
         $this->assertNull($metricsByCode['SUPPLIER_READINESS']['scorecard_weight_pct'] ?? null);
         $this->assertNull($metricsByCode['RECORDABLE_INCIDENT_RATE']['scorecard_weight_pct'] ?? null);
@@ -195,6 +251,13 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertSame('blocker_only', $lamGateControl['reward']['reward_mode'] ?? null);
         $this->assertTrue($lamGateControl['staged_value_suppression']['suppressed'] ?? false);
         $this->assertSame('present', $lamGateControl['counter_metric_status']['status'] ?? null);
+        $ctqCapability = $metricsByCode['CPK_PRODUCT_MIN_CTQ']['metric_control'] ?? [];
+        $this->assertSame('ctq_capability_policy', $ctqCapability['capability']['policy'] ?? null);
+        $this->assertSame('CTQ-STATUS-CARD-LAM-2026-05', $ctqCapability['ctq_status_card']['panel_id'] ?? null);
+        $this->assertContains('sample_band', $ctqCapability['ctq_status_card']['capability_fields'] ?? []);
+        $ctqGate = $metricsByCode['GAGE_VALID_FOR_CTQ_MEASUREMENT']['metric_control'] ?? [];
+        $this->assertSame('CTQ-STATUS-CARD-LAM-2026-05', $ctqGate['ctq_status_card']['panel_id'] ?? null);
+        $this->assertSame('ctq_capability_policy', $ctqGate['ctq_status_card']['policy_ref'] ?? null);
     }
 
     public function testExecutiveScorecardWeightsAndQuantitativeRulesAreComplete(): void
@@ -360,6 +423,26 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $finCodes = array_column($roles['FIN']['active_scorecard'] ?? [], 'kpi_code');
         $this->assertContains('INVOICE_RFT', $finCodes);
         $this->assertNotContains('GROSS_MARGIN_JOB_FAMILY', $finCodes);
+
+        $apar = $roles['APAR'];
+        $this->assertStringContainsString('invoice pack', strtolower((string) ($apar['controllability_scope'] ?? '')));
+        $this->assertStringContainsString('queue từ ship-ready sang invoice', mb_strtolower((string) ($apar['fairness_notes'] ?? '')));
+        $this->assertStringNotContainsString(
+            'kiểm soát bằng chứng dữ liệu/tuân thủ, access-backup-recovery',
+            mb_strtolower((string) ($apar['active_scorecard'][0]['controllability_scope'] ?? ''))
+        );
+
+        $ita = $roles['ITA'];
+        $this->assertStringContainsString('backup-restore drill', mb_strtolower((string) ($ita['controllability_scope'] ?? '')));
+        $this->assertStringContainsString('approval nghiệp vụ', mb_strtolower((string) ($ita['attribution_rules']['exclusions'] ?? '')));
+        $this->assertStringContainsString('backup policy', mb_strtolower((string) ($ita['active_scorecard'][0]['owner_control_boundary'] ?? '')));
+
+        $registry = $this->readRegistry();
+        $lamEvidence = $registry['lam_evidence_pack_contract'] ?? [];
+        $this->assertSame('LAM-EVIDENCE-PACK-CONTRACT-P15', $lamEvidence['contract_id'] ?? null);
+        $this->assertSame('LAM_SEMSYSCO', $lamEvidence['profile_code'] ?? null);
+        $this->assertGreaterThanOrEqual(10, (int) ($lamEvidence['retention_requirements']['retention_years'] ?? 0));
+        $this->assertContains('CHECK_DIM_REPORT_ON_SHIP', $lamEvidence['required_sections'][5]['linked_metric_codes'] ?? []);
     }
 
     public function testMetricSupportSeparatesKnownNonRuntimeFromUnknownMetric(): void

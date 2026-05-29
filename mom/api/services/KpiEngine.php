@@ -666,6 +666,8 @@ final class KpiEngine
                 'formula' => is_array($row['formula'] ?? null) ? $row['formula'] : null,
                 'thresholds' => is_array($row['thresholds'] ?? null) ? $row['thresholds'] : null,
                 'registry_data_source' => is_array($row['data_source'] ?? null) ? $row['data_source'] : null,
+                'manual_input_contract' => is_array($row['manual_input_contract'] ?? null)
+                    ? $row['manual_input_contract'] : null,
                 'owner_role' => $this->stringField($row, 'owner_role'),
                 'data_stewardship_role' => $this->stringField($row, 'data_stewardship_role'),
                 'cadence' => $this->stringField($row, 'cadence'),
@@ -690,18 +692,28 @@ final class KpiEngine
                 'reward_mode' => $this->stringField($row, 'reward_mode'),
                 'lifecycle_status' => $this->stringField($row, 'lifecycle_status'),
                 'sample_policy' => is_array($row['sample_policy'] ?? null) ? $row['sample_policy'] : null,
+                'small_lot_review_policy' => is_array($row['small_lot_review_policy'] ?? null)
+                    ? $row['small_lot_review_policy'] : null,
+                'usage_types' => $this->arrayField($row, 'usage_types'),
                 'usage_contexts' => $this->arrayField($row, 'usage_contexts'),
 	                'role_assignments' => is_array($row['role_assignments'] ?? null)
 	                    ? $row['role_assignments'] : [],
 	                'lam_profile_link' => $this->stringField($row, 'lam_profile_link'),
 	                'customer_profile_link' => $this->stringField($row, 'customer_profile_link'),
 	                'applicability_rule' => $this->stringField($row, 'applicability_rule'),
-	                'hold_release_rule' => $this->stringField($row, 'hold_release_rule'),
-	                'controllability_scope' => $this->stringField($row, 'controllability_scope'),
-	                'action_when_red' => $this->stringField($row, 'action_when_red'),
-	                'components' => is_array($row['components'] ?? null) ? $row['components'] : [],
-	                'required_evidence' => $this->arrayField($row, 'required_evidence'),
-	            ], $aliases);
+                'hold_release_rule' => $this->stringField($row, 'hold_release_rule'),
+                'controllability_scope' => $this->stringField($row, 'controllability_scope'),
+                'action_when_red' => $this->stringField($row, 'action_when_red'),
+                'components' => is_array($row['components'] ?? null) ? $row['components'] : [],
+                'readiness_component_contract' => is_array($row['readiness_component_contract'] ?? null)
+                    ? $row['readiness_component_contract'] : null,
+                'readiness_block_rule' => $this->stringField($row, 'readiness_block_rule'),
+                'repeat_detection_rule' => is_array($row['repeat_detection_rule'] ?? null)
+                    ? $row['repeat_detection_rule'] : null,
+                'capa_effectiveness_rule' => is_array($row['capa_effectiveness_rule'] ?? null)
+                    ? $row['capa_effectiveness_rule'] : null,
+                'required_evidence' => $this->arrayField($row, 'required_evidence'),
+            ], $aliases);
 	        }
 
         foreach ($this->registryRows($registry, 'proposed_operating_metrics') as $row) {
@@ -716,6 +728,9 @@ final class KpiEngine
                 'registry_status' => $this->stringField($row, 'status'),
                 'registry_calculation_status' => $this->stringField($row, 'calculation_status'),
                 'thresholds' => is_array($row['thresholds'] ?? null) ? $row['thresholds'] : null,
+                'registry_data_source' => is_array($row['data_source'] ?? null) ? $row['data_source'] : null,
+                'manual_input_contract' => is_array($row['manual_input_contract'] ?? null)
+                    ? $row['manual_input_contract'] : null,
                 'owner_role' => $this->stringField($row, 'owner_role'),
                 'cadence' => $this->stringField($row, 'cadence'),
                 'decision_action' => $this->stringField($row, 'decision_action'),
@@ -734,6 +749,9 @@ final class KpiEngine
                 'reward_mode' => $this->stringField($row, 'reward_mode'),
                 'lifecycle_status' => $this->stringField($row, 'lifecycle_status'),
                 'sample_policy' => is_array($row['sample_policy'] ?? null) ? $row['sample_policy'] : null,
+                'small_lot_review_policy' => is_array($row['small_lot_review_policy'] ?? null)
+                    ? $row['small_lot_review_policy'] : null,
+                'usage_types' => $this->arrayField($row, 'usage_types'),
                 'usage_contexts' => $this->arrayField($row, 'usage_contexts'),
 	                'role_assignments' => is_array($row['role_assignments'] ?? null)
 	                    ? $row['role_assignments'] : [],
@@ -745,12 +763,19 @@ final class KpiEngine
 	                'gate' => $this->stringField($row, 'gate'),
 	                'linked_cdr' => is_array($row['linked_cdr'] ?? null) ? $row['linked_cdr'] : null,
 	                'gate_pass_condition' => $this->stringField($row, 'gate_pass_condition'),
-	                'hold_release_rule' => $this->stringField($row, 'hold_release_rule'),
-	                'controllability_scope' => $this->stringField($row, 'controllability_scope'),
-	                'action_when_red' => $this->stringField($row, 'action_when_red'),
-	                'components' => is_array($row['components'] ?? null) ? $row['components'] : [],
-	                'required_evidence' => $this->arrayField($row, 'required_evidence'),
-	            ], $aliases);
+                'hold_release_rule' => $this->stringField($row, 'hold_release_rule'),
+                'controllability_scope' => $this->stringField($row, 'controllability_scope'),
+                'action_when_red' => $this->stringField($row, 'action_when_red'),
+                'components' => is_array($row['components'] ?? null) ? $row['components'] : [],
+                'readiness_component_contract' => is_array($row['readiness_component_contract'] ?? null)
+                    ? $row['readiness_component_contract'] : null,
+                'readiness_block_rule' => $this->stringField($row, 'readiness_block_rule'),
+                'repeat_detection_rule' => is_array($row['repeat_detection_rule'] ?? null)
+                    ? $row['repeat_detection_rule'] : null,
+                'capa_effectiveness_rule' => is_array($row['capa_effectiveness_rule'] ?? null)
+                    ? $row['capa_effectiveness_rule'] : null,
+                'required_evidence' => $this->arrayField($row, 'required_evidence'),
+            ], $aliases);
 	        }
 
         foreach ($this->registryStringList($registry, 'executive_scorecard') as $code) {
@@ -784,6 +809,9 @@ final class KpiEngine
                 'gate_pass_condition' => $this->stringField($row, 'gate_pass_condition'),
                 'registry_calculation_status' => $this->stringField($row, 'calculation_status'),
                 'thresholds' => is_array($row['thresholds'] ?? null) ? $row['thresholds'] : null,
+                'registry_data_source' => is_array($row['data_source'] ?? null) ? $row['data_source'] : null,
+                'manual_input_contract' => is_array($row['manual_input_contract'] ?? null)
+                    ? $row['manual_input_contract'] : null,
                 'owner_role' => $this->stringField($row, 'owner_role'),
                 'cadence' => $this->stringField($row, 'cadence'),
                 'data_contract_gap' => $this->stringField($row, 'data_contract_gap'),
@@ -801,18 +829,30 @@ final class KpiEngine
                 'reward_mode' => $this->stringField($row, 'reward_mode'),
                 'lifecycle_status' => $this->stringField($row, 'lifecycle_status'),
                 'sample_policy' => is_array($row['sample_policy'] ?? null) ? $row['sample_policy'] : null,
+                'small_lot_review_policy' => is_array($row['small_lot_review_policy'] ?? null)
+                    ? $row['small_lot_review_policy'] : null,
+                'usage_types' => $this->arrayField($row, 'usage_types'),
                 'usage_contexts' => $this->arrayField($row, 'usage_contexts'),
 	                'role_assignments' => is_array($row['role_assignments'] ?? null)
 	                    ? $row['role_assignments'] : [],
 	                'lam_profile_link' => $this->stringField($row, 'lam_profile_link'),
 	                'customer_profile_link' => $this->stringField($row, 'customer_profile_link'),
-	                'applicability_rule' => $this->stringField($row, 'applicability_rule'),
-	                'paired_metric' => $this->stringField($row, 'paired_metric'),
-	                'attribution_rule' => $this->stringField($row, 'attribution_rule'),
-	                'hold_release_rule' => $this->stringField($row, 'hold_release_rule'),
-	                'components' => is_array($row['components'] ?? null) ? $row['components'] : [],
-	                'required_evidence' => $this->arrayField($row, 'required_evidence'),
-	            ], $aliases);
+                'applicability_rule' => $this->stringField($row, 'applicability_rule'),
+                'paired_metric' => $this->stringField($row, 'paired_metric'),
+                'attribution_rule' => $this->stringField($row, 'attribution_rule'),
+                'hold_release_rule' => $this->stringField($row, 'hold_release_rule'),
+                'components' => is_array($row['components'] ?? null) ? $row['components'] : [],
+                'readiness_component_contract' => is_array($row['readiness_component_contract'] ?? null)
+                    ? $row['readiness_component_contract'] : null,
+                'readiness_block_rule' => $this->stringField($row, 'readiness_block_rule'),
+                'release_dependency_contract' => is_array($row['release_dependency_contract'] ?? null)
+                    ? $row['release_dependency_contract'] : null,
+                'repeat_detection_rule' => is_array($row['repeat_detection_rule'] ?? null)
+                    ? $row['repeat_detection_rule'] : null,
+                'capa_effectiveness_rule' => is_array($row['capa_effectiveness_rule'] ?? null)
+                    ? $row['capa_effectiveness_rule'] : null,
+                'required_evidence' => $this->arrayField($row, 'required_evidence'),
+            ], $aliases);
 	        }
 
         $this->enrichCatalogGovernance($catalog, $registry);
@@ -2191,6 +2231,11 @@ final class KpiEngine
                     LOWER(COALESCE(material_readiness_status, '')) IN
                         ('ready', 'available', 'complete', 'ok', 'cleared') AS physical_ready,
                     (
+                        (meta ? 'material_cert_blocked')
+                        OR (meta ? 'mill_cert_coc_verified')
+                        OR (meta ? 'coc_verified')
+                    ) AS cert_coc_declared,
+                    (
                         LOWER(COALESCE(metadata->>'material_cert_blocked', '')) IN
                             ('true', 'yes', '1', 'blocked', 'missing', 'mismatch', 'not_verified', 'failed')
                         OR LOWER(COALESCE(metadata->>'mill_cert_coc_verified', '')) IN
@@ -2199,11 +2244,19 @@ final class KpiEngine
                             ('false', 'no', '0', 'blocked', 'missing', 'mismatch', 'not_verified', 'failed')
                     ) AS cert_coc_blocked,
                     (
+                        (meta ? 'iqc_blocked')
+                        OR (meta ? 'iqc_released')
+                    ) AS iqc_declared,
+                    (
                         LOWER(COALESCE(metadata->>'iqc_blocked', '')) IN
                             ('true', 'yes', '1', 'blocked', 'hold', 'rejected', 'failed')
                         OR LOWER(COALESCE(metadata->>'iqc_released', '')) IN
                             ('false', 'no', '0', 'blocked', 'hold', 'pending', 'rejected', 'failed')
                     ) AS iqc_blocked,
+                    (
+                        (meta ? 'traceability_blocked')
+                        OR (meta ? 'traceability_label_verified')
+                    ) AS traceability_declared,
                     (
                         LOWER(COALESCE(metadata->>'traceability_blocked', '')) IN
                             ('true', 'yes', '1', 'blocked', 'missing', 'mismatch', 'failed')
@@ -2211,15 +2264,28 @@ final class KpiEngine
                             ('false', 'no', '0', 'blocked', 'missing', 'mismatch', 'failed')
                     ) AS traceability_blocked,
                     (
+                        (meta ? 'special_process_blocked')
+                        OR (meta ? 'special_process_clear')
+                    ) AS special_process_declared,
+                    (
                         LOWER(COALESCE(metadata->>'special_process_blocked', '')) IN
                             ('true', 'yes', '1', 'blocked', 'missing', 'unclear', 'failed')
                         OR LOWER(COALESCE(metadata->>'special_process_clear', '')) IN
                             ('false', 'no', '0', 'blocked', 'missing', 'unclear', 'failed')
                     ) AS special_process_blocked,
                     (
+                        (meta ? 'kit_ready_before_constraint')
+                    ) AS kit_declared,
+                    (
                         LOWER(COALESCE(metadata->>'kit_ready_before_constraint', '')) IN
                             ('false', 'no', '0', 'blocked', 'missing', 'not_ready', 'failed')
                     ) AS kit_blocked,
+                    (
+                        (meta ? 'tool_fixture_gage_blocked')
+                        OR (meta ? 'tooling_available')
+                        OR (meta ? 'fixture_available')
+                        OR (meta ? 'gage_ready')
+                    ) AS tool_fixture_gage_declared,
                     (
                         LOWER(COALESCE(metadata->>'tool_fixture_gage_blocked', '')) IN
                             ('true', 'yes', '1', 'blocked', 'missing', 'failed')
@@ -2238,6 +2304,12 @@ final class KpiEngine
                 COUNT(*) FILTER (WHERE physical_ready) AS material_status_ready,
                 COUNT(*) FILTER (
                     WHERE physical_ready
+                      AND cert_coc_declared
+                      AND iqc_declared
+                      AND traceability_declared
+                      AND special_process_declared
+                      AND kit_declared
+                      AND tool_fixture_gage_declared
                       AND NOT (
                         cert_coc_blocked OR iqc_blocked OR traceability_blocked
                         OR special_process_blocked OR kit_blocked OR tool_fixture_gage_blocked
@@ -2245,15 +2317,38 @@ final class KpiEngine
                 ) AS ready,
                 COUNT(*) FILTER (WHERE NOT physical_ready) AS material_status_not_ready,
                 COUNT(*) FILTER (WHERE cert_coc_blocked) AS cert_coc_blocked,
+                COUNT(*) FILTER (WHERE cert_coc_declared AND NOT cert_coc_blocked) AS cert_coc_ready,
+                COUNT(*) FILTER (WHERE physical_ready AND NOT cert_coc_declared) AS cert_coc_metadata_missing,
                 COUNT(*) FILTER (WHERE iqc_blocked) AS iqc_blocked,
+                COUNT(*) FILTER (WHERE iqc_declared AND NOT iqc_blocked) AS iqc_ready,
+                COUNT(*) FILTER (WHERE physical_ready AND NOT iqc_declared) AS iqc_metadata_missing,
                 COUNT(*) FILTER (WHERE traceability_blocked) AS traceability_blocked,
+                COUNT(*) FILTER (WHERE traceability_declared AND NOT traceability_blocked) AS traceability_ready,
+                COUNT(*) FILTER (WHERE physical_ready AND NOT traceability_declared) AS traceability_metadata_missing,
                 COUNT(*) FILTER (WHERE special_process_blocked) AS special_process_blocked,
+                COUNT(*) FILTER (WHERE special_process_declared AND NOT special_process_blocked) AS special_process_ready,
+                COUNT(*) FILTER (WHERE physical_ready AND NOT special_process_declared) AS special_process_metadata_missing,
                 COUNT(*) FILTER (WHERE kit_blocked) AS kit_blocked,
+                COUNT(*) FILTER (WHERE kit_declared AND NOT kit_blocked) AS kit_ready,
+                COUNT(*) FILTER (WHERE physical_ready AND NOT kit_declared) AS kit_metadata_missing,
                 COUNT(*) FILTER (WHERE tool_fixture_gage_blocked) AS tool_fixture_gage_blocked,
+                COUNT(*) FILTER (WHERE tool_fixture_gage_declared AND NOT tool_fixture_gage_blocked) AS tool_fixture_gage_ready,
+                COUNT(*) FILTER (WHERE physical_ready AND NOT tool_fixture_gage_declared) AS tool_fixture_gage_metadata_missing,
                 COUNT(*) FILTER (
                     WHERE cert_coc_blocked OR iqc_blocked OR traceability_blocked
                        OR special_process_blocked OR kit_blocked OR tool_fixture_gage_blocked
                 ) AS readiness_blocked_jobs,
+                COUNT(*) FILTER (
+                    WHERE physical_ready
+                      AND NOT (
+                        cert_coc_declared
+                        AND iqc_declared
+                        AND traceability_declared
+                        AND special_process_declared
+                        AND kit_declared
+                        AND tool_fixture_gage_declared
+                      )
+                ) AS readiness_component_metadata_missing,
                 COUNT(*) FILTER (
                     WHERE (meta ? 'material_cert_blocked')
                        OR (meta ? 'mill_cert_coc_verified')
@@ -2278,6 +2373,7 @@ final class KpiEngine
         $ready = (int) ($row['ready'] ?? 0);
         $materialStatusReady = (int) ($row['material_status_ready'] ?? 0);
         $metadataDeclared = (int) ($row['readiness_metadata_declared'] ?? 0);
+        $requiredMetadataMissing = (int) ($row['readiness_component_metadata_missing'] ?? 0);
         $pct = $total > 0 ? ($ready / $total) * 100 : 0.0;
 
         $componentBlockers = [
@@ -2288,6 +2384,65 @@ final class KpiEngine
             'special_process_blocked' => (int) ($row['special_process_blocked'] ?? 0),
             'kit_blocked' => (int) ($row['kit_blocked'] ?? 0),
             'tool_fixture_gage_blocked' => (int) ($row['tool_fixture_gage_blocked'] ?? 0),
+            'readiness_component_metadata_missing' => $requiredMetadataMissing,
+        ];
+        $componentBreakdown = [
+            [
+                'component_code' => 'physical_material_available',
+                'required_for_green' => true,
+                'ready_jobs' => $materialStatusReady,
+                'blocked_jobs' => (int) ($row['material_status_not_ready'] ?? 0),
+                'metadata_missing_jobs' => 0,
+                'declared_jobs' => $total,
+            ],
+            [
+                'component_code' => 'mill_cert_coc_verified',
+                'required_for_green' => true,
+                'ready_jobs' => (int) ($row['cert_coc_ready'] ?? 0),
+                'blocked_jobs' => (int) ($row['cert_coc_blocked'] ?? 0),
+                'metadata_missing_jobs' => (int) ($row['cert_coc_metadata_missing'] ?? 0),
+                'declared_jobs' => max(0, $total - (int) ($row['cert_coc_metadata_missing'] ?? 0)),
+            ],
+            [
+                'component_code' => 'iqc_released',
+                'required_for_green' => true,
+                'ready_jobs' => (int) ($row['iqc_ready'] ?? 0),
+                'blocked_jobs' => (int) ($row['iqc_blocked'] ?? 0),
+                'metadata_missing_jobs' => (int) ($row['iqc_metadata_missing'] ?? 0),
+                'declared_jobs' => max(0, $total - (int) ($row['iqc_metadata_missing'] ?? 0)),
+            ],
+            [
+                'component_code' => 'traceability_label_verified',
+                'required_for_green' => true,
+                'ready_jobs' => (int) ($row['traceability_ready'] ?? 0),
+                'blocked_jobs' => (int) ($row['traceability_blocked'] ?? 0),
+                'metadata_missing_jobs' => (int) ($row['traceability_metadata_missing'] ?? 0),
+                'declared_jobs' => max(0, $total - (int) ($row['traceability_metadata_missing'] ?? 0)),
+            ],
+            [
+                'component_code' => 'special_process_clear',
+                'required_for_green' => true,
+                'ready_jobs' => (int) ($row['special_process_ready'] ?? 0),
+                'blocked_jobs' => (int) ($row['special_process_blocked'] ?? 0),
+                'metadata_missing_jobs' => (int) ($row['special_process_metadata_missing'] ?? 0),
+                'declared_jobs' => max(0, $total - (int) ($row['special_process_metadata_missing'] ?? 0)),
+            ],
+            [
+                'component_code' => 'kit_ready_before_constraint',
+                'required_for_green' => true,
+                'ready_jobs' => (int) ($row['kit_ready'] ?? 0),
+                'blocked_jobs' => (int) ($row['kit_blocked'] ?? 0),
+                'metadata_missing_jobs' => (int) ($row['kit_metadata_missing'] ?? 0),
+                'declared_jobs' => max(0, $total - (int) ($row['kit_metadata_missing'] ?? 0)),
+            ],
+            [
+                'component_code' => 'tool_fixture_gage_ready',
+                'required_for_green' => true,
+                'ready_jobs' => (int) ($row['tool_fixture_gage_ready'] ?? 0),
+                'blocked_jobs' => (int) ($row['tool_fixture_gage_blocked'] ?? 0),
+                'metadata_missing_jobs' => (int) ($row['tool_fixture_gage_metadata_missing'] ?? 0),
+                'declared_jobs' => max(0, $total - (int) ($row['tool_fixture_gage_metadata_missing'] ?? 0)),
+            ],
         ];
         $dataQualityFlags = [];
         foreach ($componentBlockers as $key => $count) {
@@ -2295,7 +2450,9 @@ final class KpiEngine
                 $dataQualityFlags[] = "material_readiness_{$key}_count={$count}";
             }
         }
-        if ($total > 0 && $metadataDeclared < $total) {
+        if ($requiredMetadataMissing > 0) {
+            $dataQualityFlags[] = 'material_readiness_component_metadata_missing_count=' . $requiredMetadataMissing;
+        } elseif ($total > 0 && $metadataDeclared < $total) {
             $dataQualityFlags[] = 'material_readiness_component_metadata_missing_count=' . ($total - $metadataDeclared);
         }
 
@@ -2309,11 +2466,13 @@ final class KpiEngine
             'physical_material_ready' => $materialStatusReady,
             'readiness_blocked_jobs' => (int) ($row['readiness_blocked_jobs'] ?? 0),
             'readiness_metadata_declared' => $metadataDeclared,
+            'readiness_component_metadata_missing' => $requiredMetadataMissing,
             'data_source' => 'job_orders.material_readiness_status+metadata_readiness_blockers',
             'empty_result' => $total === 0,
             'breakdown' => [
                 'component_blockers' => $componentBlockers,
                 'metadata_component_coverage_pct' => $total > 0 ? round(($metadataDeclared / $total) * 100, 2) : 0.0,
+                'components' => $componentBreakdown,
             ],
             'data_quality_flags' => $dataQualityFlags,
         ];
@@ -2481,6 +2640,9 @@ final class KpiEngine
         if ($unscored > 0) {
             $dataQualityFlags[] = "unscored_fai_result_count={$unscored}";
         }
+        if ($total < 5) {
+            $dataQualityFlags[] = "small_lot_event_review_required_n={$total}";
+        }
 
         // Breakdowns: by part_number (product family proxy), by fai_type, by customer.
         $breakdown = [
@@ -2566,6 +2728,7 @@ final class KpiEngine
             'total'        => $total,
             'breakdown'    => $breakdown,
             'data_source'  => 'fai_records',
+            'small_lot_review_required' => $total < 5,
             'data_quality_flags' => $dataQualityFlags,
         ];
     }
@@ -2615,6 +2778,9 @@ final class KpiEngine
         $dataQualityFlags = [];
         if ($unscored > 0) {
             $dataQualityFlags[] = "unscored_ipqc_result_count={$unscored}";
+        }
+        if ($total < 10) {
+            $dataQualityFlags[] = "small_lot_event_review_required_n={$total}";
         }
 
         // Breakdowns: by defect_code, by characteristic. Workcenter/shift are
@@ -2703,6 +2869,7 @@ final class KpiEngine
             'total'        => $total,
             'breakdown'    => $breakdown,
             'data_source'  => 'ipqc_inspection_results',
+            'small_lot_review_required' => $total < 10,
             'data_quality_flags' => $dataQualityFlags,
         ];
     }
@@ -2719,7 +2886,17 @@ final class KpiEngine
 
         $row = $this->db->queryOne(
             "WITH scoped AS (
-                SELECT shipment_status, packlist_status, coc_status, coa_status, customs_status
+                SELECT
+                    shipment_status,
+                    packlist_status,
+                    coc_status,
+                    coa_status,
+                    customs_status,
+                    LOWER(COALESCE(meta->>'gage_release_blocked', '')) IN
+                        ('true', 'yes', '1', 'blocked', 'invalid', 'failed') AS gage_release_blocked,
+                    LOWER(COALESCE(meta->>'gage_valid_for_release', '')) IN
+                        ('false', 'no', '0', 'blocked', 'invalid', 'failed') AS gage_valid_for_release_false,
+                    COALESCE(metadata, '{}'::jsonb) AS meta
                 FROM shipment_releases
                 WHERE COALESCE(actual_ship_date, planned_ship_date, updated_at::date, created_at::date)
                     BETWEEN (:s)::date AND (:e)::date
@@ -2731,13 +2908,23 @@ final class KpiEngine
                       AND lower(COALESCE(coc_status, '')) IN {$completeStatuses}
                       AND lower(COALESCE(coa_status, '')) IN {$completeStatuses}
                       AND lower(COALESCE(customs_status, 'not_required')) IN {$customsCompleteStatuses}
+                      AND NOT (
+                        LOWER(COALESCE(meta->>'check_dimension_report_required', '')) IN ('true', 'yes', '1', 'required')
+                        AND COALESCE(
+                            NULLIF(BTRIM(meta->>'check_dimension_report_link'), ''),
+                            NULLIF(BTRIM(meta->>'report_file_path'), '')
+                        ) IS NULL
+                        AND LOWER(COALESCE(meta->>'check_dimension_report_status', '')) NOT IN {$completeStatuses}
+                        AND LOWER(COALESCE(meta->>'check_dimension_report_attached', '')) NOT IN ('true', 'yes', '1', 'attached', 'available')
+                      )
+                      AND NOT (gage_release_blocked OR gage_valid_for_release_false)
                 ) AS complete,
                 COUNT(*) FILTER (
                     WHERE COALESCE(packlist_status, '') = ''
                        OR COALESCE(coc_status, '') = ''
                        OR COALESCE(coa_status, '') = ''
                        OR COALESCE(customs_status, '') = ''
-                ) AS missing_status
+                    ) AS missing_status
              FROM scoped",
             $params,
         );
@@ -2769,6 +2956,19 @@ final class KpiEngine
                               AND lower(COALESCE(coc_status, '')) IN {$completeStatuses}
                               AND lower(COALESCE(coa_status, '')) IN {$completeStatuses}
                               AND lower(COALESCE(customs_status, 'not_required')) IN {$customsCompleteStatuses}
+                              AND NOT (
+                                LOWER(COALESCE(metadata->>'check_dimension_report_required', '')) IN ('true', 'yes', '1', 'required')
+                                AND COALESCE(
+                                    NULLIF(BTRIM(metadata->>'check_dimension_report_link'), ''),
+                                    NULLIF(BTRIM(metadata->>'report_file_path'), '')
+                                ) IS NULL
+                                AND LOWER(COALESCE(metadata->>'check_dimension_report_status', '')) NOT IN {$completeStatuses}
+                                AND LOWER(COALESCE(metadata->>'check_dimension_report_attached', '')) NOT IN ('true', 'yes', '1', 'attached', 'available')
+                              )
+                              AND NOT (
+                                LOWER(COALESCE(metadata->>'gage_release_blocked', '')) IN ('true', 'yes', '1', 'blocked', 'invalid', 'failed')
+                                OR LOWER(COALESCE(metadata->>'gage_valid_for_release', '')) IN ('false', 'no', '0', 'blocked', 'invalid', 'failed')
+                              )
                         ) AS complete
                  FROM shipment_releases
                  WHERE COALESCE(actual_ship_date, planned_ship_date, updated_at::date, created_at::date)
@@ -2793,7 +2993,20 @@ final class KpiEngine
                     COUNT(*) FILTER (WHERE lower(COALESCE(packlist_status, '')) NOT IN {$completeStatuses}) AS packlist_gap,
                     COUNT(*) FILTER (WHERE lower(COALESCE(coc_status, '')) NOT IN {$completeStatuses}) AS coc_gap,
                     COUNT(*) FILTER (WHERE lower(COALESCE(coa_status, '')) NOT IN {$completeStatuses}) AS coa_gap,
-                    COUNT(*) FILTER (WHERE lower(COALESCE(customs_status, 'not_required')) NOT IN {$customsCompleteStatuses}) AS customs_gap
+                    COUNT(*) FILTER (WHERE lower(COALESCE(customs_status, 'not_required')) NOT IN {$customsCompleteStatuses}) AS customs_gap,
+                    COUNT(*) FILTER (
+                        WHERE LOWER(COALESCE(metadata->>'check_dimension_report_required', '')) IN ('true', 'yes', '1', 'required')
+                          AND COALESCE(
+                              NULLIF(BTRIM(metadata->>'check_dimension_report_link'), ''),
+                              NULLIF(BTRIM(metadata->>'report_file_path'), '')
+                          ) IS NULL
+                          AND LOWER(COALESCE(metadata->>'check_dimension_report_status', '')) NOT IN {$completeStatuses}
+                          AND LOWER(COALESCE(metadata->>'check_dimension_report_attached', '')) NOT IN ('true', 'yes', '1', 'attached', 'available')
+                    ) AS check_dimension_gap,
+                    COUNT(*) FILTER (
+                        WHERE LOWER(COALESCE(metadata->>'gage_release_blocked', '')) IN ('true', 'yes', '1', 'blocked', 'invalid', 'failed')
+                           OR LOWER(COALESCE(metadata->>'gage_valid_for_release', '')) IN ('false', 'no', '0', 'blocked', 'invalid', 'failed')
+                    ) AS gage_release_gap
                  FROM shipment_releases
                  WHERE COALESCE(actual_ship_date, planned_ship_date, updated_at::date, created_at::date)
                     BETWEEN (:s)::date AND (:e)::date",
@@ -2804,6 +3017,8 @@ final class KpiEngine
                 'coc_gap' => (int) ($gapRow['coc_gap'] ?? 0),
                 'coa_gap' => (int) ($gapRow['coa_gap'] ?? 0),
                 'customs_gap' => (int) ($gapRow['customs_gap'] ?? 0),
+                'check_dimension_gap' => (int) ($gapRow['check_dimension_gap'] ?? 0),
+                'gage_release_gap' => (int) ($gapRow['gage_release_gap'] ?? 0),
             ];
         } catch (\Throwable) {
             // best-effort breakdown only; primary value remains authoritative.
@@ -2812,6 +3027,14 @@ final class KpiEngine
         $flags = [];
         if ($missingStatus > 0) {
             $flags[] = "shipment_release_missing_document_status_count={$missingStatus}";
+        }
+        $checkDimensionGap = (int) ($breakdown['document_gap']['check_dimension_gap'] ?? 0);
+        if ($checkDimensionGap > 0) {
+            $flags[] = "shipment_release_check_dimension_gap_count={$checkDimensionGap}";
+        }
+        $gageReleaseGap = (int) ($breakdown['document_gap']['gage_release_gap'] ?? 0);
+        if ($gageReleaseGap > 0) {
+            $flags[] = "shipment_release_gage_release_gap_count={$gageReleaseGap}";
         }
 
         return [
@@ -3651,7 +3874,10 @@ final class KpiEngine
         foreach ($catalog as $code => &$metric) {
             $override = array_merge($scorecardItems[$code] ?? [], $overrides[$code] ?? []);
             $sources = $this->stringListFromValue($metric['sources'] ?? []);
-            $usageTypes = $this->inferUsageTypes($sources);
+            $usageTypes = array_merge(
+                $this->stringListFromValue($metric['usage_types'] ?? []),
+                $this->inferUsageTypes($sources),
+            );
             foreach ($this->stringListFromValue($override['usage_types'] ?? []) as $usageType) {
                 $usageTypes[] = $usageType;
             }
@@ -3754,6 +3980,15 @@ final class KpiEngine
             return [];
         }
 
+        $pilotProgram = is_array($registry['pilot_governance_program'] ?? null)
+            ? $registry['pilot_governance_program'] : [];
+        $freeze = is_array($pilotProgram['reward_freeze_controls'] ?? null)
+            ? $pilotProgram['reward_freeze_controls'] : [];
+        $pilotRewardFreezeActive = ($freeze['monetary_payout_allowed'] ?? true) === false
+            && ($freeze['payroll_impact_allowed'] ?? true) === false;
+        $pilotRewardFreezeRule = is_string($pilotProgram['reward_freeze_rule'] ?? null)
+            ? trim((string) $pilotProgram['reward_freeze_rule']) : '';
+
         $contracts = [];
         $rawContracts = $registry['scorecard_evidence_contracts'] ?? [];
         if (is_array($rawContracts)) {
@@ -3775,7 +4010,13 @@ final class KpiEngine
             }
             $code = $this->codeField($row, 'canonical_code');
             if ($code !== '') {
-                $items[$code] = array_merge($row, $contracts[$code] ?? []);
+                $merged = array_merge($row, $contracts[$code] ?? []);
+                if ($pilotRewardFreezeActive) {
+                    $merged['pilot_reward_freeze_active'] = true;
+                    $merged['pilot_reward_freeze_rule'] = $pilotRewardFreezeRule;
+                    $merged['scorecard_contributes_to_reward'] = false;
+                }
+                $items[$code] = $merged;
             }
         }
 
@@ -4122,6 +4363,17 @@ final class KpiEngine
         $metric['scorecard_contributes_to_reward'] = $scorecardApplicable
             ? ($this->boolField($override, 'scorecard_contributes_to_reward') ?? false)
             : false;
+        $pilotRewardFreezeActive = ($override['pilot_reward_freeze_active'] ?? false) === true;
+        if ($pilotRewardFreezeActive) {
+            $metric['scorecard_contributes_to_reward'] = false;
+            $metric['reward_eligible'] = false;
+            $metric['reward_freeze_active'] = true;
+            $metric['reward_freeze_rule'] = $this->overrideOrDefault(
+                $override,
+                'pilot_reward_freeze_rule',
+                'Pilot reward freeze active.',
+            );
+        }
         $metric['scorecard_governance_reason'] = $scorecardApplicable
             ? $this->overrideOrDefault($override, 'scorecard_governance_reason', 'Executive scorecard item governed by scorecard_operating_model.')
             : 'Not an executive scorecard item; use metric_type/evaluation_use/consequence for local control only.';
@@ -4136,9 +4388,11 @@ final class KpiEngine
 	            $metric['consequence']['recognition_rule'] = $metric['reward_rule'];
 	            $metric['consequence']['recognition_applicable'] = $metric['scorecard_contributes_to_reward'];
 	            $metric['consequence']['calibration_input_only'] = !$metric['scorecard_contributes_to_reward'];
-	            $metric['consequence']['monetary_recognition_status'] = $metric['scorecard_contributes_to_reward']
-	                ? 'eligible_after_hr_qms_ceo_calibration_and_blocker_check'
-	                : (string) $metric['scorecard_scoring_status'];
+	            $metric['consequence']['monetary_recognition_status'] = $pilotRewardFreezeActive
+	                ? 'pilot_reward_freeze_active'
+	                : ($metric['scorecard_contributes_to_reward']
+	                    ? 'eligible_after_hr_qms_ceo_calibration_and_blocker_check'
+	                    : (string) $metric['scorecard_scoring_status']);
 	        }
 	    }
 
@@ -4257,6 +4511,33 @@ final class KpiEngine
                     ? (bool) ($samplePolicy['gage_validity_required'] ?? true)
                     : true,
                 'customer_claim_rule' => 'n>=customer_grade_n and stable+gage-valid+spec-present+post-change-revalidated',
+            ];
+        }
+        if (in_array('ctq_capability_contract', $this->stringListFromValue($metric['usage_types'] ?? []), true)) {
+            $metric['metric_control']['ctq_status_card'] = [
+                'panel_id' => 'CTQ-STATUS-CARD-LAM-2026-05',
+                'policy_ref' => 'ctq_capability_policy',
+                'required_fields' => [
+                    'calculation_status',
+                    'data_confidence_level',
+                    'data_contract_gap',
+                    'target_graduation_condition',
+                    'sample_policy',
+                    'blockers',
+                    'evidence_source',
+                    'owner_role',
+                    'action_when_red',
+                ],
+                'capability_fields' => [
+                    'capability_status',
+                    'sample_band',
+                    'numeric_cpk_suppressed',
+                    'customer_claim_allowed',
+                    'stable',
+                    'gage_valid',
+                    'change_revalidated',
+                ],
+                'render_contract' => 'CTQ cards must suppress numeric green claims when insufficient, unstable, gage-invalid, or missing revalidation evidence.',
             ];
         }
     }

@@ -192,6 +192,7 @@ td,th{vertical-align:top}
 
 <h3>7.5 Trọng số, ngưỡng định lượng và reward gate</h3>
 <p>Scorecard lãnh đạo dùng model <span class="code">CNC-EXEC-BSC-LEAN-7+DRIVERS-2026</span>. Tổng weight của 7 <span class="code">scored_core</span> bằng 100%. Strategic driver panel và gate blocker có thể hiển thị trên dashboard lãnh đạo để hướng hành động, cap hoặc chặn recognition, nhưng không cộng điểm và không payout khi chưa được nâng cấp bằng data contract, change control và phê duyệt vận hành thử. Mỗi scored core có target, ngưỡng xanh/vàng/đỏ, criteria đánh giá, reward rule, blocking conditions và scoring trạng thái trong registry. Tài liệu khác chỉ được tham chiếu, không tự tạo trọng số riêng.</p>
+<div class="note"><b>Prompt 03 high-mix threshold authority.</b> Registry phải giữ khối <span class="code">threshold_policy</span> làm SSOT cho ngưỡng: official scorecard policy, gate policy, small-lot policy, Cpk sample policy, severity policy và pilot calibration policy. Nếu pilot reward freeze còn hiệu lực, các contract trong <span class="code">scorecard_evidence_contracts</span> phải để <span class="code">scorecard_contributes_to_reward=false</span> dù metric vẫn hiển thị trên scorecard quản trị.</div>
 <div class="table-card"><table class="table">
 <thead><tr><th>Thành phần</th><th>Quy tắc</th><th>Ý nghĩa thực chiến</th></tr></thead>
 <tbody>

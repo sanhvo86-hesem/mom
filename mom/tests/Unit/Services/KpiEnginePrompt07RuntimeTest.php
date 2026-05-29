@@ -51,7 +51,7 @@ final class KpiEnginePrompt07RuntimeTest extends TestCase
         $db = new Prompt07KpiFakeConnection(
             queryOneRows: [
                 ['total' => 4, 'complete' => 3, 'missing_status' => 1],
-                ['packlist_gap' => 0, 'coc_gap' => 1, 'coa_gap' => 0, 'customs_gap' => 0],
+                ['packlist_gap' => 0, 'coc_gap' => 1, 'coa_gap' => 0, 'customs_gap' => 0, 'check_dimension_gap' => 0],
             ],
             queryRows: [
                 [['key' => 'planning', 'count' => 4, 'complete' => 3]],
@@ -71,6 +71,59 @@ final class KpiEnginePrompt07RuntimeTest extends TestCase
         self::assertSame(1, $result->breakdown['breakdown']['document_gap']['coc_gap'] ?? null);
         self::assertContains(
             'shipment_release_missing_document_status_count=1',
+            $result->breakdown['data_quality_flags'] ?? [],
+        );
+    }
+
+    public function testShipPacketCompletenessFailsWhenCheckDimensionEvidenceIsRequiredButMissing(): void
+    {
+        $db = new Prompt07KpiFakeConnection(
+            queryOneRows: [
+                ['total' => 2, 'complete' => 1, 'missing_status' => 0],
+                ['packlist_gap' => 0, 'coc_gap' => 0, 'coa_gap' => 0, 'customs_gap' => 0, 'check_dimension_gap' => 1],
+            ],
+            queryRows: [
+                [['key' => 'released', 'count' => 2, 'complete' => 1]],
+            ],
+        );
+
+        $result = (new KpiEngine($db))->calculateKpi(
+            'SHIP_PACKET_COMPLETENESS',
+            new DateRange('2026-05-01', '2026-05-31'),
+        );
+
+        self::assertSame(50.0, $result->value);
+        self::assertSame(1, $result->breakdown['numerator'] ?? null);
+        self::assertSame(2, $result->breakdown['denominator'] ?? null);
+        self::assertSame(1, $result->breakdown['breakdown']['document_gap']['check_dimension_gap'] ?? null);
+        self::assertSame(1, $result->breakdown['breakdown']['by_shipment_status'][0]['complete'] ?? null);
+        self::assertContains(
+            'shipment_release_check_dimension_gap_count=1',
+            $result->breakdown['data_quality_flags'] ?? [],
+        );
+    }
+
+    public function testShipPacketCompletenessFailsWhenGageValidityBlocksRelease(): void
+    {
+        $db = new Prompt07KpiFakeConnection(
+            queryOneRows: [
+                ['total' => 3, 'complete' => 2, 'missing_status' => 0],
+                ['packlist_gap' => 0, 'coc_gap' => 0, 'coa_gap' => 0, 'customs_gap' => 0, 'check_dimension_gap' => 0, 'gage_release_gap' => 1],
+            ],
+            queryRows: [
+                [['key' => 'released', 'count' => 3, 'complete' => 2]],
+            ],
+        );
+
+        $result = (new KpiEngine($db))->calculateKpi(
+            'SHIP_PACKET_COMPLETENESS',
+            new DateRange('2026-05-01', '2026-05-31'),
+        );
+
+        self::assertSame(66.67, $result->value);
+        self::assertSame(1, $result->breakdown['breakdown']['document_gap']['gage_release_gap'] ?? null);
+        self::assertContains(
+            'shipment_release_gage_release_gap_count=1',
             $result->breakdown['data_quality_flags'] ?? [],
         );
     }

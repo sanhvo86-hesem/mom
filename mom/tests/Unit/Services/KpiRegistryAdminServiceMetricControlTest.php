@@ -56,6 +56,8 @@ final class KpiRegistryAdminServiceMetricControlTest extends TestCase
             'calculation_status' => 'runtime_calculated',
             'reward_mode' => 'bonus_pool_candidate',
             'attribution_rule' => 'service test attribution rule',
+            'backend_status' => 'runtime_calculated',
+            'primary_endpoint' => 'GET /api/kpi/TEST_MCO_SERVICE',
             'formula' => [
                 'min_sample' => 5,
             ],
@@ -64,6 +66,23 @@ final class KpiRegistryAdminServiceMetricControlTest extends TestCase
         $validator($row, true);
 
         $this->addToAssertionCount(1);
+    }
+
+    public function testServiceRejectsRuntimeMetricWithoutBackendStatus(): void
+    {
+        $validator = $this->validator();
+        $row = $this->completeMetricControlRow([
+            'calculation_status' => 'runtime_calculated',
+            'data_contract_gap' => '',
+            'target_graduation_condition' => '',
+            'backend_status' => '',
+            'primary_endpoint' => 'GET /api/kpi/TEST_MCO_SERVICE',
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('kpi_registry_mco_runtime_missing_backend_status:TEST_MCO_SERVICE');
+
+        $validator($row, false);
     }
 
     public function testServiceAllowsStagedPilotCpkMetricWithStrictSamplePolicy(): void
@@ -87,6 +106,100 @@ final class KpiRegistryAdminServiceMetricControlTest extends TestCase
         $validator($row, true);
     }
 
+    public function testServiceRejectsBlockerMetricWithoutBlockerOnlyContract(): void
+    {
+        $validator = $this->validator();
+        $row = $this->completeMetricControlRow([
+            'canonical_code' => 'TEST_BLOCKER_SERVICE',
+            'metric_subtype' => 'blocker_metric',
+            'reward_mode' => 'not_rewardable',
+            'scoring_model_detail' => 'blocker_only',
+            'hold_release_rule' => '',
+            'decision_action' => '',
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('kpi_registry_mco_blocker_invalid_reward_mode:TEST_BLOCKER_SERVICE');
+
+        $validator($row, true);
+    }
+
+    public function testServiceRejectsGateMetricWithoutLinkedCdr(): void
+    {
+        $validator = $this->validator();
+        $row = $this->completeMetricControlRow([
+            'canonical_code' => 'TEST_GATE_SERVICE',
+            'metric_subtype' => 'gate_control_metric',
+            'measurement_data_type' => 'binary_event',
+            'scoring_model_detail' => 'binary_pass_fail',
+            'evaluation_use' => 'gate_hold_release',
+            'reward_mode' => 'blocker_only',
+            'gate' => 'G5',
+            'linked_cdr' => [],
+            'gate_pass_condition' => 'All required release evidence complete.',
+            'hold_release_rule' => 'Hold shipment until evidence is complete.',
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('kpi_registry_mco_gate_missing_linked_cdr:TEST_GATE_SERVICE');
+
+        $validator($row, true);
+    }
+
+    public function testServiceRejectsCanonicalCodeWithVietnameseCharacters(): void
+    {
+        $validator = $this->validator();
+        $row = $this->completeMetricControlRow([
+            'canonical_code' => 'CHECK_DIM_BÁO_CÁO',
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('kpi_registry_mco_invalid_code:CHECK_DIM_BÁO_CÁO');
+
+        $validator($row, true);
+    }
+
+    public function testServiceRejectsCompositeWeightsNotEqualToHundred(): void
+    {
+        $validator = $this->validator();
+        $row = $this->completeMetricControlRow([
+            'canonical_code' => 'TEST_COMPOSITE_SERVICE',
+            'metric_subtype' => 'composite_readiness_index',
+            'measurement_data_type' => 'composite_index',
+            'scoring_model_detail' => 'composite_weighted_score',
+            'reward_mode' => 'not_rewardable',
+            'components' => [
+                ['code' => 'A', 'weight_pct' => 60, 'name' => 'A'],
+                ['code' => 'B', 'weight_pct' => 30, 'name' => 'B'],
+            ],
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('kpi_registry_mco_composite_weights_not_100:TEST_COMPOSITE_SERVICE');
+
+        $validator($row, true);
+    }
+
+    public function testServiceRejectsRoleMeasureWithoutControllability(): void
+    {
+        $validator = $this->validator();
+        $row = $this->completeMetricControlRow([
+            'canonical_code' => 'TEST_ROLE_SERVICE',
+            'metric_subtype' => 'role_performance_measure',
+            'evaluation_use' => 'role_performance_review',
+            'controllability_scope' => '',
+            'role_assignments' => [
+                ['role' => 'QA', 'assignment_type' => 'role_measure_active', 'weight_pct' => 100],
+            ],
+            'action_when_red' => 'Open same-day coaching and evidence review.',
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('kpi_registry_mco_role_missing_controllability:TEST_ROLE_SERVICE');
+
+        $validator($row, true);
+    }
+
     public function testLoadExposesPrompt10AdminConsoleContractAndIntegrityPanels(): void
     {
         $repoRoot = dirname(__DIR__, 4);
@@ -94,10 +207,10 @@ final class KpiRegistryAdminServiceMetricControlTest extends TestCase
 
         $config = $service->load();
 
-        self::assertSame(
-            'KPI-ADMIN-CONSOLE-DYNAMIC-UX-P10',
-            $config['admin_console_contract']['contract_id'] ?? null,
-        );
+        self::assertSame('KPI-ADMIN-CONSOLE-DYNAMIC-UX-P13', $config['admin_console_contract']['contract_id'] ?? null);
+        self::assertSame('field_structured_no_raw_json', $config['admin_console_contract']['editor_mode'] ?? null);
+        self::assertTrue($config['admin_console_contract']['ui_render_contract']['suppress_staged_numeric_values'] ?? false);
+        self::assertSame('LAM-EVIDENCE-PACK-CONTRACT-P15', $config['lam_evidence_pack_contract']['contract_id'] ?? null);
         self::assertArrayHasKey('integrity_panels', $config['admin_views'] ?? []);
         self::assertArrayHasKey('bsc_model', $config['admin_views']['integrity_panels'] ?? []);
         self::assertArrayHasKey('annex128_matrix', $config['admin_views']['integrity_panels'] ?? []);

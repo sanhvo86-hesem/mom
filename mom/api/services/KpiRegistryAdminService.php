@@ -249,6 +249,8 @@ final class KpiRegistryAdminService
                 ? $seed['ctq_capability_policy'] : new \stdClass(),
             'ctq_data_contract' => is_array($seed['ctq_data_contract'] ?? null)
                 ? $seed['ctq_data_contract'] : new \stdClass(),
+            'lam_evidence_pack_contract' => is_array($seed['lam_evidence_pack_contract'] ?? null)
+                ? $seed['lam_evidence_pack_contract'] : new \stdClass(),
             'lean_flow_operating_model' => is_array($seed['lean_flow_operating_model'] ?? null)
                 ? $seed['lean_flow_operating_model'] : new \stdClass(),
             // P08 — dashboard render + manual input contracts are exposed to
@@ -758,6 +760,20 @@ final class KpiRegistryAdminService
                 throw new RuntimeException('kpi_registry_mco_gate_invalid_reward_mode:' . $code);
             }
         }
+        if ($subtype === 'blocker_metric') {
+            if ($rewardMode !== 'blocker_only') {
+                throw new RuntimeException('kpi_registry_mco_blocker_invalid_reward_mode:' . $code);
+            }
+            if ($scoring !== 'blocker_only') {
+                throw new RuntimeException('kpi_registry_mco_blocker_invalid_scoring_model:' . $code);
+            }
+            if (!$this->hasNonEmptyList($row['blocking_conditions'] ?? null)) {
+                throw new RuntimeException('kpi_registry_mco_blocker_missing_conditions:' . $code);
+            }
+            if (!$this->hasText($row, 'hold_release_rule') && !$this->hasText($row, 'decision_action')) {
+                throw new RuntimeException('kpi_registry_mco_blocker_missing_hold_or_action:' . $code);
+            }
+        }
         if ($calcStatus === 'manual_governed') {
             $manual = $row['manual_input_contract'] ?? null;
             if ((string) ($row['backend_status'] ?? '') !== 'manual_governed') {
@@ -780,6 +796,14 @@ final class KpiRegistryAdminService
             }
             if (!$this->hasText($manual, 'reward_gate')) {
                 throw new RuntimeException('kpi_registry_mco_manual_governed_missing_reward_gate:' . $code);
+            }
+        }
+        if ($calcStatus === 'runtime_calculated') {
+            if ((string) ($row['backend_status'] ?? '') !== 'runtime_calculated') {
+                throw new RuntimeException('kpi_registry_mco_runtime_missing_backend_status:' . $code);
+            }
+            if ((string) ($row['primary_endpoint'] ?? '') !== 'GET /api/kpi/' . $code) {
+                throw new RuntimeException('kpi_registry_mco_runtime_missing_primary_endpoint:' . $code);
             }
         }
 
@@ -1319,7 +1343,8 @@ final class KpiRegistryAdminService
     private function adminConsoleContract(): array
     {
         return [
-            'contract_id' => 'KPI-ADMIN-CONSOLE-DYNAMIC-UX-P10',
+            'contract_id' => 'KPI-ADMIN-CONSOLE-DYNAMIC-UX-P13',
+            'editor_mode' => 'field_structured_no_raw_json',
             'wizard_sections' => [
                 'problem_control_intent',
                 'metric_subtype',
@@ -1337,6 +1362,13 @@ final class KpiRegistryAdminService
                 'calculation_status_runtime_promotion',
                 'source_table',
                 'source_column',
+            ],
+            'ui_render_contract' => [
+                'show_metric_state_badges' => ['runtime_calculated', 'manual_governed', 'staged_data_contract', 'pilot', 'retired'],
+                'suppress_staged_numeric_values' => true,
+                'show_counter_metric_status' => true,
+                'show_action_when_red' => true,
+                'show_evidence_link' => true,
             ],
             'save_policy' => [
                 'console_added_metrics' => 'Chỉ số tạo từ bảng quản trị luôn ở calculation_status=staged_data_contract và lifecycle_status=pilot; bảng quản trị không được tự nâng lên runtime_calculated.',
@@ -2433,11 +2465,23 @@ final class KpiRegistryAdminService
     {
         $profiles = $seed['customer_requirement_profiles']['profiles'] ?? [];
         $profile = is_array($profiles['LAM_SEMSYSCO'] ?? null) ? $profiles['LAM_SEMSYSCO'] : [];
-        $metricLinks = is_array($profile['evidence_pack_metric_links'] ?? null) ? $profile['evidence_pack_metric_links'] : [];
-        $recordKeys = is_array($profile['evidence_pack_record_keys'] ?? null) ? $profile['evidence_pack_record_keys'] : [];
-        $sections = is_array($profile['evidence_pack_sections'] ?? null) ? $profile['evidence_pack_sections'] : [];
-        $retention = is_array($profile['retention_requirements'] ?? null) ? $profile['retention_requirements'] : [];
-        $viewSpec = is_array($profile['audit_pack_view'] ?? null) ? $profile['audit_pack_view'] : [];
+        $contract = is_array($seed['lam_evidence_pack_contract'] ?? null) ? $seed['lam_evidence_pack_contract'] : [];
+        $metricLinks = is_array($contract['mirror_profile_fields']['evidence_pack_metric_links'] ?? null)
+            ? $contract['mirror_profile_fields']['evidence_pack_metric_links']
+            : (is_array($profile['evidence_pack_metric_links'] ?? null) ? $profile['evidence_pack_metric_links'] : []);
+        $recordKeys = is_array($contract['record_keys'] ?? null)
+            ? $contract['record_keys']
+            : (is_array($profile['evidence_pack_record_keys'] ?? null) ? $profile['evidence_pack_record_keys'] : []);
+        $sections = is_array($contract['required_sections'] ?? null)
+            ? $contract['required_sections']
+            : (is_array($profile['evidence_pack_sections'] ?? null) ? $profile['evidence_pack_sections'] : []);
+        $retention = is_array($contract['retention_requirements'] ?? null)
+            ? $contract['retention_requirements']
+            : (is_array($profile['retention_requirements'] ?? null) ? $profile['retention_requirements'] : []);
+        $viewSpec = is_array($contract['audit_pack_view'] ?? null)
+            ? $contract['audit_pack_view']
+            : (is_array($profile['audit_pack_view'] ?? null) ? $profile['audit_pack_view'] : []);
+        $retrievalTest = is_array($contract['retrieval_test'] ?? null) ? $contract['retrieval_test'] : [];
 
         $known = [];
         foreach ($library as $row) {
@@ -2472,6 +2516,14 @@ final class KpiRegistryAdminService
                 'message' => 'LAM/Semsysco evidence-pack profile block is missing.',
             ];
         }
+        if ($contract === []) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'LAM_EVIDENCE_PACK_CONTRACT_MISSING',
+                'metric_code' => 'lam_evidence_pack_contract',
+                'message' => 'LAM/Semsysco evidence-pack contract block is missing.',
+            ];
+        }
         if ($metricLinks === []) {
             $findings[] = [
                 'priority' => 'P0',
@@ -2502,6 +2554,22 @@ final class KpiRegistryAdminService
                 'code' => 'LAM_EVIDENCE_PACK_SECTION_THIN',
                 'metric_code' => 'evidence_pack_sections',
                 'message' => 'LAM/Semsysco evidence pack should declare the required audit sections end-to-end.',
+            ];
+        }
+        if (!is_array($retrievalTest['query_keys'] ?? null) || count($retrievalTest['query_keys']) < 4) {
+            $findings[] = [
+                'priority' => 'P0',
+                'code' => 'LAM_EVIDENCE_PACK_RETRIEVAL_KEYS_MISSING',
+                'metric_code' => 'lam_evidence_pack_contract.retrieval_test',
+                'message' => 'LAM/Semsysco evidence pack contract must declare retrieval query keys for PO/shipment/job/packet lookup.',
+            ];
+        }
+        if (!is_array($retrievalTest['expected_outputs'] ?? null) || count($retrievalTest['expected_outputs']) < 4) {
+            $findings[] = [
+                'priority' => 'P1',
+                'code' => 'LAM_EVIDENCE_PACK_RETRIEVAL_OUTPUTS_THIN',
+                'metric_code' => 'lam_evidence_pack_contract.retrieval_test',
+                'message' => 'LAM/Semsysco evidence pack contract should declare retrieval outputs for release package, provenance, gaps, retention and audit trail.',
             ];
         }
         if ((int) ($retention['retention_years'] ?? 0) < 10 || trim((string) ($retention['retention_owner_role'] ?? '')) === '') {
@@ -2545,8 +2613,10 @@ final class KpiRegistryAdminService
             'missing_metric_links' => $missingMetrics,
             'record_key_count' => count($recordKeys),
             'section_count' => count($sections),
+            'contract_id' => (string) ($contract['contract_id'] ?? ''),
             'retention_requirements' => $retention,
             'audit_pack_view' => $viewSpec,
+            'retrieval_test' => $retrievalTest,
             'findings' => $findings,
         ];
     }

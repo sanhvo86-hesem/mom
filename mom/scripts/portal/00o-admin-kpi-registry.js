@@ -586,6 +586,16 @@ function _profileOptions(selected){
 	    if(['blocker_only','not_rewardable'].indexOf(reward) < 0)
 	      e.push(_t('Chỉ số cổng chỉ được dùng reward_mode=blocker_only hoặc not_rewardable.', 'Gate must be blocker_only/not_rewardable.'));
 	  }
+	  if(subtype === 'blocker_metric'){
+	    if(reward !== 'blocker_only')
+	      e.push(_t('Blocker metric phải dùng reward_mode=blocker_only.', 'Blocker metric must use reward_mode=blocker_only.'));
+	    if(scoring !== 'blocker_only')
+	      e.push(_t('Blocker metric phải dùng scoring_model_detail=blocker_only.', 'Blocker metric must use scoring_model_detail=blocker_only.'));
+	    if(!_splitList(row.blocking_conditions).length)
+	      e.push(_t('Blocker metric thiếu blocking_conditions.', 'Blocker metric is missing blocking_conditions.'));
+	    if(!String(row.hold_release_rule || row.decision_action || '').trim())
+	      e.push(_t('Blocker metric thiếu hold_release_rule hoặc decision_action.', 'Blocker metric is missing hold_release_rule or decision_action.'));
+	  }
 	  if(subtype === 'role_performance_measure'){
 	    if(!_splitList(row.role_assignments).length && !String(row.owner_role || '').trim())
 	      e.push(_t('Chỉ số vai trò thiếu role_assignments hoặc owner_role.', 'Role measure missing role_assignments or owner_role.'));

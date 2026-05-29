@@ -68,6 +68,10 @@ declare(strict_types=1);
  *      JD documents must hydrate scorecards from the registry renderer.
  *  20. Audit-facing docs reintroduce translated canonical codes or known
  *      machine-translation defects that make the KPI system non-audit-ready.
+ *  21. Prompt 03 threshold-policy drift: the high-mix threshold policy block
+ *      is missing/incomplete, pilot reward-freeze contradicts scorecard
+ *      evidence contracts, or a reward-frozen scorecard metric still
+ *      contributes to reward through side-channel config.
  *
  * P1 findings (warn, do not block)
  * ────────────────────────────────
@@ -340,6 +344,12 @@ foreach ($governance as $row) {
             $p0[] = "Registry $code: calculation_status=runtime_calculated but "
                 . "KpiEngine::getCalculator() does not wire a calculator.";
         }
+        if (trim((string) ($row['backend_status'] ?? '')) !== 'runtime_calculated') {
+            $p0[] = "Registry $code: runtime_calculated must declare backend_status=runtime_calculated.";
+        }
+        if (trim((string) ($row['primary_endpoint'] ?? '')) !== "GET /api/kpi/$code") {
+            $p0[] = "Registry $code: runtime_calculated must declare primary_endpoint=GET /api/kpi/$code.";
+        }
     }
     if (($row['reward_eligible'] ?? false) === true && $status === 'staged_data_contract') {
         $p0[] = "Registry $code: staged_data_contract must not be reward_eligible.";
@@ -597,6 +607,15 @@ $forbiddenDocFragments = [
     'sub-nhà cung cấp' => 'mixed-language supplier phrase',
     'đặc biệt-quy trình' => 'machine-translated process phrase',
     'bộ hồ sơing' => 'mixed-language packet phrase',
+    'Quote Package Rft' => 'non-standard KPI display name',
+    'Rfq Turnaround Time For Complete Rfq' => 'non-standard KPI display name',
+    'Rfq Completeness Rft' => 'non-standard KPI display name',
+    'Routing Bom Change Rft' => 'non-standard KPI display name',
+    'Dfm Feasibility Rft' => 'non-standard KPI display name',
+    'Shift Handover Rft' => 'non-standard KPI display name',
+    'Shortage Recovery Ot' => 'non-standard KPI display name',
+    'Supplier readiness composite from OTD and incoming quality' => 'mixed-case KPI display name',
+    'Supplier RBA / Lam Supplier Code Compliance Bằng chứng' => 'mixed-language KPI display name',
     'xác nhận kho lưu' => 'awkward audit-facing phrase',
     'GIAO HÀNG_BỘ HỒ SƠET_COMPLETENESS' => 'corrupted canonical code',
     'thẻ điểm_weight_pct' => 'translated API field token',
@@ -1584,6 +1603,82 @@ if ($pilotProgram === null) {
     }
 }
 
+// ── P0.21 — Prompt 03 high-mix threshold policy + pilot reward freeze ─────
+// Prompt 03 hardens threshold semantics for high-mix/low-volume CNC. Two
+// failure modes matter: (1) the registry loses the explicit threshold-policy
+// contract, so reviewers must infer small-lot behavior from scattered rows;
+// (2) pilot reward freeze says "no payout" while scorecard evidence contracts
+// still mark core metrics as reward-contributing. Both create silent fairness
+// regressions and are therefore deploy blockers.
+$thresholdPolicy = is_array($registry['threshold_policy'] ?? null)
+    ? $registry['threshold_policy'] : null;
+if ($thresholdPolicy === null) {
+    $p0[] = 'P0.21 Registry: missing threshold_policy block.';
+} else {
+    foreach ([
+        'official_scorecard_policy',
+        'gate_policy',
+        'small_lot_policy',
+        'cpk_sample_policy',
+        'severity_policy',
+        'pilot_calibration_policy',
+    ] as $sectionKey) {
+        if (!is_array($thresholdPolicy[$sectionKey] ?? null) || $thresholdPolicy[$sectionKey] === []) {
+            $p0[] = "P0.21 threshold_policy.$sectionKey must be a non-empty object.";
+        }
+    }
+
+    $officialPolicy = is_array($thresholdPolicy['official_scorecard_policy'] ?? null)
+        ? $thresholdPolicy['official_scorecard_policy'] : [];
+    $smallLotPolicy = is_array($thresholdPolicy['small_lot_policy'] ?? null)
+        ? $thresholdPolicy['small_lot_policy'] : [];
+    $cpkPolicy = is_array($thresholdPolicy['cpk_sample_policy'] ?? null)
+        ? $thresholdPolicy['cpk_sample_policy'] : [];
+    $severityPolicy = is_array($thresholdPolicy['severity_policy'] ?? null)
+        ? $thresholdPolicy['severity_policy'] : [];
+    $pilotCalibration = is_array($thresholdPolicy['pilot_calibration_policy'] ?? null)
+        ? $thresholdPolicy['pilot_calibration_policy'] : [];
+
+    if (!is_string($officialPolicy['basis_rule'] ?? null) || trim((string) $officialPolicy['basis_rule']) === '') {
+        $p0[] = 'P0.21 threshold_policy.official_scorecard_policy.basis_rule must not be empty.';
+    }
+    if (($smallLotPolicy['prototype_event_review_required'] ?? null) !== true) {
+        $p0[] = 'P0.21 threshold_policy.small_lot_policy.prototype_event_review_required must remain true.';
+    }
+    if (($smallLotPolicy['ppm_dppm_trend_only_below_min_sample'] ?? null) !== true) {
+        $p0[] = 'P0.21 threshold_policy.small_lot_policy.ppm_dppm_trend_only_below_min_sample must remain true.';
+    }
+    if (($cpkPolicy['stability_required'] ?? null) !== true || ($cpkPolicy['gage_validity_required'] ?? null) !== true) {
+        $p0[] = 'P0.21 threshold_policy.cpk_sample_policy must require both stability and gage validity.';
+    }
+    if (($severityPolicy['critical_event_overrides_rate'] ?? null) !== true) {
+        $p0[] = 'P0.21 threshold_policy.severity_policy.critical_event_overrides_rate must remain true.';
+    }
+    if (($pilotCalibration['reward_freeze_required'] ?? null) !== true) {
+        $p0[] = 'P0.21 threshold_policy.pilot_calibration_policy.reward_freeze_required must remain true.';
+    }
+}
+
+$freezeControls = is_array($pilotProgram['reward_freeze_controls'] ?? null)
+    ? $pilotProgram['reward_freeze_controls'] : [];
+$scorecardEvidence = is_array($registry['scorecard_evidence_contracts'] ?? null)
+    ? $registry['scorecard_evidence_contracts'] : [];
+$rewardFrozen = ($freezeControls['monetary_payout_allowed'] ?? true) === false
+    && ($freezeControls['payroll_impact_allowed'] ?? true) === false;
+if ($rewardFrozen) {
+    foreach ((array) ($pilotProgram['pilot_scope']['scored_core'] ?? []) as $code) {
+        $canon = strtoupper(trim((string) $code));
+        $contract = is_array($scorecardEvidence[$canon] ?? null) ? $scorecardEvidence[$canon] : null;
+        if ($contract === null) {
+            $p0[] = "P0.21 scorecard_evidence_contracts missing scored-core contract '$canon' during pilot reward freeze.";
+            continue;
+        }
+        if (($contract['scorecard_contributes_to_reward'] ?? null) !== false) {
+            $p0[] = "P0.21 scorecard_evidence_contracts.$canon.scorecard_contributes_to_reward must remain false while pilot reward freeze is active.";
+        }
+    }
+}
+
 // ── P0.7.7 — discipline_scope.whitelist tokens must match condition_ids ────
 // (P07 hardening) performance_governance_policy.discipline_scope.whitelist
 // lists controllable behaviours that may justify discipline. Each token MUST
@@ -1797,6 +1892,20 @@ if ($mcsExt !== []) {
 	            }
 	            if ($reward !== '' && !in_array($reward, ['blocker_only', 'not_rewardable'], true)) {
 	                $p0[] = "$label $rc: gate_control_metric reward_mode '$reward' must be blocker_only or not_rewardable.";
+	            }
+	        }
+	        if ($subtype === 'blocker_metric') {
+	            if ($reward !== 'blocker_only') {
+	                $p0[] = "$label $rc: blocker_metric reward_mode must be blocker_only.";
+	            }
+	            if ($scoring !== 'blocker_only') {
+	                $p0[] = "$label $rc: blocker_metric scoring_model_detail must be blocker_only.";
+	            }
+	            if (!$hasNonEmptyList($row['blocking_conditions'] ?? null)) {
+	                $p0[] = "$label $rc: blocker_metric requires blocking_conditions.";
+	            }
+	            if (!$hasText($row, 'hold_release_rule') && !$hasText($row, 'decision_action')) {
+	                $p0[] = "$label $rc: blocker_metric requires hold_release_rule or decision_action.";
 	            }
 	        }
 	        if ($subtype === 'role_performance_measure') {
@@ -2104,6 +2213,137 @@ if ($profiles !== []) {
                     }
                 }
             }
+
+            $riskClasses = is_array($profile['risk_class_gate_applicability'] ?? null)
+                ? $profile['risk_class_gate_applicability'] : [];
+            $requiredRiskClasses = [
+                'LAM_SEMSYSCO' => ['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'],
+                'SEMICONDUCTOR_CRITICAL' => ['G3', 'G4', 'G5', 'G6', 'G7'],
+                'FIRST_ARTICLE' => ['G2', 'G4', 'G5', 'G6'],
+                'REPEAT_PROVEN' => ['G1', 'G3', 'G5', 'G6', 'G7'],
+                'ENGINEERING_CHANGE' => ['G1', 'G2', 'G4', 'G5', 'G6', 'G7'],
+                'DEVIATION_SPECIAL_RELEASE' => ['G5', 'G6', 'G7'],
+                'REPAIR_REWORK' => ['G2', 'G4', 'G5', 'G6', 'G7'],
+                'HOT_ORDER' => ['G1', 'G3', 'G5', 'G6', 'G7'],
+            ];
+            foreach ($requiredRiskClasses as $riskCode => $requiredGatesForRisk) {
+                $riskRule = is_array($riskClasses[$riskCode] ?? null) ? $riskClasses[$riskCode] : null;
+                if ($riskRule === null) {
+                    $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: risk_class_gate_applicability.$riskCode is missing.";
+                    continue;
+                }
+                foreach (['label', 'applies_when', 'na_waiver_rule', 'hard_gate_rule'] as $field) {
+                    if (trim((string) ($riskRule[$field] ?? '')) === '') {
+                        $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: risk_class_gate_applicability.$riskCode.$field must not be empty.";
+                    }
+                }
+                $riskGates = array_map('strtoupper', array_map('strval', (array) ($riskRule['required_gates'] ?? [])));
+                if ($riskGates === []) {
+                    $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: risk_class_gate_applicability.$riskCode.required_gates must not be empty.";
+                }
+                foreach ($requiredGatesForRisk as $requiredGateCode) {
+                    if (!in_array($requiredGateCode, $riskGates, true)) {
+                        $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: risk_class_gate_applicability.$riskCode "
+                            . "missing required gate '$requiredGateCode'.";
+                    }
+                }
+                $riskGateMetrics = is_array($riskRule['gate_metrics'] ?? null) ? $riskRule['gate_metrics'] : [];
+                if ($riskGateMetrics === []) {
+                    $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: risk_class_gate_applicability.$riskCode.gate_metrics must not be empty.";
+                    continue;
+                }
+                foreach ($requiredGatesForRisk as $requiredGateCode) {
+                    $metricCodes = array_map('strtoupper', array_map('strval', (array) ($riskGateMetrics[$requiredGateCode] ?? [])));
+                    if ($metricCodes === []) {
+                        $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: risk_class_gate_applicability.$riskCode.gate_metrics.$requiredGateCode "
+                            . "must not be empty.";
+                        continue;
+                    }
+                    foreach ($metricCodes as $metricCode) {
+                        if (!isset($allCodesForProfile[$metricCode])) {
+                            $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: risk_class_gate_applicability.$riskCode "
+                                . "references unknown metric '$metricCode'.";
+                            continue;
+                        }
+                        if (!in_array($metricCode, $linked, true)) {
+                            $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: risk_class_gate_applicability.$riskCode "
+                                . "uses metric '$metricCode' that is not declared in linked_metrics.";
+                        }
+                        $riskGateRow = $gateByCode[$metricCode] ?? null;
+                        if (is_array($riskGateRow)) {
+                            if (strtoupper(trim((string) ($riskGateRow['gate'] ?? ''))) !== $requiredGateCode) {
+                                $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: risk_class_gate_applicability.$riskCode "
+                                    . "expects metric '$metricCode' on gate $requiredGateCode.";
+                            }
+                            if (trim((string) ($riskGateRow['lam_profile_link'] ?? '')) !== 'LAM_SEMSYSCO') {
+                                $p0[] = "customer_requirement_profiles LAM_SEMSYSCO: risk_class_gate_applicability.$riskCode "
+                                    . "metric '$metricCode' must keep lam_profile_link=LAM_SEMSYSCO.";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    $lamContract = is_array($registry['lam_evidence_pack_contract'] ?? null)
+        ? $registry['lam_evidence_pack_contract'] : [];
+    if ($lamContract === []) {
+        $p0[] = "lam_evidence_pack_contract block is missing.";
+    } else {
+        if (trim((string) ($lamContract['contract_id'] ?? '')) === '') {
+            $p0[] = "lam_evidence_pack_contract.contract_id must not be empty.";
+        }
+        if (strtoupper(trim((string) ($lamContract['profile_code'] ?? ''))) !== 'LAM_SEMSYSCO') {
+            $p0[] = "lam_evidence_pack_contract.profile_code must be LAM_SEMSYSCO.";
+        }
+        if (!is_array($lamContract['record_keys'] ?? null) || count($lamContract['record_keys']) < 8) {
+            $p0[] = "lam_evidence_pack_contract.record_keys must declare order/job/shipment/profile/part/revision/packet lookup keys.";
+        }
+        if (!is_array($lamContract['required_sections'] ?? null) || count($lamContract['required_sections']) < 8) {
+            $p0[] = "lam_evidence_pack_contract.required_sections must cover the end-to-end LAM evidence pack.";
+        } else {
+            foreach ($lamContract['required_sections'] as $idx => $section) {
+                $label = 'lam_evidence_pack_contract.required_sections[' . $idx . ']';
+                if (trim((string) ($section['section_id'] ?? '')) === '') {
+                    $p0[] = "$label.section_id must not be empty.";
+                }
+                if (trim((string) ($section['gate'] ?? '')) === '') {
+                    $p0[] = "$label.gate must not be empty.";
+                }
+                if (!is_array($section['linked_metric_codes'] ?? null) || $section['linked_metric_codes'] === []) {
+                    $p0[] = "$label.linked_metric_codes must not be empty.";
+                }
+            }
+        }
+        $lamRetention = is_array($lamContract['retention_requirements'] ?? null)
+            ? $lamContract['retention_requirements'] : [];
+        if ((int) ($lamRetention['retention_years'] ?? 0) < 10) {
+            $p0[] = "lam_evidence_pack_contract.retention_requirements.retention_years must be >= 10.";
+        }
+        if (trim((string) ($lamRetention['retention_owner_role'] ?? '')) === '') {
+            $p0[] = "lam_evidence_pack_contract.retention_requirements.retention_owner_role must not be empty.";
+        }
+        if ((int) ($lamRetention['retrieval_sla_minutes'] ?? 0) <= 0) {
+            $p0[] = "lam_evidence_pack_contract.retention_requirements.retrieval_sla_minutes must be > 0.";
+        }
+        $lamRetrieval = is_array($lamContract['retrieval_test'] ?? null)
+            ? $lamContract['retrieval_test'] : [];
+        if (!is_array($lamRetrieval['query_keys'] ?? null) || count($lamRetrieval['query_keys']) < 4) {
+            $p0[] = "lam_evidence_pack_contract.retrieval_test.query_keys must include PO/shipment/job/packet lookup keys.";
+        }
+        if (!is_array($lamRetrieval['expected_outputs'] ?? null) || count($lamRetrieval['expected_outputs']) < 4) {
+            $p0[] = "lam_evidence_pack_contract.retrieval_test.expected_outputs must include release package, provenance, retention and audit trail outputs.";
+        }
+        $mirror = is_array($lamContract['mirror_profile_fields'] ?? null) ? $lamContract['mirror_profile_fields'] : [];
+        $lamProfile = is_array($profiles['LAM_SEMSYSCO'] ?? null) ? $profiles['LAM_SEMSYSCO'] : [];
+        if ($lamProfile !== []) {
+            $profileLinks = array_values(array_map('strtoupper', array_map('strval', (array) ($lamProfile['evidence_pack_metric_links'] ?? []))));
+            $contractLinks = array_values(array_map('strtoupper', array_map('strval', (array) ($mirror['evidence_pack_metric_links'] ?? []))));
+            sort($profileLinks);
+            sort($contractLinks);
+            if ($profileLinks !== $contractLinks) {
+                $p0[] = "lam_evidence_pack_contract.mirror_profile_fields.evidence_pack_metric_links must stay in sync with customer_requirement_profiles LAM_SEMSYSCO.";
+            }
         }
     }
     // Reverse: every metric.lam_profile_link must reference a known profile.
@@ -2293,6 +2533,98 @@ if ($bonusModel === []) {
             $p0[] = "bonus_simulation_model.hard_gates missing matrix hard gate '$conditionId'.";
         }
     }
+    $calibrationBody = trim((string) ($bonusModel['calibration_body'] ?? ''));
+    foreach (['HR', 'QMS', 'CEO'] as $token) {
+        if (stripos($calibrationBody, $token) === false) {
+            $p0[] = "bonus_simulation_model.calibration_body must include $token.";
+        }
+    }
+    foreach (['no_real_payout_rule', 'discipline_boundary'] as $field) {
+        if (trim((string) ($bonusModel[$field] ?? '')) === '') {
+            $p0[] = "bonus_simulation_model.$field missing.";
+        }
+    }
+}
+
+$customerSeverityMetric = $rowsByCodeP05['CUSTOMER_NCR_SEVERITY_SCORE'] ?? null;
+if (is_array($customerSeverityMetric)) {
+    $manualContract = is_array($customerSeverityMetric['manual_input_contract'] ?? null)
+        ? $customerSeverityMetric['manual_input_contract'] : [];
+    $manualFields = array_map('strval', (array) ($manualContract['fields'] ?? []));
+    foreach ([
+        'customer_notification_status',
+        'containment_status',
+        'customer_acceptance_status',
+        'repeat_root_cause_family',
+        'special_release_approval_ref',
+        'process_change_authorization_ref',
+        'gage_release_validity_ref',
+        'falsification_investigation_ref',
+    ] as $field) {
+        if (!in_array($field, $manualFields, true)) {
+            $p0[] = "CUSTOMER_NCR_SEVERITY_SCORE.manual_input_contract.fields missing '$field'.";
+        }
+    }
+    $verification = trim((string) ($manualContract['verification'] ?? ''));
+    foreach (['customer notification', 'containment', 'customer acceptance', 'special-release', 'gage', 'event timestamps'] as $token) {
+        if (stripos($verification, $token) === false) {
+            $p0[] = "CUSTOMER_NCR_SEVERITY_SCORE.manual_input_contract.verification must mention $token.";
+        }
+    }
+}
+
+$repeatNcrMetric = $rowsByCodeP05['REPEAT_NCR_RATE'] ?? null;
+if (is_array($repeatNcrMetric)) {
+    $repeatRule = is_array($repeatNcrMetric['repeat_detection_rule'] ?? null)
+        ? $repeatNcrMetric['repeat_detection_rule'] : [];
+    foreach (['repeat_root_cause_family', 'failed_control_id', 'prior_capa_reference', 'customer_family'] as $field) {
+        if (!in_array($field, (array) ($repeatRule['required_fields'] ?? []), true)) {
+            $p0[] = "REPEAT_NCR_RATE.repeat_detection_rule.required_fields missing '$field'.";
+        }
+    }
+    if ((int) ($repeatRule['lookback_days'] ?? 0) !== 365) {
+        $p0[] = "REPEAT_NCR_RATE.repeat_detection_rule.lookback_days must be 365.";
+    }
+}
+
+$capaEffectivenessMetric = $rowsByCodeP05['CAPA_EFFECTIVENESS'] ?? null;
+if (is_array($capaEffectivenessMetric)) {
+    $capaRule = is_array($capaEffectivenessMetric['capa_effectiveness_rule'] ?? null)
+        ? $capaEffectivenessMetric['capa_effectiveness_rule'] : [];
+    if (($capaRule['training_only_not_accepted'] ?? null) !== true) {
+        $p0[] = "CAPA_EFFECTIVENESS.capa_effectiveness_rule.training_only_not_accepted must be true.";
+    }
+    if (($capaRule['exception_approval_required'] ?? null) !== true) {
+        $p0[] = "CAPA_EFFECTIVENESS.capa_effectiveness_rule.exception_approval_required must be true.";
+    }
+    foreach (['QMS', 'CEO'] as $role) {
+        if (!in_array($role, (array) ($capaRule['exception_approval_roles'] ?? []), true)) {
+            $p0[] = "CAPA_EFFECTIVENESS.capa_effectiveness_rule.exception_approval_roles missing '$role'.";
+        }
+    }
+    if (trim((string) ($capaRule['linked_counter_metric'] ?? '')) !== 'TRAINING_AS_CAPA_COUNTER') {
+        $p0[] = "CAPA_EFFECTIVENESS.capa_effectiveness_rule.linked_counter_metric must be TRAINING_AS_CAPA_COUNTER.";
+    }
+    if (count((array) ($capaRule['required_non_training_actions'] ?? [])) < 2) {
+        $p0[] = "CAPA_EFFECTIVENESS.capa_effectiveness_rule.required_non_training_actions missing.";
+    }
+}
+
+$trainingAsCapaMetric = $rowsByCodeP05['TRAINING_AS_CAPA_COUNTER'] ?? null;
+if (is_array($trainingAsCapaMetric)) {
+    $manualContract = is_array($trainingAsCapaMetric['manual_input_contract'] ?? null)
+        ? $trainingAsCapaMetric['manual_input_contract'] : [];
+    foreach (['capa_reference', 'exception_approval_ref', 'systemic_action_reference'] as $field) {
+        if (!in_array($field, (array) ($manualContract['fields'] ?? []), true)) {
+            $p0[] = "TRAINING_AS_CAPA_COUNTER.manual_input_contract.fields missing '$field'.";
+        }
+    }
+    $verification = trim((string) ($manualContract['verification'] ?? ''));
+    foreach (['CAPA reference', 'exceptional approval', 'systemic follow-up action'] as $token) {
+        if (stripos($verification, $token) === false) {
+            $p0[] = "TRAINING_AS_CAPA_COUNTER.manual_input_contract.verification must mention $token.";
+        }
+    }
 }
 
 $customerNcrContract = is_array($registry['customer_ncr_data_contract'] ?? null)
@@ -2381,6 +2713,26 @@ foreach ($p06RequiredMetricCodes as $code) {
         $p0[] = "Prompt 06 required metric '$code' missing from KPI registry.";
     }
 }
+foreach ([
+    'CTQ_MEASUREMENT_COMPLETENESS',
+    'CPK_PRODUCT_MIN_CTQ',
+    'CPK_COVERAGE_RATE',
+    'INSUFFICIENT_CPK_DATA_STATUS',
+    'POST_CHANGE_CPK_REVALIDATION',
+    'GAGE_VALID_FOR_CTQ_MEASUREMENT',
+    'SPC_SIGNAL_REACTION_TIME',
+    'CTQ_OUT_OF_SPEC_EVENT_COUNT',
+    'CTQ_SPECIAL_CAUSE_OPEN_ACTIONS',
+] as $code) {
+    $row = $rowsByCodeP05[$code] ?? null;
+    if (!is_array($row)) {
+        continue;
+    }
+    $usageTypes = array_map('strval', (array) ($row['usage_types'] ?? []));
+    if (!in_array('ctq_capability_contract', $usageTypes, true)) {
+        $p0[] = "Prompt 06 $code: usage_types must include ctq_capability_contract.";
+    }
+}
 
 $ctqCharacteristics = is_array($registry['ctq_characteristics'] ?? null)
     ? $registry['ctq_characteristics'] : [];
@@ -2447,6 +2799,52 @@ if ($ctqCapabilityPolicy === []) {
     foreach (['stable', 'unstable', 'insufficient', 'special_cause_detected', 'last_signal_time', 'reaction_time', 'open_action', 'reviewer'] as $field) {
         if (trim((string) ($stateFields[$field] ?? '')) === '') {
             $p0[] = "Prompt 06 ctq_capability_policy.spc_state_fields missing '$field'.";
+        }
+    }
+    $ctqDashboardContract = is_array($ctqCapabilityPolicy['dashboard_card_contract'] ?? null)
+        ? $ctqCapabilityPolicy['dashboard_card_contract'] : [];
+    if (trim((string) ($ctqDashboardContract['panel_id'] ?? '')) === '') {
+        $p0[] = "Prompt 06 ctq_capability_policy.dashboard_card_contract.panel_id must not be empty.";
+    }
+    $dashboardMetrics = array_map('strtoupper', array_map('strval', (array) ($ctqDashboardContract['required_metrics'] ?? [])));
+    foreach ([
+        'CTQ_MEASUREMENT_COMPLETENESS',
+        'CPK_PRODUCT_MIN_CTQ',
+        'CPK_COVERAGE_RATE',
+        'INSUFFICIENT_CPK_DATA_STATUS',
+        'POST_CHANGE_CPK_REVALIDATION',
+        'GAGE_VALID_FOR_CTQ_MEASUREMENT',
+        'SPC_SIGNAL_REACTION_TIME',
+        'CTQ_OUT_OF_SPEC_EVENT_COUNT',
+        'CTQ_SPECIAL_CAUSE_OPEN_ACTIONS',
+    ] as $code) {
+        if (!in_array($code, $dashboardMetrics, true)) {
+            $p0[] = "Prompt 06 ctq_capability_policy.dashboard_card_contract.required_metrics missing '$code'.";
+        }
+    }
+    $dashboardFields = array_map('strval', (array) ($ctqDashboardContract['required_fields'] ?? []));
+    foreach ([
+        'calculation_status',
+        'data_confidence_level',
+        'sample_policy',
+        'capability_status',
+        'sample_band',
+        'numeric_cpk_suppressed',
+        'customer_claim_allowed',
+        'blockers',
+        'evidence_source',
+        'owner_role',
+        'action_when_red',
+    ] as $field) {
+        if (!in_array($field, $dashboardFields, true)) {
+            $p0[] = "Prompt 06 ctq_capability_policy.dashboard_card_contract.required_fields missing '$field'.";
+        }
+    }
+    $dashboardRenderRules = is_array($ctqDashboardContract['render_rules'] ?? null)
+        ? $ctqDashboardContract['render_rules'] : [];
+    foreach (['capability_metric', 'support_metric', 'manual_governed', 'staged_data_contract'] as $field) {
+        if (trim((string) ($dashboardRenderRules[$field] ?? '')) === '') {
+            $p0[] = "Prompt 06 ctq_capability_policy.dashboard_card_contract.render_rules.$field must not be empty.";
         }
     }
 }
@@ -2818,21 +3216,21 @@ if (is_array($constraintManual)) {
     $manual = is_array($constraintManual['manual_input_contract'] ?? null)
         ? $constraintManual['manual_input_contract'] : [];
     $fields = array_map('strval', is_array($manual['fields'] ?? null) ? $manual['fields'] : []);
-    foreach (['constraint_id', 'resource_type', 'resource_code', 'approved_by', 'action_due_at', 'evidence_reference'] as $field) {
+    foreach (['constraint_id', 'resource_type', 'resource_code', 'approved_by', 'buffer_policy', 'protection_action', 'action_due_at', 'evidence_reference'] as $field) {
         if (!in_array($field, $fields, true)) {
             $p0[] = "Prompt 07 CURRENT_CONSTRAINT_RESOURCE: manual_input_contract.fields missing '$field'.";
         }
     }
 }
 
-foreach (['CMM_QUEUE_AGING', 'QC_HOLD_SLA', 'INSPECTION_PLAN_ADHERENCE'] as $code) {
+foreach (['CMM_QUEUE_AGING', 'QC_HOLD_SLA'] as $code) {
     $row = $metricIndex[$code] ?? null;
     if (!is_array($row)) {
         continue;
     }
     $manual = is_array($row['manual_input_contract'] ?? null) ? $row['manual_input_contract'] : [];
     $fields = array_map('strval', is_array($manual['fields'] ?? null) ? $manual['fields'] : []);
-    foreach (['owner_role', 'hold_reason', 'action_due_at', 'promise_risk_status', 'blocker_category'] as $field) {
+    foreach (['inspection_request_at', 'needed_by_at', 'queue_status', 'owner_role', 'completion_at', 'hold_reason', 'action_due_at', 'promise_risk_status', 'blocker_category'] as $field) {
         if (!in_array($field, $fields, true)) {
             $p0[] = "Prompt 07 $code: manual_input_contract.fields missing '$field'.";
         }
@@ -2860,15 +3258,15 @@ foreach (['FAI_QUEUE_AGING', 'FINAL_INSPECTION_QUEUE_AGING'] as $code) {
         ],
         JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
     ));
-    foreach (['queue_entry', 'owner', 'hold_reason', 'action_due_at', 'promise_risk_status', 'blocker_category'] as $token) {
+    foreach (['inspection_request', 'queue_entry', 'needed_by', 'queue_status', 'completion', 'owner', 'hold_reason', 'action_due_at', 'promise_risk_status', 'blocker_category'] as $token) {
         if (!str_contains($joined, $token)) {
             $p0[] = "Prompt 07 $code: staged queue contract must mention '$token'.";
         }
     }
 }
 
-// ── P0.18 — Prompt 08 Lean/TOC, CMM/QC queue and readiness contracts ────────
-// Prompt 08 makes flow constraints and material readiness visible before OTD
+// ── P0.18 — Prompt 07 Lean/TOC, CMM/QC queue contracts ───────────────────────
+// Prompt 07 makes flow constraints and queue blockers visible before OTD
 // fails. These metrics are intentionally drivers/blockers, not bonus shortcuts
 // and not fake runtime. The guard preserves the model: any future edit that
 // removes the current-constraint signal, strips queue context, weakens material
@@ -2898,7 +3296,7 @@ foreach ((array) ($scorecardModelP08['strategic_driver_panel'] ?? []) as $row) {
 $leanFlow = is_array($registry['lean_flow_operating_model'] ?? null)
     ? $registry['lean_flow_operating_model'] : [];
 if ($leanFlow === []) {
-    $p0[] = "Prompt 08: missing lean_flow_operating_model.";
+    $p0[] = "Prompt 07: missing lean_flow_operating_model.";
 } else {
     $types = [];
     foreach ((array) ($leanFlow['constraint_resource_types'] ?? []) as $row) {
@@ -2914,32 +3312,67 @@ if ($leanFlow === []) {
     foreach (['cnc_machine', 'cnc_cell', 'cmm', 'setup', 'cam',
               'qc_final_inspection', 'deburr_cleaning_packing', 'supplier_material'] as $requiredType) {
         if (!isset($types[$requiredType])) {
-            $p0[] = "Prompt 08 lean_flow_operating_model: missing constraint_resource_type '$requiredType'.";
+            $p0[] = "Prompt 07 lean_flow_operating_model: missing constraint_resource_type '$requiredType'.";
         }
     }
     foreach (['constraint_register_contract', 'queue_aging_contract', 'constraint_loss_contract', 'action_loop_contract'] as $field) {
         $contract = is_array($leanFlow[$field] ?? null) ? $leanFlow[$field] : [];
         if ($contract === [] || trim((string) ($contract['contract_id'] ?? '')) === '') {
-            $p0[] = "Prompt 08 lean_flow_operating_model: missing $field.contract_id.";
+            $p0[] = "Prompt 07 lean_flow_operating_model: missing $field.contract_id.";
             continue;
         }
         if (!is_array($contract['required_fields'] ?? null) || $contract['required_fields'] === []) {
-            $p0[] = "Prompt 08 lean_flow_operating_model: $field.required_fields must not be empty.";
+            $p0[] = "Prompt 07 lean_flow_operating_model: $field.required_fields must not be empty.";
         }
+    }
+    $constraintRegisterFields = array_map('strval', is_array($leanFlow['constraint_register_contract']['required_fields'] ?? null)
+        ? $leanFlow['constraint_register_contract']['required_fields'] : []);
+    foreach (['effective_from', 'effective_to', 'owner_role', 'reason_code', 'buffer_policy', 'protection_action'] as $field) {
+        if (!in_array($field, $constraintRegisterFields, true)) {
+            $p0[] = "Prompt 07 lean_flow_operating_model.constraint_register_contract: missing '$field'.";
+        }
+    }
+    $queueFields = array_map('strval', is_array($leanFlow['queue_aging_contract']['required_fields'] ?? null)
+        ? $leanFlow['queue_aging_contract']['required_fields'] : []);
+    foreach (['inspection_request_at', 'needed_by_at', 'risk_class_or_customer_profile', 'queue_status', 'owner_role', 'completion_at'] as $field) {
+        if (!in_array($field, $queueFields, true)) {
+            $p0[] = "Prompt 07 lean_flow_operating_model.queue_aging_contract: missing '$field'.";
+        }
+    }
+    $queueMetrics = array_map('strval', is_array($leanFlow['cmm_qc_queue_metrics'] ?? null)
+        ? $leanFlow['cmm_qc_queue_metrics'] : []);
+    $supportMetrics = array_map('strval', is_array($leanFlow['queue_discipline_support_metrics'] ?? null)
+        ? $leanFlow['queue_discipline_support_metrics'] : []);
+    if (!in_array('INSPECTION_PLAN_ADHERENCE', $supportMetrics, true)) {
+        $p0[] = "Prompt 07 lean_flow_operating_model: queue_discipline_support_metrics must include INSPECTION_PLAN_ADHERENCE.";
+    }
+    if (in_array('INSPECTION_PLAN_ADHERENCE', $queueMetrics, true)) {
+        $p0[] = "Prompt 07 lean_flow_operating_model: INSPECTION_PLAN_ADHERENCE must not be treated as a queue engine metric.";
+    }
+    $dailySignals = array_map('strval', is_array($leanFlow['daily_board_required_signals'] ?? null)
+        ? $leanFlow['daily_board_required_signals'] : []);
+    if (in_array('INSPECTION_PLAN_ADHERENCE', $dailySignals, true)) {
+        $p0[] = "Prompt 07 daily_board_required_signals: INSPECTION_PLAN_ADHERENCE must stay off the daily flow board.";
+    }
+    if (isset($dashboardByCodeP08['INSPECTION_PLAN_ADHERENCE'])) {
+        $p0[] = "Prompt 07 dashboard: INSPECTION_PLAN_ADHERENCE must stay off dashboard_core_kpis.";
+    }
+    if (isset($driverCodesP08['INSPECTION_PLAN_ADHERENCE'])) {
+        $p0[] = "Prompt 07 scorecard_operating_model: INSPECTION_PLAN_ADHERENCE must stay off strategic_driver_panel.";
     }
     $forums = is_array($leanFlow['review_forums'] ?? null) ? $leanFlow['review_forums'] : [];
     if (count($forums) < 3) {
-        $p0[] = "Prompt 08 lean_flow_operating_model: review_forums must declare daily Tier 1, daily Tier 2 and weekly TOC review.";
+        $p0[] = "Prompt 07 lean_flow_operating_model: review_forums must declare daily Tier 1, daily Tier 2 and weekly TOC review.";
     }
     $dashboardRules = is_array($leanFlow['dashboard_rules'] ?? null) ? $leanFlow['dashboard_rules'] : [];
     foreach (['staged_flags_required', 'owner_due_required', 'cause_breakdown_required', 'top_reason_required', 'evidence_action_link_required'] as $field) {
         if (($dashboardRules[$field] ?? null) !== true) {
-            $p0[] = "Prompt 08 lean_flow_operating_model.dashboard_rules.$field must be true.";
+            $p0[] = "Prompt 07 lean_flow_operating_model.dashboard_rules.$field must be true.";
         }
     }
 }
 
-$p08ConstraintMetrics = [
+$p07ConstraintMetrics = [
     'CURRENT_CONSTRAINT_RESOURCE',
     'CONSTRAINT_LOST_HOURS',
     'OEE_BOTTLENECK',
@@ -2947,64 +3380,66 @@ $p08ConstraintMetrics = [
     'CONSTRAINT_STARVED_TIME',
     'CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS',
 ];
-foreach ($p08ConstraintMetrics as $code) {
+foreach ($p07ConstraintMetrics as $code) {
     $row = $metricIndex[$code] ?? null;
     if (!is_array($row)) {
-        $p0[] = "Prompt 08 required constraint metric '$code' missing.";
+        $p0[] = "Prompt 07 required constraint metric '$code' missing.";
         continue;
     }
     if (in_array($code, array_map('strtoupper', $runtimeList), true) || isset($engineCalculatorCodes[$code])) {
-        $p0[] = "Prompt 08 $code: constraint driver must not be runtime_calculated until constraint event contract exists.";
+        $p0[] = "Prompt 07 $code: constraint driver must not be runtime_calculated until constraint event contract exists.";
     }
     if ((bool) ($row['reward_eligible'] ?? false)
         || (bool) ($row['scorecard_contributes_to_reward'] ?? false)
         || in_array((string) ($row['reward_mode'] ?? ''), ['bonus_pool_candidate', 'team_reward_candidate', 'role_review_input'], true)) {
-        $p0[] = "Prompt 08 $code: constraint metric must not be rewardable or scorecard contributing.";
+        $p0[] = "Prompt 07 $code: constraint metric must not be rewardable or scorecard contributing.";
     }
     if (trim((string) ($row['data_contract_gap'] ?? '')) === ''
         || trim((string) ($row['target_graduation_condition'] ?? '')) === '') {
-        $p0[] = "Prompt 08 $code: constraint metric requires data_contract_gap and target_graduation_condition.";
+        $p0[] = "Prompt 07 $code: constraint metric requires data_contract_gap and target_graduation_condition.";
     }
     if (!isset($dashboardByCodeP08[$code])) {
-        $p0[] = "Prompt 08 dashboard: constraint metric '$code' missing from dashboard_core_kpis.";
+        $p0[] = "Prompt 07 dashboard: constraint metric '$code' missing from dashboard_core_kpis.";
     } elseif ((bool) ($dashboardByCodeP08[$code]['scoreable'] ?? false)) {
-        $p0[] = "Prompt 08 dashboard $code: constraint driver must be scoreable=false.";
+        $p0[] = "Prompt 07 dashboard $code: constraint driver must be scoreable=false.";
     }
     if (!isset($driverCodesP08[$code])) {
-        $p0[] = "Prompt 08 scorecard_operating_model: constraint metric '$code' missing from strategic_driver_panel.";
+        $p0[] = "Prompt 07 scorecard_operating_model: constraint metric '$code' missing from strategic_driver_panel.";
     }
     if (($row['cadence'] ?? '') === 'monthly') {
-        $p0[] = "Prompt 08 $code: constraint driver cadence must support daily or weekly action loops, not monthly-only.";
+        $p0[] = "Prompt 07 $code: constraint driver cadence must support daily or weekly action loops, not monthly-only.";
     }
 }
 
-$p08QueueMetrics = [
+$p07QueueMetrics = [
     'CMM_QUEUE_AGING',
     'FAI_QUEUE_AGING',
     'FINAL_INSPECTION_QUEUE_AGING',
     'QC_HOLD_SLA',
-    'INSPECTION_PLAN_ADHERENCE',
 ];
-foreach ($p08QueueMetrics as $code) {
+foreach ($p07QueueMetrics as $code) {
     $row = $metricIndex[$code] ?? null;
     if (!is_array($row)) {
-        $p0[] = "Prompt 08 required CMM/QC queue metric '$code' missing.";
+        $p0[] = "Prompt 07 required CMM/QC queue metric '$code' missing.";
         continue;
     }
     $contexts = array_map('strval', is_array($row['usage_contexts'] ?? null) ? $row['usage_contexts'] : []);
     if (!in_array('daily_management', $contexts, true) && !in_array('flow_constraint', $contexts, true)) {
-        $p0[] = "Prompt 08 $code: queue metric must include daily_management or flow_constraint usage_context.";
+        $p0[] = "Prompt 07 $code: queue metric must include daily_management or flow_constraint usage_context.";
+    }
+    if (in_array((string) ($row['metric_type'] ?? ''), ['role_performance_measure'], true)) {
+        $p0[] = "Prompt 07 $code: queue engine metric must not be a role_performance_measure.";
     }
     if ((bool) ($row['reward_eligible'] ?? false)
         || (bool) ($row['scorecard_contributes_to_reward'] ?? false)
         || in_array((string) ($row['reward_mode'] ?? ''), ['bonus_pool_candidate', 'team_reward_candidate', 'role_review_input'], true)) {
-        $p0[] = "Prompt 08 $code: CMM/QC queue metric must not be rewardable or scorecard contributing.";
+        $p0[] = "Prompt 07 $code: CMM/QC queue metric must not be rewardable or scorecard contributing.";
     }
     if (!isset($dashboardByCodeP08[$code])) {
-        $p0[] = "Prompt 08 dashboard: queue metric '$code' missing from dashboard_core_kpis.";
+        $p0[] = "Prompt 07 dashboard: queue metric '$code' missing from dashboard_core_kpis.";
     }
     if (!isset($driverCodesP08[$code])) {
-        $p0[] = "Prompt 08 scorecard_operating_model: queue metric '$code' missing from strategic_driver_panel.";
+        $p0[] = "Prompt 07 scorecard_operating_model: queue metric '$code' missing from strategic_driver_panel.";
     }
 }
 
@@ -3038,7 +3473,9 @@ if (!is_array($materialPlanP08)) {
     }
     $sourceText = strtolower((string) json_encode($materialPlanP08['data_source'] ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
     foreach (['metadata.material_cert_blocked', 'metadata.iqc_released', 'metadata.traceability_label_verified',
-              'metadata.special_process_clear', 'metadata.kit_ready_before_constraint', 'metadata.gage_ready'] as $token) {
+              'metadata.special_process_clear', 'metadata.kit_ready_before_constraint', 'metadata.gage_ready',
+              'metadata.readiness_override_reason', 'metadata.readiness_override_approved_by',
+              'metadata.readiness_override_evidence_reference'] as $token) {
         if (!str_contains($sourceText, strtolower($token))) {
             $p0[] = "Prompt 08 MATERIAL_AVAILABILITY_PLAN: data_source must mention '$token'.";
         }
@@ -3050,6 +3487,95 @@ if (!is_array($materialPlanP08)) {
               'tool_fixture_gage_not_ready_for_constraint'] as $blocker) {
         if (!in_array($blocker, $blockers, true)) {
             $p0[] = "Prompt 08 MATERIAL_AVAILABILITY_PLAN: missing readiness blocker '$blocker'.";
+        }
+    }
+    $componentContract = is_array($materialPlanP08['readiness_component_contract'] ?? null)
+        ? $materialPlanP08['readiness_component_contract'] : [];
+    foreach (['component_code', 'required_for_green', 'ready_jobs', 'blocked_jobs', 'metadata_missing_jobs', 'declared_jobs'] as $field) {
+        if (!in_array($field, array_map('strval', (array) ($componentContract['required_result_fields'] ?? [])), true)) {
+            $p0[] = "Prompt 08 MATERIAL_AVAILABILITY_PLAN.readiness_component_contract: missing required_result_field '$field'.";
+        }
+    }
+    foreach (['metadata.readiness_override_reason', 'metadata.readiness_override_approved_by', 'metadata.readiness_override_evidence_reference'] as $field) {
+        if (!in_array($field, array_map('strval', (array) ($componentContract['manual_override_fields'] ?? [])), true)) {
+            $p0[] = "Prompt 08 MATERIAL_AVAILABILITY_PLAN.readiness_component_contract: missing manual_override_field '$field'.";
+        }
+    }
+    $blockRule = strtolower((string) ($materialPlanP08['readiness_block_rule'] ?? ''));
+    foreach (['physical_ready=true', 'override', 'approver', 'evidence reference'] as $token) {
+        if (!str_contains($blockRule, $token)) {
+            $p0[] = "Prompt 08 MATERIAL_AVAILABILITY_PLAN.readiness_block_rule must mention '$token'.";
+        }
+    }
+}
+
+// ── P0.19 — Prompt 09 Quality-at-source release integrity ───────────────────
+$p09SmallLotPolicies = [
+    'FAI_FIRST_PASS' => ['below_n' => 5, 'views' => ['defect_family', 'part_number', 'fai_type']],
+    'IN_PROCESS_REJECT_RATE' => ['below_n' => 10, 'views' => ['defect_code', 'characteristic', 'inspection_status']],
+];
+foreach ($p09SmallLotPolicies as $code => $policy) {
+    $row = $metricIndex[$code] ?? null;
+    if (!is_array($row)) {
+        $p0[] = "Prompt 09 $code: missing metric row.";
+        continue;
+    }
+    $smallLot = is_array($row['small_lot_review_policy'] ?? null) ? $row['small_lot_review_policy'] : [];
+    if ((int) ($smallLot['below_n'] ?? 0) !== $policy['below_n']) {
+        $p0[] = "Prompt 09 $code.small_lot_review_policy.below_n must be {$policy['below_n']}.";
+    }
+    if ((string) ($smallLot['review_mode'] ?? '') !== 'event_review_not_rate_punishment') {
+        $p0[] = "Prompt 09 $code.small_lot_review_policy.review_mode must be event_review_not_rate_punishment.";
+    }
+    foreach ($policy['views'] as $view) {
+        if (!in_array($view, array_map('strval', (array) ($smallLot['required_views'] ?? [])), true)) {
+            $p0[] = "Prompt 09 $code.small_lot_review_policy: missing required_view '$view'.";
+        }
+    }
+}
+
+$shipPacket = $metricIndex['SHIP_PACKET_COMPLETENESS'] ?? null;
+if (!is_array($shipPacket)) {
+    $p0[] = 'Prompt 09 SHIP_PACKET_COMPLETENESS: missing metric row.';
+} else {
+    $shipSource = strtolower((string) json_encode($shipPacket['data_source'] ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    foreach ([
+        'metadata.check_dimension_report_required',
+        'metadata.check_dimension_report_link',
+        'metadata.gage_release_blocked',
+        'metadata.gage_valid_for_release',
+        'metadata.customer_doc_rejected_after_release',
+    ] as $token) {
+        if (!str_contains($shipSource, strtolower($token))) {
+            $p0[] = "Prompt 09 SHIP_PACKET_COMPLETENESS: data_source must mention '$token'.";
+        }
+    }
+    $dependency = is_array($shipPacket['release_dependency_contract'] ?? null)
+        ? $shipPacket['release_dependency_contract'] : [];
+    foreach (['CHECK_DIM_REPORT_ON_SHIP', 'GAGE_VALID_FOR_RELEASE'] as $metricCode) {
+        if (!in_array($metricCode, array_map('strval', (array) ($dependency['required_gate_metrics'] ?? [])), true)) {
+            $p0[] = "Prompt 09 SHIP_PACKET_COMPLETENESS.release_dependency_contract: missing required_gate_metric '$metricCode'.";
+        }
+    }
+    foreach (['metadata.check_dimension_report_required', 'metadata.gage_release_blocked', 'metadata.gage_valid_for_release'] as $field) {
+        if (!in_array($field, array_map('strval', (array) ($dependency['runtime_blocker_fields'] ?? [])), true)) {
+            $p0[] = "Prompt 09 SHIP_PACKET_COMPLETENESS.release_dependency_contract: missing runtime_blocker_field '$field'.";
+        }
+    }
+}
+
+$finalRelease = $metricIndex['FINAL_RELEASE_RFT'] ?? null;
+if (is_array($finalRelease)) {
+    $manual = is_array($finalRelease['manual_input_contract'] ?? null) ? $finalRelease['manual_input_contract'] : [];
+    foreach (['linked_ship_packet_complete_count', 'linked_gage_valid_release_count'] as $field) {
+        if (!in_array($field, array_map('strval', (array) ($manual['fields'] ?? [])), true)) {
+            $p0[] = "Prompt 09 FINAL_RELEASE_RFT: manual_input_contract.fields missing '$field'.";
+        }
+    }
+    $verify = strtolower((string) ($manual['verification'] ?? ''));
+    foreach (['release package completeness', 'check-dimension', 'gage validity'] as $token) {
+        if (!str_contains($verify, strtolower($token))) {
+            $p0[] = "Prompt 09 FINAL_RELEASE_RFT.manual_input_contract.verification must mention '$token'.";
         }
     }
 }

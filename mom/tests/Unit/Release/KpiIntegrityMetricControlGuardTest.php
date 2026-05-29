@@ -124,6 +124,26 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
         );
     }
 
+    public function testRejectsBlockerMetricWithoutBlockerOnlyContract(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['proposed_operating_metrics'][] = self::baseFakeMetric([
+                    'canonical_code' => 'FAKE_BLOCKER_RULE_DRIFT_P04',
+                    'metric_subtype' => 'blocker_metric',
+                    'control_intent' => 'gate_release_control',
+                    'measurement_data_type' => 'risk_score',
+                    'scoring_model_detail' => 'rag_3_band',
+                    'reward_mode' => 'not_rewardable',
+                    'blocking_conditions' => [],
+                    'hold_release_rule' => '',
+                    'decision_action' => '',
+                ]);
+            },
+            'blocker_metric reward_mode must be blocker_only',
+        );
+    }
+
     public function testRejectsCanonicalCodeWithTranslatedCharacters(): void
     {
         $this->assertFakeDriftRejected(
@@ -165,6 +185,28 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
                 $registry['customer_requirement_profiles']['profiles']['LAM_SEMSYSCO']['evidence_pack_metric_links'][] = 'FAKE_UNKNOWN_EVIDENCE_METRIC';
             },
             "customer_requirement_profiles LAM_SEMSYSCO: evidence_pack_metric_links references unknown metric 'FAKE_UNKNOWN_EVIDENCE_METRIC'.",
+        );
+    }
+
+    public function testRejectsLamRiskClassApplicabilityMissingCategory(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                unset($registry['customer_requirement_profiles']['profiles']['LAM_SEMSYSCO']['risk_class_gate_applicability']['HOT_ORDER']);
+            },
+            'customer_requirement_profiles LAM_SEMSYSCO: risk_class_gate_applicability.HOT_ORDER is missing.',
+        );
+    }
+
+    public function testRejectsLamRiskClassApplicabilityMetricMappedToWrongGate(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['customer_requirement_profiles']['profiles']['LAM_SEMSYSCO']['risk_class_gate_applicability']['FIRST_ARTICLE']['gate_metrics']['G4'] = [
+                    'SHIP_PACKET_COMPLETENESS',
+                ];
+            },
+            "customer_requirement_profiles LAM_SEMSYSCO: risk_class_gate_applicability.FIRST_ARTICLE expects metric 'SHIP_PACKET_COMPLETENESS' on gate G4.",
         );
     }
 
@@ -307,6 +349,85 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
         );
     }
 
+    public function testRejectsBonusSimulationCalibrationWithoutHr(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['bonus_simulation_model']['calibration_body'] = 'CEO + QMS + Finance';
+            },
+            'bonus_simulation_model.calibration_body must include HR',
+        );
+    }
+
+    public function testRejectsRuntimeMetricWithoutDeclaredBackendStatus(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'OTD', static function (array &$row): void {
+                    $row['backend_status'] = '';
+                });
+            },
+            'Registry OTD: runtime_calculated must declare backend_status=runtime_calculated',
+        );
+    }
+
+    public function testRejectsCustomerSeverityManualContractMissingContainmentField(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'CUSTOMER_NCR_SEVERITY_SCORE', static function (array &$row): void {
+                    $row['manual_input_contract']['fields'] = array_values(array_filter(
+                        $row['manual_input_contract']['fields'] ?? [],
+                        static fn($field): bool => $field !== 'containment_status',
+                    ));
+                });
+            },
+            "CUSTOMER_NCR_SEVERITY_SCORE.manual_input_contract.fields missing 'containment_status'",
+        );
+    }
+
+    public function testRejectsRepeatNcrRuleWithoutFailedControlId(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'REPEAT_NCR_RATE', static function (array &$row): void {
+                    $row['repeat_detection_rule']['required_fields'] = array_values(array_filter(
+                        $row['repeat_detection_rule']['required_fields'] ?? [],
+                        static fn($field): bool => $field !== 'failed_control_id',
+                    ));
+                });
+            },
+            "REPEAT_NCR_RATE.repeat_detection_rule.required_fields missing 'failed_control_id'",
+        );
+    }
+
+    public function testRejectsCapaEffectivenessTrainingOnlyDrift(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'CAPA_EFFECTIVENESS', static function (array &$row): void {
+                    $row['capa_effectiveness_rule']['training_only_not_accepted'] = false;
+                });
+            },
+            'CAPA_EFFECTIVENESS.capa_effectiveness_rule.training_only_not_accepted must be true',
+        );
+    }
+
+    public function testRejectsTrainingAsCapaManualContractMissingApprovalReference(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'TRAINING_AS_CAPA_COUNTER', static function (array &$row): void {
+                    $row['manual_input_contract']['fields'] = array_values(array_filter(
+                        $row['manual_input_contract']['fields'] ?? [],
+                        static fn($field): bool => $field !== 'exception_approval_ref',
+                    ));
+                });
+            },
+            "TRAINING_AS_CAPA_COUNTER.manual_input_contract.fields missing 'exception_approval_ref'",
+        );
+    }
+
     public function testRejectsMissingPrompt05CustomerNcrMetric(): void
     {
         $this->assertFakeDriftRejected(
@@ -431,6 +552,28 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
         );
     }
 
+    public function testRejectsMissingCtqDashboardPanelId(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                unset($registry['ctq_capability_policy']['dashboard_card_contract']['panel_id']);
+            },
+            'Prompt 06 ctq_capability_policy.dashboard_card_contract.panel_id must not be empty.',
+        );
+    }
+
+    public function testRejectsCtqMetricWithoutCtqCapabilityUsageType(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'POST_CHANGE_CPK_REVALIDATION', static function (array &$row): void {
+                    $row['usage_types'] = ['lam_profile_gate'];
+                });
+            },
+            'Prompt 06 POST_CHANGE_CPK_REVALIDATION: usage_types must include ctq_capability_contract.',
+        );
+    }
+
     public function testRejectsPrompt07RuntimeMetricStillCarryingStagedGap(): void
     {
         $this->assertFakeDriftRejected(
@@ -473,7 +616,7 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
         );
     }
 
-    public function testRejectsPrompt08MissingConstraintMetric(): void
+    public function testRejectsPrompt07MissingConstraintMetric(): void
     {
         $this->assertFakeDriftRejected(
             static function (array &$registry): void {
@@ -483,7 +626,7 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
                     static fn(array $row): bool => ($row['canonical_code'] ?? '') !== 'CURRENT_CONSTRAINT_RESOURCE',
                 ));
             },
-            "Prompt 08 required constraint metric 'CURRENT_CONSTRAINT_RESOURCE' missing.",
+            "Prompt 07 required constraint metric 'CURRENT_CONSTRAINT_RESOURCE' missing.",
         );
     }
 
@@ -502,7 +645,37 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
         );
     }
 
-    public function testRejectsPrompt08ConstraintMetricMadeRewardable(): void
+    public function testRejectsPrompt08MaterialReadinessMissingOverrideEvidenceField(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'MATERIAL_AVAILABILITY_PLAN', static function (array &$row): void {
+                    $row['readiness_component_contract']['manual_override_fields'] = array_values(array_filter(
+                        $row['readiness_component_contract']['manual_override_fields'] ?? [],
+                        static fn(string $field): bool => $field !== 'metadata.readiness_override_evidence_reference',
+                    ));
+                });
+            },
+            "Prompt 08 MATERIAL_AVAILABILITY_PLAN.readiness_component_contract: missing manual_override_field 'metadata.readiness_override_evidence_reference'.",
+        );
+    }
+
+    public function testRejectsPrompt09ShipPacketDependencyMissingGageGate(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'SHIP_PACKET_COMPLETENESS', static function (array &$row): void {
+                    $row['release_dependency_contract']['required_gate_metrics'] = array_values(array_filter(
+                        $row['release_dependency_contract']['required_gate_metrics'] ?? [],
+                        static fn(string $field): bool => $field !== 'GAGE_VALID_FOR_RELEASE',
+                    ));
+                });
+            },
+            "Prompt 09 SHIP_PACKET_COMPLETENESS.release_dependency_contract: missing required_gate_metric 'GAGE_VALID_FOR_RELEASE'.",
+        );
+    }
+
+    public function testRejectsPrompt07ConstraintMetricMadeRewardable(): void
     {
         $this->assertFakeDriftRejected(
             static function (array &$registry): void {
@@ -511,11 +684,11 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
                     $row['reward_mode'] = 'bonus_pool_candidate';
                 });
             },
-            'Prompt 08 CONSTRAINT_LOST_HOURS: constraint metric must not be rewardable or scorecard contributing.',
+            'Prompt 07 CONSTRAINT_LOST_HOURS: constraint metric must not be rewardable or scorecard contributing.',
         );
     }
 
-    public function testRejectsPrompt08QueueMetricWithoutDailyManagementContext(): void
+    public function testRejectsPrompt07QueueMetricWithoutDailyManagementContext(): void
     {
         $this->assertFakeDriftRejected(
             static function (array &$registry): void {
@@ -523,17 +696,63 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
                     $row['usage_contexts'] = ['lam_profile_gate'];
                 });
             },
-            'Prompt 08 CMM_QUEUE_AGING: queue metric must include daily_management or flow_constraint usage_context.',
+            'Prompt 07 CMM_QUEUE_AGING: queue metric must include daily_management or flow_constraint usage_context.',
         );
     }
 
-    public function testRejectsPrompt08MissingConstraintRegisterContract(): void
+    public function testRejectsPrompt07MissingConstraintRegisterContract(): void
     {
         $this->assertFakeDriftRejected(
             static function (array &$registry): void {
                 unset($registry['lean_flow_operating_model']['constraint_register_contract']);
             },
-            'Prompt 08 lean_flow_operating_model: missing constraint_register_contract.contract_id.',
+            'Prompt 07 lean_flow_operating_model: missing constraint_register_contract.contract_id.',
+        );
+    }
+
+    public function testRejectsPrompt07ConstraintRegisterMissingBufferPolicy(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['lean_flow_operating_model']['constraint_register_contract']['required_fields'] = array_values(array_filter(
+                    $registry['lean_flow_operating_model']['constraint_register_contract']['required_fields'] ?? [],
+                    static fn(string $field): bool => $field !== 'buffer_policy',
+                ));
+            },
+            "Prompt 07 lean_flow_operating_model.constraint_register_contract: missing 'buffer_policy'.",
+        );
+    }
+
+    public function testRejectsPrompt07QueueContractMissingNeededByField(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['lean_flow_operating_model']['queue_aging_contract']['required_fields'] = array_values(array_filter(
+                    $registry['lean_flow_operating_model']['queue_aging_contract']['required_fields'] ?? [],
+                    static fn(string $field): bool => $field !== 'needed_by_at',
+                ));
+            },
+            "Prompt 07 lean_flow_operating_model.queue_aging_contract: missing 'needed_by_at'.",
+        );
+    }
+
+    public function testRejectsPrompt07InspectionPlanAdherenceAsQueueMetric(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['lean_flow_operating_model']['cmm_qc_queue_metrics'][] = 'INSPECTION_PLAN_ADHERENCE';
+            },
+            'Prompt 07 lean_flow_operating_model: INSPECTION_PLAN_ADHERENCE must not be treated as a queue engine metric.',
+        );
+    }
+
+    public function testRejectsPrompt07InspectionPlanAdherenceOnDailyBoard(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['lean_flow_operating_model']['daily_board_required_signals'][] = 'INSPECTION_PLAN_ADHERENCE';
+            },
+            'Prompt 07 daily_board_required_signals: INSPECTION_PLAN_ADHERENCE must stay off the daily flow board.',
         );
     }
 
@@ -589,6 +808,21 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
                 });
             },
             "Prompt 07 CMM_QUEUE_AGING: manual_input_contract.fields missing 'owner_role'.",
+        );
+    }
+
+    public function testRejectsPrompt07CmmQueueContractMissingNeededByField(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                self::mutateMetric($registry, 'CMM_QUEUE_AGING', static function (array &$row): void {
+                    $row['manual_input_contract']['fields'] = array_values(array_filter(
+                        $row['manual_input_contract']['fields'] ?? [],
+                        static fn(string $field): bool => $field !== 'needed_by_at',
+                    ));
+                });
+            },
+            "Prompt 07 CMM_QUEUE_AGING: manual_input_contract.fields missing 'needed_by_at'.",
         );
     }
 
@@ -683,6 +917,27 @@ final class KpiIntegrityMetricControlGuardTest extends TestCase
                 $registry['jd_kpi_scorecards']['roles']['QC']['active_scorecard'][0]['scorecard_contributes_to_reward'] = true;
             },
             'role measures must stay not_rewardable in Prompt 09',
+        );
+    }
+
+    public function testRejectsPrompt12SupportRoleGenericTemplateText(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                $registry['jd_kpi_scorecards']['roles']['APAR']['active_scorecard'][0]['controllability_scope']
+                    = "APAR kiểm soát trực tiếp bằng chứng 'invoice pack review' và các hành vi nằm trong ranh giới công việc của vai trò này; cụ thể là kiểm soát bằng chứng dữ liệu/tuân thủ, access-backup-recovery, hồ sơ tài chính/nhân sự/EHS/IT, chất lượng closure và escalation ngoại lệ trong quy trình hỗ trợ được giao. Không dùng measure này để gánh nguyên nhân ngoài ranh giới kiểm soát của APAR.";
+            },
+            "still contains generic blocklisted text 'kiểm soát bằng chứng dữ liệu/tuân thủ, access-backup-recovery, hồ sơ tài chính/nhân sự/ehs/it, chất lượng closure và escalation ngoại lệ trong quy trình hỗ trợ được giao.'",
+        );
+    }
+
+    public function testRejectsPrompt15LamEvidencePackContractWithoutRetrievalKeys(): void
+    {
+        $this->assertFakeDriftRejected(
+            static function (array &$registry): void {
+                unset($registry['lam_evidence_pack_contract']['retrieval_test']['query_keys']);
+            },
+            'lam_evidence_pack_contract.retrieval_test.query_keys must include PO/shipment/job/packet lookup keys.',
         );
     }
 
