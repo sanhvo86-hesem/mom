@@ -53,8 +53,8 @@ entities:
   - root_code: MDA-QUALITY-CASE
     canonical_name: QualityHoldNcrMrbCapaComplaintScarAuthority
     owner_domain: quality_management
-    table_names: [quality_order, quality_holds, wms_quarantine_holds, inspection_lot, inspection_result, inspection_results, incoming_inspections, incoming_inspection_results, ipqc_inspections, ipqc_inspection_results, oqc_inspections, ncr_records, nonconformance, ncr, ncr_mrb_decisions, material_review_board, capa, capa_records, capa_8d_steps, scar, scar_records, complaint, customer_complaints, supplier_quality_case, concessions, deviation, deviations]
-    required_command_service: "QualityCase command service"
+    table_names: [quality_order, quality_hold, quality_holds, quality_order_trigger_ledger, quality_case_trace_link, wms_quarantine_holds, inspection_lot, inspection_result, inspection_results, incoming_inspections, incoming_inspection_results, ipqc_inspections, ipqc_inspection_results, oqc_inspections, ncr_records, nonconformance, ncr, ncr_mrb_decisions, material_review_board, capa, capa_records, capa_8d_steps, scar, scar_records, complaint, customer_complaints, supplier_quality_case, concessions, deviation, deviations]
+    required_command_service: "QualityCase command service plus CanonicalQualityCaseAuthorityService for hold/case gates"
     allowed_commands: [quality_hold_place, quality_hold_release, ncr_open, mrb_disposition, capa_approve, complaint_close, scar_issue]
     forbidden_generic_actions: [create, update, delete, transition, approve, hold, release]
     severity: P0

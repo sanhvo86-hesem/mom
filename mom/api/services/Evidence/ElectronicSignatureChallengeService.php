@@ -31,6 +31,10 @@ final class ElectronicSignatureChallengeService
         'party_merge_apply',
         'user_party_link_approval',
         'inventory_adjustment_approval',
+        'mrb_use_as_is_disposition',
+        'capa_approval',
+        'critical_scar_issue_approval',
+        'complaint_closure_approval',
     ];
 
     private ?object $db;
