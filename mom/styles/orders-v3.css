@@ -919,3 +919,48 @@ body.orders-v3-active #page-orders.active > .page-breadcrumb {
   --o3-shadow-raised:   0 4px 12px rgba(0,0,0,0.40), 0 2px 4px rgba(0,0,0,0.24);
   --o3-shadow-drawer:   -8px 0 24px rgba(0,0,0,0.45);
 }
+
+/* v3-G15 (2026-05-29): full dark mode coverage — also flip LEGACY
+ * portal vars so sidebar + admin inline-styles using var(--bg-*) and
+ * var(--text-*) cascade to dark too. Without these, sidebar/admin-nav
+ * stay light because inline styles win over our class/attribute rules
+ * unless the var() they consume has been redefined. */
+:root[data-color-mode="dark"] {
+  --bg-page:            #0f172a;
+  --bg-app:             #0f172a;
+  --bg-surface:         #1e293b;
+  --bg-surface-alt:     #162032;
+  --bg-modal:           #1e293b;
+  --bg-hover:           #263348;
+  --surface-1:          #1e293b;
+  --surface-2:          #263348;
+  --surface-3:          #162032;
+  --text-primary:       #f1f5f9;
+  --text-secondary:     #cbd5e1;
+  --text-tertiary:      #94a3b8;
+  --text-1:             #f1f5f9;
+  --text-2:             #cbd5e1;
+  --text-3:             #94a3b8;
+  --text-on-brand:      #0f172a;
+  --border:             #475569;
+  --border-subtle:      #334155;
+  --border-strong:      #64748b;
+  --border-1:           #334155;
+  --border-2:           #475569;
+  --border-3:           #64748b;
+}
+
+/* Dark mode — sidebar + admin scoped overrides. Each rule uses
+ * !important because inline styles win specificity. */
+:root[data-color-mode="dark"] #sidebar,
+:root[data-color-mode="dark"] aside#sidebar{background:#0a1628 !important;color:#f1f5f9}
+:root[data-color-mode="dark"] #sidebar *{color:#cbd5e1}
+:root[data-color-mode="dark"] #admin-content{background:#0f172a;color:#f1f5f9}
+:root[data-color-mode="dark"] #admin-content input[type="text"],
+:root[data-color-mode="dark"] #admin-content input[type="number"],
+:root[data-color-mode="dark"] #admin-content input[type="search"],
+:root[data-color-mode="dark"] #admin-content textarea,
+:root[data-color-mode="dark"] #admin-content select{background:#1e293b !important;color:#f1f5f9 !important;border-color:#475569 !important}
+:root[data-color-mode="dark"] #admin-content button:not([class*="primary"]):not([class*="danger"]):not([class*="success"]){background:#1e293b;color:#f1f5f9;border-color:#475569}
+:root[data-color-mode="dark"] #admin-content code{background:#0f172a;color:#94a3b8}
+:root[data-color-mode="dark"] body{background:#0f172a;color:#f1f5f9}

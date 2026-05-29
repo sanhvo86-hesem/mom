@@ -125,114 +125,171 @@
   }
 
   /* ── Render the Theme tab body ───────────────────────────────────── */
+  /* Active sub-tab inside Theme tab. Persist per session so admin
+   * returning to Theme lands on the same panel. */
+  var _activeThemeSubtab = (function(){
+    try { return sessionStorage.getItem('o3-theme-subtab') || 'mode'; }
+    catch (e) { return 'mode'; }
+  })();
+  window._admThemeSetSubtab = function(id){
+    _activeThemeSubtab = id || 'mode';
+    try { sessionStorage.setItem('o3-theme-subtab', _activeThemeSubtab); } catch (e) {}
+    var panel = document.getElementById('adm-appearance-panel-theme');
+    if (panel) {
+      panel.innerHTML = window._renderAdmThemeHtml(window.__lang === 'en'
+        ? function(vi,en){ return en || vi; }
+        : function(vi,en){ return vi || en; });
+      if (typeof window._wireAdmTheme === 'function') window._wireAdmTheme();
+    }
+  };
+
+  function renderSeg(name, options, current){
+    return '<div style="display:inline-flex;border:1px solid var(--o3-border-subtle);border-radius:6px;overflow:hidden">'
+      + options.map(function(o){
+          var active = o.v === current;
+          return '<button type="button" data-theme-seg="' + esc(name) + '" data-theme-val="' + esc(o.v) + '"'
+            + ' style="border:0;padding:6px 12px;cursor:pointer;font-size:12px;'
+            + (active ? 'background:var(--o3-brand);color:#fff' : 'background:transparent;color:var(--text-primary,#0f172a)')
+            + '">' + esc(o.l) + '</button>';
+        }).join('')
+      + '</div>';
+  }
+  function renderRow(label, control, hint){
+    return '<div style="display:grid;grid-template-columns:200px 1fr;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--o3-border-subtle)">'
+      + '<div><div style="font-size:13px;font-weight:500;color:var(--text-primary,#0f172a)">' + esc(label) + '</div>'
+      + (hint ? '<div style="font-size:10.5px;color:var(--text-tertiary,#94a3b8);margin-top:2px">' + esc(hint) + '</div>' : '')
+      + '</div>'
+      + '<div>' + control + '</div>'
+      + '</div>';
+  }
+  function renderSwatch(label, cssVar){
+    return '<div style="display:flex;flex-direction:column;align-items:center;gap:4px">'
+      + '<div style="width:40px;height:40px;border-radius:6px;background:var(' + cssVar + ');border:1px solid var(--o3-border-subtle);box-shadow:inset 0 0 0 1px rgba(0,0,0,0.06)"></div>'
+      + '<span style="font-size:10px;color:var(--text-secondary,#475569)">' + esc(label) + '</span>'
+      + '</div>';
+  }
+
+  /* ── Sub-tab content renderers (each returns innerHTML for body) ── */
+  function renderModeTab(L, t){
+    return ''
+      + renderRow(L('Chế độ màu','Color mode'),
+          renderSeg('color-mode', [{v:'light',l:'☀ Light'},{v:'dark',l:'☾ Dark'},{v:'auto',l:'◐ Auto'}], t['color-mode']),
+          L('Auto theo system preference (prefers-color-scheme).', 'Auto follows system preference.'));
+  }
+  function renderColorTab(L, t){
+    return ''
+      + renderRow(L('Brand chính','Brand primary'),
+          '<input type="color" id="theme-brand" value="' + esc(t['brand']) + '" style="width:48px;height:32px;border:1px solid var(--o3-border-subtle);border-radius:6px;background:transparent;cursor:pointer">'
+          + ' <code style="font-family:ui-monospace,monospace;font-size:11px;color:var(--text-tertiary,#94a3b8);margin-left:8px">' + esc(t['brand']) + '</code>',
+          L('Material 3 — màu chính của tổ chức.', 'Material 3 — organisation primary.'))
+      + '<div style="display:flex;gap:14px;flex-wrap:wrap;padding:14px 0;border-bottom:1px solid var(--o3-border-subtle)">'
+      +   renderSwatch('brand', '--o3-brand')
+      +   renderSwatch('brand·hover', '--o3-brand-hover')
+      +   renderSwatch('brand·soft', '--o3-brand-soft')
+      +   renderSwatch('success', '--o3-success')
+      +   renderSwatch('warning', '--o3-warning')
+      +   renderSwatch('danger', '--o3-danger')
+      +   renderSwatch('info', '--o3-info')
+      +   renderSwatch('neutral', '--o3-neutral')
+      + '</div>'
+      + '<div style="padding-top:14px;font-size:11.5px;color:var(--text-tertiary,#94a3b8);line-height:1.5">'
+      +   esc(L('Swatch trạng thái auto-derive từ palette gốc. Roadmap v3-G16: HSL harmonization để hover/soft xoay theo brand.',
+                'Status swatches derive from base palette. Roadmap: HSL harmonisation so hover/soft shift with brand.'))
+      + '</div>';
+  }
+  function renderTypographyTab(L, t){
+    return ''
+      + renderRow(L('Font family','Font family'),
+          '<select id="theme-font-family" style="width:300px;height:32px;padding:0 8px;border:1px solid var(--o3-border-subtle);border-radius:6px;background:var(--o3-surface-card);color:var(--text-primary,#0f172a);font-size:12px">'
+          + ['Inter, -apple-system, "SF Pro Text", system-ui, sans-serif',
+             '"IBM Plex Sans", -apple-system, sans-serif',
+             '"Noto Sans", -apple-system, sans-serif',
+             'system-ui, -apple-system, "Segoe UI", sans-serif',
+             '"SF Pro Text", -apple-system, system-ui, sans-serif'
+            ].map(function(f){
+              var first = f.split(',')[0].replace(/['"]/g, '');
+              return '<option value="' + esc(f) + '"' + (f === t['font-family'] ? ' selected' : '') + ' style="font-family:' + esc(f) + '">' + esc(first) + '</option>';
+            }).join('')
+          + '</select>',
+          L('Inter (Vercel), IBM Plex (Carbon), system-ui (native).', 'Inter, IBM Plex, system-ui.'))
+      + renderRow(L('Cỡ chữ chuẩn','Base font size'),
+          '<input type="number" id="theme-font-base" value="' + t['font-base'] + '" min="11" max="16" step="1" style="width:64px;height:32px;padding:0 6px;border:1px solid var(--o3-border-subtle);border-radius:6px;background:var(--o3-surface-card);color:var(--text-primary,#0f172a);font-size:12px">'
+          + ' <span style="font-size:11px;color:var(--text-tertiary,#94a3b8);margin-left:4px">px</span>',
+          L('Body 13px là chuẩn Vercel/Linear cho industrial UI.', 'Body 13px is Vercel/Linear industrial standard.'))
+      + '<div style="padding-top:14px;font-size:11.5px;color:var(--text-tertiary,#94a3b8);line-height:1.5">'
+      +   esc(L('Type ramp tự sinh từ base: XS = base × 0.85, SM × 0.92, MD = base, LG × 1.15, XL × 1.4, 2XL × 1.7, 3XL × 2.15.',
+                'Type ramp auto-scales from base: XS×0.85, SM×0.92, MD=base, LG×1.15, XL×1.4, 2XL×1.7, 3XL×2.15.'))
+      + '</div>';
+  }
+  function renderDensityTab(L, t){
+    return ''
+      + renderRow(L('Mật độ','Density'),
+          renderSeg('density', [{v:'compact',l:'Compact 32'},{v:'cozy',l:'Cozy 36'},{v:'comfortable',l:'Comfortable 40'}], t['density']),
+          L('Atlassian 3-tier — Compact dày, Comfortable touch.', 'Atlassian 3-tier — Compact dense, Comfortable for touch.'))
+      + renderRow(L('Khe hở chính','Master gap'),
+          '<input type="range" id="theme-master-gap" min="2" max="24" value="' + t['master-gap'] + '" style="width:200px">'
+          + ' <span style="font-size:11px;color:var(--text-tertiary,#94a3b8);margin-left:8px"><span id="theme-master-gap-val">' + t['master-gap'] + '</span>px</span>')
+      + renderRow(L('Khe phân đoạn','Section gap'),
+          '<input type="range" id="theme-section-gap" min="4" max="32" value="' + t['section-gap'] + '" style="width:200px">'
+          + ' <span style="font-size:11px;color:var(--text-tertiary,#94a3b8);margin-left:8px"><span id="theme-section-gap-val">' + t['section-gap'] + '</span>px</span>')
+      + renderRow(L('Bo góc control','Control radius'),
+          '<input type="range" id="theme-master-radius" min="0" max="16" value="' + t['master-radius'] + '" style="width:200px">'
+          + ' <span style="font-size:11px;color:var(--text-tertiary,#94a3b8);margin-left:8px"><span id="theme-master-radius-val">' + t['master-radius'] + '</span>px</span>')
+      + renderRow(L('Bo góc card','Card radius'),
+          '<input type="range" id="theme-card-radius" min="0" max="20" value="' + t['card-radius'] + '" style="width:200px">'
+          + ' <span style="font-size:11px;color:var(--text-tertiary,#94a3b8);margin-left:8px"><span id="theme-card-radius-val">' + t['card-radius'] + '</span>px</span>');
+  }
+  function renderMotionTab(L, t){
+    return ''
+      + renderRow(L('Cường độ','Intensity'),
+          renderSeg('motion', [{v:'subtle',l:'Subtle (0.7×)'},{v:'standard',l:'Standard (1.0×)'},{v:'expressive',l:'Expressive (1.4×)'}], t['motion']),
+          L('Linear khuyến nghị Subtle cho ops, Expressive cho marketing.', 'Linear recommends Subtle for ops, Expressive for marketing.'))
+      + '<div style="padding-top:14px;font-size:11.5px;color:var(--text-tertiary,#94a3b8);line-height:1.5">'
+      +   esc(L('Cường độ multiply lên 3 mức cơ bản: Fast 120ms, Base 200ms, Slow 320ms (Material 3 spec).',
+                'Intensity multiplies 3 base tiers: Fast 120ms, Base 200ms, Slow 320ms (Material 3 spec).'))
+      + '</div>';
+  }
+
   window._renderAdmThemeHtml = function(L){
     L = L || function(vi, en){ return vi || en; };
     var t = readTheme();
-    var swatch = function(label, cssVar){
-      return '<div style="display:flex;flex-direction:column;align-items:center;gap:4px">'
-        + '<div style="width:36px;height:36px;border-radius:6px;background:var(' + cssVar + ');border:1px solid var(--o3-border-subtle)"></div>'
-        + '<span style="font-size:10px;color:var(--text-secondary)">' + esc(label) + '</span>'
-        + '</div>';
-    };
-    var seg = function(name, options, current){
-      return '<div style="display:inline-flex;border:1px solid var(--o3-border-subtle);border-radius:6px;overflow:hidden">'
-        + options.map(function(o){
-            var active = o.v === current;
-            return '<button type="button" data-theme-seg="' + esc(name) + '" data-theme-val="' + esc(o.v) + '"'
-              + ' style="border:0;padding:6px 12px;cursor:pointer;font-size:12px;'
-              + (active ? 'background:var(--o3-brand);color:#fff' : 'background:transparent;color:var(--text-primary)')
-              + '">' + esc(o.l) + '</button>';
-          }).join('')
-        + '</div>';
-    };
-    var row = function(label, control, hint){
-      return '<div style="display:grid;grid-template-columns:200px 1fr;align-items:center;gap:14px;padding:8px 0;border-bottom:1px solid var(--o3-border-subtle)">'
-        + '<div><div style="font-size:13px;font-weight:500;color:var(--text-primary)">' + esc(label) + '</div>'
-        + (hint ? '<div style="font-size:10.5px;color:var(--text-tertiary);margin-top:2px">' + esc(hint) + '</div>' : '')
-        + '</div>'
-        + '<div>' + control + '</div>'
-        + '</div>';
-    };
+    var SUBTABS = [
+      { id: 'mode',       vi: '☾ Chế độ',   en: '☾ Mode',       render: renderModeTab },
+      { id: 'color',      vi: '🎨 Màu',     en: '🎨 Color',     render: renderColorTab },
+      { id: 'typography', vi: '🔠 Chữ',     en: '🔠 Typography',render: renderTypographyTab },
+      { id: 'density',    vi: '📐 Mật độ',  en: '📐 Density',   render: renderDensityTab },
+      { id: 'motion',     vi: '⚡ Chuyển động','en': '⚡ Motion', render: renderMotionTab }
+    ];
+    var active = SUBTABS.find(function(x){ return x.id === _activeThemeSubtab; }) || SUBTABS[0];
+
+    var tabStrip = '<nav style="display:flex;gap:0;border-bottom:1px solid var(--o3-border-subtle);margin:0 0 14px">'
+      + SUBTABS.map(function(s){
+          var isAct = s.id === active.id;
+          return '<button type="button" data-theme-subtab="' + esc(s.id) + '"'
+            + ' onclick="_admThemeSetSubtab(\'' + esc(s.id) + '\')"'
+            + ' style="border:0;padding:8px 14px;background:transparent;cursor:pointer;font-size:12.5px;'
+            + 'color:' + (isAct ? 'var(--o3-brand)' : 'var(--text-secondary,#475569)') + ';'
+            + 'border-bottom:2px solid ' + (isAct ? 'var(--o3-brand)' : 'transparent') + ';'
+            + 'font-weight:' + (isAct ? '600' : '500') + '">'
+            + esc(L(s.vi, s.en)) + '</button>';
+        }).join('')
+      + '</nav>';
+
     return ''
-      + '<div style="font-size:12px;color:var(--text-secondary);margin:0 0 10px;line-height:1.5">'
-      +   esc(L('🎨 Global Theme — chỉnh ở đây cascade tới toàn bộ Module Master. Per-property nếu muốn override thì bấm Custom trong Module Master.',
-                '🎨 Global Theme — edits cascade to every Module Master section. Per-property overrides live in the Module Master dock.'))
+      + '<div style="font-size:12px;color:var(--text-secondary,#475569);margin:0 0 12px;line-height:1.5">'
+      +   esc(L('🎨 Global Theme — chỉnh ở đây cascade tới toàn bộ Module Master. Per-property nếu muốn override thì bấm Custom trong dock Module Master.',
+                '🎨 Global Theme — edits cascade to every Module Master section. Per-property overrides live in the Module Master dock via Custom checkbox.'))
       + '</div>'
-
-      + '<section style="background:var(--o3-surface-card);border:1px solid var(--o3-border-subtle);border-radius:var(--card-radius);padding:16px;margin-bottom:14px">'
-      +   '<h3 style="margin:0 0 8px;font-size:13px;font-weight:600">' + esc(L('Chế độ màu','Color mode')) + '</h3>'
-      +   row(L('Chế độ','Mode'),
-            seg('color-mode', [{v:'light',l:'☀ Light'},{v:'dark',l:'☾ Dark'},{v:'auto',l:'◐ Auto'}], t['color-mode']),
-            L('Auto theo system preference (prefers-color-scheme).', 'Auto follows system preference.'))
+      + tabStrip
+      + '<section style="background:var(--o3-surface-card);border:1px solid var(--o3-border-subtle);border-radius:var(--card-radius);padding:14px 18px">'
+      +   active.render(L, t)
       + '</section>'
-
-      + '<section style="background:var(--o3-surface-card);border:1px solid var(--o3-border-subtle);border-radius:var(--card-radius);padding:16px;margin-bottom:14px">'
-      +   '<h3 style="margin:0 0 8px;font-size:13px;font-weight:600">' + esc(L('Thương hiệu + Bảng màu','Brand + Palette')) + '</h3>'
-      +   row(L('Brand chính','Brand primary'),
-            '<input type="color" id="theme-brand" value="' + esc(t['brand']) + '" style="width:48px;height:32px;border:1px solid var(--o3-border-subtle);border-radius:6px;background:transparent;cursor:pointer">'
-            + ' <code style="font-family:ui-monospace,monospace;font-size:11px;color:var(--text-tertiary);margin-left:8px">' + esc(t['brand']) + '</code>',
-            L('Material 3 — màu chính của tổ chức.', 'Material 3 — organisation primary.'))
-      +   '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">'
-      +     swatch('brand', '--o3-brand')
-      +     swatch('brand·hover', '--o3-brand-hover')
-      +     swatch('brand·soft', '--o3-brand-soft')
-      +     swatch('success', '--o3-success')
-      +     swatch('warning', '--o3-warning')
-      +     swatch('danger', '--o3-danger')
-      +     swatch('info', '--o3-info')
-      +     swatch('neutral', '--o3-neutral')
-      +   '</div>'
-      + '</section>'
-
-      + '<section style="background:var(--o3-surface-card);border:1px solid var(--o3-border-subtle);border-radius:var(--card-radius);padding:16px;margin-bottom:14px">'
-      +   '<h3 style="margin:0 0 8px;font-size:13px;font-weight:600">' + esc(L('Typography','Typography')) + '</h3>'
-      +   row(L('Font family','Font family'),
-            '<select id="theme-font-family" style="width:300px;height:32px;padding:0 8px;border:1px solid var(--o3-border-subtle);border-radius:6px;background:var(--o3-surface-card);font-size:12px">'
-            + ['Inter, -apple-system, "SF Pro Text", system-ui, sans-serif',
-               '"IBM Plex Sans", -apple-system, sans-serif',
-               '"Noto Sans", -apple-system, sans-serif',
-               'system-ui, -apple-system, "Segoe UI", sans-serif',
-               '"SF Pro Text", -apple-system, system-ui, sans-serif'
-              ].map(function(f){
-                return '<option value="' + esc(f) + '"' + (f === t['font-family'] ? ' selected' : '') + '>' + esc(f.split(',')[0].replace(/['"]/g, '')) + '</option>';
-              }).join('')
-            + '</select>',
-            L('Font công nghiệp phổ biến — Inter (Vercel), IBM Plex (Carbon), system-ui (native).', 'Industrial fonts — Inter, IBM Plex, system-ui.'))
-      +   row(L('Cỡ chữ chuẩn','Base font size'),
-            '<input type="number" id="theme-font-base" value="' + t['font-base'] + '" min="11" max="16" step="1" style="width:60px;height:32px;padding:0 6px;border:1px solid var(--o3-border-subtle);border-radius:6px;font-size:12px">'
-            + ' <span style="font-size:11px;color:var(--text-tertiary);margin-left:4px">px</span>',
-            L('Body 13px là chuẩn Vercel/Linear cho industrial UI.', 'Body 13px is Vercel/Linear industrial standard.'))
-      + '</section>'
-
-      + '<section style="background:var(--o3-surface-card);border:1px solid var(--o3-border-subtle);border-radius:var(--card-radius);padding:16px;margin-bottom:14px">'
-      +   '<h3 style="margin:0 0 8px;font-size:13px;font-weight:600">' + esc(L('Mật độ + Hình dạng','Density + Shape')) + '</h3>'
-      +   row(L('Mật độ','Density'),
-            seg('density', [{v:'compact',l:'Compact 32'},{v:'cozy',l:'Cozy 36'},{v:'comfortable',l:'Comfortable 40'}], t['density']),
-            L('Atlassian gọi 3 mức — Compact cho dashboards dày, Comfortable cho touch.', 'Atlassian 3-tier — Compact for dense dashboards, Comfortable for touch.'))
-      +   row(L('Khe hở chính','Master gap'),
-            '<input type="range" id="theme-master-gap" min="2" max="24" value="' + t['master-gap'] + '" style="width:200px">'
-            + ' <span style="font-size:11px;color:var(--text-tertiary);margin-left:8px"><span id="theme-master-gap-val">' + t['master-gap'] + '</span>px</span>')
-      +   row(L('Khe phân đoạn','Section gap'),
-            '<input type="range" id="theme-section-gap" min="4" max="32" value="' + t['section-gap'] + '" style="width:200px">'
-            + ' <span style="font-size:11px;color:var(--text-tertiary);margin-left:8px"><span id="theme-section-gap-val">' + t['section-gap'] + '</span>px</span>')
-      +   row(L('Bo góc control','Control radius'),
-            '<input type="range" id="theme-master-radius" min="0" max="16" value="' + t['master-radius'] + '" style="width:200px">'
-            + ' <span style="font-size:11px;color:var(--text-tertiary);margin-left:8px"><span id="theme-master-radius-val">' + t['master-radius'] + '</span>px</span>')
-      +   row(L('Bo góc card','Card radius'),
-            '<input type="range" id="theme-card-radius" min="0" max="20" value="' + t['card-radius'] + '" style="width:200px">'
-            + ' <span style="font-size:11px;color:var(--text-tertiary);margin-left:8px"><span id="theme-card-radius-val">' + t['card-radius'] + '</span>px</span>')
-      + '</section>'
-
-      + '<section style="background:var(--o3-surface-card);border:1px solid var(--o3-border-subtle);border-radius:var(--card-radius);padding:16px;margin-bottom:14px">'
-      +   '<h3 style="margin:0 0 8px;font-size:13px;font-weight:600">' + esc(L('Chuyển động','Motion')) + '</h3>'
-      +   row(L('Cường độ','Intensity'),
-            seg('motion', [{v:'subtle',l:'Subtle'},{v:'standard',l:'Standard'},{v:'expressive',l:'Expressive'}], t['motion']),
-            L('Linear khuyến nghị Subtle cho ops. Expressive cho marketing surface.', 'Linear recommends Subtle for ops, Expressive for marketing.'))
-      + '</section>'
-
-      + '<div style="display:flex;gap:10px;justify-content:flex-end;padding:16px 0">'
-      +   '<button type="button" id="theme-reset" style="padding:8px 14px;border:1px solid var(--o3-border-subtle);background:var(--o3-surface-card);border-radius:6px;cursor:pointer;font-size:12px">'
+      + '<div style="display:flex;gap:10px;justify-content:flex-end;padding:14px 0">'
+      +   '<button type="button" id="theme-reset" style="padding:8px 14px;border:1px solid var(--o3-border-subtle);background:var(--o3-surface-card);color:var(--text-primary,#0f172a);border-radius:6px;cursor:pointer;font-size:12px">'
       +     esc(L('Reset to design defaults', 'Reset to design defaults'))
+      +   '</button>'
+      +   '<button type="button" id="theme-save" style="padding:8px 14px;border:0;background:var(--o3-brand);color:#fff;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">'
+      +     esc(L('Lưu Theme cho tổ chức', 'Save Theme for org'))
       +   '</button>'
       + '</div>';
   };
@@ -303,12 +360,44 @@
       rb.addEventListener('click', function(){
         if (!confirm('Reset Theme về defaults? Mọi Custom override trong Module Master vẫn giữ nguyên.')) return;
         resetTheme();
-        // Re-render Theme tab to reflect reset values
         var panel = document.getElementById('adm-appearance-panel-theme');
         if (panel) panel.innerHTML = window._renderAdmThemeHtml(window.__lang === 'en'
           ? function(vi,en){ return en || vi; }
           : function(vi,en){ return vi || en; });
         if (typeof window._wireAdmTheme === 'function') window._wireAdmTheme();
+      });
+    }
+    // Save (POST to backend via existing GraphicsAuthority pipeline if
+    // available, else fall back to localStorage-only persistence).
+    var sb = document.getElementById('theme-save');
+    if (sb && sb.getAttribute('data-theme-wired') !== '1') {
+      sb.setAttribute('data-theme-wired', '1');
+      sb.addEventListener('click', function(){
+        var theme = readTheme();
+        var posted = false;
+        try {
+          if (window.GraphicsAuthority && window.GraphicsAuthority.tokens
+              && typeof window.GraphicsAuthority.tokens.stage === 'function') {
+            // Map theme settings to token catalog keys
+            window.GraphicsAuthority.tokens.stage('space.master',  theme['master-gap'] + 'px');
+            window.GraphicsAuthority.tokens.stage('space.section', theme['section-gap'] + 'px');
+            window.GraphicsAuthority.tokens.stage('radius.master', theme['master-radius'] + 'px');
+            window.GraphicsAuthority.tokens.stage('radius.card',   theme['card-radius'] + 'px');
+            window.GraphicsAuthority.tokens.stage('control.height.standard',
+              ({compact:32,cozy:36,comfortable:40}[theme['density']] || 36) + 'px');
+            window.GraphicsAuthority.tokens.stage('brand.primary', theme['brand']);
+            if (window.GraphicsAuthority.preview
+                && typeof window.GraphicsAuthority.preview.simulate === 'function') {
+              window.GraphicsAuthority.preview.simulate();
+              posted = true;
+            }
+          }
+        } catch (e) { /* fall through */ }
+        if (posted) {
+          alert('✓ Đã stage Theme + chạy WCAG simulation. Mở Graphics tab gốc để publish ra org.');
+        } else {
+          alert('✓ Theme saved to browser. GraphicsAuthority pipeline chưa wire ở session này — backend persistence sẽ wire ở v3-G16.');
+        }
       });
     }
   };

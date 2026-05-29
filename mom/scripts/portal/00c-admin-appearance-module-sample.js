@@ -646,14 +646,14 @@
 
   function sections(L){
     return [
-      densitySection(L),
-      // Global SSOT sections — merged in from legacy Tokens + Effects
-      // sub-tabs (v3-G11). These edit the same underlying CSS vars as
-      // the per-component property panels so admins have one place.
-      globalTokensSection(L),
-      typographySection(L),
-      effectsGlobalSection(L),
-      // Per-component preview sections
+      /* v3-G15 (2026-05-29): Global sections REMOVED from Module Master.
+       * Density (Khe hở Master), Global tokens, Typography, Effects are
+       * now exclusively in the 🎨 Theme tab. Module Master keeps ONLY
+       * per-component preview sections so the SSOT split is clean:
+       *   • Theme tab  = global design tokens (theme-level)
+       *   • Module Master = per-component DETAILS (override-level)
+       * Per-property "Custom" checkbox in the dock lets a single
+       * component override the global value without touching others. */
       buttonsSection(L),
       formFieldsSection(L),
       tabsSection(L),
@@ -683,7 +683,8 @@
   // Internal state — which inner tab is active inside the Module Sample tab.
   // Default to 'density' since the master gap knob is the first thing
   // an admin should see when they open Module Sample.
-  var _activeSection = 'density';
+  // v3-G15: default to 'buttons' since 'density'/global sections moved to Theme tab.
+  var _activeSection = 'buttons';
 
   /* Authoritative token-key → CSS variable map.
    * Mirrors graphics_token_catalog.css_variable. Without this lookup
