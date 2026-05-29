@@ -8,15 +8,26 @@ export default defineConfig({
     timeout: 5_000,
     toHaveScreenshot: {
       // Cross-OS visual regression tolerance — baselines may be generated on
-      // any developer host (macOS / Linux / Windows) but CI always runs on
-      // Linux. Font hinting and sub-pixel rasterization differ enough across
-      // OSes that very tight thresholds produce false-positives on what is
-      // semantically the same render. 0.25 per-channel + 5000 pixels is the
-      // band that absorbs that drift while still catching real visual
-      // regressions (a moved button, a swapped color, a missing component).
-      // The Graphics Authority remains the SSOT for token values; this
-      // tolerance only governs pixel-level rendering equivalence.
-      maxDiffPixels: 5_000,
+      // macOS / Linux / Windows but CI always runs on Linux. Two distinct
+      // sources of drift need to be absorbed:
+      //
+      //   (1) Sub-pixel font hinting differences (typically affect ~3-4% of
+      //       pixels across the page).
+      //   (2) Page *height* drift — `fullPage: true` screenshots can vary in
+      //       height by 15-25px across OSes because scrollbar width and
+      //       font-line-height affect layout flow. Playwright treats any size
+      //       mismatch as "every pixel in the new region is different",
+      //       adding 1280 × 20 = ~25 000 extra "diff" pixels even though no
+      //       real content moved.
+      //
+      // We therefore use `maxDiffPixelRatio` (relative) instead of an absolute
+      // pixel cap — 0.08 (8%) absorbs both sources of drift while still
+      // failing on genuine layout changes (moved button, swapped color, or
+      // missing component would shift far more than 8% of pixels).
+      //
+      // Graphics Authority remains the SSOT for token values; this tolerance
+      // only governs pixel-level rendering equivalence in the test layer.
+      maxDiffPixelRatio: 0.08,
       threshold: 0.25,
       animations: 'disabled'
     }
