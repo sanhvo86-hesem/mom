@@ -660,10 +660,18 @@
   // Sample. Stages each change into GraphicsAuthority draft AND
   // updates every CSS variable bound to the token so the live preview
   // re-renders immediately.
+  //
+  // Per-input dedupe via [data-mod-sample-wired] attribute so this can
+  // be called any number of times safely (initial mount, sub-tab switch,
+  // defensive poll). Without dedupe, double-wiring would fire the
+  // handler multiple times per input event.
   function wireInlineTokenEditors(){
     Array.prototype.forEach.call(
-      document.querySelectorAll('[data-mod-sample-token]'),
+      document.querySelectorAll('[data-mod-sample-token]:not([data-mod-sample-wired])'),
       function(input){
+        // Mark immediately so a re-entrant call from MutationObserver
+        // does not double-attach the listener.
+        input.setAttribute('data-mod-sample-wired', '1');
         var tokenKey = input.getAttribute('data-mod-sample-token');
         var cssVars = TOKEN_CSS_VAR[tokenKey] || ['--' + tokenKey.replace(/\./g, '-')];
 
@@ -691,7 +699,7 @@
           }
         } catch (e) { /* non-fatal */ }
 
-        input.addEventListener('input', function(){
+        var apply = function(){
           var v = input.value;
           var staged = v;
           if (input.type === 'number') staged = v + 'px';
@@ -708,7 +716,12 @@
           cssVars.forEach(function(cv){
             try { document.documentElement.style.setProperty(cv, staged); } catch (e) {}
           });
-        });
+        };
+        // Bind both 'input' (live as user types/drags) and 'change'
+        // (commit) so colour pickers (which fire 'input' on every swatch
+        // hover and 'change' on close) and number spinners both work.
+        input.addEventListener('input', apply);
+        input.addEventListener('change', apply);
       }
     );
   }
@@ -716,6 +729,8 @@
   // Wire the density sliders to live CSS variable updates + stage the
   // changes into GraphicsAuthority's draft buffer so the existing
   // "Save for org" pipeline (WCAG sim + commit) handles publish.
+  // Per-input dedupe via [data-density-wired] same as the inline
+  // token editors above.
   function wireDensitySliders(){
     var pairs = [
       ['o3-density-master',  'o3-density-master-val',  '--master-gap',    '--o3-space',         'space.master'],
@@ -727,6 +742,8 @@
       var input = document.getElementById(p[0]);
       var out   = document.getElementById(p[1]);
       if (!input) return;
+      if (input.getAttribute('data-density-wired') === '1') return;
+      input.setAttribute('data-density-wired', '1');
       // Reflect current root value if available
       var current = getComputedStyle(document.documentElement).getPropertyValue(p[2]).trim()
                  || getComputedStyle(document.documentElement).getPropertyValue(p[3]).trim();
@@ -752,41 +769,59 @@
     });
   }
 
+  // Always wire ALL editors after any panel re-render. The wire
+  // functions are idempotent thanks to data-mod-sample-wired and
+  // data-density-wired attribute dedupe, so calling them on every
+  // section change (not just density) costs nothing and removes the
+  // entire class of "editor renders but doesn't react" bugs.
+  function ensureAllWired(){
+    try { wireDensitySliders(); } catch (e) { /* swallow */ }
+    try { wireInlineTokenEditors(); } catch (e) { /* swallow */ }
+  }
+
   window._admModuleSampleSetSection = function(id){
     _activeSection = id || 'density';
-    // Re-render only the Module Sample panel
     var panel = document.getElementById('adm-appearance-panel-module-sample');
     if (panel && typeof window._renderAdmModuleSampleHtml === 'function') {
       var L = window.__lang === 'en'
         ? function(vi,en){ return en || vi; }
         : function(vi,en){ return vi || en; };
       panel.innerHTML = window._renderAdmModuleSampleHtml(L);
-      // If density section is active, wire the sliders
-      if (_activeSection === 'density') wireDensitySliders();
+      ensureAllWired();
     }
   };
 
-  // Observe DOM for the module-sample panel being inserted, then wire
-  // sliders once for the initial paint. After that, the section setter
-  // handles re-wiring on sub-tab switches.
-  var _wiredInitial = false;
-  function tryInitialWire(){
-    if (_wiredInitial) return;
-    var hasSliders = document.getElementById('o3-density-master');
-    var hasTokenEditors = document.querySelector('[data-mod-sample-token]');
-    if (hasSliders || hasTokenEditors) {
-      if (hasSliders) wireDensitySliders();
-      if (hasTokenEditors) wireInlineTokenEditors();
-      _wiredInitial = true;
-    }
-  }
+  // Public init — 00c-admin-appearance.js may call this after switching
+  // to the Module Sample sub-tab. Safe to call any time; dedup'd.
+  window._admModuleSampleEnsureWired = ensureAllWired;
+
+  // Defensive: observe the body so wiring happens on the initial
+  // panel mount (which is performed inline by 00c, not via our
+  // _admModuleSampleSetSection setter). Calls ensureAllWired() which
+  // is itself idempotent.
   if (typeof MutationObserver !== 'undefined') {
-    var mo = new MutationObserver(function(){ tryInitialWire(); });
+    var mo = new MutationObserver(function(){
+      if (document.querySelector('[data-mod-sample-token]:not([data-mod-sample-wired])')
+          || (document.getElementById('o3-density-master')
+              && document.getElementById('o3-density-master').getAttribute('data-density-wired') !== '1')) {
+        ensureAllWired();
+      }
+    });
     try { mo.observe(document.body, { childList: true, subtree: true }); }
-    catch (e) { /* DOM not ready yet — defer */ setTimeout(function(){
+    catch (e) { setTimeout(function(){
       try { mo.observe(document.body, { childList: true, subtree: true }); } catch(e2){}
     }, 1000); }
   }
+
+  // Final safety net — a short interval that rewires for the first
+  // few seconds after page load, in case the panel mounts before
+  // MutationObserver attaches. Runs only 10× then stops.
+  var _bootTicks = 0;
+  var _bootPoll = setInterval(function(){
+    _bootTicks++;
+    if (_bootTicks > 10) { clearInterval(_bootPoll); return; }
+    ensureAllWired();
+  }, 500);
 
   /* renderAdmModuleSampleHtml(L)
    * Used by 00c-admin-appearance.js render() to fill the bodies map.
@@ -794,9 +829,17 @@
    * Returns the full inner HTML of the panel (not wrapped in #adm-appearance-panel-module-sample).
    */
   window._renderAdmModuleSampleHtml = function(L){
-    // Reset wire flag so the next render rewires (because sub-tab
-    // changes recreate the slider DOM)
-    _wiredInitial = false;
+    // New DOM coming — clear wired flags from any inputs the upcoming
+    // innerHTML replacement is about to destroy, so the dedupe map
+    // matches the new DOM rather than the doomed old elements.
+    try {
+      Array.prototype.forEach.call(
+        document.querySelectorAll('[data-mod-sample-token][data-mod-sample-wired]'),
+        function(el){ el.removeAttribute('data-mod-sample-wired'); });
+      Array.prototype.forEach.call(
+        document.querySelectorAll('[data-density-wired]'),
+        function(el){ el.removeAttribute('data-density-wired'); });
+    } catch (e) { /* non-fatal */ }
     L = L || function(vi,en){ return vi || en; };
     var secs = sections(L);
     var active = secs.find(function(s){ return s.id === _activeSection; }) || secs[0];
