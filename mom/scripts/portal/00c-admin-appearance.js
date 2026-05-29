@@ -1266,8 +1266,11 @@ function normalizeSubTab(subTab){
   /* "components" tab removed 2026-05-29: functionality merged into
      Module Sample (preview + inline token editor in one place). Old
      URLs that point to /components auto-redirect to module-sample. */
-  var aliases = { overview:'templates', typography:'tokens', colors:'tokens', layout:'tokens', a11y:'accessibility', export:'analytics', exports:'analytics', sample:'module-sample', samples:'module-sample', components:'module-sample' };
-  var valid = { templates:1, tokens:1, effects:1, accessibility:1, analytics:1, governance:1, advanced:1, standard:1, 'module-sample':1 };
+  // Tokens + Effects merged into Module Master (v3-G11). Old URLs
+  // pointing to /tokens, /effects, /typography, /colors etc auto-
+  // redirect to /module-sample so deep links don't 404.
+  var aliases = { overview:'templates', typography:'module-sample', colors:'module-sample', layout:'module-sample', tokens:'module-sample', effects:'module-sample', a11y:'accessibility', export:'analytics', exports:'analytics', sample:'module-sample', samples:'module-sample', components:'module-sample' };
+  var valid = { templates:1, accessibility:1, analytics:1, governance:1, advanced:1, standard:1, 'module-sample':1 };
   var resolved = aliases[subTab] || subTab || 'templates';
   return valid[resolved] ? resolved : 'templates';
 }
@@ -3942,16 +3945,15 @@ function render(el, subTab, currentLang){
 
   var tabs = [
     {key:'templates',    icon:'📐', label:T('templates')},
-    {key:'tokens',       icon:'🎨', label:T('tokens')},
-    /* "components" tab removed 2026-05-29: merged into Module Sample
-       (preview + inline token editor in one screen). */
-    /* Module Sample — SSOT showcase of every reusable v3 component
-       (button, tab, kpi, table, chip, drawer, toolbar, …). Every new
-       frontend module must consume tokens validated here. Renderer
-       lives in 00c-admin-appearance-module-sample.js. Placed early
-       in the strip because it's the primary editing surface now. */
+    /* Tokens + Effects tabs REMOVED 2026-05-29 (v3-G11): their content
+     * lives inside Module Master under sections "🌐 Global tokens",
+     * "🔠 Typography" and "✨ Effects". Single source of truth: one
+     * Properties dock for ALL design tokens, no parallel edit paths. */
+    /* Module Master — SSOT showcase of every reusable v3 component +
+     * global token ramp (typography + colours + status + effects).
+     * Every new frontend module must consume tokens validated here.
+     * Renderer lives in 00c-admin-appearance-module-sample.js. */
     {key:'module-sample',icon:'🧩', label:L('Module Master','Module Master')},
-    {key:'effects',      icon:'✨', label:T('effects')},
     {key:'accessibility',icon:'♿', label:L('Trợ năng','Accessibility')},
     {key:'analytics',    icon:'📊', label:L('Xuất & Phân tích','Export & Analytics')},
     {key:'governance',   icon:'🛡️', label:T('governance')},
@@ -5361,7 +5363,7 @@ function renderStandard(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260529-mm3';
+window._renderAdminAppearanceFullVersion = '20260529-mm4';
 window._renderAdminAppearanceFull = render;
 
 })();

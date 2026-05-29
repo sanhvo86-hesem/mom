@@ -569,9 +569,91 @@
       tokens:['space.master','radius.master','colorsLight.bgSurface','colorsLight.bgSurfaceAlt','colorsLight.borderSubtle','brand.primary','status.danger.light'] };
   }
 
+  /* ── SSOT merger from legacy Tokens + Effects tabs (v3-G11) ───────
+   * Previously the admin Appearance area had separate tabs for:
+   *   • Token hệ thống (Typography + Colors + Layout)
+   *   • Hiệu ứng (Motion + Focus ring + Overlay + Skeleton)
+   * Those edit the SAME underlying CSS vars as Module Master per-
+   * component properties — duplicate edit paths = SSOT violation.
+   * The three sections below host the legacy content INSIDE Module
+   * Master so admins can edit the global ramps from one place and
+   * the parent Appearance tabs become read-only / removable. */
+
+  function globalTokensSection(L){
+    var body = ''
+      + '<div style="display:flex;flex-direction:column;gap:14px">'
+      +   '<div style="font-size:12px;color:var(--text-secondary)">'
+      +     esc(L('Color ramp + status palette toàn hệ thống. Đây là SSOT cho mọi module.','Global colour ramp + status palette. SSOT for every module.'))
+      +   '</div>'
+      +   '<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">'
+      +     '<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:44px;height:44px;border-radius:8px;background:var(--o3-brand);border:1px solid var(--o3-border-subtle)"></div><span style="font-size:10px">brand</span></div>'
+      +     '<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:44px;height:44px;border-radius:8px;background:var(--o3-brand-hover);border:1px solid var(--o3-border-subtle)"></div><span style="font-size:10px">brand-hover</span></div>'
+      +     '<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:44px;height:44px;border-radius:8px;background:var(--o3-success);border:1px solid var(--o3-border-subtle)"></div><span style="font-size:10px">success</span></div>'
+      +     '<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:44px;height:44px;border-radius:8px;background:var(--o3-warning);border:1px solid var(--o3-border-subtle)"></div><span style="font-size:10px">warning</span></div>'
+      +     '<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:44px;height:44px;border-radius:8px;background:var(--o3-danger);border:1px solid var(--o3-border-subtle)"></div><span style="font-size:10px">danger</span></div>'
+      +     '<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:44px;height:44px;border-radius:8px;background:var(--o3-info);border:1px solid var(--o3-border-subtle)"></div><span style="font-size:10px">info</span></div>'
+      +   '</div>'
+      +   '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">'
+      +     '<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:44px;height:44px;border-radius:8px;background:var(--o3-surface-page);border:1px solid var(--o3-border-subtle)"></div><span style="font-size:10px">page</span></div>'
+      +     '<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:44px;height:44px;border-radius:8px;background:var(--o3-surface-card);border:1px solid var(--o3-border-subtle)"></div><span style="font-size:10px">card</span></div>'
+      +     '<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:44px;height:44px;border-radius:8px;background:var(--o3-surface-muted);border:1px solid var(--o3-border-subtle)"></div><span style="font-size:10px">muted</span></div>'
+      +     '<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:44px;height:44px;border-radius:8px;background:var(--o3-surface-raised);border:1px solid var(--o3-border-subtle)"></div><span style="font-size:10px">raised</span></div>'
+      +     '<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:44px;height:44px;border-radius:8px;background:var(--o3-neutral);border:1px solid var(--o3-border-subtle)"></div><span style="font-size:10px">neutral</span></div>'
+      +   '</div>'
+      + '</div>';
+    return { id:'global-tokens', label_vi:'🌐 Global tokens', label_en:'🌐 Global tokens', body_html: body,
+      tokens:['brand.primary','brand.primaryHover','brand.primarySoft','status.success.light','status.warning.light','status.danger.light','status.info.light','status.neutral.light','colorsLight.bgPage','colorsLight.bgSurface','colorsLight.bgSurfaceAlt','colorsLight.borderSubtle','colorsLight.borderStrong'] };
+  }
+
+  function typographySection(L){
+    var body = ''
+      + '<div style="display:flex;flex-direction:column;gap:10px">'
+      +   '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em">'+esc(L('Cỡ chữ ramp','Font-size ramp'))+'</div>'
+      +   '<div style="font-size:var(--o3-font-size-xs);color:var(--text-primary)">XS · 11px · Caption · Bộ lọc nhanh tháng này</div>'
+      +   '<div style="font-size:var(--o3-font-size-sm);color:var(--text-primary)">SM · 12px · Body small · Filter chips</div>'
+      +   '<div style="font-size:var(--o3-font-size-md);color:var(--text-primary)">MD · 13px · Body default · Most labels</div>'
+      +   '<div style="font-size:var(--o3-font-size-lg);color:var(--text-primary)">LG · 15px · Card title · Sub heading</div>'
+      +   '<div style="font-size:var(--o3-font-size-xl);color:var(--text-primary)">XL · 18px · Section heading</div>'
+      +   '<div style="font-size:var(--o3-font-size-2xl);color:var(--text-primary)">2XL · 22px · KPI value</div>'
+      +   '<div style="font-size:var(--o3-font-size-3xl);color:var(--text-primary)">3XL · 28px · Hero number</div>'
+      +   '<div style="margin-top:14px;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em">'+esc(L('Độ đậm','Weight'))+'</div>'
+      +   '<div style="font-weight:var(--o3-font-weight-regular)">Regular 400 · Standard body</div>'
+      +   '<div style="font-weight:var(--o3-font-weight-medium)">Medium 500 · Labels, button text</div>'
+      +   '<div style="font-weight:var(--o3-font-weight-semi)">Semibold 600 · Subheads</div>'
+      +   '<div style="font-weight:var(--o3-font-weight-bold)">Bold 700 · KPI values</div>'
+      + '</div>';
+    return { id:'typography', label_vi:'🔠 Typography', label_en:'🔠 Typography', body_html: body, tokens:[] };
+  }
+
+  function effectsGlobalSection(L){
+    var body = ''
+      + '<div style="display:flex;flex-direction:column;gap:14px">'
+      +   '<div style="font-size:12px;color:var(--text-secondary)">'+esc(L('Motion + shadow + z-index ramp toàn hệ thống.','Global motion + shadow + z-index ramp.'))+'</div>'
+      +   '<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start">'
+      +     '<div style="display:flex;flex-direction:column;gap:4px"><div style="width:100px;height:60px;border-radius:8px;background:var(--o3-surface-card);box-shadow:var(--o3-shadow-card);border:1px solid var(--o3-border-subtle)"></div><span style="font-size:10px">shadow-card</span></div>'
+      +     '<div style="display:flex;flex-direction:column;gap:4px"><div style="width:100px;height:60px;border-radius:8px;background:var(--o3-surface-card);box-shadow:var(--o3-shadow-raised);border:1px solid var(--o3-border-subtle)"></div><span style="font-size:10px">shadow-raised</span></div>'
+      +     '<div style="display:flex;flex-direction:column;gap:4px"><div style="width:100px;height:60px;border-radius:8px;background:var(--o3-surface-card);box-shadow:var(--o3-shadow-drawer);border:1px solid var(--o3-border-subtle)"></div><span style="font-size:10px">shadow-drawer</span></div>'
+      +   '</div>'
+      +   '<div style="margin-top:8px;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em">'+esc(L('Motion ramp (hover để xem)','Motion ramp (hover to see)'))+'</div>'
+      +   '<div style="display:flex;gap:14px;flex-wrap:wrap">'
+      +     '<button style="height:32px;padding:0 14px;background:var(--o3-brand);color:#fff;border:0;border-radius:6px;transition:transform var(--o3-motion-fast)" onmouseover="this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.transform=\'\'">fast 120ms</button>'
+      +     '<button style="height:32px;padding:0 14px;background:var(--o3-brand);color:#fff;border:0;border-radius:6px;transition:transform var(--o3-motion-base)" onmouseover="this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.transform=\'\'">base 200ms</button>'
+      +     '<button style="height:32px;padding:0 14px;background:var(--o3-brand);color:#fff;border:0;border-radius:6px;transition:transform var(--o3-motion-slow)" onmouseover="this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.transform=\'\'">slow 320ms</button>'
+      +   '</div>'
+      + '</div>';
+    return { id:'effects', label_vi:'✨ Effects', label_en:'✨ Effects', body_html: body, tokens:[] };
+  }
+
   function sections(L){
     return [
       densitySection(L),
+      // Global SSOT sections — merged in from legacy Tokens + Effects
+      // sub-tabs (v3-G11). These edit the same underlying CSS vars as
+      // the per-component property panels so admins have one place.
+      globalTokensSection(L),
+      typographySection(L),
+      effectsGlobalSection(L),
+      // Per-component preview sections
       buttonsSection(L),
       formFieldsSection(L),
       tabsSection(L),
@@ -677,6 +759,71 @@
         _tn('radius.master','Bo góc control','Control radius',0,16),
         _tn('radius.card','Bo góc panel','Card radius',0,20),
         _tn('control.height.standard','Cao chuẩn','Standard height',24,56)
+      ])
+    ],
+    'global-tokens': [
+      _grp('brand','Thương hiệu','Brand',[
+        _tc('brand.primary','Brand chính','Brand primary'),
+        _tc('brand.primaryHover','Brand · hover','Brand hover'),
+        _tc('brand.primarySoft','Brand · soft','Brand soft'),
+        _tc('colorsLight.textOnBrand','Chữ trên nền brand','Text on brand')
+      ]),
+      _grp('status','Trạng thái','Status',[
+        _tc('status.success.light','Success','Success'),
+        _tc('status.success.soft','Success soft','Success soft'),
+        _tc('status.warning.light','Warning','Warning'),
+        _tc('status.warning.soft','Warning soft','Warning soft'),
+        _tc('status.danger.light','Danger','Danger'),
+        _tc('status.danger.soft','Danger soft','Danger soft'),
+        _tc('status.info.light','Info','Info'),
+        _tc('status.info.soft','Info soft','Info soft'),
+        _tc('status.neutral.light','Neutral','Neutral'),
+        _tc('status.neutral.soft','Neutral soft','Neutral soft')
+      ]),
+      _grp('surface','Nền','Surface',[
+        _tc('colorsLight.bgPage','Nền trang','Page bg'),
+        _tc('colorsLight.bgSurface','Nền thẻ','Card bg'),
+        _tc('colorsLight.bgSurfaceAlt','Nền mờ','Muted bg')
+      ]),
+      _grp('text','Chữ','Text',[
+        _tc('colorsLight.textPrimary','Chữ chính','Primary text'),
+        _tc('colorsLight.textSecondary','Chữ phụ','Secondary text'),
+        _tc('colorsLight.textTertiary','Chữ mờ','Tertiary text')
+      ]),
+      _grp('border','Viền','Border',[
+        _tc('colorsLight.borderSubtle','Viền nhẹ','Subtle border'),
+        _tc('colorsLight.borderStrong','Viền đậm','Strong border')
+      ])
+    ],
+    'typography': [
+      _grp('size','Cỡ chữ','Font sizes',[
+        _vn('--o3-font-size-xs','XS · caption','XS caption',8,16),
+        _vn('--o3-font-size-sm','SM · body small','SM body small',9,18),
+        _vn('--o3-font-size-md','MD · body default','MD body',10,20),
+        _vn('--o3-font-size-lg','LG · card title','LG card',12,24),
+        _vn('--o3-font-size-xl','XL · section','XL section',14,32),
+        _vn('--o3-font-size-2xl','2XL · KPI','2XL KPI',16,40),
+        _vn('--o3-font-size-3xl','3XL · hero','3XL hero',18,56)
+      ]),
+      _grp('weight','Độ đậm','Weight',[
+        _vn('--o3-font-weight-regular','Regular','Regular',100,900,''),
+        _vn('--o3-font-weight-medium','Medium','Medium',100,900,''),
+        _vn('--o3-font-weight-semi','Semibold','Semibold',100,900,''),
+        _vn('--o3-font-weight-bold','Bold','Bold',100,900,'')
+      ])
+    ],
+    'effects': [
+      _grp('motion','Chuyển động','Motion',[
+        _vn('--o3-motion-fast','Fast','Fast',0,500,'ms'),
+        _vn('--o3-motion-base','Base','Base',0,800,'ms'),
+        _vn('--o3-motion-slow','Slow','Slow',0,1500,'ms')
+      ]),
+      _grp('zindex','Lớp xếp chồng','Z-index',[
+        _vn('--o3-z-base','Base','Base',0,100,''),
+        _vn('--o3-z-sticky','Sticky','Sticky',1,1000,''),
+        _vn('--o3-z-drawer','Drawer','Drawer',10,9000,''),
+        _vn('--o3-z-modal','Modal','Modal',50,9500,''),
+        _vn('--o3-z-toast','Toast','Toast',100,9999,'')
       ])
     ],
     'buttons': [
@@ -1025,6 +1172,51 @@
   // be called any number of times safely (initial mount, sub-tab switch,
   // defensive poll). Without dedupe, double-wiring would fire the
   // handler multiple times per input event.
+  /* CSS variables hold literal `var()` text when read via
+   * getPropertyValue, so colours like #0c4a6e never appear in the
+   * editor pre-fill. Solution: render the CSS var via a hidden probe
+   * element and read the COMPUTED color/width — which resolves the
+   * var() chain to the actual paint value. */
+  var _probe = null;
+  function getProbe(){
+    if (_probe && document.body.contains(_probe)) return _probe;
+    _probe = document.createElement('div');
+    _probe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:0;height:0;visibility:hidden;pointer-events:none';
+    document.body.appendChild(_probe);
+    return _probe;
+  }
+  function _rgbToHex(rgb){
+    if (!rgb) return '';
+    var m = rgb.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+    if (!m) return '';
+    var to2 = function(n){ var s = parseInt(n,10).toString(16); return s.length===1?'0'+s:s; };
+    return '#' + to2(m[1]) + to2(m[2]) + to2(m[3]);
+  }
+  function resolveCssVarColor(cssVarChain){
+    var p = getProbe();
+    for (var i = 0; i < cssVarChain.length; i++) {
+      try {
+        p.style.color = 'var(' + cssVarChain[i] + ')';
+        var c = getComputedStyle(p).color;
+        var hex = _rgbToHex(c);
+        if (hex && hex !== '#000000') return hex;
+        // #000000 may be real or fallback — only accept if user actually set it
+      } catch (e) {}
+    }
+    return '';
+  }
+  function resolveCssVarPx(cssVarChain){
+    var p = getProbe();
+    for (var i = 0; i < cssVarChain.length; i++) {
+      try {
+        p.style.width = 'var(' + cssVarChain[i] + ')';
+        var w = parseFloat(getComputedStyle(p).width);
+        if (!isNaN(w) && w > 0) return Math.round(w);
+      } catch (e) {}
+    }
+    return null;
+  }
+
   function wireInlineTokenEditors(){
     Array.prototype.forEach.call(
       document.querySelectorAll(
@@ -1047,27 +1239,36 @@
           cssVars = [];
         }
 
-        // Pre-fill from currently-resolved CSS variable so admin sees
-        // the actual production value, not a guess.
+        // Pre-fill from currently-painted CSS variable so admin sees
+        // the actual production value, not a guess. Uses the resolver
+        // helpers (probe element + getComputedStyle) because raw
+        // getPropertyValue returns the literal `var()` text not the
+        // resolved colour/length.
         try {
-          var rootStyle = window.getComputedStyle(document.documentElement);
-          var resolved = '';
-          for (var i = 0; i < cssVars.length && !resolved; i++) {
-            resolved = (rootStyle.getPropertyValue(cssVars[i]) || '').trim();
-          }
-          // Try GraphicsAuthority as secondary source
-          if (!resolved && window.GraphicsAuthority && window.GraphicsAuthority.tokens
-              && typeof window.GraphicsAuthority.tokens.read === 'function') {
-            try { resolved = window.GraphicsAuthority.tokens.read(tokenKey) || ''; } catch (e) {}
-          }
           if (input.type === 'color') {
-            var hex = resolved.match(/#[0-9a-f]{3,8}/i);
-            if (hex) input.value = hex[0].length === 4
-              ? '#' + hex[0][1]+hex[0][1] + hex[0][2]+hex[0][2] + hex[0][3]+hex[0][3]
-              : hex[0].substring(0, 7);
+            var hex = resolveCssVarColor(cssVars);
+            if (!hex && tokenKey && window.GraphicsAuthority && window.GraphicsAuthority.tokens
+                && typeof window.GraphicsAuthority.tokens.read === 'function') {
+              try {
+                var v = window.GraphicsAuthority.tokens.read(tokenKey) || '';
+                var m = v.match(/#[0-9a-f]{3,8}/i);
+                if (m) hex = m[0].length === 4
+                  ? '#' + m[0][1]+m[0][1] + m[0][2]+m[0][2] + m[0][3]+m[0][3]
+                  : m[0].substring(0, 7);
+              } catch (e) {}
+            }
+            if (hex) input.value = hex;
           } else if (input.type === 'number') {
-            var num = parseInt(resolved, 10);
-            if (!isNaN(num)) input.value = num;
+            var num = resolveCssVarPx(cssVars);
+            if (num === null && tokenKey && window.GraphicsAuthority && window.GraphicsAuthority.tokens
+                && typeof window.GraphicsAuthority.tokens.read === 'function') {
+              try {
+                var raw = window.GraphicsAuthority.tokens.read(tokenKey) || '';
+                var n = parseInt(raw, 10);
+                if (!isNaN(n)) num = n;
+              } catch (e) {}
+            }
+            if (num !== null && !isNaN(num)) input.value = num;
           }
         } catch (e) { /* non-fatal */ }
 
@@ -1176,9 +1377,9 @@
     dock.id = 'o3-props-dock';
     dock.className = 'o3-props-dock' + (_dockCollapsed ? ' o3-props-dock--collapsed' : '');
     dock.innerHTML = ''
-      + '<button type="button" class="o3-props-dock__handle" aria-label="Toggle properties">'
+      // Small bookmark-style handle — only visible when collapsed.
+      + '<button type="button" class="o3-props-dock__handle" aria-label="Open properties" title="Properties">'
       +   '<span class="o3-props-dock__handle-chevron"></span>'
-      +   '<span>PROPERTIES</span>'
       + '</button>'
       + '<div class="o3-props-dock__panel">'
       +   '<header class="o3-props-dock__header">'
@@ -1186,7 +1387,11 @@
       +       '<span>⚙️</span><span data-dock-title>Properties</span>'
       +       '<span class="o3-props-dock__subtitle" data-dock-subtitle></span>'
       +     '</h3>'
-      +     '<button type="button" class="o3-props-dock__close" aria-label="Collapse">×</button>'
+      +     // Refined chevron-collapse in the header (replaces the giant
+      +     // edge handle). Click → slide the panel away; the bookmark
+      +     // handle then becomes the only way back in.
+      +     '<button type="button" class="o3-props-dock__collapse" aria-label="Collapse properties" title="Collapse"></button>'
+      +     '<button type="button" class="o3-props-dock__close" aria-label="Close">×</button>'
       +   '</header>'
       +   '<nav class="o3-props-dock__subtabs" data-dock-subtabs></nav>'
       +   '<div class="o3-props-dock__body" data-dock-body></div>'
@@ -1197,6 +1402,7 @@
       + '</div>';
     document.body.appendChild(dock);
     dock.querySelector('.o3-props-dock__handle').addEventListener('click', toggleDock);
+    dock.querySelector('.o3-props-dock__collapse').addEventListener('click', collapseDock);
     dock.querySelector('.o3-props-dock__close').addEventListener('click', collapseDock);
     dock.querySelector('[data-dock-save]').addEventListener('click', function(){
       try {
