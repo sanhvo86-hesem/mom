@@ -274,9 +274,9 @@ final class UomImpactAnalysisService
 
     private function computeRuleImpactLevel(array $dims, array $rule): string
     {
-        $totalPolicies = $dims['policies_using_from'] + $dims['policies_using_to'];
-        $totalThread   = $dims['recent_thread_from'] + $dims['recent_thread_to'];
-        $isAffine      = $dims['is_affine'];
+        $totalPolicies = (int)$dims['policies_using_from'] + (int)$dims['policies_using_to'];
+        $totalThread   = (int)$dims['recent_thread_from'] + (int)$dims['recent_thread_to'];
+        $isAffine      = (bool)$dims['is_affine'];
 
         // Affine rule changes are always at least MEDIUM due to T/°F danger
         if ($isAffine && ($totalPolicies > 0 || $totalThread > 0)) {
