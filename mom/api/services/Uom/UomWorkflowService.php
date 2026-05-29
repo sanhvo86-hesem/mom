@@ -59,10 +59,24 @@ final class UomWorkflowService
         string  $ipAddressHash = '',
         ?string $sessionId     = null
     ): array {
-        return $this->createApprovalRecord(
+        $record = $this->createApprovalRecord(
             $ruleId, $version, 'TECHNICAL_REVIEW',
             $signerId, $meaningEn, $meaningVi, $authMethod, $ipAddressHash, $sessionId
         );
+
+        // HB-01 (V3 P01): the rule lifecycle was previously never advanced to
+        // pending_review at submit time, which left activateRule()'s WHERE
+        // clause unable to find anything to activate. Move the rule into
+        // pending_review now so the e-sign step can flip it to active.
+        $this->db->execute(
+            "UPDATE uom_conversion_rule
+                SET lifecycle_status = 'pending_review', updated_at = now()
+              WHERE id = :id
+                AND lifecycle_status IN ('draft','review')",
+            [':id' => $ruleId]
+        );
+
+        return $record;
     }
 
     /**
@@ -369,10 +383,17 @@ final class UomWorkflowService
 
     private function activateRule(string $ruleId): void
     {
+        // HB-01 (V3 P01): rule lifecycle on this branch carries legacy
+        // pre-V3 values ('review','approved') alongside the V3 enum
+        // ('pending_review','active'). Accept either as a transition source
+        // so workflow promotion works on both legacy seed data and
+        // freshly-submitted rules. Migration 231 broadens the CHECK
+        // constraint to allow both classes of values.
         $this->db->execute(
             "UPDATE uom_conversion_rule
-             SET lifecycle_status = 'active', updated_at = now()
-             WHERE id = :id AND lifecycle_status = 'pending_review'",
+                SET lifecycle_status = 'active', updated_at = now()
+              WHERE id = :id
+                AND lifecycle_status IN ('pending_review','review','approved')",
             [':id' => $ruleId]
         );
     }
