@@ -133,7 +133,19 @@ final class MeasurementValueFactory
      * @param array  $context    Caller context (source_table, source_id, item_id, …)
      * @return array  MEASVAL envelope
      */
-    public function buildWrapOnly(string $magnitude, string $unitCode, array $context = []): array
+    /**
+     * @param array|null $unitRow V3 P08 (HB-14): optional uom_unit_catalog
+     *   row. When supplied the canonical SI value and quantity kind are
+     *   computed via the same affine triplet path that `build()` uses.
+     *   When null the wrap stays catalog-blind (pre-V3 behaviour) and the
+     *   caller is responsible for recording an explicit reason code.
+     */
+    public function buildWrapOnly(
+        string $magnitude,
+        string $unitCode,
+        array  $context = [],
+        ?array $unitRow = null
+    ): array
     {
         $identityRule = [
             'rule_code'    => 'IDENTITY',
@@ -143,9 +155,30 @@ final class MeasurementValueFactory
             'offset_value' => '0',
             'reversed'     => false,
         ];
+
+        // HB-14 (V3 P08): if the unit row is known, compute canonical SI
+        // exactly like build() does. Otherwise leave it equal to the input
+        // magnitude and surface an explicit reason code so the caller's
+        // downstream consumer can decide whether to escalate.
+        if ($unitRow !== null) {
+            $siValue  = $this->canonicalSiFromInput($magnitude, $unitRow);
+            $siUnit   = $this->findSiBaseCode(
+                $unitRow['quantity_kind_code'] ?? null
+            );
+            $kindCode = $unitRow['quantity_kind_code'] ?? null;
+            $catalogAware = true;
+            $reason   = 'wrap_only_catalog_aware';
+        } else {
+            $siValue  = $magnitude;
+            $siUnit   = null;
+            $kindCode = null;
+            $catalogAware = false;
+            $reason   = 'wrap_only_catalog_blind_no_row_supplied';
+        }
+
         $auditHash = $this->computeEvidenceHash(
             $unitCode, $magnitude, $unitCode, $magnitude,
-            $magnitude, null,
+            $siValue, $siUnit,
             $identityRule, 0, 'ROUND_HALF_EVEN'
         );
 
@@ -153,11 +186,13 @@ final class MeasurementValueFactory
             'input' => [
                 'magnitude' => $magnitude,
                 'unit_code' => $unitCode,
-                'kind_code' => null,
+                'kind_code' => $kindCode,
             ],
             'normalization' => [
-                'si_value'          => $magnitude,
-                'si_unit'           => null,
+                'si_value'          => $siValue,
+                'si_unit'           => $siUnit,
+                'derivation'        => $reason,
+                'catalog_aware'     => $catalogAware,
                 'converted_magnitude' => null,
                 'converted_unit'    => null,
                 'rule_code'         => 'IDENTITY',
@@ -174,7 +209,7 @@ final class MeasurementValueFactory
                 'rounding_policy' => 'ROUND_HALF_EVEN',
             ],
             'semantic_context' => [
-                'quantity_kind'   => null,
+                'quantity_kind'   => $kindCode,
                 'context_code'    => $context['context_code'] ?? null,
                 'source_table'    => $context['source_table'] ?? null,
                 'source_id'       => $context['source_id']    ?? null,
