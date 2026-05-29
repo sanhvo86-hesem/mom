@@ -1263,8 +1263,11 @@ var VISUAL_THEMES = [
 ];
 
 function normalizeSubTab(subTab){
-  var aliases = { overview:'templates', typography:'tokens', colors:'tokens', layout:'tokens', a11y:'accessibility', export:'analytics', exports:'analytics', sample:'module-sample', samples:'module-sample' };
-  var valid = { templates:1, tokens:1, components:1, effects:1, accessibility:1, analytics:1, governance:1, advanced:1, standard:1, 'module-sample':1 };
+  /* "components" tab removed 2026-05-29: functionality merged into
+     Module Sample (preview + inline token editor in one place). Old
+     URLs that point to /components auto-redirect to module-sample. */
+  var aliases = { overview:'templates', typography:'tokens', colors:'tokens', layout:'tokens', a11y:'accessibility', export:'analytics', exports:'analytics', sample:'module-sample', samples:'module-sample', components:'module-sample' };
+  var valid = { templates:1, tokens:1, effects:1, accessibility:1, analytics:1, governance:1, advanced:1, standard:1, 'module-sample':1 };
   var resolved = aliases[subTab] || subTab || 'templates';
   return valid[resolved] ? resolved : 'templates';
 }
@@ -3940,18 +3943,20 @@ function render(el, subTab, currentLang){
   var tabs = [
     {key:'templates',    icon:'📐', label:T('templates')},
     {key:'tokens',       icon:'🎨', label:T('tokens')},
-    {key:'components',   icon:'🧱', label:T('components')},
+    /* "components" tab removed 2026-05-29: merged into Module Sample
+       (preview + inline token editor in one screen). */
+    /* Module Sample — SSOT showcase of every reusable v3 component
+       (button, tab, kpi, table, chip, drawer, toolbar, …). Every new
+       frontend module must consume tokens validated here. Renderer
+       lives in 00c-admin-appearance-module-sample.js. Placed early
+       in the strip because it's the primary editing surface now. */
+    {key:'module-sample',icon:'🎛️', label:L('Module Sample','Module Sample')},
     {key:'effects',      icon:'✨', label:T('effects')},
     {key:'accessibility',icon:'♿', label:L('Trợ năng','Accessibility')},
     {key:'analytics',    icon:'📊', label:L('Xuất & Phân tích','Export & Analytics')},
     {key:'governance',   icon:'🛡️', label:T('governance')},
     {key:'advanced',     icon:'🧩', label:T('advanced')},
-    {key:'standard',     icon:'📖', label:L('Chuẩn thiết kế','Design Standard')},
-    /* Module Sample — SSOT showcase of every reusable v3 component
-       (button, tab, kpi, table, chip, drawer, toolbar, …). Every new
-       frontend module must consume tokens validated here. Renderer
-       lives in 00c-admin-appearance-module-sample.js. */
-    {key:'module-sample',icon:'🎛️', label:L('Module Sample','Module Sample')}
+    {key:'standard',     icon:'📖', label:L('Chuẩn thiết kế','Design Standard')}
   ];
 
   /* Width-cap removed 2026-05-28 per HESEM space-utilization rule:
@@ -3978,7 +3983,7 @@ function render(el, subTab, currentLang){
   var bodies = {
     templates:    renderTemplates(),
     tokens:       renderTokens(),
-    components:   renderComponents(),
+    /* components: removed 2026-05-29 — merged into module-sample */
     effects:      renderEffects(),
     accessibility:renderAccessibility(),
     analytics:    renderAnalytics(),
