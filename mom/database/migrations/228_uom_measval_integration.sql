@@ -84,9 +84,9 @@ COMMENT ON TABLE uom_measurement_thread IS
 -- Seeds below ensure resolution without hitting quarantine on first contact.
 INSERT INTO uom_alias (alias_code, canonical_code, context_scope, notes)
 VALUES
-    ('mm',  'MM',    'SYSTEM', 'PG measurement_unit enum: mm'),
-    ('in',  'IN',    'SYSTEM', 'PG measurement_unit enum: in'),
-    ('deg', 'DEG',   'SYSTEM', 'PG measurement_unit enum: deg'),
+    ('mm',  'mm',    'SYSTEM', 'PG measurement_unit enum: mm'),
+    ('in',  'in',    'SYSTEM', 'PG measurement_unit enum: in'),
+    ('deg', 'deg',   'SYSTEM', 'PG measurement_unit enum: deg'),
     ('Ra',  'RA_UM', 'SYSTEM', 'PG measurement_unit enum: Ra surface roughness'),
     ('HRC', 'HRC',   'SYSTEM', 'PG measurement_unit enum: Rockwell C hardness'),
     ('HRB', 'HRB',   'SYSTEM', 'PG measurement_unit enum: Rockwell B hardness')
