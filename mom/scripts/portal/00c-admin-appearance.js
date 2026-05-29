@@ -3950,7 +3950,7 @@ function render(el, subTab, currentLang){
        frontend module must consume tokens validated here. Renderer
        lives in 00c-admin-appearance-module-sample.js. Placed early
        in the strip because it's the primary editing surface now. */
-    {key:'module-sample',icon:'🎛️', label:L('Module Sample','Module Sample')},
+    {key:'module-sample',icon:'🧩', label:L('Module Master','Module Master')},
     {key:'effects',      icon:'✨', label:T('effects')},
     {key:'accessibility',icon:'♿', label:L('Trợ năng','Accessibility')},
     {key:'analytics',    icon:'📊', label:L('Xuất & Phân tích','Export & Analytics')},
@@ -5361,7 +5361,7 @@ function renderStandard(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260529-modsamp';
+window._renderAdminAppearanceFullVersion = '20260529-mm3';
 window._renderAdminAppearanceFull = render;
 
 })();

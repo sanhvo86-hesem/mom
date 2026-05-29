@@ -1027,13 +1027,25 @@
   // handler multiple times per input event.
   function wireInlineTokenEditors(){
     Array.prototype.forEach.call(
-      document.querySelectorAll('[data-mod-sample-token]:not([data-mod-sample-wired])'),
+      document.querySelectorAll(
+        '[data-mod-sample-token]:not([data-mod-sample-wired]),'
+        + '[data-mod-sample-cssvar]:not([data-mod-sample-wired])'),
       function(input){
         // Mark immediately so a re-entrant call from MutationObserver
         // does not double-attach the listener.
         input.setAttribute('data-mod-sample-wired', '1');
         var tokenKey = input.getAttribute('data-mod-sample-token');
-        var cssVars = TOKEN_CSS_VAR[tokenKey] || ['--' + tokenKey.replace(/\./g, '-')];
+        var cssVarRaw = input.getAttribute('data-mod-sample-cssvar');
+        var unit = input.getAttribute('data-mod-sample-unit');
+        if (unit === null) unit = 'px';
+        var cssVars;
+        if (tokenKey) {
+          cssVars = TOKEN_CSS_VAR[tokenKey] || ['--' + tokenKey.replace(/\./g, '-')];
+        } else if (cssVarRaw) {
+          cssVars = cssVarRaw.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+        } else {
+          cssVars = [];
+        }
 
         // Pre-fill from currently-resolved CSS variable so admin sees
         // the actual production value, not a guess.
@@ -1062,14 +1074,17 @@
         var apply = function(){
           var v = input.value;
           var staged = v;
-          if (input.type === 'number') staged = v + 'px';
-          // Stage via Authority for save pipeline
-          try {
-            if (window.GraphicsAuthority && window.GraphicsAuthority.tokens
-                && typeof window.GraphicsAuthority.tokens.stage === 'function') {
-              window.GraphicsAuthority.tokens.stage(tokenKey, staged);
-            }
-          } catch (e) {}
+          if (input.type === 'number') staged = v + (unit || '');
+          // Stage via Authority for save pipeline (only if token-keyed
+          // — cssvar-only edits don't have a stable token to stage)
+          if (tokenKey) {
+            try {
+              if (window.GraphicsAuthority && window.GraphicsAuthority.tokens
+                  && typeof window.GraphicsAuthority.tokens.stage === 'function') {
+                window.GraphicsAuthority.tokens.stage(tokenKey, staged);
+              }
+            } catch (e) {}
+          }
           // Live-update EVERY CSS var bound to this token so the
           // preview (and the real production UI under it) reflects
           // the change immediately.
@@ -1139,6 +1154,195 @@
     try { wireInlineTokenEditors(); } catch (e) { /* swallow */ }
   }
 
+  /* ── Floating Properties dock (v3-G10, 2026-05-29) ───────────────
+   * Fixed-position right-side inspector panel à la Figma. Lazy-mounted
+   * to <body> on first show; subsequent showProperties() calls just
+   * re-render contents. Persists collapsed state in localStorage. */
+
+  var _activeDockSubtab = {};
+  var _dockCollapsed = false;
+  try { _dockCollapsed = localStorage.getItem('o3-props-dock.collapsed') === '1'; } catch (e) {}
+
+  function syncDockBodyClass(){
+    if (!document.body) return;
+    if (_dockCollapsed) document.body.classList.remove('o3-dock-open');
+    else                document.body.classList.add('o3-dock-open');
+  }
+
+  function ensureDockElement(){
+    var dock = document.getElementById('o3-props-dock');
+    if (dock) return dock;
+    dock = document.createElement('div');
+    dock.id = 'o3-props-dock';
+    dock.className = 'o3-props-dock' + (_dockCollapsed ? ' o3-props-dock--collapsed' : '');
+    dock.innerHTML = ''
+      + '<button type="button" class="o3-props-dock__handle" aria-label="Toggle properties">'
+      +   '<span class="o3-props-dock__handle-chevron"></span>'
+      +   '<span>PROPERTIES</span>'
+      + '</button>'
+      + '<div class="o3-props-dock__panel">'
+      +   '<header class="o3-props-dock__header">'
+      +     '<h3 class="o3-props-dock__title">'
+      +       '<span>⚙️</span><span data-dock-title>Properties</span>'
+      +       '<span class="o3-props-dock__subtitle" data-dock-subtitle></span>'
+      +     '</h3>'
+      +     '<button type="button" class="o3-props-dock__close" aria-label="Collapse">×</button>'
+      +   '</header>'
+      +   '<nav class="o3-props-dock__subtabs" data-dock-subtabs></nav>'
+      +   '<div class="o3-props-dock__body" data-dock-body></div>'
+      +   '<footer class="o3-props-dock__footer">'
+      +     '<button type="button" data-dock-reset>Hủy thay đổi</button>'
+      +     '<button type="button" class="is-primary" data-dock-save>Lưu cho tổ chức</button>'
+      +   '</footer>'
+      + '</div>';
+    document.body.appendChild(dock);
+    dock.querySelector('.o3-props-dock__handle').addEventListener('click', toggleDock);
+    dock.querySelector('.o3-props-dock__close').addEventListener('click', collapseDock);
+    dock.querySelector('[data-dock-save]').addEventListener('click', function(){
+      try {
+        if (window.GraphicsAuthority && window.GraphicsAuthority.preview
+            && typeof window.GraphicsAuthority.preview.simulate === 'function') {
+          window.GraphicsAuthority.preview.simulate();
+        } else if (typeof window._hmSimulate === 'function') {
+          window._hmSimulate();
+        } else {
+          alert('GraphicsAuthority save pipeline chưa wire — thay đổi đã stage vào draft buffer.');
+        }
+      } catch (e) { alert('Lưu thất bại: ' + (e && e.message || e)); }
+    });
+    dock.querySelector('[data-dock-reset]').addEventListener('click', function(){
+      if (!confirm('Hủy mọi thay đổi chưa lưu?')) return;
+      try {
+        if (window.GraphicsAuthority && window.GraphicsAuthority.draft
+            && typeof window.GraphicsAuthority.draft.discard === 'function') {
+          window.GraphicsAuthority.draft.discard();
+        }
+      } catch (e) {}
+      location.reload();
+    });
+    syncDockBodyClass();
+    return dock;
+  }
+
+  function toggleDock(){
+    _dockCollapsed = !_dockCollapsed;
+    try { localStorage.setItem('o3-props-dock.collapsed', _dockCollapsed ? '1' : '0'); } catch (e) {}
+    var dock = ensureDockElement();
+    dock.classList.toggle('o3-props-dock--collapsed', _dockCollapsed);
+    syncDockBodyClass();
+  }
+  function collapseDock(){
+    if (_dockCollapsed) return;
+    _dockCollapsed = true;
+    try { localStorage.setItem('o3-props-dock.collapsed', '1'); } catch (e) {}
+    var dock = ensureDockElement();
+    dock.classList.add('o3-props-dock--collapsed');
+    syncDockBodyClass();
+  }
+  function hideDock(){
+    var dock = document.getElementById('o3-props-dock');
+    if (dock) dock.hidden = true;
+    if (document.body) document.body.classList.remove('o3-dock-open','module-master-active');
+  }
+  function showDock(){
+    var dock = ensureDockElement();
+    dock.hidden = false;
+    if (document.body) document.body.classList.add('module-master-active');
+    syncDockBodyClass();
+  }
+
+  function renderPropertyRow(item, L){
+    var label = (item.label && (item.label[window.__lang === 'en' ? 'en' : 'vi'] || item.label.vi || item.label.en)) || '';
+    var en    = (item.label && item.label.en) || '';
+    var typ   = item.type || 'number';
+    var unit  = item.unit !== undefined ? item.unit : 'px';
+    var min   = item.min  !== undefined ? item.min  : 0;
+    var max   = item.max  !== undefined ? item.max  : 48;
+    var step  = item.step !== undefined ? item.step : 1;
+    var attrBind, keyDisplay;
+    if (item.kind === 'token') {
+      attrBind = 'data-mod-sample-token="' + esc(item.key) + '"';
+      keyDisplay = item.key;
+    } else if (item.kind === 'cssvar') {
+      var cv = Array.isArray(item.cssVar) ? item.cssVar.join(',') : item.cssVar;
+      attrBind = 'data-mod-sample-cssvar="' + esc(cv) + '"';
+      keyDisplay = Array.isArray(item.cssVar) ? item.cssVar[0] : item.cssVar;
+    } else {
+      return '';
+    }
+    if (unit) attrBind += ' data-mod-sample-unit="' + esc(unit) + '"';
+    var input;
+    if (typ === 'color') {
+      input = '<input type="color" class="o3-props-row__input" ' + attrBind + '>';
+    } else if (typ === 'text') {
+      input = '<input type="text" class="o3-props-row__input" ' + attrBind + '>';
+    } else {
+      input = '<input type="number" class="o3-props-row__input"'
+        + ' min="' + esc(min) + '" max="' + esc(max) + '" step="' + esc(step) + '"'
+        + ' ' + attrBind + '>'
+        + (unit ? '<span class="o3-props-row__unit">' + esc(unit) + '</span>' : '');
+    }
+    return ''
+      + '<div class="o3-props-row">'
+      +   '<div class="o3-props-row__label">'
+      +     '<span class="o3-props-row__name" title="' + esc(en) + '">' + esc(label) + '</span>'
+      +     '<span class="o3-props-row__key">' + esc(keyDisplay) + '</span>'
+      +   '</div>'
+      +   '<div class="o3-props-row__control">' + input + '</div>'
+      + '</div>';
+  }
+
+  function renderDockForSection(section, L){
+    L = L || function(vi,en){ return vi || en; };
+    var dock = ensureDockElement();
+    var groups = getPropertiesForSection(section);
+    var titleEl = dock.querySelector('[data-dock-title]');
+    var subtitleEl = dock.querySelector('[data-dock-subtitle]');
+    var subtabsEl = dock.querySelector('[data-dock-subtabs]');
+    var bodyEl = dock.querySelector('[data-dock-body]');
+    titleEl.textContent = L('Properties', 'Properties');
+    subtitleEl.textContent = '· ' + L(section.label_vi, section.label_en);
+    if (!groups.length) {
+      subtabsEl.innerHTML = '';
+      bodyEl.innerHTML = '<div style="padding:16px;color:var(--o3-text-muted,#64748b);font-size:12px">'
+        + esc(L('Không có property nào để chỉnh ở section này.','No properties to edit in this section.'))
+        + '</div>';
+      return;
+    }
+    var savedSub = _activeDockSubtab[section.id];
+    var activeGroup = groups.find(function(g){ return g.id === savedSub; }) || groups[0];
+    if (groups.length > 1) {
+      subtabsEl.innerHTML = groups.map(function(g){
+        var isAct = g.id === activeGroup.id;
+        return '<button type="button" class="o3-props-dock__subtab' + (isAct?' is-active':'') + '"'
+          + ' data-dock-subtab="' + esc(g.id) + '">'
+          + esc(L(g.label_vi, g.label_en)) + '</button>';
+      }).join('');
+      Array.prototype.forEach.call(subtabsEl.querySelectorAll('[data-dock-subtab]'), function(btn){
+        btn.addEventListener('click', function(){
+          _activeDockSubtab[section.id] = btn.getAttribute('data-dock-subtab');
+          renderDockForSection(section, L);
+          ensureAllWired();
+        });
+      });
+    } else {
+      subtabsEl.innerHTML = '';
+    }
+    bodyEl.innerHTML = '<div class="o3-props-dock__group">'
+      + activeGroup.items.map(function(it){ return renderPropertyRow(it, L); }).join('')
+      + '</div>';
+  }
+
+  function showProperties(sectionId, L){
+    var secs = sections(L || function(vi,en){return vi||en;});
+    var section = secs.find(function(s){ return s.id === sectionId; }) || secs[0];
+    showDock();
+    renderDockForSection(section, L);
+    ensureAllWired();
+  }
+  window._admModuleSampleShowProperties = showProperties;
+  window._admModuleSampleHideDock = hideDock;
+
   window._admModuleSampleSetSection = function(id){
     _activeSection = id || 'density';
     var panel = document.getElementById('adm-appearance-panel-module-sample');
@@ -1148,6 +1352,7 @@
         : function(vi,en){ return vi || en; };
       panel.innerHTML = window._renderAdmModuleSampleHtml(L);
       ensureAllWired();
+      try { showProperties(_activeSection, L); } catch (e) { /* dock will catch up via observer */ }
     }
   };
 
@@ -1214,67 +1419,29 @@
         + '</button>';
     }).join('');
 
-    // Token list panel — every token displayed as a code chip + description
-    var tokenItems = active.tokens.map(function(tk){
-      return '<li style="padding:4px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px"><code style="background:var(--bg-surface-alt);padding:2px 6px;border-radius:3px">' + esc(tk) + '</code></li>';
-    }).join('');
-
-    // Inline token editor — for each token, render an input that
-    // stages into the GraphicsAuthority draft buffer (merging the
-    // Components tab functionality into Module Sample). Numeric tokens
-    // get a small slider+number input; color tokens get a color picker.
-    // Falls back to read-only chip if token meta is unknown.
-    var tokenEditors = active.tokens.map(function(tk){
-      var meta = (window._adm_token_meta || {})[tk] || {};
-      var inputId = 'mod-sample-token-' + tk.replace(/\./g, '-');
-      // Render type heuristic based on key prefix (until we wire a
-      // proper meta lookup against graphics_token_catalog).
-      var isColor = /color|brand|status|bg|text|border/i.test(tk);
-      var isNumeric = /space|radius|height|width|size/i.test(tk);
-      var editor = '';
-      if (isColor) {
-        editor = '<input id="' + inputId + '" type="color" data-mod-sample-token="' + esc(tk) + '" style="width:32px;height:20px;padding:0;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer">';
-      } else if (isNumeric) {
-        editor = '<input id="' + inputId + '" type="number" min="0" max="48" step="1" data-mod-sample-token="' + esc(tk) + '" style="width:52px;height:20px;padding:0 4px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:ui-monospace,monospace">';
-      } else {
-        editor = '<span style="font-size:10px;color:var(--text-secondary)">read-only</span>';
-      }
-      return ''
-        + '<li style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 0">'
-        +   '<code style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0">' + esc(tk) + '</code>'
-        +   editor
-        + '</li>';
-    }).join('');
+    // Schedule a microtask to refresh the floating Properties dock
+    // after this innerHTML is applied so the dock always reflects the
+    // currently active section.
+    setTimeout(function(){
+      try { showProperties(active.id, L); } catch (e) { /* dock will catch up via observer */ }
+    }, 0);
 
     return ''
-      // Ultra-compact intro — 1 line, no boxed background. SSOT message
-      // is in the tab title bar so we don't need to repeat it.
+      // Ultra-compact intro — 1 line, no boxed background.
       + '<div style="font-size:11px;color:var(--text-secondary);line-height:1.4;margin:0 0 8px 0">'
       +   esc(L(
-            '🎛️ SSOT — mỗi component dưới đây render bằng đúng CSS production của Orders v3. Token chỉnh trực tiếp ở cột phải.',
-            '🎛️ SSOT — every component below renders with the exact production CSS of Orders v3. Tokens edit inline on the right.'))
+            '🎛️ SSOT — mỗi component render bằng đúng CSS production. Mở panel "PROPERTIES" bên phải để chỉnh token theo từng tab.',
+            '🎛️ SSOT — every component renders with production CSS. Open the right-edge "PROPERTIES" panel to edit tokens per tab.'))
       + '</div>'
 
-      // Inner tab strip — production o3-shell__tab class. Allow horizontal
-      // scroll AND wrap to multi-row for 20+ component sections.
+      // Inner tab strip — production o3-shell__tab class. Allow wrap
+      // to multi-row for 24+ component sections.
       + '<nav class="o3-shell__tabs" role="tablist" style="margin:0 0 8px 0;border-bottom:1px solid var(--o3-border-subtle);flex-wrap:wrap;overflow:visible">' + innerTabsHtml + '</nav>'
 
-      // Two-column layout — preview + inline token editor merged from Components tab
-      + '<div style="display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:8px;align-items:start">'
-
-      //   Left: live preview, padded by master-gap so visible content fills space
-      +   '<div style="padding:var(--master-gap,8px);background:var(--bg-surface);border:1px solid var(--o3-border-subtle);border-radius:var(--card-radius,8px);min-height:200px">'
-      +     active.body_html
-      +   '</div>'
-
-      //   Right: inline token editor (replaces the "Thành phần" tab — edit here)
-      +   '<aside style="padding:8px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--o3-border-subtle);border-radius:var(--card-radius,8px)">'
-      +     '<div style="font-weight:600;font-size:10px;color:var(--text-primary);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">' + esc(L('Tokens · chỉnh trực tiếp','Tokens · edit inline')) + '</div>'
-      +     '<ul style="margin:0;padding-left:0;list-style:none">' + tokenEditors + '</ul>'
-      +     '<div style="margin-top:6px;font-size:10px;color:var(--text-secondary);line-height:1.4">' + esc(L(
-                'Mọi thay đổi stage vào draft buffer; bấm "Lưu cho tổ chức" để qua mô phỏng WCAG + publish.',
-                'Edits stage to draft; click "Save for org" to run WCAG sim + publish.')) + '</div>'
-      +   '</aside>'
+      // Single-column preview — full width. Properties live in the
+      // floating right-edge dock (#o3-props-dock) mounted to body.
+      + '<div style="padding:var(--master-gap,8px);background:var(--bg-surface);border:1px solid var(--o3-border-subtle);border-radius:var(--card-radius,8px);min-height:200px">'
+      +   active.body_html
       + '</div>';
   };
 })();
