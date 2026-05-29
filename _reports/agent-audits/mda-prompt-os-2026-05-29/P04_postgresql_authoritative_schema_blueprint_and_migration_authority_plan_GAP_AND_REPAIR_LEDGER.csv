@@ -1,0 +1,5 @@
+gap_id,severity,why_not_fixed_now,owner,required_source_or_decision,acceptance_criterion,blocks_next_prompt
+GAP-P04-001,P2,Exact canonical bridge between `users`, `employees`, and target `user_party_link` is not yet implemented in repo,identity_user,P05 must resolve person/party/user authority and bridge rules,Identity writes use one canonical chain without parallel mutations,N
+GAP-P04-002,P2,`engineering_release_bundle` is a blueprint addition not yet implemented physically,engineering_authority,Implement schema and command package in later prompt,Released execution package has physical authority tables and constraints,N
+GAP-P04-003,P2,Customer-item and supplier-process approval objects are still partial or implicit in current repo,master_data/P05,Define exact physical tables and command ownership,Approval objects no longer depend on JSON-only collections,N
+GAP-P04-004,P2,Some tables lack proven `row_version` / actor columns in this turn and need uplift inventory,platform_backend,Schema uplift plan in implementation phase,All lifecycle owners expose optimistic concurrency and actor lineage,N

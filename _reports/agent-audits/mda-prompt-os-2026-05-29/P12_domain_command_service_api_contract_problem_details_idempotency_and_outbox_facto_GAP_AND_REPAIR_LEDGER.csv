@@ -1,0 +1,4 @@
+gap_id,severity,why_not_fixed_now,owner,required_source_or_decision,acceptance_criterion,blocks_next_prompt
+GAP-P12-001,P2,Command catalog is complete at design level but runtime command implementations still partial,platform_backend,Implement remaining governed command services and route registration,all governed mutations resolve to commands only,N
+GAP-P12-002,P2,OpenAPI and Arazzo generation artifacts are specified but not emitted here,platform_backend and integration_architecture,Generate API contracts from command source,client and workflow docs match runtime contracts,N
+GAP-P12-003,P2,Telemetry and operator recovery UX for idempotency are deferred to later prompts,sre and frontend,Implement recovery console and metrics,stale in-progress rows are visible and safely recoverable,N

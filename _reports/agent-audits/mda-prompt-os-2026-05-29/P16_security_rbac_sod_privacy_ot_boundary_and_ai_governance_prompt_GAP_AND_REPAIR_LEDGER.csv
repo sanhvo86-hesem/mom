@@ -1,0 +1,4 @@
+gap_id,severity,why_not_fixed_now,owner,required_source_or_decision,acceptance_criterion,blocks_next_prompt
+GAP-P16-001,P2,Permission and field-redaction matrix is defined but not yet wired across all command and read surfaces,security_iam and frontend,Implement central authz service and UI redaction contract,command and record shell access align to one policy source,N
+GAP-P16-002,P2,SoD exceptions and delegation lifecycle need runtime policy objects,security_iam and quality_authority,Implement SoD exception records and expiry checks,override and deputy use is bounded and auditable,N
+GAP-P16-003,P2,Security and OT abuse-case telemetry remains design-only until P17 implementation,sre and mes_execution,Wire incidents and heartbeats into alerting,critical security or OT trust failures alert within SLO,N

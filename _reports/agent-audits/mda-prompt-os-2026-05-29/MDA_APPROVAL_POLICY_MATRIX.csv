@@ -1,0 +1,9 @@
+object,action,approval_route,role,sod_rule,signature_required,signature_meaning,timeout_escalation,delegation
+ItemRevision,release,engineering plus quality,engineering_manager and qa_manager,originator_cannot_final_approve,Y,Approve released manufacturing definition,24h escalate to director,approved deputy only
+EngineeringReleasePackage,release,engineering plus production plus quality,engineering_manager production_manager qa_manager,independent final approver,Y,Authorize package for execution,24h escalate to COO,approved deputy only
+QualityHold,release,mrb_or_qa,qa_manager or mrb_board,creator_cannot_solo_release,Y,Authorize release of contained product,8h escalate to QMR,time boxed deputy
+InventoryAdjustment,approve,inventory plus finance,inventory_controller finance_manager,requester_cannot_approve,Y,Approve variance correction to stock ledger,8h escalate to CFO,approved deputy only
+ClosedPeriodException,use,finance_control,controller plus finance_manager,separate_request_and_use,Y,Authorize backdated posting exception,4h escalate to CFO,no standing delegation
+CAPA,close,quality_management,qa_manager and process_owner,owner_needs_independent_verifier,Y,Approve effectiveness closure of CAPA,72h escalate to QMR,temporary deputy
+MRBDisposition,approve,mrb_board,qa_manager engineering_manager supply_chain_if_supplier,disposition_proposer_cannot_final_approve,Y,Approve disposition of nonconforming material,12h escalate to GM,board quorum delegation
+ShipmentRelease,approve,logistics plus quality,logistics_manager qa_release,packer_cannot_release,Y,Authorize shipment of product to customer,4h escalate to COO,approved deputy only

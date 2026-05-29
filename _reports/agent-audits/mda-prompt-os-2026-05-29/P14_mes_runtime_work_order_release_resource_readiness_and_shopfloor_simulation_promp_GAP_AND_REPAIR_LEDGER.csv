@@ -1,0 +1,4 @@
+gap_id,severity,why_not_fixed_now,owner,required_source_or_decision,acceptance_criterion,blocks_next_prompt
+GAP-P14-001,P2,Canonical ResourceReadinessService is designed but not implemented,mes_execution and maintenance_engineering,Implement one readiness gate service for release and start,all shopfloor start and release commands call one readiness decision chain,N
+GAP-P14-002,P2,Runtime event spine and containment triggers still need physical command/event implementation,mes_execution and quality_authority,Implement raw and derived event services with containment hooks,alarm tool break and inspection fail all spawn governed reactions,N
+GAP-P14-003,P2,Offline high-risk reconcile policy remains design-only,mes_execution and frontend,Implement candidate queue and operator reconcile UX,offline stale completions cannot mutate closed or changed runtime state,N

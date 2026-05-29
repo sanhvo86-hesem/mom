@@ -1,0 +1,201 @@
+scenario_id,group,seed_data,preconditions,commands,expected_events,expected_ledgers,expected_holds,expected_audit_or_evidence,expected_errors,assertions
+SIMLIB-001,master_data,item draft exists,unique code and owner,CreateItemRevision,item_revision.created,none,none,audit row,no_error,status draft
+SIMLIB-002,master_data,duplicate party candidate,matching tax id,CreateParty,none,none,none,duplicate review packet,duplicate_party,error returned
+SIMLIB-003,master_data,item review ready,approvals complete,ReleaseItemRevision,item_revision.released,none,none,release packet,no_error,released immutable
+SIMLIB-004,engineering,bom and routing ready,cp and ip released,ApproveEngineeringReleasePackage,engineering_release_package.released,none,none,member hash packet,no_error,package snapshot frozen
+SIMLIB-005,engineering,missing IP,release package incomplete,ApproveEngineeringReleasePackage,none,none,none,gate failure packet,missing_inspection_plan,release blocked
+SIMLIB-006,supplier_quality,approved supplier receipt,PO approved,ReceiveInventory,inventory.receipt_recorded,inventory_ledger receipt,iqc pending,receipt evidence,no_error,quarantine stock only
+SIMLIB-007,supplier_quality,receipt fails IQC,quality trigger active,RecordIqcResult,quality.hold_applied,none,inventory hold,inspection evidence,inspection_fail,putaway blocked
+SIMLIB-008,inventory,passed receipt lot,available stock,PutawayInventory,inventory.putaway_recorded,inventory_ledger move,none,warehouse evidence,no_error,location updated
+SIMLIB-009,inventory,held lot requested,hold active,IssueMaterialToWO,none,none,quality hold,hold evidence,hold_blocked,issue blocked
+SIMLIB-010,inventory,insufficient qty,balance low,IssueMaterialToWO,none,none,none,stock check evidence,insufficient_stock,issue blocked
+SIMLIB-011,inventory,same issue replay,same fingerprint,IssueMaterialToWO,inventory.issued_to_wip,wip and inventory once,none,audit replay,no_error,single ledger mutation
+SIMLIB-012,inventory,closed period issue,period closed,IssueMaterialToWO,none,none,none,period policy evidence,closed_period,no posting
+SIMLIB-013,mes,wo scheduled,all readiness pass,ReleaseWorkOrder,work_order.released,none,none,readiness snapshot,no_error,wo setup or running
+SIMLIB-014,mes,operator expired,training out of date,StartJob,none,none,none,qualification evidence,block_operator_training,no start
+SIMLIB-015,mes,machine PM overdue,PM overdue,StartJob,none,none,none,maintenance evidence,block_machine_pm,no start
+SIMLIB-016,mes,nc mismatch,wrong checksum,LoadProgram,none,none,none,program receipt evidence,block_program_checksum,no run
+SIMLIB-017,mes,tool near stop,life below threshold,LoadTool,none,none,none,tool life evidence,block_tool_life,no run
+SIMLIB-018,mes,good run,inputs issued,RecordProcessParam,mes.process_parameter_recorded,none,none,param evidence,no_error,param captured
+SIMLIB-019,mes,ipqc fail,measurement out of limit,RecordInspectionResult,quality.hold_applied,none,lot hold,inspection evidence,inspection_fail,completion blocked
+SIMLIB-020,mes,good completion,all inspections pass,CompleteOperation,production.output_recorded,wip and inventory and cost,none,genealogy evidence,no_error,output lot created
+SIMLIB-021,mes,double complete,double tap replay,CompleteOperation,production.output_recorded,one set only,none,replay audit,no_error,no duplicate output
+SIMLIB-022,mes,scrap threshold exceeded,scrap high,ReportScrap,quality.deviation_opened,scrap and cost,possible hold,scrap evidence,approval_required,supervisor gate
+SIMLIB-023,quality,oqc fail,shipment pending,RecordOqcResult,quality.hold_applied,none,shipment hold,oqc evidence,inspection_fail,shipment blocked
+SIMLIB-024,quality,ncr created,containment needed,CreateNcrFromFailure,quality.case_linked,none,quality hold,ncr evidence,no_error,ncr linked to source
+SIMLIB-025,quality,capa created,root cause started,CreateCapa,quality.capa_initiated,none,none,capa packet,no_error,capa traceable
+SIMLIB-026,quality,mrb use as is,approved concession,ReleaseQualityHold,quality.hold_released,none,hold released,mrb minutes and esign,no_error,controlled release
+SIMLIB-027,quality,SoD violation,same creator approver,ReleaseQualityHold,none,none,hold remains,esign packet,sod_blocked,release blocked
+SIMLIB-028,tooling,breakage event,run active,RecordToolBreakage,tool.breakage_recorded,none,suspect quantity hold,breakage evidence,no_error,containment opens
+SIMLIB-029,tooling,gage OOT,measurement system invalid,ReleaseWorkOrder,none,none,none,calibration evidence,block_gage_calibration,wo blocked
+SIMLIB-030,traceability,complaint serial exists,shipment linked,SimulateRecall,trace.recall_simulated,none,possible hold,recall export,no_error,backward chain complete
+SIMLIB-031,traceability,supplier heat exists,shipments linked,SimulateRecall,trace.recall_simulated,none,possible hold,recall export,no_error,forward chain complete
+SIMLIB-032,traceability,missing genealogy edge,output missing input link,GenerateDppFromShipment,none,none,shipment hold,trace gap evidence,trace_incomplete,DPP blocked
+SIMLIB-033,finance,copq source exists,period open,PostCopqEntry,quality.copq_posted,copq ledger,none,cost evidence,no_error,copq posted
+SIMLIB-034,finance,backdate without exception,period closed,PostCopqEntry,none,none,none,period policy evidence,closed_period,posting blocked
+SIMLIB-035,finance,shipment confirmed,invoice pending,PostArInvoice,ar.invoice_posted,ar ledger,none,invoice evidence,no_error,SO invoice linked
+SIMLIB-036,finance,SO close with open hold,quality hold active,CloseSalesOrder,none,none,hold remains,close attempt audit,open_hold,SO remains open
+SIMLIB-037,migration,shadow write fail,PG unavailable,ReceiveInventory,inventory.receipt_recorded,json authoritative only,projection stale,reconcile warning,shadow_write_failed,cutover blocked later
+SIMLIB-038,migration,fallback read in primary,PG row missing,OpenItemRecord,none,none,none,telemetry alert,fallback_read,alert emitted
+SIMLIB-039,migration,unknown status import,legacy alias new,MigrationBatch,none,none,none,mapping report,unknown_status,batch blocked
+SIMLIB-040,migration,rerun batch same payload,mapping stable,MigrationBatch,none,none,none,batch audit,no_error,idempotent rerun
+SIMLIB-041,security,expired session,privileged command,ReleaseQualityHold,none,none,hold remains,auth audit,auth_expired,command blocked
+SIMLIB-042,security,reused totp,esign command,ApproveEngineeringReleasePackage,none,none,none,security evidence,esign_replay,command blocked
+SIMLIB-043,security,ai tries release,no human command,AIProposalOnly,none,none,none,advisory log,autonomous_action_forbidden,proposal only
+SIMLIB-044,security,supplier portal cross tenant,wrong supplier record,OpenSupplierNcr,none,none,none,access audit,permission_denied,redaction and deny
+SIMLIB-045,security,edge fake ready,unapproved adapter mapping,RecordMachineEvent,none,none,none,security audit,adapter_untrusted,event quarantined
+SIMLIB-046,observability,drift spike,post migration,ReconcileDomain,drift.detected,none,none,reconcile report,no_error,p0 alert
+SIMLIB-047,observability,outbox lag high,worker stalled,DispatchOutbox,outbox.lag_alert,none,none,incident evidence,no_error,alert fired
+SIMLIB-048,observability,audit write failure,audit store down,ReleaseItemRevision,none,none,none,failure log,audit_write_failure,fail closed
+SIMLIB-049,observability,projection stale,dashboard open,OpenReadinessBoard,none,none,none,ui telemetry,projection_stale,actions disabled
+SIMLIB-050,frontend,projection mutation attempt,workspace button clicked,WorkspaceMutateAttempt,none,none,none,ui audit,projection_mutation_forbidden,reanchor required
+SIMLIB-051,frontend,record shell open,authoritative record route,OpenRecordShell,none,none,none,ui telemetry,no_error,evidence panels visible
+SIMLIB-052,frontend,disabled action reason,gate fail known,OpenRecordShell,none,none,none,ui telemetry,no_error,reason code displayed
+SIMLIB-053,frontend,offline edit on released record,mobile offline,SaveOfflineCandidate,none,none,none,candidate log,offline_candidate_only,no mutation
+SIMLIB-054,frontend,field redaction,shopfloor role,OpenPartyRecord,none,none,none,access log,no_error,sensitive fields hidden
+SIMLIB-055,data_quality,bulk import duplicates,mixed source,ImportItemBatch,none,none,none,quality report,duplicate_detected,batch quarantined
+SIMLIB-056,data_quality,missing mandatory field,import feed,ImportSupplierBatch,none,none,none,quality report,validation_error,row quarantined
+SIMLIB-057,data_quality,expired supplier cert,receipt planned,ReceiveInventory,none,none,none,cert evidence,supplier_cert_expired,receipt blocked
+SIMLIB-058,data_quality,stale controlled gap,owner overdue,ReviewGapLedger,none,none,none,governance report,no_error,escalation created
+SIMLIB-059,planning,SO confirmed,package missing,ReleaseSalesOrderToProduction,none,none,none,gate audit,missing_release_member,SO blocked
+SIMLIB-060,planning,JO created from wrong SO,SO only confirmed,CreateJobOrder,none,none,none,readiness audit,so_not_engineering_ready,JO blocked
+SIMLIB-061,planning,WO snapshot locked,master changes later,OpenWorkOrderHistory,none,none,none,history evidence,no_error,frozen snapshot visible
+SIMLIB-062,planning,customer-specific approval missing,export part,ReleaseSalesOrderToProduction,none,none,none,approval evidence,customer_approval_missing,release blocked
+SIMLIB-063,planning,supplier approval missing,special process outsourced,ApproveEngineeringReleasePackage,none,none,none,approval evidence,supplier_process_approval_missing,package blocked
+SIMLIB-064,maintenance,PM created by critical alarm,alarm active,RecordMachineEvent,maintenance.work_order_requested,none,possible machine hold,alarm evidence,no_error,PM trigger linked
+SIMLIB-065,maintenance,calibration due reached,clock crosses due date,ReleaseWorkOrder,none,none,none,calibration evidence,block_machine_calibration,release blocked
+SIMLIB-066,maintenance,OOT investigation open,gage linked lots known,ReleaseQualityHold,none,none,hold remains,investigation evidence,oot_open,affected lots blocked
+SIMLIB-067,maintenance,safety interlock fail,machine unsafe,StartJob,none,none,none,safety evidence,block_safety_gate,no start
+SIMLIB-068,shipment,pick held lot,shipment in packing,ConfirmPacking,none,none,shipment hold,hold evidence,hold_blocked,packing blocked
+SIMLIB-069,shipment,deliver without OQC,OQC required,ConfirmDelivery,none,none,shipment hold,oqc evidence,oqc_required,delivery blocked
+SIMLIB-070,shipment,deliver good lot,all gates pass,ConfirmDelivery,shipment.confirmed,none,holds none,delivery evidence,no_error,shipment complete
+SIMLIB-071,shipment,customer complaint after delivery,serial linked,CreateComplaint,quality.complaint_created,none,possible complaint hold,complaint evidence,no_error,complaint trace begins
+SIMLIB-072,governance,manual status patch attempt,db update direct,DirectPatchStatus,none,none,none,security audit,command_required,patch rejected
+SIMLIB-073,governance,manual balance update attempt,db update direct,DirectUpdateBalance,none,none,none,security audit,ledger_required,update rejected
+SIMLIB-074,governance,generated workflow stale,ui enum outdated,OpenStatusControl,none,none,none,build audit,status_registry_mismatch,CI failure
+SIMLIB-075,governance,open conflict unresolved,root ambiguity,ReviewConflictLedger,none,none,none,governance report,no_error,blocker visible
+SIMLIB-076,governance,decision log missing token,prompt handoff incomplete,ReviewPromptBundle,none,none,none,bundle audit,decision_token_missing,bundle blocked
+SIMLIB-077,recall,heat to shipments plus complaint,dual direction recall,SimulateRecall,trace.recall_simulated,none,possible holds,export packet,no_error,both directions complete
+SIMLIB-078,recall,containment after recall,affected shipments open,ApplyQualityHold,quality.hold_applied,none,shipment hold,containment packet,no_error,customer ship block
+SIMLIB-079,recall,recall with archived JSON used,PG only mode,SimulateRecall,none,none,none,telemetry alert,archived_json_access,raise_p0
+SIMLIB-080,recall,complaint serial missing,customer typo,SimulateRecall,none,none,none,query audit,ambiguous_or_missing_trace,error handled
+SIMLIB-081,observability,label explosion,bad telemetry labels,EmitMetric,none,none,none,sre audit,metric_label_cardinality_blocked,metric sanitized
+SIMLIB-082,observability,pii in log,sensitive field logged,WriteStructuredLog,none,none,none,security alert,pii_redaction_failure,incident opened
+SIMLIB-083,observability,runbook missing owner,p0 alert fires,TriggerAlert,none,none,none,incident record,no_owner_defined,governance gap
+SIMLIB-084,observability,no incident on slo breach,lag too high,CheckSLO,none,none,none,sre evidence,incident_missing,control breach
+SIMLIB-085,identity,badge borrowed,operator scans another badge,StartJob,none,none,none,auth evidence,identity_mismatch,command blocked
+SIMLIB-086,identity,role revoked but UI cached,projection stale,ReleaseQualityHold,none,none,hold remains,auth audit,permission_denied,action blocked
+SIMLIB-087,identity,deputy expired,delegation ended,ApproveEngineeringReleasePackage,none,none,none,delegation evidence,delegation_expired,approval blocked
+SIMLIB-088,identity,self-role-grant,user requests own elevation,GrantRole,none,none,none,security audit,sod_blocked,grant blocked
+SIMLIB-089,customer,customer item crossref mismatch,wrong item alias,ReleaseSalesOrderToProduction,none,none,none,crossref evidence,customer_crossref_mismatch,release blocked
+SIMLIB-090,customer,complaint linked to wrong shipment,serial mismatch,CreateComplaint,none,none,none,complaint audit,shipment_trace_mismatch,complaint quarantined
+SIMLIB-091,supplier,supplier blocked but PO create attempted,status blocked,CreatePurchaseOrder,none,none,none,supplier status evidence,supplier_blocked,PO blocked
+SIMLIB-092,supplier,scorecard stale,approval gate reads stale projection,ApprovePurchaseOrder,none,none,none,projection evidence,projection_stale,reanchor required
+SIMLIB-093,supplier,SCAR overdue,receipt attempted,ReceiveInventory,none,none,possible receipt hold,scar evidence,scar_overdue,receipt blocked
+SIMLIB-094,ai,AI duplicate suggestion,party import pending,ReviewAiSuggestion,none,none,none,advisory log,no_error,human review only
+SIMLIB-095,ai,AI tries auto-close CAPA,proposal escalated,AutoCloseAttempt,none,none,none,security audit,autonomous_action_forbidden,blocked
+SIMLIB-096,ai,AI summarization only,audit export request,ExportCaseSummary,none,none,none,advisory log,no_error,read only allowed
+SIMLIB-097,ui,signature modal meaning missing,regulated action,OpenSignatureModal,none,none,none,ui test,signature_meaning_missing,ui blocked
+SIMLIB-098,ui,timeline missing command id,record shell open,OpenTimeline,none,none,none,ui test,command_id_missing,bug flagged
+SIMLIB-099,ui,projection freshness unknown,readiness board open,OpenReadinessBoard,none,none,none,ui telemetry,projection_freshness_unknown,actions disabled
+SIMLIB-100,ui,navigate from WO to frozen source,history panel open,OpenWorkOrderHistory,none,none,none,ui telemetry,no_error,frozen source links visible
+SIMLIB-101,bulk,import 10k items,mixed quality feed,ImportItemBatch,none,none,none,import report,duplicates_and_missing_fields,batch partitioned
+SIMLIB-102,bulk,import 5k suppliers,cert and ASL gaps,ImportSupplierBatch,none,none,none,import report,validation_errors,row quarantine
+SIMLIB-103,bulk,import 2k customers,duplicate aliases,ImportCustomerBatch,none,none,none,import report,duplicate_detected,row quarantine
+SIMLIB-104,bulk,mass route import,overlapping effectivity,ImportRoutingBatch,none,none,none,import report,effectivity_overlap,batch blocked
+SIMLIB-105,bulk,mass CP import,missing CTQ reaction plan,ImportControlPlanBatch,none,none,none,import report,ctq_missing,batch blocked
+SIMLIB-106,bulk,mass IP import,missing sample rule,ImportInspectionPlanBatch,none,none,none,import report,sampling_missing,batch blocked
+SIMLIB-107,bulk,mass machine import,duplicate serial nos,ImportEquipmentBatch,none,none,none,import report,duplicate_identity,batch blocked
+SIMLIB-108,bulk,mass tool import,compatibility metadata absent,ImportToolBatch,none,none,none,import report,compatibility_missing,row quarantine
+SIMLIB-109,bulk,mass user link import,identity SSOT mismatch,ImportOperatorQualificationBatch,none,none,none,import report,identity_ssot_conflict,row quarantine
+SIMLIB-110,bulk,mass hold import,unknown source refs,ImportHoldBatch,none,none,none,import report,unknown_source,batch blocked
+SIMLIB-111,disaster,evidence store outage,release attempted,ApproveEngineeringReleasePackage,none,none,none,incident log,evidence_store_unavailable,fail closed
+SIMLIB-112,disaster,audit db outage,hold release attempted,ReleaseQualityHold,none,none,hold remains,incident log,audit_store_unavailable,fail closed
+SIMLIB-113,disaster,outbox worker down,command commit complete,ReceiveInventory,inventory.receipt_recorded,ledger persisted,none,incident log,no_immediate_error,outbox lag alert
+SIMLIB-114,disaster,db deadlock,two issue commands race,IssueMaterialToWO,one issue event,one ledger delta,none,deadlock audit,deadlock_retry,exactly one success
+SIMLIB-115,disaster,network partition offline tablet,completion queued offline,SyncOfflineCandidate,none,none,none,offline audit,queued_candidate,manual reconcile
+SIMLIB-116,disaster,restore drill,PG backup restored,RestoreAuthoritativeState,none,none,none,restore evidence,no_error,checksum pass
+SIMLIB-117,disaster,json archive corruption,request archive export,ExportArchive,none,none,none,archive audit,archive_corrupt,non-authority impact only
+SIMLIB-118,disaster,drift on cutover day,fallback and missing rows,SwitchMode,none,none,none,cutover report,drift_blocked,no switch
+SIMLIB-119,disaster,operator recovery stale in_progress,row aged out,RecoverIdempotencyRow,none,none,none,recovery audit,recovery_required,operator-only action
+SIMLIB-120,disaster,incorrect rollback request,pg-only writes exist,RollbackMode,none,none,none,rollback audit,rollback_not_allowed,block rollback
+SIMLIB-121,acceptance,prompt bundle complete,P01-P20 artifacts exist,ReviewBundle,none,none,none,bundle audit,no_error,ready for red-team
+SIMLIB-122,acceptance,prompt bundle missing matrix,P12 matrix absent,ReviewBundle,none,none,none,bundle audit,artifact_missing,fail
+SIMLIB-123,acceptance,prompt bundle no gaps carried,P20 hides issues,ReviewBundle,none,none,none,bundle audit,gap_ledger_incomplete,fail
+SIMLIB-124,acceptance,prompt bundle no conflict ledger,root conflict omitted,ReviewBundle,none,none,none,bundle audit,conflict_ledger_missing,fail
+SIMLIB-125,acceptance,repair queue generated,P21 findings exist,ReviewRedTeam,none,none,none,redteam report,no_error,repair prompts ready
+SIMLIB-126,acceptance,score under threshold,command completeness weak,ReviewRedTeam,none,none,none,redteam report,criterion_score_low,blocked
+SIMLIB-127,acceptance,final decision pass with p0,hidden mutation found,ReviewRedTeam,none,none,none,redteam report,p0_open,blocked
+SIMLIB-128,acceptance,final decision pass with p1,major cutover gap remains,ReviewRedTeam,none,none,none,redteam report,p1_open,blocked
+SIMLIB-129,acceptance,final decision controlled gaps only,p2 backlog only,ReviewRedTeam,none,none,none,redteam report,no_error,pass_with_controlled_gaps
+SIMLIB-130,acceptance,handoff prompts exact,implementation files named,ReviewHandoff,none,none,none,handoff audit,no_error,no guess possible
+SIMLIB-131,warehouse,container move,child lots attached,MoveInventory,inventory.container_moved,inventory ledger move,none,move evidence,no_error,child projections updated
+SIMLIB-132,warehouse,container move stale children,projection mismatch,MoveInventory,inventory.container_moved,ledger correct,reconcile flag,move evidence,no_error,reconcile opened
+SIMLIB-133,warehouse,merge lots compatible,same item status,MergeLot,inventory.lot_merged,inventory ledger merge,none,merge evidence,no_error,child genealogy preserved
+SIMLIB-134,warehouse,merge lots incompatible,mixed status,MergeLot,none,none,none,merge audit,incompatible_status,merge blocked
+SIMLIB-135,warehouse,split lot compatible,parent lot valid,SplitLot,inventory.lot_split,inventory ledger split,none,split evidence,no_error,genealogy edges created
+SIMLIB-136,warehouse,split lot without genealogy,logic bug,SplitLot,inventory.lot_split,inventory ledger split,none,split audit,no_error if bug not caught,test asserts genealogy
+SIMLIB-137,warehouse,cycle count variance,count discrepancy,AdjustInventoryWithApproval,inventory.adjustment_posted,inventory and cost ledger,none,approval evidence,no_error,variance governed
+SIMLIB-138,warehouse,cycle count no approval,variance high,AdjustInventoryWithApproval,none,none,none,approval audit,approval_missing,blocked
+SIMLIB-139,warehouse,pick after hold release,hold released,ConfirmPacking,shipment.packing_confirmed,none,none,release evidence,no_error,pick allowed
+SIMLIB-140,warehouse,putaway before pass,IQC pending,PutawayInventory,none,none,iqc hold,receipt evidence,iqc_required,blocked
+SIMLIB-141,quality_system,document training expired,approver outdated,ApproveEngineeringReleasePackage,none,none,none,training evidence,qualification_expired,blocked
+SIMLIB-142,quality_system,legal hold active,purge job runs,PurgeEvidence,none,none,legal hold remains,retention audit,legal_hold_active,blocked
+SIMLIB-143,quality_system,evidence export signed,customer auditor request,ExportEvidencePackage,none,none,none,export packet,no_error,signature meaning visible
+SIMLIB-144,quality_system,evidence replace attempt,hash mismatch,ReplaceEvidence,none,none,none,security audit,evidence_immutable,blocked
+SIMLIB-145,quality_system,customer complaint links NCR,serial traced,CreateNcrFromFailure,quality.case_linked,none,shipment hold,complaint and ncr evidence,no_error,linked chain
+SIMLIB-146,quality_system,supplier complaint links SCAR,receipt traced,CreateScar,quality.scar_created,none,supplier hold,scar evidence,no_error,linked chain
+SIMLIB-147,quality_system,SCAR closed no verification,verification missing,CloseScar,none,none,none,scar audit,verification_missing,blocked
+SIMLIB-148,quality_system,CAPA effectiveness missing,close attempted,CloseCapa,none,none,none,capa audit,effectiveness_missing,blocked
+SIMLIB-149,quality_system,NCR void after closure,closed case edit,VoidNcr,none,none,none,ncr audit,invalid_state,blocked
+SIMLIB-150,quality_system,MRB approval with self approver,creator approves,ApproveMrbDisposition,none,none,none,mrb audit,sod_blocked,blocked
+SIMLIB-151,execution,process param capture,limits defined,RecordProcessParam,mes.process_parameter_recorded,none,none,param evidence,no_error,captured with correlation
+SIMLIB-152,execution,alarm critical midrun,critical alarm,RecordMachineEvent,maintenance.work_order_requested,none,suspect hold,alarm evidence,no_error,containment spawned
+SIMLIB-153,execution,pause and resume,planned downtime,PauseJob then ResumeJob,job.paused and job.resumed,none,none,reason audit,no_error,state restored
+SIMLIB-154,execution,pause without reason,user tries pause,PauseJob,none,none,none,pause audit,reason_required,blocked
+SIMLIB-155,execution,job close with open WO,WO active,CloseWorkOrder,none,none,none,close audit,child_open,blocked
+SIMLIB-156,execution,job close complete,all children closed,CloseWorkOrder,work_order.closed,ledger reconciled,none,close evidence,no_error,wo closed
+SIMLIB-157,execution,rework created,output nonconforming,CreateRework,quality.rework_created,wip ledger,possible hold,rework evidence,no_error,rework trace linked
+SIMLIB-158,execution,rework consumes wrong lot,operator selects output lot incorrectly,CreateRework,none,none,none,rework audit,genealogy_conflict,blocked
+SIMLIB-159,execution,backflush no lot,lot required item,BackflushMaterial,none,none,none,backflush audit,traceability_required,blocked
+SIMLIB-160,execution,backflush valid,rate based issue,BackflushMaterial,inventory.issued_to_wip,wip and inventory ledger,none,consumption evidence,no_error,issue captured
+SIMLIB-161,security_boundary,raw event direct mutation attempt,adapter sends WO close,RecordMachineEvent,none,none,none,security audit,ot_command_forbidden,event quarantined
+SIMLIB-162,security_boundary,AI closes CAPA from note,LLM output malicious,ProcessAiSuggestion,none,none,none,security audit,ai_action_forbidden,proposal only
+SIMLIB-163,security_boundary,browser no csrf,session cookie present,ReleaseQualityHold,none,none,none,auth audit,csrf_required,blocked
+SIMLIB-164,security_boundary,api key too broad,token scope wrong,ApproveEngineeringReleasePackage,none,none,none,security audit,scope_denied,blocked
+SIMLIB-165,security_boundary,row version stale,record updated elsewhere,CreateItemRevision,none,none,none,concurrency audit,stale_row_version,blocked
+SIMLIB-166,security_boundary,different fingerprint same key,client bug,IssueMaterialToWO,none,none,none,idempotency audit,idempotency_conflict,blocked
+SIMLIB-167,security_boundary,in progress retry,user retries too early,IssueMaterialToWO,none,none,none,idempotency audit,in_progress_recovery_required,blocked
+SIMLIB-168,security_boundary,correlation missing,command request bad,CreateParty,none,none,none,api audit,correlation_required,blocked
+SIMLIB-169,security_boundary,command returns 500 no problem details,bug path,CreateParty,none,none,none,api audit,problem_details_required,test fails
+SIMLIB-170,security_boundary,field path missing on validation,bad DTO,CreateItemRevision,none,none,none,api audit,violations_required,test fails
+SIMLIB-171,projection,search merges two parties,duplicate suspicion only,OpenMasterDataSearch,none,none,none,ui audit,no_error,recommend merge only
+SIMLIB-172,projection,dashboard hold release button,projection only,ClickHoldReleaseFromBoard,none,none,none,ui audit,projection_mutation_forbidden,reanchor required
+SIMLIB-173,projection,quality queue ready but missing IP,projection optimistic,OpenReleaseQueue,none,none,none,ui telemetry,projection_warning,action disabled
+SIMLIB-174,projection,permission stale cache,role revoked,ClickReleaseAction,none,none,none,auth audit,permission_denied,refresh and block
+SIMLIB-175,projection,local storage authority attempt,browser cached state,OpenRecordShell,none,none,none,ui audit,local_authority_forbidden,server truth wins
+SIMLIB-176,projection,timeline export missing esign,export request,ExportTimeline,none,none,none,export audit,esign_context_missing,test fails
+SIMLIB-177,projection,audit tab hidden on released rev,record shell,OpenRecordShell,none,none,none,ui audit,no_error,audit tab mandatory
+SIMLIB-178,projection,evidence panel hidden on hold,record shell,OpenRecordShell,none,none,none,ui audit,no_error,evidence mandatory
+SIMLIB-179,projection,mobile action no reauth,regulated action,ReleaseQualityHold,none,none,none,ui audit,reauth_required,blocked
+SIMLIB-180,projection,gate reason inaccessible keyboard,accessibility test,OpenDisabledActionTooltip,none,none,none,a11y audit,keyboard_access_required,test fails
+SIMLIB-181,roadmap,wave starts before freeze,portfolio review,ReviewBuildPlan,none,none,none,portfolio audit,wave_order_invalid,plan blocked
+SIMLIB-182,roadmap,story lacks acceptance tests,backlog review,ReviewBuildPlan,none,none,none,portfolio audit,acceptance_missing,story blocked
+SIMLIB-183,roadmap,rollback omitted,build plan review,ReviewBuildPlan,none,none,none,portfolio audit,rollback_missing,plan blocked
+SIMLIB-184,roadmap,no data steward owner,build plan review,ReviewBuildPlan,none,none,none,portfolio audit,owner_missing,plan blocked
+SIMLIB-185,roadmap,no generic crud bypass test,build plan review,ReviewBuildPlan,none,none,none,portfolio audit,test_gap,plan blocked
+SIMLIB-186,roadmap,no migration rehearsal,build plan review,ReviewBuildPlan,none,none,none,portfolio audit,cutover_test_missing,plan blocked
+SIMLIB-187,roadmap,no observability owner,build plan review,ReviewBuildPlan,none,none,none,portfolio audit,owner_missing,plan blocked
+SIMLIB-188,roadmap,no operator UX gate reason,build plan review,ReviewBuildPlan,none,none,none,portfolio audit,ux_gate_gap,plan blocked
+SIMLIB-189,roadmap,no AI boundary,build plan review,ReviewBuildPlan,none,none,none,portfolio audit,ai_governance_missing,plan blocked
+SIMLIB-190,roadmap,no conflict carry-forward,build plan review,ReviewBuildPlan,none,none,none,portfolio audit,conflict_hidden,plan blocked
+SIMLIB-191,redteam,authority clarity scored low,external buyer review,ReviewExternalScorecard,none,none,none,redteam evidence,score_below_threshold,blocked
+SIMLIB-192,redteam,command completeness low,external buyer review,ReviewExternalScorecard,none,none,none,redteam evidence,score_below_threshold,blocked
+SIMLIB-193,redteam,migration safety low,external buyer review,ReviewExternalScorecard,none,none,none,redteam evidence,score_below_threshold,blocked
+SIMLIB-194,redteam,security low,external buyer review,ReviewExternalScorecard,none,none,none,redteam evidence,score_below_threshold,blocked
+SIMLIB-195,redteam,evidence integrity low,external buyer review,ReviewExternalScorecard,none,none,none,redteam evidence,score_below_threshold,blocked
+SIMLIB-196,redteam,simulation depth low,external buyer review,ReviewExternalScorecard,none,none,none,redteam evidence,score_below_threshold,blocked
+SIMLIB-197,redteam,no source for benchmark,external buyer review,ReviewExternalScorecard,none,none,none,redteam evidence,source_missing,blocked
+SIMLIB-198,redteam,repair queue absent,external buyer review,ReviewExternalScorecard,none,none,none,redteam evidence,repair_queue_missing,blocked
+SIMLIB-199,redteam,unsafe final token,external buyer review,ReviewExternalScorecard,none,none,none,redteam evidence,final_token_invalid,blocked
+SIMLIB-200,redteam,controlled gaps only,external buyer review,ReviewExternalScorecard,none,none,none,redteam evidence,no_error,pass_with_controlled_gaps

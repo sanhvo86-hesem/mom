@@ -1,0 +1,11 @@
+role,command,object,condition,site_scope,data_sensitivity,field_level_access,approval_or_esign
+mdm_admin,CreateParty,Party,enterprise stewardship,enterprise,internal,full_non_secret,N
+engineering_manager,ApproveEngineeringReleasePackage,EngineeringReleasePackage,independent reviewer,site_or_global,internal,full_engineering,Y
+qa_manager,ApplyQualityHold,QualityHold,quality source present,site,regulated,quality_fields_full,Y for release only
+warehouse_operator,IssueMaterialToWO,InventoryLedger,released WO and assigned area,site_or_warehouse,internal,inventory_operational,N
+shift_leader,ReleaseWorkOrder,WorkOrder,assigned work center,site,internal,operational plus gate reasons,N
+finance_manager,AdjustInventoryWithApproval,InventoryLedger,approved variance and period open,legal_entity,financial,cost visible,Y
+customer_service,ViewComplaintTrace,ComplaintTrace,customer account scope,customer_scope,customer_data,redacted cost and PII,N
+supplier_portal_user,ViewSupplierNcr,SupplierQuality,own supplier only,supplier_scope,supplier_data,own records redacted internal notes,N
+ot_adapter,RecordMachineEvent,MachineEvent,approved adapter identity,device_scope,technical,write raw event only,N
+ai_copilot,RecommendDuplicateOrRisk,AdvisoryOnly,never mutate governed state,read_scope,redacted,proposal_only,N

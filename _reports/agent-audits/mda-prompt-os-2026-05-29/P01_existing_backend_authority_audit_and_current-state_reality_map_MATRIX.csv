@@ -1,0 +1,10 @@
+artifact_id,prompt_id,source_tag,source_path_or_url,root_code,domain,object_or_table,command_ref,workflow_ref,api_ref,event_ref,evidence_ref,audit_ref,esign_ref,telemetry_ref,validation_ref,standard_ref,benchmark_ref,controlled_gap_ref,owner,decision_token
+P01-001,P01,REPO_EVIDENCE,docs/backend/RUNTIME_AUTHORITY_MAP.md,P01-RAM,master_data,authority_map,,,runtime_review,,audit_table,,telemetry_gap,drift_audit,,,GAP-P01-001,platform_backend,P01_REPAIR_REQUIRED
+P01-002,P01,REPO_EVIDENCE,mom/api/services/MasterDataService.php,P01-MDS,master_data,master_data_service,,,MasterDataController,,history_log,pending_approval,audit_review,,php_review,,,GAP-P01-002,master_data,P01_REPAIR_REQUIRED
+P01-003,P01,REPO_EVIDENCE,mom/api/services/JsonMasterDataRepository.php,P01-JMR,master_data,json_master_data_store,,,MasterDataController,,json_store,archive_store,audit_review,,php_review,,,GAP-P01-001,master_data,P01_REPAIR_REQUIRED
+P01-004,P01,REPO_EVIDENCE,mom/database/DataLayer.php,P01-DL,master_data,loadRuntimeMasterDataFromPg,,,DataLayer,,pg_rebuild,,audit_review,,drift_audit,,,GAP-P01-003,platform_backend,P01_REPAIR_REQUIRED
+P01-005,P01,REPO_EVIDENCE,mom/database/RuntimeShadowSync.php,P01-RSS,master_data,syncMasterDataStore,,,RuntimeShadowSync,,shadow_write,,audit_review,,sync_validation,,,GAP-P01-003,platform_backend,P01_REPAIR_REQUIRED
+P01-006,P01,REPO_EVIDENCE,mom/api/controllers/GenericCrudController.php,P01-GCC,cross_domain,governed_mutation_block,domain_command_required,,/api/runtime/*,,audit_log,,security_audit,,endpoint_validation,,,GAP-P01-004,platform_backend,P01_REPAIR_REQUIRED
+P01-007,P01,REPO_EVIDENCE,mom/database/migrations/064_master_data_governance.sql,P01-UOMA,master_data,mdm_uom_conversions,,,,,,,,schema_only,,migration_review,,GAP-P01-005,master_data,P01_REPAIR_REQUIRED
+P01-008,P01,REPO_EVIDENCE,mom/database/migrations/072_canonical_foundation_governance.sql,P01-UOMB,master_data,uom,,,,,,,,schema_only,,migration_review,,GAP-P01-005,master_data,P01_REPAIR_REQUIRED
+

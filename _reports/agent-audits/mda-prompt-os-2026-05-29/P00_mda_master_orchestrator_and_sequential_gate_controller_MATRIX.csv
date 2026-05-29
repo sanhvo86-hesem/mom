@@ -1,0 +1,5 @@
+artifact_id,prompt_id,source_tag,source_path_or_url,root_code,domain,object_or_table,command_ref,workflow_ref,api_ref,event_ref,evidence_ref,audit_ref,esign_ref,telemetry_ref,validation_ref,standard_ref,benchmark_ref,controlled_gap_ref,owner,decision_token
+P00-001,P00,REPO_EVIDENCE,_reports/agent-audits/mda-prompt-os-2026-05-29/MDA_RUN_MANIFEST.md,P00-MAN,platform,run_manifest,,,,,,,,,,no_guess,,NONE,platform_architecture,P00_PASS_READY_FOR_NEXT
+P00-002,P00,REPO_EVIDENCE,_reports/agent-audits/mda-prompt-os-2026-05-29/MDA_SOURCE_MAP.md,P00-SRC,platform,source_map,,,,,,,,,,source_verification,,NONE,platform_architecture,P00_PASS_READY_FOR_NEXT
+P00-003,P00,REPO_EVIDENCE,_reports/agent-audits/mda-prompt-os-2026-05-29/MDA_DECISION_LOG.md,P00-DEC,platform,decision_log,,,,,,,,,,token_gate,,NONE,platform_architecture,P00_PASS_READY_FOR_NEXT
+

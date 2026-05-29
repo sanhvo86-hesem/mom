@@ -1,0 +1,31 @@
+object_or_table,constraint_or_index_type,rule_or_expression,purpose,source_basis,priority
+item_revision,unique,item_id + revision_code,prevent duplicate revision identity,073_canonical_master_data_core.sql,P1
+item_revision,effectivity_non_overlap,target released/effective windows must not overlap per item,prevent concurrent released revisions for same scope,P04 blueprint,P1
+party_role,unique,party_id + role_code + scope_entity_name + scope_entity_id,prevent duplicate role assignment,072_canonical_foundation_governance.sql,P1
+party,tax_id_partial_unique,target unique tax_registration_no where active business-party scope is governed,prevent duplicate legal entity drift,P04 blueprint,P1
+item_site,unique,item_id + site_id,site release uniqueness,073_canonical_master_data_core.sql,P1
+bill_of_materials,unique,bom_id + bom_revision,legacy BOM identity,006_erp_master_data.sql,P1
+bom_components,check,no circular substitute/self-reference at component level,prevent substitute loops,P04 blueprint,P2
+routings,unique,routing_id + routing_revision,legacy routing identity,006_erp_master_data.sql,P1
+routing_operations,unique,routing_id + routing_revision + operation_seq,stable operation sequence,006_erp_master_data.sql,P1
+control_plans,unique,plan_number + revision,target canonical identity from contract,align with control plan contract,P1
+control_plans,check,active/released plan requires linked FMEA or approved standalone reason,quality release integrity,control plan contract,P2
+inspection_plans,unique,inspection_plan_id,stable inspection plan identity,011_quality.sql,P1
+engineering_release_bundle,unique,target item_revision_id + site_id + bundle_code,one release bundle identity per scope,P04 blueprint,P1
+engineering_release_bundle_member,unique,target bundle_id + member_type + member_id,prevent duplicate bundle membership,P04 blueprint,P1
+engineering_release_bundle_member,check,target exactly one active member of each required type for released bundle,release completeness,P04 blueprint,P1
+approved_supplier_list,unique,target vendor_id + normalized scope key,avoid duplicate ASL scope rows,035_supplier_quality_management.sql + P04 blueprint,P1
+customer_item_approval,unique,target party_id + item_revision_id + site_id + approval_scope,customer release uniqueness,P04 blueprint,P2
+supplier_process_approval,unique,target party_id + process_code + site_id,special-process approval uniqueness,P04 blueprint,P2
+mes_connectivity_adapters,index,equipment_id + adapter_status,readiness and stale adapter lookup,026_mes_world_class_foundations.sql,P2
+mes_connectivity_events,index,adapter_id + event_time desc,recent adapter health and replay analysis,026_mes_world_class_foundations.sql,P2
+mes_nc_release_packages,index,item_id + revision_code + operation_seq,NC release bundle lookup,026_mes_world_class_foundations.sql,P2
+mes_tool_assemblies,effectivity_non_overlap,target parent_tool_id + component_tool_id active windows non-overlap,prevent simultaneous conflicting assembly rows,P04 blueprint,P2
+stock_balances,read_only_policy,deny direct update/delete except projection refresh path,protect ledger authority,stock-balance contract,P1
+inventory_ledger,ledger_integrity,sum ledger movements equals derived balance,projection integrity,POSTGRES_MIGRATION_AND_SYNC_SPEC.md,P1
+mes_part_genealogy,index,item_id + serial_or_lot + updated_at desc,recall and genealogy lookup performance,P04 simulation,P1
+outbox_events,idempotency_unique,scope_key_hash + idempotency_key,replay-safe command outbox,POSTGRES_MIGRATION_AND_SYNC_SPEC.md,P1
+approval,index,entity_name + entity_id + status_code,approval outstanding lookup,072_canonical_foundation_governance.sql,P2
+electronic_signature,check,hash_value not null and signature_meaning not blank,e-sign evidence integrity,072_canonical_foundation_governance.sql,P2
+user_party_link,unique,target user_id + party_id + link_type,avoid duplicate identity links,P04 blueprint,P1
+operator_qualification,index,target employee_or_party + qualification_scope + status_code,readiness lookup,P04 blueprint,P2

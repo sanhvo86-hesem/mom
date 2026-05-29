@@ -1,0 +1,3 @@
+gap_id,severity,why_not_fixed_now,owner,required_source_or_decision,acceptance_criterion,blocks_next_prompt
+GAP-P20-001,P2,Final synthesis remains design-level because implementation waves are intentionally not executed here,platform_architecture and domain owners,Execute backlog waves and re-run red team,all DoD gates pass in runtime not only in planning pack,N
+GAP-P20-002,P2,Some stories still depend on future physical schema and command services from earlier prompt gaps,platform_architecture and platform_backend,Close dependent implementation gaps,backlog blockers collapse as waves complete,N

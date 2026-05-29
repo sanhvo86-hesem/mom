@@ -1,0 +1,14 @@
+gap_id,prompt_id,severity,domain,gap_summary,owner,acceptance_criterion,status
+GAP-P01-001,P01,P2,master_data,Master data runtime still carries compatibility bridge until PG-native command authority is implemented,master_data,all governed master data commands write and read authoritative PG roots,open
+GAP-P04-002,P04,P2,engineering_authority,Engineering release package physical schema is still a blueprint,engineering_authority,package tables and constraints live with tests,open
+GAP-P08-001,P08,P2,mes_execution,Machine readiness policy not yet embodied as one runtime service,mes_execution,all release and start paths call one readiness service,open
+GAP-P09-001,P09,P2,tooling_control,Tool breakage containment lacks dedicated physical event chain,tooling_control,breakage event and suspect quantity hold automated,open
+GAP-P10-001,P10,P2,quality_authority,Canonical hold service still not implemented,quality_authority,all blocked releases read one hold authority,open
+GAP-P11-001,P11,P2,inventory_logistics,Cost and inventory ledger still need one production-grade reconciliation runner,inventory_logistics,ledger and cost reconciliation pass daily,open
+GAP-P12-001,P12,P2,platform_backend,Command catalog exists but not all governed mutations are implemented as commands,platform_backend,command coverage reaches all governed actions,open
+GAP-P13-001,P13,P2,quality_authority,Shared evidence/e-sign generator not yet emitted from one runtime source,quality_authority,workflow approval evidence and e-sign generated from one source,open
+GAP-P15-001,P15,P2,platform_backend,Domain-by-domain cutover rehearsal still pending,platform_backend,documented restore drill and zero blocker drift evidence,open
+GAP-P17-001,P17,P2,sre,Control tower dashboards and runbooks remain design artifacts,sre,telemetry and runbooks live with alert tests,open
+GAP-P18-001,P18,P2,frontend,Authoritative record shells and projection gating remain to be implemented,frontend,UI contract tests prove no projection mutation path,open
+GAP-P19-001,P19,P2,qa_automation,Scenario DSL and automation harness remain planned not implemented,qa_automation,200+ scenarios executable with reports,open
+GAP-P21-001,P21,P2,portfolio_governance,Critical criteria clear threshold reached only at design-pack level not runtime deployment,platform_architecture,implementation waves complete and red-team rerun passes,open

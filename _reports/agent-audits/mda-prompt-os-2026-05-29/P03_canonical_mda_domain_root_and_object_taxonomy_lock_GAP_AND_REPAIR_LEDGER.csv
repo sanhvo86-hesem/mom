@@ -1,0 +1,4 @@
+gap_id,severity,why_not_fixed_now,owner,required_source_or_decision,acceptance_criterion,blocks_next_prompt
+GAP-P03-001,P2,Party root is locked conceptually but current repo still stores customers and suppliers in separate physical tables,master_data,P04 must define physical mapping and migration bridge,Party role model is mapped without losing customer/supplier compatibility,N
+GAP-P03-002,P2,UserIdentity EmployeeProfile OperatorQualification split is locked conceptually but not yet represented as one formal contract pack,identity_user,P04/P05 must define canonical storage and command model,No duplicate person mutation lanes remain,N
+GAP-P03-003,P2,EngineeringReleaseBundle is a canonical taxonomy decision not yet backed by schema,engineering_authority,P04 must define schema package and release bundle tables or views,Released engineering authority becomes physically modelled,N

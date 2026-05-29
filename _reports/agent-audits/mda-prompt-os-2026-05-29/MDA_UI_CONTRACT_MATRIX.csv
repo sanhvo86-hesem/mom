@@ -1,0 +1,11 @@
+route,record_or_projection,authority_class,root,commands,disabled_states,evidence_panels,audit_panels,telemetry
+/ops/records/party/{id},record,authoritative_record,Party,CreateParty SuspendParty ArchiveParty,duplicate or missing approval,profile docs approvals,audit timeline signatures,record_open trace_id
+/ops/records/item-revisions/{id},record,authoritative_record,ItemRevision,CreateItemRevision ReleaseItemRevision SupersedeItemRevision,released immutable or missing package,specs release packet,e-sign audit timeline,record_open trace_id
+/ops/records/release-packages/{id},record,authoritative_record,EngineeringReleasePackage,ApproveEngineeringReleasePackage SupersedePackage,missing member or approval,member hashes approvals,audit signatures timeline,gate_eval trace_id
+/ops/records/equipment/{id},record,authoritative_record,EquipmentAsset,ChangeEquipmentLifecycleState ReleaseMachineFromMaintenance,PM or calibration overdue,pm calibration safety,audit alarms overrides,readiness_eval trace_id
+/ops/records/tooling-assets/{id},record,authoritative_record,ToolingAsset,CreateToolingAsset RecordToolUsage RecordToolBreakage,tool hold or incompatibility,life breakage calibration,audit timeline,tool_gate trace_id
+/ops/records/quality-holds/{id},record,authoritative_record,QualityGatePolicy,ApplyQualityHold ReleaseQualityHold,missing disposition or esign,source case evidence,audit signatures,hold_eval trace_id
+/ops/workspaces/master-data-search,projection,projection_workspace,multi_root,open_record_only,cannot mutate from projection,summary links only,none,projection_freshness
+/ops/workspaces/readiness-board,projection,projection_workspace,multi_root,reanchor_to_work_order_or_equipment,stale projection or unknown freshness,gate reasons linked,audit links only,board_refresh_age
+/ops/workspaces/supplier-scorecard,projection,projection_workspace,Party,open_supplier_record and open_quality_case,read only and no hold release,scorecard evidence links,case timeline links,projection_freshness
+/ops/workspaces/item-quality-board,projection,projection_workspace,ItemRevision,open_revision_or_hold,no direct status change,quality and trace panels,case timeline,projection_freshness

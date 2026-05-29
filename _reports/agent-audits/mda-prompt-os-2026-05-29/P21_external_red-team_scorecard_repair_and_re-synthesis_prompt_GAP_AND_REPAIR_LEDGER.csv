@@ -1,0 +1,2 @@
+gap_id,severity,why_not_fixed_now,owner,required_source_or_decision,acceptance_criterion,blocks_next_prompt
+GAP-P21-001,P2,External red-team confirms the pack is planning-complete but still depends on implementation waves for runtime proof,platform_architecture and domain owners,Execute backlog and rerun scorecard on live implementation,critical criteria remain >=4 after runtime evidence is added,N

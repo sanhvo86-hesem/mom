@@ -1,0 +1,4 @@
+gap_id,severity,why_not_fixed_now,owner,required_source_or_decision,acceptance_criterion,blocks_next_prompt
+GAP-P11-001,P2,Cost and inventory reconciliation runner is specified but not implemented in runtime,inventory_logistics and finance_inventory,Build canonical reconciliation service and alerting,ledger and cost parity checks run daily and block close/switch,N
+GAP-P11-002,P2,Container-child parity and FEFO enforcement depend on later command and UI work,inventory_logistics,Implement command service and projection re-anchor logic,move and issue commands enforce child parity and FEFO,N
+GAP-P11-003,P2,Recall export depends on later runtime snapshot and evidence export hardening,traceability_serialization and quality_authority,Implement recall export command and evidence package,complaint serial and supplier heat exports are one-click and auditable,N

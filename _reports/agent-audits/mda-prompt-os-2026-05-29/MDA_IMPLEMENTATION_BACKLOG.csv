@@ -1,0 +1,16 @@
+epic,story,domain,dependencies,acceptance_criteria,tests,owner,risk,wave,blocking_gates
+AuthorityFreeze,Publish governed mutation denylist,cross_domain,P12 and P13,all governed CRUD paths return command_required,guard tests,platform_backend,high,0,no hidden mutation
+StatusAuthority,Generate workflow status registry,cross_domain,P13,status sets parity across DB PHP OpenAPI UI,WF-001..010,platform_backend,high,0,no stale status
+PartyIdentity,Implement party plus identity bridge,master_data,P05 and SSOT,one writer chain for party and identity,identity integration tests,master_data,medium,1,no duplicate person lanes
+ItemRevision,Implement item revision release commands,engineering_authority,P06 and P12,released revisions immutable and traceable,release command tests,engineering_authority,high,1,no mutable release
+EquipmentTooling,Implement readiness services,maintenance_and_tooling,P08 P09 P14,start-job and release use one readiness chain,readiness simulation pack,mes_execution,high,2,no bypassed readiness
+ReleasePackage,Implement engineering release package tables and commands,engineering_authority,P07 P12 package model,member hash and freeze rules enforced,package tests,engineering_authority,high,3,no freeform package
+AuditESign,Implement shared audit/e-sign spine,quality_authority,P13 P16,regulated commands fail closed without audit/e-sign,esign/audit failure tests,quality_authority,high,4,no weak signatures
+InventoryLedger,Implement ledger-only stock authority,inventory_logistics,P11 P12,balances derive from ledger and holds gate availability,ledger invariants,inventory_logistics,high,5,no direct balance mutation
+QualityHoldService,Implement canonical hold authority,quality_authority,P10 P11 P13,shipment issue and putaway read one hold chain,hold service tests,quality_authority,high,5,no fragmented holds
+MesRuntime,Implement release/start/complete commands with frozen snapshots,mes_execution,P14 and prior waves,shopfloor events and output genealogy are command-driven,shopfloor scenario library,mes_execution,high,5,no stale runtime mutation
+MigrationCutover,Execute JSON to PG cutover by domain,platform_backend,P15 and all schema waves,zero blocker drift and rollback rehearsed,PG protocol suite,platform_backend,high,6,no unsafe cutover
+Observability,Implement control tower dashboards and SLOs,sre_data_governance,P17,alerts actionable and exportable,telemetry tests,sre,medium,7,no blind failures
+FrontendContract,Re-anchor UI to authoritative shells,frontend_contract,P18,projection actions disabled until re-anchor,UI contract tests,frontend,medium,7,no hidden workspace authority
+SimulationPack,Automate 200 scenario library,qa_automation,P19,core scenarios executable in CI or rehearsal rig,scenario DSL tests,qa_automation,medium,7,no shallow validation
+RedTeamClosure,Run external scorecard and close remaining gaps,portfolio_governance,P21,scores >=4 for critical criteria and no P0/P1 open,redteam acceptance tests,platform_architecture,medium,7,no premature completion

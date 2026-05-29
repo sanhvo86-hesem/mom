@@ -1,0 +1,4 @@
+gap_id,severity,why_not_fixed_now,owner,required_source_or_decision,acceptance_criterion,blocks_next_prompt
+GAP-P15-001,P2,Live domain-by-domain cutover rehearsals and restore drills are not executed in this prompt pack,platform_backend and sre,Run rehearsal evidence on staging or controlled prod-like environment,each domain shows zero blocker drift and tested restore,N
+GAP-P15-002,P2,Some collection mappings remain design-level until corresponding runtime services exist,platform_backend and domain owners,Implement services and verify crosswalk fidelity,all required collections round-trip JSON and PG without fatal drift,N
+GAP-P15-003,P2,Fallback telemetry and human-readable drift exports still require control-tower implementation,sre and frontend,Implement dashboard and report export,operators can see fallback and drift blockers immediately,N

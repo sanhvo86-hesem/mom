@@ -1,0 +1,4 @@
+gap_id,severity,why_not_fixed_now,owner,required_source_or_decision,acceptance_criterion,blocks_next_prompt
+GAP-P13-001,P2,Workflow/evidence/e-sign generator is designed but not yet implemented in runtime,platform_backend,Implement generator and parity CI,DB PHP UI and OpenAPI statuses stay byte-equivalent,N
+GAP-P13-002,P2,Approval routes and delegation policy are defined but not yet backed by one canonical runtime policy store,quality_authority and security_iam,Implement approval policy service,all regulated approvals resolve through one policy source,N
+GAP-P13-003,P2,Shared audit/e-sign telemetry remains deferred to P17 implementation,sre and quality_authority,Wire signatures and audit failures into control tower,signature and audit incidents alert within SLO,N

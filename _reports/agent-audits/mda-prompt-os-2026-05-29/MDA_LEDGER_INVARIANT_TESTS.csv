@@ -1,0 +1,11 @@
+test_id,invariant,scope,assertion,failure_action
+LEDGER-001,inventory_balance_equals_ledger,inventory,Derived balance per item lot serial location equals signed ledger sum,block_cutover
+LEDGER-002,wip_balance_equals_open_consumption,wip,Open WO WIP equals issue plus completion plus scrap plus rework deltas,block_close_wo
+LEDGER-003,serial_uniqueness,traceability,One active serial cannot exist in two locations or two output completions,raise_p0
+LEDGER-004,hold_blocks_availability,quality,Active governed hold removes available_to_issue_or_ship quantity,block_release
+LEDGER-005,period_policy_finance_inventory,finance_inventory,No governed posting lands in closed period without approved exception,block_posting
+LEDGER-006,genealogy_completeness,traceability,Every produced output lot or serial has at least one input link or approved no-material process route,block_shipment
+LEDGER-007,cost_ledger_parity,finance_inventory,Material issue scrap rework and completion each create aligned cost hook entries,block_period_close
+LEDGER-008,container_child_parity,inventory,Container move updates child location projections without mutating child ledger truth,open_reconcile_incident
+LEDGER-009,idempotent_issue,inventory,Retry with same idempotency key returns same issue response and no second ledger row,block_command_replay
+LEDGER-010,snapshot_history_immutability,execution,Released WO snapshot stays unchanged after later master revision edits,raise_release_integrity_incident

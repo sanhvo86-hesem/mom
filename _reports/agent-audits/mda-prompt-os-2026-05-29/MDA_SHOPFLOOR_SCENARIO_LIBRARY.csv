@@ -1,0 +1,101 @@
+scenario_id,group,seed,precondition,expected_gate
+SF-001,start_job,qualified_operator,operator current and WO released,pass
+SF-002,start_job,expired_training,operator training expired,block_operator_training
+SF-003,start_job,pm_overdue,machine PM overdue,block_machine_pm
+SF-004,start_job,calibration_expired,gage expired,block_gage_calibration
+SF-005,start_job,tool_life_stop,tool below stop threshold,block_tool_life
+SF-006,start_job,nc_checksum_bad,wrong NC checksum,block_program_checksum
+SF-007,start_job,material_hold,input lot on hold,block_material_hold
+SF-008,start_job,fa_required,first article not recorded,block_first_article
+SF-009,start_job,doc_obsolete,obsolete WI linked,block_document_status
+SF-010,start_job,connectivity_stale,adapter heartbeat stale,block_connectivity
+SF-011,issue_material,normal_issue,lot available and period open,pass
+SF-012,issue_material,insufficient_stock,balance below requested,block_stock_shortage
+SF-013,issue_material,closed_period,inventory period closed,block_closed_period
+SF-014,issue_material,replay_issue,same idempotency key retried,replay_same_response
+SF-015,issue_material,double_scan,two scanners issue same lot concurrently,block_concurrency
+SF-016,issue_material,fefo_violation,older eligible lot exists,block_fefo
+SF-017,issue_material,missing_lot_scan,lot-controlled item without lot,block_traceability
+SF-018,issue_material,substitute_not_approved,customer-specific substitute lacks approval,block_customer_approval
+SF-019,issue_material,expired_lot,lot shelf life expired,block_expired_lot
+SF-020,issue_material,container_move_stale,container moved but projection stale,block_reanchor_required
+SF-021,inspection,ipqc_pass,measurement in limit,pass
+SF-022,inspection,ipqc_fail,measurement out of limit,create_quality_hold
+SF-023,inspection,gage_oot,gage OOT active,block_measurement_system
+SF-024,inspection,duplicate_sample,same sample posted twice,replay_same_response
+SF-025,inspection,missing_evidence,required image absent,block_missing_evidence
+SF-026,inspection,unqualified_inspector,inspector qualification expired,block_actor_qualification
+SF-027,inspection,sample_plan_missing,inspection sample rule missing,block_plan_integrity
+SF-028,inspection,first_piece_fail,first piece fails,start_containment
+SF-029,inspection,rework_loop,reworked piece re-inspection required,force_reinspection
+SF-030,inspection,offline_stale,offline inspection sync after WO closed,block_stale_runtime
+SF-031,tooling,load_correct,assembly and preset match route,pass
+SF-032,tooling,wrong_assembly,assembly revision mismatch,block_tool_compatibility
+SF-033,tooling,breakage_mid_run,tool breakage detected,create_suspect_quantity_hold
+SF-034,tooling,life_warning,tool near warning threshold,warn_non_blocking
+SF-035,tooling,preset_missing,preset not approved,block_preset
+SF-036,tooling,fixture_wrong,fixture family mismatch,block_fixture_compatibility
+SF-037,tooling,gage_missing,required gage not loaded,block_gage_presence
+SF-038,tooling,offset_override,manual offset override needs approval,require_override_approval
+SF-039,tooling,replay_load,same load command retried,replay_same_response
+SF-040,tooling,tool_hold,tool status hold active,block_tool_hold
+SF-041,completion,normal_complete,all gates pass,pass
+SF-042,completion,qty_over_release,good plus scrap exceeds WO,block_qty_limit
+SF-043,completion,oqc_required,final inspection pending,block_oqc
+SF-044,completion,scrap_threshold,scrap over threshold,require_supervisor_approval
+SF-045,completion,process_param_oot,param outside limit,create_deviation_or_hold
+SF-046,completion,duplicate_complete,same completion replayed,replay_same_response
+SF-047,completion,job_closed,completion arrives after close,block_work_order_state
+SF-048,completion,snapshot_changed,master revision changed during run,use_frozen_snapshot
+SF-049,completion,missing_consumption,no issued material on traceable route,block_genealogy
+SF-050,completion,suspect_output,critical alarm active,create_suspect_quantity_hold
+SF-051,quality,iqc_fail,receipt fails IQC,block_putaway
+SF-052,quality,iqc_conditional,conditional receipt with segregated stock,conditional_only
+SF-053,quality,oqc_fail,final inspection fails,block_shipment
+SF-054,quality,ncr_open,open NCR linked to lot,block_release
+SF-055,quality,capa_open,open CAPA effectiveness pending,allow_with_visibility_only
+SF-056,quality,mrb_use_as_is,approved concession exists,allow_with_signature
+SF-057,quality,complaint_received,customer complaint on serial,start_recall_graph
+SF-058,quality,scar_overdue,supplier 8D overdue,block_supplier_receipt_or_approval
+SF-059,quality,hold_release_no_evidence,release attempted without evidence,block_hold_release
+SF-060,quality,ai_recommend_only,AI suggests disposition,require_human_command
+SF-061,inventory,receipt_to_quarantine,PO receipt before IQC,quarantine_only
+SF-062,inventory,putaway_after_pass,IQC pass and lot available,pass
+SF-063,inventory,lot_split,split with genealogy edges,pass
+SF-064,inventory,lot_merge_bad,mismatched statuses in merge,block_merge
+SF-065,inventory,serial_duplicate,serial already active,block_serial_uniqueness
+SF-066,inventory,balance_stale,snapshot stale but ledger correct,refresh_projection
+SF-067,inventory,adjustment_no_approval,variance without approval,block_adjustment
+SF-068,inventory,shipment_pick_hold,pick held lot,block_pick
+SF-069,inventory,rework_return,return from WO to stock,pass_with_wip_reversal
+SF-070,inventory,backflush_missing_lot,backflush for lot item without lot,block_backflush
+SF-071,genealogy,forward_recall,supplier heat to shipments,pass
+SF-072,genealogy,backward_recall,complaint serial to supplier,pass
+SF-073,genealogy,missing_edge,output lot missing input link,block_shipment
+SF-074,genealogy,program_link_missing,run missing NC program receipt,block_execution_release
+SF-075,genealogy,operator_link_missing,run lacks operator identity,block_completion
+SF-076,genealogy,tool_link_missing,completion lacks tool usage,flag_traceability_gap
+SF-077,genealogy,alarm_linked,critical alarm during run,containment_required
+SF-078,genealogy,container_lineage,container transfer preserves child links,pass
+SF-079,genealogy,dpp_issue,generate DPP from shipment,pass
+SF-080,genealogy,recall_export,export evidence package for recall,pass
+SF-081,security,self_approval,requester tries to approve,block_sod
+SF-082,security,expired_session,privileged command with expired session,block_auth
+SF-083,security,totp_replay,reused challenge token,block_esign_replay
+SF-084,security,field_redaction,shopfloor role opens PII fields,redact_fields
+SF-085,security,stolen_tablet,offline device with cached work,force_reauth
+SF-086,security,prompt_injection,attachment contains AI prompt injection,ignore_ai_instruction
+SF-087,security,edge_fake_ready,adapter claims machine ready without approved mapping,block_ot_mutation
+SF-088,security,api_scope_mismatch,integration token calls admin command,block_permission
+SF-089,security,emergency_override,override without expiry,block_override
+SF-090,security,audit_delete_attempt,delete append-only audit row,block_and_alert
+SF-091,migration,shadow_write_fail,JSON success PG fail,mark_projection_stale
+SF-092,migration,fallback_read,PG primary falls back to JSON,alert_fallback
+SF-093,migration,unknown_status,legacy status not in registry,block_cutover
+SF-094,migration,duplicate_key,normalized duplicate part number,block_migration
+SF-095,migration,rerun_idempotent,migration rerun with same batch,pass_idempotent
+SF-096,migration,rollback_window,rollback from PG primary with dual write intact,controlled_rollback_only
+SF-097,migration,archive_used,API reads archived JSON in PG only mode,raise_p0
+SF-098,migration,drift_report_old,reconciliation stale,block_switch
+SF-099,migration,in_progress_rows,cutover with stale in_progress idempotency,block_switch
+SF-100,migration,backup_restore,restore drill executed,pass_restore_test

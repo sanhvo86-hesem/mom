@@ -1,0 +1,13 @@
+signal,source,labels,correlation_id,slo,alert,owner,dashboard,retention
+command_success_total,command_service,command root site yes,required,99.5% success excluding policy blocks,rate_drop,platform_backend,authority_health,90d
+command_failure_total,command_service,command error_code site yes,required,classified failures,unexpected_spike,platform_backend,authority_health,90d
+gate_failure_by_code,readiness_and_quality_gates,gate_code root site yes,required,top blockers visible,p0_gate_code_spike,operations,readiness_failures,180d
+fallback_read_total,data_layer,domain collection mode yes,required,zero in postgres_only,any_nonzero,platform_backend,migration_cutover_health,180d
+drift_count,reconciliation_jobs,domain severity yes,required,zero fatal drift,fatal_drift_nonzero,platform_backend,migration_cutover_health,365d
+outbox_lag_seconds,outbox_worker,event_name root yes,required,<60s p95,lag_breach,sre,authority_health,30d
+audit_write_failure_total,audit_spine,root command site yes,required,zero tolerated,any_nonzero,security,security_events,365d
+esign_failure_total,esign_service,root reason_code yes,required,<0.1% unexpected,unexpected_spike,quality_authority,eqms_gate_health,365d
+projection_stale_age_seconds,projection_workers,projection_name yes,required,<300s for runtime boards,staleness_breach,sre,authority_health,30d
+data_quality_score,data_quality_jobs,domain dimension owner yes,required,>=95 target,score_drop,data_governance,data_quality_board,365d
+generic_crud_block_count,generic_crud_guard,entity action yes,required,downward trend,unexpected_spike,platform_backend,security_events,180d
+ot_adapter_heartbeat_age_seconds,adapter_monitor,adapter_id machine_id yes,required,<120s for critical cells,heartbeat_stale,mes_execution,readiness_failures,30d

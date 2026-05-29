@@ -1,0 +1,4 @@
+gap_id,severity,why_not_fixed_now,owner,required_source_or_decision,acceptance_criterion,blocks_next_prompt
+GAP-P18-001,P2,Authoritative record shells are defined but not implemented in frontend routes and templates,frontend,Implement canonical routes and shell layouts,governed roots open in record shells with audit evidence and command actions,N
+GAP-P18-002,P2,Projection disable reasons and freshness banners still need runtime/UI wiring,frontend and sre,Implement UI badges and disabled state reason panels,workspaces never present hidden authority or unknown freshness,N
+GAP-P18-003,P2,Offline candidate queue and re-anchor UX remain design-only,frontend and mes_execution,Implement candidate capture and reconcile flows,mobile offline cannot mutate governed data without governed reconcile,N
