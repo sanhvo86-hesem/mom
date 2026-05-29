@@ -1,0 +1,346 @@
+openapi: "3.1.0"
+
+# ──────────────────────────────────────────────────────────────────────────────
+# HESEM UoM V3 OpenAPI supplement (P06 deliverable, closes HB-09).
+#
+# This file documents every /api/v1/uom/* route declared in
+# `mom/api/routes/uom-routes.php` against a shared RFC 9457 ProblemDetails
+# schema. The host repository's primary spec is `mom/api/openapi.yaml`
+# (3.1.2); this supplement mirrors the pattern used by
+# `mom/api/openapi-eqms-worldclass.yaml` and is meant to be consumed by
+# the same `tools/scripts/merge-openapi.php` merger.
+#
+# A drift test in `mom/tests/Feature/UomOpenApiContractTest.php` walks
+# both files and the routes file to ensure no route is undocumented.
+# ──────────────────────────────────────────────────────────────────────────────
+
+info:
+  title: HESEM UoM Measurement Intelligence API
+  version: 3.0.0-prototype
+  description: |
+    Pre-production prototype API for the HESEM UoM / Measurement
+    Conversion subsystem. Error responses follow RFC 9457 Problem
+    Details with a `problem_code` extension carrying the stable
+    HESEM error code.
+
+servers:
+  - url: https://eqms.hesemeng.com/api/v1
+    description: Prototype VPS (development/prototype only)
+
+tags:
+  - name: uom
+    description: HESEM UoM V3 Measurement Intelligence
+
+paths:
+  /uom/convert:
+    post:
+      tags: [uom]
+      summary: Convert a magnitude between two units.
+      operationId: uomConvert
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ConversionRequest' }
+      responses:
+        '200':
+          description: Successful conversion.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConversionResponse' }
+        '400': { $ref: '#/components/responses/ProblemDetails' }
+        '422': { $ref: '#/components/responses/ProblemDetails' }
+
+  /uom/units:
+    get:
+      tags: [uom]
+      summary: List units in the catalog.
+      operationId: uomListUnits
+      responses:
+        '200': { $ref: '#/components/responses/UnitList' }
+        '500': { $ref: '#/components/responses/ProblemDetails' }
+
+  /uom/units/{code}:
+    get:
+      tags: [uom]
+      summary: Get a single unit by canonical code.
+      operationId: uomGetUnit
+      parameters:
+        - in: path
+          name: code
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Unit record.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Unit' }
+        '404': { $ref: '#/components/responses/ProblemDetails' }
+
+  /uom/kinds:
+    get:
+      tags: [uom]
+      summary: List quantity kinds.
+      operationId: uomListKinds
+      responses:
+        '200':
+          description: Quantity kind list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/QuantityKind' }
+
+  /uom/rules:
+    get:
+      tags: [uom]
+      summary: List conversion rules.
+      operationId: uomListRules
+      responses:
+        '200':
+          description: Rules list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ConversionRule' }
+
+  /uom/aliases/resolve:
+    post:
+      tags: [uom]
+      summary: Resolve a vendor / supplier alias to a canonical unit code.
+      operationId: uomResolveAlias
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AliasResolutionRequest' }
+      responses:
+        '200':
+          description: Resolution result.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AliasResolutionResponse' }
+        '422': { $ref: '#/components/responses/ProblemDetails' }
+
+  /uom/external-map/{system}/{code}:
+    get:
+      tags: [uom]
+      summary: Resolve an external system code (UNECE, OPC UA, …) to a HESEM unit.
+      operationId: uomResolveExternalCode
+      parameters:
+        - in: path
+          name: system
+          required: true
+          schema: { type: string, enum: [UNECE, OPC_UA, EDI, SAP, ORACLE] }
+        - in: path
+          name: code
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: External code resolution result.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExternalMapping' }
+        '404': { $ref: '#/components/responses/ProblemDetails' }
+
+  /uom/health:
+    get:
+      tags: [uom]
+      summary: Catalog/health stats.
+      operationId: uomHealth
+      responses:
+        '200':
+          description: Health/stats payload.
+
+  /uom/item-policy/{item_id}:
+    get:
+      tags: [uom]
+      summary: Resolve an item's UoM policy (8-level priority).
+      operationId: uomGetItemPolicy
+      parameters:
+        - in: path
+          name: item_id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Item policy resolution result.
+        '404': { $ref: '#/components/responses/ProblemDetails' }
+
+  /uom/item-packaging/{item_id}:
+    get:
+      tags: [uom]
+      summary: Resolve item packaging unit information.
+      operationId: uomGetItemPackaging
+      parameters:
+        - in: path
+          name: item_id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Packaging information.
+        '404': { $ref: '#/components/responses/ProblemDetails' }
+
+components:
+  responses:
+    UnitList:
+      description: Unit catalog list.
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/Unit' }
+    ProblemDetails:
+      description: RFC 9457 Problem Details response.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/ProblemDetails' }
+
+  schemas:
+    ProblemDetails:
+      description: |
+        RFC 9457 Problem Details payload. The HESEM extension
+        `problem_code` carries the stable machine-readable code
+        (e.g. UOM_CONTEXT_REQUIRED, UOM_KIND_MISMATCH).
+      type: object
+      required: [type, title, status, problem_code]
+      properties:
+        type:
+          type: string
+          format: uri
+          description: A URI reference identifying the problem type.
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 100
+          maximum: 599
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        problem_code:
+          type: string
+          description: HESEM stable problem code.
+          enum:
+            - UOM_UNIT_NOT_ACTIVE
+            - UOM_KIND_MISMATCH
+            - UOM_NO_CONVERSION_PATH
+            - UOM_BLOCKED_CURRENCY_IN_PHYSICAL_ENGINE
+            - UOM_INVALID_MAGNITUDE
+            - UOM_NEGATIVE_MAGNITUDE_FORBIDDEN
+            - UOM_MAGNITUDE_OVERFLOW
+            - UOM_UNIT_ITUOM_ONLY_NO_PHYSICAL_CONVERSION
+            - UOM_RULE_NOT_ACTIVE
+            - UOM_EXTERNAL_CODE_UNKNOWN
+            - UOM_RULE_NOT_FOUND
+            - UOM_RULE_VERSION_MISMATCH
+            - UOM_APPROVAL_ALREADY_RECORDED
+            - UOM_APPROVAL_STEP_MISSING
+            - UOM_INVALID_ADVISORY_TYPE
+            - UOM_ADVISORY_NOT_FOUND
+            - UOM_ADVISORY_ALREADY_REVIEWED
+            - UOM_INVALID_DECISION
+            - UOM_CONTEXT_REQUIRED
+            - UOM_CONTEXT_RULE_NOT_EFFECTIVE
+            - UOM_POLICY_NOT_FOUND
+            - UOM_METHOD_MISMATCH
+            - UOM_DENSITY_NOT_FOUND
+            - UOM_DENSITY_ZERO
+            - UOM_MANIFEST_INVALID_AUTHORITY
+            - UOM_MANIFEST_DUPLICATE
+            - UOM_MANIFEST_NOT_FOUND
+            - UOM_MANIFEST_INVALID_TRANSITION
+            - UOM_MANIFEST_NOT_ACTIVE
+            - UOM_PLANNER_MISUSE
+            - UOM_ROUTE_NOT_IMPLEMENTED
+
+    ConversionRequest:
+      type: object
+      required: [magnitude, from_unit, to_unit]
+      properties:
+        magnitude:        { type: string, description: "BCMath-safe decimal string" }
+        from_unit:        { type: string }
+        to_unit:          { type: string }
+        display_precision:{ type: integer }
+        rounding_policy:  { type: string, default: ROUND_HALF_EVEN }
+        context:          { type: object, additionalProperties: true }
+
+    ConversionResponse:
+      type: object
+      required: [result, from_unit, to_unit, measval]
+      properties:
+        result:    { type: string }
+        from_unit: { type: string }
+        to_unit:   { type: string }
+        measval:   { $ref: '#/components/schemas/Measval' }
+
+    Measval:
+      type: object
+      description: MEASVAL V2 evidence envelope (see P03 report).
+      properties:
+        input:              { type: object }
+        display:            { type: object }
+        normalization:      { type: object }
+        precision_envelope: { type: object }
+        evidence:           { type: object }
+        digital_thread:
+          type: object
+          properties:
+            audit_hash:
+              type: string
+              pattern: '^[0-9a-f]{64}$'
+            hash_algorithm:
+              type: string
+              enum: [SHA-256]
+
+    Unit:
+      type: object
+      required: [canonical_code, lifecycle_status]
+      properties:
+        canonical_code:   { type: string }
+        display_symbol:   { type: string }
+        quantity_kind_code: { type: string }
+        lifecycle_status: { type: string }
+
+    QuantityKind:
+      type: object
+      properties:
+        kind_code:      { type: string }
+        si_base_code:   { type: string, nullable: true }
+
+    ConversionRule:
+      type: object
+      properties:
+        rule_code:    { type: string }
+        rule_version: { type: integer }
+        lifecycle_status: { type: string }
+        standard_library_manifest_id: { type: string, nullable: true }
+
+    AliasResolutionRequest:
+      type: object
+      required: [raw_alias]
+      properties:
+        raw_alias: { type: string }
+        context:   { type: object, additionalProperties: true }
+
+    AliasResolutionResponse:
+      type: object
+      properties:
+        resolved_code:  { type: string, nullable: true }
+        is_quarantined: { type: boolean }
+        review_status:  { type: string }
+
+    ExternalMapping:
+      type: object
+      properties:
+        system:           { type: string }
+        external_code:    { type: string }
+        canonical_code:   { type: string, nullable: true }
+        opc_ua_unit_id:   { type: integer, nullable: true }
+        unece_common_code:{ type: string,  nullable: true }
