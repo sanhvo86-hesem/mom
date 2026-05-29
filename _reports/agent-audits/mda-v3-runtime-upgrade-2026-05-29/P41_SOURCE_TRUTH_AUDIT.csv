@@ -1,0 +1,13 @@
+source_path,evidence_found,classification,p41_impact,gap_or_decision
+_reports/agent-audits/mda-v3-runtime-upgrade-2026-05-29/P40_HANDOFF_PACKET.md,P40_PASS_WITH_CONTROLLED_GAPS with browser UI sync and persistence gaps,previous_handoff,P41 must score controlled gaps honestly,NO_GO unless closed by evidence
+_reports/agent-audits/mda-v3-runtime-upgrade-2026-05-29/MDA_V3_P0_P1_BLOCKER_REGISTER.csv,15 P0 blockers and 57 P1/partial/open blockers counted by runner,blocker_source,Open P0 blocks final pass,P41_BLOCKED_RUNTIME_AUTHORITY_RISK
+_reports/agent-audits/mda-v3-runtime-upgrade-2026-05-29/MDA_V3_DOMAIN_RUNTIME_MATURITY_SCORECARD.csv,0 roots allow runtime claim,evidence_source,Design/service gates cannot be marketed as runtime-complete,design_only_claim_downgraded
+_reports/agent-audits/mda-v3-runtime-upgrade-2026-05-29/MDA_V3_RUNTIME_PROOF_MATRIX.csv,ROOT-RDT-001 added for final scorecard and open blockers listed,proof_source,Final evidence path is explicit but blocked,Repair implemented
+mom/tools/run_mda_runtime_red_team_scorecard.php,CLI scorecard returns NO_GO and P41_BLOCKED_RUNTIME_AUTHORITY_RISK,executable_evidence,Score is computed from repo evidence not narrative,Repair implemented
+mom/api/services/MdaRuntimeRedTeamScorecardService.php,service blocks on open P0 JSON_ONLY runtime command scenario gap restore drill gap and bypass gap,service_evidence,Converts P41 required simulations into executable score rules,Repair implemented
+mom/tests/Unit/Services/MdaRuntimeRedTeamScorecardServiceTest.php,unit tests specify open P0 JSON_ONLY restore gap and P1 controlled gap behavior,test_evidence,Test file exists but PHPUnit vendor missing locally,Controlled gap
+php mom/tools/audit_runtime_authority_consistency.php,local runtime mode JSON_ONLY database_configured=false postgres_reachable=false,runtime_probe,Runtime authority cannot be claimed,Block final readiness
+mom/tools/run_mda_executable_scenarios.php,P38 static contract runner exists and executed 200 scenarios previously,scenario_evidence,Static runner is not real command-stack execution,GAP-P19-003 remains open
+mom/database/migrations/241_runtime_cutover_control_tower.sql,restore drill evidence tables exist from P37,schema_evidence,Physical anchor exists but actual restore drill is missing,GAP-P15-001 remains open
+mom/api/controllers/GenericCrudController.php,governed generic hard-stop exists and grew through P40,bypass_guard,Mitigation exists but all command middleware integration is not complete,P23-P0-003 remains open
+docs/backend/RUNTIME_AUTHORITY_MAP.md,POSTGRES_PRIMARY/POSTGRES_ONLY semantics documented,architecture_source,Local JSON_ONLY is below target authority mode,Block final readiness

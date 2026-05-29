@@ -1,0 +1,9 @@
+gap_id,severity,status,owner,next_prompt,description,repair_done,remaining_work
+GAP-P41-001,P1,open,platform_architecture_domain_owners,NEXT_IMPLEMENTATION,Final scorecard is static evidence evaluation not live runtime certification,scorecard service and CLI runner added,close runtime blockers and rerun against live environment
+P23-P1-052,P1,partially_repaired,platform_architecture_domain_owners,NEXT_IMPLEMENTATION,red-team score rerun on implementation,P41 scorecard runner executed and returned NO_GO,rerun after P0/P1 closure
+P23-P0-001,P0,open,master_data,NEXT_IMPLEMENTATION,master data commands use PostgreSQL authority or verified bridge,physical slices exist across V3,wire live handlers and authority probes
+P23-P0-002,P0,open,master_data,NEXT_IMPLEMENTATION,authorityProbe no longer reports compatibility_only,not repaired by P41,replace compatibility-only governed master data probes
+P23-P0-003,P0,open,cross_domain,NEXT_IMPLEMENTATION,all governed mutations execute only through command APIs,Generic CRUD hard-stops expanded,wire every governed command path and block legacy mutation bypass
+P23-P1-049,P1,open,platform_architecture_domain_owners,NEXT_IMPLEMENTATION,critical scenarios run against real command stack,P38 static runner exists,implement runtime_command scenario driver
+P23-P1-055,P1,open,frontend_operator_experience,NEXT_IMPLEMENTATION,operator browser UI consumes record shell workspace freshness and disabled action contracts,P40 contracts exist,wire browser UI and deploy smoke
+P23-P1-056,P1,open,frontend_mes_execution,NEXT_IMPLEMENTATION,offline candidates reconcile through governed command stack before commit,P40 candidate gate exists,integrate SyncManager with governed command reconciliation
