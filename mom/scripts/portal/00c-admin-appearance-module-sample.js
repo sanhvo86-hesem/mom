@@ -37,32 +37,25 @@
 
   function buttonsSection(L){
     var body = ''
-      + '<div style="display:flex;flex-direction:column;gap:18px">'
-      +   '<div>'
-      +     '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px">'+esc(L('Cả 4 biến thể đứng cùng baseline — height = control-h-md','All four variants share a baseline — height = control-h-md'))+'</div>'
-      +     '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
-      +       '<button class="o3-btn o3-btn--primary">Primary</button>'
-      +       '<button class="o3-btn o3-btn--success">Success</button>'
-      +       '<button class="o3-btn o3-btn--danger">Danger</button>'
-      +       '<button class="o3-btn">Default</button>'
-      +       '<button class="o3-btn o3-btn--ghost">Ghost</button>'
-      +       '<button class="o3-btn" disabled>Disabled</button>'
-      +     '</div>'
+      + '<div style="display:flex;flex-direction:column;gap:14px">'
+      +   '<div style="font-size:12px;color:var(--text-secondary)">'
+      +     esc(L('SSOT chuẩn HESEM (2026-05-28): MỘT kích thước duy nhất = control.height.standard (36px). Không có sm/lg. Nếu cần kích thước khác phải đăng ký token mới qua Authority.',
+      +           'HESEM SSOT rule (2026-05-28): ONE size only = control.height.standard (36px). No sm/lg. Other sizes require a new Authority token.'))
       +   '</div>'
-      +   '<div>'
-      +     '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px">'+esc(L('3 kích thước — control-h-sm / md / lg','3 sizes — control-h-sm / md / lg'))+'</div>'
-      +     '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
-      +       '<button class="o3-btn o3-btn--sm o3-btn--primary">Small (sm)</button>'
-      +       '<button class="o3-btn o3-btn--primary">Medium (md)</button>'
-      +       '<button class="o3-btn o3-btn--lg o3-btn--primary">Large (lg)</button>'
-      +     '</div>'
+      +   '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
+      +     '<button class="o3-btn o3-btn--primary">Primary</button>'
+      +     '<button class="o3-btn o3-btn--success">Success</button>'
+      +     '<button class="o3-btn o3-btn--danger">Danger</button>'
+      +     '<button class="o3-btn">Default</button>'
+      +     '<button class="o3-btn o3-btn--ghost">Ghost</button>'
+      +     '<button class="o3-btn" disabled>Disabled</button>'
       +   '</div>'
       + '</div>';
     return {
       id: 'buttons',
       label_vi: 'Nút bấm', label_en: 'Buttons',
       body_html: body,
-      tokens: ['control.height.sm','control.height.md','control.height.lg','spacing.sm','spacing.md','spacing.lg','radius.md','brand.primary','brand.primaryHover','status.success.light','status.danger.light']
+      tokens: ['control.height.standard','spacing.md','spacing.lg','radius.md','brand.primary','brand.primaryHover','status.success.light','status.danger.light']
     };
   }
 
@@ -83,7 +76,7 @@
       id: 'tabs',
       label_vi: 'Tabs workspace', label_en: 'Workspace tabs',
       body_html: body,
-      tokens: ['control.height.lg','spacing.md','spacing.lg','brand.primary','colorsLight.borderSubtle']
+      tokens: ['control.height.standard','spacing.md','spacing.lg','brand.primary','colorsLight.borderSubtle']
     };
   }
 
@@ -130,7 +123,7 @@
       id: 'chips',
       label_vi: 'Chip / Badge', label_en: 'Chips / Badges',
       body_html: body,
-      tokens: ['control.height.sm','spacing.xs','spacing.sm','radius.pill','status.success.soft','status.warning.soft','status.danger.soft','status.info.soft','status.neutral.soft']
+      tokens: ['control.height.standard','spacing.xs','spacing.sm','radius.pill','status.success.soft','status.warning.soft','status.danger.soft','status.info.soft','status.neutral.soft']
     };
   }
 
@@ -152,7 +145,7 @@
       id: 'toolbar',
       label_vi: 'Toolbar', label_en: 'Toolbar',
       body_html: body,
-      tokens: ['control.height.md','spacing.md','spacing.lg','radius.lg','colorsLight.bgSurface','colorsLight.borderSubtle']
+      tokens: ['control.height.standard','spacing.md','spacing.lg','radius.lg','colorsLight.bgSurface','colorsLight.borderSubtle']
     };
   }
 
@@ -280,37 +273,33 @@
     }).join('');
 
     return ''
-      + '<div style="padding:16px 0">'
+      // Compact intro — 8px padding, no margin-bottom gap (next element handles spacing)
+      + '<div style="padding:10px 12px;background:var(--bg-surface-alt,#f1f5f9);border:1px solid var(--border);border-radius:8px;margin-bottom:10px">'
+      +   '<div style="font-weight:600;font-size:12px;color:var(--text-primary)">' + esc(L('🎛️ Module Sample — SSOT cho mọi thành phần đồ họa', '🎛️ Module Sample — SSOT for every reusable graphic component')) + '</div>'
+      +   '<div style="font-size:11px;color:var(--text-secondary);line-height:1.45;margin-top:2px">' + esc(L(
+              'Mọi module frontend mới PHẢI dùng pattern + token ở đây — không được tự dựng hex hay chiều cao. Migration 213 + 214 chốt MỘT chuẩn duy nhất cho control-height (36px).',
+              'Every new frontend module MUST reuse these patterns + tokens — no hex or one-off heights. Migrations 213+214 lock ONE standard control-height (36px).')) + '</div>'
+      + '</div>'
 
-      // Intro
-      +   '<div style="padding:14px 16px;background:var(--bg-surface-alt,#f1f5f9);border:1px solid var(--border);border-radius:8px;margin-bottom:16px">'
-      +     '<div style="font-weight:600;font-size:13px;color:var(--text-primary);margin-bottom:4px">' + esc(L('🎛️ Module Sample — SSOT cho mọi thành phần đồ họa', '🎛️ Module Sample — SSOT for every reusable graphic component')) + '</div>'
-      +     '<div style="font-size:12px;color:var(--text-secondary);line-height:1.5">' + esc(L(
-                'Mỗi thành phần dưới đây tiêu thụ tokens đã đăng ký trong graphics_token_catalog (migration 213). Mọi module frontend mới PHẢI dùng các pattern này, không được tự dựng hex hoặc đặt chiều cao tuỳ ý. Nếu cần biến thể mới, đăng ký token trong Authority trước, sau đó tham chiếu ở đây.',
-                'Every component below consumes tokens registered in graphics_token_catalog (migration 213). All new frontend modules MUST reuse these patterns — never invent fresh hex literals or arbitrary heights. To add a variant, register the token in the Authority first, then reference it here.')) + '</div>'
+      // Inner tab strip — tight
+      + '<div class="hm-tabs" role="tablist" style="margin-bottom:10px">' + innerTabsHtml + '</div>'
+
+      // Two-column layout filling full width, no max-width cap, no orphan bottom space
+      + '<div style="display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:12px;align-items:stretch">'
+
+      //   Left: live preview — stretches to right column height; padding tightened
+      +   '<div style="padding:14px;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px">'
+      +     active.body_html
       +   '</div>'
 
-      // Inner tab strip
-      +   '<div class="hm-tabs" role="tablist" style="margin-bottom:16px">' + innerTabsHtml + '</div>'
-
-      // Two-column layout: preview + token list
-      +   '<div style="display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:20px;align-items:start">'
-
-      // Left: live preview
-      +     '<div style="padding:20px;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;min-height:240px">'
-      +       active.body_html
-      +     '</div>'
-
-      // Right: token whitelist
-      +     '<aside style="padding:16px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border);border-radius:10px">'
-      +       '<div style="font-weight:600;font-size:12px;color:var(--text-primary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">' + esc(L('Tokens điều khiển','Controlling tokens')) + '</div>'
-      +       '<ul style="margin:0;padding-left:0;list-style:none">' + tokenItems + '</ul>'
-      +       '<div style="margin-top:12px;font-size:11px;color:var(--text-secondary);line-height:1.5">' + esc(L(
-                  'Mở tab "Tokens" hoặc "Components" cùng cấp để chỉnh giá trị; mọi thay đổi đều phải qua mô phỏng WCAG trước khi publish.',
-                  'Use the "Tokens" or "Components" sub-tabs to tune values; every change must pass WCAG simulation before publishing.')) + '</div>'
-      +     '</aside>'
-
-      +   '</div>'
+      //   Right: token whitelist; no min-height so it doesn't introduce empty space
+      +   '<aside style="padding:12px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border);border-radius:10px">'
+      +     '<div style="font-weight:600;font-size:11px;color:var(--text-primary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">' + esc(L('Tokens điều khiển','Controlling tokens')) + '</div>'
+      +     '<ul style="margin:0;padding-left:0;list-style:none">' + tokenItems + '</ul>'
+      +     '<div style="margin-top:8px;font-size:10px;color:var(--text-secondary);line-height:1.45">' + esc(L(
+                'Chỉnh giá trị ở tab "Token hệ thống". Mọi thay đổi đều phải qua mô phỏng WCAG trước khi publish.',
+                'Edit values in the "Tokens" sub-tab. Every change must pass WCAG simulation before publishing.')) + '</div>'
+      +   '</aside>'
       + '</div>';
   };
 })();

@@ -158,16 +158,36 @@ motion durations, or any other visual token in JS, inline style, or HTML.**
   heights in a toolbar, mismatched paddings, free-floating hex literals)
   must be reported and fixed BEFORE they ship — the answer is never
   "add a one-off CSS rule in the module's own stylesheet."
-- **Control-height triad.** The single biggest source of visual drift was
-  buttons/tabs/inputs computing their own heights from per-component
-  padding. Three tokens fix this: `control.height.sm` (28px),
-  `control.height.md` (36px), `control.height.lg` (44px). Every
-  interactive control must adopt one of the three via the CSS variable
-  `--o3-control-h-{sm|md|lg}` (or the equivalent in any future module's
-  token prefix). When a toolbar contains a chip-button, a search input,
-  and a primary button, they must all use `control.height.md`. If you
-  build a component whose height doesn't snap to this triad, audit the
-  Graphics Authority for an explanation and update the token if needed.
+- **Single-standard control-height (one size, no variants).** HESEM SSOT
+  rule (2026-05-28, migration 223): every interactive control —
+  button, tab, input, chip-button, search — uses ONE height,
+  `control.height.standard` (36px), via the CSS variable
+  `--o3-control-h-standard`. The previous triad (sm/md/lg) is dropped;
+  legacy aliases stay alive for one release as a transitional safety
+  net. If you genuinely need a denser or larger size, propose a new
+  token via the Authority + run simulation evidence first — never
+  hardcode a one-off height. This rule eliminates an entire class of
+  visual-drift bugs (toolbars where chips, buttons and inputs end up
+  at different heights).
+- **Maximum space utilization (no orphan gutters).** Admin and module
+  surfaces must dedicate every available pixel to actual work content.
+  Concrete rules:
+  - No artificial `max-width` caps on admin pages (the 1120px cap in
+    00c-admin-appearance.js was deleted 2026-05-28 — never add one
+    back). Use `width:100%` for the outer wrapper.
+  - Module shells use `body.{module}-active` class trick to zero the
+    global `#page-{module}` 24px padding (see
+    `body.orders-v3-active #page-orders.active{padding:0}` in
+    orders-v3.css).
+  - Empty bottom space below content is a bug. Either fill it with
+    content, or anchor an action bar to the bottom of the available
+    height.
+  - Padding inside panels: prefer `spacing.lg` (16px) over `xl` (24px)
+    unless the design contract explicitly says otherwise. Stack gaps
+    `spacing.md` (12px) by default, not `xl`.
+  - When designing a new sub-tab, the right-side aside (if any) must
+    NOT introduce a min-height that creates orphan space below the
+    main column.
 
 ## MANDATORY: HMV4 Wave 1 Frontend Slice Program
 
