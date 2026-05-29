@@ -169,6 +169,31 @@ motion durations, or any other visual token in JS, inline style, or HTML.**
   hardcode a one-off height. This rule eliminates an entire class of
   visual-drift bugs (toolbars where chips, buttons and inputs end up
   at different heights).
+- **Master density — ONE knob controls all gaps.** HESEM SSOT rule
+  (2026-05-29, migration 227): the entire UI density is governed by
+  TWO tokens only.
+  - `space.master` (8px) → 99% of gaps. CSS var: `--o3-space` (or
+    `--master-gap` in master-density.css).
+  - `space.section` (12px) → ONLY top-level section dividers
+    (between panels). CSS var: `--o3-space-section` (or
+    `--section-gap`).
+  Same for corners:
+  - `radius.master` (4px) → every control. CSS var: `--o3-radius`
+    (or `--master-radius`).
+  - `radius.card` (8px) → every container. CSS var:
+    `--o3-radius-card` (or `--card-radius`).
+  - `radius.pill` (999px) → special-purpose only (chips, badges).
+  The deprecated 7-level spacing scale (xs/sm/md/lg/xl/2xl/3xl) and
+  3-level radius scale (sm/md/lg) are aliased to one of the two
+  masters for back-compat — do NOT use them in new code. Read Linear,
+  Vercel, Bloomberg Terminal density patterns: one master multiplier
+  scales the whole UI. Admins tune density via the Graphics tab; one
+  edit ripples everywhere.
+- **Scrollbar — HESEM amber, no exceptions.** The default scrollbar
+  thumb is `brand.accent` (#f9a825), track is `brand.accentLight`
+  soft. Defined globally in `master-density.css`. Do not override
+  scrollbar colors per module; if a module needs a different scrollbar,
+  flag it as a design exception requiring approval.
 - **Maximum space utilization (no orphan gutters).** Admin and module
   surfaces must dedicate every available pixel to actual work content.
   Concrete rules:

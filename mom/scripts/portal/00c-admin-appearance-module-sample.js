@@ -219,8 +219,67 @@
     };
   }
 
+  /* ── Master Density section ───────────────────────────────────────
+   * The single knob that controls 99% of the UI's whitespace. Renders
+   * a live preview that shrinks/grows as the slider moves; the slider
+   * stages a change into the Graphics Authority draft buffer (same
+   * pipeline as every other token edit). */
+  function densitySection(L){
+    var body = ''
+      + '<div style="display:flex;flex-direction:column;gap:14px">'
+      +   '<div style="font-size:12px;color:var(--text-secondary);line-height:1.5">'
+      +     esc(L(
+              'MỘT thanh trượt điều khiển toàn bộ khe hở giữa các thành phần. Kéo để xem UI co/giãn theo thời gian thực. Bấm "Lưu cho tổ chức" để publish thay đổi qua mô phỏng WCAG.',
+              'ONE slider controls every gap in the UI. Drag to see the UI compress/expand in real time. Click "Save for org" to publish through WCAG simulation.'))
+      +   '</div>'
+
+      +   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+      +     '<label style="display:flex;flex-direction:column;gap:4px">'
+      +       '<span style="font-size:11px;font-weight:600;color:var(--text-primary)">space.master</span>'
+      +       '<input id="o3-density-master" type="range" min="4" max="16" step="1" value="8" />'
+      +       '<span id="o3-density-master-val" style="font-family:ui-monospace,monospace;font-size:11px;color:var(--text-secondary)">8px</span>'
+      +     '</label>'
+      +     '<label style="display:flex;flex-direction:column;gap:4px">'
+      +       '<span style="font-size:11px;font-weight:600;color:var(--text-primary)">space.section</span>'
+      +       '<input id="o3-density-section" type="range" min="8" max="24" step="1" value="12" />'
+      +       '<span id="o3-density-section-val" style="font-family:ui-monospace,monospace;font-size:11px;color:var(--text-secondary)">12px</span>'
+      +     '</label>'
+      +   '</div>'
+
+      +   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+      +     '<label style="display:flex;flex-direction:column;gap:4px">'
+      +       '<span style="font-size:11px;font-weight:600;color:var(--text-primary)">radius.master</span>'
+      +       '<input id="o3-density-radius" type="range" min="0" max="12" step="1" value="4" />'
+      +       '<span id="o3-density-radius-val" style="font-family:ui-monospace,monospace;font-size:11px;color:var(--text-secondary)">4px</span>'
+      +     '</label>'
+      +     '<label style="display:flex;flex-direction:column;gap:4px">'
+      +       '<span style="font-size:11px;font-weight:600;color:var(--text-primary)">radius.card</span>'
+      +       '<input id="o3-density-card" type="range" min="0" max="16" step="1" value="8" />'
+      +       '<span id="o3-density-card-val" style="font-family:ui-monospace,monospace;font-size:11px;color:var(--text-secondary)">8px</span>'
+      +     '</label>'
+      +   '</div>'
+
+      +   '<div style="margin-top:8px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--card-radius,8px)">'
+      +     '<div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px">'+esc(L('Preview cùng density:','Preview at current density:'))+'</div>'
+      +     '<div style="display:flex;gap:var(--master-gap,8px);align-items:center;padding:var(--master-gap,8px);background:var(--bg-surface-alt);border-radius:var(--card-radius,8px)">'
+      +       '<button class="o3-btn o3-btn--primary">Primary</button>'
+      +       '<button class="o3-btn">Default</button>'
+      +       '<span class="o3-chip o3-chip--info">🤖 chip</span>'
+      +       '<span class="o3-chip o3-chip--success">✓ chip</span>'
+      +     '</div>'
+      +   '</div>'
+      + '</div>';
+    return {
+      id: 'density',
+      label_vi: 'Khe hở (Master)', label_en: 'Gap (Master)',
+      body_html: body,
+      tokens: ['space.master','space.section','radius.master','radius.card']
+    };
+  }
+
   function sections(L){
     return [
+      densitySection(L),
       buttonsSection(L),
       tabsSection(L),
       kpiSection(L),
@@ -233,10 +292,51 @@
   }
 
   // Internal state — which inner tab is active inside the Module Sample tab.
-  var _activeSection = 'buttons';
+  // Default to 'density' since the master gap knob is the first thing
+  // an admin should see when they open Module Sample.
+  var _activeSection = 'density';
+
+  // Wire the density sliders to live CSS variable updates + stage the
+  // changes into GraphicsAuthority's draft buffer so the existing
+  // "Save for org" pipeline (WCAG sim + commit) handles publish.
+  function wireDensitySliders(){
+    var pairs = [
+      ['o3-density-master',  'o3-density-master-val',  '--master-gap',    '--o3-space',         'space.master'],
+      ['o3-density-section', 'o3-density-section-val', '--section-gap',   '--o3-space-section', 'space.section'],
+      ['o3-density-radius',  'o3-density-radius-val',  '--master-radius', '--o3-radius',        'radius.master'],
+      ['o3-density-card',    'o3-density-card-val',    '--card-radius',   '--o3-radius-card',   'radius.card']
+    ];
+    pairs.forEach(function(p){
+      var input = document.getElementById(p[0]);
+      var out   = document.getElementById(p[1]);
+      if (!input) return;
+      // Reflect current root value if available
+      var current = getComputedStyle(document.documentElement).getPropertyValue(p[2]).trim()
+                 || getComputedStyle(document.documentElement).getPropertyValue(p[3]).trim();
+      if (current) {
+        var n = parseInt(current, 10);
+        if (!isNaN(n)) { input.value = n; if (out) out.textContent = n + 'px'; }
+      }
+      input.addEventListener('input', function(){
+        var v = input.value + 'px';
+        document.documentElement.style.setProperty(p[2], v);
+        document.documentElement.style.setProperty(p[3], v);
+        if (out) out.textContent = v;
+        // Stage into Authority draft if available (legacy bridge)
+        try {
+          if (typeof window._hmSetWithUnit === 'function') {
+            window._hmSetWithUnit(p[2], p[4], parseInt(input.value, 10), 'px');
+          } else if (window.GraphicsAuthority && window.GraphicsAuthority.tokens
+                     && typeof window.GraphicsAuthority.tokens.stage === 'function') {
+            window.GraphicsAuthority.tokens.stage(p[4], v);
+          }
+        } catch (e) { /* non-fatal — preview still works */ }
+      });
+    });
+  }
 
   window._admModuleSampleSetSection = function(id){
-    _activeSection = id || 'buttons';
+    _activeSection = id || 'density';
     // Re-render only the Module Sample panel
     var panel = document.getElementById('adm-appearance-panel-module-sample');
     if (panel && typeof window._renderAdmModuleSampleHtml === 'function') {
@@ -244,8 +344,30 @@
         ? function(vi,en){ return en || vi; }
         : function(vi,en){ return vi || en; };
       panel.innerHTML = window._renderAdmModuleSampleHtml(L);
+      // If density section is active, wire the sliders
+      if (_activeSection === 'density') wireDensitySliders();
     }
   };
+
+  // Observe DOM for the module-sample panel being inserted, then wire
+  // sliders once for the initial paint. After that, the section setter
+  // handles re-wiring on sub-tab switches.
+  var _wiredInitial = false;
+  function tryInitialWire(){
+    if (_wiredInitial) return;
+    var hasSliders = document.getElementById('o3-density-master');
+    if (hasSliders) {
+      wireDensitySliders();
+      _wiredInitial = true;
+    }
+  }
+  if (typeof MutationObserver !== 'undefined') {
+    var mo = new MutationObserver(function(){ tryInitialWire(); });
+    try { mo.observe(document.body, { childList: true, subtree: true }); }
+    catch (e) { /* DOM not ready yet — defer */ setTimeout(function(){
+      try { mo.observe(document.body, { childList: true, subtree: true }); } catch(e2){}
+    }, 1000); }
+  }
 
   /* renderAdmModuleSampleHtml(L)
    * Used by 00c-admin-appearance.js render() to fill the bodies map.
@@ -253,6 +375,9 @@
    * Returns the full inner HTML of the panel (not wrapped in #adm-appearance-panel-module-sample).
    */
   window._renderAdmModuleSampleHtml = function(L){
+    // Reset wire flag so the next render rewires (because sub-tab
+    // changes recreate the slider DOM)
+    _wiredInitial = false;
     L = L || function(vi,en){ return vi || en; };
     var secs = sections(L);
     var active = secs.find(function(s){ return s.id === _activeSection; }) || secs[0];

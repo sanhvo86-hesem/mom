@@ -1,0 +1,213 @@
+/* ════════════════════════════════════════════════════════════════════════
+ * Master density + scrollbar theme
+ *
+ * HESEM industrial-design rule (2026-05-29):
+ *   • ONE master gap value (--master-gap) controls 99% of spacings.
+ *   • ONE section-level gap (--section-gap) for top-level dividers.
+ *   • ONE master radius (--master-radius) for every interactive control.
+ *   • ONE card radius (--card-radius) for every container.
+ *   • Scrollbars adopt HESEM amber globally.
+ *
+ * This file is loaded AFTER portal.main.css so it overrides the wider
+ * legacy spacings without modifying the frozen file. Selectors are
+ * scoped to admin surfaces and the orders-v3 module so we don't break
+ * unrelated pages.
+ *
+ * To adjust HESEM density everywhere at once, update --master-gap on
+ * the :root selector via the admin Graphics tab (token: space.master).
+ * ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Industrial-design master density. Aligned with graphics_token_catalog
+     rows: space.master, space.section, radius.master, radius.card. */
+  --master-gap:    8px;
+  --section-gap:   12px;
+  --master-radius: 4px;
+  --card-radius:   8px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Scrollbar — HESEM amber. WebKit + Firefox.
+ * Applies globally because scrollbars should feel consistent across the
+ * whole portal, not just one module. The amber matches HESEM's
+ * brand.accent token and pops against neutral surfaces without
+ * dominating attention.
+ * ════════════════════════════════════════════════════════════════════════ */
+:root {
+  --hesem-scrollbar-track: #fef3c7;
+  --hesem-scrollbar-thumb: #f9a825;
+  --hesem-scrollbar-thumb-hover: #d97706;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--hesem-scrollbar-thumb) var(--hesem-scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--hesem-scrollbar-track);
+  border-radius: var(--master-radius);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--hesem-scrollbar-thumb);
+  border-radius: var(--master-radius);
+  transition: background 0.15s ease-out;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--hesem-scrollbar-thumb-hover);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Admin Appearance — gap compression
+ *
+ * The old admin pages used 14–20px paddings and 16–24px margins between
+ * sections — way too generous on wide monitors. Scoped overrides squeeze
+ * everything to master/section without modifying the giant
+ * 00c-admin-appearance.js file (which uses many inline styles).
+ * ════════════════════════════════════════════════════════════════════════ */
+
+/* Page-level wrapper */
+#admin-content,
+#page-admin .page-body {
+  padding: var(--master-gap) !important;
+}
+
+/* The admin two-column shell — left nav + right content */
+#admin-content > div[style*="display:grid"],
+#admin-content > div[style*="display: grid"] {
+  gap: var(--master-gap) !important;
+}
+
+/* All hm-page-header / page header blocks */
+#admin-content .hm-page-header {
+  margin-bottom: var(--master-gap) !important;
+  padding-bottom: var(--master-gap) !important;
+}
+
+#admin-content .hm-page-title {
+  font-size: 16px !important;
+  margin: 0 !important;
+}
+
+/* Tab strips inside admin */
+#admin-content .hm-tabs {
+  margin-bottom: var(--master-gap) !important;
+  gap: 2px !important;
+}
+
+#admin-content .hm-tab {
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+}
+
+#admin-content .hm-tab-icon {
+  font-size: 13px;
+  margin-right: 4px;
+}
+
+/* Panel-like sections (the "Mặt phẳng điều khiển đồ họa" wrapper) */
+#admin-content section,
+#admin-content > div > div {
+  margin-bottom: var(--master-gap);
+}
+
+#admin-content section + section {
+  margin-top: var(--master-gap);
+}
+
+/* The admin left sidebar — compress row padding */
+#admin-content > div > div:first-child > div,
+#admin-content .admin-sidebar > div,
+#admin-content nav[class*="admin"] li,
+#admin-content nav[class*="admin"] a {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+
+/* Compact every notice/banner inside admin */
+#admin-content div[style*="border-radius"][style*="padding"] {
+  /* Cannot guarantee tightening without breaking, so leave structural
+     padding alone; only round corners adopt master radius. */
+}
+
+/* Round-corner master alignment for admin panels */
+#admin-content [style*="border-radius:6px"],
+#admin-content [style*="border-radius: 6px"],
+#admin-content [style*="border-radius:8px"],
+#admin-content [style*="border-radius: 8px"],
+#admin-content [style*="border-radius:10px"],
+#admin-content [style*="border-radius: 10px"] {
+  border-radius: var(--card-radius) !important;
+}
+
+#admin-content button[style*="border-radius"],
+#admin-content input[style*="border-radius"],
+#admin-content select[style*="border-radius"] {
+  border-radius: var(--master-radius) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Module Sample tab — inherit master density.
+ * The sub-tab is scoped under #adm-appearance-panel-module-sample which
+ * already lives inside #admin-content.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+#adm-appearance-panel-module-sample > div {
+  padding: 0 !important;
+}
+
+#adm-appearance-panel-module-sample > div:first-child {
+  padding: var(--master-gap) !important;
+  margin-bottom: var(--master-gap) !important;
+}
+
+/* The inner Module Sample tab strip */
+#adm-appearance-panel-module-sample > .hm-tabs {
+  margin-bottom: var(--master-gap) !important;
+}
+
+/* The two-column preview + token sidebar */
+#adm-appearance-panel-module-sample > div[style*="grid-template-columns"] {
+  gap: var(--master-gap) !important;
+}
+
+#adm-appearance-panel-module-sample > div[style*="grid-template-columns"] > div,
+#adm-appearance-panel-module-sample > div[style*="grid-template-columns"] > aside {
+  padding: var(--master-gap) !important;
+  border-radius: var(--card-radius) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Orders v3 — explicit density wiring (most already inherits via
+ * orders-v3.css, this block is the safety net for any inline style
+ * that bypassed the token).
+ * ════════════════════════════════════════════════════════════════════════ */
+
+body.orders-v3-active .o3-shell__body {
+  padding: var(--master-gap);
+  gap: var(--master-gap);
+}
+
+body.orders-v3-active .o3-shell__topbar {
+  padding: 6px var(--master-gap);
+}
+
+body.orders-v3-active .o3-shell__title {
+  font-size: 16px;
+}
+
+body.orders-v3-active .o3-shell__subtitle {
+  font-size: 11px;
+}
+
+body.orders-v3-active .o3-toolbar {
+  padding: 6px var(--master-gap);
+  gap: var(--master-gap);
+}
