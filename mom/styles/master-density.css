@@ -242,3 +242,19 @@ body.sidebar-collapsed .o3-props-dock,body.is-sidebar-collapsed .o3-props-dock,b
 .o3-props-dock__footer button.is-primary{background:var(--o3-brand,#0c4a6e);border-color:var(--o3-brand,#0c4a6e);color:var(--o3-text-inverse,#fff)}
 .o3-props-dock__footer button.is-primary:hover{background:var(--o3-brand-hover,#075985)}
 @media (max-width:1280px){body.module-master-active.o3-dock-open #admin-content{margin-left:360px;transition:margin-left 180ms cubic-bezier(.4,0,.2,1)}}
+
+/* v3-G14: Custom override checkbox + inherited input styling */
+.o3-props-row{display:grid;grid-template-columns:18px 1fr auto;align-items:center;gap:8px;padding:6px 0;font-size:12px;border-bottom:1px dashed transparent;transition:border-color 120ms}
+.o3-props-row.is-custom{border-bottom-color:var(--o3-brand-soft,#e0f2fe)}
+.o3-props-row__custom{appearance:none;-webkit-appearance:none;width:14px;height:14px;border:1.5px solid var(--o3-border-default,#cbd5e1);border-radius:3px;cursor:pointer;background:var(--o3-surface-card,#fff);position:relative;transition:all 120ms;flex-shrink:0}
+.o3-props-row__custom:hover{border-color:var(--o3-brand,#0c4a6e)}
+.o3-props-row__custom:checked{background:var(--o3-brand,#0c4a6e);border-color:var(--o3-brand,#0c4a6e)}
+.o3-props-row__custom:checked::after{content:"";position:absolute;left:3px;top:0px;width:4px;height:8px;border:solid #fff;border-width:0 1.5px 1.5px 0;transform:rotate(45deg)}
+.o3-props-row__input.is-inherited{opacity:.55;cursor:not-allowed;background:var(--o3-surface-muted,#f8fafc)}
+.o3-props-row__input.is-custom{opacity:1;cursor:text;background:var(--o3-surface-card,#fff);border-color:var(--o3-brand,#0c4a6e)}
+
+/* Dark-mode dock fine-tuning */
+:root[data-color-mode="dark"] .o3-props-dock__panel{background:var(--o3-surface-card);border-color:var(--o3-border-subtle);box-shadow:8px 0 24px rgba(0,0,0,0.30)}
+:root[data-color-mode="dark"] .o3-props-dock__header{background:var(--o3-surface-muted)}
+:root[data-color-mode="dark"] .o3-props-row__input[type="number"],
+:root[data-color-mode="dark"] .o3-props-row__input[type="text"]{background:var(--o3-surface-page);color:var(--o3-text-strong);border-color:var(--o3-border-default)}

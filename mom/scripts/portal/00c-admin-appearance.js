@@ -1270,7 +1270,7 @@ function normalizeSubTab(subTab){
   // pointing to /tokens, /effects, /typography, /colors etc auto-
   // redirect to /module-sample so deep links don't 404.
   var aliases = { overview:'templates', typography:'module-sample', colors:'module-sample', layout:'module-sample', tokens:'module-sample', effects:'module-sample', a11y:'accessibility', export:'analytics', exports:'analytics', sample:'module-sample', samples:'module-sample', components:'module-sample' };
-  var valid = { templates:1, accessibility:1, analytics:1, governance:1, advanced:1, standard:1, 'module-sample':1 };
+  var valid = { templates:1, accessibility:1, analytics:1, governance:1, advanced:1, standard:1, 'module-sample':1, theme:1 };
   var resolved = aliases[subTab] || subTab || 'templates';
   return valid[resolved] ? resolved : 'templates';
 }
@@ -3954,6 +3954,10 @@ function render(el, subTab, currentLang){
      * Every new frontend module must consume tokens validated here.
      * Renderer lives in 00c-admin-appearance-module-sample.js. */
     {key:'module-sample',icon:'🧩', label:L('Module Master','Module Master')},
+    /* Global Theme tab (v3-G14) — controls font/density/motion/dark
+     * mode for ALL Module Master sections. Per-property overrides
+     * live in the Module Master dock via "Custom" checkbox. */
+    {key:'theme',        icon:'🎨', label:L('Theme','Theme')},
     {key:'accessibility',icon:'♿', label:L('Trợ năng','Accessibility')},
     {key:'analytics',    icon:'📊', label:L('Xuất & Phân tích','Export & Analytics')},
     {key:'governance',   icon:'🛡️', label:T('governance')},
@@ -3997,12 +4001,18 @@ function render(el, subTab, currentLang){
        instead of crashing the Appearance tab. */
     'module-sample': (typeof window._renderAdmModuleSampleHtml === 'function'
                         ? window._renderAdmModuleSampleHtml(L)
-                        : '<div style="padding:24px;color:var(--text-secondary)">Module Sample renderer chưa được load. Kiểm tra portal.html có nạp 00c-admin-appearance-module-sample.js chưa.</div>')
+                        : '<div style="padding:24px;color:var(--text-secondary)">Module Sample renderer chưa được load. Kiểm tra portal.html có nạp 00c-admin-appearance-module-sample.js chưa.</div>'),
+    /* Theme tab — global design controls. Renderer in 00d-admin-appearance-theme.js */
+    'theme': (typeof window._renderAdmThemeHtml === 'function'
+                ? window._renderAdmThemeHtml(L)
+                : '<div style="padding:24px;color:var(--text-secondary)">Theme renderer chưa được load. Kiểm tra portal.html có nạp 00d-admin-appearance-theme.js chưa.</div>')
   };
   tabs.forEach(function(t){
     var active = _subTab === t.key;
     h += '<div id="adm-appearance-panel-'+t.key+'" role="tabpanel" aria-labelledby="adm-appearance-tab-'+t.key+'" tabindex="'+(active?'0':'-1')+'"'+(active?'':' hidden aria-hidden="true"')+'>'+bodies[t.key]+'</div>';
   });
+  // After bodies are mounted, wire the Theme tab interactivity
+  setTimeout(function(){ if (typeof window._wireAdmTheme === 'function') { try { window._wireAdmTheme(); } catch(e){} } }, 0);
 
   /* Global actions */
   var _hasDirty = typeof HmTheme !== 'undefined' && HmTheme.hasPreviewOverrides && HmTheme.hasPreviewOverrides();
@@ -5363,7 +5373,7 @@ function renderStandard(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260529-mm9';
+window._renderAdminAppearanceFullVersion = '20260529-mm10';
 window._renderAdminAppearanceFull = render;
 
 })();

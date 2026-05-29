@@ -877,3 +877,45 @@ body.orders-v3-active #page-orders.active > .page-breadcrumb {
   white-space: nowrap;
   border: 0;
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Dark mode (v3-G14, 2026-05-29) — Material 3 dark surface palette
+ * Toggle via <html data-color-mode="dark"> or localStorage 'o3-color-mode'.
+ * Inherits all spacing / radius / typography from light mode — only
+ * surface / text / border / status colours flip.
+ * ════════════════════════════════════════════════════════════════════════ */
+:root[data-color-mode="dark"] {
+  /* Surfaces — Material 3 Surface Container scale */
+  --o3-surface-page:    #0f172a;  /* slate-900 — page bg */
+  --o3-surface-card:    #1e293b;  /* slate-800 — card */
+  --o3-surface-raised:  #334155;  /* slate-700 — modal */
+  --o3-surface-muted:   #1e293b;  /* slate-800 — muted */
+  /* Text */
+  --o3-text-strong:     #f1f5f9;  /* slate-100 */
+  --o3-text-default:    #cbd5e1;  /* slate-300 */
+  --o3-text-muted:      #94a3b8;  /* slate-400 */
+  --o3-text-inverse:    #0f172a;
+  /* Borders */
+  --o3-border-subtle:   #334155;  /* slate-700 */
+  --o3-border-default:  #475569;  /* slate-600 */
+  --o3-border-strong:   #64748b;  /* slate-500 */
+  /* Brand — Carbon Dark "blue 40" softer for dark surfaces */
+  --o3-brand:           #38bdf8;  /* sky-400 */
+  --o3-brand-hover:     #7dd3fc;  /* sky-300 */
+  --o3-brand-soft:      #0c4a6e;  /* sky-900 — soft on dark */
+  /* Status — desaturated for dark to reduce glare (SLDS dark spec) */
+  --o3-success:         #34d399;  /* emerald-400 */
+  --o3-success-soft:    #064e3b;  /* emerald-900 */
+  --o3-warning:         #fbbf24;  /* amber-400 */
+  --o3-warning-soft:    #78350f;  /* amber-900 */
+  --o3-danger:          #f87171;  /* red-400 */
+  --o3-danger-soft:     #7f1d1d;  /* red-900 */
+  --o3-info:            #60a5fa;  /* blue-400 */
+  --o3-info-soft:       #1e3a8a;  /* blue-900 */
+  --o3-neutral:         #94a3b8;
+  --o3-neutral-soft:    #1e293b;
+  /* Shadows softer + bluer on dark */
+  --o3-shadow-card:     0 1px 2px rgba(0,0,0,0.30), 0 1px 1px rgba(0,0,0,0.20);
+  --o3-shadow-raised:   0 4px 12px rgba(0,0,0,0.40), 0 2px 4px rgba(0,0,0,0.24);
+  --o3-shadow-drawer:   -8px 0 24px rgba(0,0,0,0.45);
+}

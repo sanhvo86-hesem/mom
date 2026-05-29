@@ -1386,9 +1386,64 @@
   // data-density-wired attribute dedupe, so calling them on every
   // section change (not just density) costs nothing and removes the
   // entire class of "editor renders but doesn't react" bugs.
+  /* Custom-override checkbox wiring (v3-G14). Click toggles disabled
+   * state of the sibling input + persists flag to localStorage. When
+   * UNCHECKED the input reverts to the Global Theme value via removeProperty
+   * + re-applying theme. Checkbox state survives reload. */
+  function wireCustomCheckboxes(){
+    Array.prototype.forEach.call(
+      document.querySelectorAll('[data-prop-custom]:not([data-custom-wired])'),
+      function(cb){
+        cb.setAttribute('data-custom-wired', '1');
+        cb.addEventListener('change', function(){
+          var key = cb.getAttribute('data-prop-custom');
+          var row = cb.closest('.o3-props-row');
+          var input = row && row.querySelector('.o3-props-row__input');
+          if (!input) return;
+          if (cb.checked) {
+            input.disabled = false;
+            input.classList.remove('is-inherited');
+            input.classList.add('is-custom');
+            row.classList.add('is-custom');
+            setPropertyOverride(key, true);
+            input.focus();
+          } else {
+            input.disabled = true;
+            input.classList.remove('is-custom');
+            input.classList.add('is-inherited');
+            row.classList.remove('is-custom');
+            setPropertyOverride(key, false);
+            // Revert: remove any inline override we set, then re-apply Theme
+            try {
+              var cssVars = [];
+              var tokenKey = input.getAttribute('data-mod-sample-token');
+              var cssVarRaw = input.getAttribute('data-mod-sample-cssvar');
+              if (tokenKey) cssVars = TOKEN_CSS_VAR[tokenKey] || ['--' + tokenKey.replace(/\./g, '-')];
+              else if (cssVarRaw) cssVars = cssVarRaw.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+              cssVars.forEach(function(cv){ document.documentElement.style.removeProperty(cv); });
+              // Re-apply Theme so the unset vars regain their global value
+              if (window._admTheme && typeof window._admTheme.apply === 'function') {
+                window._admTheme.apply(window._admTheme.read());
+              }
+              // Refresh the input value from new effective value
+              if (input.type === 'number') {
+                var n = resolveCssVarPx(cssVars);
+                if (n !== null) input.value = n;
+              } else if (input.type === 'color') {
+                var h = resolveCssVarColor(cssVars);
+                if (h) input.value = h;
+              }
+            } catch (e) {}
+          }
+        });
+      }
+    );
+  }
+
   function ensureAllWired(){
     try { wireDensitySliders(); } catch (e) { /* swallow */ }
     try { wireInlineTokenEditors(); } catch (e) { /* swallow */ }
+    try { wireCustomCheckboxes(); } catch (e) { /* swallow */ }
   }
 
   /* ── Floating Properties dock (v3-G10, 2026-05-29) ───────────────
@@ -1496,6 +1551,24 @@
     syncDockBodyClass();
   }
 
+  /* Read per-property override flags from localStorage. Each entry:
+   *   { 'space.master': true, 'brand.primary': true }
+   * Only listed keys are user-customised; others inherit from Theme. */
+  function readPropertyOverrides(){
+    try {
+      var raw = localStorage.getItem('o3-props-overrides');
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+  function writePropertyOverrides(map){
+    try { localStorage.setItem('o3-props-overrides', JSON.stringify(map)); } catch (e) {}
+  }
+  function setPropertyOverride(key, enabled){
+    var m = readPropertyOverrides();
+    if (enabled) m[key] = true; else delete m[key];
+    writePropertyOverrides(m);
+  }
+
   function renderPropertyRow(item, L){
     var label = (item.label && (item.label[window.__lang === 'en' ? 'en' : 'vi'] || item.label.vi || item.label.en)) || '';
     var en    = (item.label && item.label.en) || '';
@@ -1504,31 +1577,47 @@
     var min   = item.min  !== undefined ? item.min  : 0;
     var max   = item.max  !== undefined ? item.max  : 48;
     var step  = item.step !== undefined ? item.step : 1;
-    var attrBind, keyDisplay;
+    var attrBind, keyDisplay, overrideKey;
     if (item.kind === 'token') {
       attrBind = 'data-mod-sample-token="' + esc(item.key) + '"';
       keyDisplay = item.key;
+      overrideKey = item.key;
     } else if (item.kind === 'cssvar') {
       var cv = Array.isArray(item.cssVar) ? item.cssVar.join(',') : item.cssVar;
       attrBind = 'data-mod-sample-cssvar="' + esc(cv) + '"';
       keyDisplay = Array.isArray(item.cssVar) ? item.cssVar[0] : item.cssVar;
+      overrideKey = keyDisplay;
     } else {
       return '';
     }
     if (unit) attrBind += ' data-mod-sample-unit="' + esc(unit) + '"';
+
+    // v3-G14: per-property Custom override. Unchecked = inherits from
+    // Theme (input disabled, shows muted Global value). Checked =
+    // unlocks editor for local override (stored to graphics_token_value
+    // scope=module-master.<sectionId> on Save).
+    var overrides = readPropertyOverrides();
+    var isCustom = !!overrides[overrideKey];
+    var disabledAttr = isCustom ? '' : ' disabled';
+    var inputClass = 'o3-props-row__input' + (isCustom ? ' is-custom' : ' is-inherited');
+
     var input;
     if (typ === 'color') {
-      input = '<input type="color" class="o3-props-row__input" ' + attrBind + '>';
+      input = '<input type="color" class="' + inputClass + '"' + disabledAttr + ' ' + attrBind + '>';
     } else if (typ === 'text') {
-      input = '<input type="text" class="o3-props-row__input" ' + attrBind + '>';
+      input = '<input type="text" class="' + inputClass + '"' + disabledAttr + ' ' + attrBind + '>';
     } else {
-      input = '<input type="number" class="o3-props-row__input"'
+      input = '<input type="number" class="' + inputClass + '"'
         + ' min="' + esc(min) + '" max="' + esc(max) + '" step="' + esc(step) + '"'
-        + ' ' + attrBind + '>'
+        + disabledAttr + ' ' + attrBind + '>'
         + (unit ? '<span class="o3-props-row__unit">' + esc(unit) + '</span>' : '');
     }
     return ''
-      + '<div class="o3-props-row">'
+      + '<div class="o3-props-row' + (isCustom ? ' is-custom' : '') + '">'
+      +   '<input type="checkbox" class="o3-props-row__custom"'
+      +     ' data-prop-custom="' + esc(overrideKey) + '"'
+      +     ' title="' + esc(L('Custom — bật để override Global Theme cho property này', 'Custom — enable to override Global Theme for this property')) + '"'
+      +     (isCustom ? ' checked' : '') + '>'
       +   '<div class="o3-props-row__label">'
       +     '<span class="o3-props-row__name" title="' + esc(en) + '">' + esc(label) + '</span>'
       +     '<span class="o3-props-row__key">' + esc(keyDisplay) + '</span>'
