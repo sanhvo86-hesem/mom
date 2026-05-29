@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 802,
-        "generated_at": "2026-05-28T04:09:05+00:00"
+        "table_count": 844,
+        "generated_at": "2026-05-29T09:36:03+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -1434,6 +1434,22 @@
             ],
             "contract": null
         },
+        "customer_item_approval_authority": {
+            "defined_in": "232_party_identity_link_authority.sql",
+            "extended_in": [],
+            "primary_key": "customer_item_approval_id",
+            "foreign_keys": [
+                {
+                    "col": "customer_party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "approved_by_party_id",
+                    "ref": "party(party_id)"
+                }
+            ],
+            "contract": null
+        },
         "customer_sites": {
             "defined_in": "032_order_management_world_class_foundations.sql",
             "extended_in": [
@@ -1845,6 +1861,41 @@
                     "ref": "departments(dept_code)"
                 }
             ],
+            "contract": null
+        },
+        "domain_command_audit": {
+            "defined_in": "235_domain_command_envelope_authority.sql",
+            "extended_in": [],
+            "primary_key": "domain_command_audit_id",
+            "foreign_keys": [
+                {
+                    "col": "problem_code",
+                    "ref": "domain_command_problem_type(problem_code)"
+                }
+            ],
+            "contract": null
+        },
+        "domain_command_outbox_link": {
+            "defined_in": "235_domain_command_envelope_authority.sql",
+            "extended_in": [],
+            "primary_key": "domain_command_outbox_link_id",
+            "foreign_keys": [
+                {
+                    "col": "domain_command_audit_id",
+                    "ref": "domain_command_audit(domain_command_audit_id)"
+                },
+                {
+                    "col": "domain_outbox_event_id",
+                    "ref": "domain_outbox_events(domain_outbox_event_id)"
+                }
+            ],
+            "contract": null
+        },
+        "domain_command_problem_type": {
+            "defined_in": "235_domain_command_envelope_authority.sql",
+            "extended_in": [],
+            "primary_key": "problem_code",
+            "foreign_keys": [],
             "contract": null
         },
         "domain_outbox_events": {
@@ -2325,7 +2376,8 @@
         "email_intake_config": {
             "defined_in": "203_email_intake_infrastructure.sql",
             "extended_in": [
-                "211_aeoi_master_data_suggestions.sql"
+                "211_aeoi_master_data_suggestions.sql",
+                "212_aeoi_master_toggle.sql"
             ],
             "primary_key": "id",
             "foreign_keys": [],
@@ -2664,6 +2716,90 @@
                 {
                     "col": "linked_record_id",
                     "ref": "records(record_id)"
+                }
+            ],
+            "contract": null
+        },
+        "engineering_release_package": {
+            "defined_in": "234_engineering_release_package_authority.sql",
+            "extended_in": [],
+            "primary_key": "engineering_release_package_id",
+            "foreign_keys": [
+                {
+                    "col": "item_revision_id",
+                    "ref": "item_revision(item_revision_id)"
+                },
+                {
+                    "col": "site_id",
+                    "ref": "org_site(site_id)"
+                },
+                {
+                    "col": "plm_change_order_id",
+                    "ref": "plm_change_orders(plm_change_order_id)"
+                },
+                {
+                    "col": "released_by_party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "superseded_by_package_id",
+                    "ref": "engineering_release_package(engineering_release_package_id)"
+                },
+                {
+                    "col": "created_by_party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "approved_by_party_id",
+                    "ref": "party(party_id)"
+                }
+            ],
+            "contract": null
+        },
+        "engineering_release_package_approval": {
+            "defined_in": "234_engineering_release_package_authority.sql",
+            "extended_in": [],
+            "primary_key": "engineering_release_package_approval_id",
+            "foreign_keys": [
+                {
+                    "col": "engineering_release_package_id",
+                    "ref": "engineering_release_package(engineering_release_package_id)"
+                },
+                {
+                    "col": "approved_by_party_id",
+                    "ref": "party(party_id)"
+                }
+            ],
+            "contract": null
+        },
+        "engineering_release_package_binding": {
+            "defined_in": "234_engineering_release_package_authority.sql",
+            "extended_in": [],
+            "primary_key": "engineering_release_package_binding_id",
+            "foreign_keys": [
+                {
+                    "col": "engineering_release_package_id",
+                    "ref": "engineering_release_package(engineering_release_package_id)"
+                },
+                {
+                    "col": "bound_by_party_id",
+                    "ref": "party(party_id)"
+                }
+            ],
+            "contract": null
+        },
+        "engineering_release_package_member": {
+            "defined_in": "234_engineering_release_package_authority.sql",
+            "extended_in": [],
+            "primary_key": "engineering_release_package_member_id",
+            "foreign_keys": [
+                {
+                    "col": "engineering_release_package_id",
+                    "ref": "engineering_release_package(engineering_release_package_id)"
+                },
+                {
+                    "col": "created_by_party_id",
+                    "ref": "party(party_id)"
                 }
             ],
             "contract": null
@@ -4499,6 +4635,20 @@
             ],
             "contract": null
         },
+        "gage_msa_gate_policy": {
+            "defined_in": "239_tooling_gage_authority_runtime_gates.sql",
+            "extended_in": [],
+            "primary_key": "gage_msa_gate_policy_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "gage_oot_impact_scope": {
+            "defined_in": "239_tooling_gage_authority_runtime_gates.sql",
+            "extended_in": [],
+            "primary_key": "gage_oot_impact_scope_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "genealogy_edge_facts": {
             "defined_in": "109_control_plane_cutover_hardening.sql",
             "extended_in": [
@@ -5301,6 +5451,25 @@
             ],
             "contract": null
         },
+        "inventory_ledger_command_packet": {
+            "defined_in": "240_inventory_ledger_genealogy_wip_cost_authority.sql",
+            "extended_in": [],
+            "primary_key": "inventory_ledger_command_packet_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "inventory_ledger_posting_packet": {
+            "defined_in": "240_inventory_ledger_genealogy_wip_cost_authority.sql",
+            "extended_in": [],
+            "primary_key": "inventory_ledger_posting_packet_id",
+            "foreign_keys": [
+                {
+                    "col": "inventory_ledger_command_packet_id",
+                    "ref": "inventory_ledger_command_packet(inventory_ledger_command_packet_id)"
+                }
+            ],
+            "contract": null
+        },
         "inventory_locations": {
             "defined_in": "009_inventory.sql",
             "extended_in": [
@@ -5317,6 +5486,44 @@
                     "ref": "warehouses(warehouse_id)"
                 }
             ],
+            "contract": null
+        },
+        "inventory_period_close_gate": {
+            "defined_in": "240_inventory_ledger_genealogy_wip_cost_authority.sql",
+            "extended_in": [],
+            "primary_key": "inventory_period_close_gate_id",
+            "foreign_keys": [
+                {
+                    "col": "inventory_reconciliation_run_id",
+                    "ref": "inventory_reconciliation_run(inventory_reconciliation_run_id)"
+                }
+            ],
+            "contract": null
+        },
+        "inventory_recall_evidence_export": {
+            "defined_in": "240_inventory_ledger_genealogy_wip_cost_authority.sql",
+            "extended_in": [],
+            "primary_key": "inventory_recall_evidence_export_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "inventory_reconciliation_discrepancy": {
+            "defined_in": "240_inventory_ledger_genealogy_wip_cost_authority.sql",
+            "extended_in": [],
+            "primary_key": "inventory_reconciliation_discrepancy_id",
+            "foreign_keys": [
+                {
+                    "col": "inventory_reconciliation_run_id",
+                    "ref": "inventory_reconciliation_run(inventory_reconciliation_run_id)"
+                }
+            ],
+            "contract": null
+        },
+        "inventory_reconciliation_run": {
+            "defined_in": "240_inventory_ledger_genealogy_wip_cost_authority.sql",
+            "extended_in": [],
+            "primary_key": "inventory_reconciliation_run_id",
+            "foreign_keys": [],
             "contract": null
         },
         "inventory_transactions": {
@@ -5405,10 +5612,55 @@
             ],
             "contract": null
         },
+        "item_customer_crossref_authority": {
+            "defined_in": "233_item_revision_profile_authority.sql",
+            "extended_in": [],
+            "primary_key": "item_customer_crossref_id",
+            "foreign_keys": [
+                {
+                    "col": "item_revision_id",
+                    "ref": "item_revision(item_revision_id)"
+                },
+                {
+                    "col": "customer_party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "customer_item_approval_id",
+                    "ref": "customer_item_approval_authority(customer_item_approval_id)"
+                },
+                {
+                    "col": "created_by_party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "approved_by_party_id",
+                    "ref": "party(party_id)"
+                }
+            ],
+            "contract": null
+        },
+        "item_legacy_key_bridge": {
+            "defined_in": "233_item_revision_profile_authority.sql",
+            "extended_in": [],
+            "primary_key": "item_legacy_key_bridge_id",
+            "foreign_keys": [
+                {
+                    "col": "canonical_item_id",
+                    "ref": "item(item_id)"
+                },
+                {
+                    "col": "canonical_item_revision_id",
+                    "ref": "item_revision(item_revision_id)"
+                }
+            ],
+            "contract": null
+        },
         "item_revision": {
             "defined_in": "073_canonical_master_data_core.sql",
             "extended_in": [
-                "091_runtime_governance_continuity.sql"
+                "091_runtime_governance_continuity.sql",
+                "233_item_revision_profile_authority.sql"
             ],
             "primary_key": "item_revision_id",
             "foreign_keys": [
@@ -5456,16 +5708,85 @@
             ],
             "contract": null
         },
+        "item_site_profile_authority": {
+            "defined_in": "233_item_revision_profile_authority.sql",
+            "extended_in": [],
+            "primary_key": "item_site_profile_id",
+            "foreign_keys": [
+                {
+                    "col": "item_site_id",
+                    "ref": "item_site(item_site_id)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "item(item_id)"
+                },
+                {
+                    "col": "item_revision_id",
+                    "ref": "item_revision(item_revision_id)"
+                },
+                {
+                    "col": "site_id",
+                    "ref": "org_site(site_id)"
+                },
+                {
+                    "col": "default_warehouse_id",
+                    "ref": "org_warehouse(warehouse_id)"
+                },
+                {
+                    "col": "created_by_party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "approved_by_party_id",
+                    "ref": "party(party_id)"
+                }
+            ],
+            "contract": null
+        },
         "item_spec": {
             "defined_in": "073_canonical_master_data_core.sql",
             "extended_in": [
-                "091_runtime_governance_continuity.sql"
+                "091_runtime_governance_continuity.sql",
+                "233_item_revision_profile_authority.sql"
             ],
             "primary_key": "item_spec_id",
             "foreign_keys": [
                 {
                     "col": "item_revision_id",
                     "ref": "item_revision(item_revision_id)"
+                }
+            ],
+            "contract": null
+        },
+        "item_supplier_crossref_authority": {
+            "defined_in": "233_item_revision_profile_authority.sql",
+            "extended_in": [],
+            "primary_key": "item_supplier_crossref_id",
+            "foreign_keys": [
+                {
+                    "col": "item_id",
+                    "ref": "item(item_id)"
+                },
+                {
+                    "col": "item_revision_id",
+                    "ref": "item_revision(item_revision_id)"
+                },
+                {
+                    "col": "supplier_party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "supplier_process_approval_id",
+                    "ref": "supplier_process_approval_authority(supplier_process_approval_id)"
+                },
+                {
+                    "col": "created_by_party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "approved_by_party_id",
+                    "ref": "party(party_id)"
                 }
             ],
             "contract": null
@@ -6535,6 +6856,18 @@
             "foreign_keys": [],
             "contract": null
         },
+        "mes_runtime_event_spine": {
+            "defined_in": "238_resource_readiness_mes_event_spine.sql",
+            "extended_in": [],
+            "primary_key": "mes_runtime_event_spine_id",
+            "foreign_keys": [
+                {
+                    "col": "resource_readiness_snapshot_id",
+                    "ref": "resource_readiness_snapshot(resource_readiness_snapshot_id)"
+                }
+            ],
+            "contract": null
+        },
         "mes_shift_handover": {
             "defined_in": "025_mes_tables.sql",
             "extended_in": [
@@ -7496,6 +7829,50 @@
                 {
                     "col": "party_site_id",
                     "ref": "party_site(party_site_id)"
+                }
+            ],
+            "contract": null
+        },
+        "party_merge_remap_catalog": {
+            "defined_in": "232_party_identity_link_authority.sql",
+            "extended_in": [],
+            "primary_key": "party_merge_remap_id",
+            "foreign_keys": [
+                {
+                    "col": "losing_party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "surviving_party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "reviewed_by_party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "approved_by_party_id",
+                    "ref": "party(party_id)"
+                }
+            ],
+            "contract": null
+        },
+        "party_profile_extension": {
+            "defined_in": "232_party_identity_link_authority.sql",
+            "extended_in": [],
+            "primary_key": "party_profile_extension_id",
+            "foreign_keys": [
+                {
+                    "col": "party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "created_by_party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "approved_by_party_id",
+                    "ref": "party(party_id)"
                 }
             ],
             "contract": null
@@ -8977,6 +9354,38 @@
             ],
             "contract": null
         },
+        "quality_case_trace_link": {
+            "defined_in": "237_canonical_quality_case_hold_authority.sql",
+            "extended_in": [],
+            "primary_key": "quality_case_trace_link_id",
+            "foreign_keys": [
+                {
+                    "col": "quality_order_id",
+                    "ref": "quality_order(quality_order_id)"
+                }
+            ],
+            "contract": null
+        },
+        "quality_holds": {
+            "defined_in": "237_canonical_quality_case_hold_authority.sql",
+            "extended_in": [],
+            "primary_key": "quality_hold_id",
+            "foreign_keys": [
+                {
+                    "col": "quality_order_id",
+                    "ref": "quality_order(quality_order_id)"
+                },
+                {
+                    "col": "nonconformance_id",
+                    "ref": "nonconformance(nonconformance_id)"
+                },
+                {
+                    "col": "release_signature_link_id",
+                    "ref": "regulated_command_signature_event_link(regulated_command_signature_event_link_id)"
+                }
+            ],
+            "contract": null
+        },
         "quality_order": {
             "defined_in": "078_canonical_eqms_compliance_backbone.sql",
             "extended_in": [
@@ -8987,6 +9396,26 @@
                 {
                     "col": "owner_party_id",
                     "ref": "party(party_id)"
+                }
+            ],
+            "contract": null
+        },
+        "quality_order_trigger_ledger": {
+            "defined_in": "237_canonical_quality_case_hold_authority.sql",
+            "extended_in": [],
+            "primary_key": "quality_order_trigger_ledger_id",
+            "foreign_keys": [
+                {
+                    "col": "quality_order_id",
+                    "ref": "quality_order(quality_order_id)"
+                },
+                {
+                    "col": "nonconformance_id",
+                    "ref": "nonconformance(nonconformance_id)"
+                },
+                {
+                    "col": "capa_id",
+                    "ref": "capa(capa_id)"
                 }
             ],
             "contract": null
@@ -9106,6 +9535,49 @@
             ],
             "contract": null
         },
+        "regulated_command_policy": {
+            "defined_in": "236_regulated_command_evidence_policy.sql",
+            "extended_in": [],
+            "primary_key": "regulated_command_policy_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "regulated_command_policy_step": {
+            "defined_in": "236_regulated_command_evidence_policy.sql",
+            "extended_in": [],
+            "primary_key": "regulated_command_policy_step_id",
+            "foreign_keys": [
+                {
+                    "col": "regulated_command_policy_id",
+                    "ref": "regulated_command_policy(regulated_command_policy_id)"
+                }
+            ],
+            "contract": null
+        },
+        "regulated_command_signature_event_link": {
+            "defined_in": "236_regulated_command_evidence_policy.sql",
+            "extended_in": [],
+            "primary_key": "regulated_command_signature_event_link_id",
+            "foreign_keys": [
+                {
+                    "col": "regulated_command_policy_id",
+                    "ref": "regulated_command_policy(regulated_command_policy_id)"
+                },
+                {
+                    "col": "signature_event_id",
+                    "ref": "signature_events(signature_event_id)"
+                },
+                {
+                    "col": "eqms_signature_event_id",
+                    "ref": "eqms_electronic_signature_event(signature_event_id)"
+                },
+                {
+                    "col": "auth_challenge_id",
+                    "ref": "e_signature_auth_challenges(auth_challenge_id)"
+                }
+            ],
+            "contract": null
+        },
         "release_manifests": {
             "defined_in": "108_world_class_control_plane_execution.sql",
             "extended_in": [],
@@ -9124,6 +9596,13 @@
                     "ref": "users(user_id)"
                 }
             ],
+            "contract": null
+        },
+        "resource_readiness_snapshot": {
+            "defined_in": "238_resource_readiness_mes_event_spine.sql",
+            "extended_in": [],
+            "primary_key": "resource_readiness_snapshot_id",
+            "foreign_keys": [],
             "contract": null
         },
         "retention_class_assignment": {
@@ -9361,6 +9840,61 @@
                 {
                     "col": "item_id",
                     "ref": "items(item_id)"
+                }
+            ],
+            "contract": null
+        },
+        "runtime_cutover_collection_probe": {
+            "defined_in": "241_runtime_cutover_control_tower.sql",
+            "extended_in": [],
+            "primary_key": "runtime_cutover_collection_probe_id",
+            "foreign_keys": [
+                {
+                    "col": "runtime_cutover_rehearsal_run_id",
+                    "ref": "runtime_cutover_rehearsal_run(runtime_cutover_rehearsal_run_id)"
+                }
+            ],
+            "contract": null
+        },
+        "runtime_cutover_fallback_incident": {
+            "defined_in": "241_runtime_cutover_control_tower.sql",
+            "extended_in": [],
+            "primary_key": "runtime_cutover_fallback_incident_id",
+            "foreign_keys": [
+                {
+                    "col": "runtime_cutover_rehearsal_run_id",
+                    "ref": "runtime_cutover_rehearsal_run(runtime_cutover_rehearsal_run_id)"
+                }
+            ],
+            "contract": null
+        },
+        "runtime_cutover_rehearsal_run": {
+            "defined_in": "241_runtime_cutover_control_tower.sql",
+            "extended_in": [],
+            "primary_key": "runtime_cutover_rehearsal_run_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "runtime_cutover_wave_gate": {
+            "defined_in": "241_runtime_cutover_control_tower.sql",
+            "extended_in": [],
+            "primary_key": "runtime_cutover_wave_gate_id",
+            "foreign_keys": [
+                {
+                    "col": "last_rehearsal_run_id",
+                    "ref": "runtime_cutover_rehearsal_run(runtime_cutover_rehearsal_run_id)"
+                }
+            ],
+            "contract": null
+        },
+        "runtime_restore_drill_evidence": {
+            "defined_in": "241_runtime_cutover_control_tower.sql",
+            "extended_in": [],
+            "primary_key": "runtime_restore_drill_evidence_id",
+            "foreign_keys": [
+                {
+                    "col": "runtime_cutover_rehearsal_run_id",
+                    "ref": "runtime_cutover_rehearsal_run(runtime_cutover_rehearsal_run_id)"
                 }
             ],
             "contract": null
@@ -10250,6 +10784,22 @@
             ],
             "contract": null
         },
+        "supplier_process_approval_authority": {
+            "defined_in": "232_party_identity_link_authority.sql",
+            "extended_in": [],
+            "primary_key": "supplier_process_approval_id",
+            "foreign_keys": [
+                {
+                    "col": "supplier_party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "approved_by_party_id",
+                    "ref": "party(party_id)"
+                }
+            ],
+            "contract": null
+        },
         "supplier_quality_case": {
             "defined_in": "078_canonical_eqms_compliance_backbone.sql",
             "extended_in": [
@@ -10693,6 +11243,13 @@
             ],
             "contract": null
         },
+        "tool_breakage_suspect_window": {
+            "defined_in": "239_tooling_gage_authority_runtime_gates.sql",
+            "extended_in": [],
+            "primary_key": "tool_breakage_suspect_window_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "tool_usage": {
             "defined_in": "076_canonical_mes_execution_spine.sql",
             "extended_in": [],
@@ -10857,12 +11414,26 @@
             ],
             "contract": null
         },
+        "tooling_life_runtime_policy": {
+            "defined_in": "239_tooling_gage_authority_runtime_gates.sql",
+            "extended_in": [],
+            "primary_key": "tooling_life_runtime_policy_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "tooling_locations": {
             "defined_in": "057_tooling_lifecycle_management.sql",
             "extended_in": [
                 "070_enterprise_governance_uplift.sql"
             ],
             "primary_key": "tooling_location_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "tooling_machine_compatibility_rule": {
+            "defined_in": "239_tooling_gage_authority_runtime_gates.sql",
+            "extended_in": [],
+            "primary_key": "tooling_machine_compatibility_rule_id",
             "foreign_keys": [],
             "contract": null
         },
@@ -11380,10 +11951,51 @@
         "uom": {
             "defined_in": "072_canonical_foundation_governance.sql",
             "extended_in": [
-                "091_runtime_governance_continuity.sql"
+                "091_runtime_governance_continuity.sql",
+                "213_uom_measurement_authority.sql"
             ],
             "primary_key": "uom_code",
             "foreign_keys": [],
+            "contract": null
+        },
+        "uom_conversion_authority": {
+            "defined_in": "213_uom_measurement_authority.sql",
+            "extended_in": [],
+            "primary_key": "uom_conversion_authority_id",
+            "foreign_keys": [
+                {
+                    "col": "from_uom_code",
+                    "ref": "uom(uom_code)"
+                },
+                {
+                    "col": "to_uom_code",
+                    "ref": "uom(uom_code)"
+                }
+            ],
+            "contract": null
+        },
+        "user_party_link": {
+            "defined_in": "232_party_identity_link_authority.sql",
+            "extended_in": [],
+            "primary_key": "user_party_link_id",
+            "foreign_keys": [
+                {
+                    "col": "user_id",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "created_by_party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "approved_by_party_id",
+                    "ref": "party(party_id)"
+                }
+            ],
             "contract": null
         },
         "user_roles": {
@@ -11842,6 +12454,30 @@
                 {
                     "col": "operation_id",
                     "ref": "operation(operation_id)"
+                }
+            ],
+            "contract": null
+        },
+        "work_order_engineering_package_snapshot": {
+            "defined_in": "234_engineering_release_package_authority.sql",
+            "extended_in": [],
+            "primary_key": "work_order_engineering_package_snapshot_id",
+            "foreign_keys": [
+                {
+                    "col": "work_order_id",
+                    "ref": "work_order(work_order_id)"
+                },
+                {
+                    "col": "legacy_work_order_id",
+                    "ref": "work_orders(work_order_id)"
+                },
+                {
+                    "col": "engineering_release_package_id",
+                    "ref": "engineering_release_package(engineering_release_package_id)"
+                },
+                {
+                    "col": "frozen_by_party_id",
+                    "ref": "party(party_id)"
                 }
             ],
             "contract": null
