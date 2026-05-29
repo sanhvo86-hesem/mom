@@ -296,6 +296,48 @@
   // an admin should see when they open Module Sample.
   var _activeSection = 'density';
 
+  // Wire inline token editors (color inputs + number inputs) in the
+  // right-side aside so admins can edit tokens without leaving Module
+  // Sample. Stages each change into GraphicsAuthority draft.
+  function wireInlineTokenEditors(){
+    Array.prototype.forEach.call(
+      document.querySelectorAll('[data-mod-sample-token]'),
+      function(input){
+        var tokenKey = input.getAttribute('data-mod-sample-token');
+        // Pre-fill from current resolved value if available
+        try {
+          var resolved = '';
+          if (window.GraphicsAuthority && window.GraphicsAuthority.tokens
+              && typeof window.GraphicsAuthority.tokens.read === 'function') {
+            resolved = window.GraphicsAuthority.tokens.read(tokenKey) || '';
+          }
+          if (input.type === 'color' && /^#?[0-9a-f]{6}$/i.test(resolved)) {
+            input.value = resolved.charAt(0) === '#' ? resolved : '#' + resolved;
+          } else if (input.type === 'number' && /^\d+(\.\d+)?(px)?$/i.test(resolved)) {
+            input.value = parseInt(resolved, 10);
+          }
+        } catch (e) { /* non-fatal */ }
+
+        input.addEventListener('change', function(){
+          var v = input.value;
+          var staged = v;
+          if (input.type === 'number') staged = v + 'px';
+          // Stage via Authority
+          try {
+            if (window.GraphicsAuthority && window.GraphicsAuthority.tokens
+                && typeof window.GraphicsAuthority.tokens.stage === 'function') {
+              window.GraphicsAuthority.tokens.stage(tokenKey, staged);
+            }
+          } catch (e) { /* non-fatal */ }
+          // Live-preview by setting CSS variable on :root if we know it
+          // (best-effort via token key → CSS var convention)
+          var cssVar = '--' + tokenKey.replace(/\./g, '-');
+          try { document.documentElement.style.setProperty(cssVar, staged); } catch (e) {}
+        });
+      }
+    );
+  }
+
   // Wire the density sliders to live CSS variable updates + stage the
   // changes into GraphicsAuthority's draft buffer so the existing
   // "Save for org" pipeline (WCAG sim + commit) handles publish.
@@ -356,8 +398,10 @@
   function tryInitialWire(){
     if (_wiredInitial) return;
     var hasSliders = document.getElementById('o3-density-master');
-    if (hasSliders) {
-      wireDensitySliders();
+    var hasTokenEditors = document.querySelector('[data-mod-sample-token]');
+    if (hasSliders || hasTokenEditors) {
+      if (hasSliders) wireDensitySliders();
+      if (hasTokenEditors) wireInlineTokenEditors();
       _wiredInitial = true;
     }
   }
@@ -397,33 +441,61 @@
       return '<li style="padding:4px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px"><code style="background:var(--bg-surface-alt);padding:2px 6px;border-radius:3px">' + esc(tk) + '</code></li>';
     }).join('');
 
+    // Inline token editor — for each token, render an input that
+    // stages into the GraphicsAuthority draft buffer (merging the
+    // Components tab functionality into Module Sample). Numeric tokens
+    // get a small slider+number input; color tokens get a color picker.
+    // Falls back to read-only chip if token meta is unknown.
+    var tokenEditors = active.tokens.map(function(tk){
+      var meta = (window._adm_token_meta || {})[tk] || {};
+      var inputId = 'mod-sample-token-' + tk.replace(/\./g, '-');
+      // Render type heuristic based on key prefix (until we wire a
+      // proper meta lookup against graphics_token_catalog).
+      var isColor = /color|brand|status|bg|text|border/i.test(tk);
+      var isNumeric = /space|radius|height|width|size/i.test(tk);
+      var editor = '';
+      if (isColor) {
+        editor = '<input id="' + inputId + '" type="color" data-mod-sample-token="' + esc(tk) + '" style="width:32px;height:20px;padding:0;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer">';
+      } else if (isNumeric) {
+        editor = '<input id="' + inputId + '" type="number" min="0" max="48" step="1" data-mod-sample-token="' + esc(tk) + '" style="width:52px;height:20px;padding:0 4px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:ui-monospace,monospace">';
+      } else {
+        editor = '<span style="font-size:10px;color:var(--text-secondary)">read-only</span>';
+      }
+      return ''
+        + '<li style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 0">'
+        +   '<code style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0">' + esc(tk) + '</code>'
+        +   editor
+        + '</li>';
+    }).join('');
+
     return ''
-      // Compact intro — 8px padding, no margin-bottom gap (next element handles spacing)
-      + '<div style="padding:10px 12px;background:var(--bg-surface-alt,#f1f5f9);border:1px solid var(--border);border-radius:8px;margin-bottom:10px">'
-      +   '<div style="font-weight:600;font-size:12px;color:var(--text-primary)">' + esc(L('🎛️ Module Sample — SSOT cho mọi thành phần đồ họa', '🎛️ Module Sample — SSOT for every reusable graphic component')) + '</div>'
-      +   '<div style="font-size:11px;color:var(--text-secondary);line-height:1.45;margin-top:2px">' + esc(L(
-              'Mọi module frontend mới PHẢI dùng pattern + token ở đây — không được tự dựng hex hay chiều cao. Migration 213 + 214 chốt MỘT chuẩn duy nhất cho control-height (36px).',
-              'Every new frontend module MUST reuse these patterns + tokens — no hex or one-off heights. Migrations 213+214 lock ONE standard control-height (36px).')) + '</div>'
+      // Ultra-compact intro — 1 line, no boxed background. SSOT message
+      // is in the tab title bar so we don't need to repeat it.
+      + '<div style="font-size:11px;color:var(--text-secondary);line-height:1.4;margin:0 0 8px 0">'
+      +   esc(L(
+            '🎛️ SSOT — mỗi component dưới đây render bằng đúng CSS production của Orders v3. Token chỉnh trực tiếp ở cột phải.',
+            '🎛️ SSOT — every component below renders with the exact production CSS of Orders v3. Tokens edit inline on the right.'))
       + '</div>'
 
-      // Inner tab strip — tight
-      + '<div class="hm-tabs" role="tablist" style="margin-bottom:10px">' + innerTabsHtml + '</div>'
+      // Inner tab strip — use the SAME o3-shell__tab class as real workspace tabs
+      // so the Module Sample tab strip matches what consumers actually see.
+      + '<nav class="o3-shell__tabs" role="tablist" style="margin:0 0 8px 0;border-bottom:1px solid var(--o3-border-subtle)">' + innerTabsHtml + '</nav>'
 
-      // Two-column layout filling full width, no max-width cap, no orphan bottom space
-      + '<div style="display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:12px;align-items:stretch">'
+      // Two-column layout — preview + inline token editor merged from Components tab
+      + '<div style="display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:8px;align-items:start">'
 
-      //   Left: live preview — stretches to right column height; padding tightened
-      +   '<div style="padding:14px;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px">'
+      //   Left: live preview, padded by master-gap so visible content fills space
+      +   '<div style="padding:var(--master-gap,8px);background:var(--bg-surface);border:1px solid var(--o3-border-subtle);border-radius:var(--card-radius,8px);min-height:200px">'
       +     active.body_html
       +   '</div>'
 
-      //   Right: token whitelist; no min-height so it doesn't introduce empty space
-      +   '<aside style="padding:12px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border);border-radius:10px">'
-      +     '<div style="font-weight:600;font-size:11px;color:var(--text-primary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">' + esc(L('Tokens điều khiển','Controlling tokens')) + '</div>'
-      +     '<ul style="margin:0;padding-left:0;list-style:none">' + tokenItems + '</ul>'
-      +     '<div style="margin-top:8px;font-size:10px;color:var(--text-secondary);line-height:1.45">' + esc(L(
-                'Chỉnh giá trị ở tab "Token hệ thống". Mọi thay đổi đều phải qua mô phỏng WCAG trước khi publish.',
-                'Edit values in the "Tokens" sub-tab. Every change must pass WCAG simulation before publishing.')) + '</div>'
+      //   Right: inline token editor (replaces the "Thành phần" tab — edit here)
+      +   '<aside style="padding:8px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--o3-border-subtle);border-radius:var(--card-radius,8px)">'
+      +     '<div style="font-weight:600;font-size:10px;color:var(--text-primary);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">' + esc(L('Tokens · chỉnh trực tiếp','Tokens · edit inline')) + '</div>'
+      +     '<ul style="margin:0;padding-left:0;list-style:none">' + tokenEditors + '</ul>'
+      +     '<div style="margin-top:6px;font-size:10px;color:var(--text-secondary);line-height:1.4">' + esc(L(
+                'Mọi thay đổi stage vào draft buffer; bấm "Lưu cho tổ chức" để qua mô phỏng WCAG + publish.',
+                'Edits stage to draft; click "Save for org" to run WCAG sim + publish.')) + '</div>'
       +   '</aside>'
       + '</div>';
   };

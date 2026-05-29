@@ -26,43 +26,11 @@
   --card-radius:   8px;
 }
 
-/* ════════════════════════════════════════════════════════════════════════
- * Scrollbar — HESEM amber. WebKit + Firefox.
- * Applies globally because scrollbars should feel consistent across the
- * whole portal, not just one module. The amber matches HESEM's
- * brand.accent token and pops against neutral surfaces without
- * dominating attention.
- * ════════════════════════════════════════════════════════════════════════ */
-:root {
-  --hesem-scrollbar-track: #fef3c7;
-  --hesem-scrollbar-thumb: #f9a825;
-  --hesem-scrollbar-thumb-hover: #d97706;
-}
-
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--hesem-scrollbar-thumb) var(--hesem-scrollbar-track);
-}
-
-*::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-*::-webkit-scrollbar-track {
-  background: var(--hesem-scrollbar-track);
-  border-radius: var(--master-radius);
-}
-
-*::-webkit-scrollbar-thumb {
-  background: var(--hesem-scrollbar-thumb);
-  border-radius: var(--master-radius);
-  transition: background 0.15s ease-out;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background: var(--hesem-scrollbar-thumb-hover);
-}
+/* Scrollbar styling intentionally NOT overridden.
+ * User feedback 2026-05-29: keep the original scrollbar color (the
+ * existing portal default from portal.main.css / browser default).
+ * Migration 227's effects.scrollbarThumb default flip was reverted
+ * in migration 228. */
 
 /* ════════════════════════════════════════════════════════════════════════
  * Admin Appearance — gap compression
