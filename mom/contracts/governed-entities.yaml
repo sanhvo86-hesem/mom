@@ -13,9 +13,9 @@ entities:
   - root_code: MDA-PARTY-IDENTITY
     canonical_name: PartyCustomerSupplierUserIdentityAuthority
     owner_domain: master_data_governance
-    table_names: [party, party_role, party_site, party_contact, customers, customer_sites, suppliers, vendors, users, employees, hcm_employees, roles, user_roles, portal_users, srm_supplier_portal_users]
-    required_command_service: "Party/MasterData command service plus AuthUserShadowSyncService for HESEM user identity"
-    allowed_commands: [party_create, party_approve, party_archive, admin_user_upsert, admin_user_deactivate]
+    table_names: [party, party_role, party_site, party_contact, party_profile_extension, user_party_link, party_merge_remap_catalog, customer_item_approval_authority, supplier_process_approval_authority, customers, customer_sites, suppliers, vendors, users, employees, hcm_employees, roles, user_roles, portal_users, srm_supplier_portal_users, mes_operator_qualifications]
+    required_command_service: "Party/MasterData command service plus AuthUserShadowSyncService for HESEM user identity and PartyIdentityAuthorityService for runtime gates"
+    allowed_commands: [party_create, party_approve, party_archive, party_merge_plan, party_merge_apply, user_party_link_approve, customer_item_approval_approve, supplier_process_approval_approve, operator_readiness_evaluate, admin_user_upsert, admin_user_deactivate]
     forbidden_generic_actions: [create, update, delete, transition, approve]
     severity: P0
   - root_code: MDA-ITEM-REVISION-SPEC
