@@ -1607,6 +1607,45 @@
     syncDockBodyClass();
   }
 
+  /* v3-G22 — auto-hide dock when admin navigates AWAY from Module Master.
+   * Bug: dock was lazy-mounted to <body> on first show but never unmounted,
+   * so it stayed visible when user clicked Customer POs / Orders / any
+   * other module. Fix: poll/observe whether #adm-appearance-panel-module-sample
+   * is currently rendered + offsetParent !== null (i.e. not hidden by an
+   * ancestor display:none). If panel is gone or hidden, hide the dock.
+   * Run on every animation frame is wasteful — use MutationObserver on
+   * <body> for childList + attribute changes, plus a passive interval as
+   * safety net. Re-check is cheap (1 DOM query + 1 boolean). */
+  function panelIsVisible(){
+    var panel = document.getElementById('adm-appearance-panel-module-sample');
+    if (!panel) return false;
+    // offsetParent === null when display:none anywhere in ancestor chain
+    if (panel.offsetParent === null) return false;
+    // also check it's still attached to a visible page
+    var page = panel.closest('.page');
+    if (page && !page.classList.contains('active')) return false;
+    return true;
+  }
+  function startDockVisibilityGuard(){
+    if (window.__o3DockGuardStarted) return;
+    window.__o3DockGuardStarted = true;
+    var lastVisible = false;
+    function check(){
+      var dock = document.getElementById('o3-props-dock');
+      if (!dock || dock.hidden) { lastVisible = false; return; }
+      var now = panelIsVisible();
+      if (lastVisible && !now) hideDock();
+      lastVisible = now;
+    }
+    try {
+      var obs = new MutationObserver(check);
+      obs.observe(document.body, { childList: true, subtree: true, attributes: true,
+                                    attributeFilter: ['class','style','hidden'] });
+    } catch (e) {}
+    // Safety-net interval (500ms — imperceptible cost, immune to observer misses)
+    setInterval(check, 500);
+  }
+
   /* Read per-property override flags from localStorage. Each entry:
    *   { 'space.master': true, 'brand.primary': true }
    * Only listed keys are user-customised; others inherit from Theme. */
@@ -1766,6 +1805,10 @@
     showDock();
     renderDockForSection(section, L);
     ensureAllWired();
+    // v3-G22: start the guard so when admin nav goes elsewhere the dock
+    // disappears with the panel. Idempotent — once-only start, safe to
+    // call from every showProperties invocation.
+    startDockVisibilityGuard();
   }
   window._admModuleSampleShowProperties = showProperties;
   window._admModuleSampleHideDock = hideDock;
