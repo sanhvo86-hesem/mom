@@ -115,6 +115,41 @@ if [ -n "$SYNC_AGENT_PID" ]; then
     SYNC_AGENT_ACTIVE="yes"
 fi
 
+# 2g. Cross-branch file collision — another AI session touching the same files
+# This is the primary cause of silent overwrites in multi-AI concurrent work.
+# We diff our unique commits (merge-base → HEAD) against every other active
+# codex/* remote branch that also has commits ahead of origin/main.
+CROSS_COLLISION_BRANCHES=()
+MY_CROSS_BASE="$(git merge-base HEAD origin/main 2>/dev/null || true)"
+if [ -n "$MY_CROSS_BASE" ]; then
+    MY_CROSS_FILES="$(git diff --name-only "$MY_CROSS_BASE" HEAD 2>/dev/null | sort -u || true)"
+    if [ -n "$MY_CROSS_FILES" ]; then
+        while IFS= read -r remote_branch; do
+            remote_branch="${remote_branch// /}"
+            remote_short="${remote_branch#origin/}"
+            # skip our own tracking branch
+            [ "$remote_short" = "$BRANCH" ] && continue
+            # skip branches with no commits ahead of main (already merged)
+            other_ahead=$(git rev-list --count origin/main.."$remote_branch" 2>/dev/null || echo 0)
+            [ "$other_ahead" -eq 0 ] && continue
+            other_base="$(git merge-base "$remote_branch" origin/main 2>/dev/null || true)"
+            [ -z "$other_base" ] && continue
+            other_files="$(git diff --name-only "$other_base" "$remote_branch" 2>/dev/null | sort -u || true)"
+            [ -z "$other_files" ] && continue
+            overlap_count=$(comm -12 \
+                <(printf '%s\n' "$MY_CROSS_FILES") \
+                <(printf '%s\n' "$other_files") 2>/dev/null | wc -l | tr -d ' ')
+            if [ "$overlap_count" -gt 0 ]; then
+                CROSS_COLLISION_BRANCHES+=("$remote_short:${overlap_count}files")
+            fi
+        done < <(git branch -r 2>/dev/null | grep 'origin/codex/' | tr -d ' ')
+        if [ ${#CROSS_COLLISION_BRANCHES[@]} -gt 0 ]; then
+            joined=$(IFS=', '; echo "${CROSS_COLLISION_BRANCHES[*]}")
+            HAZARDS+=("cross_branch_collision:files overlap with other active AI branches: $joined — cherry-pick separately via 'bash tools/ai/cherry-pick-to-main.sh'")
+        fi
+    fi
+fi
+
 # ── 3. Write session state ────────────────────────────────────────────────
 cat > "$STATE_FILE" <<JSON
 {

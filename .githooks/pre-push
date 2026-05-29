@@ -112,6 +112,54 @@ if [[ -n "$MERGE_BASE" && -n "$ORIGIN_MAIN_SHA" && "$MERGE_BASE" != "$ORIGIN_MAI
     fi
 fi
 
+# ── Check 1b: cross-branch collision — another active AI session on same files ─
+# The main collision check (1a) only catches files also modified on origin/main.
+# This check catches the more common case: two AI sessions on two codex/* branches
+# both touching the same file. When the second branch is later cherry-picked or
+# merged, one session silently overwrites the other's work.
+MY_CROSS_BASE="$(git merge-base HEAD origin/main 2>/dev/null || echo)"
+if [[ -n "$MY_CROSS_BASE" ]]; then
+    MY_CROSS_FILES="$(git diff --name-only "$MY_CROSS_BASE" HEAD 2>/dev/null | sort -u || true)"
+    if [[ -n "$MY_CROSS_FILES" ]]; then
+        CROSS_BLOCKS=()
+        while IFS= read -r remote_branch; do
+            remote_branch="${remote_branch// /}"
+            remote_short="${remote_branch#origin/}"
+            [[ "$remote_short" == "$CURRENT_BRANCH" ]] && continue
+            other_ahead=$(git rev-list --count origin/main.."$remote_branch" 2>/dev/null || echo 0)
+            [[ "$other_ahead" -eq 0 ]] && continue
+            other_base="$(git merge-base "$remote_branch" origin/main 2>/dev/null || echo)"
+            [[ -z "$other_base" ]] && continue
+            other_files="$(git diff --name-only "$other_base" "$remote_branch" 2>/dev/null | sort -u || true)"
+            [[ -z "$other_files" ]] && continue
+            overlap=$(comm -12 \
+                <(printf '%s\n' "$MY_CROSS_FILES") \
+                <(printf '%s\n' "$other_files") 2>/dev/null)
+            if [[ -n "$overlap" ]]; then
+                overlap_count=$(printf '%s\n' "$overlap" | wc -l | tr -d ' ')
+                CROSS_BLOCKS+=("$remote_short ($overlap_count files)")
+            fi
+        done < <(git branch -r 2>/dev/null | grep 'origin/codex/' | tr -d ' ')
+        if [[ ${#CROSS_BLOCKS[@]} -gt 0 ]]; then
+            echo ""
+            echo "pre-push: CROSS-BRANCH COLLISION — another AI session is working on the same files."
+            echo ""
+            echo "  Your branch:  $CURRENT_BRANCH"
+            echo "  Conflicting branches:"
+            for b in "${CROSS_BLOCKS[@]}"; do
+                echo "    - $b"
+            done
+            echo ""
+            echo "  REQUIRED: coordinate before pushing. Options:"
+            echo "    A) Let the other session cherry-pick to main first, then rebase this branch onto main."
+            echo "    B) Run 'bash tools/ai/cherry-pick-to-main.sh' to stage your commits safely."
+            echo "    C) Confirm no real conflict and bypass: git push --no-verify"
+            echo ""
+            exit 1
+        fi
+    fi
+fi
+
 # ── Check 2: migration drift (cheap offline file check) ────────────────────
 if [[ -f "$REPO_ROOT/mom/tools/release/check_migration_drift.php" ]]; then
     if ! php "$REPO_ROOT/mom/tools/release/check_migration_drift.php" --quiet >"$PRE_PUSH_LOG" 2>&1; then

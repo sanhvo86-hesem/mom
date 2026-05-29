@@ -21,19 +21,31 @@ Quick mandatory sequence every session:
 ## MANDATORY: Multi-AI session safety + fast deploys
 
 The repo is edited concurrently by multiple AI sessions (Claude, Codex, …).
-Three guards prevent data loss between sessions:
+**Four guards** prevent data loss between sessions:
 
 1. **Preflight at session start** (`bash tools/ai/preflight.sh`) — records
-   the SHA you branched from. Auto-enables `.githooks`. Without preflight
-   the pre-push hook falls back to `git merge-base` (less precise about
-   when a collision started but still correct).
+   the SHA you branched from. Auto-enables `.githooks`. Also now detects
+   **cross-branch file collisions**: if another active `codex/*` branch
+   already touches the same files you plan to change, it warns immediately
+   so you can coordinate before writing any code.
 
-2. **Pre-push collision guard** (`.githooks/pre-push`) — refuses to push
-   when `origin/main` advanced during the session AND touched a file the
-   current commits also modified. Bypass with `git push --no-verify` only
-   after verifying overlap manually.
+2. **Pre-push collision guard** (`.githooks/pre-push`) — two sub-checks:
+   - **1a (vs origin/main):** refuses to push when `origin/main` advanced
+     and touched a file your commits also modified.
+   - **1b (cross-branch):** refuses to push when another active `codex/*`
+     remote branch has commits touching the same files. This is the most
+     common cause of silent overwrites and was not previously guarded.
+   Bypass with `git push --no-verify` only after verifying overlap manually.
 
-3. **Migration drift detector** (`php mom/tools/release/check_migration_drift.php`)
+3. **Cherry-pick-to-main workflow** (`bash tools/ai/cherry-pick-to-main.sh`)
+   — when an AI session is done, this script creates a clean `cherry/*`
+   branch from `origin/main`, applies only the session's commits (oldest →
+   newest), runs PHP syntax + migration drift check, and prints the next
+   step. **Never merge a `codex/*` branch directly into main while other AI
+   sessions are active.** See AGENTS.md → "Cherry-pick to main" for the
+   full sequence.
+
+4. **Migration drift detector** (`php mom/tools/release/check_migration_drift.php`)
    — runs in CI on every commit touching `mom/database/migrations/*.sql`.
    Detects ghost migrations (live DB applied + file missing — the exact
    bug that lost `188_error_code_registry`), duplicate ids, prefix
