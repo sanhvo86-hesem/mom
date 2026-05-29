@@ -98,6 +98,14 @@ entities:
     allowed_commands: [security_boundary_evaluate, field_redaction_policy_update, sod_exception_approve, ai_firewall_record, ot_signal_trust_approve]
     forbidden_generic_actions: [create, update, delete, transition, approve, sign]
     severity: P0
+  - root_code: MDA-FRONTEND-PROJECTION-SAFETY
+    canonical_name: FrontendRecordShellWorkspaceProjectionAuthority
+    owner_domain: frontend_operator_experience
+    table_names: [mda_authoritative_record_shell_anchor, mda_workspace_projection_policy, mda_workspace_projection_freshness, mda_frontend_alias_resolution_policy, mda_offline_candidate_queue, mda_frontend_action_guard_decision]
+    required_command_service: "MOM\\Services\\MdaFrontendProjectionSafetyService"
+    allowed_commands: [record_shell_open, workspace_projection_evaluate, projection_freshness_evaluate, offline_candidate_queue, alias_resolve]
+    forbidden_generic_actions: [create, update, delete, transition, approve, release, post]
+    severity: P1
   - root_code: MDA-FINANCE-PERIOD
     canonical_name: FinanceCostPeriodAuthority
     owner_domain: finance

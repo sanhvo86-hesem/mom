@@ -7,6 +7,13 @@ namespace MOM\Api\Controllers;
 use MOM\Api\Router;
 
 return static function (Router $router, string $dataDir): void {
+    // MDA V3 P40 frontend/operator projection safety contracts.
+    $router->actions([
+        'mda_frontend_projection_contract' => [MdaFrontendProjectionSafetyController::class, 'contract'],
+        'mda_frontend_projection_evaluate' => [MdaFrontendProjectionSafetyController::class, 'evaluate'],
+        'mda_record_shell'                 => [MdaFrontendProjectionSafetyController::class, 'recordShell'],
+    ]);
+
     // Module Schema Builder
     $router->actions([
         'module_schema_list'    => [ModuleSchemaController::class, 'listSchemas'],

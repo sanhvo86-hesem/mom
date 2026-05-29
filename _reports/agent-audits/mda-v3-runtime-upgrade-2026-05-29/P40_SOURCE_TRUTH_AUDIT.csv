@@ -1,0 +1,13 @@
+source_path,evidence_found,classification,p40_impact,gap_or_decision
+_reports/agent-audits/mda-v3-runtime-upgrade-2026-05-29/P39_HANDOFF_PACKET.md,P39_PASS_WITH_CONTROLLED_GAPS with security boundary service not yet command-wired,previous_handoff,P40 must not claim final UI/runtime readiness,Proceed with frontend projection safety slice only
+mom/database/migrations/160_rbac_modules_and_module_permission.sql,modules_catalog has route_class values workspace_projection and authoritative_record_shell,existing_schema,P40 route semantics align to existing route-class vocabulary,Reuse vocabulary
+mom/assets/js/offline-store.js,offline IndexedDB submission queue exists for form submissions,existing_frontend,P40 must prevent offline candidates from claiming authority commit,Add offline candidate authority anchor and service proof
+mom/assets/js/sync-manager.js,sync manager posts queued submissions to legacy form_submit endpoint,existing_frontend_gap,Offline command-stack reconciliation is not runtime-complete,Register GAP-P40-002
+mom/api/controllers/DomainCommandController.php,generic command endpoint exists and fails closed when handler missing,existing_command_surface,P40 record shells can point to command endpoint but do not execute commands,Controlled gap for live command UI wiring
+mom/api/controllers/GenericCrudController.php,governed mutation hard-stop exists,existing_guard,P40 tables added to generic hard-stop,Repair implemented
+mom/api/routes/platform-routes.php,platform action routes register internal frontend/backend utility actions,route_surface,P40 adds contract/evaluate/record shell action routes,Repair implemented
+mom/database/migrations/243_mda_frontend_projection_safety.sql,new additive tables for record shell workspace policy freshness alias offline candidate action guard,physical_evidence,Creates P40 authority anchors,Repair implemented
+mom/api/services/MdaFrontendProjectionSafetyService.php,new side-effect-free evaluator for /ops route grammar workspace action freshness record shell offline candidate and alias resolution,service_evidence,Converts P40 focus areas into executable gates,Repair implemented
+mom/api/controllers/MdaFrontendProjectionSafetyController.php,new authenticated action endpoints expose P40 safety contracts,api_evidence,Operator UI can consume contract without direct mutation,Repair implemented
+mom/tests/Unit/Services/MdaFrontendProjectionSafetyServiceTest.php,unit tests cover required five P40 scenarios,test_evidence,Required simulations converted into tests,Repair implemented but PHPUnit vendor unavailable locally
+docs/backend/RUNTIME_AUTHORITY_MAP.md,runtime modes remain JSON_ONLY locally,architecture_evidence,P40 cannot claim deployed runtime authority,CONTROLLED_GAP

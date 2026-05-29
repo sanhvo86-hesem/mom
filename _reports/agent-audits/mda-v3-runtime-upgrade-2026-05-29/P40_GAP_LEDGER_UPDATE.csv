@@ -1,0 +1,7 @@
+gap_id,severity,status,owner,next_prompt,description,repair_done,remaining_work
+GAP-P40-001,P1,open,frontend_operator_experience,P41,Browser UI does not yet consume record shell workspace freshness and disabled action contracts,P40 service/controller/tables/tests added,wire actual browser components and run Chrome smoke on deployed app
+GAP-P40-002,P1,open,frontend_mes_execution,P41,Offline candidates are not yet reconciled through governed command stack before commit,P40 queue prevents direct authority commit,wire SyncManager/offline submission to command reconciliation and evidence
+GAP-P40-003,P1,controlled_gap,frontend_sre,P41,Action guard decisions are not persisted by live endpoints yet,mda_frontend_action_guard_decision table and evidence hash payloads added,write decisions in controller/service integration with audit/outbox where needed
+P23-P1-044,P1,partially_repaired,frontend,P41,governed roots open with audit evidence and command actions,P40 record shell builder and action route expose audit/evidence/command refs,live UI shell pending
+P23-P1-045,P1,partially_repaired,frontend_sre,P41,workspaces show freshness and disabled-state panels,P40 freshness evaluator returns disabled action reasons,live freshness banner pending
+P23-P1-046,P1,partially_repaired,frontend_mes_execution,P41,offline cannot mutate governed data without reconcile,P40 offline candidate queue blocks committed authority flag,sync manager reconciliation pending

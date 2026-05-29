@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 850,
-        "generated_at": "2026-05-29T10:03:14+00:00"
+        "table_count": 856,
+        "generated_at": "2026-05-29T10:10:27+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -6335,10 +6335,38 @@
             "foreign_keys": [],
             "contract": null
         },
+        "mda_authoritative_record_shell_anchor": {
+            "defined_in": "243_mda_frontend_projection_safety.sql",
+            "extended_in": [],
+            "primary_key": "mda_authoritative_record_shell_anchor_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "mda_field_redaction_policy": {
             "defined_in": "242_mda_security_boundary_authority.sql",
             "extended_in": [],
             "primary_key": "mda_field_redaction_policy_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "mda_frontend_action_guard_decision": {
+            "defined_in": "243_mda_frontend_projection_safety.sql",
+            "extended_in": [],
+            "primary_key": "mda_frontend_action_guard_decision_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "mda_frontend_alias_resolution_policy": {
+            "defined_in": "243_mda_frontend_projection_safety.sql",
+            "extended_in": [],
+            "primary_key": "mda_frontend_alias_resolution_policy_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "mda_offline_candidate_queue": {
+            "defined_in": "243_mda_frontend_projection_safety.sql",
+            "extended_in": [],
+            "primary_key": "mda_offline_candidate_queue_id",
             "foreign_keys": [],
             "contract": null
         },
@@ -6367,6 +6395,20 @@
             "defined_in": "242_mda_security_boundary_authority.sql",
             "extended_in": [],
             "primary_key": "mda_sod_exception_authority_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "mda_workspace_projection_freshness": {
+            "defined_in": "243_mda_frontend_projection_safety.sql",
+            "extended_in": [],
+            "primary_key": "mda_workspace_projection_freshness_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "mda_workspace_projection_policy": {
+            "defined_in": "243_mda_frontend_projection_safety.sql",
+            "extended_in": [],
+            "primary_key": "mda_workspace_projection_policy_id",
             "foreign_keys": [],
             "contract": null
         },
