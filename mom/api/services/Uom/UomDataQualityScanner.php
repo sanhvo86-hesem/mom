@@ -78,7 +78,7 @@ final class UomDataQualityScanner
     /**
      * Aliases in uom_alias_quarantine awaiting metrology team review.
      *
-     * @return list<array{alias_string, source_system, first_seen_at, retry_count}>
+     * @return list<array<string, mixed>>
      */
     public function scanQuarantinedAliases(): array
     {
@@ -101,7 +101,7 @@ final class UomDataQualityScanner
      * after the policy was set. ConversionEngine will fail for these items
      * until the policy is updated.
      *
-     * @return list<array{item_id, slot, unit_code, unit_status, policy_id}>
+     * @return list<array<string, mixed>>
      */
     public function scanOrphanedPolicies(): array
     {
@@ -132,7 +132,7 @@ final class UomDataQualityScanner
      * These gaps cause ConversionEngine to fall through to SI-base hop.
      * If both units lack si_factor, the hop also fails → runtime error.
      *
-     * @return list<array{slot_a, unit_a, slot_b, unit_b, item_count, has_si_hop}>
+     * @return list<array<string, mixed>>
      */
     public function scanConversionGaps(): array
     {
@@ -198,7 +198,7 @@ final class UomDataQualityScanner
      *
      * These items will fail volume↔mass conversion at runtime.
      *
-     * @return list<array{item_id, slot, volume_unit, missing_density}>
+     * @return list<array<string, mixed>>
      */
     public function scanMissingDensity(): array
     {
@@ -227,7 +227,7 @@ final class UomDataQualityScanner
     /**
      * Conversion rules stuck in 'pending_review' longer than STALE_REVIEW_DAYS.
      *
-     * @return list<array{rule_id, rule_code, from_unit, to_unit, days_pending, steps_completed}>
+     * @return list<array<string, mixed>>
      */
     public function scanStaleReviews(): array
     {
@@ -248,7 +248,7 @@ final class UomDataQualityScanner
     /**
      * AI advisory log entries awaiting human review.
      *
-     * @return list<array{id, advisory_type, model_id, confidence, days_pending}>
+     * @return list<array<string, mixed>>
      */
     public function scanPendingAiAdvisories(): array
     {
@@ -268,7 +268,7 @@ final class UomDataQualityScanner
     /**
      * Count active aliases per canonical code for a catalog health overview.
      *
-     * @return list<array{canonical_code, display_label_en, alias_count, quarantine_count}>
+     * @return list<array<string, mixed>>
      */
     public function catalogAliasHealth(): array
     {
