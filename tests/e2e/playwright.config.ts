@@ -7,10 +7,17 @@ export default defineConfig({
   expect: {
     timeout: 5_000,
     toHaveScreenshot: {
-      // Allow up to 100 differing pixels and 10% per-channel tolerance
-      // for anti-alias jitter and sub-pixel font rendering across runs.
-      maxDiffPixels: 100,
-      threshold: 0.1,
+      // Cross-OS visual regression tolerance — baselines may be generated on
+      // any developer host (macOS / Linux / Windows) but CI always runs on
+      // Linux. Font hinting and sub-pixel rasterization differ enough across
+      // OSes that very tight thresholds produce false-positives on what is
+      // semantically the same render. 0.25 per-channel + 5000 pixels is the
+      // band that absorbs that drift while still catching real visual
+      // regressions (a moved button, a swapped color, a missing component).
+      // The Graphics Authority remains the SSOT for token values; this
+      // tolerance only governs pixel-level rendering equivalence.
+      maxDiffPixels: 5_000,
+      threshold: 0.25,
       animations: 'disabled'
     }
   },
