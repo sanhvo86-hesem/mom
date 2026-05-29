@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace MOM\Services;
 
+use MOM\Database\DataLayer;
+
+require_once __DIR__ . '/MasterDataRepository.php';
+require_once __DIR__ . '/JsonMasterDataRepository.php';
+require_once __DIR__ . '/DataLayerMasterDataRepository.php';
+
 /**
  * Result object returned by MasterDataService mutation methods.
  */
@@ -208,7 +214,7 @@ final class MasterDataService
     {
         $this->repository = $repository
             ?? ($rootDirOrRepository instanceof MasterDataRepository ? $rootDirOrRepository : null)
-            ?? new JsonMasterDataRepository($dataDir, $this->defaultStore());
+            ?? $this->buildRuntimeRepository($dataDir, $rootDirOrRepository);
     }
 
     /**
@@ -228,20 +234,23 @@ final class MasterDataService
             ];
 
         $primary = strtolower(trim((string)($repoProbe['primary_backend'] ?? 'custom')));
-        $readiness = match ($primary) {
-            'postgres' => 'authoritative_ready',
-            'json' => 'compatibility_only',
+        $authorityMode = strtoupper(trim((string)($repoProbe['authority_mode'] ?? $dataLayerSummary['mode'] ?? '')));
+        $readiness = match (true) {
+            $primary === 'postgres' && $authorityMode === DataLayer::MODE_POSTGRES_ONLY => 'postgres_only_authoritative',
+            $primary === 'postgres' && $authorityMode === DataLayer::MODE_POSTGRES_PRIMARY => 'postgres_primary_with_controlled_json_fallback',
+            $authorityMode === DataLayer::MODE_SHADOW_WRITE => 'shadow_write_bridge',
+            $primary === 'json' => 'compatibility_only',
             default => 'degraded',
         };
 
         return array_merge($repoProbe, [
             'slice' => 'master_data',
             'readiness_state' => $readiness,
-            'authoritative_primary' => $readiness === 'authoritative_ready',
+            'authoritative_primary' => in_array($readiness, ['postgres_only_authoritative', 'postgres_primary_with_controlled_json_fallback'], true),
             'data_layer_mode' => (string)($dataLayerSummary['mode'] ?? ''),
             'postgres_configured' => (bool)($dataLayerSummary['use_postgres'] ?? false),
-            'notes' => $readiness === 'compatibility_only'
-                ? 'Master data governance is repository-bound but JSON primary; PostgreSQL-native repository remains deferred.'
+            'notes' => in_array($readiness, ['compatibility_only', 'shadow_write_bridge'], true)
+                ? 'Master data governance is repository-bound but not PostgreSQL primary yet; JSON remains compatibility/migration authority for this mode.'
                 : (string)($repoProbe['notes'] ?? ''),
         ]);
     }
@@ -312,6 +321,44 @@ final class MasterDataService
         $this->logHistory($entityType, $id, 'create', [], $record, $userId, 'Initial creation');
 
         return new MasterDataResult(true, 'Record created.', data: $record);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function listEntityRecords(string $entityType): array
+    {
+        if (!$this->isValidEntity($entityType)) {
+            return [];
+        }
+
+        $store = $this->loadStore();
+        return array_values(array_filter((array)($store[$entityType] ?? []), 'is_array'));
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function findEntityRecord(string $entityType, string $entityId): ?array
+    {
+        $entityId = trim($entityId);
+        if ($entityId === '') {
+            return null;
+        }
+
+        $idKey = self::ENTITY_KEYS[$entityType] ?? '';
+        foreach ($this->listEntityRecords($entityType) as $record) {
+            if ($idKey !== '' && (string)($record[$idKey] ?? '') === $entityId) {
+                return $record;
+            }
+            foreach (['id', 'machine_id', 'work_center_id', 'item_id', 'operator_id', 'customer_id', 'vendor_id', 'part_id', 'shift_code'] as $keyField) {
+                if ((string)($record[$keyField] ?? '') === $entityId) {
+                    return $record;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -1210,6 +1257,19 @@ final class MasterDataService
     private function saveArchive(array $data): void
     {
         $this->repository->saveArchive($data);
+    }
+
+    private function buildRuntimeRepository(string $dataDir, mixed $rootDirOrRepository): MasterDataRepository
+    {
+        $jsonRepository = new JsonMasterDataRepository($dataDir, $this->defaultStore());
+        if (!is_string($rootDirOrRepository) || trim($rootDirOrRepository) === '') {
+            return $jsonRepository;
+        }
+
+        return new DataLayerMasterDataRepository(
+            new DataLayer($dataDir, $rootDirOrRepository),
+            $jsonRepository,
+        );
     }
 
     private function loadOrders(): array

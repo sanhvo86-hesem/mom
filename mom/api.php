@@ -4633,6 +4633,9 @@ function load_master_data_store(): array {
       'item_count' => runtime_store_item_count(is_array($data) ? $data : []),
       'scope' => 'master_data_runtime',
     ]);
+    if (runtime_domain_requires_postgres_authority('master_data')) {
+      throw new RuntimeException('master_data_postgres_authority_unavailable: ' . $e->getMessage(), 0, $e);
+    }
   }
   if (!is_array($data)) {
     $data = $defaults;
@@ -4651,7 +4654,32 @@ function load_master_data_active_store(): array {
   global $MASTER_DATA_FILE;
   ensure_dir(dirname($MASTER_DATA_FILE));
   $defaults = master_data_store_default();
-  $data = read_json_file($MASTER_DATA_FILE);
+  $data = null;
+  if (runtime_domain_requires_postgres_authority('master_data')) {
+    try {
+      $layer = runtime_data_layer();
+      $data = $layer->getRuntimeMasterDataStore();
+      observe_primary_read('master_data', $layer->getLastReadMeta(), [
+        'item_count' => runtime_store_item_count($data),
+        'scope' => 'master_data_active_store',
+      ]);
+    } catch (Throwable $e) {
+      observe_primary_read('master_data', [
+        'source' => 'json_fallback',
+        'fallback' => true,
+        'error' => $e->getMessage(),
+        'mode' => (string)(runtime_data_layer_summary()['mode'] ?? 'UNKNOWN'),
+        'timestamp' => now_iso(),
+      ], [
+        'item_count' => 0,
+        'scope' => 'master_data_active_store',
+        'blocked' => true,
+      ]);
+      throw new RuntimeException('master_data_postgres_authority_unavailable: ' . $e->getMessage(), 0, $e);
+    }
+  } else {
+    $data = read_json_file($MASTER_DATA_FILE);
+  }
   if (!is_array($data)) {
     $data = $defaults;
   }
@@ -4672,6 +4700,11 @@ function save_master_data_store(array $data): void {
   $data['_meta']['updated'] = now_iso();
   if (runtime_domain_requires_postgres_authority('master_data')) {
     shadow_sync_master_data_store($data);
+    $runtimeMode = (string)(runtime_data_layer_summary()['mode'] ?? '');
+    if (runtime_domain_read_mode('master_data') === 'postgres_only' || $runtimeMode === 'POSTGRES_ONLY') {
+      return;
+    }
+    $data['_meta']['json_role'] = 'compatibility_cache_after_postgres_write';
   }
   write_json_file($MASTER_DATA_FILE, $data);
   if (!runtime_domain_requires_postgres_authority('master_data')) {
@@ -4723,7 +4756,7 @@ function master_data_service(): \MOM\Services\MasterDataService {
   require_once __DIR__ . '/api/services/MasterDataService.php';
   static $service = null;
   if ($service === null) {
-    $service = new \MOM\Services\MasterDataService($DATA_DIR);
+    $service = new \MOM\Services\MasterDataService($DATA_DIR, dirname(__DIR__));
   }
   return $service;
 }
@@ -4924,7 +4957,16 @@ function runtime_domain_read_mode(string $domain): string {
 }
 
 function runtime_domain_requires_postgres_authority(string $domain): bool {
-  return in_array(runtime_domain_read_mode($domain), ['postgres_primary', 'postgres_only'], true);
+  $domainMode = runtime_domain_read_mode($domain);
+  if ($domainMode === 'json') {
+    return false;
+  }
+  if (in_array($domainMode, ['postgres_primary', 'postgres_only'], true)) {
+    return true;
+  }
+
+  $summary = runtime_data_layer_summary();
+  return in_array((string)($summary['mode'] ?? ''), ['POSTGRES_PRIMARY', 'POSTGRES_ONLY'], true);
 }
 
 function mes_runtime_supports_live_stream(array $mode): bool {

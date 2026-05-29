@@ -2237,6 +2237,10 @@ class DataLayer
         $supplierRows = $this->db->query('SELECT metadata, updated_at FROM vendors ORDER BY vendor_id');
         $partRows = $this->db->query('SELECT metadata, updated_at FROM items ORDER BY item_id');
         $revisionRows = $this->db->query('SELECT metadata, valid_from FROM item_revisions ORDER BY item_id, rev');
+        $routingRows = $this->db->query('SELECT metadata, valid_from FROM routings ORDER BY routing_id, routing_revision');
+        $bomRows = $this->db->query('SELECT metadata, valid_from FROM bill_of_materials ORDER BY bom_id, bom_revision');
+        $controlPlanRows = $this->db->query('SELECT metadata, updated_at FROM control_plans ORDER BY plan_number');
+        $inspectionPlanRows = $this->db->query('SELECT metadata, valid_from FROM inspection_plans ORDER BY inspection_plan_id');
         $workCenterRows = $this->db->query('SELECT metadata, updated_at FROM work_centers ORDER BY work_center_id');
         $machineRows = $this->db->query('SELECT metadata, updated_at FROM equipment ORDER BY equipment_id');
         $toolingRows = $this->db->query("SELECT metadata, updated_at FROM tools WHERE COALESCE(metadata->>'shadow_source', '') <> 'mes_runtime' ORDER BY tool_id");
@@ -2273,6 +2277,10 @@ class DataLayer
                 $supplierRows,
                 $partRows,
                 $revisionRows,
+                $routingRows,
+                $bomRows,
+                $controlPlanRows,
+                $inspectionPlanRows,
                 $workCenterRows,
                 $machineRows,
                 $toolingRows,
@@ -2288,6 +2296,10 @@ class DataLayer
             'suppliers' => $this->extractMetadataRows($supplierRows),
             'parts' => $this->extractMetadataRows($partRows),
             'revisions' => $this->extractMetadataRows($revisionRows),
+            'routing_library' => $this->extractMetadataRows($routingRows),
+            'bom_library' => $this->extractMetadataRows($bomRows),
+            'control_plans' => $this->extractMetadataRows($controlPlanRows),
+            'inspection_plans' => $this->extractMetadataRows($inspectionPlanRows),
             'work_centers' => $this->extractMetadataRows($workCenterRows),
             'machines' => $this->extractMetadataRows($machineRows),
             'tooling_assets' => $this->extractMetadataRows($toolingRows),

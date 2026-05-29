@@ -1,0 +1,27 @@
+collection,json_key,postgres_table_or_path,repository_mode,round_trip_status,p27_delta,remaining_gap
+customers,customers,customers,DataLayerMasterDataRepository,implemented_existing,controller/service now read through repository,party command service still deferred
+suppliers,suppliers,vendors,DataLayerMasterDataRepository,implemented_existing,controller/service now read through repository,supplier command service still deferred
+parts,parts,items,DataLayerMasterDataRepository,implemented_existing,controller/service now read through repository,item command service still deferred
+revisions,revisions,item_revisions,DataLayerMasterDataRepository,implemented_existing,controller/service now read through repository,revision release command still deferred
+routing_library,routing_library,routings,DataLayerMasterDataRepository,implemented_p27,RuntimeShadowSync and DataLayer PG rebuild now include routing headers,routing operations/native release package still P30
+bom_library,bom_library,bill_of_materials,DataLayerMasterDataRepository,implemented_p27,RuntimeShadowSync and DataLayer PG rebuild now include BOM headers,BOM components/native release package still P30
+control_plans,control_plans,control_plans,DataLayerMasterDataRepository,implemented_p27,RuntimeShadowSync and DataLayer PG rebuild now include control plan headers,characteristics/reaction plan detail still P30/P33
+inspection_plans,inspection_plans,inspection_plans,DataLayerMasterDataRepository,implemented_p27,RuntimeShadowSync and DataLayer PG rebuild now include inspection plan headers,characteristics/sample detail still P30/P33
+work_centers,work_centers,work_centers,DataLayerMasterDataRepository,implemented_existing,repository read path now uses DataLayer when rootDir is supplied,readiness service still P34
+machines,machines,equipment,DataLayerMasterDataRepository,implemented_existing,repository read path now uses DataLayer when rootDir is supplied,readiness service still P34
+operators,operators,v_user_canonical plus employees metadata,DataLayerMasterDataRepository,implemented_existing,identity SSOT projection retained,operator readiness/training gate still P34
+tooling_assets,tooling_assets,tools,DataLayerMasterDataRepository,implemented_existing,repository read path now uses DataLayer when rootDir is supplied,tool life command service still P34/P36
+nc_program_releases,nc_program_releases,mes_nc_release_packages,DataLayerMasterDataRepository,implemented_existing,repository read path now uses DataLayer when rootDir is supplied,checksum gate and release package still P30/P34
+mes_connectivity_adapters,mes_connectivity_adapters,mes_connectivity_adapters,DataLayerMasterDataRepository,implemented_existing,repository read path now uses DataLayer when rootDir is supplied,OT readiness evidence still P34
+mes_alarm_catalog,mes_alarm_catalog,mes_alarm_catalog,DataLayerMasterDataRepository,implemented_existing,repository read path now uses DataLayer when rootDir is supplied,alarm reaction command service still deferred
+mes_alarm_playbooks,mes_alarm_playbooks,mes_alarm_playbooks,DataLayerMasterDataRepository,implemented_existing,repository read path now uses DataLayer when rootDir is supplied,playbook approval workflow still deferred
+tool_assemblies,tool_assemblies,mes_tool_assemblies,DataLayerMasterDataRepository,implemented_existing,repository read path now uses DataLayer when rootDir is supplied,tool assembly release command still P34
+downtime_reason_codes,downtime_reason_codes,variable_registry runtime_downtime_reason,DataLayerMasterDataRepository,implemented_existing,variable mirror retained,reason-code governance still later
+downtime_resolution_codes,downtime_resolution_codes,variable_registry runtime_downtime_resolution,DataLayerMasterDataRepository,implemented_existing,variable mirror retained,reason-code governance still later
+traveler_templates,traveler_templates,none,report_only,not_implemented,no safe existing table found in registry,P30 must physicalize or map
+quality_gate_profiles,quality_gate_profiles,none,report_only,not_implemented,no safe existing table found in registry,P33 must physicalize or map
+warehouse_locations,warehouse_locations,none,report_only,not_implemented,no safe existing table found in registry,P36 must physicalize or map
+defect_catalog,defect_catalog,none,report_only,not_implemented,no safe existing table found in registry,P33 must physicalize or map
+history,master-data-history.json,JSON compatibility bridge,DataLayerMasterDataRepository,controlled_gap,P27 emits bridge events for writes,native audit/event ledger deferred to P31/P32
+pending,master-data-pending.json,JSON compatibility bridge,DataLayerMasterDataRepository,controlled_gap,P27 emits bridge events for writes,native approval workflow deferred to P32
+archive,master-data-archive.json,JSON compatibility bridge,DataLayerMasterDataRepository,controlled_gap,P27 emits bridge events for writes,native archive/retention bridge deferred

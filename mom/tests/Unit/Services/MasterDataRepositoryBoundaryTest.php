@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MOM\Tests\Unit\Services;
 
+use MOM\Database\DataLayer;
+use MOM\Services\DataLayerMasterDataRepository;
+use MOM\Services\JsonMasterDataRepository;
 use MOM\Services\MasterDataRepository;
 use MOM\Services\MasterDataService;
 use PHPUnit\Framework\TestCase;
@@ -84,6 +87,64 @@ final class MasterDataRepositoryBoundaryTest extends TestCase
         $this->assertSame([], $repository->store['suppliers']);
         $this->assertSame('SUP-001', $repository->archive['suppliers'][0]['supplier_id'] ?? null);
         $this->assertSame('delete', $repository->history['entries'][0]['action'] ?? null);
+    }
+
+    public function testDataLayerRepositoryReportsJsonOnlyCompatibilityBridge(): void
+    {
+        $dataDir = sys_get_temp_dir() . '/hesem-md-repo-' . bin2hex(random_bytes(4));
+        @mkdir($dataDir . '/master-data', 0775, true);
+
+        try {
+            $defaults = [
+                '_meta' => ['version' => 'test'],
+                'customers' => [],
+                'suppliers' => [],
+                'parts' => [],
+                'revisions' => [],
+            ];
+            $dataLayer = new DataLayer($dataDir, (string)constant('QMS_TEST_ROOT_DIR'), [
+                'use_postgres' => false,
+                'shadow_write' => false,
+                'json_fallback' => false,
+            ]);
+            $repository = new DataLayerMasterDataRepository(
+                $dataLayer,
+                new JsonMasterDataRepository($dataDir, $defaults),
+            );
+
+            $repository->saveStore(array_merge($defaults, [
+                'customers' => [[
+                    'customer_id' => 'CUS-P27',
+                    'customer_name' => 'P27 Customer',
+                ]],
+            ]));
+
+            $loaded = $repository->loadStore();
+            $probe = $repository->authorityProbe($dataLayer->getModeSummary());
+
+            $this->assertSame('CUS-P27', $loaded['customers'][0]['customer_id'] ?? null);
+            $this->assertSame(DataLayer::MODE_JSON_ONLY, $probe['authority_mode'] ?? null);
+            $this->assertSame('json', $probe['primary_backend'] ?? null);
+            $this->assertSame('primary_compatibility_store', $probe['json_bridge_role'] ?? null);
+        } finally {
+            $this->removeTree($dataDir);
+        }
+    }
+
+    private function removeTree(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        foreach (array_diff(scandir($dir) ?: [], ['.', '..']) as $entry) {
+            $path = $dir . '/' . $entry;
+            if (is_dir($path)) {
+                $this->removeTree($path);
+                continue;
+            }
+            @unlink($path);
+        }
+        @rmdir($dir);
     }
 }
 

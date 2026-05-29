@@ -26,6 +26,11 @@ final class RuntimeShadowSync
             $this->syncVendors((array)($store['suppliers'] ?? []));
             $this->syncItems((array)($store['parts'] ?? []));
             $this->syncItemRevisions((array)($store['revisions'] ?? []));
+            $knownItemIds = $this->collectRuntimeItemIds((array)($store['parts'] ?? []));
+            $this->syncRoutings((array)($store['routing_library'] ?? []), $knownItemIds);
+            $this->syncBillsOfMaterial((array)($store['bom_library'] ?? []), $knownItemIds);
+            $this->syncControlPlans((array)($store['control_plans'] ?? []), $knownItemIds);
+            $this->syncInspectionPlans((array)($store['inspection_plans'] ?? []), $knownItemIds);
             $this->syncWorkCenters((array)($store['work_centers'] ?? []));
             $this->syncEquipment((array)($store['machines'] ?? []), (array)($store['work_centers'] ?? []));
             $this->syncTools((array)($store['tooling_assets'] ?? []));
@@ -182,6 +187,129 @@ final class RuntimeShadowSync
                 'valid_from' => $this->parseTimestamp((string)($row['release_date'] ?? '')) ?? date(DATE_ATOM),
                 'metadata' => $row,
             ], ['item_id', 'rev'], ['metadata']);
+        }
+    }
+
+    /**
+     * @param array<string, bool> $knownItemIds
+     */
+    private function syncRoutings(array $rows, array $knownItemIds): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $routingId = trim((string)($row['routing_id'] ?? ''));
+            if ($routingId === '') {
+                continue;
+            }
+            $itemId = $this->runtimeItemId($row, $knownItemIds);
+            if ($itemId === null) {
+                continue;
+            }
+            $revision = trim((string)($row['routing_revision'] ?? $row['revision'] ?? '1')) ?: '1';
+            $this->upsert('routings', [
+                'routing_id' => $routingId,
+                'routing_revision' => $revision,
+                'item_id' => $itemId,
+                'status' => strtolower(trim((string)($row['status'] ?? 'active'))) ?: 'active',
+                'metadata' => $row,
+                'valid_from' => $this->parseTimestamp((string)($row['valid_from'] ?? $row['effective_from'] ?? '')) ?? date(DATE_ATOM),
+                'valid_to' => $this->parseTimestamp((string)($row['valid_to'] ?? $row['effective_to'] ?? '')),
+            ], ['routing_id', 'routing_revision'], ['metadata']);
+        }
+    }
+
+    /**
+     * @param array<string, bool> $knownItemIds
+     */
+    private function syncBillsOfMaterial(array $rows, array $knownItemIds): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $bomId = trim((string)($row['bom_id'] ?? ''));
+            if ($bomId === '') {
+                continue;
+            }
+            $parentItemId = $this->runtimeItemId($row, $knownItemIds);
+            if ($parentItemId === null) {
+                continue;
+            }
+            $revision = trim((string)($row['bom_revision'] ?? $row['revision'] ?? '1')) ?: '1';
+            $this->upsert('bill_of_materials', [
+                'bom_id' => $bomId,
+                'bom_revision' => $revision,
+                'bom_type' => $this->enumValue((string)($row['bom_type'] ?? $row['type'] ?? ''), ['engineering', 'manufacturing', 'planning', 'cost'], 'manufacturing'),
+                'bom_status' => strtolower(trim((string)($row['status'] ?? 'active'))) ?: 'active',
+                'parent_item_id' => $parentItemId,
+                'eco_number' => trim((string)($row['eco_number'] ?? '')) ?: null,
+                'alternate_bom_id' => trim((string)($row['alternate_bom_id'] ?? '')) ?: null,
+                'bom_notes' => trim((string)($row['notes'] ?? $row['bom_notes'] ?? '')) ?: null,
+                'metadata' => $row,
+                'valid_from' => $this->parseTimestamp((string)($row['valid_from'] ?? $row['effective_from'] ?? '')) ?? date(DATE_ATOM),
+                'valid_to' => $this->parseTimestamp((string)($row['valid_to'] ?? $row['effective_to'] ?? '')),
+            ], ['bom_id', 'bom_revision'], ['metadata']);
+        }
+    }
+
+    /**
+     * @param array<string, bool> $knownItemIds
+     */
+    private function syncControlPlans(array $rows, array $knownItemIds): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $planNumber = trim((string)($row['plan_number'] ?? $row['control_plan_id'] ?? ''));
+            if ($planNumber === '') {
+                continue;
+            }
+            $this->upsert('control_plans', [
+                'plan_number' => $planNumber,
+                'plan_type' => $this->enumValue((string)($row['plan_type'] ?? $row['type'] ?? ''), ['prototype', 'pre_launch', 'production'], 'production'),
+                'title' => trim((string)($row['title'] ?? $row['control_plan_name'] ?? $planNumber)),
+                'title_vi' => trim((string)($row['title_vi'] ?? $row['control_plan_name_vi'] ?? '')) ?: null,
+                'item_id' => $this->runtimeItemId($row, $knownItemIds),
+                'revision' => max(1, (int)($row['revision'] ?? 1)),
+                'status' => strtolower(trim((string)($row['status'] ?? 'draft'))) ?: 'draft',
+                'effective_date' => $this->parseDate((string)($row['effective_date'] ?? $row['valid_from'] ?? '')),
+                'metadata' => $row,
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['plan_number'], ['metadata']);
+        }
+    }
+
+    /**
+     * @param array<string, bool> $knownItemIds
+     */
+    private function syncInspectionPlans(array $rows, array $knownItemIds): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $planId = trim((string)($row['inspection_plan_id'] ?? $row['plan_id'] ?? ''));
+            if ($planId === '') {
+                continue;
+            }
+            $this->upsert('inspection_plans', [
+                'inspection_plan_id' => $planId,
+                'inspection_type' => $this->enumValue((string)($row['inspection_type'] ?? $row['type'] ?? ''), ['incoming', 'in_process', 'final', 'source', 'first_article', 'periodic'], 'in_process'),
+                'item_id' => $this->runtimeItemId($row, $knownItemIds),
+                'sampling_plan' => $this->enumValue((string)($row['sampling_plan'] ?? ''), ['c0', 'aql', 'skip_lot', '100pct', 'reduced', 'tightened'], 'aql'),
+                'sampling_standard' => $this->enumValue((string)($row['sampling_standard'] ?? ''), ['ansi_z14', 'mil_std_1916', 'iso2859', 'custom'], 'ansi_z14'),
+                'aql_level' => trim((string)($row['aql_level'] ?? '')) ?: null,
+                'accept_number' => isset($row['accept_number']) ? (int)$row['accept_number'] : null,
+                'reject_number' => isset($row['reject_number']) ? (int)$row['reject_number'] : null,
+                'sample_size' => isset($row['sample_size']) ? (int)$row['sample_size'] : null,
+                'test_method' => trim((string)($row['test_method'] ?? '')) ?: null,
+                'metadata' => $row,
+                'valid_from' => $this->parseTimestamp((string)($row['valid_from'] ?? $row['effective_from'] ?? '')) ?? date(DATE_ATOM),
+                'valid_to' => $this->parseTimestamp((string)($row['valid_to'] ?? $row['effective_to'] ?? '')),
+            ], ['inspection_plan_id'], ['metadata']);
         }
     }
 
@@ -1482,6 +1610,51 @@ final class RuntimeShadowSync
             $map[$workCenterId] = $this->mapDept((string)($row['department'] ?? ''));
         }
         return $map;
+    }
+
+    /**
+     * @return array<string, bool>
+     */
+    private function collectRuntimeItemIds(array $rows): array
+    {
+        $ids = [];
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $itemId = trim((string)($row['part_number'] ?? $row['item_id'] ?? ''));
+            if ($itemId !== '') {
+                $ids[$itemId] = true;
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * @param array<string, bool> $knownItemIds
+     */
+    private function runtimeItemId(array $row, array $knownItemIds): ?string
+    {
+        foreach (['item_id', 'part_number', 'parent_item_id', 'parent_part_number'] as $field) {
+            $candidate = trim((string)($row[$field] ?? ''));
+            if ($candidate !== '' && isset($knownItemIds[$candidate])) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<int, string> $allowed
+     */
+    private function enumValue(string $value, array $allowed, string $default): string
+    {
+        $normalized = strtolower(trim($value));
+        $normalized = str_replace([' ', '-'], '_', $normalized);
+
+        return in_array($normalized, $allowed, true) ? $normalized : $default;
     }
 
     private function parseDate(?string $value): ?string
