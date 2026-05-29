@@ -27,6 +27,10 @@ tests/e2e/node_modules/
 # Whitelist KPI audit/report outputs so AI sessions can commit evidence
 # produced during the KPI upgrade program (prompt pack 01→09).
 !_reports/kpi/
+# Whitelist UoM Measurement Intelligence audit + IMPL-NN report deliverables
+# (required by HESEM UoM Prompt OS V1 every IMPL slice must emit a
+# matching `_reports/uom-measurement-conversion-v1/implNN-*.md` file).
+!_reports/uom-measurement-conversion-v1/
 _build/
 _Deleted/
 .tmp/
