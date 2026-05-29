@@ -27,7 +27,10 @@
             "MOM\\Api\\": "api/",
             "MOM\\Services\\": "api/services/",
             "MOM\\Database\\": "database/"
-        }
+        },
+        "files": [
+            "api/services/Uom/UomException.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
