@@ -964,3 +964,73 @@ body.orders-v3-active #page-orders.active > .page-breadcrumb {
 :root[data-color-mode="dark"] #admin-content button:not([class*="primary"]):not([class*="danger"]):not([class*="success"]){background:#1e293b;color:#f1f5f9;border-color:#475569}
 :root[data-color-mode="dark"] #admin-content code{background:#0f172a;color:#94a3b8}
 :root[data-color-mode="dark"] body{background:#0f172a;color:#f1f5f9}
+
+/* ════════════════════════════════════════════════════════════════════
+ * v3-G16 (2026-05-29) — Dark mode CONTRAST FIXES
+ * User-reported issues:
+ *   1. Sidebar item text (Dashboard/Tìm kiếm/Từ điển) invisible
+ *   2. Active Theme sub-tab background dark with dark text
+ *   3. Number/text inputs in Theme tab show WHITE bg in dark mode
+ *   4. Properties dock inputs disabled state hard to read
+ * ════════════════════════════════════════════════════════════════════ */
+
+/* Sidebar — force white-ish text on dark, !important to beat inline */
+:root[data-color-mode="dark"] #sidebar a,
+:root[data-color-mode="dark"] #sidebar a *,
+:root[data-color-mode="dark"] #sidebar .menu-item,
+:root[data-color-mode="dark"] #sidebar .menu-item *,
+:root[data-color-mode="dark"] #sidebar div[onclick],
+:root[data-color-mode="dark"] #sidebar div[onclick] *,
+:root[data-color-mode="dark"] #sidebar > div > div{color:#e2e8f0 !important}
+:root[data-color-mode="dark"] #sidebar a:hover,
+:root[data-color-mode="dark"] #sidebar div[onclick]:hover{background:#1e293b !important}
+:root[data-color-mode="dark"] #sidebar [class*="active"]{background:linear-gradient(180deg,#1d4ed8 0%,#1e40af 100%) !important;color:#fff !important}
+
+/* Theme tab active sub-tab — light text on brand bg */
+:root[data-color-mode="dark"] [data-theme-seg].active,
+:root[data-color-mode="dark"] [data-theme-seg][style*="background:var(--o3-brand)"]{color:#fff !important}
+/* Active sub-tab strip in Theme renderer (brand bg = sky-400 in dark) */
+:root[data-color-mode="dark"] button[data-theme-subtab][style*="border-bottom"]{color:#38bdf8 !important}
+
+/* Theme tab inputs in dark mode — force dark bg + light text */
+:root[data-color-mode="dark"] #adm-appearance-panel-theme input[type="number"],
+:root[data-color-mode="dark"] #adm-appearance-panel-theme input[type="text"],
+:root[data-color-mode="dark"] #adm-appearance-panel-theme input[type="color"],
+:root[data-color-mode="dark"] #adm-appearance-panel-theme select{background:#1e293b !important;color:#f1f5f9 !important;border-color:#475569 !important}
+:root[data-color-mode="dark"] #adm-appearance-panel-theme input[type="range"]{accent-color:#38bdf8}
+:root[data-color-mode="dark"] #adm-appearance-panel-theme section{background:#1e293b !important;border-color:#334155 !important}
+:root[data-color-mode="dark"] #adm-appearance-panel-theme h3,
+:root[data-color-mode="dark"] #adm-appearance-panel-theme code{color:#f1f5f9 !important}
+:root[data-color-mode="dark"] #adm-appearance-panel-theme button#theme-reset{background:#334155 !important;color:#f1f5f9 !important;border-color:#475569 !important}
+
+/* Properties dock inputs — improve disabled-state contrast in dark */
+:root[data-color-mode="dark"] .o3-props-row__input.is-inherited{background:#0f172a !important;color:#64748b !important;border-color:#334155 !important;opacity:.7}
+:root[data-color-mode="dark"] .o3-props-row__input.is-custom{background:#1e293b !important;color:#f1f5f9 !important;border-color:#38bdf8 !important;opacity:1}
+:root[data-color-mode="dark"] .o3-props-row__custom{background:#1e293b !important;border-color:#475569 !important}
+:root[data-color-mode="dark"] .o3-props-row__custom:checked{background:#38bdf8 !important;border-color:#38bdf8 !important}
+:root[data-color-mode="dark"] .o3-props-row__name{color:#f1f5f9}
+:root[data-color-mode="dark"] .o3-props-row__key{color:#94a3b8}
+
+/* Properties dock body — ensure inputs reactive when dock under dark */
+:root[data-color-mode="dark"] .o3-props-dock__panel,
+:root[data-color-mode="dark"] .o3-props-dock__header,
+:root[data-color-mode="dark"] .o3-props-dock__footer{background:#0f172a;color:#f1f5f9;border-color:#334155}
+:root[data-color-mode="dark"] .o3-props-dock__title{color:#f1f5f9}
+:root[data-color-mode="dark"] .o3-props-dock__subtitle{color:#94a3b8}
+:root[data-color-mode="dark"] .o3-props-dock__subtab{color:#94a3b8}
+:root[data-color-mode="dark"] .o3-props-dock__subtab.is-active{background:#1e3a8a;color:#38bdf8}
+:root[data-color-mode="dark"] .o3-props-dock__close,
+:root[data-color-mode="dark"] .o3-props-dock__collapse{color:#cbd5e1}
+:root[data-color-mode="dark"] .o3-props-dock__close:hover,
+:root[data-color-mode="dark"] .o3-props-dock__collapse:hover{background:#334155;color:#f1f5f9}
+:root[data-color-mode="dark"] .o3-props-dock__footer button{background:#334155;color:#f1f5f9;border-color:#475569}
+:root[data-color-mode="dark"] .o3-props-dock__footer button.is-primary{background:#38bdf8;color:#0f172a;border-color:#38bdf8}
+
+/* Smooth cross-mode transition so flips don't strobe */
+body,
+#sidebar,
+#admin-content,
+.o3-props-dock__panel,
+.o3-shell,
+.o3-btn,
+.o3-chip{transition:background-color 180ms ease, color 180ms ease, border-color 180ms ease}

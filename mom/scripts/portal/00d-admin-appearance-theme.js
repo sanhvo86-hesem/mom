@@ -374,30 +374,51 @@
       sb.setAttribute('data-theme-wired', '1');
       sb.addEventListener('click', function(){
         var theme = readTheme();
+        var overrides = readOverrides();
+        var stagedCount = 0;
         var posted = false;
         try {
           if (window.GraphicsAuthority && window.GraphicsAuthority.tokens
               && typeof window.GraphicsAuthority.tokens.stage === 'function') {
-            // Map theme settings to token catalog keys
-            window.GraphicsAuthority.tokens.stage('space.master',  theme['master-gap'] + 'px');
-            window.GraphicsAuthority.tokens.stage('space.section', theme['section-gap'] + 'px');
-            window.GraphicsAuthority.tokens.stage('radius.master', theme['master-radius'] + 'px');
-            window.GraphicsAuthority.tokens.stage('radius.card',   theme['card-radius'] + 'px');
-            window.GraphicsAuthority.tokens.stage('control.height.standard',
-              ({compact:32,cozy:36,comfortable:40}[theme['density']] || 36) + 'px');
-            window.GraphicsAuthority.tokens.stage('brand.primary', theme['brand']);
-            if (window.GraphicsAuthority.preview
+            var dHeight = ({compact:32,cozy:36,comfortable:40}[theme['density']] || 36);
+            [['space.master', theme['master-gap']+'px'],
+             ['space.section', theme['section-gap']+'px'],
+             ['radius.master', theme['master-radius']+'px'],
+             ['radius.card',   theme['card-radius']+'px'],
+             ['control.height.standard', dHeight+'px'],
+             ['brand.primary', theme['brand']]].forEach(function(p){
+              try { window.GraphicsAuthority.tokens.stage(p[0], p[1]); stagedCount++; } catch(e){}
+            });
+            // Stage custom property overrides too
+            Object.keys(overrides).forEach(function(k){
+              if (!overrides[k]) return;
+              var raw = document.documentElement.style.getPropertyValue(
+                ({
+                  'space.master':'--o3-space',
+                  'space.section':'--o3-space-section',
+                  'radius.master':'--o3-radius',
+                  'radius.card':'--o3-radius-card',
+                  'control.height.standard':'--o3-control-h-standard',
+                  'brand.primary':'--o3-brand'
+                })[k] || ('--'+k.replace(/\./g,'-'))
+              );
+              if (raw) { try { window.GraphicsAuthority.tokens.stage(k, raw); stagedCount++; } catch(e){} }
+            });
+            if (stagedCount > 0 && window.GraphicsAuthority.preview
                 && typeof window.GraphicsAuthority.preview.simulate === 'function') {
               window.GraphicsAuthority.preview.simulate();
               posted = true;
             }
           }
-        } catch (e) { /* fall through */ }
-        if (posted) {
-          alert('✓ Đã stage Theme + chạy WCAG simulation. Mở Graphics tab gốc để publish ra org.');
-        } else {
-          alert('✓ Theme saved to browser. GraphicsAuthority pipeline chưa wire ở session này — backend persistence sẽ wire ở v3-G16.');
-        }
+        } catch (e) {}
+        // Toast notification — no alert() which blocks the thread
+        var toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 20px;background:#0f172a;color:#fff;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.30);font-size:13px;font-weight:500;z-index:99999;border-left:3px solid '+(posted?'#16a34a':'#0ea5e9');
+        toast.innerHTML = posted
+          ? '✓ Saved — staged ' + stagedCount + ' tokens to GraphicsAuthority + WCAG simulation queued'
+          : '✓ Saved to browser localStorage (' + stagedCount + ' tokens). Backend wire pending v3-G17.';
+        document.body.appendChild(toast);
+        setTimeout(function(){ toast.style.transition='opacity 300ms'; toast.style.opacity='0'; setTimeout(function(){ toast.remove(); }, 350); }, 4000);
       });
     }
   };
