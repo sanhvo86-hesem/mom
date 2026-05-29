@@ -1,0 +1,7 @@
+claim_id,source,claim_summary,evidence_status,risk,status,next_owner_prompt,notes
+SCL-P22-001,MDA_FINAL_ACCEPTANCE_DECISION,"prior package accepted as design/governance output, not runtime-complete",supported,low,closed,P22,"no stale production-ready claim found"
+SCL-P22-002,MDA_EXTERNAL_REDTEAM_REPORT,"package is enterprise-grade planning material but not runtime-complete authority platform",supported,low,closed,P22,"red-team statement is consistent with V3 purpose"
+SCL-P22-003,MDA_RUN_MANIFEST,"prior P08-P10 handoff repair completed before V3",supported,low,closed,P22,"current file inventory confirms P08-P10 handoff packets exist"
+SCL-P22-004,MDA_CONTROLLED_GAP_LEDGER_FINAL,"13 runtime gaps remain classified as P2 controlled gaps",supported_but_requires_reclassification,high,open,P23,"V3 policy may convert authority-path items to P0/P1 blockers"
+SCL-P22-005,docs/backend/RUNTIME_AUTHORITY_MAP,"Generic CRUD guard exists but command authority is still required for governed state transitions",supported,high,open,P23,"P23 must decide severity and blocker policy"
+SCL-P22-006,prior_simulation_libraries,"scenario rows exist as design/narrative assets",supported,medium,open,P38,"P38 must convert scenario coverage into executable runtime acceptance evidence"

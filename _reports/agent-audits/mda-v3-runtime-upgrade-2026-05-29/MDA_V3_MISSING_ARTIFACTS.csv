@@ -1,0 +1,2 @@
+artifact_id,prompt_id,artifact_class,expected_path,observed_path,status,repair_action,notes
+NONE,ALL,ALL_REQUIRED_PROMPT_LEVEL_ARTIFACTS,ALL_P00_P21_MAIN_AUDIT_MATRIX_SIMULATION_GAP_HANDOFF,ALL_PRESENT,pass,none,"P22 found no missing required P00-P21 prompt-level artifact in the prior MDA package"
