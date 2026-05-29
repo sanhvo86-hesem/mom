@@ -118,9 +118,9 @@ VALUES
 ('Cel',  'Cel',       '°C',  'degree Celsius', 'độ C',             'ThermodynamicTemperature', false,1, 273.15, true,  'active', 'BIPM', 'medium'),
 ('degF', '[degF]',    '°F',  'degree Fahrenheit','độ F',           'ThermodynamicTemperature', false,NULL,NULL,  true,  'active', 'UCUM', 'medium'),
 
--- Temperature difference
-('DeltaK',   'K',   'ΔK',   'kelvin difference',  'chênh lệch kelvin',  'TemperatureDifference', false, 1,    0, false, 'active', 'BIPM', 'low'),
-('DeltaCel', 'Cel', 'Δ°C',  'Celsius difference', 'chênh lệch độ C',    'TemperatureDifference', false, 1,    0, false, 'active', 'BIPM', 'low'),
+-- Temperature difference — UCUM annotation codes to avoid conflict with K/Cel
+('DeltaK',   'K{diff}',   'ΔK',   'kelvin difference',  'chênh lệch kelvin',  'TemperatureDifference', false, 1,    0, false, 'active', 'BIPM', 'low'),
+('DeltaCel', 'Cel{diff}', 'Δ°C',  'Celsius difference', 'chênh lệch độ C',    'TemperatureDifference', false, 1,    0, false, 'active', 'BIPM', 'low'),
 
 -- Time / Duration
 ('s',    's',         's',   'second',         'giây',             'Duration', true,  1,       0, false, 'active', 'BIPM', 'low'),
@@ -186,11 +186,10 @@ VALUES
 ON CONFLICT (canonical_code) DO NOTHING;
 
 -- ============================================================
--- CONVERSION RULES — Phase 1 (key rules; engine derives inverses)
+-- CONVERSION RULES — Phase 1
+-- Seeds as 'draft'; DO block below activates them using first
+-- available user to satisfy chk_rule_approved constraint.
 -- ============================================================
-
--- Note: approved_by / created_by use NULL here (seed data); migration actor
--- In production: these would reference a system seed user UUID
 
 INSERT INTO uom_conversion_rule
     (rule_code, version, from_unit_code, to_unit_code, quantity_kind_code,
@@ -199,69 +198,88 @@ INSERT INTO uom_conversion_rule
 VALUES
 
 -- Mass linear
-('UOMCONV-MASS-KG-G-v1',   1,'kg',  'g',   'Mass',   'exact_linear',  1000,            0,'BIPM SI prefix k=10^3',         true, 'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-MASS-KG-MG-v1',  1,'kg',  'mg',  'Mass',   'exact_linear',  1000000,         0,'BIPM SI prefix m=10^-3',        true, 'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-MASS-KG-UG-v1',  1,'kg',  'ug',  'Mass',   'exact_linear',  1000000000,      0,'BIPM SI prefix µ=10^-6',        true, 'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-MASS-KG-T-v1',   1,'kg',  't',   'Mass',   'exact_linear',  0.001,           0,'BIPM SI: 1 t = 1000 kg',        true, 'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-MASS-KG-LB-v1',  1,'kg',  'lb',  'Mass',   'exact_linear',  2.20462262184878,0,'NIST/ISO: 1 lb = 0.45359237 kg exact',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-MASS-KG-OZ-v1',  1,'kg',  'oz',  'Mass',   'exact_linear',  35.27396194958,  0,'NIST: 1 oz_av = 28.349523125 g',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
+('UOMCONV-MASS-KG-G-v1',   1,'kg',  'g',   'Mass',   'exact_linear',  1000,            0,'BIPM SI prefix k=10^3',              true, 'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-MASS-KG-MG-v1',  1,'kg',  'mg',  'Mass',   'exact_linear',  1000000,         0,'BIPM SI prefix m=10^-3',             true, 'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-MASS-KG-UG-v1',  1,'kg',  'ug',  'Mass',   'exact_linear',  1000000000,      0,'BIPM SI prefix µ=10^-6',             true, 'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-MASS-KG-T-v1',   1,'kg',  't',   'Mass',   'exact_linear',  0.001,           0,'BIPM SI: 1 t = 1000 kg',             true, 'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-MASS-KG-LB-v1',  1,'kg',  'lb',  'Mass',   'exact_linear',  2.20462262184878,0,'NIST/ISO: 1 lb = 0.45359237 kg exact',true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-MASS-KG-OZ-v1',  1,'kg',  'oz',  'Mass',   'exact_linear',  35.27396194958,  0,'NIST: 1 oz_av = 28.349523125 g',    true, 'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
 
 -- Length linear
-('UOMCONV-LEN-M-MM-v1',    1,'m',   'mm',  'Length', 'exact_linear',  1000,            0,'BIPM SI prefix m=10^-3',        true, 'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-LEN-M-CM-v1',    1,'m',   'cm',  'Length', 'exact_linear',  100,             0,'BIPM SI prefix c=10^-2',        true, 'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-LEN-M-UM-v1',    1,'m',   'um',  'Length', 'exact_linear',  1000000,         0,'BIPM SI prefix µ=10^-6',        true, 'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-LEN-M-KM-v1',    1,'m',   'km',  'Length', 'exact_linear',  0.001,           0,'BIPM SI prefix k=10^3',         true, 'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-LEN-M-IN-v1',    1,'m',   'in',  'Length', 'exact_linear',  39.3700787401575,0,'ISO 31-1/NIST: 1 in=0.0254 m exact',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-LEN-M-FT-v1',    1,'m',   'ft',  'Length', 'exact_linear',  3.28083989501312,0,'ISO 31-1: 1 ft=0.3048 m exact', true, 'ROUND_HALF_EVEN','2026-01-01','approved','low'),
+('UOMCONV-LEN-M-MM-v1',    1,'m',   'mm',  'Length', 'exact_linear',  1000,            0,'BIPM SI prefix m=10^-3',             true, 'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-LEN-M-CM-v1',    1,'m',   'cm',  'Length', 'exact_linear',  100,             0,'BIPM SI prefix c=10^-2',             true, 'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-LEN-M-UM-v1',    1,'m',   'um',  'Length', 'exact_linear',  1000000,         0,'BIPM SI prefix µ=10^-6',             true, 'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-LEN-M-KM-v1',    1,'m',   'km',  'Length', 'exact_linear',  0.001,           0,'BIPM SI prefix k=10^3',              true, 'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-LEN-M-IN-v1',    1,'m',   'in',  'Length', 'exact_linear',  39.3700787401575,0,'ISO 31-1/NIST: 1 in=0.0254 m exact', true, 'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-LEN-M-FT-v1',    1,'m',   'ft',  'Length', 'exact_linear',  3.28083989501312,0,'ISO 31-1: 1 ft=0.3048 m exact',      true, 'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
 
 -- Volume linear
-('UOMCONV-VOL-M3-L-v1',    1,'m3',  'L',   'Volume', 'exact_linear',  1000,            0,'SI: 1 m³=1000 L (1 dm³=1 L)',   true, 'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-VOL-L-ML-v1',    1,'L',   'mL',  'Volume', 'exact_linear',  1000,            0,'SI: 1 L = 1000 mL',             true, 'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-VOL-ML-UL-v1',   1,'mL',  'uL',  'Volume', 'exact_linear',  1000,            0,'SI prefix',                     true, 'ROUND_HALF_EVEN','2026-01-01','approved','low'),
+('UOMCONV-VOL-M3-L-v1',    1,'m3',  'L',   'Volume', 'exact_linear',  1000,            0,'SI: 1 m³=1000 L (1 dm³=1 L)',        true, 'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-VOL-L-ML-v1',    1,'L',   'mL',  'Volume', 'exact_linear',  1000,            0,'SI: 1 L = 1000 mL',                  true, 'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-VOL-ML-UL-v1',   1,'mL',  'uL',  'Volume', 'exact_linear',  1000,            0,'SI prefix',                          true, 'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
 
--- Temperature affine (°C→K uses offset 273.15)
-('UOMCONV-TEMP-CEL-K-v1',  1,'Cel', 'K',   'ThermodynamicTemperature','affine',1,273.15,'ITS-90/BIPM: K = °C + 273.15 exactly',true,'ROUND_HALF_EVEN','2026-01-01','approved','medium'),
--- °F→°C is affine: C = (F-32) × 5/9
--- Stored as: factor = 5/9 = 0.55555..., but the -32 offset is applied to magnitude first
--- Engine handles: C = (F + offset) × factor where offset=-32 applied before multiply
+-- Temperature affine (°C→K uses additive offset 273.15; engine: K = °C + 273.15)
+('UOMCONV-TEMP-CEL-K-v1',  1,'Cel', 'K',   'ThermodynamicTemperature','affine',1,273.15,'ITS-90/BIPM: K = °C + 273.15 exactly', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','medium'),
+-- °F→°C affine: C = (F + offset) × factor where offset=-32, factor=5/9
 ('UOMCONV-TEMP-DEGF-CEL-v1',1,'degF','Cel','ThermodynamicTemperature','affine',
     0.55555555555555555556,-32.0,'ITS-90/BIPM: C=(F-32)×5/9',
-    true,'ROUND_HALF_EVEN','2026-01-01','approved','medium'),
+    true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','medium'),
 
--- Temperature difference (linear, factor=1)
-('UOMCONV-TDIFF-DELTAK-DELTACEL-v1',1,'DeltaK','DeltaCel','TemperatureDifference','exact_linear',1,0,'ITS-90: ΔK = Δ°C exactly',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
+-- Temperature difference (linear, factor=1 — ΔK and Δ°C are numerically equal)
+('UOMCONV-TDIFF-DELTAK-DELTACEL-v1',1,'DeltaK','DeltaCel','TemperatureDifference','exact_linear',1,0,'ITS-90: ΔK = Δ°C exactly', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
 
 -- Pressure
-('UOMCONV-PRES-PA-KPA-v1',  1,'Pa',  'kPa', 'Pressure','exact_linear',0.001,          0,'SI prefix',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-PRES-PA-MPA-v1',  1,'Pa',  'MPa', 'Pressure','exact_linear',0.000001,       0,'SI prefix',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-PRES-PA-BAR-v1',  1,'Pa',  'bar', 'Pressure','defined_linear',0.00001,      0,'ISO 80000-4: 1 bar=100000 Pa',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-PRES-PA-PSI-v1',  1,'Pa',  'psi', 'Pressure','defined_linear',0.000145038,  0,'NIST: 1 psi=6894.757293 Pa',false,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-PRES-PA-ATM-v1',  1,'Pa',  'atm', 'Pressure','defined_linear',0.0000098692, 0,'SI: 1 atm=101325 Pa exactly',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
+('UOMCONV-PRES-PA-KPA-v1',  1,'Pa',  'kPa', 'Pressure','exact_linear',   0.001,         0,'SI prefix', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-PRES-PA-MPA-v1',  1,'Pa',  'MPa', 'Pressure','exact_linear',   0.000001,      0,'SI prefix', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-PRES-PA-BAR-v1',  1,'Pa',  'bar', 'Pressure','defined_linear', 0.00001,       0,'ISO 80000-4: 1 bar=100000 Pa', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-PRES-PA-PSI-v1',  1,'Pa',  'psi', 'Pressure','defined_linear', 0.000145038,   0,'NIST: 1 psi=6894.757293 Pa',false,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-PRES-PA-ATM-v1',  1,'Pa',  'atm', 'Pressure','defined_linear', 0.0000098692,  0,'SI: 1 atm=101325 Pa exactly', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
 
 -- Energy
-('UOMCONV-ENRG-J-KJ-v1',   1,'J',   'kJ',  'Energy','exact_linear',0.001,            0,'SI prefix',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-ENRG-J-KWH-v1',  1,'J',   'kWh', 'Energy','defined_linear',2.7778e-7,      0,'SI: 1 kWh=3600000 J exactly',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-ENRG-J-WH-v1',   1,'J',   'Wh',  'Energy','defined_linear',0.000277778,    0,'SI: 1 Wh=3600 J',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
+('UOMCONV-ENRG-J-KJ-v1',   1,'J',   'kJ',  'Energy','exact_linear',  0.001,             0,'SI prefix', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-ENRG-J-KWH-v1',  1,'J',   'kWh', 'Energy','defined_linear',0.00000027778,     0,'SI: 1 kWh=3600000 J exactly', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-ENRG-J-WH-v1',   1,'J',   'Wh',  'Energy','defined_linear',0.000277778,       0,'SI: 1 Wh=3600 J', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
 
 -- Power
-('UOMCONV-PWR-W-KW-v1',    1,'W',   'kW',  'Power','exact_linear',0.001,             0,'SI prefix',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-PWR-W-MW-v1',    1,'W',   'MW',  'Power','exact_linear',0.000001,          0,'SI prefix',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
+('UOMCONV-PWR-W-KW-v1',    1,'W',   'kW',  'Power','exact_linear',   0.001,             0,'SI prefix', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-PWR-W-MW-v1',    1,'W',   'MW',  'Power','exact_linear',   0.000001,          0,'SI prefix', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
 
 -- Duration
-('UOMCONV-TIME-S-MIN-v1',  1,'s',   'min', 'Duration','exact_linear',0.01666667,     0,'1 min=60 s',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-TIME-S-H-v1',    1,'s',   'h',   'Duration','exact_linear',0.000277778,    0,'1 h=3600 s',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-('UOMCONV-TIME-S-D-v1',    1,'s',   'd',   'Duration','exact_linear',0.0000115741,   0,'1 d=86400 s',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
+('UOMCONV-TIME-S-MIN-v1',  1,'s',   'min', 'Duration','exact_linear',0.01666667,        0,'1 min=60 s', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-TIME-S-H-v1',    1,'s',   'h',   'Duration','exact_linear',0.000277778,       0,'1 h=3600 s', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
+('UOMCONV-TIME-S-D-v1',    1,'s',   'd',   'Duration','exact_linear',0.0000115741,      0,'1 d=86400 s', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
 
 -- Density
-('UOMCONV-DENS-KGM3-KGL-v1',1,'kg_m3','kg_L','Density','exact_linear',0.001,         0,'SI: 1 kg/m³ = 0.001 kg/L',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
+('UOMCONV-DENS-KGM3-KGL-v1',1,'kg_m3','kg_L','Density','exact_linear',0.001,            0,'SI: 1 kg/m³ = 0.001 kg/L', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low'),
 
 -- Angle
-('UOMCONV-ANG-RAD-DEG-v1', 1,'rad', 'deg', 'Angle','defined_linear',57.2957795131,   0,'SI: 1 rad = 180/π deg',true,'ROUND_HALF_EVEN','2026-01-01','approved','low'),
-
--- Angular velocity
-('UOMCONV-ANGV-RPM-RADS-v1',1,'rpm','m_s', 'AngularVelocity','defined_linear',0.10472,0,'1 rpm = 2π/60 rad/s ≈ 0.10472',false,'ROUND_HALF_EVEN','2026-01-01','approved','low')
+('UOMCONV-ANG-RAD-DEG-v1', 1,'rad', 'deg', 'Angle','defined_linear', 57.2957795131,     0,'SI: 1 rad = 180/π deg', true,'ROUND_HALF_EVEN', true, '2026-01-01','draft','low')
 
 ON CONFLICT (rule_code, version) DO NOTHING;
+
+-- Activate standard conversion rules using first available user.
+-- Rules stay 'draft' if no users exist yet (safe for empty-DB bootstrap).
+DO $$
+DECLARE
+    v_approver UUID;
+    v_count    INT;
+BEGIN
+    SELECT user_id INTO v_approver FROM users ORDER BY created_at ASC LIMIT 1;
+    IF v_approver IS NOT NULL THEN
+        UPDATE uom_conversion_rule
+        SET    lifecycle_status = 'approved',
+               approved_by     = v_approver,
+               approved_at     = NOW()
+        WHERE  rule_code LIKE 'UOMCONV-%'
+          AND  lifecycle_status = 'draft';
+        GET DIAGNOSTICS v_count = ROW_COUNT;
+        RAISE NOTICE 'UoM seed: activated % standard conversion rules', v_count;
+    ELSE
+        RAISE NOTICE 'UoM seed: no users found — % UOMCONV rules remain in draft; activate via admin UI',
+            (SELECT COUNT(*) FROM uom_conversion_rule WHERE rule_code LIKE 'UOMCONV-%' AND lifecycle_status = 'draft');
+    END IF;
+END;
+$$;
 
 -- ============================================================
 -- MATERIAL DENSITY REGISTRY — Phase 1 seeds
@@ -271,12 +289,12 @@ INSERT INTO material_density_registry
     (substance_code, substance_name_vi, substance_name_en,
      density_value, density_unit_code, temperature_celsius, density_source, effective_from)
 VALUES
-    ('WATER',     'Nước',           'Water',         0.99821,  'kg_L', 20.0, 'NIST Webbook',         '2026-01-01'),
-    ('ETHANOL',   'Cồn etanol',     'Ethanol',       0.78945,  'kg_L', 20.0, 'NIST Webbook',         '2026-01-01'),
-    ('ACETONE',   'Axêtôn',         'Acetone',       0.79100,  'kg_L', 20.0, 'NIST Webbook',         '2026-01-01'),
-    ('STEEL_CARBON','Thép carbon',  'Carbon Steel',  7.850,    'kg_L', 20.0, 'Engineering reference', '2026-01-01'),
-    ('ALUMINUM',  'Nhôm',           'Aluminum',      2.700,    'kg_L', 20.0, 'Engineering reference', '2026-01-01'),
-    ('POLYETHYLENE','Polyêtylen',   'Polyethylene',  0.950,    'kg_L', 20.0, 'Engineering reference', '2026-01-01')
+    ('WATER',       'Nước',           'Water',         0.99821,  'kg_L', 20.0, 'NIST Webbook',          '2026-01-01'),
+    ('ETHANOL',     'Cồn etanol',     'Ethanol',       0.78945,  'kg_L', 20.0, 'NIST Webbook',          '2026-01-01'),
+    ('ACETONE',     'Axêtôn',         'Acetone',       0.79100,  'kg_L', 20.0, 'NIST Webbook',          '2026-01-01'),
+    ('STEEL_CARBON','Thép carbon',    'Carbon Steel',  7.850,    'kg_L', 20.0, 'Engineering reference',  '2026-01-01'),
+    ('ALUMINUM',    'Nhôm',           'Aluminum',      2.700,    'kg_L', 20.0, 'Engineering reference',  '2026-01-01'),
+    ('POLYETHYLENE','Polyêtylen',     'Polyethylene',  0.950,    'kg_L', 20.0, 'Engineering reference',  '2026-01-01')
 ON CONFLICT DO NOTHING;
 
 -- ============================================================
