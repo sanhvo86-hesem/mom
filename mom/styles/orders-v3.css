@@ -53,20 +53,35 @@
   --o3-neutral:         var(--state-neutral, #475569);
   --o3-neutral-soft:    var(--state-neutral-soft, #f1f5f9);
 
-  /* Spacing scale (SSOT: spacing.{size} in graphics_token_catalog) */
-  --o3-space-xs:        4px;
-  --o3-space-sm:        8px;
-  --o3-space-md:        12px;
-  --o3-space-lg:        16px;
-  --o3-space-xl:        24px;
-  --o3-space-2xl:       32px;
-  --o3-space-3xl:       48px;
+  /* MASTER spacing (SSOT: space.master + space.section, migration 227).
+   * HESEM density rule 2026-05-29: ONE master controls 99% of gaps.
+   * One section value for top-level dividers. Adjust master to compress
+   * or expand the entire UI proportionally — Linear/Vercel pattern. */
+  --o3-space:           8px;   /* master — 99% of gaps */
+  --o3-space-section:   12px;  /* only for section dividers */
 
-  /* Radius (SSOT: radius.{size}) */
-  --o3-radius-sm:       4px;
-  --o3-radius-md:       6px;
-  --o3-radius-lg:       10px;
-  --o3-radius-pill:     999px;
+  /* Legacy 7-level scale — DEPRECATED, all alias the two masters.
+     Kept for one release so existing markup doesn't break. New code
+     uses --o3-space and --o3-space-section directly. */
+  --o3-space-xs:        var(--o3-space);
+  --o3-space-sm:        var(--o3-space);
+  --o3-space-md:        var(--o3-space);
+  --o3-space-lg:        var(--o3-space);
+  --o3-space-xl:        var(--o3-space-section);
+  --o3-space-2xl:       var(--o3-space-section);
+  --o3-space-3xl:       var(--o3-space-section);
+
+  /* MASTER radius (SSOT: radius.master + radius.card, migration 227).
+   * radius.master snaps every control to one curve. radius.card snaps
+   * every container. pill stays for chips/badges. */
+  --o3-radius:          4px;   /* master — controls */
+  --o3-radius-card:     8px;   /* cards, panels, KPI tiles, drawers */
+  --o3-radius-pill:     999px; /* special — chips, badges */
+
+  /* Legacy aliases */
+  --o3-radius-sm:       var(--o3-radius);
+  --o3-radius-md:       var(--o3-radius);
+  --o3-radius-lg:       var(--o3-radius-card);
 
   /* CONTROL HEIGHT — STANDARD (SSOT: control.height.standard)
    * HESEM rule (2026-05-28): ONE size for every interactive control.
@@ -144,8 +159,8 @@ body.orders-v3-active #content > #page-orders.active {
 .o3-shell__topbar {
   display: flex;
   align-items: center;
-  gap: var(--o3-space-md);
-  padding: var(--o3-space-md) var(--o3-space-xl);
+  gap: var(--o3-space);
+  padding: var(--o3-space) var(--o3-space-section);
   background: var(--o3-surface-card);
   border-bottom: 1px solid var(--o3-border-subtle);
   position: sticky;
@@ -229,12 +244,13 @@ body.orders-v3-active #page-orders.active > .page-breadcrumb {
 
 .o3-shell__body {
   flex: 1;
-  /* Tightened 2026-05-28 per HESEM space rule: lg padding + md gap is
-     enough for visual rhythm without wasting screen real estate. */
-  padding: var(--o3-space-lg);
+  /* Master density rule 2026-05-29: every gap is space.master (8px)
+     except section-level which is space.section (12px). Adjust
+     space.master in admin to tighten/loosen the entire UI. */
+  padding: var(--o3-space);
   display: flex;
   flex-direction: column;
-  gap: var(--o3-space-md);
+  gap: var(--o3-space);
 }
 
 /* ════════════════════════════════════════════════════════════════════════

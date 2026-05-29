@@ -15,6 +15,11 @@
 <link rel="stylesheet" href="./styles/so-jo-wo-dashboard.css">
 <link rel="stylesheet" href="./styles/order-management.css">
 <link rel="stylesheet" href="./styles/orders-v3.css?v=20260528a">
+<!-- Master density + scrollbar theme. HESEM industrial-design rule
+     (2026-05-29): one master gap + one section gap + one master radius
+     + one card radius govern the whole UI. Loaded AFTER all other
+     stylesheets so its !important overrides win. -->
+<link rel="stylesheet" href="./styles/master-density.css?v=20260529a">
 <link rel="stylesheet" href="./styles/quality-exception.css">
 <link rel="stylesheet" href="./styles/supplier-quality.css">
 <link rel="stylesheet" href="./styles/quoting.css">
@@ -388,6 +393,13 @@
 <script charset="UTF-8" src="./scripts/portal/34-purchasing-workspace.js?v=20260409a"></script>
 <script charset="UTF-8" src="./scripts/portal/11-e-signature.js?v=20260405x"></script>
 <script charset="UTF-8" src="./scripts/portal/12-searchable-input.js"></script>
+<!-- UoM Measurement Intelligence Control Center — feature-flagged admin module.
+     Enable: localStorage.setItem('uom_admin','1'); location.reload();
+     Disable: localStorage.removeItem('uom_admin'); location.reload();
+     Requires migrations 214-226 applied (Phase 1 seed data).
+     See mom/docs/ai-prompts/uom-measurement-conversion-v1/ for full spec. -->
+<script charset="UTF-8" src="./scripts/portal/81-uom-quantity-widget.js?v=20260529a"></script>
+<script charset="UTF-8" src="./scripts/portal/80-uom-control-center.js?v=20260529a"></script>
 <script charset="UTF-8" src="./scripts/portal/13-master-data-control.js?v=20260411m"></script>
 <script charset="UTF-8" src="./scripts/portal/14-mes-control-center.js?v=20260411m"></script>
 <script charset="UTF-8" src="./scripts/portal/14-exception-dashboard.js"></script>
