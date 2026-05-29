@@ -27,6 +27,17 @@ tests/e2e/node_modules/
 # Whitelist KPI audit/report outputs so AI sessions can commit evidence
 # produced during the KPI upgrade program (prompt pack 01→09).
 !_reports/kpi/
+# Whitelist UoM V3 No-Guess World-Class hardening reports (P00..P13). Each
+# V3 prompt emits an evidence-locked report set under this path; the
+# Controlled Source Boundary check must let them ride to GitHub for the
+# external integration readiness review.
+!_reports/uom-measurement-conversion-v3/
+# Whitelist V1 UoM planning reports — referenced by the V3 contradiction
+# ledger and external evaluators per the same precedent as v3.
+!_reports/uom-measurement-conversion-v1/
+# Whitelist MDA Sequential Authority prompt-pack audit bundle (governance
+# artifacts committed by 23b7f35ff for external evaluator review on GitHub).
+!_reports/agent-audits/
 _build/
 _Deleted/
 .tmp/
