@@ -61,15 +61,15 @@ entities:
   - root_code: MDA-INVENTORY-TRACE-COST
     canonical_name: InventoryLotSerialGenealogyWipCostLedgerAuthority
     owner_domain: inventory
-    table_names: [stock_balances, inventory_balance_snapshot, inventory_ledger, inventory_transactions, inventory_locations, location_balance, lot, lot_master, lot_policy, serial, serial_master, serial_policy, container, genealogy_link, genealogy_edges, genealogy_nodes, wip_ledger, mes_wip_location, mes_wip_movements, cost_ledger, copq_ledger, inventory_valuations, material_consumption, mes_material_consumption]
-    required_command_service: "InventoryMovement/Ledger command service"
-    allowed_commands: [inventory_receive, inventory_issue, inventory_adjust, lot_hold, serial_genealogy_link, wip_move, cost_post]
+    table_names: [stock_balances, inventory_balance_snapshot, inventory_ledger, inventory_transactions, inventory_ledger_command_packet, inventory_ledger_posting_packet, inventory_reconciliation_run, inventory_reconciliation_discrepancy, inventory_period_close_gate, inventory_recall_evidence_export, inventory_locations, location_balance, lot, lot_master, lot_policy, serial, serial_master, serial_policy, container, genealogy_link, genealogy_edges, genealogy_nodes, wip_ledger, mes_wip_location, mes_wip_movements, cost_ledger, copq_ledger, inventory_valuations, material_consumption, mes_material_consumption]
+    required_command_service: "InventoryMovement/Ledger command service plus InventoryLedgerAuthorityService for idempotency FEFO projection reconciliation recall gates"
+    allowed_commands: [inventory_receive, inventory_issue, inventory_adjust, lot_hold, serial_genealogy_link, wip_move, cost_post, inventory_reconcile, period_close_inventory_gate, recall_evidence_export]
     forbidden_generic_actions: [create, update, delete, transition, hold, post, reconcile]
     severity: P0
   - root_code: MDA-COMMERCIAL-EXECUTION
     canonical_name: SalesPurchaseJobWorkOrderAuthority
     owner_domain: production
-    table_names: [sales_orders, sales_order, sales_order_line, sales_order_lines, quotes, quote, quote_lines, job_orders, job_order, work_orders, work_order, production_order, job_operations, job_release_gates, resource_readiness_snapshot, purchase_orders, purchase_order, purchase_order_line, purchase_order_lines, purchase_receipts, purchase_receipt_lines, order_holds, shipment_releases, shipments]
+    table_names: [sales_orders, sales_order, sales_order_line, sales_order_lines, quotes, quote, quote_lines, job_orders, job_order, work_orders, work_order, production_order, job_operations, job_release_gates, resource_readiness_snapshot, inventory_ledger_posting_packet, purchase_orders, purchase_order, purchase_order_line, purchase_order_lines, purchase_receipts, purchase_receipt_lines, order_holds, shipment_releases, shipments]
     required_command_service: "Order/WorkOrder command services plus ResourceReadinessService before release/start"
     allowed_commands: [sales_order_release, job_order_release, work_order_release, work_order_start, purchase_order_approve, shipment_release]
     forbidden_generic_actions: [create, update, delete, transition, release, approve, hold]
@@ -77,7 +77,7 @@ entities:
   - root_code: MDA-MES-RUNTIME
     canonical_name: MesRuntimeEventAndReadinessAuthority
     owner_domain: mes_execution
-    table_names: [dispatch_queue, mes_dispatch_queue, resource_readiness_snapshot, mes_runtime_event_spine, mes_job_execution, mes_operation_execution, mes_operational_event_ledger, mes_cycle_events, mes_downtime_events, mes_machine_state_events, job_event, machine_event, downtime_event, track_in, track_out, material_consumption, tool_usage, production_completion, mes_tool_life_events, tool_breakage_suspect_window, shift_dispatch_execution_events, shift_production_report_events, pause_resume, labor_capture, labor_transactions]
+    table_names: [dispatch_queue, mes_dispatch_queue, resource_readiness_snapshot, mes_runtime_event_spine, mes_job_execution, mes_operation_execution, mes_operational_event_ledger, mes_cycle_events, mes_downtime_events, mes_machine_state_events, job_event, machine_event, downtime_event, track_in, track_out, material_consumption, tool_usage, production_completion, inventory_ledger_command_packet, inventory_ledger_posting_packet, mes_tool_life_events, tool_breakage_suspect_window, shift_dispatch_execution_events, shift_production_report_events, pause_resume, labor_capture, labor_transactions]
     required_command_service: "ResourceReadinessService plus ToolingGageAuthorityService plus MES runtime command service"
     allowed_commands: [resource_readiness_evaluate, job_start, operation_report, material_consume, machine_event_record, downtime_record]
     forbidden_generic_actions: [create, update, delete, transition, post]
@@ -93,7 +93,7 @@ entities:
   - root_code: MDA-FINANCE-PERIOD
     canonical_name: FinanceCostPeriodAuthority
     owner_domain: finance
-    table_names: [ap_invoices, ap_invoice_lines, gl_transactions, period_closes, backdate_exceptions, fin_standard_cost_rollups, fin_cost_versions, fin_multi_book_ledgers, fin_cash_transactions, fin_bank_reconciliations]
+    table_names: [ap_invoices, ap_invoice_lines, gl_transactions, period_closes, backdate_exceptions, inventory_period_close_gate, inventory_reconciliation_run, fin_standard_cost_rollups, fin_cost_versions, fin_multi_book_ledgers, fin_cash_transactions, fin_bank_reconciliations]
     required_command_service: "Finance posting and period close command service"
     allowed_commands: [invoice_post, cost_rollup_release, period_close, backdate_exception_approve]
     forbidden_generic_actions: [create, update, delete, transition, approve, post, reconcile]
