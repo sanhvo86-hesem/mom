@@ -1,0 +1,11 @@
+downstream_area,current_evidence,current_risk,required_integration,owner_prompt,status
+Item master and revision,"items and item_revisions reference base_uom_code","released item may use draft or ambiguous UOM","call assertUomApprovedForRelease during item/revision release",P27,open
+BOM and routing,"legacy component_uom and item UOM fields exist","component quantity may be interpreted locally","store source component qty/UOM normalized qty/UOM and conversion snapshot",P30,open
+Procurement and email intake,"CPO and email services default missing UOM to EA","supplier pack size may be lost","validate parsed UOM and defer pack conversion to UOM service",P31,open
+Receiving and putaway,"receipt and logistics tables carry uom text fields","receipt quantity can bypass canonical conversion","call convertQuantity before ledger write and hold source snapshot",P36,open
+Inventory ledger and WIP,"inventory schemas exist but command authority incomplete","balance can be updated without normalized UOM proof","persist source qty/UOM normalized qty/UOM conversion_id and snapshot",P36,open
+MES material issue and completion,"ShopfloorExecutionService writes uom defaults","WO issue/complete can use local defaults","use released WO conversion snapshot or UOM service by command timestamp",P34,open
+Inspection and special characteristics,"unit_of_measure fields exist in EQMS controllers","sample and CTQ units may be inconsistent","validate measurement UOM dimension and gage compatibility",P33,open
+Packaging shipment labeling,"BOX and shipment units exist as text or defaults","shipping unit can be confused with stock unit","use item/customer/supplier scoped conversion and packaging policy ref",P33,open
+Cost and COPQ,"cost services round money and quantities locally","unit cost can divide by unnormalized quantity","use normalized base quantity and source snapshot",P36,open
+Tool preset and measurement,"tooling and CTQ measurements use various unit fields","preset or measurement unit can be incompatible","validate measurement dimension and approved UOM before release",P34,open
