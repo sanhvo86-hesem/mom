@@ -655,6 +655,366 @@
     'status.neutral.soft':      ['--o3-neutral-soft', '--state-neutral-soft']
   };
 
+  /* ── Property catalog (v3-G10, 2026-05-29) ─────────────────────────
+   * Per-section grouped property catalog. Each entry is an array of
+   * { id, label_vi, label_en, items[] } sub-tab groups. Items can be
+   * either kind:'token' (uses TOKEN_CSS_VAR) or kind:'cssvar' (direct
+   * CSS variable binding). World-class properties researched from
+   * Figma Inspector, Material 3, IBM Carbon, Atlassian, SLDS, Vercel
+   * Geist. Sections not in catalog fall back to a single-group editor
+   * derived from the section's legacy `tokens[]` field. */
+  function _l(vi, en){ return { vi: vi, en: en }; }
+  function _tc(key, vi, en){ return { kind:'token', key:key, type:'color', label:_l(vi,en) }; }
+  function _tn(key, vi, en, mn, mx){ return { kind:'token', key:key, type:'number', unit:'px', min:mn||0, max:mx||48, label:_l(vi,en) }; }
+  function _vn(cv, vi, en, mn, mx, u){ return { kind:'cssvar', cssVar:cv, type:'number', unit:u===undefined?'px':u, min:mn||0, max:mx||48, label:_l(vi,en) }; }
+  function _grp(id, vi, en, items){ return { id:id, label_vi:vi, label_en:en, items:items }; }
+
+  var PROPERTY_CATALOG = {
+    'density': [
+      _grp('master','Master','Master',[
+        _tn('space.master','Khe hở chính','Master gap',2,24),
+        _tn('space.section','Khe phân đoạn','Section gap',4,32),
+        _tn('radius.master','Bo góc control','Control radius',0,16),
+        _tn('radius.card','Bo góc panel','Card radius',0,20),
+        _tn('control.height.standard','Cao chuẩn','Standard height',24,56)
+      ])
+    ],
+    'buttons': [
+      _grp('layout','Bố cục','Layout',[
+        _tn('control.height.standard','Chiều cao nút','Button height',24,56),
+        _vn('--o3-space-md','Padding ngang','Horizontal padding',4,32),
+        _vn('--o3-radius','Bo góc','Border radius',0,20),
+        _vn('--o3-space-sm','Khe giữa nút','Gap between',0,24)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('brand.primary','Màu chính','Primary'),
+        _tc('brand.primaryHover','Màu chính · hover','Primary hover'),
+        _tc('brand.primarySoft','Màu chính · soft','Primary soft'),
+        _tc('status.success.light','Màu success','Success'),
+        _tc('status.danger.light','Màu danger','Danger'),
+        _tc('colorsLight.textOnBrand','Chữ trên nền','Text on brand')
+      ]),
+      _grp('typography','Chữ','Typography',[
+        _vn('--o3-font-size-md','Cỡ chữ','Font size',10,18),
+        _vn('--o3-font-weight-semi','Độ đậm','Font weight',400,800,'')
+      ]),
+      _grp('motion','Hiệu ứng','Motion',[
+        _vn('--o3-motion-base','Transition','Transition',0,500,'ms')
+      ])
+    ],
+    'form': [
+      _grp('layout','Bố cục','Layout',[
+        _tn('control.height.standard','Chiều cao input','Input height',24,56),
+        _vn('--o3-space-md','Padding ngang','Horizontal padding',4,24),
+        _vn('--o3-radius','Bo góc','Border radius',0,16),
+        _vn('--o3-space-sm','Gap label-input','Label-input gap',0,16)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurface','Nền input','Input background'),
+        _tc('colorsLight.bgSurfaceAlt','Nền disabled','Disabled background'),
+        _tc('colorsLight.borderSubtle','Border thường','Default border'),
+        _tc('colorsLight.borderStrong','Border focus','Focus border'),
+        _tc('colorsLight.textPrimary','Chữ chính','Primary text'),
+        _tc('colorsLight.textTertiary','Placeholder','Placeholder text'),
+        _tc('status.danger.light','Border lỗi','Error border')
+      ]),
+      _grp('typography','Chữ','Typography',[
+        _vn('--o3-font-size-md','Cỡ chữ input','Input font size',10,18),
+        _vn('--o3-font-size-sm','Cỡ chữ label','Label font size',9,16)
+      ])
+    ],
+    'tabs': [
+      _grp('layout','Bố cục','Layout',[
+        _tn('control.height.standard','Chiều cao tab','Tab height',24,56),
+        _vn('--o3-space-lg','Padding ngang tab','Tab horizontal padding',6,32),
+        _vn('--o3-space-md','Khe giữa tab','Gap between tabs',0,24)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('brand.primary','Màu indicator','Indicator color'),
+        _tc('colorsLight.textPrimary','Chữ tab active','Active text'),
+        _tc('colorsLight.textTertiary','Chữ tab inactive','Inactive text'),
+        _tc('colorsLight.borderSubtle','Border bottom','Bottom border'),
+        _tc('colorsLight.bgSurface','Nền tab bar','Tab bar bg')
+      ]),
+      _grp('typography','Chữ','Typography',[
+        _vn('--o3-font-size-md','Cỡ chữ tab','Tab font size',10,18),
+        _vn('--o3-font-weight-medium','Độ đậm','Weight',400,800,'')
+      ])
+    ],
+    'kpi': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-lg','Padding tile','Tile padding',4,32),
+        _vn('--o3-radius-card','Bo góc tile','Tile radius',0,20),
+        _vn('--o3-space-sm','Gap nội thất','Internal gap',0,16)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurface','Nền tile','Tile bg'),
+        _tc('colorsLight.borderSubtle','Border tile','Tile border'),
+        _tc('brand.primary','Brand value','Brand value'),
+        _tc('status.success.light','Success value','Success value'),
+        _tc('status.warning.light','Warning value','Warning value'),
+        _tc('status.danger.light','Danger value','Danger value'),
+        _tc('status.info.light','Info value','Info value'),
+        _tc('colorsLight.textPrimary','Chữ giá trị','Value text'),
+        _tc('colorsLight.textTertiary','Chữ phụ','Sub text')
+      ]),
+      _grp('typography','Chữ','Typography',[
+        _vn('--o3-font-size-xs','Cỡ label','Label font size',9,14),
+        _vn('--o3-font-size-2xl','Cỡ giá trị','Value font size',16,36),
+        _vn('--o3-font-weight-bold','Độ đậm','Value weight',400,900,'')
+      ])
+    ],
+    'chips': [
+      _grp('layout','Bố cục','Layout',[
+        _tn('control.height.standard','Chiều cao chip','Chip height',20,48),
+        _vn('--o3-space-sm','Padding ngang','Horizontal padding',4,20),
+        _vn('--o3-radius-pill','Bo góc','Border radius',0,999),
+        _vn('--o3-space-xs','Gap chip-chip','Chip gap',0,16)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('status.success.soft','BG success','Success soft bg'),
+        _tc('status.warning.soft','BG warning','Warning soft bg'),
+        _tc('status.danger.soft','BG danger','Danger soft bg'),
+        _tc('status.info.soft','BG info','Info soft bg'),
+        _tc('status.neutral.soft','BG neutral','Neutral soft bg'),
+        _tc('brand.primarySoft','BG filter active','Filter active bg')
+      ]),
+      _grp('typography','Chữ','Typography',[
+        _vn('--o3-font-size-xs','Cỡ chữ chip','Chip font size',9,14),
+        _vn('--o3-font-weight-medium','Độ đậm','Weight',400,800,'')
+      ])
+    ],
+    'toolbar': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-md','Padding toolbar','Toolbar padding',4,24),
+        _vn('--o3-space-sm','Gap item','Item gap',0,16),
+        _vn('--o3-radius-card','Bo góc','Radius',0,16)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurface','Nền','Background'),
+        _tc('colorsLight.borderSubtle','Border','Border')
+      ])
+    ],
+    'table': [
+      _grp('layout','Bố cục','Layout',[
+        _tn('control.height.standard','Cao hàng','Row height',24,56),
+        _vn('--o3-space-md','Padding cell','Cell padding-X',4,24),
+        _vn('--o3-space-sm','Padding dọc','Cell padding-Y',0,16),
+        _vn('--o3-font-size-md','Cỡ chữ','Font size',10,18)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurface','Nền hàng','Row bg'),
+        _tc('colorsLight.bgSurfaceAlt','Nền header','Header bg'),
+        _tc('colorsLight.borderSubtle','Border ngang','Row border'),
+        _tc('colorsLight.textPrimary','Chữ cell','Cell text'),
+        _tc('colorsLight.textTertiary','Chữ header','Header text'),
+        _tc('brand.primarySoft','Nền hover','Row hover bg')
+      ])
+    ],
+    'panel': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-lg','Padding panel','Panel padding',4,40),
+        _vn('--o3-radius-card','Bo góc','Border radius',0,20)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurface','Nền','Background'),
+        _tc('colorsLight.borderSubtle','Border','Border'),
+        _tc('colorsLight.textPrimary','Chữ','Text')
+      ])
+    ],
+    'modal': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-lg','Padding modal','Modal padding',8,48),
+        _vn('--o3-radius-card','Bo góc','Border radius',0,24),
+        _tn('control.height.standard','Cao header','Header height',32,64)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurface','Nền modal','Modal bg'),
+        _tc('colorsLight.borderSubtle','Border','Border'),
+        _tc('brand.primary','Nút primary','Primary button'),
+        _tc('status.danger.light','Nút danger','Danger button')
+      ]),
+      _grp('motion','Hiệu ứng','Motion',[
+        _vn('--o3-motion-base','Animation','Animation duration',0,500,'ms')
+      ])
+    ],
+    'dropdown': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-sm','Padding item','Item padding-Y',0,16),
+        _vn('--o3-space-md','Padding ngang','Item padding-X',4,24),
+        _vn('--o3-radius','Bo góc menu','Menu radius',0,16)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurface','Nền menu','Menu bg'),
+        _tc('colorsLight.bgSurfaceAlt','Nền hover','Hover bg'),
+        _tc('colorsLight.borderSubtle','Border','Border'),
+        _tc('brand.primary','Selected','Selected color'),
+        _tc('status.danger.light','Destructive','Destructive item')
+      ])
+    ],
+    'tooltip': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-sm','Padding tooltip','Tooltip padding',2,16),
+        _vn('--o3-radius','Bo góc','Border radius',0,12),
+        _vn('--o3-font-size-xs','Cỡ chữ','Font size',9,16)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurfaceAlt','Nền tooltip','Tooltip bg'),
+        _tc('colorsLight.textPrimary','Chữ','Text')
+      ])
+    ],
+    'kanban': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-md','Padding cột','Column padding',4,24),
+        _vn('--o3-space-sm','Gap card-card','Card gap',0,16),
+        _vn('--o3-space-md','Gap cột-cột','Column gap',0,32),
+        _vn('--o3-radius-card','Bo góc card','Card radius',0,16)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurface','Nền card','Card bg'),
+        _tc('colorsLight.bgSurfaceAlt','Nền cột','Column bg'),
+        _tc('colorsLight.borderSubtle','Border','Border'),
+        _tc('brand.primary','Tag brand','Brand tag'),
+        _tc('status.warning.light','Tag warning','Warning tag')
+      ])
+    ],
+    'tree': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-md','Indent mỗi cấp','Indent per level',8,32),
+        _vn('--o3-space-sm','Cao hàng','Row height',0,24)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.textPrimary','Chữ','Text'),
+        _tc('colorsLight.textTertiary','Chữ caret','Caret color'),
+        _tc('brand.primarySoft','Nền selected','Selected bg'),
+        _tc('status.success.light','Badge OK','OK badge')
+      ])
+    ],
+    'timeline': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-md','Gap event','Event gap',4,32),
+        _vn('--o3-space-sm','Kích thước dot','Dot size',4,24)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.borderSubtle','Đường line','Line color'),
+        _tc('status.success.light','Dot success','Success dot'),
+        _tc('status.info.light','Dot info','Info dot'),
+        _tc('status.neutral.light','Dot neutral','Neutral dot')
+      ])
+    ],
+    'stepper': [
+      _grp('layout','Bố cục','Layout',[
+        _tn('control.height.standard','Cao step','Step height',24,56),
+        _vn('--o3-space-md','Gap step-step','Step gap',0,32)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('brand.primary','Active','Active step'),
+        _tc('status.success.light','Complete','Complete step'),
+        _tc('colorsLight.borderStrong','Connector','Connector line')
+      ])
+    ],
+    'pagination': [
+      _grp('layout','Bố cục','Layout',[
+        _tn('control.height.standard','Cao button','Button height',24,56),
+        _vn('--o3-space-xs','Gap button','Button gap',0,16),
+        _vn('--o3-radius','Bo góc','Radius',0,16)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('brand.primary','Active','Active bg'),
+        _tc('colorsLight.borderSubtle','Border','Border')
+      ])
+    ],
+    'filter-panel': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-md','Padding panel','Panel padding',4,32),
+        _vn('--o3-space-sm','Gap section','Section gap',0,24),
+        _vn('--o3-radius-card','Bo góc','Radius',0,16)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurface','Nền panel','Panel bg'),
+        _tc('colorsLight.bgSurfaceAlt','Nền section','Section bg'),
+        _tc('brand.primary','Filter active','Active filter')
+      ])
+    ],
+    'sparkline-kpi': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-md','Padding','Card padding',4,24),
+        _vn('--o3-radius-card','Bo góc','Radius',0,16)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurface','Nền','Background'),
+        _tc('status.success.light','Trend up','Trend up'),
+        _tc('status.danger.light','Trend down','Trend down')
+      ])
+    ],
+    'progress': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-xs','Cao bar','Bar height',2,24),
+        _vn('--o3-radius-pill','Bo góc bar','Bar radius',0,999)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('brand.primary','Brand','Brand'),
+        _tc('status.success.light','Success','Success'),
+        _tc('status.warning.light','Warning','Warning'),
+        _tc('status.danger.light','Danger','Danger'),
+        _tc('colorsLight.bgSurfaceAlt','Track','Track bg')
+      ])
+    ],
+    'status-indicator': [
+      _grp('colors','Màu','Colors',[
+        _tc('status.success.light','Online','Online'),
+        _tc('status.warning.light','Away','Away'),
+        _tc('status.danger.light','Busy','Busy'),
+        _tc('status.info.light','Info','Info'),
+        _tc('status.neutral.light','Offline','Offline')
+      ])
+    ],
+    'avatar-status': [
+      _grp('colors','Màu','Colors',[
+        _tc('brand.primary','Brand seed','Brand seed'),
+        _tc('status.success.light','Active','Active'),
+        _tc('status.warning.light','Idle','Idle'),
+        _tc('status.neutral.light','Offline','Offline')
+      ])
+    ],
+    'skeleton': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-radius','Bo góc','Radius',0,16),
+        _vn('--o3-radius-card','Bo góc card','Card radius',0,20)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurfaceAlt','Base','Base color'),
+        _tc('colorsLight.borderSubtle','Shimmer','Shimmer color')
+      ]),
+      _grp('motion','Hiệu ứng','Motion',[
+        _vn('--o3-motion-slow','Shimmer speed','Shimmer duration',200,2000,'ms')
+      ])
+    ],
+    'empty-toast': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-3xl','Padding empty','Empty padding',16,64),
+        _vn('--o3-radius-card','Bo góc','Radius',0,20)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurface','Nền','Background'),
+        _tc('status.success.light','Toast success','Toast success'),
+        _tc('status.warning.light','Toast warning','Toast warning'),
+        _tc('status.danger.light','Toast danger','Toast danger'),
+        _tc('status.info.light','Toast info','Toast info')
+      ])
+    ]
+  };
+
+  function getPropertiesForSection(section){
+    if (PROPERTY_CATALOG[section.id]) return PROPERTY_CATALOG[section.id];
+    var legacyTokens = section.tokens || [];
+    if (!legacyTokens.length) return [];
+    return [_grp('general','Chung','General', legacyTokens.map(function(tk){
+      var isColor = /color|brand|status|bg|text|border/i.test(tk);
+      return { kind:'token', key:tk, type: isColor ? 'color' : 'number', unit: isColor ? '' : 'px', min:0, max:48, label:_l(tk, tk) };
+    }))];
+  }
+
   // Wire inline token editors (color inputs + number inputs) in the
   // right-side aside so admins can edit tokens without leaving Module
   // Sample. Stages each change into GraphicsAuthority draft AND
