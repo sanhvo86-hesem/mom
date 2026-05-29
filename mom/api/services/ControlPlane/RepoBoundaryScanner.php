@@ -106,6 +106,10 @@ final class RepoBoundaryScanner
         // P-prompt emits `_reports/uom-measurement-conversion-v1/pNN-*.md`.
         // .gitignore allowlist matches.
         '#^_reports/uom-measurement-conversion-v1/.*$#',
+        // UoM V3 No-Guess World-Class hardening reports — P00..P13 evidence
+        // set for the external integration readiness review. Mirrors the
+        // .gitignore `!_reports/uom-measurement-conversion-v3/` allowlist.
+        '#^_reports/uom-measurement-conversion-v3/.*$#',
     ];
 
     /**
