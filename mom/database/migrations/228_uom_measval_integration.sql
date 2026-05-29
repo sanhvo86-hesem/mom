@@ -94,27 +94,29 @@ ON CONFLICT (alias_code, context_scope, COALESCE(supplier_id, ''))
 DO NOTHING;
 
 
--- Ra surface roughness and Rockwell hardness as dimensionless catalog entries
--- (these are metrological quantities without SI dimension; no conversion rule)
-INSERT INTO uom_unit_catalog (canonical_code, ucum_code, display_label_en, display_label_vi,
-                               quantity_kind_code, si_factor, si_offset, is_si_base,
-                               is_conversion_blocked, lifecycle_status)
-VALUES
-    ('RA_UM',  '{Ra}',  'Roughness Ra (µm)', 'Độ nhám Ra (µm)',
-     'SurfaceRoughness', '1', '0', FALSE, FALSE, 'active'),
-    ('HRC',    '{HRC}', 'Rockwell C hardness', 'Độ cứng Rockwell C',
-     'Hardness', '1', '0', FALSE, TRUE, 'active'),
-    ('HRB',    '{HRB}', 'Rockwell B hardness', 'Độ cứng Rockwell B',
-     'Hardness', '1', '0', FALSE, TRUE, 'active')
-ON CONFLICT (canonical_code) DO NOTHING;
-
+-- Ra surface roughness and Rockwell hardness — quality inspection units
+-- quantity kinds first (may already exist if 224 seeded them; DO NOTHING is idempotent)
 INSERT INTO uom_quantity_kind (kind_code, label_en, label_vi, dimension_vector,
-                                is_dimensionless, allows_negative, lifecycle_status)
+                                is_dimensionless, source)
 VALUES
     ('SurfaceRoughness', 'Surface Roughness', 'Độ nhám bề mặt',
-     'M0L1T0I0Θ0N0J0',   -- length dimension (Ra is a linear deviation)
-     FALSE, FALSE, 'active'),
+     'M0L1T0I0Θ0N0J0',   -- Ra is a linear deviation (length dimension)
+     FALSE, 'ISO'),
     ('Hardness', 'Hardness (Rockwell)', 'Độ cứng (Rockwell)',
-     'M0L0T0I0Θ0N0J0',   -- dimensionless ratio
-     TRUE, FALSE, 'active')
+     'M0L0T0I0Θ0N0J0',   -- empirical dimensionless ratio
+     TRUE, 'ISO')
 ON CONFLICT (kind_code) DO NOTHING;
+
+-- Ra in µm (si_factor=0.000001 — same scale as µm); HRC/HRB have no SI conversion
+INSERT INTO uom_unit_catalog
+    (canonical_code, ucum_code, display_symbol, display_name_en, display_name_vi,
+     quantity_kind_code, si_base, si_factor, si_offset, is_affine,
+     lifecycle_status, source_tag, risk_level)
+VALUES
+    ('RA_UM', '{Ra}',  'Ra',  'Surface Roughness Ra (µm)', 'Độ nhám Ra (µm)',
+     'SurfaceRoughness', FALSE, 0.000001, 0, FALSE, 'active', 'ISO', 'medium'),
+    ('HRC',   '{HRC}', 'HRC', 'Rockwell C Hardness',       'Độ cứng Rockwell C',
+     'Hardness',        FALSE, NULL,      NULL, FALSE, 'active', 'ISO', 'low'),
+    ('HRB',   '{HRB}', 'HRB', 'Rockwell B Hardness',       'Độ cứng Rockwell B',
+     'Hardness',        FALSE, NULL,      NULL, FALSE, 'active', 'ISO', 'low')
+ON CONFLICT (canonical_code) DO NOTHING;
