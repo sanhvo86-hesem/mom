@@ -70,28 +70,86 @@ class GenericCrudController extends BaseController
         'ap_invoice_lines',
         'inventory_transactions',
         'inventory_ledger',
+        'inventory_balance_snapshot',
+        'location_balance',
+        'wip_ledger',
         'kpi_definitions',
         'stock_balances',
         'material_consumption',
         'mes_material_consumption',
+        'uom',
+        'uom_conversion_authority',
+        'mdm_uom_conversions',
+        'item',
+        'items',
+        'item_revision',
+        'item_revisions',
+        'item_site',
+        'item_spec',
+        'bom',
+        'bill_of_materials',
+        'bom_version',
+        'bom_line',
+        'routing_operations',
+        'routings',
+        'work_definition',
+        'work_definition_version',
+        'control_plans',
+        'inspection_plans',
+        'engineering_release_package',
+        'engineering_release_packages',
         'inspection_lot',
         'inspection_result',
         'incoming_inspections',
+        'quality_order',
+        'quality_holds',
+        'wms_quarantine_holds',
         'ncr_records',
         'nonconformance',
         'ncr',
         'capa',
         'capa_records',
         'scar',
+        'scar_records',
+        'complaint',
+        'customer_complaints',
+        'material_review_board',
         'approved_supplier_list',
         'supplier_scorecards',
         'lot',
+        'lot_master',
         'serial',
+        'serial_master',
         'genealogy_link',
+        'genealogy_edges',
+        'genealogy_nodes',
         'dpp_passports',
+        'work_centers',
+        'equipment',
+        'pm_equipment_master',
+        'maintenance_work_orders',
+        'pm_work_orders',
+        'calibration_records',
+        'tools',
+        'fixture_master',
+        'tooling_assemblies',
+        'tooling_life_measurements',
+        'mes_tool_life_events',
+        'mes_tool_assemblies',
+        'mes_nc_release_packages',
+        'mes_operational_event_ledger',
+        'mes_job_execution',
+        'mes_operation_execution',
+        'state_transition_events',
+        'workflow_instances',
+        'approval',
+        'mdm_approval_policies',
         'period_closes',
         'backdate_exceptions',
         'electronic_signature',
+        'electronic_signatures',
+        'signature_events',
+        'eqms_electronic_signature_event',
         'audit_trail',
     ];
 
@@ -113,6 +171,8 @@ class GenericCrudController extends BaseController
     private ?GenericCrudService $service = null;
     private ?IdempotencyService $idempotencyService = null;
     private ?array $runtimeAccessPolicy = null;
+    private ?array $governedEntityRegistry = null;
+    private ?array $governedEntityTableIndex = null;
 
     private function service(): GenericCrudService
     {
@@ -141,6 +201,60 @@ class GenericCrudController extends BaseController
         }
 
         return $this->runtimeAccessPolicy;
+    }
+
+    private function governedEntityRegistry(): array
+    {
+        if ($this->governedEntityRegistry === null) {
+            $path = $this->rootDir . '/mom/contracts/governed-entities.json';
+            $payload = $this->readJsonFile($path) ?? [];
+            $this->governedEntityRegistry = is_array($payload) ? $payload : [];
+        }
+
+        return $this->governedEntityRegistry;
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    private function governedEntityTableIndex(): array
+    {
+        if ($this->governedEntityTableIndex !== null) {
+            return $this->governedEntityTableIndex;
+        }
+
+        $index = [];
+        $registry = $this->governedEntityRegistry();
+        $entities = is_array($registry['entities'] ?? null) ? $registry['entities'] : [];
+        foreach ($entities as $entity) {
+            if (!is_array($entity)) {
+                continue;
+            }
+
+            $actions = array_map(
+                static fn($action): string => strtolower(trim((string)$action)),
+                (array)($entity['forbidden_generic_actions'] ?? [])
+            );
+            $actions = array_values(array_unique(array_filter($actions)));
+            foreach ((array)($entity['table_names'] ?? []) as $tableName) {
+                $table = strtolower(trim((string)$tableName));
+                if ($table === '') {
+                    continue;
+                }
+
+                $index[$table] = [
+                    'source' => 'governed_entity_registry',
+                    'root_code' => (string)($entity['root_code'] ?? ''),
+                    'canonical_name' => (string)($entity['canonical_name'] ?? ''),
+                    'owner_domain' => (string)($entity['owner_domain'] ?? ''),
+                    'required_command_service' => (string)($entity['required_command_service'] ?? ''),
+                    'forbidden_generic_actions' => $actions,
+                    'severity' => (string)($entity['severity'] ?? 'P1'),
+                ];
+            }
+        }
+
+        return $this->governedEntityTableIndex = $index;
     }
 
     /**
@@ -1083,6 +1197,10 @@ class GenericCrudController extends BaseController
             return false;
         }
 
+        if ($this->governedEntityPolicyForContext($ctx) !== null) {
+            return true;
+        }
+
         $scope = $this->runtimePolicyScope($ctx);
         $genericMutation = strtolower(trim((string)($scope['genericMutation'] ?? $scope['generic_mutation'] ?? '')));
         if (in_array($genericMutation, ['allow', 'allowed', 'generic_allowed'], true)) {
@@ -1109,6 +1227,35 @@ class GenericCrudController extends BaseController
     }
 
     /**
+     * @param array<string, mixed> $ctx
+     * @return array<string, mixed>|null
+     */
+    private function governedEntityPolicyForContext(array $ctx): ?array
+    {
+        $kind = strtolower(trim((string)($ctx['kind'] ?? '')));
+        if (!in_array($kind, self::MUTATION_KINDS, true)) {
+            return null;
+        }
+
+        $table = strtolower(trim((string)($ctx['table'] ?? '')));
+        if ($table === '') {
+            return null;
+        }
+
+        $policy = $this->governedEntityTableIndex()[$table] ?? null;
+        if (!is_array($policy)) {
+            return null;
+        }
+
+        $actions = (array)($policy['forbidden_generic_actions'] ?? []);
+        if (in_array('*', $actions, true) || in_array($kind, $actions, true)) {
+            return $policy;
+        }
+
+        return null;
+    }
+
+    /**
      * @param array<string, mixed> $user
      */
     private function governedGenericMutationOverrideEnabled(array $user): bool
@@ -1129,11 +1276,44 @@ class GenericCrudController extends BaseController
             return false;
         }
 
+        $overrideHeader = trim((string)($this->requestHeader('X-HESEM-Internal-Generic-Override') ?? ''));
         $releaseManifest = trim((string)($this->requestHeader('X-HESEM-Release-Manifest') ?? ''));
         $commandId = trim((string)($this->requestHeader('X-HESEM-Command-Id') ?? ''));
 
-        return preg_match('/^REL-[A-Z0-9._:-]+$/', $releaseManifest) === 1
+        return $overrideHeader === 'domain-command-backfill'
+            && preg_match('/^REL-[A-Z0-9._:-]+$/', $releaseManifest) === 1
             && preg_match('/^[a-f0-9-]{36}$/i', $commandId) === 1;
+    }
+
+    /**
+     * @param array<string, mixed> $ctx
+     * @param array<string, mixed> $user
+     * @param array<string, mixed> $boundary
+     */
+    private function emitGovernedGenericMutationTelemetry(array $ctx, array $user, array $boundary, string $outcome): void
+    {
+        $roles = array_values(array_filter(array_map('strval', (array)($user['roles'] ?? []))));
+        $role = trim((string)($user['role'] ?? ''));
+        if ($role !== '') {
+            $roles[] = $role;
+        }
+
+        $event = [
+            'event' => 'governed_generic_mutation_boundary',
+            'outcome' => $outcome,
+            'domain' => (string)($ctx['domain'] ?? ''),
+            'table' => (string)($ctx['table'] ?? ''),
+            'kind' => (string)($ctx['kind'] ?? ''),
+            'boundary_source' => (string)($boundary['source'] ?? 'legacy_or_runtime_policy'),
+            'root_code' => (string)($boundary['root_code'] ?? ''),
+            'severity' => (string)($boundary['severity'] ?? ''),
+            'roles' => array_values(array_unique($roles)),
+        ];
+
+        $encoded = json_encode($event, JSON_UNESCAPED_SLASHES);
+        if (is_string($encoded)) {
+            error_log('[hesem.runtime_authority] ' . $encoded);
+        }
     }
 
     /**
@@ -1141,15 +1321,29 @@ class GenericCrudController extends BaseController
      */
     private function enforceDomainCommandBoundary(array $ctx, array $user): void
     {
-        if (!$this->requiresDomainCommand($ctx) || $this->governedGenericMutationOverrideEnabled($user)) {
+        if (!$this->requiresDomainCommand($ctx)) {
             return;
         }
 
+        $boundary = $this->governedEntityPolicyForContext($ctx) ?? [
+            'source' => 'legacy_or_runtime_policy',
+            'root_code' => '',
+            'severity' => '',
+        ];
+
+        if ($this->governedGenericMutationOverrideEnabled($user)) {
+            $this->emitGovernedGenericMutationTelemetry($ctx, $user, $boundary, 'break_glass_allowed');
+            return;
+        }
+
+        $this->emitGovernedGenericMutationTelemetry($ctx, $user, $boundary, 'denied');
         $this->error('domain_command_required', 409, 'Generic CRUD mutation is disabled for governed runtime domains. Use a dedicated process command API so business gates, transaction boundaries, idempotency, ledger posting, audit, and evidence are enforced.', [
             'domain' => (string)($ctx['domain'] ?? ''),
             'table' => (string)($ctx['table'] ?? ''),
             'kind' => (string)($ctx['kind'] ?? ''),
             'policy' => 'frontend_must_not_call_raw_runtime_mutations_for_governed_domains',
+            'boundary_source' => (string)($boundary['source'] ?? 'legacy_or_runtime_policy'),
+            'root_code' => (string)($boundary['root_code'] ?? ''),
         ]);
     }
 

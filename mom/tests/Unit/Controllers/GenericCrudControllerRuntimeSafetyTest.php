@@ -176,6 +176,72 @@ final class GenericCrudControllerRuntimeSafetyTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testGovernedEntityRegistryTablesRequireCommandBoundary(): void
+    {
+        $controller = $this->controller();
+
+        $cases = [
+            ['update', 'master_data', 'uom_conversion_authority', 'MDA-FOUNDATION-MEASUREMENT'],
+            ['update', 'master_data', 'item_revisions', 'MDA-ITEM-REVISION-SPEC'],
+            ['transition', 'production', 'work_order', 'MDA-COMMERCIAL-EXECUTION'],
+            ['delete', 'quality_management', 'quality_holds', 'MDA-QUALITY-CASE'],
+            ['update', 'inventory', 'inventory_balance_snapshot', 'MDA-INVENTORY-TRACE-COST'],
+            ['update', 'record_system', 'electronic_signatures', 'MDA-WORKFLOW-AUDIT-EVIDENCE'],
+        ];
+
+        foreach ($cases as [$kind, $domain, $table, $rootCode]) {
+            try {
+                $this->enforceRuntimePermission($controller, [
+                    'username' => 'admin-user',
+                    'role' => 'admin',
+                    'roles' => ['admin'],
+                ], [
+                    'kind' => $kind,
+                    'domain' => $domain,
+                    'table' => $table,
+                    'tableMeta' => [
+                        'columns' => [],
+                    ],
+                ]);
+                $this->fail("{$table} {$kind} was not blocked by the governed entity registry.");
+            } catch (ExitException $e) {
+                $this->assertSame(409, $e->getStatusCode());
+                $this->assertSame('domain_command_required', $e->getPayload()['error'] ?? null);
+                $this->assertSame('governed_entity_registry', $e->getPayload()['boundary_source'] ?? null);
+                $this->assertSame($rootCode, $e->getPayload()['root_code'] ?? null);
+            }
+        }
+    }
+
+    public function testGovernedGenericMutationOverrideRequiresInternalOverrideHeader(): void
+    {
+        putenv('HESEM_ALLOW_GOVERNED_GENERIC_MUTATION=break_glass_for_migration_only');
+        $_SERVER['HTTP_X_HESEM_RELEASE_MANIFEST'] = 'REL-2026-001';
+        $_SERVER['HTTP_X_HESEM_COMMAND_ID'] = '00000000-0000-0000-0000-000000000001';
+
+        $controller = $this->controller();
+
+        try {
+            $this->enforceRuntimePermission($controller, [
+                'username' => 'admin-user',
+                'role' => 'admin',
+                'roles' => ['admin'],
+            ], [
+                'kind' => 'update',
+                'domain' => 'quality_management',
+                'table' => 'capa_records',
+                'tableMeta' => [
+                    'columns' => [],
+                    'workflowId' => 'wf_capa',
+                ],
+            ]);
+            $this->fail('Break-glass mutation bypassed the internal override header.');
+        } catch (ExitException $e) {
+            $this->assertSame(409, $e->getStatusCode());
+            $this->assertSame('domain_command_required', $e->getPayload()['error'] ?? null);
+        }
+    }
+
     private function controller(): GenericCrudController
     {
         $dataDir = (string) constant('QMS_TEST_DATA_DIR');

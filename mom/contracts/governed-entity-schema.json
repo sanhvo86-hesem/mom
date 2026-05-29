@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hesem.local/contracts/governed-entity-schema.json",
+  "title": "HESEM Governed Entity Registry",
+  "type": "object",
+  "required": ["version", "runtime_contract", "entities"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_by": {
+      "type": "string"
+    },
+    "runtime_contract": {
+      "type": "string",
+      "minLength": 1
+    },
+    "entities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "root_code",
+          "canonical_name",
+          "owner_domain",
+          "table_names",
+          "required_command_service",
+          "allowed_commands",
+          "forbidden_generic_actions",
+          "severity"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "root_code": {
+            "type": "string",
+            "pattern": "^MDA-[A-Z0-9-]+$"
+          },
+          "canonical_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "owner_domain": {
+            "type": "string",
+            "minLength": 1
+          },
+          "table_names": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$"
+            },
+            "uniqueItems": true
+          },
+          "required_command_service": {
+            "type": "string",
+            "minLength": 1
+          },
+          "allowed_commands": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "forbidden_generic_actions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "enum": ["create", "update", "delete", "transition", "release", "approve", "sign", "hold", "post", "reconcile", "*"]
+            },
+            "uniqueItems": true
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["P0", "P1", "P2"]
+          }
+        }
+      }
+    }
+  }
+}
