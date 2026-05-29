@@ -82,21 +82,17 @@ COMMENT ON TABLE uom_measurement_thread IS
 -- The measurement_unit PG enum ('mm', 'in', 'deg', 'Ra', 'HRC', 'HRB') maps
 -- to canonical UoM codes in uom_unit_catalog via uom_alias with context_scope='SYSTEM'.
 -- Seeds below ensure resolution without hitting quarantine on first contact.
-INSERT INTO uom_alias (alias_string, canonical_code, context_scope, context_id,
-                        lifecycle_status, created_by)
+INSERT INTO uom_alias (alias_code, canonical_code, context_scope, notes)
 VALUES
-    -- Linear / dimensional
-    ('mm',    'MM',    'SYSTEM', 'HESEM_QC', 'active', 'seed'),
-    ('in',    'IN',    'SYSTEM', 'HESEM_QC', 'active', 'seed'),
-    -- Angular
-    ('deg',   'DEG',   'SYSTEM', 'HESEM_QC', 'active', 'seed'),
-    -- Surface roughness — Ra (arithmetic mean deviation); no SI conversion
-    ('Ra',    'RA_UM', 'SYSTEM', 'HESEM_QC', 'active', 'seed'),
-    -- Hardness scales — dimensionless ratio quantities
-    ('HRC',   'HRC',   'SYSTEM', 'HESEM_QC', 'active', 'seed'),
-    ('HRB',   'HRB',   'SYSTEM', 'HESEM_QC', 'active', 'seed')
-ON CONFLICT (alias_string, context_scope, COALESCE(context_id, ''))
+    ('mm',  'MM',    'SYSTEM', 'PG measurement_unit enum: mm'),
+    ('in',  'IN',    'SYSTEM', 'PG measurement_unit enum: in'),
+    ('deg', 'DEG',   'SYSTEM', 'PG measurement_unit enum: deg'),
+    ('Ra',  'RA_UM', 'SYSTEM', 'PG measurement_unit enum: Ra surface roughness'),
+    ('HRC', 'HRC',   'SYSTEM', 'PG measurement_unit enum: Rockwell C hardness'),
+    ('HRB', 'HRB',   'SYSTEM', 'PG measurement_unit enum: Rockwell B hardness')
+ON CONFLICT (alias_code, context_scope, COALESCE(supplier_id, ''))
 DO NOTHING;
+
 
 -- Ra surface roughness and Rockwell hardness as dimensionless catalog entries
 -- (these are metrological quantities without SI dimension; no conversion rule)
