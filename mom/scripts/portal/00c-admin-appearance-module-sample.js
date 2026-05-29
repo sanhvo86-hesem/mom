@@ -285,30 +285,37 @@
    * not a screenshot. */
 
   function formFieldsSection(L){
+    // v3-G20: all visual literals replaced with var() bindings so every
+    // property in the catalog actually drives the preview. Fallbacks
+    // preserve the original look when var resolves to nothing.
+    var iStyle = 'height:var(--o3-control-h-standard);padding:0 var(--o3-space-md,10px);border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius);font-size:var(--o3-font-size-md,13px);color:var(--o3-text-strong)';
+    var labStyle = 'font-size:var(--o3-font-size-xs,11px);font-weight:600;color:var(--o3-text-default,var(--text-secondary))';
+    var lblWrap  = 'display:flex;flex-direction:column;gap:var(--o3-space-xs,4px)';
+    var helpStyle= 'padding:0 var(--o3-space-md,10px);display:flex;align-items:center;background:var(--o3-surface-muted,var(--bg-surface-alt));font-size:var(--o3-font-size-sm,12px);color:var(--o3-text-muted,var(--text-secondary))';
     var body = ''
-      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:800px">'
-      +   '<label style="display:flex;flex-direction:column;gap:4px"><span style="font-size:11px;font-weight:600;color:var(--text-secondary)">Text</span>'
-      +     '<input type="text" placeholder="SO-2026-0001" style="height:var(--o3-control-h-standard);padding:0 10px;border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius);font-size:13px"></label>'
-      +   '<label style="display:flex;flex-direction:column;gap:4px"><span style="font-size:11px;font-weight:600;color:var(--text-secondary)">Number + unit</span>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--o3-space-md,12px);max-width:800px">'
+      +   '<label style="' + lblWrap + '"><span style="' + labStyle + '">Text</span>'
+      +     '<input type="text" placeholder="SO-2026-0001" style="' + iStyle + '"></label>'
+      +   '<label style="' + lblWrap + '"><span style="' + labStyle + '">Number + unit</span>'
       +     '<div style="display:flex;height:var(--o3-control-h-standard);border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius);overflow:hidden">'
-      +       '<input type="number" value="100" style="border:0;padding:0 10px;width:100%;font-size:13px;outline:none">'
-      +       '<span style="padding:0 10px;display:flex;align-items:center;background:var(--bg-surface-alt);font-size:12px;color:var(--text-secondary);border-left:1px solid var(--o3-border-subtle)">EA</span>'
+      +       '<input type="number" value="100" style="border:0;padding:0 var(--o3-space-md,10px);width:100%;font-size:var(--o3-font-size-md,13px);outline:none">'
+      +       '<span style="' + helpStyle + ';border-left:1px solid var(--o3-border-subtle)">EA</span>'
       +     '</div></label>'
-      +   '<label style="display:flex;flex-direction:column;gap:4px"><span style="font-size:11px;font-weight:600;color:var(--text-secondary)">Select</span>'
-      +     '<select style="height:var(--o3-control-h-standard);padding:0 10px;border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius);font-size:13px;background:#fff">'
+      +   '<label style="' + lblWrap + '"><span style="' + labStyle + '">Select</span>'
+      +     '<select style="' + iStyle + ';background:var(--o3-surface-card,#fff)">'
       +       '<option>LAM Research</option><option>Applied Materials</option><option>KLA Corp</option></select></label>'
-      +   '<label style="display:flex;flex-direction:column;gap:4px"><span style="font-size:11px;font-weight:600;color:var(--text-secondary)">Date</span>'
-      +     '<input type="date" value="2026-06-15" style="height:var(--o3-control-h-standard);padding:0 10px;border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius);font-size:13px"></label>'
-      +   '<label style="display:flex;flex-direction:column;gap:4px"><span style="font-size:11px;font-weight:600;color:var(--text-secondary)">Currency</span>'
+      +   '<label style="' + lblWrap + '"><span style="' + labStyle + '">Date</span>'
+      +     '<input type="date" value="2026-06-15" style="' + iStyle + '"></label>'
+      +   '<label style="' + lblWrap + '"><span style="' + labStyle + '">Currency</span>'
       +     '<div style="display:flex;height:var(--o3-control-h-standard);border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius);overflow:hidden">'
-      +       '<span style="padding:0 10px;display:flex;align-items:center;background:var(--bg-surface-alt);font-size:12px;color:var(--text-secondary);border-right:1px solid var(--o3-border-subtle)">$</span>'
-      +       '<input type="text" value="12,400.00" style="border:0;padding:0 10px;width:100%;font-size:13px;outline:none"></div></label>'
-      +   '<label style="display:flex;flex-direction:column;gap:4px"><span style="font-size:11px;font-weight:600;color:var(--text-secondary)">Search with hint</span>'
+      +       '<span style="' + helpStyle + ';border-right:1px solid var(--o3-border-subtle)">$</span>'
+      +       '<input type="text" value="12,400.00" style="border:0;padding:0 var(--o3-space-md,10px);width:100%;font-size:var(--o3-font-size-md,13px);outline:none"></div></label>'
+      +   '<label style="' + lblWrap + '"><span style="' + labStyle + '">Search with hint</span>'
       +     '<div style="position:relative;height:var(--o3-control-h-standard)">'
-      +       '<span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px">🔍</span>'
-      +       '<input type="search" placeholder="Part number, customer…" style="height:100%;padding:0 10px 0 28px;width:100%;border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius);font-size:13px"></div></label>'
+      +       '<span style="position:absolute;left:var(--o3-space-md,10px);top:50%;transform:translateY(-50%);font-size:var(--o3-font-size-sm,12px)">🔍</span>'
+      +       '<input type="search" placeholder="Part number, customer…" style="height:100%;padding:0 var(--o3-space-md,10px) 0 28px;width:100%;border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius);font-size:var(--o3-font-size-md,13px)"></div></label>'
       + '</div>'
-      + '<div style="margin-top:8px;display:flex;gap:14px;align-items:center;font-size:12px">'
+      + '<div style="margin-top:var(--o3-space-sm,8px);display:flex;gap:var(--o3-space-md,14px);align-items:center;font-size:var(--o3-font-size-sm,12px)">'
       +   '<label style="display:flex;align-items:center;gap:6px"><input type="checkbox" checked> Đã duyệt</label>'
       +   '<label style="display:flex;align-items:center;gap:6px"><input type="radio" name="r1" checked> Khẩn</label>'
       +   '<label style="display:flex;align-items:center;gap:6px"><input type="radio" name="r1"> Bình thường</label>'
@@ -866,14 +873,15 @@
       ])
     ],
     'form': [
-      // v3-G18 expanded ~17 properties — IBM Carbon + SAP Fiori form spec
+      // v3-G20 — only properties the input ACTUALLY consumes. Padding-Y
+      // removed (input uses fixed height). Label-input gap now correctly
+      // wires to the column gap inside each <label>. Field-field gap
+      // drives the grid gap between fields.
       _grp('layout','Bố cục','Layout',[
         _tn('control.height.standard','Chiều cao input','Input height',24,56),
         _vn('--o3-space-md','Padding ngang','Horizontal padding',4,24),
-        _vn('--o3-space-sm','Padding dọc','Vertical padding',0,16),
         _vn('--o3-radius','Bo góc','Border radius',0,16),
-        _vn('--o3-space-sm','Gap label-input','Label-input gap',0,16),
-        _vn('--o3-space-xs','Gap helper text','Helper text gap',0,12),
+        _vn('--o3-space-xs','Gap label-input','Label-input gap',0,16),
         _vn('--o3-space-md','Gap field-field','Field group gap',0,32)
       ]),
       _grp('colors','Màu','Colors',[
