@@ -60,8 +60,8 @@ P23-P1-043,GAP-P17-003,P1,P37,data_governance_frontend,P24 P37,stewards act on f
 P23-P1-044,GAP-P18-001,P1,P39,frontend,P24 P39,governed roots open with audit evidence and command actions,controlled for backend-only runtime,expires before UI runtime claim,open
 P23-P1-045,GAP-P18-002,P1,P39,frontend_sre,P24 P39,workspaces show freshness and disabled-state panels,controlled for backend-only runtime,expires before workspace runtime claim,open
 P23-P1-046,GAP-P18-003,P1,P39,frontend_mes_execution,P24 P39,offline cannot mutate governed data without reconcile,controlled for online-only mode,expires before offline runtime claim,open
-P23-P1-047,GAP-P19-001,P1,P38,qa_automation,P24 P38,200 scenarios execute with pass fail evidence,controlled for narrative planning only,expires before runtime acceptance,open
-P23-P1-048,GAP-P19-002,P1,P38,qa_automation_frontend,P24 P38,auditors view scenario evidence and blocker counts,controlled for CLI-only validation only,expires before acceptance dashboard claim,open
+P23-P1-047,GAP-P19-001,P1,P38,qa_automation,P24 P38,200 scenarios execute with pass fail evidence,P38 static contract runner executes 200 scenarios with pass fail dashboard and evidence hash,expires before runtime command-stack acceptance,partially_repaired
+P23-P1-048,GAP-P19-002,P1,P38,qa_automation_frontend,P24 P38,auditors view scenario evidence and blocker counts,P38 CLI/dashboard payload exposes total executed failed blockers coverage and evidence hash; browser UI remains pending,expires before browser dashboard claim,partially_repaired
 P23-P1-049,GAP-P19-003,P1,P38,platform_architecture_domain_owners,P24 P38,critical scenarios run against real command stack,controlled until prerequisite runtime services exist,expires before final acceptance,open
 P23-P1-050,GAP-P20-001,P1,P40,platform_architecture_domain_owners,P24 P40,all DoD gates pass in runtime,controlled for planning only,expires before final handoff,open
 P23-P1-051,GAP-P20-002,P1,P40,platform_architecture_platform_backend,P24 P40,backlog blockers collapse as waves complete,controlled for planning only,expires before implementation handoff,open

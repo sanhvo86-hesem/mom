@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "traceability_serialization",
         "table_count": 4,
-        "generated_at": "2026-05-29T09:36:03+00:00"
+        "generated_at": "2026-05-29T09:50:24+00:00"
     },
     "tables": {
         "genealogy_link": {

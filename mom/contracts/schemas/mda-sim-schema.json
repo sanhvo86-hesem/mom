@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hesem.local/contracts/mda-sim-schema.json",
+  "title": "HESEM MDA Executable Scenario DSL",
+  "type": "object",
+  "required": ["dsl_version", "declared_count", "scenarios"],
+  "additionalProperties": false,
+  "properties": {
+    "dsl_version": {
+      "type": "string",
+      "const": "2026-05-29.p38"
+    },
+    "declared_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "final_acceptance": {
+      "type": "boolean",
+      "default": false
+    },
+    "minimum_required_count": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 200
+    },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/scenario"
+      }
+    }
+  },
+  "$defs": {
+    "string_list": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "required": [
+        "scenario_id",
+        "root_code",
+        "command",
+        "expected_gate",
+        "expected_events",
+        "expected_ledgers",
+        "expected_evidence",
+        "assertions",
+        "severity",
+        "command_driver"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "scenario_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "group": {
+          "type": "string"
+        },
+        "root_code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "seed_data": {
+          "type": "string"
+        },
+        "preconditions": {
+          "type": "string"
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_gate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_events": {
+          "$ref": "#/$defs/string_list"
+        },
+        "expected_ledgers": {
+          "$ref": "#/$defs/string_list"
+        },
+        "expected_holds": {
+          "$ref": "#/$defs/string_list"
+        },
+        "expected_evidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_errors": {
+          "$ref": "#/$defs/string_list"
+        },
+        "assertions": {
+          "$ref": "#/$defs/string_list"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["P0", "P1", "P2", "P3"]
+        },
+        "command_driver": {
+          "type": "string",
+          "enum": ["static_contract", "runtime_command", "mock_only", "manual_evidence"]
+        },
+        "forced_result": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
