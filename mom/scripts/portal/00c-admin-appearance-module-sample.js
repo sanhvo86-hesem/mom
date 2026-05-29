@@ -1196,11 +1196,13 @@
     var p = getProbe();
     for (var i = 0; i < cssVarChain.length; i++) {
       try {
-        p.style.color = 'var(' + cssVarChain[i] + ')';
+        // Sentinel rgb(255,0,255) magenta — if browser hits it, var was
+        // undefined and we move on. Reset cssText each iter so prior
+        // styles don't pollute computed result.
+        p.style.cssText = 'position:absolute;left:-9999px;top:-9999px;visibility:hidden;width:1px;height:1px;color:var(' + cssVarChain[i] + ',rgb(255,0,255))';
         var c = getComputedStyle(p).color;
         var hex = _rgbToHex(c);
-        if (hex && hex !== '#000000') return hex;
-        // #000000 may be real or fallback — only accept if user actually set it
+        if (hex && hex !== '#ff00ff') return hex;
       } catch (e) {}
     }
     return '';
@@ -1209,9 +1211,11 @@
     var p = getProbe();
     for (var i = 0; i < cssVarChain.length; i++) {
       try {
-        p.style.width = 'var(' + cssVarChain[i] + ')';
+        // Sentinel 99999px so we detect when var is undefined. Reset
+        // cssText each iter so prior invalid widths don't stick.
+        p.style.cssText = 'position:absolute;left:-9999px;top:-9999px;visibility:hidden;height:1px;width:var(' + cssVarChain[i] + ',99999px)';
         var w = parseFloat(getComputedStyle(p).width);
-        if (!isNaN(w) && w > 0) return Math.round(w);
+        if (!isNaN(w) && w > 0 && w < 99999) return Math.round(w);
       } catch (e) {}
     }
     return null;

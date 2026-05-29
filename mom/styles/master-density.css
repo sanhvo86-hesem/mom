@@ -208,8 +208,7 @@ body.sidebar-collapsed .o3-props-dock,body.is-sidebar-collapsed .o3-props-dock,b
 .o3-props-dock__panel{pointer-events:auto;width:340px;max-width:92vw;background:var(--o3-surface-card,#fff);border:1px solid var(--o3-border-subtle,#e5e7eb);border-left:0;border-radius:0 12px 12px 0;box-shadow:8px 0 24px rgba(15,23,42,.10);display:flex;flex-direction:column;overflow:hidden;transform:translateX(0);transition:transform 200ms cubic-bezier(.32,.72,.34,1);max-height:calc(100vh - 120px)}
 /* Slide panel a hair further than -100% so the right-edge shadow
  * doesn't peek out past the handle when collapsed. */
-.o3-props-dock--collapsed .o3-props-dock__panel{transform:translateX(calc(-100% - 32px));pointer-events:none;opacity:0}
-.o3-props-dock__panel{opacity:1;transition:transform 200ms cubic-bezier(.32,.72,.34,1),opacity 160ms ease}
+.o3-props-dock--collapsed .o3-props-dock__panel{transform:translateX(-110%) !important;pointer-events:none;opacity:0}
 /* In-header collapse chevron (chevron-LEFT — slides panel away left) */
 .o3-props-dock__collapse{width:24px;height:24px;border:0;border-radius:6px;background:transparent;color:var(--o3-text-muted,#64748b);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background 120ms,color 120ms;margin-right:2px;padding:0}
 .o3-props-dock__collapse:hover{background:var(--o3-border-subtle,#e5e7eb);color:var(--o3-text-strong,#0f172a)}
