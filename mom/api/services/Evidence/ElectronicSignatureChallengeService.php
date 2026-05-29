@@ -25,6 +25,12 @@ final class ElectronicSignatureChallengeService
         'periodic_evaluation_waiver',
         'change_order_release',
         'verification_waiver',
+        'engineering_package_release',
+        'item_revision_release',
+        'quality_hold_release',
+        'party_merge_apply',
+        'user_party_link_approval',
+        'inventory_adjustment_approval',
     ];
 
     private ?object $db;

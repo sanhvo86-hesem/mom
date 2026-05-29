@@ -107,7 +107,7 @@
       "root_code": "MDA-WORKFLOW-AUDIT-EVIDENCE",
       "canonical_name": "WorkflowApprovalAuditEvidenceEsignAuthority",
       "owner_domain": "record_system",
-      "table_names": ["workflow_instances", "workflow_step_data", "state_transition_events", "approval", "mdm_approval_policies", "electronic_signature", "electronic_signatures", "signature_events", "eqms_electronic_signature_event", "audit_trail", "audit_events", "audit_event_chain", "evidence_records", "evidence_artifacts", "evidence_links", "eqms_evidence_record", "eqms_evidence_artifact", "outbox_events", "domain_outbox_events", "idempotency_replay_ledger"],
+      "table_names": ["workflow_instances", "workflow_step_data", "state_transition_events", "approval", "mdm_approval_policies", "regulated_command_policy", "regulated_command_policy_step", "regulated_command_signature_event_link", "electronic_signature", "electronic_signatures", "signature_events", "eqms_electronic_signature_event", "audit_trail", "audit_events", "audit_event_chain", "evidence_records", "evidence_artifacts", "evidence_links", "eqms_evidence_record", "eqms_evidence_artifact", "outbox_events", "domain_outbox_events", "idempotency_replay_ledger"],
       "required_command_service": "Workflow/Evidence/E-signature command spine",
       "allowed_commands": ["workflow_transition", "approval_record", "e_signature_apply", "evidence_attach", "audit_append", "outbox_publish"],
       "forbidden_generic_actions": ["create", "update", "delete", "transition", "approve", "sign"],
