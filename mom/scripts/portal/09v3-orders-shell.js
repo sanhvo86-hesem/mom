@@ -124,7 +124,24 @@
 
   function mountWorkspace(workspaceId){
     var all = orderedWorkspaces();
-    if (!all.length) return;
+    if (!all.length) {
+      // Race condition: shell.mount() fired before workspace files
+      // self-registered. Retry every 50ms up to 2s, then give up.
+      if (!state._wsWaitStart) state._wsWaitStart = Date.now();
+      if (Date.now() - state._wsWaitStart < 2000) {
+        setTimeout(function(){ mountWorkspace(workspaceId); }, 50);
+        return;
+      }
+      // Still nothing — render a clear error rather than blank body
+      var body = state.container && state.container.querySelector('#o3-shell-body');
+      if (body) body.innerHTML = ui.EmptyState({
+        icon: '⚠️',
+        title: t('Không có workspace nào được đăng ký','No workspaces registered'),
+        hint:  t('Kiểm tra portal.html có nạp đủ 09v3-workspace-*.js chưa.','Verify portal.html loads all 09v3-workspace-*.js scripts.')
+      }).html;
+      return;
+    }
+    state._wsWaitStart = null;
     var ws = all.find(function(w){ return w.id === workspaceId; }) || pickDefaultWorkspace(all);
 
     if (state.activeWorkspace === ws.id && state.activeMount) return;
