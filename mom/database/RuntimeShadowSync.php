@@ -26,6 +26,11 @@ final class RuntimeShadowSync
             $this->syncVendors((array)($store['suppliers'] ?? []));
             $this->syncItems((array)($store['parts'] ?? []));
             $this->syncItemRevisions((array)($store['revisions'] ?? []));
+            $this->syncRoutings((array)($store['routing_library'] ?? []));
+            $this->syncBillOfMaterials((array)($store['bom_library'] ?? []));
+            $this->syncControlPlans((array)($store['control_plans'] ?? []));
+            $this->syncInspectionPlans((array)($store['inspection_plans'] ?? []));
+            $this->syncMasterDataStoreMirror('defect_catalog', (array)($store['defect_catalog'] ?? []), 'defect_code');
             $this->syncWorkCenters((array)($store['work_centers'] ?? []));
             $this->syncEquipment((array)($store['machines'] ?? []), (array)($store['work_centers'] ?? []));
             $this->syncTools((array)($store['tooling_assets'] ?? []));
@@ -182,6 +187,116 @@ final class RuntimeShadowSync
                 'valid_from' => $this->parseTimestamp((string)($row['release_date'] ?? '')) ?? date(DATE_ATOM),
                 'metadata' => $row,
             ], ['item_id', 'rev'], ['metadata']);
+        }
+    }
+
+    private function syncRoutings(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $routingId = trim((string)($row['routing_id'] ?? ''));
+            $routingRevision = trim((string)($row['routing_revision'] ?? $row['revision'] ?? '1')) ?: '1';
+            $itemId = trim((string)($row['part_number'] ?? $row['item_id'] ?? ''));
+            if ($routingId === '' || $itemId === '') {
+                continue;
+            }
+
+            $this->upsert('routings', [
+                'routing_id' => $routingId,
+                'routing_revision' => $routingRevision,
+                'item_id' => $itemId,
+                'status' => strtolower(trim((string)($row['status'] ?? 'draft'))) ?: 'draft',
+                'metadata' => $row,
+                'valid_from' => $this->parseTimestamp((string)($row['release_date'] ?? $row['effective_from'] ?? $row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+                'created_at' => $this->parseTimestamp((string)($row['created_at'] ?? $row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['routing_id', 'routing_revision'], ['metadata']);
+        }
+    }
+
+    private function syncBillOfMaterials(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $bomId = trim((string)($row['bom_id'] ?? ''));
+            $bomRevision = trim((string)($row['bom_revision'] ?? $row['revision'] ?? '1')) ?: '1';
+            $parentItemId = trim((string)($row['part_number'] ?? $row['parent_item_id'] ?? ''));
+            if ($bomId === '' || $parentItemId === '') {
+                continue;
+            }
+
+            $this->upsert('bill_of_materials', [
+                'bom_id' => $bomId,
+                'bom_revision' => $bomRevision,
+                'bom_type' => $this->safeEnum((string)($row['bom_type'] ?? 'manufacturing'), ['engineering', 'manufacturing', 'planning', 'cost'], 'manufacturing') ?? 'manufacturing',
+                'bom_status' => strtolower(trim((string)($row['status'] ?? 'draft'))) ?: 'draft',
+                'parent_item_id' => $parentItemId,
+                'alternate_bom_id' => trim((string)($row['alternate_bom_id'] ?? '')) ?: null,
+                'bom_notes' => trim((string)($row['bom_notes'] ?? $row['description'] ?? '')) ?: null,
+                'metadata' => $row,
+                'valid_from' => $this->parseTimestamp((string)($row['release_date'] ?? $row['effective_from'] ?? $row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+                'created_at' => $this->parseTimestamp((string)($row['created_at'] ?? $row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['bom_id', 'bom_revision'], ['metadata']);
+        }
+    }
+
+    private function syncControlPlans(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $planNumber = trim((string)($row['plan_number'] ?? $row['control_plan_id'] ?? ''));
+            if ($planNumber === '') {
+                continue;
+            }
+
+            $this->upsert('control_plans', [
+                'plan_number' => $planNumber,
+                'plan_type' => $this->safeEnum((string)($row['plan_type'] ?? 'production'), ['prototype', 'pre_launch', 'production'], 'production') ?? 'production',
+                'title' => trim((string)($row['control_plan_name'] ?? $row['title'] ?? $planNumber)) ?: $planNumber,
+                'title_vi' => trim((string)($row['title_vi'] ?? '')) ?: null,
+                'item_id' => trim((string)($row['part_number'] ?? $row['item_id'] ?? '')) ?: null,
+                'revision' => max(1, (int)($row['revision'] ?? 1)),
+                'status' => strtolower(trim((string)($row['status'] ?? 'draft'))) ?: 'draft',
+                'effective_date' => $this->parseDate((string)($row['effective_date'] ?? '')),
+                'customer_approval_required' => $this->safeBool($row['customer_approval_required'] ?? false),
+                'customer_approved' => $this->safeBool($row['customer_approved'] ?? false),
+                'metadata' => $row,
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['plan_number'], ['metadata']);
+        }
+    }
+
+    private function syncInspectionPlans(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $inspectionPlanId = trim((string)($row['inspection_plan_id'] ?? ''));
+            if ($inspectionPlanId === '') {
+                continue;
+            }
+
+            $this->upsert('inspection_plans', [
+                'inspection_plan_id' => $inspectionPlanId,
+                'inspection_type' => $this->safeEnum((string)($row['inspection_type'] ?? 'in_process'), ['incoming', 'in_process', 'final', 'source', 'first_article', 'periodic'], 'in_process') ?? 'in_process',
+                'item_id' => trim((string)($row['part_number'] ?? $row['item_id'] ?? '')) ?: null,
+                'sampling_plan' => $this->safeEnum((string)($row['sampling_plan'] ?? 'aql'), ['c0', 'aql', 'skip_lot', '100pct', 'reduced', 'tightened'], 'aql') ?? 'aql',
+                'sampling_standard' => $this->safeEnum((string)($row['sampling_standard'] ?? 'ansi_z14'), ['ansi_z14', 'mil_std_1916', 'iso2859', 'custom'], 'ansi_z14') ?? 'ansi_z14',
+                'aql_level' => trim((string)($row['aql_level'] ?? '')) ?: null,
+                'accept_number' => isset($row['accept_number']) ? (int)$row['accept_number'] : null,
+                'reject_number' => isset($row['reject_number']) ? (int)$row['reject_number'] : null,
+                'sample_size' => isset($row['sample_size']) ? (int)$row['sample_size'] : null,
+                'test_method' => trim((string)($row['test_method'] ?? '')) ?: null,
+                'metadata' => $row,
+                'valid_from' => $this->parseTimestamp((string)($row['release_date'] ?? $row['valid_from'] ?? $row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+                'created_at' => $this->parseTimestamp((string)($row['created_at'] ?? $row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['inspection_plan_id'], ['metadata']);
         }
     }
 
@@ -481,6 +596,27 @@ final class RuntimeShadowSync
                 'metadata' => $row,
                 'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? '')) ?? date(DATE_ATOM),
             ], ['assembly_id'], ['metadata']);
+        }
+    }
+
+    private function syncMasterDataStoreMirror(string $entityType, array $rows, string $keyField): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $entityId = trim((string)($row[$keyField] ?? ''));
+            if ($entityId === '') {
+                continue;
+            }
+
+            $this->upsert('master_data_store', [
+                'entity_type' => $entityType,
+                'entity_id' => $entityId,
+                'status' => strtolower(trim((string)($row['status'] ?? 'active'))) ?: 'active',
+                'data' => $row,
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['entity_type', 'entity_id'], ['data']);
         }
     }
 

@@ -249,6 +249,35 @@ final class MasterDataService
     // ── Public API ──────────────────────────────────────────────────────────
 
     /**
+     * List runtime records for a governed master-data entity.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function listRecords(string $entityType): array
+    {
+        if (!$this->isValidEntity($entityType)) {
+            return [];
+        }
+
+        return array_values(array_filter(
+            (array)($this->loadStore()[$entityType] ?? []),
+            'is_array',
+        ));
+    }
+
+    /**
+     * Fetch a single runtime record by governed entity key.
+     */
+    public function getRecord(string $entityType, string $entityId): ?array
+    {
+        if (!$this->isValidEntity($entityType)) {
+            return null;
+        }
+
+        return $this->findRecord($this->loadStore(), $entityType, $entityId);
+    }
+
+    /**
      * Create a new master-data record.
      *
      * Performs duplicate detection and assigns lifecycle status "draft".

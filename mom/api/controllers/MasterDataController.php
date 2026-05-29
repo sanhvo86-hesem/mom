@@ -87,14 +87,11 @@ class MasterDataController extends BaseController
     }
 
     /**
-     * Load all records for an entity type from master-data.json.
+     * Load all records for an entity type from the governed runtime authority chain.
      */
     private function loadEntityRecords(string $entity): array
     {
-        $file = $this->dataDir . '/master-data/master-data.json';
-        $data = $this->readJsonFile($file);
-        if (!$data) return [];
-        return is_array($data[$entity] ?? null) ? $data[$entity] : [];
+        return $this->mdService()->listRecords($entity);
     }
 
     /**
@@ -102,17 +99,7 @@ class MasterDataController extends BaseController
      */
     private function findRecord(string $entity, string $id): ?array
     {
-        $records = $this->loadEntityRecords($entity);
-        // Find by any key field
-        foreach ($records as $r) {
-            if (!is_array($r)) continue;
-            // Check common key fields
-            foreach (['id', 'machine_id', 'work_center_id', 'item_id', 'operator_id',
-                       'customer_id', 'vendor_id', 'part_id', 'shift_code'] as $keyField) {
-                if (isset($r[$keyField]) && (string)$r[$keyField] === $id) return $r;
-            }
-        }
-        return null;
+        return $this->mdService()->getRecord($entity, $id);
     }
 
     private function shiftDir(): string
