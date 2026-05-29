@@ -310,10 +310,13 @@ body.sidebar-collapsed .o3-props-dock,body.is-sidebar-collapsed .o3-props-dock,b
 
 /* Inner inputs inside o3-input-group: get height/font from group wrapper
    but NO border or radius (wrapper provides those). Keep their own
-   padding from inline style so prefix/suffix don't collide. */
-#adm-appearance-panel-module-sample input.o3-input-inner {
+   padding from inline style so prefix/suffix don't collide.
+   NB: :not() chain matches portal.main.css admin-bridge specificity
+   (0,1,4,1) so we win when stacked at same !important level. */
+#adm-appearance-panel-module-sample input.o3-input-inner:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]) {
   min-height: 100% !important;
   height:     100% !important;
+  padding:    0 var(--o3-space-md, 10px) !important;
   border:     0 !important;
   border-radius: 0 !important;
   font-size:  var(--o3-font-size-md, 13px) !important;
@@ -325,7 +328,7 @@ body.sidebar-collapsed .o3-props-dock,body.is-sidebar-collapsed .o3-props-dock,b
 /* Search input with icon overlay: height from wrapper, font + radius
    from tokens, but PADDING-LEFT must reserve room for icon (28px icon
    slot + token space) so placeholder text doesn't sit under the icon. */
-#adm-appearance-panel-module-sample input.o3-input-search {
+#adm-appearance-panel-module-sample input.o3-input-search:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]) {
   min-height: var(--o3-control-h-standard, 32px) !important;
   height:     var(--o3-control-h-standard, 32px) !important;
   padding:    0 var(--o3-space-md, 10px) 0 calc(28px + var(--o3-space-md, 10px)) !important;
