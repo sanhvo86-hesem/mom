@@ -6,6 +6,7 @@ namespace MOM\Api\Controllers;
 
 use MOM\Api\Controllers\BaseController;
 use MOM\Api\Services\EmailIntakeCaseService;
+use MOM\Database\Connection;
 use MOM\Services\CustomerPurchaseOrderService;
 use MOM\Services\OrderService;
 use MOM\Services\OrdersV3WorkspaceService;
@@ -34,7 +35,7 @@ class OrdersV3Controller extends BaseController
             try {
                 // EmailIntakeCaseService needs the DB connection; ignore
                 // failures so the Today's queue still renders without AEOI.
-                $aeoi = new EmailIntakeCaseService($this->db());
+                $aeoi = new EmailIntakeCaseService(Connection::getInstance());
             } catch (Throwable $e) {
                 $aeoi = null;
             }
