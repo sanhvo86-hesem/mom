@@ -21,6 +21,7 @@ final class ResourceReadinessService
 
     public function __construct(
         private readonly ?CanonicalQualityCaseAuthorityService $qualityCaseAuthority = null,
+        private readonly ?ToolingGageAuthorityService $toolingGageAuthority = null,
     ) {
     }
 
@@ -339,6 +340,18 @@ final class ResourceReadinessService
     /** @param array<string, mixed> $context */
     private function checkToolGageReadiness(array $context, DateTimeImmutable $asOf): array
     {
+        if ($this->toolingGageAuthority !== null) {
+            $advancedGate = $this->toolingGageAuthority->evaluateToolingReadiness($context, $asOf);
+            if (($advancedGate['allowed'] ?? true) === false) {
+                return $advancedGate;
+            }
+
+            $gageGate = $this->toolingGageAuthority->evaluateGageCtqGate($context, $asOf);
+            if (($gageGate['allowed'] ?? true) === false) {
+                return $gageGate;
+            }
+        }
+
         $resources = [];
         foreach (['tools', 'tooling', 'gages', 'gauges'] as $field) {
             if (is_array($context[$field] ?? null)) {

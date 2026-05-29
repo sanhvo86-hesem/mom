@@ -37,23 +37,23 @@ entities:
   - root_code: MDA-EQUIPMENT-RESOURCE
     canonical_name: EquipmentWorkCenterMaintenanceCalibrationAuthority
     owner_domain: plant_maintenance
-    table_names: [work_centers, org_work_center, equipment, pm_equipment_master, maintenance_work_orders, pm_work_orders, pm_maintenance_plans, pm_maintenance_plan_items, calibration_records, calibration_grr_studies, calibration_oot_investigations, qual_lab_equipment, mes_equipment_extended]
-    required_command_service: "EquipmentResource command service"
+    table_names: [work_centers, org_work_center, equipment, pm_equipment_master, maintenance_work_orders, pm_work_orders, pm_maintenance_plans, pm_maintenance_plan_items, calibration_records, calibration_grr_studies, calibration_oot_investigations, eqms_calibration_records, eqms_msa_records, gage_msa_gate_policy, gage_oot_impact_scope, qual_lab_equipment, mes_equipment_extended]
+    required_command_service: "EquipmentResource command service plus ToolingGageAuthorityService for gage/OOT/MSA gates"
     allowed_commands: [equipment_register, equipment_release, maintenance_close, calibration_record_result, resource_status_change]
     forbidden_generic_actions: [create, update, delete, transition, release, approve]
     severity: P1
   - root_code: MDA-TOOLING
     canonical_name: ToolingFixtureGageLifeAuthority
     owner_domain: tooling_lifecycle
-    table_names: [tools, fixture_master, fixture_maintenance_logs, tooling_assemblies, tooling_components, tooling_families, tooling_life_limits, tooling_life_measurements, tooling_presets, tooling_calibration_links, tooling_crib_transactions, mes_tool_assemblies, mes_tool_life_events, mes_tool_preset_offsets]
-    required_command_service: "Tooling command service"
-    allowed_commands: [tool_register, tool_assembly_release, tool_life_post, tool_retire]
+    table_names: [tools, fixture_master, fixture_maintenance_logs, tooling_assemblies, tooling_components, tooling_families, tooling_life_limits, tooling_life_measurements, tooling_presets, tooling_calibration_links, tooling_crib_transactions, tooling_life_runtime_policy, tooling_machine_compatibility_rule, tool_breakage_suspect_window, gage_msa_gate_policy, gage_oot_impact_scope, mes_tool_assemblies, mes_tool_life_events, mes_tool_preset_offsets, mes_fixture_assignments]
+    required_command_service: "Tooling command service plus ToolingGageAuthorityService for runtime gates"
+    allowed_commands: [tool_register, tool_assembly_release, tool_life_post, tool_retire, tool_breakage_contain, gage_oot_impact_assess]
     forbidden_generic_actions: [create, update, delete, transition, release, approve, post]
     severity: P1
   - root_code: MDA-QUALITY-CASE
     canonical_name: QualityHoldNcrMrbCapaComplaintScarAuthority
     owner_domain: quality_management
-    table_names: [quality_order, quality_hold, quality_holds, quality_order_trigger_ledger, quality_case_trace_link, wms_quarantine_holds, inspection_lot, inspection_result, inspection_results, incoming_inspections, incoming_inspection_results, ipqc_inspections, ipqc_inspection_results, oqc_inspections, ncr_records, nonconformance, ncr, ncr_mrb_decisions, material_review_board, capa, capa_records, capa_8d_steps, scar, scar_records, complaint, customer_complaints, supplier_quality_case, concessions, deviation, deviations]
+    table_names: [quality_order, quality_hold, quality_holds, quality_order_trigger_ledger, quality_case_trace_link, wms_quarantine_holds, inspection_lot, inspection_result, inspection_results, incoming_inspections, incoming_inspection_results, ipqc_inspections, ipqc_inspection_results, oqc_inspections, ncr_records, nonconformance, ncr, ncr_mrb_decisions, material_review_board, capa, capa_records, capa_8d_steps, scar, scar_records, complaint, customer_complaints, supplier_quality_case, concessions, deviation, deviations, tool_breakage_suspect_window, gage_oot_impact_scope]
     required_command_service: "QualityCase command service plus CanonicalQualityCaseAuthorityService for hold/case gates"
     allowed_commands: [quality_hold_place, quality_hold_release, ncr_open, mrb_disposition, capa_approve, complaint_close, scar_issue]
     forbidden_generic_actions: [create, update, delete, transition, approve, hold, release]
@@ -77,8 +77,8 @@ entities:
   - root_code: MDA-MES-RUNTIME
     canonical_name: MesRuntimeEventAndReadinessAuthority
     owner_domain: mes_execution
-    table_names: [dispatch_queue, mes_dispatch_queue, resource_readiness_snapshot, mes_runtime_event_spine, mes_job_execution, mes_operation_execution, mes_operational_event_ledger, mes_cycle_events, mes_downtime_events, mes_machine_state_events, job_event, machine_event, downtime_event, track_in, track_out, material_consumption, tool_usage, production_completion, shift_dispatch_execution_events, shift_production_report_events, pause_resume, labor_capture, labor_transactions]
-    required_command_service: "ResourceReadinessService plus MES runtime command service"
+    table_names: [dispatch_queue, mes_dispatch_queue, resource_readiness_snapshot, mes_runtime_event_spine, mes_job_execution, mes_operation_execution, mes_operational_event_ledger, mes_cycle_events, mes_downtime_events, mes_machine_state_events, job_event, machine_event, downtime_event, track_in, track_out, material_consumption, tool_usage, production_completion, mes_tool_life_events, tool_breakage_suspect_window, shift_dispatch_execution_events, shift_production_report_events, pause_resume, labor_capture, labor_transactions]
+    required_command_service: "ResourceReadinessService plus ToolingGageAuthorityService plus MES runtime command service"
     allowed_commands: [resource_readiness_evaluate, job_start, operation_report, material_consume, machine_event_record, downtime_record]
     forbidden_generic_actions: [create, update, delete, transition, post]
     severity: P0
