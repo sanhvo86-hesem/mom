@@ -10,6 +10,9 @@ $targets = [
     $root . '/mom/docs/operations/references/05-ANNEX-500/annex-599-production-scenario-playbooks.html',
     $root . '/mom/docs/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html',
     $root . '/mom/assets/style.css',
+    $root . '/mom/portal.html',
+    $root . '/mom/scripts/portal/01-data-config.js',
+    $root . '/mom/scripts/portal/02-state-auth-ui.js',
 ];
 
 $issues = [];

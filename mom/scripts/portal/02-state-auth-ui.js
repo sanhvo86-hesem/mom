@@ -4456,7 +4456,7 @@ function renderDashboard(){
       </div>
     </div>
     <div class="card" style="margin-top:12px">
-      <h3>📊 ${lang==='en'?'Operational KPIs — ISO 9001:2026 §9.1':'KPI vận hành — ISO 9001:2026 §9.1'}</h3>
+      <h3>📊 ${lang==='en'?'Operational KPIs — ISO 9001:2015/Amd 1:2024 §9.1':'KPI vận hành — ISO 9001:2015/Amd 1:2024 §9.1'}</h3>
       <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:6px;font-size:12px">
         <div style="padding:10px;border:1px solid var(--green-bg,#dcfce7);border-radius:8px;background:var(--green-bg,#f0fdf4);text-align:center;min-width:0"><div style="font-size:10px;color:var(--green,#166534);font-weight:600;text-transform:uppercase">OTD</div><div style="font-size:18px;font-weight:700;color:var(--green-light,#16a34a);margin:4px 0">—</div><div style="font-size:9px;color:var(--text-3,#666)">${lang==='en'?'On-Time Delivery':'Giao hàng đúng hạn'}</div><div style="font-size:9px;color:var(--text-3,#999);margin-top:2px">≥ 95%</div></div>
         <div style="padding:10px;border:1px solid var(--blue-bg,#dbeafe);border-radius:8px;background:var(--blue-bg,#eff6ff);text-align:center;min-width:0"><div style="font-size:10px;color:var(--blue,#1e40af);font-weight:600;text-transform:uppercase">FPY</div><div style="font-size:18px;font-weight:700;color:var(--blue-light,#2563eb);margin:4px 0">—</div><div style="font-size:9px;color:var(--text-3,#666)">${lang==='en'?'First Pass Yield':'Tỷ lệ đạt lần đầu'}</div><div style="font-size:9px;color:var(--text-3,#999);margin-top:2px">≥ 98%</div></div>
