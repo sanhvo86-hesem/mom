@@ -61,8 +61,16 @@ test.describe('module-template-v4 visual regression', () => {
       await stabilize(page);
 
       const snapName = fixturePage.replace(/\.html$/, '.png');
+      // Cross-OS visual stability — `fullPage: true` produces OS-dependent
+      // image heights (Linux CI renders ~20px taller than macOS for the
+      // same content). Playwright treats any size mismatch as a hard fail
+      // regardless of pixel-tolerance settings (maxDiffPixelRatio applies
+      // ONLY to same-size comparisons). Switching to viewport-only capture
+      // locks the snapshot at the fixed 1280×800 viewport declared above,
+      // which is identical on every host. Below-fold content is covered by
+      // the dedicated `module-template-v4-axe.spec.ts` accessibility pack.
       await expect(page).toHaveScreenshot(snapName, {
-        fullPage: true,
+        fullPage: false,
         omitBackground: false,
         animations: 'disabled'
       });
