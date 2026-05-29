@@ -323,6 +323,7 @@ $routeModules = [
     __DIR__ . '/routes/generic-runtime-routes.php',
     __DIR__ . '/routes/frontend-alias-routes.php',
     __DIR__ . '/routes/rest-routes.php',
+    __DIR__ . '/routes/uom-routes.php',             // UoM Measurement Intelligence (v1)
 ];
 
 foreach ($routeModules as $routeModule) {
