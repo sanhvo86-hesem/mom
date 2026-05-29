@@ -161,8 +161,93 @@ tags:
       Canonical portal-first EQMS control-plane endpoints for document control,
       form issuance/submission/finalization, evidence packages, publication
       monitor, audit packs, change authority, and genealogy graph reads.
+  - name: Domain Commands
+    description: |
+      Governed command envelope surface for master-data and manufacturing authority
+      mutations. The endpoint enforces command name, idempotency, correlation ID,
+      session/CSRF controls and RFC 9457 Problem Details. Domain command services,
+      not Generic CRUD, own actual business transitions.
 
 paths:
+  /api/v1/commands/{commandName}:
+    parameters:
+      - name: commandName
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: '^[A-Za-z][A-Za-z0-9_.:-]{1,119}$'
+        description: Canonical governed command name, for example `EngineeringReleasePackage.Release`.
+    post:
+      operationId: mdaDomainCommandExecute
+      tags: [Domain Commands]
+      summary: Execute a governed domain command envelope
+      description: |
+        Shared domain-command gateway for MDA/MOM/MES/eQMS mutations. The route is
+        fail-closed unless a domain-owned handler is registered; it still defines
+        the required command envelope, idempotency replay behavior, correlation ID,
+        session/CSRF requirements, outbox retry semantics and RFC 9457 error model.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+            minLength: 16
+            maxLength: 128
+            pattern: '^[A-Za-z0-9._-]{8,128}$'
+          description: Replay key for deterministic command retry.
+        - name: X-Correlation-Id
+          in: header
+          required: true
+          schema:
+            type: string
+            minLength: 1
+          description: End-to-end correlation ID written to command/audit/outbox evidence.
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainCommandEnvelope'
+      responses:
+        '200':
+          description: Command completed or replayed with a deterministic result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainCommandResultEnvelope'
+        '202':
+          description: Command accepted with asynchronous outbox processing pending.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainCommandResultEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedProblem'
+        '403':
+          $ref: '#/components/responses/ForbiddenProblem'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/DefaultProblem'
+        '501':
+          description: Domain command handler is not registered.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
   # Transactional plural-form canonical paths (ADR-0008, Stream C.2)
   /api/v1/sales-orders:
     get:
@@ -7143,6 +7228,58 @@ components:
           format: date-time
           description: Server UTC timestamp (ISO 8601).
 
+    DomainCommandEnvelope:
+      type: object
+      required: [command_name, payload]
+      properties:
+        command_name:
+          type: string
+          pattern: '^[A-Za-z][A-Za-z0-9_.:-]{1,119}$'
+          description: Canonical governed command name. Must match the path parameter.
+        idempotency_key:
+          type: string
+          minLength: 16
+          maxLength: 128
+          description: Optional body mirror of the required `Idempotency-Key` header.
+        correlation_id:
+          type: string
+          description: Optional body mirror of the required `X-Correlation-Id` header.
+        aggregate_type:
+          type: string
+          description: Governed aggregate/root affected by the command.
+        aggregate_id:
+          type: string
+          description: Aggregate ID affected by the command.
+        payload:
+          type: object
+          additionalProperties: true
+          description: Command-specific payload owned by the domain command service.
+      additionalProperties: false
+
+    DomainCommandResultEnvelope:
+      type: object
+      required: [ok, replayed, outbox_status]
+      properties:
+        ok:
+          type: boolean
+          const: true
+        data:
+          type: object
+          additionalProperties: true
+          description: Command-specific result payload.
+        replayed:
+          type: boolean
+          description: True when returned from the idempotency replay ledger.
+        idempotency_stored_at:
+          type: string
+          format: date-time
+          description: Replay ledger completion timestamp when available.
+        outbox_status:
+          type: string
+          enum: [not_applicable, pending, published, pending_retry]
+          description: Outbox publication state for command side effects.
+      additionalProperties: true
+
     RegistryDocumentEnvelope:
       allOf:
         - $ref: '#/components/schemas/SuccessEnvelope'
@@ -9142,9 +9279,30 @@ components:
         trace_id:
           type: string
           description: Distributed trace identifier for correlation.
+        correlation_id:
+          type: string
+          description: Command/request correlation identifier written to audit and outbox evidence.
+        retryable:
+          type: boolean
+          description: True when the caller may retry the same idempotent request after the retry window or state recovery.
         current_etag:
           type: string
           description: Current ETag value when a concurrency conflict occurs.
+        violations:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: JSON pointer or field name.
+              message:
+                type: string
+                description: Validation or gate failure message.
+              code:
+                type: string
+                description: Machine-readable violation code.
+          description: Command-envelope or domain-precondition violations.
         errors:
           type: array
           items:

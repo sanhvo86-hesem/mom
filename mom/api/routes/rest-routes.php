@@ -44,6 +44,10 @@ return static function (Router $router, string $dataDir): void {
     
     // Meta / API catalog
     $router->get('/api/meta/catalog', ModuleSchemaController::class, 'apiCatalog');
+
+    // Governed domain-command envelope. The controller is fail-closed unless
+    // a domain-owned handler is explicitly registered behind the gateway.
+    $router->post('/api/v1/commands/{commandName}', DomainCommandController::class, 'execute');
     
     // System contract registry for frontend/AI tooling
     $router->get('/api/system/contracts', RegistryController::class, 'getSystemContract');
