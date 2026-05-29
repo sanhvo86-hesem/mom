@@ -26,7 +26,9 @@ use MOM\Database\Connection;
  * This converter is advisory-only — it writes a flag to the MEASVAL
  * evidence envelope so downstream QA can verify the density assumption.
  */
-final class DensityContextualConverter
+// V3 P05: marker removed from `final` so the ContextualConversionPlanner
+// unit tests can swap in a mock without standing up a real Connection.
+class DensityContextualConverter
 {
     private const BCMATH_SCALE = 30;
 
