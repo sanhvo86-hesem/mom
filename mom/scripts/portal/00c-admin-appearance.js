@@ -3954,7 +3954,10 @@ function render(el, subTab, currentLang){
     {key:'module-sample',icon:'🎛️', label:L('Module Sample','Module Sample')}
   ];
 
-  var h = '<div style="max-width:min(100%,1120px);margin:0 auto">';
+  /* Width-cap removed 2026-05-28 per HESEM space-utilization rule:
+     admin work surface must span the full available width. The previous
+     1120px cap left ~30% empty gutter on wide monitors. */
+  var h = '<div style="width:100%;margin:0">';
 
   /* Title */
 	  h += '<div class="hm-page-header" style="align-items:flex-start;margin-bottom:16px">';

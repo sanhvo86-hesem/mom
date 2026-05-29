@@ -68,16 +68,17 @@
   --o3-radius-lg:       10px;
   --o3-radius-pill:     999px;
 
-  /* CONTROL HEIGHT TRIAD (SSOT: control.height.{sm|md|lg})
-   * The single most important addition. Every interactive control
-   * (button, tab, input, chip-as-button, search) must adopt one of
-   * these heights so they align horizontally in any toolbar. Without
-   * this, heights diverged because each component computed its own
-   * from per-component padding + line-height. User-visible bug
-   * reported on 2026-05-28 ("chiều cao không đồng vô").              */
-  --o3-control-h-sm:    28px;
-  --o3-control-h-md:    36px;
-  --o3-control-h-lg:    44px;
+  /* CONTROL HEIGHT — STANDARD (SSOT: control.height.standard)
+   * HESEM rule (2026-05-28): ONE size for every interactive control.
+   * No sm/lg variants. Buttons, tabs, inputs, chip-buttons, searches
+   * all snap to this single height. To request a different size,
+   * propose a new token via Authority and run simulation evidence
+   * — never hardcode a one-off height. */
+  --o3-control-h-standard: 36px;
+  /* Legacy aliases kept for ONE release only (migration 214 deprecates) */
+  --o3-control-h-md: var(--o3-control-h-standard);
+  --o3-control-h-sm: var(--o3-control-h-standard);
+  --o3-control-h-lg: var(--o3-control-h-standard);
 
   /* Shadows */
   --o3-shadow-card:     0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
@@ -228,10 +229,12 @@ body.orders-v3-active #page-orders.active > .page-breadcrumb {
 
 .o3-shell__body {
   flex: 1;
-  padding: var(--o3-space-xl);
+  /* Tightened 2026-05-28 per HESEM space rule: lg padding + md gap is
+     enough for visual rhythm without wasting screen real estate. */
+  padding: var(--o3-space-lg);
   display: flex;
   flex-direction: column;
-  gap: var(--o3-space-xl);
+  gap: var(--o3-space-md);
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -453,16 +456,14 @@ body.orders-v3-active #page-orders.active > .page-breadcrumb {
   border-color: transparent;
 }
 
-.o3-btn--sm {
-  height: var(--o3-control-h-sm);
-  padding: 0 var(--o3-space-sm);
-  font-size: var(--o3-font-size-xs);
-}
-
+/* .o3-btn--sm and .o3-btn--lg are DEPRECATED 2026-05-28 — they now
+   alias the standard height. Existing markup keeps working; new
+   markup should not use them. SSOT rule: ONE size only. */
+.o3-btn--sm,
 .o3-btn--lg {
-  height: var(--o3-control-h-lg);
-  padding: 0 var(--o3-space-lg);
-  font-size: var(--o3-font-size-md);
+  height: var(--o3-control-h-standard);
+  padding: 0 var(--o3-space-md);
+  font-size: var(--o3-font-size-sm);
 }
 
 .o3-btn:disabled {
