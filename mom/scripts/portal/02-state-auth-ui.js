@@ -6449,7 +6449,7 @@ const ADMIN_TAB_FILTER_DEFAULTS = {
   activity:{search:'',actor:'',eventType:'',aggregateType:'',dateFrom:'',dateTo:'',includeSystem:false}
 };
 let ADMIN_TAB_FILTERS = JSON.parse(JSON.stringify(ADMIN_TAB_FILTER_DEFAULTS));
-const ADMIN_RUNTIME_ASSET_VERSION = '20260529-mm18';
+const ADMIN_RUNTIME_ASSET_VERSION = '20260529-mm19';
 const ADMIN_MANUAL_MACHINE_ENTITIES = Object.freeze([
   'work_centers',
   'machines',

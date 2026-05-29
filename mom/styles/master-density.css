@@ -293,12 +293,42 @@ body.sidebar-collapsed .o3-props-dock,body.is-sidebar-collapsed .o3-props-dock,b
    loads later in the cascade so it wins for the preview area only.
    Buttons and chips don't need the override because their CSS already
    reads o3 tokens directly. */
-#adm-appearance-panel-module-sample input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+#adm-appearance-panel-module-sample input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not(.o3-input-inner):not(.o3-input-search),
 #adm-appearance-panel-module-sample select,
 #adm-appearance-panel-module-sample textarea {
   min-height: var(--o3-control-h-standard, 32px) !important;
   height:     var(--o3-control-h-standard, 32px) !important;
   padding:    0 var(--o3-space-md, 10px) !important;
+  font-size:  var(--o3-font-size-md, 13px) !important;
+  border-radius: var(--o3-radius, 4px) !important;
+  border:     1px solid var(--o3-border-subtle, #e5e7eb) !important;
+  background: var(--o3-surface-card, #fff) !important;
+  color:      var(--o3-text-strong, #0f172a) !important;
+  line-height: 1.25 !important;
+  box-sizing: border-box !important;
+}
+
+/* Inner inputs inside o3-input-group: get height/font from group wrapper
+   but NO border or radius (wrapper provides those). Keep their own
+   padding from inline style so prefix/suffix don't collide. */
+#adm-appearance-panel-module-sample input.o3-input-inner {
+  min-height: 100% !important;
+  height:     100% !important;
+  border:     0 !important;
+  border-radius: 0 !important;
+  font-size:  var(--o3-font-size-md, 13px) !important;
+  background: transparent !important;
+  color:      var(--o3-text-strong, #0f172a) !important;
+  box-sizing: border-box !important;
+}
+
+/* Search input with icon overlay: height from wrapper, font + radius
+   from tokens, but PADDING-LEFT must reserve room for icon (28px icon
+   slot + token space) so placeholder text doesn't sit under the icon. */
+#adm-appearance-panel-module-sample input.o3-input-search {
+  min-height: var(--o3-control-h-standard, 32px) !important;
+  height:     var(--o3-control-h-standard, 32px) !important;
+  padding:    0 var(--o3-space-md, 10px) 0 calc(28px + var(--o3-space-md, 10px)) !important;
   font-size:  var(--o3-font-size-md, 13px) !important;
   border-radius: var(--o3-radius, 4px) !important;
   border:     1px solid var(--o3-border-subtle, #e5e7eb) !important;
