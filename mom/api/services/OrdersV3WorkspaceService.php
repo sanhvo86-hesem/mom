@@ -75,8 +75,7 @@ class OrdersV3WorkspaceService
         $aeoiOldest   = null;
         foreach ($cases as $c) {
             $status = strtolower((string)($c['status'] ?? ''));
-            if (in_array($status, ['received','extracted','validated','needs_review','approved','committed_cpo'], true)
-                && !in_array($status, ['committed','rejected','duplicate_hold'], true)) {
+            if (in_array($status, ['received','extracted','validated','needs_review','approved','committed_cpo'], true)) {
                 $aeoiQueueLen++;
                 $ca = strtotime((string)($c['created_at'] ?? ''));
                 if ($ca && (!$aeoiOldest || $ca < $aeoiOldest)) $aeoiOldest = $ca;
@@ -195,27 +194,27 @@ class OrdersV3WorkspaceService
         $group = strtolower((string)($filters['status_group'] ?? ''));
         if ($group !== '' && $group !== 'all') {
             $items = array_values(array_filter($items, static function($i) use ($group){
-                return ($i['status_group'] ?? '') === $group;
+                return $i['status_group'] === $group;
             }));
         }
         $source = strtolower((string)($filters['source'] ?? ''));
         if ($source === 'ai') {
             $items = array_values(array_filter($items, static function($i){
-                return ($i['source'] ?? '') === 'ai_order_intake';
+                return $i['source'] === 'ai_order_intake';
             }));
         } elseif ($source === 'manual') {
             $items = array_values(array_filter($items, static function($i){
-                return ($i['source'] ?? '') !== 'ai_order_intake';
+                return $i['source'] !== 'ai_order_intake';
             }));
         }
         $q = strtolower(trim((string)($filters['q'] ?? '')));
         if ($q !== '') {
             $items = array_values(array_filter($items, static function($i) use ($q){
                 $hay = strtolower(
-                    ($i['id'] ?? '') . ' '
-                    . ($i['po_number'] ?? '') . ' '
-                    . ($i['customer_id'] ?? '') . ' '
-                    . ($i['customer_name'] ?? '')
+                    $i['id'] . ' '
+                    . $i['po_number'] . ' '
+                    . $i['customer_id'] . ' '
+                    . $i['customer_name']
                 );
                 return strpos($hay, $q) !== false;
             }));
@@ -223,7 +222,7 @@ class OrdersV3WorkspaceService
 
         // Sort newest received first
         usort($items, static function($a, $b){
-            return strcmp((string)($b['received_at'] ?? ''), (string)($a['received_at'] ?? ''));
+            return strcmp((string)$b['received_at'], (string)$a['received_at']);
         });
 
         // Counts by group (always include all groups so chips render counts)
