@@ -279,6 +279,35 @@ body.sidebar-collapsed .o3-props-dock,body.is-sidebar-collapsed .o3-props-dock,b
 .o3-props-row.is-custom{background:linear-gradient(90deg,var(--o3-brand-soft,#e0f2fe) 0%,transparent 6%);border-left:3px solid var(--o3-brand,#0c4a6e);padding-left:6px;margin-left:-9px}
 :root[data-color-mode="dark"] .o3-props-row.is-custom{background:linear-gradient(90deg,rgba(56,189,248,0.15) 0%,transparent 12%);border-left-color:#38bdf8}
 
+/* v3-G20 — Graphics Authority bridge for Module Sample preview area.
+   portal.main.css applies a global admin authority bridge:
+     #admin-content input...:not([type="file"]) {
+       min-height: var(--admin-object-min-h, var(--hds-control-h)) !important;
+       padding:    var(--input-padding-y, 0px) var(--hds-control-px) !important;
+       font-size:  var(--hds-control-font) !important;
+       border-radius: var(--hds-control-radius) !important;
+     }
+   This was clamping Module Sample preview inputs to 34px/10px regardless
+   of the user's slider value in Properties dock. The fix below targets
+   the SAME specificity (0,1,0,1) but uses Graphics Authority tokens AND
+   loads later in the cascade so it wins for the preview area only.
+   Buttons and chips don't need the override because their CSS already
+   reads o3 tokens directly. */
+#adm-appearance-panel-module-sample input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+#adm-appearance-panel-module-sample select,
+#adm-appearance-panel-module-sample textarea {
+  min-height: var(--o3-control-h-standard, 32px) !important;
+  height:     var(--o3-control-h-standard, 32px) !important;
+  padding:    0 var(--o3-space-md, 10px) !important;
+  font-size:  var(--o3-font-size-md, 13px) !important;
+  border-radius: var(--o3-radius, 4px) !important;
+  border:     1px solid var(--o3-border-subtle, #e5e7eb) !important;
+  background: var(--o3-surface-card, #fff) !important;
+  color:      var(--o3-text-strong, #0f172a) !important;
+  line-height: 1.25 !important;
+  box-sizing: border-box !important;
+}
+
 /* Dot indicator on Module Master inner tab strip — shows tab has overrides */
 .hm-tab.has-overrides::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--o3-brand,#0c4a6e);margin-left:6px;vertical-align:1px;box-shadow:0 0 0 2px var(--o3-brand-soft,#e0f2fe)}
 :root[data-color-mode="dark"] .hm-tab.has-overrides::after{background:#38bdf8;box-shadow:0 0 0 2px rgba(56,189,248,0.25)}
