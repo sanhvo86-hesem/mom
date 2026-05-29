@@ -1663,10 +1663,47 @@
     } else {
       subtabsEl.innerHTML = '';
     }
-    bodyEl.innerHTML = '<div class="o3-props-dock__group">'
+    // v3-G17: hint banner explaining the Custom checkbox model.
+    var hintHtml = '<div class="o3-props-dock__hint">'
+      + '<strong>' + esc(L('💡 Cách dùng','💡 How it works')) + ':</strong> '
+      + esc(L(
+          'Mỗi property mặc định kế thừa Global Theme (input bị mờ). Tick ☑ Custom bên trái để chỉnh giá trị RIÊNG cho component này.',
+          'Each property inherits from Global Theme (input muted). Tick ☑ Custom on the left to override for THIS component only.'))
+      + '</div>';
+    bodyEl.innerHTML = hintHtml
+      + '<div class="o3-props-dock__group">'
       + activeGroup.items.map(function(it){ return renderPropertyRow(it, L); }).join('')
       + '</div>';
   }
+
+  // v3-G17: listen for Global Theme apply → refresh non-Custom input
+  // values in the dock so they show the new inherited value.
+  document.addEventListener('o3:theme-applied', function(){
+    var dock = document.getElementById('o3-props-dock');
+    if (!dock || dock.classList.contains('o3-props-dock--collapsed')) return;
+    // For each input WITHOUT data-mod-sample-wired flag of "custom",
+    // re-resolve and update its display value (only if input is disabled
+    // = it's inherited, not overridden).
+    var inputs = dock.querySelectorAll('.o3-props-row__input');
+    Array.prototype.forEach.call(inputs, function(input){
+      if (!input.disabled) return;  // Custom override — don't touch
+      var tokenKey = input.getAttribute('data-mod-sample-token');
+      var cssVarRaw = input.getAttribute('data-mod-sample-cssvar');
+      var cssVars;
+      if (tokenKey) cssVars = TOKEN_CSS_VAR[tokenKey] || ['--' + tokenKey.replace(/\./g, '-')];
+      else if (cssVarRaw) cssVars = cssVarRaw.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+      else return;
+      try {
+        if (input.type === 'number') {
+          var n = resolveCssVarPx(cssVars);
+          if (n !== null) input.value = n;
+        } else if (input.type === 'color') {
+          var h = resolveCssVarColor(cssVars);
+          if (h) input.value = h;
+        }
+      } catch (e) {}
+    });
+  });
 
   function showProperties(sectionId, L){
     var secs = sections(L || function(vi,en){return vi||en;});
@@ -1744,11 +1781,27 @@
     var secs = sections(L);
     var active = secs.find(function(s){ return s.id === _activeSection; }) || secs[0];
 
-    // Inner sub-tab strip
+    // Inner sub-tab strip — v3-G17 adds `.has-overrides` class to tabs
+    // whose section has at least one Custom override flag set.
+    var overrides = readPropertyOverrides();
+    function sectionHasOverrides(secId){
+      var groups = PROPERTY_CATALOG[secId];
+      if (!groups) return false;
+      for (var i = 0; i < groups.length; i++) {
+        for (var j = 0; j < groups[i].items.length; j++) {
+          var it = groups[i].items[j];
+          var key = it.kind === 'token' ? it.key : (Array.isArray(it.cssVar) ? it.cssVar[0] : it.cssVar);
+          if (overrides[key]) return true;
+        }
+      }
+      return false;
+    }
     var innerTabsHtml = secs.map(function(s){
       var isActive = s.id === active.id;
-      return '<button type="button" class="hm-tab' + (isActive ? ' active' : '') + '"'
+      var hasOv = sectionHasOverrides(s.id);
+      return '<button type="button" class="hm-tab' + (isActive ? ' active' : '') + (hasOv ? ' has-overrides' : '') + '"'
         + ' aria-selected="' + (isActive ? 'true' : 'false') + '"'
+        + ' title="' + (hasOv ? esc(L('Có Custom override trong section này','Has Custom overrides in this section')) : '') + '"'
         + ' onclick="_admModuleSampleSetSection(\'' + esc(s.id) + '\')">'
         + '<span class="hm-tab-label">' + esc(L(s.label_vi, s.label_en)) + '</span>'
         + '</button>';

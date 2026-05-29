@@ -98,6 +98,9 @@
     }
     // Persist
     try { localStorage.setItem('o3-theme', JSON.stringify(theme)); } catch (e) {}
+    // v3-G17: notify listeners (Module Master dock) so non-Custom rows
+    // can re-read their inherited values from root computed style.
+    try { document.dispatchEvent(new CustomEvent('o3:theme-applied', { detail: { theme: theme } })); } catch (e) {}
   }
 
   function readTheme(){
@@ -119,8 +122,15 @@
     } catch (e) { return {}; }
   }
 
-  function resetTheme(){
+  function resetTheme(alsoClearOverrides){
     try { localStorage.removeItem('o3-theme'); } catch (e) {}
+    if (alsoClearOverrides) {
+      try { localStorage.removeItem('o3-props-overrides'); } catch (e) {}
+      // Remove any inline overrides on :root so the cascade returns
+      // to the stylesheet defaults
+      var commonVars = ['--o3-space','--o3-space-section','--o3-radius','--o3-radius-card','--o3-control-h-standard','--o3-control-h-md','--o3-control-h-sm','--o3-control-h-lg','--o3-brand','--brand-primary','--o3-font-size-md','--o3-font-size-sm','--o3-font-size-lg','--master-gap','--section-gap','--master-radius','--card-radius','--o3-motion-fast','--o3-motion-base','--o3-motion-slow'];
+      commonVars.forEach(function(v){ document.documentElement.style.removeProperty(v); });
+    }
     applyTheme(THEME_DEFAULTS);
   }
 
@@ -358,8 +368,16 @@
     if (rb && rb.getAttribute('data-theme-wired') !== '1') {
       rb.setAttribute('data-theme-wired', '1');
       rb.addEventListener('click', function(){
-        if (!confirm('Reset Theme về defaults? Mọi Custom override trong Module Master vẫn giữ nguyên.')) return;
-        resetTheme();
+        var overrides = readOverrides();
+        var overrideCount = Object.keys(overrides).filter(function(k){ return overrides[k]; }).length;
+        var msg = 'Reset Global Theme về research-backed defaults?';
+        var alsoClear = false;
+        if (overrideCount > 0) {
+          alsoClear = confirm(msg + '\n\n' + overrideCount + ' Custom override đang được giữ nguyên trong Module Master.\n\nBấm OK để CŨNG XOÁ HẾT các override (full reset).\nBấm Cancel để CHỈ reset Theme (giữ overrides).');
+        } else {
+          if (!confirm(msg)) return;
+        }
+        resetTheme(alsoClear);
         var panel = document.getElementById('adm-appearance-panel-theme');
         if (panel) panel.innerHTML = window._renderAdmThemeHtml(window.__lang === 'en'
           ? function(vi,en){ return en || vi; }

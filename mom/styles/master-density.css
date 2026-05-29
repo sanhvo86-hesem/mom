@@ -258,3 +258,32 @@ body.sidebar-collapsed .o3-props-dock,body.is-sidebar-collapsed .o3-props-dock,b
 :root[data-color-mode="dark"] .o3-props-dock__header{background:var(--o3-surface-muted)}
 :root[data-color-mode="dark"] .o3-props-row__input[type="number"],
 :root[data-color-mode="dark"] .o3-props-row__input[type="text"]{background:var(--o3-surface-page);color:var(--o3-text-strong);border-color:var(--o3-border-default)}
+
+/* ════════════════════════════════════════════════════════════════════
+ * v3-G17 (2026-05-29) — Custom checkbox UX clarity + dot indicators
+ * ════════════════════════════════════════════════════════════════════ */
+
+/* Properties dock — hint banner at top of body */
+.o3-props-dock__hint{margin:0 12px 8px;padding:8px 10px;background:var(--o3-info-soft,#dbeafe);color:var(--o3-info,#1d4ed8);border-radius:6px;font-size:11px;line-height:1.45;border-left:3px solid var(--o3-info,#1d4ed8)}
+.o3-props-dock__hint strong{font-weight:600}
+:root[data-color-mode="dark"] .o3-props-dock__hint{background:#1e3a8a;color:#bfdbfe;border-left-color:#60a5fa}
+
+/* Bigger, clearer Custom checkbox visual difference */
+.o3-props-row__custom{width:16px;height:16px;border:2px solid var(--o3-border-default,#cbd5e1);border-radius:4px}
+.o3-props-row__custom:not(:checked):hover{border-color:var(--o3-brand,#0c4a6e);box-shadow:0 0 0 3px var(--o3-brand-soft,#e0f2fe)}
+.o3-props-row__custom:checked{background:var(--o3-brand,#0c4a6e);border-color:var(--o3-brand,#0c4a6e);box-shadow:0 0 0 2px var(--o3-brand-soft,#e0f2fe)}
+.o3-props-row__custom:checked::after{left:3.5px;top:0.5px;width:5px;height:9px}
+/* Inherited row — strongly muted to show "use Global" */
+.o3-props-row:not(.is-custom) .o3-props-row__input{background:repeating-linear-gradient(45deg,transparent 0 4px,rgba(100,116,139,0.06) 4px 5px) !important;cursor:not-allowed}
+.o3-props-row:not(.is-custom) .o3-props-row__name{color:var(--o3-text-muted,#94a3b8)}
+.o3-props-row.is-custom{background:linear-gradient(90deg,var(--o3-brand-soft,#e0f2fe) 0%,transparent 6%);border-left:3px solid var(--o3-brand,#0c4a6e);padding-left:6px;margin-left:-9px}
+:root[data-color-mode="dark"] .o3-props-row.is-custom{background:linear-gradient(90deg,rgba(56,189,248,0.15) 0%,transparent 12%);border-left-color:#38bdf8}
+
+/* Dot indicator on Module Master inner tab strip — shows tab has overrides */
+.hm-tab.has-overrides::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--o3-brand,#0c4a6e);margin-left:6px;vertical-align:1px;box-shadow:0 0 0 2px var(--o3-brand-soft,#e0f2fe)}
+:root[data-color-mode="dark"] .hm-tab.has-overrides::after{background:#38bdf8;box-shadow:0 0 0 2px rgba(56,189,248,0.25)}
+
+/* Theme tab — bigger save button so it's obvious */
+#theme-save{box-shadow:0 2px 8px rgba(56,189,248,0.30);font-weight:600}
+#theme-save:hover{box-shadow:0 3px 12px rgba(56,189,248,0.45);transform:translateY(-1px)}
+:root[data-color-mode="dark"] #theme-save{box-shadow:0 2px 8px rgba(56,189,248,0.45)}
