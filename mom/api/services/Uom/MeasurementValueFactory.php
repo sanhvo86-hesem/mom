@@ -108,6 +108,75 @@ final class MeasurementValueFactory
     }
 
     /**
+     * Build a MEASVAL envelope for a measurement that requires no conversion.
+     *
+     * Used by QualityMeasurementBridge when wrapping an existing inspection
+     * measurement in-situ (no unit change). The audit hash uses the same
+     * format with from_unit == to_unit and rule_code = 'IDENTITY'.
+     *
+     * @param string $magnitude  The measurement value (numeric string)
+     * @param string $unitCode   The canonical unit code
+     * @param array  $context    Caller context (source_table, source_id, item_id, …)
+     * @return array  MEASVAL envelope
+     */
+    public function buildWrapOnly(string $magnitude, string $unitCode, array $context = []): array
+    {
+        $identityRule = [
+            'rule_code'    => 'IDENTITY',
+            'rule_version' => 0,
+            'category'     => 'identity',
+            'factor'       => '1',
+            'offset_value' => '0',
+            'reversed'     => false,
+        ];
+        $auditHash = $this->computeHash($unitCode, $magnitude, $unitCode, $identityRule, 0, $magnitude);
+
+        return [
+            'input' => [
+                'magnitude' => $magnitude,
+                'unit_code' => $unitCode,
+                'kind_code' => null,
+            ],
+            'normalization' => [
+                'si_value'          => $magnitude,
+                'si_unit'           => null,
+                'converted_magnitude' => null,
+                'converted_unit'    => null,
+                'rule_code'         => 'IDENTITY',
+                'rule_version'      => 0,
+                'rounding_policy'   => 'ROUND_HALF_EVEN',
+            ],
+            'display' => [
+                'magnitude' => $magnitude,
+                'unit_code' => $unitCode,
+            ],
+            'precision_envelope' => [
+                'bcmath_scale'    => ExactLinearConverter::BCMATH_SCALE,
+                'display_scale'   => null,
+                'rounding_policy' => 'ROUND_HALF_EVEN',
+            ],
+            'semantic_context' => [
+                'quantity_kind'   => null,
+                'context_code'    => $context['context_code'] ?? null,
+                'source_table'    => $context['source_table'] ?? null,
+                'source_id'       => $context['source_id']    ?? null,
+                'item_id'         => $context['item_id']      ?? null,
+                'ai_advisory'     => false,
+            ],
+            'evidence' => $identityRule,
+            'digital_thread' => [
+                'audit_hash'   => $auditHash,
+                'hash_algorithm' => strtoupper(self::HASH_ALGORITHM),
+                'trace_id'     => $context['trace_id']   ?? null,
+                'request_id'   => $context['request_id'] ?? null,
+                'actor_id'     => $context['actor_id']   ?? null,
+                'recorded_at'  => (new \DateTimeImmutable())->format(\DateTimeInterface::RFC3339_EXTENDED),
+            ],
+            'ai_flags' => [],
+        ];
+    }
+
+    /**
      * Compute the deterministic SHA-256 audit hash.
      * Input format: from_unit|magnitude|to_unit|rule_code|rule_version|scale|result
      */
