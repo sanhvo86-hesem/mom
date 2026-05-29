@@ -38,4 +38,8 @@ return static function (Router $router, string $dataDir): void {
 
     // Health / catalog stats
     $router->get('/api/v1/uom/health',            UomController::class, 'health');
+
+    // Item UoM policy (ITUOM) — 8-level priority resolution
+    $router->get('/api/v1/uom/item-policy/{item_id}',   UomController::class, 'getItemPolicy');
+    $router->get('/api/v1/uom/item-packaging/{item_id}', UomController::class, 'getItemPackaging');
 };

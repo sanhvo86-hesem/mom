@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Api\Services\Uom\AffineConverter;
+use MOM\Api\Services\Uom\ItemUomPolicyService;
 use MOM\Api\Services\Uom\ConversionEngine;
 use MOM\Api\Services\Uom\ConversionRuleService;
 use MOM\Api\Services\Uom\DensityContextualConverter;
@@ -299,6 +300,66 @@ final class UomController extends BaseController
                 'rounding_default'=> 'ROUND_HALF_EVEN',
             ],
         ]);
+    }
+
+    // ── GET /api/v1/uom/item-policy/{item_id} ────────────────────────────────
+
+    /**
+     * Resolve the effective ITUOM policy for an item in a given context.
+     *
+     * Query params: site_id, supplier_id, customer_id, context_code, slot
+     *   slot = inventory | purchase | sales | recipe | qc
+     *          (omit to return all 5 unit codes)
+     */
+    public function getItemPolicy(string $itemId): never
+    {
+        $this->requireAuth();
+
+        $siteId      = $this->query('site_id');
+        $supplierId  = $this->query('supplier_id');
+        $customerId  = $this->query('customer_id');
+        $contextCode = $this->query('context_code') ?? 'STANDARD';
+        $slot        = $this->query('slot');
+
+        $service = new ItemUomPolicyService(Connection::getInstance(), $this->getRedis());
+
+        try {
+            if ($slot !== null) {
+                $unitCode = $service->getSlotUnit($itemId, $slot, $siteId, $supplierId, $customerId, $contextCode);
+                if ($unitCode === null) {
+                    $this->error('no_ituom_policy', 404, "No ITUOM policy found for item '{$itemId}'.");
+                }
+                $this->success(['item_id' => $itemId, 'slot' => $slot, 'unit_code' => $unitCode]);
+            }
+
+            $policy = $service->resolve($itemId, $siteId, $supplierId, $customerId, $contextCode);
+            if ($policy === null) {
+                $this->error('no_ituom_policy', 404, "No ITUOM policy found for item '{$itemId}'.");
+            }
+            $this->success(['item_id' => $itemId, 'policy' => $policy]);
+        } catch (UomException $e) {
+            $this->uomProblemDetail($e, '/api/v1/uom/item-policy/' . $itemId);
+        }
+    }
+
+    // ── GET /api/v1/uom/item-packaging/{item_id} ──────────────────────────────
+
+    public function getItemPackaging(string $itemId): never
+    {
+        $this->requireAuth();
+
+        $siteId     = $this->query('site_id');
+        $supplierId = $this->query('supplier_id');
+        $customerId = $this->query('customer_id');
+
+        $service   = new ItemUomPolicyService(Connection::getInstance(), $this->getRedis());
+        $packaging = $service->resolvePackaging($itemId, $siteId, $supplierId, $customerId);
+
+        if ($packaging === null) {
+            $this->error('no_packaging_policy', 404, "No packaging policy found for item '{$itemId}'.");
+        }
+
+        $this->success(['item_id' => $itemId, 'packaging' => $packaging]);
     }
 
     // ── RFC 9457 Problem Details helper ──────────────────────────────────────
