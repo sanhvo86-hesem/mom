@@ -445,11 +445,40 @@
    * without requiring the admin to visit the Theme tab. */
   function bootApply(){
     try { applyTheme(readTheme()); } catch (e) {}
+    try { startSidebarInlineColorStripper(); } catch (e) {}
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bootApply);
   } else {
     bootApply();
+  }
+
+  /* v3-G18: in dark mode, strip inline `color:` attributes from sidebar
+   * text elements so legacy inline styles don't keep displaying dark
+   * text on dark background. Runs only when [data-color-mode=dark] is
+   * active and re-runs whenever sidebar mutates. */
+  function startSidebarInlineColorStripper(){
+    if (typeof MutationObserver === 'undefined') return;
+    function stripIfDark(){
+      if (document.documentElement.getAttribute('data-color-mode') !== 'dark') return;
+      var sb = document.getElementById('sidebar');
+      if (!sb) return;
+      // Strip the `color:` part from inline `style` of sidebar text
+      // descendants. Don't remove the whole style — preserve display/
+      // position/etc.
+      Array.prototype.forEach.call(sb.querySelectorAll('[style*="color"]'), function(el){
+        var s = el.getAttribute('style') || '';
+        var stripped = s.replace(/(?:^|;)\s*color\s*:\s*[^;]+;?/gi, '').trim();
+        if (stripped !== s) el.setAttribute('style', stripped);
+      });
+    }
+    stripIfDark();
+    var observer = new MutationObserver(function(){ stripIfDark(); });
+    var sb = document.getElementById('sidebar');
+    if (sb) observer.observe(sb, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+    // Re-strip when color-mode flips
+    var htmlObserver = new MutationObserver(function(){ stripIfDark(); });
+    htmlObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-color-mode'] });
   }
 
   // Public helpers for the dock to read theme + overrides

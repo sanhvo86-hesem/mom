@@ -828,47 +828,68 @@
       ])
     ],
     'buttons': [
+      // v3-G18 expanded — Material 3 + Atlassian + Carbon spec (~16 properties)
       _grp('layout','Bố cục','Layout',[
         _tn('control.height.standard','Chiều cao nút','Button height',24,56),
         _vn('--o3-space-md','Padding ngang','Horizontal padding',4,32),
+        _vn('--o3-space-sm','Padding dọc','Vertical padding',0,16),
         _vn('--o3-radius','Bo góc','Border radius',0,20),
-        _vn('--o3-space-sm','Khe giữa nút','Gap between',0,24)
+        _vn('--o3-space-sm','Khe giữa nút','Gap between buttons',0,24),
+        _vn('--o3-space-xs','Khe icon-chữ','Icon-text gap',0,12)
       ]),
       _grp('colors','Màu','Colors',[
-        _tc('brand.primary','Màu chính','Primary'),
-        _tc('brand.primaryHover','Màu chính · hover','Primary hover'),
-        _tc('brand.primarySoft','Màu chính · soft','Primary soft'),
-        _tc('status.success.light','Màu success','Success'),
-        _tc('status.danger.light','Màu danger','Danger'),
-        _tc('colorsLight.textOnBrand','Chữ trên nền','Text on brand')
+        _tc('brand.primary','Brand chính','Primary brand'),
+        _tc('brand.primaryHover','Brand · hover','Primary hover'),
+        _tc('brand.primarySoft','Brand · soft','Primary soft'),
+        _tc('status.success.light','Success','Success'),
+        _tc('status.warning.light','Warning','Warning'),
+        _tc('status.danger.light','Danger','Danger'),
+        _tc('status.info.light','Info','Info'),
+        _tc('colorsLight.bgSurface','Nền ghost','Ghost bg'),
+        _tc('colorsLight.borderDefault','Border default','Default border'),
+        _tc('colorsLight.textOnBrand','Chữ trên brand','Text on brand'),
+        _tc('colorsLight.textPrimary','Chữ default','Default text'),
+        _tc('colorsLight.textMuted','Chữ disabled','Disabled text')
       ]),
       _grp('typography','Chữ','Typography',[
         _vn('--o3-font-size-md','Cỡ chữ','Font size',10,18),
-        _vn('--o3-font-weight-semi','Độ đậm','Font weight',400,800,'')
+        _vn('--o3-font-weight-semi','Độ đậm','Font weight',400,800,''),
+        _vn('--o3-font-size-sm','Cỡ chữ nhỏ','Small variant',9,14)
       ]),
       _grp('motion','Hiệu ứng','Motion',[
-        _vn('--o3-motion-base','Transition','Transition',0,500,'ms')
+        _vn('--o3-motion-fast','Hover fast','Hover transition',0,300,'ms'),
+        _vn('--o3-motion-base','Click base','Click transition',0,500,'ms')
       ])
     ],
     'form': [
+      // v3-G18 expanded ~17 properties — IBM Carbon + SAP Fiori form spec
       _grp('layout','Bố cục','Layout',[
         _tn('control.height.standard','Chiều cao input','Input height',24,56),
         _vn('--o3-space-md','Padding ngang','Horizontal padding',4,24),
+        _vn('--o3-space-sm','Padding dọc','Vertical padding',0,16),
         _vn('--o3-radius','Bo góc','Border radius',0,16),
-        _vn('--o3-space-sm','Gap label-input','Label-input gap',0,16)
+        _vn('--o3-space-sm','Gap label-input','Label-input gap',0,16),
+        _vn('--o3-space-xs','Gap helper text','Helper text gap',0,12),
+        _vn('--o3-space-md','Gap field-field','Field group gap',0,32)
       ]),
       _grp('colors','Màu','Colors',[
         _tc('colorsLight.bgSurface','Nền input','Input background'),
         _tc('colorsLight.bgSurfaceAlt','Nền disabled','Disabled background'),
-        _tc('colorsLight.borderSubtle','Border thường','Default border'),
-        _tc('colorsLight.borderStrong','Border focus','Focus border'),
+        _tc('colorsLight.borderSubtle','Border default','Default border'),
+        _tc('colorsLight.borderDefault','Border hover','Hover border'),
+        _tc('brand.primary','Border focus','Focus border'),
         _tc('colorsLight.textPrimary','Chữ chính','Primary text'),
+        _tc('colorsLight.textSecondary','Chữ label','Label text'),
         _tc('colorsLight.textTertiary','Placeholder','Placeholder text'),
-        _tc('status.danger.light','Border lỗi','Error border')
+        _tc('status.danger.light','Border lỗi','Error border'),
+        _tc('status.danger.soft','Nền lỗi','Error bg'),
+        _tc('status.warning.light','Border warning','Warning border')
       ]),
       _grp('typography','Chữ','Typography',[
         _vn('--o3-font-size-md','Cỡ chữ input','Input font size',10,18),
-        _vn('--o3-font-size-sm','Cỡ chữ label','Label font size',9,16)
+        _vn('--o3-font-size-sm','Cỡ chữ label','Label font size',9,16),
+        _vn('--o3-font-size-xs','Cỡ chữ helper','Helper text size',8,14),
+        _vn('--o3-font-weight-medium','Độ đậm label','Label weight',400,800,'')
       ])
     ],
     'tabs': [
@@ -890,10 +911,13 @@
       ])
     ],
     'kpi': [
+      // v3-G18 expanded ~18 properties — Material 3 KPI + Bloomberg data tile spec
       _grp('layout','Bố cục','Layout',[
         _vn('--o3-space-lg','Padding tile','Tile padding',4,32),
         _vn('--o3-radius-card','Bo góc tile','Tile radius',0,20),
-        _vn('--o3-space-sm','Gap nội thất','Internal gap',0,16)
+        _vn('--o3-space-sm','Gap label-value','Label-value gap',0,16),
+        _vn('--o3-space-xs','Gap value-sub','Value-sub gap',0,12),
+        _vn('--o3-space-md','Grid gap','Grid gap',0,32)
       ]),
       _grp('colors','Màu','Colors',[
         _tc('colorsLight.bgSurface','Nền tile','Tile bg'),
@@ -903,13 +927,18 @@
         _tc('status.warning.light','Warning value','Warning value'),
         _tc('status.danger.light','Danger value','Danger value'),
         _tc('status.info.light','Info value','Info value'),
+        _tc('status.neutral.light','Neutral value','Neutral value'),
         _tc('colorsLight.textPrimary','Chữ giá trị','Value text'),
+        _tc('colorsLight.textSecondary','Chữ label','Label text'),
         _tc('colorsLight.textTertiary','Chữ phụ','Sub text')
       ]),
       _grp('typography','Chữ','Typography',[
         _vn('--o3-font-size-xs','Cỡ label','Label font size',9,14),
         _vn('--o3-font-size-2xl','Cỡ giá trị','Value font size',16,36),
-        _vn('--o3-font-weight-bold','Độ đậm','Value weight',400,900,'')
+        _vn('--o3-font-size-3xl','Cỡ hero','Hero font size',20,48),
+        _vn('--o3-font-size-sm','Cỡ sub','Sub font size',9,16),
+        _vn('--o3-font-weight-bold','Độ đậm giá trị','Value weight',400,900,''),
+        _vn('--o3-font-weight-medium','Độ đậm label','Label weight',400,800,'')
       ])
     ],
     'chips': [
@@ -944,19 +973,33 @@
       ])
     ],
     'table': [
+      // v3-G18 expanded ~19 properties — SAP Fiori data table + AG-Grid spec
       _grp('layout','Bố cục','Layout',[
         _tn('control.height.standard','Cao hàng','Row height',24,56),
-        _vn('--o3-space-md','Padding cell','Cell padding-X',4,24),
-        _vn('--o3-space-sm','Padding dọc','Cell padding-Y',0,16),
-        _vn('--o3-font-size-md','Cỡ chữ','Font size',10,18)
+        _vn('--o3-space-md','Padding ngang cell','Cell padding-X',4,24),
+        _vn('--o3-space-sm','Padding dọc cell','Cell padding-Y',0,16),
+        _vn('--o3-space-md','Cao header','Header height',20,56),
+        _vn('--o3-space-xs','Padding dense','Compact density',0,12)
       ]),
       _grp('colors','Màu','Colors',[
         _tc('colorsLight.bgSurface','Nền hàng','Row bg'),
+        _tc('colorsLight.bgSurfaceAlt','Nền hàng zebra','Zebra row bg'),
         _tc('colorsLight.bgSurfaceAlt','Nền header','Header bg'),
         _tc('colorsLight.borderSubtle','Border ngang','Row border'),
+        _tc('colorsLight.borderDefault','Border header','Header border'),
         _tc('colorsLight.textPrimary','Chữ cell','Cell text'),
-        _tc('colorsLight.textTertiary','Chữ header','Header text'),
-        _tc('brand.primarySoft','Nền hover','Row hover bg')
+        _tc('colorsLight.textSecondary','Chữ header','Header text'),
+        _tc('brand.primarySoft','Nền hover','Row hover bg'),
+        _tc('brand.primary','Nền selected','Row selected'),
+        _tc('colorsLight.textOnBrand','Chữ selected','Selected text')
+      ]),
+      _grp('typography','Chữ','Typography',[
+        _vn('--o3-font-size-md','Cỡ chữ cell','Cell font size',10,18),
+        _vn('--o3-font-size-xs','Cỡ chữ header','Header font size',9,14),
+        _vn('--o3-font-weight-semi','Độ đậm header','Header weight',400,800,'')
+      ]),
+      _grp('motion','Hiệu ứng','Motion',[
+        _vn('--o3-motion-fast','Hover transition','Hover',0,300,'ms')
       ])
     ],
     'panel': [
