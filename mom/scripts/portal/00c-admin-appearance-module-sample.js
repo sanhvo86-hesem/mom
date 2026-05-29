@@ -42,7 +42,7 @@
       +     esc(L('SSOT chuẩn HESEM (2026-05-28): MỘT kích thước duy nhất = control.height.standard (36px). Không có sm/lg. Nếu cần kích thước khác phải đăng ký token mới qua Authority.',
       +           'HESEM SSOT rule (2026-05-28): ONE size only = control.height.standard (36px). No sm/lg. Other sizes require a new Authority token.'))
       +   '</div>'
-      +   '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
+      +   '<div style="display:flex;gap:var(--o3-space-sm,8px);align-items:center;flex-wrap:wrap">'
       +     '<button class="o3-btn o3-btn--primary">Primary</button>'
       +     '<button class="o3-btn o3-btn--success">Success</button>'
       +     '<button class="o3-btn o3-btn--danger">Danger</button>'
@@ -725,7 +725,9 @@
     'colorsLight.textTertiary': ['--o3-text-muted',    '--text-tertiary',  '--text-3'],
     'colorsLight.textOnBrand':  ['--text-on-brand'],
     'colorsLight.borderSubtle': ['--o3-border-subtle', '--border-subtle', '--border-1'],
+    'colorsLight.borderDefault':['--o3-border-default','--border-default','--border-2'],
     'colorsLight.borderStrong': ['--o3-border-strong', '--border-strong', '--border-3'],
+    'colorsLight.textMuted':    ['--o3-text-muted',    '--text-muted',    '--text-4'],
     'status.success.light':     ['--o3-success', '--status-success', '--state-success'],
     'status.success.soft':      ['--o3-success-soft', '--state-success-soft'],
     'status.warning.light':     ['--o3-warning', '--status-warning', '--state-warning'],
@@ -828,11 +830,13 @@
       ])
     ],
     'buttons': [
-      // v3-G18 expanded — Material 3 + Atlassian + Carbon spec (~16 properties)
+      // v3-G19 — only properties the button ACTUALLY consumes. Padding-Y
+      // removed (button uses fixed height, vertical padding has no visual
+      // effect). Khe giữa nút now correctly drives the container gap
+      // (previously container had hardcoded 8px).
       _grp('layout','Bố cục','Layout',[
         _tn('control.height.standard','Chiều cao nút','Button height',24,56),
         _vn('--o3-space-md','Padding ngang','Horizontal padding',4,32),
-        _vn('--o3-space-sm','Padding dọc','Vertical padding',0,16),
         _vn('--o3-radius','Bo góc','Border radius',0,20),
         _vn('--o3-space-sm','Khe giữa nút','Gap between buttons',0,24),
         _vn('--o3-space-xs','Khe icon-chữ','Icon-text gap',0,12)
