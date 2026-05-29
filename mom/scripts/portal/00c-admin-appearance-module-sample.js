@@ -1192,33 +1192,65 @@
     var to2 = function(n){ var s = parseInt(n,10).toString(16); return s.length===1?'0'+s:s; };
     return '#' + to2(m[1]) + to2(m[2]) + to2(m[3]);
   }
+  /* Primary path: getComputedStyle(:root).getPropertyValue() returns
+   * the RESOLVED hex/px value when the var chain successfully resolves
+   * via cascade. Browser does the var() chain walk for us.
+   * Fallback: Shadow-DOM probe — isolated from body-level CSS that
+   * was clamping div widths to 8px (the master space). */
   function resolveCssVarColor(cssVarChain){
-    var p = getProbe();
+    var rs = getComputedStyle(document.documentElement);
     for (var i = 0; i < cssVarChain.length; i++) {
-      try {
-        // Sentinel rgb(255,0,255) magenta — if browser hits it, var was
-        // undefined and we move on. Reset cssText each iter so prior
-        // styles don't pollute computed result.
-        p.style.cssText = 'position:absolute;left:-9999px;top:-9999px;visibility:hidden;width:1px;height:1px;color:var(' + cssVarChain[i] + ',rgb(255,0,255))';
-        var c = getComputedStyle(p).color;
-        var hex = _rgbToHex(c);
-        if (hex && hex !== '#ff00ff') return hex;
-      } catch (e) {}
+      var raw = (rs.getPropertyValue(cssVarChain[i]) || '').trim();
+      if (!raw || raw.indexOf('var(') === 0) continue;
+      var hexMatch = raw.match(/^#[0-9a-f]{3,8}$/i);
+      if (hexMatch) {
+        return hexMatch[0].length === 4
+          ? '#' + raw[1]+raw[1] + raw[2]+raw[2] + raw[3]+raw[3]
+          : raw.substring(0, 7);
+      }
+      var hex = _rgbToHex(raw);
+      if (hex && hex !== '#000000') return hex;
     }
-    return '';
+    try {
+      var host = document.createElement('div');
+      host.attachShadow({ mode: 'open' });
+      document.body.appendChild(host);
+      var inner = document.createElement('div');
+      host.shadowRoot.appendChild(inner);
+      var out = '';
+      for (var j = 0; j < cssVarChain.length && !out; j++) {
+        inner.style.cssText = 'position:absolute;width:1px;height:1px;color:var(' + cssVarChain[j] + ',rgb(255,0,255))';
+        var c = getComputedStyle(inner).color;
+        var hx = _rgbToHex(c);
+        if (hx && hx !== '#ff00ff') out = hx;
+      }
+      document.body.removeChild(host);
+      return out;
+    } catch (e) { return ''; }
   }
   function resolveCssVarPx(cssVarChain){
-    var p = getProbe();
+    var rs = getComputedStyle(document.documentElement);
     for (var i = 0; i < cssVarChain.length; i++) {
-      try {
-        // Sentinel 99999px so we detect when var is undefined. Reset
-        // cssText each iter so prior invalid widths don't stick.
-        p.style.cssText = 'position:absolute;left:-9999px;top:-9999px;visibility:hidden;height:1px;width:var(' + cssVarChain[i] + ',99999px)';
-        var w = parseFloat(getComputedStyle(p).width);
-        if (!isNaN(w) && w > 0 && w < 99999) return Math.round(w);
-      } catch (e) {}
+      var raw = (rs.getPropertyValue(cssVarChain[i]) || '').trim();
+      if (!raw || raw.indexOf('var(') === 0) continue;
+      var n = parseFloat(raw);
+      if (!isNaN(n)) return Math.round(n);
     }
-    return null;
+    try {
+      var host = document.createElement('div');
+      host.attachShadow({ mode: 'open' });
+      document.body.appendChild(host);
+      var inner = document.createElement('div');
+      host.shadowRoot.appendChild(inner);
+      var out = null;
+      for (var j = 0; j < cssVarChain.length && out === null; j++) {
+        inner.style.cssText = 'position:absolute;width:var(' + cssVarChain[j] + ',99999px);height:1px';
+        var w = parseFloat(getComputedStyle(inner).width);
+        if (!isNaN(w) && w >= 0 && w < 99999) out = Math.round(w);
+      }
+      document.body.removeChild(host);
+      return out;
+    } catch (e) { return null; }
   }
 
   function wireInlineTokenEditors(){
