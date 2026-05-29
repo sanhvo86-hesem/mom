@@ -1,0 +1,72 @@
+gap_id,old_prompt,old_severity,new_severity,blocker_class,authority_path,owner_prompt,blocking_scope,acceptance_gate,rationale
+GAP-P01-001,P01,P2,P0,JSON_PRIMARY_GOVERNED_MASTER_DATA,master_data,P27,runtime_authority_claim,master data writes use PostgreSQL authority or verified bridge,V3 forbids JSON primary on governed decision path
+GAP-P01-002,P01,P2,P0,AUTHORITY_PROBE_COMPATIBILITY_ONLY,master_data,P27,runtime_authority_claim,authorityProbe no longer reports compatibility_only,V3 forbids compatibility_only authority proof
+GAP-P01-003,P01,P2,P1,INCOMPLETE_RECONCILIATION_COVERAGE,master_data,P27,preproduction_cutover,all required collections round trip and drift check clean,coverage gap blocks cutover evidence
+GAP-P01-004,P01,P2,P0,GENERIC_CRUD_MUTATION_RISK,cross_domain,P26,runtime_authority_claim,governed mutations execute only through command APIs,guard is mitigation not mutation authority
+GAP-P01-005,P01,P2,P0,UOM_AUTHORITY_AMBIGUITY,master_data,P25,runtime_authority_claim,UOM lifecycle command sync and validation coverage exists,V3 declares UOM ambiguity a P0 blocker
+GAP-P01-006,P01,P2,P0,CANONICAL_HOLD_ABSENCE,quality_authority,P33,runtime_release_or_shipment,shipment and putaway gates read one governed hold authority,fragmented quality holds can bypass release gates
+GAP-P02-001,P02,P2,P2,BENCHMARK_SOURCE_REFRESH,benchmark,P23,documentation_refresh,Oracle claims remain pattern level and non version claiming,not on runtime authority path
+GAP-P02-002,P02,P2,P2,BENCHMARK_SOURCE_REFRESH,benchmark,P23,documentation_refresh,no compliance claim without official evidence package,not on runtime authority path
+GAP-P02-003,P02,P2,P2,BENCHMARK_GRANULARITY,benchmark,P23,documentation_refresh,HESEM artifacts remain executable and vendor agnostic,not on runtime authority path
+GAP-P02-004,P02,P2,P2,BENCHMARK_OBSERVABILITY_DEPTH,benchmark,P24,documentation_refresh,telemetry gates remain repo grounded and testable,not on runtime authority path
+GAP-P03-001,P03,P2,P1,PARTY_PHYSICAL_MAPPING_GAP,master_data,P27,preproduction_master_data,party role model mapped without data loss,party split blocks clean master-data proof
+GAP-P03-002,P03,P2,P1,PERSON_IDENTITY_CONTRACT_GAP,identity_user,P31,regulated_identity_evidence,no duplicate person mutation lanes remain,identity must be one SSOT for regulated actions
+GAP-P03-003,P03,P2,P0,ENGINEERING_RELEASE_PACKAGE_NOT_PHYSICAL,engineering_authority,P30,runtime_release_claim,released engineering authority physically modeled,V3 declares nonphysical engineering release package P0
+GAP-P04-001,P04,P2,P1,USER_EMPLOYEE_BRIDGE_GAP,identity_user,P31,regulated_identity_evidence,identity writes use one canonical chain,person bridge is required evidence for signatures and audit
+GAP-P04-002,P04,P2,P0,ENGINEERING_RELEASE_PACKAGE_NOT_PHYSICAL,engineering_authority,P30,runtime_release_claim,package root and member tables with constraints exist,V3 declares engineering package physicalization P0
+GAP-P04-003,P04,P2,P1,APPROVAL_OBJECTS_PARTIAL,master_data,P30,release_package_evidence,approval objects no longer depend on JSON-only collections,release package must not infer approvals
+GAP-P04-004,P04,P2,P1,ROW_VERSION_ACTOR_LINEAGE_GAP,platform_backend,P31,preproduction_command_evidence,lifecycle owners expose concurrency and actor lineage,command audit evidence needs row version and actor lineage
+GAP-P05-001,P05,P2,P1,USER_PARTY_LINK_NOT_PHYSICAL,identity_user,P31,regulated_identity_evidence,user party relationship has authoritative chain with effectivity,signature actor evidence depends on canonical person link
+GAP-P05-002,P05,P2,P1,OPERATOR_QUALIFICATION_SPLIT,manufacturing_operations,P34,mes_preproduction,start gate reads one governed qualification chain,split qualification blocks readiness proof
+GAP-P05-003,P05,P2,P1,CUSTOMER_SUPPLIER_PARTY_CONVERGENCE_GAP,master_data,P27,preproduction_master_data,commercial and supplier gates avoid implicit JSON metadata,party convergence affects approvals and holds
+GAP-P05-004,P05,P2,P1,DUPLICATE_MERGE_TRANSACTION_GAP,master_data,P31,preproduction_master_data,party merge is replay safe and lineage preserving,merge without remap catalog risks referential corruption
+GAP-P05-005,P05,P2,P1,REGULATED_REAUTH_GAP,security_iam,P32,regulated_mode_claim,regulated paths reject missing MFA and record challenge evidence,re-auth is required for regulated approval evidence
+GAP-P06-001,P06,P2,P1,ITEM_KEY_BRIDGE_GAP,engineering_authority,P27,preproduction_master_data,runtime no longer guesses between UUID and legacy identifiers,item identity drift blocks release proof
+GAP-P06-002,P06,P2,P1,ITEM_APPROVAL_OBJECTS_CONCEPTUAL,engineering_authority,P30,release_package_evidence,item release and shipment PO gates read explicit approval objects,approval evidence must be physical
+GAP-P06-003,P06,P2,P0,UOM_AUTHORITY_AMBIGUITY,platform_backend,P25,runtime_authority_claim,item commands consume one governed UOM source,V3 declares UOM ambiguity P0
+GAP-P06-004,P06,P2,P1,ITEM_SITE_PROFILE_NOT_PHYSICAL,planning_production,P27,preproduction_master_data,item header no longer owns local operational settings,site profile drift blocks enterprise item proof
+GAP-P06-005,P06,P2,P1,REVISION_RELEASE_ESIGN_SOD_GAP,security_iam,P32,regulated_mode_claim,release commands enforce MFA SoD and replay safety,e-sign and SoD are regulated mode blockers
+GAP-P07-001,P07,P2,P0,ENGINEERING_RELEASE_PACKAGE_NOT_PHYSICAL,engineering_authority,P30,runtime_release_claim,SO JO and WO release read one canonical package authority,V3 declares release package absence P0
+GAP-P07-002,P07,P2,P0,JSON_PRIMARY_READINESS_COLLECTIONS,platform_backend,P27,runtime_release_claim,release verification reads PostgreSQL authority without JSON primary fallback,release readiness cannot depend on JSON rebuilds
+GAP-P07-003,P07,P2,P1,INSPECTION_PLAN_CANONICAL_GAP,quality_authority,P30,release_package_evidence,inspection gates read one characteristic and sampling authority,quality plan release needs canonical member package
+GAP-P07-004,P07,P2,P1,APPROVAL_DEPENDENCY_GAP,commercial_operations_procurement_supplier_quality,P30,release_package_evidence,engineering release uses explicit approvals not metadata,release package must bind customer and supplier approvals
+GAP-P07-005,P07,P2,P1,ENGINEERING_COMMAND_ESIGN_GAP,security_iam,P32,regulated_mode_claim,package release approval carries actor evidence SoD and replay safety,regulated engineering release needs command and signature spine
+GAP-P08-001,P08,P2,P0,RESOURCE_READINESS_SERVICE_ABSENT,mes_execution,P34,mes_runtime_claim,all governed releases and starts use one readiness chain,V3 declares ResourceReadinessService absence P0 for MES runtime
+GAP-P08-002,P08,P2,P1,OOT_INVESTIGATION_GAP,quality_authority,P33,regulated_quality_evidence,open OOT quarantines affected machine and lots,calibration impact must be governed
+GAP-P08-003,P08,P2,P1,SIGNAL_TAG_MAP_AUTHORITY_GAP,mes_execution_security_iam,P34,ot_runtime_evidence,signal semantics cannot change without approval,line signal trust requires approved mapping
+GAP-P09-001,P09,P2,P1,TOOL_BREAKAGE_CONTAINMENT_GAP,tooling_control_quality_authority,P34,mes_preproduction,suspect output containment is automatic and auditable,tool breakage must spawn governed reaction
+GAP-P09-002,P09,P2,P1,MEASUREMENT_SYSTEM_AUTHORITY_GAP,quality_authority,P33,regulated_quality_evidence,CTQ measurements require valid gage and MSA chain,measurement evidence must be canonical
+GAP-P09-003,P09,P2,P1,TOOL_COMPATIBILITY_AUTHORITY_GAP,tooling_control_manufacturing_engineering,P30,release_package_evidence,tool load decisions read explicit compatibility truth,metadata cannot own compatibility
+GAP-P10-001,P10,P2,P0,CANONICAL_HOLD_ABSENCE,quality_authority,P33,runtime_release_or_shipment,all movements and releases read one governed hold chain,V3 declares canonical hold absence P0
+GAP-P10-002,P10,P2,P1,QUALITY_ORDER_TRIGGER_GAP,quality_authority,P33,regulated_quality_evidence,quality orders are generated exactly once from governed triggers,fragmented triggers break quality proof
+GAP-P10-003,P10,P2,P1,COMPLAINT_SCAR_MIXED_LANES,quality_authority_supplier_quality,P33,regulated_quality_evidence,quality trace does not rely on freeform metadata,customer and supplier quality must be linked
+GAP-P11-001,P11,P2,P0,INVENTORY_LEDGER_RECONCILIATION_ABSENT,inventory_logistics_finance_inventory,P36,runtime_inventory_finance_claim,ledger and cost parity checks block close and cutover,inventory balance without ledger proof is P0 authority risk
+GAP-P11-002,P11,P2,P1,INVENTORY_COMMAND_FEFO_GAP,inventory_logistics,P36,preproduction_inventory,move and issue commands enforce child parity and FEFO,inventory execution needs command guards
+GAP-P11-003,P11,P2,P1,RECALL_EXPORT_EVIDENCE_GAP,traceability_serialization,P36,traceability_preproduction,recall exports are one click and auditable,traceability evidence remains design level
+GAP-P12-001,P12,P2,P0,COMMAND_RUNTIME_COVERAGE_INCOMPLETE,platform_backend,P31,runtime_authority_claim,all governed mutations resolve to commands only,command catalog without runtime command coverage is P0
+GAP-P12-002,P12,P2,P1,OPENAPI_ARAZZO_GENERATION_GAP,integration_architecture,P31,preproduction_api_evidence,client and workflow docs match runtime contracts,contract generation blocks API proof
+GAP-P12-003,P12,P2,P1,IDEMPOTENCY_RECOVERY_TELEMETRY_GAP,sre_frontend,P31,preproduction_command_evidence,stale in-progress rows visible and recoverable,idempotency proof needs recovery evidence
+GAP-P13-001,P13,P2,P1,WORKFLOW_ESIGN_GENERATOR_ABSENT,platform_backend,P32,regulated_mode_claim,statuses stay byte equivalent across DB PHP UI OpenAPI,V3 declares e-sign audit generator absence P1 for regulated mode
+GAP-P13-002,P13,P2,P1,APPROVAL_POLICY_RUNTIME_GAP,quality_authority_security_iam,P32,regulated_mode_claim,regulated approvals resolve through one policy source,approval policy must be canonical
+GAP-P13-003,P13,P2,P1,AUDIT_ESIGN_TELEMETRY_GAP,sre_quality_authority,P37,regulated_mode_claim,signature and audit incidents alert within SLO,regulated mode needs audit failure visibility
+GAP-P14-001,P14,P2,P0,RESOURCE_READINESS_SERVICE_ABSENT,mes_execution,P34,mes_runtime_claim,start and release commands call one readiness decision chain,V3 declares ResourceReadinessService absence P0
+GAP-P14-002,P14,P2,P1,MES_EVENT_SPINE_CONTAINMENT_GAP,mes_execution_quality_authority,P34,mes_preproduction,alarm tool break and inspection fail events spawn governed reactions,event spine proof is required before MES readiness
+GAP-P14-003,P14,P2,P1,OFFLINE_RECONCILE_POLICY_GAP,mes_execution_frontend,P34,mes_preproduction,offline stale completions cannot mutate closed state,offline candidate mutation must be governed
+GAP-P15-001,P15,P2,P1,CUTOVER_RESTORE_DRILL_MISSING,platform_backend_sre,P29,postgres_cutover_claim,zero blocker drift and tested restore per domain,restore drill absence blocks cutover evidence
+GAP-P15-002,P15,P2,P1,COLLECTION_MAPPING_RUNTIME_GAP,platform_backend_domain_owners,P27,postgres_cutover_claim,required collections round trip without fatal drift,crosswalk must match runtime services
+GAP-P15-003,P15,P2,P1,FALLBACK_DRIFT_TELEMETRY_GAP,sre_frontend,P37,preproduction_cutover,operators can see fallback and drift blockers immediately,cutover needs visible drift blockers
+GAP-P16-001,P16,P2,P1,AUTHZ_REDACTION_WIRING_GAP,security_iam_frontend,P35,regulated_mode_claim,command and record shell access align to one policy source,security policy must cover all surfaces
+GAP-P16-002,P16,P2,P1,SOD_EXCEPTION_LIFECYCLE_GAP,security_iam_quality_authority,P32,regulated_mode_claim,override and deputy use is bounded and auditable,SoD exceptions must expire and audit
+GAP-P16-003,P16,P2,P1,SECURITY_OT_TELEMETRY_GAP,sre_mes_execution,P37,preproduction_security_evidence,critical security and OT trust failures alert within SLO,security runtime proof needs telemetry
+GAP-P17-001,P17,P2,P1,TELEMETRY_DASHBOARD_RUNTIME_GAP,sre_platform_backend,P37,preproduction_runtime_proof,critical signals visible with owners and runbooks,observability is required for runtime proof
+GAP-P17-002,P17,P2,P1,RUNBOOK_RECONCILIATION_EXPORT_GAP,sre_data_governance,P37,preproduction_runtime_proof,incidents and reconciliations produce evidence packages,audit evidence needs exportable packs
+GAP-P17-003,P17,P2,P1,PROJECTION_FRESHNESS_GAP,data_governance_frontend,P37,preproduction_runtime_proof,stewards can act on freshness and quality failures,projection staleness can hide authority drift
+GAP-P18-001,P18,P2,P1,AUTHORITATIVE_RECORD_SHELL_GAP,frontend,P39,preproduction_ui_evidence,governed roots open with audit evidence and command actions,UI must not imply false authority
+GAP-P18-002,P18,P2,P1,PROJECTION_DISABLE_REASON_GAP,frontend_sre,P39,preproduction_ui_evidence,workspaces show freshness and disabled-state panels,projection UI must reveal non-authority state
+GAP-P18-003,P18,P2,P1,OFFLINE_REANCHOR_UX_GAP,frontend_mes_execution,P39,mes_preproduction,offline cannot mutate governed data without reconcile,offline UX must preserve command authority
+GAP-P19-001,P19,P2,P1,EXECUTABLE_SCENARIO_RUNNER_ABSENT,qa_automation,P38,preproduction_validation,200 scenarios execute with pass fail evidence,V3 declares paper-only simulation P1
+GAP-P19-002,P19,P2,P1,ACCEPTANCE_DASHBOARD_GAP,qa_automation_frontend,P38,preproduction_validation,auditors can view scenario evidence and blocker counts,validation evidence needs visible dashboard or export
+GAP-P19-003,P19,P2,P1,SCENARIO_RUNTIME_DEPENDENCY_GAP,platform_architecture_domain_owners,P38,preproduction_validation,critical scenarios run against real command stack without mocks,scenario automation depends on runtime services
+GAP-P20-001,P20,P2,P1,DESIGN_ONLY_FINAL_SYNTHESIS,platform_architecture_domain_owners,P40,preproduction_handoff,all DoD gates pass in runtime not planning pack,final synthesis must wait for runtime evidence
+GAP-P20-002,P20,P2,P1,DEPENDENT_STORY_BLOCKERS,platform_architecture_platform_backend,P40,preproduction_handoff,backlog blockers collapse as waves complete,backlog is blocked by physical and command gaps
+GAP-P21-001,P21,P2,P1,RUNTIME_REDTEAM_EVIDENCE_GAP,platform_architecture_domain_owners,P41,final_runtime_acceptance,critical criteria remain above threshold after runtime evidence,red-team score must be rerun on implementation

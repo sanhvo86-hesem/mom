@@ -1,0 +1,68 @@
+blocker_id,gap_id,severity,owner_prompt,domain,dependent_prompts,acceptance_criterion,temporary_exception,expiry_rule,status
+P23-P0-001,GAP-P01-001,P0,P27,master_data,P24 P25 P26 P27,master data commands use PostgreSQL authority or verified bridge,none,no P0 exception allowed,open
+P23-P0-002,GAP-P01-002,P0,P27,master_data,P24 P27,authorityProbe no longer reports compatibility_only,none,no P0 exception allowed,open
+P23-P0-003,GAP-P01-004,P0,P26,cross_domain,P24 P26 P31,all governed mutations execute only through command APIs,none,no P0 exception allowed,open
+P23-P0-004,GAP-P01-005,P0,P25,master_data,P24 P25 P27,UOM records have lifecycle command sync and validation coverage,none,no P0 exception allowed,open
+P23-P0-005,GAP-P01-006,P0,P33,quality_authority,P24 P33 P36,shipment and putaway gates read one governed hold authority,none,no P0 exception allowed,open
+P23-P0-006,GAP-P03-003,P0,P30,engineering_authority,P24 P30,released engineering authority physically modeled,none,no P0 exception allowed,open
+P23-P0-007,GAP-P04-002,P0,P30,engineering_authority,P24 P30,engineering release package root and member tables exist,none,no P0 exception allowed,open
+P23-P0-008,GAP-P06-003,P0,P25,platform_backend,P24 P25 P27,item commands consume one governed UOM source,none,no P0 exception allowed,open
+P23-P0-009,GAP-P07-001,P0,P30,engineering_authority,P24 P30,SO JO WO release read one package authority,none,no P0 exception allowed,open
+P23-P0-010,GAP-P07-002,P0,P27,platform_backend,P24 P27 P30,release verification reads PostgreSQL authority without JSON primary fallback,none,no P0 exception allowed,open
+P23-P0-011,GAP-P08-001,P0,P34,mes_execution,P24 P34,governed releases and starts use one readiness chain,none,no P0 exception allowed,open
+P23-P0-012,GAP-P10-001,P0,P33,quality_authority,P24 P33 P36,all movements and releases read one governed hold chain,none,no P0 exception allowed,open
+P23-P0-013,GAP-P11-001,P0,P36,inventory_logistics_finance_inventory,P24 P36,ledger and cost parity checks block close and cutover,none,no P0 exception allowed,open
+P23-P0-014,GAP-P12-001,P0,P31,platform_backend,P24 P26 P31,all governed mutations resolve to command APIs only,none,no P0 exception allowed,open
+P23-P0-015,GAP-P14-001,P0,P34,mes_execution,P24 P34,start and release commands call one readiness chain,none,no P0 exception allowed,open
+P23-P1-001,GAP-P01-003,P1,P27,master_data,P24 P27,all required collections round trip and drift check clean,controlled only outside cutover,expires before POSTGRES_PRIMARY,open
+P23-P1-002,GAP-P03-001,P1,P27,master_data,P24 P27,party role model mapped without data loss,controlled for planning only,expires before master-data preproduction,open
+P23-P1-003,GAP-P03-002,P1,P31,identity_user,P24 P31,no duplicate person mutation lanes remain,controlled for nonregulated planning only,expires before regulated-mode claim,open
+P23-P1-004,GAP-P04-001,P1,P31,identity_user,P24 P31,identity writes use one canonical chain,controlled for nonregulated planning only,expires before e-sign runtime,open
+P23-P1-005,GAP-P04-003,P1,P30,master_data,P24 P30,approval objects no longer depend on JSON-only collections,controlled for design only,expires before engineering release package runtime,open
+P23-P1-006,GAP-P04-004,P1,P31,platform_backend,P24 P31,lifecycle owners expose row version and actor lineage,controlled for design only,expires before command runtime proof,open
+P23-P1-007,GAP-P05-001,P1,P31,identity_user,P24 P31,user party relationship has authoritative chain,controlled for nonregulated planning only,expires before regulated commands,open
+P23-P1-008,GAP-P05-002,P1,P34,manufacturing_operations,P24 P34,start gate reads one governed qualification chain,controlled for non-MES planning only,expires before MES runtime claim,open
+P23-P1-009,GAP-P05-003,P1,P27,master_data,P24 P27,commercial and supplier gates avoid implicit metadata,controlled for design only,expires before release gates,open
+P23-P1-010,GAP-P05-004,P1,P31,master_data,P24 P31,party merge is replay safe and lineage preserving,controlled for no-merge operations only,expires before duplicate merge command,open
+P23-P1-011,GAP-P05-005,P1,P32,security_iam,P24 P32,regulated paths reject missing MFA and record challenge evidence,controlled for nonregulated mode only,expires before regulated-mode claim,open
+P23-P1-012,GAP-P06-001,P1,P27,engineering_authority,P24 P27,runtime no longer guesses between item identifiers,controlled for design only,expires before item runtime authority,open
+P23-P1-013,GAP-P06-002,P1,P30,engineering_authority,P24 P30,item release and shipment PO gates read explicit approval objects,controlled for design only,expires before release package runtime,open
+P23-P1-014,GAP-P06-004,P1,P27,planning_production,P24 P27,item header no longer owns local operational settings,controlled for design only,expires before planning runtime claim,open
+P23-P1-015,GAP-P06-005,P1,P32,security_iam,P24 P32,release commands enforce MFA SoD and replay safety,controlled for nonregulated planning only,expires before regulated release,open
+P23-P1-016,GAP-P07-003,P1,P30,quality_authority,P24 P30,inspection gates read one characteristic and sampling authority,controlled for design only,expires before inspection plan release runtime,open
+P23-P1-017,GAP-P07-004,P1,P30,commercial_operations_procurement_supplier_quality,P24 P30,engineering release uses explicit approvals,controlled for design only,expires before engineering release package runtime,open
+P23-P1-018,GAP-P07-005,P1,P32,security_iam,P24 P32,package release carries actor evidence SoD and replay safety,controlled for nonregulated planning only,expires before regulated release,open
+P23-P1-019,GAP-P08-002,P1,P33,quality_authority,P24 P33,open OOT quarantines affected machine and lots,controlled for design only,expires before calibration governed runtime,open
+P23-P1-020,GAP-P08-003,P1,P34,mes_execution_security_iam,P24 P34,signal semantics require governed approval,controlled for design only,expires before machine-event runtime,open
+P23-P1-021,GAP-P09-001,P1,P34,tooling_control_quality_authority,P24 P34,suspect output containment is automatic and auditable,controlled for design only,expires before MES containment runtime,open
+P23-P1-022,GAP-P09-002,P1,P33,quality_authority,P24 P33,CTQ measurements require valid gage and MSA chain,controlled for design only,expires before quality measurement runtime,open
+P23-P1-023,GAP-P09-003,P1,P30,tooling_control_manufacturing_engineering,P24 P30,tool load decisions read explicit compatibility truth,controlled for design only,expires before tool release package runtime,open
+P23-P1-024,GAP-P10-002,P1,P33,quality_authority,P24 P33,quality orders generated once from governed triggers,controlled for design only,expires before quality trigger runtime,open
+P23-P1-025,GAP-P10-003,P1,P33,quality_authority_supplier_quality,P24 P33,quality trace avoids freeform metadata,controlled for design only,expires before complaint and SCAR runtime,open
+P23-P1-026,GAP-P11-002,P1,P36,inventory_logistics,P24 P36,move and issue commands enforce parity and FEFO,controlled for design only,expires before inventory command runtime,open
+P23-P1-027,GAP-P11-003,P1,P36,traceability_serialization,P24 P36,recall exports are auditable,controlled for design only,expires before recall runtime,open
+P23-P1-028,GAP-P12-002,P1,P31,integration_architecture,P24 P31,API docs match runtime contracts,controlled for internal only,expires before API preproduction,open
+P23-P1-029,GAP-P12-003,P1,P31,sre_frontend,P24 P31,stale in-progress rows visible and recoverable,controlled for design only,expires before command runtime SLO,open
+P23-P1-030,GAP-P13-001,P1,P32,platform_backend,P24 P32,statuses stay byte equivalent across generated artifacts,controlled for nonregulated planning only,expires before regulated-mode claim,open
+P23-P1-031,GAP-P13-002,P1,P32,quality_authority_security_iam,P24 P32,regulated approvals resolve through one policy source,controlled for nonregulated planning only,expires before regulated approvals,open
+P23-P1-032,GAP-P13-003,P1,P37,sre_quality_authority,P24 P37,signature and audit incidents alert within SLO,controlled for nonregulated planning only,expires before regulated-mode claim,open
+P23-P1-033,GAP-P14-002,P1,P34,mes_execution_quality_authority,P24 P34,inspection fail and tool break events spawn governed reactions,controlled for design only,expires before MES runtime,open
+P23-P1-034,GAP-P14-003,P1,P34,mes_execution_frontend,P24 P34,offline stale completions cannot mutate closed state,controlled for online-only runtime only,expires before offline MES release,open
+P23-P1-035,GAP-P15-001,P1,P29,platform_backend_sre,P24 P29,zero drift and restore drill evidence per domain,controlled until cutover rehearsal,expires before POSTGRES_PRIMARY,open
+P23-P1-036,GAP-P15-002,P1,P27,platform_backend_domain_owners,P24 P27,collections round trip without fatal drift,controlled until services exist,expires before POSTGRES_PRIMARY,open
+P23-P1-037,GAP-P15-003,P1,P37,sre_frontend,P24 P37,operators see fallback and drift blockers,controlled until cutover UI,expires before POSTGRES_PRIMARY,open
+P23-P1-038,GAP-P16-001,P1,P35,security_iam_frontend,P24 P35,access aligns to one policy source,controlled for internal only,expires before regulated-mode claim,open
+P23-P1-039,GAP-P16-002,P1,P32,security_iam_quality_authority,P24 P32,override and deputy use bounded and auditable,controlled for no-exception mode only,expires before regulated-mode claim,open
+P23-P1-040,GAP-P16-003,P1,P37,sre_mes_execution,P24 P37,critical security and OT failures alert within SLO,controlled for design only,expires before OT runtime proof,open
+P23-P1-041,GAP-P17-001,P1,P37,sre_platform_backend,P24 P37,critical signals visible with owners and runbooks,controlled for design only,expires before runtime proof claim,open
+P23-P1-042,GAP-P17-002,P1,P37,sre_data_governance,P24 P37,reconciliations produce evidence packages,controlled for design only,expires before audit evidence claim,open
+P23-P1-043,GAP-P17-003,P1,P37,data_governance_frontend,P24 P37,stewards act on freshness and quality failures,controlled for design only,expires before projection runtime claim,open
+P23-P1-044,GAP-P18-001,P1,P39,frontend,P24 P39,governed roots open with audit evidence and command actions,controlled for backend-only runtime,expires before UI runtime claim,open
+P23-P1-045,GAP-P18-002,P1,P39,frontend_sre,P24 P39,workspaces show freshness and disabled-state panels,controlled for backend-only runtime,expires before workspace runtime claim,open
+P23-P1-046,GAP-P18-003,P1,P39,frontend_mes_execution,P24 P39,offline cannot mutate governed data without reconcile,controlled for online-only mode,expires before offline runtime claim,open
+P23-P1-047,GAP-P19-001,P1,P38,qa_automation,P24 P38,200 scenarios execute with pass fail evidence,controlled for narrative planning only,expires before runtime acceptance,open
+P23-P1-048,GAP-P19-002,P1,P38,qa_automation_frontend,P24 P38,auditors view scenario evidence and blocker counts,controlled for CLI-only validation only,expires before acceptance dashboard claim,open
+P23-P1-049,GAP-P19-003,P1,P38,platform_architecture_domain_owners,P24 P38,critical scenarios run against real command stack,controlled until prerequisite runtime services exist,expires before final acceptance,open
+P23-P1-050,GAP-P20-001,P1,P40,platform_architecture_domain_owners,P24 P40,all DoD gates pass in runtime,controlled for planning only,expires before final handoff,open
+P23-P1-051,GAP-P20-002,P1,P40,platform_architecture_platform_backend,P24 P40,backlog blockers collapse as waves complete,controlled for planning only,expires before implementation handoff,open
+P23-P1-052,GAP-P21-001,P1,P41,platform_architecture_domain_owners,P24 P41,red-team score rerun on implementation,controlled for planning only,expires before final runtime scorecard,open
