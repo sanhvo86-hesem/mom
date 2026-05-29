@@ -159,24 +159,22 @@ final class ConversionEngine
 
     /**
      * Validate and normalise a magnitude string.
-     * Guards against SQL injection, NaN, non-numeric input, overflow.
+     *
+     * HB-04 (V3 P02): the previous implementation went through PHP float
+     * (`(float)$trimmed` + `number_format`) for scientific-notation input,
+     * which silently lost the 54th bit on values like `9007199254740993e0`.
+     * Magnitude parsing is now delegated to `DecimalString::parse`, a
+     * pure-string expander that preserves every significant digit and
+     * rejects oversized exponents up front.
      */
     private function validateMagnitude(string $raw): string
     {
-        $trimmed = trim($raw);
+        $trimmed = DecimalString::parse($raw);
 
-        if (!preg_match('/^-?[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?$/', $trimmed)) {
-            throw new UomInvalidMagnitudeException($raw);
-        }
-
-        // Scientific notation normalisation: convert to plain decimal for BCMath
-        if (str_contains(strtolower($trimmed), 'e')) {
-            $float   = (float)$trimmed;
-            $trimmed = number_format($float, 20, '.', '');
-            $trimmed = rtrim(rtrim($trimmed, '0'), '.');
-        }
-
-        // Overflow guard: BCMath can handle huge numbers but precision degrades
+        // Final overflow guard kept here for backwards compatibility with
+        // the existing MAX_MAGNITUDE_DIGITS contract — DecimalString caps
+        // at MAX_TOTAL_DIGITS (256) which is much higher than the engine's
+        // own cap, so this check is the engine's local policy.
         $digits = strlen(str_replace(['-', '.'], '', $trimmed));
         if ($digits > self::MAX_MAGNITUDE_DIGITS) {
             throw new UomMagnitudeOverflowException();
