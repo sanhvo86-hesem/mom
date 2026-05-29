@@ -21,9 +21,9 @@ entities:
   - root_code: MDA-ITEM-REVISION-SPEC
     canonical_name: ItemRevisionSpecificationAuthority
     owner_domain: master_data
-    table_names: [item, items, item_revision, item_revisions, item_site, item_spec, item_attr, item_class, mdm_item_classes, mdm_attribute_sets, mdm_attribute_values]
-    required_command_service: "ItemMaster command service"
-    allowed_commands: [item_create, revision_create, revision_release, site_assignment_approve, spec_revision_release]
+    table_names: [item, items, item_revision, item_revisions, item_site, item_site_profile_authority, item_spec, item_attr, item_class, item_legacy_key_bridge, item_customer_crossref_authority, item_supplier_crossref_authority, mdm_item_classes, mdm_attribute_sets, mdm_attribute_values]
+    required_command_service: "ItemMaster command service plus ItemRevisionAuthorityService for runtime gates"
+    allowed_commands: [item_create, revision_create, revision_release, revision_supersede, site_assignment_approve, site_profile_approve, spec_revision_release, customer_crossref_approve, supplier_crossref_approve, eco_create_revision]
     forbidden_generic_actions: [create, update, delete, transition, release, approve]
     severity: P0
   - root_code: MDA-ENGINEERING-RELEASE
