@@ -77,25 +77,9 @@ COMMENT ON TABLE uom_measurement_thread IS
     'Digital thread for QC/MES measurements: links source records to MEASVAL envelopes and conversion audit hashes.';
 
 -- ---------------------------------------------------------------------------
--- 4. measurement_unit enum → canonical_unit_code lookup seed
+-- 4. Ra/HRC/HRB quantity kinds and catalog entries (prerequisite for alias seed)
 -- ---------------------------------------------------------------------------
--- The measurement_unit PG enum ('mm', 'in', 'deg', 'Ra', 'HRC', 'HRB') maps
--- to canonical UoM codes in uom_unit_catalog via uom_alias with context_scope='SYSTEM'.
--- Seeds below ensure resolution without hitting quarantine on first contact.
-INSERT INTO uom_alias (alias_code, canonical_code, context_scope, notes)
-VALUES
-    ('mm',  'mm',    'SYSTEM', 'PG measurement_unit enum: mm'),
-    ('in',  'in',    'SYSTEM', 'PG measurement_unit enum: in'),
-    ('deg', 'deg',   'SYSTEM', 'PG measurement_unit enum: deg'),
-    ('Ra',  'RA_UM', 'SYSTEM', 'PG measurement_unit enum: Ra surface roughness'),
-    ('HRC', 'HRC',   'SYSTEM', 'PG measurement_unit enum: Rockwell C hardness'),
-    ('HRB', 'HRB',   'SYSTEM', 'PG measurement_unit enum: Rockwell B hardness')
-ON CONFLICT (alias_code, context_scope, COALESCE(supplier_id, ''))
-DO NOTHING;
-
-
--- Ra surface roughness and Rockwell hardness — quality inspection units
--- quantity kinds first (may already exist if 224 seeded them; DO NOTHING is idempotent)
+-- Quantity kinds first — unit catalog has FK on quantity_kind_code
 INSERT INTO uom_quantity_kind (kind_code, label_en, label_vi, dimension_vector,
                                 is_dimensionless, source)
 VALUES
@@ -120,3 +104,20 @@ VALUES
     ('HRB',   '{HRB}', 'HRB', 'Rockwell B Hardness',       'Độ cứng Rockwell B',
      'Hardness',        FALSE, NULL,      NULL, FALSE, 'active', 'ISO', 'low')
 ON CONFLICT (canonical_code) DO NOTHING;
+
+-- ---------------------------------------------------------------------------
+-- 5. measurement_unit enum → canonical_unit_code alias seed
+-- ---------------------------------------------------------------------------
+-- The measurement_unit PG enum ('mm', 'in', 'deg', 'Ra', 'HRC', 'HRB') maps
+-- to canonical UoM codes in uom_unit_catalog via uom_alias with context_scope='SYSTEM'.
+-- RA_UM/HRC/HRB must already exist in uom_unit_catalog before this INSERT.
+INSERT INTO uom_alias (alias_code, canonical_code, context_scope, notes)
+VALUES
+    ('mm',  'mm',    'SYSTEM', 'PG measurement_unit enum: mm'),
+    ('in',  'in',    'SYSTEM', 'PG measurement_unit enum: in'),
+    ('deg', 'deg',   'SYSTEM', 'PG measurement_unit enum: deg'),
+    ('Ra',  'RA_UM', 'SYSTEM', 'PG measurement_unit enum: Ra surface roughness'),
+    ('HRC', 'HRC',   'SYSTEM', 'PG measurement_unit enum: Rockwell C hardness'),
+    ('HRB', 'HRB',   'SYSTEM', 'PG measurement_unit enum: Rockwell B hardness')
+ON CONFLICT (alias_code, context_scope, COALESCE(supplier_id, ''))
+DO NOTHING;
