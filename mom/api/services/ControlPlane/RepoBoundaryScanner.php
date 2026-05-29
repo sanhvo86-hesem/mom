@@ -94,6 +94,18 @@ final class RepoBoundaryScanner
         // acceptance, and release hardening. Mirrors the same repo-level
         // precedent already used for KPI and deploy playbook artifact sets.
         '#^_reports/raci-v3/.*$#',
+        // MDA Sequential Authority prompt-pack audit bundle — 179 governance
+        // artifacts committed by `23b7f35ff docs(mda): add sequential authority
+        // prompt-pack audit bundle`. Same allowlist precedent as the other
+        // governance bundles (module-template-v4, deploy-playbook, kpi).
+        // External evaluators review on GitHub; .gitignore must mirror.
+        '#^_reports/agent-audits/.*$#',
+        // UoM Measurement Intelligence audit + IMPL-NN report deliverables
+        // (HESEM UoM Prompt OS V1). Every IMPL slice emits a matching
+        // `_reports/uom-measurement-conversion-v1/implNN-*.md` audit and every
+        // P-prompt emits `_reports/uom-measurement-conversion-v1/pNN-*.md`.
+        // .gitignore allowlist matches.
+        '#^_reports/uom-measurement-conversion-v1/.*$#',
     ];
 
     /**
