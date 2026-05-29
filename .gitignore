@@ -27,6 +27,15 @@ tests/e2e/node_modules/
 # Whitelist KPI audit/report outputs so AI sessions can commit evidence
 # produced during the KPI upgrade program (prompt pack 01→09).
 !_reports/kpi/
+# Whitelist UoM Measurement Intelligence audit + IMPL-NN report deliverables
+# (required by HESEM UoM Prompt OS V1 every IMPL slice must emit a
+# matching `_reports/uom-measurement-conversion-v1/implNN-*.md` file).
+!_reports/uom-measurement-conversion-v1/
+# Whitelist MDA Sequential Authority prompt-pack audit bundle (179 governance
+# artifacts committed by `23b7f35ff docs(mda): add sequential authority
+# prompt-pack audit bundle` for external evaluator review on GitHub).
+# Mirrors the RepoBoundaryScanner allowlist entry for the same path.
+!_reports/agent-audits/
 _build/
 _Deleted/
 .tmp/
