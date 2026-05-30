@@ -1154,8 +1154,12 @@
       ]),
       _grp('typography','Chữ','Typography',[
         _vn('--o3-font-size-xs','Cỡ label','Label font size',9,14),
-        _vn('--o3-font-size-2xl','Cỡ giá trị','Value font size',16,36),
-        _vn('--o3-font-size-3xl','Cỡ hero','Hero font size',20,48),
+        // v3-G25: dedicated --o3-kpi-value-size (was --o3-font-size-2xl,
+        // a no-op — .o3-kpi__value read 3xl). The old "Cỡ hero" (3xl)
+        // entry is trimmed: there is only one KPI value element, so a
+        // second font-size knob was a catalog over-list (also leaked to
+        // .o3-empty__icon). 3xl stays editable via the global Typography tab.
+        _vn('--o3-kpi-value-size','Cỡ giá trị','Value font size',16,36),
         _vn('--o3-font-size-sm','Cỡ sub','Sub font size',9,16),
         _vn('--o3-font-weight-bold','Độ đậm giá trị','Value weight',400,900,''),
         _vn('--o3-font-weight-medium','Độ đậm label','Label weight',400,800,'')
@@ -1164,7 +1168,9 @@
     'chips': [
       _grp('layout','Bố cục','Layout',[
         _tn('control.height.standard','Chiều cao chip','Chip height',20,48),
-        _vn('--o3-space-sm','Padding ngang','Horizontal padding',4,20),
+        // v3-G25: dedicated --o3-chip-pad-x (was --o3-space-sm, a no-op —
+        // .o3-chip hardcoded `padding:0 10px`). Default 10px = prior value.
+        _vn('--o3-chip-pad-x','Padding ngang','Horizontal padding',4,20),
         _vn('--o3-radius-pill','Bo góc','Border radius',0,999),
         _vn('--o3-space-xs','Gap chip-chip','Chip gap',0,16)
       ]),
@@ -1177,8 +1183,11 @@
         _tc('brand.primarySoft','BG filter active','Filter active bg')
       ]),
       _grp('typography','Chữ','Typography',[
-        _vn('--o3-font-size-xs','Cỡ chữ chip','Chip font size',9,14),
-        _vn('--o3-font-weight-medium','Độ đậm','Weight',400,800,'')
+        // v3-G25: dedicated chip tokens (were --o3-font-size-xs /
+        // --o3-font-weight-medium, both no-ops — .o3-chip hardcoded
+        // `font-size:12px; font-weight:500`). Defaults match (12px / 500).
+        _vn('--o3-chip-font-size','Cỡ chữ chip','Chip font size',9,14),
+        _vn('--o3-chip-font-weight','Độ đậm','Weight',400,800,'')
       ])
     ],
     'toolbar': [
@@ -1214,7 +1223,10 @@
         _tc('colorsLight.textOnBrand','Chữ selected','Selected text')
       ]),
       _grp('typography','Chữ','Typography',[
-        _vn('--o3-font-size-md','Cỡ chữ cell','Cell font size',10,18),
+        // v3-G25: dedicated --o3-table-cell-size (was --o3-font-size-md, a
+        // no-op — .o3-table read --o3-font-size-sm). Default 12px = prior
+        // size. Header font/weight already bind to live tokens below.
+        _vn('--o3-table-cell-size','Cỡ chữ cell','Cell font size',10,18),
         _vn('--o3-font-size-xs','Cỡ chữ header','Header font size',9,14),
         _vn('--o3-font-weight-semi','Độ đậm header','Header weight',400,800,'')
       ]),
@@ -1315,8 +1327,10 @@
     ],
     'stepper': [
       _grp('layout','Bố cục','Layout',[
-        _tn('control.height.standard','Cao step','Step height',24,56),
-        _vn('--o3-space-md','Gap step-step','Step gap',0,32)
+        // v3-G25: "Gap step-step" trimmed (catalog over-list) — the stepper
+        // lays out via flex:1 steps + flex:1 connector lines, so there is
+        // no `gap` property for --o3-space-md to drive. Step height stays.
+        _tn('control.height.standard','Cao step','Step height',24,56)
       ]),
       _grp('colors','Màu','Colors',[
         _tc('brand.primary','Active','Active step'),

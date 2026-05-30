@@ -123,6 +123,20 @@
   --o3-z-drawer:        100;
   --o3-z-modal:         200;
   --o3-z-toast:         300;
+
+  /* ── Component-scoped overrides (v3-G25, 2026-05-30) ───────────────────
+   * Give the Module Master "Properties" dock a 1-knob ↔ 1-component lever
+   * for values that were previously hardcoded inside the component classes
+   * (so the matching dock property was a live no-op). Each defaults to the
+   * EXACT prior value → zero visual regression. Editing one affects ONLY
+   * its component — deliberately NOT aliased to the shared font/space ramp,
+   * which would couple chip/table/KPI sizing to unrelated surfaces.
+   * Registered in graphics_token_catalog via migration 255 (SSOT). */
+  --o3-kpi-value-size:    28px;  /* .o3-kpi__value font-size (was --o3-font-size-3xl) */
+  --o3-chip-pad-x:        10px;  /* .o3-chip horizontal padding (was literal 0 10px) */
+  --o3-chip-font-size:    12px;  /* .o3-chip font-size (was literal 12px) */
+  --o3-chip-font-weight:  500;   /* .o3-chip font-weight (was literal 500) */
+  --o3-table-cell-size:   12px;  /* .o3-table cell font-size (was --o3-font-size-sm) */
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -286,7 +300,10 @@ body.orders-v3-active #page-orders.active > .page-breadcrumb {
 }
 
 .o3-kpi__value {
-  font-size: var(--o3-font-size-3xl);
+  /* v3-G25: dedicated token so the Module Master "Cỡ giá trị" knob
+     drives ONLY the KPI value (was --o3-font-size-3xl, which the dock
+     edited via a second "Cỡ hero" knob + leaked to .o3-empty__icon). */
+  font-size: var(--o3-kpi-value-size);
   font-weight: var(--o3-font-weight-bold);
   color: var(--o3-text-strong);
   line-height: 1.1;
@@ -373,9 +390,12 @@ body.orders-v3-active #page-orders.active > .page-breadcrumb {
   /* Chips snap to the same standard height as everything else so
      toolbar rows stay on one baseline. Atlassian/Vercel pattern. */
   height: var(--o3-control-h-standard);
-  padding: 0 10px;
-  font-size: 12px;
-  font-weight: 500;
+  /* v3-G25: dedicated tokens so the Module Master chip knobs
+     (Padding ngang / Cỡ chữ chip / Độ đậm) are live, not no-ops.
+     Defaults match the prior literals exactly (10px / 12px / 500). */
+  padding: 0 var(--o3-chip-pad-x);
+  font-size: var(--o3-chip-font-size);
+  font-weight: var(--o3-chip-font-weight);
   border-radius: var(--o3-radius-pill);
   background: var(--o3-neutral-soft);
   color: var(--o3-neutral);
@@ -499,7 +519,9 @@ body.orders-v3-active #page-orders.active > .page-breadcrumb {
 .o3-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--o3-font-size-sm);
+  /* v3-G25: dedicated token so the Module Master "Cỡ chữ cell" knob is
+     live (was --o3-font-size-sm; default 12px keeps the prior size). */
+  font-size: var(--o3-table-cell-size);
 }
 
 .o3-table thead th {
