@@ -110,6 +110,10 @@ final class RepoBoundaryScanner
         // RACI v3 authority consolidation audit bundle — sequential governance
         // evidence. Mirrors .gitignore `!_reports/raci-v3/`.
         '#^_reports/raci-v3/.*$#',
+        // Graphics Authority adversarial critique + Lego-SSOT redesign proposal
+        // (strategy deliverables reviewed alongside the dark-mode fix).
+        // Mirrors .gitignore `!_reports/graphics-authority-critique/`.
+        '#^_reports/graphics-authority-critique/.*$#',
     ];
 
     /**
