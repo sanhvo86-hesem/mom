@@ -1,0 +1,1 @@
+scenario_id,scenario_type,domain,trigger,preconditions,command_or_api,tables_or_stores,expected_result,forbidden_result,gate_or_stop_rule,evidence_required,test_to_add_or_run,repair_if_failed,final_status

@@ -1,0 +1,2 @@
+gap_id,prompt_id,severity,domain,description,source_path,status,owner_path,next_action
+P00-GAP-001,P00,P2,platform_governance,Full P01 backend authority audit has not run yet because P00 only initializes the sequence gate,docs/ai-prompts/HESEM_MDA_PROMPT_OS_V2_EXECUTION_GRADE_2026-05-30/prompts/P01_current_backend_authority_reality_audit.md,controlled,_reports/agent-audits/mda-prompt-os-v2-2026-05-30/,Execute P01 after confirming P00 token

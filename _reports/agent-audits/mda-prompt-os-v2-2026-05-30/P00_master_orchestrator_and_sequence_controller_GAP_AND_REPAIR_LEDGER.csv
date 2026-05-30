@@ -1,0 +1,3 @@
+issue_id,severity,found_in,description,repair_action,status
+P00-R001,P2,self_audit,P01 backend authority audit not yet executed because P00 scope is governance initialization,Logged as controlled follow-up and kept next_prompt=P01,controlled
+P00-R002,P3,self_audit,Imported download directory contained .DS_Store,Excluded .DS_Store during rsync import,repaired

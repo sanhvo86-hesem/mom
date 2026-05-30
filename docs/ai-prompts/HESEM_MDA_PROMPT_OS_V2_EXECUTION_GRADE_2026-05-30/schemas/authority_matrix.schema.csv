@@ -1,0 +1,1 @@
+artifact_id,prompt_id,root_code,domain,object_or_table,command_ref,workflow_ref,api_ref,event_ref,evidence_ref,audit_ref,esign_ref,telemetry_ref,validation_ref,standard_ref,benchmark_ref,gap_ref,owner,decision_token

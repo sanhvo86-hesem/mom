@@ -1,0 +1,5 @@
+authority_id,domain,authority_source,allowed_action,forbidden_action,gate,status
+P00-A001,platform_governance,MDA_V2_SEQUENCE_STATE.json,Unlock only the next prompt after accepted token,Skip prompts or run out of order,sequential_token_required,active
+P00-A002,file_placement,.ai/CONVENTIONS.md,Place prompt pack under docs/ai-prompts,Place generated prompt artifacts at repo root or mom/docs root,file_placement_check,active
+P00-A003,reporting,_reports/agent-audits/mda-prompt-os-v2-2026-05-30/,Write machine-readable and human-readable P00 artifacts,Hide blockers in prose without ledger entry,artifact_contract_check,active
+P00-A004,runtime_safety,P00 mode PLANNING_AND_GOVERNANCE_ONLY,Create sequence/report artifacts only,Modify PHP runtime or database migrations,runtime_mutation_stop_rule,active

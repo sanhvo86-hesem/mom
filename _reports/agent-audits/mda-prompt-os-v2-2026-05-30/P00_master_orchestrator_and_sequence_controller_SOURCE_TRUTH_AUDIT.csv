@@ -1,0 +1,6 @@
+claim_id,claim,source_tag,exact_source_path_or_url,verification_method,confidence,risk_if_wrong,status
+P00-C001,AI prompt/context files belong under docs/ai-prompts,repo_governance,.ai/AI-WORKFLOW.md,read Phase 2 file placement table,high,prompt pack placed in forbidden path,verified
+P00-C002,Generated AI audit reports belong under _reports,repo_governance,.ai/AI-WORKFLOW.md,read Phase 2 file placement table,high,reports placed in served app content,verified
+P00-C003,AGENTS.md requires branch/worktree safety before remediation,repo_governance,AGENTS.md,read Branch And Worktree Safety section,high,cross-session data loss or mixed branch history,verified
+P00-C004,Prompt pack has 34 prompts P00 through P33,prompt_pack,docs/ai-prompts/HESEM_MDA_PROMPT_OS_V2_EXECUTION_GRADE_2026-05-30/04_PACKAGE_MANIFEST.md,read manifest and sequence matrix,high,sequence gate accepts missing prompt,verified
+P00-C005,P00 must not modify runtime code,prompt_pack,docs/ai-prompts/HESEM_MDA_PROMPT_OS_V2_EXECUTION_GRADE_2026-05-30/prompts/P00_master_orchestrator_and_sequence_controller.md,read mode and required tasks,high,runtime mutation during governance-only prompt,verified

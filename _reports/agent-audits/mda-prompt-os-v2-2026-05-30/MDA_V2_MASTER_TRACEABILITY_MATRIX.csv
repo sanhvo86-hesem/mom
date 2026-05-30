@@ -1,0 +1,9 @@
+prompt_id,artifact_type,path,source_or_requirement,status,evidence
+P00,main_report,_reports/agent-audits/mda-prompt-os-v2-2026-05-30/P00_master_orchestrator_and_sequence_controller_MAIN.md,P00 required output,created,git status shows report root
+P00,source_truth_audit,_reports/agent-audits/mda-prompt-os-v2-2026-05-30/P00_master_orchestrator_and_sequence_controller_SOURCE_TRUTH_AUDIT.csv,P00 required output,created,contains governance source checks
+P00,authority_matrix,_reports/agent-audits/mda-prompt-os-v2-2026-05-30/P00_master_orchestrator_and_sequence_controller_AUTHORITY_MATRIX.csv,P00 required output,created,defines sequence gate authority
+P00,operational_simulation,_reports/agent-audits/mda-prompt-os-v2-2026-05-30/P00_master_orchestrator_and_sequence_controller_OPERATIONAL_SIMULATION_MATRIX.csv,P00 required output,created,contains out-of-order and dirty-worktree scenarios
+P00,adversarial_review,_reports/agent-audits/mda-prompt-os-v2-2026-05-30/P00_master_orchestrator_and_sequence_controller_ADVERSARIAL_REVIEW.md,P00 required output,created,review lenses applied
+P00,gap_repair_ledger,_reports/agent-audits/mda-prompt-os-v2-2026-05-30/P00_master_orchestrator_and_sequence_controller_GAP_AND_REPAIR_LEDGER.csv,P00 required output,created,no P0/P1 remaining
+P00,verification_log,_reports/agent-audits/mda-prompt-os-v2-2026-05-30/P00_master_orchestrator_and_sequence_controller_VERIFICATION_LOG.md,P00 required output,created,commands recorded
+P00,handoff_packet,_reports/agent-audits/mda-prompt-os-v2-2026-05-30/P00_master_orchestrator_and_sequence_controller_HANDOFF_PACKET.md,P00 required output,created,next prompt unlock recorded

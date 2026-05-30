@@ -1,0 +1,14 @@
+{
+  "run_id": "mda-prompt-os-v2-2026-05-30",
+  "current_prompt": "P01",
+  "completed_prompts": [
+    "P00"
+  ],
+  "accepted_tokens": [
+    "P00_PASS_READY_FOR_NEXT"
+  ],
+  "next_prompt": "P01",
+  "gate_policy": "sequential_token_required",
+  "last_updated": "2026-05-30",
+  "status": "P00_COMPLETE"
+}
