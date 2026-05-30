@@ -223,7 +223,7 @@
 [data-color-mode="dark"] textarea,
 [data-color-scheme-active="dark"] input,
 [data-color-scheme-active="dark"] select,
-[data-color-scheme-active="dark"] textarea { background: #1e293b; color: #f1f5f9; border-color: #475569; }
+[data-color-scheme-active="dark"] textarea { background: #1e293b !important; color: #f1f5f9 !important; border-color: #475569 !important; }
 /* number/native inputs paint their own white widget background unless the
    native appearance is reset — without this the author background above is
    ignored and the field renders white-on-white (e.g. Theme "Cỡ chữ chuẩn"). */
