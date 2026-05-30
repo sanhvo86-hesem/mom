@@ -5440,7 +5440,7 @@ function renderAdvancedTableV3(config, data, state, blockId, reactiveCtx){
   html += '<div class="hm-dropdown-content">';
   columns.forEach(function(col){
     var checked = colVis[col.key] !== false ? ' checked' : '';
-    html += '<label class="hm-dropdown-item"><input type="checkbox" data-action="hm-table-col-toggle" data-col="'+_esc(col.key)+'" data-block-id="'+_esc(blockId)+'"'+checked+'> '+_esc(_t(col.label||col.key, col.labelEn||col.key))+'</label>';
+    html += '<label class="hm-dropdown-item"><input type="checkbox" data-action="hm-table-col-toggle" data-col="'+_esc(col.key)+'" data-block-id="'+_esc(blockId)+'"'+checked+'> '+_esc(_textLabel(col.label || col.key, col.labelEn || col.key))+'</label>';
   });
   html += '</div></div>';
   // Export buttons
@@ -5499,7 +5499,7 @@ function renderAdvancedTableV3(config, data, state, blockId, reactiveCtx){
     if(ts.pinnedRight.indexOf(col.key)>=0) pinCls = ' hm-col-pinned-right';
 
     html += '<th class="hm-th-sortable'+pinCls+'" style="'+align+width+minW+'cursor:pointer;user-select:none;position:relative" data-action="hm-table-sort" data-col="'+_esc(col.key)+'" data-block-id="'+_esc(blockId)+'">';
-    html += _esc(_t(col.label||col.key, col.labelEn||col.key));
+    html += _esc(_textLabel(col.label || col.key, col.labelEn || col.key));
     html += '<span class="hm-sort-indicator">'+sortIndicator+'</span>';
     // Resize handle
     html += '<span class="hm-col-resize" data-col="'+_esc(col.key)+'" data-block-id="'+_esc(blockId)+'" style="position:absolute;right:0;top:0;bottom:0;width:4px;cursor:col-resize"></span>';
@@ -6206,7 +6206,7 @@ function renderFilterBar(config, data, state){
   filters.forEach(function(f){
     var value = values[f.key];
     if(f.type==='search'){
-      html += '<input type="text" class="hm-input" placeholder="'+_esc(_t(f.placeholder||'Tim kiem...',f.placeholderEn||'Search...'))+'" data-filter="'+_esc(f.key)+'" value="'+_esc(value != null ? value : '')+'">';
+      html += '<input type="text" class="hm-input" placeholder="'+_esc(f.placeholder ? _textLabel(f.placeholder, f.placeholderEn) : _t('Tim kiem...','Search...'))+'" data-filter="'+_esc(f.key)+'" value="'+_esc(value != null ? value : '')+'">';
     } else if(f.type==='select'){
       html += '<select class="hm-input hm-select" data-filter="'+_esc(f.key)+'">';
       html += '<option value="">'+_esc(_t(f.allLabel||'Tat ca',f.allLabelEn||'All'))+'</option>';
@@ -9600,6 +9600,10 @@ function _scStatusColor(value){
   if(/down|fail|reject|lost|overdue|critical|major|offline|breach|error/.test(k)) return 'var(--red,#dc2626)';
   return 'var(--brand-2,#2563eb)';
 }
+function _scText(v, vEn){
+  if(v && typeof v === 'object') return _t(v.vi || '', v.en || v.vi || '');
+  return _t(v == null ? '' : v, vEn == null ? v : vEn);
+}
 
 /* --- Funnel (insight-funnel) --- */
 function renderFunnel(config, data, blockId){
@@ -9731,7 +9735,7 @@ function renderLinkGrid(config, data){
     html += '<div class="hm-link-card" style="display:flex;align-items:center;gap:10px;padding:var(--space-3,12px);border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius-card,8px);background:var(--bg-surface,#fff);cursor:pointer">';
     html += '<span style="font-size:22px">'+(item.icon || '🔗')+'</span>';
     html += '<span style="display:flex;flex-direction:column;min-width:0"><span style="font-weight:700;font-size:13px;color:var(--text-primary)">'+_esc(_scLabel(item, i))+'</span>';
-    if(item.desc) html += '<span style="font-size:12px;color:var(--text-tertiary)">'+_esc(_t(item.desc, item.descEn || item.desc))+'</span>';
+    if(item.desc) html += '<span style="font-size:12px;color:var(--text-tertiary)">'+_esc(_scText(item.desc, item.descEn))+'</span>';
     html += '</span></div>';
   });
   html += '</div>';
@@ -9807,7 +9811,7 @@ function renderDeviceGrid(config, data){
     html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px"><span style="font-weight:700;font-size:13px;color:var(--text-primary)">'+_esc(_scLabel(item, i))+'</span><span style="width:10px;height:10px;border-radius:50%;background:'+color+'" title="'+_esc(status)+'"></span></div>';
     html += '<div style="font-size:11px;color:var(--text-tertiary);margin-top:2px">'+_esc(status)+'</div>';
     if(item.metric != null) html += '<div style="margin-top:8px;font-size:20px;font-weight:800;color:'+color+'">'+_esc(_fmt(_chartNumber(item.metric)))+_esc(item.unit || '')+'</div>';
-    if(item.metricLabel) html += '<div style="font-size:11px;color:var(--text-secondary)">'+_esc(_t(item.metricLabel, item.metricLabelEn || item.metricLabel))+'</div>';
+    if(item.metricLabel) html += '<div style="font-size:11px;color:var(--text-secondary)">'+_esc(_scText(item.metricLabel, item.metricLabelEn))+'</div>';
     html += '</div>';
   });
   html += '</div>';
