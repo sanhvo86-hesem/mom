@@ -1648,21 +1648,28 @@
   function startDockVisibilityGuard(){
     if (window.__o3DockGuardStarted) return;
     window.__o3DockGuardStarted = true;
-    var lastVisible = false;
+    /* v3-G25a: LEVEL-triggered (not edge-triggered). The old
+     * `if (lastVisible && !now) hide` only fired on the exact
+     * visible→hidden transition and missed intra-Appearance sub-tab
+     * switches (Module Master → Mẫu bố cục), leaving the dock floating
+     * over the wrong sub-tab. Now: whenever the dock is shown but the
+     * Module Master panel is NOT the visible/active surface, hide it.
+     * Idempotent + cheap (2 DOM queries). */
     function check(){
       var dock = document.getElementById('o3-props-dock');
-      if (!dock || dock.hidden) { lastVisible = false; return; }
-      var now = panelIsVisible();
-      if (lastVisible && !now) hideDock();
-      lastVisible = now;
+      if (!dock || dock.hidden) return;
+      if (!panelIsVisible()) hideDock();
     }
     try {
       var obs = new MutationObserver(check);
       obs.observe(document.body, { childList: true, subtree: true, attributes: true,
                                     attributeFilter: ['class','style','hidden'] });
     } catch (e) {}
-    // Safety-net interval (500ms — imperceptible cost, immune to observer misses)
-    setInterval(check, 500);
+    // Instant response to any tab/nav click — re-check on the next tick
+    // after the DOM has applied the sub-tab show/hide.
+    document.addEventListener('click', function(){ setTimeout(check, 0); }, true);
+    // Safety-net interval (300ms — imperceptible, immune to observer misses)
+    setInterval(check, 300);
   }
 
   /* Read per-property override flags from localStorage. Each entry:
