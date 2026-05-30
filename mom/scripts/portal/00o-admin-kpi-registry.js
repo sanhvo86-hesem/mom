@@ -1106,7 +1106,7 @@ function _renderCustomerProfileForm(){
     '<section class="kc-mco-section"><div class="kc-mco-title"><b>3</b><span>' +
       _t('Yêu cầu chất lượng & KPI liên kết', 'Quality requirements and linked KPIs') + '</span></div>' +
       _field('quality_requirements (key=value)', '<textarea class="kc-input kc-ta" rows="5" oninput="_kpiCustomerProfileField(\'quality_requirements\',this.value)">' + _esc(f.quality_requirements) + '</textarea>') +
-      _field('linked_metrics', '<textarea class="kc-input kc-ta" rows="4" placeholder="OTD, COMPLAINT_RATE" oninput="_kpiCustomerProfileField(\'linked_metrics\',this.value)">' + _esc(f.linked_metrics) + '</textarea>') +
+      _field('linked_metrics', '<textarea class="kc-input kc-ta" rows="4" placeholder="OTD, CUSTOMER_ESCAPE_DPMO" oninput="_kpiCustomerProfileField(\'linked_metrics\',this.value)">' + _esc(f.linked_metrics) + '</textarea>') +
       _field('gate_coverage (G1: CODE, CODE)', '<textarea class="kc-input kc-ta" rows="4" oninput="_kpiCustomerProfileField(\'gate_coverage\',this.value)">' + _esc(f.gate_coverage) + '</textarea>') +
       _field('evidence_pack_required', '<textarea class="kc-input kc-ta" rows="3" oninput="_kpiCustomerProfileField(\'evidence_pack_required\',this.value)">' + _esc(f.evidence_pack_required) + '</textarea>') +
     '</section>' +
@@ -2331,7 +2331,7 @@ function _renderUnifiedMcoEditCard(m, section, inline){
   var pcat = (_state.config || {}).process_catalog || {};
   Object.keys(pcat).forEach(function(k){ if(!procOpts.some(function(o){ return o[0] === k; })) procOpts.push([k, (pcat[k] && pcat[k].vi) || k]); });
   var identityHelp = _t(
-    'Khóa SSOT: Nhóm và Mã KPI là định danh cấu trúc. Với KPI tính tự động như COMPLAINT_RATE, đổi trực tiếp sẽ làm lệch công thức KpiEngine, bảng điều khiển, tài liệu, thẻ điểm JD và các KPI ghép cặp. Cần dùng luồng đổi định danh có kiểm soát hoặc tạo KPI thay thế kèm bí danh.',
+    'Khóa SSOT: Nhóm và Mã KPI là định danh cấu trúc. Với KPI tính tự động như CUSTOMER_ESCAPE_DPMO, đổi trực tiếp sẽ làm lệch công thức KpiEngine, bảng điều khiển, tài liệu, thẻ điểm JD và các KPI ghép cặp. Cần dùng luồng đổi định danh có kiểm soát hoặc tạo KPI thay thế kèm bí danh.',
     'SSOT locked identity fields.'
   );
   var lockedTitle = c(identityHelp);

@@ -204,7 +204,7 @@ final class DashboardService
             KpiEngine::METRIC_CAPA_CLOSURE,
             KpiEngine::METRIC_DPMO,
             KpiEngine::METRIC_CAL_COMPLIANCE,
-            KpiEngine::METRIC_COMPLAINT_RATE,
+            KpiEngine::METRIC_CUSTOMER_ESCAPE_DPMO,
         ];
 
         $kpis = [];

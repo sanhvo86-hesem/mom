@@ -71,7 +71,7 @@ td,th{vertical-align:top}
 <tr><td>CAPA-CLOSE</td><td>CAPA_CLOSURE</td><td>Chuẩn hóa format underscore cho runtime metric.</td></tr>
 <tr><td>CAL-COMP</td><td>CAL_COMPLIANCE</td><td>Khớp với mã tính trong KpiEngine.</td></tr>
 <tr><td>TRN-COMP</td><td>TRAINING_COMP</td><td>Khớp với mã tính trong KpiEngine.</td></tr>
-<tr><td>CCR</td><td>COMPLAINT_RATE</td><td>Không dùng CCR cho complaint vì CCR cũng dễ bị hiểu là critical constraint resource trong TOC.</td></tr>
+<tr><td>CCR</td><td>CUSTOMER_ESCAPE_DPMO</td><td>Không dùng CCR cho complaint vì CCR cũng dễ bị hiểu là critical constraint resource trong TOC.</td></tr>
 <tr><td>SQI</td><td>SUPPLIER_QUAL</td><td>Chuẩn hóa chất lượng nhà cung cấp metric.</td></tr>
 <tr><td>UTIL</td><td>MACHINE_UTIL</td><td>Khớp runtime utilization metric.</td></tr>
 <tr><td>SETUP</td><td>SETUP_RATIO</td><td>Khớp runtime setup ratio metric.</td></tr>
@@ -82,7 +82,7 @@ td,th{vertical-align:top}
 <p>Các KPI sau đang được KpiEngine tính trực tiếp và được giữ nguyên. Không đổi công thức trong tài liệu này.</p>
 <div class="grid-2">
 <div class="card"><span class="tag">Delivery</span><span class="tag">OTD</span><span class="tag">PUT_THRU</span><span class="tag">INV_TURNS</span></div>
-<div class="card"><span class="tag">Quality</span><span class="tag">FPY</span><span class="tag">DPMO</span><span class="tag">SCRAP_RATE</span><span class="tag">REWORK_RATE</span><span class="tag">NCR_RATE</span><span class="tag">COMPLAINT_RATE</span></div>
+<div class="card"><span class="tag">Quality</span><span class="tag">FPY</span><span class="tag">DPMO</span><span class="tag">SCRAP_RATE</span><span class="tag">REWORK_RATE</span><span class="tag">NCR_RATE</span><span class="tag">CUSTOMER_ESCAPE_DPMO</span></div>
 <div class="card"><span class="tag">Equipment/Production</span><span class="tag">OEE</span><span class="tag">MACHINE_UTIL</span><span class="tag">CHUẨN BỊ MÁY_RATIO</span><span class="tag">LABOR_EFF</span></div>
 <div class="card"><span class="tag">Governance</span><span class="tag">COPQ</span><span class="tag">CAPA_CLOSURE</span><span class="tag">CAL_COMPLIANCE</span><span class="tag">TRAINING_COMP</span><span class="tag">NHÀ CUNG CẤP_OTD</span><span class="tag">NHÀ CUNG CẤP_QUAL</span></div>
 </div>
@@ -92,7 +92,7 @@ td,th{vertical-align:top}
 <div class="table-card"><table class="table">
 <thead><tr><th>Layer</th><th>KPI/chỉ số bổ sung</th><th>Trạng thái</th><th>Điều kiện nâng cấp</th></tr></thead>
 <tbody>
-<tr><td>Executive BSC</td><td>7 scored core: OTD, COMPLAINT_RATE, FPY, COPQ, PLAN_ADHERENCE, WIP_AGING, MATERIAL_AVAILABILITY_PLAN. Driver panel: FAI_FIRST_PASS, FINAL_RELEASE_RFT, INSPECTION_QUEUE_AGING, OEE_BOTTLENECK, CONSTRAINT_LOST_HOURS, CHECK_DIM_REPORT_ON_SHIP, GAGE_VALID_FOR_RELEASE, NCR_3D_RESPONSE_SLA, NCR_8D_UPDATE_SLA, LAM G3 material/IQC/traceability mức sẵn sàng, LAM G5 IPQC/SPC/CMM/containment/gage validity, CRITICAL_ROLE_BACKUP_COVERAGE, SUPPLIER_READINESS.</td><td>Scorecard controlled</td><td>Chỉ scored core cộng điểm. Driver panel hiển thị để hành động/cap/block, không payout khi chưa có data contract và phê duyệt vận hành thử.</td></tr>
+<tr><td>Executive BSC</td><td>7 scored core: OTD, CUSTOMER_ESCAPE_DPMO, FPY, COPQ, PLAN_ADHERENCE, WIP_AGING, MATERIAL_AVAILABILITY_PLAN. Driver panel: FAI_FIRST_PASS, FINAL_RELEASE_RFT, INSPECTION_QUEUE_AGING, OEE_BOTTLENECK, CONSTRAINT_LOST_HOURS, CHECK_DIM_REPORT_ON_SHIP, GAGE_VALID_FOR_RELEASE, NCR_3D_RESPONSE_SLA, NCR_8D_UPDATE_SLA, LAM G3 material/IQC/traceability mức sẵn sàng, LAM G5 IPQC/SPC/CMM/containment/gage validity, CRITICAL_ROLE_BACKUP_COVERAGE, SUPPLIER_READINESS.</td><td>Scorecard controlled</td><td>Chỉ scored core cộng điểm. Driver panel hiển thị để hành động/cap/block, không payout khi chưa có data contract và phê duyệt vận hành thử.</td></tr>
 <tr><td>TOC weekly</td><td>BOTTLENECK_BUFFER_STATUS, THROUGHPUT_PER_CONSTRAINT_HOUR, CONSTRAINT_LOST_HOURS, WIP_BEFORE_CONSTRAINT</td><td>Staged data contract</td><td>Có constraint register, machine/job context và buffer rule.</td></tr>
 <tr><td>Lean daily</td><td>IN_PROCESS_REJECT_RATE, IPQC_CHARACTERISTIC_COMPLETENESS, SPC_SIGNAL_REACTION_TIME, CMM_QUEUE_AGING, NCR_CONTAINMENT_ON_TIME, GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT, CYCLE_TIME_VARIANCE, MTBF, MTTR, thời gian dừng máy reason pareto</td><td>Runtime + staged/manual governed mix</td><td>Có hiện trường source, reason code, hold/release bằng chứng và action log; staged/manual metric không được dùng reward.</td></tr>
 <tr><td>QMS/MES event</td><td>FAI_FIRST_PASS, SETUP_FIRST_PASS, CAPA_EFFECTIVENESS, gate tính đầy đủ bằng chứng</td><td>Bằng chứng controlled</td><td>Có form/gate record và quyền QA/QMS rõ.</td></tr>
