@@ -696,6 +696,34 @@ class OrderController extends BaseController
      *
      * @return never
      */
+    /**
+     * GET order_get_linked_forms — list evidence linked to one SO/JO/WO.
+     * Accepts order_type (so|jo|wo) + order_id. Powers the Linked
+     * Evidence section in the order detail inspector. The alias in
+     * frontend-alias-routes.php previously pointed to getHierarchy()
+     * by mistake — every detail panel silently rendered "No linked
+     * evidence yet." even when records existed (incident 2026-05-28).
+     */
+    public function listLinkedForms(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireOrderPermission($user, 'so_read');
+
+        $orderType = strtolower(trim((string)($this->query('order_type') ?? '')));
+        $orderId   = trim((string)($this->query('order_id') ?? ''));
+        if (!in_array($orderType, ['so', 'jo', 'wo'], true) || $orderId === '') {
+            $this->error('invalid_linked_forms_request', 400, 'order_type (so|jo|wo) and order_id are required.');
+        }
+
+        try {
+            $forms = $this->orderService()->getLinkedFormsByOrder($orderType, $orderId);
+            $this->success(['forms' => $forms, 'order_type' => $orderType, 'order_id' => $orderId]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('linked_forms_failed', 500, $e->getMessage());
+        }
+    }
+
     public function linkForm(): never
     {
         $user = $this->requireAuth();

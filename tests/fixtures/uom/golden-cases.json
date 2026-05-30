@@ -1,0 +1,520 @@
+{
+  "_meta": {
+    "spec": "P14 — Test Simulation and Golden Cases",
+    "version": "1.0.0",
+    "package": "HESEM_UOM_PROMPT_OS_V1_2026-05-28",
+    "date": "2026-05-29",
+    "rounding": "ROUND_HALF_EVEN (Banker's rounding)",
+    "precision_note": "All expected values computed with PHP BCMath scale=30"
+  },
+  "golden_cases": [
+    {
+      "id": "TC-G001",
+      "label": "kg → g exact linear",
+      "from_unit": "kg",
+      "to_unit": "g",
+      "quantity_kind": "Mass",
+      "input": "1",
+      "expected": "1000",
+      "expected_precision": 0,
+      "category": "exact_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G002",
+      "label": "g → kg reverse (bidirectional)",
+      "from_unit": "g",
+      "to_unit": "kg",
+      "quantity_kind": "Mass",
+      "input": "1000",
+      "expected": "1",
+      "expected_precision": 0,
+      "category": "exact_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G003",
+      "label": "kg → lb NIST exact",
+      "from_unit": "kg",
+      "to_unit": "lb",
+      "quantity_kind": "Mass",
+      "input": "1",
+      "expected": "2.20462262184878",
+      "expected_precision": 14,
+      "category": "exact_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G004",
+      "label": "lb → kg (reverse of G003)",
+      "from_unit": "lb",
+      "to_unit": "kg",
+      "quantity_kind": "Mass",
+      "input": "2.20462262184878",
+      "expected": "1",
+      "expected_precision": 0,
+      "category": "exact_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G005",
+      "label": "°C → K affine: 100°C = 373.15K",
+      "from_unit": "Cel",
+      "to_unit": "K",
+      "quantity_kind": "ThermodynamicTemperature",
+      "input": "100",
+      "expected": "373.15",
+      "expected_precision": 2,
+      "category": "affine",
+      "risk_level": "medium"
+    },
+    {
+      "id": "TC-G006",
+      "label": "°F → °C affine: 98.6°F = 37°C (body temp, not 54.8)",
+      "from_unit": "degF",
+      "to_unit": "Cel",
+      "quantity_kind": "ThermodynamicTemperature",
+      "input": "98.6",
+      "expected": "37",
+      "expected_precision": 0,
+      "category": "affine",
+      "risk_level": "medium",
+      "_danger": "naive factor-only: 98.6 × 5/9 = 54.8 — must guard against this"
+    },
+    {
+      "id": "TC-G007",
+      "label": "°F → °C affine: 32°F = 0°C (freeze point)",
+      "from_unit": "degF",
+      "to_unit": "Cel",
+      "quantity_kind": "ThermodynamicTemperature",
+      "input": "32",
+      "expected": "0",
+      "expected_precision": 0,
+      "category": "affine",
+      "risk_level": "medium"
+    },
+    {
+      "id": "TC-G008",
+      "label": "°F → °C affine: 212°F = 100°C (boiling point)",
+      "from_unit": "degF",
+      "to_unit": "Cel",
+      "quantity_kind": "ThermodynamicTemperature",
+      "input": "212",
+      "expected": "100",
+      "expected_precision": 0,
+      "category": "affine",
+      "risk_level": "medium"
+    },
+    {
+      "id": "TC-G009",
+      "label": "K → °C: 273.15K = 0°C",
+      "from_unit": "K",
+      "to_unit": "Cel",
+      "quantity_kind": "ThermodynamicTemperature",
+      "input": "273.15",
+      "expected": "0",
+      "expected_precision": 0,
+      "category": "affine",
+      "risk_level": "medium"
+    },
+    {
+      "id": "TC-G010",
+      "label": "m → mm exact: 1.234m = 1234mm",
+      "from_unit": "m",
+      "to_unit": "mm",
+      "quantity_kind": "Length",
+      "input": "1.234",
+      "expected": "1234",
+      "expected_precision": 0,
+      "category": "exact_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G011",
+      "label": "m → in: 1m = 39.37007874015748in (NIST)",
+      "from_unit": "m",
+      "to_unit": "in",
+      "quantity_kind": "Length",
+      "input": "1",
+      "expected": "39.3700787401575",
+      "expected_precision": 13,
+      "category": "exact_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G012",
+      "label": "m³ → L: 1 m³ = 1000 L",
+      "from_unit": "m3",
+      "to_unit": "L",
+      "quantity_kind": "Volume",
+      "input": "1",
+      "expected": "1000",
+      "expected_precision": 0,
+      "category": "exact_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G013",
+      "label": "L → mL: 1.5 L = 1500 mL",
+      "from_unit": "L",
+      "to_unit": "mL",
+      "quantity_kind": "Volume",
+      "input": "1.5",
+      "expected": "1500",
+      "expected_precision": 0,
+      "category": "exact_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G014",
+      "label": "Pa → bar: 100000 Pa = 1 bar",
+      "from_unit": "Pa",
+      "to_unit": "bar",
+      "quantity_kind": "Pressure",
+      "input": "100000",
+      "expected": "1",
+      "expected_precision": 0,
+      "category": "defined_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G015",
+      "label": "Pa → atm: 101325 Pa = 1 atm",
+      "from_unit": "Pa",
+      "to_unit": "atm",
+      "quantity_kind": "Pressure",
+      "input": "101325",
+      "expected": "1",
+      "expected_precision": 0,
+      "category": "defined_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G016",
+      "label": "J → kWh: 3600000 J = 1 kWh",
+      "from_unit": "J",
+      "to_unit": "kWh",
+      "quantity_kind": "Energy",
+      "input": "3600000",
+      "expected": "1",
+      "expected_precision": 0,
+      "category": "defined_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G017",
+      "label": "s → h: 3600 s = 1 h",
+      "from_unit": "s",
+      "to_unit": "h",
+      "quantity_kind": "Duration",
+      "input": "3600",
+      "expected": "1",
+      "expected_precision": 0,
+      "category": "exact_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G018",
+      "label": "s → min: 120 s = 2 min",
+      "from_unit": "s",
+      "to_unit": "min",
+      "quantity_kind": "Duration",
+      "input": "120",
+      "expected": "2",
+      "expected_precision": 0,
+      "category": "exact_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G019",
+      "label": "rad → deg: 1 rad = 57.2957795131deg",
+      "from_unit": "rad",
+      "to_unit": "deg",
+      "quantity_kind": "Angle",
+      "input": "1",
+      "expected": "57.2957795131",
+      "expected_precision": 10,
+      "category": "defined_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G020",
+      "label": "deg → rad: 180° = π rad",
+      "from_unit": "deg",
+      "to_unit": "rad",
+      "quantity_kind": "Angle",
+      "input": "180",
+      "expected": "3.14159265235",
+      "expected_precision": 8,
+      "category": "defined_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G021",
+      "label": "kg/m³ → kg/L: 1000 kg/m³ = 1 kg/L (water at 4°C)",
+      "from_unit": "kg_m3",
+      "to_unit": "kg_L",
+      "quantity_kind": "Density",
+      "input": "1000",
+      "expected": "1",
+      "expected_precision": 0,
+      "category": "exact_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G022",
+      "label": "BCMath precision: 1/3 kg → g, scale=12",
+      "from_unit": "kg",
+      "to_unit": "g",
+      "quantity_kind": "Mass",
+      "input": "0.333333333333",
+      "expected": "333.333333333",
+      "expected_precision": 9,
+      "category": "exact_linear",
+      "risk_level": "low",
+      "_note": "Verifies no IEEE754 float drift"
+    },
+    {
+      "id": "TC-G023",
+      "label": "Banker's rounding: 2.5 kg → rounds to 2 (not 3) at precision 0",
+      "from_unit": "kg",
+      "to_unit": "kg",
+      "quantity_kind": "Mass",
+      "input": "2.5",
+      "expected": "2",
+      "expected_precision": 0,
+      "rounding": "ROUND_HALF_EVEN",
+      "category": "exact_linear",
+      "_note": "ROUND_HALF_EVEN: ties go to nearest even"
+    },
+    {
+      "id": "TC-G024",
+      "label": "Banker's rounding: 3.5 kg → rounds to 4 (not 3) at precision 0",
+      "from_unit": "kg",
+      "to_unit": "kg",
+      "quantity_kind": "Mass",
+      "input": "3.5",
+      "expected": "4",
+      "expected_precision": 0,
+      "rounding": "ROUND_HALF_EVEN",
+      "category": "exact_linear"
+    },
+    {
+      "id": "TC-G025",
+      "label": "DeltaK → Delta°C: 10 ΔK = 10 Δ°C (difference, not absolute)",
+      "from_unit": "DeltaK",
+      "to_unit": "DeltaCel",
+      "quantity_kind": "TemperatureDifference",
+      "input": "10",
+      "expected": "10",
+      "expected_precision": 0,
+      "category": "exact_linear",
+      "risk_level": "low",
+      "_note": "Temperature DIFFERENCES are linear; absolute temperatures are affine"
+    },
+    {
+      "id": "TC-G026",
+      "label": "W → kW: 5500 W = 5.5 kW",
+      "from_unit": "W",
+      "to_unit": "kW",
+      "quantity_kind": "Power",
+      "input": "5500",
+      "expected": "5.5",
+      "expected_precision": 1,
+      "category": "exact_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G027",
+      "label": "km → mm: 1.5 km = 1500000 mm (multi-hop via m)",
+      "from_unit": "km",
+      "to_unit": "mm",
+      "quantity_kind": "Length",
+      "input": "1.5",
+      "expected": "1500000",
+      "expected_precision": 0,
+      "category": "exact_linear",
+      "risk_level": "low",
+      "_note": "Engine must chain km→m→mm (two hops)"
+    },
+    {
+      "id": "TC-G028",
+      "label": "mg → t: extreme precision chain (6 orders)",
+      "from_unit": "mg",
+      "to_unit": "t",
+      "quantity_kind": "Mass",
+      "input": "1000000000",
+      "expected": "1",
+      "expected_precision": 0,
+      "category": "exact_linear",
+      "risk_level": "low"
+    },
+    {
+      "id": "TC-G029",
+      "label": "kPa → psi: 100 kPa = 14.5037738 psi (bidirectional=false; reverse blocked)",
+      "from_unit": "Pa",
+      "to_unit": "psi",
+      "quantity_kind": "Pressure",
+      "input": "100000",
+      "expected": "14.5038",
+      "expected_precision": 4,
+      "category": "defined_linear",
+      "risk_level": "low",
+      "_note": "Rule is bidirectional=false for psi; reverse must use separate rule or error"
+    },
+    {
+      "id": "TC-G030",
+      "label": "°C → °F inverse affine: 100°C = 212°F",
+      "from_unit": "Cel",
+      "to_unit": "degF",
+      "quantity_kind": "ThermodynamicTemperature",
+      "input": "100",
+      "expected": "212",
+      "expected_precision": 0,
+      "category": "affine",
+      "risk_level": "medium",
+      "_note": "Reverse of affine: F = C × 9/5 + 32"
+    }
+  ],
+  "negative_cases": [
+    {
+      "id": "TC-N001",
+      "label": "Kind mismatch: kg → L blocked (Mass ≠ Volume)",
+      "from_unit": "kg",
+      "to_unit": "L",
+      "expected_error": "UOM_KIND_MISMATCH",
+      "expected_status": 422
+    },
+    {
+      "id": "TC-N002",
+      "label": "Kind mismatch: m → s blocked (Length ≠ Duration)",
+      "from_unit": "m",
+      "to_unit": "s",
+      "expected_error": "UOM_KIND_MISMATCH",
+      "expected_status": 422
+    },
+    {
+      "id": "TC-N003",
+      "label": "Naive affine danger: 98.6 × 5/9 must NOT equal 54.8",
+      "from_unit": "degF",
+      "to_unit": "Cel",
+      "input": "98.6",
+      "forbidden_result": "54.8",
+      "expected": "37",
+      "_danger": "If engine ignores offset and multiplies only: (98.6)×(5/9)=54.8. Test that this does NOT occur."
+    },
+    {
+      "id": "TC-N004",
+      "label": "Torque vs Energy: same dimension M1L2T-2 but different kinds — blocked",
+      "from_unit": "J",
+      "to_unit_kind": "Torque",
+      "expected_error": "UOM_KIND_MISMATCH",
+      "expected_status": 422
+    },
+    {
+      "id": "TC-N005",
+      "label": "Currency code rejected by engine",
+      "from_unit": "VND",
+      "to_unit": "USD",
+      "expected_error": "UOM_BLOCKED_CURRENCY_IN_PHYSICAL_ENGINE",
+      "expected_status": 422
+    },
+    {
+      "id": "TC-N006",
+      "label": "Retired unit conversion blocked",
+      "from_unit": "RETIRED_UNIT",
+      "to_unit": "kg",
+      "expected_error": "UOM_UNIT_NOT_ACTIVE",
+      "expected_status": 422
+    },
+    {
+      "id": "TC-N007",
+      "label": "Negative magnitude for mass blocked",
+      "from_unit": "kg",
+      "to_unit": "g",
+      "input": "-5",
+      "expected_error": "UOM_NEGATIVE_MAGNITUDE_FORBIDDEN",
+      "expected_status": 422,
+      "_note": "Mass, volume, count cannot be negative; temperature can"
+    },
+    {
+      "id": "TC-N008",
+      "label": "AI advisory cannot auto-approve conversion rule",
+      "scenario": "ai_advisory_approval_attempt",
+      "expected_error": "UOM_AI_ADVISORY_ONLY",
+      "expected_status": 403
+    },
+    {
+      "id": "TC-N009",
+      "label": "Packaging unit (box) rejected by physical conversion engine",
+      "from_unit": "BOX",
+      "to_unit": "kg",
+      "expected_error": "UOM_UNIT_ITUOM_ONLY_NO_PHYSICAL_CONVERSION",
+      "expected_status": 422
+    },
+    {
+      "id": "TC-N010",
+      "label": "Unknown external unit code returns quarantine, not silent pass",
+      "scenario": "opc_ua_unknown_unit_id",
+      "external_system": "OPC_UA",
+      "external_numeric_id": 99999,
+      "expected_error": "UOM_EXTERNAL_CODE_UNKNOWN",
+      "expected_status": 422
+    },
+    {
+      "id": "TC-N011",
+      "label": "Magnitude overflow beyond BCMath precision boundary",
+      "from_unit": "m",
+      "to_unit": "mm",
+      "input": "999999999999999999999999999999",
+      "expected_error": "UOM_MAGNITUDE_OVERFLOW",
+      "expected_status": 422
+    },
+    {
+      "id": "TC-N012",
+      "label": "Injection attempt in magnitude field",
+      "from_unit": "kg",
+      "to_unit": "g",
+      "input": "1; DROP TABLE uom_unit_catalog;--",
+      "expected_error": "UOM_INVALID_MAGNITUDE",
+      "expected_status": 400
+    },
+    {
+      "id": "TC-N013",
+      "label": "pH has no linear conversion (scale is logarithmic — procedure-defined)",
+      "from_unit": "pH_unit",
+      "to_unit": "mol_L",
+      "expected_error": "UOM_NO_CONVERSION_PATH",
+      "expected_status": 422
+    },
+    {
+      "id": "TC-N014",
+      "label": "Dimensionless kinds cannot cross: YieldPercentage vs ScrapRate blocked",
+      "from_kind": "YieldPercentage",
+      "to_kind": "ScrapRate",
+      "expected_error": "UOM_KIND_MISMATCH",
+      "expected_status": 422,
+      "_note": "Same dimension vector M0L0T0... but different semantic kind"
+    },
+    {
+      "id": "TC-N015",
+      "label": "Deprecated lifecycle_status rule cannot be used for new conversions",
+      "scenario": "use_deprecated_rule",
+      "expected_error": "UOM_RULE_NOT_ACTIVE",
+      "expected_status": 422
+    }
+  ],
+  "replay_test": {
+    "description": "MeasurementValue SHA-256 audit hash replay — same inputs must produce same hash",
+    "seed": {
+      "from_unit": "Cel",
+      "to_unit": "K",
+      "magnitude": "37.0",
+      "rule_code": "UOMCONV-TEMP-CEL-K-v1",
+      "rule_version": 1,
+      "scale": 12
+    },
+    "expected_hash_algorithm": "SHA-256",
+    "expected_hash_inputs": ["from_unit", "magnitude", "to_unit", "rule_code", "rule_version", "scale", "result"]
+  }
+}

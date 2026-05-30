@@ -1,0 +1,351 @@
+/* ════════════════════════════════════════════════════════════════════════
+ * Master density + scrollbar theme
+ *
+ * HESEM industrial-design rule (2026-05-29):
+ *   • ONE master gap value (--master-gap) controls 99% of spacings.
+ *   • ONE section-level gap (--section-gap) for top-level dividers.
+ *   • ONE master radius (--master-radius) for every interactive control.
+ *   • ONE card radius (--card-radius) for every container.
+ *   • Scrollbars adopt HESEM amber globally.
+ *
+ * This file is loaded AFTER portal.main.css so it overrides the wider
+ * legacy spacings without modifying the frozen file. Selectors are
+ * scoped to admin surfaces and the orders-v3 module so we don't break
+ * unrelated pages.
+ *
+ * To adjust HESEM density everywhere at once, update --master-gap on
+ * the :root selector via the admin Graphics tab (token: space.master).
+ * ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Industrial-design master density. Aligned with graphics_token_catalog
+     rows: space.master, space.section, radius.master, radius.card. */
+  --master-gap:    8px;
+  --section-gap:   12px;
+  --master-radius: 4px;
+  --card-radius:   8px;
+}
+
+/* Scrollbar styling intentionally NOT overridden.
+ * User feedback 2026-05-29: keep the original scrollbar color (the
+ * existing portal default from portal.main.css / browser default).
+ * Migration 227's effects.scrollbarThumb default flip was reverted
+ * in migration 228. */
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Admin Appearance — gap compression
+ *
+ * The old admin pages used 14–20px paddings and 16–24px margins between
+ * sections — way too generous on wide monitors. Scoped overrides squeeze
+ * everything to master/section without modifying the giant
+ * 00c-admin-appearance.js file (which uses many inline styles).
+ * ════════════════════════════════════════════════════════════════════════ */
+
+/* Page-level wrapper */
+#admin-content,
+#page-admin .page-body {
+  padding: var(--master-gap) !important;
+}
+
+/* The admin two-column shell — left nav + right content */
+#admin-content > div[style*="display:grid"],
+#admin-content > div[style*="display: grid"] {
+  gap: var(--master-gap) !important;
+}
+
+/* All hm-page-header / page header blocks */
+#admin-content .hm-page-header {
+  margin-bottom: var(--master-gap) !important;
+  padding-bottom: var(--master-gap) !important;
+}
+
+#admin-content .hm-page-title {
+  font-size: 16px !important;
+  margin: 0 !important;
+}
+
+/* Tab strips inside admin */
+#admin-content .hm-tabs {
+  margin-bottom: var(--master-gap) !important;
+  gap: 2px !important;
+}
+
+#admin-content .hm-tab {
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+}
+
+#admin-content .hm-tab-icon {
+  font-size: 13px;
+  margin-right: 4px;
+}
+
+/* Panel-like sections (the "Mặt phẳng điều khiển đồ họa" wrapper) */
+#admin-content section,
+#admin-content > div > div {
+  margin-bottom: var(--master-gap);
+}
+
+#admin-content section + section {
+  margin-top: var(--master-gap);
+}
+
+/* The admin left sidebar — compress row padding */
+#admin-content > div > div:first-child > div,
+#admin-content .admin-sidebar > div,
+#admin-content nav[class*="admin"] li,
+#admin-content nav[class*="admin"] a {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+
+/* Compact every notice/banner inside admin */
+#admin-content div[style*="border-radius"][style*="padding"] {
+  /* Cannot guarantee tightening without breaking, so leave structural
+     padding alone; only round corners adopt master radius. */
+}
+
+/* Round-corner master alignment for admin panels */
+#admin-content [style*="border-radius:6px"],
+#admin-content [style*="border-radius: 6px"],
+#admin-content [style*="border-radius:8px"],
+#admin-content [style*="border-radius: 8px"],
+#admin-content [style*="border-radius:10px"],
+#admin-content [style*="border-radius: 10px"] {
+  border-radius: var(--card-radius) !important;
+}
+
+#admin-content button[style*="border-radius"],
+#admin-content input[style*="border-radius"],
+#admin-content select[style*="border-radius"] {
+  border-radius: var(--master-radius) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Module Sample tab — inherit master density.
+ * The sub-tab is scoped under #adm-appearance-panel-module-sample which
+ * already lives inside #admin-content.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+#adm-appearance-panel-module-sample > div {
+  padding: 0 !important;
+}
+
+#adm-appearance-panel-module-sample > div:first-child {
+  padding: var(--master-gap) !important;
+  margin-bottom: var(--master-gap) !important;
+}
+
+/* The inner Module Sample tab strip */
+#adm-appearance-panel-module-sample > .hm-tabs {
+  margin-bottom: var(--master-gap) !important;
+}
+
+/* The two-column preview + token sidebar */
+#adm-appearance-panel-module-sample > div[style*="grid-template-columns"] {
+  gap: var(--master-gap) !important;
+}
+
+#adm-appearance-panel-module-sample > div[style*="grid-template-columns"] > div,
+#adm-appearance-panel-module-sample > div[style*="grid-template-columns"] > aside {
+  padding: var(--master-gap) !important;
+  border-radius: var(--card-radius) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Orders v3 — explicit density wiring (most already inherits via
+ * orders-v3.css, this block is the safety net for any inline style
+ * that bypassed the token).
+ * ════════════════════════════════════════════════════════════════════════ */
+
+body.orders-v3-active .o3-shell__body {
+  padding: var(--master-gap);
+  gap: var(--master-gap);
+}
+
+body.orders-v3-active .o3-shell__topbar {
+  padding: 6px var(--master-gap);
+}
+
+body.orders-v3-active .o3-shell__title {
+  font-size: 16px;
+}
+
+body.orders-v3-active .o3-shell__subtitle {
+  font-size: 11px;
+}
+
+body.orders-v3-active .o3-toolbar {
+  padding: 6px var(--master-gap);
+  gap: var(--master-gap);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+ * Module Master — Floating Properties dock (v3-G10, 2026-05-29)
+ * ════════════════════════════════════════════════════════════════════
+ * Fixed-position right-side inspector panel for editing properties of
+ * the currently-viewed component in Module Master. Mirrors Figma /
+ * Sketch / Webflow inspector pattern. */
+/* v3-G12 (2026-05-29): moved to LEFT edge + refined SVG icons.
+ * - Dock anchored to left edge so right-side workspace breathes.
+ * - When collapsed: panel slides off LEFT, bookmark handle hugs
+ *   the left edge with a refined chevron-right SVG icon.
+ * - When expanded: panel slides in from left; in-header chevron-left
+ *   button collapses it. Close X with thin stroke. */
+/* Dock anchored just past the 260px sidebar so the bookmark handle
+ * sits on the LEFT edge of the workspace content (not behind the
+ * sidebar menu items). When the sidebar collapses via "Thu gọn",
+ * body.sidebar-collapsed overrides this to a narrower offset. */
+.o3-props-dock{position:fixed;top:96px;left:260px;bottom:16px;z-index:9000;display:flex;align-items:flex-start;pointer-events:none;font-family:var(--font-sans,-apple-system,system-ui,sans-serif)}
+body.sidebar-collapsed .o3-props-dock,body.is-sidebar-collapsed .o3-props-dock,body[data-sidebar="collapsed"] .o3-props-dock{left:60px}
+.o3-props-dock[hidden],.o3-props-dock.is-inert{display:none !important}
+/* Bookmark handle — only visible when collapsed, on far LEFT edge */
+.o3-props-dock__handle{pointer-events:auto;width:22px;height:48px;background:linear-gradient(180deg,var(--o3-brand,#0c4a6e) 0%,var(--o3-brand-hover,#075985) 100%);color:var(--o3-text-inverse,#fff);border:0;border-radius:0 8px 8px 0;padding:0;cursor:pointer;box-shadow:3px 2px 10px rgba(15,23,42,.18);display:none;align-items:center;justify-content:center;transition:width 160ms ease,box-shadow 160ms ease;margin-top:8px}
+.o3-props-dock--collapsed .o3-props-dock__handle{display:flex}
+.o3-props-dock__handle:hover{width:26px;box-shadow:4px 3px 14px rgba(15,23,42,.22)}
+.o3-props-dock__handle svg{stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+/* Panel — slides in from LEFT, attached to left edge */
+.o3-props-dock__panel{pointer-events:auto;width:340px;max-width:92vw;background:var(--o3-surface-card,#fff);border:1px solid var(--o3-border-subtle,#e5e7eb);border-left:0;border-radius:0 12px 12px 0;box-shadow:8px 0 24px rgba(15,23,42,.10);display:flex;flex-direction:column;overflow:hidden;transform:translateX(0);transition:transform 200ms cubic-bezier(.32,.72,.34,1);max-height:calc(100vh - 120px)}
+/* Slide panel a hair further than -100% so the right-edge shadow
+ * doesn't peek out past the handle when collapsed. */
+.o3-props-dock--collapsed .o3-props-dock__panel{transform:translateX(-110%) !important;pointer-events:none;opacity:0}
+/* In-header collapse chevron (chevron-LEFT — slides panel away left) */
+.o3-props-dock__collapse{width:24px;height:24px;border:0;border-radius:6px;background:transparent;color:var(--o3-text-muted,#64748b);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background 120ms,color 120ms;margin-right:2px;padding:0}
+.o3-props-dock__collapse:hover{background:var(--o3-border-subtle,#e5e7eb);color:var(--o3-text-strong,#0f172a)}
+.o3-props-dock__collapse svg,.o3-props-dock__close svg{stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.o3-props-dock__header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--o3-border-subtle,#e5e7eb);background:var(--o3-surface-muted,#f8fafc)}
+.o3-props-dock__title{margin:0;font-size:13px;font-weight:600;color:var(--o3-text-strong,#0f172a);letter-spacing:.02em;display:flex;align-items:center;gap:6px}
+.o3-props-dock__subtitle{font-size:10px;font-weight:500;color:var(--o3-text-muted,#64748b);text-transform:uppercase;letter-spacing:.05em}
+.o3-props-dock__close{width:24px;height:24px;border:0;border-radius:6px;background:transparent;color:var(--o3-text-muted,#64748b);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background 120ms,color 120ms;padding:0}
+.o3-props-dock__close:hover{background:var(--o3-border-subtle,#e5e7eb);color:var(--o3-text-strong,#0f172a)}
+.o3-props-dock__subtabs{display:flex;gap:0;border-bottom:1px solid var(--o3-border-subtle,#e5e7eb);background:var(--o3-surface-card,#fff);overflow-x:auto;flex-shrink:0}
+.o3-props-dock__subtab{flex:1 0 auto;min-height:32px;border:0;background:transparent;color:var(--o3-text-muted,#64748b);font-size:11px;font-weight:500;cursor:pointer;padding:6px 10px;border-bottom:2px solid transparent;white-space:nowrap;transition:color 120ms,border-color 120ms}
+.o3-props-dock__subtab:hover{color:var(--o3-text-strong,#0f172a)}
+.o3-props-dock__subtab.is-active{color:var(--o3-brand,#0c4a6e);border-bottom-color:var(--o3-brand,#0c4a6e);background:var(--o3-brand-soft,#e0f2fe)}
+.o3-props-dock__body{flex:1;overflow-y:auto;padding:8px 0}
+.o3-props-dock__group{padding:4px 12px 10px}
+.o3-props-dock__group + .o3-props-dock__group{border-top:1px solid var(--o3-border-subtle,#e5e7eb);padding-top:10px}
+.o3-props-dock__group-title{font-size:10px;font-weight:600;color:var(--o3-text-muted,#64748b);text-transform:uppercase;letter-spacing:.06em;margin:0 0 6px}
+.o3-props-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0;font-size:12px}
+.o3-props-row__label{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.o3-props-row__name{color:var(--o3-text-strong,#0f172a);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.o3-props-row__key{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:9.5px;color:var(--o3-text-muted,#64748b);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.o3-props-row__control{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.o3-props-row__input[type="number"]{width:58px;height:24px;padding:0 6px;border:1px solid var(--o3-border-default,#cbd5e1);border-radius:4px;font-size:12px;font-family:ui-monospace,monospace;background:var(--o3-surface-card,#fff);color:var(--o3-text-strong,#0f172a)}
+.o3-props-row__input[type="color"]{width:32px;height:24px;padding:0;border:1px solid var(--o3-border-default,#cbd5e1);border-radius:4px;background:transparent;cursor:pointer}
+.o3-props-row__input[type="range"]{width:80px;accent-color:var(--o3-brand,#0c4a6e)}
+.o3-props-row__input[type="text"],.o3-props-row__input--select{width:100px;height:24px;padding:0 6px;border:1px solid var(--o3-border-default,#cbd5e1);border-radius:4px;font-size:11px;background:var(--o3-surface-card,#fff);color:var(--o3-text-strong,#0f172a)}
+.o3-props-row__unit{font-size:10px;color:var(--o3-text-muted,#64748b);font-family:ui-monospace,monospace}
+.o3-props-dock__footer{display:flex;gap:8px;padding:8px 12px;border-top:1px solid var(--o3-border-subtle,#e5e7eb);background:var(--o3-surface-muted,#f8fafc);flex-shrink:0}
+.o3-props-dock__footer button{flex:1;min-height:28px;border:1px solid var(--o3-border-default,#cbd5e1);border-radius:6px;background:var(--o3-surface-card,#fff);color:var(--o3-text-strong,#0f172a);font-size:12px;font-weight:500;cursor:pointer;transition:background 120ms}
+.o3-props-dock__footer button:hover{background:var(--o3-surface-muted,#f1f5f9)}
+.o3-props-dock__footer button.is-primary{background:var(--o3-brand,#0c4a6e);border-color:var(--o3-brand,#0c4a6e);color:var(--o3-text-inverse,#fff)}
+.o3-props-dock__footer button.is-primary:hover{background:var(--o3-brand-hover,#075985)}
+@media (max-width:1280px){body.module-master-active.o3-dock-open #admin-content{margin-left:360px;transition:margin-left 180ms cubic-bezier(.4,0,.2,1)}}
+
+/* v3-G14: Custom override checkbox + inherited input styling */
+.o3-props-row{display:grid;grid-template-columns:18px 1fr auto;align-items:center;gap:8px;padding:6px 0;font-size:12px;border-bottom:1px dashed transparent;transition:border-color 120ms}
+.o3-props-row.is-custom{border-bottom-color:var(--o3-brand-soft,#e0f2fe)}
+.o3-props-row__custom{appearance:none;-webkit-appearance:none;width:14px;height:14px;border:1.5px solid var(--o3-border-default,#cbd5e1);border-radius:3px;cursor:pointer;background:var(--o3-surface-card,#fff);position:relative;transition:all 120ms;flex-shrink:0}
+.o3-props-row__custom:hover{border-color:var(--o3-brand,#0c4a6e)}
+.o3-props-row__custom:checked{background:var(--o3-brand,#0c4a6e);border-color:var(--o3-brand,#0c4a6e)}
+.o3-props-row__custom:checked::after{content:"";position:absolute;left:3px;top:0px;width:4px;height:8px;border:solid #fff;border-width:0 1.5px 1.5px 0;transform:rotate(45deg)}
+.o3-props-row__input.is-inherited{opacity:.55;cursor:not-allowed;background:var(--o3-surface-muted,#f8fafc)}
+.o3-props-row__input.is-custom{opacity:1;cursor:text;background:var(--o3-surface-card,#fff);border-color:var(--o3-brand,#0c4a6e)}
+
+/* Dark-mode dock fine-tuning */
+:root[data-color-mode="dark"] .o3-props-dock__panel{background:var(--o3-surface-card);border-color:var(--o3-border-subtle);box-shadow:8px 0 24px rgba(0,0,0,0.30)}
+:root[data-color-mode="dark"] .o3-props-dock__header{background:var(--o3-surface-muted)}
+:root[data-color-mode="dark"] .o3-props-row__input[type="number"],
+:root[data-color-mode="dark"] .o3-props-row__input[type="text"]{background:var(--o3-surface-page);color:var(--o3-text-strong);border-color:var(--o3-border-default)}
+
+/* ════════════════════════════════════════════════════════════════════
+ * v3-G17 (2026-05-29) — Custom checkbox UX clarity + dot indicators
+ * ════════════════════════════════════════════════════════════════════ */
+
+/* Properties dock — hint banner at top of body */
+.o3-props-dock__hint{margin:0 12px 8px;padding:8px 10px;background:var(--o3-info-soft,#dbeafe);color:var(--o3-info,#1d4ed8);border-radius:6px;font-size:11px;line-height:1.45;border-left:3px solid var(--o3-info,#1d4ed8)}
+.o3-props-dock__hint strong{font-weight:600}
+:root[data-color-mode="dark"] .o3-props-dock__hint{background:#1e3a8a;color:#bfdbfe;border-left-color:#60a5fa}
+
+/* Bigger, clearer Custom checkbox visual difference */
+.o3-props-row__custom{width:16px;height:16px;border:2px solid var(--o3-border-default,#cbd5e1);border-radius:4px}
+.o3-props-row__custom:not(:checked):hover{border-color:var(--o3-brand,#0c4a6e);box-shadow:0 0 0 3px var(--o3-brand-soft,#e0f2fe)}
+.o3-props-row__custom:checked{background:var(--o3-brand,#0c4a6e);border-color:var(--o3-brand,#0c4a6e);box-shadow:0 0 0 2px var(--o3-brand-soft,#e0f2fe)}
+.o3-props-row__custom:checked::after{left:3.5px;top:0.5px;width:5px;height:9px}
+/* Inherited row — strongly muted to show "use Global" */
+.o3-props-row:not(.is-custom) .o3-props-row__input{background:repeating-linear-gradient(45deg,transparent 0 4px,rgba(100,116,139,0.06) 4px 5px) !important;cursor:not-allowed}
+.o3-props-row:not(.is-custom) .o3-props-row__name{color:var(--o3-text-muted,#94a3b8)}
+.o3-props-row.is-custom{background:linear-gradient(90deg,var(--o3-brand-soft,#e0f2fe) 0%,transparent 6%);border-left:3px solid var(--o3-brand,#0c4a6e);padding-left:6px;margin-left:-9px}
+:root[data-color-mode="dark"] .o3-props-row.is-custom{background:linear-gradient(90deg,rgba(56,189,248,0.15) 0%,transparent 12%);border-left-color:#38bdf8}
+
+/* v3-G20 — Graphics Authority bridge for Module Sample preview area.
+   portal.main.css applies a global admin authority bridge:
+     #admin-content input...:not([type="file"]) {
+       min-height: var(--admin-object-min-h, var(--hds-control-h)) !important;
+       padding:    var(--input-padding-y, 0px) var(--hds-control-px) !important;
+       font-size:  var(--hds-control-font) !important;
+       border-radius: var(--hds-control-radius) !important;
+     }
+   This was clamping Module Sample preview inputs to 34px/10px regardless
+   of the user's slider value in Properties dock. The fix below targets
+   the SAME specificity (0,1,0,1) but uses Graphics Authority tokens AND
+   loads later in the cascade so it wins for the preview area only.
+   Buttons and chips don't need the override because their CSS already
+   reads o3 tokens directly. */
+#adm-appearance-panel-module-sample input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not(.o3-input-inner):not(.o3-input-search),
+#adm-appearance-panel-module-sample select,
+#adm-appearance-panel-module-sample textarea {
+  min-height: var(--o3-control-h-standard, 32px) !important;
+  height:     var(--o3-control-h-standard, 32px) !important;
+  padding:    0 var(--o3-space-md, 10px) !important;
+  font-size:  var(--o3-font-size-md, 13px) !important;
+  border-radius: var(--o3-radius, 4px) !important;
+  border:     1px solid var(--o3-border-subtle, #e5e7eb) !important;
+  background: var(--o3-surface-card, #fff) !important;
+  color:      var(--o3-text-strong, #0f172a) !important;
+  line-height: 1.25 !important;
+  box-sizing: border-box !important;
+}
+
+/* Inner inputs inside o3-input-group: get height/font from group wrapper
+   but NO border or radius (wrapper provides those). Keep their own
+   padding from inline style so prefix/suffix don't collide.
+   NB: :not() chain matches portal.main.css admin-bridge specificity
+   (0,1,4,1) so we win when stacked at same !important level. */
+#adm-appearance-panel-module-sample input.o3-input-inner:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]) {
+  min-height: 100% !important;
+  height:     100% !important;
+  padding:    0 var(--o3-space-md, 10px) !important;
+  border:     0 !important;
+  border-radius: 0 !important;
+  font-size:  var(--o3-font-size-md, 13px) !important;
+  background: transparent !important;
+  color:      var(--o3-text-strong, #0f172a) !important;
+  box-sizing: border-box !important;
+}
+
+/* Search input with icon overlay: height from wrapper, font + radius
+   from tokens, but PADDING-LEFT must reserve room for icon (28px icon
+   slot + token space) so placeholder text doesn't sit under the icon. */
+#adm-appearance-panel-module-sample input.o3-input-search:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]) {
+  min-height: var(--o3-control-h-standard, 32px) !important;
+  height:     var(--o3-control-h-standard, 32px) !important;
+  padding:    0 var(--o3-space-md, 10px) 0 calc(28px + var(--o3-space-md, 10px)) !important;
+  font-size:  var(--o3-font-size-md, 13px) !important;
+  border-radius: var(--o3-radius, 4px) !important;
+  border:     1px solid var(--o3-border-subtle, #e5e7eb) !important;
+  background: var(--o3-surface-card, #fff) !important;
+  color:      var(--o3-text-strong, #0f172a) !important;
+  line-height: 1.25 !important;
+  box-sizing: border-box !important;
+}
+
+/* Dot indicator on Module Master inner tab strip — shows tab has overrides */
+.hm-tab.has-overrides::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--o3-brand,#0c4a6e);margin-left:6px;vertical-align:1px;box-shadow:0 0 0 2px var(--o3-brand-soft,#e0f2fe)}
+:root[data-color-mode="dark"] .hm-tab.has-overrides::after{background:#38bdf8;box-shadow:0 0 0 2px rgba(56,189,248,0.25)}
+
+/* Theme tab — bigger save button so it's obvious */
+#theme-save{box-shadow:0 2px 8px rgba(56,189,248,0.30);font-weight:600}
+#theme-save:hover{box-shadow:0 3px 12px rgba(56,189,248,0.45);transform:translateY(-1px)}
+:root[data-color-mode="dark"] #theme-save{box-shadow:0 2px 8px rgba(56,189,248,0.45)}

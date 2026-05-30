@@ -5457,15 +5457,20 @@ function runtime_cutover_postgres_counts(array $runtimeMode): array {
       'work_orders' => "SELECT COUNT(*) AS c FROM job_operations WHERE COALESCE(metadata->>'wo_number', '') <> ''",
     ],
     'mes' => [
-      'runtime_machine_context' => "SELECT COUNT(*) AS c FROM mes_equipment_extended WHERE metadata ? 'machine_signal' OR metadata ? 'connector_feed'",
-      'progress_reports' => "SELECT COUNT(*) AS c FROM mes_operation_execution WHERE metadata ? 'wo_number'",
-      'downtime_events' => "SELECT COUNT(*) AS c FROM mes_downtime_events WHERE metadata ? 'shadow_id'",
+      // PDO interprets bare ? as a parameter placeholder, breaking the JSONB
+      // key-exists operator. jsonb_exists(col, 'key') is the unambiguous
+      // function form and produces the identical query plan. Bug surfaced
+      // on 2026-05-28: every order_hierarchy / order_dashboard_stats request
+      // returned 500 with SQLSTATE[42601] "syntax error at or near $1".
+      'runtime_machine_context' => "SELECT COUNT(*) AS c FROM mes_equipment_extended WHERE jsonb_exists(metadata, 'machine_signal') OR jsonb_exists(metadata, 'connector_feed')",
+      'progress_reports' => "SELECT COUNT(*) AS c FROM mes_operation_execution WHERE jsonb_exists(metadata, 'wo_number')",
+      'downtime_events' => "SELECT COUNT(*) AS c FROM mes_downtime_events WHERE jsonb_exists(metadata, 'shadow_id')",
       'maintenance_requests' => "SELECT COUNT(*) AS c FROM maintenance_work_orders WHERE COALESCE(metadata->>'request_id', '') <> ''",
-      'material_consumption' => "SELECT COUNT(*) AS c FROM mes_material_consumption WHERE metadata ? 'consumption_id'",
-      'part_genealogy' => "SELECT COUNT(*) AS c FROM mes_part_genealogy WHERE metadata ? 'genealogy_id'",
-      'shift_handover' => "SELECT COUNT(*) AS c FROM mes_shift_handover WHERE metadata ? 'handover_id'",
-      'machine_alarm_events' => "SELECT COUNT(*) AS c FROM mes_machine_alarms WHERE metadata ? 'alarm_event_id'",
-      'nc_download_receipts' => "SELECT COUNT(*) AS c FROM mes_nc_download_receipts WHERE metadata ? 'receipt_id'",
+      'material_consumption' => "SELECT COUNT(*) AS c FROM mes_material_consumption WHERE jsonb_exists(metadata, 'consumption_id')",
+      'part_genealogy' => "SELECT COUNT(*) AS c FROM mes_part_genealogy WHERE jsonb_exists(metadata, 'genealogy_id')",
+      'shift_handover' => "SELECT COUNT(*) AS c FROM mes_shift_handover WHERE jsonb_exists(metadata, 'handover_id')",
+      'machine_alarm_events' => "SELECT COUNT(*) AS c FROM mes_machine_alarms WHERE jsonb_exists(metadata, 'alarm_event_id')",
+      'nc_download_receipts' => "SELECT COUNT(*) AS c FROM mes_nc_download_receipts WHERE jsonb_exists(metadata, 'receipt_id')",
       'dpp_passports' => "SELECT COUNT(*) AS c FROM mes_dpp_passports WHERE COALESCE(metadata->>'dpp_id', '') <> ''",
       'energy_snapshots' => "SELECT COUNT(*) AS c FROM mes_energy_snapshots WHERE COALESCE(metadata->>'energy_snapshot_id', '') <> ''",
       'cost_tracking' => "SELECT COUNT(*) AS c FROM mes_cost_tracking WHERE COALESCE(metadata->>'cost_id', '') <> ''",

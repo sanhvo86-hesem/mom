@@ -63,16 +63,27 @@ body {
   padding-right: env(safe-area-inset-right, 0);
 }
 
-/* Ensure all interactive elements meet minimum touch target size. */
-button,
-a,
-input[type="submit"],
-input[type="button"],
-select,
-.btn,
-[role="button"] {
-  min-height: var(--touch-min);
-  min-width: var(--touch-min);
+/* Ensure all interactive elements meet minimum touch target size.
+   SSOT FIX 2026-05-29 (v3-G19): Scoped to (pointer: coarse) so this
+   rule ONLY fires on touch-primary devices. The previous unconditional
+   rule was forcing min-height: 48px on every button on desktops, which
+   silently overrode the HESEM SSOT control.height.standard token
+   (32px) and broke every height-control slider in the Graphics
+   Authority panel — typing 28 in Module Master left buttons at 48px,
+   typing 50 only added 2px. WCAG 2.5.5 (target size) only requires
+   44×44 for touch — mouse pointers don't need this clamp.
+   Affected scope: every interactive control on desktop. */
+@media (pointer: coarse) {
+  button,
+  a,
+  input[type="submit"],
+  input[type="button"],
+  select,
+  .btn,
+  [role="button"] {
+    min-height: var(--touch-min);
+    min-width: var(--touch-min);
+  }
 }
 
 /* Prevent double-tap zoom on interactive elements. */
@@ -299,11 +310,15 @@ textarea {
     margin-left: var(--sidebar-w);
   }
 
-  /* Slightly larger touch targets for tablet-with-gloves. */
-  button,
-  a,
-  [role="button"] {
-    min-height: var(--touch-comfortable);
+  /* Slightly larger touch targets for tablet-with-gloves.
+     v3-G19: Inner gate on (pointer: coarse) so a 768-1024px DESKTOP
+     window (resized browser) doesn't inherit a 56px button clamp. */
+  @media (pointer: coarse) {
+    button,
+    a,
+    [role="button"] {
+      min-height: var(--touch-comfortable);
+    }
   }
 
   /* Two-column card grids. */

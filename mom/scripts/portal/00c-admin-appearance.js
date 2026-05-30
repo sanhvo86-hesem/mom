@@ -1263,8 +1263,14 @@ var VISUAL_THEMES = [
 ];
 
 function normalizeSubTab(subTab){
-  var aliases = { overview:'templates', typography:'tokens', colors:'tokens', layout:'tokens', a11y:'accessibility', export:'analytics', exports:'analytics' };
-  var valid = { templates:1, tokens:1, components:1, effects:1, accessibility:1, analytics:1, governance:1, advanced:1, standard:1 };
+  /* "components" tab removed 2026-05-29: functionality merged into
+     Module Sample (preview + inline token editor in one place). Old
+     URLs that point to /components auto-redirect to module-sample. */
+  // Tokens + Effects merged into Module Master (v3-G11). Old URLs
+  // pointing to /tokens, /effects, /typography, /colors etc auto-
+  // redirect to /module-sample so deep links don't 404.
+  var aliases = { overview:'templates', typography:'module-sample', colors:'module-sample', layout:'module-sample', tokens:'module-sample', effects:'module-sample', a11y:'accessibility', export:'analytics', exports:'analytics', sample:'module-sample', samples:'module-sample', components:'module-sample' };
+  var valid = { templates:1, accessibility:1, analytics:1, governance:1, advanced:1, standard:1, 'module-sample':1, theme:1 };
   var resolved = aliases[subTab] || subTab || 'templates';
   return valid[resolved] ? resolved : 'templates';
 }
@@ -3939,9 +3945,19 @@ function render(el, subTab, currentLang){
 
   var tabs = [
     {key:'templates',    icon:'📐', label:T('templates')},
-    {key:'tokens',       icon:'🎨', label:T('tokens')},
-    {key:'components',   icon:'🧱', label:T('components')},
-    {key:'effects',      icon:'✨', label:T('effects')},
+    /* Tokens + Effects tabs REMOVED 2026-05-29 (v3-G11): their content
+     * lives inside Module Master under sections "🌐 Global tokens",
+     * "🔠 Typography" and "✨ Effects". Single source of truth: one
+     * Properties dock for ALL design tokens, no parallel edit paths. */
+    /* Module Master — SSOT showcase of every reusable v3 component +
+     * global token ramp (typography + colours + status + effects).
+     * Every new frontend module must consume tokens validated here.
+     * Renderer lives in 00c-admin-appearance-module-sample.js. */
+    {key:'module-sample',icon:'🧩', label:L('Module Master','Module Master')},
+    /* Global Theme tab (v3-G14) — controls font/density/motion/dark
+     * mode for ALL Module Master sections. Per-property overrides
+     * live in the Module Master dock via "Custom" checkbox. */
+    {key:'theme',        icon:'🎨', label:L('Theme','Theme')},
     {key:'accessibility',icon:'♿', label:L('Trợ năng','Accessibility')},
     {key:'analytics',    icon:'📊', label:L('Xuất & Phân tích','Export & Analytics')},
     {key:'governance',   icon:'🛡️', label:T('governance')},
@@ -3949,7 +3965,10 @@ function render(el, subTab, currentLang){
     {key:'standard',     icon:'📖', label:L('Chuẩn thiết kế','Design Standard')}
   ];
 
-  var h = '<div style="max-width:min(100%,1120px);margin:0 auto">';
+  /* Width-cap removed 2026-05-28 per HESEM space-utilization rule:
+     admin work surface must span the full available width. The previous
+     1120px cap left ~30% empty gutter on wide monitors. */
+  var h = '<div style="width:100%;margin:0">';
 
   /* Title */
 	  h += '<div class="hm-page-header" style="align-items:flex-start;margin-bottom:16px">';
@@ -3970,18 +3989,30 @@ function render(el, subTab, currentLang){
   var bodies = {
     templates:    renderTemplates(),
     tokens:       renderTokens(),
-    components:   renderComponents(),
+    /* components: removed 2026-05-29 — merged into module-sample */
     effects:      renderEffects(),
     accessibility:renderAccessibility(),
     analytics:    renderAnalytics(),
     governance:   renderGovernance(),
     advanced:     renderAdvanced(),
-    standard:     renderStandard()
+    standard:     renderStandard(),
+    /* Module Sample — defers to the separately loaded renderer; if
+       the bundle is missing for any reason, render a helpful note
+       instead of crashing the Appearance tab. */
+    'module-sample': (typeof window._renderAdmModuleSampleHtml === 'function'
+                        ? window._renderAdmModuleSampleHtml(L)
+                        : '<div style="padding:24px;color:var(--text-secondary)">Module Sample renderer chưa được load. Kiểm tra portal.html có nạp 00c-admin-appearance-module-sample.js chưa.</div>'),
+    /* Theme tab — global design controls. Renderer in 00d-admin-appearance-theme.js */
+    'theme': (typeof window._renderAdmThemeHtml === 'function'
+                ? window._renderAdmThemeHtml(L)
+                : '<div style="padding:24px;color:var(--text-secondary)">Theme renderer chưa được load. Kiểm tra portal.html có nạp 00d-admin-appearance-theme.js chưa.</div>')
   };
   tabs.forEach(function(t){
     var active = _subTab === t.key;
     h += '<div id="adm-appearance-panel-'+t.key+'" role="tabpanel" aria-labelledby="adm-appearance-tab-'+t.key+'" tabindex="'+(active?'0':'-1')+'"'+(active?'':' hidden aria-hidden="true"')+'>'+bodies[t.key]+'</div>';
   });
+  // After bodies are mounted, wire the Theme tab interactivity
+  setTimeout(function(){ if (typeof window._wireAdmTheme === 'function') { try { window._wireAdmTheme(); } catch(e){} } }, 0);
 
   /* Global actions */
   var _hasDirty = typeof HmTheme !== 'undefined' && HmTheme.hasPreviewOverrides && HmTheme.hasPreviewOverrides();
@@ -4720,41 +4751,14 @@ function renderComponents(){
     + previewDropdown()
   , false, statusChip('full', L('Shared dropdown', 'Shared dropdown')));
 
-  h += sect('🧩 '+L('Đối tượng trong Admin', 'Admin objects'),
-    sectionLead(
-      L('Các đối tượng riêng của module Admin phải đi qua cùng lớp đồ họa này', 'Admin-specific objects must go through this same graphics layer'),
-      L('Nhóm này chi phối toolbar, nút phân đoạn, thẻ người dùng, thẻ thống kê, panel cây tổ chức, canvas sơ đồ và cụm điều khiển phóng to. Không sửa kích thước từng màn hình bằng hardcode.', 'This group governs toolbars, segmented controls, user cards, stat cards, org tree panels, graph canvas, and zoom controls. Do not tune individual screens with hardcoded values.'),
-      statusChip('admin', L('SSOT cho Admin', 'Admin SSOT'))
-      + statusChip('full', L('Có consumer thật', 'Real consumers'))
-    )
-    + slider(L('Đệm toolbar', 'Toolbar padding'), '--admin-toolbar-padding', 'components.admin.toolbarPadding', 0, 20, 8, 'px')
-    + slider(L('Chiều cao control Admin', 'Admin control height'), '--admin-object-min-h', 'components.admin.objectMinH', 28, 56, 34, 'px')
-    + slider(L('Chiều cao tối thiểu thẻ', 'Card minimum height'), '--admin-card-min-h', 'components.admin.cardMinH', 88, 180, 118, 'px')
-    + slider(L('Cỡ ảnh đại diện', 'Avatar size'), '--admin-avatar-size', 'components.admin.avatarSize', 28, 64, 36, 'px')
-    + slider(L('Cỡ chấm trạng thái', 'Status dot size'), '--admin-status-dot-size', 'components.admin.statusDotSize', 10, 28, 18, 'px')
-    + slider(L('Chiều cao canvas tối thiểu', 'Canvas min height'), '--admin-canvas-min-h', 'components.admin.canvasMinH', 360, 760, 520, 'px')
-    + slider(L('Ô lưới canvas', 'Canvas grid size'), '--admin-canvas-grid-size', 'components.admin.canvasGridSize', 12, 40, 24, 'px')
-    + slider(L('Đệm cụm zoom', 'Zoom tool padding'), '--admin-canvas-tool-padding', 'components.admin.canvasToolPadding', 2, 12, 4, 'px')
-    + previewBox(
-      L('Xem trước đối tượng Admin', 'Preview Admin objects'),
-      '<div style="display:grid;gap:var(--admin-gap-md,14px)">'
-      + '<div style="display:flex;gap:var(--admin-gap-sm,8px);align-items:center;padding:var(--admin-toolbar-padding,8px);border:1px solid var(--border);border-radius:var(--admin-surface-radius,18px);background:var(--bg-surface)">'
-      + '<button class="btn-admin primary" style="height:var(--admin-object-min-h,34px)">Đang chọn</button>'
-      + '<button class="btn-admin secondary" style="height:var(--admin-object-min-h,34px)">Tác vụ</button>'
-      + '<span style="height:var(--admin-object-min-h,34px);min-width:54px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--admin-nested-radius,14px);font-weight:800">100%</span>'
-      + '</div>'
-      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--admin-gap-md,14px)">'
-      + '<div style="min-height:var(--admin-card-min-h,118px);padding:var(--admin-row-padding,12px);border:1px solid var(--border);border-radius:var(--admin-nested-radius,14px);background:var(--bg-surface);display:flex;gap:var(--admin-gap-sm,8px);align-items:flex-start">'
-      + '<span style="width:var(--admin-avatar-size,36px);height:var(--admin-avatar-size,36px);border-radius:999px;background:var(--brand-2);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800">NV</span>'
-      + '<div style="flex:1"><div style="height:12px;width:70%;border-radius:999px;background:var(--bg-surface-alt)"></div><div style="margin-top:8px;height:10px;width:52%;border-radius:999px;background:var(--bg-surface-alt)"></div></div>'
-      + '<span style="width:var(--admin-status-dot-size,18px);height:var(--admin-status-dot-size,18px);border-radius:999px;background:var(--green)"></span>'
-      + '</div>'
-      + '<div style="min-height:var(--admin-canvas-min-h,520px);max-height:140px;padding:var(--admin-canvas-tool-padding,4px);border:1px solid var(--border);border-radius:var(--admin-surface-radius,18px);background:repeating-linear-gradient(0deg,var(--bg-surface-alt) 0 1px,transparent 1px var(--admin-canvas-grid-size,24px)),repeating-linear-gradient(90deg,var(--bg-surface-alt) 0 1px,transparent 1px var(--admin-canvas-grid-size,24px)),var(--bg-surface)"></div>'
-      + '</div>'
-      + '</div>',
-      L('Cùng token đang áp dụng cho Người dùng, Phòng ban & Chức danh và Sơ đồ tổ chức.', 'The same tokens feed Users, Departments & Titles, and Org Chart.')
-    )
-  , false, statusChip('full', L('Toolbar / card / canvas', 'Toolbar / card / canvas')));
+  /* REMOVED 2026-05-29: "Đối tượng trong Admin / Toolbar / card / canvas"
+   * section. Admin must NOT have its own graphic objects — that
+   * violates SSOT. Every toolbar / card / canvas in Admin uses the
+   * SAME tokens as every other module:
+   *   - Toolbar height  → control.height.standard (36px)
+   *   - Card radius     → radius.card (8px)
+   *   - Gaps            → space.master / space.section
+   * Test in: Admin → Mặt phẳng điều khiển đồ họa → Module Sample. */
 
   /* NAV ITEM */
   h += sect('🧭 '+T('navSettings'),
@@ -5369,7 +5373,7 @@ function renderStandard(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260413c';
+window._renderAdminAppearanceFullVersion = '20260529-mm29';
 window._renderAdminAppearanceFull = render;
 
 })();

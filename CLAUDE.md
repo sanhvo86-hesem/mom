@@ -149,6 +149,92 @@ motion durations, or any other visual token in JS, inline style, or HTML.**
   `_admGraphicsMarkChange` are preserved as aliases that delegate to
   `GraphicsAuthority.tokens.stage()` / `draft.recordChange()`. Do not call
   them in new code; use the namespaced API.
+- **Module Sample is the canonical SSOT for reusable frontend components.**
+  Tab path: Admin → Mặt phẳng điều khiển đồ họa → Module Sample
+  (script: `00c-admin-appearance-module-sample.js`, renderer:
+  `window._renderAdmModuleSampleHtml`). It hosts every reusable component
+  (Button, Tab, KPI tile, Chip, Toolbar, Table, Panel, Drawer, Empty,
+  Loading, Toast) with the exact tokens that control each one. **When
+  building a new frontend module, START HERE.** Every component you use
+  must already appear in Module Sample. If it doesn't, you have three
+  obligations in this order:
+  1. Add a row to `graphics_token_catalog` for any new visual parameter
+     (new migration in `mom/database/migrations/`, follow the pattern of
+     migration 213 — `213_graphics_orders_v3_tokens.sql`).
+  2. Add the token key to the relevant `graphics_component_contract`
+     `overridable_tokens` array.
+  3. Add a section to `00c-admin-appearance-module-sample.js` so the
+     component shows up in the Module Sample tab with its token list.
+  Only after those three steps may the new component appear in a real
+  module. Components that fail to align with their siblings (unequal
+  heights in a toolbar, mismatched paddings, free-floating hex literals)
+  must be reported and fixed BEFORE they ship — the answer is never
+  "add a one-off CSS rule in the module's own stylesheet."
+- **Single-standard control-height (one size, no variants).** HESEM SSOT
+  rule (refined 2026-05-29, migration 230): every interactive control
+  — button, tab, input, chip-button, search — uses ONE height,
+  `control.height.standard` = **32px**, via the CSS variable
+  `--o3-control-h-standard`. Research basis: Atlassian / Vercel 32px,
+  Linear / Notion 28px, SAP Fiori 36px (industrial touch), Bloomberg
+  24px (data-dense). 32 lands at the modern-industrial sweet spot.
+  The previous triad (sm/md/lg) is dropped; legacy aliases stay alive
+  for one release as a transitional safety net. If you genuinely need
+  a denser or larger size, propose a new token via the Authority + run
+  simulation evidence first — never hardcode a one-off height. This
+  rule eliminates an entire class of visual-drift bugs (toolbars where
+  chips, buttons and inputs end up at different heights).
+- **No Admin-only graphics — Admin uses the SAME tokens as every
+  module.** HESEM SSOT rule (2026-05-29): the old
+  "components.admin.toolbarPadding / objectMinH / cardMinH / avatarSize"
+  family was deleted because it created a parallel admin-only design
+  system. All admin toolbars / cards / canvases now use
+  `control.height.standard`, `radius.card`, `space.master`, etc. — the
+  same tokens that orders, intake, dispatch, and every other module
+  use. Test Admin renders in: Admin → Mặt phẳng đồ họa → Module
+  Sample (which renders production CSS, not admin-only CSS).
+- **Scrollbar — keep portal default.** User opted (2026-05-29) to keep
+  the original portal scrollbar color; migration 229 reverted the brief
+  amber experiment. Do not override scrollbar appearance per module.
+- **Master density — ONE knob controls all gaps.** HESEM SSOT rule
+  (2026-05-29, migration 227): the entire UI density is governed by
+  TWO tokens only.
+  - `space.master` (8px) → 99% of gaps. CSS var: `--o3-space` (or
+    `--master-gap` in master-density.css).
+  - `space.section` (12px) → ONLY top-level section dividers
+    (between panels). CSS var: `--o3-space-section` (or
+    `--section-gap`).
+  Same for corners:
+  - `radius.master` (4px) → every control. CSS var: `--o3-radius`
+    (or `--master-radius`).
+  - `radius.card` (8px) → every container. CSS var:
+    `--o3-radius-card` (or `--card-radius`).
+  - `radius.pill` (999px) → special-purpose only (chips, badges).
+  The deprecated 7-level spacing scale (xs/sm/md/lg/xl/2xl/3xl) and
+  3-level radius scale (sm/md/lg) are aliased to one of the two
+  masters for back-compat — do NOT use them in new code. Read Linear,
+  Vercel, Bloomberg Terminal density patterns: one master multiplier
+  scales the whole UI. Admins tune density via the Graphics tab; one
+  edit ripples everywhere.
+- (Scrollbar rule moved above to the "keep portal default" entry.)
+- **Maximum space utilization (no orphan gutters).** Admin and module
+  surfaces must dedicate every available pixel to actual work content.
+  Concrete rules:
+  - No artificial `max-width` caps on admin pages (the 1120px cap in
+    00c-admin-appearance.js was deleted 2026-05-28 — never add one
+    back). Use `width:100%` for the outer wrapper.
+  - Module shells use `body.{module}-active` class trick to zero the
+    global `#page-{module}` 24px padding (see
+    `body.orders-v3-active #page-orders.active{padding:0}` in
+    orders-v3.css).
+  - Empty bottom space below content is a bug. Either fill it with
+    content, or anchor an action bar to the bottom of the available
+    height.
+  - Padding inside panels: prefer `spacing.lg` (16px) over `xl` (24px)
+    unless the design contract explicitly says otherwise. Stack gaps
+    `spacing.md` (12px) by default, not `xl`.
+  - When designing a new sub-tab, the right-side aside (if any) must
+    NOT introduce a min-height that creates orphan space below the
+    main column.
 
 ## MANDATORY: HMV4 Wave 1 Frontend Slice Program
 

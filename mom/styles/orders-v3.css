@@ -1,0 +1,1064 @@
+/* ════════════════════════════════════════════════════════════════════════
+ * Orders v3 — Module stylesheet
+ *
+ * SSOT GOVERNANCE
+ * Every --o3-* variable below is registered in graphics_token_catalog
+ * (migration 213). The fallback values are seed defaults only — the
+ * authoritative values come from the catalog and can be retuned by
+ * admins in the "Module Sample" sub-tab of the Appearance module.
+ *
+ * Audit gate (must pass on every build):
+ *   grep -nE "'#[0-9a-fA-F]{3,8}'" mom/scripts/portal/09v3-*.js
+ *     → MUST return zero matches.
+ *
+ * Token CSS-variable naming convention:
+ *   --o3-{family}-{variant}   (semantic)
+ *   --o3-space-{size}         (spacing scale)
+ *   --o3-radius-{size}        (radius scale)
+ *   --o3-control-h-{size}     (control-height triad — sm/md/lg)
+ * ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Surfaces */
+  --o3-surface-page:    var(--bg-page, var(--bg-app, #f8fafc));
+  --o3-surface-card:    var(--bg-surface, var(--surface-1, #ffffff));
+  --o3-surface-raised:  var(--bg-modal, var(--surface-2, #ffffff));
+  --o3-surface-muted:   var(--bg-surface-alt, var(--surface-3, #f1f5f9));
+
+  /* Text */
+  --o3-text-strong:     var(--text-primary, var(--text-1, #0f172a));
+  --o3-text-default:    var(--text-secondary, var(--text-2, #334155));
+  --o3-text-muted:      var(--text-tertiary, var(--text-3, #64748b));
+  --o3-text-inverse:    var(--text-on-brand, #ffffff);
+
+  /* Borders */
+  --o3-border-subtle:   var(--border-subtle, var(--border-1, #e5e7eb));
+  --o3-border-default:  var(--border, var(--border-2, #cbd5e1));
+  --o3-border-strong:   var(--border-strong, var(--border-3, #94a3b8));
+
+  /* Brand */
+  --o3-brand:           var(--brand-primary, #0c4a6e);
+  --o3-brand-hover:     var(--brand-primary-hover, #075985);
+  --o3-brand-soft:      var(--brand-primary-soft, #e0f2fe);
+
+  /* Semantic — backed by status.* tokens in migration 213 */
+  --o3-success:         var(--status-success, var(--state-success, #16a34a));
+  --o3-success-soft:    var(--state-success-soft, #d1fae5);
+  --o3-warning:         var(--status-warning, var(--state-warning, #d97706));
+  --o3-warning-soft:    var(--state-warning-soft, #fef3c7);
+  --o3-danger:          var(--status-error, var(--state-danger, #b91c1c));
+  --o3-danger-soft:     var(--state-danger-soft, #fee2e2);
+  --o3-info:            var(--status-info, var(--state-info, #1d4ed8));
+  --o3-info-soft:       var(--state-info-soft, #dbeafe);
+  --o3-neutral:         var(--state-neutral, #475569);
+  --o3-neutral-soft:    var(--state-neutral-soft, #f1f5f9);
+
+  /* MASTER spacing (SSOT: space.master + space.section, migration 227).
+   * HESEM density rule 2026-05-29: ONE master controls 99% of gaps.
+   * One section value for top-level dividers. Adjust master to compress
+   * or expand the entire UI proportionally — Linear/Vercel pattern. */
+  --o3-space:           8px;   /* master — 99% of gaps */
+  --o3-space-section:   12px;  /* only for section dividers */
+
+  /* Legacy 7-level scale — DEPRECATED, all alias the two masters.
+     Kept for one release so existing markup doesn't break. New code
+     uses --o3-space and --o3-space-section directly. */
+  --o3-space-xs:        var(--o3-space);
+  --o3-space-sm:        var(--o3-space);
+  --o3-space-md:        var(--o3-space);
+  --o3-space-lg:        var(--o3-space);
+  --o3-space-xl:        var(--o3-space-section);
+  --o3-space-2xl:       var(--o3-space-section);
+  --o3-space-3xl:       var(--o3-space-section);
+
+  /* MASTER radius (SSOT: radius.master + radius.card, migration 227).
+   * radius.master snaps every control to one curve. radius.card snaps
+   * every container. pill stays for chips/badges. */
+  --o3-radius:          4px;   /* master — controls */
+  --o3-radius-card:     8px;   /* cards, panels, KPI tiles, drawers */
+  --o3-radius-pill:     999px; /* special — chips, badges */
+
+  /* Legacy aliases */
+  --o3-radius-sm:       var(--o3-radius);
+  --o3-radius-md:       var(--o3-radius);
+  --o3-radius-lg:       var(--o3-radius-card);
+
+  /* CONTROL HEIGHT — STANDARD (SSOT: control.height.standard)
+   * HESEM rule (2026-05-29, refined): ONE size = 32px. Research:
+   * Atlassian/Vercel 32, Linear/Notion 28, SAP 36, Bloomberg 24.
+   * 32 keeps industrial reach without feeling chunky. Migration 230. */
+  --o3-control-h-standard: 32px;
+  /* Legacy aliases kept for ONE release only (migration 214 deprecates) */
+  --o3-control-h-md: var(--o3-control-h-standard);
+  --o3-control-h-sm: var(--o3-control-h-standard);
+  --o3-control-h-lg: var(--o3-control-h-standard);
+
+  /* Shadows */
+  --o3-shadow-card:     0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --o3-shadow-raised:   0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --o3-shadow-drawer:   -8px 0 24px rgba(15, 23, 42, 0.12);
+
+  /* Motion */
+  --o3-motion-fast:     var(--motion-fast, 100ms);
+  --o3-motion-base:     var(--motion-normal, 200ms);
+  --o3-motion-slow:     var(--motion-slow, 320ms);
+  --o3-motion-ease:     var(--easing-out, cubic-bezier(0.4, 0, 0.2, 1));
+
+  /* Typography (system font stack inherited from portal.main.css) */
+  --o3-font-size-xs:    11px;
+  --o3-font-size-sm:    12px;
+  --o3-font-size-md:    13px;
+  --o3-font-size-lg:    15px;
+  --o3-font-size-xl:    18px;
+  --o3-font-size-2xl:   22px;
+  --o3-font-size-3xl:   28px;
+  --o3-font-weight-regular: 400;
+  --o3-font-weight-medium:  500;
+  --o3-font-weight-semi:    600;
+  --o3-font-weight-bold:    700;
+
+  /* Z-index scale */
+  --o3-z-base:          1;
+  --o3-z-sticky:        10;
+  --o3-z-drawer:        100;
+  --o3-z-modal:         200;
+  --o3-z-toast:         300;
+
+  /* ── Component-scoped overrides (v3-G25, 2026-05-30) ───────────────────
+   * Give the Module Master "Properties" dock a 1-knob ↔ 1-component lever
+   * for values that were previously hardcoded inside the component classes
+   * (so the matching dock property was a live no-op). Each defaults to the
+   * EXACT prior value → zero visual regression. Editing one affects ONLY
+   * its component — deliberately NOT aliased to the shared font/space ramp,
+   * which would couple chip/table/KPI sizing to unrelated surfaces.
+   * Registered in graphics_token_catalog via migration 255 (SSOT). */
+  --o3-kpi-value-size:    28px;  /* .o3-kpi__value font-size (was --o3-font-size-3xl) */
+  --o3-chip-pad-x:        10px;  /* .o3-chip horizontal padding (was literal 0 10px) */
+  --o3-chip-font-size:    12px;  /* .o3-chip font-size (was literal 12px) */
+  --o3-chip-font-weight:  500;   /* .o3-chip font-weight (was literal 500) */
+  --o3-table-cell-size:   12px;  /* .o3-table cell font-size (was --o3-font-size-sm) */
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Page container override — the global #content > .page rule applies a
+ * 24px padding around every page in portal.html. When the v3 shell is
+ * active, claim full width by zeroing that padding. Scoped via the
+ * body.orders-v3-active class which the shell sets on mount and removes
+ * on unmount. Without this override, the v3 module had ~24px empty
+ * margins on all four sides (user-reported 2026-05-28).
+ * ════════════════════════════════════════════════════════════════════════ */
+body.orders-v3-active #content > #page-orders.active {
+  padding: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Shell
+ * ════════════════════════════════════════════════════════════════════════ */
+.o3-shell {
+  display: flex;
+  flex-direction: column;
+  /* Fill the available height of the page container. The shell takes
+     over the entire orders page including the area previously left as
+     padding-margin gutter (now zeroed by the body.orders-v3-active
+     override above). */
+  min-height: 100%;
+  background: var(--o3-surface-page);
+  color: var(--o3-text-default);
+  font-size: var(--o3-font-size-md);
+  line-height: 1.5;
+}
+
+.o3-shell__topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--o3-space);
+  padding: var(--o3-space) var(--o3-space-section);
+  background: var(--o3-surface-card);
+  border-bottom: 1px solid var(--o3-border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: var(--o3-z-sticky);
+}
+
+/* Hide the implicit page breadcrumb that the global shell injects above
+   the module on the orders page — the v3 topbar carries its own
+   breadcrumb-equivalent so the duplicated header was just dead space.
+   Scoped strictly to body.orders-v3-active and only the orders page. */
+body.orders-v3-active #page-orders.active > .breadcrumb,
+body.orders-v3-active #page-orders.active > .page-breadcrumb {
+  display: none;
+}
+
+.o3-shell__title {
+  font-size: var(--o3-font-size-xl);
+  font-weight: var(--o3-font-weight-semi);
+  color: var(--o3-text-strong);
+  margin: 0;
+}
+
+.o3-shell__subtitle {
+  font-size: var(--o3-font-size-sm);
+  color: var(--o3-text-muted);
+  margin: 0;
+}
+
+.o3-shell__tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 var(--o3-space-xl);
+  background: var(--o3-surface-card);
+  border-bottom: 1px solid var(--o3-border-subtle);
+  overflow-x: auto;
+}
+
+.o3-shell__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--o3-space-sm);
+  /* Height pinned via control-height-lg so all tabs sit on a single
+     baseline; padding only controls inset, not height. */
+  height: var(--o3-control-h-lg);
+  padding: 0 var(--o3-space-lg);
+  font-size: var(--o3-font-size-md);
+  font-weight: var(--o3-font-weight-medium);
+  color: var(--o3-text-muted);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--o3-motion-fast) var(--o3-motion-ease),
+              border-color var(--o3-motion-fast) var(--o3-motion-ease);
+}
+
+.o3-shell__tab:hover {
+  color: var(--o3-text-strong);
+}
+
+.o3-shell__tab--active {
+  color: var(--o3-brand);
+  border-bottom-color: var(--o3-brand);
+}
+
+.o3-shell__tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  font-size: var(--o3-font-size-xs);
+  font-weight: var(--o3-font-weight-semi);
+  background: var(--o3-danger-soft);
+  color: var(--o3-danger);
+  border-radius: var(--o3-radius-pill);
+}
+
+.o3-shell__body {
+  flex: 1;
+  /* Master density rule 2026-05-29: every gap is space.master (8px)
+     except section-level which is space.section (12px). Adjust
+     space.master in admin to tighten/loosen the entire UI. */
+  padding: var(--o3-space);
+  display: flex;
+  flex-direction: column;
+  gap: var(--o3-space);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * KPI tile (a single number with label, optional delta, optional click)
+ * ════════════════════════════════════════════════════════════════════════ */
+.o3-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--o3-space-xs);
+  padding: var(--o3-space-lg);
+  background: var(--o3-surface-card);
+  border: 1px solid var(--o3-border-subtle);
+  border-radius: var(--o3-radius-lg);
+  box-shadow: var(--o3-shadow-card);
+  min-width: 0;
+}
+
+.o3-kpi--clickable {
+  cursor: pointer;
+  transition: transform var(--o3-motion-fast) var(--o3-motion-ease),
+              box-shadow var(--o3-motion-fast) var(--o3-motion-ease);
+}
+
+.o3-kpi--clickable:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--o3-shadow-raised);
+}
+
+.o3-kpi__label {
+  font-size: var(--o3-font-size-xs);
+  font-weight: var(--o3-font-weight-medium);
+  color: var(--o3-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.o3-kpi__value {
+  /* v3-G25: dedicated token so the Module Master "Cỡ giá trị" knob
+     drives ONLY the KPI value (was --o3-font-size-3xl, which the dock
+     edited via a second "Cỡ hero" knob + leaked to .o3-empty__icon). */
+  font-size: var(--o3-kpi-value-size);
+  font-weight: var(--o3-font-weight-bold);
+  color: var(--o3-text-strong);
+  line-height: 1.1;
+}
+
+.o3-kpi__value--success { color: var(--o3-success); }
+.o3-kpi__value--warning { color: var(--o3-warning); }
+.o3-kpi__value--danger  { color: var(--o3-danger);  }
+.o3-kpi__value--info    { color: var(--o3-info);    }
+.o3-kpi__value--brand   { color: var(--o3-brand);   }
+
+.o3-kpi__sub {
+  font-size: var(--o3-font-size-sm);
+  color: var(--o3-text-muted);
+}
+
+.o3-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--o3-space-md);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Section panel
+ * ════════════════════════════════════════════════════════════════════════ */
+.o3-panel {
+  background: var(--o3-surface-card);
+  border: 1px solid var(--o3-border-subtle);
+  border-radius: var(--o3-radius-lg);
+  box-shadow: var(--o3-shadow-card);
+  overflow: hidden;
+}
+
+.o3-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--o3-space-md);
+  padding: var(--o3-space-md) var(--o3-space-lg);
+  border-bottom: 1px solid var(--o3-border-subtle);
+  background: var(--o3-surface-card);
+}
+
+.o3-panel__title {
+  font-size: var(--o3-font-size-lg);
+  font-weight: var(--o3-font-weight-semi);
+  color: var(--o3-text-strong);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--o3-space-sm);
+}
+
+.o3-panel__count {
+  font-size: var(--o3-font-size-xs);
+  font-weight: var(--o3-font-weight-semi);
+  color: var(--o3-text-muted);
+  background: var(--o3-surface-muted);
+  padding: 2px 8px;
+  border-radius: var(--o3-radius-pill);
+}
+
+.o3-panel__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--o3-space-sm);
+}
+
+.o3-panel__body {
+  padding: var(--o3-space-lg);
+}
+
+.o3-panel__body--flush {
+  padding: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Chip / Badge
+ * ════════════════════════════════════════════════════════════════════════ */
+.o3-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  /* Chips snap to the same standard height as everything else so
+     toolbar rows stay on one baseline. Atlassian/Vercel pattern. */
+  height: var(--o3-control-h-standard);
+  /* v3-G25: dedicated tokens so the Module Master chip knobs
+     (Padding ngang / Cỡ chữ chip / Độ đậm) are live, not no-ops.
+     Defaults match the prior literals exactly (10px / 12px / 500). */
+  padding: 0 var(--o3-chip-pad-x);
+  font-size: var(--o3-chip-font-size);
+  font-weight: var(--o3-chip-font-weight);
+  border-radius: var(--o3-radius-pill);
+  background: var(--o3-neutral-soft);
+  color: var(--o3-neutral);
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.o3-chip--brand   { background: var(--o3-brand-soft);   color: var(--o3-brand);   }
+.o3-chip--success { background: var(--o3-success-soft); color: var(--o3-success); }
+.o3-chip--warning { background: var(--o3-warning-soft); color: var(--o3-warning); }
+.o3-chip--danger  { background: var(--o3-danger-soft);  color: var(--o3-danger);  }
+.o3-chip--info    { background: var(--o3-info-soft);    color: var(--o3-info);    }
+
+.o3-chip--ai {
+  background: var(--o3-info-soft);
+  color: var(--o3-info);
+}
+.o3-chip--manual {
+  background: var(--o3-neutral-soft);
+  color: var(--o3-neutral);
+}
+
+.o3-chip--button {
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background var(--o3-motion-fast) var(--o3-motion-ease);
+}
+.o3-chip--button:hover {
+  background: var(--o3-surface-muted);
+}
+.o3-chip--active {
+  background: var(--o3-brand-soft);
+  color: var(--o3-brand);
+  border-color: var(--o3-brand);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Buttons
+ * ════════════════════════════════════════════════════════════════════════ */
+.o3-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* v3-G19: padding/font-size/gap were hardcoded — Module Master
+     property catalog claimed these were editable via tokens but the
+     button never consumed the tokens. Now genuinely token-driven. */
+  gap: var(--o3-space-xs, 6px);
+  height: var(--o3-control-h-standard);
+  /* min-height kept in sync so mobile.css (--touch-min) cannot clamp
+     the standard height larger than the user's chosen token value */
+  min-height: var(--o3-control-h-standard);
+  padding: 0 var(--o3-space-md, 12px);
+  font-size: var(--o3-font-size-md, 13px);
+  font-weight: var(--o3-font-weight-medium, 500);
+  border-radius: var(--o3-radius);
+  border: 1px solid var(--o3-border-default);
+  background: var(--o3-surface-card);
+  color: var(--o3-text-strong);
+  cursor: pointer;
+  transition: background var(--o3-motion-fast) var(--o3-motion-ease),
+              border-color var(--o3-motion-fast) var(--o3-motion-ease);
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.o3-btn:hover {
+  background: var(--o3-surface-muted);
+  border-color: var(--o3-border-strong);
+}
+
+.o3-btn--primary {
+  background: var(--o3-brand);
+  color: var(--o3-text-inverse);
+  border-color: var(--o3-brand);
+}
+
+.o3-btn--primary:hover {
+  background: var(--o3-brand-hover);
+  border-color: var(--o3-brand-hover);
+}
+
+.o3-btn--success {
+  background: var(--o3-success);
+  color: var(--o3-text-inverse);
+  border-color: var(--o3-success);
+}
+
+.o3-btn--danger {
+  background: var(--o3-danger);
+  color: var(--o3-text-inverse);
+  border-color: var(--o3-danger);
+}
+
+.o3-btn--ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+/* .o3-btn--sm and .o3-btn--lg are DEPRECATED 2026-05-28 — they now
+   alias the standard height. Existing markup keeps working; new
+   markup should not use them. SSOT rule: ONE size only. */
+.o3-btn--sm,
+.o3-btn--lg {
+  height: var(--o3-control-h-standard);
+  padding: 0 var(--o3-space-md);
+  font-size: var(--o3-font-size-sm);
+}
+
+.o3-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Table
+ * ════════════════════════════════════════════════════════════════════════ */
+.o3-table-wrap {
+  overflow-x: auto;
+}
+
+.o3-table {
+  width: 100%;
+  border-collapse: collapse;
+  /* v3-G25: dedicated token so the Module Master "Cỡ chữ cell" knob is
+     live (was --o3-font-size-sm; default 12px keeps the prior size). */
+  font-size: var(--o3-table-cell-size);
+}
+
+.o3-table thead th {
+  background: var(--o3-surface-muted);
+  color: var(--o3-text-muted);
+  font-size: var(--o3-font-size-xs);
+  font-weight: var(--o3-font-weight-semi);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: left;
+  padding: var(--o3-space-sm) var(--o3-space-md);
+  border-bottom: 1px solid var(--o3-border-subtle);
+  white-space: nowrap;
+}
+
+.o3-table tbody td {
+  padding: var(--o3-space-sm) var(--o3-space-md);
+  border-bottom: 1px solid var(--o3-border-subtle);
+  vertical-align: middle;
+}
+
+.o3-table tbody tr {
+  transition: background var(--o3-motion-fast) var(--o3-motion-ease);
+}
+
+.o3-table tbody tr:hover {
+  background: var(--o3-surface-muted);
+}
+
+.o3-table tbody tr.o3-table__row--clickable {
+  cursor: pointer;
+}
+
+.o3-table tbody tr.o3-table__row--selected {
+  background: var(--o3-brand-soft);
+}
+
+.o3-table .o3-cell--mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--o3-font-size-xs);
+}
+
+.o3-table .o3-cell--num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.o3-table .o3-cell--muted {
+  color: var(--o3-text-muted);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Toolbar (filter chips, search, refresh)
+ * ════════════════════════════════════════════════════════════════════════ */
+.o3-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--o3-space-md);
+  padding: var(--o3-space-sm) var(--o3-space-lg);
+  background: var(--o3-surface-card);
+  border: 1px solid var(--o3-border-subtle);
+  border-radius: var(--o3-radius-lg);
+  flex-wrap: wrap;
+  /* Total inner height aligns with control-h-md + padding so the bar
+     visually matches its button row. */
+  min-height: calc(var(--o3-control-h-md) + var(--o3-space-md));
+  box-sizing: border-box;
+}
+
+.o3-toolbar__chips {
+  display: flex;
+  align-items: center;
+  gap: var(--o3-space-xs);
+  flex-wrap: wrap;
+}
+
+.o3-toolbar__spacer {
+  flex: 1;
+}
+
+.o3-toolbar__search {
+  display: flex;
+  align-items: center;
+  gap: var(--o3-space-sm);
+  /* Search pill matches button height exactly. */
+  height: var(--o3-control-h-md);
+  padding: 0 var(--o3-space-md);
+  background: var(--o3-surface-muted);
+  border: 1px solid var(--o3-border-subtle);
+  border-radius: var(--o3-radius-md);
+  min-width: 220px;
+  box-sizing: border-box;
+}
+
+.o3-toolbar__search input {
+  border: 0;
+  background: transparent;
+  outline: none;
+  padding: 0;
+  font-size: var(--o3-font-size-sm);
+  flex: 1;
+  color: var(--o3-text-strong);
+  height: 100%;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Drawer (right-side slide-in)
+ * ════════════════════════════════════════════════════════════════════════ */
+.o3-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  z-index: var(--o3-z-drawer);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--o3-motion-base) var(--o3-motion-ease);
+}
+
+.o3-drawer-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.o3-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 540px;
+  max-width: 95vw;
+  background: var(--o3-surface-card);
+  box-shadow: var(--o3-shadow-drawer);
+  z-index: calc(var(--o3-z-drawer) + 1);
+  transform: translateX(100%);
+  transition: transform var(--o3-motion-base) var(--o3-motion-ease);
+  display: flex;
+  flex-direction: column;
+}
+
+.o3-drawer.is-open {
+  transform: translateX(0);
+}
+
+.o3-drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--o3-space-md);
+  padding: var(--o3-space-lg);
+  border-bottom: 1px solid var(--o3-border-subtle);
+}
+
+.o3-drawer__title {
+  font-size: var(--o3-font-size-lg);
+  font-weight: var(--o3-font-weight-semi);
+  color: var(--o3-text-strong);
+  margin: 0;
+}
+
+.o3-drawer__close {
+  background: transparent;
+  border: 0;
+  font-size: var(--o3-font-size-xl);
+  color: var(--o3-text-muted);
+  cursor: pointer;
+  padding: var(--o3-space-xs) var(--o3-space-sm);
+  border-radius: var(--o3-radius-sm);
+}
+
+.o3-drawer__close:hover {
+  background: var(--o3-surface-muted);
+  color: var(--o3-text-strong);
+}
+
+.o3-drawer__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--o3-space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--o3-space-lg);
+}
+
+.o3-drawer__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--o3-space-sm);
+  padding: var(--o3-space-lg);
+  border-top: 1px solid var(--o3-border-subtle);
+  background: var(--o3-surface-muted);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Empty state
+ * ════════════════════════════════════════════════════════════════════════ */
+.o3-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--o3-space-3xl) var(--o3-space-xl);
+  text-align: center;
+  gap: var(--o3-space-sm);
+  color: var(--o3-text-muted);
+}
+
+.o3-empty__icon {
+  font-size: var(--o3-font-size-3xl);
+}
+
+.o3-empty__title {
+  font-size: var(--o3-font-size-lg);
+  font-weight: var(--o3-font-weight-semi);
+  color: var(--o3-text-strong);
+}
+
+.o3-empty__hint {
+  font-size: var(--o3-font-size-sm);
+  max-width: 400px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Toast
+ * ════════════════════════════════════════════════════════════════════════ */
+.o3-toast-stack {
+  position: fixed;
+  bottom: var(--o3-space-xl);
+  right: var(--o3-space-xl);
+  z-index: var(--o3-z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--o3-space-sm);
+  pointer-events: none;
+}
+
+.o3-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--o3-space-sm);
+  padding: var(--o3-space-md) var(--o3-space-lg);
+  background: var(--o3-surface-card);
+  border: 1px solid var(--o3-border-subtle);
+  border-left: 4px solid var(--o3-neutral);
+  border-radius: var(--o3-radius-md);
+  box-shadow: var(--o3-shadow-raised);
+  font-size: var(--o3-font-size-sm);
+  color: var(--o3-text-strong);
+  pointer-events: auto;
+  min-width: 260px;
+  max-width: 420px;
+}
+
+.o3-toast--success { border-left-color: var(--o3-success); }
+.o3-toast--warning { border-left-color: var(--o3-warning); }
+.o3-toast--danger  { border-left-color: var(--o3-danger);  }
+.o3-toast--info    { border-left-color: var(--o3-info);    }
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Loading
+ * ════════════════════════════════════════════════════════════════════════ */
+.o3-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--o3-space-3xl);
+  color: var(--o3-text-muted);
+  font-size: var(--o3-font-size-sm);
+  gap: var(--o3-space-sm);
+}
+
+.o3-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--o3-border-default);
+  border-top-color: var(--o3-brand);
+  border-radius: 50%;
+  animation: o3-spin 600ms linear infinite;
+}
+
+@keyframes o3-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Today's queue specific
+ * ════════════════════════════════════════════════════════════════════════ */
+.o3-today-deck {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--o3-space-lg);
+}
+
+@media (max-width: 1024px) {
+  .o3-today-deck { grid-template-columns: 1fr; }
+}
+
+.o3-exception-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.o3-exception {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--o3-space-md);
+  padding: var(--o3-space-md) var(--o3-space-lg);
+  border-bottom: 1px solid var(--o3-border-subtle);
+  cursor: pointer;
+  transition: background var(--o3-motion-fast) var(--o3-motion-ease);
+}
+
+.o3-exception:hover {
+  background: var(--o3-surface-muted);
+}
+
+.o3-exception:last-child {
+  border-bottom: 0;
+}
+
+.o3-exception__severity {
+  width: 4px;
+  align-self: stretch;
+  border-radius: var(--o3-radius-pill);
+  background: var(--o3-neutral);
+  flex-shrink: 0;
+}
+
+.o3-exception__severity--critical { background: var(--o3-danger);  }
+.o3-exception__severity--warning  { background: var(--o3-warning); }
+.o3-exception__severity--info     { background: var(--o3-info);    }
+
+.o3-exception__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.o3-exception__title {
+  font-size: var(--o3-font-size-sm);
+  font-weight: var(--o3-font-weight-semi);
+  color: var(--o3-text-strong);
+  margin-bottom: 2px;
+}
+
+.o3-exception__msg {
+  font-size: var(--o3-font-size-xs);
+  color: var(--o3-text-muted);
+}
+
+.o3-exception__time {
+  font-size: var(--o3-font-size-xs);
+  color: var(--o3-text-muted);
+  flex-shrink: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Intake list
+ * ════════════════════════════════════════════════════════════════════════ */
+.o3-intake-row__source-col {
+  width: 90px;
+}
+
+.o3-intake-row__actions {
+  display: flex;
+  gap: var(--o3-space-xs);
+  justify-content: flex-end;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Visually hidden (a11y)
+ * ════════════════════════════════════════════════════════════════════════ */
+.o3-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Dark mode (v3-G14, 2026-05-29) — Material 3 dark surface palette
+ * Toggle via <html data-color-mode="dark"> or localStorage 'o3-color-mode'.
+ * Inherits all spacing / radius / typography from light mode — only
+ * surface / text / border / status colours flip.
+ * ════════════════════════════════════════════════════════════════════════ */
+:root[data-color-mode="dark"] {
+  /* Surfaces — Material 3 Surface Container scale */
+  --o3-surface-page:    #0f172a;  /* slate-900 — page bg */
+  --o3-surface-card:    #1e293b;  /* slate-800 — card */
+  --o3-surface-raised:  #334155;  /* slate-700 — modal */
+  --o3-surface-muted:   #1e293b;  /* slate-800 — muted */
+  /* Text */
+  --o3-text-strong:     #f1f5f9;  /* slate-100 */
+  --o3-text-default:    #cbd5e1;  /* slate-300 */
+  --o3-text-muted:      #94a3b8;  /* slate-400 */
+  --o3-text-inverse:    #0f172a;
+  /* Borders */
+  --o3-border-subtle:   #334155;  /* slate-700 */
+  --o3-border-default:  #475569;  /* slate-600 */
+  --o3-border-strong:   #64748b;  /* slate-500 */
+  /* Brand — Carbon Dark "blue 40" softer for dark surfaces */
+  --o3-brand:           #38bdf8;  /* sky-400 */
+  --o3-brand-hover:     #7dd3fc;  /* sky-300 */
+  --o3-brand-soft:      #0c4a6e;  /* sky-900 — soft on dark */
+  /* Status — desaturated for dark to reduce glare (SLDS dark spec) */
+  --o3-success:         #34d399;  /* emerald-400 */
+  --o3-success-soft:    #064e3b;  /* emerald-900 */
+  --o3-warning:         #fbbf24;  /* amber-400 */
+  --o3-warning-soft:    #78350f;  /* amber-900 */
+  --o3-danger:          #f87171;  /* red-400 */
+  --o3-danger-soft:     #7f1d1d;  /* red-900 */
+  --o3-info:            #60a5fa;  /* blue-400 */
+  --o3-info-soft:       #1e3a8a;  /* blue-900 */
+  --o3-neutral:         #94a3b8;
+  --o3-neutral-soft:    #1e293b;
+  /* Shadows softer + bluer on dark */
+  --o3-shadow-card:     0 1px 2px rgba(0,0,0,0.30), 0 1px 1px rgba(0,0,0,0.20);
+  --o3-shadow-raised:   0 4px 12px rgba(0,0,0,0.40), 0 2px 4px rgba(0,0,0,0.24);
+  --o3-shadow-drawer:   -8px 0 24px rgba(0,0,0,0.45);
+}
+
+/* v3-G15 (2026-05-29): full dark mode coverage — also flip LEGACY
+ * portal vars so sidebar + admin inline-styles using var(--bg-*) and
+ * var(--text-*) cascade to dark too. Without these, sidebar/admin-nav
+ * stay light because inline styles win over our class/attribute rules
+ * unless the var() they consume has been redefined. */
+:root[data-color-mode="dark"] {
+  --bg-page:            #0f172a;
+  --bg-app:             #0f172a;
+  --bg-surface:         #1e293b;
+  --bg-surface-alt:     #162032;
+  --bg-modal:           #1e293b;
+  --bg-hover:           #263348;
+  --surface-1:          #1e293b;
+  --surface-2:          #263348;
+  --surface-3:          #162032;
+  --text-primary:       #f1f5f9;
+  --text-secondary:     #cbd5e1;
+  --text-tertiary:      #94a3b8;
+  --text-1:             #f1f5f9;
+  --text-2:             #cbd5e1;
+  --text-3:             #94a3b8;
+  --text-on-brand:      #0f172a;
+  --border:             #475569;
+  --border-subtle:      #334155;
+  --border-strong:      #64748b;
+  --border-1:           #334155;
+  --border-2:           #475569;
+  --border-3:           #64748b;
+}
+
+/* Dark mode — sidebar + admin scoped overrides. Each rule uses
+ * !important because inline styles win specificity. */
+:root[data-color-mode="dark"] #sidebar,
+:root[data-color-mode="dark"] aside#sidebar{background:#0a1628 !important;color:#f1f5f9}
+:root[data-color-mode="dark"] #sidebar *{color:#cbd5e1}
+:root[data-color-mode="dark"] #admin-content{background:#0f172a;color:#f1f5f9}
+:root[data-color-mode="dark"] #admin-content input[type="text"],
+:root[data-color-mode="dark"] #admin-content input[type="number"],
+:root[data-color-mode="dark"] #admin-content input[type="search"],
+:root[data-color-mode="dark"] #admin-content textarea,
+:root[data-color-mode="dark"] #admin-content select{background:#1e293b !important;color:#f1f5f9 !important;border-color:#475569 !important}
+:root[data-color-mode="dark"] #admin-content button:not([class*="primary"]):not([class*="danger"]):not([class*="success"]){background:#1e293b;color:#f1f5f9;border-color:#475569}
+:root[data-color-mode="dark"] #admin-content code{background:#0f172a;color:#94a3b8}
+:root[data-color-mode="dark"] body{background:#0f172a;color:#f1f5f9}
+
+/* ════════════════════════════════════════════════════════════════════
+ * v3-G16 (2026-05-29) — Dark mode CONTRAST FIXES
+ * User-reported issues:
+ *   1. Sidebar item text (Dashboard/Tìm kiếm/Từ điển) invisible
+ *   2. Active Theme sub-tab background dark with dark text
+ *   3. Number/text inputs in Theme tab show WHITE bg in dark mode
+ *   4. Properties dock inputs disabled state hard to read
+ * ════════════════════════════════════════════════════════════════════ */
+
+/* Sidebar — force white-ish text on dark, !important to beat inline */
+:root[data-color-mode="dark"] #sidebar a,
+:root[data-color-mode="dark"] #sidebar a *,
+:root[data-color-mode="dark"] #sidebar .menu-item,
+:root[data-color-mode="dark"] #sidebar .menu-item *,
+:root[data-color-mode="dark"] #sidebar div[onclick],
+:root[data-color-mode="dark"] #sidebar div[onclick] *,
+:root[data-color-mode="dark"] #sidebar > div > div{color:#e2e8f0 !important}
+:root[data-color-mode="dark"] #sidebar a:hover,
+:root[data-color-mode="dark"] #sidebar div[onclick]:hover{background:#1e293b !important}
+:root[data-color-mode="dark"] #sidebar [class*="active"]{background:linear-gradient(180deg,#1d4ed8 0%,#1e40af 100%) !important;color:#fff !important}
+
+/* Theme tab active sub-tab — light text on brand bg */
+:root[data-color-mode="dark"] [data-theme-seg].active,
+:root[data-color-mode="dark"] [data-theme-seg][style*="background:var(--o3-brand)"]{color:#fff !important}
+/* Active sub-tab strip in Theme renderer (brand bg = sky-400 in dark) */
+:root[data-color-mode="dark"] button[data-theme-subtab][style*="border-bottom"]{color:#38bdf8 !important}
+
+/* Theme tab inputs in dark mode — force dark bg + light text */
+:root[data-color-mode="dark"] #adm-appearance-panel-theme input[type="number"],
+:root[data-color-mode="dark"] #adm-appearance-panel-theme input[type="text"],
+:root[data-color-mode="dark"] #adm-appearance-panel-theme input[type="color"],
+:root[data-color-mode="dark"] #adm-appearance-panel-theme select{background:#1e293b !important;color:#f1f5f9 !important;border-color:#475569 !important}
+:root[data-color-mode="dark"] #adm-appearance-panel-theme input[type="range"]{accent-color:#38bdf8}
+:root[data-color-mode="dark"] #adm-appearance-panel-theme section{background:#1e293b !important;border-color:#334155 !important}
+:root[data-color-mode="dark"] #adm-appearance-panel-theme h3,
+:root[data-color-mode="dark"] #adm-appearance-panel-theme code{color:#f1f5f9 !important}
+:root[data-color-mode="dark"] #adm-appearance-panel-theme button#theme-reset{background:#334155 !important;color:#f1f5f9 !important;border-color:#475569 !important}
+
+/* Properties dock inputs — improve disabled-state contrast in dark */
+:root[data-color-mode="dark"] .o3-props-row__input.is-inherited{background:#0f172a !important;color:#64748b !important;border-color:#334155 !important;opacity:.7}
+:root[data-color-mode="dark"] .o3-props-row__input.is-custom{background:#1e293b !important;color:#f1f5f9 !important;border-color:#38bdf8 !important;opacity:1}
+:root[data-color-mode="dark"] .o3-props-row__custom{background:#1e293b !important;border-color:#475569 !important}
+:root[data-color-mode="dark"] .o3-props-row__custom:checked{background:#38bdf8 !important;border-color:#38bdf8 !important}
+:root[data-color-mode="dark"] .o3-props-row__name{color:#f1f5f9}
+:root[data-color-mode="dark"] .o3-props-row__key{color:#94a3b8}
+
+/* Properties dock body — ensure inputs reactive when dock under dark */
+:root[data-color-mode="dark"] .o3-props-dock__panel,
+:root[data-color-mode="dark"] .o3-props-dock__header,
+:root[data-color-mode="dark"] .o3-props-dock__footer{background:#0f172a;color:#f1f5f9;border-color:#334155}
+:root[data-color-mode="dark"] .o3-props-dock__title{color:#f1f5f9}
+:root[data-color-mode="dark"] .o3-props-dock__subtitle{color:#94a3b8}
+:root[data-color-mode="dark"] .o3-props-dock__subtab{color:#94a3b8}
+:root[data-color-mode="dark"] .o3-props-dock__subtab.is-active{background:#1e3a8a;color:#38bdf8}
+:root[data-color-mode="dark"] .o3-props-dock__close,
+:root[data-color-mode="dark"] .o3-props-dock__collapse{color:#cbd5e1}
+:root[data-color-mode="dark"] .o3-props-dock__close:hover,
+:root[data-color-mode="dark"] .o3-props-dock__collapse:hover{background:#334155;color:#f1f5f9}
+:root[data-color-mode="dark"] .o3-props-dock__footer button{background:#334155;color:#f1f5f9;border-color:#475569}
+:root[data-color-mode="dark"] .o3-props-dock__footer button.is-primary{background:#38bdf8;color:#0f172a;border-color:#38bdf8}
+
+/* Smooth cross-mode transition so flips don't strobe */
+body,
+#sidebar,
+#admin-content,
+.o3-props-dock__panel,
+.o3-shell,
+.o3-btn,
+.o3-chip{transition:background-color 180ms ease, color 180ms ease, border-color 180ms ease}

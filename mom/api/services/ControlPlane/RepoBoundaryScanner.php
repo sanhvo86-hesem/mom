@@ -94,6 +94,15 @@ final class RepoBoundaryScanner
         // acceptance, and release hardening. Mirrors the same repo-level
         // precedent already used for KPI and deploy playbook artifact sets.
         '#^_reports/raci-v3/.*$#',
+        // UoM V3 No-Guess World-Class hardening reports — P00..P13 evidence
+        // set for the external integration readiness review. Mirrors the
+        // .gitignore `!_reports/uom-measurement-conversion-v3/` allowlist.
+        '#^_reports/uom-measurement-conversion-v3/.*$#',
+        // V1 UoM planning reports — referenced by the V3 contradiction
+        // ledger; mirrors the .gitignore reversal entry.
+        '#^_reports/uom-measurement-conversion-v1/.*$#',
+        // MDA Sequential Authority audit bundle inherited from main.
+        '#^_reports/agent-audits/.*$#',
     ];
 
     /**

@@ -2237,6 +2237,11 @@ class DataLayer
         $supplierRows = $this->db->query('SELECT metadata, updated_at FROM vendors ORDER BY vendor_id');
         $partRows = $this->db->query('SELECT metadata, updated_at FROM items ORDER BY item_id');
         $revisionRows = $this->db->query('SELECT metadata, valid_from FROM item_revisions ORDER BY item_id, rev');
+        $routingRows = $this->db->query('SELECT routing_id, routing_revision, item_id, status, metadata, valid_from, created_at FROM routings ORDER BY routing_id, routing_revision');
+        $bomRows = $this->db->query('SELECT bom_id, bom_revision, parent_item_id, bom_type, bom_status, metadata, valid_from, created_at FROM bill_of_materials ORDER BY bom_id, bom_revision');
+        $controlPlanRows = $this->db->query('SELECT control_plan_id::text AS control_plan_uuid, plan_number, title, item_id, revision, status, metadata, effective_date, updated_at FROM control_plans ORDER BY COALESCE(plan_number, control_plan_id::text)');
+        $inspectionPlanRows = $this->db->query('SELECT plan_id::text AS plan_uuid, inspection_plan_id, inspection_type, item_id, sampling_plan, sampling_standard, aql_level, accept_number, reject_number, sample_size, test_method, metadata, valid_from, created_at FROM inspection_plans ORDER BY inspection_plan_id');
+        $defectCatalogRows = $this->db->query("SELECT entity_id, status, data AS metadata, updated_at FROM master_data_store WHERE entity_type = 'defect_catalog' ORDER BY entity_id");
         $workCenterRows = $this->db->query('SELECT metadata, updated_at FROM work_centers ORDER BY work_center_id');
         $machineRows = $this->db->query('SELECT metadata, updated_at FROM equipment ORDER BY equipment_id');
         $toolingRows = $this->db->query("SELECT metadata, updated_at FROM tools WHERE COALESCE(metadata->>'shadow_source', '') <> 'mes_runtime' ORDER BY tool_id");
@@ -2273,6 +2278,11 @@ class DataLayer
                 $supplierRows,
                 $partRows,
                 $revisionRows,
+                $routingRows,
+                $bomRows,
+                $controlPlanRows,
+                $inspectionPlanRows,
+                $defectCatalogRows,
                 $workCenterRows,
                 $machineRows,
                 $toolingRows,
@@ -2288,6 +2298,61 @@ class DataLayer
             'suppliers' => $this->extractMetadataRows($supplierRows),
             'parts' => $this->extractMetadataRows($partRows),
             'revisions' => $this->extractMetadataRows($revisionRows),
+            'routing_library' => $this->extractMasterDataMirrorRows($routingRows, [
+                'routing_id' => 'routing_id',
+                'routing_revision' => 'routing_revision',
+                'revision' => 'routing_revision',
+                'part_number' => 'item_id',
+                'item_id' => 'item_id',
+                'status' => 'status',
+                'release_date' => 'valid_from',
+                'updated_at' => 'created_at',
+            ]),
+            'bom_library' => $this->extractMasterDataMirrorRows($bomRows, [
+                'bom_id' => 'bom_id',
+                'bom_revision' => 'bom_revision',
+                'revision' => 'bom_revision',
+                'part_number' => 'parent_item_id',
+                'parent_item_id' => 'parent_item_id',
+                'bom_type' => 'bom_type',
+                'status' => 'bom_status',
+                'release_date' => 'valid_from',
+                'updated_at' => 'created_at',
+            ]),
+            'control_plans' => $this->extractMasterDataMirrorRows($controlPlanRows, [
+                'control_plan_id' => ['plan_number', 'control_plan_uuid'],
+                'plan_number' => 'plan_number',
+                'control_plan_name' => 'title',
+                'title' => 'title',
+                'part_number' => 'item_id',
+                'item_id' => 'item_id',
+                'revision' => 'revision',
+                'status' => 'status',
+                'effective_date' => 'effective_date',
+                'updated_at' => 'updated_at',
+            ]),
+            'inspection_plans' => $this->extractMasterDataMirrorRows($inspectionPlanRows, [
+                'inspection_plan_id' => 'inspection_plan_id',
+                'plan_id' => 'plan_uuid',
+                'inspection_plan_name' => 'inspection_plan_id',
+                'inspection_type' => 'inspection_type',
+                'part_number' => 'item_id',
+                'item_id' => 'item_id',
+                'sampling_plan' => 'sampling_plan',
+                'sampling_standard' => 'sampling_standard',
+                'aql_level' => 'aql_level',
+                'accept_number' => 'accept_number',
+                'reject_number' => 'reject_number',
+                'sample_size' => 'sample_size',
+                'test_method' => 'test_method',
+                'release_date' => 'valid_from',
+                'updated_at' => 'created_at',
+            ]),
+            'defect_catalog' => $this->extractMasterDataMirrorRows($defectCatalogRows, [
+                'defect_code' => 'entity_id',
+                'status' => 'status',
+                'updated_at' => 'updated_at',
+            ]),
             'work_centers' => $this->extractMetadataRows($workCenterRows),
             'machines' => $this->extractMetadataRows($machineRows),
             'tooling_assets' => $this->extractMetadataRows($toolingRows),
@@ -2509,6 +2574,42 @@ class DataLayer
         $items = [];
         foreach ($rows as $row) {
             $item = $this->decodeJsonArray($row[$column] ?? null);
+            if ($item !== []) {
+                $items[] = $item;
+            }
+        }
+        return $items;
+    }
+
+    /**
+     * Rehydrate governed runtime rows from mirror tables and preserve key fields
+     * even when the legacy metadata payload is incomplete.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     * @param array<string, string|array<int, string>> $fallbackMap
+     * @return array<int, array<string, mixed>>
+     */
+    private function extractMasterDataMirrorRows(array $rows, array $fallbackMap, string $column = 'metadata'): array
+    {
+        $items = [];
+        foreach ($rows as $row) {
+            $item = $this->decodeJsonArray($row[$column] ?? null);
+            foreach ($fallbackMap as $targetField => $sourceField) {
+                if (isset($item[$targetField]) && $item[$targetField] !== null && $item[$targetField] !== '') {
+                    continue;
+                }
+
+                $sources = is_array($sourceField) ? $sourceField : [$sourceField];
+                foreach ($sources as $candidate) {
+                    $value = $row[$candidate] ?? null;
+                    if ($value === null || $value === '') {
+                        continue;
+                    }
+                    $item[$targetField] = $value;
+                    break;
+                }
+            }
+
             if ($item !== []) {
                 $items[] = $item;
             }
