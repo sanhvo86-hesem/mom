@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-05-27T06:14:24.992Z",
+    "generatedAt": "2026-05-30T13:54:47.959Z",
     "domainCount": 49,
-    "tableCount": 889,
+    "tableCount": 907,
     "description": "Domain architecture map for HESEM QMS Portal aligned to SAP, Epicor, IFS, Oracle, and Dynamics patterns.",
     "researchReferences": [
       {
@@ -544,17 +544,31 @@
         "item",
         "item_attr",
         "item_class",
+        "item_packaging_policy",
         "item_revision",
         "item_revisions",
         "item_site",
         "item_spec",
+        "item_uom_policy",
         "item_variant",
         "items",
         "lot_policy",
+        "material_density_registry",
         "routing_operations",
         "routings",
         "serial_policy",
         "shelf_life_policy",
+        "uom_ai_advisory_log",
+        "uom_alias",
+        "uom_alias_quarantine",
+        "uom_conversion_rule",
+        "uom_external_code_map",
+        "uom_measurement_thread",
+        "uom_quantity_kind",
+        "uom_rounding_policy",
+        "uom_rule_approval",
+        "uom_standard_library_manifest",
+        "uom_unit_catalog",
         "work_centers"
       ],
       "primaryWorkflows": [
@@ -563,11 +577,15 @@
         "wf_item_revision",
         "wf_item_site",
         "wf_item_spec",
+        "wf_item_uom_policy",
         "wf_items",
         "wf_lot_policy",
         "wf_routing",
         "wf_serial_policy",
-        "wf_shelf_life_policy"
+        "wf_shelf_life_policy",
+        "wf_uom_alias_quarantine",
+        "wf_uom_conversion_rule",
+        "wf_uom_standard_library_manifest"
       ],
       "upstreamDomains": [
         "core_system",
@@ -617,6 +635,9 @@
       "description": "Khách hàng, đơn hàng bán, line và cộng tác thực hiện đơn.",
       "businessProcess": "Quote-to-order, order promising, contract review, and customer delivery commitments.",
       "tables": [
+        "aeoi_auto_created_record",
+        "aeoi_llm_routing",
+        "aeoi_master_data_suggestion",
         "contract_review_items",
         "customer_sites",
         "customers",
@@ -636,6 +657,7 @@
         "sales_orders"
       ],
       "primaryWorkflows": [
+        "wf_aeoi_master_data_suggestion",
         "wf_customer_site",
         "wf_customer",
         "wf_order_hold",
@@ -647,7 +669,8 @@
         "core_system",
         "foundation_governance",
         "master_data",
-        "mes_execution"
+        "mes_execution",
+        "system_infrastructure"
       ],
       "downstreamDomains": [
         "advanced_planning",
@@ -2683,6 +2706,7 @@
         "escalation_log",
         "escalation_rules",
         "file_attachments",
+        "graphics_block_contract",
         "graphics_component_contract",
         "graphics_contrast_check",
         "graphics_module_binding",
@@ -2719,6 +2743,7 @@
         "wf_email_intake_mailbox",
         "wf_email_intake_message",
         "wf_email_intake_poll_run",
+        "wf_graphics_block_contract",
         "wf_graphics_rollout_scope",
         "wf_idempotency_replay_ledger",
         "wf_integration_monitor",
@@ -2735,6 +2760,7 @@
         "mes_execution"
       ],
       "downstreamDomains": [
+        "sales",
         "transportation"
       ],
       "supportDomain": true
