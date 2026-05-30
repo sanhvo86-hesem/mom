@@ -26,7 +26,6 @@ namespace MOM\Api\Services\Uom;
 final class MeasurementValueFactory
 {
     private const HASH_ALGORITHM = 'sha256';
-    private const HASH_SEPARATOR = '|';
     private const BCMATH_SCALE_SI = 30;
 
     /**
