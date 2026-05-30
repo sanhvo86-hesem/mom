@@ -220,7 +220,10 @@
 /* ── Generic forms & inputs ── */
 [data-color-mode="dark"] input,
 [data-color-mode="dark"] select,
-[data-color-mode="dark"] textarea { background: #1e293b; color: #f1f5f9; border-color: #475569; }
+[data-color-mode="dark"] textarea,
+[data-color-scheme-active="dark"] input,
+[data-color-scheme-active="dark"] select,
+[data-color-scheme-active="dark"] textarea { background: #1e293b; color: #f1f5f9; border-color: #475569; }
 [data-color-mode="dark"] input:focus,
 [data-color-mode="dark"] select:focus,
 [data-color-mode="dark"] textarea:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96,165,250,0.15); }
@@ -234,6 +237,29 @@
 [data-color-mode="dark"] .hm-table th { background: #162032; border-color: #334155; color: #94a3b8; }
 [data-color-mode="dark"] .hm-table td { border-color: #263348; }
 [data-color-mode="dark"] .hm-table tr:hover td { background: #263348; }
+
+/* ── Sidebar + admin console surfaces — HESEM-DARK-SIDEBAR-FIX-20260530 ─────────────────────
+   FIX: portal.main.css hardcodes rgba(255,255,255,.88) into .nav-section and
+   .admin-nav-group, and a tri-colour light gradient into #sidebar and
+   .admin-nav-panel. Those literals sit OUTSIDE the token system, so the dark
+   --bg-surface remap never reaches them -> washed-out glassy panels in dark mode.
+   Re-bind to the dark surface tokens. Covers explicit dark AND scheme-active dark. */
+[data-color-mode="dark"] #sidebar,
+[data-color-scheme-active="dark"] #sidebar{
+  background:linear-gradient(165deg, var(--bg-sidebar-dark,#0a1628) 0%, var(--bg-surface-alt-dark,#162032) 100%);
+}
+[data-color-mode="dark"] .admin-nav-panel,
+[data-color-scheme-active="dark"] .admin-nav-panel{
+  background:linear-gradient(165deg, var(--bg-surface-dark,#1e293b) 0%, var(--bg-surface-alt-dark,#162032) 100%);
+  border-color:var(--border-dark,#334155);
+}
+[data-color-mode="dark"] .nav-section,
+[data-color-scheme-active="dark"] .nav-section,
+[data-color-mode="dark"] .admin-nav-group,
+[data-color-scheme-active="dark"] .admin-nav-group{
+  background:color-mix(in srgb, var(--brand-2,#3b82f6) 10%, var(--bg-surface-dark,#1e293b));
+  border-color:color-mix(in srgb, var(--brand-2,#3b82f6) 18%, var(--border-dark,#334155));
+}
 
 /* ── Module builder header already has gradient — keep it ── */
 
