@@ -30,7 +30,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
 
         $this->assertSame('SCRAP_RATE', $this->invokeNormalize($engine, 'SCRAP'));
         $this->assertSame('CAPA_CLOSURE', $this->invokeNormalize($engine, 'CAPA-CLOSE'));
-        $this->assertSame('COMPLAINT_RATE', $this->invokeNormalize($engine, 'CCR'));
+        $this->assertSame('CUSTOMER_ESCAPE_DPMO', $this->invokeNormalize($engine, 'CCR'));
         $this->assertSame('SUPPLIER_QUAL', $this->invokeNormalize($engine, 'SQI'));
         $this->assertSame('TRAINING_COMP', $this->invokeNormalize($engine, 'TRN-COMP'));
         $this->assertSame('CYCLE_TIME_VARIANCE', $this->invokeNormalize($engine, 'CYCLE-VAR'));
@@ -53,7 +53,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
 
         $this->assertSame([
             'OTD',
-            'COMPLAINT_RATE',
+            'CUSTOMER_ESCAPE_DPMO',
             'FPY',
             'COPQ',
             'PLAN_ADHERENCE',
