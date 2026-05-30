@@ -1783,6 +1783,7 @@
       }
     } catch (e) {}
     reapplyOverrideValues();
+    window.__o3Hydrated = true;  // mark so boot poll + lazy callers stop
     return true;
   }
 
@@ -1824,25 +1825,52 @@
    * has no blob (or HmTheme never loads — e.g. logged out), fall back to
    * whatever localStorage holds and just re-apply the cached values. */
   function bootHydrate(){
-    var tries = 0;
-    (function poll(){
-      tries++;
-      var HmTheme = window.HmTheme;
-      var ready = false;
-      try {
-        ready = !!(HmTheme && typeof HmTheme.getAdminConfig === 'function'
-          && HmTheme.getAdminConfig() && HmTheme.getAdminConfig()._meta);
-      } catch (e) { ready = false; }
-      if (ready) {
-        var hydrated = false;
-        try { hydrated = hydrateModuleMaster(); } catch (e) {}
-        if (!hydrated) { try { reapplyOverrideValues(); } catch (e) {} }
+    if (window.__o3BootStarted) return;   // idempotent
+    window.__o3BootStarted = true;
+    var ticks = 0;
+    var blobSeenAt = 0;
+    var iv = setInterval(function(){
+      ticks++; window.__o3PollTicks = ticks;
+      if (window.__o3Hydrated) { clearInterval(iv); return; }
+      var c = null;
+      try { c = window.HmTheme && typeof window.HmTheme.getAdminConfig === 'function' && window.HmTheme.getAdminConfig(); } catch (e) {}
+      var ready = !!(c && c._meta);
+      var hasBlob = !!(c && c.moduleMaster);
+      if (ready && hasBlob) {
+        try { hydrateModuleMaster(); } catch (e) { window.__o3HydrateErr = String(e && e.message || e); }
+        clearInterval(iv);
         return;
       }
-      if (tries < 40) { setTimeout(poll, 250); }  // up to ~10s
-      else { try { reapplyOverrideValues(); } catch (e) {} } // give up → cache
-    })();
+      // Org has loaded config but NO saved blob. Wait a few extra ticks in
+      // case the blob is still streaming, then fall back to localStorage
+      // cache. Do NOT mark hydrated here — let lazy/tab-open retry later.
+      if (ready && !hasBlob) {
+        if (!blobSeenAt) blobSeenAt = ticks;
+        if (ticks - blobSeenAt >= 6) {   // ~3s of "ready but no blob"
+          try { reapplyOverrideValues(); } catch (e) {}
+          window.__o3Hydrated = true;     // genuinely nothing to hydrate
+          clearInterval(iv);
+        }
+        return;
+      }
+      if (ticks >= 120) {                 // ~60s hard stop
+        try { reapplyOverrideValues(); } catch (e) {}
+        clearInterval(iv);
+      }
+    }, 500);
   }
+  /* Lazy backstop: the moment the admin opens the Module Master / Theme
+   * surface, the org config is guaranteed loaded — hydrate once if boot
+   * somehow missed it. Guarded by __o3Hydrated so it never clobbers
+   * edits the user has already started this session. */
+  function lazyHydrateOnce(){
+    if (window.__o3Hydrated) return;
+    try {
+      var c = window.HmTheme && window.HmTheme.getAdminConfig && window.HmTheme.getAdminConfig();
+      if (c && c._meta && c.moduleMaster) { hydrateModuleMaster(); }
+    } catch (e) {}
+  }
+  window._moduleMasterStore.lazyHydrate = lazyHydrateOnce;
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bootHydrate);
   } else {
@@ -1985,6 +2013,9 @@
   });
 
   function showProperties(sectionId, L){
+    // v3-G23: backstop hydration — if boot missed it, opening the tab
+    // (config guaranteed loaded by now) restores the org's saved settings.
+    try { lazyHydrateOnce(); } catch (e) {}
     var secs = sections(L || function(vi,en){return vi||en;});
     var section = secs.find(function(s){ return s.id === sectionId; }) || secs[0];
     showDock();
