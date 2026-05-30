@@ -794,6 +794,10 @@ const tableDomainOverrides = {
   party_site: 'foundation_governance',
   party_contact: 'foundation_governance',
   uom: 'foundation_governance',
+  // UoM Measurement Intelligence master-data policies (migrations 220-222)
+  item_uom_policy: 'master_data',
+  item_packaging_policy: 'master_data',
+  material_density_registry: 'master_data',
   calendar: 'foundation_governance',
   shift: 'foundation_governance',
   reason_code: 'foundation_governance',
@@ -2553,6 +2557,8 @@ function inferDomain(tableName, migration) {
   if (/^eqms_/.test(tableName)) return 'quality_management';
   if (/^dcc_/.test(tableName)) return 'document_control';
   if (/^graphics_/.test(tableName)) return 'system_infrastructure';
+  if (/^uom_/.test(tableName)) return 'master_data';
+  if (/^aeoi_/.test(tableName)) return 'sales';
   if (/^org_/.test(tableName)) return 'foundation_governance';
   if (/^retention_/.test(tableName) || /^source_system_/.test(tableName) || /^data_archival_/.test(tableName)) return 'master_data_governance';
   if (/^integration_/.test(tableName)) return 'system_infrastructure';
