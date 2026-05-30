@@ -192,6 +192,13 @@ jobs:
         # cannot ship. Runs unconditionally (frontend-only changesets).
         run: php mom/tools/release/check_graphics_block_registry.php
 
+      - name: L4 module archetype gate (Lego-SSOT)
+        # Validates 00be-archetype-registry.js: every zone references a PUBLISHED
+        # L3 block, required_blocks are used, zone_order entries exist, and a
+        # renderer exists. An archetype that can't be assembled from real blocks
+        # cannot ship. Runs unconditionally (frontend-only changesets).
+        run: php mom/tools/release/check_graphics_archetype_registry.php
+
       - name: ISO reference status check
         run: php mom/tools/release/check_iso_reference_status.php
 
