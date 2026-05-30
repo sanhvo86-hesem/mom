@@ -71,6 +71,10 @@
   /* ── Bridge legacy portal.main.css variables ── */
   --bg:var(--bg-page); --surface:var(--bg-surface);
   --text:var(--text-primary); --text-2:var(--text-secondary); --text-3:var(--text-tertiary);
+  /* SSOT input surface: portal.main #admin-content input reads
+     var(--input-bg,...) — without this remap it stays #fff in dark mode and
+     every admin input renders white-on-white. Remap at the token, not per-input. */
+  --input-bg:var(--bg-surface-dark, #1e293b);
   color-scheme: dark;
 }
 
@@ -100,6 +104,7 @@
     /* Bridge legacy */
     --bg:var(--bg-page); --surface:var(--bg-surface);
     --text:var(--text-primary); --text-2:var(--text-secondary); --text-3:var(--text-tertiary);
+    --input-bg:var(--bg-surface-dark, #1e293b);
     color-scheme: dark;
   }
 }
