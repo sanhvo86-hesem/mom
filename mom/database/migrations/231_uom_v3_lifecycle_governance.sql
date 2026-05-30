@@ -200,28 +200,25 @@ BEGIN
         'BIPM_SI',
         'https://www.bipm.org/en/publications/si-brochure',
         'migration:229_uom_v3_lifecycle_governance',
-        'active',
+        'pending_review',   -- must satisfy constraint before approver is set
         DATE '2026-01-01'
     )
     ON CONFLICT (manifest_code) DO UPDATE
         SET title              = EXCLUDED.title,
             description        = EXCLUDED.description,
             source_authority   = EXCLUDED.source_authority,
-            source_citation_uri= EXCLUDED.source_citation_uri,
-            lifecycle_status   = EXCLUDED.lifecycle_status
+            source_citation_uri= EXCLUDED.source_citation_uri
     RETURNING id INTO v_manifest_id;
 
-    -- The manifest is treated as approved-by-authority for the purpose
-    -- of the new CHECK on uom_conversion_rule. We satisfy
-    -- uom_slm_active_requires_approver by injecting the seed manifest
-    -- owner — for development/prototype we use the same first user as
-    -- a transitional bridge AND mark the manifest record clearly. P11
-    -- security/AI governance will lock this down further.
+    -- Satisfy uom_slm_active_requires_approver: set approver + promote to
+    -- 'active' in a single UPDATE so the CHECK is never violated.
+    -- For development/prototype we use the first registered user as a
+    -- transitional bridge; P11 security/AI governance will lock this down.
     UPDATE uom_standard_library_manifest
-       SET approved_by = (SELECT user_id FROM users ORDER BY created_at ASC LIMIT 1),
-           approved_at = COALESCE(approved_at, now())
-     WHERE id = v_manifest_id
-       AND approved_by IS NULL;
+       SET approved_by      = (SELECT user_id FROM users ORDER BY created_at ASC LIMIT 1),
+           approved_at      = COALESCE(approved_at, now()),
+           lifecycle_status = 'active'
+     WHERE id = v_manifest_id;
 
     UPDATE uom_conversion_rule
        SET standard_library_manifest_id = v_manifest_id,
