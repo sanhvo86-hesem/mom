@@ -233,7 +233,7 @@ function kindOf(type, alias){
   if(type === 'quality-spc-chart') return 'spc';
   if(type === 'quality-control-chart') return 'control';
   if(type === 'quality-pareto') return 'pareto';
-  if(type === 'quality-checksheet' || type === 'quality-inspection-form') return 'checksheet';
+  if(type === 'quality-checksheet') return 'checksheet';
   if(type === 'mfg-machine-status') return 'machine';
   if(type === 'data-kanban') return 'kanban';
   if(type === 'data-gantt') return 'gantt';

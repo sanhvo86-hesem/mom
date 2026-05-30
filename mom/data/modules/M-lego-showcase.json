@@ -8114,44 +8114,63 @@
             "en": ""
           },
           "config": {
-            "columns": [
+            "columns": 2,
+            "fields": [
               {
-                "key": "check",
+                "key": "code",
                 "label": {
-                  "vi": "Hạng mục",
-                  "en": "Item"
-                }
+                  "vi": "Mã",
+                  "en": "Code"
+                },
+                "type": "text",
+                "defaultValue": "SO-1042"
               },
               {
-                "key": "ca1",
+                "key": "customer",
                 "label": {
-                  "vi": "Ca 1",
-                  "en": "Shift 1"
-                }
+                  "vi": "Khách hàng",
+                  "en": "Customer"
+                },
+                "type": "text",
+                "defaultValue": "Hesem Co"
               },
               {
-                "key": "ca2",
+                "key": "due",
                 "label": {
-                  "vi": "Ca 2",
-                  "en": "Shift 2"
-                }
-              }
-            ],
-            "rows": [
-              {
-                "check": "Xước bề mặt",
-                "ca1": 2,
-                "ca2": 1
+                  "vi": "Ngày giao",
+                  "en": "Due date"
+                },
+                "type": "date",
+                "defaultValue": "2026-06-01"
               },
               {
-                "check": "Sai kích thước",
-                "ca1": 1,
-                "ca2": 3
+                "key": "priority",
+                "label": {
+                  "vi": "Ưu tiên",
+                  "en": "Priority"
+                },
+                "type": "select",
+                "defaultValue": "normal",
+                "options": [
+                  {
+                    "value": "normal",
+                    "label": "Bình thường"
+                  },
+                  {
+                    "value": "high",
+                    "label": "Cao"
+                  }
+                ]
               },
               {
-                "check": "Ba via",
-                "ca1": 0,
-                "ca2": 2
+                "key": "note",
+                "label": {
+                  "vi": "Ghi chú",
+                  "en": "Note"
+                },
+                "type": "textarea",
+                "span": "full",
+                "defaultValue": ""
               }
             ]
           }

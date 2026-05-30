@@ -45,6 +45,7 @@ schema.tabs.forEach((tab) => {
     catch(e){ problems.push([tab.tabId, b.type, 'THROW: ' + e.message]); return; }
     if(!html || !html.trim()){ problems.push([tab.tabId, b.type, 'BLANK']); return; }
     if(/class="hm-empty"/.test(html) && EMPTY.test(html)){ problems.push([tab.tabId, b.type, 'EMPTY/FALLBACK']); return; }
+    if(/\[object Object\]|undefined<|>undefined<|NaN%/.test(html)){ problems.push([tab.tabId, b.type, 'BAD-INTERP: ' + (html.match(/\[object Object\]|undefined|NaN%/)||[''])[0]]); return; }
     ok++;
   });
 });
