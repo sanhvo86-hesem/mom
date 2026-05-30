@@ -185,6 +185,13 @@ jobs:
         # dark mode. Widen GOVERNED_GLOBS as modules migrate onto tokens.
         run: php mom/tools/release/check_graphics_no_hardcode.php
 
+      - name: L3 block registry gate (Lego-SSOT)
+        # Validates graphics-block-registry.json: every block composes only
+        # real orders-v3 CSS classes, root_class ∈ composed_of, and every
+        # published block has a BlockKit renderer. A phantom/unbuildable block
+        # cannot ship. Runs unconditionally (frontend-only changesets).
+        run: php mom/tools/release/check_graphics_block_registry.php
+
       - name: ISO reference status check
         run: php mom/tools/release/check_iso_reference_status.php
 
