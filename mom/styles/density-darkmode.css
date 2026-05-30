@@ -1108,12 +1108,17 @@ dialog, [role="dialog"], .hm-modal, .hm-dialog {
    latest source, so it wins. Surface tokens are already dark here, so binding
    --input-bg to --bg-surface (now #1e293b) is correct. SSOT, no per-input hack.
    ════════════════════════════════════════════════════════════════════════════ */
-[data-color-mode="dark"],
-[data-color-scheme-active="dark"] {
-  --input-bg: var(--bg-surface-dark, #1e293b);
+/* Empirically (live Chrome): a plain or even higher-specificity remap still
+   lost — --input-bg resolved to #ffffff on <html> in dark mode. Only
+   :root[data-color-mode="dark"] (specificity 0,2,0) WITH !important reliably
+   wins and flips every admin input to the dark surface. Verified: admin
+   user-search input bg #ffffff -> rgb(30,41,59), text rgb(241,245,249). */
+:root[data-color-mode="dark"],
+:root[data-color-scheme-active="dark"] {
+  --input-bg: var(--bg-surface-dark, #1e293b) !important;
 }
 @media (prefers-color-scheme: dark) {
-  [data-color-mode="auto"] {
-    --input-bg: var(--bg-surface-dark, #1e293b);
+  :root[data-color-mode="auto"] {
+    --input-bg: var(--bg-surface-dark, #1e293b) !important;
   }
 }
