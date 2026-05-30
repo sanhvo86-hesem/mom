@@ -176,6 +176,15 @@ jobs:
       - name: Generated marker inventory check
         run: php mom/tools/release/check_generated_marker_inventory.php
 
+      - name: Graphics SSOT gate (no-hardcode + dark-parity)
+        # Runs unconditionally (often frontend-only changesets). Enforces the
+        # "Lego, no-hardcode" rules on the governed module set: zero colour
+        # literals in governed JS, dark-mode parity for surface selectors, and
+        # no rgba(255,255,255) surface bases. This is the guard for the exact
+        # class of bug that left the sidebar / admin rail / inputs white in
+        # dark mode. Widen GOVERNED_GLOBS as modules migrate onto tokens.
+        run: php mom/tools/release/check_graphics_no_hardcode.php
+
       - name: ISO reference status check
         run: php mom/tools/release/check_iso_reference_status.php
 
