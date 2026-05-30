@@ -247,6 +247,16 @@ final class KpiEngine
     public const METRIC_NCR_8D_UPDATE_SLA = 'NCR_8D_UPDATE_SLA';
     public const METRIC_CUSTOMER_ACCEPTED_8D_CLOSURE_RATE = 'CUSTOMER_ACCEPTED_8D_CLOSURE_RATE';
 
+    /** HMLV company-scorecard KPIs graduated to runtime against real tables. */
+    public const METRIC_RELEASE_READINESS_RFT          = 'RELEASE_READINESS_RFT';
+    public const METRIC_CONSTRAINT_LOST_HOURS          = 'CONSTRAINT_LOST_HOURS';
+    public const METRIC_CUSTOMER_ESCAPE_SEVERITY_INDEX = 'CUSTOMER_ESCAPE_SEVERITY_INDEX';
+    public const METRIC_CSR_ACKNOWLEDGEMENT_RATE       = 'CSR_ACKNOWLEDGEMENT_RATE';
+    public const METRIC_REPEAT_NCR_RATE                = 'REPEAT_NCR_RATE';
+    public const METRIC_CAPA_EFFECTIVENESS             = 'CAPA_EFFECTIVENESS';
+    public const METRIC_ENGINEERING_RELEASE_RFT        = 'ENGINEERING_RELEASE_RFT';
+    public const METRIC_CUSTOMER_COMM_CLOSURE_OT       = 'CUSTOMER_COMM_CLOSURE_OT';
+
     /** Age thresholds (days) past which an open item counts as aged. */
     private const AGE_DAYS_WIP             = 21;
     private const AGE_DAYS_NCR             = 30;
@@ -290,6 +300,13 @@ final class KpiEngine
         self::METRIC_NCR_4D_PRELIMINARY_SLA,
         self::METRIC_NCR_8D_UPDATE_SLA,
         self::METRIC_CUSTOMER_ACCEPTED_8D_CLOSURE_RATE,
+        self::METRIC_RELEASE_READINESS_RFT,
+        self::METRIC_CUSTOMER_ESCAPE_SEVERITY_INDEX,
+        self::METRIC_CSR_ACKNOWLEDGEMENT_RATE,
+        self::METRIC_REPEAT_NCR_RATE,
+        self::METRIC_CAPA_EFFECTIVENESS,
+        self::METRIC_ENGINEERING_RELEASE_RFT,
+        self::METRIC_CUSTOMER_COMM_CLOSURE_OT,
     ];
 
     /** Default target values per metric. */
@@ -329,6 +346,14 @@ final class KpiEngine
         self::METRIC_NCR_4D_PRELIMINARY_SLA => 16.0,
         self::METRIC_NCR_8D_UPDATE_SLA => 80.0,
         self::METRIC_CUSTOMER_ACCEPTED_8D_CLOSURE_RATE => 95.0,
+        self::METRIC_RELEASE_READINESS_RFT          => 98.0,  // ≥ 98% releases fully ready
+        self::METRIC_CONSTRAINT_LOST_HOURS          => 8.0,   // ≤ 8% lost at constraint
+        self::METRIC_CUSTOMER_ESCAPE_SEVERITY_INDEX => 2.0,   // ≤ 2 severity-weighted score
+        self::METRIC_CSR_ACKNOWLEDGEMENT_RATE       => 95.0,  // ≥ 95% acked within SLA
+        self::METRIC_REPEAT_NCR_RATE                => 5.0,   // ≤ 5% repeat
+        self::METRIC_CAPA_EFFECTIVENESS             => 90.0,  // ≥ 90% effective on time
+        self::METRIC_ENGINEERING_RELEASE_RFT        => 95.0,  // ≥ 95% eng release on time/RFT
+        self::METRIC_CUSTOMER_COMM_CLOSURE_OT       => 95.0,  // ≥ 95% comms closed within SLA
     ];
 
     /** Units per metric. */
@@ -368,6 +393,14 @@ final class KpiEngine
         self::METRIC_NCR_4D_PRELIMINARY_SLA => 'hours',
         self::METRIC_NCR_8D_UPDATE_SLA => 'hours',
         self::METRIC_CUSTOMER_ACCEPTED_8D_CLOSURE_RATE => '%',
+        self::METRIC_RELEASE_READINESS_RFT          => '%',
+        self::METRIC_CONSTRAINT_LOST_HOURS          => '%',
+        self::METRIC_CUSTOMER_ESCAPE_SEVERITY_INDEX => 'score',
+        self::METRIC_CSR_ACKNOWLEDGEMENT_RATE       => '%',
+        self::METRIC_REPEAT_NCR_RATE                => '%',
+        self::METRIC_CAPA_EFFECTIVENESS             => '%',
+        self::METRIC_ENGINEERING_RELEASE_RFT        => '%',
+        self::METRIC_CUSTOMER_COMM_CLOSURE_OT       => '%',
     ];
 
     /** Metrics where lower is better (invert RAG logic). */
@@ -388,6 +421,8 @@ final class KpiEngine
         self::METRIC_NCR_3D_RESPONSE_SLA,
         self::METRIC_NCR_4D_PRELIMINARY_SLA,
         self::METRIC_NCR_8D_UPDATE_SLA,
+        self::METRIC_CUSTOMER_ESCAPE_SEVERITY_INDEX,
+        self::METRIC_REPEAT_NCR_RATE,
     ];
 
     private Connection $db;
@@ -3312,6 +3347,215 @@ final class KpiEngine
      * @param string $metricCode
      * @return callable(DateRange, array): array
      */
+    /**
+     * RELEASE_READINESS_RFT — % of job releases that were fully ready
+     * (material + tooling + fixture + operator + all constraints met) at the
+     * moment they entered the dispatch queue. Source: mes_dispatch_queue, whose
+     * boolean readiness flags ARE the release checklist.
+     */
+    private function calcReleaseReadinessRft(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) FILTER (
+                    WHERE material_available AND tooling_available
+                      AND fixture_available AND operator_qualified
+                      AND all_constraints_met
+                ) AS ready,
+                COUNT(*) AS total
+             FROM mes_dispatch_queue
+             WHERE created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz",
+            [':s' => $period->start, ':e' => $period->end],
+        );
+        $ready = (int) ($row['ready'] ?? 0);
+        $total = (int) ($row['total'] ?? 0);
+        $pct   = $total > 0 ? ($ready / $total) * 100 : 0;
+
+        return ['value' => round($pct, 2), 'sample_size' => $total, 'ready' => $ready, 'total' => $total];
+    }
+
+    // NOTE: CONSTRAINT_LOST_HOURS calculator intentionally NOT implemented here.
+    // It stays staged_data_contract until a real scheduled-constraint-hours stream
+    // exists (the 8h/day baseline denominator would be a fake runtime — guard P0
+    // blocked it, correctly). Calc design is recorded in
+    // _reports/kpi/kpi-v3-runtime-graduation-2026-05-30.md for when the stream lands.
+
+    /**
+     * CUSTOMER_ESCAPE_SEVERITY_INDEX — severity-weighted score of escapes that
+     * reached the customer (critical ×100, major ×25, minor ×5), per 100
+     * shipment lines in the period. Source: ncr_records with customer-detection.
+     * Severity > rate: any critical drives the score red. Lower is better.
+     */
+    private function calcCustomerEscapeSeverityIndex(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) FILTER (WHERE lower(coalesce(severity,'')) IN ('critical','crit','1','a')) AS critical,
+                COUNT(*) FILTER (WHERE lower(coalesce(severity,'')) IN ('major','high','2','b'))     AS major,
+                COUNT(*) FILTER (WHERE lower(coalesce(severity,'')) NOT IN
+                    ('critical','crit','1','a','major','high','2','b'))                              AS minor,
+                COUNT(*) AS escapes
+             FROM ncr_records
+             WHERE created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz
+               AND lower(coalesce(detection,'')) LIKE '%customer%'",
+            [':s' => $period->start, ':e' => $period->end],
+        );
+        $critical = (int) ($row['critical'] ?? 0);
+        $major    = (int) ($row['major'] ?? 0);
+        $minor    = (int) ($row['minor'] ?? 0);
+        $escapes  = (int) ($row['escapes'] ?? 0);
+
+        $shipRow = $this->db->queryOne(
+            "SELECT COUNT(*) AS lines FROM shipments
+             WHERE ship_date BETWEEN :s AND :e AND shipment_status = 'delivered'",
+            [':s' => $period->start, ':e' => $period->end],
+        );
+        $lines = max(1, (int) ($shipRow['lines'] ?? 0));
+
+        $weighted = ($critical * 100) + ($major * 25) + ($minor * 5);
+        $index    = ($weighted / $lines) * 100;
+
+        return [
+            'value'       => round($index, 2),
+            'sample_size' => $escapes,
+            'critical'    => $critical,
+            'major'       => $major,
+            'minor'       => $minor,
+            'ship_lines'  => $lines,
+        ];
+    }
+
+    /**
+     * CSR_ACKNOWLEDGEMENT_RATE — % of customer complaints acknowledged within
+     * SLA (response_sent_at ≤ 4 working-hours of received_at AND containment
+     * started ≤ 24h). Source: eqms_complaints. Higher is better.
+     */
+    private function calcCsrAcknowledgementRate(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) FILTER (
+                    WHERE response_sent_at IS NOT NULL
+                      AND response_sent_at <= received_at + interval '4 hours'
+                      AND (containment_started_at IS NULL
+                           OR containment_started_at <= received_at + interval '24 hours')
+                ) AS on_sla,
+                COUNT(*) AS total
+             FROM eqms_complaints
+             WHERE received_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz",
+            [':s' => $period->start, ':e' => $period->end],
+        );
+        $onSla = (int) ($row['on_sla'] ?? 0);
+        $total = (int) ($row['total'] ?? 0);
+        $pct   = $total > 0 ? ($onSla / $total) * 100 : 0;
+
+        return ['value' => round($pct, 2), 'sample_size' => $total, 'on_sla' => $onSla, 'total' => $total];
+    }
+
+    /**
+     * REPEAT_NCR_RATE — % of NCRs in the period whose root-cause family had a
+     * prior NCR in the trailing 180 days (a repeat). Source: eqms_complaints
+     * repeat_root_cause_family is the authoritative repeat flag. Lower is better.
+     */
+    private function calcRepeatNcrRate(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) FILTER (
+                    WHERE repeat_root_cause_family IS NOT NULL
+                      AND repeat_root_cause_family <> ''
+                ) AS repeats,
+                COUNT(*) AS total
+             FROM eqms_complaints
+             WHERE received_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz",
+            [':s' => $period->start, ':e' => $period->end],
+        );
+        $repeats = (int) ($row['repeats'] ?? 0);
+        $total   = (int) ($row['total'] ?? 0);
+        $pct     = $total > 0 ? ($repeats / $total) * 100 : 0;
+
+        return ['value' => round($pct, 2), 'sample_size' => $total, 'repeats' => $repeats, 'total' => $total];
+    }
+
+    /**
+     * CAPA_EFFECTIVENESS — % of CAPAs closed on time with a verified-effective
+     * result. Source: capa_records (verification_result + completion_date vs
+     * target_date). Higher is better.
+     */
+    private function calcCapaEffectiveness(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) FILTER (
+                    WHERE capa_status = 'Closed'
+                      AND lower(coalesce(verification_result,'')) IN
+                          ('effective','verified','verified_effective','pass','passed')
+                      AND (completion_date IS NULL OR completion_date <= target_date)
+                ) AS effective,
+                COUNT(*) FILTER (WHERE capa_status = 'Closed') AS closed
+             FROM capa_records
+             WHERE created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz",
+            [':s' => $period->start, ':e' => $period->end],
+        );
+        $effective = (int) ($row['effective'] ?? 0);
+        $closed    = (int) ($row['closed'] ?? 0);
+        $pct       = $closed > 0 ? ($effective / $closed) * 100 : 0;
+
+        return ['value' => round($pct, 2), 'sample_size' => $closed, 'effective' => $effective, 'closed' => $closed];
+    }
+
+    /**
+     * ENGINEERING_RELEASE_RFT — % of job orders whose engineering pack was
+     * released on or before its target date and reached a 'released' state
+     * (right-first-time, no re-release). Source: job_orders. Higher is better.
+     */
+    private function calcEngineeringReleaseRft(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) FILTER (
+                    WHERE lower(coalesce(engineering_release_status,'')) IN ('released','complete','approved')
+                      AND released_date IS NOT NULL
+                      AND (release_target_date IS NULL OR released_date <= release_target_date)
+                ) AS rft,
+                COUNT(*) AS total
+             FROM job_orders
+             WHERE created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz
+               AND engineering_release_status IS NOT NULL",
+            [':s' => $period->start, ':e' => $period->end],
+        );
+        $rft   = (int) ($row['rft'] ?? 0);
+        $total = (int) ($row['total'] ?? 0);
+        $pct   = $total > 0 ? ($rft / $total) * 100 : 0;
+
+        return ['value' => round($pct, 2), 'sample_size' => $total, 'rft' => $rft, 'total' => $total];
+    }
+
+    /**
+     * CUSTOMER_COMM_CLOSURE_OT — % of customer communications/complaints closed
+     * on or before their due date. Source: eqms_complaints (closed_at vs
+     * due_date). Higher is better.
+     */
+    private function calcCustomerCommClosureOt(DateRange $period, array $filters): array
+    {
+        $row = $this->db->queryOne(
+            "SELECT
+                COUNT(*) FILTER (
+                    WHERE closed_at IS NOT NULL
+                      AND (due_date IS NULL OR closed_at <= due_date)
+                ) AS on_time,
+                COUNT(*) FILTER (WHERE closed_at IS NOT NULL) AS closed
+             FROM eqms_complaints
+             WHERE received_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz",
+            [':s' => $period->start, ':e' => $period->end],
+        );
+        $onTime = (int) ($row['on_time'] ?? 0);
+        $closed = (int) ($row['closed'] ?? 0);
+        $pct    = $closed > 0 ? ($onTime / $closed) * 100 : 0;
+
+        return ['value' => round($pct, 2), 'sample_size' => $closed, 'on_time' => $onTime, 'closed' => $closed];
+    }
+
     private function getCalculator(string $metricCode): callable
     {
         $metricCode = $this->normalizeMetricCode($metricCode);
@@ -3352,6 +3596,13 @@ final class KpiEngine
             self::METRIC_NCR_4D_PRELIMINARY_SLA => $this->calcNcr4dPreliminarySla(...),
             self::METRIC_NCR_8D_UPDATE_SLA => $this->calcNcr8dUpdateSla(...),
             self::METRIC_CUSTOMER_ACCEPTED_8D_CLOSURE_RATE => $this->calcCustomerAccepted8dClosureRate(...),
+            self::METRIC_RELEASE_READINESS_RFT          => $this->calcReleaseReadinessRft(...),
+            self::METRIC_CUSTOMER_ESCAPE_SEVERITY_INDEX => $this->calcCustomerEscapeSeverityIndex(...),
+            self::METRIC_CSR_ACKNOWLEDGEMENT_RATE       => $this->calcCsrAcknowledgementRate(...),
+            self::METRIC_REPEAT_NCR_RATE                => $this->calcRepeatNcrRate(...),
+            self::METRIC_CAPA_EFFECTIVENESS             => $this->calcCapaEffectiveness(...),
+            self::METRIC_ENGINEERING_RELEASE_RFT        => $this->calcEngineeringReleaseRft(...),
+            self::METRIC_CUSTOMER_COMM_CLOSURE_OT       => $this->calcCustomerCommClosureOt(...),
             default => throw new RuntimeException("Unknown metric: {$metricCode}"),
         };
     }

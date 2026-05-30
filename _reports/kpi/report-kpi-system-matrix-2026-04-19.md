@@ -1,6 +1,6 @@
 # KPI System Matrix Audit
 
-Generated: 2026-05-29T02:07:08+00:00
+Generated: 2026-05-30T23:09:19+00:00
 
 ## Summary
 
@@ -8,14 +8,14 @@ Generated: 2026-05-29T02:07:08+00:00
 |---|---:|
 | `html_file_count` | 510 |
 | `documents_with_metric_usage` | 128 |
-| `registry_metric_count` | 223 |
-| `metric_codes_seen` | 185 |
+| `registry_metric_count` | 229 |
+| `metric_codes_seen` | 204 |
 | `executive_scorecard_metrics_seen` | 7 |
 | `role_measure_codes_seen` | 95 |
-| `findings_total` | 7 |
+| `findings_total` | 9 |
 | `p1_findings` | 0 |
-| `p2_findings` | 6 |
-| `p3_findings` | 1 |
+| `p2_findings` | 7 |
+| `p3_findings` | 2 |
 
 ## Operating Conclusion
 
@@ -26,46 +26,50 @@ Luật change-control: mọi lần tạo KPI/metric, đổi tên, đổi target/
 
 | Priority | Finding | Document | Metrics | Recommendation |
 |---:|---|---|---|---|
+| P2 | `GENERIC_OEE_TARGET_REVIEW` | `mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html` | OEE, OEE_BOTTLENECK | Generic OEE ≥85% is world-class as an aspirational equipment benchmark, but CNC job-shop scorecard should clarify whether it means all-machine OEE health or OEE_BOTTLENECK with active constraint context. |
 | P2 | `LEGACY_ALIAS_USED` | `mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-129-bsc-kpi-operating-mechanism-assessment.html` | MACHINE_UTIL | Legacy alias MACHINE_UTILIZATION appears; use canonical code MACHINE_UTIL in governed KPI tables. |
 | P2 | `LEGACY_ALIAS_USED` | `mom/docs/operations/references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-145-v5-stress-test-fixes-and-workflow-lists-schema.html` | DOWNTIME_IMPACT | Legacy alias DOWNTIME appears; use canonical code DOWNTIME_IMPACT in governed KPI tables. |
-| P2 | `LEGACY_ALIAS_USED` | `mom/docs/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html` | COMPLAINT_RATE | Legacy alias CCR appears; use canonical code COMPLAINT_RATE in governed KPI tables. |
-| P2 | `LEGACY_ALIAS_USED` | `mom/docs/system/organization/04-RACI-Authority/authority-matrix.html` | COMPLAINT_RATE | Legacy alias CCR appears; use canonical code COMPLAINT_RATE in governed KPI tables. |
+| P2 | `LEGACY_ALIAS_USED` | `mom/docs/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html` | CUSTOMER_ESCAPE_DPMO | Legacy alias CCR appears; use canonical code CUSTOMER_ESCAPE_DPMO in governed KPI tables. |
+| P2 | `LEGACY_ALIAS_USED` | `mom/docs/system/organization/04-RACI-Authority/authority-matrix.html` | CUSTOMER_ESCAPE_DPMO | Legacy alias CCR appears; use canonical code CUSTOMER_ESCAPE_DPMO in governed KPI tables. |
 | P2 | `CONTEXT_FIT_REVIEW` | `mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html` | OEE | Gate control metric appears outside normal gate/work-instruction context. |
-| P2 | `LEGACY_ALIAS_USED` | `mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html` | COMPLAINT_RATE | Legacy alias CCR appears; use canonical code COMPLAINT_RATE in governed KPI tables. |
+| P2 | `LEGACY_ALIAS_USED` | `mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html` | CUSTOMER_ESCAPE_DPMO | Legacy alias CCR appears; use canonical code CUSTOMER_ESCAPE_DPMO in governed KPI tables. |
+| P3 | `TARGET_VALUE_REVIEW` | `mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html` | CUSTOMER_ESCAPE_DPMO | Document has target/threshold text that does not clearly include the registry scorecard target. Confirm whether this is a role/gate target or update the matrix mapping. |
 | P3 | `TARGET_VALUE_REVIEW` | `mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-125-cnc-performance-operating-system.html` | PLAN_ADHERENCE | Document has target/threshold text that does not clearly include the registry scorecard target. Confirm whether this is a role/gate target or update the matrix mapping. |
 
 ## Metric Matrix
 
 | Code | Class | Docs | Uses | Target | Backend/statistical plan | Target consistency | Name consistency |
 |---|---|---:|---:|---|---|---|---|
-| `OTD` | executive_scorecard_kpi | 74 | 200 | ≥95% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
-| `FPY` | executive_scorecard_kpi | 28 | 41 | ≥98% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
-| `OEE` | gate_control_metric | 22 | 47 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `OTD` | executive_scorecard_kpi | 74 | 202 | ≥95% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
+| `FPY` | executive_scorecard_kpi | 29 | 42 | ≥98% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
+| `OEE` | gate_control_metric | 23 | 49 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `COPQ` | executive_scorecard_kpi | 22 | 34 | ≤2 percent_of_sales | manual_governed_with_evidence_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
-| `CAPA_EFFECTIVENESS` | operating_metric | 9 | 11 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `WIP_AGING` | executive_scorecard_kpi | 9 | 12 | ≤5 aged_wip_percent | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
+| `CAPA_EFFECTIVENESS` | operating_metric | 9 | 11 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `MTTR` | operating_metric | 8 | 11 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `WIP_AGING` | executive_scorecard_kpi | 8 | 11 | ≤5 aged_wip_percent | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
-| `COMPLAINT_RATE` | executive_scorecard_kpi | 7 | 34 | ≤1 complaints_per_100_shipments | manual_governed_with_evidence_contract | target_seen_matches_registry_number | legacy_alias_seen |
-| `FAI_FIRST_PASS` | operating_metric | 6 | 13 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `PLAN_ADHERENCE` | executive_scorecard_kpi | 6 | 12 | ≥90% | runtime_calculated_with_registry_contract | target_seen_needs_review_against_registry | canonical_or_mapped_name |
-| `CMM_QUEUE_AGING` | gate_control_metric | 6 | 8 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `IN_PROCESS_REJECT_RATE` | operating_metric | 6 | 7 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `MATERIAL_AVAILABILITY_PLAN` | executive_scorecard_kpi | 5 | 6 | ≥95% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
-| `IPQC_CHARACTERISTIC_COMPLETENESS` | gate_control_metric | 4 | 7 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `CUSTOMER_ESCAPE_DPMO` | executive_scorecard_kpi | 7 | 36 | ≤100 dpmo | runtime_calculated_with_registry_contract | target_seen_needs_review_against_registry | legacy_alias_seen |
+| `FAI_FIRST_PASS` | operating_metric | 6 | 15 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `PLAN_ADHERENCE` | executive_scorecard_kpi | 6 | 13 | ≥90% | runtime_calculated_with_registry_contract | target_seen_needs_review_against_registry | canonical_or_mapped_name |
+| `CMM_QUEUE_AGING` | gate_control_metric | 6 | 9 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `IN_PROCESS_REJECT_RATE` | operating_metric | 6 | 8 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `MATERIAL_AVAILABILITY_PLAN` | executive_scorecard_kpi | 5 | 7 | ≥95% | runtime_calculated_with_registry_contract | target_seen_matches_registry_number | canonical_or_mapped_name |
+| `IPQC_CHARACTERISTIC_COMPLETENESS` | gate_control_metric | 4 | 8 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `OEE_BOTTLENECK` | operating_metric | 4 | 6 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CONSTRAINT_LOST_HOURS` | operating_metric | 4 | 5 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `CHECK_DIM_REPORT_ON_SHIP` | gate_control_metric | 3 | 10 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `CHECK_DIM_REPORT_ON_SHIP` | gate_control_metric | 3 | 11 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `C18-M1` | role_performance_measure | 3 | 8 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
-| `GAGE_VALID_FOR_RELEASE` | gate_control_metric | 3 | 5 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `CRITICAL_ROLE_BACKUP_COVERAGE` | governance_kpi | 3 | 4 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `GAGE_VALID_FOR_RELEASE` | gate_control_metric | 3 | 7 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `CRITICAL_ROLE_BACKUP_COVERAGE` | governance_kpi | 3 | 5 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `NCR_CONTAINMENT_ON_TIME` | gate_control_metric | 3 | 5 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `SPC_SIGNAL_REACTION_TIME` | gate_control_metric | 3 | 5 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `FAI_QUEUE_AGING` | operating_metric | 3 | 4 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `FINAL_INSPECTION_QUEUE_AGING` | operating_metric | 3 | 4 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `FINAL_RELEASE_RFT` | governance_kpi | 3 | 4 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `NCR_3D_RESPONSE_SLA` | operating_metric | 3 | 4 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `NCR_CONTAINMENT_ON_TIME` | gate_control_metric | 3 | 4 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `QC_HOLD_SLA` | operating_metric | 3 | 4 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `SPC_SIGNAL_REACTION_TIME` | gate_control_metric | 3 | 4 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `SHIP_PACKET_COMPLETENESS` | gate_control_metric | 3 | 4 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `THROUGHPUT_PER_CONSTRAINT_HOUR` | operating_metric | 3 | 4 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `FINAL_RELEASE_RFT` | governance_kpi | 3 | 3 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `SETUP_FIRST_PASS` | operating_metric | 3 | 3 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `C01-M2` | role_performance_measure | 2 | 7 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C01-M5` | role_performance_measure | 2 | 7 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C02-M2` | role_performance_measure | 2 | 7 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
@@ -91,6 +95,8 @@ Luật change-control: mọi lần tạo KPI/metric, đổi tên, đổi target/
 | `C17-M1` | role_performance_measure | 2 | 7 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C18-M2` | role_performance_measure | 2 | 7 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C19-M5` | role_performance_measure | 2 | 7 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
+| `DPMO` | local_or_unmapped_metric | 2 | 6 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | unmapped_or_local_name |
+| `TRACEABILITY_LABEL_VERIFIED` | gate_control_metric | 2 | 6 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `C03-M1` | role_performance_measure | 2 | 5 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C03-M2` | role_performance_measure | 2 | 5 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C05-M2` | role_performance_measure | 2 | 5 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
@@ -107,48 +113,62 @@ Luật change-control: mọi lần tạo KPI/metric, đổi tên, đổi target/
 | `C18-M3` | role_performance_measure | 2 | 5 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C19-M2` | role_performance_measure | 2 | 5 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C19-M3` | role_performance_measure | 2 | 5 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
-| `TRACEABILITY_LABEL_VERIFIED` | gate_control_metric | 2 | 5 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `MATERIAL_CERT_VERIFICATION_COMPLETENESS` | gate_control_metric | 2 | 4 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `SPECIAL_PROCESS_REQUIREMENT_CLEAR` | gate_control_metric | 2 | 4 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `MATERIAL_CERT_VERIFICATION_COMPLETENESS` | gate_control_metric | 2 | 5 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `SPECIAL_PROCESS_REQUIREMENT_CLEAR` | gate_control_metric | 2 | 5 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `CTQ_OUT_OF_SPEC_EVENT_COUNT` | gate_control_metric | 2 | 4 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `LAM_EVIDENCE_PACK_COMPLETENESS` | gate_control_metric | 2 | 4 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `SPECIAL_RELEASE_COMPLIANCE` | gate_control_metric | 2 | 4 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `C03-M4` | role_performance_measure | 2 | 3 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C13-M4` | role_performance_measure | 2 | 3 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C14-M5` | role_performance_measure | 2 | 3 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C16-M5` | role_performance_measure | 2 | 3 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C18-M4` | role_performance_measure | 2 | 3 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C18-M5` | role_performance_measure | 2 | 3 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
-| `SHIP_PACKET_COMPLETENESS` | gate_control_metric | 2 | 3 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `SPECIAL_RELEASE_COMPLIANCE` | gate_control_metric | 2 | 3 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED` | gate_control_metric | 2 | 3 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `GAGE_VALID_FOR_CTQ_MEASUREMENT` | gate_control_metric | 2 | 3 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT` | gate_control_metric | 2 | 3 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `IQC_RELEASE_ON_TIME` | gate_control_metric | 2 | 3 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `LAM_MATERIAL_KIT_READY_TO_PLAN` | gate_control_metric | 2 | 3 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `POST_CHANGE_CPK_REVALIDATION` | gate_control_metric | 2 | 3 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `SPECIAL_RELEASE_MARKING_COMPLIANCE` | gate_control_metric | 2 | 3 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `BOTTLENECK_BUFFER_STATUS` | operating_metric | 2 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `C12-M2` | role_performance_measure | 2 | 2 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
+| `CTQ_SPECIAL_CAUSE_OPEN_ACTIONS` | gate_control_metric | 2 | 2 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CURRENT_CONSTRAINT_RESOURCE` | operating_metric | 2 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED` | gate_control_metric | 2 | 2 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `DOC_RECORD_RETENTION_10Y` | operating_metric | 2 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT` | gate_control_metric | 2 | 2 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `INSPECTION_PLAN_ADHERENCE` | operating_metric | 2 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `IQC_RELEASE_ON_TIME` | gate_control_metric | 2 | 2 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `LAM_MATERIAL_KIT_READY_TO_PLAN` | gate_control_metric | 2 | 2 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `MACHINE_UTIL` | local_or_unmapped_metric | 2 | 2 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | legacy_alias_seen |
 | `MTBF` | operating_metric | 2 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `NCR_8D_UPDATE_SLA` | operating_metric | 2 | 2 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `PUT_THRU` | local_or_unmapped_metric | 2 | 2 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | unmapped_or_local_name |
-| `SETUP_FIRST_PASS` | operating_metric | 2 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `SPECIAL_RELEASE_MARKING_COMPLIANCE` | gate_control_metric | 2 | 2 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `SUPPLIER_READINESS` | operating_metric | 2 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `DSO` | governance_kpi | 1 | 6 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `INVENTORY_ACCURACY` | governance_kpi | 1 | 4 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `INVOICE_RFT` | governance_kpi | 1 | 4 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `QUOTE_HIT_RATE` | governance_kpi | 1 | 4 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `SETUP_RATIO` | local_or_unmapped_metric | 1 | 4 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | legacy_alias_seen |
-| `CTQ_OUT_OF_SPEC_EVENT_COUNT` | gate_control_metric | 1 | 3 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `INVENTORY_ACCURACY` | governance_kpi | 1 | 3 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `LAM_EVIDENCE_PACK_COMPLETENESS` | gate_control_metric | 1 | 3 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `QUOTE_HIT_RATE` | governance_kpi | 1 | 3 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `CRITICAL_SYSTEM_AVAILABILITY` | governance_kpi | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `CRITICAL_SYSTEM_AVAILABILITY` | governance_kpi | 1 | 3 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `ORDER_REVIEW_RFT` | gate_control_metric | 1 | 3 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `RECORDABLE_INCIDENT_RATE` | governance_kpi | 1 | 3 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `RFQ_FEASIBILITY_STUDY_COMPLETENESS` | gate_control_metric | 1 | 3 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `RFQ_TURNAROUND_TIME` | gate_control_metric | 1 | 3 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `SHIP_READY_TO_INVOICE_LT` | gate_control_metric | 1 | 3 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `SUBTIER_REQUIREMENT_FLOWDOWN` | operating_metric | 1 | 3 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `BCP_READINESS` | governance_kpi | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `CSR_ACKNOWLEDGEMENT_RATE` | gate_control_metric | 1 | 2 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `CUSTOMER_GAGE_DAMAGE_UNSUITABLE_NOTIFICATION_LT` | gate_control_metric | 1 | 2 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `DOWNTIME_IMPACT` | operating_metric | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | legacy_alias_seen |
-| `GAGE_VALID_FOR_CTQ_MEASUREMENT` | gate_control_metric | 1 | 2 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `POST_CHANGE_CPK_REVALIDATION` | gate_control_metric | 1 | 2 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `RECORDABLE_INCIDENT_RATE` | governance_kpi | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `RFQ_FEASIBILITY_STUDY_COMPLETENESS` | gate_control_metric | 1 | 2 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `SUBTIER_REQUIREMENT_FLOWDOWN` | operating_metric | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `ENGINEERING_RELEASE_ON_TIME` | governance_kpi | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `GROSS_MARGIN_JOB_FAMILY` | governance_kpi | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `INCIDENT_ACTION_CLOSURE_AGING` | governance_kpi | 1 | 2 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `INSPECTION_PLAN_COMPLETENESS` | gate_control_metric | 1 | 2 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `IQC_PASS_RATE` | gate_control_metric | 1 | 2 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `PROCESS_CHANGE_APPROVAL_RATE` | gate_control_metric | 1 | 2 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `SAFETY_ONBOARDING_COMPLIANCE` | governance_kpi | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `SCHEDULE_RECOVERY_EFFECTIVENESS` | governance_kpi | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `SERVICE_TICKET_SLA` | governance_kpi | 1 | 2 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `SUPPLIER_OTD` | governance_kpi | 1 | 2 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `BCP_READINESS` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `TRACEABILITY_DRILL_TIME` | gate_control_metric | 1 | 2 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `C01-M1` | role_performance_measure | 1 | 1 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C01-M3` | role_performance_measure | 1 | 1 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C01-M4` | role_performance_measure | 1 | 1 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
@@ -195,41 +215,42 @@ Luật change-control: mọi lần tạo KPI/metric, đổi tên, đổi target/
 | `C17-M5` | role_performance_measure | 1 | 1 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C19-M1` | role_performance_measure | 1 | 1 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
 | `C19-M4` | role_performance_measure | 1 | 1 |  | competency_evaluation_not_company_scorecard | local_target_requires_classification | canonical_or_mapped_name |
+| `CAL_COMPLIANCE` | governance_kpi | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `CHANGEOVER_TIME` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CONSTRAINT_STARVED_TIME` | operating_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CONTINGENCY_PLAN_READINESS_LAM` | operating_metric | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `CSR_ACKNOWLEDGEMENT_RATE` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `CTQ_SPECIAL_CAUSE_OPEN_ACTIONS` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `CONTROL_PLAN_PFMEA_APPROVAL` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CUSTOMER_ACCEPTED_8D_CLOSURE_RATE` | operating_metric | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `CUSTOMER_GAGE_DAMAGE_UNSUITABLE_NOTIFICATION_LT` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `CUSTOMER_COMM_CLOSURE_OT` | governance_kpi | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `CUSTOMER_ESCAPE_NOTIFICATION_LT` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CUSTOMER_NCR_SEVERITY_SCORE` | operating_metric | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `CYCLE_TIME_VARIANCE` | operating_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `ENGINEERING_RELEASE_ON_TIME` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `GROSS_MARGIN_JOB_FAMILY` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `INCIDENT_ACTION_CLOSURE_AGING` | governance_kpi | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `INSPECTION_PLAN_COMPLETENESS` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `ECN_LEAD_TIME` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `ECO_CLOSURE_AGING` | governance_kpi | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `ENGINEERING_RELEASE_RFT` | gate_control_metric | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `FAI_CYCLE_TIME` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `FOD_LINE_CLEARANCE_COMPLIANCE` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `INSPECTION_QUEUE_AGING` | operating_metric | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `MASTER_DATA_EXCEPTION_AGING` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `MONTH_END_CLOSE_OT` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `NCR_4D_PRELIMINARY_SLA` | operating_metric | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `ORDER_REVIEW_RFT` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `PROCESS_CHANGE_APPROVAL_RATE` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `NCR_CLOSURE_AGING` | governance_kpi | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `PROJECT_PLAN_DEVIATION_COMMUNICATION_LT` | operating_metric | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `REPEAT_NCR_RATE` | operating_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `REPEAT_NCR_RATE` | operating_metric | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `REPEAT_ROOT_CAUSE_ESCAPE_RATE` | operating_metric | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `RFQ_TURNAROUND_TIME` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `SAFETY_ONBOARDING_COMPLIANCE` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `SCHEDULE_RECOVERY_EFFECTIVENESS` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `SERVICE_TICKET_SLA` | governance_kpi | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `SHIP_READY_TO_INVOICE_LT` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `RFQ_COMPLETENESS_RFT` | operating_metric | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `SUPPLIER_RBA_COMPLIANCE_EVIDENCE` | operating_metric | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
-| `SUPPLIER_READINESS` | operating_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `TRACEABILITY_COMPLETENESS` | gate_control_metric | 1 | 1 |  | gate_hold_release_evidence_not_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `TRAINING_AS_CAPA_COUNTER` | operating_metric | 1 | 1 |  | not_declared_or_informational | no_registered_target_no_local_target | canonical_or_mapped_name |
+| `TRAINING_COMP` | governance_kpi | 1 | 1 |  | runtime_calculated_with_registry_contract | no_registered_target_no_local_target | canonical_or_mapped_name |
 | `WIP_BEFORE_CONSTRAINT` | operating_metric | 1 | 1 |  | candidate_data_contract_required_before_payout | no_registered_target_no_local_target | canonical_or_mapped_name |
 
 ## Registry Inventory
 
 | Code | Class | Registry sources | Backend/statistical plan | Target |
 |---|---|---|---|---|
-| `COMPLAINT_RATE` | executive_scorecard_kpi | runtime_calculated_metrics, legacy_aliases, annex122_governance_kpis, dashboard_core_kpis, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides | manual_governed / manual_governed_with_evidence_contract | ≤1 complaints_per_100_shipments |
 | `COPQ` | executive_scorecard_kpi | runtime_calculated_metrics, dashboard_core_kpis, gate_control_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides | manual_governed / manual_governed_with_evidence_contract | ≤2 percent_of_sales |
+| `CUSTOMER_ESCAPE_DPMO` | executive_scorecard_kpi | runtime_calculated_metrics, legacy_aliases, annex122_governance_kpis, dashboard_core_kpis, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides | runtime_calculated / runtime_calculated_with_registry_contract | ≤100 dpmo |
 | `FPY` | executive_scorecard_kpi | runtime_calculated_metrics, dashboard_core_kpis, gate_control_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides | runtime_calculated / runtime_calculated_with_registry_contract | ≥98% |
 | `MATERIAL_AVAILABILITY_PLAN` | executive_scorecard_kpi | runtime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides | runtime_calculated / runtime_calculated_with_registry_contract | ≥95% |
 | `OTD` | executive_scorecard_kpi | runtime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis, gate_control_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides | runtime_calculated / runtime_calculated_with_registry_contract | ≥95% |
@@ -239,14 +260,14 @@ Luật change-control: mọi lần tạo KPI/metric, đổi tên, đổi target/
 | `CHECK_DIM_REPORT_ON_SHIP` | gate_control_metric | dashboard_core_kpis, gate_control_metrics | manual_governed / gate_hold_release_evidence_not_payout |  |
 | `CMM_QUEUE_AGING` | gate_control_metric | dashboard_core_kpis, gate_control_metrics | manual_governed / gate_hold_release_evidence_not_payout |  |
 | `CONTROL_PLAN_PFMEA_APPROVAL` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
-| `CSR_ACKNOWLEDGEMENT_RATE` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `CSR_ACKNOWLEDGEMENT_RATE` | gate_control_metric | runtime_calculated_metrics, gate_control_metrics | runtime_calculated / runtime_calculated_with_registry_contract |  |
 | `CTQ_OUT_OF_SPEC_EVENT_COUNT` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `CTQ_SPECIAL_CAUSE_OPEN_ACTIONS` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `CUSTOMER_ESCAPE_NOTIFICATION_LT` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `CUSTOMER_GAGE_DAMAGE_UNSUITABLE_NOTIFICATION_LT` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `CUSTOMER_REQUIREMENT_PROFILE_ASSIGNED` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `ECN_LEAD_TIME` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
-| `ENGINEERING_RELEASE_RFT` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
+| `ENGINEERING_RELEASE_RFT` | gate_control_metric | runtime_calculated_metrics, gate_control_metrics | runtime_calculated / runtime_calculated_with_registry_contract |  |
 | `FAI_CYCLE_TIME` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `GAGE_VALID_FOR_CTQ_MEASUREMENT` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
 | `GAGE_VALID_FOR_IN_PROCESS_MEASUREMENT` | gate_control_metric | gate_control_metrics | not_declared / gate_hold_release_evidence_not_payout |  |
@@ -278,7 +299,7 @@ Luật change-control: mọi lần tạo KPI/metric, đổi tên, đổi target/
 | `CAL_COMPLIANCE` | governance_kpi | runtime_calculated_metrics, legacy_aliases, annex122_governance_kpis | runtime_calculated / runtime_calculated_with_registry_contract |  |
 | `CRITICAL_ROLE_BACKUP_COVERAGE` | governance_kpi | annex122_governance_kpis, dashboard_core_kpis | manual_governed / not_declared_or_informational |  |
 | `CRITICAL_SYSTEM_AVAILABILITY` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
-| `CUSTOMER_COMM_CLOSURE_OT` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
+| `CUSTOMER_COMM_CLOSURE_OT` | governance_kpi | runtime_calculated_metrics, annex122_governance_kpis | runtime_calculated / runtime_calculated_with_registry_contract |  |
 | `DSO` | governance_kpi | runtime_calculated_metrics, annex122_governance_kpis | runtime_calculated / runtime_calculated_with_registry_contract |  |
 | `ECO_CLOSURE_AGING` | governance_kpi | runtime_calculated_metrics, annex122_governance_kpis | runtime_calculated / runtime_calculated_with_registry_contract |  |
 | `ENGINEERING_RELEASE_ON_TIME` | governance_kpi | annex122_governance_kpis | not_declared / not_declared_or_informational |  |
@@ -313,7 +334,7 @@ Luật change-control: mọi lần tạo KPI/metric, đổi tên, đổi target/
 | `AR_DISPUTE_AGING` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `AUDIT_FINDING_AGING` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `BOTTLENECK_BUFFER_STATUS` | operating_metric | dashboard_core_kpis, proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
-| `CAPA_EFFECTIVENESS` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `CAPA_EFFECTIVENESS` | operating_metric | runtime_calculated_metrics, proposed_operating_metrics | runtime_calculated / runtime_calculated_with_registry_contract |  |
 | `CMM_PROGRAM_VALIDATION` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `COMPLAINT_LOG_ON_TIME` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `CONSTRAINT_IDLE_WHILE_NON_CONSTRAINT_RUNS` | operating_metric | dashboard_core_kpis, proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
@@ -325,14 +346,16 @@ Luật change-control: mọi lần tạo KPI/metric, đổi tên, đổi target/
 | `CRITICAL_ROLE_CERT_COVERAGE` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
 | `CTQ_MEASUREMENT_COMPLETENESS` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `CTQ_SAMPLE_POLICY_STATUS` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `CURRENT_CONSTRAINT_HEALTH` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
 | `CURRENT_CONSTRAINT_RESOURCE` | operating_metric | dashboard_core_kpis, proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `CUSTOMER_ACCEPTED_8D_CLOSURE_RATE` | operating_metric | runtime_calculated_metrics, proposed_operating_metrics | runtime_calculated / runtime_calculated_with_registry_contract |  |
-| `CUSTOMER_ESCAPE_DPPM_12M` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `CUSTOMER_ESCAPE_DPPM_12M` | operating_metric | proposed_operating_metrics | retired / not_declared_or_informational |  |
+| `CUSTOMER_ESCAPE_SEVERITY_INDEX` | operating_metric | runtime_calculated_metrics, proposed_operating_metrics | runtime_calculated / runtime_calculated_with_registry_contract |  |
 | `CUSTOMER_NCR_EVENTS_M` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
 | `CUSTOMER_NCR_SEVERITY_SCORE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
 | `CUSTOMER_NOTIFICATION_LT` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
 | `CYCLE_TIME_VARIANCE` | operating_metric | legacy_aliases, proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
-| `DEFECTIVE_ORDER_RATE_M` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `DEFECTIVE_ORDER_RATE_M` | operating_metric | proposed_operating_metrics | retired / not_declared_or_informational |  |
 | `DEFECT_PARETO_ACTION_CLOSURE` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `DFM_FEASIBILITY_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `DOCUMENT_CHANGE_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
@@ -355,6 +378,7 @@ Luật change-control: mọi lần tạo KPI/metric, đổi tên, đổi target/
 | `KPI_RED_ACTION_CLOSURE` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `KPI_REGISTRY_DRIFT_COUNT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `LAM_EVIDENCE_PACK_BLOCKER_COUNT` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `MARGIN_PER_CONSTRAINT_HOUR` | operating_metric | proposed_operating_metrics | retired / not_declared_or_informational |  |
 | `MRP_EXCEPTION_AGING` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `MSA_READINESS` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `MTBF` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
@@ -426,12 +450,14 @@ Luật change-control: mọi lần tạo KPI/metric, đổi tên, đổi target/
 | `POS_TOOL_INVENTORY_ACCURACY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
 | `POS_TOOL_LIFE_ADHERENCE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
 | `POS_TOOL_PRESET_ACCURACY` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
-| `PROJECT_PLAN_DEVIATION_COMMUNICATION_LT` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
+| `PROJECT_PLAN_DEVIATION_COMMUNICATION_LT` | operating_metric | proposed_operating_metrics | retired / not_declared_or_informational |  |
 | `PROMISE_DATE_RISK` | operating_metric | legacy_aliases, proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `QC_HOLD_SLA` | operating_metric | legacy_aliases, dashboard_core_kpis, proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `QUOTE_MARGIN_ACCURACY` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `QUOTE_PACKAGE_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
-| `REPEAT_NCR_RATE` | operating_metric | legacy_aliases, proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `RELEASE_AND_SHIP_PACKET_INTEGRITY` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
+| `RELEASE_READINESS_RFT` | operating_metric | runtime_calculated_metrics, proposed_operating_metrics | runtime_calculated / runtime_calculated_with_registry_contract |  |
+| `REPEAT_NCR_RATE` | operating_metric | runtime_calculated_metrics, legacy_aliases, proposed_operating_metrics | runtime_calculated / runtime_calculated_with_registry_contract |  |
 | `REPEAT_ROOT_CAUSE_ESCAPE_RATE` | operating_metric | proposed_operating_metrics | not_declared / not_declared_or_informational |  |
 | `RFQ_COMPLETENESS_RFT` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `RFQ_TURNAROUND_TIME_FOR_COMPLETE_RFQ` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
@@ -450,6 +476,7 @@ Luật change-control: mọi lần tạo KPI/metric, đổi tên, đổi target/
 | `TRAINING_MATRIX_FRESHNESS` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `TRAINING_RECORD_INTEGRITY` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
 | `TRANSACTION_SYNC_RELIABILITY` | operating_metric | proposed_operating_metrics | manual_governed / not_declared_or_informational |  |
+| `UNMANAGED_PROMISE_RISK_14D` | operating_metric | proposed_operating_metrics | retired / not_declared_or_informational |  |
 | `WIP_BEFORE_CONSTRAINT` | operating_metric | proposed_operating_metrics | staged_data_contract / candidate_data_contract_required_before_payout |  |
 
 ## Benchmark Rule
