@@ -651,6 +651,198 @@
     return { id:'effects', label_vi:'✨ Effects', label_en:'✨ Effects', body_html: body, tokens:[] };
   }
 
+  /* ════════════════════════════════════════════════════════════════
+   * v3-G25: World-class ERP / MES / EQMS components (research-backed).
+   * Sources: SAP Fiori, IBM Carbon, Atlassian, MS Fluent 2, Salesforce
+   * SLDS, Siemens Opcenter, Oracle JET, Veeva/ETQ/MasterControl QMS +
+   * FDA 21 CFR Part 11. Every visual literal is a var(--o3-*) binding so
+   * the dock property sliders actually drive the preview.
+   * ════════════════════════════════════════════════════════════════ */
+
+  /* 1. Object / Record header — SAP Fiori Object Page Header */
+  function recordHeaderSection(L){
+    var body = ''
+      + '<div style="background:var(--o3-surface-card);border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius-card);padding:var(--o3-space-section,12px);max-width:680px">'
+      +   '<div style="display:flex;align-items:flex-start;gap:var(--o3-space-md,12px)">'
+      +     '<div style="flex:1">'
+      +       '<div style="display:flex;align-items:center;gap:var(--o3-space-sm,8px);flex-wrap:wrap">'
+      +         '<span style="font-size:var(--o3-font-size-xl,18px);font-weight:var(--o3-font-weight-bold,700);color:var(--o3-text-strong)">NCR-2026-0142</span>'
+      +         '<span class="o3-chip o3-chip--warning">Đang xử lý</span>'
+      +       '</div>'
+      +       '<div style="font-size:var(--o3-font-size-sm,12px);color:var(--o3-text-muted);margin-top:2px">Nonconformance · LAM Research · mở 3 ngày</div>'
+      +     '</div>'
+      +     '<div style="display:flex;gap:var(--o3-space-section,12px)">'
+      +       '<div style="text-align:right"><div style="font-size:var(--o3-font-size-xs,11px);color:var(--o3-text-muted)">SEVERITY</div><div style="font-size:var(--o3-font-size-lg,15px);font-weight:600;color:var(--o3-danger)">Cao</div></div>'
+      +       '<div style="text-align:right"><div style="font-size:var(--o3-font-size-xs,11px);color:var(--o3-text-muted)">CONTAIN</div><div style="font-size:var(--o3-font-size-lg,15px);font-weight:600;color:var(--o3-success)">92%</div></div>'
+      +     '</div>'
+      +   '</div>'
+      + '</div>';
+    return { id:'record-header', label_vi:'Tiêu đề hồ sơ', label_en:'Record header', body_html: body,
+      tokens:['colorsLight.bgSurface','space.section','radius.card','colorsLight.borderSubtle','colorsLight.textStrong','status.danger.light','status.success.light'] };
+  }
+
+  /* 2. Data grid — editable (Fluent DataGrid / SAP Grid Table) */
+  function dataGridSection(L){
+    var cell = function(v, edit, bad){ return '<td style="padding:0 var(--o3-space-md,10px);height:var(--o3-control-h-standard);border:1px solid var(--o3-border-subtle);font-size:var(--o3-font-size-sm,12px);'+(edit?'background:var(--o3-brand-soft);':'')+(bad?'color:var(--o3-danger);font-weight:600;':'')+'">'+v+'</td>'; };
+    var body = ''
+      + '<table style="border-collapse:collapse;max-width:560px;width:100%">'
+      +   '<thead><tr>'
+      +     '<th style="padding:0 var(--o3-space-md,10px);height:var(--o3-control-h-standard);background:var(--o3-surface-muted);border:1px solid var(--o3-border-subtle);font-size:var(--o3-font-size-xs,11px);text-align:left;color:var(--o3-text-muted)">Đặc tính</th>'
+      +     '<th style="padding:0 var(--o3-space-md,10px);height:var(--o3-control-h-standard);background:var(--o3-surface-muted);border:1px solid var(--o3-border-subtle);font-size:var(--o3-font-size-xs,11px);text-align:left;color:var(--o3-text-muted)">Nominal</th>'
+      +     '<th style="padding:0 var(--o3-space-md,10px);height:var(--o3-control-h-standard);background:var(--o3-surface-muted);border:1px solid var(--o3-border-subtle);font-size:var(--o3-font-size-xs,11px);text-align:left;color:var(--o3-text-muted)">Đo</th>'
+      +   '</tr></thead><tbody>'
+      +     '<tr>'+cell('Ø ngoài')+cell('25.40')+cell('25.41', true)+'</tr>'
+      +     '<tr>'+cell('Độ phẳng')+cell('0.05')+cell('0.08', true, true)+'</tr>'
+      +     '<tr>'+cell('Độ nhám Ra')+cell('1.6')+cell('1.4', true)+'</tr>'
+      +   '</tbody></table>';
+    return { id:'datagrid', label_vi:'Lưới dữ liệu', label_en:'Data grid', body_html: body,
+      tokens:['control.height.standard','space.md','colorsLight.borderSubtle','colorsLight.bgSurfaceAlt','brand.primarySoft','status.danger.light'] };
+  }
+
+  /* 3. Breadcrumb — Carbon / Fluent / SAP shell */
+  function breadcrumbSection(L){
+    var sep = '<span style="color:var(--o3-border-strong);font-size:var(--o3-font-size-sm,12px)">›</span>';
+    var crumb = function(t, cur){ return '<a style="font-size:var(--o3-font-size-sm,12px);color:'+(cur?'var(--o3-text-strong);font-weight:600':'var(--o3-text-muted)')+';text-decoration:none;cursor:pointer">'+t+'</a>'; };
+    var body = '<nav style="display:flex;align-items:center;gap:var(--o3-space-sm,8px);flex-wrap:wrap">'
+      + crumb('Sản xuất')+sep+crumb('SO-2026-9001')+sep+crumb('JO-2026-5101')+sep+crumb('WO-2026-7301', true)+'</nav>';
+    return { id:'breadcrumb', label_vi:'Đường dẫn', label_en:'Breadcrumb', body_html: body,
+      tokens:['space.sm','colorsLight.textMuted','colorsLight.textStrong','colorsLight.borderStrong'] };
+  }
+
+  /* 4. Banner / inline alert — Fluent MessageBar / Atlassian Banner */
+  function bannerSection(L){
+    var ban = function(tone, soft, text){ return '<div style="display:flex;align-items:center;gap:var(--o3-space-sm,8px);min-height:var(--o3-control-h-standard);padding:0 var(--o3-space-md,12px);background:var(--o3-'+soft+');border-left:3px solid var(--o3-'+tone+');border-radius:var(--o3-radius);font-size:var(--o3-font-size-sm,13px);color:var(--o3-text-strong)">'+text+'</div>'; };
+    var body = '<div style="display:flex;flex-direction:column;gap:var(--o3-space-sm,8px);max-width:560px">'
+      + ban('danger','danger-soft','⛔ Lô này đang QA Hold — cần disposition trước khi xuất.')
+      + ban('warning','warning-soft','⚠ FAI chưa duyệt cho part LAM-CLEAN-0011.')
+      + ban('success','success-soft','✓ Validation pass · 0 blockers.')
+      + ban('info','info-soft','ℹ AEOI trích xuất email với độ tin cậy 0.96.')
+      + '</div>';
+    return { id:'banner', label_vi:'Dải thông báo', label_en:'Banner / Alert', body_html: body,
+      tokens:['control.height.standard','space.md','radius.master','status.danger.soft','status.warning.soft','status.success.soft','status.info.soft'] };
+  }
+
+  /* 5. Segmented control — Carbon Content switcher / SAP SegmentedButton */
+  function segmentedSection(L){
+    var seg = function(t, active){ return '<button style="height:var(--o3-control-h-standard);padding:0 var(--o3-space-md,14px);border:0;background:'+(active?'var(--o3-surface-card)':'transparent')+';color:'+(active?'var(--o3-text-strong);font-weight:600':'var(--o3-text-muted)')+';border-radius:var(--o3-radius);font-size:var(--o3-font-size-sm,12px);cursor:pointer">'+t+'</button>'; };
+    var body = '<div style="display:inline-flex;gap:2px;padding:2px;background:var(--o3-surface-muted);border-radius:var(--o3-radius);border:1px solid var(--o3-border-subtle)">'
+      + seg('Danh sách', true)+seg('Kanban')+seg('Lịch')+'</div>';
+    return { id:'segmented', label_vi:'Nút phân đoạn', label_en:'Segmented control', body_html: body,
+      tokens:['control.height.standard','space.md','radius.master','colorsLight.bgSurface','colorsLight.bgSurfaceAlt','colorsLight.textStrong'] };
+  }
+
+  /* 6. Accordion — Carbon / Fluent / SLDS */
+  function accordionSection(L){
+    var item = function(title, open){ return '<div style="border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius-card);overflow:hidden">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;height:var(--o3-control-h-standard);padding:0 var(--o3-space-md,12px);background:var(--o3-surface-muted);cursor:pointer">'
+      + '<span style="font-size:var(--o3-font-size-sm,13px);font-weight:500;color:var(--o3-text-strong)">'+title+'</span><span style="color:var(--o3-text-muted);font-size:var(--o3-font-size-md,13px)">'+(open?'▾':'▸')+'</span></div>'
+      + (open?'<div style="padding:var(--o3-space-md,12px);font-size:var(--o3-font-size-sm,12px);color:var(--o3-text-default)">Root cause: tool wear vượt ngưỡng sau 1,200 chu kỳ. Containment: cách ly 42 phôi.</div>':'')+'</div>'; };
+    var body = '<div style="display:flex;flex-direction:column;gap:var(--o3-space-sm,8px);max-width:520px">'
+      + item('Vấn đề (Problem)', true)+item('Phân tích nguyên nhân')+item('Kế hoạch hành động')+'</div>';
+    return { id:'accordion', label_vi:'Khối thu gọn', label_en:'Accordion', body_html: body,
+      tokens:['control.height.standard','space.md','radius.card','colorsLight.bgSurfaceAlt','colorsLight.borderSubtle','colorsLight.textStrong'] };
+  }
+
+  /* 7. Description list — key/value (SAP Object attributes / Carbon Structured list) */
+  function descListSection(L){
+    var kv = function(k, v){ return '<div style="display:flex;gap:var(--o3-space-md,12px);padding:var(--o3-space-xs,4px) 0">'
+      + '<span style="width:120px;flex-shrink:0;font-size:var(--o3-font-size-xs,11px);color:var(--o3-text-muted);text-transform:uppercase;letter-spacing:.03em">'+k+'</span>'
+      + '<span style="font-size:var(--o3-font-size-sm,13px);color:var(--o3-text-strong)">'+v+'</span></div>'; };
+    var body = '<div style="max-width:460px">'
+      + kv('Part No','LAM-CLEAN-0011')+kv('Heat No','H-2026-8842')+kv('Nhà cung cấp','LAM Research')+kv('Số lượng','100 EA')+kv('Cert No','MTR-90231')+'</div>';
+    return { id:'desc-list', label_vi:'Danh sách thuộc tính', label_en:'Description list', body_html: body,
+      tokens:['space.md','colorsLight.textMuted','colorsLight.textStrong'] };
+  }
+
+  /* 8. Slider / range — Carbon / Atlassian / Fluent */
+  function sliderSection(L){
+    var sl = function(label, pct){ return '<div style="display:flex;flex-direction:column;gap:var(--o3-space-xs,6px)"><div style="display:flex;justify-content:space-between;font-size:var(--o3-font-size-xs,11px);color:var(--o3-text-muted)"><span>'+label+'</span><span>'+pct+'%</span></div>'
+      + '<div style="position:relative;height:var(--o3-space-xs,6px);background:var(--o3-surface-muted);border-radius:var(--o3-radius-pill)"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:var(--o3-brand);border-radius:var(--o3-radius-pill)"></div>'
+      + '<div style="position:absolute;left:'+pct+'%;top:50%;transform:translate(-50%,-50%);width:var(--o3-space-md,14px);height:var(--o3-space-md,14px);background:var(--o3-surface-card);border:2px solid var(--o3-brand);border-radius:var(--o3-radius-pill)"></div></div></div>'; };
+    var body = '<div style="display:flex;flex-direction:column;gap:var(--o3-space-md,14px);max-width:360px">'
+      + sl('Ngưỡng dung sai', 65)+sl('Độ mờ cảnh báo', 40)+'</div>';
+    return { id:'slider', label_vi:'Thanh trượt', label_en:'Slider / Range', body_html: body,
+      tokens:['space.xs','space.md','radius.pill','colorsLight.bgSurfaceAlt','brand.primary'] };
+  }
+
+  /* 9. Tag input / token field — Fluent TagPicker / SAP MultiInput */
+  function tagInputSection(L){
+    var tok = function(t){ return '<span style="display:inline-flex;align-items:center;gap:var(--o3-space-xs,4px);height:calc(var(--o3-control-h-standard) - 8px);padding:0 var(--o3-space-sm,8px);background:var(--o3-surface-muted);border-radius:var(--o3-radius-pill);font-size:var(--o3-font-size-xs,11px);color:var(--o3-text-strong)">'+t+'<span style="cursor:pointer;color:var(--o3-text-muted)">✕</span></span>'; };
+    var body = '<div style="display:flex;flex-wrap:wrap;gap:var(--o3-space-xs,6px);align-items:center;min-height:var(--o3-control-h-standard);padding:0 var(--o3-space-md,10px);border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius);max-width:460px">'
+      + tok('ISO 9001:2015')+tok('AS9100D')+tok('§8.7')+'<input placeholder="thêm clause…" style="flex:1;min-width:80px;border:0;outline:none;font-size:var(--o3-font-size-sm,12px);background:transparent;height:var(--o3-control-h-standard)"></div>';
+    return { id:'tag-input', label_vi:'Ô nhập thẻ', label_en:'Tag input', body_html: body,
+      tokens:['control.height.standard','space.md','radius.master','radius.pill','colorsLight.bgSurfaceAlt','colorsLight.borderSubtle'] };
+  }
+
+  /* 10. File upload / dropzone — Carbon File uploader / Fluent */
+  function fileUploadSection(L){
+    var body = '<div style="display:flex;flex-direction:column;gap:var(--o3-space-sm,8px);max-width:460px">'
+      + '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--o3-space-xs,6px);min-height:96px;padding:var(--o3-space-lg,16px);border:2px dashed var(--o3-border-default);border-radius:var(--o3-radius-card);background:var(--o3-surface-muted);text-align:center">'
+      + '<span style="font-size:var(--o3-font-size-2xl,22px)">📎</span><span style="font-size:var(--o3-font-size-sm,13px);color:var(--o3-text-default)">Kéo thả MTR / ảnh, hoặc <strong style="color:var(--o3-brand)">chọn tệp</strong></span><span style="font-size:var(--o3-font-size-xs,11px);color:var(--o3-text-muted)">PDF, JPG · tối đa 20MB</span></div>'
+      + '<div style="display:flex;align-items:center;gap:var(--o3-space-sm,8px);height:var(--o3-control-h-standard);padding:0 var(--o3-space-md,10px);border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius);font-size:var(--o3-font-size-sm,12px)"><span>📄</span><span style="flex:1">MTR-90231.pdf</span><span style="color:var(--o3-success)">✓</span></div></div>';
+    return { id:'file-upload', label_vi:'Vùng tải tệp', label_en:'File upload', body_html: body,
+      tokens:['control.height.standard','space.lg','radius.card','colorsLight.borderDefault','colorsLight.bgSurfaceAlt','brand.primary'] };
+  }
+
+  /* 11. Bullet micro-chart — SAP Fiori micro-chart family */
+  function microchartSection(L){
+    var bullet = function(label, actual, target, tone){ return '<div style="display:flex;flex-direction:column;gap:var(--o3-space-xs,4px)"><div style="display:flex;justify-content:space-between;font-size:var(--o3-font-size-xs,11px)"><span style="color:var(--o3-text-strong);font-weight:600">'+label+'</span><span style="color:var(--o3-text-muted)">'+actual+'% / '+target+'%</span></div>'
+      + '<div style="position:relative;height:var(--o3-space-md,10px);background:var(--o3-surface-muted);border-radius:var(--o3-radius)"><div style="position:absolute;left:0;top:0;height:100%;width:'+actual+'%;background:var(--o3-'+tone+');border-radius:var(--o3-radius)"></div>'
+      + '<div style="position:absolute;left:'+target+'%;top:-2px;bottom:-2px;width:2px;background:var(--o3-text-strong)"></div></div></div>'; };
+    var body = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--o3-space-md,14px);max-width:560px">'
+      + bullet('First-Pass Yield', 94, 97, 'warning')+bullet('OTD', 98, 95, 'success')+bullet('NCR rate', 12, 8, 'danger')+bullet('OEE', 87, 85, 'success')+'</div>';
+    return { id:'microchart', label_vi:'Vi biểu đồ bullet', label_en:'Bullet micro-chart', body_html: body,
+      tokens:['space.md','radius.master','colorsLight.bgSurfaceAlt','colorsLight.textStrong','status.success.light','status.warning.light','status.danger.light'] };
+  }
+
+  /* 12. List with row actions — SAP Object List Item / Carbon List */
+  function listActionsSection(L){
+    var row = function(id, title, tone, chip){ return '<div style="display:flex;align-items:center;gap:var(--o3-space-md,12px);min-height:calc(var(--o3-control-h-standard) * 1.4);padding:var(--o3-space-sm,8px) var(--o3-space-md,12px);border-bottom:1px solid var(--o3-border-subtle)">'
+      + '<div style="flex:1"><div style="font-size:var(--o3-font-size-sm,13px);font-weight:600;color:var(--o3-text-strong)">'+id+'</div><div style="font-size:var(--o3-font-size-xs,11px);color:var(--o3-text-muted)">'+title+'</div></div>'
+      + '<span class="o3-chip o3-chip--'+tone+'">'+chip+'</span><span style="color:var(--o3-text-muted);cursor:pointer;font-size:var(--o3-font-size-lg,15px)">⋯</span></div>'; };
+    var body = '<div style="border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius-card);overflow:hidden;max-width:520px">'
+      + row('DEV-2026-0142','Độ phẳng vượt dung sai','danger','Cao')+row('DEV-2026-0141','Nhám bề mặt','warning','TB')+row('DEV-2026-0140','Sai lệch nhãn','info','Thấp')+'</div>';
+    return { id:'list-actions', label_vi:'Danh sách có thao tác', label_en:'List with actions', body_html: body,
+      tokens:['control.height.standard','space.md','radius.card','colorsLight.borderSubtle','colorsLight.textStrong'] };
+  }
+
+  /* 13. ⭐ E-signature block — 21 CFR Part 11 §11.50 manifestation */
+  function esignatureSection(L){
+    var sig = function(name, role, time, meaning, tone){ return '<div style="display:flex;flex-direction:column;gap:var(--o3-space-xs,4px);padding:var(--o3-space-md,12px);background:var(--o3-surface-muted);border-left:3px solid var(--o3-'+tone+');border-radius:var(--o3-radius-card)">'
+      + '<div style="display:flex;align-items:center;gap:var(--o3-space-sm,8px)"><span style="font-size:var(--o3-font-size-md,13px);font-weight:var(--o3-font-weight-bold,700);color:var(--o3-text-strong)">'+name+'</span><span class="o3-chip o3-chip--'+tone+'">'+meaning+'</span></div>'
+      + '<div style="font-size:var(--o3-font-size-xs,11px);color:var(--o3-text-muted)">'+role+' · '+time+' ICT</div></div>'; };
+    var body = '<div style="display:flex;flex-direction:column;gap:var(--o3-space-sm,8px);max-width:480px">'
+      + sig('Trần Văn Minh','QA Manager','2026-05-30 14:22','Approval','success')
+      + sig('Nguyễn An','Production Lead','2026-05-30 13:08','Reviewed','info')
+      + '<div style="display:flex;align-items:center;gap:var(--o3-space-sm,8px);margin-top:var(--o3-space-xs,4px)"><input type="password" placeholder="Mật khẩu để ký…" style="flex:1;height:var(--o3-control-h-standard);padding:0 var(--o3-space-md,10px);border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius);font-size:var(--o3-font-size-sm,12px)"><button class="o3-btn o3-btn--primary">Ký điện tử</button></div></div>';
+    return { id:'esignature', label_vi:'⭐ Khối ký điện tử', label_en:'E-signature (Part 11)', body_html: body,
+      tokens:['control.height.standard','space.md','radius.card','colorsLight.bgSurfaceAlt','colorsLight.textStrong','status.success.light','status.info.light','brand.primary'] };
+  }
+
+  /* 14. ⭐ Audit-trail entry — 21 CFR Part 11 §11.10(e) */
+  function auditTrailSection(L){
+    var entry = function(actor, field, oldV, newV, time, reason){ return '<div style="display:flex;flex-direction:column;gap:2px;padding:var(--o3-space-sm,8px) 0;border-bottom:1px solid var(--o3-border-subtle)">'
+      + '<div style="font-size:var(--o3-font-size-sm,12px);color:var(--o3-text-strong)"><strong style="font-weight:var(--o3-font-weight-bold,700)">'+actor+'</strong> đổi <span style="color:var(--o3-text-muted)">'+field+'</span>: <span style="text-decoration:line-through;color:var(--o3-danger)">'+oldV+'</span> → <span style="color:var(--o3-success);font-weight:600">'+newV+'</span></div>'
+      + '<div style="font-size:var(--o3-font-size-xs,11px);color:var(--o3-text-muted);font-family:ui-monospace,monospace">'+time+' · lý do: '+reason+'</div></div>'; };
+    var body = '<div style="max-width:560px">'
+      + entry('Trưởng Phòng QA','Status','Open','In Verification','2026-05-29 09:14','evidence received')
+      + entry('sanh.vo','Disposition','—','Rework','2026-05-29 08:50','MRB decision')
+      + entry('AEOI bot','Confidence','0.71','0.96','2026-05-29 08:42','re-extract')+'</div>';
+    return { id:'audit-trail', label_vi:'⭐ Dòng nhật ký kiểm toán', label_en:'Audit trail entry', body_html: body,
+      tokens:['space.sm','colorsLight.borderSubtle','colorsLight.textStrong','colorsLight.textMuted','status.danger.light','status.success.light'] };
+  }
+
+  /* 15. ⭐ Workflow-state pill — SLDS Path / Atlassian Lozenge / Veeva lifecycle */
+  function workflowPillSection(L){
+    var pill = function(t, tone, active){ return '<span style="display:inline-flex;align-items:center;gap:var(--o3-space-xs,4px);height:calc(var(--o3-control-h-standard) - 8px);padding:0 var(--o3-space-md,12px);background:var(--o3-'+tone+'-soft);color:var(--o3-'+tone+');border-radius:var(--o3-radius-pill);font-size:var(--o3-font-size-xs,11px);font-weight:600;'+(active?'box-shadow:0 0 0 2px var(--o3-'+tone+')':'')+'">'+t+'</span>'; };
+    var body = '<div style="display:flex;flex-direction:column;gap:var(--o3-space-md,14px)">'
+      + '<div style="display:flex;gap:var(--o3-space-sm,8px);flex-wrap:wrap;align-items:center">'
+      +   pill('Nháp','neutral')+'<span style="color:var(--o3-border-strong)">→</span>'+pill('Đang duyệt','warning',true)+'<span style="color:var(--o3-border-strong)">→</span>'+pill('Đã duyệt','success')+'<span style="color:var(--o3-border-strong)">→</span>'+pill('Hiệu lực','info')+'</div>'
+      + '<div style="display:flex;gap:var(--o3-space-sm,8px);flex-wrap:wrap">'+pill('Đóng','neutral')+pill('Từ chối','danger')+pill('Quá hạn','danger')+'</div></div>';
+    return { id:'workflow-pill', label_vi:'⭐ Nhãn trạng thái quy trình', label_en:'Workflow state pill', body_html: body,
+      tokens:['control.height.standard','space.md','radius.pill','status.neutral.soft','status.warning.soft','status.success.soft','status.info.soft','status.danger.soft'] };
+  }
+
   function sections(L){
     return [
       /* v3-G15 (2026-05-29): Global sections REMOVED from Module Master.
@@ -683,7 +875,23 @@
       dropdownSection(L),
       tooltipSection(L),
       skeletonSection(L),
-      emptyAndToastSection(L)
+      emptyAndToastSection(L),
+      /* v3-G25: world-class ERP/MES/EQMS components */
+      recordHeaderSection(L),
+      dataGridSection(L),
+      breadcrumbSection(L),
+      bannerSection(L),
+      segmentedSection(L),
+      accordionSection(L),
+      descListSection(L),
+      sliderSection(L),
+      tagInputSection(L),
+      fileUploadSection(L),
+      microchartSection(L),
+      listActionsSection(L),
+      esignatureSection(L),
+      auditTrailSection(L),
+      workflowPillSection(L)
     ];
   }
 
@@ -1204,6 +1412,195 @@
         _tc('status.warning.light','Toast warning','Toast warning'),
         _tc('status.danger.light','Toast danger','Toast danger'),
         _tc('status.info.light','Toast info','Toast info')
+      ])
+    ],
+    /* ── v3-G25: world-class ERP/MES/EQMS component catalogs ──────── */
+    'record-header': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-section','Padding','Padding',4,32),
+        _vn('--o3-radius-card','Bo góc','Radius',0,20),
+        _vn('--o3-font-size-xl','Cỡ tiêu đề','Title size',12,28),
+        _vn('--o3-font-size-lg','Cỡ facet','Facet size',10,22)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurface','Nền','Background'),
+        _tc('colorsLight.borderSubtle','Border','Border'),
+        _tc('colorsLight.textPrimary','Chữ tiêu đề','Title text'),
+        _tc('status.danger.light','Severity','Severity'),
+        _tc('status.success.light','Contain','Contain')
+      ])
+    ],
+    'datagrid': [
+      _grp('layout','Bố cục','Layout',[
+        _tn('control.height.standard','Cao hàng','Row height',24,56),
+        _vn('--o3-space-md','Padding cell','Cell padding',4,24),
+        _vn('--o3-font-size-sm','Cỡ chữ','Cell font',9,16)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.borderSubtle','Gridline','Gridline'),
+        _tc('colorsLight.bgSurfaceAlt','Nền header','Header bg'),
+        _tc('brand.primarySoft','Nền ô sửa','Edit cell bg'),
+        _tc('status.danger.light','Giá trị lỗi','Bad value')
+      ])
+    ],
+    'breadcrumb': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-sm','Khe','Gap',0,24),
+        _vn('--o3-font-size-sm','Cỡ chữ','Font size',9,16)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.textMuted','Chữ link','Link color'),
+        _tc('colorsLight.textPrimary','Chữ hiện tại','Current'),
+        _tc('colorsLight.borderStrong','Dấu phân cách','Separator')
+      ])
+    ],
+    'banner': [
+      _grp('layout','Bố cục','Layout',[
+        _tn('control.height.standard','Cao','Min height',24,56),
+        _vn('--o3-space-md','Padding','Padding',4,24),
+        _vn('--o3-radius','Bo góc','Radius',0,16),
+        _vn('--o3-space-sm','Khe giữa banner','Stack gap',0,24)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('status.danger.soft','Nền lỗi','Error bg'),
+        _tc('status.warning.soft','Nền cảnh báo','Warning bg'),
+        _tc('status.success.soft','Nền OK','Success bg'),
+        _tc('status.info.soft','Nền info','Info bg')
+      ])
+    ],
+    'segmented': [
+      _grp('layout','Bố cục','Layout',[
+        _tn('control.height.standard','Cao','Height',24,56),
+        _vn('--o3-space-md','Padding','Padding',4,24),
+        _vn('--o3-radius','Bo góc','Radius',0,16)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurface','Nền active','Active bg'),
+        _tc('colorsLight.bgSurfaceAlt','Nền track','Track bg'),
+        _tc('colorsLight.textPrimary','Chữ active','Active text')
+      ])
+    ],
+    'accordion': [
+      _grp('layout','Bố cục','Layout',[
+        _tn('control.height.standard','Cao header','Header height',24,56),
+        _vn('--o3-space-md','Padding nội dung','Body padding',4,24),
+        _vn('--o3-radius-card','Bo góc','Radius',0,20)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurfaceAlt','Nền header','Header bg'),
+        _tc('colorsLight.borderSubtle','Border','Border'),
+        _tc('colorsLight.textPrimary','Chữ','Text')
+      ])
+    ],
+    'desc-list': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-md','Khe cột','Column gap',4,32),
+        _vn('--o3-space-xs','Khe hàng','Row gap',0,16),
+        _vn('--o3-font-size-sm','Cỡ value','Value size',9,18)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.textMuted','Chữ label','Label'),
+        _tc('colorsLight.textPrimary','Chữ value','Value')
+      ])
+    ],
+    'slider': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-xs','Cao track','Track height',2,16),
+        _vn('--o3-space-md','Cỡ thumb','Thumb size',8,24),
+        _vn('--o3-radius-pill','Bo góc','Radius',0,999)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('brand.primary','Màu fill','Fill'),
+        _tc('colorsLight.bgSurfaceAlt','Màu track','Track')
+      ])
+    ],
+    'tag-input': [
+      _grp('layout','Bố cục','Layout',[
+        _tn('control.height.standard','Cao','Height',24,56),
+        _vn('--o3-space-md','Padding','Padding',4,24),
+        _vn('--o3-radius-pill','Bo góc token','Token radius',0,999),
+        _vn('--o3-space-xs','Khe token','Token gap',0,16)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurfaceAlt','Nền token','Token bg'),
+        _tc('colorsLight.borderSubtle','Border','Border')
+      ])
+    ],
+    'file-upload': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-lg','Padding','Padding',4,32),
+        _vn('--o3-radius-card','Bo góc','Radius',0,20),
+        _tn('control.height.standard','Cao hàng tệp','File row height',24,56)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.borderDefault','Viền đứt','Dashed border'),
+        _tc('colorsLight.bgSurfaceAlt','Nền','Background'),
+        _tc('brand.primary','Link','Link')
+      ])
+    ],
+    'microchart': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-md','Cao bar','Bar height',4,24),
+        _vn('--o3-radius','Bo góc','Radius',0,16),
+        _vn('--o3-space-md','Khe chart','Chart gap',4,32)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurfaceAlt','Track','Track'),
+        _tc('colorsLight.textPrimary','Đường target','Target line'),
+        _tc('status.success.light','Tốt','Good'),
+        _tc('status.warning.light','Cảnh báo','Warn'),
+        _tc('status.danger.light','Xấu','Bad')
+      ])
+    ],
+    'list-actions': [
+      _grp('layout','Bố cục','Layout',[
+        _tn('control.height.standard','Cao hàng','Row height',24,56),
+        _vn('--o3-space-md','Padding','Padding',4,24),
+        _vn('--o3-radius-card','Bo góc','Radius',0,20)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.borderSubtle','Border','Border'),
+        _tc('colorsLight.textPrimary','Chữ','Text')
+      ])
+    ],
+    'esignature': [
+      _grp('layout','Bố cục','Layout',[
+        _tn('control.height.standard','Cao input','Input height',24,56),
+        _vn('--o3-space-md','Padding khối','Block padding',4,24),
+        _vn('--o3-radius-card','Bo góc','Radius',0,20)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.bgSurfaceAlt','Nền khối','Block bg'),
+        _tc('status.success.light','Accent duyệt','Approve accent'),
+        _tc('status.info.light','Accent review','Review accent'),
+        _tc('brand.primary','Nút ký','Sign button')
+      ])
+    ],
+    'audit-trail': [
+      _grp('layout','Bố cục','Layout',[
+        _vn('--o3-space-sm','Khe hàng','Row gap',0,24),
+        _vn('--o3-font-size-sm','Cỡ chữ','Font size',9,16)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('colorsLight.borderSubtle','Border','Border'),
+        _tc('colorsLight.textPrimary','Chữ','Text'),
+        _tc('status.danger.light','Giá trị cũ','Old value'),
+        _tc('status.success.light','Giá trị mới','New value')
+      ])
+    ],
+    'workflow-pill': [
+      _grp('layout','Bố cục','Layout',[
+        _tn('control.height.standard','Cao pill','Pill height',24,56),
+        _vn('--o3-space-md','Padding','Padding',4,24),
+        _vn('--o3-radius-pill','Bo góc','Radius',0,999),
+        _vn('--o3-space-sm','Khe pill','Pill gap',0,24)
+      ]),
+      _grp('colors','Màu','Colors',[
+        _tc('status.neutral.soft','Nháp','Draft'),
+        _tc('status.warning.soft','Đang duyệt','Pending'),
+        _tc('status.success.soft','Đã duyệt','Approved'),
+        _tc('status.info.soft','Hiệu lực','Effective'),
+        _tc('status.danger.soft','Từ chối','Rejected')
       ])
     ]
   };
