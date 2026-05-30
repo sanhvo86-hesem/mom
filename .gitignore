@@ -46,6 +46,9 @@ tests/e2e/node_modules/
 # Whitelist RACI v3 authority consolidation audit bundle — sequential
 # governance evidence set reviewed by external evaluators.
 !_reports/raci-v3/
+# Whitelist the Graphics Authority adversarial critique + Lego-SSOT redesign
+# proposal — strategy deliverables reviewed alongside the dark-mode fix.
+!_reports/graphics-authority-critique/
 _build/
 _Deleted/
 .tmp/
