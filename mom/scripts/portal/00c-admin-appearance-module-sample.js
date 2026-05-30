@@ -1384,6 +1384,13 @@
           cssVars.forEach(function(cv){
             try { document.documentElement.style.setProperty(cv, staged); } catch (e) {}
           });
+          // v3-G23: persist the custom value durably (survives reload +
+          // gets uploaded to backend on Save). Only when this row is an
+          // active custom override (input enabled) — inherited rows must
+          // not pollute the values store.
+          if (!input.disabled) {
+            try { setPropertyValues(cssVars, staged); } catch (e) {}
+          }
         };
         // Bind both 'input' (live as user types/drags) and 'change'
         // (commit) so colour pickers (which fire 'input' on every swatch
@@ -1462,6 +1469,14 @@
             input.classList.add('is-custom');
             row.classList.add('is-custom');
             setPropertyOverride(key, true);
+            // v3-G23: capture the current value immediately so an override
+            // toggled on (but not yet edited) still persists its value.
+            try {
+              var onVars = cssVarsForInput(input);
+              var onVal = input.value;
+              if (input.type === 'number') onVal = onVal + (input.getAttribute('data-mod-sample-unit') || 'px');
+              setPropertyValues(onVars, onVal);
+            } catch (e) {}
             input.focus();
           } else {
             input.disabled = true;
@@ -1471,12 +1486,9 @@
             setPropertyOverride(key, false);
             // Revert: remove any inline override we set, then re-apply Theme
             try {
-              var cssVars = [];
-              var tokenKey = input.getAttribute('data-mod-sample-token');
-              var cssVarRaw = input.getAttribute('data-mod-sample-cssvar');
-              if (tokenKey) cssVars = TOKEN_CSS_VAR[tokenKey] || ['--' + tokenKey.replace(/\./g, '-')];
-              else if (cssVarRaw) cssVars = cssVarRaw.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+              var cssVars = cssVarsForInput(input);
               cssVars.forEach(function(cv){ document.documentElement.style.removeProperty(cv); });
+              clearPropertyValues(cssVars);  // v3-G23: drop persisted value
               // Re-apply Theme so the unset vars regain their global value
               if (window._admTheme && typeof window._admTheme.apply === 'function') {
                 window._admTheme.apply(window._admTheme.read());
@@ -1555,16 +1567,23 @@
     dock.querySelector('.o3-props-dock__collapse').addEventListener('click', collapseDock);
     dock.querySelector('.o3-props-dock__close').addEventListener('click', collapseDock);
     dock.querySelector('[data-dock-save]').addEventListener('click', function(){
+      var btn = this;
+      var orig = btn.textContent;
+      btn.disabled = true; btn.textContent = 'Đang lưu…';
+      // Best-effort WCAG simulation evidence (non-blocking, if mounted).
       try {
         if (window.GraphicsAuthority && window.GraphicsAuthority.preview
             && typeof window.GraphicsAuthority.preview.simulate === 'function') {
           window.GraphicsAuthority.preview.simulate();
-        } else if (typeof window._hmSimulate === 'function') {
-          window._hmSimulate();
-        } else {
-          alert('GraphicsAuthority save pipeline chưa wire — thay đổi đã stage vào draft buffer.');
         }
-      } catch (e) { alert('Lưu thất bại: ' + (e && e.message || e)); }
+      } catch (e) {}
+      // v3-G23: REAL persistence — merge {theme, overrides, values} into
+      // the org design config via HmTheme.saveAdminConfig (backend
+      // authority, survives re-login on any device).
+      persistModuleMaster(function(ok, mode){
+        btn.disabled = false; btn.textContent = orig;
+        showModuleMasterToast(ok, mode);
+      });
     });
     dock.querySelector('[data-dock-reset]').addEventListener('click', function(){
       if (!confirm('Hủy mọi thay đổi chưa lưu?')) return;
@@ -1662,6 +1681,172 @@
     var m = readPropertyOverrides();
     if (enabled) m[key] = true; else delete m[key];
     writePropertyOverrides(m);
+  }
+
+  /* ── v3-G23: Durable custom VALUE store + backend persistence ──────
+   * Bug fixed here: previously `o3-props-overrides` stored only boolean
+   * flags (`{key:true}`). The actual custom value the user typed lived
+   * ONLY in document.documentElement.style and was LOST on reload — so
+   * "giữ cài đặt cho lần đăng nhập sau" never worked for per-component
+   * overrides. Now every custom value is captured into `o3-props-values`
+   * (a flat {cssVar:value} map) and re-applied on boot.
+   *
+   * Persistence ladder (backend = authority, localStorage = cache):
+   *   Save  → merge {theme, overrides, values} into the existing
+   *           design-system-config.json under key `moduleMaster`, via the
+   *           proven HmTheme.saveAdminConfig() path (versioned + CSRF +
+   *           audit + DataSyncMutation-whitelisted). NO parallel SSOT.
+   *   Boot  → read cfg.moduleMaster from backend, seed localStorage,
+   *           then apply. Falls back to localStorage if backend empty. */
+  function readPropertyValues(){
+    try {
+      var raw = localStorage.getItem('o3-props-values');
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+  function writePropertyValues(map){
+    try { localStorage.setItem('o3-props-values', JSON.stringify(map)); } catch (e) {}
+  }
+  /* Record the resolved value for every CSS var bound to a custom row. */
+  function setPropertyValues(cssVars, value){
+    if (!cssVars || !cssVars.length) return;
+    var m = readPropertyValues();
+    cssVars.forEach(function(cv){ if (cv) m[cv] = value; });
+    writePropertyValues(m);
+  }
+  function clearPropertyValues(cssVars){
+    if (!cssVars || !cssVars.length) return;
+    var m = readPropertyValues();
+    cssVars.forEach(function(cv){ delete m[cv]; });
+    writePropertyValues(m);
+  }
+  /* Resolve a tokenKey/cssVar attribute pair to its CSS variable list. */
+  function cssVarsForInput(input){
+    var tokenKey = input.getAttribute('data-mod-sample-token');
+    var cssVarRaw = input.getAttribute('data-mod-sample-cssvar');
+    if (tokenKey) return TOKEN_CSS_VAR[tokenKey] || ['--' + tokenKey.replace(/\./g, '-')];
+    if (cssVarRaw) return cssVarRaw.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+    return [];
+  }
+  /* Re-apply persisted custom values to :root. Called on boot AFTER the
+   * global theme has been applied so overrides win over inherited theme. */
+  function reapplyOverrideValues(){
+    var vals = readPropertyValues();
+    Object.keys(vals).forEach(function(cv){
+      try { document.documentElement.style.setProperty(cv, vals[cv]); } catch (e) {}
+    });
+  }
+
+  /* Read-merge-write the moduleMaster blob into the org design config via
+   * the established HmTheme.saveAdminConfig path. cb(ok, mode). */
+  function persistModuleMaster(cb){
+    var blob = {
+      theme:     (function(){ try { return JSON.parse(localStorage.getItem('o3-theme') || 'null'); } catch (e) { return null; } })(),
+      overrides: readPropertyOverrides(),
+      values:    readPropertyValues(),
+      _savedAt:  new Date().toISOString()
+    };
+    var HmTheme = window.HmTheme;
+    if (!HmTheme || typeof HmTheme.getAdminConfig !== 'function' || typeof HmTheme.saveAdminConfig !== 'function') {
+      if (cb) cb(false, 'local-only');
+      return;
+    }
+    var cfg;
+    try { cfg = HmTheme.getAdminConfig() || {}; } catch (e) { cfg = {}; }
+    // Shallow clone so we never mutate the manager's live object in place.
+    var next = {}; Object.keys(cfg).forEach(function(k){ next[k] = cfg[k]; });
+    next.moduleMaster = blob;
+    try {
+      HmTheme.saveAdminConfig(next, function(ok){ if (cb) cb(!!ok, ok ? 'backend' : 'backend-failed'); });
+    } catch (e) {
+      if (cb) cb(false, 'local-only');
+    }
+  }
+
+  /* Seed localStorage from the backend moduleMaster blob (backend wins on
+   * a fresh device). Returns true if backend data was found + applied. */
+  function hydrateModuleMaster(){
+    var HmTheme = window.HmTheme;
+    if (!HmTheme || typeof HmTheme.getAdminConfig !== 'function') return false;
+    var cfg; try { cfg = HmTheme.getAdminConfig() || {}; } catch (e) { return false; }
+    var blob = cfg.moduleMaster;
+    if (!blob || typeof blob !== 'object') return false;
+    try {
+      if (blob.theme)     localStorage.setItem('o3-theme', JSON.stringify(blob.theme));
+      if (blob.overrides) localStorage.setItem('o3-props-overrides', JSON.stringify(blob.overrides));
+      if (blob.values)    localStorage.setItem('o3-props-values', JSON.stringify(blob.values));
+    } catch (e) {}
+    // Apply global theme (if the theme controller is loaded) then overrides.
+    try {
+      if (window._admTheme && typeof window._admTheme.apply === 'function' && blob.theme) {
+        window._admTheme.apply(blob.theme);
+      }
+    } catch (e) {}
+    reapplyOverrideValues();
+    return true;
+  }
+
+  /* Non-blocking toast, honest about WHERE the data landed. */
+  function showModuleMasterToast(ok, mode){
+    var msg, accent;
+    if (ok && mode === 'backend') {
+      msg = '✓ Đã lưu vào backend — áp dụng cho cả tổ chức, giữ nguyên cho lần đăng nhập sau (mọi thiết bị).';
+      accent = '#16a34a';
+    } else if (mode === 'local-only') {
+      msg = '⚠ Đã lưu vào trình duyệt này (ThemeManager chưa sẵn sàng). Đăng nhập lại rồi Lưu để đẩy lên backend.';
+      accent = '#d97706';
+    } else {
+      msg = '✗ Lưu backend thất bại — thay đổi vẫn còn trong trình duyệt. Thử lại.';
+      accent = '#b91c1c';
+    }
+    var toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);max-width:520px;padding:12px 18px;background:#0f172a;color:#fff;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.30);font-size:13px;font-weight:500;z-index:99999;border-left:3px solid ' + accent + ';line-height:1.45';
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(function(){ toast.style.transition = 'opacity 300ms'; toast.style.opacity = '0'; setTimeout(function(){ toast.remove(); }, 350); }, 4200);
+  }
+
+  /* Expose a single shared store so the Theme tab (00d) and any other
+   * consumer use ONE persistence path — no duplicate save logic. */
+  window._moduleMasterStore = {
+    persist: persistModuleMaster,
+    hydrate: hydrateModuleMaster,
+    reapplyValues: reapplyOverrideValues,
+    readValues: readPropertyValues,
+    readOverrides: readPropertyOverrides,
+    toast: showModuleMasterToast
+  };
+
+  /* ── v3-G23 boot: hydrate from backend, then re-apply custom values ──
+   * HmTheme loads the org design config asynchronously at startup. Poll
+   * (bounded) until it's ready, then hydrate the moduleMaster blob so a
+   * fresh device shows the org's saved theme + overrides. If the backend
+   * has no blob (or HmTheme never loads — e.g. logged out), fall back to
+   * whatever localStorage holds and just re-apply the cached values. */
+  function bootHydrate(){
+    var tries = 0;
+    (function poll(){
+      tries++;
+      var HmTheme = window.HmTheme;
+      var ready = false;
+      try {
+        ready = !!(HmTheme && typeof HmTheme.getAdminConfig === 'function'
+          && HmTheme.getAdminConfig() && HmTheme.getAdminConfig()._meta);
+      } catch (e) { ready = false; }
+      if (ready) {
+        var hydrated = false;
+        try { hydrated = hydrateModuleMaster(); } catch (e) {}
+        if (!hydrated) { try { reapplyOverrideValues(); } catch (e) {} }
+        return;
+      }
+      if (tries < 40) { setTimeout(poll, 250); }  // up to ~10s
+      else { try { reapplyOverrideValues(); } catch (e) {} } // give up → cache
+    })();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootHydrate);
+  } else {
+    bootHydrate();
   }
 
   function renderPropertyRow(item, L){
