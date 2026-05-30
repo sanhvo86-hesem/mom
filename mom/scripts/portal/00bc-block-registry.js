@@ -1,8 +1,25 @@
-{
+/* ════════════════════════════════════════════════════════════════════════════
+ * L3 Block Registry — runtime SSOT (Lego-SSOT)
+ *
+ * Authored as a web-served JS module (NOT data/config/*.json, which nginx 403s
+ * because it holds runtime secrets). Assigns window.__HM_BLOCK_REGISTRY__ so
+ * BlockKit (00bd) reads it synchronously — no fetch, no 403, no async race.
+ *
+ * This is the SINGLE authored runtime source. The CI gate
+ * (check_graphics_block_registry.php) parses THIS file; migration 261
+ * (graphics_block_contract) is the governance/audit mirror for the
+ * multi-tenant SaaS direction.
+ *
+ * A block is a reusable cluster of L2 components (orders-v3 .o3-* classes) with
+ * named data "slots". Building a module = assembling published blocks + filling
+ * slots, never hand-writing component HTML. A block ships only when
+ * status='published' AND every composed_of class exists AND it has a BlockKit
+ * renderer (all enforced by the gate). Load BEFORE 00bd-blockkit.js.
+ * ════════════════════════════════════════════════════════════════════════════ */
+window.__HM_BLOCK_REGISTRY__ = {
   "$schema_version": "1.0.0",
-  "_doc": "L3 Block Registry — runtime SSOT for the Lego-SSOT program. A block is a reusable cluster of L2 components (orders-v3 classes) with named data 'slots'. Building a module = assembling published blocks and filling their slots, never hand-writing component HTML. JSON is the runtime authority (frontend-only deploy); graphics_block_contract (migration 261) is the governance/audit mirror. BlockKit (00bd-blockkit.js) renders these. A block ships only when status='published' AND every composed_of class + required_tokens exist (enforced by check_graphics_block_registry.php).",
   "authority": {
-    "runtime_ssot": "mom/data/config/graphics-block-registry.json",
+    "runtime_ssot": "mom/scripts/portal/00bc-block-registry.js",
     "governance_mirror": "graphics_block_contract (migration 261)",
     "renderer": "window.BlockKit.render (mom/scripts/portal/00bd-blockkit.js)",
     "css_layer": "mom/styles/orders-v3.css",
@@ -55,7 +72,7 @@
       "composed_of": ["o3-kpi-grid", "o3-kpi"],
       "root_class": "o3-kpi-grid",
       "slots": {
-        "tiles": { "type": "kpi[]", "required": true, "desc": "Each tile: {label, value, sub?, tone?, clickable?}. tone ∈ brand|success|warning|danger|info" }
+        "tiles": { "type": "kpi[]", "required": true, "desc": "Each tile: {label, value, sub?, tone?, clickable?}. tone in brand|success|warning|danger|info" }
       },
       "variant_axes": { "tone": ["brand", "success", "warning", "danger", "info"] },
       "required_tokens": ["spacing.lg", "radius.card", "colorsLight.bgSurface", "colorsLight.borderSubtle", "brand.primary"],
@@ -75,7 +92,7 @@
       },
       "variant_axes": { "row": ["default", "clickable", "selected"] },
       "required_tokens": ["spacing.sm", "spacing.md", "colorsLight.bgSurfaceAlt", "colorsLight.borderSubtle", "colorsLight.textPrimary"],
-      "a11y_contract": { "role": "table", "keyboard": "clickable rows are activatable; header cells are <th scope=col>" }
+      "a11y_contract": { "role": "table", "keyboard": "clickable rows are activatable; header cells are th scope=col" }
     },
     {
       "block_key": "empty.state",
@@ -113,4 +130,4 @@
       "a11y_contract": { "role": "region", "keyboard": "tabs are a tablist (Arrow keys move, Enter selects)" }
     }
   ]
-}
+};

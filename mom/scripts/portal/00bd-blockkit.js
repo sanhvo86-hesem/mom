@@ -26,8 +26,10 @@
 (function () {
   'use strict';
 
-  var REGISTRY = null;          // loaded block registry (lazy)
-  var REGISTRY_URL = './data/config/graphics-block-registry.json';
+  // Registry SSOT is the web-served global set by 00bc-block-registry.js
+  // (loaded before this file). NOT fetched from data/config/* — that path is
+  // nginx-403'd because it holds runtime secrets.
+  var REGISTRY = (typeof window !== 'undefined' && window.__HM_BLOCK_REGISTRY__) || null;
 
   function esc(s) {
     if (s === undefined || s === null) return '';
@@ -41,18 +43,17 @@
     return '<div class="o3-empty" role="status">'
       + '<div class="o3-empty__icon">⚠️</div>'
       + '<div class="o3-empty__title">' + esc(msg) + '</div>'
-      + '<div class="o3-empty__hint">BlockKit: kiểm tra block_key + trạng thái published trong graphics-block-registry.json</div>'
+      + '<div class="o3-empty__hint">BlockKit: kiểm tra block_key + trạng thái published trong 00bc-block-registry.js</div>'
       + '</div>';
   }
 
   /* ── registry access ─────────────────────────────────────────────────────── */
   var BlockKit = {
-    /** Load + cache the registry. Returns a Promise<registry>. */
-    load: function (force) {
-      if (REGISTRY && !force) return Promise.resolve(REGISTRY);
-      return fetch(REGISTRY_URL, { cache: 'no-store' })
-        .then(function (r) { return r.json(); })
-        .then(function (json) { REGISTRY = json; return json; });
+    /** Re-read the global registry (set by 00bc). Synchronous; returns it.
+     * Kept Promise-returning for API compatibility with earlier callers. */
+    load: function () {
+      REGISTRY = (typeof window !== 'undefined' && window.__HM_BLOCK_REGISTRY__) || REGISTRY;
+      return Promise.resolve(REGISTRY);
     },
     /** Synchronous lookup (registry must already be loaded). */
     get: function (blockKey) {

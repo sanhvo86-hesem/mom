@@ -24,7 +24,8 @@ declare(strict_types=1);
  */
 
 $root = dirname(__DIR__, 3);
-$registryFp = $root . '/mom/data/config/graphics-block-registry.json';
+// Runtime SSOT is a web-served JS module (data/config/*.json is nginx-403'd).
+$registryFp = $root . '/mom/scripts/portal/00bc-block-registry.js';
 $cssFp      = $root . '/mom/styles/orders-v3.css';
 $blockkitFp = $root . '/mom/scripts/portal/00bd-blockkit.js';
 
@@ -35,9 +36,17 @@ foreach (['registry' => $registryFp, 'css' => $cssFp, 'blockkit' => $blockkitFp]
     }
 }
 
-$json = json_decode((string)file_get_contents($registryFp), true);
+// Extract the JSON object literal from `window.__HM_BLOCK_REGISTRY__ = { … };`.
+$raw = (string)file_get_contents($registryFp);
+$start = strpos($raw, '=');
+$objStart = $start !== false ? strpos($raw, '{', $start) : false;
+$objEnd = strrpos($raw, '}');
+$json = null;
+if ($objStart !== false && $objEnd !== false && $objEnd > $objStart) {
+    $json = json_decode(substr($raw, $objStart, $objEnd - $objStart + 1), true);
+}
 if (!is_array($json) || !isset($json['blocks']) || !is_array($json['blocks'])) {
-    fwrite(STDERR, "[P0] registry JSON malformed or missing 'blocks' array\n");
+    fwrite(STDERR, "[P0] block registry malformed or missing 'blocks' array in 00bc-block-registry.js\n");
     exit(1);
 }
 

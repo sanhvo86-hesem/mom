@@ -222,9 +222,6 @@ rate-limit/
 !mom/data/config/
 mom/data/config/*
 !mom/data/config/*.bootstrap.json
-# L3 Block Registry — static design SSOT (versioned in git, not runtime-mutated;
-# read by BlockKit + check_graphics_block_registry.php, must ship on fresh clone).
-!mom/data/config/graphics-block-registry.json
 # Translation engine prompts (versioned in git, not runtime-mutated).
 !mom/data/config/translator-system-prompt.md
 !mom/data/config/translation-reviewer-system-prompt.md
