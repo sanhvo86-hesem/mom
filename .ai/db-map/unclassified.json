@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 802,
-        "generated_at": "2026-05-28T04:09:05+00:00"
+        "table_count": 816,
+        "generated_at": "2026-05-30T07:47:09+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -2325,7 +2325,8 @@
         "email_intake_config": {
             "defined_in": "203_email_intake_infrastructure.sql",
             "extended_in": [
-                "211_aeoi_master_data_suggestions.sql"
+                "211_aeoi_master_data_suggestions.sql",
+                "212_aeoi_master_toggle.sql"
             ],
             "primary_key": "id",
             "foreign_keys": [],
@@ -5200,7 +5201,8 @@
                 "113_audit_columns.sql",
                 "113_audit_columns.sql",
                 "113_audit_columns.sql",
-                "113_audit_columns.sql"
+                "113_audit_columns.sql",
+                "228_uom_measval_integration.sql"
             ],
             "primary_key": "result_id",
             "foreign_keys": [
@@ -5405,6 +5407,18 @@
             ],
             "contract": null
         },
+        "item_packaging_policy": {
+            "defined_in": "221_item_packaging_policy.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "created_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
         "item_revision": {
             "defined_in": "073_canonical_master_data_core.sql",
             "extended_in": [
@@ -5466,6 +5480,50 @@
                 {
                     "col": "item_revision_id",
                     "ref": "item_revision(item_revision_id)"
+                }
+            ],
+            "contract": null
+        },
+        "item_uom_policy": {
+            "defined_in": "220_item_uom_policy.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "purchase_unit_code",
+                    "ref": "uom_unit_catalog(canonical_code)"
+                },
+                {
+                    "col": "sales_unit_code",
+                    "ref": "uom_unit_catalog(canonical_code)"
+                },
+                {
+                    "col": "recipe_unit_code",
+                    "ref": "uom_unit_catalog(canonical_code)"
+                },
+                {
+                    "col": "qc_unit_code",
+                    "ref": "uom_unit_catalog(canonical_code)"
+                },
+                {
+                    "col": "inv_to_sales_rule_id",
+                    "ref": "uom_conversion_rule(id)"
+                },
+                {
+                    "col": "inv_to_recipe_rule_id",
+                    "ref": "uom_conversion_rule(id)"
+                },
+                {
+                    "col": "inv_to_qc_rule_id",
+                    "ref": "uom_conversion_rule(id)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "created_by",
+                    "ref": "users(user_id)"
                 }
             ],
             "contract": null
@@ -5985,6 +6043,22 @@
             "foreign_keys": [],
             "contract": null
         },
+        "material_density_registry": {
+            "defined_in": "222_material_density_registry.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "density_unit_code",
+                    "ref": "uom_unit_catalog(canonical_code)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
         "material_review_board": {
             "defined_in": "034_exception_management.sql",
             "extended_in": [
@@ -6374,7 +6448,8 @@
         "mes_inline_measurements": {
             "defined_in": "025_mes_tables.sql",
             "extended_in": [
-                "070_enterprise_governance_uplift.sql"
+                "070_enterprise_governance_uplift.sql",
+                "228_uom_measval_integration.sql"
             ],
             "primary_key": "measurement_id, measured_at",
             "foreign_keys": [],
@@ -11384,6 +11459,162 @@
             ],
             "primary_key": "uom_code",
             "foreign_keys": [],
+            "contract": null
+        },
+        "uom_ai_advisory_log": {
+            "defined_in": "225_uom_rule_approval.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "human_reviewer_id",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
+        "uom_alias": {
+            "defined_in": "219_uom_alias.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "canonical_code",
+                    "ref": "uom_unit_catalog(canonical_code)"
+                }
+            ],
+            "contract": null
+        },
+        "uom_alias_quarantine": {
+            "defined_in": "219_uom_alias.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "resolved_canonical_code",
+                    "ref": "uom_unit_catalog(canonical_code)"
+                },
+                {
+                    "col": "reviewed_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
+        "uom_conversion_rule": {
+            "defined_in": "217_uom_conversion_rule.sql",
+            "extended_in": [
+                "231_uom_v3_lifecycle_governance.sql"
+            ],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "from_unit_code",
+                    "ref": "uom_unit_catalog(canonical_code)"
+                },
+                {
+                    "col": "to_unit_code",
+                    "ref": "uom_unit_catalog(canonical_code)"
+                },
+                {
+                    "col": "quantity_kind_code",
+                    "ref": "uom_quantity_kind(kind_code)"
+                },
+                {
+                    "col": "rounding_policy_id",
+                    "ref": "uom_rounding_policy(policy_id)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "created_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
+        "uom_external_code_map": {
+            "defined_in": "218_uom_external_code_map.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "canonical_code",
+                    "ref": "uom_unit_catalog(canonical_code)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
+        "uom_measurement_thread": {
+            "defined_in": "228_uom_measval_integration.sql",
+            "extended_in": [],
+            "primary_key": "thread_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "uom_quantity_kind": {
+            "defined_in": "214_uom_quantity_kind.sql",
+            "extended_in": [],
+            "primary_key": "kind_code",
+            "foreign_keys": [
+                {
+                    "col": "parent_kind_code",
+                    "ref": "uom_quantity_kind(kind_code)"
+                }
+            ],
+            "contract": null
+        },
+        "uom_rounding_policy": {
+            "defined_in": "216_uom_rounding_policy.sql",
+            "extended_in": [],
+            "primary_key": "policy_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "uom_rule_approval": {
+            "defined_in": "225_uom_rule_approval.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "rule_id",
+                    "ref": "uom_conversion_rule(id)"
+                }
+            ],
+            "contract": null
+        },
+        "uom_standard_library_manifest": {
+            "defined_in": "231_uom_v3_lifecycle_governance.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
+        "uom_unit_catalog": {
+            "defined_in": "215_uom_unit_catalog.sql",
+            "extended_in": [],
+            "primary_key": "canonical_code",
+            "foreign_keys": [
+                {
+                    "col": "quantity_kind_code",
+                    "ref": "uom_quantity_kind(kind_code)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
             "contract": null
         },
         "user_roles": {
