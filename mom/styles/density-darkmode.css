@@ -1098,3 +1098,22 @@ dialog, [role="dialog"], .hm-modal, .hm-dialog {
 [data-color-scheme-active="dark"] #admin-content [style*="color:#475569;"] {
   color: var(--text-secondary) !important;
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   FINAL OVERRIDE — --input-bg dark remap (source-order tiebreaker)
+   The component-token :root block (~line 573) assigns
+   `--input-bg: var(--bg-surface, #fff)` with the SAME specificity as the
+   [data-color-mode="dark"] block but LATER in source order, so it wins the tie
+   and admin inputs stayed white in dark mode. This end-of-file block is the
+   latest source, so it wins. Surface tokens are already dark here, so binding
+   --input-bg to --bg-surface (now #1e293b) is correct. SSOT, no per-input hack.
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-color-mode="dark"],
+[data-color-scheme-active="dark"] {
+  --input-bg: var(--bg-surface-dark, #1e293b);
+}
+@media (prefers-color-scheme: dark) {
+  [data-color-mode="auto"] {
+    --input-bg: var(--bg-surface-dark, #1e293b);
+  }
+}
