@@ -5169,6 +5169,13 @@ function renderBlock(block, data, state){
 
 function _renderBlockInner(block, data, state, reactiveCtx){
   var config = block.config || {};
+  // Showcase / no-API demo data: when a block ships inline `config.demoData` and
+  // no live data has been fetched, render against the demo payload so a catalog
+  // showcase paints a realistic preview for every block instead of an empty
+  // state. Live data (from a dataSource fetch) always wins.
+  if(config.demoData && (data == null || (typeof data === 'object' && !Array.isArray(data) && !Object.keys(data).length))){
+    data = config.demoData;
+  }
   var catalogEntry = BLOCK_CATALOG[block.type] || {};
   var renderType = catalogEntry.renderer || block.type;
   var blockRuntimeId = block.id || block.blockId || '';
@@ -5206,6 +5213,12 @@ function _renderBlockInner(block, data, state, reactiveCtx){
   if(block.type === 'data-kanban') renderType = 'data-kanban';
   if(block.type === 'data-gantt') renderType = 'data-gantt';
   if(block.type === 'mfg-machine-status') renderType = 'mfg-machine-status';
+
+  // Catalog showcase routing: give navigation / media / insight / iot /
+  // automation / board archetypes their own true renderers instead of the
+  // generic alias they inherit from the catalog (e.g. a funnel rendered as a
+  // bar chart, navigation rendered as a button row, media as a banner).
+  if(_SHOWCASE_RENDER[block.type]) renderType = _SHOWCASE_RENDER[block.type];
 
   switch(renderType){
     case 'kpi-row':         return renderKpiRow(resolvedConfig, data);
@@ -5245,6 +5258,22 @@ function _renderBlockInner(block, data, state, reactiveCtx){
       var containerBlock = _clone(block);
       containerBlock.config = resolvedConfig;
       return renderCardContainer(containerBlock, data, state);
+    case 'chart-heatmap':    return renderHeatmapChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
+    case 'insight-funnel':   return renderFunnel(resolvedConfig, data, blockRuntimeId);
+    case 'insight-scorecard':return renderScorecard(resolvedConfig, data);
+    case 'nav-breadcrumb':   return renderBreadcrumb(resolvedConfig, data);
+    case 'nav-steps':        return renderStepper(resolvedConfig, data);
+    case 'nav-pills':        return renderNavPills(resolvedConfig, data);
+    case 'nav-pagination':   return renderPagination(resolvedConfig, data);
+    case 'nav-links':        return renderLinkGrid(resolvedConfig, data);
+    case 'media-image':      return renderMediaImage(resolvedConfig, data);
+    case 'media-gallery':    return renderGallery(resolvedConfig, data);
+    case 'media-embed':      return renderMediaEmbed(resolvedConfig, data);
+    case 'media-richtext':   return renderRichText(resolvedConfig, data);
+    case 'iot-device-grid':  return renderDeviceGrid(resolvedConfig, data);
+    case 'iot-sensor-strip': return renderSensorStrip(resolvedConfig, data);
+    case 'auto-sla-timer':   return renderSlaTimer(resolvedConfig, data);
+    case 'showcase-board':   return renderBoard(resolvedConfig, data);
     default:
       return '<div class="hm-empty"><div style="font-weight:600;margin-bottom:4px">'+_esc(_t(catalogEntry.label || block.type, catalogEntry.labelEn || block.type))+'</div><div style="font-size:12px;color:var(--text-tertiary)">'+_t('Block đang dùng renderer mặc định. Cấu hình thêm trong Module Builder.','This block is using the generic renderer. Configure it in Module Builder.')+'</div></div>';
   }
@@ -9517,6 +9546,345 @@ function renderInfoBanner(config){
   if(config.icon) html += '<span class="hm-banner-icon">'+config.icon+'</span>';
   html += '<div class="hm-banner-text">'+_esc(_t(config.text||'',config.textEn||''))+'</div>';
   if(config.dismissible) html += '<button class="hm-banner-close" data-action="hm-dismiss">&times;</button>';
+  html += '</div>';
+  return html;
+}
+
+/* ── Catalog showcase renderers ──────────────────────────────────────────
+ * True visual renderers for navigation / media / insight / iot / automation /
+ * board archetypes that would otherwise inherit a generic catalog alias (a
+ * funnel drawn as a bar chart, navigation as a button row, media as a banner,
+ * a kanban board as a plain card grid). Every renderer is inline-data driven
+ * (config.items, or the demoData payload injected in _renderBlockInner) and
+ * binds to design tokens so Module Master governs their appearance.
+ * ----------------------------------------------------------------------- */
+
+var _SHOWCASE_RENDER = {
+  'insight-funnel':'insight-funnel',
+  'insight-scorecard':'insight-scorecard',
+  'insight-cohort':'chart-heatmap',
+  'quality-defect-matrix':'chart-heatmap',
+  'heat-table':'chart-heatmap',
+  'nav-breadcrumb':'nav-breadcrumb',
+  'nav-steps':'nav-steps', 'nav-process-map':'nav-steps',
+  'nav-pills':'nav-pills', 'nav-tabs':'nav-pills',
+  'nav-pagination':'nav-pagination',
+  'nav-related-links':'nav-links', 'nav-module-menu':'nav-links', 'nav-anchor':'nav-links',
+  'nav-sidebar':'nav-links', 'action-launchpad':'nav-links', 'action-shortcuts':'nav-links',
+  'media-image':'media-image',
+  'media-gallery':'media-gallery',
+  'media-video':'media-embed', 'media-iframe':'media-embed', 'media-pdf':'media-embed',
+  'media-html':'media-richtext', 'media-markdown':'media-richtext', 'media-document':'media-richtext',
+  'iot-device-grid':'iot-device-grid', 'iot-machine-twin':'iot-device-grid',
+  'iot-maintenance-panel':'iot-device-grid', 'iot-connector-panel':'iot-device-grid',
+  'iot-sensor-strip':'iot-sensor-strip', 'iot-edge-health':'iot-sensor-strip',
+  'auto-sla-timer':'auto-sla-timer', 'auto-queue-monitor':'auto-sla-timer',
+  'kanban-board':'showcase-board', 'status-board':'showcase-board', 'quality-capa-board':'showcase-board',
+  'quality-8d-board':'showcase-board', 'auto-task-board':'showcase-board', 'auto-approval-lane':'showcase-board',
+  'mfg-wip-lane':'showcase-board', 'auto-escalation-map':'showcase-board'
+};
+
+function _scRows(config, data){
+  var rows = _chartRows(config || {}, data);
+  return (rows && rows.length) ? rows : ((config && config.items) || []);
+}
+function _scLabel(item, i){
+  if(item == null) return 'Item ' + (i + 1);
+  if(item.label && typeof item.label === 'object') return _t(item.label.vi || '', item.label.en || item.label.vi || '');
+  return String(item.label != null ? item.label : (item.name != null ? item.name : (item.title != null ? item.title : ('Item ' + (i + 1)))));
+}
+function _scStatusColor(value){
+  var k = String(value || '').toLowerCase();
+  if(/run|ok|approved|won|pass|closed|done|success|verified|online|healthy|good/.test(k)) return 'var(--green,#16a34a)';
+  if(/warn|idle|review|draft|pending|submit|hold|todo|queued|watch/.test(k)) return 'var(--amber,#d97706)';
+  if(/down|fail|reject|lost|overdue|critical|major|offline|breach|error/.test(k)) return 'var(--red,#dc2626)';
+  return 'var(--brand-2,#2563eb)';
+}
+
+/* --- Funnel (insight-funnel) --- */
+function renderFunnel(config, data, blockId){
+  var rows = _scRows(config, data);
+  if(!rows.length) return _chartEmpty(_t('Không có dữ liệu','No data'));
+  var fcfg = config.funnel || {};
+  var labelKey = fcfg.labelField || config.labelKey || 'label';
+  var valueKey = fcfg.valueField || config.valueKey || 'value';
+  var first = _chartNumber(rows[0].value != null ? rows[0].value : rows[0][valueKey]) || 1;
+  var max = 0;
+  rows.forEach(function(r){ var v = _chartNumber(r.value != null ? r.value : r[valueKey]); if(v > max) max = v; });
+  if(max <= 0) max = 1;
+  var html = '<div class="hm-funnel" style="display:flex;flex-direction:column;gap:var(--space-2,6px)" data-block-id="'+_esc(blockId||'')+'">';
+  rows.forEach(function(r, i){
+    var v = _chartNumber(r.value != null ? r.value : r[valueKey]);
+    var pct = Math.round((v / max) * 100);
+    var conv = i === 0 ? 100 : Math.round((v / first) * 100);
+    var color = r.color || _chartColor(i, 'var(--brand-2,#2563eb)');
+    html += '<div style="display:flex;align-items:center;gap:var(--space-3,10px)">';
+    html += '<span style="min-width:130px;font-size:12px;color:var(--text-secondary)">'+_esc(r[labelKey] != null ? String(r[labelKey]) : _scLabel(r, i))+'</span>';
+    html += '<div style="flex:1;display:flex;justify-content:center"><div style="width:'+Math.max(pct,8)+'%;background:'+color+';color:var(--text-inverse,#fff);border-radius:var(--o3-radius,6px);padding:8px 12px;text-align:center;font-weight:700;font-size:13px">'+_esc(_fmt(v))+'</div></div>';
+    html += '<span style="min-width:48px;text-align:right;font-size:12px;color:var(--text-tertiary)">'+conv+'%</span>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+/* --- Scorecard (insight-scorecard) — actual vs target with RAG --- */
+function renderScorecard(config, data){
+  var rows = _scRows(config, data);
+  if(!rows.length) return '<div class="hm-empty">'+_t('Không có dữ liệu','No data')+'</div>';
+  var html = '<div class="hm-scorecard" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:var(--space-3,10px)">';
+  rows.forEach(function(item, i){
+    var val = _chartNumber(item.value);
+    var target = _chartNumber(item.target);
+    var ratio = target ? (val / target) : 1;
+    var color = ratio >= 1 ? 'var(--green,#16a34a)' : ratio >= 0.9 ? 'var(--amber,#d97706)' : 'var(--red,#dc2626)';
+    var pct = (_chartClamp(ratio, 0, 1.2) / 1.2) * 100;
+    var unit = item.unit || '';
+    html += '<div style="border:1px solid var(--border,#e2e8f0);border-left:4px solid '+color+';border-radius:var(--o3-radius-card,8px);padding:var(--space-3,12px);background:var(--bg-surface,#fff)">';
+    html += '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px">'+_esc(_scLabel(item, i))+'</div>';
+    html += '<div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:22px;font-weight:800;color:var(--text-primary)">'+_esc(_fmt(val))+_esc(unit)+'</span>';
+    if(item.target != null) html += '<span style="font-size:12px;color:var(--text-tertiary)">/ '+_esc(_fmt(target))+_esc(unit)+'</span>';
+    html += '</div>';
+    html += '<div style="height:6px;border-radius:999px;background:var(--gray-100,#f1f5f9);margin-top:8px;overflow:hidden"><div style="height:100%;width:'+pct.toFixed(0)+'%;background:'+color+'"></div></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+/* --- Breadcrumb (nav-breadcrumb) --- */
+function renderBreadcrumb(config, data){
+  var rows = _scRows(config, data);
+  if(!rows.length) rows = [{label:_t('Trang chủ','Home')},{label:_t('Mục','Section')},{label:_t('Hiện tại','Current')}];
+  var html = '<nav class="hm-breadcrumb" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13px" aria-label="breadcrumb">';
+  rows.forEach(function(item, i){
+    var last = i === rows.length - 1;
+    if(i > 0) html += '<span style="color:var(--text-tertiary)">/</span>';
+    html += '<span style="color:'+(last ? 'var(--text-primary);font-weight:700' : 'var(--brand-2,#2563eb)')+'">'+_esc(_scLabel(item, i))+'</span>';
+  });
+  html += '</nav>';
+  return html;
+}
+
+/* --- Stepper / process map (nav-steps, nav-process-map) --- */
+function renderStepper(config, data){
+  var rows = _scRows(config, data);
+  if(!rows.length) return '<div class="hm-empty">'+_t('Không có dữ liệu','No data')+'</div>';
+  var html = '<div class="hm-stepper" style="display:flex;flex-wrap:wrap;align-items:flex-start">';
+  rows.forEach(function(item, i){
+    var st = String(item.state || 'todo').toLowerCase();
+    var done = st === 'done' || st === 'complete' || st === 'completed';
+    var active = st === 'active' || st === 'current';
+    var color = done ? 'var(--green,#16a34a)' : active ? 'var(--brand-2,#2563eb)' : 'var(--gray-300,#cbd5e1)';
+    var fg = (done || active) ? 'var(--text-inverse,#fff)' : 'var(--text-secondary)';
+    html += '<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:90px;position:relative">';
+    if(i > 0) html += '<div style="position:absolute;top:14px;left:-50%;width:100%;height:2px;background:'+((done || active) ? 'var(--brand-2,#2563eb)' : 'var(--gray-200,#e2e8f0)')+';z-index:0"></div>';
+    html += '<div style="position:relative;z-index:1;width:28px;height:28px;border-radius:50%;background:'+color+';color:'+fg+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">'+(done ? '✓' : (i + 1))+'</div>';
+    html += '<div style="font-size:12px;color:'+(active ? 'var(--text-primary);font-weight:700' : 'var(--text-secondary)')+';margin-top:6px;text-align:center">'+_esc(_scLabel(item, i))+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+/* --- Nav pills / tabs (nav-pills, nav-tabs) --- */
+function renderNavPills(config, data){
+  var rows = _scRows(config, data);
+  if(!rows.length) return '<div class="hm-empty">'+_t('Không có dữ liệu','No data')+'</div>';
+  var html = '<div class="hm-nav-pills" style="display:flex;flex-wrap:wrap;gap:var(--space-2,8px)">';
+  rows.forEach(function(item, i){
+    var active = !!item.active;
+    html += '<button type="button" class="hm-btn" style="height:var(--o3-control-h-standard,32px);border-radius:999px;padding:0 14px;border:1px solid '+(active ? 'var(--brand-2,#2563eb)' : 'var(--border,#e2e8f0)')+';background:'+(active ? 'var(--brand-2,#2563eb)' : 'var(--bg-surface,#fff)')+';color:'+(active ? 'var(--text-inverse,#fff)' : 'var(--text-secondary)')+';font-size:13px;font-weight:600">';
+    html += _esc(_scLabel(item, i));
+    if(item.count != null) html += ' <span style="opacity:.8">('+_esc(_fmt(_chartNumber(item.count)))+')</span>';
+    html += '</button>';
+  });
+  html += '</div>';
+  return html;
+}
+
+/* --- Pagination (nav-pagination) --- */
+function renderPagination(config, data){
+  var page = Math.max(parseInt(config.page, 10) || 1, 1);
+  var count = Math.max(parseInt(config.pageCount, 10) || 5, 1);
+  function pgBtn(label, disabled, active){
+    return '<button type="button" class="hm-btn" style="min-width:32px;height:var(--o3-control-h-standard,32px);border-radius:var(--o3-radius,6px);border:1px solid '+(active ? 'var(--brand-2,#2563eb)' : 'var(--border,#e2e8f0)')+';background:'+(active ? 'var(--brand-2,#2563eb)' : 'var(--bg-surface,#fff)')+';color:'+(active ? 'var(--text-inverse,#fff)' : disabled ? 'var(--text-tertiary)' : 'var(--text-secondary)')+';font-weight:600'+(disabled ? ';opacity:.5' : '')+'">'+label+'</button>';
+  }
+  var html = '<div class="hm-pagination" style="display:flex;align-items:center;gap:6px;font-size:13px">';
+  html += pgBtn('‹', page <= 1, false);
+  for(var p = 1; p <= count; p++){
+    if(count > 7 && p > 2 && p < count - 1 && Math.abs(p - page) > 1){ if(p === 3) html += '<span style="color:var(--text-tertiary)">…</span>'; continue; }
+    html += pgBtn(String(p), false, p === page);
+  }
+  html += pgBtn('›', page >= count, false);
+  html += '<span style="margin-left:8px;color:var(--text-tertiary)">'+_t('Trang','Page')+' '+page+' / '+count+'</span>';
+  html += '</div>';
+  return html;
+}
+
+/* --- Link grid / launchpad (nav-related-links, nav-module-menu, action-launchpad…) --- */
+function renderLinkGrid(config, data){
+  var rows = _scRows(config, data);
+  if(!rows.length) return '<div class="hm-empty">'+_t('Không có dữ liệu','No data')+'</div>';
+  var html = '<div class="hm-link-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--space-3,10px)">';
+  rows.forEach(function(item, i){
+    html += '<div class="hm-link-card" style="display:flex;align-items:center;gap:10px;padding:var(--space-3,12px);border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius-card,8px);background:var(--bg-surface,#fff);cursor:pointer">';
+    html += '<span style="font-size:22px">'+(item.icon || '🔗')+'</span>';
+    html += '<span style="display:flex;flex-direction:column;min-width:0"><span style="font-weight:700;font-size:13px;color:var(--text-primary)">'+_esc(_scLabel(item, i))+'</span>';
+    if(item.desc) html += '<span style="font-size:12px;color:var(--text-tertiary)">'+_esc(_t(item.desc, item.descEn || item.desc))+'</span>';
+    html += '</span></div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+/* --- Media image (media-image) --- */
+function renderMediaImage(config, data){
+  var cap = _t(config.caption || '', config.captionEn || config.caption || '');
+  var inner = config.src
+    ? '<img src="'+_esc(config.src)+'" alt="'+_esc(cap)+'" style="max-width:100%;border-radius:var(--o3-radius-card,8px)">'
+    : '<div style="aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--brand,#1e3a8a),var(--brand-2,#2563eb));color:var(--text-inverse,#fff);border-radius:var(--o3-radius-card,8px);font-size:40px">🖼️</div>';
+  var html = '<figure class="hm-media-image" style="margin:0">'+inner;
+  if(cap) html += '<figcaption style="font-size:12px;color:var(--text-tertiary);margin-top:6px;text-align:center">'+_esc(cap)+'</figcaption>';
+  html += '</figure>';
+  return html;
+}
+
+/* --- Gallery (media-gallery) --- */
+function renderGallery(config, data){
+  var rows = _scRows(config, data);
+  if(!rows.length) rows = [{},{},{},{}];
+  var html = '<div class="hm-gallery" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:var(--space-2,8px)">';
+  rows.forEach(function(item, i){
+    var cap = item.caption ? _t(item.caption, item.captionEn || item.caption) : '';
+    html += '<figure style="margin:0">';
+    if(item.src) html += '<img src="'+_esc(item.src)+'" alt="'+_esc(cap)+'" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--o3-radius,6px)">';
+    else html += '<div style="aspect-ratio:1;border-radius:var(--o3-radius,6px);background:linear-gradient(135deg,'+_chartColor(i)+',var(--gray-200,#e2e8f0));display:flex;align-items:center;justify-content:center;font-size:24px">🖼️</div>';
+    if(cap) html += '<figcaption style="font-size:11px;color:var(--text-tertiary);margin-top:4px">'+_esc(cap)+'</figcaption>';
+    html += '</figure>';
+  });
+  html += '</div>';
+  return html;
+}
+
+/* --- Media embed (media-video, media-iframe, media-pdf) --- */
+function renderMediaEmbed(config, data){
+  var kind = String(config.kind || config.embedKind || 'iframe').toLowerCase();
+  var icon = kind === 'video' ? '🎬' : kind === 'pdf' ? '📕' : '🌐';
+  var label = kind === 'video' ? _t('Video nhúng','Embedded video') : kind === 'pdf' ? _t('Tài liệu PDF','PDF document') : _t('Khung nhúng','Embedded frame');
+  var cap = _t(config.caption || '', config.captionEn || config.caption || '');
+  var html = '<div class="hm-media-embed" style="border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius-card,8px);overflow:hidden;background:var(--bg-surface,#fff)">';
+  html += '<div style="aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--gray-50,#f8fafc);color:var(--text-secondary)"><span style="font-size:40px">'+icon+'</span><span style="font-size:13px;font-weight:600">'+_esc(label)+'</span>';
+  if(config.src) html += '<span style="font-size:11px;color:var(--text-tertiary)">'+_esc(config.src)+'</span>';
+  html += '</div>';
+  if(cap) html += '<div style="padding:8px 12px;font-size:12px;color:var(--text-tertiary)">'+_esc(cap)+'</div>';
+  html += '</div>';
+  return html;
+}
+
+/* --- Rich text (media-html, media-markdown, media-document) --- */
+function renderRichText(config, data){
+  var html = '<div class="hm-richtext" style="font-size:14px;line-height:1.6;color:var(--text-primary)">';
+  if(config.heading) html += '<h3 style="margin:0 0 8px;font-size:16px;font-weight:700">'+_esc(_t(config.heading, config.headingEn || config.heading))+'</h3>';
+  var body = _t(config.text || '', config.textEn || config.text || '');
+  String(body).split(/\n{2,}/).forEach(function(p){
+    if(!p.trim()) return;
+    html += '<p style="margin:0 0 8px;color:var(--text-secondary)">'+_esc(p.trim())+'</p>';
+  });
+  html += '</div>';
+  return html;
+}
+
+/* --- Device grid (iot-device-grid, iot-machine-twin…) --- */
+function renderDeviceGrid(config, data){
+  var rows = _scRows(config, data);
+  if(!rows.length) return '<div class="hm-empty">'+_t('Không có dữ liệu','No data')+'</div>';
+  var html = '<div class="hm-device-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--space-3,10px)">';
+  rows.forEach(function(item, i){
+    var color = _scStatusColor(item.status);
+    var status = String(item.status || 'idle');
+    html += '<div style="border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius-card,8px);padding:var(--space-3,12px);background:var(--bg-surface,#fff)">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px"><span style="font-weight:700;font-size:13px;color:var(--text-primary)">'+_esc(_scLabel(item, i))+'</span><span style="width:10px;height:10px;border-radius:50%;background:'+color+'" title="'+_esc(status)+'"></span></div>';
+    html += '<div style="font-size:11px;color:var(--text-tertiary);margin-top:2px">'+_esc(status)+'</div>';
+    if(item.metric != null) html += '<div style="margin-top:8px;font-size:20px;font-weight:800;color:'+color+'">'+_esc(_fmt(_chartNumber(item.metric)))+_esc(item.unit || '')+'</div>';
+    if(item.metricLabel) html += '<div style="font-size:11px;color:var(--text-secondary)">'+_esc(_t(item.metricLabel, item.metricLabelEn || item.metricLabel))+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+/* --- Sensor strip (iot-sensor-strip, iot-edge-health) --- */
+function renderSensorStrip(config, data){
+  var rows = _scRows(config, data);
+  if(!rows.length) return '<div class="hm-empty">'+_t('Không có dữ liệu','No data')+'</div>';
+  var html = '<div class="hm-sensor-strip" style="display:flex;flex-wrap:wrap;gap:var(--space-2,8px)">';
+  rows.forEach(function(item, i){
+    var color = _scStatusColor(item.state);
+    var val = _chartNumber(item.value);
+    var min = item.min != null ? _chartNumber(item.min) : 0;
+    var max = item.max != null ? _chartNumber(item.max) : 100;
+    var pct = _chartClamp((val - min) / Math.max(max - min, 1), 0, 1) * 100;
+    html += '<div style="flex:1;min-width:130px;border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius-card,8px);padding:var(--space-2,8px) var(--space-3,12px);background:var(--bg-surface,#fff)">';
+    html += '<div style="font-size:11px;color:var(--text-tertiary)">'+_esc(_scLabel(item, i))+'</div>';
+    html += '<div style="font-size:18px;font-weight:800;color:var(--text-primary)">'+_esc(_fmt(val))+'<span style="font-size:11px;font-weight:600;color:var(--text-tertiary)"> '+_esc(item.unit || '')+'</span></div>';
+    html += '<div style="height:4px;border-radius:999px;background:var(--gray-100,#f1f5f9);margin-top:6px;overflow:hidden"><div style="height:100%;width:'+pct.toFixed(0)+'%;background:'+color+'"></div></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+/* --- SLA timer (auto-sla-timer, auto-queue-monitor) --- */
+function renderSlaTimer(config, data){
+  var rows = _scRows(config, data);
+  if(!rows.length) return '<div class="hm-empty">'+_t('Không có dữ liệu','No data')+'</div>';
+  var html = '<div class="hm-sla-timer" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--space-3,10px)">';
+  rows.forEach(function(item, i){
+    var remaining = _chartNumber(item.remaining);
+    var total = item.total != null ? _chartNumber(item.total) : Math.max(remaining, 1);
+    var ratio = _chartClamp(remaining / Math.max(total, 1), 0, 1);
+    var breach = remaining <= 0;
+    var warn = ratio < 0.25;
+    var color = breach ? 'var(--red,#dc2626)' : warn ? 'var(--amber,#d97706)' : 'var(--green,#16a34a)';
+    var hrs = Math.floor(Math.abs(remaining) / 60), mins = Math.abs(remaining) % 60;
+    var txt = (breach ? '-' : '') + hrs + 'h ' + mins + 'm';
+    html += '<div style="border:1px solid var(--border,#e2e8f0);border-left:4px solid '+color+';border-radius:var(--o3-radius-card,8px);padding:var(--space-3,12px);background:var(--bg-surface,#fff)">';
+    html += '<div style="font-size:12px;color:var(--text-secondary)">'+_esc(_scLabel(item, i))+'</div>';
+    html += '<div style="font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;color:'+color+'">'+_esc(txt)+'</div>';
+    html += '<div style="font-size:11px;color:var(--text-tertiary)">'+(breach ? _t('Quá hạn SLA','SLA breached') : _t('Còn lại','Remaining'))+'</div>';
+    html += '<div style="height:4px;border-radius:999px;background:var(--gray-100,#f1f5f9);margin-top:8px;overflow:hidden"><div style="height:100%;width:'+(ratio * 100).toFixed(0)+'%;background:'+color+'"></div></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+/* --- Board (kanban-board, status-board, quality-capa-board, 8d-board…) --- */
+function renderBoard(config, data){
+  var rows = _scRows(config, data);
+  if(!rows.length) return '<div class="hm-empty">'+_t('Không có dữ liệu','No data')+'</div>';
+  var statusKey = config.statusKey || 'status';
+  var lanes = config.lanes;
+  if(!lanes || !lanes.length){
+    var seen = {}; lanes = [];
+    rows.forEach(function(r){ var s = String(r[statusKey] || '—'); if(!seen[s]){ seen[s] = 1; lanes.push({ key:s, label:s }); } });
+  }
+  var html = '<div class="hm-board" style="display:flex;gap:var(--space-3,10px);overflow-x:auto;padding-bottom:4px">';
+  lanes.forEach(function(lane){
+    var laneKey = lane.key != null ? lane.key : lane;
+    var items = rows.filter(function(r){ return String(r[statusKey]) === String(laneKey); });
+    var color = lane.color || _scStatusColor(laneKey);
+    html += '<div style="flex:1;min-width:200px;background:var(--gray-50,#f8fafc);border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius-card,8px);padding:var(--space-2,8px)">';
+    html += '<div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;padding:0 4px"><span style="width:8px;height:8px;border-radius:50%;background:'+color+'"></span>'+_esc(_t(lane.label || laneKey, lane.labelEn || lane.label || laneKey))+' <span style="color:var(--text-tertiary)">('+items.length+')</span></div>';
+    items.forEach(function(item){
+      html += '<div style="background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius,6px);padding:var(--space-2,8px) var(--space-3,10px);margin-bottom:6px">';
+      html += '<div style="font-size:13px;font-weight:600;color:var(--text-primary)">'+_esc(item.title || item.label || item.name || '—')+'</div>';
+      if(item.owner) html += '<div style="font-size:11px;color:var(--text-tertiary);margin-top:2px">👤 '+_esc(item.owner)+'</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  });
   html += '</div>';
   return html;
 }
