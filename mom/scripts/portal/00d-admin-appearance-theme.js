@@ -214,7 +214,7 @@
   function renderTypographyTab(L, t){
     return ''
       + renderRow(L('Font family','Font family'),
-          '<select id="theme-font-family" style="width:300px;height:32px;padding:0 8px;border:1px solid var(--o3-border-subtle);border-radius:6px;font-size:12px;background:var(--bg-surface);color:var(--text-primary)">'
+          '<select id="theme-font-family" style="width:300px;height:32px;padding:0 8px;border:1px solid var(--o3-border-subtle);border-radius:6px;font-size:12px;background:var(--bg-surface) !important;color:var(--text-primary) !important">'
           + ['Inter, -apple-system, "SF Pro Text", system-ui, sans-serif',
              '"IBM Plex Sans", -apple-system, sans-serif',
              '"Noto Sans", -apple-system, sans-serif',
@@ -227,7 +227,7 @@
           + '</select>',
           L('Inter (Vercel), IBM Plex (Carbon), system-ui (native).', 'Inter, IBM Plex, system-ui.'))
       + renderRow(L('Cỡ chữ chuẩn','Base font size'),
-          '<input type="number" id="theme-font-base" value="' + t['font-base'] + '" min="11" max="16" step="1" style="width:64px;height:32px;padding:0 6px;border:1px solid var(--o3-border-subtle);border-radius:6px;font-size:12px;background:var(--bg-surface);color:var(--text-primary)">'
+          '<input type="number" id="theme-font-base" value="' + t['font-base'] + '" min="11" max="16" step="1" style="width:64px;height:32px;padding:0 6px;border:1px solid var(--o3-border-subtle);border-radius:6px;font-size:12px;background:var(--bg-surface) !important;color:var(--text-primary) !important">'
           + ' <span style="font-size:11px;color:var(--text-tertiary,#94a3b8);margin-left:4px">px</span>',
           L('Body 13px là chuẩn Vercel/Linear cho industrial UI.', 'Body 13px is Vercel/Linear industrial standard.'))
       + '<div style="padding-top:14px;font-size:11.5px;color:var(--text-tertiary,#94a3b8);line-height:1.5">'
