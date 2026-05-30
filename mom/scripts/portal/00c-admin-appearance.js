@@ -5373,7 +5373,7 @@ function renderStandard(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260529-mm30';
+window._renderAdminAppearanceFullVersion = '20260531-mm31';
 window._renderAdminAppearanceFull = render;
 
 })();

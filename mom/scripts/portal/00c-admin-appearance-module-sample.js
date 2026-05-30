@@ -843,8 +843,95 @@
       tokens:['control.height.standard','space.md','radius.pill','status.neutral.soft','status.warning.soft','status.success.soft','status.info.soft','status.danger.soft'] };
   }
 
+  /* ── v3-G26 (2026-05-31): DATA-DRIVEN sections ──────────────────────────────
+   * Unlike the 40+ hand-coded sections above, these two read the Lego-SSOT
+   * registries at render time and preview every block / archetype via
+   * BlockKit / ArchetypeKit. Adding an L3 block or L4 archetype to its registry
+   * makes it appear here automatically — no edit to this file. This is the
+   * data-driven model the whole Module Sample tab should migrate toward. */
+  function blocksSection(L){
+    var reg = (typeof window !== 'undefined') && window.__HM_BLOCK_REGISTRY__;
+    var BK  = (typeof window !== 'undefined') && window.BlockKit;
+    var body;
+    if (!reg || !BK) {
+      body = '<div style="font-size:12px;color:var(--text-secondary)">'
+        + esc(L('Block registry (00bc) / BlockKit (00bd) chưa nạp.','Block registry (00bc) / BlockKit (00bd) not loaded.'))
+        + '</div>';
+      return { id:'l3-blocks', label_vi:'🧩 Blocks (L3)', label_en:'Blocks (L3)', body_html: body, tokens:[] };
+    }
+    // sample slot data per block so each renders something representative
+    var SAMPLES = {
+      'toolbar.filtered': { title:L('Đơn hàng','Orders'), filters:[{label:L('Tất cả','All'),active:true},{label:L('Chờ duyệt','Pending')}], search:L('Tìm…','Search…'), actions:[{label:L('Tạo','New'),variant:'primary'}] },
+      'panel.standard':   { title:L('Chi tiết','Details'), count:'12', actions:[{label:L('Lưu','Save'),variant:'primary'}], body:'<div style="font-size:12px;color:var(--text-secondary)">'+esc(L('Nội dung panel','Panel body'))+'</div>' },
+      'kpi.grid':         { tiles:[{label:'OTD',value:'95%',tone:'success'},{label:'NCR',value:'2',tone:'danger'},{label:'IQC',value:'99%',tone:'info'}] },
+      'table.data':       { columns:[L('Mã','Code'),L('Tên','Name'),L('Trạng thái','Status')], rows:[['SO-1','A1','<span class="o3-chip o3-chip--success">OK</span>'],{cells:['SO-2','A2','<span class="o3-chip o3-chip--warning">'+esc(L('Chờ','Wait'))+'</span>'],clickable:true}] },
+      'empty.state':      { icon:'📭', title:L('Chưa có dữ liệu','No data'), hint:L('Tạo bản ghi đầu tiên','Create the first record') },
+      'shell.workspace':  { title:L('Workspace','Workspace'), subtitle:L('Phép chiếu mẫu','Sample projection'), tabs:[{label:L('Tất cả','All'),active:true},{label:L('Của tôi','Mine'),badge:'3'}], body:'<div style="padding:8px;font-size:12px;color:var(--text-secondary)">'+esc(L('Thân workspace','Workspace body'))+'</div>' }
+    };
+    var blocks = Array.isArray(reg.blocks) ? reg.blocks : [];
+    body = '<div style="display:flex;flex-direction:column;gap:14px">'
+      + '<div style="font-size:12px;color:var(--text-secondary)">'
+      + esc(L('Tự sinh từ 00bc-block-registry.js qua BlockKit. Thêm block vào registry → tự hiện ở đây.',
+              'Auto-generated from 00bc-block-registry.js via BlockKit. Add a block to the registry → it appears here.'))
+      + '</div>';
+    blocks.filter(function(b){ return b.status==='published'; }).forEach(function(b){
+      body += '<div style="display:flex;flex-direction:column;gap:6px">'
+        + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary)">'
+        + esc(L(b.display_name_vi,b.display_name_en)) + ' <span style="font-weight:400;opacity:.7">· ' + esc(b.block_key) + '</span></div>'
+        + BK.render(b.block_key, SAMPLES[b.block_key] || {})
+        + '</div>';
+    });
+    body += '</div>';
+    return { id:'l3-blocks', label_vi:'🧩 Blocks (L3)', label_en:'Blocks (L3)', body_html: body,
+      tokens:['control.height.standard','spacing.md','spacing.lg','radius.card','brand.primary'] };
+  }
+
+  function archetypesSection(L){
+    var reg = (typeof window !== 'undefined') && window.__HM_ARCHETYPE_REGISTRY__;
+    var AK  = (typeof window !== 'undefined') && window.ArchetypeKit;
+    var body;
+    if (!reg || !AK) {
+      body = '<div style="font-size:12px;color:var(--text-secondary)">'
+        + esc(L('Archetype registry (00be) / ArchetypeKit (00bf) chưa nạp.','Archetype registry (00be) / ArchetypeKit (00bf) not loaded.'))
+        + '</div>';
+      return { id:'l4-archetypes', label_vi:'🏗️ Archetypes (L4)', label_en:'Archetypes (L4)', body_html: body, tokens:[] };
+    }
+    var PACKETS = {
+      'workspace-projection': {
+        shell:   { slots:{ title:L('Đơn hàng','Orders'), tabs:[{label:L('Tất cả','All'),active:true}] } },
+        kpis:    { slots:{ tiles:[{label:'OTD',value:'95%',tone:'success'},{label:'NCR',value:'2',tone:'danger'}] } },
+        toolbar: { slots:{ filters:[{label:L('Tất cả','All'),active:true}], search:L('Tìm…','Search…') } },
+        list:    { slots:{ columns:[L('Mã','Code'),L('Tên','Name')], rows:[['SO-1','A1'],['SO-2','A2']] } }
+      },
+      'authoritative-record-shell': {
+        shell:   { slots:{ title:L('Hồ sơ NCR','NCR record') } },
+        actions: { slots:{ actions:[{label:L('Duyệt','Approve'),variant:'success'},{label:L('Từ chối','Reject'),variant:'danger'}] } },
+        main:    { slots:{ title:L('Nội dung','Body'), body:'<div style="font-size:12px;color:var(--text-secondary)">'+esc(L('Thân hồ sơ','Record body'))+'</div>' } },
+        aside:   { slots:{ title:L('Thông tin','Meta'), body:'<div style="font-size:12px;color:var(--text-secondary)">'+esc(L('Bên lề','Sidebar'))+'</div>' } }
+      }
+    };
+    var arcs = Array.isArray(reg.archetypes) ? reg.archetypes : [];
+    body = '<div style="display:flex;flex-direction:column;gap:18px">'
+      + '<div style="font-size:12px;color:var(--text-secondary)">'
+      + esc(L('Tự sinh từ 00be-archetype-registry.js qua ArchetypeKit. Mỗi archetype = một khung module ráp từ blocks.',
+              'Auto-generated from 00be-archetype-registry.js via ArchetypeKit. Each archetype = a module shell assembled from blocks.'))
+      + '</div>';
+    arcs.filter(function(a){ return a.status==='published'; }).forEach(function(a){
+      body += '<div style="display:flex;flex-direction:column;gap:6px">'
+        + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary)">'
+        + esc(L(a.display_name_vi,a.display_name_en)) + ' <span style="font-weight:400;opacity:.7">· ' + esc(a.archetype_key) + ' · ' + esc(a.route_class) + '</span></div>'
+        + ArchetypeKit.render(a.archetype_key, PACKETS[a.archetype_key] || {})
+        + '</div>';
+    });
+    body += '</div>';
+    return { id:'l4-archetypes', label_vi:'🏗️ Archetypes (L4)', label_en:'Archetypes (L4)', body_html: body,
+      tokens:['control.height.standard','spacing.md','spacing.lg','radius.card','brand.primary','colorsLight.bgSurface'] };
+  }
+
   function sections(L){
     return [
+      blocksSection(L),
+      archetypesSection(L),
       /* v3-G15 (2026-05-29): Global sections REMOVED from Module Master.
        * Density (Khe hở Master), Global tokens, Typography, Effects are
        * now exclusively in the 🎨 Theme tab. Module Master keeps ONLY
