@@ -103,6 +103,13 @@ final class RepoBoundaryScanner
         '#^_reports/uom-measurement-conversion-v1/.*$#',
         // MDA Sequential Authority audit bundle inherited from main.
         '#^_reports/agent-audits/.*$#',
+        // Orders-v3 Module Master v3-G14..G25c slice audit evidence
+        // (live-test findings, backend persistence proof, CSS token wiring).
+        // Mirrors .gitignore `!_reports/module-master-properties-dock/`.
+        '#^_reports/module-master-properties-dock/.*$#',
+        // RACI v3 authority consolidation audit bundle — sequential governance
+        // evidence. Mirrors .gitignore `!_reports/raci-v3/`.
+        '#^_reports/raci-v3/.*$#',
     ];
 
     /**

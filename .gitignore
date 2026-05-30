@@ -38,6 +38,14 @@ tests/e2e/node_modules/
 # Whitelist MDA Sequential Authority prompt-pack audit bundle (governance
 # artifacts committed by 23b7f35ff for external evaluator review on GitHub).
 !_reports/agent-audits/
+# Whitelist orders-v3 Module Master v3-G14..G25c slice audit evidence
+# (live-test findings, backend persistence proof, CSS token wiring audit).
+# Tracked so external evaluators and future AI sessions can review the
+# audit trail from the v3 property dock hardening sprint.
+!_reports/module-master-properties-dock/
+# Whitelist RACI v3 authority consolidation audit bundle — sequential
+# governance evidence set reviewed by external evaluators.
+!_reports/raci-v3/
 _build/
 _Deleted/
 .tmp/
