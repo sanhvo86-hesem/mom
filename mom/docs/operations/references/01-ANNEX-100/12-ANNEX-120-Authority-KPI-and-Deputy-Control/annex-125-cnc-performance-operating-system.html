@@ -110,7 +110,7 @@
 <thead><tr><th>KPI chuẩn</th><th>Trọng số</th><th>Trạng thái tính điểm</th><th>Target / ngưỡng</th><th>Chủ bằng chứng / nguồn</th><th>Ghi nhận / blocker</th></tr></thead>
 <tbody>
 <tr><td><span class="code">OTD</span></td><td>18%</td><td>active_runtime</td><td>≥95%; yellow 90-94.99%; red &lt;90%</td><td>PD/CS; shipment + approved promise date</td><td>Eligible only when complaint, FPY and ship-packet blockers are clean.</td></tr>
-<tr><td><span class="code">COMPLAINT_RATE</span></td><td>14%</td><td>manual_governed</td><td>≤1/100 shipments or approved ppm contract; major escape is red</td><td>QA/CS; EQMS complaint + containment bằng chứng</td><td>Containment overdue or major escape blocks recognition.</td></tr>
+<tr><td><span class="code">CUSTOMER_ESCAPE_DPMO</span></td><td>14%</td><td>runtime_calculated</td><td>≤100 DPMO (chuẩn hóa theo cơ hội đặc tính CTQ, rolling 12 tháng); major escape là đỏ bất kể tỷ lệ</td><td>QA/CS; EQMS complaint + containment bằng chứng</td><td>Containment overdue or major escape blocks recognition.</td></tr>
 <tr><td><span class="code">FPY</span></td><td>14%</td><td>active_runtime</td><td>≥98%; yellow 95-97.99%; red &lt;95%</td><td>QA/OPS; tập lô kiểm đạt ngay lần đầu</td><td>Inspection bypass or customer escape blocks recognition.</td></tr>
 <tr><td><span class="code">COPQ</span></td><td>14%</td><td>manual_governed</td><td>≤2% sales; red &gt;4%</td><td>QA/Finance; COPQ cost buckets + sales close</td><td>Cost exclusion or repeat NCR red blocks recognition.</td></tr>
 <tr><td><span class="code">PLAN_ADHERENCE</span></td><td>14%</td><td>active_runtime</td><td>≥90%; red &lt;80%</td><td>PPL/PD; job_orders plan adherence bằng chứng</td><td>Hot-job gaming or unapproved resequence blocks recognition.</td></tr>
@@ -202,7 +202,7 @@
 <thead><tr><th>Chủ đề</th><th>Quy tắc cứng</th><th>Ý nghĩa vận hành</th></tr></thead>
 <tbody>
 <tr><td>Báo cáo trung thực</td><td><span class="code">internal_contained</span> và <span class="code">near_miss</span> không được bị dùng như critical escape. Mục tiêu là mở NCR/containment sớm, không đẩy con người vào hành vi giấu lỗi.</td><td>Hệ phải thưởng cho tính trung thực trong phát hiện sớm, không phải chỉ thưởng cho bảng số đẹp.</td></tr>
-<tr><td>Late/no NCR và thiếu thông báo khách</td><td>Nếu complaint/escape không được mở NCR đúng lúc hoặc không có <span class="code">customer_notification_sent_at</span> đúng clock, mô hình severity phải coi đó là hard gate dữ liệu/chăm sóc khách hàng.</td><td>Ngăn việc giữ <span class="code">COMPLAINT_RATE</span> đẹp bằng cách xử lý qua email/miệng ngoài EQMS.</td></tr>
+<tr><td>Late/no NCR và thiếu thông báo khách</td><td>Nếu complaint/escape không được mở NCR đúng lúc hoặc không có <span class="code">customer_notification_sent_at</span> đúng clock, mô hình severity phải coi đó là hard gate dữ liệu/chăm sóc khách hàng.</td><td>Ngăn việc giữ <span class="code">CUSTOMER_ESCAPE_DPMO</span> đẹp bằng cách xử lý qua email/miệng ngoài EQMS.</td></tr>
 <tr><td>Containment và repeat root cause</td><td><span class="code">NO_CONTAINMENT_COUNTER</span> và <span class="code">REPEAT_ROOT_CAUSE_ESCAPE_RATE</span> phải được review cùng 3D/4D/8D. Repeat cùng root-cause family không được xóa sạch chỉ vì đổi tên nguyên nhân.</td><td>Chặn behavior “đóng 8D nhanh nhưng containment/CAPA không thật”.</td></tr>
 <tr><td>Special release / deviation</td><td>Khi deviation cần special release mà thiếu reference/approval, severity phải bị nâng thành hard gate như một customer escape nghiêm trọng.</td><td>Ngăn phát hành bằng verbal approval hoặc concession không truy được.</td></tr>
 <tr><td>Bonus simulation only</td><td>Mọi metric complaint severity chỉ được vào <span class="code">bonus_simulation_model</span>; không cho payout thật trong pilot, và hard gate luôn thắng điểm số.</td><td>Không dùng complaint KPI để ép người che vấn đề hoặc tự động kỷ luật cá nhân.</td></tr>
@@ -228,7 +228,7 @@
 <li>Nhóm part family đại diện: manifold nhôm độ chính xác cao, carrier inox dung sai chặt, rework/revision critical low-volume.</li>
 <li>Work center trong pilot: CNC 3-axis, CNC 5-axis, CMM, final inspection, ship release.</li>
 <li>Vai trò bắt buộc có mặt trong roster pilot: CS, ENGM, PPL, SCM, WKM, OPE, QA, QC, MCS, CPS, QMS, DCC.</li>
-<li>Giữ 7 scored core: <span class="code">OTD</span>, <span class="code">COMPLAINT_RATE</span>, <span class="code">FPY</span>, <span class="code">COPQ</span>, <span class="code">PLAN_ADHERENCE</span>, <span class="code">WIP_AGING</span>, <span class="code">MATERIAL_AVAILABILITY_PLAN</span>.</li>
+<li>Giữ 7 scored core: <span class="code">OTD</span>, <span class="code">CUSTOMER_ESCAPE_DPMO</span>, <span class="code">FPY</span>, <span class="code">COPQ</span>, <span class="code">PLAN_ADHERENCE</span>, <span class="code">WIP_AGING</span>, <span class="code">MATERIAL_AVAILABILITY_PLAN</span>.</li>
 <li>Dùng driver panel để bảo vệ flow/chất lượng: constraint, CMM queue, material-cert-IQC, traceability, special process, check-dimension, 3D/8D.</li>
 <li>Giữ LAM evidence gates và CTQ/Cpk pilot bundle ở trạng thái evidence-first; chỉ graduate khi có bằng chứng.</li>
 <li>Metric loại trừ khỏi thành công pilot/thưởng: OEE tổng quát, gross-margin job family, KPI EHS không liên quan release, metric đào tạo trang trí.</li>

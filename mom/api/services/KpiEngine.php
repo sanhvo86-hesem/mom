@@ -220,7 +220,7 @@ final class KpiEngine
     public const METRIC_TRAINING_COMPLETION  = 'TRAINING_COMP';
     public const METRIC_SUPPLIER_OTD         = 'SUPPLIER_OTD';
     public const METRIC_SUPPLIER_QUALITY     = 'SUPPLIER_QUAL';
-    public const METRIC_COMPLAINT_RATE       = 'COMPLAINT_RATE';
+    public const METRIC_CUSTOMER_ESCAPE_DPMO = 'CUSTOMER_ESCAPE_DPMO';
     public const METRIC_INVENTORY_TURNS      = 'INV_TURNS';
     public const METRIC_LABOR_EFFICIENCY     = 'LABOR_EFF';
     public const METRIC_PUT_THRU_INDEX       = 'PUT_THRU';
@@ -270,7 +270,7 @@ final class KpiEngine
         self::METRIC_TRAINING_COMPLETION,
         self::METRIC_SUPPLIER_OTD,
         self::METRIC_SUPPLIER_QUALITY,
-        self::METRIC_COMPLAINT_RATE,
+        self::METRIC_CUSTOMER_ESCAPE_DPMO,
         self::METRIC_INVENTORY_TURNS,
         self::METRIC_LABOR_EFFICIENCY,
         self::METRIC_PUT_THRU_INDEX,
@@ -309,7 +309,7 @@ final class KpiEngine
         self::METRIC_TRAINING_COMPLETION => 95.0,
         self::METRIC_SUPPLIER_OTD        => 90.0,
         self::METRIC_SUPPLIER_QUALITY    => 98.0,
-        self::METRIC_COMPLAINT_RATE      => 100.0,    // ≤ 100 PPM
+        self::METRIC_CUSTOMER_ESCAPE_DPMO => 100.0,   // ≤ 100 DPMO (~5.2σ)
         self::METRIC_INVENTORY_TURNS     => 6.0,
         self::METRIC_LABOR_EFFICIENCY    => 85.0,
         self::METRIC_PUT_THRU_INDEX      => 0.0,      // revenue / labor-hr
@@ -348,7 +348,7 @@ final class KpiEngine
         self::METRIC_TRAINING_COMPLETION => '%',
         self::METRIC_SUPPLIER_OTD        => '%',
         self::METRIC_SUPPLIER_QUALITY    => '%',
-        self::METRIC_COMPLAINT_RATE      => 'ppm',
+        self::METRIC_CUSTOMER_ESCAPE_DPMO => 'dpmo',
         self::METRIC_INVENTORY_TURNS     => 'turns',
         self::METRIC_LABOR_EFFICIENCY    => '%',
         self::METRIC_PUT_THRU_INDEX      => '$/hr',
@@ -378,7 +378,7 @@ final class KpiEngine
         self::METRIC_REWORK_RATE,
         self::METRIC_SETUP_TIME_RATIO,
         self::METRIC_NCR_RATE,
-        self::METRIC_COMPLAINT_RATE,
+        self::METRIC_CUSTOMER_ESCAPE_DPMO,
         self::METRIC_WIP_AGING,
         self::METRIC_NCR_CLOSURE_AGING,
         self::METRIC_ECO_CLOSURE_AGING,
@@ -1991,9 +1991,14 @@ final class KpiEngine
     /**
      * Customer Complaint Rate = Complaints / Total Shipments x 1000 (PPM)
      */
-    private function calcComplaintRate(DateRange $period, array $filters): array
+    private function calcCustomerEscapeDpmo(DateRange $period, array $filters): array
     {
-        $complaints = (int) $this->db->queryScalar(
+        // Customer escapes = defective CTQ characteristics that reached the
+        // customer (NCR nonconformance_source = 'Customer'). Counted as defects,
+        // not defective units, so the metric is opportunity-normalized (DPMO)
+        // rather than unit-based ppm — the statistically valid form for the
+        // low/medium-volume, high-mix, many-CTQ work HESEM machines for LAM/AMAT.
+        $defects = (int) $this->db->queryScalar(
             "SELECT COUNT(*) FROM ncr_records nr
              JOIN records r ON r.record_id = nr.record_id
              WHERE nr.nonconformance_source = 'Customer'
@@ -2001,16 +2006,36 @@ final class KpiEngine
             [':s' => $period->start, ':e' => $period->end],
         );
 
-        $shipments = (int) $this->db->queryScalar(
+        // Delivered units in the window — the per-unit base of the denominator.
+        $units = (int) $this->db->queryScalar(
             "SELECT COUNT(*) FROM shipments
              WHERE ship_date BETWEEN :s AND :e
                AND shipment_status = 'delivered'",
             [':s' => $period->start, ':e' => $period->end],
         );
 
-        $ppm = $shipments > 0 ? ($complaints / $shipments) * 1_000_000 : 0;
+        // Opportunities per unit = inspected CTQ characteristics (AS9102
+        // ballooned). Runtime proxy from inspection_results; the frozen,
+        // per-part-revision CTQ master (ctq_characteristics) is the staged
+        // authoritative source per ctq_data_contract.
+        $opportunities = max(1, (int) $this->db->queryScalar(
+            "SELECT COUNT(DISTINCT characteristic) FROM inspection_results
+             WHERE recorded_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz",
+            [':s' => $period->start, ':e' => $period->end],
+        ));
 
-        return ['value' => round($ppm, 0), 'sample_size' => $shipments, 'complaints' => $complaints, 'shipments' => $shipments];
+        $denominator = $units * $opportunities;
+        $dpmo = $denominator > 0 ? ($defects / $denominator) * 1_000_000 : 0;
+
+        // sample_size = total opportunities — drives the min_sample (10000) gate
+        // that suppresses RAG color when the rolling window is too thin to score.
+        return [
+            'value'         => round($dpmo, 0),
+            'sample_size'   => $denominator,
+            'defects'       => $defects,
+            'units'         => $units,
+            'opportunities' => $opportunities,
+        ];
     }
 
     /**
@@ -3307,7 +3332,7 @@ final class KpiEngine
             self::METRIC_TRAINING_COMPLETION => $this->calcTrainingCompletion(...),
             self::METRIC_SUPPLIER_OTD        => $this->calcSupplierOtd(...),
             self::METRIC_SUPPLIER_QUALITY    => $this->calcSupplierQuality(...),
-            self::METRIC_COMPLAINT_RATE      => $this->calcComplaintRate(...),
+            self::METRIC_CUSTOMER_ESCAPE_DPMO => $this->calcCustomerEscapeDpmo(...),
             self::METRIC_INVENTORY_TURNS     => $this->calcInventoryTurns(...),
             self::METRIC_LABOR_EFFICIENCY    => $this->calcLaborEfficiency(...),
             self::METRIC_PUT_THRU_INDEX      => $this->calcPutThru(...),

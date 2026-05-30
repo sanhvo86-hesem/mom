@@ -32,7 +32,7 @@
         "TRAINING_COMP",
         "SUPPLIER_OTD",
         "SUPPLIER_QUAL",
-        "COMPLAINT_RATE",
+        "CUSTOMER_ESCAPE_DPMO",
         "INV_TURNS",
         "LABOR_EFF",
         "PUT_THRU",
@@ -64,8 +64,9 @@
         "CAL_COMP": "CAL_COMPLIANCE",
         "TRN-COMP": "TRAINING_COMP",
         "TRAINING_COMPLETION": "TRAINING_COMP",
-        "CCR": "COMPLAINT_RATE",
-        "CUSTOMER_COMPLAINT_RATE": "COMPLAINT_RATE",
+        "CCR": "CUSTOMER_ESCAPE_DPMO",
+        "CUSTOMER_COMPLAINT_RATE": "CUSTOMER_ESCAPE_DPMO",
+        "COMPLAINT_RATE": "CUSTOMER_ESCAPE_DPMO",
         "SQI": "SUPPLIER_QUAL",
         "SUPPLIER_QUALITY_INDEX": "SUPPLIER_QUAL",
         "UTIL": "MACHINE_UTIL",
@@ -91,7 +92,7 @@
     },
     "executive_scorecard": [
         "OTD",
-        "COMPLAINT_RATE",
+        "CUSTOMER_ESCAPE_DPMO",
         "FPY",
         "COPQ",
         "PLAN_ADHERENCE",
@@ -232,43 +233,50 @@
         },
         {
             "no": 2,
-            "canonical_code": "COMPLAINT_RATE",
-            "name": "Customer Quality Escape / Complaint Rate",
-            "name_vi": "Tỷ lệ lỗi thoát ra khách hàng",
+            "canonical_code": "CUSTOMER_ESCAPE_DPMO",
+            "name": "Customer Escape DPMO",
+            "name_vi": "Lỗi thoát khách hàng theo cơ hội (DPMO)",
             "tier": "company",
             "layer": "bsc_monthly",
-            "purpose": "Đo lỗi thoát ra khách hàng để quyết định bao vây, thông báo khách và mở CAPA.",
+            "purpose": "Đo lỗi thoát ra khách hàng chuẩn hóa theo số cơ hội kiểm (đặc tính CTQ) thay vì theo số con hàng, phù hợp sản xuất ít/vừa nhiều chủng loại, để quyết định bao vây, thông báo khách và mở CAPA.",
             "formula": {
-                "numerator": "Số NCR có nonconformance_source = 'Customer' trong kỳ × 1.000.000",
-                "denominator": "Tổng số lô có shipment_status = 'delivered' trong kỳ",
-                "unit": "ppm",
+                "numerator": "Số đặc tính CTQ lỗi thoát ra khách hàng (NCR nonconformance_source = 'Customer', đếm theo đặc tính) trong cửa sổ rolling 12 tháng × 1.000.000",
+                "denominator": "Tổng số cơ hội = Σ theo mỗi mã giao của (số con giao × số đặc tính CTQ ballooned theo AS9102, đông-cứng theo part_no + revision)",
+                "unit": "dpmo",
                 "rounding": "round to integer",
                 "exclusions": "none",
                 "direction": "lower_is_better",
-                "min_sample": 30
+                "window": "rolling_12_month",
+                "min_sample": 10000
             },
             "thresholds": {
                 "direction": "lower_is_better",
-                "unit": "ppm",
+                "unit": "dpmo",
                 "green_point": 100,
-                "yellow_point": 200,
+                "yellow_point": 233,
                 "target": 100,
-                "basis": "Mục tiêu 6-sigma escape ≤233 ppm; CNC chính xác hàng đầu vận hành ≤100 ppm. HESEM green ≤100 ppm, đỏ >200 ppm theo ANNEX-129 §7."
+                "basis": "Chuẩn hóa theo cơ hội (đặc tính CTQ) cho sản xuất ít/vừa nhiều chủng loại: 6-sigma = 3,4 DPMO, ~233 DPMO ≈ 5σ (giới hạn escape), ≤100 DPMO ≈ 5,2σ. Mẫu số là số đặc tính ballooned AS9102 đông-cứng theo part_no + revision; cửa sổ rolling 12 tháng; ẩn màu khi tổng cơ hội < 10.000 theo ANNEX-129 §7."
             },
             "data_source": {
                 "system": "EQMS",
                 "tables": [
                     "ncr_records",
                     "records",
+                    "inspection_results",
+                    "ctq_characteristics",
                     "shipments"
                 ],
                 "columns": [
                     "nonconformance_source",
+                    "characteristic",
+                    "part_no",
+                    "revision",
+                    "drawing_balloon",
                     "created_at",
                     "ship_date",
                     "shipment_status"
                 ],
-                "evidence": "Sổ khiếu nại EQMS + liên kết NCR/CAPA."
+                "evidence": "Sổ NCR khách hàng EQMS + master đặc tính CTQ (AS9102 ballooned) + kết quả kiểm; mẫu số = Σ(con giao × số đặc tính CTQ đông-cứng theo part_no + revision)."
             },
             "owner_role": "QA",
             "data_stewardship_role": "CS",
@@ -277,10 +285,10 @@
             "paired_metric": "CUSTOMER_NCR_SEVERITY_SCORE",
             "decision_action": "Đỏ: CEO/QA soát xét, mở bao vây trong 24h và thông báo khách nếu cần.",
             "action_reference": "SOP-902 xem xét của lãnh đạo + quy trình NCR/CAPA; CDR cổng G6.",
-            "attribution_rule": "Quy trách nhiệm cho COMPLAINT_RATE phải phân rã theo nguyên nhân, người gây ra sai lệch, contributor liên quan, phạm vi quá trình và ngoại lệ đã ghi nhận; không dùng một kết quả đơn lẻ khi chưa rà soát chỉ số đối trọng.",
+            "attribution_rule": "Quy trách nhiệm cho CUSTOMER_ESCAPE_DPMO phải phân rã theo nguyên nhân, người gây ra sai lệch, contributor liên quan, phạm vi quá trình và ngoại lệ đã ghi nhận; không dùng một kết quả đơn lẻ khi chưa rà soát chỉ số đối trọng.",
             "counter_metric": {
-                "code": "COMPLAINT_RATE-CTR",
-                "endpoint": "POST /api/kpi/COMPLAINT_RATE-CTR/input",
+                "code": "CUSTOMER_ESCAPE_DPMO-CTR",
+                "endpoint": "POST /api/kpi/CUSTOMER_ESCAPE_DPMO-CTR/input",
                 "name_vi": "Tỷ lệ khiếu nại bị ghi nhận trễ hoặc không mở NCR",
                 "name": "Suppressed / late-logged complaint rate",
                 "intent": "Bắt việc làm đẹp số khiếu nại bằng cách giấu hoặc trì hoãn mở NCR."
@@ -309,11 +317,12 @@
                 "qa_hold_valid_per_gate",
                 "force_majeure_or_utility_outage"
             ],
-            "low_volume_policy": "Do not use complaint rate alone for payout, discipline or punishment in high-mix/low-volume cells; require sample/denominator context plus severity/hard-gate review.",
-            "severity_gate_note": "Critical, no-containment, late/no-NCR, unauthorized change, special-release, expired-gage and falsified-record cases block simulation even when PPM/DPPM is numerically low.",
+            "low_volume_policy": "Opportunity-normalized (DPMO) is the low/medium-volume escape metric; do not score, pay, discipline or punish on it alone in high-mix/low-volume cells. Suppress RAG color until cumulative opportunities >= 10000 in the rolling window; pair with CUSTOMER_NCR_SEVERITY_SCORE count + FPY; require severity/hard-gate review.",
+            "severity_gate_note": "Critical, no-containment, late/no-NCR, unauthorized change, special-release, expired-gage and falsified-record cases block simulation even when DPMO is numerically low.",
             "sample_policy": {
-                "min_n_score": 30,
-                "provisional_n": 10,
+                "min_n_score": 10000,
+                "provisional_n": 3000,
+                "sample_unit": "opportunities",
                 "denominator_context_required": true,
                 "low_volume_review_required": true
             },
@@ -325,7 +334,7 @@
             "lifecycle_status": "active_runtime",
             "data_contract_gap": "Hợp đồng dữ liệu cho luồng tính tự động đã có; mọi thay đổi phải qua kiểm thử hồi quy dịch vụ máy chủ/API/catalog trước khi sử dụng.",
             "target_graduation_condition": "Đã là chỉ số có thẩm quyền tự động; mọi thay đổi phải qua KPI integrity, kiểm thử hồi quy API/catalog và đồng bộ ANNEX/JD trước khi sử dụng.",
-            "evidence_source": "Bằng chứng cho luồng tính tự động của COMPLAINT_RATE: kết quả tính từ KpiEngine, truy vết giao dịch nguồn, nhãn ngưỡng và ảnh chụp bộ lọc kỳ đo.",
+            "evidence_source": "Bằng chứng cho luồng tính tự động của CUSTOMER_ESCAPE_DPMO: kết quả tính từ KpiEngine, truy vết giao dịch nguồn, nhãn ngưỡng và ảnh chụp bộ lọc kỳ đo.",
             "required_evidence": [
                 "kết quả API tự động",
                 "truy vết giao dịch nguồn",
@@ -338,8 +347,8 @@
                 "quality_system"
             ],
             "controllability_scope": "QA sở hữu các đòn bẩy kiểm soát, bằng chứng dữ liệu và rà soát chỉ số đối trọng cho hệ thống chất lượng.",
-            "action_when_red": "Mở leo thang trong họp quản trị hằng ngày cho COMPLAINT_RATE, xác minh dữ liệu nguồn, gán chủ sở hữu hành động và rà soát chỉ số đối trọng trước khi dùng cho đánh giá/thưởng.",
-            "hold_release_rule": "COMPLAINT_RATE không tự động tạo giữ sản xuất; phải đi qua leo thang trong họp quản trị hằng ngày, liên kết CDR/CAPA và hành động được chủ sở hữu phê duyệt trước khi có hệ quả vận hành.",
+            "action_when_red": "Mở leo thang trong họp quản trị hằng ngày cho CUSTOMER_ESCAPE_DPMO, xác minh dữ liệu nguồn, gán chủ sở hữu hành động và rà soát chỉ số đối trọng trước khi dùng cho đánh giá/thưởng.",
+            "hold_release_rule": "CUSTOMER_ESCAPE_DPMO không tự động tạo giữ sản xuất; phải đi qua leo thang trong họp quản trị hằng ngày, liên kết CDR/CAPA và hành động được chủ sở hữu phê duyệt trước khi có hệ quả vận hành.",
             "role_assignments": [
                 {
                     "role": "QA",
@@ -351,7 +360,7 @@
             ],
             "decision_purpose": "Dùng để kiểm soát Tỷ lệ lỗi thoát ra khách hàng; khi lệch ngưỡng phải xác định nguyên nhân, chủ sở hữu, hành động khắc phục và chỉ số đối trọng trước khi dùng cho đánh giá.",
             "backend_status": "runtime_calculated",
-            "primary_endpoint": "GET /api/kpi/COMPLAINT_RATE"
+            "primary_endpoint": "GET /api/kpi/CUSTOMER_ESCAPE_DPMO"
         },
         {
             "no": 3,
@@ -3005,7 +3014,7 @@
             "data_stewardship_role": "CS",
             "cadence": "weekly",
             "lead_or_lag": "lag",
-            "paired_metric": "COMPLAINT_RATE",
+            "paired_metric": "CUSTOMER_ESCAPE_DPMO",
             "decision_action": "Quá hạn: leo thang lãnh đạo trên tài khoản rủi ro; CS chủ trì.",
             "action_reference": "WI-202 T2 + leo thang tài khoản rủi ro; CDR dịch vụ khách hàng.",
             "attribution_rule": "Quy trách nhiệm cho CUSTOMER_COMM_CLOSURE_OT phải phân rã theo nguyên nhân, người gây ra sai lệch, contributor liên quan, phạm vi quá trình và ngoại lệ đã ghi nhận; không dùng một kết quả đơn lẻ khi chưa rà soát chỉ số đối trọng.",
@@ -15743,7 +15752,7 @@
                 "chỉ số đối trọng cho thấy rủi ro thao túng",
                 "hành động của chủ sở hữu quá hạn sau kết quả đỏ"
             ],
-            "paired_metric": "COMPLAINT_RATE",
+            "paired_metric": "CUSTOMER_ESCAPE_DPMO",
             "action_when_red": "Kiểm chứng bằng chứng nhập tay của CUSTOMER_NCR_SEVERITY_SCORE, từ chối dòng chưa verified và yêu cầu chủ sở hữu sửa trước khi dùng trong rà soát.",
             "decision_action": "Khi đỏ hoặc bị chặn: chủ sở hữu QA ghi nguyên nhân, mở hành động khắc phục trong kỳ đo, kiểm tra chỉ số đối trọng và báo cáo tại diễn đàn rà soát.",
             "required_evidence": [
@@ -15991,7 +16000,7 @@
                 "truy vết nguồn hoặc bộ bằng chứng chưa đủ",
                 "chưa rà soát chỉ số đối trọng"
             ],
-            "paired_metric": "COMPLAINT_RATE",
+            "paired_metric": "CUSTOMER_ESCAPE_DPMO",
             "data_contract_gap": "Chưa có hợp đồng dữ liệu được duyệt cho DEFECTIVE_ORDER_RATE_M; cần chốt nguồn dữ liệu, ánh xạ trường, công thức, bằng chứng mẫu và kiểm thử hiển thị trước khi dùng chính thức.",
             "target_graduation_condition": "Chỉ được chuyển trạng thái khi chủ sở hữu nguồn, hợp đồng dữ liệu, kiểm thử công thức, cơ sở ngưỡng, bộ bằng chứng và kiểm thử bảng điều khiển ẩn số đã được phê duyệt.",
             "required_evidence": [
@@ -16181,8 +16190,8 @@
                 "chỉ số đối trọng cho thấy rủi ro thao túng",
                 "hành động của chủ sở hữu quá hạn sau kết quả đỏ"
             ],
-            "paired_metric": "COMPLAINT_RATE",
-            "parent_metric": "COMPLAINT_RATE",
+            "paired_metric": "CUSTOMER_ESCAPE_DPMO",
+            "parent_metric": "CUSTOMER_ESCAPE_DPMO",
             "required_evidence": [
                 "dòng nhập tay đã verified",
                 "file hoặc form bằng chứng",
@@ -17857,10 +17866,10 @@
         },
         {
             "local_id": "BSC-CORE-02",
-            "canonical_code": "COMPLAINT_RATE",
-            "name": "Customer Complaint / Escape Rate",
-            "backend_status": "manual_governed",
-            "primary_endpoint": "GET /api/kpi/COMPLAINT_RATE",
+            "canonical_code": "CUSTOMER_ESCAPE_DPMO",
+            "name": "Customer Escape DPMO",
+            "backend_status": "runtime_calculated",
+            "primary_endpoint": "GET /api/kpi/CUSTOMER_ESCAPE_DPMO",
             "scorecard_role": "scored_core",
             "dashboard_card_class": "executive",
             "scorecard_model_id": "CNC-EXEC-BSC-LEAN-7+DRIVERS-2026",
@@ -24303,7 +24312,7 @@
                 },
                 "linked_metrics": [
                     "OTD",
-                    "COMPLAINT_RATE",
+                    "CUSTOMER_ESCAPE_DPMO",
                     "FPY",
                     "CAL_COMPLIANCE",
                     "TRAINING_COMP"
@@ -25079,18 +25088,18 @@
                 "review_forum": "monthly BSC; weekly delivery recovery when yellow/red"
             },
             {
-                "canonical_code": "COMPLAINT_RATE",
+                "canonical_code": "CUSTOMER_ESCAPE_DPMO",
                 "scorecard_weight_pct": 14,
-                "unit": "complaints_per_100_shipments",
-                "target": 1,
+                "unit": "dpmo",
+                "target": 100,
                 "higher_is_better": false,
                 "quantitative_thresholds": {
                     "stretch_max": 0,
-                    "green_max": 1,
-                    "yellow_max": 2,
-                    "red_above": 2
+                    "green_max": 100,
+                    "yellow_max": 233,
+                    "red_above": 233
                 },
-                "rating_criteria": "Count confirmed customer complaints or escapes per 100 shipments; major escape is red regardless of rate.",
+                "rating_criteria": "Opportunity-normalized customer escape (DPMO) over rolling 12 months; suppress color until cumulative opportunities >= 10000; major escape is red regardless of rate.",
                 "reward_rule": "Blocks quality/delivery recognition when containment or customer response is overdue.",
                 "blocking_conditions": [
                     "major_customer_escape",
@@ -25240,7 +25249,7 @@
         "design_rule": "Keep the executive scorecard to seven scored core metrics. Put valuable leading, gate, TOC, LAM and capability indicators into strategic_driver_panel or gate_blockers until their evidence contract is approved and change-controlled.",
         "scored_core": [
             "OTD",
-            "COMPLAINT_RATE",
+            "CUSTOMER_ESCAPE_DPMO",
             "FPY",
             "COPQ",
             "PLAN_ADHERENCE",
@@ -25701,7 +25710,7 @@
                 "lead_or_lag": "lag_gate",
                 "initiative_link": "customer containment and 3D/8D discipline",
                 "linked_metrics": [
-                    "COMPLAINT_RATE",
+                    "CUSTOMER_ESCAPE_DPMO",
                     "NCR_3D_RESPONSE_SLA",
                     "NCR_8D_UPDATE_SLA"
                 ],
@@ -25848,7 +25857,7 @@
             ],
             "scored_core": [
                 "OTD",
-                "COMPLAINT_RATE",
+                "CUSTOMER_ESCAPE_DPMO",
                 "FPY",
                 "COPQ",
                 "PLAN_ADHERENCE",
@@ -26097,7 +26106,7 @@
             "freshness_rule": "monthly close; promise revisions approved before shipment is scored",
             "lineage_rule": "unapproved promise-date change blocks reward even when shipment is on revised date"
         },
-        "COMPLAINT_RATE": {
+        "CUSTOMER_ESCAPE_DPMO": {
             "scorecard_scoring_status": "manual_governed",
             "scorecard_contributes_to_reward": false,
             "data_contract_approval_id": "KPI-DC-COMPLAINT-001",
@@ -26313,7 +26322,7 @@
             "review_cadence": "weekly recovery and monthly BSC",
             "review_forum": "T2/T3 delivery recovery and monthly BSC",
             "counter_metric": [
-                "COMPLAINT_RATE",
+                "CUSTOMER_ESCAPE_DPMO",
                 "FPY",
                 "SHIP_PACKET_COMPLETENESS"
             ],
@@ -26325,7 +26334,7 @@
                 "promise_date_owner"
             ]
         },
-        "COMPLAINT_RATE": {
+        "CUSTOMER_ESCAPE_DPMO": {
             "metric_type": "kpi",
             "evaluation_use": "company_scorecard",
             "evaluation_scope": "company",
@@ -26363,7 +26372,7 @@
             "review_cadence": "daily tier and monthly BSC",
             "review_forum": "Lean Daily Management and BSC review",
             "counter_metric": [
-                "COMPLAINT_RATE",
+                "CUSTOMER_ESCAPE_DPMO",
                 "SCRAP_RATE",
                 "REWORK_RATE"
             ],
@@ -26390,7 +26399,7 @@
             "review_forum": "management review and CAPA review",
             "counter_metric": [
                 "NCR_RATE",
-                "COMPLAINT_RATE",
+                "CUSTOMER_ESCAPE_DPMO",
                 "REPEAT_NCR_RATE"
             ],
             "data_confidence_level": "runtime_calculated",
@@ -26909,8 +26918,8 @@
                     },
                     {
                         "role_measure_code": "CEO_CUSTOMER_QUALITY_ESCAPE_REVIEW",
-                        "kpi_code": "COMPLAINT_RATE",
-                        "mapped_canonical_metric": "COMPLAINT_RATE",
+                        "kpi_code": "CUSTOMER_ESCAPE_DPMO",
+                        "mapped_canonical_metric": "CUSTOMER_ESCAPE_DPMO",
                         "measure_type": "role_performance_measure",
                         "weight": 20,
                         "evidence_source": "EQMS complaint and containment record",
@@ -27106,8 +27115,8 @@
                     },
                     {
                         "role_measure_code": "CEO_CUSTOMER_QUALITY_ESCAPE_REVIEW",
-                        "kpi_code": "COMPLAINT_RATE",
-                        "mapped_canonical_metric": "COMPLAINT_RATE",
+                        "kpi_code": "CUSTOMER_ESCAPE_DPMO",
+                        "mapped_canonical_metric": "CUSTOMER_ESCAPE_DPMO",
                         "measure_type": "role_performance_measure",
                         "weight": 20,
                         "evidence_source": "EQMS complaint and containment record",
@@ -33867,8 +33876,8 @@
                 "active_scorecard": [
                     {
                         "role_measure_code": "QA_CUSTOMER_ESCAPE_CONTAINMENT",
-                        "kpi_code": "COMPLAINT_RATE",
-                        "mapped_canonical_metric": "COMPLAINT_RATE",
+                        "kpi_code": "CUSTOMER_ESCAPE_DPMO",
+                        "mapped_canonical_metric": "CUSTOMER_ESCAPE_DPMO",
                         "measure_type": "role_performance_measure",
                         "weight": 20,
                         "evidence_source": "complaint/containment evidence",
@@ -34064,8 +34073,8 @@
                 "scorecard": [
                     {
                         "role_measure_code": "QA_CUSTOMER_ESCAPE_CONTAINMENT",
-                        "kpi_code": "COMPLAINT_RATE",
-                        "mapped_canonical_metric": "COMPLAINT_RATE",
+                        "kpi_code": "CUSTOMER_ESCAPE_DPMO",
+                        "mapped_canonical_metric": "CUSTOMER_ESCAPE_DPMO",
                         "measure_type": "role_performance_measure",
                         "weight": 20,
                         "evidence_source": "complaint/containment evidence",

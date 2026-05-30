@@ -142,11 +142,11 @@ function isRateMetric(array $row): bool
     // ratios — they share the small-N noise problem that the min_sample
     // guardrail protects against. ppm/dppm/per_million are parts-per-million
     // forms of percent; rate/ratio cover engineered ratios such as
-    // SETUP_RATIO. Extending to ppm catches the COMPLAINT_RATE class that
+    // SETUP_RATIO. Extending to ppm catches the CUSTOMER_ESCAPE_DPMO class that
     // previously bypassed the P0.7.2 sample-size guard.
     return in_array($unit, [
         '%', 'percent', 'percentage',
-        'ppm', 'dppm',
+        'ppm', 'dppm', 'dpmo',
         'rate', 'ratio',
         'per_million', 'parts_per_million',
     ], true);
@@ -509,7 +509,7 @@ $annex128RequiredTokens = [
     'Metric code thấy được',
     'Findings',
     'OTD',
-    'COMPLAINT_RATE',
+    'CUSTOMER_ESCAPE_DPMO',
     'FPY',
     'COPQ',
     'PLAN_ADHERENCE',
@@ -2673,11 +2673,11 @@ foreach (['detection', 'NCR creation', 'customer notification', 'customer accept
     }
 }
 
-$complaintRate = $rowsByCodeP05['COMPLAINT_RATE'] ?? null;
+$complaintRate = $rowsByCodeP05['CUSTOMER_ESCAPE_DPMO'] ?? null;
 if (is_array($complaintRate)) {
     if (trim((string) ($complaintRate['low_volume_policy'] ?? '')) === ''
         || trim((string) ($complaintRate['paired_metric'] ?? '')) !== 'CUSTOMER_NCR_SEVERITY_SCORE') {
-        $p0[] = "COMPLAINT_RATE: Prompt 05 requires low_volume_policy and paired_metric=CUSTOMER_NCR_SEVERITY_SCORE.";
+        $p0[] = "CUSTOMER_ESCAPE_DPMO: Prompt 05 requires low_volume_policy and paired_metric=CUSTOMER_NCR_SEVERITY_SCORE.";
     }
 }
 
