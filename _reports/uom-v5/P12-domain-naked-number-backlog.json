@@ -1,0 +1,87 @@
+{
+  "schema_version": "uom-domain-naked-number-backlog.v1",
+  "posture": "development/prototype -> pre-production readiness candidate",
+  "classification": "controlled backlog, not a silent rollout",
+  "items": [
+    {
+      "id": "P12-BL-001",
+      "root": "SO",
+      "file": "mom/api/services/CustomerPurchaseOrderService.php",
+      "evidence": "rawLine['uom'] defaults to EA beside quantity",
+      "risk": "commercial quantity can remain free-text/default unit",
+      "required_repair": "route customer order line quantity through {magnitude, unit_code, quantity_kind} and preserve original customer unit"
+    },
+    {
+      "id": "P12-BL-002",
+      "root": "SO",
+      "file": "mom/api/services/EmailIntakeCommitService.php",
+      "evidence": "line uom defaults to EA during intake commit",
+      "risk": "email-derived commercial demand can silently assume EA",
+      "required_repair": "quarantine unknown/missing UoM before governed SO/PO commit"
+    },
+    {
+      "id": "P12-BL-003",
+      "root": "WO",
+      "file": "mom/api/services/ShopfloorExecutionService.php",
+      "evidence": "execution log uom defaults to target uom or EA",
+      "risk": "MES actuals can retain naked quantity semantics",
+      "required_repair": "wrap actual consumption/completion in MEASVAL and item_uom_policy slot"
+    },
+    {
+      "id": "P12-BL-004",
+      "root": "LOT",
+      "file": "mom/api/services/Traceability/GenealogyGraphService.php",
+      "evidence": "genealogy fact stores quantity and uom",
+      "risk": "analytics drill-through may lose original/canonical distinction",
+      "required_repair": "link genealogy edge quantity to MEASVAL audit hash"
+    },
+    {
+      "id": "P12-BL-005",
+      "root": "INSP",
+      "file": "mom/api/controllers/EqmsFaiController.php",
+      "evidence": "unit_of_measure persisted beside nominal/tolerance fields",
+      "risk": "inspection specifications can bypass canonical unit lifecycle",
+      "required_repair": "resolve spec unit through UoM alias/canonical catalog before FAI persistence"
+    },
+    {
+      "id": "P12-BL-006",
+      "root": "INSP",
+      "file": "mom/api/controllers/EqmsSpecialCharsController.php",
+      "evidence": "unit_of_measure persisted beside nominal/tolerance fields",
+      "risk": "special-characteristic acceptance criteria can remain free-text",
+      "required_repair": "require canonical unit_code and quantity_kind for special-characteristic specs"
+    },
+    {
+      "id": "P12-BL-007",
+      "root": "BREL",
+      "file": "mom/scripts/portal/58-eqms-batch-release.js",
+      "evidence": "quantity and quantity_used fields render as plain numbers",
+      "risk": "batch release reviewer may not see original/canonical measurement evidence",
+      "required_repair": "render MEASVAL drill-through and correction history in release review"
+    },
+    {
+      "id": "P12-BL-008",
+      "root": "NQCASE",
+      "file": "mom/scripts/form-runtimes/frm-403-scar.js",
+      "evidence": "quantity_received and quantity_rejected are parsed as numbers",
+      "risk": "supplier quality case quantities can be stored without canonical unit",
+      "required_repair": "replace plain quantity fields with UomQuantityWidget or backend MEASVAL contract"
+    },
+    {
+      "id": "P12-BL-009",
+      "root": "EQP",
+      "file": "mom/database/migrations/046_plant_maintenance_cmms.sql",
+      "evidence": "frequency_uom VARCHAR(20)",
+      "risk": "maintenance cadence units can drift from canonical catalog",
+      "required_repair": "map cadence units to canonical time units or controlled schedule policy"
+    },
+    {
+      "id": "P12-BL-010",
+      "root": "Analytics/AI",
+      "file": "mom/api/services/Traceability/GenealogyGraphService.php",
+      "evidence": "analytics-facing genealogy payload exposes quantity/uom",
+      "risk": "normalized facts may be consumed without original-source drill-through",
+      "required_repair": "publish normalized facts with source measurement hash and read-only authority label"
+    }
+  ]
+}

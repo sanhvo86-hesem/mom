@@ -1,0 +1,24 @@
+{
+  "prompt_id": "P01",
+  "decision_token": "UOM_V5_P01_GLOBAL_STANDARD_RESEARCH_LOCKED",
+  "status": "PASS_WITH_WARNINGS",
+  "can_advance_to_next_prompt": true,
+  "next_prompt": "02_REPO_REALITY_LOCK_AND_CONTRADICTION_LEDGER_PROMPT.md",
+  "blockers": [],
+  "warnings": [
+    "CONTROLLED_GAP_STANDARD_RECHECK_REQUIRED: UCUM official source domain was outside repo allowlist.",
+    "CONTROLLED_GAP_STANDARD_RECHECK_REQUIRED: QUDT official source domain was outside repo allowlist.",
+    "CONTROLLED_GAP_STANDARD_RECHECK_REQUIRED: UNECE, HL7 FHIR, RFC9457, FDA, EU Annex 11, GAMP, OWASP, WCAG, and OpenTelemetry official domains were outside repo allowlist.",
+    "Vendor sources were used only for pattern extraction, not equivalency claims."
+  ],
+  "evidence_files": [
+    "_reports/uom-v5/P01-global-standards-authority-matrix.md",
+    "_reports/uom-v5/P01-implementation-report.md",
+    "_reports/uom-v5/P01-audit-report.md",
+    "_reports/uom-v5/P01-adversarial-critique.md",
+    "_reports/uom-v5/P01-operational-simulation.md",
+    "_reports/uom-v5/P01-defect-and-repair-log.md",
+    "_reports/uom-v5/P01-rollback-plan.md",
+    "_reports/uom-v5/P01-test-evidence.md"
+  ]
+}

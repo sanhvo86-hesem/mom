@@ -39,11 +39,17 @@ class UomUnitNotFoundException extends UomException
 /** Source and target units belong to incompatible quantity kinds. */
 class UomKindMismatchException extends UomException
 {
-    public function __construct(string $fromKind, string $toKind)
-    {
+    public function __construct(
+        public readonly string $fromKind,
+        public readonly string $toKind,
+        public readonly string $reason = 'no_active_compatibility_rule',
+        public readonly string $remediationPath = 'Create and approve a uom_quantity_kind_compatibility rule, or use units from the same quantity kind.',
+        public readonly ?string $traceId = null
+    ) {
+        $traceSuffix = $traceId !== null && $traceId !== '' ? " Trace: {$traceId}." : '';
         parent::__construct(
             'UOM_KIND_MISMATCH',
-            "Cannot convert between quantity kinds '{$fromKind}' and '{$toKind}'.",
+            "Cannot convert between quantity kinds '{$fromKind}' and '{$toKind}'. Reason: {$reason}. Remediation: {$remediationPath}.{$traceSuffix}",
             422
         );
     }
@@ -104,6 +110,19 @@ class UomMagnitudeOverflowException extends UomException
     public function __construct()
     {
         parent::__construct('UOM_MAGNITUDE_OVERFLOW', 'Magnitude value exceeds allowable precision range.', 422);
+    }
+}
+
+/** Conversion rule category is known but not implemented in this engine phase. */
+class UomCategoryNotSupportedException extends UomException
+{
+    public function __construct(string $category)
+    {
+        parent::__construct(
+            'UOM_CATEGORY_NOT_SUPPORTED',
+            "Conversion category '{$category}' is not supported by the deterministic UoM engine.",
+            422
+        );
     }
 }
 

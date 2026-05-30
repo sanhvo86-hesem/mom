@@ -1,0 +1,48 @@
+{
+  "schema_version": "uom-shadow-sample.v1",
+  "posture": "development/prototype -> pre-production readiness candidate",
+  "samples": [
+    {
+      "id": "SIM-P15-01",
+      "source": {"record_id": "LEG-WEIGHT-001", "field": "weight", "value": "12", "unit": null},
+      "classification": "cannot_infer_unit",
+      "shadow_proposal": null,
+      "quarantine_reason": "missing unit evidence"
+    },
+    {
+      "id": "SIM-P15-02",
+      "source": {"record_id": "SUP-LINE-001", "field": "unit", "value": "LB", "evidence": "supplier_contract"},
+      "classification": "needs_measval_wrapper",
+      "shadow_proposal": {"original_unit": "LB", "canonical_unit": "lb", "requires_alias_review": true},
+      "quarantine_reason": null
+    },
+    {
+      "id": "SIM-P15-03A",
+      "source": {"item": "A", "packaging": "box", "count": 10},
+      "classification": "needs_item_policy",
+      "shadow_proposal": {"from_unit": "BOX", "to_unit": "EA", "factor": "10", "policy_required": true},
+      "quarantine_reason": null
+    },
+    {
+      "id": "SIM-P15-03B",
+      "source": {"item": "B", "packaging": "box", "count": null},
+      "classification": "cannot_infer_unit",
+      "shadow_proposal": null,
+      "quarantine_reason": "item packaging policy missing"
+    },
+    {
+      "id": "SIM-P15-04",
+      "source": {"unit": "IU", "lot_potency_evidence": null},
+      "classification": "ambiguous_alias",
+      "shadow_proposal": null,
+      "quarantine_reason": "lot potency evidence required"
+    },
+    {
+      "id": "SIM-P15-05",
+      "source": {"rollback": "requested"},
+      "classification": "rollback",
+      "shadow_proposal": {"delete_shadow_only": true, "delete_original": false},
+      "quarantine_reason": null
+    }
+  ]
+}

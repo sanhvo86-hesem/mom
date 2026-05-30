@@ -1,0 +1,176 @@
+{
+  "schema_version": "uom-domain-integration-contracts.v1",
+  "posture": "development/prototype -> pre-production readiness candidate",
+  "authority_policy": {
+    "measurement_contract": "MEASVAL or {magnitude, unit_code, quantity_kind}",
+    "canonical_unit_required": true,
+    "alias_policy": "external/free-text aliases must resolve through uom_alias or uom_alias_quarantine",
+    "ai_policy": "analytics and AI may consume normalized facts for advisory use only; they cannot override authoritative measurements",
+    "pricing_policy": "commercial price/currency truth must not be silently converted by UoM display policy"
+  },
+  "domain_roots": {
+    "ITEM": {
+      "domain": "inventory_logistics",
+      "authority_owner": "ItemUomPolicyService",
+      "measurement_fields": ["base_inventory_unit", "purchase_unit_code", "sales_unit_code", "recipe_unit_code", "qc_unit_code"],
+      "required_contract": "{magnitude, unit_code, quantity_kind} for item policies; MEASVAL for measured item facts",
+      "existing_evidence": ["mom/api/services/Uom/ItemUomPolicyService.php", "mom/api/controllers/UomController.php:/api/v1/uom/item-policy/{item_id}"],
+      "integration_status": "contract_defined"
+    },
+    "CUST": {
+      "domain": "master_data/commercial_customer",
+      "authority_owner": "customer display unit policy",
+      "measurement_fields": ["customer_display_unit_policy", "commercial_uom"],
+      "required_contract": "display policy only; no hidden conversion of price/currency or order commitment",
+      "existing_evidence": ["mom/contracts/objects/master_data--customers/contract.json", "mom/contracts/objects/commercial_customer--customer-purchase-orders/contract.json"],
+      "integration_status": "backlog_required"
+    },
+    "SUP": {
+      "domain": "master_data/procurement_supplier_quality",
+      "authority_owner": "supplier alias and inbound evidence owner",
+      "measurement_fields": ["supplier_unit_alias", "supplier_packaging_unit", "coa_measurement"],
+      "required_contract": "supplier aliases resolve through alias quarantine; COA values require MEASVAL evidence",
+      "existing_evidence": ["mom/contracts/objects/master_data--suppliers/contract.json", "mom/api/services/Uom/UomAliasResolutionService.php"],
+      "integration_status": "backlog_required"
+    },
+    "EQP": {
+      "domain": "master_data/maintenance_ehs",
+      "authority_owner": "equipment engineering-unit owner",
+      "measurement_fields": ["engineering_unit", "sensor_unit", "equipment_display_unit"],
+      "required_contract": "OPC UA/MTConnect engineering unit maps to canonical unit or quarantine",
+      "existing_evidence": ["mom/contracts/objects/master_data--equipment/contract.json", "mom/api/services/Uom/ExternalEngineeringUnitMapper.php"],
+      "integration_status": "backlog_required"
+    },
+    "MDEV": {
+      "domain": "master_data/quality_improvement",
+      "authority_owner": "metrology device owner",
+      "measurement_fields": ["calibration_unit", "device_display_unit", "measurement_resolution"],
+      "required_contract": "calibration and device readings require MEASVAL with original/display/canonical values",
+      "existing_evidence": ["mom/contracts/objects/master_data--measuring-devices/contract.json", "mom/api/services/Uom/MeasurementValueFactory.php"],
+      "integration_status": "backlog_required"
+    },
+    "PO": {
+      "domain": "procurement_supplier_quality",
+      "authority_owner": "supplier purchase order command path",
+      "measurement_fields": ["ordered_quantity", "received_quantity", "supplier_uom", "inventory_unit"],
+      "required_contract": "supplier quantity/uom normalized to inventory MEASVAL at receipt; original supplier value preserved",
+      "existing_evidence": ["mom/contracts/objects/procurement_supplier_quality--supplier-purchase-orders/contract.json", "mom/contracts/objects/procurement_supplier_quality--purchase-receipts/contract.json"],
+      "integration_status": "backlog_required"
+    },
+    "IREV": {
+      "domain": "procurement_supplier_quality/inventory_logistics",
+      "authority_owner": "item revision and receiving evidence owner",
+      "measurement_fields": ["revision_specific_uom", "coa_spec_unit", "receiving_normalization"],
+      "required_contract": "revision-specific measurement specs require canonical unit and replayable evidence",
+      "existing_evidence": ["mom/api/services/MasterDataLookupService.php", "mom/contracts/objects/inventory_logistics--inventory-items/contract.json"],
+      "integration_status": "backlog_required"
+    },
+    "SO": {
+      "domain": "commercial_customer",
+      "authority_owner": "sales order command path",
+      "measurement_fields": ["ordered_quantity", "customer_uom", "delivery_quantity", "commercial_uom"],
+      "required_contract": "customer display unit policy cannot alter price/currency truth; original customer unit preserved",
+      "existing_evidence": ["mom/contracts/objects/commercial_customer--sales-orders/contract.json", "mom/api/services/CustomerPurchaseOrderService.php"],
+      "integration_status": "backlog_required"
+    },
+    "WO": {
+      "domain": "planning_production/mes_execution",
+      "authority_owner": "work order and recipe command path",
+      "measurement_fields": ["planned_quantity", "recipe_quantity", "actual_consumption", "potency_adjusted_quantity"],
+      "required_contract": "recipe and actuals require MEASVAL; potency scaling delegates to contextual conversion",
+      "existing_evidence": ["mom/contracts/objects/planning_production--work-orders/contract.json", "mom/api/services/Uom/PotencyContextualConverter.php"],
+      "integration_status": "backlog_required"
+    },
+    "LOT": {
+      "domain": "traceability_serialization",
+      "authority_owner": "lot genealogy command path",
+      "measurement_fields": ["lot_quantity", "genealogy_edge_quantity", "yield_quantity"],
+      "required_contract": "lot quantity facts require original and normalized drill-through",
+      "existing_evidence": ["mom/contracts/objects/traceability_serialization--lot-genealogy/contract.json", "mom/api/services/Traceability/GenealogyGraphService.php"],
+      "integration_status": "backlog_required"
+    },
+    "INSP": {
+      "domain": "quality_improvement/procurement_supplier_quality",
+      "authority_owner": "inspection result command path",
+      "measurement_fields": ["spec_nominal", "spec_tolerance", "device_reading", "measurement_values"],
+      "required_contract": "inspection values require MEASVAL with original device unit and normalized spec unit",
+      "existing_evidence": ["mom/api/controllers/EqmsInspectionController.php", "mom/api/services/Uom/QualityMeasurementBridge.php"],
+      "integration_status": "bridge_exists_backlog_remains"
+    },
+    "NQCASE": {
+      "domain": "quality_improvement",
+      "authority_owner": "nonconformance case command path",
+      "measurement_fields": ["defect_quantity", "affected_quantity", "containment_quantity"],
+      "required_contract": "case quantities require canonical unit and linked evidence record",
+      "existing_evidence": ["mom/contracts/objects/quality_improvement--nonconformances/contract.json"],
+      "integration_status": "backlog_required"
+    },
+    "CAPA": {
+      "domain": "quality_improvement",
+      "authority_owner": "corrective action command path",
+      "measurement_fields": ["effectiveness_measure", "verification_sample_size", "residual_risk_metric"],
+      "required_contract": "CAPA effectiveness measures require MEASVAL or governed KPI source; AI cannot close CAPA",
+      "existing_evidence": ["mom/contracts/objects/quality_improvement--corrective-actions/contract.json"],
+      "integration_status": "backlog_required"
+    },
+    "BREL": {
+      "domain": "quality_improvement",
+      "authority_owner": "batch release command path",
+      "measurement_fields": ["release_test_result", "coa_measurement", "batch_quantity"],
+      "required_contract": "release signatures must see original and normalized measurement evidence",
+      "existing_evidence": ["mom/scripts/portal/58-eqms-batch-release.js", "mom/api/services/Uom/MeasurementEvidenceVerifier.php"],
+      "integration_status": "backlog_required"
+    },
+    "CDOC": {
+      "domain": "quality_improvement",
+      "authority_owner": "controlled document command path",
+      "measurement_fields": ["specification_unit", "acceptance_criteria_unit"],
+      "required_contract": "controlled specs reference canonical unit definitions and lifecycle-approved rules",
+      "existing_evidence": ["mom/contracts/objects/quality_improvement--document-control/contract.json"],
+      "integration_status": "backlog_required"
+    },
+    "TRAIN": {
+      "domain": "quality_improvement",
+      "authority_owner": "training command path",
+      "measurement_fields": ["training_material_unit_examples", "operator_competency_evidence"],
+      "required_contract": "training examples must match canonical UoM contract and cannot authorize rule changes",
+      "existing_evidence": ["mom/contracts/objects/quality_improvement--document-control/contract.json"],
+      "integration_status": "backlog_required"
+    },
+    "Analytics/AI": {
+      "domain": "analytics",
+      "authority_owner": "analytics read-model owner",
+      "measurement_fields": ["normalized_fact", "source_measurement_drillthrough", "advisory_feature"],
+      "required_contract": "analytics may read normalized facts only with drill-through to original measurement and cannot override authority",
+      "existing_evidence": ["mom/api/services/Uom/UomAuditEvidenceService.php", "mom/contracts/ai-authority-chain.json"],
+      "integration_status": "contract_defined"
+    }
+  },
+  "simulation_contracts": {
+    "SIM-P12-01": {
+      "scenario": "Supplier PO line in lb received into kg inventory with evidence",
+      "root_sequence": ["SUP", "PO", "ITEM"],
+      "required_evidence": ["original supplier lb", "canonical kg", "item_uom_policy slot inventory_unit_code", "audit_hash"]
+    },
+    "SIM-P12-02": {
+      "scenario": "Inspection spec in mm, device sends inch",
+      "root_sequence": ["MDEV", "INSP"],
+      "required_evidence": ["original inch", "normalized mm", "device id", "spec id", "rule_version"]
+    },
+    "SIM-P12-03": {
+      "scenario": "Batch release sees changed measurement after original entry",
+      "root_sequence": ["INSP", "BREL"],
+      "required_evidence": ["original entry", "correction event", "audit trail", "release signature sees both values"]
+    },
+    "SIM-P12-04": {
+      "scenario": "Work order recipe uses potency adjusted raw material",
+      "root_sequence": ["ITEM", "WO", "LOT"],
+      "required_evidence": ["potency evidence", "recipe unit", "actual consumption MEASVAL", "lot link"]
+    },
+    "SIM-P12-05": {
+      "scenario": "Analytics uses normalized kg but drill-through shows original supplier lb",
+      "root_sequence": ["PO", "LOT", "Analytics/AI"],
+      "required_evidence": ["normalized kg fact", "source supplier lb", "read-only analytics", "no authority override"]
+    }
+  }
+}

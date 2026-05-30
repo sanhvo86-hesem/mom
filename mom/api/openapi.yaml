@@ -161,8 +161,274 @@ tags:
       Canonical portal-first EQMS control-plane endpoints for document control,
       form issuance/submission/finalization, evidence packages, publication
       monitor, audit packs, change authority, and genealogy graph reads.
+  - name: UoM Measurement Intelligence
+    description: |
+      Unit-of-measure conversion, unit catalog, quantity-kind, alias resolution,
+      external mapping, item policy, packaging, and health endpoints. Conversion
+      is a governed preview/read operation and never creates approved rules.
 
 paths:
+  # UoM Measurement Intelligence (contract-first P10)
+  /api/v1/uom/convert:
+    post:
+      operationId: uomConvertPreview
+      tags: [UoM Measurement Intelligence]
+      summary: Preview a governed unit conversion
+      description: |
+        Computes a conversion preview through the MOM/MES UoM service path.
+        This endpoint does not create or approve conversion rules. Contextual
+        conversions require explicit evidence such as density, potency, or
+        packaging policy fields. Errors use RFC 9457 Problem Details with
+        `type`, `title`, `status`, `detail`, `instance`, `trace_id`, `code`,
+        `field_errors`, and `remediation`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: X-Trace-Id
+          in: header
+          required: false
+          schema: { type: string }
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema: { type: string }
+          description: Optional client key for replay-aware mutation-safe contract checks. Conversion remains preview-only.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [magnitude, from_unit, to_unit]
+              properties:
+                magnitude: { type: number }
+                from_unit: { type: string }
+                to_unit: { type: string }
+                item_id: { type: string }
+                domain: { type: string }
+                density_value: { type: number }
+                density_unit: { type: string }
+                potency_value: { type: number }
+                potency_unit: { type: string }
+                packaging_level: { type: string }
+                linked_record_type: { type: string }
+                linked_record_id: { type: string }
+              additionalProperties: true
+      responses:
+        '200':
+          description: Conversion preview result with measurement evidence.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/uom/units:
+    get:
+      operationId: uomUnitsList
+      tags: [UoM Measurement Intelligence]
+      summary: List canonical units
+      description: Read-only canonical UoM catalog endpoint.
+      responses:
+        '200':
+          description: Canonical unit list.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/uom/units/{code}:
+    parameters:
+      - name: code
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: uomUnitDetail
+      tags: [UoM Measurement Intelligence]
+      summary: Get canonical unit detail
+      description: Read-only detail for a canonical UoM code.
+      responses:
+        '200':
+          description: Unit detail.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/uom/kinds:
+    get:
+      operationId: uomKindsList
+      tags: [UoM Measurement Intelligence]
+      summary: List quantity kinds
+      description: Read-only quantity-kind catalog including compatibility governance.
+      responses:
+        '200':
+          description: Quantity-kind list.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/uom/rules:
+    get:
+      operationId: uomRulesList
+      tags: [UoM Measurement Intelligence]
+      summary: List conversion rules
+      description: Read-only rule catalog. Rule submission, approval, and activation are governed outside this preview API.
+      responses:
+        '200':
+          description: Conversion rule list.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/uom/aliases/resolve:
+    post:
+      operationId: uomAliasResolve
+      tags: [UoM Measurement Intelligence]
+      summary: Resolve or quarantine an external alias
+      description: |
+        Resolves an alias without silently inventing authority. Ambiguous or
+        unsafe aliases return structured quarantine data including `ambiguous`
+        and `quarantine_id`; the `uom.alias.quarantined` event contract is
+        defined in `mom/data/registry/uom-event-contracts.json`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: X-Trace-Id
+          in: header
+          required: false
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [alias]
+              properties:
+                alias: { type: string }
+                source_system: { type: string }
+                context: { type: object, additionalProperties: true }
+              additionalProperties: true
+      responses:
+        '200':
+          description: Alias resolution or quarantine result.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [resolved, ambiguous, quarantined, unknown]
+                  ambiguous:
+                    type: boolean
+                  quarantine_id:
+                    type: string
+                additionalProperties: true
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/uom/external-map/{system}/{code}:
+    parameters:
+      - name: system
+        in: path
+        required: true
+        schema: { type: string }
+      - name: code
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: uomExternalMapResolve
+      tags: [UoM Measurement Intelligence]
+      summary: Resolve an external unit map
+      description: Read-only external-system code mapping lookup.
+      responses:
+        '200':
+          description: External map resolution.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/uom/health:
+    get:
+      operationId: uomHealth
+      tags: [UoM Measurement Intelligence]
+      summary: Check UoM service health
+      description: Read-only service readiness and registry health check.
+      responses:
+        '200':
+          description: UoM service health.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/uom/item-policy/{item_id}:
+    parameters:
+      - name: item_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: uomItemPolicyGet
+      tags: [UoM Measurement Intelligence]
+      summary: Get item UoM policy
+      description: Read-only item UoM policy resolved through the governed priority chain.
+      responses:
+        '200':
+          description: Item UoM policy result.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/uom/item-packaging/{item_id}:
+    parameters:
+      - name: item_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: uomItemPackagingGet
+      tags: [UoM Measurement Intelligence]
+      summary: Get item packaging policy
+      description: Read-only item packaging resolution for contextual packaging conversions.
+      responses:
+        '200':
+          description: Item packaging policy result.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   # Transactional plural-form canonical paths (ADR-0008, Stream C.2)
   /api/v1/sales-orders:
     get:
@@ -9160,6 +9426,15 @@ components:
                 type: string
                 description: Machine-readable validation error code.
           description: Detailed validation errors for 422 responses.
+        field_errors:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          description: Field-level validation details returned by UoM and contract-first APIs.
+        remediation:
+          type: string
+          description: Operator-safe remediation guidance for the failed request.
 
     # ── Foundation Items ──
 

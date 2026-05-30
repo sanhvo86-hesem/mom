@@ -1,0 +1,26 @@
+{
+  "prompt_id": "P13",
+  "decision_token": "UOM_V5_P13_ENTERPRISE_OPERABILITY_LOCKED",
+  "status": "PASS_WITH_WARNINGS",
+  "can_advance_to_next_prompt": true,
+  "next_prompt": "14_EQMS_VALIDATION_PART11_ANNEX11_GAMP_PROMPT.md",
+  "blockers": [],
+  "warnings": [
+    "composer check remains red because of existing KPI registry count drift: KpiEngineAuthorityRegistryTest expected 142 but saw 148.",
+    "OpenTelemetry spans/metrics are contract-defined but not wired to a runtime collector in P13.",
+    "Multi-node cache invalidation requires deployment event fanout and is not proven by local tests.",
+    "Performance evidence is local micro-benchmark only and is not a production SLO claim."
+  ],
+  "evidence_files": [
+    "mom/api/services/Uom/UcumParser.php",
+    "mom/data/registry/uom-operability-contracts.json",
+    "mom/tests/Unit/Uom/UomOperabilityP13Test.php",
+    "_reports/uom-v5/P13-implementation-report.md",
+    "_reports/uom-v5/P13-audit-report.md",
+    "_reports/uom-v5/P13-adversarial-critique.md",
+    "_reports/uom-v5/P13-operational-simulation.md",
+    "_reports/uom-v5/P13-defect-and-repair-log.md",
+    "_reports/uom-v5/P13-rollback-plan.md",
+    "_reports/uom-v5/P13-test-evidence.md"
+  ]
+}

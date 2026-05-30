@@ -1,0 +1,29 @@
+{
+  "prompt_id": "P06",
+  "decision_token": "UOM_V5_P06_UCUM_ALIAS_EXTERNAL_GOVERNED",
+  "status": "PASS_WITH_WARNINGS",
+  "can_advance_to_next_prompt": true,
+  "next_prompt": "07_SEMANTIC_COMPATIBILITY_QUANTITY_KIND_ENGINE_PROMPT.md",
+  "blockers": [],
+  "warnings": [
+    "composer check remains red because of existing KPI registry count drift: KpiEngineAuthorityRegistryTest expected 142 but saw 148.",
+    "Full UCUM universe and QUDT catalog backfill remain controlled gaps outside P06.",
+    "Problem Details parity for all alias statuses remains P10.",
+    "UI remediation for alias quarantine remains P11."
+  ],
+  "evidence_files": [
+    "_reports/uom-v5/P06-controlled-gap-manifest.md",
+    "_reports/uom-v5/P06-implementation-report.md",
+    "_reports/uom-v5/P06-audit-report.md",
+    "_reports/uom-v5/P06-adversarial-critique.md",
+    "_reports/uom-v5/P06-operational-simulation.md",
+    "_reports/uom-v5/P06-defect-and-repair-log.md",
+    "_reports/uom-v5/P06-rollback-plan.md",
+    "_reports/uom-v5/P06-test-evidence.md",
+    "mom/api/services/Uom/UcumParser.php",
+    "mom/api/services/Uom/UomAliasResolutionService.php",
+    "mom/database/migrations/258_uom_v5_alias_quarantine_contract.sql",
+    "mom/tests/Unit/Uom/UomAliasResolutionP06Test.php",
+    "mom/tests/Unit/Uom/UcumParserP06Test.php"
+  ]
+}

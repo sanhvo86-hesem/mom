@@ -1,0 +1,24 @@
+{
+  "prompt_id": "P02",
+  "decision_token": "UOM_V5_P02_REPO_REALITY_LOCKED",
+  "status": "PASS_WITH_WARNINGS",
+  "can_advance_to_next_prompt": true,
+  "next_prompt": "03_SCHEMA_SERVICE_LIFECYCLE_REPAIR_PROMPT.md",
+  "blockers": [],
+  "warnings": [
+    "P0 product defects exist and are assigned to P03/P04/P05/P06/P10/P13; P02 is report-only.",
+    "UoM tables are mostly unclassified in .ai/db-map/index.json.",
+    "Previous V3 reports are useful context but current repo files remain source truth."
+  ],
+  "evidence_files": [
+    "_reports/uom-v5/P02-current-state-file-inventory.csv",
+    "_reports/uom-v5/P02-contradiction-ledger.md",
+    "_reports/uom-v5/P02-implementation-report.md",
+    "_reports/uom-v5/P02-audit-report.md",
+    "_reports/uom-v5/P02-adversarial-critique.md",
+    "_reports/uom-v5/P02-operational-simulation.md",
+    "_reports/uom-v5/P02-defect-and-repair-log.md",
+    "_reports/uom-v5/P02-rollback-plan.md",
+    "_reports/uom-v5/P02-test-evidence.md"
+  ]
+}

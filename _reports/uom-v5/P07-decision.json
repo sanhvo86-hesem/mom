@@ -1,0 +1,29 @@
+{
+  "prompt_id": "P07",
+  "decision_token": "UOM_V5_P07_SEMANTIC_COMPATIBILITY_LOCKED",
+  "status": "PASS_WITH_WARNINGS",
+  "can_advance_to_next_prompt": true,
+  "next_prompt": "08_CONTEXTUAL_CONVERSION_DENSITY_POTENCY_PACKAGING_PROMPT.md",
+  "blockers": [],
+  "warnings": [
+    "composer check remains red because of existing KPI registry count drift: KpiEngineAuthorityRegistryTest expected 142 but saw 148.",
+    "DeltaDegF conversion rule is registered pending_review and requires governed human approval before active runtime use.",
+    "Stress, Work, and Moment quantity kinds are absent in the current registry and were recorded as controlled gaps.",
+    "Conditional compatibility handlers remain later controlled work."
+  ],
+  "evidence_files": [
+    "_reports/uom-v5/P07-implementation-report.md",
+    "_reports/uom-v5/P07-audit-report.md",
+    "_reports/uom-v5/P07-adversarial-critique.md",
+    "_reports/uom-v5/P07-operational-simulation.md",
+    "_reports/uom-v5/P07-defect-and-repair-log.md",
+    "_reports/uom-v5/P07-rollback-plan.md",
+    "_reports/uom-v5/P07-test-evidence.md",
+    "mom/database/migrations/259_uom_v5_quantity_kind_compatibility.sql",
+    "mom/api/services/Uom/QuantityKindService.php",
+    "mom/api/services/Uom/UomException.php",
+    "mom/api/services/Uom/ConversionEngine.php",
+    "mom/api/controllers/UomController.php",
+    "mom/tests/Unit/Uom/QuantityKindCompatibilityP07Test.php"
+  ]
+}

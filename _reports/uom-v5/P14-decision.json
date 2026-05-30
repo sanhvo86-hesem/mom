@@ -1,0 +1,29 @@
+{
+  "prompt_id": "P14",
+  "decision_token": "UOM_V5_P14_VALIDATION_READY_PACKAGE_COMPLETE",
+  "status": "PASS_WITH_WARNINGS",
+  "can_advance_to_next_prompt": true,
+  "next_prompt": "15_DATA_MIGRATION_BACKFILL_VERTICAL_PACKS_PROMPT.md",
+  "blockers": [],
+  "warnings": [
+    "composer check remains red because of existing KPI registry count drift: KpiEngineAuthorityRegistryTest expected 142 but saw 148.",
+    "P12 naked-number domain backlog remains open.",
+    "P13 telemetry collector wiring remains an environment/runtime gap.",
+    "PQ scenarios are repository-level simulations only; site-specific execution remains required before regulated use."
+  ],
+  "evidence_files": [
+    "_reports/uom-v5/validation/URS-UOM-V5.md",
+    "_reports/uom-v5/validation/FRS-UOM-V5.md",
+    "_reports/uom-v5/validation/DS-UOM-V5.md",
+    "_reports/uom-v5/validation/RISK-FMEA-UOM-V5.csv",
+    "_reports/uom-v5/validation/TRACEABILITY-UOM-V5.csv",
+    "_reports/uom-v5/validation/IQ-PROTOCOL-UOM-V5.md",
+    "_reports/uom-v5/validation/OQ-PROTOCOL-UOM-V5.md",
+    "_reports/uom-v5/validation/PQ-PROTOCOL-UOM-V5.md",
+    "_reports/uom-v5/validation/TEST-REPORT-UOM-V5.md",
+    "_reports/uom-v5/validation/PART11-ANNEX11-CONTROL-MATRIX.md",
+    "_reports/uom-v5/validation/DEVIATION-LOG-UOM-V5.md",
+    "_reports/uom-v5/P14-traceability-matrix.csv",
+    "mom/tests/Unit/Uom/UomValidationPackageP14Test.php"
+  ]
+}

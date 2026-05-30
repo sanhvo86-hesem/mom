@@ -1,0 +1,28 @@
+{
+  "prompt_id": "P05",
+  "decision_token": "UOM_V5_P05_ENGINE_PRECISION_RULE_RESOLUTION_LOCKED",
+  "status": "PASS_WITH_WARNINGS",
+  "can_advance_to_next_prompt": true,
+  "next_prompt": "06_UCUM_QUDT_UNECE_OPCUA_ALIAS_QUARANTINE_PROMPT.md",
+  "blockers": [],
+  "warnings": [
+    "composer check remains red because of existing KPI registry count drift: KpiEngineAuthorityRegistryTest expected 142 but saw 148.",
+    "Problem Details mapping for UOM_CATEGORY_NOT_SUPPORTED remains P10.",
+    "Full contextual density/potency/packaging execution remains P08.",
+    "Alias quarantine remains P06."
+  ],
+  "evidence_files": [
+    "_reports/uom-v5/P05-category-dispatch-matrix.md",
+    "_reports/uom-v5/P05-implementation-report.md",
+    "_reports/uom-v5/P05-audit-report.md",
+    "_reports/uom-v5/P05-adversarial-critique.md",
+    "_reports/uom-v5/P05-operational-simulation.md",
+    "_reports/uom-v5/P05-defect-and-repair-log.md",
+    "_reports/uom-v5/P05-rollback-plan.md",
+    "_reports/uom-v5/P05-test-evidence.md",
+    "mom/api/services/Uom/ConversionEngine.php",
+    "mom/api/services/Uom/ConversionRuleService.php",
+    "mom/api/services/Uom/MeasurementValueFactory.php",
+    "mom/tests/Unit/Uom/ConversionEngineP05Test.php"
+  ]
+}

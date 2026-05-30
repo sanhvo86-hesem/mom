@@ -1,0 +1,72 @@
+{
+  "schema_version": "uom-operability-contracts.v1",
+  "posture": "development/prototype -> pre-production readiness candidate",
+  "threat_model": {
+    "frameworks": ["OWASP API", "ASVS", "ISA/IEC 62443 OT boundary"],
+    "threats": {
+      "injection_magnitude": "DecimalString and ConversionEngine reject non-numeric and oversized magnitude before DB use.",
+      "malicious_unit_expression": "UcumParser allows only governed atoms/operators and enforces length and atom-count limits.",
+      "alias_poisoning": "External aliases resolve through uom_alias/uom_external_code_map or uom_alias_quarantine.",
+      "privilege_escalation": "Preview/list/read are separate from submit/review/approve/esign/manifest/link policies.",
+      "replay_esign": "UomWorkflowService and manifest service require human actor, permission, meaning, and immutable audit.",
+      "stale_cache": "Rule cache key includes from/to/as_of/context/policy; workflow invalidates known rule-pair cache keys.",
+      "event_spoofing": "P10 event contracts require event_id, event_type, occurred_at, actor/source fields, and trace_id."
+    }
+  },
+  "parser_limits": {
+    "ucum_max_expression_bytes": 256,
+    "ucum_max_atom_count": 16,
+    "magnitude_engine_max_digits": 60,
+    "decimal_expansion_max_total_digits": 256
+  },
+  "authorization_matrix": {
+    "list_read_preview": ["uom.units.read", "uom.kinds.read", "uom.rules.read", "uom.convert.preview"],
+    "submit_review": ["uom.rule.submit", "uom.rule.review"],
+    "approve_esign": ["uom.rule.approve", "uom.rule.esign"],
+    "manifest_link": ["uom.standard_library_manifest.approve", "uom.standard_library_manifest.link_rule"],
+    "policy_change": ["uom.item_policy.change", "uom.packaging_policy.change"]
+  },
+  "observability_contract": {
+    "traces": [
+      "uom.convert.preview",
+      "uom.alias.resolve",
+      "uom.rule.resolve",
+      "uom.measval.create"
+    ],
+    "metrics": [
+      "uom_conversion_latency_ms",
+      "uom_alias_quarantine_total",
+      "uom_alias_quarantine_rate",
+      "uom_rule_cache_hit_total",
+      "uom_problem_code_total",
+      "uom_measval_create_total"
+    ],
+    "alerts": [
+      {
+        "id": "UOM-ALERT-QUARANTINE-SPIKE",
+        "condition": "uom_alias_quarantine_rate exceeds baseline for 15 minutes",
+        "response": "freeze auto-acceptance, review source_system, sample raw aliases, open metrology review"
+      }
+    ]
+  },
+  "index_contract": {
+    "rule_lookup": ["uom_conversion_rule(from_unit_code,to_unit_code,lifecycle_status,effective_from,effective_to)"],
+    "measval_linked_record": ["uom_measurement_thread(linked_record_type,linked_record_id)"],
+    "audit_trace": ["audit_event(trace_id)", "uom_alias_quarantine(trace_id)"]
+  },
+  "cache_contract": {
+    "rule_cache_key": "uom:rule:v5:{from}:{to}:{as_of}:{context}:{policy}",
+    "alias_cache_key": "uom:alias:v6:{source_system}:{normalized_alias}:{supplier_id}",
+    "ituom_cache_key": "uom:ituom:{item_id}:{site}:{supplier}:{customer}:{context}",
+    "invalidation": "workflow activation invalidates known rule pair keys; multi-node invalidation remains controlled gap unless Redis/RabbitMQ event fanout is configured"
+  },
+  "benchmark_contract": {
+    "claim_scope": "local micro-benchmark evidence only, not production SLO",
+    "scenarios": ["conversion preview", "alias resolve", "unit list", "large catalog simulation"],
+    "required_percentiles": ["p50", "p95", "p99"]
+  },
+  "replay_contract": {
+    "required_fields": ["original_input", "canonical", "display", "rule_code", "rule_version", "effective_from", "effective_to", "audit_hash", "trace_id"],
+    "restore_expectation": "conversion result must be reproducible after restore using rule version and effective date"
+  }
+}

@@ -1,0 +1,47 @@
+path,purpose,maturity_0_7,source_tag,current_sha,notes
+mom/contracts/objects/uom/uom-scope-contract.md,UoM subsystem scope contract,5,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Defines canonical-code anchor human approval audit and AI advisory boundary
+mom/database/migrations/214_uom_quantity_kind.sql,QKIND schema,4,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Quantity kind root exists
+mom/database/migrations/215_uom_unit_catalog.sql,UOM catalog schema,4,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Canonical unit catalog exists with active lifecycle
+mom/database/migrations/216_uom_rounding_policy.sql,Rounding policy schema,4,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Precision policy root exists
+mom/database/migrations/217_uom_conversion_rule.sql,UOMCONV schema,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Canonical column is version and initial lifecycle used approved
+mom/database/migrations/218_uom_external_code_map.sql,External code map schema,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,UNECE/OPC mapping root exists
+mom/database/migrations/219_uom_alias.sql,Alias/quarantine schema,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Alias and quarantine root exists
+mom/database/migrations/220_item_uom_policy.sql,Item UoM policy schema,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,ITUOM root exists
+mom/database/migrations/221_item_packaging_policy.sql,Item packaging policy schema,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,PACKPOL root exists but omitted from git ls-files uom glob due name pattern
+mom/database/migrations/222_material_density_registry.sql,Material density registry schema,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,DENSITY root exists
+mom/database/migrations/224_uom_seeds.sql,UoM seed data,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Contains legacy first-user approval pattern
+mom/database/migrations/225_uom_rule_approval.sql,Rule approval/e-sign schema,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,UOMAPPROVAL root exists
+mom/database/migrations/226_uom_indexes.sql,UoM indexes,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Contains approved-only partial index
+mom/database/migrations/228_uom_measval_integration.sql,MEASVAL integration schema,4,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Measurement thread/evidence root exists
+mom/database/migrations/231_uom_v3_lifecycle_governance.sql,V3 lifecycle/manifest repair migration,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Adds active lifecycle and manifest but retains transitional first-user bridge
+mom/api/services/Uom/ConversionRuleService.php,Rule resolver/cache,2,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Approved-only and cache-key drift confirmed
+mom/api/services/Uom/ConversionEngine.php,Conversion dispatcher,4,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Handles linear affine identity log default reject but needs full category matrix
+mom/api/services/Uom/DecimalString.php,Decimal string parser,5,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Existing precision hardening and tests
+mom/api/services/Uom/ExactLinearConverter.php,Linear converter,5,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,BCMath path exists
+mom/api/services/Uom/AffineConverter.php,Affine converter,5,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Affine path exists
+mom/api/services/Uom/LogarithmicConverter.php,Log converter guard,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,pH conversion guarded
+mom/api/services/Uom/UomWorkflowService.php,Rule approval workflow,2,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Still uses rule_version column in rule table
+mom/api/services/Uom/UomStandardLibraryManifestService.php,Standard library manifest service,2,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,No permission check beyond UUID/transition comments
+mom/api/services/Uom/UomAliasResolutionService.php,Alias resolver/quarantine,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Unknown quarantines but ambiguity candidate shape not implemented
+mom/api/services/Uom/ExternalEngineeringUnitMapper.php,OPC/UNECE/LIMS mapper,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Mapping wrapper exists
+mom/api/services/Uom/MeasurementValueFactory.php,MEASVAL envelope factory,5,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Deterministic evidence hash exists
+mom/api/services/Uom/MeasurementEvidenceVerifier.php,MEASVAL hash verifier,5,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Replay verifier exists
+mom/api/services/Uom/ContextualConversionPlanner.php,Contextual conversion planner,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Planner/test root exists
+mom/api/services/Uom/DensityContextualConverter.php,Density converter,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Density handler root exists
+mom/api/services/Uom/ItemUomPolicyService.php,Item and packaging UoM resolver,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Policy resolver exists
+mom/api/services/Uom/QuantityKindService.php,Quantity kind service,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Kind service exists
+mom/api/services/Uom/UnitCatalogService.php,Catalog/listing service,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Rules default status requires review
+mom/api/services/Uom/UomAuditEvidenceService.php,Audit evidence helper,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Audit helper exists
+mom/api/services/Uom/UomDataQualityScanner.php,Data quality scanner,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,UOMDQ root exists
+mom/api/services/Uom/UomImpactAnalysisService.php,Impact analysis helper,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Impact root exists
+mom/api/services/Uom/QualityMeasurementBridge.php,Quality/MES measurement bridge,4,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Quality bridge to MEASVAL exists
+mom/api/controllers/UomController.php,UoM API controller,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Problem Details helper exists but route parity needs P10
+mom/api/routes/uom-routes.php,UoM routes,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Core routes exist
+mom/api/openapi.yaml,OpenAPI contract,2,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,UoM contract presence needs P10 parity audit
+mom/scripts/portal/80-uom-control-center.js,UoM control center,2,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Workspace UI has localStorage admin enable and live API calls
+mom/scripts/portal/81-uom-quantity-widget.js,UoM quantity widget,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Magnitude+unit widget exists
+mom/tests/Unit/Uom/DecimalStringTest.php,Decimal parser tests,5,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Precision unit tests exist
+mom/tests/Unit/Uom/NegativeTestsTest.php,Negative conversion tests,4,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Negative guard tests exist
+mom/tests/Unit/Uom/UomStandardLibraryManifestTest.php,Manifest tests,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Manifest unit tests exist
+_reports/uom-measurement-conversion-v3/P00-source-truth-lock.md,Prior source-truth report,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Prior V3 evidence
+_reports/uom-measurement-conversion-v3/P01-lifecycle-single-truth-report.md,Prior lifecycle report,3,REPO_EVIDENCE,247b1fbeabfe8bd07feb3d2265a8c2ec0ec625a4,Prior V3 evidence

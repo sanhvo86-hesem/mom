@@ -1,0 +1,26 @@
+{
+  "prompt_id": "P11",
+  "decision_token": "UOM_V5_P11_UI_SAFE_PROJECTION_LOCKED",
+  "status": "PASS_WITH_WARNINGS",
+  "can_advance_to_next_prompt": true,
+  "next_prompt": "12_DOMAIN_INTEGRATION_ERP_MOM_MES_EQMS_PROMPT.md",
+  "blockers": [],
+  "warnings": [
+    "composer check remains red because of existing KPI registry count drift: KpiEngineAuthorityRegistryTest expected 142 but saw 148.",
+    "npm --prefix mom test -- uom is unavailable because mom/package.json does not exist.",
+    "Browser-level E2E harness is not present; P11 evidence uses syntax/static tests and focused PHPUnit static contracts.",
+    "Domain-wide legacy quantity-field remediation remains assigned to P12/P15."
+  ],
+  "evidence_files": [
+    "_reports/uom-v5/P11-implementation-report.md",
+    "_reports/uom-v5/P11-audit-report.md",
+    "_reports/uom-v5/P11-adversarial-critique.md",
+    "_reports/uom-v5/P11-operational-simulation.md",
+    "_reports/uom-v5/P11-defect-and-repair-log.md",
+    "_reports/uom-v5/P11-rollback-plan.md",
+    "_reports/uom-v5/P11-test-evidence.md",
+    "mom/scripts/portal/80-uom-control-center.js",
+    "mom/scripts/portal/81-uom-quantity-widget.js",
+    "mom/tests/Unit/Uom/UomUiProjectionP11Test.php"
+  ]
+}

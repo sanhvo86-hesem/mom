@@ -148,7 +148,9 @@ final class UomWorkflowService
     public function getApprovalStatus(string $ruleId): array
     {
         $rule = $this->db->queryOne(
-            "SELECT id, rule_code, rule_version, lifecycle_status FROM uom_conversion_rule WHERE id = :id",
+            "SELECT id, rule_code, version AS rule_version, lifecycle_status
+               FROM uom_conversion_rule
+              WHERE id = :id",
             [':id' => $ruleId]
         );
 
@@ -190,13 +192,13 @@ final class UomWorkflowService
     {
         return $this->db->query(
             "SELECT r.id, r.rule_code, r.from_unit_code, r.to_unit_code,
-                    r.rule_version, r.lifecycle_status, r.created_at,
+                    r.version AS rule_version, r.lifecycle_status, r.created_at,
                     COUNT(a.id) AS approval_steps_completed
              FROM uom_conversion_rule r
-             LEFT JOIN uom_rule_approval a ON a.rule_id = r.id AND a.rule_version = r.rule_version
+             LEFT JOIN uom_rule_approval a ON a.rule_id = r.id AND a.rule_version = r.version
              WHERE r.lifecycle_status = 'pending_review'
              GROUP BY r.id, r.rule_code, r.from_unit_code, r.to_unit_code,
-                      r.rule_version, r.lifecycle_status, r.created_at
+                      r.version, r.lifecycle_status, r.created_at
              ORDER BY r.created_at DESC",
             []
         );
@@ -295,7 +297,7 @@ final class UomWorkflowService
         ?string $sessionId
     ): array {
         $rule = $this->db->queryOne(
-            "SELECT id, rule_code, rule_version, from_unit_code, to_unit_code,
+            "SELECT id, rule_code, version AS rule_version, from_unit_code, to_unit_code,
                     factor, offset_value, category, lifecycle_status
              FROM uom_conversion_rule WHERE id = :id",
             [':id' => $ruleId]
@@ -407,8 +409,21 @@ final class UomWorkflowService
         );
         if ($rule) {
             try {
-                $redis->del("uom:rule:{$rule['from_unit_code']}:{$rule['to_unit_code']}");
-                $redis->del("uom:rule:{$rule['to_unit_code']}:{$rule['from_unit_code']}");
+                $today = (new \DateTimeImmutable('today'))->format('Y-m-d');
+                $pairs = [
+                    [$rule['from_unit_code'], $rule['to_unit_code']],
+                    [$rule['to_unit_code'], $rule['from_unit_code']],
+                ];
+                foreach ($pairs as [$from, $to]) {
+                    $redis->del(ConversionRuleService::LEGACY_CACHE_PREFIX . "{$from}:{$to}");
+                    $redis->del(implode(':', [
+                        ConversionRuleService::CACHE_PREFIX . $from,
+                        $to,
+                        $today,
+                        'none',
+                        ConversionRuleService::LIFECYCLE_POLICY_VERSION,
+                    ]));
+                }
             } catch (\Throwable) {
                 // Non-fatal: cache will expire naturally
             }

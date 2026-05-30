@@ -1,0 +1,27 @@
+{
+  "prompt_id": "P10",
+  "decision_token": "UOM_V5_P10_CONTRACT_FIRST_API_LOCKED",
+  "status": "PASS_WITH_WARNINGS",
+  "can_advance_to_next_prompt": true,
+  "next_prompt": "11_UI_CONTROL_CENTER_AND_QUANTITY_WIDGET_PROMPT.md",
+  "blockers": [],
+  "warnings": [
+    "composer check remains red because of existing KPI registry count drift: KpiEngineAuthorityRegistryTest expected 142 but saw 148.",
+    "OpenAPI 3.2.x evaluation is backlog only; current repo baseline remains 3.1.2.",
+    "P10 locks static contract/idempotency/trace coverage but does not add a new runtime mutation/idempotency store."
+  ],
+  "evidence_files": [
+    "_reports/uom-v5/P10-route-openapi-parity.md",
+    "_reports/uom-v5/P10-implementation-report.md",
+    "_reports/uom-v5/P10-audit-report.md",
+    "_reports/uom-v5/P10-adversarial-critique.md",
+    "_reports/uom-v5/P10-operational-simulation.md",
+    "_reports/uom-v5/P10-defect-and-repair-log.md",
+    "_reports/uom-v5/P10-rollback-plan.md",
+    "_reports/uom-v5/P10-test-evidence.md",
+    "mom/api/controllers/UomController.php",
+    "mom/api/openapi.yaml",
+    "mom/data/registry/uom-event-contracts.json",
+    "mom/tests/Unit/Uom/UomApiContractP10Test.php"
+  ]
+}

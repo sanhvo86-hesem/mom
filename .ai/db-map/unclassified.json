@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 816,
-        "generated_at": "2026-05-30T07:47:09+00:00"
+        "table_count": 819,
+        "generated_at": "2026-05-30T23:48:57+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -4587,6 +4587,13 @@
             "foreign_keys": [],
             "contract": null
         },
+        "graphics_block_contract": {
+            "defined_in": "261_graphics_block_contract_l3.sql",
+            "extended_in": [],
+            "primary_key": "block_contract_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "graphics_component_contract": {
             "defined_in": "148_graphics_authority_tables.sql",
             "extended_in": [
@@ -4620,6 +4627,13 @@
                     "ref": "graphics_token_catalog(token_key)"
                 }
             ],
+            "contract": null
+        },
+        "graphics_module_archetype": {
+            "defined_in": "262_graphics_module_archetype_l4.sql",
+            "extended_in": [],
+            "primary_key": "archetype_id",
+            "foreign_keys": [],
             "contract": null
         },
         "graphics_module_binding": {
@@ -5409,7 +5423,9 @@
         },
         "item_packaging_policy": {
             "defined_in": "221_item_packaging_policy.sql",
-            "extended_in": [],
+            "extended_in": [
+                "260_uom_v5_contextual_conversion_contract.sql"
+            ],
             "primary_key": "id",
             "foreign_keys": [
                 {
@@ -6045,7 +6061,9 @@
         },
         "material_density_registry": {
             "defined_in": "222_material_density_registry.sql",
-            "extended_in": [],
+            "extended_in": [
+                "260_uom_v5_contextual_conversion_contract.sql"
+            ],
             "primary_key": "id",
             "foreign_keys": [
                 {
@@ -11487,7 +11505,9 @@
         },
         "uom_alias_quarantine": {
             "defined_in": "219_uom_alias.sql",
-            "extended_in": [],
+            "extended_in": [
+                "258_uom_v5_alias_quarantine_contract.sql"
+            ],
             "primary_key": "id",
             "foreign_keys": [
                 {
@@ -11558,9 +11578,23 @@
             "foreign_keys": [],
             "contract": null
         },
+        "uom_potency_assay_registry": {
+            "defined_in": "260_uom_v5_contextual_conversion_contract.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
         "uom_quantity_kind": {
             "defined_in": "214_uom_quantity_kind.sql",
-            "extended_in": [],
+            "extended_in": [
+                "259_uom_v5_quantity_kind_compatibility.sql"
+            ],
             "primary_key": "kind_code",
             "foreign_keys": [
                 {
