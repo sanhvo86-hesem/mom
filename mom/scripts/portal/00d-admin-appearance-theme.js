@@ -30,7 +30,11 @@
     'font-base': 13,                        // Vercel Geist body 13px, Linear 13px
     'font-scale': 1.0,                      // multiplier for the XS→3XL ramp
     'brand': '#0c4a6e',                     // HESEM sky-900
-    'density': 'cozy',                      // Atlassian default
+    // v3-G24: density default = 'compact' so the derived control height is
+    // 32px — matching the HESEM single-standard SSOT (control.height.standard
+    // = 32px, CLAUDE.md). Previously 'cozy' (36px) silently overrode the
+    // stylesheet SSOT on every load. compact/cozy/comfortable = 32/36/40.
+    'density': 'compact',
     'master-gap': 8,                        // SSOT
     'section-gap': 12,                      // SSOT
     'master-radius': 4,                     // Carbon "rounded"
@@ -77,7 +81,7 @@
       root.style.setProperty('--brand-primary', theme['brand']);
     }
     // Density preset → control-height
-    var dh = { compact: 32, cozy: 36, comfortable: 40 }[theme['density']] || 36;
+    var dh = { compact: 32, cozy: 36, comfortable: 40 }[theme['density']] || 32;
     if (!overrides['control.height.standard']) {
       root.style.setProperty('--o3-control-h-standard', dh + 'px');
       root.style.setProperty('--o3-control-h-md', dh + 'px');
