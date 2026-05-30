@@ -351,7 +351,7 @@
       var bg = state==='done' ? 'var(--o3-success)' : state==='active' ? 'var(--o3-brand)' : 'var(--o3-border-default)';
       var fg = state==='pending' ? 'var(--text-secondary)' : '#fff';
       return '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">'
-        +   '<div style="width:28px;height:28px;border-radius:50%;background:'+bg+';color:'+fg+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">' + (state==='done' ? '✓' : n) + '</div>'
+        +   '<div style="width:var(--o3-control-h-standard,28px);height:var(--o3-control-h-standard,28px);border-radius:50%;background:'+bg+';color:'+fg+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">' + (state==='done' ? '✓' : n) + '</div>'
         +   '<span style="font-size:11px;color:var(--text-secondary);text-align:center">' + label + '</span>'
         + '</div>';
     };
@@ -371,7 +371,7 @@
   function progressSection(L){
     var bar = function(label, percent, tone){
       return '<div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--text-primary);font-weight:600">'+label+'</span><span style="color:var(--text-secondary);font-family:ui-monospace,monospace">'+percent+'%</span></div>'
-        + '<div style="height:6px;background:var(--bg-surface-alt);border-radius:999px;overflow:hidden"><div style="width:'+percent+'%;height:100%;background:var(--o3-'+tone+');border-radius:999px"></div></div></div>';
+        + '<div style="height:var(--o3-space-xs,6px);background:var(--o3-surface-muted,var(--bg-surface-alt));border-radius:var(--o3-radius-pill,999px);overflow:hidden"><div style="width:'+percent+'%;height:100%;background:var(--o3-'+tone+');border-radius:var(--o3-radius-pill,999px)"></div></div></div>';
     };
     var body = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:680px">'
       + bar('Readiness',   85, 'success')
@@ -416,8 +416,8 @@
 
   function timelineSection(L){
     var entry = function(time, who, action, color){
-      return '<div style="display:flex;gap:10px;padding:6px 0;border-left:2px solid var(--o3-border-subtle);padding-left:12px;margin-left:6px;position:relative">'
-        + '<span style="position:absolute;left:-5px;top:10px;width:8px;height:8px;border-radius:50%;background:'+color+';border:2px solid var(--o3-surface-card)"></span>'
+      return '<div style="display:flex;gap:10px;padding:var(--o3-space-md,6px) 0;border-left:2px solid var(--o3-border-subtle);padding-left:12px;margin-left:6px;position:relative">'
+        + '<span style="position:absolute;left:-5px;top:10px;width:var(--o3-space-sm,8px);height:var(--o3-space-sm,8px);border-radius:50%;background:'+color+';border:2px solid var(--o3-surface-card)"></span>'
         + '<div style="flex:1"><div style="font-size:12px;color:var(--text-primary)"><strong>'+who+'</strong> '+action+'</div><div style="font-size:10px;color:var(--text-secondary);font-family:ui-monospace,monospace">'+time+'</div></div></div>';
     };
     var body = '<div style="max-width:480px">'
@@ -435,7 +435,7 @@
     var body = '<div style="display:flex;flex-direction:column;gap:10px">'
       + '<div style="position:relative;width:100%;max-width:480px;padding:0;background:var(--bg-surface);border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius-card);box-shadow:0 4px 16px rgba(0,0,0,0.08);overflow:hidden">'
       +   '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--o3-border-subtle)"><strong style="font-size:14px">Duyệt CPO</strong><button class="o3-btn o3-btn--sm o3-btn--ghost">×</button></div>'
-      +   '<div style="padding:14px;font-size:13px;color:var(--text-primary);line-height:1.5">Bạn có chắc muốn commit <strong>SO-2026-9001</strong> vào Customer PO? Hành động này không thể hoàn tác.</div>'
+      +   '<div style="padding:var(--o3-space-lg,14px);font-size:13px;color:var(--text-primary);line-height:1.5">Bạn có chắc muốn commit <strong>SO-2026-9001</strong> vào Customer PO? Hành động này không thể hoàn tác.</div>'
       +   '<div style="display:flex;justify-content:flex-end;gap:6px;padding:10px 14px;border-top:1px solid var(--o3-border-subtle);background:var(--bg-surface-alt)">'
       +     '<button class="o3-btn">Huỷ</button><button class="o3-btn o3-btn--primary">Duyệt + Commit</button></div>'
       + '</div>'
@@ -465,9 +465,9 @@
 
   function tooltipSection(L){
     var body = '<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><span style="position:relative;display:inline-flex"><button class="o3-btn">Hover me</button>'
-      + '<span style="position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:4px 8px;background:rgba(15,23,42,0.92);color:#fff;font-size:11px;border-radius:4px;white-space:nowrap">Tooltip text · 11px</span></span>'
+      + '<span style="position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:var(--o3-space-sm,4px) 8px;background:rgba(15,23,42,0.92);color:#fff;font-size:var(--o3-font-size-xs,11px);border-radius:var(--o3-radius,4px);white-space:nowrap">Tooltip text</span></span>'
       + '<span style="position:relative;display:inline-flex"><button class="o3-btn o3-btn--primary">With shortcut</button>'
-      + '<span style="position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:4px 8px;background:rgba(15,23,42,0.92);color:#fff;font-size:11px;border-radius:4px;white-space:nowrap;display:flex;gap:4px;align-items:center">Save<kbd style="background:rgba(255,255,255,0.2);padding:0 4px;border-radius:2px">⌘S</kbd></span></span>'
+      + '<span style="position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:var(--o3-space-sm,4px) 8px;background:rgba(15,23,42,0.92);color:#fff;font-size:var(--o3-font-size-xs,11px);border-radius:var(--o3-radius,4px);white-space:nowrap;display:flex;gap:4px;align-items:center">Save<kbd style="background:rgba(255,255,255,0.2);padding:0 4px;border-radius:2px">⌘S</kbd></span></span>'
       + '<div style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary)">'
       +   '<span>OEE 87%</span><span style="width:14px;height:14px;border-radius:50%;background:var(--bg-surface-alt);display:inline-flex;align-items:center;justify-content:center;font-size:10px;cursor:help">?</span></div>'
       + '</div>';
@@ -506,14 +506,14 @@
 
   function kanbanSection(L){
     var col = function(title, count, items, headerTone){
-      var html = '<div style="flex:1;min-width:140px;background:var(--bg-surface-alt);border-radius:var(--o3-radius-card);padding:8px;display:flex;flex-direction:column;gap:6px">'
+      var html = '<div style="flex:1;min-width:140px;background:var(--bg-surface-alt);border-radius:var(--o3-radius-card);padding:var(--o3-space-md,8px);display:flex;flex-direction:column;gap:var(--o3-space-sm,6px)">'
         + '<div style="display:flex;align-items:center;justify-content:space-between;padding:0 4px"><strong style="font-size:11px;color:var(--o3-'+headerTone+');text-transform:uppercase;letter-spacing:.04em">'+title+'</strong><span style="font-size:10px;background:var(--bg-surface);padding:0 6px;border-radius:999px;color:var(--text-secondary)">'+count+'</span></div>';
       items.forEach(function(i){
         html += '<div style="padding:6px 8px;background:var(--bg-surface);border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius);font-size:11px"><strong>'+i.id+'</strong><div style="color:var(--text-secondary);margin-top:2px">'+i.text+'</div></div>';
       });
       return html + '</div>';
     };
-    var body = '<div style="display:flex;gap:8px;max-width:760px">'
+    var body = '<div style="display:flex;gap:var(--o3-space-md,8px);max-width:760px">'
       + col('Chờ', 3, [{id:'WO-7301',text:'CNC-01 · 14:00'},{id:'WO-7302',text:'CNC-02 · 15:30'},{id:'WO-7303',text:'CNC-03 · queued'}], 'warning')
       + col('Đang chạy', 2, [{id:'WO-7298',text:'CNC-04 · 87%'},{id:'WO-7299',text:'CNC-05 · 42%'}], 'info')
       + col('QC', 1, [{id:'WO-7295',text:'FAI pending'}], 'brand')
@@ -560,12 +560,12 @@
   function dropdownSection(L){
     var body = '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start">'
       + '<div style="width:200px;background:var(--bg-surface);border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius);box-shadow:0 2px 8px rgba(0,0,0,0.06);font-size:12px;overflow:hidden">'
-      +   '<button style="display:flex;width:100%;padding:6px 10px;border:0;background:transparent;align-items:center;gap:6px;cursor:pointer;text-align:left">📋 Mở chi tiết</button>'
-      +   '<button style="display:flex;width:100%;padding:6px 10px;border:0;background:var(--bg-surface-alt);align-items:center;gap:6px;cursor:pointer;text-align:left;color:var(--o3-brand);font-weight:500">✏️ Chỉnh sửa</button>'
-      +   '<button style="display:flex;width:100%;padding:6px 10px;border:0;background:transparent;align-items:center;gap:6px;cursor:pointer;text-align:left">📤 Xuất bản</button>'
-      +   '<button style="display:flex;width:100%;padding:6px 10px;border:0;background:transparent;align-items:center;gap:6px;cursor:pointer;text-align:left">🔁 Duplicate</button>'
+      +   '<button style="display:flex;width:100%;padding:var(--o3-space-sm,6px) var(--o3-space-md,10px);border:0;background:transparent;align-items:center;gap:6px;cursor:pointer;text-align:left">📋 Mở chi tiết</button>'
+      +   '<button style="display:flex;width:100%;padding:var(--o3-space-sm,6px) var(--o3-space-md,10px);border:0;background:var(--bg-surface-alt);align-items:center;gap:6px;cursor:pointer;text-align:left;color:var(--o3-brand);font-weight:500">✏️ Chỉnh sửa</button>'
+      +   '<button style="display:flex;width:100%;padding:var(--o3-space-sm,6px) var(--o3-space-md,10px);border:0;background:transparent;align-items:center;gap:6px;cursor:pointer;text-align:left">📤 Xuất bản</button>'
+      +   '<button style="display:flex;width:100%;padding:var(--o3-space-sm,6px) var(--o3-space-md,10px);border:0;background:transparent;align-items:center;gap:6px;cursor:pointer;text-align:left">🔁 Duplicate</button>'
       +   '<div style="border-top:1px solid var(--o3-border-subtle)"></div>'
-      +   '<button style="display:flex;width:100%;padding:6px 10px;border:0;background:transparent;align-items:center;gap:6px;cursor:pointer;text-align:left;color:var(--o3-danger)">🗑️ Xoá</button>'
+      +   '<button style="display:flex;width:100%;padding:var(--o3-space-sm,6px) var(--o3-space-md,10px);border:0;background:transparent;align-items:center;gap:6px;cursor:pointer;text-align:left;color:var(--o3-danger)">🗑️ Xoá</button>'
       + '</div>'
       + '<div style="width:220px;background:var(--bg-surface);border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius);box-shadow:0 2px 8px rgba(0,0,0,0.06);font-size:12px;padding:8px"><div style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;padding:0 4px 6px">Bộ lọc nhanh</div>'
       +   '<label style="display:flex;gap:6px;align-items:center;padding:4px"><input type="checkbox" checked> Hôm nay</label>'
