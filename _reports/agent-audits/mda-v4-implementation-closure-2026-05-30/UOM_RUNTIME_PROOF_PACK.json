@@ -45,19 +45,21 @@
   "runtime_evidence_probe": {
     "bcmath": "PASS",
     "php_lint_uom_services": "PASS",
+    "php_lint_mda_uom_bridge": "PASS",
     "phpunit_uom": "BLOCKED_MISSING_VENDOR_BIN_PHPUNIT",
     "measval_hash_probe": "PASS_64_CHAR_SHA256",
     "affine_temperature_probe": "PASS_98_6F_TO_37_00C_AND_100C_TO_212_00F",
-    "command_stack_probe": "FAIL_NO_REQUIRED_COMMAND_USAGE_FOUND",
+    "mda_existing_uom_bridge_probe": "PASS_RECEIVE_INVENTORY_10_BOX_TO_500_PCS_USING_EXISTING_UOM_SERVICES",
+    "command_stack_probe": "BRIDGE_READY_BUT_LIVE_HANDLERS_NOT_WIRED",
     "alias_ambiguity_probe": "FAIL_MAIN_BRANCH_LIMIT_1_NOT_QUARANTINE"
   },
   "blockers": [
     {
       "id": "P46-BLOCK-CMD-001",
       "severity": "P0",
-      "title": "Required governed commands can bypass canonical UOM conversion",
-      "evidence": "Search found UOM services used by UomController and QualityMeasurementBridge, but not by ReceiveInventory, Putaway, IssueMaterial, CompleteOperation, CostRollup, ShipmentPack, or ToolPresetMeasurement command paths.",
-      "repair": "Wire each live domain command through ItemUomPolicyService, ConversionEngine, MEASVAL, audit/evidence, and domain transaction before mutation."
+      "title": "Required governed commands are bridge-ready but live handlers can still bypass canonical UOM conversion",
+      "evidence": "MdaUomAuthorityBridge maps required P46 commands to existing UOM services and probe converts ReceiveInventory 10 BOX to 500 PCS, but live domain handlers do not call the bridge yet.",
+      "repair": "Wire each live domain command through MdaUomAuthorityBridge before mutation, then persist MEASVAL, audit/evidence, and outbox atomically."
     },
     {
       "id": "P46-BLOCK-ALIAS-001",
@@ -85,7 +87,7 @@
     {
       "scenario_id": "V4-SIM-046-001",
       "expected": "PO receipt 10 BOX converts to 500 PCS inventory quantity",
-      "current_status": "BLOCKED",
+      "current_status": "BRIDGE_PASS_LIVE_HANDLER_NOT_WIRED",
       "failure_if_missing": "ReceiveInventory can store raw supplier UOM without item policy conversion"
     },
     {
@@ -136,6 +138,8 @@
     "UOM_COMMAND_AND_POLICY_MATRIX.csv",
     "UOM_CONVERSION_TEST_SUITE_REPORT.md",
     "UOM_RUNTIME_PROOF_PACK.json",
+    "mom/api/services/MdaUomAuthorityBridge.php",
+    "mom/tests/Unit/Services/MdaUomAuthorityBridgeTest.php",
     "V4_P46_GAP_LEDGER_UPDATE.csv",
     "V4_PROMPT_HANDOFF_P46.md"
   ]

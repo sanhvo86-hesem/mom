@@ -7,7 +7,7 @@ Decision token: P46_BLOCKED_RUNTIME_AUTHORITY_RISK
 
 ## 1. EXECUTIVE DECISION
 
-NO-GO for UOM runtime closure on this branch. The repo has a substantial UOM engine and MEASVAL foundation, but P46 requires proof that governed command paths cannot bypass canonical conversion. That proof does not exist on `main`, and the UOM files needed to repair alias/lifecycle gaps are actively owned by parallel UOM branches.
+NO-GO for full UOM runtime closure on this branch. The repo has a substantial UOM engine and MEASVAL foundation, and this P46 repair pass adds an MDA-side bridge into the existing UOM authority. However, P46 requires proof that governed live command handlers cannot bypass canonical conversion. That live-handler proof does not exist yet, and the UOM files needed to repair alias/lifecycle internals are actively owned by parallel UOM branches.
 
 ## 2. SOURCE TRUTH AUDIT
 
@@ -21,6 +21,7 @@ Authoritative UOM implementation currently present:
 | Conversion engine | `ConversionEngine.php`, `ConversionRuleService.php`, `AffineConverter.php`, `ExactLinearConverter.php` | PARTIAL |
 | Alias resolution | `UomAliasResolutionService.php` | BLOCKED |
 | Command-stack integration | inventory/MES/quality/cost/tooling command paths | BLOCKED |
+| MDA-to-UOM connector | `mom/api/services/MdaUomAuthorityBridge.php` | BRIDGE_READY |
 
 Active remote branches touching the P46 repair surface:
 
@@ -41,13 +42,14 @@ Commands executed:
 | `composer --working-dir=mom run test -- --filter Uom` | BLOCKED: `vendor/bin/phpunit` missing |
 | Manual `MeasurementValueFactory` probe | PASS: deterministic SI normalization and 64-char SHA-256 hash |
 | Manual `AffineConverter` probe | PASS: `98.6F_to_C=37.00`, `100C_to_F=212.00` |
-| Command-stack usage search | FAIL: required governed commands do not call canonical UOM service |
+| MDA existing-UOM bridge probe | PASS: `ReceiveInventoryCommand` payload `10 BOX` normalized to `500 PCS` through existing UOM services |
+| Command-stack usage search | PARTIAL: bridge exists, but required governed live handlers do not call it yet |
 
 ## 4. BLOCKER / GAP MAP
 
 | Blocker | Severity | Evidence | Repair |
 |---|---:|---|---|
-| Commands bypass canonical UOM conversion | P0 | Required command names were not found using UOM services | Wire each command to item policy, conversion, MEASVAL, audit, outbox |
+| Commands bypass canonical UOM conversion | P0 | Bridge exists, but required command handlers are not wired | Wire each command to `MdaUomAuthorityBridge`, then persist MEASVAL, audit, outbox |
 | Alias ambiguity not quarantined | P0 | Main resolver uses `LIMIT 1` for active alias match | Query all candidates and quarantine conflicting canonical results |
 | Lifecycle semantics inconsistent | P1 | rule resolver uses `approved`, workflow/data quality use `active` | Declare one active state or explicit compatibility mapping |
 | UOM repair surface owned by active branches | P0 | remote branch diff shows UOM services/controller/tests/migrations changed | Integrate reviewed UOM branch before editing UOM files here |
@@ -55,17 +57,20 @@ Commands executed:
 
 ## 5. DESIGN DELTA
 
-No code delta was applied in P46 because the only safe, honest decision is blocked. A partial code patch would either:
+Code delta applied after user clarification: MDA must connect to the existing parallel UOM authority, not build a competing UOM. The safe delta is therefore a connector outside `mom/api/services/Uom/`:
 
-- touch UOM files currently modified by active UOM sessions; or
-- add a second command/measurement gate without proving existing command paths use it.
+- `mom/api/services/MdaUomAuthorityBridge.php` maps required P46 commands to existing UOM authority services.
+- It calls `ItemUomPolicyService`, `UomAliasResolutionService`, `ConversionEngine`, and `MeasurementValueFactory`.
+- It does not define any conversion rule, rounding policy, alias policy, item UOM policy, or MEASVAL format.
+- It is fail-closed for missing command policy, missing magnitude/unit, missing item policy, or unresolved alias.
+- `mom/tests/Unit/Services/MdaUomAuthorityBridgeTest.php` pins required command mappings and the `10 BOX -> 500 PCS` bridge scenario.
 
 The correct design delta for a future repair pass is:
 
 1. Stabilize the UOM branch first.
 2. Adopt one conversion rule lifecycle vocabulary.
 3. Change alias resolution from first-match to candidate-set resolution.
-4. Wire domain command handlers to `ItemUomPolicyService`, `ConversionEngine`, and `MeasurementValueFactory` before any quantity mutation.
+4. Wire domain command handlers to `MdaUomAuthorityBridge` before any quantity mutation.
 5. Add real command-stack scenarios through P59, not static narrative simulations.
 
 ## 6. IMPLEMENTATION PLAN
@@ -82,7 +87,12 @@ The correct design delta for a future repair pass is:
 
 ## 7. FILES TO EDIT
 
-For this P46 pass, only report artifacts were created in `_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/`.
+For this P46 repair pass, code was added only outside the parallel UOM implementation folder.
+
+| File | Reason |
+|---|---|
+| `mom/api/services/MdaUomAuthorityBridge.php` | MDA bridge into existing UOM authority |
+| `mom/tests/Unit/Services/MdaUomAuthorityBridgeTest.php` | command mapping and bridge normalization coverage |
 
 Future repair files after UOM branch stabilization:
 
@@ -100,7 +110,7 @@ All `mom/api/services/Uom/*`, `mom/api/controllers/UomController.php`, `mom/api/
 
 ## 9. CODE / SCHEMA / CONTRACT CHANGES
 
-None. This is intentional. P46 would be a runtime authority regression if it created a parallel UOM authority or overwrote the active UOM sessions.
+Added `MdaUomAuthorityBridge`, a connector service that consumes the existing UOM runtime authority. It does not create a second authority. It gives later command prompts a single integration seam that can survive the parallel UOM branch merge.
 
 ## 10. TEST PLAN
 
@@ -109,6 +119,7 @@ Required before P46 can pass:
 | Test | Required evidence |
 |---|---|
 | UOM unit tests | PHPUnit UOM suite passes in this branch |
+| MDA bridge tests | `MdaUomAuthorityBridgeTest` passes when PHPUnit vendor is available |
 | Alias ambiguity | Multiple active alias rows with distinct canonical codes quarantine, not resolve |
 | Lifecycle | Deprecated/inactive/expired rule is blocked; effective approved/active rule resolves |
 | ReceiveInventory | PO receipt 10 BOX -> 500 PCS canonical inventory quantity with MEASVAL |
@@ -121,7 +132,7 @@ Required before P46 can pass:
 
 | Scenario | Expected gate | Current result | Test to add |
 |---|---|---|---|
-| V4-SIM-046-001 PO receipt 10 BOX -> 500 PCS | ReceiveInventory resolves item policy and conversion rule before ledger write | BLOCKED: no live command proof | command-stack receipt scenario |
+| V4-SIM-046-001 PO receipt 10 BOX -> 500 PCS | ReceiveInventory resolves item policy and conversion rule before ledger write | BRIDGE PASS, live handler not wired | command-stack receipt scenario |
 | V4-SIM-046-002 supplier alias `in` conflict | deterministic scope or quarantine | BLOCKED: main resolver can first-match | alias ambiguity unit/integration test |
 | V4-SIM-046-003 Celsius/Fahrenheit | affine offset, not factor-only | PASS engine probe only | API + command scenario |
 | V4-SIM-046-004 length as mass | dimensional incompatibility block | PASS design only | conversion engine + command scenario |
@@ -143,7 +154,7 @@ Required before P46 can pass:
 
 ## 13. ROLLBACK / RESTORE / RECOVERY PLAN
 
-No runtime code was changed, so rollback is limited to reverting the P46 report commit. For future code repair, rollback must include:
+Runtime code changed only by adding a bridge service and test. Rollback is reverting the bridge commit. For future live command repair, rollback must include:
 
 - revert UOM service/controller changes;
 - revert or disable new migrations;
@@ -170,6 +181,8 @@ No live telemetry was added in P46. Required future telemetry:
 - `UOM_RUNTIME_PROOF_PACK.json`
 - `V4_P46_GAP_LEDGER_UPDATE.csv`
 - `V4_PROMPT_HANDOFF_P46.md`
+- `mom/api/services/MdaUomAuthorityBridge.php`
+- `mom/tests/Unit/Services/MdaUomAuthorityBridgeTest.php`
 
 ## 16. GAP LEDGER UPDATE
 
@@ -181,6 +194,6 @@ P46_BLOCKED_RUNTIME_AUTHORITY_RISK
 
 ## 18. HANDOFF PACKET FOR NEXT PROMPT
 
-Do not proceed as if UOM P0 is closed. P47 can only continue if it treats UOM as an open runtime blocker and avoids caller-provided requirement truth that depends on unresolved UOM command integration.
+Do not proceed as if UOM P0 is fully closed. P47 can continue only if it treats `MdaUomAuthorityBridge` as the required connector to existing UOM authority and rejects caller-provided `uom`, `unit_of_measure`, quantity kind, or `require_*` flags unless they resolve through this bridge or later UOM branch internals.
 
 P46_BLOCKED_RUNTIME_AUTHORITY_RISK

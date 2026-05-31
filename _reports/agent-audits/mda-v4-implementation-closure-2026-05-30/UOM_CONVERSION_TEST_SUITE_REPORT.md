@@ -16,13 +16,15 @@ Posture: pre-production runtime-readiness evidence only; not production-ready
 | MEASVAL hash/envelope probe | PASS | Manual `MeasurementValueFactory` probe returned SI normalization `1.000000000000000000000000000000`, rounding `ROUND_HALF_EVEN`, and 64-char SHA-256 audit hash |
 | Affine temperature probe | PASS | Manual `AffineConverter` probe returned `98.6F_to_C=37.00` and `100C_to_F=212.00` |
 | Decimal parser precision probe | PASS | Manual `DecimalString` probe preserved `9007199254740993e0 => 9007199254740993` and rejected injected magnitude after requiring `UomException.php` |
+| MDA existing-UOM bridge lint | PASS | `php -l mom/api/services/MdaUomAuthorityBridge.php` and `php -l mom/tests/Unit/Services/MdaUomAuthorityBridgeTest.php` passed |
+| MDA existing-UOM bridge probe | PASS | Manual bridge probe returned `["existing_uom_runtime_authority","PCS","500.000000","BOX_TO_PCS"]` for `ReceiveInventoryCommand` with `10 BOX` |
 
 ## Stop Rule Results
 
 | Stop Rule | Result | Evidence |
 |---|---|---|
 | BLOCK if two UOM authorities exist | BLOCKED | Legacy `uom` and `mdm_uom_conversions` tables remain in older migrations; active runtime UOM authority is `uom_unit_catalog` / `uom_conversion_rule`, but command paths still accept raw `uom` fields |
-| BLOCK if commands bypass canonical conversion | BLOCKED | Search found no live required command handlers using `ConversionEngine`, `ItemUomPolicyService`, or `MeasurementValueFactory` outside UOM controller/bridge |
+| BLOCK if commands bypass canonical conversion | BLOCKED | `MdaUomAuthorityBridge` now connects MDA commands to existing UOM authority, but live required command handlers are not wired to it yet |
 | BLOCK if alias ambiguity does not quarantine | BLOCKED | Main `UomAliasResolutionService` queries `uom_alias ... ORDER BY supplier_id NULLS LAST LIMIT 1`, so multiple active canonical candidates are not quarantined |
 | BLOCK if rounding/precision rules are undocumented or untested | PARTIAL | Rounding and precision are documented/tested in UOM classes, but full PHPUnit execution is blocked by missing `vendor/bin/phpunit` |
 
@@ -32,6 +34,6 @@ The UOM package on `origin/codex/uom-production-backend-clean-20260531` reports 
 
 ## Decision
 
-P46 cannot close the UOM P0 in this branch without editing the same UOM authority files currently changed by active UOM branches and without implementing domain command-stack wiring that later V4 prompts own. The safe output is a blocked runtime proof pack, not a partial code patch.
+P46 now connects MDA to the existing UOM authority through `MdaUomAuthorityBridge` without touching active UOM branch files. P46 still cannot fully close the UOM P0 until live domain command handlers call this bridge and alias/lifecycle internals from the parallel UOM branch are integrated.
 
 P46_BLOCKED_RUNTIME_AUTHORITY_RISK
