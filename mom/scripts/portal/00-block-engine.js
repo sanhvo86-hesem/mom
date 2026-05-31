@@ -9680,7 +9680,7 @@ function renderScorecard(config, data){
     var unit = item.unit || '';
     html += '<div style="border:1px solid var(--border,#e2e8f0);border-left:4px solid '+color+';border-radius:var(--o3-radius-card,8px);padding:var(--space-3,12px);background:var(--bg-surface,#fff)">';
     html += '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px">'+_esc(_scLabel(item, i))+'</div>';
-    html += '<div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:22px;font-weight:800;color:var(--text-primary)">'+_esc(_fmt(val))+_esc(unit)+'</span>';
+    html += '<div style="display:flex;align-items:baseline;gap:var(--o3-space)"><span style="font-size:22px;font-weight:800;color:var(--text-primary)">'+_esc(_fmt(val))+_esc(unit)+'</span>';
     if(item.target != null) html += '<span style="font-size:12px;color:var(--text-tertiary)">/ '+_esc(_fmt(target))+_esc(unit)+'</span>';
     html += '</div>';
     html += '<div style="height:6px;border-radius:999px;background:var(--gray-100,#f1f5f9);margin-top:8px;overflow:hidden"><div style="height:100%;width:'+pct.toFixed(0)+'%;background:'+color+'"></div></div>';
@@ -9694,7 +9694,7 @@ function renderScorecard(config, data){
 function renderBreadcrumb(config, data){
   var rows = _scRows(config, data);
   if(!rows.length) rows = [{label:_t('Trang chủ','Home')},{label:_t('Mục','Section')},{label:_t('Hiện tại','Current')}];
-  var html = '<nav class="hm-breadcrumb" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13px" aria-label="breadcrumb">';
+  var html = '<nav class="hm-breadcrumb" style="display:flex;flex-wrap:wrap;align-items:center;gap:var(--o3-space);font-size:13px" aria-label="breadcrumb">';
   rows.forEach(function(item, i){
     var last = i === rows.length - 1;
     if(i > 0) html += '<span aria-hidden="true" style="color:var(--text-tertiary)">/</span>';
@@ -9752,7 +9752,7 @@ function renderPagination(config, data){
       + (ariaLabel ? ' aria-label="'+_esc(ariaLabel)+'"' : '')
       + ' style="min-width:32px;height:var(--o3-control-h-standard,32px);border-radius:var(--o3-radius,6px);border:1px solid '+(active ? 'var(--brand-2,#2563eb)' : 'var(--border,#e2e8f0)')+';background:'+(active ? 'var(--brand-2,#2563eb)' : 'var(--bg-surface,#fff)')+';color:'+(active ? 'var(--text-inverse,#fff)' : disabled ? 'var(--text-tertiary)' : 'var(--text-secondary)')+';font-weight:600'+(disabled ? ';opacity:.5' : '')+'">'+label+'</button>';
   }
-  var html = '<nav class="hm-pagination" aria-label="'+_esc(_t('Phân trang','Pagination'))+'" style="display:flex;align-items:center;gap:6px;font-size:13px">';
+  var html = '<nav class="hm-pagination" aria-label="'+_esc(_t('Phân trang','Pagination'))+'" style="display:flex;align-items:center;gap:var(--o3-space);font-size:13px">';
   html += pgBtn('<span aria-hidden="true">‹</span>', page <= 1, false, _t('Trang trước','Previous page'));
   for(var p = 1; p <= count; p++){
     if(count > 7 && p > 2 && p < count - 1 && Math.abs(p - page) > 1){ if(p === 3) html += '<span aria-hidden="true" style="color:var(--text-tertiary)">…</span>'; continue; }
@@ -9848,7 +9848,7 @@ function renderDeviceGrid(config, data){
     var color = _scStatusColor(item.status);
     var status = String(item.status || 'idle');
     html += '<div style="border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius-card,8px);padding:var(--space-3,12px);background:var(--bg-surface,#fff)">';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px"><span style="font-weight:700;font-size:13px;color:var(--text-primary)">'+_esc(_scLabel(item, i))+'</span><span aria-hidden="true" style="width:10px;height:10px;border-radius:50%;background:'+color+'" title="'+_esc(status)+'"></span></div>';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:var(--o3-space)"><span style="font-weight:700;font-size:13px;color:var(--text-primary)">'+_esc(_scLabel(item, i))+'</span><span aria-hidden="true" style="width:10px;height:10px;border-radius:50%;background:'+color+'" title="'+_esc(status)+'"></span></div>';
     html += '<div style="font-size:11px;color:var(--text-tertiary);margin-top:2px">'+_esc(status)+'</div>';
     if(item.metric != null) html += '<div style="margin-top:8px;font-size:20px;font-weight:800;color:'+color+'">'+_esc(_fmt(_chartNumber(item.metric)))+_esc(item.unit || '')+'</div>';
     if(item.metricLabel) html += '<div style="font-size:11px;color:var(--text-secondary)">'+_esc(_scText(item.metricLabel, item.metricLabelEn))+'</div>';
@@ -9921,7 +9921,7 @@ function renderBoard(config, data){
     var items = rows.filter(function(r){ return String(r[statusKey]) === String(laneKey); });
     var color = _safeColor(lane.color, _scStatusColor(laneKey));
     html += '<div style="flex:1;min-width:200px;background:var(--gray-50,#f8fafc);border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius-card,8px);padding:var(--space-2,8px)">';
-    html += '<div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;padding:0 4px"><span aria-hidden="true" style="width:8px;height:8px;border-radius:50%;background:'+color+'"></span>'+_esc(_t(lane.label || laneKey, lane.labelEn || lane.label || laneKey))+' <span style="color:var(--text-tertiary)">('+items.length+')</span></div>';
+    html += '<div style="display:flex;align-items:center;gap:var(--o3-space);font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;padding:0 4px"><span aria-hidden="true" style="width:8px;height:8px;border-radius:50%;background:'+color+'"></span>'+_esc(_t(lane.label || laneKey, lane.labelEn || lane.label || laneKey))+' <span style="color:var(--text-tertiary)">('+items.length+')</span></div>';
     items.forEach(function(item){
       html += '<div style="background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius,6px);padding:var(--space-2,8px) var(--space-3,10px);margin-bottom:6px">';
       html += '<div style="font-size:13px;font-weight:600;color:var(--text-primary)">'+_esc(item.title || item.label || item.name || '—')+'</div>';
@@ -13933,7 +13933,7 @@ Object.assign(window.HmBlockEngine, {
       '.hm-runtime-design-stage .hm-btn-secondary,.hm-runtime-design-stage .hm-btn-ghost{background:var(--hmrt-surface-bg)}',
       '.hm-runtime-design-stage .hm-input,.hm-runtime-design-stage .hm-select,.hm-runtime-design-stage .hm-textarea, .hm-runtime-design-stage input[type="text"],.hm-runtime-design-stage input[type="number"],.hm-runtime-design-stage input[type="date"],.hm-runtime-design-stage select,.hm-runtime-design-stage textarea{border-radius:var(--o3-radius-card);border:1px solid var(--hmrt-border);background:var(--hmrt-input-bg);color:var(--hmrt-text);padding:var(--hmrt-input-padding)}',
       '.hm-runtime-design-stage .hm-input:focus,.hm-runtime-design-stage .hm-select:focus,.hm-runtime-design-stage .hm-textarea:focus,.hm-runtime-design-stage input:focus,.hm-runtime-design-stage select:focus,.hm-runtime-design-stage textarea:focus{outline:2px solid var(--hmrt-focus);outline-offset:1px;border-color:var(--hmrt-accent)}',
-      '.hm-runtime-design-stage .hm-badge,.hm-runtime-design-stage .hm-record-detail-chip,.hm-runtime-design-stage .hm-record-detail-meta>span{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;background:var(--hmrt-chip-bg);border:1px solid var(--hmrt-border);color:var(--hmrt-chip-text)}',
+      '.hm-runtime-design-stage .hm-badge,.hm-runtime-design-stage .hm-record-detail-chip,.hm-runtime-design-stage .hm-record-detail-meta>span{display:inline-flex;align-items:center;gap:var(--o3-space);border-radius:999px;padding:4px 10px;background:var(--hmrt-chip-bg);border:1px solid var(--hmrt-border);color:var(--hmrt-chip-text)}',
       '.hm-runtime-design-stage .hm-empty,.hm-runtime-design-stage .hm-empty-icon,.hm-runtime-design-stage .hm-hint,.hm-runtime-design-stage .hm-kpi-label,.hm-runtime-design-stage .hm-card-subtitle,.hm-runtime-design-stage .hm-record-detail-subtitle,.hm-runtime-design-stage .hm-kanban-count,.hm-runtime-design-stage .hm-table-rowcount,.hm-runtime-design-stage .hm-table-info,.hm-runtime-design-stage .hm-block-caption{color:var(--hmrt-text-soft)}',
       '.hm-runtime-design-stage .hm-kpi-value,.hm-runtime-design-stage .hm-record-value,.hm-runtime-design-stage .hm-machine-label,.hm-runtime-design-stage .hm-record-detail-value{color:var(--hmrt-text)}',
       '.hm-runtime-design-stage[data-rt-tone="dark"] .hm-btn,.hm-runtime-design-stage[data-rt-tone="dark"] .hm-input,.hm-runtime-design-stage[data-rt-tone="dark"] .hm-select,.hm-runtime-design-stage[data-rt-tone="dark"] .hm-textarea{color:var(--hmrt-text)}',
