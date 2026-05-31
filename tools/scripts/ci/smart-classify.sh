@@ -43,6 +43,16 @@ matches() {
   [[ "$file" =~ $regex ]]
 }
 
+is_design_token_path() {
+  local file="$1"
+  matches "$file" '^tools/scripts/gen-lego-tokens\.mjs$' ||
+    matches "$file" '^tokens/' ||
+    matches "$file" '(^|/)lego\.tokens(\.generated)?\.json$' ||
+    matches "$file" '^mom/styles/lego-(foundation|shell)\.css$' ||
+    matches "$file" '(^|/)(lego-token|design-token|theme-token)' ||
+    matches "$file" '(lego-token|design-token|theme-token)'
+}
+
 resolve_changed_files() {
   if [[ "${SMART_CI_FORCE_BASE_UNRESOLVED:-}" == "1" ]]; then
     printf '%s\n' '__SMART_CI_UNRESOLVED_BASE__'
@@ -106,6 +116,8 @@ needs_openapi=false
 needs_doc_health=false
 needs_raci=false
 needs_frontend_safety=false
+needs_frontend_js_safety=false
+needs_graphics_safety=false
 needs_hmv4_safety=false
 needs_playwright_e2e=false
 needs_visual_e2e=false
@@ -146,7 +158,6 @@ while IFS= read -r file; do
     matches "$file" '^tools/ci/' ||
     matches "$file" '(^|/)\.?actionlint(\.ya?ml)?$' ||
     matches "$file" '^mom/(composer\.json|composer\.lock|phpstan\.neon|phpunit\.xml)$' ||
-    matches "$file" '^tests/e2e/package(-lock)?\.json$' ||
     matches "$file" '^playwright\.config\.(js|ts)$' ||
     matches "$file" '^package(-lock)?\.json$'; then
     set_flag needs_classifier_selftest
@@ -156,9 +167,21 @@ while IFS= read -r file; do
     mark_full "ci-platform:${file}"
   fi
 
+  if matches "$file" '^tests/e2e/package(-lock)?\.json$'; then
+    set_flag needs_classifier_selftest
+    set_flag needs_frontend_safety
+    set_flag needs_hmv4_safety
+    set_flag needs_playwright_e2e
+  fi
+
   if matches "$file" '^tools/scripts/(gen-lego-tokens|smoke-blocks-l3-map)\.mjs$' ||
     matches "$file" '^tools/scripts/.*(lego|token|theme|blocks).*\.mjs$'; then
     set_flag needs_frontend_safety
+    set_flag needs_frontend_js_safety
+    if matches "$file" '^tools/scripts/gen-lego-tokens\.mjs$' ||
+      matches "$file" '^tools/scripts/.*(lego|token|theme).*\.mjs$'; then
+      set_flag needs_graphics_safety
+    fi
   fi
 
   if matches "$file" '^scripts/doc-.*\.py$' ||
@@ -183,11 +206,14 @@ while IFS= read -r file; do
 
   if matches "$file" '^mom/tools/release/check_graphics.*\.php$'; then
     set_flag needs_frontend_safety
+    set_flag needs_graphics_safety
     set_flag needs_php_syntax
   fi
 
-  if matches "$file" '^mom/tools/release/check_(user_identity_ssot|authorization_invariants)\.php$' ||
-    matches "$file" '([Aa]dmin|auth|authorization|permission|user_identity|csrf|xss|session|password|token|sanitize)'; then
+  if ! is_design_token_path "$file" && {
+    matches "$file" '^mom/tools/release/check_(user_identity_ssot|authorization_invariants)\.php$' ||
+      matches "$file" '([Aa]dmin|[Aa]uth|authorization|permission|user_identity|csrf|xss|session|password|access[-_]?token|api[-_]?token|auth[-_]?token|session[-_]?token|csrf[-_]?token|sanitize|upload)'
+  }; then
     set_flag needs_security_light
     if matches "$file" '\.php$'; then
       set_flag needs_php_syntax
@@ -249,14 +275,36 @@ while IFS= read -r file; do
     matches "$file" '^mom/(portal|index)\.html$' ||
     matches "$file" '^mom/sw\.js$'; then
     set_flag needs_frontend_safety
+    if matches "$file" '^mom/(scripts|assets)/.*\.js$' ||
+      matches "$file" '^mom/sw\.js$' ||
+      matches "$file" '^mom/(portal|index)\.html$'; then
+      set_flag needs_frontend_js_safety
+    fi
+    if matches "$file" '^mom/styles/' ||
+      matches "$file" '^mom/scripts/portal/.*(theme|lego).*\.js$'; then
+      set_flag needs_graphics_safety
+    fi
   fi
 
   if matches "$file" '^mom/scripts/portal/7[0-4]-module-template-v4-.*\.js$' ||
-    matches "$file" '^mom/styles/module-template-v4' ||
     matches "$file" '^tests/fixtures/module-template-v4/'; then
     set_flag needs_frontend_safety
+    set_flag needs_frontend_js_safety
     set_flag needs_hmv4_safety
     set_flag needs_playwright_e2e
+  fi
+
+  if matches "$file" '^mom/styles/module-template-v4'; then
+    set_flag needs_frontend_safety
+    set_flag needs_graphics_safety
+    set_flag needs_hmv4_safety
+  fi
+
+  if matches "$file" '^tokens/' ||
+    matches "$file" '(^|/)lego\.tokens(\.generated)?\.json$' ||
+    matches "$file" '^mom/styles/lego-(foundation|shell)\.css$'; then
+    set_flag needs_frontend_safety
+    set_flag needs_graphics_safety
   fi
 
   if matches "$file" '^tests/e2e/.*(visual|__snapshots__|snapshots).*'; then
@@ -300,6 +348,8 @@ if [[ "$is_full_required" == "true" ]]; then
   needs_doc_health=true
   needs_raci=true
   needs_frontend_safety=true
+  needs_frontend_js_safety=true
+  needs_graphics_safety=true
   needs_hmv4_safety=true
   needs_playwright_e2e=true
   needs_visual_e2e=true
@@ -325,6 +375,8 @@ for key in \
   needs_doc_health \
   needs_raci \
   needs_frontend_safety \
+  needs_frontend_js_safety \
+  needs_graphics_safety \
   needs_hmv4_safety \
   needs_playwright_e2e \
   needs_visual_e2e \
@@ -339,6 +391,6 @@ for key in \
   fi
 done
 
-summary="files=${file_count}; full=${is_full_required}; reason=${SMART_CI_FULL_REASON:-none}; php=${needs_php_syntax}/${needs_phpstan}/${needs_phpunit}; kpi=${needs_kpi_tests}; db=${needs_db_migration_check}; openapi=${needs_openapi}; docs=${needs_doc_health}; raci=${needs_raci}; frontend=${needs_frontend_safety}; hmv4=${needs_hmv4_safety}; e2e=${needs_playwright_e2e}; visual=${needs_visual_e2e}; security=${needs_security_light}; actionlint=${needs_actionlint}; selftest=${needs_classifier_selftest}"
+summary="files=${file_count}; full=${is_full_required}; reason=${SMART_CI_FULL_REASON:-none}; php=${needs_php_syntax}/${needs_phpstan}/${needs_phpunit}; kpi=${needs_kpi_tests}; db=${needs_db_migration_check}; openapi=${needs_openapi}; docs=${needs_doc_health}; raci=${needs_raci}; frontend=${needs_frontend_safety}; frontend_js=${needs_frontend_js_safety}; graphics=${needs_graphics_safety}; hmv4=${needs_hmv4_safety}; e2e=${needs_playwright_e2e}; visual=${needs_visual_e2e}; security=${needs_security_light}; actionlint=${needs_actionlint}; selftest=${needs_classifier_selftest}"
 write_output summary "$summary"
 echo "Smart CI summary: $summary"

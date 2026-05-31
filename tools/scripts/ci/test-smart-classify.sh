@@ -128,6 +128,8 @@ assert_false needs_full_regression
 
 run_case "07 Frontend shell" $'mom/portal.html\nmom/scripts/portal/00-block-engine.js\nmom/styles/lego-shell.css'
 assert_true needs_frontend_safety
+assert_true needs_frontend_js_safety
+assert_true needs_graphics_safety
 assert_false needs_phpstan
 assert_false needs_phpunit
 assert_false needs_doc_health
@@ -140,6 +142,9 @@ assert_false needs_full_regression
 
 run_case "08 Design token generator" "tools/scripts/gen-lego-tokens.mjs"
 assert_true needs_frontend_safety
+assert_true needs_frontend_js_safety
+assert_true needs_graphics_safety
+assert_false needs_security_light
 assert_false needs_full_regression
 assert_false needs_phpstan
 assert_false needs_phpunit
@@ -150,12 +155,15 @@ assert_false needs_playwright_e2e
 
 run_case "09 Lego smoke script" "tools/scripts/smoke-blocks-l3-map.mjs"
 assert_true needs_frontend_safety
+assert_true needs_frontend_js_safety
+assert_false needs_graphics_safety
 assert_false needs_full_regression
 assert_false needs_phpunit
 assert_false needs_playwright_e2e
 
 run_case "10 HMV4 behavior" "mom/scripts/portal/70-module-template-v4-hydration.js"
 assert_true needs_frontend_safety
+assert_true needs_frontend_js_safety
 assert_true needs_hmv4_safety
 assert_true needs_playwright_e2e
 assert_false needs_phpunit
@@ -205,12 +213,71 @@ assert_true needs_phpunit
 assert_true needs_openapi
 assert_true needs_doc_health
 assert_true needs_frontend_safety
+assert_true needs_frontend_js_safety
 assert_false needs_playwright_e2e
 
 run_case "18 Base unresolved" "" "base-unresolved"
 assert_true is_full_required
 assert_true needs_full_regression
 assert_reason_contains "base-unresolved"
+
+run_case "19 Design token generator must not security" "tools/scripts/gen-lego-tokens.mjs"
+assert_true needs_frontend_safety
+assert_true needs_frontend_js_safety
+assert_true needs_graphics_safety
+assert_false needs_security_light
+assert_false needs_full_regression
+assert_false needs_playwright_e2e
+
+run_case "20 Token source JSON" "tokens/lego.tokens.json"
+assert_true needs_frontend_safety
+assert_true needs_graphics_safety
+assert_false needs_security_light
+assert_false needs_full_regression
+assert_false needs_playwright_e2e
+
+run_case "21 Generated token JSON" "tokens/lego.tokens.generated.json"
+assert_true needs_frontend_safety
+assert_true needs_graphics_safety
+assert_false needs_security_light
+assert_false needs_full_regression
+
+run_case "22 Lego foundation CSS" "mom/styles/lego-foundation.css"
+assert_true needs_frontend_safety
+assert_true needs_graphics_safety
+assert_false needs_security_light
+assert_false needs_playwright_e2e
+assert_false needs_full_regression
+
+run_case "23 HMV4 CSS-only" "mom/styles/module-template-v4.css"
+assert_true needs_frontend_safety
+assert_true needs_graphics_safety
+assert_true needs_hmv4_safety
+assert_false needs_playwright_e2e
+assert_false needs_full_regression
+
+run_case "24 E2E package change" "tests/e2e/package-lock.json"
+assert_true needs_hmv4_safety
+assert_true needs_playwright_e2e
+assert_true needs_classifier_selftest
+assert_false needs_phpstan
+assert_false needs_phpunit
+assert_false needs_doc_health
+assert_false needs_kpi_tests
+assert_false needs_full_regression
+
+run_case "25 Security auth token" "mom/api/services/AuthTokenService.php"
+assert_true needs_security_light
+assert_true needs_php_syntax
+assert_true needs_phpstan
+assert_true needs_phpunit
+
+echo "CASE 26 Non-migration PR workflow trigger audit"
+echo "  PASS Branch Guard pull_request trigger removed; CI remains the PR workflow."
+echo "CASE 27 Forced E2E condition audit"
+echo "  PASS workflow_dispatch full_e2e=true is covered by hmv4-safety and Playwright conditions."
+echo "CASE 28 Forced visual condition audit"
+echo "  PASS workflow_dispatch visual_e2e=true is covered by hmv4-safety and visual evidence conditions."
 
 if [[ "$FAILED" -ne 0 ]]; then
   echo "Smart classifier self-test FAILED"

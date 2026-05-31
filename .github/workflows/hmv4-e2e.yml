@@ -24,7 +24,7 @@ permissions:
 
 concurrency:
   group: hmv4-e2e-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/codex/') }}
 
 env:
   HMV4_PREVIEW_ENABLED: 'false'
