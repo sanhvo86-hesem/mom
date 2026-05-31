@@ -4034,6 +4034,19 @@ function _ensureBuilderStyles(){
   // 8px master frame (2 IDs > the frozen rule's specificity, no !important) so the
   // builder uses the full width — no empty left/right regions.
   css += '#content > #page-module-builder.page{padding:var(--o3-space)}';
+  // UNIFORM GRID for ALL blocks (SSOT): block-engine renderers use the legacy
+  // spacing/radius scales (--space-N, --radius-md, …) which resolve OFF-grid
+  // (12/10/6px). Remap them — scoped to the builder + runtime block content — onto
+  // the 8/4 master grid so EVERY block/component gets the same 8px gap, 8px outer
+  // radius, 4px inner radius without editing 196 renderers. Also collapse the
+  // section gap to 8 so spacing is uniform (no 12px).
+  css += '.mb-ultra-root,.hm-runtime-design-stage,.mb-canvas-root{'
+    + '--o3-space-section:var(--o3-space);--master-gap:var(--o3-space);--section-gap:var(--o3-space);'
+    + '--space-1:var(--o3-radius);--space-2:var(--o3-space);--space-3:var(--o3-space);--space-4:var(--o3-space);'
+    + '--space-5:var(--o3-space);--space-6:var(--o3-space);--space-7:var(--o3-space);--space-8:var(--o3-space);'
+    + '--radius-sm:var(--o3-radius);--radius:var(--o3-radius);--radius-md:var(--o3-radius-card);'
+    + '--radius-lg:var(--o3-radius-card);--radius-xl:var(--o3-radius-card)'
+    + '}';
   css += '.mb-builder-shell{display:flex;gap:var(--o3-space-section);align-items:stretch;min-height:560px;height:var(--mb-shell-height,560px);max-height:var(--mb-shell-height,560px)}';
   css += '.mb-side-panel,.mb-main-panel,.mb-rail-panel{background:var(--o3-surface-card);border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius-card);box-shadow:var(--shadow-sm)}';
   css += '.mb-side-panel{width:304px;flex:0 0 304px;overflow:hidden;display:flex;flex-direction:column;min-height:0}';
