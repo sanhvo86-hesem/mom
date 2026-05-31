@@ -17786,4 +17786,20 @@ if(window.__HM_MODULE_BUILDER_ULTRA_PATCH_R13__ !== '2026-04-08-r13-glass-comman
 
 window._renderModuleBuilder = render;
 
+/* TEMP DIAGNOSTIC (block-persistence bug): read-only probe of state.schema. */
+(function(){
+  function cnt(sc){ var n=0; (sc&&sc.tabs||[]).forEach(function(t){ (function w(l){(l||[]).forEach(function(b){ if(!b)return; n++; if(b.slots) Object.keys(b.slots).forEach(function(k){ w(b.slots[k]); }); });})(t.blocks); }); return n; }
+  window.__MB_SCHEMA_PROBE = function(){
+    try {
+      return { stateBlocks: state && state.schema ? cnt(state.schema) : 'no-schema',
+        activeTab: state ? state.activeTab : null,
+        tabIds: state && state.schema && state.schema.tabs ? state.schema.tabs.map(function(t){return t.tabId;}) : null,
+        tabBlockCounts: state && state.schema && state.schema.tabs ? state.schema.tabs.map(function(t){return (t.blocks||[]).length;}) : null,
+        hasConfig: !!(state && state.schema && state.schema.config),
+        theme: state && state.schema && state.schema.config ? state.schema.config.theme : null,
+        compiledBlocks: (state && state.schema && typeof _compileRuntimeSchema==='function') ? cnt(_compileRuntimeSchema(state.schema)) : 'n/a' };
+    } catch(e){ return { err:String(e) }; }
+  };
+})();
+
 })();
