@@ -5536,10 +5536,15 @@ _renderLibraryPanel = function(){
         h += '<div class="mb-library-section-body">';
         keys.forEach(function(key){
           var entry = catalog[key];
-          h += '<div class="mb-tree-node" draggable="true" data-library-type="'+_esc(key)+'" style="border:1px solid var(--border)">';
+          h += '<div class="mb-tree-node" draggable="true" data-library-type="'+_esc(key)+'" style="border:1px solid var(--o3-border-subtle)">';
           h += '<div style="font-size:18px;width:26px;text-align:center">'+_esc(entry.icon || '📦')+'</div>';
           h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="add-block-type" data-type="'+_esc(key)+'" style="padding:0;border:0;background:none;display:flex;align-items:flex-start;gap:8px;flex:1;min-width:0;text-align:left">';
           h += '<span class="mb-tree-label"><span class="mb-tree-title">'+_esc(entry.label)+'</span><span class="mb-tree-type">'+_esc(entry.labelEn || '')+'</span></span></button>';
+          // Provenance badge: a block flipped to its curated L3 equivalent (e.g. kpi-row→kpi.grid)
+          // renders through BlockKit everywhere — same as in Admin Module Master.
+          if (typeof window !== 'undefined' && window.Blocks && typeof window.Blocks.isFlipped === 'function' && window.Blocks.isFlipped(key)) {
+            h += '<span class="o3-chip o3-chip--success" style="flex:0 0 auto;font-size:10px;height:auto;padding:2px 6px" title="'+_esc(_t('Block curated L3 (SSOT)','Curated L3 block (SSOT)'))+'">SSOT</span>';
+          }
           h += '</div>';
         });
         h += '</div>';

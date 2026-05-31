@@ -928,9 +928,60 @@
       tokens:['control.height.standard','spacing.md','spacing.lg','radius.card','brand.primary','colorsLight.bgSurface'] };
   }
 
+  /* v3-G27 (2026-05-31): UNIFIED block catalog — reads window.Blocks (the
+   * facade over L3 BlockKit + the ~196-type Engine catalog). This is the EXACT
+   * list Module Builder offers, so Module Master and the builder palette are in
+   * sync: add a block to either system and it appears here. Each block shows its
+   * provenance — "SSOT" (flipped to a curated L3 block), "L3" (published L3), or
+   * "Engine" (legacy config-driven). Meta cards only (no risky live-render of all
+   * 196); the curated few keep their live preview in the Blocks (L3) section. */
+  function engineCatalogSection(L){
+    var B  = (typeof window !== 'undefined') && window.Blocks;
+    var BEng = (typeof window !== 'undefined') && window.HmBlockEngine;
+    if (!B || typeof B.list !== 'function') {
+      return { id:'block-catalog', label_vi:'📦 Catalog Block', label_en:'Block Catalog',
+        body_html:'<div style="font-size:12px;color:var(--text-secondary)">'
+          + esc(L('window.Blocks (00bh) chưa nạp.','window.Blocks (00bh) not loaded.')) + '</div>', tokens:[] };
+    }
+    var cats = (BEng && BEng.BLOCK_CATEGORIES) ? BEng.BLOCK_CATEGORIES : [];
+    var all = B.list();
+    var cov = (typeof B.coverage === 'function') ? B.coverage() : { total: all.length, blockkitPublished:0, engineCatalog: all.length };
+    var byCat = {};
+    all.forEach(function(k){ var m = B.meta(k) || { key:k, source:'engine', category:'other' }; var c = m.category || 'other'; (byCat[c] = byCat[c] || []).push(m); });
+    function badge(m){
+      var flipped = (typeof B.isFlipped === 'function') && B.isFlipped(m.key);
+      if (flipped) return '<span class="o3-chip o3-chip--success">SSOT</span>';
+      return '<span class="o3-chip">' + (m.source === 'blockkit' ? 'L3' : 'Engine') + '</span>';
+    }
+    var html = '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px">'
+      + esc(L('Catalog hợp nhất qua window.Blocks (L3 + Engine) — ĐÚNG danh sách Module Builder dùng. Thêm block vào registry/catalog → tự hiện ở cả hai nơi. ',
+              'Unified catalog via window.Blocks (L3 + Engine) — the SAME list Module Builder offers. Add a block to either system → it appears in both. '))
+      + '<strong>' + cov.total + '</strong> ' + esc(L('block','blocks'))
+      + ' · L3 ' + (cov.blockkitPublished || 0) + ' · Engine ' + (cov.engineCatalog || 0) + '</div>';
+    var order = cats.length ? cats : Object.keys(byCat).map(function(k){ return { key:k, label:k, labelEn:k }; });
+    order.forEach(function(cat){
+      var listc = byCat[cat.key]; if (!listc || !listc.length) return;
+      html += '<div style="margin-top:10px"><div class="mb-cat mb-cat--' + esc(cat.key) + '" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">'
+        + esc(L(cat.label, cat.labelEn || cat.label)) + ' (' + listc.length + ')</div>'
+        + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(184px,1fr));gap:var(--o3-space,8px)">';
+      listc.forEach(function(m){
+        var nm = L((m.display && m.display.vi) || m.key, (m.display && m.display.en) || m.key);
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius-card,8px);background:var(--o3-surface-card)">'
+          + '<span style="font-size:16px;flex:0 0 auto">' + esc(m.icon || '🧩') + '</span>'
+          + '<span style="min-width:0;flex:1 1 auto"><span style="display:block;font-size:12px;font-weight:600;color:var(--o3-text-strong);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(nm) + '</span>'
+          + '<span style="display:block;font-size:10px;color:var(--text-tertiary);font-family:ui-monospace,monospace;overflow:hidden;text-overflow:ellipsis">' + esc(m.key) + '</span></span>'
+          + badge(m) + '</div>';
+      });
+      html += '</div></div>';
+    });
+    return { id:'block-catalog', label_vi:'📦 Catalog Block (hợp nhất)', label_en:'Block Catalog (unified)',
+      body_html: html, tokens:['radius.card','space.master','brand.primary','control.height.standard'] };
+  }
+
   function sections(L){
     return [
       blocksSection(L),
+      engineCatalogSection(L),
       archetypesSection(L),
       /* v3-G15 (2026-05-29): Global sections REMOVED from Module Master.
        * Density (Khe hở Master), Global tokens, Typography, Effects are
