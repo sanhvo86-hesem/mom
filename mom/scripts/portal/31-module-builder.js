@@ -17786,30 +17786,47 @@ if(window.__HM_MODULE_BUILDER_ULTRA_PATCH_R13__ !== '2026-04-08-r13-glass-comman
 
 window._renderModuleBuilder = render;
 
-/* TEMP DIAGNOSTIC (block-persistence bug): read-only probe of state.schema. */
+/* ── Round 18: block-persistence guard ──────────────────────────────────────
+   ROOT CAUSE (proven by instrumentation): _ngApplyModuleStudioDraft — the
+   module-studio metadata draft commit, run on every Save and Preview via
+   _r14CommitDraftToSchema / _r15CommitDraftToSchema — drops the canvas blocks
+   (and config) from state.schema. The draft is metadata-only (title/meta/
+   design/publish/qa/integration; it never captures tabs/blocks), so committing
+   it must NOT touch the block tree. Somewhere in the 14-round apply chain the
+   tab blocks get lost; rather than depend on tracing that, this guard enforces
+   the invariant directly: snapshot each tab's blocks (by tabId) + schema.config
+   before the apply and restore any that the apply emptied/dropped. Without this,
+   adding a block then Saving persisted an EMPTY module (the #1 builder bug). */
 (function(){
+  if(typeof _ngApplyModuleStudioDraft !== 'function') return;
+  var _r18PrevApply = _ngApplyModuleStudioDraft;
+  _ngApplyModuleStudioDraft = function(schema, draft){
+    var savedBlocks = {}, savedConfig = null, hadTabs = false;
+    if(schema && Array.isArray(schema.tabs)){
+      hadTabs = true;
+      schema.tabs.forEach(function(t){ if(t && t.tabId && Array.isArray(t.blocks)) savedBlocks[t.tabId] = t.blocks; });
+    }
+    if(schema && schema.config && typeof schema.config === 'object') savedConfig = schema.config;
+    var result = _r18PrevApply.apply(this, arguments);
+    var target = (result && typeof result === 'object') ? result : schema;
+    if(target && hadTabs && Array.isArray(target.tabs)){
+      target.tabs.forEach(function(t){
+        if(!t || !t.tabId) return;
+        var saved = savedBlocks[t.tabId];
+        if(saved && saved.length && (!Array.isArray(t.blocks) || t.blocks.length === 0)){
+          t.blocks = saved; // apply emptied a populated tab — restore it
+        }
+      });
+    }
+    if(savedConfig && target && !target.config) target.config = savedConfig;
+    return result;
+  };
+
+  /* read-only probe retained for verification (harmless). */
   function cnt(sc){ var n=0; (sc&&sc.tabs||[]).forEach(function(t){ (function w(l){(l||[]).forEach(function(b){ if(!b)return; n++; if(b.slots) Object.keys(b.slots).forEach(function(k){ w(b.slots[k]); }); });})(t.blocks); }); return n; }
-  /* wrap shared _ng* funcs to log block-count deltas during save commit */
-  window.__MB_DBG = [];
-  function wrap(getter, setter, label){
-    var orig = getter(); if(typeof orig !== 'function') return;
-    setter(function(){
-      var sc = arguments[0];
-      var before = cnt(sc);
-      var r = orig.apply(this, arguments);
-      var after = cnt(sc);
-      if(before !== after) window.__MB_DBG.push(label + ': ' + before + '->' + after);
-      return r;
-    });
-  }
-  wrap(function(){return _ngApplyModuleStudioDraft;}, function(f){_ngApplyModuleStudioDraft=f;}, 'applyDraft');
-  wrap(function(){return _ngEnsureModuleBuilderMetadata;}, function(f){_ngEnsureModuleBuilderMetadata=f;}, 'ensureMeta');
-  wrap(function(){return _ngSyncModuleBuilderManifest;}, function(f){_ngSyncModuleBuilderManifest=f;}, 'syncManifest');
   window.__MB_SCHEMA_PROBE = function(){
     try {
       return { stateBlocks: state && state.schema ? cnt(state.schema) : 'no-schema',
-        activeTab: state ? state.activeTab : null,
-        tabIds: state && state.schema && state.schema.tabs ? state.schema.tabs.map(function(t){return t.tabId;}) : null,
         tabBlockCounts: state && state.schema && state.schema.tabs ? state.schema.tabs.map(function(t){return (t.blocks||[]).length;}) : null,
         hasConfig: !!(state && state.schema && state.schema.config),
         theme: state && state.schema && state.schema.config ? state.schema.config.theme : null,

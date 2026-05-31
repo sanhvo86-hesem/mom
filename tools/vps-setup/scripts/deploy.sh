@@ -569,7 +569,10 @@ restore_git_executable_bits
 # it. Use a separate read-only working copy if you ever need it.
 
 # Writable directories (PHP-FPM writes here through the configured pool user/group)
-for dir in uploads online-forms allocations form-workflow/state; do
+# `modules` holds Module Builder schemas written by ModuleSchemaController on
+# Save; without g+w here the global `chmod 755` above leaves it read-only and
+# every save returns "Cannot write json" (the schemas are JSON data, not code).
+for dir in uploads online-forms allocations form-workflow/state modules; do
     target="$SITE_DIR/mom/data/$dir"
     if [ -d "$target" ]; then
         find "$target" -type d -exec chmod 775 {} +
