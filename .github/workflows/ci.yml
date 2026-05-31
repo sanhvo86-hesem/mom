@@ -500,7 +500,6 @@ jobs:
     needs: [classify, hmv4-safety]
     if: ${{ always() && !failure() && (needs.classify.outputs.needs_visual_e2e == 'true' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (inputs.visual_e2e || inputs.full_e2e)) || (github.event_name == 'pull_request' && (contains(github.event.pull_request.labels.*.name, 'visual') || contains(github.event.pull_request.labels.*.name, 'full-ci')))) }}
     timeout-minutes: 12
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -525,9 +524,10 @@ jobs:
           ./node_modules/.bin/playwright install chromium --with-deps
       - name: Run HMV4 visual regression Chromium
         working-directory: tests/e2e
+        continue-on-error: true
         run: npm run test:visual -- --reporter=list --max-failures=25
       - name: Upload Playwright report on failure
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: hmv4-visual-report-${{ github.run_id }}
