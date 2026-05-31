@@ -19,6 +19,7 @@ final class DomainCommandGateway
         private readonly ?CommandRegistry $registry = null,
         private readonly ?IdempotencyReplayRepository $idempotency = null,
         private readonly ?EngineeringReleasePackageCommandHandler $engineeringPackages = null,
+        private readonly ?SecurityBoundaryMiddleware $securityBoundary = null,
     ) {}
 
     /**
@@ -44,6 +45,11 @@ final class DomainCommandGateway
         }
 
         $this->assertPermission($entry, $envelope);
+        $payload = is_array($envelope['payload'] ?? null) ? (array)$envelope['payload'] : [];
+        $payload['actor_id'] = $payload['actor_id'] ?? $actorId;
+        $payload['idempotency_key'] = $payload['idempotency_key'] ?? $idempotencyKey;
+        ($this->securityBoundary ?? new SecurityBoundaryMiddleware($this->db))->assertAllowed($entry, $envelope, $payload, $actorId);
+
         if (($entry['implemented'] ?? false) !== true) {
             throw new DomainCommandException(
                 'command_handler_not_runtime_complete',
@@ -53,9 +59,6 @@ final class DomainCommandGateway
             );
         }
 
-        $payload = is_array($envelope['payload'] ?? null) ? (array)$envelope['payload'] : [];
-        $payload['actor_id'] = $payload['actor_id'] ?? $actorId;
-        $payload['idempotency_key'] = $payload['idempotency_key'] ?? $idempotencyKey;
         $fingerprint = $this->fingerprint($commandName, $payload);
         $scopeKey = (string)($entry['idempotency_scope'] ?? 'domain_command') . '|' . $this->businessKey($commandName, $payload);
 

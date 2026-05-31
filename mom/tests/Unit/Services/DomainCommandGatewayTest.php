@@ -36,7 +36,7 @@ final class DomainCommandGatewayTest extends TestCase
 
         try {
             $gateway->dispatch([
-                'command_name' => 'StartJobCommand',
+                'command_name' => 'CreateItemCommand',
                 'idempotency_key' => 'idem-start-1',
                 'actor_id' => 'operator',
                 'actor_roles' => ['admin'],
@@ -61,6 +61,7 @@ final class DomainCommandGatewayTest extends TestCase
             'idempotency_key' => 'idem-release-1',
             'actor_id' => 'qa',
             'actor_roles' => ['admin'],
+            'reauth_at' => date(DATE_ATOM),
             'payload' => ['package_id' => 'pkg-1'],
         ]);
 
@@ -83,6 +84,7 @@ final class DomainCommandGatewayTest extends TestCase
                 'idempotency_key' => 'idem-release-1',
                 'actor_id' => 'qa',
                 'actor_roles' => ['admin'],
+                'reauth_at' => date(DATE_ATOM),
                 'payload' => ['package_id' => 'pkg-2'],
             ]);
             $this->fail('Expected idempotency conflict.');
@@ -95,6 +97,18 @@ final class DomainCommandGatewayTest extends TestCase
 final class DomainCommandFakeConnection extends Connection
 {
     public function __construct() {}
+
+    public function queryOne(string $sql, array $params = []): ?array
+    {
+        unset($sql, $params);
+        return ['created_by' => 'originator'];
+    }
+
+    public function execute(string $sql, array $params = []): int
+    {
+        unset($sql, $params);
+        return 1;
+    }
 }
 
 final class DomainCommandFakeIdempotencyReplayRepository implements IdempotencyReplayRepository
