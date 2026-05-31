@@ -113,7 +113,12 @@ jobs:
             BASE="origin/main"
           fi
           DIFF="$(git diff --name-only "$BASE" HEAD || true)"
-          if echo "$DIFF" | grep -E 'mom/styles/(portal\.main|eqms-suite|density-darkmode)\.css|mom/scripts/portal/(01-module-router|02-state-auth-ui|40-eqms-shell)\.js'; then
+          HMV4_DIFF="$(printf '%s\n' "$DIFF" | grep -E '^mom/scripts/portal/7[0-4]-module-template-v4-.*\.js$|^mom/styles/module-template-v4|^tests/fixtures/module-template-v4/|^tests/e2e/|(^|/)playwright\.config\.(ts|js)$' || true)"
+          if [ -z "$HMV4_DIFF" ]; then
+            echo "PASS forbidden diff (no HMV4 slice files changed)"
+            exit 0
+          fi
+          if printf '%s\n' "$DIFF" | grep -E 'mom/styles/(portal\.main|eqms-suite|density-darkmode)\.css|mom/scripts/portal/(01-module-router|02-state-auth-ui|40-eqms-shell)\.js'; then
             echo "FAIL forbidden file modified in slice diff"
             exit 1
           fi
