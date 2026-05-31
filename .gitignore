@@ -49,6 +49,9 @@ tests/e2e/node_modules/
 # Whitelist the Graphics Authority adversarial critique + Lego-SSOT redesign
 # proposal — strategy deliverables reviewed alongside the dark-mode fix.
 !_reports/graphics-authority-critique/
+# Lego Empire master strategy — world-class component-system research +
+# architecture + roadmap (current-state audit + web-platform + enterprise benchmark).
+!_reports/lego-empire/
 _build/
 _Deleted/
 .tmp/
