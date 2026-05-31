@@ -17789,6 +17789,22 @@ window._renderModuleBuilder = render;
 /* TEMP DIAGNOSTIC (block-persistence bug): read-only probe of state.schema. */
 (function(){
   function cnt(sc){ var n=0; (sc&&sc.tabs||[]).forEach(function(t){ (function w(l){(l||[]).forEach(function(b){ if(!b)return; n++; if(b.slots) Object.keys(b.slots).forEach(function(k){ w(b.slots[k]); }); });})(t.blocks); }); return n; }
+  /* wrap shared _ng* funcs to log block-count deltas during save commit */
+  window.__MB_DBG = [];
+  function wrap(getter, setter, label){
+    var orig = getter(); if(typeof orig !== 'function') return;
+    setter(function(){
+      var sc = arguments[0];
+      var before = cnt(sc);
+      var r = orig.apply(this, arguments);
+      var after = cnt(sc);
+      if(before !== after) window.__MB_DBG.push(label + ': ' + before + '->' + after);
+      return r;
+    });
+  }
+  wrap(function(){return _ngApplyModuleStudioDraft;}, function(f){_ngApplyModuleStudioDraft=f;}, 'applyDraft');
+  wrap(function(){return _ngEnsureModuleBuilderMetadata;}, function(f){_ngEnsureModuleBuilderMetadata=f;}, 'ensureMeta');
+  wrap(function(){return _ngSyncModuleBuilderManifest;}, function(f){_ngSyncModuleBuilderManifest=f;}, 'syncManifest');
   window.__MB_SCHEMA_PROBE = function(){
     try {
       return { stateBlocks: state && state.schema ? cnt(state.schema) : 'no-schema',
