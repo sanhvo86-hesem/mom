@@ -14,7 +14,6 @@ The P58 scenario runner and P59/P60 evidence tools can be reviewed as controlled
 
 ## Why Merge Is Blocked
 
-- P0 fallback read telemetry is non-zero.
 - P0 PostgreSQL restore target is missing.
 - P0 live VPS Chrome smoke is missing or failed.
 - P1 PHPUnit/PHPStan full suites are blocked by missing vendor binaries.

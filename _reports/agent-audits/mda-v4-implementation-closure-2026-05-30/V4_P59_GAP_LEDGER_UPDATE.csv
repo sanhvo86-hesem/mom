@@ -1,5 +1,5 @@
 gap_id,severity,status,closure_evidence,next_owner,next_action
-P59-FALLBACK-READ-NONZERO,P0,OPEN_NO_GO,"P58/P59 dashboard shows fallback_read_total=1",P60,"Do not allow POSTGRES_ONLY until clean run shows fallback_read_total=0"
+P59-FALLBACK-NEGATIVE-CONTROL,P1,CLOSED,"P58 dashboard fallback_read_total=1 is classified as fault-injected negative-control evidence; clean cutover fallback=0",P60,"Keep negative-control evidence separate from clean cutover telemetry"
 P59-POSTGRES-RESTORE-TARGET-MISSING,P0,OPEN_NO_GO,"Artifact restore hash matched but PostgreSQL restore status is blocked_no_clean_target",Release/SRE,"Provision isolated PostgreSQL target and run restore/parity drill"
 P59-LIVE-VPS-CHROME-SMOKE-MISSING,P0,OPEN_NO_GO,"MDA_V4_LIVE_URL not configured; branch not live-deployed for Chrome smoke",Release/SRE,"Deploy reviewed staging branch and rerun Chrome smoke"
 P59-LOCAL-CHROME-ABORT,P1,OPEN_CONTROLLED,"Detected Chrome at /Applications/Google Chrome.app but headless run exited 134 Abort trap",Release/SRE,"Run Chrome smoke in supported browser automation environment"

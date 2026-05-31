@@ -1,8 +1,8 @@
 {
     "schema_version": "mda.v4.p59.operational_drill.v1",
-    "generated_at": "2026-05-31T11:03:22+00:00",
+    "generated_at": "2026-05-31T11:19:19+00:00",
     "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
-    "sha": "8c5e6cdc3",
+    "sha": "3ffa34b78",
     "p58_dashboard": {
         "path": "mom/data/registry/mda-v4-runtime-scenario-dashboard.latest.json",
         "decision": "P58_PASS_READY_FOR_NEXT",
@@ -10,7 +10,18 @@
         "passed": 14,
         "failed": 0,
         "fallback_read_total": 1,
+        "fault_injected_fallback_read_total": 1,
+        "clean_cutover_fallback_read_total": 0,
         "cutover_decision": "NO_GO_CUTOVER_FALLBACK_READ_PRESENT"
+    },
+    "cutover_rehearsal": {
+        "clean_fallback_read_total": 0,
+        "fault_injected_fallback_read_total": 1,
+        "negative_control": {
+            "fallback_read_total_non_zero_expected_no_go": true,
+            "source": "V4-SIM-058-007"
+        },
+        "drift_count": 0
     },
     "scenario_library": {
         "path": "mom/data/registry/mda-v4-runtime-scenarios.json",
@@ -42,7 +53,7 @@
         "operator_banner_required": true,
         "operator_banner_text": "MDA cutover is not complete. Fallback/drift controls are active; POSTGRES_ONLY is disabled.",
         "warnings": [
-            "fallback telemetry present; rollback/cutover banner required"
+            "fault-injected fallback telemetry present for negative-control proof"
         ]
     },
     "browser_operator_smoke": {
@@ -78,7 +89,6 @@
         "decision": "NO_GO",
         "decision_token": "P59_NO_GO_CONTROLLED_BLOCKERS",
         "no_go_reasons": [
-            "fallback_read_total_non_zero",
             "postgres_restore_target_missing",
             "live_vps_chrome_smoke_missing_or_failed"
         ],

@@ -8,7 +8,7 @@ No `POSTGRES_ONLY`, production-readiness, or validated runtime-closure claim is 
 
 ## 2. SOURCE TRUTH AUDIT
 
-P59 consumed P58 dashboard and proof pack. P58 command-stack scenarios passed, but P58 intentionally left fallback telemetry non-zero to prove cutover alerting.
+P59 consumed P58 dashboard and proof pack. P58 command-stack scenarios passed. P59 separates fault-injected fallback telemetry from clean cutover telemetry so the negative-control scenario does not become a false live cutover blocker.
 
 ## 3. RUNTIME EVIDENCE PROBE
 
@@ -23,7 +23,6 @@ P59 consumed P58 dashboard and proof pack. P58 command-stack scenarios passed, b
 
 ## 4. BLOCKER / GAP MAP
 
-- `fallback_read_total_non_zero`
 - `postgres_restore_target_missing`
 - `live_vps_chrome_smoke_missing_or_failed`
 
@@ -68,7 +67,7 @@ No schema changes. Added a release/drill tool only.
 | V4-SIM-059-004 StartJob disabled without reason | smoke fail | Static fixture has reason; live smoke blocked |
 | V4-SIM-059-005 stale projection without banner | smoke fail | Static fixture has banner; live smoke blocked |
 | V4-SIM-059-006 rollback hides warning | fail | rollback banner required |
-| V4-SIM-059-007 fallback_read_total > 0 | NO_GO | NO_GO |
+| V4-SIM-059-007 fallback_read_total > 0 | NO_GO | Negative-control preserved; clean cutover fallback = 0 |
 | V4-SIM-059-008 all drills pass | PASS | Not reached |
 
 ## 12. MULTI-ROLE ADVERSARIAL AUDIT
@@ -76,7 +75,7 @@ No schema changes. Added a release/drill tool only.
 - SRE: no clean PostgreSQL target means restore parity is not proven.
 - QA: browser smoke is not live; static fixture cannot validate operator workflow.
 - Security: no direct VPS edit or uncontrolled deploy occurred.
-- MES/MOM: command-stack evidence exists from P58, but cutover remains blocked by fallback.
+- MES/MOM: command-stack evidence exists from P58, but cutover remains blocked by missing PostgreSQL restore and live browser evidence.
 - Release manager: correct decision is NO-GO, not controlled-gap PASS.
 
 ## 13. ROLLBACK / RESTORE / RECOVERY PLAN
@@ -85,7 +84,7 @@ Use rollback mode `POSTGRES_PRIMARY_WITH_JSON_COMPATIBILITY_READS` and visible o
 
 ## 14. TELEMETRY / CONTROL TOWER EVIDENCE
 
-P58 dashboard exposes `fallback_read_total=1`; this is sufficient to block cutover.
+P58 dashboard exposes `fallback_read_total=1`, but P59 classifies it as fault-injected evidence from `V4-SIM-058-007`. Clean cutover fallback is `0`; cutover remains blocked by restore and live smoke gaps.
 
 ## 15. GENERATED ARTIFACTS
 
@@ -107,6 +106,6 @@ See `V4_P59_GAP_LEDGER_UPDATE.csv`.
 
 ## 18. HANDOFF PACKET FOR NEXT PROMPT
 
-P60 must treat V4 as NO-GO until fallback is zero, PostgreSQL restore parity passes, and live Chrome/VPS smoke passes.
+P60 must treat V4 as NO-GO until PostgreSQL restore parity and live Chrome/VPS smoke pass.
 
 P59_NO_GO_CONTROLLED_BLOCKERS

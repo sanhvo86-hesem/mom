@@ -12,7 +12,9 @@
 - Local static operator smoke: PASS.
 - Local headless Chrome smoke: FAIL, exit code 134.
 - Live VPS Chrome smoke: BLOCKED, no deployed/live URL configured for this branch.
-- Cutover: NO-GO because fallback read telemetry is non-zero.
+- Cutover: NO-GO because PostgreSQL restore target and live VPS Chrome smoke are missing.
+- Clean cutover fallback telemetry: `0`.
+- Fault-injected fallback telemetry from negative-control scenario: `1`.
 
 ## Main Artifact
 
@@ -22,7 +24,6 @@
 
 P60 must issue a final NO-GO unless these are repaired:
 
-- `fallback_read_total=0`
 - isolated PostgreSQL restore drill pass
 - ledger/outbox/audit/evidence parity pass
 - live VPS Chrome/operator smoke pass

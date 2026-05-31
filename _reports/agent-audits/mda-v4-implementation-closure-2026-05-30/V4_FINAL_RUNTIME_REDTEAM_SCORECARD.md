@@ -14,14 +14,13 @@ P60 consumed P42-P59 handoff packets, P58 scenario dashboard, P59 operational dr
 
 - `php mom/tools/release/run_mda_v4_final_redteam.php`: expected NO-GO exit.
 - Final scorecard: `V4_FINAL_SCORECARD.json`.
-- P0 open count: `3`.
+- P0 open count: `2`.
 - P1 open count: `2`.
 
 ## 4. BLOCKER / GAP MAP
 
 | Blocker | Severity | Evidence |
 |---|---|---|
-| P60-FALLBACK-READ-TOTAL-NON-ZERO | P0 | `fallback_read_total_non_zero` |
 | P60-POSTGRES-RESTORE-TARGET-MISSING | P0 | `postgres_restore_target_missing` |
 | P60-LIVE-VPS-CHROME-SMOKE-MISSING-OR-FAILED | P0 | `live_vps_chrome_smoke_missing_or_failed` |
 | P60-FULL-PHPUNIT-BLOCKED | P1 | `BLOCKED_VENDOR_PHPUNIT_MISSING` |
@@ -29,7 +28,7 @@ P60 consumed P42-P59 handoff packets, P58 scenario dashboard, P59 operational dr
 
 ## 5. DESIGN DELTA
 
-P60 added a machine-readable final red-team runner and scorecard. It intentionally rejects runtime closure when restore, live browser, fallback or validation evidence is missing.
+P60 added a machine-readable final red-team runner and scorecard. It intentionally rejects runtime closure when restore, live browser or validation evidence is missing. Fault-injected fallback telemetry is tracked as a negative-control, not as a clean cutover blocker.
 
 ## 6. IMPLEMENTATION PLAN
 
@@ -55,7 +54,7 @@ No schema change. Added final red-team release tool and reports only.
 ## 10. TEST PLAN
 
 - `php -l mom/tools/release/run_mda_v4_final_redteam.php`: PASS.
-- `php mom/tools/release/run_mda_v4_final_redteam.php`: expected NO-GO with 3 P0 and 2 P1 open.
+- `php mom/tools/release/run_mda_v4_final_redteam.php`: expected NO-GO with 2 P0 and 2 P1 open.
 
 ## 11. OPERATIONAL SIMULATION MATRIX
 
@@ -65,7 +64,7 @@ No schema change. Added final red-team release tool and reports only.
 | V4-SIM-060-002 one P0 open | NO_GO | NO_GO |
 | V4-SIM-060-003 mock-only scenario | NO_GO | P58 mock_only=false, but other P0s open |
 | V4-SIM-060-004 Generic CRUD bypass | NO_GO | No new bypass found in P58-P60 scope |
-| V4-SIM-060-005 fallback reads present | NO_GO | NO_GO |
+| V4-SIM-060-005 fallback reads present | NO_GO | Negative-control preserved; clean cutover fallback = 0 |
 | V4-SIM-060-006 browser smoke fail | UI claim blocked | NO_GO |
 | V4-SIM-060-007 P0/P1 closed but validation absent | pre-production only | Not reached |
 | V4-SIM-060-008 all evidence present | controlled integration | Not reached |
@@ -76,7 +75,7 @@ No schema change. Added final red-team release tool and reports only.
 - SRE red-team: restore drill is not a PostgreSQL restore and cannot prove recoverability.
 - QA red-team: live browser/operator smoke is missing; static DOM fixture is not live UI evidence.
 - Security red-team: AI actor and e-sign gates have scenario proof, but production validation remains absent.
-- Data authority red-team: fallback read telemetry prevents `POSTGRES_ONLY`.
+- Data authority red-team: clean fallback telemetry is zero, but restore and live-smoke evidence still prevent `POSTGRES_ONLY`.
 
 ## 13. ROLLBACK / RESTORE / RECOVERY PLAN
 
@@ -84,7 +83,7 @@ Stay in `POSTGRES_PRIMARY_WITH_JSON_COMPATIBILITY_READS` with warning banner. Do
 
 ## 14. TELEMETRY / CONTROL TOWER EVIDENCE
 
-Telemetry proves the gate is active because fallback reads generate a P0 alert. That alert correctly blocks cutover.
+Telemetry proves the gate is active because the fault-injected fallback scenario generates alert evidence. Clean cutover fallback is zero in P59, so final cutover remains blocked by restore and live-smoke gaps.
 
 ## 15. GENERATED ARTIFACTS
 

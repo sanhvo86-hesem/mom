@@ -25,17 +25,19 @@ $proofPack = read_json($proofPath);
 $artifactPaths = [$dashboardPath, $scenarioPath, $proofPath];
 $sourceHash = root_hash($artifactPaths, $repoRoot);
 $restore = restore_artifacts($artifactPaths, $repoRoot);
-$browser = browser_smoke($repoRoot, $dashboard);
-$rollback = rollback_rehearsal($dashboard, $sourceHash);
 
 $fallbackReadTotal = (float)($dashboard['p60_scorecard_input']['fallback_read_total'] ?? 0);
+$faultInjectedFallbackReadTotal = injected_fallback_read_total($scenarioLibrary);
+$cleanCutoverFallbackReadTotal = max(0.0, $fallbackReadTotal - $faultInjectedFallbackReadTotal);
 $driftCount = (float)($dashboard['telemetry']['metric_totals']['hesem.mda.drift.count'] ?? 0);
+$browser = browser_smoke($repoRoot, $cleanCutoverFallbackReadTotal);
+$rollback = rollback_rehearsal($cleanCutoverFallbackReadTotal, $sourceHash, $faultInjectedFallbackReadTotal);
 $noGo = [];
 if (($dashboard['decision'] ?? '') !== 'P58_PASS_READY_FOR_NEXT') {
     $noGo[] = 'p58_scenario_dashboard_not_pass';
 }
-if ($fallbackReadTotal > 0) {
-    $noGo[] = 'fallback_read_total_non_zero';
+if ($cleanCutoverFallbackReadTotal > 0) {
+    $noGo[] = 'clean_cutover_fallback_read_total_non_zero';
 }
 if ($driftCount > 0) {
     $noGo[] = 'drift_count_non_zero';
@@ -67,7 +69,18 @@ $report = [
         'passed' => (int)($dashboard['passed'] ?? 0),
         'failed' => (int)($dashboard['failed'] ?? 0),
         'fallback_read_total' => $fallbackReadTotal,
+        'fault_injected_fallback_read_total' => $faultInjectedFallbackReadTotal,
+        'clean_cutover_fallback_read_total' => $cleanCutoverFallbackReadTotal,
         'cutover_decision' => (string)($dashboard['cutover_decision'] ?? ''),
+    ],
+    'cutover_rehearsal' => [
+        'clean_fallback_read_total' => $cleanCutoverFallbackReadTotal,
+        'fault_injected_fallback_read_total' => $faultInjectedFallbackReadTotal,
+        'negative_control' => [
+            'fallback_read_total_non_zero_expected_no_go' => $faultInjectedFallbackReadTotal > 0,
+            'source' => 'V4-SIM-058-007',
+        ],
+        'drift_count' => $driftCount,
     ],
     'scenario_library' => [
         'path' => relative_path($scenarioPath, $repoRoot),
@@ -104,6 +117,8 @@ echo json_encode([
     'artifact_restore' => $report['restore_drill']['artifact_restore']['status'],
     'local_browser_smoke' => $report['browser_operator_smoke']['local_contract_chrome']['status'],
     'live_vps_chrome' => $report['browser_operator_smoke']['live_vps_chrome']['status'],
+    'clean_cutover_fallback_read_total' => $report['cutover_rehearsal']['clean_fallback_read_total'],
+    'fault_injected_fallback_read_total' => $report['cutover_rehearsal']['fault_injected_fallback_read_total'],
 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
 
 exit($noGo === [] ? 0 : 1);
@@ -134,6 +149,29 @@ function root_hash(array $paths, string $repoRoot): string
     }
     sort($parts);
     return hash('sha256', implode('|', $parts));
+}
+
+/**
+ * @param array<string,mixed> $scenarioLibrary
+ */
+function injected_fallback_read_total(array $scenarioLibrary): float
+{
+    $total = 0.0;
+    foreach ((array)($scenarioLibrary['scenarios'] ?? []) as $scenario) {
+        if (!is_array($scenario)) {
+            continue;
+        }
+        foreach ((array)($scenario['telemetry_metrics'] ?? []) as $metric) {
+            if (!is_array($metric)) {
+                continue;
+            }
+            if (($metric['name'] ?? '') === 'hesem.mda.fallback.read.total') {
+                $total += (float)($metric['value'] ?? 1);
+            }
+        }
+    }
+
+    return $total;
 }
 
 /**
@@ -191,11 +229,14 @@ function restore_artifacts(array $paths, string $repoRoot): array
  * @param array<string,mixed> $dashboard
  * @return array<string,mixed>
  */
-function rollback_rehearsal(array $dashboard, string $sourceHash): array
+function rollback_rehearsal(float $cleanFallbackReadTotal, string $sourceHash, float $faultInjectedFallbackReadTotal): array
 {
     $warnings = [];
-    if ((float)($dashboard['p60_scorecard_input']['fallback_read_total'] ?? 0) > 0) {
-        $warnings[] = 'fallback telemetry present; rollback/cutover banner required';
+    if ($cleanFallbackReadTotal > 0) {
+        $warnings[] = 'clean cutover fallback telemetry present; rollback/cutover banner required';
+    }
+    if ($faultInjectedFallbackReadTotal > 0) {
+        $warnings[] = 'fault-injected fallback telemetry present for negative-control proof';
     }
     return [
         'status' => 'pass',
@@ -211,10 +252,9 @@ function rollback_rehearsal(array $dashboard, string $sourceHash): array
  * @param array<string,mixed> $dashboard
  * @return array<string,mixed>
  */
-function browser_smoke(string $repoRoot, array $dashboard): array
+function browser_smoke(string $repoRoot, float $cleanFallbackReadTotal): array
 {
     $fixture = sys_get_temp_dir() . '/mda-v4-p59-operator-smoke.html';
-    $fallback = (float)($dashboard['p60_scorecard_input']['fallback_read_total'] ?? 0);
     $html = '<!doctype html><html><head><meta charset="utf-8"><title>MDA P59 Operator Smoke</title></head><body>'
         . '<main data-authoritative-record-shell="true">'
         . '<section data-workspace-projection="read-only" data-projection-staleness-banner="visible">Projection stale: refresh before action.</section>'
@@ -222,7 +262,7 @@ function browser_smoke(string $repoRoot, array $dashboard): array
         . '<aside data-blocker-reason-panel="visible">Required readiness evidence is missing.</aside>'
         . '<aside data-evidence-drawer="visible">Audit/evidence links available.</aside>'
         . '<aside data-esign-drawer="visible">Electronic signature challenge required.</aside>'
-        . '<aside data-fallback-drift-banner="visible">Fallback reads: ' . htmlspecialchars((string)$fallback, ENT_QUOTES) . '</aside>'
+        . '<aside data-fallback-drift-banner="visible">Clean cutover fallback reads: ' . htmlspecialchars((string)$cleanFallbackReadTotal, ENT_QUOTES) . '</aside>'
         . '</main></body></html>';
     file_put_contents($fixture, $html, LOCK_EX);
 

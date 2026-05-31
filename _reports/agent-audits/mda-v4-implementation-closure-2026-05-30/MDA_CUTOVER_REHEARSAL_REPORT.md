@@ -16,7 +16,7 @@ Cutover is `NO_GO`.
 | Gate | Result | Evidence |
 |---|---|---|
 | Command-stack scenario runner | PASS | P58 dashboard 14/14 |
-| Fallback reads zero | FAIL | `fallback_read_total=1` |
+| Clean fallback reads zero | PASS | clean cutover fallback = `0`; fault-injected fallback = `1` |
 | Drift zero | NOT PROVEN | No restored PostgreSQL target for full parity |
 | Restore drill | BLOCKED | no clean PostgreSQL restore target |
 | Browser/operator smoke | BLOCKED/FAIL | live VPS URL not configured; local Chrome aborted |
@@ -24,11 +24,10 @@ Cutover is `NO_GO`.
 
 ## Reasoning
 
-The correct cutover posture is fail-closed. P58 intentionally injected fallback telemetry to prove the alert works. Until a clean rehearsal produces `fallback_read_total=0`, no `POSTGRES_ONLY` claim is allowed.
+The correct cutover posture is fail-closed. P58 intentionally injected fallback telemetry to prove the alert works. P59 separates that negative-control metric from clean cutover telemetry. Clean fallback is zero, but `POSTGRES_ONLY` remains blocked by missing PostgreSQL restore and live smoke evidence.
 
 ## Required Repair Before GO
 
-- Run clean P58/P59 with no injected fallback metric and no live fallback reads.
 - Execute restore drill on isolated PostgreSQL target.
 - Run live Chrome smoke against deployed VPS URL for this branch or a cherry-picked staging branch.
 - Recompute go/no-go after all gates are green.

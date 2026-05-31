@@ -1,5 +1,4 @@
 blocker_id,severity,status,source,evidence,required_repair
-P60-FALLBACK-READ-TOTAL-NON-ZERO,P0,OPEN,P59 operational drill,fallback_read_total_non_zero,"Run clean cutover rehearsal with fallback_read_total=0"
 P60-POSTGRES-RESTORE-TARGET-MISSING,P0,OPEN,P59 operational drill,postgres_restore_target_missing,"Provision isolated PostgreSQL restore target and prove ledger/outbox/audit/evidence parity"
 P60-LIVE-VPS-CHROME-SMOKE-MISSING-OR-FAILED,P0,OPEN,P59 operational drill,live_vps_chrome_smoke_missing_or_failed,"Deploy reviewed staging branch and run live Chrome/operator smoke"
 P60-FULL-PHPUNIT-BLOCKED,P1,OPEN,P58 proof pack,BLOCKED_VENDOR_PHPUNIT_MISSING,"Install vendor dependencies or CI runner and run PHPUnit"

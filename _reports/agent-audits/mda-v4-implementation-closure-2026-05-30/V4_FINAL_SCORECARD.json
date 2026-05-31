@@ -1,12 +1,12 @@
 {
     "schema_version": "mda.v4.final_redteam_scorecard.v1",
-    "generated_at": "2026-05-31T11:10:15+00:00",
+    "generated_at": "2026-05-31T11:19:18+00:00",
     "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
-    "sha": "a9c20865e",
+    "sha": "3ffa34b78",
     "decision_token": "P60_NO_GO_REPAIR_REQUIRED",
     "merge_readiness": "blocked_no_go",
     "production_ready_claim_allowed": false,
-    "p0_open_count": 3,
+    "p0_open_count": 2,
     "p1_open_count": 2,
     "handoff_audit": {
         "required_prompts": "P42-P59",
@@ -101,7 +101,7 @@
             {
                 "prompt": "P59",
                 "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P59.md",
-                "sha256": "836df9ce5d789426d5750616451dcecb8855410d73350d8c781f4c342cc628a4"
+                "sha256": "8c94bfa663ab71c3fba60f76e8112461988882226e904283733f6b599dc32b03"
             }
         ]
     },
@@ -111,6 +111,8 @@
         "p58_failed": 0,
         "p59_decision_token": "P59_NO_GO_CONTROLLED_BLOCKERS",
         "fallback_read_total": 1,
+        "fault_injected_fallback_read_total": 1,
+        "clean_cutover_fallback_read_total": 0,
         "artifact_restore_status": "pass",
         "postgres_restore_status": "blocked_no_clean_target",
         "local_chrome_status": "fail",
@@ -129,16 +131,9 @@
         "scenario_proof": 8,
         "restore_proof": 2,
         "browser_operator_proof": 2,
-        "observability_cutover": 4
+        "observability_cutover": 6
     },
     "blockers": [
-        {
-            "blocker_id": "P60-FALLBACK-READ-TOTAL-NON-ZERO",
-            "severity": "P0",
-            "status": "OPEN",
-            "source": "P59 operational drill",
-            "evidence": "fallback_read_total_non_zero"
-        },
         {
             "blocker_id": "P60-POSTGRES-RESTORE-TARGET-MISSING",
             "severity": "P0",

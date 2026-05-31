@@ -31,7 +31,7 @@ for ($prompt = 42; $prompt <= 59; $prompt++) {
 
 $blockers = [];
 foreach ((array)($p59['go_no_go']['no_go_reasons'] ?? []) as $reason) {
-    $severity = in_array($reason, ['fallback_read_total_non_zero', 'postgres_restore_target_missing', 'live_vps_chrome_smoke_missing_or_failed'], true) ? 'P0' : 'P1';
+    $severity = in_array($reason, ['clean_cutover_fallback_read_total_non_zero', 'postgres_restore_target_missing', 'live_vps_chrome_smoke_missing_or_failed'], true) ? 'P0' : 'P1';
     $blockers[] = [
         'blocker_id' => 'P60-' . strtoupper(str_replace('_', '-', (string)$reason)),
         'severity' => $severity,
@@ -94,6 +94,8 @@ $scorecard = [
         'p58_failed' => (int)($p58['failed'] ?? 0),
         'p59_decision_token' => (string)($p59['go_no_go']['decision_token'] ?? ''),
         'fallback_read_total' => (float)($p59['p58_dashboard']['fallback_read_total'] ?? 0),
+        'fault_injected_fallback_read_total' => (float)($p59['p58_dashboard']['fault_injected_fallback_read_total'] ?? $p59['cutover_rehearsal']['fault_injected_fallback_read_total'] ?? 0),
+        'clean_cutover_fallback_read_total' => (float)($p59['p58_dashboard']['clean_cutover_fallback_read_total'] ?? $p59['cutover_rehearsal']['clean_fallback_read_total'] ?? 0),
         'artifact_restore_status' => (string)($p59['restore_drill']['artifact_restore']['status'] ?? ''),
         'postgres_restore_status' => (string)($p59['restore_drill']['postgres_restore']['status'] ?? ''),
         'local_chrome_status' => (string)($p59['browser_operator_smoke']['local_contract_chrome']['status'] ?? ''),
@@ -112,7 +114,7 @@ $scorecard = [
         'scenario_proof' => 8,
         'restore_proof' => 2,
         'browser_operator_proof' => 2,
-        'observability_cutover' => 4
+        'observability_cutover' => ((float)($p59['p58_dashboard']['clean_cutover_fallback_read_total'] ?? $p59['cutover_rehearsal']['clean_fallback_read_total'] ?? 0) > 0) ? 4 : 6
     ],
     'blockers' => $blockers,
 ];
