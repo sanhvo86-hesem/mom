@@ -195,7 +195,7 @@ final class CommandRegistry
             'idempotency_scope' => 'quality:hold:apply',
             'openapi_operation' => 'submitDomainCommand',
             'expected_events' => ['QualityHoldApplied'],
-            'implemented' => false,
+            'implemented' => true,
         ],
         'ReleaseQualityHoldCommand' => [
             'root' => 'quality_hold',
@@ -204,7 +204,16 @@ final class CommandRegistry
             'idempotency_scope' => 'quality:hold:release',
             'openapi_operation' => 'submitDomainCommand',
             'expected_events' => ['QualityHoldReleased'],
-            'implemented' => false,
+            'implemented' => true,
+        ],
+        'RecordMrbDispositionCommand' => [
+            'root' => 'material_review_board',
+            'permission' => 'quality.mrb.disposition',
+            'regulated_action' => true,
+            'idempotency_scope' => 'quality:mrb:disposition',
+            'openapi_operation' => 'submitDomainCommand',
+            'expected_events' => ['MrbDispositionRecorded'],
+            'implemented' => true,
         ],
         'PostInventoryLedgerTransactionCommand' => [
             'root' => 'inventory_ledger',

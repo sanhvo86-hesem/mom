@@ -23,6 +23,7 @@ final class DomainCommandGateway
         private readonly ?RegulatedCommandEvidenceSpine $regulatedEvidence = null,
         private readonly ?MesRuntimeCommandHandler $mesRuntime = null,
         private readonly ?UomCommandQuantityNormalizer $uomNormalizer = null,
+        private readonly ?QualityHoldService $qualityHolds = null,
     ) {}
 
     /**
@@ -145,7 +146,8 @@ final class DomainCommandGateway
     private function executeHandler(string $commandName, array $payload): array
     {
         $engineering = $this->engineeringPackages ?? new EngineeringReleasePackageCommandHandler($this->db);
-        $mesRuntime = $this->mesRuntime ?? new MesRuntimeCommandHandler($this->db, null, $this->uomNormalizer);
+        $qualityHolds = $this->qualityHolds ?? new QualityHoldService($this->db);
+        $mesRuntime = $this->mesRuntime ?? new MesRuntimeCommandHandler($this->db, null, $this->uomNormalizer, $qualityHolds);
 
         try {
             return match ($commandName) {
@@ -165,6 +167,9 @@ final class DomainCommandGateway
                 'LoadToolCommand' => $mesRuntime->loadTool($payload),
                 'RecordInspectionResultCommand' => $mesRuntime->recordInspectionResult($payload),
                 'CompleteOperationCommand' => $mesRuntime->completeOperation($payload),
+                'ApplyQualityHoldCommand' => $qualityHolds->applyHold($payload),
+                'ReleaseQualityHoldCommand' => $qualityHolds->releaseHold($payload),
+                'RecordMrbDispositionCommand' => $qualityHolds->recordMrbDisposition($payload),
                 default => throw new DomainCommandException('command_handler_missing', "Command '{$commandName}' has no executable handler.", 501),
             };
         } catch (EngineeringReleasePackageException $e) {

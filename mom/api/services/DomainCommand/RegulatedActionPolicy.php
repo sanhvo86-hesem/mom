@@ -126,6 +126,12 @@ final class RegulatedActionPolicy
             'signature_required' => true,
             'allowed_signature_meanings' => ['quality_hold_release'],
         ],
+        'RecordMrbDispositionCommand' => [
+            'root' => 'material_review_board',
+            'risk_class' => 'critical',
+            'signature_required' => true,
+            'allowed_signature_meanings' => ['mrb_disposition'],
+        ],
         'PostInventoryLedgerTransactionCommand' => [
             'root' => 'inventory_ledger',
             'risk_class' => 'critical',

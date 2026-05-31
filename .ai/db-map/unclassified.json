@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 840,
-        "generated_at": "2026-06-01T03:28:13+00:00"
+        "table_count": 849,
+        "generated_at": "2026-06-01T03:28:55+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -7018,6 +7018,26 @@
             ],
             "contract": null
         },
+        "mrb_disposition_runtime": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "disposition_id",
+            "foreign_keys": [
+                {
+                    "col": "ncr_id",
+                    "ref": "quality_nonconformance_runtime(ncr_id)"
+                },
+                {
+                    "col": "hold_id",
+                    "ref": "quality_hold(hold_id)"
+                },
+                {
+                    "col": "signature_event_id",
+                    "ref": "signature_events(signature_event_id)"
+                }
+            ],
+            "contract": null
+        },
         "mrp_signal": {
             "defined_in": "075_canonical_planning_erp_orchestration.sql",
             "extended_in": [
@@ -9199,6 +9219,87 @@
             ],
             "contract": null
         },
+        "quality_case_trace_link": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "trace_link_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "quality_hold": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "hold_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "quality_hold_release": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "release_id",
+            "foreign_keys": [
+                {
+                    "col": "hold_id",
+                    "ref": "quality_hold(hold_id)"
+                },
+                {
+                    "col": "signature_event_id",
+                    "ref": "signature_events(signature_event_id)"
+                }
+            ],
+            "contract": null
+        },
+        "quality_hold_source": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "hold_source_id",
+            "foreign_keys": [
+                {
+                    "col": "hold_id",
+                    "ref": "quality_hold(hold_id)"
+                }
+            ],
+            "contract": null
+        },
+        "quality_hold_subject": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "hold_subject_id",
+            "foreign_keys": [
+                {
+                    "col": "hold_id",
+                    "ref": "quality_hold(hold_id)"
+                }
+            ],
+            "contract": null
+        },
+        "quality_inspection_result_runtime": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "result_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "quality_nonconformance_runtime": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "ncr_id",
+            "foreign_keys": [
+                {
+                    "col": "quality_order_id",
+                    "ref": "quality_order_runtime(quality_order_id)"
+                },
+                {
+                    "col": "hold_id",
+                    "ref": "quality_hold(hold_id)"
+                },
+                {
+                    "col": "source_result_id",
+                    "ref": "quality_inspection_result_runtime(result_id)"
+                }
+            ],
+            "contract": null
+        },
         "quality_order": {
             "defined_in": "078_canonical_eqms_compliance_backbone.sql",
             "extended_in": [
@@ -9209,6 +9310,18 @@
                 {
                     "col": "owner_party_id",
                     "ref": "party(party_id)"
+                }
+            ],
+            "contract": null
+        },
+        "quality_order_runtime": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "quality_order_id",
+            "foreign_keys": [
+                {
+                    "col": "source_result_id",
+                    "ref": "quality_inspection_result_runtime(result_id)"
                 }
             ],
             "contract": null

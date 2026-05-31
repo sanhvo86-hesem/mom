@@ -13,6 +13,7 @@ final class MesRuntimeCommandHandler
         private readonly Connection $db,
         private readonly ?ResourceReadinessService $readiness = null,
         private readonly ?UomCommandQuantityNormalizer $uomNormalizer = null,
+        private readonly ?QualityHoldService $qualityHolds = null,
     ) {}
 
     /**
@@ -21,6 +22,7 @@ final class MesRuntimeCommandHandler
      */
     public function startJob(array $command): array
     {
+        $this->qualityHolds()->assertNoActiveHoldsForCommand('StartJobCommand', $command, $this->actor($command));
         $readiness = $this->readiness($command, 'StartJobCommand');
         $jobNumber = $this->requiredAny($command, ['job_number', 'work_order_ref', 'wo_number'], 'job_number');
         $operationSeq = (int)$this->requiredAny($command, ['operation_seq', 'operation_ref'], 'operation_seq');
@@ -69,6 +71,7 @@ final class MesRuntimeCommandHandler
 
     public function issueMaterial(array $command): array
     {
+        $this->qualityHolds()->assertNoActiveHoldsForCommand('IssueMaterialToWorkOrderCommand', $command, $this->actor($command));
         $uomPayload = $command;
         if (!isset($uomPayload['issue_quantity']) && isset($uomPayload['qty_consumed'])) {
             $uomPayload['issue_quantity'] = $uomPayload['qty_consumed'];
@@ -115,6 +118,7 @@ final class MesRuntimeCommandHandler
 
     public function loadTool(array $command): array
     {
+        $this->qualityHolds()->assertNoActiveHoldsForCommand('LoadToolCommand', $command, $this->actor($command));
         $readiness = $this->readiness($command, 'LoadToolCommand');
         $toolId = $this->requiredAny($command, ['tool_id', 'tool_ref'], 'tool_id');
         $equipmentId = $this->requiredAny($command, ['equipment_id', 'machine_ref'], 'equipment_id');
@@ -149,14 +153,22 @@ final class MesRuntimeCommandHandler
         $readiness = $this->readiness($command, 'RecordInspectionResultCommand');
         $inspectionId = $this->requiredAny($command, ['inspection_id', 'inspection_result_id', 'characteristic_ref'], 'inspection_id');
         $commandWithUom = $this->withUomEvidence($command, [$uomMeasurement]);
+        $qualityChain = $this->qualityHolds()->recordInspectionResult($commandWithUom, $uomMeasurement);
         $event = $this->writeOperationalEvent('quality.inspection', 'quality', 'inspection_result_recorded', $commandWithUom, $readiness);
         $this->writeAuditAndOutbox('quality.inspection_result_recorded', $inspectionId, $commandWithUom, $event, $readiness);
 
-        return ['inspection_id' => $inspectionId, 'event_id' => $event['event_id'] ?? '', 'readiness' => $readiness, 'uom' => $uomMeasurement];
+        return [
+            'inspection_id' => $inspectionId,
+            'event_id' => $event['event_id'] ?? '',
+            'readiness' => $readiness,
+            'uom' => $uomMeasurement,
+            'quality_chain' => $qualityChain,
+        ];
     }
 
     public function completeOperation(array $command): array
     {
+        $this->qualityHolds()->assertNoActiveHoldsForCommand('CompleteOperationCommand', $command, $this->actor($command));
         $goodPayload = $command;
         if (!isset($goodPayload['completed_quantity']) && isset($goodPayload['qty_good'])) {
             $goodPayload['completed_quantity'] = $goodPayload['qty_good'];
@@ -256,6 +268,11 @@ final class MesRuntimeCommandHandler
             $this->actor($command),
             $this->requiredAny($command, ['idempotency_key'], 'idempotency_key')
         );
+    }
+
+    private function qualityHolds(): QualityHoldService
+    {
+        return $this->qualityHolds ?? new QualityHoldService($this->db);
     }
 
     private function writeOperationalEvent(string $eventType, string $category, string $semanticEvent, array $command, array $readiness): array
