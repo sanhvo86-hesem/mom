@@ -31,7 +31,7 @@ permissions:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/codex/') }}
 
 jobs:
   classify:
@@ -52,6 +52,8 @@ jobs:
       needs_doc_health: ${{ steps.classify.outputs.needs_doc_health }}
       needs_raci: ${{ steps.classify.outputs.needs_raci }}
       needs_frontend_safety: ${{ steps.classify.outputs.needs_frontend_safety }}
+      needs_frontend_js_safety: ${{ steps.classify.outputs.needs_frontend_js_safety }}
+      needs_graphics_safety: ${{ steps.classify.outputs.needs_graphics_safety }}
       needs_hmv4_safety: ${{ steps.classify.outputs.needs_hmv4_safety }}
       needs_playwright_e2e: ${{ steps.classify.outputs.needs_playwright_e2e }}
       needs_visual_e2e: ${{ steps.classify.outputs.needs_visual_e2e }}
@@ -347,34 +349,64 @@ jobs:
       - name: ISO reference status
         run: php mom/tools/release/check_iso_reference_status.php
 
-  frontend-safety:
-    name: Frontend Safety
+  frontend-js-safety:
+    name: Frontend JS Safety
     runs-on: ubuntu-latest
     needs: [classify, repo-boundary]
-    if: ${{ always() && !failure() && needs.classify.outputs.needs_frontend_safety == 'true' }}
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_frontend_js_safety == 'true' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.5'
-      - name: Node syntax check for changed portal JavaScript
+      - name: Node syntax check for changed JS/MJS
         run: |
           set -euo pipefail
           cat > /tmp/changed-files <<'EOF'
           ${{ needs.classify.outputs.changed_files }}
           EOF
-          JS_FILES="$(sed 's/^ *//' /tmp/changed-files | grep -E '^(mom/scripts|mom/assets)/.*\.js$|^mom/sw\.js$' || true)"
+          JS_FILES="$(sed 's/^ *//' /tmp/changed-files | grep -E '^(mom/scripts|mom/assets)/.*\.js$|^mom/sw\.js$|^tools/scripts/.*\.(mjs|js)$' || true)"
           if [ -z "$JS_FILES" ]; then
-            echo "No changed JS files require node --check."
+            echo "No changed JS/MJS files require node --check."
           else
             printf '%s\n' "$JS_FILES" | while IFS= read -r f; do
               [ -f "$f" ] || continue
               node --check "$f"
             done
           fi
+      - name: Targeted Blocks L3 smoke
+        run: |
+          set -euo pipefail
+          cat > /tmp/changed-files <<'EOF'
+          ${{ needs.classify.outputs.changed_files }}
+          EOF
+          if sed 's/^ *//' /tmp/changed-files | grep -qxE 'tools/scripts/smoke-blocks-l3-map\.mjs|mom/scripts/portal/00bh-blocks-facade\.js|mom/scripts/portal/00bi-blocks-l3-map\.js'; then
+            node tools/scripts/smoke-blocks-l3-map.mjs
+          else
+            echo "Blocks L3 smoke not relevant for this changeset."
+          fi
+      - name: Lego token generator drift check
+        run: |
+          set -euo pipefail
+          cat > /tmp/changed-files <<'EOF'
+          ${{ needs.classify.outputs.changed_files }}
+          EOF
+          if sed 's/^ *//' /tmp/changed-files | grep -qxE 'tools/scripts/gen-lego-tokens\.mjs|tokens/lego\.tokens\.json|tokens/lego\.tokens\.generated\.json|mom/styles/lego-foundation\.css|mom/styles/lego-shell\.css'; then
+            node tools/scripts/gen-lego-tokens.mjs --check
+          else
+            echo "Lego token generator check not relevant for this changeset."
+          fi
+
+  graphics-safety:
+    name: Graphics Safety
+    runs-on: ubuntu-latest
+    needs: [classify, repo-boundary]
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_graphics_safety == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
       - name: Graphics no-hardcode gate
         run: php mom/tools/release/check_graphics_no_hardcode.php
       - name: Graphics block registry gate
@@ -386,7 +418,7 @@ jobs:
     name: HMV4 Safety
     runs-on: ubuntu-latest
     needs: [classify, repo-boundary]
-    if: ${{ always() && !failure() && (needs.classify.outputs.needs_hmv4_safety == 'true' || (github.event_name == 'pull_request' && (contains(github.event.pull_request.labels.*.name, 'e2e') || contains(github.event.pull_request.labels.*.name, 'full-ci')))) }}
+    if: ${{ always() && !failure() && (needs.classify.outputs.needs_hmv4_safety == 'true' || needs.classify.outputs.needs_playwright_e2e == 'true' || needs.classify.outputs.needs_visual_e2e == 'true' || needs.classify.outputs.needs_full_regression == 'true' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (inputs.full_e2e || inputs.visual_e2e)) || (github.event_name == 'pull_request' && (contains(github.event.pull_request.labels.*.name, 'e2e') || contains(github.event.pull_request.labels.*.name, 'visual') || contains(github.event.pull_request.labels.*.name, 'full-ci')))) }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -566,7 +598,8 @@ jobs:
       - openapi
       - doc-health
       - raci-integrity
-      - frontend-safety
+      - frontend-js-safety
+      - graphics-safety
       - hmv4-safety
       - playwright-e2e
       - hmv4-visual-e2e
@@ -597,6 +630,8 @@ jobs:
           | needs_doc_health | ${{ needs.classify.outputs.needs_doc_health }} |
           | needs_raci | ${{ needs.classify.outputs.needs_raci }} |
           | needs_frontend_safety | ${{ needs.classify.outputs.needs_frontend_safety }} |
+          | needs_frontend_js_safety | ${{ needs.classify.outputs.needs_frontend_js_safety }} |
+          | needs_graphics_safety | ${{ needs.classify.outputs.needs_graphics_safety }} |
           | needs_hmv4_safety | ${{ needs.classify.outputs.needs_hmv4_safety }} |
           | needs_playwright_e2e | ${{ needs.classify.outputs.needs_playwright_e2e }} |
           | needs_visual_e2e | ${{ needs.classify.outputs.needs_visual_e2e }} |
@@ -620,13 +655,47 @@ jobs:
           | openapi | ${{ needs.openapi.result }} |
           | doc-health | ${{ needs.doc-health.result }} |
           | raci-integrity | ${{ needs.raci-integrity.result }} |
-          | frontend-safety | ${{ needs.frontend-safety.result }} |
+          | frontend-js-safety | ${{ needs.frontend-js-safety.result }} |
+          | graphics-safety | ${{ needs.graphics-safety.result }} |
           | hmv4-safety | ${{ needs.hmv4-safety.result }} |
           | playwright-e2e | ${{ needs.playwright-e2e.result }} |
           | hmv4-visual-e2e | ${{ needs.hmv4-visual-e2e.result }} |
           | security-light | ${{ needs.security-light.result }} |
           EOF
 
+          echo
+          echo "Fast lane selected"
+          lane="backend"
+          if [ '${{ needs.classify.outputs.needs_full_regression }}' = 'true' ]; then lane="full"; fi
+          if [ '${{ needs.classify.outputs.needs_doc_health }}' = 'true' ] && [ '${{ needs.classify.outputs.needs_phpstan }}' = 'false' ] && [ '${{ needs.classify.outputs.needs_phpunit }}' = 'false' ]; then lane="docs"; fi
+          if [ '${{ needs.classify.outputs.needs_frontend_safety }}' = 'true' ] && [ '${{ needs.classify.outputs.needs_phpstan }}' = 'false' ] && [ '${{ needs.classify.outputs.needs_phpunit }}' = 'false' ]; then lane="frontend"; fi
+          if [ '${{ needs.classify.outputs.needs_hmv4_safety }}' = 'true' ] || [ '${{ needs.classify.outputs.needs_playwright_e2e }}' = 'true' ]; then lane="hmv4"; fi
+          echo "  ${lane}"
+          echo
+          echo "Heavy gates skipped by design"
+          [ '${{ needs.classify.outputs.needs_phpstan }}' = 'true' ] || echo "  - phpstan"
+          [ '${{ needs.classify.outputs.needs_phpunit }}' = 'true' ] || echo "  - phpunit"
+          [ '${{ needs.classify.outputs.needs_playwright_e2e }}' = 'true' ] || echo "  - playwright-e2e"
+          [ '${{ needs.classify.outputs.needs_doc_health }}' = 'true' ] || echo "  - doc-health"
+          [ '${{ needs.classify.outputs.needs_raci }}' = 'true' ] || echo "  - raci-integrity"
+          [ '${{ needs.classify.outputs.needs_openapi }}' = 'true' ] || echo "  - openapi"
+          echo
+          echo "Playwright decision"
+          if [ '${{ needs.classify.outputs.needs_playwright_e2e }}' = 'true' ]; then
+            echo "  Playwright runs because classifier found HMV4 behavior/E2E scope."
+          elif [ '${{ github.event_name }}' = 'workflow_dispatch' ] && [ '${{ inputs.full_e2e }}' = 'true' ]; then
+            echo "  Playwright runs because workflow_dispatch full_e2e=true."
+          else
+            echo "  Playwright skipped because no functional HMV4/E2E signal was present."
+          fi
+          echo
+          echo "Full regression decision"
+          if [ '${{ needs.classify.outputs.needs_full_regression }}' = 'true' ]; then
+            echo "  Full regression runs: ${{ needs.classify.outputs.full_required_reason }}"
+          else
+            echo "  Full regression skipped: changeset is classified and path-scoped."
+          fi
+          echo
           echo "Note: hmv4-visual-e2e is evidence-only and is reported above without blocking CI summary."
 
           bad=0
@@ -643,7 +712,8 @@ jobs:
             '${{ needs.openapi.result }}' \
             '${{ needs.doc-health.result }}' \
             '${{ needs.raci-integrity.result }}' \
-            '${{ needs.frontend-safety.result }}' \
+            '${{ needs.frontend-js-safety.result }}' \
+            '${{ needs.graphics-safety.result }}' \
             '${{ needs.hmv4-safety.result }}' \
             '${{ needs.playwright-e2e.result }}' \
             '${{ needs.security-light.result }}'; do
