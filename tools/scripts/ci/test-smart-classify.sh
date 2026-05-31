@@ -99,7 +99,8 @@ assert_false needs_kpi_tests
 assert_false needs_full_regression
 
 run_case "03 README-only" "README.md"
-assert_true needs_doc_health
+assert_true needs_doc_light
+assert_false needs_doc_health
 assert_false needs_full_regression
 assert_false needs_phpunit
 assert_false needs_playwright_e2e
@@ -129,6 +130,7 @@ assert_false needs_full_regression
 run_case "07 Frontend shell" $'mom/portal.html\nmom/scripts/portal/00-block-engine.js\nmom/styles/lego-shell.css'
 assert_true needs_frontend_safety
 assert_true needs_frontend_js_safety
+assert_true needs_frontend_static_safety
 assert_true needs_graphics_safety
 assert_false needs_phpstan
 assert_false needs_phpunit
@@ -231,6 +233,7 @@ assert_false needs_playwright_e2e
 
 run_case "20 Token source JSON" "tokens/lego.tokens.json"
 assert_true needs_frontend_safety
+assert_true needs_frontend_js_safety
 assert_true needs_graphics_safety
 assert_false needs_security_light
 assert_false needs_full_regression
@@ -238,6 +241,7 @@ assert_false needs_playwright_e2e
 
 run_case "21 Generated token JSON" "tokens/lego.tokens.generated.json"
 assert_true needs_frontend_safety
+assert_true needs_frontend_js_safety
 assert_true needs_graphics_safety
 assert_false needs_security_light
 assert_false needs_full_regression
@@ -278,6 +282,93 @@ echo "CASE 27 Forced E2E condition audit"
 echo "  PASS workflow_dispatch full_e2e=true is covered by hmv4-safety and Playwright conditions."
 echo "CASE 28 Forced visual condition audit"
 echo "  PASS workflow_dispatch visual_e2e=true is covered by hmv4-safety and visual evidence conditions."
+
+run_case "29 README doc-light" "README.md"
+assert_true needs_doc_light
+assert_false needs_doc_health
+assert_false needs_full_regression
+assert_false needs_phpunit
+assert_false needs_playwright_e2e
+
+run_case "30 Portal HTML only" "mom/portal.html"
+assert_true needs_frontend_static_safety
+assert_false needs_frontend_js_safety
+assert_false needs_playwright_e2e
+assert_false needs_full_regression
+
+run_case "31 Template only" "mom/templates/example.html"
+assert_true needs_frontend_static_safety
+assert_false needs_phpunit
+assert_false needs_playwright_e2e
+assert_false needs_full_regression
+
+run_case "32 Non-design token" "tokens/auth.tokens.json"
+assert_false needs_graphics_safety
+if [[ "$(value_of needs_security_light)" == "true" || "$(value_of needs_full_regression)" == "true" ]]; then
+  echo "  PASS non-design token is not silently design-token safe"
+else
+  fail_assert "expected needs_security_light=true OR needs_full_regression=true for tokens/auth.tokens.json"
+fi
+
+run_case "33 Workflow actionlint pinned" ".github/workflows/ci.yml"
+assert_true needs_actionlint
+assert_true needs_classifier_selftest
+assert_true needs_full_regression
+
+run_case "34 docs README doc-light" "docs/README.md"
+assert_true needs_doc_light
+assert_false needs_full_regression
+
+run_case "35 full docs DCC" "mom/docs/quality/example.html"
+assert_true needs_doc_health
+assert_false needs_doc_light
+
+echo "CASE 36 Visual required policy audit"
+if grep -q "visual_required" "$ROOT/.github/workflows/ci.yml" &&
+  grep -q "visual-required" "$ROOT/.github/workflows/ci.yml" &&
+  grep -q "Visual policy: blocking" "$ROOT/.github/workflows/ci.yml"; then
+  echo "  PASS visual_required workflow/label policy is present."
+else
+  fail_assert "expected visual_required input, visual-required label, and blocking summary policy in ci.yml"
+fi
+
+echo "CASE 37 Parallel dependency audit"
+python3 - "$ROOT/.github/workflows/ci.yml" <<'PY' || FAILED=1
+import re
+import sys
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text()
+
+def block(job):
+    match = re.search(rf"\n  {re.escape(job)}:\n(.*?)(?=\n  [A-Za-z0-9_-]+:\n|\Z)", text, re.S)
+    if not match:
+        print(f"  FAIL missing job {job}")
+        return ""
+    return match.group(1)
+
+bad = []
+for job in (
+    "php-syntax", "phpstan", "phpunit", "kpi-guard", "db-migration-check",
+    "openapi", "doc-health", "doc-light", "raci-integrity",
+    "frontend-js-safety", "frontend-static-safety", "graphics-safety",
+    "security-light", "hmv4-safety",
+):
+    b = block(job)
+    if "repo-boundary" in re.sub(r"\n\s+#.*", "", b.split("steps:", 1)[0]):
+        bad.append(f"{job} still waits on repo-boundary")
+
+summary = block("ci-summary")
+if "repo-boundary" not in summary.split("steps:", 1)[0]:
+    bad.append("ci-summary does not need repo-boundary")
+
+if bad:
+    for item in bad:
+        print("  FAIL", item)
+    sys.exit(1)
+
+print("  PASS independent jobs do not need repo-boundary; ci-summary still does.")
+PY
 
 if [[ "$FAILED" -ne 0 ]]; then
   echo "Smart classifier self-test FAILED"

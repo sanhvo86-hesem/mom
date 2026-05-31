@@ -23,6 +23,11 @@ on:
         required: false
         default: false
         type: boolean
+      visual_required:
+        description: Fail CI Summary if visual evidence fails
+        required: false
+        default: false
+        type: boolean
   schedule:
     - cron: '31 18 * * *'
 
@@ -49,10 +54,12 @@ jobs:
       needs_kpi_tests: ${{ steps.classify.outputs.needs_kpi_tests }}
       needs_db_migration_check: ${{ steps.classify.outputs.needs_db_migration_check }}
       needs_openapi: ${{ steps.classify.outputs.needs_openapi }}
+      needs_doc_light: ${{ steps.classify.outputs.needs_doc_light }}
       needs_doc_health: ${{ steps.classify.outputs.needs_doc_health }}
       needs_raci: ${{ steps.classify.outputs.needs_raci }}
       needs_frontend_safety: ${{ steps.classify.outputs.needs_frontend_safety }}
       needs_frontend_js_safety: ${{ steps.classify.outputs.needs_frontend_js_safety }}
+      needs_frontend_static_safety: ${{ steps.classify.outputs.needs_frontend_static_safety }}
       needs_graphics_safety: ${{ steps.classify.outputs.needs_graphics_safety }}
       needs_hmv4_safety: ${{ steps.classify.outputs.needs_hmv4_safety }}
       needs_playwright_e2e: ${{ steps.classify.outputs.needs_playwright_e2e }}
@@ -80,18 +87,10 @@ jobs:
     if: ${{ always() && !failure() && needs.classify.outputs.needs_actionlint == 'true' }}
     steps:
       - uses: actions/checkout@v4
-      - name: Run actionlint only for changed workflow files
+      - name: Run pinned actionlint for all workflows
         run: |
           set -euo pipefail
-          cat > /tmp/changed-files <<'EOF'
-          ${{ needs.classify.outputs.changed_files }}
-          EOF
-          mapfile -t WORKFLOWS < <(sed 's/^ *//' /tmp/changed-files | grep -E '^\.github/workflows/.*\.ya?ml$' || true)
-          if [ "${#WORKFLOWS[@]}" -eq 0 ]; then
-            echo "No changed workflow files require actionlint."
-            exit 0
-          fi
-          docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest "${WORKFLOWS[@]}"
+          docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.7 .github/workflows/*.yml
 
   classifier-selftest:
     name: Smart Classifier Self-test
@@ -119,7 +118,7 @@ jobs:
   php-syntax:
     name: PHP Syntax Check
     runs-on: ubuntu-latest
-    needs: [classify, repo-boundary]
+    needs: classify
     if: ${{ always() && !failure() && needs.classify.outputs.needs_php_syntax == 'true' }}
     steps:
       - uses: actions/checkout@v4
@@ -132,7 +131,7 @@ jobs:
   phpstan:
     name: Static Analysis PHPStan
     runs-on: ubuntu-latest
-    needs: [classify, repo-boundary]
+    needs: classify
     if: ${{ always() && !failure() && needs.classify.outputs.needs_phpstan == 'true' }}
     steps:
       - uses: actions/checkout@v4
@@ -167,7 +166,7 @@ jobs:
   phpunit:
     name: PHPUnit Tests
     runs-on: ubuntu-latest
-    needs: [classify, repo-boundary]
+    needs: classify
     if: ${{ always() && !failure() && needs.classify.outputs.needs_phpunit == 'true' }}
     services:
       postgres:
@@ -229,7 +228,7 @@ jobs:
   kpi-guard:
     name: KPI Guard
     runs-on: ubuntu-latest
-    needs: [classify, repo-boundary]
+    needs: classify
     if: ${{ always() && !failure() && needs.classify.outputs.needs_kpi_tests == 'true' }}
     steps:
       - uses: actions/checkout@v4
@@ -244,7 +243,7 @@ jobs:
   db-migration-check:
     name: DB Migration Check
     runs-on: ubuntu-latest
-    needs: [classify, repo-boundary]
+    needs: classify
     if: ${{ always() && !failure() && needs.classify.outputs.needs_db_migration_check == 'true' }}
     steps:
       - uses: actions/checkout@v4
@@ -279,7 +278,7 @@ jobs:
   openapi:
     name: OpenAPI Validation
     runs-on: ubuntu-latest
-    needs: [classify, repo-boundary]
+    needs: classify
     if: ${{ always() && !failure() && needs.classify.outputs.needs_openapi == 'true' }}
     steps:
       - uses: actions/checkout@v4
@@ -294,7 +293,7 @@ jobs:
   doc-health:
     name: Doc Health
     runs-on: ubuntu-latest
-    needs: [classify, repo-boundary]
+    needs: classify
     if: ${{ always() && !failure() && needs.classify.outputs.needs_doc_health == 'true' }}
     steps:
       - uses: actions/checkout@v4
@@ -320,10 +319,80 @@ jobs:
             exit 1
           fi
 
+  doc-light:
+    name: Doc Light
+    runs-on: ubuntu-latest
+    needs: classify
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_doc_light == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lightweight markdown sanity
+        run: |
+          set -euo pipefail
+          cat > /tmp/changed-files <<'EOF'
+          ${{ needs.classify.outputs.changed_files }}
+          EOF
+          python3 - <<'PY'
+          import os
+          import re
+          import sys
+          from pathlib import Path
+
+          changed = [line.strip() for line in Path('/tmp/changed-files').read_text().splitlines() if line.strip()]
+          docs = [
+              p for p in changed
+              if p == 'LICENSE'
+              or re.match(r'^[^/]+\.md$', p)
+              or re.match(r'^docs/.*\.md$', p)
+          ]
+          if not docs:
+              print('No lightweight markdown files in this changeset.')
+              sys.exit(0)
+
+          conflict = re.compile(r'^(<<<<<<<|=======|>>>>>>>)', re.M)
+          link = re.compile(r'(?<!!)\[[^\]]+\]\(([^)]+)\)')
+          bad = []
+          for rel in docs:
+              path = Path(rel)
+              if not path.exists():
+                  bad.append(f'{rel}: file is missing')
+                  continue
+              text = path.read_text(encoding='utf-8', errors='ignore')
+              if conflict.search(text):
+                  bad.append(f'{rel}: unresolved conflict marker')
+              if re.search(r'\b(TBD|TODO_PLACEHOLDER|FIXME_PLACEHOLDER)\b', text):
+                  bad.append(f'{rel}: forbidden placeholder token')
+              base = path.parent
+              for target in link.findall(text):
+                  target = target.strip()
+                  if (
+                      not target or target.startswith(('#', 'http://', 'https://', 'mailto:', 'tel:', 'data:'))
+                      or target.startswith('<')
+                  ):
+                      continue
+                  clean = target.split('#', 1)[0].split('?', 1)[0]
+                  if not clean:
+                      continue
+                  candidate = (base / clean).resolve()
+                  root = Path.cwd().resolve()
+                  try:
+                      candidate.relative_to(root)
+                  except ValueError:
+                      continue
+                  if not candidate.exists():
+                      bad.append(f'{rel}: broken relative markdown link -> {target}')
+
+          if bad:
+              print('Doc light failed:')
+              print('\n'.join('  - ' + item for item in bad))
+              sys.exit(1)
+          print(f'Doc light clean ({len(docs)} file(s)).')
+          PY
+
   raci-integrity:
     name: RACI Integrity
     runs-on: ubuntu-latest
-    needs: [classify, repo-boundary]
+    needs: classify
     if: ${{ always() && !failure() && needs.classify.outputs.needs_raci == 'true' }}
     steps:
       - uses: actions/checkout@v4
@@ -352,7 +421,7 @@ jobs:
   frontend-js-safety:
     name: Frontend JS Safety
     runs-on: ubuntu-latest
-    needs: [classify, repo-boundary]
+    needs: classify
     if: ${{ always() && !failure() && needs.classify.outputs.needs_frontend_js_safety == 'true' }}
     steps:
       - uses: actions/checkout@v4
@@ -397,10 +466,143 @@ jobs:
             echo "Lego token generator check not relevant for this changeset."
           fi
 
+  frontend-static-safety:
+    name: Frontend Static Safety
+    runs-on: ubuntu-latest
+    needs: classify
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_frontend_static_safety == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Static HTML/template sanity
+        run: |
+          set -euo pipefail
+          cat > /tmp/changed-files <<'EOF'
+          ${{ needs.classify.outputs.changed_files }}
+          EOF
+          python3 - <<'PY'
+          import os
+          import re
+          import sys
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urlparse
+
+          changed = [line.strip() for line in Path('/tmp/changed-files').read_text().splitlines() if line.strip()]
+          targets = [
+              p for p in changed
+              if p in ('mom/portal.html', 'mom/index.html')
+              or p.startswith('mom/templates/')
+              or (p.startswith('mom/assets/') and p.endswith('.html'))
+          ]
+          if not targets:
+              print('No static HTML/template files in this changeset.')
+              sys.exit(0)
+
+          class RefParser(HTMLParser):
+              def __init__(self):
+                  super().__init__(convert_charrefs=True)
+                  self.scripts = []
+                  self.refs = []
+                  self.errors = []
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  if tag == 'script' and attrs.get('src'):
+                      self.scripts.append(attrs['src'])
+                  for attr in ('href', 'src', 'action'):
+                      if attrs.get(attr):
+                          self.refs.append((tag, attr, attrs[attr]))
+              def error(self, message):
+                  self.errors.append(message)
+
+          fixture_rx = re.compile(r'74-module-template-v4-fixtures|fixture-only', re.I)
+          conflict_rx = re.compile(r'^(<<<<<<<|=======|>>>>>>>)', re.M)
+          critical_portal_scripts = {
+              '00-version-check.js',
+              '00a-registry-service.js',
+              '00bb-graphics-authority.js',
+              '01-module-router.js',
+              '02-state-auth-ui.js',
+              '31-module-builder.js',
+              '99-bootstrap.js',
+          }
+          bad = []
+
+          def local_asset_exists(owner: Path, ref: str) -> bool:
+              if not ref or ref.startswith(('#', 'mailto:', 'tel:', 'javascript:', 'data:', 'blob:')):
+                  return True
+              parsed = urlparse(ref)
+              if parsed.scheme or parsed.netloc:
+                  return True
+              clean = parsed.path
+              if not clean:
+                  return True
+              if clean.startswith('/mom/'):
+                  candidate = Path('mom') / clean.removeprefix('/mom/')
+              elif clean.startswith('/styles/'):
+                  candidate = Path('mom') / clean.removeprefix('/')
+              elif clean.startswith('/scripts/'):
+                  candidate = Path('mom') / clean.removeprefix('/')
+              elif clean.startswith('/assets/'):
+                  candidate = Path('mom') / clean.removeprefix('/')
+              elif clean.startswith('/') and not Path(clean).suffix:
+                  return True
+              elif clean.startswith('../'):
+                  return True
+              elif not Path(clean).suffix:
+                  return True
+              else:
+                  candidate = owner.parent / clean
+              return candidate.exists()
+
+          for rel in targets:
+              path = Path(rel)
+              if not path.exists():
+                  bad.append(f'{rel}: file is missing')
+                  continue
+              text = path.read_text(encoding='utf-8-sig', errors='ignore')
+              if conflict_rx.search(text):
+                  bad.append(f'{rel}: unresolved conflict marker')
+              if fixture_rx.search(text):
+                  bad.append(f'{rel}: fixture-only script/load detected')
+
+              parser = RefParser()
+              try:
+                  parser.feed(text)
+                  parser.close()
+              except Exception as exc:
+                  bad.append(f'{rel}: HTML parse failed: {exc}')
+
+              scripts = [src.split('?', 1)[0].split('#', 1)[0] for src in parser.scripts]
+              seen = {}
+              for src in scripts:
+                  seen[src] = seen.get(src, 0) + 1
+              for src, count in sorted(seen.items()):
+                  if count > 1 and ('scripts/portal/' in src or src.endswith('.js')):
+                      bad.append(f'{rel}: duplicate script src {src}')
+
+              if rel == 'mom/portal.html':
+                  basenames = {Path(src).name for src in scripts}
+                  missing = sorted(critical_portal_scripts - basenames)
+                  if missing:
+                      bad.append(f'{rel}: missing critical portal script(s): {", ".join(missing)}')
+
+              for tag, attr, ref in parser.refs:
+                  if not local_asset_exists(path, ref):
+                      bad.append(f'{rel}: missing local {tag} {attr} target {ref}')
+
+          if bad:
+              print('Frontend static safety failed:')
+              print('\n'.join('  - ' + item for item in bad))
+              sys.exit(1)
+          print(f'Frontend static safety clean ({len(targets)} file(s)).')
+          PY
+
   graphics-safety:
     name: Graphics Safety
     runs-on: ubuntu-latest
-    needs: [classify, repo-boundary]
+    needs: classify
     if: ${{ always() && !failure() && needs.classify.outputs.needs_graphics_safety == 'true' }}
     steps:
       - uses: actions/checkout@v4
@@ -417,7 +619,7 @@ jobs:
   hmv4-safety:
     name: HMV4 Safety
     runs-on: ubuntu-latest
-    needs: [classify, repo-boundary]
+    needs: classify
     if: ${{ always() && !failure() && (needs.classify.outputs.needs_hmv4_safety == 'true' || needs.classify.outputs.needs_playwright_e2e == 'true' || needs.classify.outputs.needs_visual_e2e == 'true' || needs.classify.outputs.needs_full_regression == 'true' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (inputs.full_e2e || inputs.visual_e2e)) || (github.event_name == 'pull_request' && (contains(github.event.pull_request.labels.*.name, 'e2e') || contains(github.event.pull_request.labels.*.name, 'visual') || contains(github.event.pull_request.labels.*.name, 'full-ci')))) }}
     timeout-minutes: 10
     steps:
@@ -530,7 +732,7 @@ jobs:
     name: HMV4 Visual Regression Evidence
     runs-on: ubuntu-latest
     needs: [classify, hmv4-safety]
-    if: ${{ always() && !failure() && (needs.classify.outputs.needs_visual_e2e == 'true' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (inputs.visual_e2e || inputs.full_e2e)) || (github.event_name == 'pull_request' && (contains(github.event.pull_request.labels.*.name, 'visual') || contains(github.event.pull_request.labels.*.name, 'full-ci')))) }}
+    if: ${{ always() && !failure() && (needs.classify.outputs.needs_visual_e2e == 'true' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (inputs.visual_e2e || inputs.full_e2e)) || (github.event_name == 'pull_request' && (contains(github.event.pull_request.labels.*.name, 'visual') || contains(github.event.pull_request.labels.*.name, 'visual-required') || contains(github.event.pull_request.labels.*.name, 'full-ci')))) }}
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
@@ -556,7 +758,7 @@ jobs:
           ./node_modules/.bin/playwright install chromium --with-deps
       - name: Run HMV4 visual regression Chromium
         working-directory: tests/e2e
-        continue-on-error: true
+        continue-on-error: ${{ !((github.event_name == 'workflow_dispatch' && inputs.visual_required) || (github.event_name == 'pull_request' && (contains(github.event.pull_request.labels.*.name, 'visual-required') || contains(github.event.pull_request.labels.*.name, 'full-ci')))) }}
         run: npm run test:visual -- --reporter=list --max-failures=25
       - name: Upload Playwright report on failure
         if: always()
@@ -570,7 +772,7 @@ jobs:
   security-light:
     name: Security Light
     runs-on: ubuntu-latest
-    needs: [classify, repo-boundary]
+    needs: classify
     if: ${{ always() && !failure() && needs.classify.outputs.needs_security_light == 'true' }}
     steps:
       - uses: actions/checkout@v4
@@ -596,9 +798,11 @@ jobs:
       - kpi-guard
       - db-migration-check
       - openapi
+      - doc-light
       - doc-health
       - raci-integrity
       - frontend-js-safety
+      - frontend-static-safety
       - graphics-safety
       - hmv4-safety
       - playwright-e2e
@@ -627,10 +831,12 @@ jobs:
           | needs_kpi_tests | ${{ needs.classify.outputs.needs_kpi_tests }} |
           | needs_db_migration_check | ${{ needs.classify.outputs.needs_db_migration_check }} |
           | needs_openapi | ${{ needs.classify.outputs.needs_openapi }} |
+          | needs_doc_light | ${{ needs.classify.outputs.needs_doc_light }} |
           | needs_doc_health | ${{ needs.classify.outputs.needs_doc_health }} |
           | needs_raci | ${{ needs.classify.outputs.needs_raci }} |
           | needs_frontend_safety | ${{ needs.classify.outputs.needs_frontend_safety }} |
           | needs_frontend_js_safety | ${{ needs.classify.outputs.needs_frontend_js_safety }} |
+          | needs_frontend_static_safety | ${{ needs.classify.outputs.needs_frontend_static_safety }} |
           | needs_graphics_safety | ${{ needs.classify.outputs.needs_graphics_safety }} |
           | needs_hmv4_safety | ${{ needs.classify.outputs.needs_hmv4_safety }} |
           | needs_playwright_e2e | ${{ needs.classify.outputs.needs_playwright_e2e }} |
@@ -653,9 +859,11 @@ jobs:
           | kpi-guard | ${{ needs.kpi-guard.result }} |
           | db-migration-check | ${{ needs.db-migration-check.result }} |
           | openapi | ${{ needs.openapi.result }} |
+          | doc-light | ${{ needs.doc-light.result }} |
           | doc-health | ${{ needs.doc-health.result }} |
           | raci-integrity | ${{ needs.raci-integrity.result }} |
           | frontend-js-safety | ${{ needs.frontend-js-safety.result }} |
+          | frontend-static-safety | ${{ needs.frontend-static-safety.result }} |
           | graphics-safety | ${{ needs.graphics-safety.result }} |
           | hmv4-safety | ${{ needs.hmv4-safety.result }} |
           | playwright-e2e | ${{ needs.playwright-e2e.result }} |
@@ -664,13 +872,39 @@ jobs:
           EOF
 
           echo
-          echo "Fast lane selected"
+          echo "Critical path class"
           lane="backend"
           if [ '${{ needs.classify.outputs.needs_full_regression }}' = 'true' ]; then lane="full"; fi
-          if [ '${{ needs.classify.outputs.needs_doc_health }}' = 'true' ] && [ '${{ needs.classify.outputs.needs_phpstan }}' = 'false' ] && [ '${{ needs.classify.outputs.needs_phpunit }}' = 'false' ]; then lane="docs"; fi
-          if [ '${{ needs.classify.outputs.needs_frontend_safety }}' = 'true' ] && [ '${{ needs.classify.outputs.needs_phpstan }}' = 'false' ] && [ '${{ needs.classify.outputs.needs_phpunit }}' = 'false' ]; then lane="frontend"; fi
+          if [ '${{ needs.classify.outputs.needs_doc_light }}' = 'true' ] && [ '${{ needs.classify.outputs.needs_doc_health }}' = 'false' ]; then lane="docs-light"; fi
+          if [ '${{ needs.classify.outputs.needs_doc_health }}' = 'true' ] && [ '${{ needs.classify.outputs.needs_phpstan }}' = 'false' ] && [ '${{ needs.classify.outputs.needs_phpunit }}' = 'false' ]; then lane="docs-full"; fi
+          if [ '${{ needs.classify.outputs.needs_graphics_safety }}' = 'true' ] && [ '${{ needs.classify.outputs.needs_phpstan }}' = 'false' ] && [ '${{ needs.classify.outputs.needs_phpunit }}' = 'false' ]; then lane="graphics-fast"; fi
+          if [ '${{ needs.classify.outputs.needs_frontend_js_safety }}' = 'true' ] && [ '${{ needs.classify.outputs.needs_graphics_safety }}' = 'false' ] && [ '${{ needs.classify.outputs.needs_phpstan }}' = 'false' ] && [ '${{ needs.classify.outputs.needs_phpunit }}' = 'false' ]; then lane="frontend-js-fast"; fi
+          if [ '${{ needs.classify.outputs.needs_frontend_static_safety }}' = 'true' ] && [ '${{ needs.classify.outputs.needs_phpstan }}' = 'false' ] && [ '${{ needs.classify.outputs.needs_phpunit }}' = 'false' ]; then lane="frontend-static-fast"; fi
           if [ '${{ needs.classify.outputs.needs_hmv4_safety }}' = 'true' ] || [ '${{ needs.classify.outputs.needs_playwright_e2e }}' = 'true' ]; then lane="hmv4"; fi
           echo "  ${lane}"
+          echo
+          echo "Expected running jobs"
+          echo "  - classify"
+          [ '${{ needs.classify.outputs.needs_repo_boundary }}' = 'true' ] && echo "  - repo-boundary"
+          [ '${{ needs.classify.outputs.needs_actionlint }}' = 'true' ] && echo "  - actionlint"
+          [ '${{ needs.classify.outputs.needs_classifier_selftest }}' = 'true' ] && echo "  - classifier-selftest"
+          [ '${{ needs.classify.outputs.needs_php_syntax }}' = 'true' ] && echo "  - php-syntax"
+          [ '${{ needs.classify.outputs.needs_phpstan }}' = 'true' ] && echo "  - phpstan"
+          [ '${{ needs.classify.outputs.needs_phpunit }}' = 'true' ] && echo "  - phpunit"
+          [ '${{ needs.classify.outputs.needs_kpi_tests }}' = 'true' ] && echo "  - kpi-guard"
+          [ '${{ needs.classify.outputs.needs_db_migration_check }}' = 'true' ] && echo "  - db-migration-check"
+          [ '${{ needs.classify.outputs.needs_openapi }}' = 'true' ] && echo "  - openapi"
+          [ '${{ needs.classify.outputs.needs_doc_light }}' = 'true' ] && echo "  - doc-light"
+          [ '${{ needs.classify.outputs.needs_doc_health }}' = 'true' ] && echo "  - doc-health"
+          [ '${{ needs.classify.outputs.needs_raci }}' = 'true' ] && echo "  - raci-integrity"
+          [ '${{ needs.classify.outputs.needs_frontend_js_safety }}' = 'true' ] && echo "  - frontend-js-safety"
+          [ '${{ needs.classify.outputs.needs_frontend_static_safety }}' = 'true' ] && echo "  - frontend-static-safety"
+          [ '${{ needs.classify.outputs.needs_graphics_safety }}' = 'true' ] && echo "  - graphics-safety"
+          [ '${{ needs.classify.outputs.needs_hmv4_safety }}' = 'true' ] && echo "  - hmv4-safety"
+          [ '${{ needs.classify.outputs.needs_playwright_e2e }}' = 'true' ] && echo "  - playwright-e2e"
+          [ '${{ needs.classify.outputs.needs_visual_e2e }}' = 'true' ] && echo "  - hmv4-visual-e2e"
+          [ '${{ needs.classify.outputs.needs_security_light }}' = 'true' ] && echo "  - security-light"
+          echo "  - ci-summary"
           echo
           echo "Heavy gates skipped by design"
           [ '${{ needs.classify.outputs.needs_phpstan }}' = 'true' ] || echo "  - phpstan"
@@ -679,6 +913,9 @@ jobs:
           [ '${{ needs.classify.outputs.needs_doc_health }}' = 'true' ] || echo "  - doc-health"
           [ '${{ needs.classify.outputs.needs_raci }}' = 'true' ] || echo "  - raci-integrity"
           [ '${{ needs.classify.outputs.needs_openapi }}' = 'true' ] || echo "  - openapi"
+          echo
+          echo "Repo-boundary policy"
+          echo "  repo-boundary runs in parallel after classify and remains required by CI Summary."
           echo
           echo "Playwright decision"
           if [ '${{ needs.classify.outputs.needs_playwright_e2e }}' = 'true' ]; then
@@ -696,7 +933,18 @@ jobs:
             echo "  Full regression skipped: changeset is classified and path-scoped."
           fi
           echo
-          echo "Note: hmv4-visual-e2e is evidence-only and is reported above without blocking CI summary."
+          echo "Visual policy"
+          visual_required='${{ (github.event_name == 'workflow_dispatch' && inputs.visual_required) || (github.event_name == 'pull_request' && (contains(github.event.pull_request.labels.*.name, 'visual-required') || contains(github.event.pull_request.labels.*.name, 'full-ci'))) }}'
+          if [ "$visual_required" = "true" ]; then
+            echo "  Visual policy: blocking"
+            echo "  Visual result considered by CI Summary."
+          else
+            echo "  Visual policy: evidence-only"
+            echo "  Visual result reported but ignored by CI Summary."
+          fi
+          echo
+          echo "Merge governance"
+          echo "  CI Summary must be required in branch protection before merging to main."
 
           bad=0
           for result in \
@@ -710,9 +958,11 @@ jobs:
             '${{ needs.kpi-guard.result }}' \
             '${{ needs.db-migration-check.result }}' \
             '${{ needs.openapi.result }}' \
+            '${{ needs.doc-light.result }}' \
             '${{ needs.doc-health.result }}' \
             '${{ needs.raci-integrity.result }}' \
             '${{ needs.frontend-js-safety.result }}' \
+            '${{ needs.frontend-static-safety.result }}' \
             '${{ needs.graphics-safety.result }}' \
             '${{ needs.hmv4-safety.result }}' \
             '${{ needs.playwright-e2e.result }}' \
@@ -721,6 +971,12 @@ jobs:
               bad=1
             fi
           done
+          if [ "$visual_required" = "true" ]; then
+            result='${{ needs.hmv4-visual-e2e.result }}'
+            if [ "$result" = "failure" ] || [ "$result" = "cancelled" ]; then
+              bad=1
+            fi
+          fi
           if [ "$bad" -ne 0 ]; then
             echo "FAIL: at least one Smart CI gate failed or was cancelled." >&2
             exit 1
