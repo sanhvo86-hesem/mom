@@ -4080,7 +4080,7 @@ function _ensureBuilderStyles(){
   css += '.mb-slot-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--o3-text-muted);margin-bottom:8px;font-weight:700}';
   css += '.mb-slot-empty{padding:var(--o3-space-section) var(--o3-space-section);text-align:center;color:var(--o3-text-muted);font-size:13px}';
   css += '.mb-slot-actions{display:flex;justify-content:center;margin-top:var(--o3-space)}';
-  css += '.mb-block-card{border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius-card);background:var(--o3-surface-card);overflow:hidden;position:relative;transition:border-color .15s, box-shadow .15s, transform .15s;margin-bottom:12px}';
+  css += '.mb-block-card{border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius-card);background:var(--o3-surface-card);overflow:hidden;position:relative;transition:border-color .15s, box-shadow .15s, transform .15s;margin-bottom:0}';
   css += '.mb-block-card.is-selected{border-color:var(--o3-brand);box-shadow:0 0 0 2px var(--o3-brand-soft)}';
   css += '.mb-block-card.is-hidden{opacity:.72}';
   css += '.mb-block-card.is-locked{background:var(--o3-surface-muted)}';
@@ -4355,7 +4355,7 @@ function _ensureTabLayout(tab){
   if(!_isObject(tab.layout)) tab.layout = {};
   if(!tab.layout.type) tab.layout.type = 'stack';
   if(!tab.layout.columns) tab.layout.columns = tab.layout.type === 'grid' ? 2 : 1;
-  if(!tab.layout.gap) tab.layout.gap = '16px';
+  if(!tab.layout.gap) tab.layout.gap = '8px';
   if(!tab.layout.align) tab.layout.align = 'stretch';
   return tab.layout;
 }
@@ -4371,12 +4371,12 @@ function _getContainerSlots(type){
 
 function _defaultBlockLayout(type){
   if(type === 'three-column'){
-    return { type:'grid', columns:3, gap:'16px', align:'stretch' };
+    return { type:'grid', columns:3, gap:'8px', align:'stretch' };
   }
   if(type === 'accordion-group'){
     return { type:'stack', columns:1, gap:'12px', align:'stretch' };
   }
-  return { type:'stack', columns:1, gap:'16px', align:'stretch' };
+  return { type:'stack', columns:1, gap:'8px', align:'stretch' };
 }
 
 function _ensureBlockBuilderDefaults(block){
@@ -4392,7 +4392,7 @@ function _ensureBlockBuilderDefaults(block){
   if(!_isObject(block.layout)) block.layout = _defaultBlockLayout(block.type);
   if(!block.layout.type) block.layout.type = 'stack';
   if(!block.layout.columns) block.layout.columns = block.layout.type === 'grid' ? 2 : 1;
-  if(!block.layout.gap) block.layout.gap = '16px';
+  if(!block.layout.gap) block.layout.gap = '8px';
   if(!block.layout.align) block.layout.align = 'stretch';
   if(block.locked == null) block.locked = false;
   if(block.collapsed == null) block.collapsed = false;
@@ -4427,8 +4427,8 @@ function _flattenRuntimeBlocks(blocks, parentId, slotKey, out){
 }
 
 function _layoutStyle(layout){
-  var actual = layout || { type:'stack', columns:1, gap:'16px', align:'stretch' };
-  var style = 'gap:' + _esc(actual.gap || '16px') + ';';
+  var actual = layout || { type:'stack', columns:1, gap:'8px', align:'stretch' };
+  var style = 'gap:' + _esc(actual.gap || '8px') + ';';
   if(actual.type === 'grid'){
     style += 'display:grid;grid-template-columns:repeat(' + Math.max(1, Math.min(6, parseInt(actual.columns, 10) || 1)) + ',minmax(0,1fr));';
   } else if(actual.type === 'flex'){
@@ -5777,7 +5777,7 @@ _renderCanvasToolbar = function(activeTab, heroMode){
   h += _renderHeroActionButton({ action:'set-tab-layout', labelVi:'Bố cục lưới', labelEn:'Grid layout', icon:'⊞', active:activeTab.layout.type === 'grid', extraAttrs:'data-layout="grid"' });
   h += _renderHeroActionButton({ action:'set-tab-layout', labelVi:'Bố cục linh hoạt', labelEn:'Flex layout', icon:'↔', active:activeTab.layout.type === 'flex', extraAttrs:'data-layout="flex"' });
   h += _renderHeroSelectControl('mb-layout-columns', 'Số cột', 'Columns', '▥', String(activeTab.layout.columns || 1), ['1','2','3','4','5','6']);
-  h += _renderHeroSelectControl('mb-layout-gap', 'Khoảng cách', 'Gap', '⇄', activeTab.layout.gap || '16px', ['8px','12px','16px','24px']);
+  h += _renderHeroSelectControl('mb-layout-gap', 'Khoảng cách', 'Gap', '⇄', activeTab.layout.gap || '8px', ['8px','12px','16px','24px']);
   h += _renderHeroActionButton({ action:'toggle-tree', labelVi:'Cây module', labelEn:'Module tree', icon:'🌳', active:!!state.showTree });
   h += _renderHeroActionButton({ action:'open-library', labelVi:'Thư viện block', labelEn:'Block library', icon:'📚', active:!!state.showLibrary, extraAttrs:'data-tab="'+_esc(activeTab.tabId)+'" data-parent="" data-slot="default"' });
   h += '</div>';
@@ -5997,7 +5997,7 @@ _createBlankModule = function(){
       tabId: 'tab-' + index + '-' + Date.now().toString(36),
       title: { vi: title, en: title },
       icon: '',
-      layout: { type:'stack', columns:1, gap:'16px', align:'stretch' },
+      layout: { type:'stack', columns:1, gap:'8px', align:'stretch' },
       blocks: []
     };
   });
@@ -6738,7 +6738,7 @@ _handleClick = function(e){
       var tabName = prompt(_t('Tên tab mới:', 'New tab name:'));
       if(tabName){
         _mutateSchema(_t('Thêm tab', 'Add tab'), function(){
-          state.schema.tabs.push({ tabId:'tab-'+Date.now().toString(36), title:{ vi:tabName, en:tabName }, icon:'', layout:{ type:'stack', columns:1, gap:'16px', align:'stretch' }, blocks:[] });
+          state.schema.tabs.push({ tabId:'tab-'+Date.now().toString(36), title:{ vi:tabName, en:tabName }, icon:'', layout:{ type:'stack', columns:1, gap:'8px', align:'stretch' }, blocks:[] });
           state.activeTab = state.schema.tabs[state.schema.tabs.length - 1].tabId;
         });
       }
@@ -6983,7 +6983,7 @@ _handleInput = function(e){
       var tab = _getActiveTab();
       if(!tab) return;
       _ensureTabLayout(tab);
-      tab.layout.gap = target.value || '16px';
+      tab.layout.gap = target.value || '8px';
     });
     return;
   }
@@ -7058,7 +7058,7 @@ _handleInput = function(e){
       var tab = _getActiveTab();
       if(!tab) return;
       _ensureTabLayout(tab);
-      tab.layout.gap = target.value || '16px';
+      tab.layout.gap = target.value || '8px';
     });
     return;
   }
@@ -8784,7 +8784,7 @@ if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH__){
     css += '.mb-ultra-root[data-backdrop="noise"] .mb-canvas-stage{background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(248,250,252,.98));position:relative}';
     css += '.mb-ultra-root[data-viewport="mobile"] .mb-canvas-root{max-width:420px;margin:0 auto}';
     css += '.mb-ultra-root[data-viewport="tablet"] .mb-canvas-root{max-width:820px;margin:0 auto}';
-    css += '.mb-ultra-root[data-viewport="desktop"] .mb-canvas-root{max-width:1260px;margin:0 auto}';
+    css += '.mb-ultra-root[data-viewport="desktop"] .mb-canvas-root{max-width:none;margin:0}';
     css += '.mb-ultra-root[data-viewport="wide"] .mb-canvas-root{max-width:1440px;margin:0 auto}';
     css += '.mb-ultra-dock{display:grid;gap:12px}';
     css += '.mb-ultra-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--o3-space)}';
@@ -12045,7 +12045,7 @@ if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R6__){
   function _r6EnsureTab(schema){
     schema.tabs = _r6Array(schema.tabs);
     if(!schema.tabs.length){
-      schema.tabs.push({ tabId:'overview', title:{ vi:'Tổng quan', en:'Overview' }, icon:'🧭', layout:{ type:'stack', columns:1, gap:'16px', align:'stretch' }, blocks:[] });
+      schema.tabs.push({ tabId:'overview', title:{ vi:'Tổng quan', en:'Overview' }, icon:'🧭', layout:{ type:'stack', columns:1, gap:'8px', align:'stretch' }, blocks:[] });
     }
     if(!state.activeTab || !_r6Array(schema.tabs).some(function(tab){ return tab && tab.tabId === state.activeTab; })) state.activeTab = schema.tabs[0].tabId;
     return schema.tabs[0];
@@ -12880,8 +12880,8 @@ if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R6__){
         createdBy: 'tester',
         createdAt: new Date().toISOString(),
         tabs: [
-          { tabId:'overview', title:{ vi:'Tổng quan', en:'Overview' }, icon:'🧭', layout:{ type:'stack', columns:1, gap:'16px', align:'stretch' }, blocks:[] },
-          { tabId:'release', title:{ vi:'Release', en:'Release' }, icon:'🚀', layout:{ type:'stack', columns:1, gap:'16px', align:'stretch' }, blocks:[] }
+          { tabId:'overview', title:{ vi:'Tổng quan', en:'Overview' }, icon:'🧭', layout:{ type:'stack', columns:1, gap:'8px', align:'stretch' }, blocks:[] },
+          { tabId:'release', title:{ vi:'Release', en:'Release' }, icon:'🚀', layout:{ type:'stack', columns:1, gap:'8px', align:'stretch' }, blocks:[] }
         ]
       };
       state.activeTab = 'overview';
@@ -13073,7 +13073,7 @@ if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R7__){
     if(state.showR7Beauty == null) state.showR7Beauty = false;
   }
   function _r7EnsureTabShape(tab){
-    if(!_r7IsObject(tab.layout)) tab.layout = { type:'stack', columns:1, gap:'16px', align:'stretch' };
+    if(!_r7IsObject(tab.layout)) tab.layout = { type:'stack', columns:1, gap:'8px', align:'stretch' };
     if(!_r7Array(tab.blocks)) tab.blocks = [];
     return tab;
   }
