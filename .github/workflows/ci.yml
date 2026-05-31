@@ -18,6 +18,11 @@ on:
         required: false
         default: false
         type: boolean
+      visual_e2e:
+        description: Force visual E2E evidence
+        required: false
+        default: false
+        type: boolean
   schedule:
     - cron: '31 18 * * *'
 
@@ -49,7 +54,10 @@ jobs:
       needs_frontend_safety: ${{ steps.classify.outputs.needs_frontend_safety }}
       needs_hmv4_safety: ${{ steps.classify.outputs.needs_hmv4_safety }}
       needs_playwright_e2e: ${{ steps.classify.outputs.needs_playwright_e2e }}
+      needs_visual_e2e: ${{ steps.classify.outputs.needs_visual_e2e }}
       needs_security_light: ${{ steps.classify.outputs.needs_security_light }}
+      needs_actionlint: ${{ steps.classify.outputs.needs_actionlint }}
+      needs_classifier_selftest: ${{ steps.classify.outputs.needs_classifier_selftest }}
       needs_full_regression: ${{ steps.classify.outputs.needs_full_regression }}
       summary: ${{ steps.classify.outputs.summary }}
     steps:
@@ -62,6 +70,36 @@ jobs:
           BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
           SMART_CI_FULL_REASON: ${{ github.event_name == 'workflow_dispatch' && inputs.full_regression && 'workflow-dispatch' || '' }}
         run: tools/scripts/ci/smart-classify.sh
+
+  actionlint:
+    name: GitHub Actions Lint
+    runs-on: ubuntu-latest
+    needs: classify
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_actionlint == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run actionlint only for changed workflow files
+        run: |
+          set -euo pipefail
+          cat > /tmp/changed-files <<'EOF'
+          ${{ needs.classify.outputs.changed_files }}
+          EOF
+          mapfile -t WORKFLOWS < <(sed 's/^ *//' /tmp/changed-files | grep -E '^\.github/workflows/.*\.ya?ml$' || true)
+          if [ "${#WORKFLOWS[@]}" -eq 0 ]; then
+            echo "No changed workflow files require actionlint."
+            exit 0
+          fi
+          docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest "${WORKFLOWS[@]}"
+
+  classifier-selftest:
+    name: Smart Classifier Self-test
+    runs-on: ubuntu-latest
+    needs: classify
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_classifier_selftest == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Smart CI path matrix self-test
+        run: bash tools/scripts/ci/test-smart-classify.sh
 
   repo-boundary:
     name: Controlled Source Boundary
@@ -117,7 +155,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: mom/.phpstan-cache
-          key: ${{ runner.os }}-phpstan-${{ github.sha }}
+          key: ${{ runner.os }}-phpstan-${{ hashFiles('mom/composer.lock', 'mom/phpstan.neon') }}
           restore-keys: |
             ${{ runner.os }}-phpstan-
       - name: Run PHPStan
@@ -158,7 +196,7 @@ jobs:
         with:
           php-version: '8.5'
           extensions: pdo, pdo_pgsql, mbstring, json, redis
-          coverage: xdebug
+          coverage: none
           tools: composer:v2
       - name: Cache Composer dependencies
         uses: actions/cache@v4
@@ -460,9 +498,8 @@ jobs:
     name: HMV4 Visual Regression Evidence
     runs-on: ubuntu-latest
     needs: [classify, hmv4-safety]
-    if: ${{ always() && !failure() && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.full_e2e) || contains(needs.classify.outputs.changed_files, 'module-template-v4-visual.spec.ts') || contains(needs.classify.outputs.changed_files, 'module-template-v4-visual.spec.ts-snapshots')) }}
+    if: ${{ always() && !failure() && (needs.classify.outputs.needs_visual_e2e == 'true' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (inputs.visual_e2e || inputs.full_e2e)) || (github.event_name == 'pull_request' && (contains(github.event.pull_request.labels.*.name, 'visual') || contains(github.event.pull_request.labels.*.name, 'full-ci')))) }}
     timeout-minutes: 12
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -487,9 +524,10 @@ jobs:
           ./node_modules/.bin/playwright install chromium --with-deps
       - name: Run HMV4 visual regression Chromium
         working-directory: tests/e2e
+        continue-on-error: true
         run: npm run test:visual -- --reporter=list --max-failures=25
       - name: Upload Playwright report on failure
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: hmv4-visual-report-${{ github.run_id }}
@@ -517,6 +555,8 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - classify
+      - actionlint
+      - classifier-selftest
       - repo-boundary
       - php-syntax
       - phpstan
@@ -559,13 +599,18 @@ jobs:
           | needs_frontend_safety | ${{ needs.classify.outputs.needs_frontend_safety }} |
           | needs_hmv4_safety | ${{ needs.classify.outputs.needs_hmv4_safety }} |
           | needs_playwright_e2e | ${{ needs.classify.outputs.needs_playwright_e2e }} |
+          | needs_visual_e2e | ${{ needs.classify.outputs.needs_visual_e2e }} |
           | needs_security_light | ${{ needs.classify.outputs.needs_security_light }} |
+          | needs_actionlint | ${{ needs.classify.outputs.needs_actionlint }} |
+          | needs_classifier_selftest | ${{ needs.classify.outputs.needs_classifier_selftest }} |
           | needs_full_regression | ${{ needs.classify.outputs.needs_full_regression }} |
 
           Jobs
           | job | result |
           |---|---|
           | classify | ${{ needs.classify.result }} |
+          | actionlint | ${{ needs.actionlint.result }} |
+          | classifier-selftest | ${{ needs.classifier-selftest.result }} |
           | repo-boundary | ${{ needs.repo-boundary.result }} |
           | php-syntax | ${{ needs.php-syntax.result }} |
           | phpstan | ${{ needs.phpstan.result }} |
@@ -582,9 +627,13 @@ jobs:
           | security-light | ${{ needs.security-light.result }} |
           EOF
 
+          echo "Note: hmv4-visual-e2e is evidence-only and is reported above without blocking CI summary."
+
           bad=0
           for result in \
             '${{ needs.classify.result }}' \
+            '${{ needs.actionlint.result }}' \
+            '${{ needs.classifier-selftest.result }}' \
             '${{ needs.repo-boundary.result }}' \
             '${{ needs.php-syntax.result }}' \
             '${{ needs.phpstan.result }}' \

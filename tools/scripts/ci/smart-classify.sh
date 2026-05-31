@@ -29,26 +29,26 @@ set_flag() {
   matched_any=true
 }
 
+mark_full() {
+  local reason="$1"
+  needs_full_regression=true
+  is_full_required=true
+  SMART_CI_FULL_REASON="${SMART_CI_FULL_REASON:+$SMART_CI_FULL_REASON,}${reason}"
+  matched_any=true
+}
+
 matches() {
   local file="$1"
   local regex="$2"
   [[ "$file" =~ $regex ]]
 }
 
-matches_ci_tooling() {
-  local file="$1"
-  if matches "$file" '^scripts/doc-.*\.py$'; then
-    return 1
-  fi
-  matches "$file" '^\.github/workflows/' ||
-    matches "$file" '^tools/' ||
-    matches "$file" '^scripts/' ||
-    matches "$file" '(^|/)(composer|package|package-lock)\.json$' ||
-    matches "$file" '(^|/)composer\.lock$' ||
-    matches "$file" '^\.spectral\.yml$'
-}
-
 resolve_changed_files() {
+  if [[ "${SMART_CI_FORCE_BASE_UNRESOLVED:-}" == "1" ]]; then
+    printf '%s\n' '__SMART_CI_UNRESOLVED_BASE__'
+    return 0
+  fi
+
   if [[ -n "${SMART_CI_CHANGED_FILES:-}" ]]; then
     printf '%s\n' "$SMART_CI_CHANGED_FILES" | sed '/^$/d'
     return 0
@@ -82,6 +82,7 @@ if [[ "$resolved_files" == "__SMART_CI_UNRESOLVED_BASE__" ]]; then
 else
   changed_files="$resolved_files"
 fi
+
 file_count=0
 if [[ -n "$changed_files" ]]; then
   file_count="$(printf '%s\n' "$changed_files" | wc -l | tr -d ' ')"
@@ -107,56 +108,124 @@ needs_raci=false
 needs_frontend_safety=false
 needs_hmv4_safety=false
 needs_playwright_e2e=false
+needs_visual_e2e=false
 needs_security_light=false
+needs_actionlint=false
+needs_classifier_selftest=false
 needs_full_regression=false
-matched_any=false
 
 event_name="${GITHUB_EVENT_NAME:-${SMART_CI_EVENT_NAME:-}}"
 ref_name="${GITHUB_REF_NAME:-${SMART_CI_REF_NAME:-}}"
 ref="${GITHUB_REF:-${SMART_CI_REF:-}}"
 
 if [[ "$event_name" == "schedule" ]]; then
-  needs_full_regression=true
   SMART_CI_FULL_REASON="${SMART_CI_FULL_REASON:+$SMART_CI_FULL_REASON,}schedule"
 fi
 
-if [[ "$event_name" == "workflow_dispatch" ]]; then
-  needs_full_regression=true
-  SMART_CI_FULL_REASON="${SMART_CI_FULL_REASON:+$SMART_CI_FULL_REASON,}workflow-dispatch"
-fi
-
-if [[ "$event_name" == "push" && "$ref_name" == "main" ]]; then
-  needs_full_regression=true
-  SMART_CI_FULL_REASON="${SMART_CI_FULL_REASON:+$SMART_CI_FULL_REASON,}main-push"
-fi
-
 if [[ "$ref" == refs/tags/* || "$ref_name" == release/* ]]; then
-  needs_full_regression=true
   SMART_CI_FULL_REASON="${SMART_CI_FULL_REASON:+$SMART_CI_FULL_REASON,}release-ref"
+fi
+
+if [[ -n "$SMART_CI_FULL_REASON" ]]; then
+  is_full_required=true
+  needs_full_regression=true
 fi
 
 while IFS= read -r file; do
   [[ -z "$file" ]] && continue
   matched_any=false
 
-  if matches "$file" '^mom/(api|core|lib|config)/.*\.php$' ||
-    matches "$file" '^mom/database/.*\.php$' ||
-    matches "$file" '^mom/api\.php$' ||
-    matches "$file" '^mom/(composer\.json|composer\.lock|phpstan\.neon|phpunit\.xml)$'; then
-    set_flag needs_php_syntax
-    set_flag needs_phpstan
-    set_flag needs_phpunit
-    set_flag needs_security_light
+  if matches "$file" '^\.github/workflows/'; then
+    set_flag needs_actionlint
+    set_flag needs_classifier_selftest
+    mark_full "ci-platform:${file}"
   fi
 
-  if matches "$file" '(^|/)([Kk][Pp][Ii]|Kpi)[^/]*' ||
-    matches "$file" '^mom/data/registry/kpi-authority-registry\.json$' ||
-    matches "$file" '^mom/tools/release/(check_|audit_|sync_)?kpi' ||
-    matches "$file" '^mom/docs/.*/(annex-12[25789]|kpi|KPI)'; then
+  if matches "$file" '^tools/scripts/ci/' ||
+    matches "$file" '^scripts/ci/' ||
+    matches "$file" '^tools/ci/' ||
+    matches "$file" '(^|/)\.?actionlint(\.ya?ml)?$' ||
+    matches "$file" '^mom/(composer\.json|composer\.lock|phpstan\.neon|phpunit\.xml)$' ||
+    matches "$file" '^tests/e2e/package(-lock)?\.json$' ||
+    matches "$file" '^playwright\.config\.(js|ts)$' ||
+    matches "$file" '^package(-lock)?\.json$'; then
+    set_flag needs_classifier_selftest
+    if matches "$file" '^\.github/workflows/' || matches "$file" '^tools/scripts/ci/' || matches "$file" '^scripts/ci/' || matches "$file" '^tools/ci/'; then
+      set_flag needs_actionlint
+    fi
+    mark_full "ci-platform:${file}"
+  fi
+
+  if matches "$file" '^tools/scripts/(gen-lego-tokens|smoke-blocks-l3-map)\.mjs$' ||
+    matches "$file" '^tools/scripts/.*(lego|token|theme|blocks).*\.mjs$'; then
+    set_flag needs_frontend_safety
+  fi
+
+  if matches "$file" '^scripts/doc-.*\.py$' ||
+    matches "$file" '^tools/scripts/doc-.*\.py$'; then
+    set_flag needs_doc_health
+  fi
+
+  if matches "$file" '^mom/tools/release/.*[Kk][Pp][Ii].*\.php$' ||
+    matches "$file" '^mom/tools/release/check_kpi.*\.php$'; then
     set_flag needs_kpi_tests
     set_flag needs_php_syntax
     set_flag needs_phpstan
     set_flag needs_phpunit
+  fi
+
+  if matches "$file" '^mom/tools/release/check_(raci|decision_threshold|role_registry|workflow_authority|scenario_coverage).*\.php$' ||
+    matches "$file" '^mom/tools/release/check_generated_marker_inventory\.php$' ||
+    matches "$file" '^mom/tools/release/check_iso_reference_status\.php$'; then
+    set_flag needs_raci
+    set_flag needs_php_syntax
+  fi
+
+  if matches "$file" '^mom/tools/release/check_graphics.*\.php$'; then
+    set_flag needs_frontend_safety
+    set_flag needs_php_syntax
+  fi
+
+  if matches "$file" '^mom/tools/release/check_(user_identity_ssot|authorization_invariants)\.php$' ||
+    matches "$file" '([Aa]dmin|auth|authorization|permission|user_identity|csrf|xss|session|password|token|sanitize)'; then
+    set_flag needs_security_light
+    if matches "$file" '\.php$'; then
+      set_flag needs_php_syntax
+      set_flag needs_phpstan
+      set_flag needs_phpunit
+    fi
+  fi
+
+  if matches "$file" '^mom/(api|core|lib|config)/.*\.php$' ||
+    matches "$file" '^mom/database/.*\.php$' ||
+    matches "$file" '^mom/api\.php$' ||
+    matches "$file" '^mom/bootstrap.*\.php$'; then
+    set_flag needs_php_syntax
+    set_flag needs_phpstan
+    set_flag needs_phpunit
+  fi
+
+  if matches "$file" '^mom/api/(controllers|routes)/' ||
+    matches "$file" '^mom/api/(index|Router)\.php$' ||
+    matches "$file" '^mom/api/openapi\.ya?ml$'; then
+    set_flag needs_openapi
+  fi
+
+  if matches "$file" '(^|/)([Kk][Pp][Ii]|Kpi)[^/]*' ||
+    matches "$file" '^mom/data/registry/kpi-authority-registry\.json$' ||
+    matches "$file" '^mom/docs/.*/(annex-12[25789]|kpi|KPI)'; then
+    set_flag needs_kpi_tests
+    if matches "$file" '\.php$'; then
+      set_flag needs_php_syntax
+      set_flag needs_phpstan
+      set_flag needs_phpunit
+    fi
+    if matches "$file" '^mom/api/' || matches "$file" '^mom/database/'; then
+      set_flag needs_phpunit
+    fi
+    if matches "$file" '^mom/docs/' || matches "$file" '^docs/'; then
+      set_flag needs_doc_health
+    fi
   fi
 
   if matches "$file" '^mom/database/migrations/.*\.sql$' ||
@@ -165,23 +234,14 @@ while IFS= read -r file; do
     set_flag needs_phpunit
   fi
 
-  if matches "$file" '^mom/api/openapi\.ya?ml$' ||
-    matches "$file" '^mom/api/controllers/' ||
-    matches "$file" '^mom/api/routes/' ||
-    matches "$file" '^mom/api/(index|Router)\.php$'; then
-    set_flag needs_openapi
-  fi
-
   if matches "$file" '^mom/docs/' ||
     matches "$file" '^docs/' ||
     matches "$file" '(^|/)[^/]+\.md$' ||
-    matches "$file" '^scripts/doc-.*\.py$' ||
     matches "$file" '^mom/tools/dcc-batch/'; then
     set_flag needs_doc_health
   fi
 
-  if matches "$file" '([Rr][Aa][Cc][Ii]|[Rr]ole|[Aa]uthority|decision[-_]?threshold|scenario[-_]?coverage|workflow[-_]?authority)' ||
-    matches "$file" '^mom/tools/release/check_(raci|decision_threshold|role_registry|workflow_authority|scenario_coverage)'; then
+  if matches "$file" '([Rr][Aa][Cc][Ii]|[Rr]ole|[Aa]uthority|decision[-_]?threshold|scenario[-_]?coverage|workflow[-_]?authority|ISO[-_ ]?reference)'; then
     set_flag needs_raci
   fi
 
@@ -193,27 +253,43 @@ while IFS= read -r file; do
 
   if matches "$file" '^mom/scripts/portal/7[0-4]-module-template-v4-.*\.js$' ||
     matches "$file" '^mom/styles/module-template-v4' ||
-    matches "$file" '^tests/fixtures/module-template-v4/' ||
-    matches "$file" '^tests/e2e/' ||
-    matches "$file" 'playwright\.config\.(ts|js)$'; then
+    matches "$file" '^tests/fixtures/module-template-v4/'; then
+    set_flag needs_frontend_safety
+    set_flag needs_hmv4_safety
+    set_flag needs_playwright_e2e
+  fi
+
+  if matches "$file" '^tests/e2e/.*(visual|__snapshots__|snapshots).*'; then
+    set_flag needs_hmv4_safety
+    set_flag needs_visual_e2e
+    set_flag needs_frontend_safety
+  elif matches "$file" '^tests/e2e/'; then
     set_flag needs_hmv4_safety
     set_flag needs_playwright_e2e
     set_flag needs_frontend_safety
   fi
 
-  if matches_ci_tooling "$file"; then
-    set_flag needs_full_regression
-    SMART_CI_FULL_REASON="${SMART_CI_FULL_REASON:+$SMART_CI_FULL_REASON,}ci-tooling:${file}"
+  if matches "$file" '^README\.md$'; then
+    set_flag needs_doc_health
+  fi
+
+  if matches "$file" '^LICENSE$'; then
+    set_flag needs_repo_boundary
+  fi
+
+  if matches "$file" '^(\.gitignore|\.editorconfig|\.prettierrc|\.prettierrc\..*)$'; then
+    set_flag needs_repo_boundary
+    if matches "$file" '^\.prettierrc'; then
+      set_flag needs_frontend_safety
+    fi
   fi
 
   if [[ "$matched_any" != "true" ]]; then
-    needs_full_regression=true
-    SMART_CI_FULL_REASON="${SMART_CI_FULL_REASON:+$SMART_CI_FULL_REASON,}unclassified:${file}"
+    mark_full "unclassified:${file}"
   fi
 done <<< "$changed_files"
 
-if [[ "$needs_full_regression" == "true" || -n "$SMART_CI_FULL_REASON" ]]; then
-  is_full_required=true
+if [[ "$is_full_required" == "true" ]]; then
   needs_repo_boundary=true
   needs_php_syntax=true
   needs_phpstan=true
@@ -226,7 +302,10 @@ if [[ "$needs_full_regression" == "true" || -n "$SMART_CI_FULL_REASON" ]]; then
   needs_frontend_safety=true
   needs_hmv4_safety=true
   needs_playwright_e2e=true
+  needs_visual_e2e=true
   needs_security_light=true
+  needs_actionlint=true
+  needs_classifier_selftest=true
   needs_full_regression=true
 fi
 
@@ -248,7 +327,10 @@ for key in \
   needs_frontend_safety \
   needs_hmv4_safety \
   needs_playwright_e2e \
+  needs_visual_e2e \
   needs_security_light \
+  needs_actionlint \
+  needs_classifier_selftest \
   needs_full_regression; do
   if [[ "${!key}" == "true" ]]; then
     bool_true "$key"
@@ -257,6 +339,6 @@ for key in \
   fi
 done
 
-summary="files=${file_count}; full=${is_full_required}; reason=${SMART_CI_FULL_REASON:-none}; php=${needs_php_syntax}/${needs_phpstan}/${needs_phpunit}; kpi=${needs_kpi_tests}; db=${needs_db_migration_check}; openapi=${needs_openapi}; docs=${needs_doc_health}; raci=${needs_raci}; frontend=${needs_frontend_safety}; hmv4=${needs_hmv4_safety}; e2e=${needs_playwright_e2e}; security=${needs_security_light}"
+summary="files=${file_count}; full=${is_full_required}; reason=${SMART_CI_FULL_REASON:-none}; php=${needs_php_syntax}/${needs_phpstan}/${needs_phpunit}; kpi=${needs_kpi_tests}; db=${needs_db_migration_check}; openapi=${needs_openapi}; docs=${needs_doc_health}; raci=${needs_raci}; frontend=${needs_frontend_safety}; hmv4=${needs_hmv4_safety}; e2e=${needs_playwright_e2e}; visual=${needs_visual_e2e}; security=${needs_security_light}; actionlint=${needs_actionlint}; selftest=${needs_classifier_selftest}"
 write_output summary "$summary"
 echo "Smart CI summary: $summary"
