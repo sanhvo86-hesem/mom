@@ -8,7 +8,7 @@ Posture: pre-production runtime-readiness evidence; not production-ready
 
 Implemented command-stack UOM runtime authority directly, not through `MdaUomAuthorityBridge`.
 
-`IssueMaterialToWorkOrderCommand`, `CompleteOperationCommand`, and `RecordInspectionResultCommand` now call:
+All governed UOM command paths now call:
 
 `UomCommandQuantityNormalizer -> UomRuntimeAuthorityService -> ItemUomPolicyService -> UomAliasResolutionService -> ConversionEngine`
 
@@ -19,7 +19,7 @@ before MES/quality mutation. The normalizer records immutable `domain_command_uo
 - Existing UOM authority remains in `mom/api/services/Uom/*`.
 - `MdaUomAuthorityBridge` has been removed from runtime source and tests; new runtime command paths must call `UomRuntimeAuthorityService` directly through `UomCommandQuantityNormalizer`.
 - New command transaction evidence table is `domain_command_uom_measurement`.
-- Live DomainCommandGateway handlers currently implemented for MES quantity paths are issue material, complete operation, and record inspection result.
+- Live DomainCommandGateway handlers now include inventory movement, MES completion, inspection result, cost rollup, shipment pack, and tool preset measurement paths.
 
 ## Runtime Evidence Probe
 
@@ -31,15 +31,17 @@ Manual probe:
 
 Interpretation:
 
-- `10 BOX` converts to `500 PCS` before `mes_material_consumption`.
+- `10 BOX` converts to `500 PCS` before command mutation.
 - Missing item UOM policy fails closed with `uom_authority_resolution_failed`.
-- Blocked command performed zero MES material writes.
+- Blocked command performed zero domain writes.
 
 ## Implementation Delta
 
 - Added `mom/database/migrations/269_uom_domain_command_runtime_authority.sql`.
 - Added `mom/api/services/DomainCommand/UomCommandQuantityNormalizer.php`.
 - Updated `mom/api/services/DomainCommand/MesRuntimeCommandHandler.php`.
+- Updated `mom/api/services/DomainCommand/InventoryCommandHandler.php`.
+- Updated `mom/api/services/DomainCommand/ToolingCommandHandler.php`.
 - Updated `mom/api/services/DomainCommand/DomainCommandGateway.php`.
 - Added `mom/database/migrations/274_uom_direct_authority_system_registry.sql`.
 - Added `mom/data/registry/mda-uom-direct-authority-system.json`.
@@ -55,12 +57,15 @@ Closed:
 - `P46-BLOCK-CMD-003`: issue material now direct UOM-normalized.
 - `P46-BLOCK-CMD-004`: complete operation now direct UOM-normalized for good/scrap quantities.
 - `P46-BLOCK-CMD-005`: record inspection result now carries direct UOM MEASVAL evidence.
+- `P46-BLOCK-CMD-006`: cost rollup now writes `cost_ledger` with UOM evidence.
+- `P46-BLOCK-CMD-007`: shipment pack now writes `shipment_packages` and genealogy with UOM evidence.
+- `P46-BLOCK-CMD-008`: tool preset measurement now writes `tooling_presets` / `tooling_life_measurements` with UOM evidence.
 
 Controlled gaps:
 
-- Cost rollup, shipment pack, and tool preset commands have direct UOM policies but no live DomainCommandGateway handler yet.
-- Some historical P46/P47 reports still describe the earlier bridge staging step; this report and `mda-uom-direct-authority-system.json` supersede that bridge plan.
+- Full PHPUnit/PHPStan execution remains blocked in this local worktree because Composer vendor binaries are missing.
+- Non-UOM V4 closure still requires restore-drill target and live VPS Chrome smoke evidence.
 
 ## Decision Token
 
-P46_PASS_WITH_CONTROLLED_GAPS_DIRECT_COMMAND_STACK_READY
+UOM_SYSTEM_SSOT_PASS

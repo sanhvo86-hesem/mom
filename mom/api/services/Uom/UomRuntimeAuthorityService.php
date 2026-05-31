@@ -12,7 +12,7 @@ use MOM\Database\Connection;
  * Domain command handlers call this service before mutating inventory, MES,
  * quality, shipment, or cost truth. The implementation delegates conversion,
  * alias resolution, item policy, rounding, and measurement evidence to the
- * existing UOM subsystem instead of maintaining an MDA-side bridge authority.
+ * existing UOM subsystem directly instead of maintaining an MDA-side connector.
  */
 final class UomRuntimeAuthorityService
 {
@@ -156,9 +156,9 @@ final class UomRuntimeAuthorityService
         'ToolPresetMeasurementCommand' => [
             'slot' => null,
             'item_required' => false,
-            'magnitude_fields' => ['offset_value', 'wear_value', 'measured_value', 'quantity', 'value'],
-            'unit_fields' => ['measurement_unit', 'uom', 'unit_code'],
-            'target_unit_fields' => ['target_unit', 'canonical_unit_code'],
+            'magnitude_fields' => ['preset_length', 'preset_length_mm', 'preset_diameter', 'preset_diameter_mm', 'offset_value', 'wear_value', 'measurement_value', 'measured_value', 'quantity', 'value'],
+            'unit_fields' => ['preset_length_uom', 'preset_diameter_uom', 'measurement_unit', 'measurement_uom', 'uom', 'unit_code'],
+            'target_unit_fields' => ['target_unit', 'target_uom', 'canonical_unit_code', 'measurement_uom'],
             'context_code' => 'TOOL_PRESET',
         ],
     ];
@@ -208,6 +208,7 @@ final class UomRuntimeAuthorityService
             'mutation_authority' => self::class,
             'command_adapter' => 'MOM\\Api\\Services\\DomainCommand\\UomCommandQuantityNormalizer',
             'api_controller' => 'MOM\\Api\\Controllers\\UomController',
+            'quality_measurement_authority' => 'MOM\\Api\\Services\\Uom\\QualityMeasurementAuthorityService',
             'evidence_table' => 'domain_command_uom_measurement',
             'canonical_tables' => [
                 'uom_quantity_kind',
@@ -216,12 +217,18 @@ final class UomRuntimeAuthorityService
                 'uom_alias',
                 'uom_alias_quarantine',
                 'item_uom_policy',
+                'uom_measurement_thread',
             ],
             'command_policy_count' => count($commands),
             'commands_requiring_uom_authority' => $commands,
             'no_bridge_runtime_contract' => true,
             'forbidden_runtime_class' => 'MOM\\Api\\Services\\MdaUomAuthorityBridge',
+            'forbidden_runtime_classes' => [
+                'MOM\\Api\\Services\\MdaUomAuthorityBridge',
+                'MOM\\Api\\Services\\Uom\\QualityMeasurementBridge',
+            ],
             'legacy_bridge_used' => false,
+            'quality_measurement_bridge_used' => false,
         ];
     }
 

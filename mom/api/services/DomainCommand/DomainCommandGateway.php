@@ -149,7 +149,7 @@ final class DomainCommandGateway
     {
         $engineering = $this->engineeringPackages ?? new EngineeringReleasePackageCommandHandler($this->db);
         $qualityHolds = $this->qualityHolds ?? new QualityHoldService($this->db);
-        $tooling = $this->tooling ?? new ToolingCommandHandler($this->db, $qualityHolds);
+        $tooling = $this->tooling ?? new ToolingCommandHandler($this->db, $qualityHolds, $this->uomNormalizer);
         $mesRuntime = $this->mesRuntime ?? new MesRuntimeCommandHandler($this->db, null, $this->uomNormalizer, $qualityHolds, $tooling);
         $inventory = $this->inventory ?? new InventoryCommandHandler($this->db, $this->uomNormalizer, $qualityHolds);
 
@@ -187,8 +187,11 @@ final class DomainCommandGateway
                 'RunInventoryReconciliationCommand' => $inventory->runReconciliation($payload),
                 'CloseInventoryPeriodCommand' => $inventory->closeInventoryPeriod($payload),
                 'ExportRecallTraceCommand' => $inventory->exportRecallTrace($payload),
+                'CostRollupCommand' => $inventory->costRollup($payload),
+                'ShipmentPackCommand' => $inventory->shipmentPack($payload),
                 'ReportToolBreakageCommand' => $tooling->reportToolBreakage($payload),
                 'GageOOTInvestigationCommand' => $tooling->investigateGageOot($payload),
+                'ToolPresetMeasurementCommand' => $tooling->recordToolPresetMeasurement($payload),
                 default => throw new DomainCommandException('command_handler_missing', "Command '{$commandName}' has no executable handler.", 501),
             };
         } catch (EngineeringReleasePackageException $e) {

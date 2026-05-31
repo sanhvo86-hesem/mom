@@ -204,6 +204,18 @@ final class RegulatedActionPolicy
             'signature_required' => false,
             'allowed_signature_meanings' => [],
         ],
+        'CostRollupCommand' => [
+            'root' => 'cost_ledger',
+            'risk_class' => 'critical',
+            'signature_required' => true,
+            'allowed_signature_meanings' => ['cost_rollup_post'],
+        ],
+        'ShipmentPackCommand' => [
+            'root' => 'shipment_packages',
+            'risk_class' => 'high',
+            'signature_required' => false,
+            'allowed_signature_meanings' => [],
+        ],
         'ReportToolBreakageCommand' => [
             'root' => 'tooling_breakage',
             'risk_class' => 'critical',
@@ -215,6 +227,12 @@ final class RegulatedActionPolicy
             'risk_class' => 'critical',
             'signature_required' => true,
             'allowed_signature_meanings' => ['gage_oot_investigation'],
+        ],
+        'ToolPresetMeasurementCommand' => [
+            'root' => 'tooling_presets',
+            'risk_class' => 'high',
+            'signature_required' => false,
+            'allowed_signature_meanings' => [],
         ],
         'PostInventoryLedgerTransactionCommand' => [
             'root' => 'inventory_ledger',

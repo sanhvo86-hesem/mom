@@ -1,8 +1,8 @@
 {
     "schema_version": "mda.v4.p59.operational_drill.v1",
-    "generated_at": "2026-05-31T11:19:19+00:00",
+    "generated_at": "2026-05-31T11:52:27+00:00",
     "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
-    "sha": "3ffa34b78",
+    "sha": "6cd969373",
     "p58_dashboard": {
         "path": "mom/data/registry/mda-v4-runtime-scenario-dashboard.latest.json",
         "decision": "P58_PASS_READY_FOR_NEXT",
@@ -27,13 +27,13 @@
         "path": "mom/data/registry/mda-v4-runtime-scenarios.json",
         "scenario_count": 14
     },
-    "source_root_hash_sha256": "3ba17850403b832655c4dd36ffa4a48d0400a72670d533be178964c99b057b4b",
+    "source_root_hash_sha256": "a8f6e4dc364cd5575db7c95e6aaef4ad6826f3ae3b614c1c3fb3ef2575dbaa1d",
     "restore_drill": {
         "artifact_restore": {
             "status": "pass",
-            "source_root_hash_sha256": "3ba17850403b832655c4dd36ffa4a48d0400a72670d533be178964c99b057b4b",
-            "restore_root_hash_sha256": "3ba17850403b832655c4dd36ffa4a48d0400a72670d533be178964c99b057b4b",
-            "target_root": "/var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/mda-v4-p59-restore-3ba17850403b",
+            "source_root_hash_sha256": "a8f6e4dc364cd5575db7c95e6aaef4ad6826f3ae3b614c1c3fb3ef2575dbaa1d",
+            "restore_root_hash_sha256": "a8f6e4dc364cd5575db7c95e6aaef4ad6826f3ae3b614c1c3fb3ef2575dbaa1d",
+            "target_root": "/var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/mda-v4-p59-restore-a8f6e4dc364c",
             "artifact_count": 3
         },
         "postgres_restore": {
@@ -49,7 +49,7 @@
     "rollback_rehearsal": {
         "status": "pass",
         "rollback_mode": "POSTGRES_PRIMARY_WITH_JSON_COMPATIBILITY_READS",
-        "restore_point_hash_sha256": "3ba17850403b832655c4dd36ffa4a48d0400a72670d533be178964c99b057b4b",
+        "restore_point_hash_sha256": "a8f6e4dc364cd5575db7c95e6aaef4ad6826f3ae3b614c1c3fb3ef2575dbaa1d",
         "operator_banner_required": true,
         "operator_banner_text": "MDA cutover is not complete. Fallback/drift controls are active; POSTGRES_ONLY is disabled.",
         "warnings": [

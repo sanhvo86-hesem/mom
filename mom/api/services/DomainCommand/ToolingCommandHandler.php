@@ -15,6 +15,7 @@ final class ToolingCommandHandler
     public function __construct(
         private readonly Connection $db,
         private readonly ?QualityHoldService $qualityHolds = null,
+        private readonly ?UomCommandQuantityNormalizer $uomNormalizer = null,
     ) {}
 
     /**
@@ -148,6 +149,102 @@ final class ToolingCommandHandler
         $this->writeAuditAndOutbox('tooling.usage_recorded', $toolId, $payload, ['event' => $event, 'life_increment' => $lifeIncrement]);
 
         return ['recorded' => true, 'tool_id' => $toolId, 'event' => $event, 'life_increment' => $lifeIncrement];
+    }
+
+    /**
+     * @param array<string,mixed> $payload
+     * @return array<string,mixed>
+     */
+    public function recordToolPresetMeasurement(array $payload): array
+    {
+        $toolId = $this->requiredAny($payload, ['tool_id', 'tool_ref'], 'tool_id');
+        $uom = $this->normalizeUom($payload, 'ToolPresetMeasurementCommand', 'preset_measurement');
+        $measurementType = $this->measurementType($payload);
+        $converted = (string)($uom['converted_magnitude'] ?? '0');
+        $unit = (string)($uom['target_unit_code'] ?? '');
+        $idempotencyKey = $this->requiredAny($payload, ['idempotency_key'], 'idempotency_key');
+
+        $preset = [];
+        if (in_array($measurementType, ['length', 'diameter'], true)) {
+            $presetNumber = $this->firstText($payload, ['preset_number', 'preset_id']);
+            if ($presetNumber === '') {
+                $presetNumber = 'PRESET-' . substr($this->hash([$toolId, $idempotencyKey, $measurementType]), 0, 16);
+            }
+            $preset = $this->db->queryOne(
+                "WITH inserted AS (
+                    INSERT INTO tooling_presets
+                        (preset_number, tool_id, preset_length, preset_diameter, measured_at, preset_status, metadata,
+                         source_command_name, idempotency_key, uom_measurement_id, preset_length_uom, preset_diameter_uom)
+                    VALUES
+                        (:preset_number, :tool_id,
+                         CASE WHEN :measurement_type = 'length' THEN CAST(:measurement_value AS numeric) ELSE NULL END,
+                         CASE WHEN :measurement_type = 'diameter' THEN CAST(:measurement_value AS numeric) ELSE NULL END,
+                         now(), 'active', CAST(:metadata AS jsonb),
+                         'ToolPresetMeasurementCommand', :idempotency_key, :uom_measurement_id,
+                         CASE WHEN :measurement_type = 'length' THEN :measurement_uom ELSE NULL END,
+                         CASE WHEN :measurement_type = 'diameter' THEN :measurement_uom ELSE NULL END)
+                    ON CONFLICT (source_command_name, idempotency_key)
+                        WHERE source_command_name IS NOT NULL AND idempotency_key IS NOT NULL
+                    DO NOTHING
+                    RETURNING *
+                 )
+                 SELECT * FROM inserted
+                 UNION ALL
+                 SELECT * FROM tooling_presets
+                  WHERE source_command_name = 'ToolPresetMeasurementCommand'
+                    AND idempotency_key = :idempotency_key
+                 LIMIT 1",
+                [
+                    ':preset_number' => $presetNumber,
+                    ':tool_id' => $toolId,
+                    ':measurement_type' => $measurementType,
+                    ':measurement_value' => $converted,
+                    ':metadata' => $this->json(['authority' => self::class, 'payload_refs' => $this->payloadRefs($payload), 'uom' => $uom]),
+                    ':idempotency_key' => $idempotencyKey,
+                    ':uom_measurement_id' => $this->nullableText($uom['measurement_id'] ?? null),
+                    ':measurement_uom' => $unit,
+                ]
+            ) ?? [];
+        }
+
+        $lifeMeasurement = $this->db->queryOne(
+            "WITH inserted AS (
+                INSERT INTO tooling_life_measurements
+                    (tool_id, measurement_type, measurement_value, measured_at, source_type, metadata,
+                     source_command_name, idempotency_key, uom_measurement_id, measurement_uom)
+                VALUES
+                    (:tool_id, :measurement_type, :measurement_value, now(), :source_type, CAST(:metadata AS jsonb),
+                     'ToolPresetMeasurementCommand', :idempotency_key, :uom_measurement_id, :measurement_uom)
+                ON CONFLICT (source_command_name, idempotency_key)
+                    WHERE source_command_name IS NOT NULL AND idempotency_key IS NOT NULL
+                DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM tooling_life_measurements
+              WHERE source_command_name = 'ToolPresetMeasurementCommand'
+                AND idempotency_key = :idempotency_key
+             LIMIT 1",
+            [
+                ':tool_id' => $toolId,
+                ':measurement_type' => $measurementType,
+                ':measurement_value' => $converted,
+                ':source_type' => $this->firstText($payload, ['measurement_source', 'source_type']) ?: 'presetter',
+                ':metadata' => $this->json(['authority' => self::class, 'payload_refs' => $this->payloadRefs($payload), 'uom' => $uom]),
+                ':idempotency_key' => $idempotencyKey,
+                ':uom_measurement_id' => $this->nullableText($uom['measurement_id'] ?? null),
+                ':measurement_uom' => $unit,
+            ]
+        ) ?? [];
+
+        $this->writeAuditAndOutbox('tooling.preset_measurement_recorded', $toolId, $payload, [
+            'preset' => $preset,
+            'life_measurement' => $lifeMeasurement,
+            'uom' => $uom,
+        ]);
+
+        return ['tool_id' => $toolId, 'preset' => $preset, 'life_measurement' => $lifeMeasurement, 'uom' => $uom];
     }
 
     /**
@@ -543,6 +640,51 @@ final class ToolingCommandHandler
     {
         $text = $this->text($value);
         return is_numeric($text) ? (float)$text : null;
+    }
+
+    /**
+     * @param array<string,mixed> $payload
+     * @return array<string,mixed>
+     */
+    private function normalizeUom(array $payload, string $commandName, string $quantityRole): array
+    {
+        return ($this->uomNormalizer ?? new UomCommandQuantityNormalizer($this->db))->normalizeAndRecord(
+            $commandName,
+            $payload,
+            $this->actor($payload),
+            $this->requiredAny($payload, ['idempotency_key'], 'idempotency_key'),
+            $quantityRole,
+            ['domain' => 'tooling_runtime_command']
+        );
+    }
+
+    /**
+     * @param array<string,mixed> $payload
+     */
+    private function measurementType(array $payload): string
+    {
+        $raw = strtolower($this->firstText($payload, ['measurement_type', 'characteristic', 'offset_type']));
+        $mapped = match ($raw) {
+            'length', 'preset_length', 'tool_length' => 'length',
+            'diameter', 'preset_diameter', 'tool_diameter' => 'diameter',
+            'wear', 'wear_offset', 'offset', 'offset_drift' => 'wear',
+            'usage', 'life', 'pieces' => 'usage',
+            default => '',
+        };
+        if ($mapped !== '') {
+            return $mapped;
+        }
+        if ($this->firstText($payload, ['preset_length', 'preset_length_mm', 'offset_value']) !== '') {
+            return 'length';
+        }
+        if ($this->firstText($payload, ['preset_diameter', 'preset_diameter_mm']) !== '') {
+            return 'diameter';
+        }
+        if ($this->firstText($payload, ['wear_value', 'wear_offset', 'offset_drift']) !== '') {
+            return 'wear';
+        }
+
+        throw new DomainCommandException('tool_preset_measurement_type_required', 'Tool preset measurement requires length, diameter, wear, or usage type.', 400);
     }
 
     private function actor(array $payload): string

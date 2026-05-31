@@ -73,7 +73,7 @@ final class InventoryCommandHandler
         $payload = $this->aliasQuantity($payload, 'issue_quantity', ['qty_consumed', 'quantity']);
         $result = $this->movement('IssueMaterialToWorkOrderCommand', $payload, 'issue_to_wip', 'issue_quantity', -1, 'consume');
         $this->writeWipIfAvailable('IssueMaterialToWorkOrderCommand', $payload, $result['uom'], 1, 'material_issue');
-        $this->writeCostIfAvailable('IssueMaterialToWorkOrderCommand', $payload, 'material', 'material_issue');
+        $this->writeCostIfAvailable('IssueMaterialToWorkOrderCommand', $payload, 'material', 'material_issue', $result['uom']);
         return $result;
     }
 
@@ -146,7 +146,7 @@ final class InventoryCommandHandler
         $payload = $this->aliasQuantity($payload, 'completed_quantity', ['qty_good', 'quantity_good', 'quantity']);
         $result = $this->movement('CompleteToStockCommand', $payload, 'complete_to_stock', 'completed_quantity', 1, 'produce');
         $this->writeWipIfAvailable('CompleteToStockCommand', $payload, $result['uom'], -1, 'complete_to_stock');
-        $this->writeCostIfAvailable('CompleteToStockCommand', $payload, 'production', 'complete_to_stock');
+        $this->writeCostIfAvailable('CompleteToStockCommand', $payload, 'production', 'complete_to_stock', $result['uom']);
         return $result;
     }
 
@@ -159,7 +159,7 @@ final class InventoryCommandHandler
         $payload = $this->aliasQuantity($payload, 'scrap_quantity', ['qty_scrap', 'quantity']);
         $result = $this->movement('ScrapInventoryCommand', $payload, 'scrap', 'scrap_quantity', -1, 'scrap');
         $this->writeWipIfAvailable('ScrapInventoryCommand', $payload, $result['uom'], -1, 'scrap');
-        $this->writeCostIfAvailable('ScrapInventoryCommand', $payload, 'scrap', 'scrap');
+        $this->writeCostIfAvailable('ScrapInventoryCommand', $payload, 'scrap', 'scrap', $result['uom']);
         return $result;
     }
 
@@ -368,6 +368,77 @@ final class InventoryCommandHandler
      * @param array<string,mixed> $payload
      * @return array<string,mixed>
      */
+    public function costRollup(array $payload): array
+    {
+        $payload = $this->aliasQuantity($payload, 'cost_quantity', ['quantity', 'qty']);
+        $uom = $this->normalizeUom('CostRollupCommand', $payload, 'cost_quantity');
+        $ledger = $this->writeCostLedger(
+            'CostRollupCommand',
+            $payload,
+            $this->firstText($payload, ['cost_element_code']) ?: 'standard_cost',
+            'cost_rollup',
+            $uom
+        );
+        $this->writeAuditAndOutbox('finance.cost_rollup_posted', (string)($ledger['cost_ledger_id'] ?? ''), $payload, ['cost_ledger' => $ledger, 'uom' => $uom]);
+
+        return ['cost_ledger' => $ledger, 'uom' => $uom];
+    }
+
+    /**
+     * @param array<string,mixed> $payload
+     * @return array<string,mixed>
+     */
+    public function shipmentPack(array $payload): array
+    {
+        $payload = $this->aliasQuantity($payload, 'ship_quantity', ['quantity', 'qty']);
+        $this->assertQualityClear('ShipmentPackCommand', $payload);
+        $uom = $this->normalizeUom('ShipmentPackCommand', $payload, 'ship_quantity');
+        $packageNumber = (int)($this->firstText($payload, ['package_number', 'package_no']) ?: '1');
+        $row = $this->db->queryOne(
+            "WITH inserted AS (
+                INSERT INTO shipment_packages
+                    (shipment_id, package_number, sscc_barcode, weight, dimensions, contents_desc, metadata,
+                     source_command_name, idempotency_key, ledger_line_role, item_id, quantity, quantity_uom, uom_measurement_id)
+                VALUES
+                    (CAST(:shipment_id AS uuid), :package_number, :sscc_barcode, :weight, :dimensions, :contents_desc, CAST(:metadata AS jsonb),
+                     'ShipmentPackCommand', :idempotency_key, 'primary', :item_id, :quantity, :quantity_uom, :uom_measurement_id)
+                ON CONFLICT (source_command_name, idempotency_key, ledger_line_role)
+                    WHERE source_command_name IS NOT NULL AND idempotency_key IS NOT NULL
+                DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM shipment_packages
+              WHERE source_command_name = 'ShipmentPackCommand'
+                AND idempotency_key = :idempotency_key
+                AND ledger_line_role = 'primary'
+             LIMIT 1",
+            [
+                ':shipment_id' => $this->requiredAny($payload, ['shipment_id'], 'shipment_id'),
+                ':package_number' => $packageNumber,
+                ':sscc_barcode' => $this->nullableText($payload['sscc_barcode'] ?? null),
+                ':weight' => $this->nullableText($payload['weight'] ?? null),
+                ':dimensions' => $this->nullableText($payload['dimensions'] ?? null),
+                ':contents_desc' => $this->nullableText($payload['contents_desc'] ?? null),
+                ':metadata' => $this->json(['authority' => self::class, 'payload_refs' => $this->payloadRefs($payload), 'uom' => $uom]),
+                ':idempotency_key' => $this->requiredAny($payload, ['idempotency_key'], 'idempotency_key'),
+                ':item_id' => $this->firstText($payload, ['item_id', 'part_number', 'material_id']) ?: null,
+                ':quantity' => (string)($uom['converted_magnitude'] ?? '0'),
+                ':quantity_uom' => (string)($uom['target_unit_code'] ?? ''),
+                ':uom_measurement_id' => $this->nullableText($uom['measurement_id'] ?? null),
+            ]
+        );
+        $this->writeCommandGenealogy('ship', $payload, $uom, (string)($row['package_id'] ?? ''));
+        $this->writeAuditAndOutbox('inventory.shipment_pack_packed', (string)($row['package_id'] ?? ''), $payload, ['shipment_package' => $row, 'uom' => $uom]);
+
+        return ['shipment_package' => $row ?? [], 'uom' => $uom];
+    }
+
+    /**
+     * @param array<string,mixed> $payload
+     * @return array<string,mixed>
+     */
     private function movement(string $commandName, array $payload, string $movementType, string $quantityRole, int $direction, string $genealogyType): array
     {
         $this->assertOpenPeriod($payload);
@@ -549,10 +620,16 @@ final class InventoryCommandHandler
                      :source_command_name, :idempotency_key, :ledger_line_role, :uom_measurement_id, CAST(:metadata AS jsonb))
                 ON CONFLICT (source_command_name, idempotency_key, ledger_line_role)
                     WHERE idempotency_key IS NOT NULL AND source_command_name IS NOT NULL
-                DO NOTHING
-                RETURNING *
+                 DO NOTHING
+                 RETURNING *
              )
-             SELECT * FROM inserted",
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM cost_ledger
+              WHERE source_command_name = :source_command_name
+                AND idempotency_key = :idempotency_key
+                AND ledger_line_role = :ledger_line_role
+             LIMIT 1",
             [
                 ':production_order_id' => $productionOrderId,
                 ':item_revision_id' => $itemRevisionId,
@@ -571,7 +648,7 @@ final class InventoryCommandHandler
     /**
      * @param array<string,mixed> $payload
      */
-    private function writeCostIfAvailable(string $commandName, array $payload, string $element, string $lineRole): void
+    private function writeCostIfAvailable(string $commandName, array $payload, string $element, string $lineRole, array $uom): void
     {
         $amount = $this->firstText($payload, ['cost_amount', 'amount_delta']);
         if ($amount === '') {
@@ -581,16 +658,34 @@ final class InventoryCommandHandler
         if ($costObjectId === '') {
             return;
         }
-        $this->db->queryOne(
+        $this->writeCostLedger($commandName, $payload, $element, 'cost_' . $lineRole, $uom);
+    }
+
+    /**
+     * @param array<string,mixed> $payload
+     * @param array<string,mixed> $uom
+     * @return array<string,mixed>
+     */
+    private function writeCostLedger(string $commandName, array $payload, string $element, string $lineRole, array $uom): array
+    {
+        $costObjectId = $this->firstText($payload, ['cost_object_id', 'production_order_id', 'work_order_id', 'reference_entity_id']);
+        if ($costObjectId === '') {
+            throw new DomainCommandException('cost_object_required', 'Cost ledger command requires cost_object_id or equivalent reference.', 400);
+        }
+        $amount = $this->firstText($payload, ['cost_amount', 'amount_delta']);
+        if ($amount === '') {
+            throw new DomainCommandException('cost_amount_required', 'Cost ledger command requires cost_amount or amount_delta.', 400);
+        }
+        $row = $this->db->queryOne(
             "WITH inserted AS (
                 INSERT INTO cost_ledger
                     (cost_object_type, cost_object_id, cost_element_code, cost_amount, currency_code,
                      reference_entity_name, reference_entity_id, source_command_name, idempotency_key,
-                     ledger_line_role, metadata)
+                     ledger_line_role, uom_measurement_id, quantity_magnitude, quantity_uom, metadata)
                 VALUES
                     (:cost_object_type, :cost_object_id, :cost_element_code, :cost_amount, :currency_code,
                      :reference_entity_name, :reference_entity_id, :source_command_name, :idempotency_key,
-                     :ledger_line_role, CAST(:metadata AS jsonb))
+                     :ledger_line_role, :uom_measurement_id, :quantity_magnitude, :quantity_uom, CAST(:metadata AS jsonb))
                 ON CONFLICT (source_command_name, idempotency_key, ledger_line_role)
                     WHERE idempotency_key IS NOT NULL AND source_command_name IS NOT NULL
                 DO NOTHING
@@ -607,10 +702,15 @@ final class InventoryCommandHandler
                 ':reference_entity_id' => $this->nullableText($payload['reference_entity_id'] ?? null),
                 ':source_command_name' => $commandName,
                 ':idempotency_key' => $this->requiredAny($payload, ['idempotency_key'], 'idempotency_key'),
-                ':ledger_line_role' => 'cost_' . $lineRole,
-                ':metadata' => $this->json(['authority' => self::class]),
+                ':ledger_line_role' => $lineRole,
+                ':uom_measurement_id' => $this->nullableText($uom['measurement_id'] ?? null),
+                ':quantity_magnitude' => (string)($uom['converted_magnitude'] ?? '0'),
+                ':quantity_uom' => (string)($uom['target_unit_code'] ?? ''),
+                ':metadata' => $this->json(['authority' => self::class, 'uom' => $uom]),
             ]
         );
+
+        return is_array($row) ? $row : [];
     }
 
     /**

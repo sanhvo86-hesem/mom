@@ -106,6 +106,46 @@ final class DomainCommandInventoryCommandHandlerTest extends TestCase
         $this->assertTrue($db->hasQuery('inventory.recall_trace_exported'));
     }
 
+    public function testCostRollupWritesCostLedgerWithUomEvidence(): void
+    {
+        $db = new DomainCommandInventoryFakeConnection();
+        $result = (new InventoryCommandHandler($db))->costRollup([
+            'idempotency_key' => 'idem-cost-rollup',
+            'actor_id' => 'cost-1',
+            'item_id' => 'PART-1',
+            'cost_object_id' => '00000000-0000-0000-0000-000000000401',
+            'cost_quantity' => '3',
+            'cost_uom' => 'PCS',
+            'cost_amount' => '1200.00',
+            'currency_code' => 'VND',
+        ]);
+
+        $this->assertSame('PCS', $result['uom']['target_unit_code']);
+        $this->assertTrue($db->hasQuery('INSERT INTO domain_command_uom_measurement'));
+        $this->assertTrue($db->hasQuery('INSERT INTO cost_ledger'));
+        $this->assertTrue($db->hasParam(':uom_measurement_id', 'uom-measurement-1'));
+    }
+
+    public function testShipmentPackWritesPackageWithUomEvidence(): void
+    {
+        $db = new DomainCommandInventoryFakeConnection();
+        $result = (new InventoryCommandHandler($db))->shipmentPack([
+            'idempotency_key' => 'idem-ship-pack',
+            'actor_id' => 'shipper-1',
+            'shipment_id' => '00000000-0000-0000-0000-000000000901',
+            'package_number' => 1,
+            'item_id' => 'PART-1',
+            'ship_quantity' => '5',
+            'sales_uom' => 'PCS',
+            'lot_number' => 'LOT-1',
+        ]);
+
+        $this->assertSame('PCS', $result['uom']['target_unit_code']);
+        $this->assertTrue($db->hasQuery('INSERT INTO shipment_packages'));
+        $this->assertTrue($db->hasQuery('INSERT INTO genealogy_edge_facts'));
+        $this->assertTrue($db->hasParam(':uom_measurement_id', 'uom-measurement-1'));
+    }
+
     /**
      * @return array<string,mixed>
      */
@@ -282,6 +322,23 @@ final class DomainCommandInventoryFakeConnection extends Connection
             ];
         }
 
+        if (str_contains($sql, 'INSERT INTO cost_ledger')) {
+            return [
+                'cost_ledger_id' => '00000000-0000-0000-0000-000000000804',
+                'cost_amount' => $params[':cost_amount'] ?? '0',
+                'uom_measurement_id' => $params[':uom_measurement_id'] ?? '',
+            ];
+        }
+
+        if (str_contains($sql, 'INSERT INTO shipment_packages')) {
+            return [
+                'package_id' => '00000000-0000-0000-0000-000000000805',
+                'shipment_id' => $params[':shipment_id'] ?? '',
+                'quantity_uom' => $params[':quantity_uom'] ?? '',
+                'uom_measurement_id' => $params[':uom_measurement_id'] ?? '',
+            ];
+        }
+
         return null;
     }
 
@@ -295,6 +352,16 @@ final class DomainCommandInventoryFakeConnection extends Connection
     {
         foreach ($this->queries as $query) {
             if (str_contains($query['sql'], $needle)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function hasParam(string $key, mixed $value): bool
+    {
+        foreach ($this->queries as $query) {
+            if (($query['params'][$key] ?? null) === $value) {
                 return true;
             }
         }

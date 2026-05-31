@@ -104,6 +104,24 @@ final class DomainCommandToolingCommandHandlerTest extends TestCase
         $this->assertTrue($db->hasQuery('UPDATE tooling_runtime_state'));
     }
 
+    public function testToolPresetMeasurementNormalizesThroughUomSsot(): void
+    {
+        $db = new DomainCommandToolingFakeConnection();
+        $result = (new ToolingCommandHandler($db))->recordToolPresetMeasurement($this->toolPayload('idem-preset-measure') + [
+            'measurement_type' => 'length',
+            'preset_length' => '125',
+            'measurement_unit' => 'MM',
+            'target_unit' => 'MM',
+            'preset_number' => 'PRESET-1',
+        ]);
+
+        $this->assertSame('MM', $result['uom']['target_unit_code']);
+        $this->assertTrue($db->hasQuery('INSERT INTO domain_command_uom_measurement'));
+        $this->assertTrue($db->hasQuery('INSERT INTO tooling_presets'));
+        $this->assertTrue($db->hasQuery('INSERT INTO tooling_life_measurements'));
+        $this->assertTrue($db->hasParam(':uom_measurement_id', 'uom-measurement-1'));
+    }
+
     /**
      * @return array<string,mixed>
      */
@@ -213,6 +231,50 @@ final class DomainCommandToolingFakeConnection extends Connection
                 'calibration_status' => $this->gageMode === 'expired' ? 'expired' : 'valid',
                 'msa_status' => 'acceptable',
                 'calibration_due_at' => $this->gageMode === 'expired' ? '2020-01-01T00:00:00Z' : '2099-01-01T00:00:00Z',
+            ];
+        }
+
+        if (str_contains($sql, 'FROM uom_unit_catalog')) {
+            $code = (string)($params[':a'] ?? $params[':code'] ?? '');
+            if ($code === 'MM') {
+                return [
+                    'canonical_code' => 'MM',
+                    'quantity_kind_code' => 'Length',
+                    'si_factor' => '0.001',
+                    'si_offset' => '0',
+                    'is_affine' => false,
+                    'lifecycle_status' => 'active',
+                    'risk_level' => 'low',
+                ];
+            }
+            return null;
+        }
+
+        if (str_contains($sql, 'FROM uom_conversion_rule')) {
+            return null;
+        }
+
+        if (str_contains($sql, 'INSERT INTO domain_command_uom_measurement')) {
+            return [
+                'measurement_id' => 'uom-measurement-1',
+                'measval_hash_sha256' => $params[':measval_hash_sha256'] ?? hash('sha256', 'uom'),
+            ];
+        }
+
+        if (str_contains($sql, 'INSERT INTO tooling_presets')) {
+            return [
+                'tooling_preset_id' => 'preset-1',
+                'tool_id' => 'TOOL-1',
+                'uom_measurement_id' => $params[':uom_measurement_id'] ?? '',
+            ];
+        }
+
+        if (str_contains($sql, 'INSERT INTO tooling_life_measurements')) {
+            return [
+                'tooling_life_measurement_id' => 'life-measure-1',
+                'tool_id' => 'TOOL-1',
+                'measurement_uom' => $params[':measurement_uom'] ?? '',
+                'uom_measurement_id' => $params[':uom_measurement_id'] ?? '',
             ];
         }
 

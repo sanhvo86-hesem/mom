@@ -3,29 +3,30 @@
 Prompt: P46 - UOM Measurement Authority Integration Closure
 Branch: `codex/mda-v4-implementation-closure-recovery-20260530`
 Date: 2026-05-31
-Decision token: `P46_PASS_WITH_CONTROLLED_GAPS_DIRECT_COMMAND_STACK_READY`
+Decision token: `UOM_SYSTEM_SSOT_PASS`
 
 ## What Changed
 
 - Replaced command-stack bridge dependency with `UomCommandQuantityNormalizer`.
-- `MesRuntimeCommandHandler` now normalizes issue material, complete operation, and inspection measurement quantities directly through `UomRuntimeAuthorityService`.
+- Domain command handlers now normalize inventory, MES, quality, cost, shipment, and tooling measurement quantities directly through `UomRuntimeAuthorityService`.
 - Added immutable `domain_command_uom_measurement` evidence table.
-- Added command-stack UOM unit test file and manual probe evidence.
+- Added command-stack UOM unit tests, SSOT release guard, and runtime scenario evidence.
 
 ## Runtime Proof
 
-- `10 BOX` material issue becomes `500 PCS` before MES write.
+- `10 BOX` governed quantity becomes `500 PCS` before domain write.
 - Missing item UOM policy returns `uom_authority_resolution_failed`.
-- Missing policy path performs zero `mes_material_consumption` writes.
+- Missing policy path performs zero domain writes.
 - UOM MEASVAL hash is carried into inspection event payload.
 
 ## Next Prompt Constraint
 
-Do not route new governed quantity writes through `MdaUomAuthorityBridge`. New command handlers must inject or instantiate `UomCommandQuantityNormalizer` inside the domain command transaction before mutation.
+New governed quantity handlers must inject or instantiate `UomCommandQuantityNormalizer` inside the domain command transaction before mutation.
 
-## Remaining Controlled Gaps
+## Remaining Non-UOM Gaps
 
-- Receive, putaway, cost, shipment, and tool preset handlers are not live DomainCommandGateway handlers yet.
-- UOM-internal alias ambiguity and lifecycle rule hardening should stay on the active UOM branch or be cherry-picked separately after review.
+- Restore drill target is not configured.
+- Live VPS Chrome smoke is not proven.
+- PHPUnit/PHPStan remain blocked by missing local Composer vendor binaries.
 
-P46_PASS_WITH_CONTROLLED_GAPS_DIRECT_COMMAND_STACK_READY
+UOM_SYSTEM_SSOT_PASS

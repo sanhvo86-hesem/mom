@@ -12,10 +12,9 @@ use Throwable;
 /**
  * Direct command-stack adapter for the UOM runtime authority.
  *
- * This class intentionally depends on UomRuntimeAuthorityService, not the old
- * MDA compatibility bridge. It normalizes governed command quantities and
- * records immutable MEASVAL lineage before the domain handler writes execution
- * or inventory truth.
+ * This class depends on UomRuntimeAuthorityService directly. It normalizes
+ * governed command quantities and records immutable MEASVAL lineage before the
+ * domain handler writes execution or inventory truth.
  */
 final class UomCommandQuantityNormalizer
 {

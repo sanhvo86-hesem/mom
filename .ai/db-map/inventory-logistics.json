@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "inventory_logistics",
         "table_count": 9,
-        "generated_at": "2026-06-01T03:32:02+00:00"
+        "generated_at": "2026-06-01T03:32:57+00:00"
     },
     "tables": {
         "freight_order_stops": {
@@ -74,7 +74,8 @@
         "shipment_packages": {
             "defined_in": "016_shipping_compliance.sql",
             "extended_in": [
-                "070_enterprise_governance_uplift.sql"
+                "070_enterprise_governance_uplift.sql",
+                "275_uom_system_ssot_closure.sql"
             ],
             "primary_key": "package_id",
             "foreign_keys": [

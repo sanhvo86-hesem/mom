@@ -72,7 +72,7 @@ final class UomDomainIntegrationP12Test extends TestCase
             'api/services/Uom/ItemUomPolicyService.php',
             'api/services/Uom/MeasurementValueFactory.php',
             'api/services/Uom/UomAliasResolutionService.php',
-            'api/services/Uom/QualityMeasurementBridge.php',
+            'api/services/Uom/QualityMeasurementAuthorityService.php',
             'api/services/Uom/PotencyContextualConverter.php',
         ] as $path) {
             $this->assertFileExists($this->root . '/' . $path);

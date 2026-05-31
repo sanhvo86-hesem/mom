@@ -48,8 +48,8 @@ Direct command-stack probe still passes: `10 BOX -> 500 PCS`, writes UOM evidenc
 - MDA architect: PASS. There is no second UOM authority class in MDA source.
 - MES lead: PASS. Material issue, complete operation, inspection, and inventory handlers normalize through UOM before mutation.
 - Quality lead: PASS. Inspection result path carries MEASVAL hash into quality/event evidence.
-- Data governance: PASS with controlled gaps. Cost rollup, shipment pack, and tool preset policies exist but still need live command handlers.
+- Data governance: PASS. Cost rollup, shipment pack, and tool preset policies now have live command handlers and UOM evidence columns.
 
 ## Decision Token
 
-UOM_DIRECT_AUTHORITY_SYSTEM_CONSOLIDATED_READY_FOR_P58
+UOM_SYSTEM_SSOT_PASS

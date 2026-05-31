@@ -79,8 +79,11 @@
     "Real command-stack scenario runner remains P58 work."
   ],
   "uom_policy": {
-    "mode": "connect_existing_uom_only",
-    "bridge": "MdaUomAuthorityBridge",
-    "uom_internal_files_touched": false
+    "mode": "direct_uom_runtime_authority",
+    "authority_service": "MOM\\Api\\Services\\Uom\\UomRuntimeAuthorityService",
+    "command_adapter": "MOM\\Api\\Services\\DomainCommand\\UomCommandQuantityNormalizer",
+    "forbidden_runtime_class_removed": "MOM\\Api\\Services\\MdaUomAuthorityBridge",
+    "quality_measurement_authority": "MOM\\Api\\Services\\Uom\\QualityMeasurementAuthorityService",
+    "uom_internal_files_touched": true
   }
 }

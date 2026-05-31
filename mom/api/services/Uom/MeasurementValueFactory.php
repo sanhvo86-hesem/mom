@@ -169,8 +169,8 @@ final class MeasurementValueFactory
     /**
      * Build a MEASVAL envelope for a measurement that requires no conversion.
      *
-     * Used by QualityMeasurementBridge when wrapping an existing inspection
-     * measurement in-situ (no unit change). The audit hash uses the same
+     * Used by QualityMeasurementAuthorityService when wrapping an existing
+     * inspection measurement in-situ (no unit change). The audit hash uses the same
      * format with from_unit == to_unit and rule_code = 'IDENTITY'.
      *
      * @param string $magnitude  The measurement value (numeric string)

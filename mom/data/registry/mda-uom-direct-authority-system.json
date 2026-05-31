@@ -6,8 +6,12 @@
     "service": "MOM\\Api\\Services\\Uom\\UomRuntimeAuthorityService",
     "command_adapter": "MOM\\Api\\Services\\DomainCommand\\UomCommandQuantityNormalizer",
     "api_controller": "MOM\\Api\\Controllers\\UomController",
+    "quality_measurement_authority": "MOM\\Api\\Services\\Uom\\QualityMeasurementAuthorityService",
     "authority_token": "uom_runtime_authority",
-    "bridge_forbidden": "MOM\\Api\\Services\\MdaUomAuthorityBridge"
+    "forbidden_runtime_classes": [
+      "MOM\\Api\\Services\\MdaUomAuthorityBridge",
+      "MOM\\Api\\Services\\Uom\\QualityMeasurementBridge"
+    ]
   },
   "authoritative_storage": {
     "catalog_tables": [
@@ -22,6 +26,7 @@
       "item_uom_policy"
     ],
     "command_evidence_table": "domain_command_uom_measurement",
+    "measurement_thread_table": "uom_measurement_thread",
     "audit_event_type": "uom.command_quantity_normalized",
     "outbox_event_type": "UomCommandQuantityNormalized"
   },
@@ -46,6 +51,7 @@
   "fail_closed_rules": [
     "No governed quantity mutation may use caller-provided unit truth directly.",
     "No governed quantity mutation may instantiate MdaUomAuthorityBridge.",
+    "No governed measurement wrapper may instantiate QualityMeasurementBridge.",
     "Missing item UOM policy, alias resolution, compatibility rule, or contextual evidence blocks before mutation.",
     "Every successful governed command quantity writes domain_command_uom_measurement before MES, quality, inventory, or cost truth."
   ],

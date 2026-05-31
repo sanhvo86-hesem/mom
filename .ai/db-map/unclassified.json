@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "unclassified",
         "table_count": 860,
-        "generated_at": "2026-06-01T03:32:02+00:00"
+        "generated_at": "2026-06-01T03:32:57+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -1243,7 +1243,8 @@
             "defined_in": "077_canonical_inventory_cost_traceability.sql",
             "extended_in": [
                 "091_runtime_governance_continuity.sql",
-                "271_inventory_ledger_runtime_authority.sql"
+                "271_inventory_ledger_runtime_authority.sql",
+                "275_uom_system_ssot_closure.sql"
             ],
             "primary_key": "cost_ledger_id",
             "foreign_keys": [],
@@ -11321,7 +11322,8 @@
         "tooling_life_measurements": {
             "defined_in": "057_tooling_lifecycle_management.sql",
             "extended_in": [
-                "070_enterprise_governance_uplift.sql"
+                "070_enterprise_governance_uplift.sql",
+                "275_uom_system_ssot_closure.sql"
             ],
             "primary_key": "tooling_life_measurement_id",
             "foreign_keys": [
@@ -11344,7 +11346,8 @@
         "tooling_presets": {
             "defined_in": "057_tooling_lifecycle_management.sql",
             "extended_in": [
-                "070_enterprise_governance_uplift.sql"
+                "070_enterprise_governance_uplift.sql",
+                "275_uom_system_ssot_closure.sql"
             ],
             "primary_key": "tooling_preset_id",
             "foreign_keys": [
