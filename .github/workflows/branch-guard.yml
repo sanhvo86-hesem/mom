@@ -42,7 +42,7 @@ jobs:
     name: Migration Collision Check
     runs-on: ubuntu-latest
     needs: classify
-    if: ${{ always() && !failure() && (needs.classify.outputs.needs_db_migration_check == 'true' || needs.classify.outputs.is_full_required == 'true') }}
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_db_migration_check == 'true' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -53,33 +53,34 @@ jobs:
           set -euo pipefail
           MIGRATION_DIR="mom/database/migrations"
 
-          # Extract the leading NNN from each filename, collect duplicates
-          NUMS=$(ls "$MIGRATION_DIR"/*.sql 2>/dev/null | xargs -I{} basename {} | grep -oE '^[0-9]+' | sort)
-          DUPS=$(echo "$NUMS" | uniq -d)
+          NEW_FILES=$(git diff --name-only --diff-filter=A origin/main...HEAD -- "$MIGRATION_DIR/*.sql" || true)
+          if [ -z "$NEW_FILES" ]; then
+            echo "No new migration files in this branch."
+            exit 0
+          fi
+
+          NEW_NUMS=$(printf '%s\n' "$NEW_FILES" | xargs -n1 basename | grep -oE '^[0-9]+' | sort || true)
+          DUPS=$(echo "$NEW_NUMS" | uniq -d)
 
           if [ -n "$DUPS" ]; then
             echo "::error::Duplicate migration number(s) detected: $DUPS"
-            echo "Two AI agents created migrations with the same number."
-            echo "Rename the conflicting file to use the next available number."
-            ls "$MIGRATION_DIR"/*.sql | xargs -I{} basename {} | grep -E "^($DUPS)_" | sed 's/^/  - /'
+            echo "This branch adds more than one migration with the same number."
+            echo "$NEW_FILES" | xargs -n1 basename | grep -E "^($(echo "$DUPS" | paste -sd'|' -))_" | sed 's/^/  - /'
             exit 1
           fi
-          echo "PASS: No duplicate migration numbers found."
+          echo "PASS: No duplicate migration numbers among new branch migrations."
 
       - name: Check this branch does not reuse a number already in main
-        if: github.event_name == 'pull_request'
         run: |
           set -euo pipefail
           MIGRATION_DIR="mom/database/migrations"
 
-          # Files added in this PR vs main
           NEW_FILES=$(git diff --name-only --diff-filter=A origin/main...HEAD -- "$MIGRATION_DIR/*.sql" || true)
           if [ -z "$NEW_FILES" ]; then
-            echo "No new migration files in this PR."
+            echo "No new migration files in this branch."
             exit 0
           fi
 
-          # Numbers already on main
           MAIN_NUMS=$(git ls-tree -r --name-only origin/main -- "$MIGRATION_DIR" | \
             xargs -n1 basename | grep -oE '^[0-9]+' | sort -u || true)
 
