@@ -489,14 +489,15 @@ final class DesignTokenCatalogService
     {
         if ($this->canReadFromDb()) {
             try {
+                // status literal inlined (constant, no injection risk) — a $1
+                // param here would bind at array key 0, which PDO_PGSQL rejects.
                 $rows = $this->data->query(
                     'SELECT preset_key, display_name_en, display_name_vi, brand,
                             density_px, radius_outer_px, radius_inner_px, control_h_px, frame_px,
                             overrides, scope_type, scope_id, base_ref, status, is_default, is_builtin, sort_order
                        FROM graphics_theme_preset
-                      WHERE status = $1
-                   ORDER BY sort_order, preset_key',
-                    ['published']
+                      WHERE status = \'published\'
+                   ORDER BY sort_order, preset_key'
                 ) ?? [];
                 if ($rows !== []) {
                     return array_map([$this, 'hydrateThemePresetRow'], $rows);
@@ -554,18 +555,18 @@ final class DesignTokenCatalogService
                  status          = EXCLUDED.status,
                  sort_order      = EXCLUDED.sort_order,
                  updated_at      = NOW()',
-            [
+            $this->pgParams([
                 $p['preset_key'], $p['display_name_en'], $p['display_name_vi'], $p['brand'],
                 $p['density_px'], $p['radius_outer_px'], $p['radius_inner_px'], $p['control_h_px'], $p['frame_px'],
                 (string)json_encode($p['overrides']), $p['scope_type'], $p['scope_id'], $p['base_ref'],
                 $p['status'], $p['sort_order'], $user,
-            ]
+            ])
         );
         // single org-default invariant
         if ($p['is_default']) {
             try {
-                $this->data->execute('UPDATE graphics_theme_preset SET is_default = FALSE WHERE preset_key <> $1', [$p['preset_key']]);
-                $this->data->execute('UPDATE graphics_theme_preset SET is_default = TRUE  WHERE preset_key = $1', [$p['preset_key']]);
+                $this->data->execute('UPDATE graphics_theme_preset SET is_default = FALSE WHERE preset_key <> $1', $this->pgParams([$p['preset_key']]));
+                $this->data->execute('UPDATE graphics_theme_preset SET is_default = TRUE  WHERE preset_key = $1', $this->pgParams([$p['preset_key']]));
             } catch (Throwable $e) {
                 // best-effort
             }
@@ -581,9 +582,26 @@ final class DesignTokenCatalogService
         }
         $this->data->execute(
             'DELETE FROM graphics_theme_preset WHERE preset_key = $1 AND is_builtin = FALSE',
-            [$presetKey]
+            $this->pgParams([$presetKey])
         );
         return ['deleted' => $presetKey];
+    }
+
+    /**
+     * Re-key a positional value list to 1-based ($1,$2,…) because
+     * Connection::executeStatement binds by array key and PDO_PGSQL requires
+     * 1-based positions for $N placeholders (a 0-indexed array triggers
+     * "bindValue(): Argument #1 must be >= 1").
+     * @param array<int, mixed> $values
+     * @return array<int, mixed>
+     */
+    private function pgParams(array $values): array
+    {
+        $values = array_values($values);
+        if ($values === []) {
+            return [];
+        }
+        return array_combine(range(1, count($values)), $values);
     }
 
     /**
