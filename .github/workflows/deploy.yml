@@ -223,6 +223,14 @@ jobs:
         # single render entry point from regressing. Runs unconditionally.
         run: node tools/scripts/smoke-blocks-facade.mjs
 
+      - name: Blocks L3 equivalence map (Stage 1)
+        # Sandbox-loads the facade + 00bi-blocks-l3-map.js and asserts the
+        # strangler migration layer: preferL3 defaults OFF (engine passthrough,
+        # no visual change), preferL3 ON routes mapped types through their L3
+        # block via the adapter, adapters map config/data→slots correctly, and a
+        # throwing adapter degrades to the engine render. Runs unconditionally.
+        run: node tools/scripts/smoke-blocks-l3-map.mjs
+
       - name: ISO reference status check
         run: php mom/tools/release/check_iso_reference_status.php
 
