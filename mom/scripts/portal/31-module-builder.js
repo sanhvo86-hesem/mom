@@ -109,6 +109,16 @@ var _ngModuleStudioDraftFromSchema;
 var _ngApplyModuleStudioDraft;
 var _ngSyncModuleBuilderManifest;
 var _ngRenderStudioField;
+/* Round-7/9 helpers called from LATER round blocks (R10/R11/R12). In strict
+   mode a `function` declared inside one round's `if` block is block-scoped and
+   invisible to sibling blocks, so a bare declaration threw "X is not defined"
+   at the cross-block call site (same class as _ngRenderStudioField). Predeclare
+   here + assign in the defining block so the name is visible everywhere; the
+   function still closes over its own block, so its internal calls resolve. */
+var _r7InsertTemplate;
+var _r7BuildSceneMoments;
+var _r7SyncManifest;
+var _r9DownloadText;
 var _ngRenderModuleStudioPanel;
 var _ngExportBuilderJson;
 var _ngExportRuntimeJson;
@@ -14386,7 +14396,7 @@ if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R7__){
     return found || _r7Array(schema && schema.tabs)[0] || null;
   }
   function _r7Template(key){ return ((BE && BE.BLOCK_TEMPLATES) || {})[key] || null; }
-  function _r7InsertTemplate(key, opts){
+  _r7InsertTemplate = function(key, opts){
     if(!state.schema) return false;
     var tpl = _r7Template(key);
     var tab = _r7FindTab(state.schema, opts && opts.tabId || state.activeTab);
@@ -14409,7 +14419,7 @@ if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R7__){
       if(!exists) _r7InsertTemplate(key, { tabId:tab.tabId });
     });
   }
-  function _r7BuildSceneMoments(schema){
+  _r7BuildSceneMoments = function(schema){
     var moments = [];
     _r7Array(schema && schema.tabs).forEach(function(tab){
       var blocks = _r7Array(tab && tab.blocks);
@@ -14582,7 +14592,7 @@ if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R7__){
       r6UltraRecovery:_r7GetByPath(schema, 'experienceDirector.r6UltraRecovered') ? 100 : 0
     };
   }
-  function _r7SyncManifest(schema){
+  _r7SyncManifest = function(schema){
     if(!schema) return null;
     _r7EnsureSchemaMeta(schema);
     var metrics = _r7ComputeExperienceMetrics(schema);
@@ -15319,7 +15329,7 @@ if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R9__){
     h += '</div>';
     return h;
   }
-  function _r9DownloadText(filename, text, mime){
+  _r9DownloadText = function(filename, text, mime){
     if(typeof document === 'undefined' || typeof Blob === 'undefined' || !document.createElement || !(window.URL || window.webkitURL)) return text;
     try {
       var blob = new Blob([String(text == null ? '' : text)], { type: mime || 'text/plain;charset=utf-8' });
