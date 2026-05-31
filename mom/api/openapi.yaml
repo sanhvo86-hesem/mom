@@ -7316,6 +7316,73 @@ paths:
 # COMPONENTS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+  /api/v1/domain-commands:
+    post:
+      operationId: submitDomainCommand
+      tags:
+        - Domain Commands
+      summary: Submit a governed domain command
+      description: >
+        Fail-closed command gateway for governed ERP/MOM/MES/eQMS mutations.
+        Unknown or unimplemented commands return RFC 9457-style Problem Details
+        and perform no business mutation. Implemented engineering package and
+        work-order release commands run through PostgreSQL transaction,
+        idempotency replay, audit, and outbox paths.
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - command_name
+                - payload
+              properties:
+                command_name:
+                  type: string
+                  example: ReleaseEngineeringReleasePackageCommand
+                idempotency_key:
+                  type: string
+                actor_id:
+                  type: string
+                actor_roles:
+                  type: array
+                  items:
+                    type: string
+                payload:
+                  type: object
+      responses:
+        '202':
+          description: Command accepted and executed.
+        '200':
+          description: Idempotent replay of a completed command.
+        '400':
+          description: Invalid command envelope.
+        '403':
+          description: Actor is not authorized for the command.
+        '404':
+          description: Command is not registered.
+        '409':
+          description: Command rejected or idempotency conflict.
+        '501':
+          description: Command is registered but runtime handler is not complete.
+
+  /api/v1/domain-commands/registry:
+    get:
+      operationId: listDomainCommandRegistry
+      tags:
+        - Domain Commands
+      summary: List governed command registry entries
+      responses:
+        '200':
+          description: Command registry returned.
+
 components:
   securitySchemes:
     sessionCookie:

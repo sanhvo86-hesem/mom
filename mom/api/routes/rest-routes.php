@@ -95,6 +95,11 @@ return static function (Router $router, string $dataDir): void {
     $router->put('/api/v1/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'updateRecord');
     $router->delete('/api/v1/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'deleteRecord');
     $router->post('/api/v1/runtime/{domain}/{table}/{id}/transition', GenericCrudController::class, 'transitionRecord');
+
+    // Governed domain command gateway. Runtime mutations that own business
+    // transitions must enter here rather than generic CRUD.
+    $router->post('/api/v1/domain-commands', DomainCommandController::class, 'submit');
+    $router->get('/api/v1/domain-commands/registry', DomainCommandController::class, 'registry');
     
     // ── Foundation Governance Contract Slice: Public REST Routes ────────────────
     

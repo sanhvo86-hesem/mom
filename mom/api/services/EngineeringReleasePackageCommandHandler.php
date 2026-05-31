@@ -376,6 +376,93 @@ final class EngineeringReleasePackageCommandHandler
     }
 
     /**
+     * Release a work order only after binding an explicit engineering package
+     * snapshot in the same PostgreSQL transaction.
+     *
+     * @param array<string,mixed> $command
+     * @return array<string,mixed>
+     */
+    public function releaseWorkOrderWithPackage(array $command): array
+    {
+        $actorId = $this->actor($command);
+        $idempotencyKey = $this->text($command['idempotency_key'] ?? '');
+        $packageId = $this->requiredText($command, 'package_id');
+        $workOrderRef = $this->requiredText($command, 'work_order_ref');
+        $expectedHash = $this->nullableSha256($command['package_manifest_hash_sha256'] ?? $command['expected_manifest_hash_sha256'] ?? null);
+        if ($expectedHash === null) {
+            throw new EngineeringReleasePackageException('package_manifest_hash_required');
+        }
+
+        return $this->db->transactional(function () use ($actorId, $idempotencyKey, $packageId, $workOrderRef, $expectedHash): array {
+            $package = $this->loadPackage($packageId);
+            if ((string)($package['lifecycle_status'] ?? '') !== 'released') {
+                throw new EngineeringReleasePackageException('released_engineering_package_required', ['package_id' => $packageId]);
+            }
+
+            $serverHash = strtolower((string)($package['manifest_hash_sha256'] ?? ''));
+            if ($serverHash === '' || !hash_equals($serverHash, strtolower($expectedHash))) {
+                throw new EngineeringReleasePackageException('engineering_package_manifest_hash_mismatch', [
+                    'package_id' => $packageId,
+                    'expected' => strtolower($expectedHash),
+                    'actual' => $serverHash,
+                ]);
+            }
+
+            $snapshot = $this->db->insertReturning(
+                "INSERT INTO work_order_engineering_package_snapshot
+                    (work_order_ref, package_id, package_manifest_hash_sha256, package_manifest_json, bound_by, idempotency_key)
+                 VALUES
+                    (:work_order_ref, CAST(:package_id AS uuid), :manifest_hash, CAST(:manifest_json AS jsonb), :bound_by, :idempotency_key)
+                 ON CONFLICT (work_order_ref, idempotency_key)
+                 DO UPDATE SET work_order_ref = EXCLUDED.work_order_ref
+                 RETURNING snapshot_id::text, work_order_ref, package_id::text, package_manifest_hash_sha256, bound_at",
+                [
+                    ':work_order_ref' => $workOrderRef,
+                    ':package_id' => $packageId,
+                    ':manifest_hash' => $serverHash,
+                    ':manifest_json' => $this->json($package['manifest_json'] ?? []),
+                    ':bound_by' => $actorId,
+                    ':idempotency_key' => $idempotencyKey !== '' ? $idempotencyKey : hash('sha256', 'release-wo|' . $workOrderRef . '|' . $packageId . '|' . $serverHash),
+                ]
+            ) ?? [];
+
+            $this->db->execute(
+                "UPDATE work_orders
+                    SET engineering_package_id = CAST(:package_id AS uuid),
+                        engineering_package_manifest_hash_sha256 = :manifest_hash,
+                        engineering_package_snapshot_id = CAST(:snapshot_id AS uuid),
+                        release_gate_status = 'released',
+                        work_order_status = 'released',
+                        updated_at = now()
+                  WHERE work_order_id::text = :work_order_ref
+                     OR work_order_number = :work_order_ref",
+                [
+                    ':package_id' => $packageId,
+                    ':manifest_hash' => $serverHash,
+                    ':snapshot_id' => (string)$snapshot['snapshot_id'],
+                    ':work_order_ref' => $workOrderRef,
+                ]
+            );
+
+            $this->writeAuditAndOutbox(
+                'engineering_release_package.work_order_released',
+                $packageId,
+                ['snapshot' => $snapshot, 'work_order_ref' => $workOrderRef],
+                $actorId,
+                $idempotencyKey
+            );
+
+            return [
+                'work_order_ref' => $workOrderRef,
+                'package_id' => $packageId,
+                'package_manifest_hash_sha256' => $serverHash,
+                'snapshot' => $snapshot,
+                'work_order_status' => 'released',
+            ];
+        });
+    }
+
+    /**
      * @param array<string,mixed> $command
      * @return array<string,mixed>
      */
