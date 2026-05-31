@@ -13,7 +13,7 @@
   --sidebar-w:280px;--header-h:52px;
   --admin-gap-lg:18px;--admin-gap-md:14px;--admin-gap-sm:8px;
   --admin-panel-padding:18px;--admin-card-padding:18px;--admin-row-padding:12px;
-  --admin-panel-radius:20px;--admin-surface-radius:18px;--admin-nested-radius:14px;
+  --admin-panel-radius:0px;--admin-surface-radius:18px;--admin-nested-radius:14px;
   --admin-toolbar-padding:8px;--admin-object-min-h:34px;--admin-card-min-h:118px;
   --admin-avatar-size:36px;--admin-status-dot-size:18px;--admin-canvas-min-h:520px;
   --admin-canvas-grid-size:24px;--admin-canvas-tool-padding:4px;
@@ -975,7 +975,7 @@ button{cursor:pointer;border:none;background:none;appearance:none;-webkit-appear
 
 /* ═══ ADMIN REDESIGN — ENHANCED TABS ═══ */
 .admin-tabs-v2{display:flex;flex-wrap:wrap;gap:var(--admin-gap-sm,8px);margin-bottom:var(--admin-gap-md,14px);overflow:visible}
-.admin-console-shell{display:grid;grid-template-columns:minmax(280px,320px) minmax(0,1fr);gap:var(--admin-gap-lg,18px);align-items:start}
+.admin-console-shell{display:grid;grid-template-columns:minmax(280px,320px) minmax(0,1fr);gap:0;align-items:start}
 .admin-console-rail{position:sticky;top:var(--admin-gap-lg,18px);max-height:calc(100vh - (var(--admin-gap-lg,18px) * 2));overflow:auto;padding-right:4px;scrollbar-gutter:stable}
 .admin-console-main{min-width:0;overflow:visible}
 #content.admin-scroll-lock > #page-admin.active .admin-console-shell{flex:1;min-height:0;align-items:stretch}
