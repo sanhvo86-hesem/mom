@@ -128,7 +128,9 @@ jobs:
           OFFENDERS="$(printf '%s\n' "$DIFF" | grep -E "$RUNTIME_CONFIG_REGEX" || true)"
           if [ -n "$OFFENDERS" ]; then
             echo "::error::This push modifies runtime-mutated config files:" >&2
-            echo "$OFFENDERS" | sed 's/^/  - /' >&2
+            while IFS= read -r offender; do
+              echo "  - ${offender}" >&2
+            done <<< "$OFFENDERS"
             echo "" >&2
             echo "Runtime config must NOT travel through git." >&2
             echo "Use: bash tools/vps-setup/scripts/data-sync.sh" >&2
