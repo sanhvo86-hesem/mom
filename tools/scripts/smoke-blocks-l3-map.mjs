@@ -73,17 +73,25 @@ const cfg = {
   items: [
     { label: { vi: 'OEE', en: 'OEE' }, dataKey: 'oee', suffix: '%', trend: 4 },
     { label: 'Scrap', dataKey: 'scrap', suffix: '%', trend: -2 },
-    { labelEn: 'Open', dataKey: 'open', default: 7 }
+    { labelEn: 'Open', dataKey: 'open', default: 7 },
+    { label: 'Backlog', dataKey: 'backlog', suffix: ' USD' },          // big number, no trend
+    { label: 'Holds', dataKey: 'holds', color: 'var(--red)' },          // semantic color, no trend
+    { label: 'OTD', dataKey: 'otd', suffix: '%', color: 'var(--green)', trend: -1 }, // color wins over trend
+    { label: 'Flat', dataKey: 'flat', trend: 0 }                        // trend 0 → no sub
   ]
 };
-const data = { oee: 92, scrap: 1.2 };
+const data = { oee: 92, scrap: 1.2, backlog: 1250000, holds: 3, otd: 97, flat: 5 };
 const adapted = Blocks._adapters['kpi-row'](cfg, data);
-check('adapter tile count', adapted.tiles.length === 3);
+check('adapter tile count', adapted.tiles.length === 7);
 check('adapter value+suffix from data', adapted.tiles[0].value === '92%');
 check('adapter positive trend → success + +sub', adapted.tiles[0].tone === 'success' && adapted.tiles[0].sub === '+4%');
 check('adapter negative trend → danger', adapted.tiles[1].tone === 'danger' && adapted.tiles[1].sub === '-2%');
 check('adapter default value when no data', adapted.tiles[2].value === '7');
 check('adapter label resolves {vi,en} and labelEn', adapted.tiles[0].label === 'OEE' && adapted.tiles[2].label === 'Open');
+check('adapter thousand-separators numeric', adapted.tiles[3].value === '1,250,000 USD');
+check('adapter explicit color → tone (no trend)', adapted.tiles[4].tone === 'danger' && adapted.tiles[4].sub === undefined);
+check('adapter color wins over trend sign', adapted.tiles[5].tone === 'success' && adapted.tiles[5].sub === '-1%');
+check('adapter trend 0 → no sub, no tone', adapted.tiles[6].sub === undefined && adapted.tiles[6].tone === undefined);
 
 /* ON (kpi-row flipped) → routes through L3 with adapted slots */
 const onOut = Blocks.render('kpi-row', { config: cfg, data: data });

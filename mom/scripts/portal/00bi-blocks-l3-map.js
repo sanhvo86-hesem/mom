@@ -34,22 +34,44 @@
 
   /* ── Adapters: engine (config,data) → L3 slots ─────────────────────────────── */
 
+  /* Number formatting identical to the engine's _fmt (thousand separators) so a
+     flipped numeric KPI keeps "1,284" / "1,250,000", not "1284". */
+  function fmtNum(n) {
+    return (n == null) ? '0' : String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  /* The engine colors each tile by an explicit per-item color token (semantic:
+     red=bad, amber=watch, green=good), independent of trend. Map those tokens
+     to an L3 tone so that meaning survives the flip. Returns undefined for
+     unknown/neutral colors (default text color). */
+  function colorToTone(color) {
+    if (!color || typeof color !== 'string') return undefined;
+    var c = color.toLowerCase();
+    if (c.indexOf('green') >= 0 || c.indexOf('success') >= 0) return 'success';
+    if (c.indexOf('red') >= 0 || c.indexOf('danger') >= 0 || c.indexOf('error') >= 0) return 'danger';
+    if (c.indexOf('amber') >= 0 || c.indexOf('orange') >= 0 || c.indexOf('warn') >= 0 || c.indexOf('yellow') >= 0) return 'warning';
+    if (c.indexOf('brand') >= 0 || c.indexOf('primary') >= 0 || c.indexOf('blue') >= 0) return 'brand';
+    return undefined;
+  }
+
   /* kpi-row → kpi.grid
-     engine: { items:[{label,labelEn,dataKey,default,suffix,color,trend}] } + data{dataKey:val}
-     L3:     { tiles:[{label,value,sub?,tone?}] } */
+     engine: { items:[{label,labelEn,dataKey,default,suffix,color,accentColor,trend}] } + data{dataKey:val}
+     L3:     { tiles:[{label,value,sub?,tone?}] }
+     Fidelity vs engine: thousand-separated numeric values; tone from explicit
+     per-item color first (semantic), else from trend sign; trend rendered as a
+     +N% / -N% sub-line; trend 0 / absent emits no sub (engine shows no trend
+     element for a falsy trend either). */
   function adapt_kpiRow(config, data) {
     config = config || {}; data = data || {};
     var tiles = (config.items || []).map(function (it) {
       var raw = (it.dataKey != null && data[it.dataKey] !== undefined)
         ? data[it.dataKey]
         : (it.default != null ? it.default : '');
-      var value = String(raw) + (it.suffix || '');
-      var tone = (typeof it.trend === 'number')
-        ? (it.trend > 0 ? 'success' : (it.trend < 0 ? 'danger' : 'info'))
-        : undefined;
-      var sub = (typeof it.trend === 'number')
-        ? (it.trend > 0 ? '+' : '') + it.trend + '%'
-        : undefined;
+      var value = (typeof raw === 'number' ? fmtNum(raw) : String(raw)) + (it.suffix || '');
+      var hasTrend = (typeof it.trend === 'number' && it.trend !== 0);
+      var tone = colorToTone(it.color || it.accentColor);
+      if (!tone && hasTrend) tone = it.trend > 0 ? 'success' : 'danger';
+      var sub = hasTrend ? ((it.trend > 0 ? '+' : '') + it.trend + '%') : undefined;
       return { label: textLabel(it.label, it.labelEn), value: value, sub: sub, tone: tone };
     });
     return { tiles: tiles };
