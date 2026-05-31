@@ -20,6 +20,7 @@ final class DomainCommandGateway
         private readonly ?IdempotencyReplayRepository $idempotency = null,
         private readonly ?EngineeringReleasePackageCommandHandler $engineeringPackages = null,
         private readonly ?SecurityBoundaryMiddleware $securityBoundary = null,
+        private readonly ?RegulatedCommandEvidenceSpine $regulatedEvidence = null,
     ) {}
 
     /**
@@ -49,6 +50,8 @@ final class DomainCommandGateway
         $payload['actor_id'] = $payload['actor_id'] ?? $actorId;
         $payload['idempotency_key'] = $payload['idempotency_key'] ?? $idempotencyKey;
         ($this->securityBoundary ?? new SecurityBoundaryMiddleware($this->db))->assertAllowed($entry, $envelope, $payload, $actorId);
+        $regulatedSpine = $this->regulatedEvidence ?? new RegulatedCommandEvidenceSpine($this->db);
+        $regulatedContext = $regulatedSpine->preflight($entry, $envelope, $payload, $actorId);
 
         if (($entry['implemented'] ?? false) !== true) {
             throw new DomainCommandException(
@@ -77,15 +80,47 @@ final class DomainCommandGateway
                 $idempotencyKey,
                 $fingerprint,
                 86400,
-                function () use ($commandName, $payload, $entry): array {
-                    return [
-                        'status_code' => 200,
-                        'payload' => [
+                function () use ($commandName, $payload, $entry, $envelope, $actorId, $idempotencyKey, $regulatedSpine, $regulatedContext): array {
+                    return $this->db->transactional(function () use (
+                        $commandName,
+                        $payload,
+                        $entry,
+                        $envelope,
+                        $actorId,
+                        $idempotencyKey,
+                        $regulatedSpine,
+                        $regulatedContext
+                    ): array {
+                        $regulatedCapture = $regulatedSpine->recordBeforeMutation($entry, $payload, $regulatedContext, $actorId, $idempotencyKey);
+                        $handlerResult = $this->executeHandler($commandName, $payload);
+                        $evidenceLink = $regulatedSpine->recordAfterMutation(
+                            $entry,
+                            $envelope,
+                            $payload,
+                            $regulatedContext,
+                            $regulatedCapture,
+                            $handlerResult,
+                            $actorId
+                        );
+
+                        $response = [
                             'command_name' => $commandName,
                             'root' => (string)($entry['root'] ?? ''),
-                            'result' => $this->executeHandler($commandName, $payload),
-                        ],
+                            'result' => $handlerResult,
+                        ];
+                        if ($evidenceLink !== []) {
+                            $response['regulated_evidence'] = [
+                                'evidence_link_id' => (string)($evidenceLink['evidence_link_id'] ?? ''),
+                                'signature_event_id' => (string)($evidenceLink['signature_event_id'] ?? ''),
+                                'record_hash_sha256' => (string)($evidenceLink['command_record_hash_sha256'] ?? ''),
+                            ];
+                        }
+
+                    return [
+                        'status_code' => 200,
+                        'payload' => $response,
                     ];
+                    });
                 }
             );
         } catch (RecordConflictException $e) {

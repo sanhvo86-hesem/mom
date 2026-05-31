@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 834,
-        "generated_at": "2026-06-01T03:27:33+00:00"
+        "table_count": 837,
+        "generated_at": "2026-06-01T03:27:34+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -1843,6 +1843,18 @@
                 {
                     "col": "dept_code",
                     "ref": "departments(dept_code)"
+                }
+            ],
+            "contract": null
+        },
+        "domain_command_evidence_links": {
+            "defined_in": "267_regulated_domain_command_evidence_spine.sql",
+            "extended_in": [],
+            "primary_key": "evidence_link_id",
+            "foreign_keys": [
+                {
+                    "col": "signature_event_id",
+                    "ref": "signature_events(signature_event_id)"
                 }
             ],
             "contract": null
@@ -9305,6 +9317,25 @@
                 {
                     "col": "assigned_to",
                     "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
+        "regulated_action_policy": {
+            "defined_in": "267_regulated_domain_command_evidence_spine.sql",
+            "extended_in": [],
+            "primary_key": "policy_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "regulated_action_validation_protocol": {
+            "defined_in": "267_regulated_domain_command_evidence_spine.sql",
+            "extended_in": [],
+            "primary_key": "protocol_id",
+            "foreign_keys": [
+                {
+                    "col": "approved_signature_event_id",
+                    "ref": "signature_events(signature_event_id)"
                 }
             ],
             "contract": null

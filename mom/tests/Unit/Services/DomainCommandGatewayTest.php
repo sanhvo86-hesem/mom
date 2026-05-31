@@ -51,13 +51,13 @@ final class DomainCommandGatewayTest extends TestCase
     public function testIdempotencyReplayReturnsStoredPayloadWithoutHandlerExecution(): void
     {
         $idempotency = new DomainCommandFakeIdempotencyReplayRepository(replayPayload: [
-            'command_name' => 'ReleaseEngineeringReleasePackageCommand',
+            'command_name' => 'CreateEngineeringReleasePackageCommand',
             'result' => ['package_id' => 'pkg-1'],
         ]);
         $gateway = new DomainCommandGateway(new DomainCommandFakeConnection(), new CommandRegistry(), $idempotency);
 
         $result = $gateway->dispatch([
-            'command_name' => 'ReleaseEngineeringReleasePackageCommand',
+            'command_name' => 'CreateEngineeringReleasePackageCommand',
             'idempotency_key' => 'idem-release-1',
             'actor_id' => 'qa',
             'actor_roles' => ['admin'],
@@ -80,7 +80,7 @@ final class DomainCommandGatewayTest extends TestCase
 
         try {
             $gateway->dispatch([
-                'command_name' => 'ReleaseEngineeringReleasePackageCommand',
+                'command_name' => 'CreateEngineeringReleasePackageCommand',
                 'idempotency_key' => 'idem-release-1',
                 'actor_id' => 'qa',
                 'actor_roles' => ['admin'],

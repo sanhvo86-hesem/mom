@@ -99,6 +99,8 @@ return static function (Router $router, string $dataDir): void {
     // Governed domain command gateway. Runtime mutations that own business
     // transitions must enter here rather than generic CRUD.
     $router->post('/api/v1/domain-commands', DomainCommandController::class, 'submit');
+    $router->post('/api/v1/domain-commands/signature-challenges', DomainCommandController::class, 'issueSignatureChallenge');
+    $router->get('/api/v1/domain-commands/signature-manifestations', DomainCommandController::class, 'signatureManifestations');
     $router->get('/api/v1/domain-commands/registry', DomainCommandController::class, 'registry');
     
     // ── Foundation Governance Contract Slice: Public REST Routes ────────────────

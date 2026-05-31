@@ -7383,6 +7383,64 @@ paths:
         '200':
           description: Command registry returned.
 
+  /api/v1/domain-commands/signature-challenges:
+    post:
+      operationId: issueDomainCommandSignatureChallenge
+      tags:
+        - Domain Commands
+      summary: Issue a server-authoritative e-signature challenge for a regulated command
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - command_name
+                - signature_meaning
+                - payload
+              properties:
+                command_name:
+                  type: string
+                signature_meaning:
+                  type: string
+                actor_id:
+                  type: string
+                payload:
+                  type: object
+      responses:
+        '201':
+          description: Signature challenge issued.
+        '409':
+          description: Signature is not required, not allowed, or command policy is missing.
+
+  /api/v1/domain-commands/signature-manifestations:
+    get:
+      operationId: listDomainCommandSignatureManifestations
+      tags:
+        - Domain Commands
+      summary: Retrieve signature manifestations linked to a command record
+      parameters:
+        - in: query
+          name: record_type
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: record_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Signature manifestations returned.
+
 components:
   securitySchemes:
     sessionCookie:
