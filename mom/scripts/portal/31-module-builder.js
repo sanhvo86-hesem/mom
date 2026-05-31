@@ -8745,7 +8745,7 @@ if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH__){
     if(document.getElementById(id)) return;
     style = document.createElement('style');
     style.id = id;
-    css += '.mb-ultra-root{--ultra-accent:var(--blue-light,#2563eb);--ultra-accent-2:#14b8a6;--ultra-surface:rgba(255,255,255,.9);--ultra-panel:#ffffff;--ultra-text:var(--text-primary,#0f172a);display:grid;gap:16px}';
+    css += '.mb-ultra-root{--ultra-accent:var(--o3-brand);--ultra-accent-2:var(--o3-brand-hover);--ultra-surface:var(--o3-surface-card);--ultra-panel:var(--o3-surface-card);--ultra-text:var(--o3-text-strong);display:grid;gap:16px}';
     css += '.mb-ultra-root[data-theme="hesem-executive"]{--ultra-accent:var(--purple-light,#7c3aed);--ultra-accent-2:var(--amber-light,#f59e0b)}';
     css += '.mb-ultra-root[data-theme="shopfloor-dark"]{--ultra-accent:var(--cyan-light,#06b6d4);--ultra-accent-2:var(--text-primary,#0f172a);--ultra-panel:var(--text-primary,#0f172a);--ultra-surface:rgba(15,23,42,.92);--ultra-text:var(--border,#e2e8f0)}';
     css += '.mb-ultra-root[data-theme="quality-lab"]{--ultra-accent:var(--green-light,#10b981);--ultra-accent-2:var(--blue-light,#2563eb)}';
@@ -17717,6 +17717,11 @@ if(window.__HM_MODULE_BUILDER_ULTRA_PATCH_R13__ !== '2026-04-08-r13-glass-comman
     bar.appendChild(sel);
     bar.appendChild(hint);
     state.container.insertBefore(bar, state.container.firstChild);
+    /* Apply the module's saved theme to the builder chrome on load so the hero,
+       chips and canvas reflect the selected theme immediately — previously the
+       theme only took effect after the user re-picked it (looked like "nothing
+       changes"). Scoped to state.container so the global portal is untouched. */
+    try { applyToBuilderView(cur); applyToPreviewStage(cur); } catch(_eApplyLoad){}
   }
 
   var _r16PrevPaint = _paint;
