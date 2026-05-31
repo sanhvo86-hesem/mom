@@ -81,7 +81,10 @@ final class RuntimeAuthorityService
             if ($state === 'degraded') {
                 $degraded[] = $slice;
             }
-            if ($state !== 'authoritative_ready') {
+            $authoritative = $state === 'authoritative_ready'
+                || str_starts_with($state, 'authoritative_ready')
+                || $state === 'postgres_authority_shadow_export';
+            if (!$authoritative) {
                 $nonAuthoritative[] = $slice;
             }
         }
@@ -166,7 +169,8 @@ final class RuntimeAuthorityService
         $authorityMode = trim((string)($probe['authority_mode'] ?? ''));
         return array_merge($probe, [
             'authority_mode' => $authorityMode !== '' ? $authorityMode : match ($state) {
-                'authoritative_ready' => 'postgres_primary',
+                'authoritative_ready', 'authoritative_ready_postgres_only', 'authoritative_ready_with_fallback_telemetry' => 'postgres_primary',
+                'postgres_authority_shadow_export' => 'shadow_mode',
                 'authority_partial' => 'shadow_mode',
                 'compatibility_only' => 'json_fallback',
                 default => 'degraded',

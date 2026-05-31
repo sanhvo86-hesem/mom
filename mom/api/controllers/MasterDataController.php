@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Services\MasterDataService;
+use MOM\Services\MasterDataAuthorityException;
+use MOM\Services\MasterDataResult;
 use MOM\Services\FoundationGovernanceService;
 use Throwable;
 
@@ -84,6 +86,24 @@ class MasterDataController extends BaseController
     private function requireShiftPlanningAccess(array $user): void
     {
         $this->requireAnyRole($user, $this->shiftPlanningRoles());
+    }
+
+    private function failMasterDataResult(MasterDataResult $result, string $fallback): never
+    {
+        $code = $result->errorCode ?? $fallback;
+        $status = $code === 'governed_master_data_postgres_authority_required' ? 409 : 400;
+        $extra = is_array($result->data ?? null) ? (array)$result->data : [];
+        $this->error($code, $status, $result->message, $extra);
+    }
+
+    private function handleMasterDataException(Throwable $e, string $fallback): never
+    {
+        $this->rethrowResponse($e);
+        if ($e instanceof MasterDataAuthorityException) {
+            $problem = $e->problemDetails();
+            $this->error($e->codeName(), (int)($problem['status'] ?? 409), $e->getMessage(), $problem);
+        }
+        $this->error($fallback, 500, $e->getMessage());
     }
 
     /**
@@ -205,13 +225,12 @@ class MasterDataController extends BaseController
         try {
             $result = $this->mdService()->create($entity, $data, $uid);
             if (!$result->ok) {
-                $this->error($result->errorCode ?? 'create_failed', 400, $result->message);
+                $this->failMasterDataResult($result, 'create_failed');
             }
             $this->auditLog('master_data_create', ['entity' => $entity], $uid);
             $this->success(['record' => $result->data ?? $data], 201);
         } catch (Throwable $e) {
-            $this->rethrowResponse($e);
-            $this->error('create_failed', 500, $e->getMessage());
+            $this->handleMasterDataException($e, 'create_failed');
         }
     }
 
@@ -247,21 +266,20 @@ class MasterDataController extends BaseController
             if ($recordId === '') {
                 $result = $this->mdService()->create($entity, $item, $uid);
                 if (!$result->ok) {
-                    $this->error($result->errorCode ?? 'create_failed', 400, $result->message);
+                    $this->failMasterDataResult($result, 'create_failed');
                 }
                 $this->auditLog('master_data_upsert_create', ['entity' => $entity], $uid);
                 $this->success(['record' => $result->data ?? $item], 201);
             } else {
                 $result = $this->mdService()->update($entity, $recordId, $item, $uid, $reason);
                 if (!$result->ok) {
-                    $this->error($result->errorCode ?? 'update_failed', 400, $result->message);
+                    $this->failMasterDataResult($result, 'update_failed');
                 }
                 $this->auditLog('master_data_upsert_update', ['entity' => $entity, 'id' => $recordId], $uid);
                 $this->success(['record' => $result->data ?? $item]);
             }
         } catch (Throwable $e) {
-            $this->rethrowResponse($e);
-            $this->error('upsert_failed', 500, $e->getMessage());
+            $this->handleMasterDataException($e, 'upsert_failed');
         }
     }
 
@@ -289,13 +307,12 @@ class MasterDataController extends BaseController
         try {
             $result = $this->mdService()->update($entity, $id, $data, $uid, $reason);
             if (!$result->ok) {
-                $this->error($result->errorCode ?? 'update_failed', 400, $result->message);
+                $this->failMasterDataResult($result, 'update_failed');
             }
             $this->auditLog('master_data_update', ['entity' => $entity, 'id' => $id], $uid);
             $this->success(['record' => $result->data ?? $data]);
         } catch (Throwable $e) {
-            $this->rethrowResponse($e);
-            $this->error('update_failed', 500, $e->getMessage());
+            $this->handleMasterDataException($e, 'update_failed');
         }
     }
 
@@ -325,13 +342,12 @@ class MasterDataController extends BaseController
 
             $delResult = $this->mdService()->delete($entity, $id, $uid);
             if (!$delResult->ok) {
-                $this->error($delResult->errorCode ?? 'delete_failed', 400, $delResult->message);
+                $this->failMasterDataResult($delResult, 'delete_failed');
             }
             $this->auditLog('master_data_delete', ['entity' => $entity, 'id' => $id], $uid);
             $this->success(['deleted' => true]);
         } catch (Throwable $e) {
-            $this->rethrowResponse($e);
-            $this->error('delete_failed', 500, $e->getMessage());
+            $this->handleMasterDataException($e, 'delete_failed');
         }
     }
 
@@ -359,8 +375,7 @@ class MasterDataController extends BaseController
             $this->auditLog('master_data_status_change', ['entity' => $entity, 'id' => $id, 'status' => $target], $uid);
             $this->success(['record' => $result]);
         } catch (Throwable $e) {
-            $this->rethrowResponse($e);
-            $this->error('status_change_failed', 500, $e->getMessage());
+            $this->handleMasterDataException($e, 'status_change_failed');
         }
     }
 
