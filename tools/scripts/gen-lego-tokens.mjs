@@ -318,6 +318,12 @@ const shellCss = `/* ===========================================================
 .hm-block-title{ font-size: var(--text-md, 14px); font-weight: var(--font-bold, 700); color: var(--text-primary); }
 /* inner filter-bar: strip its own card chrome (the .hm-block panel provides it) */
 .hm-block .hm-filter-bar{ margin: 0 !important; border: 0 !important; border-radius: 0 !important; padding: 0 !important; background: transparent !important; gap: var(--lego-frame) !important; }
+/* Admin graphics control plane (same tidy language): the .admin-panel outer card
+   carried a chunky 16px radius — flatten it to 0 so the outer frame reads as
+   'removed' (flush, edge-to-edge). Inner panels keep the refined --lego-block-radius
+   and the uniform --lego-frame gaps. */
+.admin-panel{ border-radius: 0 !important; }
+#admin-content.admin-panel{ margin: 0 !important; padding: var(--lego-frame) !important; }
 `;
 
 const jsonOut = JSON.stringify(compiled, null, 2) + '\n';
