@@ -84,12 +84,12 @@ jobs:
           cat > /tmp/changed-files <<'EOF'
           ${{ needs.classify.outputs.changed_files }}
           EOF
-          WORKFLOWS="$(sed 's/^ *//' /tmp/changed-files | grep -E '^\.github/workflows/.*\.ya?ml$' || true)"
-          if [ -z "$WORKFLOWS" ]; then
+          mapfile -t WORKFLOWS < <(sed 's/^ *//' /tmp/changed-files | grep -E '^\.github/workflows/.*\.ya?ml$' || true)
+          if [ "${#WORKFLOWS[@]}" -eq 0 ]; then
             echo "No changed workflow files require actionlint."
             exit 0
           fi
-          docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest $WORKFLOWS
+          docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest "${WORKFLOWS[@]}"
 
   classifier-selftest:
     name: Smart Classifier Self-test
