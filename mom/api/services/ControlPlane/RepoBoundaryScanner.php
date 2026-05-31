@@ -114,6 +114,10 @@ final class RepoBoundaryScanner
         // (strategy deliverables reviewed alongside the dark-mode fix).
         // Mirrors .gitignore `!_reports/graphics-authority-critique/`.
         '#^_reports/graphics-authority-critique/.*$#',
+        // Lego Empire master strategy — world-class component-system research,
+        // target architecture, and roadmap. Mirrors .gitignore
+        // `!_reports/lego-empire/`.
+        '#^_reports/lego-empire/.*$#',
     ];
 
     /**
