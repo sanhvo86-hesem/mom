@@ -475,6 +475,214 @@ final class DesignTokenCatalogService
         return [];
     }
 
+    // ── Theme presets (graphics_theme_preset, migration 263) ─────────────────
+    // A theme preset = brand seed + the master knobs density(gap)/radius_outer
+    // (cấp1)/radius_inner(cấp2-3)/control_h/frame + a free-form token overrides
+    // bag. Modules reference one by preset_key; editing it ripples everywhere.
+
+    /**
+     * List published theme presets (DB-backed; falls back to the 6 builtins in
+     * JSON_ONLY or when the table is empty).
+     * @return array<int, array<string, mixed>>
+     */
+    public function listThemePresets(): array
+    {
+        if ($this->canReadFromDb()) {
+            try {
+                $rows = $this->data->query(
+                    'SELECT preset_key, display_name_en, display_name_vi, brand,
+                            density_px, radius_outer_px, radius_inner_px, control_h_px, frame_px,
+                            overrides, scope_type, scope_id, base_ref, status, is_default, is_builtin, sort_order
+                       FROM graphics_theme_preset
+                      WHERE status = $1
+                   ORDER BY sort_order, preset_key',
+                    ['published']
+                ) ?? [];
+                if ($rows !== []) {
+                    return array_map([$this, 'hydrateThemePresetRow'], $rows);
+                }
+            } catch (Throwable $e) {
+                // fall through to builtins
+            }
+        }
+        return $this->builtinThemePresets();
+    }
+
+    /** @return array<string, mixed>|null */
+    public function getThemePreset(string $presetKey): ?array
+    {
+        foreach ($this->listThemePresets() as $p) {
+            if (($p['preset_key'] ?? null) === $presetKey) {
+                return $p;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Create/update a theme preset (upsert by preset_key). Requires a DB write
+     * mode; builtins stay read-only in JSON_ONLY.
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
+    public function saveThemePreset(array $input, string $user = ''): array
+    {
+        $p = $this->sanitizeThemePresetInput($input);
+        if ($p['preset_key'] === '') {
+            throw new \InvalidArgumentException('preset_key is required');
+        }
+        if (!$this->canWriteToDb()) {
+            throw new \RuntimeException('theme preset write requires a Postgres data mode');
+        }
+        $this->data->execute(
+            'INSERT INTO graphics_theme_preset
+                 (preset_key, display_name_en, display_name_vi, brand, density_px, radius_outer_px,
+                  radius_inner_px, control_h_px, frame_px, overrides, scope_type, scope_id, base_ref,
+                  status, sort_order, created_by, updated_at)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15,$16,NOW())
+             ON CONFLICT (preset_key) DO UPDATE SET
+                 display_name_en = EXCLUDED.display_name_en,
+                 display_name_vi = EXCLUDED.display_name_vi,
+                 brand           = EXCLUDED.brand,
+                 density_px      = EXCLUDED.density_px,
+                 radius_outer_px = EXCLUDED.radius_outer_px,
+                 radius_inner_px = EXCLUDED.radius_inner_px,
+                 control_h_px    = EXCLUDED.control_h_px,
+                 frame_px        = EXCLUDED.frame_px,
+                 overrides       = EXCLUDED.overrides,
+                 base_ref        = EXCLUDED.base_ref,
+                 status          = EXCLUDED.status,
+                 sort_order      = EXCLUDED.sort_order,
+                 updated_at      = NOW()',
+            [
+                $p['preset_key'], $p['display_name_en'], $p['display_name_vi'], $p['brand'],
+                $p['density_px'], $p['radius_outer_px'], $p['radius_inner_px'], $p['control_h_px'], $p['frame_px'],
+                (string)json_encode($p['overrides']), $p['scope_type'], $p['scope_id'], $p['base_ref'],
+                $p['status'], $p['sort_order'], $user,
+            ]
+        );
+        // single org-default invariant
+        if ($p['is_default']) {
+            try {
+                $this->data->execute('UPDATE graphics_theme_preset SET is_default = FALSE WHERE preset_key <> $1', [$p['preset_key']]);
+                $this->data->execute('UPDATE graphics_theme_preset SET is_default = TRUE  WHERE preset_key = $1', [$p['preset_key']]);
+            } catch (Throwable $e) {
+                // best-effort
+            }
+        }
+        return $this->getThemePreset($p['preset_key']) ?? $p;
+    }
+
+    /** @return array<string, mixed> */
+    public function deleteThemePreset(string $presetKey): array
+    {
+        if (!$this->canWriteToDb()) {
+            throw new \RuntimeException('theme preset delete requires a Postgres data mode');
+        }
+        $this->data->execute(
+            'DELETE FROM graphics_theme_preset WHERE preset_key = $1 AND is_builtin = FALSE',
+            [$presetKey]
+        );
+        return ['deleted' => $presetKey];
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @return array<string, mixed>
+     */
+    private function hydrateThemePresetRow(array $row): array
+    {
+        $row['density_px']      = (int)($row['density_px'] ?? 8);
+        $row['radius_outer_px'] = (int)($row['radius_outer_px'] ?? 8);
+        $row['radius_inner_px'] = (int)($row['radius_inner_px'] ?? 4);
+        $row['control_h_px']    = (int)($row['control_h_px'] ?? 32);
+        $row['frame_px']        = (int)($row['frame_px'] ?? 8);
+        $row['sort_order']      = (int)($row['sort_order'] ?? 100);
+        $row['is_default']      = $this->presetBool($row['is_default'] ?? false);
+        $row['is_builtin']      = $this->presetBool($row['is_builtin'] ?? false);
+        $row['overrides']       = is_string($row['overrides'] ?? null)
+            ? (json_decode((string)$row['overrides'], true) ?: [])
+            : (is_array($row['overrides'] ?? null) ? $row['overrides'] : []);
+        return $row;
+    }
+
+    private function presetBool(mixed $v): bool
+    {
+        if (is_bool($v)) {
+            return $v;
+        }
+        if (is_int($v)) {
+            return $v !== 0;
+        }
+        return in_array(strtolower((string)$v), ['t', 'true', '1', 'yes'], true);
+    }
+
+    /**
+     * @param array<string, mixed> $in
+     * @return array<string, mixed>
+     */
+    private function sanitizeThemePresetInput(array $in): array
+    {
+        $clamp = static function (mixed $v, int $min, int $max, int $def): int {
+            $n = is_numeric($v) ? (int)$v : $def;
+            return max($min, min($max, $n));
+        };
+        $key = (string)preg_replace('/[^a-z0-9\-]/', '', strtolower((string)($in['preset_key'] ?? '')));
+        $status = (string)($in['status'] ?? 'published');
+        if (!in_array($status, ['draft', 'review', 'published', 'deprecated'], true)) {
+            $status = 'published';
+        }
+        $scopeType = (string)($in['scope_type'] ?? 'organization');
+        if (!in_array($scopeType, ['organization', 'tenant', 'role', 'user', 'module'], true)) {
+            $scopeType = 'organization';
+        }
+        $brand = (string)($in['brand'] ?? '#1565c0');
+        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $brand)) {
+            $brand = '#1565c0';
+        }
+        $en = trim((string)($in['display_name_en'] ?? $key));
+        $vi = trim((string)($in['display_name_vi'] ?? $en));
+        return [
+            'preset_key'      => $key,
+            'display_name_en' => $en !== '' ? $en : $key,
+            'display_name_vi' => $vi !== '' ? $vi : ($en !== '' ? $en : $key),
+            'brand'           => $brand,
+            'density_px'      => $clamp($in['density_px'] ?? 8, 2, 24, 8),
+            'radius_outer_px' => $clamp($in['radius_outer_px'] ?? 8, 0, 40, 8),
+            'radius_inner_px' => $clamp($in['radius_inner_px'] ?? 4, 0, 32, 4),
+            'control_h_px'    => $clamp($in['control_h_px'] ?? 32, 24, 56, 32),
+            'frame_px'        => $clamp($in['frame_px'] ?? 8, 0, 40, 8),
+            'overrides'       => is_array($in['overrides'] ?? null) ? $in['overrides'] : [],
+            'scope_type'      => $scopeType,
+            'scope_id'        => (trim((string)($in['scope_id'] ?? 'default')) ?: 'default'),
+            'base_ref'        => !empty($in['base_ref']) ? (string)$in['base_ref'] : null,
+            'status'          => $status,
+            'is_default'      => !empty($in['is_default']),
+            'sort_order'      => $clamp($in['sort_order'] ?? 100, 0, 9999, 100),
+        ];
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    private function builtinThemePresets(): array
+    {
+        $mk = static function (string $k, string $en, string $vi, string $brand, int $g, int $ro, int $ri, int $ch, int $fr, bool $def, int $so): array {
+            return [
+                'preset_key' => $k, 'display_name_en' => $en, 'display_name_vi' => $vi, 'brand' => $brand,
+                'density_px' => $g, 'radius_outer_px' => $ro, 'radius_inner_px' => $ri, 'control_h_px' => $ch, 'frame_px' => $fr,
+                'overrides' => [], 'scope_type' => 'organization', 'scope_id' => 'default', 'base_ref' => null,
+                'status' => 'published', 'is_default' => $def, 'is_builtin' => true, 'sort_order' => $so,
+            ];
+        };
+        return [
+            $mk('hesem-default', 'HESEM Default', 'HESEM mặc định', '#1565c0', 8, 8, 4, 32, 8, true, 10),
+            $mk('industrial-dense', 'Industrial Dense', 'Công nghiệp dày', '#1565c0', 6, 4, 2, 28, 6, false, 20),
+            $mk('comfortable', 'Comfortable', 'Thoáng', '#1565c0', 12, 10, 5, 36, 12, false, 30),
+            $mk('shop-floor', 'Shop-floor (touch)', 'Xưởng (cảm ứng)', '#0f766e', 10, 8, 4, 44, 10, false, 40),
+            $mk('violet', 'Violet', 'Tím', '#7c3aed', 8, 8, 4, 32, 8, false, 50),
+            $mk('slate', 'Slate', 'Xám đen', '#334155', 8, 6, 3, 32, 8, false, 60),
+        ];
+    }
+
     // ── Internals ───────────────────────────────────────────────────────────
 
     private function canReadFromDb(): bool
