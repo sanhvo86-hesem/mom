@@ -1,0 +1,55 @@
+{
+  "prompt": "P48",
+  "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
+  "decision_token": "P48_PASS_WITH_CONTROLLED_GAPS",
+  "runtime_evidence": [
+    {
+      "probe": "php_lint_services",
+      "result": "PASS",
+      "files": [
+        "mom/api/services/EngineeringReleasePackageCommandHandler.php",
+        "mom/api/services/EngineeringReleasePackageException.php",
+        "mom/api/services/EngineeringPackageManifestBuilder.php",
+        "mom/api/services/RequiredMemberMatrix.php"
+      ]
+    },
+    {
+      "probe": "missing_inspection_plan_blocks_before_update",
+      "result": "PASS",
+      "evidence": "[\"engineering_package_release_invariants_failed\",[\"inspection_plan\"],false]"
+    },
+    {
+      "probe": "successful_release_manifest_hash",
+      "result": "PASS",
+      "evidence": "[\"released\",64,3]"
+    },
+    {
+      "probe": "job_order_bind_snapshot",
+      "result": "PASS",
+      "evidence": "[\"job_order\",true,true]"
+    },
+    {
+      "probe": "composer_test",
+      "result": "BLOCKED",
+      "evidence": "Could not open input file: vendor/bin/phpunit"
+    },
+    {
+      "probe": "composer_analyse_check",
+      "result": "BLOCKED",
+      "evidence": "Could not open input file: vendor/bin/phpstan"
+    }
+  ],
+  "closed_blockers": [
+    "P0-ENGINEERING-PACKAGE-NOT-LIVE-GATED",
+    "P0-WO-RELEASE-LATEST-MASTER-DATA",
+    "P0-SO-JO-RELEASE-LATEST-MASTER-DATA",
+    "P0-CALLER-MANIFEST-HASH-TRUST",
+    "P0-RELEASED-PACKAGE-MUTABLE"
+  ],
+  "remaining_gaps": [
+    "P49 must expose live command entrypoints/API inventory.",
+    "P49/P55 must prove legacy JSON release paths cannot bypass handler or DB triggers.",
+    "Full PHPUnit/PHPStan evidence needs restored vendor dependencies or CI.",
+    "P58 must add telemetry/control tower metrics."
+  ]
+}

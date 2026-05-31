@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 828,
-        "generated_at": "2026-06-01T03:26:01+00:00"
+        "table_count": 834,
+        "generated_at": "2026-06-01T03:26:52+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -2665,6 +2665,54 @@
                 {
                     "col": "linked_record_id",
                     "ref": "records(record_id)"
+                }
+            ],
+            "contract": null
+        },
+        "engineering_release_package": {
+            "defined_in": "266_engineering_release_package_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "package_id",
+            "foreign_keys": [
+                {
+                    "col": "superseded_by_package_id",
+                    "ref": "engineering_release_package(package_id)"
+                }
+            ],
+            "contract": null
+        },
+        "engineering_release_package_approval": {
+            "defined_in": "266_engineering_release_package_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "approval_id",
+            "foreign_keys": [
+                {
+                    "col": "package_id",
+                    "ref": "engineering_release_package(package_id)"
+                }
+            ],
+            "contract": null
+        },
+        "engineering_release_package_event": {
+            "defined_in": "266_engineering_release_package_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "package_event_id",
+            "foreign_keys": [
+                {
+                    "col": "package_id",
+                    "ref": "engineering_release_package(package_id)"
+                }
+            ],
+            "contract": null
+        },
+        "engineering_release_package_member": {
+            "defined_in": "266_engineering_release_package_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "member_id",
+            "foreign_keys": [
+                {
+                    "col": "package_id",
+                    "ref": "engineering_release_package(package_id)"
                 }
             ],
             "contract": null
@@ -7185,6 +7233,18 @@
             ],
             "contract": null
         },
+        "order_engineering_package_snapshot": {
+            "defined_in": "266_engineering_release_package_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "snapshot_id",
+            "foreign_keys": [
+                {
+                    "col": "package_id",
+                    "ref": "engineering_release_package(package_id)"
+                }
+            ],
+            "contract": null
+        },
         "order_holds": {
             "defined_in": "032_order_management_world_class_foundations.sql",
             "extended_in": [
@@ -9525,7 +9585,8 @@
         "sales_order": {
             "defined_in": "075_canonical_planning_erp_orchestration.sql",
             "extended_in": [
-                "091_runtime_governance_continuity.sql"
+                "091_runtime_governance_continuity.sql",
+                "266_engineering_release_package_runtime_closure.sql"
             ],
             "primary_key": "sales_order_id",
             "foreign_keys": [
@@ -12171,6 +12232,18 @@
                 {
                     "col": "operation_id",
                     "ref": "operation(operation_id)"
+                }
+            ],
+            "contract": null
+        },
+        "work_order_engineering_package_snapshot": {
+            "defined_in": "266_engineering_release_package_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "snapshot_id",
+            "foreign_keys": [
+                {
+                    "col": "package_id",
+                    "ref": "engineering_release_package(package_id)"
                 }
             ],
             "contract": null
