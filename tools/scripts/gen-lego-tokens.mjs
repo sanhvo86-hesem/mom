@@ -322,13 +322,29 @@ const shellCss = `/* ===========================================================
    carried a chunky 16px radius — flatten it to 0 so the outer frame reads as
    'removed' (flush, edge-to-edge). Inner panels keep the refined --lego-block-radius
    and the uniform --lego-frame gaps. */
-.admin-panel{ border-radius: 0 !important; }
+.admin-panel,
+.admin-nav-panel{ border-radius: 0 !important; }
+.admin-nav-panel{ padding: var(--lego-frame) !important; }
 #admin-content.admin-panel{ margin: 0 !important; padding: var(--lego-frame) !important; }
-/* Synchronize EVERY admin gap to the single frame token: the outer page gutter
-   (was 24px) and the 2-column nav↔content grid gap (was 16px) now both equal the
-   inner 8px — one uniform rhythm across the whole admin. */
-#content > #page-admin.page{ padding: var(--lego-frame) !important; }
-.admin-console-shell{ gap: var(--lego-frame) !important; }
+/* Zero outer page gutter — panels flush to the #content edges */
+#content > #page-admin.page{ padding: 0 !important; }
+.admin-console-shell{ gap: 0 !important; }
+/* Rail: stick flush to top, sized to visible area, no visible scrollbar track */
+.admin-console-rail{
+  top: 0 !important;
+  max-height: calc(100vh - var(--header-h, 52px)) !important;
+  padding-right: 0 !important;
+  scrollbar-gutter: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.admin-console-rail::-webkit-scrollbar{ display: none !important; }
+/* Main page scroll (#content overflow-y:auto) hidden while admin is active */
+#content:has(#page-admin.active){
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+#content:has(#page-admin.active)::-webkit-scrollbar{ display: none !important; }
 `;
 
 const jsonOut = JSON.stringify(compiled, null, 2) + '\n';
