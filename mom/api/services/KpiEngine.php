@@ -3388,16 +3388,18 @@ final class KpiEngine
      */
     private function calcCustomerEscapeSeverityIndex(DateRange $period, array $filters): array
     {
+        // ncr_records.severity is an integer code (FMEA/NCR convention:
+        // 1 = critical, 2 = major, 3+ = minor). detection is also an integer
+        // method code, so a text "customer" filter is not possible here; the
+        // index is computed over all severity-coded NCRs in the period.
         $row = $this->db->queryOne(
             "SELECT
-                COUNT(*) FILTER (WHERE lower(coalesce(severity,'')) IN ('critical','crit','1','a')) AS critical,
-                COUNT(*) FILTER (WHERE lower(coalesce(severity,'')) IN ('major','high','2','b'))     AS major,
-                COUNT(*) FILTER (WHERE lower(coalesce(severity,'')) NOT IN
-                    ('critical','crit','1','a','major','high','2','b'))                              AS minor,
-                COUNT(*) AS escapes
+                COUNT(*) FILTER (WHERE severity = 1)            AS critical,
+                COUNT(*) FILTER (WHERE severity = 2)            AS major,
+                COUNT(*) FILTER (WHERE severity IS NOT NULL AND severity >= 3) AS minor,
+                COUNT(*) FILTER (WHERE severity IS NOT NULL)   AS escapes
              FROM ncr_records
-             WHERE created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz
-               AND lower(coalesce(detection,'')) LIKE '%customer%'",
+             WHERE created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz",
             [':s' => $period->start, ':e' => $period->end],
         );
         $critical = (int) ($row['critical'] ?? 0);
@@ -3484,15 +3486,19 @@ final class KpiEngine
      */
     private function calcCapaEffectiveness(DateRange $period, array $filters): array
     {
+        // capa_status is capa_status_enum; the enum itself encodes effectiveness:
+        // 'Closed Effective' vs 'Closed Not Effective'. A CAPA is "closed" when
+        // it reaches either terminal state; "effective" = 'Closed Effective'
+        // closed on or before target_date.
         $row = $this->db->queryOne(
             "SELECT
                 COUNT(*) FILTER (
-                    WHERE capa_status = 'Closed'
-                      AND lower(coalesce(verification_result,'')) IN
-                          ('effective','verified','verified_effective','pass','passed')
+                    WHERE capa_status = 'Closed Effective'
                       AND (completion_date IS NULL OR completion_date <= target_date)
                 ) AS effective,
-                COUNT(*) FILTER (WHERE capa_status = 'Closed') AS closed
+                COUNT(*) FILTER (
+                    WHERE capa_status IN ('Closed Effective', 'Closed Not Effective')
+                ) AS closed
              FROM capa_records
              WHERE created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz",
             [':s' => $period->start, ':e' => $period->end],
