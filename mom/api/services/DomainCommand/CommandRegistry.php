@@ -150,7 +150,7 @@ final class CommandRegistry
             'idempotency_scope' => 'mes:job:start',
             'openapi_operation' => 'submitDomainCommand',
             'expected_events' => ['JobStarted'],
-            'implemented' => false,
+            'implemented' => true,
         ],
         'IssueMaterialToWorkOrderCommand' => [
             'root' => 'inventory_issue',
@@ -159,7 +159,7 @@ final class CommandRegistry
             'idempotency_scope' => 'inventory:material_issue',
             'openapi_operation' => 'submitDomainCommand',
             'expected_events' => ['MaterialIssuedToWorkOrder'],
-            'implemented' => false,
+            'implemented' => true,
         ],
         'LoadToolCommand' => [
             'root' => 'tooling',
@@ -168,7 +168,7 @@ final class CommandRegistry
             'idempotency_scope' => 'tooling:load',
             'openapi_operation' => 'submitDomainCommand',
             'expected_events' => ['ToolLoaded'],
-            'implemented' => false,
+            'implemented' => true,
         ],
         'RecordInspectionResultCommand' => [
             'root' => 'inspection_result',
@@ -177,7 +177,7 @@ final class CommandRegistry
             'idempotency_scope' => 'quality:inspection_result',
             'openapi_operation' => 'submitDomainCommand',
             'expected_events' => ['InspectionResultRecorded'],
-            'implemented' => false,
+            'implemented' => true,
         ],
         'CompleteOperationCommand' => [
             'root' => 'operation_execution',
@@ -186,7 +186,7 @@ final class CommandRegistry
             'idempotency_scope' => 'mes:operation:complete',
             'openapi_operation' => 'submitDomainCommand',
             'expected_events' => ['OperationCompleted'],
-            'implemented' => false,
+            'implemented' => true,
         ],
         'ApplyQualityHoldCommand' => [
             'root' => 'quality_hold',

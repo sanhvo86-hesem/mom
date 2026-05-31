@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 837,
-        "generated_at": "2026-06-01T03:27:34+00:00"
+        "table_count": 839,
+        "generated_at": "2026-06-01T03:27:35+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -9358,6 +9358,20 @@
                     "ref": "users(user_id)"
                 }
             ],
+            "contract": null
+        },
+        "resource_readiness_evidence_state": {
+            "defined_in": "268_resource_readiness_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "evidence_state_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "resource_readiness_snapshot": {
+            "defined_in": "268_resource_readiness_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "readiness_snapshot_id",
+            "foreign_keys": [],
             "contract": null
         },
         "retention_class_assignment": {

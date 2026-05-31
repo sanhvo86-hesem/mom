@@ -1,0 +1,8 @@
+gap_id,severity,status,evidence,owner_prompt,next_step
+P0-RESOURCE-READINESS-NOT-WIRED,P0,closed_for_gateway,"StartJob/IssueMaterial/LoadTool/RecordInspectionResult/CompleteOperation now call ResourceReadinessService and write immutable readiness snapshots before MES events.",P52,"P55/P58 must prove legacy route bypass closure"
+P0-MISSING-READINESS-EVIDENCE-DEFAULTS-ALLOW,P0,closed,"Missing readiness evidence rows create readiness_evidence_missing blockers and block command.",P52,"Populate evidence_state from canonical resource domains"
+P0-MES-EVENT-BEFORE-GATE,P0,closed,"Manual probe shows snapshot index before mes_operational_event_ledger index; blocked probe writes no MES event.",P52,"Add integration test when vendor restored"
+P0-OPERATOR-REASON-PAYLOAD-MISSING,P0,closed,"Problem Details include operator_reason_payload and snapshot persists the same payload.",P52,"P18/P60 should surface disabled action reasons in UI"
+P1-READINESS-EVIDENCE-STATE-POPULATION,P1,open,"P52 creates/readies the evidence state table but upstream canonical feeders are still future work.",P53/P54/P55,"Write quality hold inventory tooling machine training feeders"
+P1-LEGACY-ROUTE-BYPASS,P1,open,"Gateway path is closed; existing legacy routes need proof.",P55/P58,"Migrate or wrap legacy route entrypoints"
+P1-LOCAL-VALIDATION-DEPENDENCIES,P1,blocked,"composer test/analyse/check cannot run because vendor/bin/phpunit and vendor/bin/phpstan are missing.",release,"Restore dependencies or use CI evidence"
