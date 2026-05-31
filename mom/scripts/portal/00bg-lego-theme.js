@@ -169,6 +169,23 @@
     return true;
   }
 
+  // Theme Layout: the uniform shell frame (gap-to-edge == gap-between) + block
+  // rounding. One call tunes the whole module layout; bound by lego-shell.css.
+  function setLayout(opts, scopeOpts) {
+    opts = opts || {};
+    var el = (scopeOpts && scopeOpts.scope) || document.documentElement;
+    var ok = false;
+    if (opts.frame != null) {
+      var f = parseInt(opts.frame, 10);
+      if (isFinite(f) && f >= 0 && f <= 40) { setVar(el, '--lego-frame', f + 'px'); ok = true; }
+    }
+    if (opts.radius != null) {
+      var r = parseInt(opts.radius, 10);
+      if (isFinite(r) && r >= 0 && r <= 32) { setVar(el, '--lego-block-radius', r + 'px'); ok = true; }
+    }
+    return ok;
+  }
+
   function reset(scope) {
     var el = scope || document.documentElement;
     var t = el[TOUCHED]; if (!t) return;
@@ -181,12 +198,12 @@
      through the same master tokens, so a module inherits a coherent, tunable look.
      Admins can edit a preset by adjusting tokens in Module Master. ── */
   var THEMES = {
-    'hesem-default':    { label: { vi:'HESEM mặc định', en:'HESEM Default' },   brand:'#1565c0', density:8,  radius:8,  controlH:32 },
-    'industrial-dense': { label: { vi:'Công nghiệp dày', en:'Industrial Dense' }, brand:'#1565c0', density:6,  radius:4,  controlH:28 },
-    'comfortable':      { label: { vi:'Thoáng',          en:'Comfortable' },     brand:'#1565c0', density:12, radius:10, controlH:36 },
-    'shop-floor':       { label: { vi:'Xưởng (cảm ứng)', en:'Shop-floor (touch)' }, brand:'#0f766e', density:10, radius:8,  controlH:44 },
-    'violet':           { label: { vi:'Tím',             en:'Violet' },          brand:'#7c3aed', density:8,  radius:8,  controlH:32 },
-    'slate':            { label: { vi:'Xám đen',         en:'Slate' },           brand:'#334155', density:8,  radius:6,  controlH:32 }
+    'hesem-default':    { label: { vi:'HESEM mặc định', en:'HESEM Default' },   brand:'#1565c0', density:8,  radius:8,  controlH:32, frame:8 },
+    'industrial-dense': { label: { vi:'Công nghiệp dày', en:'Industrial Dense' }, brand:'#1565c0', density:6,  radius:4,  controlH:28, frame:6 },
+    'comfortable':      { label: { vi:'Thoáng',          en:'Comfortable' },     brand:'#1565c0', density:12, radius:10, controlH:36, frame:12 },
+    'shop-floor':       { label: { vi:'Xưởng (cảm ứng)', en:'Shop-floor (touch)' }, brand:'#0f766e', density:10, radius:8,  controlH:44, frame:10 },
+    'violet':           { label: { vi:'Tím',             en:'Violet' },          brand:'#7c3aed', density:8,  radius:8,  controlH:32, frame:8 },
+    'slate':            { label: { vi:'Xám đen',         en:'Slate' },           brand:'#334155', density:8,  radius:6,  controlH:32, frame:8 }
   };
   function listThemes(){
     return Object.keys(THEMES).map(function(k){ return { key:k, label:THEMES[k].label, brand:THEMES[k].brand }; });
@@ -198,6 +215,7 @@
     if(t.density != null) setDensity(t.density, opts);
     if(t.radius != null) setRadius(t.radius, opts);
     if(t.controlH != null) setControlHeight(t.controlH, opts);
+    setLayout({ frame: t.frame != null ? t.frame : t.density, radius: t.radius }, opts);
     return { ok: !!(r && r.ok), theme:name, ramp: r && r.ramp };
   }
 
@@ -210,6 +228,7 @@
     setDensity: setDensity,
     setRadius: setRadius,
     setControlHeight: setControlHeight,
+    setLayout: setLayout,
     deriveRamp: deriveRamp,
     contrast: contrast,
     wcag: wcag,
