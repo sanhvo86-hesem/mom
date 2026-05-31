@@ -206,6 +206,14 @@ jobs:
         # deploy. Runs unconditionally (frontend-only changesets).
         run: php mom/tools/release/check_lego_tokens.php
 
+      - name: Block engine XSS regression
+        # Loads 00-block-engine.js in a vm sandbox and feeds the renderers the
+        # exact attack inputs from the security audit (script/img icons, style
+        # break-out colors, attribute-break src, javascript: URLs); fails if any
+        # produces live injection. Guards the _esc quote-escaping + _safeColor +
+        # _safeUrl hardening from regressing. Runs unconditionally.
+        run: node tools/scripts/xss-regression.mjs
+
       - name: ISO reference status check
         run: php mom/tools/release/check_iso_reference_status.php
 

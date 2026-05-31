@@ -23,7 +23,7 @@
 
 /* ── Helpers ─────────────────────────────────────────────────────────────── */
 function _t(vi,en){ return (typeof lang!=='undefined'&&lang==='en')?en:vi; }
-function _esc(v){ var d=document.createElement('div'); d.appendChild(document.createTextNode(v==null?'':String(v))); return d.innerHTML; }
+function _esc(v){ return (v==null?'':String(v)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function _textLabel(label, labelEn){
   if(label && typeof label === 'object') return _t(label.vi || label.label || '', label.en || label.labelEn || label.vi || '');
   return _t(label || '', labelEn || label || '');
@@ -5667,7 +5667,7 @@ function _formatCellValue(val, col, row){
     case 'boolean':
       return val ? '<span class="hm-bool-true">&#10003;</span>' : '<span class="hm-bool-false">&#10007;</span>';
     case 'link':
-      return '<a href="'+_esc(String(val))+'" class="hm-link" target="_blank">'+_esc(col.linkText||String(val))+'</a>';
+      return '<a href="'+_esc(_safeUrl(val))+'" class="hm-link" target="_blank" rel="noopener noreferrer">'+_esc(col.linkText||String(val))+'</a>';
     case 'image':
       return val ? '<img src="'+_esc(String(val))+'" class="hm-cell-img" alt="">' : '';
     default:
@@ -6509,7 +6509,7 @@ function renderDonutChart(config, data, state, blockId, reactiveCtx, block){
   if(total > 0){
     items.forEach(function(item, index){
       var pct = (_chartNumber(item.value) / total) * 100;
-      gradientParts.push((item.color || _chartColor(index)) + ' ' + cumPct.toFixed(2) + '% ' + (cumPct + pct).toFixed(2) + '%');
+      gradientParts.push(_safeColor(item.color, _chartColor(index)) + ' ' + cumPct.toFixed(2) + '% ' + (cumPct + pct).toFixed(2) + '%');
       item.percent = pct;
       cumPct += pct;
     });
@@ -7053,7 +7053,7 @@ function renderBarChart(config, data, state, blockId, reactiveCtx, block){
       var label = item[labelKey] != null ? String(item[labelKey]) : _chartText(item, item.label || item.name || ('Item ' + (index + 1)), item.labelEn || item.name || ('Item ' + (index + 1)));
       var value = _chartNumber(item.value != null ? item.value : item[valueKey]);
       var pct = Math.round((value / max) * 100);
-      var color = item.color || (colorKey && item[colorKey]) || _chartColor(index, 'var(--brand-2)');
+      var color = _safeColor(item.color || (colorKey && item[colorKey]), _chartColor(index, 'var(--brand-2)'));
       var tip = label + ': ' + _chartFormatValue(value, config.format || '');
       html += '<div class="hm-bar-row">';
       html += '<span class="hm-bar-label">'+_esc(label)+'</span>';
@@ -9334,7 +9334,7 @@ function renderToolbar(config, data){
     var cls = 'hm-btn hm-btn-'+(btn.variant||'secondary');
     if(btn.size) cls += ' hm-btn-'+btn.size;
     html += '<button class="'+cls+'" data-action="'+_esc(btn.action||'')+'"'+(btn.tab ? ' data-tab="'+_esc(btn.tab)+'"' : '')+'>';
-    if(btn.icon) html += '<span class="hm-btn-icon">'+btn.icon+'</span> ';
+    if(btn.icon) html += '<span class="hm-btn-icon">'+_esc(btn.icon)+'</span> ';
     html += _esc(_textLabel(btn.label, btn.labelEn));
     html += '</button>';
   });
@@ -9451,7 +9451,7 @@ function renderTimeline(config, data){
   items.forEach(function(item, idx){
     var isLast = idx === items.length-1;
     html += '<div class="hm-timeline-item'+(isLast?' hm-timeline-last':'')+'">';
-    html += '<div class="hm-timeline-dot" style="background:'+(item.color||'var(--brand-2)')+'"></div>';
+    html += '<div class="hm-timeline-dot" style="background:'+_safeColor(item.color,'var(--brand-2)')+'"></div>';
     if(!isLast) html += '<div class="hm-timeline-line"></div>';
     html += '<div class="hm-timeline-content">';
     if(item.date) html += '<div class="hm-timeline-date">'+_esc(item.date)+'</div>';
@@ -9543,7 +9543,7 @@ function renderSectionHeader(config){
 function renderInfoBanner(config){
   var type = config.type || 'info'; // info, success, warning, danger
   var html = '<div class="hm-banner hm-banner-'+_esc(type)+'">';
-  if(config.icon) html += '<span class="hm-banner-icon">'+config.icon+'</span>';
+  if(config.icon) html += '<span class="hm-banner-icon">'+_esc(config.icon)+'</span>';
   html += '<div class="hm-banner-text">'+_esc(_t(config.text||'',config.textEn||''))+'</div>';
   if(config.dismissible) html += '<button class="hm-banner-close" data-action="hm-dismiss">&times;</button>';
   html += '</div>';
@@ -9594,15 +9594,37 @@ function _scLabel(item, i){
   return String(item.label != null ? item.label : (item.name != null ? item.name : (item.title != null ? item.title : ('Item ' + (i + 1)))));
 }
 function _scStatusColor(value){
-  var k = String(value || '').toLowerCase();
-  if(/run|ok|approved|won|pass|closed|done|success|verified|online|healthy|good/.test(k)) return 'var(--green,#16a34a)';
-  if(/warn|idle|review|draft|pending|submit|hold|todo|queued|watch/.test(k)) return 'var(--amber,#d97706)';
-  if(/down|fail|reject|lost|overdue|critical|major|offline|breach|error/.test(k)) return 'var(--red,#dc2626)';
+  // Match whole tokens (split on non-letters) instead of substrings, so
+  // 'Broken' is not green ('ok') and 'shutdown' is not red ('down').
+  var toks = String(value || '').toLowerCase().split(/[^a-z]+/);
+  var has = function(set){ for(var i=0;i<toks.length;i++){ if(set.indexOf(toks[i]) >= 0) return true; } return false; };
+  if(has(['run','running','ok','approved','won','pass','passed','closed','done','complete','completed','success','verified','online','healthy','good','active'])) return 'var(--green,#16a34a)';
+  if(has(['warn','warning','idle','review','draft','pending','submit','submitted','hold','todo','queued','watch','new'])) return 'var(--amber,#d97706)';
+  if(has(['down','fail','failed','reject','rejected','lost','overdue','critical','major','offline','breach','error','blocked'])) return 'var(--red,#dc2626)';
   return 'var(--brand-2,#2563eb)';
 }
 function _scText(v, vEn){
   if(v && typeof v === 'object') return _t(v.vi || '', v.en || v.vi || '');
   return _t(v == null ? '' : v, vEn == null ? v : vEn);
+}
+/* Sanitize a caller-supplied CSS color before it is concatenated into a
+   style="…" attribute. Allows hex / named / var() / rgb()/hsl()/oklch() (which
+   need parens) but rejects any char that could break out of the attribute or
+   inject extra declarations. Defends the colour interpolation sinks that do not
+   pass through _esc. */
+function _safeColor(v, fallback){
+  if(v == null) return fallback;
+  var s = String(v);
+  return /["'<>;{}\\]/.test(s) ? (fallback != null ? fallback : 'currentColor') : s;
+}
+/* Neutralize dangerous URL schemes (javascript:/vbscript:/data:text/html) before
+   a caller/data value is used as an href/src. Safe schemes + relative URLs pass
+   through; data:image/* is allowed; everything dangerous becomes '#'. */
+function _safeUrl(v){
+  var s = String(v == null ? '' : v).trim();
+  if(/^\s*(?:javascript|vbscript):/i.test(s)) return '#';
+  if(/^\s*data:/i.test(s)) return /^\s*data:image\//i.test(s) ? s : '#';
+  return s;
 }
 
 /* --- Funnel (insight-funnel) --- */
@@ -9621,7 +9643,7 @@ function renderFunnel(config, data, blockId){
     var v = _chartNumber(r.value != null ? r.value : r[valueKey]);
     var pct = Math.round((v / max) * 100);
     var conv = i === 0 ? 100 : Math.round((v / first) * 100);
-    var color = r.color || _chartColor(i, 'var(--brand-2,#2563eb)');
+    var color = _safeColor(r.color, _chartColor(i, 'var(--brand-2,#2563eb)'));
     html += '<div style="display:flex;align-items:center;gap:var(--space-3,10px)">';
     html += '<span style="min-width:130px;font-size:12px;color:var(--text-secondary)">'+_esc(r[labelKey] != null ? String(r[labelKey]) : _scLabel(r, i))+'</span>';
     html += '<div style="flex:1;display:flex;justify-content:center"><div style="width:'+Math.max(pct,8)+'%;background:'+color+';color:var(--text-inverse,#fff);border-radius:var(--o3-radius,6px);padding:8px 12px;text-align:center;font-weight:700;font-size:13px">'+_esc(_fmt(v))+'</div></div>';
@@ -9695,7 +9717,7 @@ function renderStepper(config, data){
 function renderNavPills(config, data){
   var rows = _scRows(config, data);
   if(!rows.length) return '<div class="hm-empty">'+_t('Không có dữ liệu','No data')+'</div>';
-  var html = '<div class="hm-nav-pills" style="display:flex;flex-wrap:wrap;gap:var(--space-2,8px)">';
+  var html = '<div class="hm-nav-pills" role="group" aria-label="'+_esc(_t('Bộ lọc','Filters'))+'" style="display:flex;flex-wrap:wrap;gap:var(--space-2,8px)">';
   rows.forEach(function(item, i){
     var active = !!item.active;
     html += '<button type="button" class="hm-btn" aria-pressed="'+(active ? 'true' : 'false')+'" style="height:var(--o3-control-h-standard,32px);border-radius:999px;padding:0 14px;border:1px solid '+(active ? 'var(--brand-2,#2563eb)' : 'var(--border,#e2e8f0)')+';background:'+(active ? 'var(--brand-2,#2563eb)' : 'var(--bg-surface,#fff)')+';color:'+(active ? 'var(--text-inverse,#fff)' : 'var(--text-secondary)')+';font-size:13px;font-weight:600">';
@@ -9711,18 +9733,22 @@ function renderNavPills(config, data){
 function renderPagination(config, data){
   var page = Math.max(parseInt(config.page, 10) || 1, 1);
   var count = Math.max(parseInt(config.pageCount, 10) || 5, 1);
-  function pgBtn(label, disabled, active){
-    return '<button type="button" class="hm-btn" style="min-width:32px;height:var(--o3-control-h-standard,32px);border-radius:var(--o3-radius,6px);border:1px solid '+(active ? 'var(--brand-2,#2563eb)' : 'var(--border,#e2e8f0)')+';background:'+(active ? 'var(--brand-2,#2563eb)' : 'var(--bg-surface,#fff)')+';color:'+(active ? 'var(--text-inverse,#fff)' : disabled ? 'var(--text-tertiary)' : 'var(--text-secondary)')+';font-weight:600'+(disabled ? ';opacity:.5' : '')+'">'+label+'</button>';
+  function pgBtn(label, disabled, active, ariaLabel){
+    return '<button type="button" class="hm-btn"'
+      + (disabled ? ' disabled' : '')
+      + (active ? ' aria-current="page"' : '')
+      + (ariaLabel ? ' aria-label="'+_esc(ariaLabel)+'"' : '')
+      + ' style="min-width:32px;height:var(--o3-control-h-standard,32px);border-radius:var(--o3-radius,6px);border:1px solid '+(active ? 'var(--brand-2,#2563eb)' : 'var(--border,#e2e8f0)')+';background:'+(active ? 'var(--brand-2,#2563eb)' : 'var(--bg-surface,#fff)')+';color:'+(active ? 'var(--text-inverse,#fff)' : disabled ? 'var(--text-tertiary)' : 'var(--text-secondary)')+';font-weight:600'+(disabled ? ';opacity:.5' : '')+'">'+label+'</button>';
   }
-  var html = '<div class="hm-pagination" style="display:flex;align-items:center;gap:6px;font-size:13px">';
-  html += pgBtn('‹', page <= 1, false);
+  var html = '<nav class="hm-pagination" aria-label="'+_esc(_t('Phân trang','Pagination'))+'" style="display:flex;align-items:center;gap:6px;font-size:13px">';
+  html += pgBtn('<span aria-hidden="true">‹</span>', page <= 1, false, _t('Trang trước','Previous page'));
   for(var p = 1; p <= count; p++){
-    if(count > 7 && p > 2 && p < count - 1 && Math.abs(p - page) > 1){ if(p === 3) html += '<span style="color:var(--text-tertiary)">…</span>'; continue; }
-    html += pgBtn(String(p), false, p === page);
+    if(count > 7 && p > 2 && p < count - 1 && Math.abs(p - page) > 1){ if(p === 3) html += '<span aria-hidden="true" style="color:var(--text-tertiary)">…</span>'; continue; }
+    html += pgBtn(String(p), false, p === page, _t('Trang ','Page ') + p);
   }
-  html += pgBtn('›', page >= count, false);
-  html += '<span style="margin-left:8px;color:var(--text-tertiary)">'+_t('Trang','Page')+' '+page+' / '+count+'</span>';
-  html += '</div>';
+  html += pgBtn('<span aria-hidden="true">›</span>', page >= count, false, _t('Trang sau','Next page'));
+  html += '<span aria-live="polite" style="margin-inline-start:8px;color:var(--text-secondary)">'+_t('Trang','Page')+' '+page+' / '+count+'</span>';
+  html += '</nav>';
   return html;
 }
 
@@ -9732,11 +9758,13 @@ function renderLinkGrid(config, data){
   if(!rows.length) return '<div class="hm-empty">'+_t('Không có dữ liệu','No data')+'</div>';
   var html = '<div class="hm-link-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--space-3,10px)">';
   rows.forEach(function(item, i){
-    html += '<div class="hm-link-card" style="display:flex;align-items:center;gap:10px;padding:var(--space-3,12px);border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius-card,8px);background:var(--bg-surface,#fff);cursor:pointer">';
-    html += '<span style="font-size:22px">'+(item.icon || '🔗')+'</span>';
+    var tag = item.href ? 'a' : 'button';
+    var attrs = item.href ? ' href="'+_esc(_safeUrl(item.href))+'" rel="noopener noreferrer"' : ' type="button"';
+    html += '<'+tag+' class="hm-link-card"'+attrs+' style="display:flex;align-items:center;gap:10px;padding:var(--space-3,12px);border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius-card,8px);background:var(--bg-surface,#fff);cursor:pointer;text-align:left;width:100%;font:inherit;color:inherit;text-decoration:none">';
+    html += '<span style="font-size:22px" aria-hidden="true">'+_esc(item.icon || '🔗')+'</span>';
     html += '<span style="display:flex;flex-direction:column;min-width:0"><span style="font-weight:700;font-size:13px;color:var(--text-primary)">'+_esc(_scLabel(item, i))+'</span>';
-    if(item.desc) html += '<span style="font-size:12px;color:var(--text-tertiary)">'+_esc(_scText(item.desc, item.descEn))+'</span>';
-    html += '</span></div>';
+    if(item.desc) html += '<span style="font-size:12px;color:var(--text-secondary)">'+_esc(_scText(item.desc, item.descEn))+'</span>';
+    html += '</span></'+tag+'>';
   });
   html += '</div>';
   return html;
@@ -9746,7 +9774,7 @@ function renderLinkGrid(config, data){
 function renderMediaImage(config, data){
   var cap = _t(config.caption || '', config.captionEn || config.caption || '');
   var inner = config.src
-    ? '<img src="'+_esc(config.src)+'" alt="'+_esc(cap)+'" style="max-width:100%;border-radius:var(--o3-radius-card,8px)">'
+    ? '<img src="'+_esc(_safeUrl(config.src))+'" alt="'+_esc(cap)+'" style="max-width:100%;border-radius:var(--o3-radius-card,8px)">'
     : '<div style="aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--brand,#1e3a8a),var(--brand-2,#2563eb));color:var(--text-inverse,#fff);border-radius:var(--o3-radius-card,8px);font-size:40px">🖼️</div>';
   var html = '<figure class="hm-media-image" style="margin:0">'+inner;
   if(cap) html += '<figcaption style="font-size:12px;color:var(--text-tertiary);margin-top:6px;text-align:center">'+_esc(cap)+'</figcaption>';
@@ -9762,7 +9790,7 @@ function renderGallery(config, data){
   rows.forEach(function(item, i){
     var cap = item.caption ? _t(item.caption, item.captionEn || item.caption) : '';
     html += '<figure style="margin:0">';
-    if(item.src) html += '<img src="'+_esc(item.src)+'" alt="'+_esc(cap)+'" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--o3-radius,6px)">';
+    if(item.src) html += '<img src="'+_esc(_safeUrl(item.src))+'" alt="'+_esc(cap)+'" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--o3-radius,6px)">';
     else html += '<div style="aspect-ratio:1;border-radius:var(--o3-radius,6px);background:linear-gradient(135deg,'+_chartColor(i)+',var(--gray-200,#e2e8f0));display:flex;align-items:center;justify-content:center;font-size:24px">🖼️</div>';
     if(cap) html += '<figcaption style="font-size:11px;color:var(--text-tertiary);margin-top:4px">'+_esc(cap)+'</figcaption>';
     html += '</figure>';
@@ -9808,7 +9836,7 @@ function renderDeviceGrid(config, data){
     var color = _scStatusColor(item.status);
     var status = String(item.status || 'idle');
     html += '<div style="border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius-card,8px);padding:var(--space-3,12px);background:var(--bg-surface,#fff)">';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px"><span style="font-weight:700;font-size:13px;color:var(--text-primary)">'+_esc(_scLabel(item, i))+'</span><span style="width:10px;height:10px;border-radius:50%;background:'+color+'" title="'+_esc(status)+'"></span></div>';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px"><span style="font-weight:700;font-size:13px;color:var(--text-primary)">'+_esc(_scLabel(item, i))+'</span><span aria-hidden="true" style="width:10px;height:10px;border-radius:50%;background:'+color+'" title="'+_esc(status)+'"></span></div>';
     html += '<div style="font-size:11px;color:var(--text-tertiary);margin-top:2px">'+_esc(status)+'</div>';
     if(item.metric != null) html += '<div style="margin-top:8px;font-size:20px;font-weight:800;color:'+color+'">'+_esc(_fmt(_chartNumber(item.metric)))+_esc(item.unit || '')+'</div>';
     if(item.metricLabel) html += '<div style="font-size:11px;color:var(--text-secondary)">'+_esc(_scText(item.metricLabel, item.metricLabelEn))+'</div>';
@@ -9851,8 +9879,9 @@ function renderSlaTimer(config, data){
     var breach = remaining <= 0;
     var warn = ratio < 0.25;
     var color = breach ? 'var(--red,#dc2626)' : warn ? 'var(--amber,#d97706)' : 'var(--green,#16a34a)';
-    var hrs = Math.floor(Math.abs(remaining) / 60), mins = Math.abs(remaining) % 60;
-    var txt = (breach ? '-' : '') + hrs + 'h ' + mins + 'm';
+    var absMin = Math.round(Math.abs(remaining));
+    var hrs = Math.floor(absMin / 60), mins = absMin % 60;
+    var txt = (breach && absMin > 0 ? '-' : '') + (hrs > 0 ? hrs + 'h ' : '') + mins + 'm';
     html += '<div style="border:1px solid var(--border,#e2e8f0);border-left:4px solid '+color+';border-radius:var(--o3-radius-card,8px);padding:var(--space-3,12px);background:var(--bg-surface,#fff)">';
     html += '<div style="font-size:12px;color:var(--text-secondary)">'+_esc(_scLabel(item, i))+'</div>';
     html += '<div style="font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;color:'+color+'">'+_esc(txt)+'</div>';
@@ -9878,9 +9907,9 @@ function renderBoard(config, data){
   lanes.forEach(function(lane){
     var laneKey = lane.key != null ? lane.key : lane;
     var items = rows.filter(function(r){ return String(r[statusKey]) === String(laneKey); });
-    var color = lane.color || _scStatusColor(laneKey);
+    var color = _safeColor(lane.color, _scStatusColor(laneKey));
     html += '<div style="flex:1;min-width:200px;background:var(--gray-50,#f8fafc);border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius-card,8px);padding:var(--space-2,8px)">';
-    html += '<div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;padding:0 4px"><span style="width:8px;height:8px;border-radius:50%;background:'+color+'"></span>'+_esc(_t(lane.label || laneKey, lane.labelEn || lane.label || laneKey))+' <span style="color:var(--text-tertiary)">('+items.length+')</span></div>';
+    html += '<div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;padding:0 4px"><span aria-hidden="true" style="width:8px;height:8px;border-radius:50%;background:'+color+'"></span>'+_esc(_t(lane.label || laneKey, lane.labelEn || lane.label || laneKey))+' <span style="color:var(--text-tertiary)">('+items.length+')</span></div>';
     items.forEach(function(item){
       html += '<div style="background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius,6px);padding:var(--space-2,8px) var(--space-3,10px);margin-bottom:6px">';
       html += '<div style="font-size:13px;font-weight:600;color:var(--text-primary)">'+_esc(item.title || item.label || item.name || '—')+'</div>';

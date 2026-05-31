@@ -95,8 +95,7 @@ const SEED_NAMES = Object.keys(seeds).filter(k => !k.startsWith('$'));
 
 const hexLines = [];   // universal hex defaults
 const oklchLines = []; // @supports enhancement
-const props = [];      // @property declarations
-const compiled = { $description: 'GENERATED — do not edit. Source: tokens/lego.tokens.json', $sourceSha256: SRC_SHA, color: { seed:{}, derived:{} } };
+const compiled ={ $description: 'GENERATED — do not edit. Source: tokens/lego.tokens.json', $sourceSha256: SRC_SHA, color: { seed:{}, derived:{} } };
 
 for(const name of SEED_NAMES){
   const hex = seeds[name].$value;
@@ -109,7 +108,6 @@ for(const name of SEED_NAMES){
   oklchLines.push(`    --lego-${name}-hover: ${oklchStr(r.hover)};`);
   oklchLines.push(`    --lego-${name}-active: ${oklchStr(r.active)};`);
   oklchLines.push(`    --lego-${name}-on: ${oklchStr(r.on)};`);
-  props.push(`  @property --lego-${name}-h { syntax: "<number>"; inherits: true; initial-value: ${fmtH(r.base.H)}; }`);
   compiled.color.seed[name] = hex;
   compiled.color.derived[name] = {
     base: oklchToHex(r.base), hover: oklchToHex(r.hover), active: oklchToHex(r.active), on: oklchToHex(r.on),
@@ -175,8 +173,6 @@ const css = `/* ================================================================
 /* @source-sha256 ${SRC_SHA} */
 @layer lego.tokens, lego.components;
 
-${props.join('\n')}
-
 @layer lego.tokens {
   :root {
     /* ── derived brand/status ramps (hex, universal) ── */
@@ -226,12 +222,22 @@ ${oklchLines.join('\n')}
     content-visibility: auto;
     contain-intrinsic-size: auto 72px;
   }
-  /* Auto-apply to the Lego Showcase module only (161 blocks) — off-screen blocks
-     are skipped during layout/paint, keeping scroll smooth. Scoped to the module
-     container so production modules are untouched. */
+  /* Auto-apply to the Lego Showcase module only — off-screen blocks are skipped
+     during layout/paint, keeping scroll smooth. Scoped to the module container so
+     production modules are untouched. (The router renders one tab at a time, so a
+     tab holds up to ~21 blocks rather than all 161 — the win is modest but real
+     on the long Data/Chart tabs.) */
   .hm-blocks-container[data-module="M-lego-showcase"] > .hm-block {
     content-visibility: auto;
     contain-intrinsic-size: auto 160px;
+  }
+  /* Visible keyboard focus for all controls (WCAG 2.2 2.4.7/2.4.13). */
+  .hm-btn:focus-visible,
+  .hm-link-card:focus-visible,
+  .hm-nav-pills button:focus-visible,
+  .hm-pagination button:focus-visible {
+    outline: 2px solid var(--brand-2, #2563eb);
+    outline-offset: 2px;
   }
   @media (prefers-reduced-motion: reduce) {
     .lego-anim { transition: none !important; animation: none !important; }

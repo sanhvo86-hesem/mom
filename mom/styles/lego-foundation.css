@@ -11,14 +11,6 @@
 /* @source-sha256 589d54094dd185cb */
 @layer lego.tokens, lego.components;
 
-  @property --lego-brand-h { syntax: "<number>"; inherits: true; initial-value: 255.67; }
-  @property --lego-accent-h { syntax: "<number>"; inherits: true; initial-value: 72.44; }
-  @property --lego-success-h { syntax: "<number>"; inherits: true; initial-value: 149.21; }
-  @property --lego-warning-h { syntax: "<number>"; inherits: true; initial-value: 58.32; }
-  @property --lego-danger-h { syntax: "<number>"; inherits: true; initial-value: 27.33; }
-  @property --lego-info-h { syntax: "<number>"; inherits: true; initial-value: 262.88; }
-  @property --lego-neutral-h { syntax: "<number>"; inherits: true; initial-value: 257.42; }
-
 @layer lego.tokens {
   :root {
     /* ── derived brand/status ramps (hex, universal) ── */
@@ -200,12 +192,22 @@
     content-visibility: auto;
     contain-intrinsic-size: auto 72px;
   }
-  /* Auto-apply to the Lego Showcase module only (161 blocks) — off-screen blocks
-     are skipped during layout/paint, keeping scroll smooth. Scoped to the module
-     container so production modules are untouched. */
+  /* Auto-apply to the Lego Showcase module only — off-screen blocks are skipped
+     during layout/paint, keeping scroll smooth. Scoped to the module container so
+     production modules are untouched. (The router renders one tab at a time, so a
+     tab holds up to ~21 blocks rather than all 161 — the win is modest but real
+     on the long Data/Chart tabs.) */
   .hm-blocks-container[data-module="M-lego-showcase"] > .hm-block {
     content-visibility: auto;
     contain-intrinsic-size: auto 160px;
+  }
+  /* Visible keyboard focus for all controls (WCAG 2.2 2.4.7/2.4.13). */
+  .hm-btn:focus-visible,
+  .hm-link-card:focus-visible,
+  .hm-nav-pills button:focus-visible,
+  .hm-pagination button:focus-visible {
+    outline: 2px solid var(--brand-2, #2563eb);
+    outline-offset: 2px;
   }
   @media (prefers-reduced-motion: reduce) {
     .lego-anim { transition: none !important; animation: none !important; }

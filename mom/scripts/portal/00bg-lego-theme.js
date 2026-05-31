@@ -65,12 +65,14 @@
   function oklchToHex(o) { return rgbToHex(oklchToRgb(o)); }
 
   function deriveRamp(hex) {
-    var base = rgbToOklch(hexToRgb(hex));
+    var rgb = hexToRgb(hex);
+    if (!rgb) return null; // invalid input — caller must handle null
+    var base = rgbToOklch(rgb);
     var hover = { L: clamp(base.L - 0.05, 0, 1), C: base.C, H: base.H };
     var active = { L: clamp(base.L - 0.10, 0, 1), C: base.C, H: base.H };
     var on = base.L < 0.62 ? { L: 0.99, C: 0, H: base.H } : { L: 0.20, C: 0.01, H: base.H };
     return {
-      base: hex.length ? oklchToHex(base) : hex,
+      base: oklchToHex(base),
       baseOklch: base,
       hover: oklchToHex(hover),
       active: oklchToHex(active),
@@ -98,12 +100,14 @@
   /* ── apply / bridge ── */
   // Production vars the live app actually consumes, fed from the derived ramp so a
   // brand swap is visible immediately across orders-v3 / showcase / admin.
+  // Only vars actually consumed somewhere in the live CSS (verified by grep) —
+  // phantom names that nothing reads were removed so a brand swap has real effect.
   var BRAND_BRIDGE = {
-    base: ['--brand', '--brand-primary', '--brand-2', '--o3-brand', '--brand-2-strong'],
-    hover: ['--o3-brand-hover', '--brand-2-hover'],
-    active: ['--o3-brand-active'],
+    base: ['--brand', '--brand-primary', '--brand-2', '--o3-brand'],
+    hover: ['--o3-brand-hover'],
+    active: [],
     on: ['--text-on-brand', '--o3-text-inverse'],
-    subtle: ['--o3-brand-soft', '--brand-soft']
+    subtle: ['--o3-brand-soft']
   };
   var TOUCHED = '__legoThemeProps';
 
@@ -125,7 +129,6 @@
     setVar(el, '--lego-brand-hover', r.hover);
     setVar(el, '--lego-brand-active', r.active);
     setVar(el, '--lego-brand-on', r.on);
-    setVar(el, '--lego-brand-h', String(Math.round(r.baseOklch.H * 100) / 100));
     // bridge to production-consumed vars
     BRAND_BRIDGE.base.forEach(function (p) { setVar(el, p, r.base); });
     BRAND_BRIDGE.hover.forEach(function (p) { setVar(el, p, r.hover); });
