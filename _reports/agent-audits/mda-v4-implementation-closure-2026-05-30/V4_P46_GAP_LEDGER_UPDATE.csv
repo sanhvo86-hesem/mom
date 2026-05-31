@@ -1,0 +1,12 @@
+gap_id,severity,status,domain,evidence,repair_path,owner_prompt
+P46-BLOCK-CMD-001,P0,OPEN,inventory_logistics,"No ReceiveInventory command-stack use of canonical UOM service found","Wire receive command through ItemUomPolicyService + ConversionEngine + MEASVAL before inventory ledger write",P54/P59
+P46-BLOCK-CMD-002,P0,OPEN,inventory_logistics,"No Putaway command-stack use of canonical UOM service found","Wire putaway quantity through canonical item policy before container/location mutation",P54/P59
+P46-BLOCK-CMD-003,P0,OPEN,mes_execution,"ShopfloorExecutionService still has uom fallback/default behavior","Replace fallback with fail-closed UOM policy resolution and MEASVAL evidence",P55/P59
+P46-BLOCK-CMD-004,P0,OPEN,mes_execution,"No CompleteOperation command-stack use of canonical UOM service found","Wire operation completion quantities through UOM policy and command transaction",P55/P59
+P46-BLOCK-CMD-005,P1,OPEN,quality_improvement,"QualityMeasurementBridge exists but FAI/special-characteristic controllers still persist unit_of_measure directly","Route inspection/spec persistence through canonical unit resolution and MEASVAL",P53/P56/P59
+P46-BLOCK-CMD-006,P0,OPEN,finance,"No CostRollup command-stack use of canonical UOM service found","Implement cost quantity normalization while keeping currency under finance authority",P54/P59
+P46-BLOCK-CMD-007,P0,OPEN,commercial_customer,"No ShipmentPack command-stack use of canonical UOM/packaging policy found","Wire shipment packing through sales/packaging policy; block ITUOM physical conversion",P54/P59
+P46-BLOCK-CMD-008,P0,OPEN,mes_execution,"MesToolOffsetService has no detected canonical UOM/MEASVAL integration","Wrap tool offset/wear/preset quantities in MEASVAL before release",P52/P55/P59
+P46-BLOCK-ALIAS-001,P0,OPEN,uom_measurement,"Main alias resolver uses ORDER BY supplier_id NULLS LAST LIMIT 1","Detect multiple active canonical candidates and quarantine ambiguity",P46 after UOM branch integration
+P46-BLOCK-LIFE-001,P1,OPEN,uom_measurement,"ConversionRuleService uses approved while UomWorkflowService activates active","Unify active/approved lifecycle semantics with migration/tests",P46 after UOM branch integration
+P46-BLOCK-MULTIAI-001,P0,OPEN,branch_safety,"Active UOM branches modify required P46 repair files","Do not edit UOM authority files here; integrate reviewed UOM branch first",Integration

@@ -1,0 +1,142 @@
+{
+  "prompt_id": "P46",
+  "prompt_name": "UOM Measurement Authority Integration Closure",
+  "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
+  "date": "2026-05-30",
+  "posture": "pre-production runtime-readiness evidence; not production-ready",
+  "decision_token": "P46_BLOCKED_RUNTIME_AUTHORITY_RISK",
+  "executive_decision": "NO_GO for UOM runtime closure in this branch",
+  "source_truth_audit": {
+    "local_uom_authority_files": [
+      "mom/api/services/Uom/ConversionEngine.php",
+      "mom/api/services/Uom/ConversionRuleService.php",
+      "mom/api/services/Uom/ItemUomPolicyService.php",
+      "mom/api/services/Uom/UomAliasResolutionService.php",
+      "mom/api/services/Uom/MeasurementValueFactory.php",
+      "mom/api/services/Uom/QualityMeasurementBridge.php",
+      "mom/api/controllers/UomController.php",
+      "mom/api/routes/uom-routes.php",
+      "mom/database/migrations/215_uom_unit_catalog.sql",
+      "mom/database/migrations/217_uom_conversion_rule.sql",
+      "mom/database/migrations/220_item_uom_policy.sql",
+      "mom/database/migrations/228_uom_measval_integration.sql",
+      "mom/database/migrations/231_uom_v3_lifecycle_governance.sql"
+    ],
+    "active_remote_uom_branches": [
+      "origin/codex/uom-production-backend-clean-20260531",
+      "origin/codex/uom-production-claim-gate-20260530",
+      "origin/codex/uom-v5-no-guess-20260530"
+    ],
+    "remote_collision_surface": [
+      "mom/api/controllers/UomController.php",
+      "mom/api/openapi.yaml",
+      "mom/api/services/Uom/ConversionEngine.php",
+      "mom/api/services/Uom/ConversionRuleService.php",
+      "mom/api/services/Uom/ItemUomPolicyService.php",
+      "mom/api/services/Uom/UomAliasResolutionService.php",
+      "mom/api/services/Uom/MeasurementValueFactory.php",
+      "mom/api/services/Uom/UomWorkflowService.php",
+      "mom/database/migrations/257_uom_v5_manifest_human_approval_lock.sql",
+      "mom/database/migrations/258_uom_v5_alias_quarantine_contract.sql",
+      "mom/database/migrations/259_uom_v5_quantity_kind_compatibility.sql",
+      "mom/database/migrations/260_uom_v5_contextual_conversion_contract.sql"
+    ]
+  },
+  "runtime_evidence_probe": {
+    "bcmath": "PASS",
+    "php_lint_uom_services": "PASS",
+    "phpunit_uom": "BLOCKED_MISSING_VENDOR_BIN_PHPUNIT",
+    "measval_hash_probe": "PASS_64_CHAR_SHA256",
+    "affine_temperature_probe": "PASS_98_6F_TO_37_00C_AND_100C_TO_212_00F",
+    "command_stack_probe": "FAIL_NO_REQUIRED_COMMAND_USAGE_FOUND",
+    "alias_ambiguity_probe": "FAIL_MAIN_BRANCH_LIMIT_1_NOT_QUARANTINE"
+  },
+  "blockers": [
+    {
+      "id": "P46-BLOCK-CMD-001",
+      "severity": "P0",
+      "title": "Required governed commands can bypass canonical UOM conversion",
+      "evidence": "Search found UOM services used by UomController and QualityMeasurementBridge, but not by ReceiveInventory, Putaway, IssueMaterial, CompleteOperation, CostRollup, ShipmentPack, or ToolPresetMeasurement command paths.",
+      "repair": "Wire each live domain command through ItemUomPolicyService, ConversionEngine, MEASVAL, audit/evidence, and domain transaction before mutation."
+    },
+    {
+      "id": "P46-BLOCK-ALIAS-001",
+      "severity": "P0",
+      "title": "Alias ambiguity is not fully quarantined on main",
+      "evidence": "Main UomAliasResolutionService uses ORDER BY supplier_id NULLS LAST LIMIT 1 for matching aliases, so conflicting active alias rows can resolve silently.",
+      "repair": "Query all active candidates; if more than one distinct canonical code exists, write uom_alias_quarantine and return a Problem Details response."
+    },
+    {
+      "id": "P46-BLOCK-LIFE-001",
+      "severity": "P1",
+      "title": "Conversion rule lifecycle vocabulary is inconsistent",
+      "evidence": "ConversionRuleService resolves lifecycle_status='approved'; UomWorkflowService promotes lifecycle_status='active'; UomDataQualityScanner checks active.",
+      "repair": "Define one runtime-active rule state or implement explicit compatibility mapping with migration and tests."
+    },
+    {
+      "id": "P46-BLOCK-MULTIAI-001",
+      "severity": "P0",
+      "title": "Active UOM branches own the files needed for safe repair",
+      "evidence": "Remote UOM branches modify UomController, UOM services, UOM registries, UOM migrations 257-260, UOM UI, and UOM tests.",
+      "repair": "Integrate the UOM branch first or cherry-pick only reviewed UOM fixes into a staging branch before P46 code remediation."
+    }
+  ],
+  "operational_simulations": [
+    {
+      "scenario_id": "V4-SIM-046-001",
+      "expected": "PO receipt 10 BOX converts to 500 PCS inventory quantity",
+      "current_status": "BLOCKED",
+      "failure_if_missing": "ReceiveInventory can store raw supplier UOM without item policy conversion"
+    },
+    {
+      "scenario_id": "V4-SIM-046-002",
+      "expected": "Supplier alias 'in' conflict deterministically scopes or quarantines",
+      "current_status": "BLOCKED",
+      "failure_if_missing": "Alias resolver may pick one matching alias via LIMIT 1"
+    },
+    {
+      "scenario_id": "V4-SIM-046-003",
+      "expected": "Celsius/Fahrenheit uses offset conversion",
+      "current_status": "PASS_ENGINE_PROBE_ONLY",
+      "failure_if_missing": "Factor-only temperature conversion produces incorrect values"
+    },
+    {
+      "scenario_id": "V4-SIM-046-004",
+      "expected": "Length value used as mass is blocked",
+      "current_status": "PASS_ENGINE_DESIGN_ONLY",
+      "failure_if_missing": "Quantity kind mismatch can contaminate inventory/cost facts"
+    },
+    {
+      "scenario_id": "V4-SIM-046-005",
+      "expected": "Inspection micron result compares to mm spec with precision proof",
+      "current_status": "PARTIAL_BRIDGE_EXISTS",
+      "failure_if_missing": "Inspection specs can still persist free-text unit fields"
+    },
+    {
+      "scenario_id": "V4-SIM-046-006",
+      "expected": "Cost rollup uses purchase UOM and canonical cost/unit conversion",
+      "current_status": "BLOCKED",
+      "failure_if_missing": "Finance cost quantities can drift from inventory units"
+    },
+    {
+      "scenario_id": "V4-SIM-046-007",
+      "expected": "Deprecated conversion rule is blocked or effectivity-resolved",
+      "current_status": "BLOCKED_LIFECYCLE_INCONSISTENT",
+      "failure_if_missing": "Wrong lifecycle state can allow or reject valid conversions unpredictably"
+    },
+    {
+      "scenario_id": "V4-SIM-046-008",
+      "expected": "Missing item UOM policy blocks lot-controlled material issue",
+      "current_status": "BLOCKED",
+      "failure_if_missing": "MES issue can default to EA or target UOM"
+    }
+  ],
+  "artifacts": [
+    "UOM_AUTHORITY_CLOSURE_REPORT.md",
+    "UOM_COMMAND_AND_POLICY_MATRIX.csv",
+    "UOM_CONVERSION_TEST_SUITE_REPORT.md",
+    "UOM_RUNTIME_PROOF_PACK.json",
+    "V4_P46_GAP_LEDGER_UPDATE.csv",
+    "V4_PROMPT_HANDOFF_P46.md"
+  ]
+}
