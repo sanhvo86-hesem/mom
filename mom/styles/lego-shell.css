@@ -67,6 +67,7 @@
    and the uniform --lego-frame gaps. */
 .admin-panel,
 .admin-nav-panel{ border-radius: 0 !important; }
+.admin-nav-panel{ padding: var(--lego-frame) !important; }
 #admin-content.admin-panel{ margin: 0 !important; padding: var(--lego-frame) !important; }
 /* Zero outer page gutter — panels flush to the #content edges */
 #content > #page-admin.page{ padding: 0 !important; }
