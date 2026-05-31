@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 853,
-        "generated_at": "2026-06-01T03:30:42+00:00"
+        "table_count": 858,
+        "generated_at": "2026-06-01T03:31:17+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -4566,6 +4566,20 @@
                     "ref": "plm_change_orders(plm_change_order_id)"
                 }
             ],
+            "contract": null
+        },
+        "gage_oot_investigation_runtime": {
+            "defined_in": "272_tooling_gage_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "oot_runtime_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "gage_runtime_state": {
+            "defined_in": "272_tooling_gage_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "gage_id",
+            "foreign_keys": [],
             "contract": null
         },
         "genealogy_edge_facts": {
@@ -11159,6 +11173,25 @@
             ],
             "contract": null
         },
+        "tooling_breakage_containment": {
+            "defined_in": "272_tooling_gage_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "containment_id",
+            "foreign_keys": [
+                {
+                    "col": "breakage_event_id",
+                    "ref": "tooling_breakage_event(breakage_event_id)"
+                }
+            ],
+            "contract": null
+        },
+        "tooling_breakage_event": {
+            "defined_in": "272_tooling_gage_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "breakage_event_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "tooling_calibration_links": {
             "defined_in": "057_tooling_lifecycle_management.sql",
             "extended_in": [],
@@ -11328,6 +11361,13 @@
                     "ref": "vendors(vendor_id)"
                 }
             ],
+            "contract": null
+        },
+        "tooling_runtime_state": {
+            "defined_in": "272_tooling_gage_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "tool_id",
+            "foreign_keys": [],
             "contract": null
         },
         "trace_dispatch_events": {

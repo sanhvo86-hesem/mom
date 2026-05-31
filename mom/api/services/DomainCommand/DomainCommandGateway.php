@@ -25,6 +25,7 @@ final class DomainCommandGateway
         private readonly ?UomCommandQuantityNormalizer $uomNormalizer = null,
         private readonly ?QualityHoldService $qualityHolds = null,
         private readonly ?InventoryCommandHandler $inventory = null,
+        private readonly ?ToolingCommandHandler $tooling = null,
     ) {}
 
     /**
@@ -148,7 +149,8 @@ final class DomainCommandGateway
     {
         $engineering = $this->engineeringPackages ?? new EngineeringReleasePackageCommandHandler($this->db);
         $qualityHolds = $this->qualityHolds ?? new QualityHoldService($this->db);
-        $mesRuntime = $this->mesRuntime ?? new MesRuntimeCommandHandler($this->db, null, $this->uomNormalizer, $qualityHolds);
+        $tooling = $this->tooling ?? new ToolingCommandHandler($this->db, $qualityHolds);
+        $mesRuntime = $this->mesRuntime ?? new MesRuntimeCommandHandler($this->db, null, $this->uomNormalizer, $qualityHolds, $tooling);
         $inventory = $this->inventory ?? new InventoryCommandHandler($this->db, $this->uomNormalizer, $qualityHolds);
 
         try {
@@ -185,6 +187,8 @@ final class DomainCommandGateway
                 'RunInventoryReconciliationCommand' => $inventory->runReconciliation($payload),
                 'CloseInventoryPeriodCommand' => $inventory->closeInventoryPeriod($payload),
                 'ExportRecallTraceCommand' => $inventory->exportRecallTrace($payload),
+                'ReportToolBreakageCommand' => $tooling->reportToolBreakage($payload),
+                'GageOOTInvestigationCommand' => $tooling->investigateGageOot($payload),
                 default => throw new DomainCommandException('command_handler_missing', "Command '{$commandName}' has no executable handler.", 501),
             };
         } catch (EngineeringReleasePackageException $e) {

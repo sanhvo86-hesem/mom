@@ -204,6 +204,18 @@ final class RegulatedActionPolicy
             'signature_required' => false,
             'allowed_signature_meanings' => [],
         ],
+        'ReportToolBreakageCommand' => [
+            'root' => 'tooling_breakage',
+            'risk_class' => 'critical',
+            'signature_required' => true,
+            'allowed_signature_meanings' => ['tool_breakage_report'],
+        ],
+        'GageOOTInvestigationCommand' => [
+            'root' => 'gage_oot_investigation',
+            'risk_class' => 'critical',
+            'signature_required' => true,
+            'allowed_signature_meanings' => ['gage_oot_investigation'],
+        ],
         'PostInventoryLedgerTransactionCommand' => [
             'root' => 'inventory_ledger',
             'risk_class' => 'critical',

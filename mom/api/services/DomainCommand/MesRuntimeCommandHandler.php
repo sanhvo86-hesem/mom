@@ -14,6 +14,7 @@ final class MesRuntimeCommandHandler
         private readonly ?ResourceReadinessService $readiness = null,
         private readonly ?UomCommandQuantityNormalizer $uomNormalizer = null,
         private readonly ?QualityHoldService $qualityHolds = null,
+        private readonly ?ToolingCommandHandler $tooling = null,
     ) {}
 
     /**
@@ -23,6 +24,7 @@ final class MesRuntimeCommandHandler
     public function startJob(array $command): array
     {
         $this->qualityHolds()->assertNoActiveHoldsForCommand('StartJobCommand', $command, $this->actor($command));
+        $toolingReadiness = $this->tooling()->assertToolReady('StartJobCommand', $command, $this->actor($command));
         $readiness = $this->readiness($command, 'StartJobCommand');
         $jobNumber = $this->requiredAny($command, ['job_number', 'work_order_ref', 'wo_number'], 'job_number');
         $operationSeq = (int)$this->requiredAny($command, ['operation_seq', 'operation_ref'], 'operation_seq');
@@ -63,10 +65,11 @@ final class MesRuntimeCommandHandler
             ]
         );
 
-        $event = $this->writeOperationalEvent('order.work_execution', 'order', 'job_started', $command, $readiness);
-        $this->writeAuditAndOutbox('mes.job_started', $jobNumber, $command, $event, $readiness);
+        $commandWithTooling = $command + ['tooling_readiness' => $toolingReadiness];
+        $event = $this->writeOperationalEvent('order.work_execution', 'order', 'job_started', $commandWithTooling, $readiness);
+        $this->writeAuditAndOutbox('mes.job_started', $jobNumber, $commandWithTooling, $event, $readiness);
 
-        return ['job_number' => $jobNumber, 'operation_seq' => $operationSeq, 'event_id' => $event['event_id'] ?? '', 'readiness' => $readiness];
+        return ['job_number' => $jobNumber, 'operation_seq' => $operationSeq, 'event_id' => $event['event_id'] ?? '', 'readiness' => $readiness, 'tooling' => $toolingReadiness];
     }
 
     public function issueMaterial(array $command): array
@@ -119,6 +122,7 @@ final class MesRuntimeCommandHandler
     public function loadTool(array $command): array
     {
         $this->qualityHolds()->assertNoActiveHoldsForCommand('LoadToolCommand', $command, $this->actor($command));
+        $toolingReadiness = $this->tooling()->assertToolReady('LoadToolCommand', $command, $this->actor($command));
         $readiness = $this->readiness($command, 'LoadToolCommand');
         $toolId = $this->requiredAny($command, ['tool_id', 'tool_ref'], 'tool_id');
         $equipmentId = $this->requiredAny($command, ['equipment_id', 'machine_ref'], 'equipment_id');
@@ -137,22 +141,24 @@ final class MesRuntimeCommandHandler
                 ':life_remaining_pct' => $this->nullableText($command['life_remaining_pct'] ?? null),
                 ':job_number' => $jobNumber !== '' ? $jobNumber : null,
                 ':operator_id' => $this->actor($command),
-                ':metadata' => $this->json(['readiness_snapshot_id' => $readiness['readiness_snapshot_id'] ?? '']),
+                ':metadata' => $this->json(['readiness_snapshot_id' => $readiness['readiness_snapshot_id'] ?? '', 'tooling_readiness' => $toolingReadiness]),
             ]
         );
 
-        $event = $this->writeOperationalEvent('order.work_execution', 'order', 'tool_loaded', $command, $readiness);
-        $this->writeAuditAndOutbox('mes.tool_loaded', $toolId, $command, $event, $readiness);
+        $commandWithTooling = $command + ['tooling_readiness' => $toolingReadiness];
+        $event = $this->writeOperationalEvent('order.work_execution', 'order', 'tool_loaded', $commandWithTooling, $readiness);
+        $this->writeAuditAndOutbox('mes.tool_loaded', $toolId, $commandWithTooling, $event, $readiness);
 
-        return ['tool_id' => $toolId, 'event_id' => $event['event_id'] ?? '', 'readiness' => $readiness];
+        return ['tool_id' => $toolId, 'event_id' => $event['event_id'] ?? '', 'readiness' => $readiness, 'tooling' => $toolingReadiness];
     }
 
     public function recordInspectionResult(array $command): array
     {
+        $gageReadiness = $this->tooling()->assertGageReady('RecordInspectionResultCommand', $command, $this->actor($command));
         $uomMeasurement = $this->normalizeUom($command, 'RecordInspectionResultCommand', 'actual_value');
         $readiness = $this->readiness($command, 'RecordInspectionResultCommand');
         $inspectionId = $this->requiredAny($command, ['inspection_id', 'inspection_result_id', 'characteristic_ref'], 'inspection_id');
-        $commandWithUom = $this->withUomEvidence($command, [$uomMeasurement]);
+        $commandWithUom = $this->withUomEvidence($command, [$uomMeasurement]) + ['gage_readiness' => $gageReadiness];
         $qualityChain = $this->qualityHolds()->recordInspectionResult($commandWithUom, $uomMeasurement);
         $event = $this->writeOperationalEvent('quality.inspection', 'quality', 'inspection_result_recorded', $commandWithUom, $readiness);
         $this->writeAuditAndOutbox('quality.inspection_result_recorded', $inspectionId, $commandWithUom, $event, $readiness);
@@ -162,6 +168,7 @@ final class MesRuntimeCommandHandler
             'event_id' => $event['event_id'] ?? '',
             'readiness' => $readiness,
             'uom' => $uomMeasurement,
+            'gage' => $gageReadiness,
             'quality_chain' => $qualityChain,
         ];
     }
@@ -186,6 +193,7 @@ final class MesRuntimeCommandHandler
         $operationSeq = (int)$this->requiredAny($command, ['operation_seq', 'operation_ref'], 'operation_seq');
         $equipmentId = $this->requiredAny($command, ['equipment_id', 'machine_ref', 'work_unit_ref'], 'equipment_id');
         $commandWithUom = $this->withUomEvidence($command, array_values(array_filter([$goodUom, $scrapUom])));
+        $toolingUsage = $this->tooling()->recordToolUsageFromCompletion($commandWithUom);
 
         $this->db->execute(
             "UPDATE mes_operation_execution
@@ -207,8 +215,9 @@ final class MesRuntimeCommandHandler
             ]
         );
 
-        $event = $this->writeOperationalEvent('order.work_execution', 'order', 'operation_completed', $commandWithUom, $readiness);
-        $this->writeAuditAndOutbox('mes.operation_completed', $jobNumber, $commandWithUom, $event, $readiness);
+        $commandWithRuntime = $commandWithUom + ['tooling_usage' => $toolingUsage];
+        $event = $this->writeOperationalEvent('order.work_execution', 'order', 'operation_completed', $commandWithRuntime, $readiness);
+        $this->writeAuditAndOutbox('mes.operation_completed', $jobNumber, $commandWithRuntime, $event, $readiness);
 
         return [
             'job_number' => $jobNumber,
@@ -216,6 +225,7 @@ final class MesRuntimeCommandHandler
             'event_id' => $event['event_id'] ?? '',
             'readiness' => $readiness,
             'uom' => array_values(array_filter([$goodUom, $scrapUom])),
+            'tooling_usage' => $toolingUsage,
         ];
     }
 
@@ -273,6 +283,11 @@ final class MesRuntimeCommandHandler
     private function qualityHolds(): QualityHoldService
     {
         return $this->qualityHolds ?? new QualityHoldService($this->db);
+    }
+
+    private function tooling(): ToolingCommandHandler
+    {
+        return $this->tooling ?? new ToolingCommandHandler($this->db, $this->qualityHolds());
     }
 
     private function writeOperationalEvent(string $eventType, string $category, string $semanticEvent, array $command, array $readiness): array

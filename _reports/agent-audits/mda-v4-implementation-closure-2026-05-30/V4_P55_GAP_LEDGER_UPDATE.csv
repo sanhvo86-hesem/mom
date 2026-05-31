@@ -1,0 +1,11 @@
+gap_id,severity,status,owner_prompt,evidence,next_step
+P55-BLOCK-TOOL-LIFE-001,P0,closed,P55,"ToolingCommandHandler checks tooling_runtime_state.life_count >= stop_limit before StartJob; probe shows mes_job_writes=0","Expose Problem Details contract in P56 and real scenario in P58"
+P55-BLOCK-PRESET-001,P0,closed,P55,"LoadToolCommand now checks preset_status='approved' before mes_tool_life_events LOAD write","Add OpenAPI blocked response in P56"
+P55-BLOCK-ASSEMBLY-001,P0,closed,P55,"ToolingCommandHandler checks tool_status, assembly_status, and component_status from PostgreSQL state","Add component obsolete scenario to real runner in P58"
+P55-BLOCK-GAGE-001,P0,closed,P55,"RecordInspectionResultCommand checks gage_runtime_state before UOM/result writes; probe shows uom_writes=0 and quality_result_writes=0","Publish RFC 9457 error schema in P56"
+P55-BLOCK-BREAKAGE-001,P0,closed,P55,"ReportToolBreakageCommand writes breakage event, life event, canonical hold, NCR, and containment rows","Exercise on deployed PostgreSQL during P59"
+P55-BLOCK-OOT-001,P0,closed,P55,"GageOOTInvestigationCommand scans inspection results, creates OOT investigation, hold/NCR, and quality_case_trace_link","Add full command-stack scenario in P58"
+P55-BLOCK-SUBJECT-001,P1,closed,P55,"Containment hold payload now uses resolved subject list; probe shows LOT-31-50 and shipped lot/serial/shipment subjects","Keep QualityHoldService as the only hold authority"
+P55-CONTROLLED-LIFE-POLICY,P2,controlled_gap,P55,"Tool life usage increments by completed quantity; no time/cycle/material-specific resolver introduced","Resolve rich tool life policy in future tooling policy prompt"
+P55-CONTROLLED-VENDOR,P2,controlled_gap,P55,"composer test/analyse/check blocked by missing vendor/bin/phpunit and vendor/bin/phpstan","Install/restore vendor or use CI environment with dependencies"
+P55-CONTROLLED-DEPLOY,P2,controlled_gap,P55,"Migration and browser/operator smoke are not executed in local branch prompt","Run deploy and Chrome verification during P59 or integration stage"
