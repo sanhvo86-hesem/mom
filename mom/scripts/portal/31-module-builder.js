@@ -17626,6 +17626,34 @@ if(window.__HM_MODULE_BUILDER_ULTRA_PATCH_R13__ !== '2026-04-08-r13-glass-comman
     var stage = state.container.querySelector('.hm-runtime-design-stage');
     if(stage){ try { lt.applyTheme(key, { scope: stage }); } catch(_e){} }
   }
+  /* Live feedback: the build step has no runtime stage, so a theme change used
+     to be invisible. Apply the theme scoped to the builder content itself so the
+     brand + density visibly shift immediately, and confirm with a toast. */
+  function applyToBuilderView(key){
+    var lt = LT();
+    if(!lt || typeof lt.applyTheme !== 'function' || !state.container) return;
+    try { lt.applyTheme(key, { scope: state.container }); } catch(_e){}
+  }
+  function themeLabelFor(key){
+    var list = themeList();
+    for(var i=0;i<list.length;i++){ if(list[i].key===key){ return (list[i].label && (list[i].label.vi||list[i].label.en)) || key; } }
+    return key;
+  }
+  function onThemeChange(key){
+    setKey(key);
+    applyToBuilderView(key);
+    applyToPreviewStage(key);
+    try {
+      if(window.HmBlockEngine && window.HmBlockEngine.toast){
+        window.HmBlockEngine.toast(
+          (typeof _t==='function'
+            ? _t('Đã đổi giao diện: ', 'Theme changed: ')
+            : 'Theme: ') + themeLabelFor(key)
+          + (typeof _t==='function' ? _t(' — áp dụng ngay & khi chạy module', ' — applied now & at runtime') : ''),
+          'success');
+      }
+    } catch(_e){}
+  }
 
   function ensureBar(){
     if(!state.container || state.step !== 'build' || !state.schema) return;
@@ -17664,13 +17692,12 @@ if(window.__HM_MODULE_BUILDER_ULTRA_PATCH_R13__ !== '2026-04-08-r13-glass-comman
       sel.appendChild(o);
     });
     sel.addEventListener('change', function(){
-      setKey(sel.value);
-      applyToPreviewStage(sel.value);
+      onThemeChange(sel.value);
     });
 
     var hint = document.createElement('span');
     hint.textContent = (typeof _t === 'function')
-      ? _t('Áp dụng khi Xem trước / chạy module', 'Applied in Preview / at runtime') : '';
+      ? _t('Đổi để xem ngay · áp dụng khi chạy module', 'Change to preview live · applied at runtime') : '';
     hint.style.cssText = 'font-size:var(--text-xs,12px);color:var(--text-tertiary,#94a3b8);'
       + 'margin-left:auto;white-space:nowrap';
 
@@ -17692,6 +17719,68 @@ if(window.__HM_MODULE_BUILDER_ULTRA_PATCH_R13__ !== '2026-04-08-r13-glass-comman
     themeKeys: function(){ return themeList().map(function(t){ return t.key; }); },
     currentTheme: function(){ return curKey(); },
     setTheme: function(k){ setKey(k); return curKey(); }
+  };
+})();
+
+/* ── Round 17: build-view declutter ─────────────────────────────────────────
+   The 14 rounds of builder UI stacked a 1,400px "Runtime Preset Studio" +
+   "Experience Director" meta-panel ABOVE the actual block canvas
+   (.mb-builder-shell sat ~2,230px down — users couldn't find where to build).
+   This post-paint pass reorders the real canvas directly under the toolbar
+   hero and folds the meta-design studio into a COLLAPSED <details> so it stays
+   available without burying the workspace. Pure DOM reorg (no markup rewrite),
+   re-applied each paint; preserves the advanced-panel open/closed state. */
+(function(){
+  if(typeof _paint !== 'function') return;
+
+  function tidy(){
+    if(state.step !== 'build' || !state.container) return;
+    var root = state.container.querySelector('.mb-ultra-root') || state.container;
+    var shell = root.querySelector('.mb-builder-shell');
+    if(!shell || shell.parentNode !== root) return; // only reorg the known layout
+    var hero = null, studio = null, i, ch = root.children;
+    for(i = 0; i < ch.length; i++){
+      var cls = (ch[i].className || '').toString();
+      if(!hero && /\bmb-builder-hero\b/.test(cls)) hero = ch[i];
+      if(!studio && /\bmb-r1[0-9]-studio\b|\bmb-r[0-9]-studio\b|\bmb-r14-studio\b/.test(cls)) studio = ch[i];
+    }
+
+    /* 1) canvas right after the hero (or first) — the workspace leads. */
+    var anchor = (hero && hero.parentNode === root) ? hero.nextSibling : root.firstChild;
+    if(shell !== anchor && shell.parentNode === root){
+      try { root.insertBefore(shell, anchor); } catch(_e){}
+    }
+
+    /* 2) fold the meta-studio into a collapsed <details>, once per paint. */
+    if(studio && studio.parentNode === root && !root.querySelector('.mb-r17-adv')){
+      var det = document.createElement('details');
+      det.className = 'mb-r17-adv';
+      det.open = !!state._r17AdvOpen;
+      det.style.cssText = 'margin-top:var(--o3-space,8px);border:1px solid var(--border,#e2e8f0);'
+        + 'border-radius:var(--o3-radius-card,8px);background:var(--bg-surface,#fff);overflow:hidden';
+      var sum = document.createElement('summary');
+      sum.textContent = (typeof _t === 'function')
+        ? _t('🎨 Thiết kế nâng cao — preset · đồ hoạ runtime', '🎨 Advanced design — presets · runtime graphics')
+        : 'Advanced design';
+      sum.style.cssText = 'cursor:pointer;list-style:none;padding:var(--o3-space,8px) var(--o3-space-section,12px);'
+        + 'font-weight:var(--font-bold,700);font-size:var(--text-sm,13px);color:var(--text-secondary);user-select:none';
+      det.addEventListener('toggle', function(){ state._r17AdvOpen = det.open; });
+      root.insertBefore(det, studio);
+      det.appendChild(sum);
+      det.appendChild(studio);
+    }
+  }
+
+  var _r17PrevPaint = _paint;
+  _paint = function(){
+    var r = _r17PrevPaint.apply(this, arguments);
+    try { tidy(); } catch(_e){}
+    return r;
+  };
+
+  window.__HM_MB_R17_TEST__ = {
+    version: '2026-05-31-r17-build-declutter',
+    tidy: function(){ try { tidy(); return true; } catch(e){ return String(e); } }
   };
 })();
 
