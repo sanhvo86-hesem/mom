@@ -57,6 +57,12 @@ return static function (Router $router, string $dataDir): void {
         'graphics_simulation_run_record'       => [GraphicsGovernanceController::class, 'simulationRunRecord'],
         'graphics_qa_gate_run'                 => [GraphicsGovernanceController::class, 'qaGateRun'],
 
+        // ── Theme presets (graphics_theme_preset, migration 263) — DB-backed
+        //    named themes the Module Builder picker + runtime applyTheme() use.
+        'graphics_theme_preset_list'           => [GraphicsGovernanceController::class, 'themePresetList'],
+        'graphics_theme_preset_save'           => [GraphicsGovernanceController::class, 'themePresetSave'],
+        'graphics_theme_preset_delete'         => [GraphicsGovernanceController::class, 'themePresetDelete'],
+
         // Backward-compatible Admin Appearance aliases. These override the
         // older platform-route mapping so Admin cannot bypass graphics-specific
         // read/write permissions, CSRF/version handling, audit, or backend

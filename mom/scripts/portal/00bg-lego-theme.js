@@ -223,6 +223,42 @@
   function listThemes(){
     return Object.keys(THEMES).map(function(k){ return { key:k, label:THEMES[k].label, brand:THEMES[k].brand }; });
   }
+
+  /* Load DB-backed presets (graphics_theme_preset, migration 263) and merge them
+     over the built-ins so the Module Builder picker + runtime applyTheme() see
+     admin-created/edited themes. radius_outer_px → radius (cấp1), radius_inner_px
+     → radiusInner (cấp2-3, honored by applyTheme). Network/JSON failure keeps the
+     6 built-ins. Fire-and-forget on load; callers can await for freshness. */
+  var _presetsLoaded = false;
+  function loadPresets(force){
+    if (_presetsLoaded && !force) return Promise.resolve(THEMES);
+    if (typeof fetch !== 'function') return Promise.resolve(THEMES);
+    return fetch('api.php?action=graphics_theme_preset_list', { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+      .then(function(r){ return r && r.ok ? r.json() : null; })
+      .then(function(res){
+        var list = res && res.presets;
+        if (Array.isArray(list) && list.length){
+          list.forEach(function(p){
+            if (!p || !p.preset_key) return;
+            var outer = (p.radius_outer_px != null) ? p.radius_outer_px : 8;
+            THEMES[p.preset_key] = {
+              label: { vi: p.display_name_vi || p.preset_key, en: p.display_name_en || p.preset_key },
+              brand: p.brand || '#1565c0',
+              density: (p.density_px != null) ? p.density_px : 8,
+              radius: outer,
+              radiusInner: (p.radius_inner_px != null) ? p.radius_inner_px : Math.max(2, Math.round(outer / 2)),
+              controlH: (p.control_h_px != null) ? p.control_h_px : 32,
+              frame: (p.frame_px != null) ? p.frame_px : ((p.density_px != null) ? p.density_px : 8),
+              overrides: p.overrides || {},
+              _db: true, _builtin: !!p.is_builtin, _default: !!p.is_default
+            };
+          });
+          _presetsLoaded = true;
+        }
+        return THEMES;
+      })
+      .catch(function(){ return THEMES; });
+  }
   function applyTheme(name, opts){
     var t = THEMES[name];
     if(!t) return { ok:false, error:'unknown theme: ' + name };
@@ -243,9 +279,10 @@
   }
 
   global.LegoTheme = {
-    version: '1.2.0',
+    version: '1.3.0',
     themes: THEMES,
     listThemes: listThemes,
+    loadPresets: loadPresets,
     applyTheme: applyTheme,
     applyBrand: applyBrand,
     setDensity: setDensity,
@@ -260,4 +297,8 @@
     // expose primitives for tests / the admin theming console
     _color: { hexToRgb: hexToRgb, rgbToOklch: rgbToOklch, oklchToHex: oklchToHex }
   };
+
+  /* Eagerly warm the DB-backed presets so the builder picker shows admin themes.
+     Safe no-op if the endpoint is unavailable (keeps the 6 built-ins). */
+  try { loadPresets(); } catch (_e) {}
 })(typeof window !== 'undefined' ? window : this);

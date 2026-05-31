@@ -517,6 +517,45 @@ class GraphicsGovernanceController extends BaseController
         ]);
     }
 
+    public function themePresetList(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $this->respond(fn(): array => [
+            'ok' => true,
+            'presets' => $this->tokenCatalog()->listThemePresets(),
+            '_meta' => ['authority' => 'graphics_theme_preset', 'mode' => $this->data->getMode()],
+        ]);
+    }
+
+    public function themePresetSave(): never
+    {
+        $user = $this->requireWriteRequest();
+        $body = $this->jsonBody();
+        $preset = is_array($body['preset'] ?? null) ? (array)$body['preset'] : $body;
+        $result = $this->call(fn(): array => $this->tokenCatalog()->saveThemePreset(
+            $preset,
+            (string)($user['username'] ?? '')
+        ));
+        $this->graphicsAudit('graphics.theme_preset.saved', (string)($result['preset_key'] ?? ''), [
+            'preset_key' => $result['preset_key'] ?? '',
+        ], $user);
+        $this->success(['ok' => true, 'preset' => $result, '_meta' => ['authority' => 'graphics_theme_preset']]);
+    }
+
+    public function themePresetDelete(): never
+    {
+        $user = $this->requireWriteRequest();
+        $body = $this->jsonBody();
+        $key = trim((string)($body['preset_key'] ?? $this->queryParam('preset_key') ?? ''));
+        if ($key === '') {
+            $this->error('preset_key is required', 400);
+        }
+        $result = $this->call(fn(): array => $this->tokenCatalog()->deleteThemePreset($key));
+        $this->graphicsAudit('graphics.theme_preset.deleted', $key, ['preset_key' => $key], $user);
+        $this->success(['ok' => true] + $result);
+    }
+
     public function simulationRunRecord(): never
     {
         $user = $this->requireWriteRequest();
