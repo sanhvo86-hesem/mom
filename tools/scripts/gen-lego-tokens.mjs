@@ -279,7 +279,7 @@ const shellCss = `/* ===========================================================
 .hm-runtime-design-stage{
   padding: var(--lego-frame) !important;   /* uniform frame: gap to outer edge */
   margin: 0 !important;
-  background: var(--lego-shell-canvas);
+  background: var(--lego-shell-canvas) !important;  /* deliberate module canvas, full-bleed */
   min-height: 100%;
   border-radius: 0 !important;
 }
