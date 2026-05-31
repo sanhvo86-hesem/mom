@@ -46,8 +46,7 @@ matches() {
 is_design_token_path() {
   local file="$1"
   matches "$file" '^tools/scripts/gen-lego-tokens\.mjs$' ||
-    matches "$file" '^tokens/' ||
-    matches "$file" '(^|/)lego\.tokens(\.generated)?\.json$' ||
+    matches "$file" '^tokens/lego\.tokens(\.generated)?\.json$' ||
     matches "$file" '^mom/styles/lego-(foundation|shell)\.css$' ||
     matches "$file" '(^|/)(lego-token|design-token|theme-token)' ||
     matches "$file" '(lego-token|design-token|theme-token)'
@@ -113,10 +112,12 @@ needs_phpunit=false
 needs_kpi_tests=false
 needs_db_migration_check=false
 needs_openapi=false
+needs_doc_light=false
 needs_doc_health=false
 needs_raci=false
 needs_frontend_safety=false
 needs_frontend_js_safety=false
+needs_frontend_static_safety=false
 needs_graphics_safety=false
 needs_hmv4_safety=false
 needs_playwright_e2e=false
@@ -185,7 +186,8 @@ while IFS= read -r file; do
   fi
 
   if matches "$file" '^scripts/doc-.*\.py$' ||
-    matches "$file" '^tools/scripts/doc-.*\.py$'; then
+    matches "$file" '^tools/scripts/doc-.*\.py$' ||
+    matches "$file" '^mom/tools/dcc-batch/'; then
     set_flag needs_doc_health
   fi
 
@@ -260,11 +262,22 @@ while IFS= read -r file; do
     set_flag needs_phpunit
   fi
 
-  if matches "$file" '^mom/docs/' ||
-    matches "$file" '^docs/' ||
-    matches "$file" '(^|/)[^/]+\.md$' ||
-    matches "$file" '^mom/tools/dcc-batch/'; then
+  if matches "$file" '^mom/docs/'; then
     set_flag needs_doc_health
+  fi
+
+  if matches "$file" '^docs/(governance|standards|design-system|benchmark)/' ||
+    matches "$file" '^docs/.*([Rr][Aa][Cc][Ii]|[Dd][Cc][Cc]|[Ee][Qq][Mm][Ss]|governance|authority|controlled[-_ ]?document)'; then
+    set_flag needs_doc_health
+  elif matches "$file" '^docs/.*\.md$'; then
+    set_flag needs_doc_light
+  fi
+
+  if matches "$file" '^[A-Z0-9_.-]*README[^/]*\.md$' ||
+    matches "$file" '^README\.md$' ||
+    matches "$file" '^LICENSE([.-][A-Za-z0-9_-]+)?$' ||
+    matches "$file" '^[^/]+\.md$'; then
+    set_flag needs_doc_light
   fi
 
   if matches "$file" '([Rr][Aa][Cc][Ii]|[Rr]ole|[Aa]uthority|decision[-_]?threshold|scenario[-_]?coverage|workflow[-_]?authority|ISO[-_ ]?reference)'; then
@@ -275,9 +288,13 @@ while IFS= read -r file; do
     matches "$file" '^mom/(portal|index)\.html$' ||
     matches "$file" '^mom/sw\.js$'; then
     set_flag needs_frontend_safety
+    if matches "$file" '^mom/(portal|index)\.html$' ||
+      matches "$file" '^mom/templates/' ||
+      matches "$file" '^mom/assets/.*\.html$'; then
+      set_flag needs_frontend_static_safety
+    fi
     if matches "$file" '^mom/(scripts|assets)/.*\.js$' ||
-      matches "$file" '^mom/sw\.js$' ||
-      matches "$file" '^mom/(portal|index)\.html$'; then
+      matches "$file" '^mom/sw\.js$'; then
       set_flag needs_frontend_js_safety
     fi
     if matches "$file" '^mom/styles/' ||
@@ -300,11 +317,12 @@ while IFS= read -r file; do
     set_flag needs_hmv4_safety
   fi
 
-  if matches "$file" '^tokens/' ||
-    matches "$file" '(^|/)lego\.tokens(\.generated)?\.json$' ||
-    matches "$file" '^mom/styles/lego-(foundation|shell)\.css$'; then
+  if is_design_token_path "$file"; then
     set_flag needs_frontend_safety
     set_flag needs_graphics_safety
+    if matches "$file" '^tools/scripts/' || matches "$file" '^tokens/'; then
+      set_flag needs_frontend_js_safety
+    fi
   fi
 
   if matches "$file" '^tests/e2e/.*(visual|__snapshots__|snapshots).*'; then
@@ -315,10 +333,6 @@ while IFS= read -r file; do
     set_flag needs_hmv4_safety
     set_flag needs_playwright_e2e
     set_flag needs_frontend_safety
-  fi
-
-  if matches "$file" '^README\.md$'; then
-    set_flag needs_doc_health
   fi
 
   if matches "$file" '^LICENSE$'; then
@@ -345,10 +359,12 @@ if [[ "$is_full_required" == "true" ]]; then
   needs_kpi_tests=true
   needs_db_migration_check=true
   needs_openapi=true
+  needs_doc_light=true
   needs_doc_health=true
   needs_raci=true
   needs_frontend_safety=true
   needs_frontend_js_safety=true
+  needs_frontend_static_safety=true
   needs_graphics_safety=true
   needs_hmv4_safety=true
   needs_playwright_e2e=true
@@ -372,10 +388,12 @@ for key in \
   needs_kpi_tests \
   needs_db_migration_check \
   needs_openapi \
+  needs_doc_light \
   needs_doc_health \
   needs_raci \
   needs_frontend_safety \
   needs_frontend_js_safety \
+  needs_frontend_static_safety \
   needs_graphics_safety \
   needs_hmv4_safety \
   needs_playwright_e2e \
@@ -391,6 +409,6 @@ for key in \
   fi
 done
 
-summary="files=${file_count}; full=${is_full_required}; reason=${SMART_CI_FULL_REASON:-none}; php=${needs_php_syntax}/${needs_phpstan}/${needs_phpunit}; kpi=${needs_kpi_tests}; db=${needs_db_migration_check}; openapi=${needs_openapi}; docs=${needs_doc_health}; raci=${needs_raci}; frontend=${needs_frontend_safety}; frontend_js=${needs_frontend_js_safety}; graphics=${needs_graphics_safety}; hmv4=${needs_hmv4_safety}; e2e=${needs_playwright_e2e}; visual=${needs_visual_e2e}; security=${needs_security_light}; actionlint=${needs_actionlint}; selftest=${needs_classifier_selftest}"
+summary="files=${file_count}; full=${is_full_required}; reason=${SMART_CI_FULL_REASON:-none}; php=${needs_php_syntax}/${needs_phpstan}/${needs_phpunit}; kpi=${needs_kpi_tests}; db=${needs_db_migration_check}; openapi=${needs_openapi}; doc_light=${needs_doc_light}; docs=${needs_doc_health}; raci=${needs_raci}; frontend=${needs_frontend_safety}; frontend_js=${needs_frontend_js_safety}; frontend_static=${needs_frontend_static_safety}; graphics=${needs_graphics_safety}; hmv4=${needs_hmv4_safety}; e2e=${needs_playwright_e2e}; visual=${needs_visual_e2e}; security=${needs_security_light}; actionlint=${needs_actionlint}; selftest=${needs_classifier_selftest}"
 write_output summary "$summary"
 echo "Smart CI summary: $summary"
