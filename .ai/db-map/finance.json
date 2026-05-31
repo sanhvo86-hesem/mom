@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "finance",
         "table_count": 3,
-        "generated_at": "2026-05-30T23:48:57+00:00"
+        "generated_at": "2026-06-01T03:26:01+00:00"
     },
     "tables": {
         "ap_invoice_lines": {

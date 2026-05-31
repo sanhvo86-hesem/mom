@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "maintenance_ehs",
         "table_count": 9,
-        "generated_at": "2026-05-30T23:48:57+00:00"
+        "generated_at": "2026-06-01T03:26:01+00:00"
     },
     "tables": {
         "ehs_incidents": {

@@ -97,10 +97,15 @@ final class TrustedReleaseRecordServiceTest extends TestCase
         ]);
 
         $readiness = $this->service->readiness($this->criteria('WO-BLOCK-1', 'SITE-B', 'PLANT-B'));
+        $callerDisabledQualification = $this->service->readiness(array_merge(
+            $this->criteria('WO-BLOCK-1', 'SITE-B', 'PLANT-B'),
+            ['require_qualification' => 'false']
+        ));
 
         $this->assertFalse($readiness['releasable']);
         $this->assertSame('blocked', $readiness['packet_state']);
         $this->assertSame(3, $readiness['blocker_count']);
+        $this->assertContains('qualification_assertion_missing', array_column($callerDisabledQualification['blockers'], 'code'));
         $this->assertSame([
             'approval_or_signature_missing',
             'evidence_missing',

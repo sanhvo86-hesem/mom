@@ -1,0 +1,86 @@
+{
+  "prompt": "P47",
+  "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
+  "date": "2026-05-31",
+  "decision_token": "P47_PASS_WITH_CONTROLLED_GAPS",
+  "runtime_posture": "pre-production runtime-readiness; not production-ready",
+  "source_truth": {
+    "worktree": "/private/tmp/mom-mda-v4-recovery",
+    "head_before_commit": "413a4e9c2c60bf9c4cd7ad9e8677f1e02daaaadc",
+    "merge_base_origin_main": "110bf6598281a723e249d8ad3be562238583ce8e",
+    "prompt_file": "P47_runtime_requirement_resolver_and_fail_closed_gate_context_builder.md",
+    "known_start_job_paths": [
+      "MOM\\Services\\MobileWorkQueueService::startTask",
+      "MOM\\Api\\Controllers\\DispatchController::reportProduction",
+      "MOM\\Services\\ShopfloorExecutionService::buildProductionLog"
+    ]
+  },
+  "implemented_artifacts": {
+    "services": [
+      "mom/api/services/RuntimeRequirementResolverService.php",
+      "mom/api/services/GateContextBuilder.php",
+      "mom/api/services/RuntimeRequirementGateException.php"
+    ],
+    "migration": "mom/database/migrations/265_runtime_requirement_resolver.sql",
+    "tests": [
+      "mom/tests/Unit/Services/RuntimeRequirementResolverServiceTest.php",
+      "mom/tests/Unit/Database/RuntimeRequirementResolverMigrationTest.php",
+      "mom/tests/Unit/Services/TrustedReleaseRecordServiceTest.php"
+    ],
+    "reports": [
+      "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_REQUIREMENT_RESOLVER_CLOSURE_REPORT.md",
+      "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P47.md",
+      "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_P47_GAP_LEDGER_UPDATE.csv"
+    ]
+  },
+  "probes": [
+    {
+      "name": "missing_checksum_blocks",
+      "result": "PASS",
+      "evidence": "[false,\"missing_required_evidence\",true,64]"
+    },
+    {
+      "name": "uom_authority_failure_blocks",
+      "result": "PASS",
+      "evidence": "[false,\"uom_authority_resolution_failed\",64]"
+    },
+    {
+      "name": "mobile_start_no_mutation",
+      "result": "PASS",
+      "evidence": "[\"missing_required_evidence\",\"pending\"]"
+    },
+    {
+      "name": "dispatch_shopfloor_no_mutation",
+      "result": "PASS",
+      "evidence": "[\"missing_required_evidence\",\"blocked\"]"
+    },
+    {
+      "name": "php_lint",
+      "result": "PASS",
+      "evidence": "No syntax errors detected for touched PHP files"
+    },
+    {
+      "name": "composer_phpunit",
+      "result": "BLOCKED",
+      "evidence": "Could not open input file: vendor/bin/phpunit"
+    },
+    {
+      "name": "composer_phpstan",
+      "result": "BLOCKED",
+      "evidence": "Could not open input file: vendor/bin/phpstan"
+    }
+  ],
+  "controlled_gaps": [
+    "Full DomainCommandGateway and command handler registration remain P49 work.",
+    "Composite ResourceReadinessService remains P52 work.",
+    "runtime_requirement_policy seed/backfill remains P48/P52/P53/P54/P55 work.",
+    "Legacy non-StartJob require_* usages in PlanningScenarioService and TraceabilityGenealogyService need domain classification and conversion where governed.",
+    "OpenTelemetry/control-tower metrics remain P57 work.",
+    "Real command-stack scenario runner remains P58 work."
+  ],
+  "uom_policy": {
+    "mode": "connect_existing_uom_only",
+    "bridge": "MdaUomAuthorityBridge",
+    "uom_internal_files_touched": false
+  }
+}

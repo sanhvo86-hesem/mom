@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 819,
-        "generated_at": "2026-05-30T23:48:57+00:00"
+        "table_count": 828,
+        "generated_at": "2026-06-01T03:26:01+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -4560,6 +4560,13 @@
             "foreign_keys": [],
             "contract": null
         },
+        "generic_crud_denial_event": {
+            "defined_in": "263_governed_generic_crud_guard.sql",
+            "extended_in": [],
+            "primary_key": "denial_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "gl_transactions": {
             "defined_in": "015_finance.sql",
             "extended_in": [
@@ -4576,6 +4583,13 @@
                     "ref": "users(user_id)"
                 }
             ],
+            "contract": null
+        },
+        "governed_entity_registry": {
+            "defined_in": "263_governed_generic_crud_guard.sql",
+            "extended_in": [],
+            "primary_key": "registry_id",
+            "foreign_keys": [],
             "contract": null
         },
         "governed_route_registry": {
@@ -6019,10 +6033,46 @@
             ],
             "contract": null
         },
+        "master_data_archive_store": {
+            "defined_in": "264_master_data_postgres_authority_bridge.sql",
+            "extended_in": [],
+            "primary_key": "archive_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "master_data_drift_snapshot": {
+            "defined_in": "264_master_data_postgres_authority_bridge.sql",
+            "extended_in": [],
+            "primary_key": "snapshot_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "master_data_fallback_telemetry": {
+            "defined_in": "264_master_data_postgres_authority_bridge.sql",
+            "extended_in": [],
+            "primary_key": "fallback_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "master_data_history_event": {
+            "defined_in": "264_master_data_postgres_authority_bridge.sql",
+            "extended_in": [],
+            "primary_key": "event_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "master_data_pending_change": {
+            "defined_in": "264_master_data_postgres_authority_bridge.sql",
+            "extended_in": [],
+            "primary_key": "pending_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "master_data_store": {
             "defined_in": "080_seed_master_data_from_json.sql",
             "extended_in": [
-                "091_runtime_governance_continuity.sql"
+                "091_runtime_governance_continuity.sql",
+                "264_master_data_postgres_authority_bridge.sql"
             ],
             "primary_key": "id",
             "foreign_keys": [],
@@ -9456,6 +9506,20 @@
                     "ref": "items(item_id)"
                 }
             ],
+            "contract": null
+        },
+        "runtime_requirement_policy": {
+            "defined_in": "265_runtime_requirement_resolver.sql",
+            "extended_in": [],
+            "primary_key": "policy_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "runtime_requirement_snapshot": {
+            "defined_in": "265_runtime_requirement_resolver.sql",
+            "extended_in": [],
+            "primary_key": "snapshot_id",
+            "foreign_keys": [],
             "contract": null
         },
         "sales_order": {
