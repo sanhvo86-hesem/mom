@@ -22,6 +22,7 @@ final class DomainCommandGateway
         private readonly ?SecurityBoundaryMiddleware $securityBoundary = null,
         private readonly ?RegulatedCommandEvidenceSpine $regulatedEvidence = null,
         private readonly ?MesRuntimeCommandHandler $mesRuntime = null,
+        private readonly ?UomCommandQuantityNormalizer $uomNormalizer = null,
     ) {}
 
     /**
@@ -144,7 +145,7 @@ final class DomainCommandGateway
     private function executeHandler(string $commandName, array $payload): array
     {
         $engineering = $this->engineeringPackages ?? new EngineeringReleasePackageCommandHandler($this->db);
-        $mesRuntime = $this->mesRuntime ?? new MesRuntimeCommandHandler($this->db);
+        $mesRuntime = $this->mesRuntime ?? new MesRuntimeCommandHandler($this->db, null, $this->uomNormalizer);
 
         try {
             return match ($commandName) {

@@ -1,0 +1,57 @@
+{
+  "prompt_id": "P46_DIRECT_REPAIR",
+  "posture": "pre-production runtime-readiness evidence; not production-ready",
+  "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
+  "decision_token": "P46_PASS_WITH_CONTROLLED_GAPS_DIRECT_COMMAND_STACK_READY",
+  "authority_path": [
+    "UomCommandQuantityNormalizer",
+    "UomRuntimeAuthorityService",
+    "ItemUomPolicyService",
+    "UomAliasResolutionService",
+    "ConversionEngine",
+    "domain_command_uom_measurement"
+  ],
+  "legacy_bridge_used_by_new_runtime_paths": false,
+  "code_changes": [
+    "mom/database/migrations/269_uom_domain_command_runtime_authority.sql",
+    "mom/api/services/DomainCommand/UomCommandQuantityNormalizer.php",
+    "mom/api/services/DomainCommand/MesRuntimeCommandHandler.php",
+    "mom/api/services/DomainCommand/DomainCommandGateway.php",
+    "mom/tests/Unit/Services/DomainCommandUomRuntimeAuthorityTest.php"
+  ],
+  "manual_probe": {
+    "command": "php /private/tmp/uom_direct_probe.php",
+    "result": {
+      "ok": {
+        "converted": "500.000000",
+        "target_unit": "PCS",
+        "measurement_id": "uom-measurement-1",
+        "mes_writes": 1
+      },
+      "blocked": [
+        "uom_authority_resolution_failed",
+        "UOM_POLICY_NOT_FOUND",
+        0
+      ]
+    }
+  },
+  "closed_gaps": [
+    "P46-BLOCK-CMD-003",
+    "P46-BLOCK-CMD-004",
+    "P46-BLOCK-CMD-005"
+  ],
+  "controlled_gaps": [
+    "ReceiveInventoryCommand has direct UOM policy but no live command handler yet.",
+    "PutawayInventoryCommand has direct UOM policy but no live command handler yet.",
+    "CostRollupCommand has direct UOM policy but no live command handler yet.",
+    "ShipmentPackCommand has direct UOM policy but no live command handler yet.",
+    "ToolPresetMeasurementCommand has direct UOM policy but no live command handler yet.",
+    "Alias ambiguity and rule lifecycle hardening remain UOM-internal branch work."
+  ],
+  "validation": {
+    "php_lint": "PASS for new/modified PHP files",
+    "manual_probe": "PASS",
+    "phpunit": "BLOCKED_MISSING_mom/vendor/bin/phpunit",
+    "phpstan": "BLOCKED_MISSING_mom/vendor/bin/phpstan"
+  }
+}

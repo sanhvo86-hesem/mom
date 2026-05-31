@@ -1,5 +1,7 @@
 # UOM Authority Closure Report - P46
 
+Superseded by `UOM_DIRECT_COMMAND_RUNTIME_CLOSURE_REPORT.md` for direct command-stack runtime wiring completed on 2026-05-31. Historical bridge references below describe the earlier P46 state before `UomCommandQuantityNormalizer` was added.
+
 Prompt: P46 - UOM Measurement Authority Integration Closure
 Branch: codex/mda-v4-implementation-closure-recovery-20260530
 Date: 2026-05-30

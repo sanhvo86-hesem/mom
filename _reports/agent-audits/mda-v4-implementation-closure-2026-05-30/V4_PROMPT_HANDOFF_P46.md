@@ -5,6 +5,8 @@ Branch: codex/mda-v4-implementation-closure-recovery-20260530
 Date: 2026-05-30
 Decision token: P46_BLOCKED_RUNTIME_AUTHORITY_RISK
 
+Superseded by: `V4_PROMPT_HANDOFF_P46_DIRECT_REPAIR.md` for direct command-stack UOM runtime wiring completed on 2026-05-31.
+
 ## Source Truth Audit
 
 - UOM engine and evidence services exist on current branch.

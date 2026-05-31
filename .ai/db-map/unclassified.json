@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 839,
-        "generated_at": "2026-06-01T03:27:35+00:00"
+        "table_count": 840,
+        "generated_at": "2026-06-01T03:28:13+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -1857,6 +1857,13 @@
                     "ref": "signature_events(signature_event_id)"
                 }
             ],
+            "contract": null
+        },
+        "domain_command_uom_measurement": {
+            "defined_in": "269_uom_domain_command_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "measurement_id",
+            "foreign_keys": [],
             "contract": null
         },
         "domain_outbox_events": {

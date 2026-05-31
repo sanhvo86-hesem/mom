@@ -4,6 +4,8 @@
   "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
   "date": "2026-05-30",
   "posture": "pre-production runtime-readiness evidence; not production-ready",
+  "superseded_by": "UOM_DIRECT_COMMAND_RUNTIME_PROOF_PACK.json",
+  "superseded_reason": "Direct command-stack repair removed bridge from implemented MES/inspection quantity write paths on 2026-05-31.",
   "decision_token": "P46_BLOCKED_RUNTIME_AUTHORITY_RISK",
   "executive_decision": "NO_GO for UOM runtime closure in this branch",
   "source_truth_audit": {

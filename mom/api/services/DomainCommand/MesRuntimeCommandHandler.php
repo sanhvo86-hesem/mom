@@ -12,6 +12,7 @@ final class MesRuntimeCommandHandler
     public function __construct(
         private readonly Connection $db,
         private readonly ?ResourceReadinessService $readiness = null,
+        private readonly ?UomCommandQuantityNormalizer $uomNormalizer = null,
     ) {}
 
     /**
@@ -68,12 +69,21 @@ final class MesRuntimeCommandHandler
 
     public function issueMaterial(array $command): array
     {
+        $uomPayload = $command;
+        if (!isset($uomPayload['issue_quantity']) && isset($uomPayload['qty_consumed'])) {
+            $uomPayload['issue_quantity'] = $uomPayload['qty_consumed'];
+        }
+        if (!isset($uomPayload['material_uom']) && isset($uomPayload['qty_uom'])) {
+            $uomPayload['material_uom'] = $uomPayload['qty_uom'];
+        }
+        $uomMeasurement = $this->normalizeUom($uomPayload, 'IssueMaterialToWorkOrderCommand', 'issue_quantity');
         $readiness = $this->readiness($command, 'IssueMaterialToWorkOrderCommand');
         $jobNumber = $this->requiredAny($command, ['job_number', 'work_order_ref', 'wo_number'], 'job_number');
         $operationSeq = (int)$this->text($command['operation_seq'] ?? $command['operation_ref'] ?? '0');
         $itemId = $this->requiredAny($command, ['item_id', 'item_ref', 'material_ref'], 'item_id');
-        $qty = $this->requiredAny($command, ['qty_consumed', 'issue_quantity', 'quantity'], 'quantity');
-        $uom = $this->requiredAny($command, ['qty_uom', 'material_uom', 'uom'], 'uom');
+        $qty = (string)$uomMeasurement['converted_magnitude'];
+        $uom = (string)$uomMeasurement['target_unit_code'];
+        $commandWithUom = $this->withUomEvidence($command, [$uomMeasurement]);
 
         $this->db->execute(
             "INSERT INTO mes_material_consumption
@@ -89,14 +99,18 @@ final class MesRuntimeCommandHandler
                 ':qty_consumed' => $qty,
                 ':qty_uom' => $uom,
                 ':operator_id' => $this->actor($command),
-                ':metadata' => $this->json(['readiness_snapshot_id' => $readiness['readiness_snapshot_id'] ?? '']),
+                ':metadata' => $this->json([
+                    'readiness_snapshot_id' => $readiness['readiness_snapshot_id'] ?? '',
+                    'uom_measurement_id' => $uomMeasurement['measurement_id'] ?? '',
+                    'uom_authority' => $uomMeasurement['authority'] ?? '',
+                ]),
             ]
         );
 
-        $event = $this->writeOperationalEvent('order.work_execution', 'order', 'material_issued', $command, $readiness);
-        $this->writeAuditAndOutbox('mes.material_issued', $jobNumber, $command, $event, $readiness);
+        $event = $this->writeOperationalEvent('order.work_execution', 'order', 'material_issued', $commandWithUom, $readiness);
+        $this->writeAuditAndOutbox('mes.material_issued', $jobNumber, $commandWithUom, $event, $readiness);
 
-        return ['job_number' => $jobNumber, 'event_id' => $event['event_id'] ?? '', 'readiness' => $readiness];
+        return ['job_number' => $jobNumber, 'event_id' => $event['event_id'] ?? '', 'readiness' => $readiness, 'uom' => $uomMeasurement];
     }
 
     public function loadTool(array $command): array
@@ -131,20 +145,35 @@ final class MesRuntimeCommandHandler
 
     public function recordInspectionResult(array $command): array
     {
+        $uomMeasurement = $this->normalizeUom($command, 'RecordInspectionResultCommand', 'actual_value');
         $readiness = $this->readiness($command, 'RecordInspectionResultCommand');
         $inspectionId = $this->requiredAny($command, ['inspection_id', 'inspection_result_id', 'characteristic_ref'], 'inspection_id');
-        $event = $this->writeOperationalEvent('quality.inspection', 'quality', 'inspection_result_recorded', $command, $readiness);
-        $this->writeAuditAndOutbox('quality.inspection_result_recorded', $inspectionId, $command, $event, $readiness);
+        $commandWithUom = $this->withUomEvidence($command, [$uomMeasurement]);
+        $event = $this->writeOperationalEvent('quality.inspection', 'quality', 'inspection_result_recorded', $commandWithUom, $readiness);
+        $this->writeAuditAndOutbox('quality.inspection_result_recorded', $inspectionId, $commandWithUom, $event, $readiness);
 
-        return ['inspection_id' => $inspectionId, 'event_id' => $event['event_id'] ?? '', 'readiness' => $readiness];
+        return ['inspection_id' => $inspectionId, 'event_id' => $event['event_id'] ?? '', 'readiness' => $readiness, 'uom' => $uomMeasurement];
     }
 
     public function completeOperation(array $command): array
     {
+        $goodPayload = $command;
+        if (!isset($goodPayload['completed_quantity']) && isset($goodPayload['qty_good'])) {
+            $goodPayload['completed_quantity'] = $goodPayload['qty_good'];
+        }
+        $goodUom = $this->normalizeUom($goodPayload, 'CompleteOperationCommand', 'completed_quantity');
+        $scrapUom = null;
+        $scrapMagnitude = $this->text($command['scrap_quantity'] ?? $command['qty_scrap'] ?? '');
+        if ($scrapMagnitude !== '' && $scrapMagnitude !== '0') {
+            $scrapPayload = $command;
+            $scrapPayload['completed_quantity'] = $scrapMagnitude;
+            $scrapUom = $this->normalizeUom($scrapPayload, 'CompleteOperationCommand', 'scrap_quantity');
+        }
         $readiness = $this->readiness($command, 'CompleteOperationCommand');
         $jobNumber = $this->requiredAny($command, ['job_number', 'work_order_ref', 'wo_number'], 'job_number');
         $operationSeq = (int)$this->requiredAny($command, ['operation_seq', 'operation_ref'], 'operation_seq');
         $equipmentId = $this->requiredAny($command, ['equipment_id', 'machine_ref', 'work_unit_ref'], 'equipment_id');
+        $commandWithUom = $this->withUomEvidence($command, array_values(array_filter([$goodUom, $scrapUom])));
 
         $this->db->execute(
             "UPDATE mes_operation_execution
@@ -161,15 +190,62 @@ final class MesRuntimeCommandHandler
                 ':job_number' => $jobNumber,
                 ':operation_seq' => $operationSeq,
                 ':equipment_id' => $equipmentId,
-                ':qty_good' => $this->text($command['completed_quantity'] ?? $command['qty_good'] ?? '0'),
-                ':qty_scrap' => $this->text($command['scrap_quantity'] ?? $command['qty_scrap'] ?? '0'),
+                ':qty_good' => (string)$goodUom['converted_magnitude'],
+                ':qty_scrap' => $scrapUom !== null ? (string)$scrapUom['converted_magnitude'] : '0',
             ]
         );
 
-        $event = $this->writeOperationalEvent('order.work_execution', 'order', 'operation_completed', $command, $readiness);
-        $this->writeAuditAndOutbox('mes.operation_completed', $jobNumber, $command, $event, $readiness);
+        $event = $this->writeOperationalEvent('order.work_execution', 'order', 'operation_completed', $commandWithUom, $readiness);
+        $this->writeAuditAndOutbox('mes.operation_completed', $jobNumber, $commandWithUom, $event, $readiness);
 
-        return ['job_number' => $jobNumber, 'operation_seq' => $operationSeq, 'event_id' => $event['event_id'] ?? '', 'readiness' => $readiness];
+        return [
+            'job_number' => $jobNumber,
+            'operation_seq' => $operationSeq,
+            'event_id' => $event['event_id'] ?? '',
+            'readiness' => $readiness,
+            'uom' => array_values(array_filter([$goodUom, $scrapUom])),
+        ];
+    }
+
+    /**
+     * @param array<string,mixed> $command
+     * @return array<string,mixed>
+     */
+    private function normalizeUom(array $command, string $commandName, string $quantityRole): array
+    {
+        return ($this->uomNormalizer ?? new UomCommandQuantityNormalizer($this->db))->normalizeAndRecord(
+            $commandName,
+            $command,
+            $this->actor($command),
+            $this->requiredAny($command, ['idempotency_key'], 'idempotency_key'),
+            $quantityRole,
+            [
+                'domain' => 'mes_runtime_command',
+                'trace_id' => $this->text($command['trace_id'] ?? $command['correlation_id'] ?? ''),
+            ]
+        );
+    }
+
+    /**
+     * @param array<string,mixed> $command
+     * @param list<array<string,mixed>> $measurements
+     * @return array<string,mixed>
+     */
+    private function withUomEvidence(array $command, array $measurements): array
+    {
+        $command['uom_authority_evidence'] = array_map(
+            static fn (array $measurement): array => [
+                'authority' => (string)($measurement['authority'] ?? ''),
+                'measurement_id' => (string)($measurement['measurement_id'] ?? ''),
+                'quantity_role' => (string)($measurement['quantity_role'] ?? ''),
+                'converted_magnitude' => (string)($measurement['converted_magnitude'] ?? ''),
+                'target_unit_code' => (string)($measurement['target_unit_code'] ?? ''),
+                'measval_hash_sha256' => (string)($measurement['measval_hash_sha256'] ?? ''),
+            ],
+            $measurements
+        );
+
+        return $command;
     }
 
     private function readiness(array $command, string $commandName): array

@@ -111,7 +111,7 @@ final class RuntimeRequirementResolverServiceTest extends TestCase
             [[
                 'reason_code' => 'uom_authority_resolution_failed',
                 'evidence_class' => 'uom',
-                'message' => 'UOM bridge failed.',
+                'message' => 'UOM authority failed.',
                 'operator_message' => 'Resolve UOM before continuing.',
             ]]
         );
