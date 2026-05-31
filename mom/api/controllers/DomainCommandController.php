@@ -9,6 +9,7 @@ use MOM\Api\Services\DomainCommand\ProblemDetailsFactory;
 use MOM\Api\Services\DomainCommand\CommandRegistry;
 use MOM\Api\Services\DomainCommand\SignatureChallengeService;
 use MOM\Api\Services\DomainCommand\SignatureManifestationService;
+use MOM\Api\Services\MdaRuntimeTelemetryService;
 use MOM\Database\Connection;
 use Throwable;
 
@@ -24,6 +25,17 @@ final class DomainCommandController extends BaseController
 
         try {
             $result = (new DomainCommandGateway(Connection::getInstance()))->dispatch($body);
+            $this->recordTelemetry(static function (MdaRuntimeTelemetryService $telemetry) use ($body, $result): void {
+                $telemetry->recordCommandOutcome(
+                    (string)($result['command_name'] ?? $body['command_name'] ?? ''),
+                    !empty($result['replayed']) ? 'replayed' : 'accepted',
+                    [
+                        'command.name' => (string)($result['command_name'] ?? $body['command_name'] ?? ''),
+                        'command.outcome' => !empty($result['replayed']) ? 'replayed' : 'accepted',
+                        'idempotency.replayed' => (bool)($result['replayed'] ?? false),
+                    ]
+                );
+            });
             $this->success(['domain_command' => $result], !empty($result['replayed']) ? 200 : 202);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
@@ -31,6 +43,9 @@ final class DomainCommandController extends BaseController
                 $e,
                 (string)($body['correlation_id'] ?? $body['trace_id'] ?? '')
             );
+            $this->recordTelemetry(static function (MdaRuntimeTelemetryService $telemetry) use ($body, $problem): void {
+                $telemetry->recordProblemDetails((string)($body['command_name'] ?? $body['command'] ?? ''), $problem);
+            });
             $this->problem($problem);
         }
     }
@@ -68,6 +83,9 @@ final class DomainCommandController extends BaseController
                 $e,
                 (string)($body['correlation_id'] ?? $body['trace_id'] ?? '')
             );
+            $this->recordTelemetry(static function (MdaRuntimeTelemetryService $telemetry) use ($body, $problem): void {
+                $telemetry->recordProblemDetails((string)($body['command_name'] ?? $body['command'] ?? ''), $problem);
+            });
             $this->problem($problem);
         }
     }
@@ -85,6 +103,9 @@ final class DomainCommandController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $problem = (new ProblemDetailsFactory())->fromThrowable($e, '');
+            $this->recordTelemetry(static function (MdaRuntimeTelemetryService $telemetry) use ($recordType, $problem): void {
+                $telemetry->recordProblemDetails('signature_manifestations:' . $recordType, $problem);
+            });
             $this->problem($problem);
         }
     }
@@ -102,6 +123,21 @@ final class DomainCommandController extends BaseController
         $this->rawResponse($encoded, (int)($problem['status'] ?? 500), [
             'Content-Type' => 'application/problem+json; charset=utf-8',
         ]);
+    }
+
+    /**
+     * @param callable(MdaRuntimeTelemetryService): void $callback
+     */
+    private function recordTelemetry(callable $callback): void
+    {
+        try {
+            $callback(new MdaRuntimeTelemetryService(
+                (string)($GLOBALS['DATA_DIR'] ?? dirname(__DIR__, 2) . '/data'),
+                Connection::getInstance()
+            ));
+        } catch (Throwable) {
+            // Observability must never block governed command execution.
+        }
     }
 
     /**

@@ -24,10 +24,10 @@
     },
     "counts": {
         "controllers": 97,
-        "services": 181,
+        "services": 182,
         "middleware": 6,
-        "migrations": 253,
-        "db_tables": 948,
+        "migrations": 254,
+        "db_tables": 950,
         "contracts": 68,
         "action_routes": 0,
         "rest_routes": 0

@@ -28,6 +28,7 @@ final class RuntimeAuthorityService
         private readonly ?ConnectedGovernanceService $connectedGovernance = null,
         private readonly ?PlanningScenarioService $planningScenario = null,
         private readonly ?TraceabilityGenealogyService $traceabilityGenealogy = null,
+        private readonly ?MdaRuntimeTelemetryService $mdaTelemetry = null,
     ) {
     }
 
@@ -50,6 +51,7 @@ final class RuntimeAuthorityService
         $connectedGovernance = ($this->connectedGovernance ?? new ConnectedGovernanceService($this->dataDir, $this->data, events: $eventBackbone))->probe();
         $planningScenario = ($this->planningScenario ?? new PlanningScenarioService($this->dataDir, $this->data))->probe();
         $traceabilityGenealogy = ($this->traceabilityGenealogy ?? new TraceabilityGenealogyService($this->dataDir, $this->data, $eventBackbone))->probe();
+        $runtimeTelemetry = ($this->mdaTelemetry ?? new MdaRuntimeTelemetryService($this->dataDir))->report();
         $canonicalGenealogy = (new \MOM\Services\Traceability\GenealogyGraphService($this->data))->probe();
         if (($canonicalGenealogy['authoritative'] ?? false) === true) {
             $traceabilityGenealogy = array_merge($traceabilityGenealogy, $canonicalGenealogy, [
@@ -70,6 +72,7 @@ final class RuntimeAuthorityService
             'connected_governance' => $this->normalizeOperationalSlice($connectedGovernance),
             'planning_scenario' => $this->normalizeOperationalSlice($planningScenario),
             'traceability_genealogy' => $this->normalizeOperationalSlice($traceabilityGenealogy),
+            'mda_runtime_control_tower' => $this->normalizeOperationalSlice($this->normalizeTelemetrySlice($runtimeTelemetry)),
         ];
 
         $states = [];
@@ -175,6 +178,24 @@ final class RuntimeAuthorityService
                 'compatibility_only' => 'json_fallback',
                 default => 'degraded',
             },
+        ]);
+    }
+
+    /**
+     * @param array<string,mixed> $probe
+     * @return array<string,mixed>
+     */
+    private function normalizeTelemetrySlice(array $probe): array
+    {
+        $scorecard = is_array($probe['p60_scorecard_input'] ?? null) ? (array)$probe['p60_scorecard_input'] : [];
+        $metricsPresent = (bool)($scorecard['required_metrics_present'] ?? false);
+        $p0AlertCount = (int)($scorecard['p0_alert_count'] ?? 0);
+
+        return array_merge($probe, [
+            'slice' => 'mda_runtime_control_tower',
+            'readiness_state' => $metricsPresent && $p0AlertCount === 0 ? 'authoritative_ready' : 'degraded',
+            'authority_mode' => 'observability_only',
+            'degradation_reason' => $metricsPresent ? ($p0AlertCount > 0 ? 'active_p0_runtime_alerts' : '') : 'required_metrics_missing',
         ]);
     }
 

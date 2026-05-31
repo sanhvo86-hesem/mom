@@ -1,7 +1,7 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 858,
+        "table_count": 860,
         "generated_at": "2026-06-01T03:31:18+00:00"
     },
     "tables": {
@@ -6273,6 +6273,20 @@
                     "ref": "users(user_id)"
                 }
             ],
+            "contract": null
+        },
+        "mda_runtime_control_tower_snapshot": {
+            "defined_in": "273_mda_runtime_telemetry_control_tower.sql",
+            "extended_in": [],
+            "primary_key": "snapshot_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "mda_runtime_telemetry_event": {
+            "defined_in": "273_mda_runtime_telemetry_control_tower.sql",
+            "extended_in": [],
+            "primary_key": "telemetry_event_id",
+            "foreign_keys": [],
             "contract": null
         },
         "mdm_approval_policies": {
