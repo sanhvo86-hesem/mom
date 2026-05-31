@@ -108,6 +108,7 @@ var _ngEnsureModuleBuilderMetadata;
 var _ngModuleStudioDraftFromSchema;
 var _ngApplyModuleStudioDraft;
 var _ngSyncModuleBuilderManifest;
+var _ngRenderStudioField;
 var _ngRenderModuleStudioPanel;
 var _ngExportBuilderJson;
 var _ngExportRuntimeJson;
@@ -7538,7 +7539,14 @@ if(!window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__){
     if(BE.toast) BE.toast(_t('Đã tạo bản sao module mới', 'Created a duplicated module copy'), 'success');
   }
 
-  function _ngRenderStudioField(options){
+  /* Assigned to the shared outer-scope var (predeclared up top) instead of a
+     bare function declaration: later rounds (R14 Design Studio, R15) live in
+     separate IIFEs and reference this by name across scope. A local-only
+     declaration left _ngRenderStudioField undefined for them, which threw
+     "_ngRenderStudioField is not defined" on EVERY build-step render and broke
+     the whole Module Builder. This matches how its sibling _ng* helpers are
+     exposed (see the predeclaration block + "strict-mode safe reassignment"). */
+  _ngRenderStudioField = function(options){
     var label = _t(options.labelVi || '', options.labelEn || options.labelVi || '');
     var path = options.path || '';
     var value = options.value;
