@@ -176,8 +176,36 @@
     el[TOUCHED] = {};
   }
 
+  /* ── Theme presets (for the Module Creator: pick a theme, then add Lego blocks).
+     Each preset is one brand seed + density/radius/control-height — all expressed
+     through the same master tokens, so a module inherits a coherent, tunable look.
+     Admins can edit a preset by adjusting tokens in Module Master. ── */
+  var THEMES = {
+    'hesem-default':    { label: { vi:'HESEM mặc định', en:'HESEM Default' },   brand:'#1565c0', density:8,  radius:8,  controlH:32 },
+    'industrial-dense': { label: { vi:'Công nghiệp dày', en:'Industrial Dense' }, brand:'#1565c0', density:6,  radius:4,  controlH:28 },
+    'comfortable':      { label: { vi:'Thoáng',          en:'Comfortable' },     brand:'#1565c0', density:12, radius:10, controlH:36 },
+    'shop-floor':       { label: { vi:'Xưởng (cảm ứng)', en:'Shop-floor (touch)' }, brand:'#0f766e', density:10, radius:8,  controlH:44 },
+    'violet':           { label: { vi:'Tím',             en:'Violet' },          brand:'#7c3aed', density:8,  radius:8,  controlH:32 },
+    'slate':            { label: { vi:'Xám đen',         en:'Slate' },           brand:'#334155', density:8,  radius:6,  controlH:32 }
+  };
+  function listThemes(){
+    return Object.keys(THEMES).map(function(k){ return { key:k, label:THEMES[k].label, brand:THEMES[k].brand }; });
+  }
+  function applyTheme(name, opts){
+    var t = THEMES[name];
+    if(!t) return { ok:false, error:'unknown theme: ' + name };
+    var r = applyBrand(t.brand, opts);
+    if(t.density != null) setDensity(t.density, opts);
+    if(t.radius != null) setRadius(t.radius, opts);
+    if(t.controlH != null) setControlHeight(t.controlH, opts);
+    return { ok: !!(r && r.ok), theme:name, ramp: r && r.ramp };
+  }
+
   global.LegoTheme = {
-    version: '1.0.0',
+    version: '1.1.0',
+    themes: THEMES,
+    listThemes: listThemes,
+    applyTheme: applyTheme,
     applyBrand: applyBrand,
     setDensity: setDensity,
     setRadius: setRadius,

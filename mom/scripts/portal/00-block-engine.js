@@ -3896,7 +3896,9 @@ function renderTwoColumn(block, data, state){
 
 function _getRuntimeLayoutStyle(layout){
   var actual = layout || {};
-  var gap = actual.gap || '16px';
+  // Default block gap = the master density knob (Module Master / LegoTheme control
+  // it), not a hardcoded 16px. Edge-to-edge, theme-linked.
+  var gap = actual.gap || 'var(--o3-space, 8px)';
   var style = 'gap:' + gap + ';';
   if(actual.type === 'grid'){
     style += 'display:grid;grid-template-columns:repeat(' + Math.max(1, Math.min(6, parseInt(actual.columns, 10) || 1)) + ',minmax(0,1fr));';
@@ -6209,7 +6211,7 @@ function renderFilterBar(config, data, state){
       html += '<input type="text" class="hm-input" placeholder="'+_esc(f.placeholder ? _textLabel(f.placeholder, f.placeholderEn) : _t('Tim kiem...','Search...'))+'" data-filter="'+_esc(f.key)+'" value="'+_esc(value != null ? value : '')+'">';
     } else if(f.type==='select'){
       html += '<select class="hm-input hm-select" data-filter="'+_esc(f.key)+'">';
-      html += '<option value="">'+_esc(_t(f.allLabel||'Tat ca',f.allLabelEn||'All'))+'</option>';
+      html += '<option value="">'+_esc(f.allLabel != null ? _textLabel(f.allLabel, f.allLabelEn) : _t('Tất cả','All'))+'</option>';
       (f.options||[]).forEach(function(opt){
         var selected = String(value != null ? value : '') === String(opt.value) ? ' selected' : '';
         html += '<option value="'+_esc(opt.value)+'"'+selected+'>'+_esc(_textLabel(opt.label, opt.labelEn))+'</option>';
