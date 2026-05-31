@@ -1,0 +1,10 @@
+gap_id,severity,status,owner_prompt,evidence,next_step
+P54-BLOCK-LEDGER-001,P0,closed,P54,"DomainCommandGateway routes IssueMaterialToWorkOrderCommand to InventoryCommandHandler; handler writes inventory_ledger with idempotency lineage","Run real command-stack scenario in P59"
+P54-BLOCK-PROJECTION-001,P0,closed,P54,"Migration 271 adds hesem_inventory_projection_write_guard to stock_balances, inventory_balance_snapshot, and location_balance","Exercise trigger on deployed PostgreSQL during P60"
+P54-BLOCK-UOM-001,P0,closed,P54,"UomRuntimeAuthorityService command matrix includes P54 inventory commands and InventoryCommandHandler uses UomCommandQuantityNormalizer","Keep future quantity commands out of MdaUomAuthorityBridge"
+P54-BLOCK-HOLD-001,P0,closed,P54,"InventoryCommandHandler calls QualityHoldService before movement/issue mutation; probe shows held lot writes zero ledger/UOM","Extend to shipment release in P55/P57"
+P54-BLOCK-LOT-001,P1,closed,P54,"InventoryCommandHandler blocks expired lot without deviation before UOM or ledger write","Add deviation success scenario in P59"
+P54-BLOCK-RECON-001,P0,closed,P54,"RunInventoryReconciliationCommand writes run/mismatch evidence and CloseInventoryPeriodCommand blocks on mismatch","Wire dashboard/telemetry in P58"
+P54-BLOCK-TRACE-001,P1,closed,P54,"Split/merge/consume/produce/scrap/ship genealogy edge writer added; split probe writes genealogy_edge_facts","Expand full recursive trace export in scenario runner"
+P54-CONTROLLED-COST-CONTEXT,P2,controlled_gap,P54,"Cost ledger writes are conditional on cost_amount and cost_object_id in command payload","Resolve cost context from routing/cost rollup authority in a later finance/cost prompt"
+P54-CONTROLLED-VENDOR,P2,controlled_gap,P54,"composer test/analyse/check blocked by missing vendor/bin/phpunit and vendor/bin/phpstan","Install/restore vendor or use CI environment with dependencies"

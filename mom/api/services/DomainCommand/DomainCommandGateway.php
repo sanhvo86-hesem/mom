@@ -24,6 +24,7 @@ final class DomainCommandGateway
         private readonly ?MesRuntimeCommandHandler $mesRuntime = null,
         private readonly ?UomCommandQuantityNormalizer $uomNormalizer = null,
         private readonly ?QualityHoldService $qualityHolds = null,
+        private readonly ?InventoryCommandHandler $inventory = null,
     ) {}
 
     /**
@@ -148,6 +149,7 @@ final class DomainCommandGateway
         $engineering = $this->engineeringPackages ?? new EngineeringReleasePackageCommandHandler($this->db);
         $qualityHolds = $this->qualityHolds ?? new QualityHoldService($this->db);
         $mesRuntime = $this->mesRuntime ?? new MesRuntimeCommandHandler($this->db, null, $this->uomNormalizer, $qualityHolds);
+        $inventory = $this->inventory ?? new InventoryCommandHandler($this->db, $this->uomNormalizer, $qualityHolds);
 
         try {
             return match ($commandName) {
@@ -163,13 +165,26 @@ final class DomainCommandGateway
                 'BindEngineeringPackageToSalesOrderCommand' => $engineering->bindPackageToSalesOrder($payload),
                 'ReleaseWorkOrderCommand' => $engineering->releaseWorkOrderWithPackage($payload),
                 'StartJobCommand' => $mesRuntime->startJob($payload),
-                'IssueMaterialToWorkOrderCommand' => $mesRuntime->issueMaterial($payload),
+                'IssueMaterialToWorkOrderCommand' => $inventory->issueMaterialToWorkOrder($payload),
                 'LoadToolCommand' => $mesRuntime->loadTool($payload),
                 'RecordInspectionResultCommand' => $mesRuntime->recordInspectionResult($payload),
                 'CompleteOperationCommand' => $mesRuntime->completeOperation($payload),
                 'ApplyQualityHoldCommand' => $qualityHolds->applyHold($payload),
                 'ReleaseQualityHoldCommand' => $qualityHolds->releaseHold($payload),
                 'RecordMrbDispositionCommand' => $qualityHolds->recordMrbDisposition($payload),
+                'ReceiveInventoryCommand' => $inventory->receiveInventory($payload),
+                'PutawayInventoryCommand' => $inventory->putawayInventory($payload),
+                'MoveInventoryCommand' => $inventory->moveInventory($payload),
+                'SplitLotCommand' => $inventory->splitLot($payload),
+                'MergeLotCommand' => $inventory->mergeLot($payload),
+                'CompleteToStockCommand' => $inventory->completeToStock($payload),
+                'ScrapInventoryCommand' => $inventory->scrapInventory($payload),
+                'ReworkInventoryCommand' => $inventory->reworkInventory($payload),
+                'AdjustInventoryWithApprovalCommand' => $inventory->adjustInventoryWithApproval($payload),
+                'PostInventoryLedgerTransactionCommand' => $inventory->postInventoryLedgerTransaction($payload),
+                'RunInventoryReconciliationCommand' => $inventory->runReconciliation($payload),
+                'CloseInventoryPeriodCommand' => $inventory->closeInventoryPeriod($payload),
+                'ExportRecallTraceCommand' => $inventory->exportRecallTrace($payload),
                 default => throw new DomainCommandException('command_handler_missing', "Command '{$commandName}' has no executable handler.", 501),
             };
         } catch (EngineeringReleasePackageException $e) {

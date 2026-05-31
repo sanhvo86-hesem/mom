@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 849,
-        "generated_at": "2026-06-01T03:28:55+00:00"
+        "table_count": 853,
+        "generated_at": "2026-06-01T03:30:42+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -1242,7 +1242,8 @@
         "cost_ledger": {
             "defined_in": "077_canonical_inventory_cost_traceability.sql",
             "extended_in": [
-                "091_runtime_governance_continuity.sql"
+                "091_runtime_governance_continuity.sql",
+                "271_inventory_ledger_runtime_authority.sql"
             ],
             "primary_key": "cost_ledger_id",
             "foreign_keys": [],
@@ -5376,7 +5377,9 @@
         },
         "inventory_ledger": {
             "defined_in": "077_canonical_inventory_cost_traceability.sql",
-            "extended_in": [],
+            "extended_in": [
+                "271_inventory_ledger_runtime_authority.sql"
+            ],
             "primary_key": "inventory_ledger_id",
             "foreign_keys": [
                 {
@@ -5414,6 +5417,48 @@
                     "ref": "warehouses(warehouse_id)"
                 }
             ],
+            "contract": null
+        },
+        "inventory_period_close": {
+            "defined_in": "271_inventory_ledger_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "inventory_period_close_id",
+            "foreign_keys": [
+                {
+                    "col": "reconciliation_run_id",
+                    "ref": "inventory_reconciliation_run(reconciliation_run_id)"
+                },
+                {
+                    "col": "signature_event_id",
+                    "ref": "signature_events(signature_event_id)"
+                }
+            ],
+            "contract": null
+        },
+        "inventory_recall_trace_export": {
+            "defined_in": "271_inventory_ledger_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "recall_trace_export_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "inventory_reconciliation_mismatch": {
+            "defined_in": "271_inventory_ledger_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "mismatch_id",
+            "foreign_keys": [
+                {
+                    "col": "reconciliation_run_id",
+                    "ref": "inventory_reconciliation_run(reconciliation_run_id)"
+                }
+            ],
+            "contract": null
+        },
+        "inventory_reconciliation_run": {
+            "defined_in": "271_inventory_ledger_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "reconciliation_run_id",
+            "foreign_keys": [],
             "contract": null
         },
         "inventory_transactions": {
@@ -12056,7 +12101,8 @@
         "wip_ledger": {
             "defined_in": "077_canonical_inventory_cost_traceability.sql",
             "extended_in": [
-                "091_runtime_governance_continuity.sql"
+                "091_runtime_governance_continuity.sql",
+                "271_inventory_ledger_runtime_authority.sql"
             ],
             "primary_key": "wip_ledger_id",
             "foreign_keys": [
