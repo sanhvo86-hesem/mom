@@ -19,9 +19,9 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: [
     ['list'],
-    ['html', { outputFolder: '../../.codex-playwright/module-template-v4-report', open: 'never' }]
+    ['html', { outputFolder: '.codex-playwright/module-template-v4-report', open: 'never' }]
   ],
-  outputDir: '../../.codex-playwright/module-template-v4-results',
+  outputDir: '.codex-playwright/module-template-v4-results',
   snapshotPathTemplate: '{testFilePath}-snapshots/{arg}-{projectName}{ext}',
   use: {
     baseURL: 'http://127.0.0.1:8091',

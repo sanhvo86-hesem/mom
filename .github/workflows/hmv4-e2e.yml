@@ -38,6 +38,7 @@ jobs:
     name: Classify HMV4 Changeset
     runs-on: ubuntu-latest
     outputs:
+      changed_files: ${{ steps.classify.outputs.changed_files }}
       file_count: ${{ steps.classify.outputs.file_count }}
       is_full_required: ${{ steps.classify.outputs.is_full_required }}
       full_required_reason: ${{ steps.classify.outputs.full_required_reason }}
@@ -172,23 +173,71 @@ jobs:
 
       - name: Run HMV4 E2E Chromium
         working-directory: tests/e2e
-        run: ./node_modules/.bin/playwright test --project=chromium --reporter=list
+        run: npm run test:hmv4:ci -- --reporter=list
 
       - name: Upload Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report-${{ github.run_id }}
+          path: tests/e2e/.codex-playwright/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  visual-e2e:
+    name: HMV4 Visual Regression Evidence
+    runs-on: ubuntu-latest
+    needs: [classify, safety-checks]
+    if: ${{ always() && !failure() && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.full_e2e) || contains(needs.classify.outputs.changed_files, 'module-template-v4-visual.spec.ts') || contains(needs.classify.outputs.changed_files, 'module-template-v4-visual.spec.ts-snapshots')) }}
+    timeout-minutes: 25
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup PHP 8.2 for built-in server
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Cache Playwright npm dependencies
+        uses: actions/cache@v4
+        with:
           path: |
-            .codex-playwright/
-            tests/e2e/test-results/
+            ~/.npm
+            tests/e2e/node_modules
+          key: ${{ runner.os }}-hmv4-e2e-${{ hashFiles('tests/e2e/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-hmv4-e2e-
+
+      - name: Install Playwright deps
+        working-directory: tests/e2e
+        run: |
+          npm ci
+          ./node_modules/.bin/playwright install chromium --with-deps
+
+      - name: Run HMV4 visual regression Chromium
+        working-directory: tests/e2e
+        run: npm run test:visual -- --reporter=list
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hmv4-visual-report-${{ github.run_id }}
+          path: tests/e2e/.codex-playwright/
           retention-days: 7
           if-no-files-found: ignore
 
   summary:
     name: HMV4 E2E Summary
     runs-on: ubuntu-latest
-    needs: [classify, safety-checks, e2e]
+    needs: [classify, safety-checks, e2e, visual-e2e]
     if: always()
     steps:
       - name: Summarize HMV4 decision
@@ -198,6 +247,7 @@ jobs:
           echo "full reason: ${{ needs.classify.outputs.full_required_reason }}"
           echo "safety-checks: ${{ needs.safety-checks.result }}"
           echo "e2e: ${{ needs.e2e.result }}"
+          echo "visual-e2e: ${{ needs.visual-e2e.result }}"
           for result in '${{ needs.classify.result }}' '${{ needs.safety-checks.result }}' '${{ needs.e2e.result }}'; do
             if [ "$result" = "failure" ] || [ "$result" = "cancelled" ]; then
               echo "FAIL: HMV4 workflow gate failed or was cancelled." >&2
