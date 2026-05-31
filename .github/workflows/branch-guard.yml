@@ -1,9 +1,10 @@
 name: Branch Guard
 
-# Runs on every push to codex/** branches and on every PR targeting main.
+# Runs on every push to codex/** branches. Pull request migration checks live in
+# the main CI workflow to avoid duplicate Branch Guard runs on non-migration PRs.
 # Purpose:
 #   1. Enforce codex/<slug> naming on AI-agent branches
-#   2. Detect migration number collisions before they reach main
+#   2. Detect migration number collisions before they reach main on agent branches
 #   3. Auto-open a draft PR when a codex/** branch is pushed without one
 #   4. Block any direct push to main that bypasses a PR
 
@@ -11,9 +12,6 @@ on:
   push:
     branches:
       - 'codex/**'
-  pull_request:
-    branches: [main]
-    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
