@@ -20,10 +20,29 @@ permissions:
   pull-requests: write
 
 jobs:
+  classify:
+    name: Branch Guard Classify
+    runs-on: ubuntu-latest
+    outputs:
+      needs_db_migration_check: ${{ steps.classify.outputs.needs_db_migration_check }}
+      is_full_required: ${{ steps.classify.outputs.is_full_required }}
+      summary: ${{ steps.classify.outputs.summary }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: classify
+        name: Compute migration relevance
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: tools/scripts/ci/smart-classify.sh
+
   # ─── 1. Migration number collision detection ───────────────────────────────
   migration-collision:
     name: Migration Collision Check
     runs-on: ubuntu-latest
+    needs: classify
+    if: ${{ always() && !failure() && (needs.classify.outputs.needs_db_migration_check == 'true' || needs.classify.outputs.is_full_required == 'true') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,8 +80,8 @@ jobs:
           fi
 
           # Numbers already on main
-          MAIN_NUMS=$(git show origin/main:HEAD -- "$MIGRATION_DIR" 2>/dev/null | \
-            grep -oE '^[0-9]+' | sort -u || true)
+          MAIN_NUMS=$(git ls-tree -r --name-only origin/main -- "$MIGRATION_DIR" | \
+            xargs -n1 basename | grep -oE '^[0-9]+' | sort -u || true)
 
           for f in $NEW_FILES; do
             NUM=$(basename "$f" | grep -oE '^[0-9]+')
@@ -120,28 +139,30 @@ jobs:
           # Build a meaningful title from the slug
           TITLE=$(echo "$SLUG" | tr '-' ' ' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2); print}')
 
+          BODY="$(cat <<EOF
+          ## Auto-opened by Branch Guard
+
+          Branch: \`$BRANCH\`
+
+          ### Pre-merge checklist
+          - [ ] CI passes (all jobs green)
+          - [ ] PHPStan: 0 errors
+          - [ ] PHPUnit: no new failures
+          - [ ] No duplicate migration numbers
+          - [ ] No runtime config files committed
+          - [ ] DCC header compliance maintained
+
+          ### Branch deletion gates (after merge)
+          - [ ] PR status = MERGED
+          - [ ] deploy.yml completed on main
+          - [ ] VPS commit confirmed: \`ssh eqms 'git -C /var/www/eqms.hesemeng.com log --oneline -1'\`
+          - [ ] Browser smoke test passed on eqms.hesemeng.com
+          EOF
+          )"
+
           gh pr create \
             --title "$TITLE" \
-            --body "$(cat <<'EOF'
-## Auto-opened by Branch Guard
-
-Branch: \`$BRANCH\`
-
-### Pre-merge checklist
-- [ ] CI passes (all jobs green)
-- [ ] PHPStan: 0 errors
-- [ ] PHPUnit: no new failures
-- [ ] No duplicate migration numbers
-- [ ] No runtime config files committed
-- [ ] DCC header compliance maintained
-
-### Branch deletion gates (after merge)
-- [ ] PR status = MERGED
-- [ ] deploy.yml completed on main
-- [ ] VPS commit confirmed: \`ssh eqms 'git -C /var/www/eqms.hesemeng.com log --oneline -1'\`
-- [ ] Browser smoke test passed on eqms.hesemeng.com
-EOF
-)" \
+            --body "$BODY" \
             --draft \
             --base main \
             --head "$BRANCH" \

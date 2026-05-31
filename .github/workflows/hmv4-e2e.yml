@@ -1,17 +1,7 @@
 name: HMV4 prototype E2E
 
-# This workflow validates the module-template-v4 (HMV4) prototype slice
-# program. It runs on every push to a codex/* branch and on PRs to main.
-#
-# Scope:
-# - Static safety checks (Node syntax, JSON parse, forbidden diff,
-#   fixture production-load guard).
-# - Playwright Chromium E2E suite.
-#
-# Activation policy: This workflow file is committed but disabled by
-# default at the GitHub Actions UI level until an explicit governance
-# decision activates it. To activate, an admin must enable workflows
-# under Settings → Actions → "Allow all actions and reusable workflows".
+# Validates the module-template-v4 (HMV4) prototype only when HMV4/UI/E2E
+# paths change, when full regression is requested, or on the nightly schedule.
 
 on:
   push:
@@ -21,7 +11,16 @@ on:
   pull_request:
     branches:
       - main
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   workflow_dispatch:
+    inputs:
+      full_e2e:
+        description: Force Playwright E2E
+        required: false
+        default: true
+        type: boolean
+  schedule:
+    - cron: '47 18 * * *'
 
 permissions:
   contents: read
@@ -35,22 +34,46 @@ env:
   HMV4_FIXTURE_MODE: 'false'
 
 jobs:
+  classify:
+    name: Classify HMV4 Changeset
+    runs-on: ubuntu-latest
+    outputs:
+      file_count: ${{ steps.classify.outputs.file_count }}
+      is_full_required: ${{ steps.classify.outputs.is_full_required }}
+      full_required_reason: ${{ steps.classify.outputs.full_required_reason }}
+      needs_hmv4_safety: ${{ steps.classify.outputs.needs_hmv4_safety }}
+      needs_playwright_e2e: ${{ steps.classify.outputs.needs_playwright_e2e }}
+      summary: ${{ steps.classify.outputs.summary }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: classify
+        name: Compute HMV4 flags
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: tools/scripts/ci/smart-classify.sh
+
   safety-checks:
     name: HMV4 safety checks
     runs-on: ubuntu-latest
+    needs: classify
+    if: ${{ always() && !failure() && (needs.classify.outputs.needs_hmv4_safety == 'true' || needs.classify.outputs.is_full_required == 'true' || (github.event_name == 'pull_request' && (contains(github.event.pull_request.labels.*.name, 'e2e') || contains(github.event.pull_request.labels.*.name, 'full-ci')))) }}
     timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Node syntax check (HMV4 70-74)
+      - name: Node syntax check HMV4 70-74
         run: |
-          set -e
+          set -euo pipefail
           for f in 70-module-template-v4-hydration 71-module-template-v4-routes \
                    72-module-template-v4-bridge 73-module-template-v4-renderers \
                    74-module-template-v4-fixtures; do
@@ -75,6 +98,7 @@ jobs:
 
       - name: Fixture production-load guard
         run: |
+          set -euo pipefail
           if grep -n "74-module-template-v4-fixtures" mom/portal.html; then
             echo "FAIL fixture production load detected in mom/portal.html"
             exit 1
@@ -83,8 +107,12 @@ jobs:
 
       - name: Forbidden diff guard
         run: |
-          set -e
-          DIFF=$(git diff --name-only origin/main..HEAD || git diff --name-only HEAD~1 HEAD || true)
+          set -euo pipefail
+          BASE="${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}"
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
+            BASE="origin/main"
+          fi
+          DIFF="$(git diff --name-only "$BASE" HEAD || true)"
           if echo "$DIFF" | grep -E 'mom/styles/(portal\.main|eqms-suite|density-darkmode)\.css|mom/scripts/portal/(01-module-router|02-state-auth-ui|40-eqms-shell)\.js'; then
             echo "FAIL forbidden file modified in slice diff"
             exit 1
@@ -93,8 +121,7 @@ jobs:
 
       - name: Graphics Authority basic JS check
         run: |
-          set -e
-          # Hex colors in HMV4 component JS are forbidden (excluding comments).
+          set -euo pipefail
           if grep -nE '#[0-9a-fA-F]{6}\b' mom/scripts/portal/7[0-4]-module-template-v4-*.js \
               | grep -vE '\s*//' | grep -vE '\s*\*'; then
             echo "FAIL hardcoded hex colors detected in HMV4 component JS"
@@ -103,9 +130,10 @@ jobs:
           echo "PASS no hardcoded hex in HMV4 component JS"
 
   e2e:
-    name: HMV4 Playwright E2E (Chromium)
+    name: HMV4 Playwright E2E Chromium
     runs-on: ubuntu-latest
-    needs: safety-checks
+    needs: [classify, safety-checks]
+    if: ${{ always() && !failure() && (needs.classify.outputs.needs_playwright_e2e == 'true' || needs.classify.outputs.is_full_required == 'true' || (github.event_name == 'workflow_dispatch' && inputs.full_e2e) || (github.event_name == 'pull_request' && (contains(github.event.pull_request.labels.*.name, 'e2e') || contains(github.event.pull_request.labels.*.name, 'full-ci')))) }}
     timeout-minutes: 25
     steps:
       - name: Checkout
@@ -121,16 +149,25 @@ jobs:
         with:
           php-version: '8.2'
 
+      - name: Cache Playwright npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            tests/e2e/node_modules
+          key: ${{ runner.os }}-hmv4-e2e-${{ hashFiles('tests/e2e/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-hmv4-e2e-
+
       - name: Install Playwright deps
         working-directory: tests/e2e
         run: |
-          npm install --no-package-lock
+          npm ci
           ./node_modules/.bin/playwright install chromium --with-deps
 
-      - name: Run HMV4 E2E (Chromium)
+      - name: Run HMV4 E2E Chromium
         working-directory: tests/e2e
-        run: |
-          ./node_modules/.bin/playwright test --project=chromium --reporter=list
+        run: ./node_modules/.bin/playwright test --project=chromium --reporter=list
 
       - name: Upload Playwright report on failure
         if: failure()
@@ -142,3 +179,23 @@ jobs:
             tests/e2e/test-results/
           retention-days: 7
           if-no-files-found: ignore
+
+  summary:
+    name: HMV4 E2E Summary
+    runs-on: ubuntu-latest
+    needs: [classify, safety-checks, e2e]
+    if: always()
+    steps:
+      - name: Summarize HMV4 decision
+        run: |
+          set -euo pipefail
+          echo "summary: ${{ needs.classify.outputs.summary }}"
+          echo "full reason: ${{ needs.classify.outputs.full_required_reason }}"
+          echo "safety-checks: ${{ needs.safety-checks.result }}"
+          echo "e2e: ${{ needs.e2e.result }}"
+          for result in '${{ needs.classify.result }}' '${{ needs.safety-checks.result }}' '${{ needs.e2e.result }}'; do
+            if [ "$result" = "failure" ] || [ "$result" = "cancelled" ]; then
+              echo "FAIL: HMV4 workflow gate failed or was cancelled." >&2
+              exit 1
+            fi
+          done

@@ -5,68 +5,69 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  workflow_dispatch:
+    inputs:
+      full_regression:
+        description: Run full Smart CI regression
+        required: false
+        default: true
+        type: boolean
+      full_e2e:
+        description: Force Playwright E2E
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    - cron: '31 18 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  # Classify the changeset so we can skip heavy PHP gates (lint, PHPStan,
-  # PHPUnit) on frontend-only patches. Mirrors deploy.yml's classify job
-  # so CI and Deploy use the same fast-path criteria — no more "CI red,
-  # Deploy green" drift. Fail-closed: any non-frontend touch (or an
-  # unresolvable base) forces full validation.
   classify:
     name: Classify Changeset
     runs-on: ubuntu-latest
     outputs:
-      needs_php_validation: ${{ steps.classify.outputs.needs_php_validation }}
+      changed_files: ${{ steps.classify.outputs.changed_files }}
+      file_count: ${{ steps.classify.outputs.file_count }}
+      is_full_required: ${{ steps.classify.outputs.is_full_required }}
+      full_required_reason: ${{ steps.classify.outputs.full_required_reason }}
+      needs_repo_boundary: ${{ steps.classify.outputs.needs_repo_boundary }}
+      needs_php_syntax: ${{ steps.classify.outputs.needs_php_syntax }}
+      needs_phpstan: ${{ steps.classify.outputs.needs_phpstan }}
+      needs_phpunit: ${{ steps.classify.outputs.needs_phpunit }}
+      needs_kpi_tests: ${{ steps.classify.outputs.needs_kpi_tests }}
+      needs_db_migration_check: ${{ steps.classify.outputs.needs_db_migration_check }}
+      needs_openapi: ${{ steps.classify.outputs.needs_openapi }}
+      needs_doc_health: ${{ steps.classify.outputs.needs_doc_health }}
+      needs_raci: ${{ steps.classify.outputs.needs_raci }}
+      needs_frontend_safety: ${{ steps.classify.outputs.needs_frontend_safety }}
+      needs_hmv4_safety: ${{ steps.classify.outputs.needs_hmv4_safety }}
+      needs_playwright_e2e: ${{ steps.classify.outputs.needs_playwright_e2e }}
+      needs_security_light: ${{ steps.classify.outputs.needs_security_light }}
+      needs_full_regression: ${{ steps.classify.outputs.needs_full_regression }}
       summary: ${{ steps.classify.outputs.summary }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - id: classify
-        name: Compute file class flags
-        run: |
-          set -euo pipefail
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BASE="${{ github.event.pull_request.base.sha }}"
-          else
-            BASE="${{ github.event.before }}"
-          fi
-          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ] \
-             || ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
-            if git cat-file -e 'HEAD~1^{commit}' 2>/dev/null; then
-              BASE="HEAD~1"
-            else
-              BASE=""
-            fi
-          fi
-          if [ -n "$BASE" ]; then
-            CHANGED="$(git diff --name-only "$BASE" HEAD)"
-          else
-            CHANGED=""
-          fi
-          FILE_COUNT="$(printf '%s' "$CHANGED" | grep -c '' || true)"
-          echo "Changed files ($FILE_COUNT):"
-          echo "$CHANGED" | awk 'NR<=50 {print "  " $0} NR==51 {print "  ... (truncated)"}'
-          FRONTEND_REGEX='^(mom/(scripts|styles|templates|docs|assets)/|mom/portal\.html$|mom/index\.html$|.*\.(md|txt)$)'
-          if [ -z "$CHANGED" ]; then
-            PHP_TOUCH="unresolved-base"
-          else
-            PHP_TOUCH="$(echo "$CHANGED" | grep -Ev "$FRONTEND_REGEX" || true)"
-          fi
-          if [ -z "$PHP_TOUCH" ]; then
-            echo "needs_php_validation=false" >> "$GITHUB_OUTPUT"
-            echo "summary=frontend-only ($FILE_COUNT files)" >> "$GITHUB_OUTPUT"
-            echo "::notice::Frontend-only changeset — skipping PHP Syntax / PHPStan / PHPUnit"
-          else
-            echo "needs_php_validation=true" >> "$GITHUB_OUTPUT"
-            NON_FE="$(echo "$PHP_TOUCH" | grep -c '' || true)"
-            echo "summary=full ($FILE_COUNT files, $NON_FE non-frontend)" >> "$GITHUB_OUTPUT"
-          fi
+        name: Compute Smart CI flags
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          SMART_CI_FULL_REASON: ${{ github.event_name == 'workflow_dispatch' && inputs.full_regression && 'workflow-dispatch' || '' }}
+        run: tools/scripts/ci/smart-classify.sh
 
   repo-boundary:
     name: Controlled Source Boundary
     runs-on: ubuntu-latest
     needs: classify
+    if: ${{ always() && needs.classify.outputs.needs_repo_boundary == 'true' }}
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -75,24 +76,24 @@ jobs:
       - name: Block generated/runtime artifacts in controlled source
         run: php mom/tools/release/check_repo_boundary.php
 
-  lint:
+  php-syntax:
     name: PHP Syntax Check
     runs-on: ubuntu-latest
     needs: [classify, repo-boundary]
-    if: needs.classify.outputs.needs_php_validation == 'true'
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_php_syntax == 'true' }}
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
       - name: Check PHP syntax
-        run: find mom/api mom/database -name "*.php" -print0 | xargs -0 -n1 php -l
+        run: find mom/api mom/database mom/tools -name "*.php" -print0 | xargs -0 -n1 php -l
 
-  analyse:
-    name: Static Analysis (PHPStan)
+  phpstan:
+    name: Static Analysis PHPStan
     runs-on: ubuntu-latest
     needs: [classify, repo-boundary]
-    if: needs.classify.outputs.needs_php_validation == 'true'
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_phpstan == 'true' }}
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -121,13 +122,13 @@ jobs:
             ${{ runner.os }}-phpstan-
       - name: Run PHPStan
         working-directory: mom
-        run: vendor/bin/phpstan analyse --error-format=github
+        run: vendor/bin/phpstan analyse --error-format=github --memory-limit=1G
 
-  test:
-    name: Tests
+  phpunit:
+    name: PHPUnit Tests
     runs-on: ubuntu-latest
     needs: [classify, repo-boundary]
-    if: needs.classify.outputs.needs_php_validation == 'true'
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_phpunit == 'true' }}
     services:
       postgres:
         image: postgres:16-alpine
@@ -158,25 +159,88 @@ jobs:
           php-version: '8.5'
           extensions: pdo, pdo_pgsql, mbstring, json, redis
           coverage: xdebug
+          tools: composer:v2
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.composer/cache
+            mom/vendor
+          key: ${{ runner.os }}-php85-composer-${{ hashFiles('mom/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php85-composer-
       - name: Install dependencies
         working-directory: mom
         run: composer install --no-interaction --prefer-dist
       - name: Run PHPUnit
         working-directory: mom
         env:
+          APP_ENV: test
           DB_HOST: localhost
           DB_PORT: 5432
           DB_NAME: mom_test
           DB_USER: mom_app
           DB_PASS: test_password
+          DB_PASSWORD: test_password
           REDIS_HOST: localhost
           REDIS_PORT: 6379
         run: php -d memory_limit=1G vendor/bin/phpunit --testdox
 
+  kpi-guard:
+    name: KPI Guard
+    runs-on: ubuntu-latest
+    needs: [classify, repo-boundary]
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_kpi_tests == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+      - name: KPI integrity check
+        run: php mom/tools/release/check_kpi_integrity.php
+      - name: KPI integrity drift self-test
+        run: php mom/tools/release/check_kpi_integrity_drift_test.php
+
+  db-migration-check:
+    name: DB Migration Check
+    runs-on: ubuntu-latest
+    needs: [classify, repo-boundary]
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_db_migration_check == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+      - name: Offline migration drift check
+        run: php mom/tools/release/check_migration_drift.php
+      - name: New migration numbers unique against main
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          MIGRATION_DIR="mom/database/migrations"
+          git fetch origin main --quiet
+          NEW_FILES="$(git diff --name-only --diff-filter=A origin/main...HEAD -- "$MIGRATION_DIR/*.sql" || true)"
+          if [ -z "$NEW_FILES" ]; then
+            echo "No new migration files in this PR."
+            exit 0
+          fi
+          MAIN_NUMS="$(git ls-tree -r --name-only origin/main -- "$MIGRATION_DIR" | xargs -n1 basename | grep -oE '^[0-9]+' | sort -u || true)"
+          for f in $NEW_FILES; do
+            NUM="$(basename "$f" | grep -oE '^[0-9]+')"
+            if printf '%s\n' "$MAIN_NUMS" | grep -qx "$NUM"; then
+              echo "::error::Migration number $NUM in $f already exists on main."
+              exit 1
+            fi
+          done
+          echo "PASS: All new migration numbers are unique vs main."
+
   openapi:
     name: OpenAPI Validation
     runs-on: ubuntu-latest
-    needs: repo-boundary
+    needs: [classify, repo-boundary]
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_openapi == 'true' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -188,9 +252,10 @@ jobs:
         run: spectral lint mom/api/openapi.yaml --fail-severity warn
 
   doc-health:
-    name: Doc Health (links + DCC audit)
+    name: Doc Health
     runs-on: ubuntu-latest
-    needs: repo-boundary
+    needs: [classify, repo-boundary]
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_doc_health == 'true' }}
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -200,17 +265,12 @@ jobs:
         run: python3 scripts/doc-broken-refs-scan.py mom/docs --max-broken 0
       - name: Actor-link gate
         run: python3 scripts/doc-actor-links-scan.py mom/docs --max-unlinked 0 --max-nested 0 --max-unknown 0
-      - name: DCC header audit (compliant-count regression gate)
-        # Asserts ≥389 of 390 HTML docs satisfy the DCC pattern. Baseline 389
-        # accommodates the one pre-existing fragment template
-        # (mom/docs/training/templates/certificate-template.html — no <head>).
-        # If a new doc fails to add a DCC header, this drops compliance and
-        # the gate fails. Bump the baseline only when intentionally retiring
-        # the certificate-template fix-up.
+      - name: DCC header audit
         run: |
+          set -euo pipefail
           OUT="$(php mom/tools/dcc-batch/audit.php 2>&1 || true)"
           echo "$OUT"
-          COMPLIANT=$(echo "$OUT" | awk -F: '/Fully compliant/{gsub(/ /,"",$2); print $2; exit}')
+          COMPLIANT="$(echo "$OUT" | awk -F: '/Fully compliant/{gsub(/ /,"",$2); print $2; exit}')"
           if [ -z "$COMPLIANT" ]; then
             echo "FAIL: could not parse 'Fully compliant' from audit output." >&2
             exit 1
@@ -223,7 +283,8 @@ jobs:
   raci-integrity:
     name: RACI Integrity
     runs-on: ubuntu-latest
-    needs: repo-boundary
+    needs: [classify, repo-boundary]
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_raci == 'true' }}
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -247,3 +308,256 @@ jobs:
         run: php mom/tools/release/check_generated_marker_inventory.php
       - name: ISO reference status
         run: php mom/tools/release/check_iso_reference_status.php
+
+  frontend-safety:
+    name: Frontend Safety
+    runs-on: ubuntu-latest
+    needs: [classify, repo-boundary]
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_frontend_safety == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+      - name: Node syntax check for changed portal JavaScript
+        run: |
+          set -euo pipefail
+          cat > /tmp/changed-files <<'EOF'
+          ${{ needs.classify.outputs.changed_files }}
+          EOF
+          JS_FILES="$(sed 's/^ *//' /tmp/changed-files | grep -E '^(mom/scripts|mom/assets)/.*\.js$|^mom/sw\.js$' || true)"
+          if [ -z "$JS_FILES" ]; then
+            echo "No changed JS files require node --check."
+          else
+            printf '%s\n' "$JS_FILES" | while IFS= read -r f; do
+              [ -f "$f" ] || continue
+              node --check "$f"
+            done
+          fi
+      - name: Graphics no-hardcode gate
+        run: php mom/tools/release/check_graphics_no_hardcode.php
+      - name: Graphics block registry gate
+        run: php mom/tools/release/check_graphics_block_registry.php
+      - name: Graphics archetype registry gate
+        run: php mom/tools/release/check_graphics_archetype_registry.php
+
+  hmv4-safety:
+    name: HMV4 Safety
+    runs-on: ubuntu-latest
+    needs: [classify, repo-boundary]
+    if: ${{ always() && !failure() && (needs.classify.outputs.needs_hmv4_safety == 'true' || (github.event_name == 'pull_request' && (contains(github.event.pull_request.labels.*.name, 'e2e') || contains(github.event.pull_request.labels.*.name, 'full-ci')))) }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Node syntax check HMV4 70-74
+        run: |
+          set -euo pipefail
+          for f in 70-module-template-v4-hydration 71-module-template-v4-routes \
+                   72-module-template-v4-bridge 73-module-template-v4-renderers \
+                   74-module-template-v4-fixtures; do
+            node --check "mom/scripts/portal/$f.js"
+            echo "PASS $f.js"
+          done
+      - name: JSON fixture parse
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, sys
+          errors = 0
+          for p in pathlib.Path('tests/fixtures/module-template-v4').rglob('*.json'):
+              try:
+                  json.loads(p.read_text())
+                  print('PASS', p.name)
+              except Exception as e:
+                  errors += 1
+                  print('FAIL', p, e)
+          sys.exit(0 if errors == 0 else 1)
+          PY
+      - name: Fixture production-load guard
+        run: |
+          set -euo pipefail
+          if grep -n "74-module-template-v4-fixtures" mom/portal.html; then
+            echo "FAIL fixture production load detected in mom/portal.html"
+            exit 1
+          fi
+          echo "PASS no fixture production load"
+      - name: Forbidden diff guard
+        run: |
+          set -euo pipefail
+          BASE="${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}"
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
+            BASE="origin/main"
+          fi
+          DIFF="$(git diff --name-only "$BASE" HEAD || true)"
+          if echo "$DIFF" | grep -E 'mom/styles/(portal\.main|eqms-suite|density-darkmode)\.css|mom/scripts/portal/(01-module-router|02-state-auth-ui|40-eqms-shell)\.js'; then
+            echo "FAIL forbidden file modified in slice diff"
+            exit 1
+          fi
+          echo "PASS forbidden diff"
+      - name: Graphics Authority basic JS check
+        run: |
+          set -euo pipefail
+          if grep -nE '#[0-9a-fA-F]{6}\b' mom/scripts/portal/7[0-4]-module-template-v4-*.js \
+              | grep -vE '\s*//' | grep -vE '\s*\*'; then
+            echo "FAIL hardcoded hex colors detected in HMV4 component JS"
+            exit 1
+          fi
+          echo "PASS no hardcoded hex in HMV4 component JS"
+
+  playwright-e2e:
+    name: Playwright E2E
+    runs-on: ubuntu-latest
+    needs: [classify, hmv4-safety]
+    if: ${{ always() && !failure() && (needs.classify.outputs.needs_playwright_e2e == 'true' || (github.event_name == 'workflow_dispatch' && inputs.full_e2e) || (github.event_name == 'pull_request' && (contains(github.event.pull_request.labels.*.name, 'e2e') || contains(github.event.pull_request.labels.*.name, 'full-ci')))) }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: Cache Playwright npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            tests/e2e/node_modules
+          key: ${{ runner.os }}-hmv4-e2e-${{ hashFiles('tests/e2e/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-hmv4-e2e-
+      - name: Install Playwright deps
+        working-directory: tests/e2e
+        run: |
+          npm ci
+          ./node_modules/.bin/playwright install chromium --with-deps
+      - name: Run HMV4 E2E Chromium
+        working-directory: tests/e2e
+        run: ./node_modules/.bin/playwright test --project=chromium --reporter=list
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: |
+            .codex-playwright/
+            tests/e2e/test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  security-light:
+    name: Security Light
+    runs-on: ubuntu-latest
+    needs: [classify, repo-boundary]
+    if: ${{ always() && !failure() && needs.classify.outputs.needs_security_light == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+      - name: User identity SSOT
+        run: php mom/tools/release/check_user_identity_ssot.php
+      - name: Authorization invariants
+        run: php mom/tools/release/check_authorization_invariants.php
+
+  ci-summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    needs:
+      - classify
+      - repo-boundary
+      - php-syntax
+      - phpstan
+      - phpunit
+      - kpi-guard
+      - db-migration-check
+      - openapi
+      - doc-health
+      - raci-integrity
+      - frontend-safety
+      - hmv4-safety
+      - playwright-e2e
+      - security-light
+    if: always()
+    steps:
+      - name: Summarize Smart CI decision and gate results
+        run: |
+          set -euo pipefail
+          cat <<'EOF'
+          Smart CI classifier
+          -------------------
+          changed files: ${{ needs.classify.outputs.file_count }}
+          summary: ${{ needs.classify.outputs.summary }}
+          full_required_reason: ${{ needs.classify.outputs.full_required_reason }}
+
+          Flags
+          | flag | value |
+          |---|---|
+          | is_full_required | ${{ needs.classify.outputs.is_full_required }} |
+          | needs_repo_boundary | ${{ needs.classify.outputs.needs_repo_boundary }} |
+          | needs_php_syntax | ${{ needs.classify.outputs.needs_php_syntax }} |
+          | needs_phpstan | ${{ needs.classify.outputs.needs_phpstan }} |
+          | needs_phpunit | ${{ needs.classify.outputs.needs_phpunit }} |
+          | needs_kpi_tests | ${{ needs.classify.outputs.needs_kpi_tests }} |
+          | needs_db_migration_check | ${{ needs.classify.outputs.needs_db_migration_check }} |
+          | needs_openapi | ${{ needs.classify.outputs.needs_openapi }} |
+          | needs_doc_health | ${{ needs.classify.outputs.needs_doc_health }} |
+          | needs_raci | ${{ needs.classify.outputs.needs_raci }} |
+          | needs_frontend_safety | ${{ needs.classify.outputs.needs_frontend_safety }} |
+          | needs_hmv4_safety | ${{ needs.classify.outputs.needs_hmv4_safety }} |
+          | needs_playwright_e2e | ${{ needs.classify.outputs.needs_playwright_e2e }} |
+          | needs_security_light | ${{ needs.classify.outputs.needs_security_light }} |
+          | needs_full_regression | ${{ needs.classify.outputs.needs_full_regression }} |
+
+          Jobs
+          | job | result |
+          |---|---|
+          | classify | ${{ needs.classify.result }} |
+          | repo-boundary | ${{ needs.repo-boundary.result }} |
+          | php-syntax | ${{ needs.php-syntax.result }} |
+          | phpstan | ${{ needs.phpstan.result }} |
+          | phpunit | ${{ needs.phpunit.result }} |
+          | kpi-guard | ${{ needs.kpi-guard.result }} |
+          | db-migration-check | ${{ needs.db-migration-check.result }} |
+          | openapi | ${{ needs.openapi.result }} |
+          | doc-health | ${{ needs.doc-health.result }} |
+          | raci-integrity | ${{ needs.raci-integrity.result }} |
+          | frontend-safety | ${{ needs.frontend-safety.result }} |
+          | hmv4-safety | ${{ needs.hmv4-safety.result }} |
+          | playwright-e2e | ${{ needs.playwright-e2e.result }} |
+          | security-light | ${{ needs.security-light.result }} |
+          EOF
+
+          bad=0
+          for result in \
+            '${{ needs.classify.result }}' \
+            '${{ needs.repo-boundary.result }}' \
+            '${{ needs.php-syntax.result }}' \
+            '${{ needs.phpstan.result }}' \
+            '${{ needs.phpunit.result }}' \
+            '${{ needs.kpi-guard.result }}' \
+            '${{ needs.db-migration-check.result }}' \
+            '${{ needs.openapi.result }}' \
+            '${{ needs.doc-health.result }}' \
+            '${{ needs.raci-integrity.result }}' \
+            '${{ needs.frontend-safety.result }}' \
+            '${{ needs.hmv4-safety.result }}' \
+            '${{ needs.playwright-e2e.result }}' \
+            '${{ needs.security-light.result }}'; do
+            if [ "$result" = "failure" ] || [ "$result" = "cancelled" ]; then
+              bad=1
+            fi
+          done
+          if [ "$bad" -ne 0 ]; then
+            echo "FAIL: at least one Smart CI gate failed or was cancelled." >&2
+            exit 1
+          fi
+          echo "PASS: all running Smart CI gates passed."
