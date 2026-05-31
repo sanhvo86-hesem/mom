@@ -270,8 +270,13 @@ const shellCss = `/* ===========================================================
   --lego-shell-bd: var(--border, #e2e8f0);
   --lego-shell-sf: var(--bg-surface, #fff);
 }
-/* edge-to-edge: engine-rendered module pages drop the 24px orphan gutter */
-#content > .page[data-module]{ padding: var(--lego-shell-pad) !important; max-width: none !important; }
+/* edge-to-edge: engine-rendered module pages drop the 24px orphan gutter.
+   renderModuleFromSchema wraps the shell in .hm-runtime-design-stage, so match the
+   page that CONTAINS the blocks (descendant :has) and zero the stage's own 20px
+   pad — together they removed a 44px gutter. */
+#content > .page[data-module],
+#content > .page:has(.hm-blocks-container){ padding: var(--lego-shell-pad) !important; max-width: none !important; }
+.hm-runtime-design-stage{ padding: 0 !important; margin: 0 !important; }
 /* header: compact connected card */
 .hm-page-header{
   margin: 0 0 var(--lego-shell-gap) !important;
