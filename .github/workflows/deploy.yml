@@ -214,6 +214,15 @@ jobs:
         # _safeUrl hardening from regressing. Runs unconditionally.
         run: node tools/scripts/xss-regression.mjs
 
+      - name: Blocks facade dispatch + parity
+        # Loads 00bh-blocks-facade.js in a vm sandbox with stubbed BlockKit +
+        # HmBlockEngine and asserts the strangler seam: L3-published types route
+        # to BlockKit, everything else delegates to BE (catch-all), published L3
+        # wins key collisions, list/meta/coverage union both systems read-only,
+        # and BE-absent unknowns degrade to a comment (never throw). Guards the
+        # single render entry point from regressing. Runs unconditionally.
+        run: node tools/scripts/smoke-blocks-facade.mjs
+
       - name: ISO reference status check
         run: php mom/tools/release/check_iso_reference_status.php
 
