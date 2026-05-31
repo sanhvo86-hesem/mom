@@ -26,13 +26,12 @@ final class DomainCommandController extends BaseController
             $result = (new DomainCommandGateway(Connection::getInstance()))->dispatch($body);
             $this->success(['domain_command' => $result], !empty($result['replayed']) ? 200 : 202);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $problem = (new ProblemDetailsFactory())->fromThrowable(
                 $e,
                 (string)($body['correlation_id'] ?? $body['trace_id'] ?? '')
             );
-            $this->error((string)$problem['code'], (int)$problem['status'], (string)$problem['detail'], [
-                'problem' => $problem,
-            ]);
+            $this->problem($problem);
         }
     }
 
@@ -64,13 +63,12 @@ final class DomainCommandController extends BaseController
             );
             $this->success(['signature_challenge' => $challenge], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $problem = (new ProblemDetailsFactory())->fromThrowable(
                 $e,
                 (string)($body['correlation_id'] ?? $body['trace_id'] ?? '')
             );
-            $this->error((string)$problem['code'], (int)$problem['status'], (string)$problem['detail'], [
-                'problem' => $problem,
-            ]);
+            $this->problem($problem);
         }
     }
 
@@ -85,11 +83,25 @@ final class DomainCommandController extends BaseController
                 'signature_manifestations' => (new SignatureManifestationService(Connection::getInstance()))->forRecord($recordType, $recordId),
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $problem = (new ProblemDetailsFactory())->fromThrowable($e, '');
-            $this->error((string)$problem['code'], (int)$problem['status'], (string)$problem['detail'], [
-                'problem' => $problem,
-            ]);
+            $this->problem($problem);
         }
+    }
+
+    /**
+     * @param array<string,mixed> $problem
+     */
+    private function problem(array $problem): never
+    {
+        $encoded = json_encode($problem, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        if ($encoded === false) {
+            $encoded = '{"type":"urn:hesem:problem:domain-command:problem-encoding-failed","title":"Problem Encoding Failed","status":500,"detail":"Problem Details response could not be encoded.","code":"problem_encoding_failed"}';
+        }
+
+        $this->rawResponse($encoded, (int)($problem['status'] ?? 500), [
+            'Content-Type' => 'application/problem+json; charset=utf-8',
+        ]);
     }
 
     /**

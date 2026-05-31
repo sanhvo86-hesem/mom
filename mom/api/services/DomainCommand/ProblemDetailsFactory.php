@@ -40,8 +40,7 @@ final class ProblemDetailsFactory
     public function build(int $status, string $code, string $detail, array $details = [], string $traceId = ''): array
     {
         $type = 'urn:hesem:problem:domain-command:' . strtolower(str_replace('_', '-', $code));
-
-        return [
+        $problem = [
             'type' => $type,
             'title' => $this->title($code),
             'status' => $status,
@@ -50,6 +49,12 @@ final class ProblemDetailsFactory
             'trace_id' => $traceId,
             'details' => $details,
         ];
+
+        if ($traceId !== '') {
+            $problem['instance'] = 'urn:hesem:trace:' . rawurlencode($traceId);
+        }
+
+        return $problem;
     }
 
     private function title(string $code): string
