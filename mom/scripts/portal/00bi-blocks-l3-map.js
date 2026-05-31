@@ -60,9 +60,19 @@
     // future faithful pairs flip in here after Chrome sign-off
   };
 
-  /* preferL3 default OFF — production unchanged until a block is flipped. */
-  if (typeof Blocks.preferL3 === 'undefined') Blocks.preferL3 = false;
+  /* Per-block opt-in (NOT a global switch) so each block is flipped after its
+     own Chrome before/after sign-off. A key set true here renders through its
+     L3 equivalent everywhere; absent/false keeps the engine renderer.
+     kpi-row → kpi.grid: approved 2026-05-31 (label-on-top, tone-colored values,
+     left-aligned o3-kpi). */
+  Blocks.l3Enabled = Object.assign({ 'kpi-row': true }, Blocks.l3Enabled || {});
   Blocks._equivalence = EQUIVALENCE;
+
+  function isFlipped(type) {
+    return !!(Blocks.l3Enabled && Blocks.l3Enabled[type]
+      && EQUIVALENCE[type] && Blocks.source(EQUIVALENCE[type].l3) === 'blockkit');
+  }
+  Blocks.isFlipped = isFlipped;
 
   /* List which dashed keys CAN be served by L3 (have a faithful adapter +
      a published L3 block right now). Drives the flip checklist. */
@@ -75,18 +85,25 @@
     return out;
   };
 
-  /* Wrap render: when preferL3 is on and a faithful published L3 equivalent
-     exists, adapt the engine payload and render through the L3 block. */
+  /* Adapt an engine payload to L3 slots for a flipped type (used by the facade
+     wrap below AND by the engine's per-block dispatch hook in
+     00-block-engine.js, which is what makes the flip take effect in real
+     modules — they render through the engine, not through window.Blocks). */
+  Blocks.renderL3 = function (type, config, data) {
+    var e = EQUIVALENCE[type];
+    if (!e || Blocks.source(e.l3) !== 'blockkit') return null;
+    try { return global.BlockKit.render(e.l3, e.adapt(config || {}, data || {})); }
+    catch (err) { return null; } // caller falls back to the engine renderer
+  };
+
+  /* Wrap the facade render too, for callers that use window.Blocks directly. */
   var baseRender = Blocks.render.bind(Blocks);
   Blocks.render = function (type, payload, ctx) {
-    if (Blocks.preferL3) {
-      var e = EQUIVALENCE[type];
-      if (e && Blocks.source(e.l3) === 'blockkit') {
-        var config = (payload && payload.config) ? payload.config : (payload || {});
-        var data = (payload && payload.data) ? payload.data : {};
-        try { return baseRender(e.l3, e.adapt(config, data), ctx); }
-        catch (err) { return baseRender(type, payload, ctx); } // never worse than engine
-      }
+    if (isFlipped(type)) {
+      var config = (payload && payload.config) ? payload.config : (payload || {});
+      var data = (payload && payload.data) ? payload.data : {};
+      var out = Blocks.renderL3(type, config, data);
+      if (out != null) return out;
     }
     return baseRender(type, payload, ctx);
   };
