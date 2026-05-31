@@ -9663,8 +9663,8 @@ function renderBreadcrumb(config, data){
   var html = '<nav class="hm-breadcrumb" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13px" aria-label="breadcrumb">';
   rows.forEach(function(item, i){
     var last = i === rows.length - 1;
-    if(i > 0) html += '<span style="color:var(--text-tertiary)">/</span>';
-    html += '<span style="color:'+(last ? 'var(--text-primary);font-weight:700' : 'var(--brand-2,#2563eb)')+'">'+_esc(_scLabel(item, i))+'</span>';
+    if(i > 0) html += '<span aria-hidden="true" style="color:var(--text-tertiary)">/</span>';
+    html += '<span'+(last ? ' aria-current="page"' : '')+' style="color:'+(last ? 'var(--text-primary);font-weight:700' : 'var(--brand-2,#2563eb)')+'">'+_esc(_scLabel(item, i))+'</span>';
   });
   html += '</nav>';
   return html;
@@ -9674,20 +9674,20 @@ function renderBreadcrumb(config, data){
 function renderStepper(config, data){
   var rows = _scRows(config, data);
   if(!rows.length) return '<div class="hm-empty">'+_t('Không có dữ liệu','No data')+'</div>';
-  var html = '<div class="hm-stepper" style="display:flex;flex-wrap:wrap;align-items:flex-start">';
+  var html = '<ol class="hm-stepper" role="list" style="display:flex;flex-wrap:wrap;align-items:flex-start;margin:0;padding:0;list-style:none">';
   rows.forEach(function(item, i){
     var st = String(item.state || 'todo').toLowerCase();
     var done = st === 'done' || st === 'complete' || st === 'completed';
     var active = st === 'active' || st === 'current';
     var color = done ? 'var(--green,#16a34a)' : active ? 'var(--brand-2,#2563eb)' : 'var(--gray-300,#cbd5e1)';
     var fg = (done || active) ? 'var(--text-inverse,#fff)' : 'var(--text-secondary)';
-    html += '<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:90px;position:relative">';
+    html += '<li'+(active ? ' aria-current="step"' : '')+' style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:90px;position:relative">';
     if(i > 0) html += '<div style="position:absolute;top:14px;left:-50%;width:100%;height:2px;background:'+((done || active) ? 'var(--brand-2,#2563eb)' : 'var(--gray-200,#e2e8f0)')+';z-index:0"></div>';
     html += '<div style="position:relative;z-index:1;width:28px;height:28px;border-radius:50%;background:'+color+';color:'+fg+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">'+(done ? '✓' : (i + 1))+'</div>';
     html += '<div style="font-size:12px;color:'+(active ? 'var(--text-primary);font-weight:700' : 'var(--text-secondary)')+';margin-top:6px;text-align:center">'+_esc(_scLabel(item, i))+'</div>';
-    html += '</div>';
+    html += '</li>';
   });
-  html += '</div>';
+  html += '</ol>';
   return html;
 }
 
@@ -9698,7 +9698,7 @@ function renderNavPills(config, data){
   var html = '<div class="hm-nav-pills" style="display:flex;flex-wrap:wrap;gap:var(--space-2,8px)">';
   rows.forEach(function(item, i){
     var active = !!item.active;
-    html += '<button type="button" class="hm-btn" style="height:var(--o3-control-h-standard,32px);border-radius:999px;padding:0 14px;border:1px solid '+(active ? 'var(--brand-2,#2563eb)' : 'var(--border,#e2e8f0)')+';background:'+(active ? 'var(--brand-2,#2563eb)' : 'var(--bg-surface,#fff)')+';color:'+(active ? 'var(--text-inverse,#fff)' : 'var(--text-secondary)')+';font-size:13px;font-weight:600">';
+    html += '<button type="button" class="hm-btn" aria-pressed="'+(active ? 'true' : 'false')+'" style="height:var(--o3-control-h-standard,32px);border-radius:999px;padding:0 14px;border:1px solid '+(active ? 'var(--brand-2,#2563eb)' : 'var(--border,#e2e8f0)')+';background:'+(active ? 'var(--brand-2,#2563eb)' : 'var(--bg-surface,#fff)')+';color:'+(active ? 'var(--text-inverse,#fff)' : 'var(--text-secondary)')+';font-size:13px;font-weight:600">';
     html += _esc(_scLabel(item, i));
     if(item.count != null) html += ' <span style="opacity:.8">('+_esc(_fmt(_chartNumber(item.count)))+')</span>';
     html += '</button>';

@@ -20,6 +20,8 @@
      + one card radius govern the whole UI. Loaded AFTER all other
      stylesheets so its !important overrides win. -->
 <link rel="stylesheet" href="./styles/master-density.css?v=20260531-mm31">
+<!-- Lego Foundation: OKLCH-derived token layer (additive, namespaced --lego-*, @layer governed) -->
+<link rel="stylesheet" href="./styles/lego-foundation.css?v=20260531lf1">
 <link rel="stylesheet" href="./styles/quality-exception.css">
 <link rel="stylesheet" href="./styles/supplier-quality.css">
 <link rel="stylesheet" href="./styles/quoting.css">
@@ -356,6 +358,8 @@
 <script>if(window.HmTheme) HmTheme.init();</script>
 <script charset="UTF-8" src="./scripts/portal/00ba-graphics-governance-service.js?v=20260413c"></script>
 <script charset="UTF-8" src="./scripts/portal/00bb-graphics-authority.js?v=20260418a"></script>
+<!-- Lego runtime theming engine: one brand seed -> OKLCH-derived palette, live + reversible -->
+<script charset="UTF-8" src="./scripts/portal/00bg-lego-theme.js?v=20260531lf1"></script>
 <!-- L3 Block Registry runtime SSOT (web-served; data/config/*.json is 403) -->
 <script charset="UTF-8" src="./scripts/portal/00bc-block-registry.js?v=20260530bk1"></script>
 <!-- L3 Block Registry renderer (Lego-SSOT): window.BlockKit.render(blockKey, slots) -->
