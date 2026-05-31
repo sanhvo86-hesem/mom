@@ -1349,8 +1349,18 @@ function getNextParam(){
   }catch(e){}
 }
 
+const KERNELIZED_API_ACTIONS = new Set([
+  'admin_users_list',
+  'admin_user_upsert',
+  'admin_user_delete',
+  'admin_user_reset_password',
+  'role_perms_get',
+  'admin_role_perms_save',
+]);
+
 async function apiCall(action, payload=null, method='POST', timeoutMs=45000){
-  let url = 'api.php?action=' + encodeURIComponent(action);
+  const routeBase = KERNELIZED_API_ACTIONS.has(String(action || '')) ? 'api/index.php' : 'api.php';
+  let url = routeBase + '?action=' + encodeURIComponent(action);
   const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
   const opts = {method, credentials:'include', headers:{}};
   if(controller) opts.signal = controller.signal;

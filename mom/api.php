@@ -15774,6 +15774,23 @@ $authz_kernel_check = static function (string $perm, array $context = []) use (&
     ], 403);
 };
 
+$kernelized_actions = [
+    'admin_users_list',
+    'admin_user_upsert',
+    'admin_user_delete',
+    'admin_user_reset_password',
+    'role_perms_get',
+    'admin_role_perms_save',
+];
+if (in_array($action, $kernelized_actions, true)) {
+    api_json([
+        'ok' => false,
+        'error' => 'legacy_path_disabled',
+        'action' => $action,
+        'hint' => 'Use the MVC API router for this kernelized action.',
+    ], 410);
+}
+
 switch ($action) {
   case 'status': {
     $logged = false;
