@@ -65,10 +65,11 @@
    carried a chunky 16px radius — flatten it to 0 so the outer frame reads as
    'removed' (flush, edge-to-edge). Inner panels keep the refined --lego-block-radius
    and the uniform --lego-frame gaps. */
-.admin-panel{ border-radius: 0 !important; }
+.admin-panel,
+.admin-nav-panel{ border-radius: 0 !important; }
 #admin-content.admin-panel{ margin: 0 !important; padding: var(--lego-frame) !important; }
 /* Synchronize EVERY admin gap to the single frame token: the outer page gutter
    (was 24px) and the 2-column nav↔content grid gap (was 16px) now both equal the
    inner 8px — one uniform rhythm across the whole admin. */
 #content > #page-admin.page{ padding: var(--lego-frame) !important; }
-.admin-console-shell{ gap: var(--lego-frame) !important; }
+.admin-console-shell{ gap: 0 !important; }
