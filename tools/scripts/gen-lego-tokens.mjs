@@ -324,6 +324,11 @@ const shellCss = `/* ===========================================================
    and the uniform --lego-frame gaps. */
 .admin-panel{ border-radius: 0 !important; }
 #admin-content.admin-panel{ margin: 0 !important; padding: var(--lego-frame) !important; }
+/* Synchronize EVERY admin gap to the single frame token: the outer page gutter
+   (was 24px) and the 2-column nav↔content grid gap (was 16px) now both equal the
+   inner 8px — one uniform rhythm across the whole admin. */
+#content > #page-admin.page{ padding: var(--lego-frame) !important; }
+.admin-console-shell{ gap: var(--lego-frame) !important; }
 `;
 
 const jsonOut = JSON.stringify(compiled, null, 2) + '\n';
