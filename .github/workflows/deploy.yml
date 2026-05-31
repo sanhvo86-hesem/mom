@@ -199,6 +199,13 @@ jobs:
         # cannot ship. Runs unconditionally (frontend-only changesets).
         run: php mom/tools/release/check_graphics_archetype_registry.php
 
+      - name: Lego Foundation token drift gate
+        # Ensures mom/styles/lego-foundation.css + tokens/lego.tokens.generated.json
+        # stay in sync with the DTCG source tokens/lego.tokens.json (source-sha256 +
+        # best-effort node --check). A stale or hand-edited generated artifact blocks
+        # deploy. Runs unconditionally (frontend-only changesets).
+        run: php mom/tools/release/check_lego_tokens.php
+
       - name: ISO reference status check
         run: php mom/tools/release/check_iso_reference_status.php
 
