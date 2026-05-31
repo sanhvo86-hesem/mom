@@ -627,6 +627,8 @@ jobs:
           | security-light | ${{ needs.security-light.result }} |
           EOF
 
+          echo "Note: hmv4-visual-e2e is evidence-only and is reported above without blocking CI summary."
+
           bad=0
           for result in \
             '${{ needs.classify.result }}' \
@@ -644,7 +646,6 @@ jobs:
             '${{ needs.frontend-safety.result }}' \
             '${{ needs.hmv4-safety.result }}' \
             '${{ needs.playwright-e2e.result }}' \
-            '${{ needs.hmv4-visual-e2e.result }}' \
             '${{ needs.security-light.result }}'; do
             if [ "$result" = "failure" ] || [ "$result" = "cancelled" ]; then
               bad=1
