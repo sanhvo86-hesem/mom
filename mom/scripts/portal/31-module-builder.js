@@ -1452,6 +1452,7 @@ function _createBlankModule(){
     version: 1,
     createdBy: (typeof currentUser!=='undefined' && currentUser) ? currentUser.username : 'admin',
     createdAt: new Date().toISOString(),
+    config: { theme: 'hesem-default' },
     tabs: tabs
   };
 
@@ -18835,6 +18836,108 @@ if(window.__HM_MODULE_BUILDER_ULTRA_PATCH_R13__ !== '2026-04-08-r13-glass-comman
     runtimeThemeExport:function(schema){ return _r15RuntimeThemeExport(schema || {}); },
     recommendBlockDesign:function(block, schema){ return _r15RecommendBlockDesign(block || {}, _r15ResolvedRuntimeDesign(schema || {})); },
     normalizeHtml:function(html, previewOnly){ return _r15NormalizeHtml(html, !!previewOnly); }
+  };
+})();
+
+/* ── Round 16: Lego Theme picker — canonical module-level theme selector ─────
+   Exposes window.LegoTheme's 6 presets as the SINGLE module theme. Persists to
+   schema.config.theme; the render chokepoint (00-block-engine R14 wrapper)
+   applies it scoped to the module stage. Deliberately NOT a new theme engine —
+   it reuses LegoTheme (OKLCH + master density/radius/frame tokens) so there is
+   one authority. The legacy R15 runtimeDesign presets remain for now and are
+   slated for reconciliation in the SSOT bridge (Phase 2.2). Injected post-paint
+   as a real DOM node to stay independent of the 14-round render decorator chain
+   and the HTML normalizer. */
+(function(){
+  if(typeof _paint !== 'function') return;
+
+  function LT(){ return (typeof window !== 'undefined') ? window.LegoTheme : null; }
+  function themeList(){
+    var lt = LT();
+    if(lt && typeof lt.listThemes === 'function'){ try { return lt.listThemes() || []; } catch(_e){} }
+    return [];
+  }
+  function curKey(){
+    return (state.schema && state.schema.config && state.schema.config.theme) || 'hesem-default';
+  }
+  function setKey(key){
+    if(!state.schema) return;
+    if(!state.schema.config || typeof state.schema.config !== 'object') state.schema.config = {};
+    state.schema.config.theme = key;
+    try { if(typeof _saveBuilderSnapshotLocal === 'function') _saveBuilderSnapshotLocal(); } catch(_e){}
+  }
+  function applyToPreviewStage(key){
+    var lt = LT();
+    if(!lt || typeof lt.applyTheme !== 'function' || !state.container) return;
+    var stage = state.container.querySelector('.hm-runtime-design-stage');
+    if(stage){ try { lt.applyTheme(key, { scope: stage }); } catch(_e){} }
+  }
+
+  function ensureBar(){
+    if(!state.container || state.step !== 'build' || !state.schema) return;
+    var list = themeList();
+    if(!list.length) return;
+    if(state.container.querySelector('.mb-r16-theme-bar')) return; // re-built each paint
+
+    var bar = document.createElement('div');
+    bar.className = 'mb-r16-theme-bar';
+    bar.style.cssText = 'display:flex;align-items:center;gap:var(--o3-space,8px);'
+      + 'margin:0 0 var(--o3-space,8px);padding:var(--o3-space,8px) var(--o3-space-section,12px);'
+      + 'background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);'
+      + 'border-radius:var(--o3-radius-card,8px)';
+
+    var label = document.createElement('span');
+    label.textContent = (typeof _t === 'function')
+      ? _t('🎨 Giao diện (Lego Theme)', '🎨 Theme (Lego)') : '🎨 Theme';
+    label.style.cssText = 'font-size:var(--text-xs,12px);font-weight:var(--font-bold,700);'
+      + 'color:var(--text-secondary);white-space:nowrap';
+
+    var sel = document.createElement('select');
+    sel.className = 'mb-r16-theme-select';
+    sel.setAttribute('aria-label', (typeof _t === 'function')
+      ? _t('Chọn giao diện module', 'Select module theme') : 'Select module theme');
+    sel.style.cssText = 'height:var(--o3-control-h-standard,32px);'
+      + 'border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius,4px);'
+      + 'background:var(--bg-surface,#fff);color:var(--text-primary,#0f172a);'
+      + 'padding:0 var(--o3-space,8px);font-size:var(--text-sm,13px);cursor:pointer';
+
+    var cur = curKey();
+    list.forEach(function(t){
+      var o = document.createElement('option');
+      o.value = t.key;
+      o.textContent = (t.label && (t.label.vi || t.label.en)) || t.key;
+      if(t.key === cur) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener('change', function(){
+      setKey(sel.value);
+      applyToPreviewStage(sel.value);
+    });
+
+    var hint = document.createElement('span');
+    hint.textContent = (typeof _t === 'function')
+      ? _t('Áp dụng khi Xem trước / chạy module', 'Applied in Preview / at runtime') : '';
+    hint.style.cssText = 'font-size:var(--text-xs,12px);color:var(--text-tertiary,#94a3b8);'
+      + 'margin-left:auto;white-space:nowrap';
+
+    bar.appendChild(label);
+    bar.appendChild(sel);
+    bar.appendChild(hint);
+    state.container.insertBefore(bar, state.container.firstChild);
+  }
+
+  var _r16PrevPaint = _paint;
+  _paint = function(){
+    var r = _r16PrevPaint.apply(this, arguments);
+    try { ensureBar(); } catch(_e){}
+    return r;
+  };
+
+  window.__HM_MB_R16_TEST__ = {
+    version: '2026-05-31-r16-lego-theme-picker',
+    themeKeys: function(){ return themeList().map(function(t){ return t.key; }); },
+    currentTheme: function(){ return curKey(); },
+    setTheme: function(k){ setKey(k); return curKey(); }
   };
 })();
 

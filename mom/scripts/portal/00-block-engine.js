@@ -14037,6 +14037,22 @@ Object.assign(window.HmBlockEngine, {
     });
   }
 
+  /* Canonical module-level theme: schema.config.theme is a window.LegoTheme
+     preset key (hesem-default, industrial-dense, comfortable, shop-floor,
+     violet, slate). Applied SCOPED to the module stage so brand + master
+     density/radius/frame ripple only inside this surface. This is the single
+     place every module render (builder Preview + runtime) passes through, so
+     it is the SSOT application point — no parallel per-module theme engine. */
+  function _r14ApplyLegoTheme(stage, schema){
+    if(!stage || typeof window === 'undefined') return;
+    var LT = window.LegoTheme;
+    if(!LT || typeof LT.applyTheme !== 'function') return;
+    var cfg = schema && schema.config;
+    var key = (cfg && typeof cfg.theme === 'string') ? cfg.theme : '';
+    if(!key) return;
+    try { LT.applyTheme(key, { scope: stage }); } catch(_e){}
+  }
+
   renderModuleFromSchema = function(container, schema, options){
     var host, vars, result;
     _r14EnsureRuntimeDesignStyle();
@@ -14045,6 +14061,7 @@ Object.assign(window.HmBlockEngine, {
     _r14ApplyStage(host.stage, vars);
     result = _r14PrevRenderModuleFromSchema(host.inner, schema, options);
     _r14ApplyBlockDesign(host.stage, schema || {});
+    _r14ApplyLegoTheme(host.stage, schema || {});
     return result;
   };
   BE.renderModuleFromSchema = renderModuleFromSchema;
