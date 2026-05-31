@@ -540,7 +540,7 @@ final class DesignTokenCatalogService
                  (preset_key, display_name_en, display_name_vi, brand, density_px, radius_outer_px,
                   radius_inner_px, control_h_px, frame_px, overrides, scope_type, scope_id, base_ref,
                   status, sort_order, created_by, updated_at)
-             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15,$16,NOW())
+             VALUES (?,?,?,?,?,?,?,?,?,?::jsonb,?,?,?,?,?,?,NOW())
              ON CONFLICT (preset_key) DO UPDATE SET
                  display_name_en = EXCLUDED.display_name_en,
                  display_name_vi = EXCLUDED.display_name_vi,
@@ -565,8 +565,8 @@ final class DesignTokenCatalogService
         // single org-default invariant
         if ($p['is_default']) {
             try {
-                $this->data->execute('UPDATE graphics_theme_preset SET is_default = FALSE WHERE preset_key <> $1', $this->pgParams([$p['preset_key']]));
-                $this->data->execute('UPDATE graphics_theme_preset SET is_default = TRUE  WHERE preset_key = $1', $this->pgParams([$p['preset_key']]));
+                $this->data->execute('UPDATE graphics_theme_preset SET is_default = FALSE WHERE preset_key <> ?', $this->pgParams([$p['preset_key']]));
+                $this->data->execute('UPDATE graphics_theme_preset SET is_default = TRUE  WHERE preset_key = ?', $this->pgParams([$p['preset_key']]));
             } catch (Throwable $e) {
                 // best-effort
             }
@@ -581,17 +581,19 @@ final class DesignTokenCatalogService
             throw new \RuntimeException('theme preset delete requires a Postgres data mode');
         }
         $this->data->execute(
-            'DELETE FROM graphics_theme_preset WHERE preset_key = $1 AND is_builtin = FALSE',
+            'DELETE FROM graphics_theme_preset WHERE preset_key = ? AND is_builtin = FALSE',
             $this->pgParams([$presetKey])
         );
         return ['deleted' => $presetKey];
     }
 
     /**
-     * Re-key a positional value list to 1-based ($1,$2,…) because
-     * Connection::executeStatement binds by array key and PDO_PGSQL requires
-     * 1-based positions for $N placeholders (a 0-indexed array triggers
-     * "bindValue(): Argument #1 must be >= 1").
+     * Re-key a positional value list to 1-based because
+     * Connection::executeStatement binds each value via bindValue($key,…) and
+     * PDO (native prepares, EMULATE_PREPARES=false) requires 1-based positions
+     * for `?` placeholders — a 0-indexed array triggers
+     * "bindValue(): Argument #1 must be >= 1". NB: use `?` placeholders, not
+     * Postgres `$N` (PDO does not register $N as bindable, so they bind NULL).
      * @param array<int, mixed> $values
      * @return array<int, mixed>
      */
