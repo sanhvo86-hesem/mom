@@ -5199,6 +5199,16 @@ function _renderBlockInner(block, data, state, reactiveCtx){
     blockCtx.filters = (state && state.filterValues) || reactiveCtx.filters || {};
     try { resolvedConfig = _resolveBindings(config, blockCtx); } catch(e){ resolvedConfig = config; }
   }
+  /* Lego SSOT strangler (Phase 2.2 Stage 2): route a flipped block type through
+     its curated L3 BlockKit equivalent. Per-block opt-in via
+     window.Blocks.l3Enabled (OFF by default); the adapter converts engine
+     config/data → L3 slots. renderL3 returns null on any miss, so this is never
+     worse than the engine renderer. This is THE point every module render passes
+     through, so flipping one key changes that block everywhere consistently. */
+  if(typeof window !== 'undefined' && window.Blocks && window.Blocks.isFlipped && window.Blocks.isFlipped(block.type)){
+    var _l3 = window.Blocks.renderL3(block.type, resolvedConfig, data || {});
+    if(_l3 != null) return _l3;
+  }
   if(block.type === 'action-status-flow') renderType = 'action-status-flow';
   if(block.type === 'chart-line') renderType = 'chart-line';
   if(block.type === 'chart-area') renderType = 'chart-area';

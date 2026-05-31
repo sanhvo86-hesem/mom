@@ -54,10 +54,14 @@ const failures = [];
 function check(name, cond) { if (!cond) failures.push(name); }
 
 check('map layer attached', !!(Blocks && Blocks._equivalence && Blocks._equivalence['kpi-row']));
-check('preferL3 defaults OFF', Blocks.preferL3 === false);
+check('kpi-row flipped ON by default (approved)', Blocks.l3Enabled && Blocks.l3Enabled['kpi-row'] === true);
+check('isFlipped(kpi-row) true', Blocks.isFlipped('kpi-row') === true);
+check('isFlipped(unmapped) false', Blocks.isFlipped('data-table') === false);
 
-/* OFF → passes through to engine */
+/* per-block OFF → passes through to engine (set the key off) */
+Blocks.l3Enabled = {};
 check('OFF: kpi-row → engine', Blocks.render('kpi-row', { config: { items: [] } }) === 'ENGINE:kpi-row');
+Blocks.l3Enabled = { 'kpi-row': true }; // restore approved default for the rest
 
 /* l3Candidates lists the faithful published pair */
 const cands = Blocks.l3Candidates();
@@ -81,14 +85,17 @@ check('adapter negative trend → danger', adapted.tiles[1].tone === 'danger' &&
 check('adapter default value when no data', adapted.tiles[2].value === '7');
 check('adapter label resolves {vi,en} and labelEn', adapted.tiles[0].label === 'OEE' && adapted.tiles[2].label === 'Open');
 
-/* ON → routes through L3 with adapted slots */
-Blocks.preferL3 = true;
+/* ON (kpi-row flipped) → routes through L3 with adapted slots */
 const onOut = Blocks.render('kpi-row', { config: cfg, data: data });
 check('ON: kpi-row routes to L3 kpi.grid', onOut.indexOf('L3:kpi.grid:') === 0);
 check('ON: adapted slots reach L3', onOut.indexOf('"value":"92%"') >= 0 && onOut.indexOf('"tone":"success"') >= 0);
 
-/* ON but unmapped type still goes to engine */
-check('ON: unmapped type → engine', Blocks.render('data-table', { config: {} }) === 'ENGINE:data-table');
+/* renderL3 direct (used by the engine hook) */
+check('renderL3 produces L3 for kpi-row', (Blocks.renderL3('kpi-row', cfg, data) || '').indexOf('L3:kpi.grid:') === 0);
+check('renderL3 null for unmapped', Blocks.renderL3('data-table', {}, {}) === null);
+
+/* unmapped type still goes to engine */
+check('unmapped type → engine', Blocks.render('data-table', { config: {} }) === 'ENGINE:data-table');
 
 /* failing adapter degrades to engine (never worse) */
 Blocks._equivalence['kpi-row'].adapt = function () { throw new Error('boom'); };
