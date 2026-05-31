@@ -17768,23 +17768,37 @@ if(window.__HM_MODULE_BUILDER_ULTRA_PATCH_R13__ !== '2026-04-08-r13-glass-comman
       try { root.insertBefore(shell, anchor); } catch(_e){}
     }
 
-    /* 2) fold the meta-studio into a collapsed <details>, once per paint. */
-    if(studio && studio.parentNode === root && !root.querySelector('.mb-r17-adv')){
-      var det = document.createElement('details');
-      det.className = 'mb-r17-adv';
-      det.open = !!state._r17AdvOpen;
-      det.style.cssText = 'margin-top:var(--o3-space,8px);border:1px solid var(--border,#e2e8f0);'
-        + 'border-radius:var(--o3-radius-card,8px);background:var(--bg-surface,#fff);overflow:hidden';
-      var sum = document.createElement('summary');
-      sum.textContent = (typeof _t === 'function')
-        ? _t('🎨 Thiết kế nâng cao — preset · đồ hoạ runtime', '🎨 Advanced design — presets · runtime graphics')
-        : 'Advanced design';
-      sum.style.cssText = 'cursor:pointer;list-style:none;padding:var(--o3-space,8px) var(--o3-space-section,12px);'
-        + 'font-weight:var(--font-bold,700);font-size:var(--text-sm,13px);color:var(--text-secondary);user-select:none';
-      det.addEventListener('toggle', function(){ state._r17AdvOpen = det.open; });
-      root.insertBefore(det, studio);
-      det.appendChild(sum);
-      det.appendChild(studio);
+    /* 2) fold EVERY meta-design scaffolding block into ONE collapsed <details>
+       at the end of the root, after the canvas. This catches the R14/15 "Runtime
+       Preset Studio" (a root child) AND the R7 "Experience Director" shell
+       (.mb-r7-shell), which renders as a page-level sibling of .mb-ultra-root and
+       was previously left leading the view with its design self-scores + glass
+       chips. Collect fresh each paint (the markup is rebuilt every paint). */
+    var scaffolding = [];
+    if(studio && studio.parentNode === root) scaffolding.push(studio);
+    var extra = state.container.querySelectorAll('.mb-r7-shell, .mb-r15-studio, .mb-r14-studio');
+    for(i = 0; i < extra.length; i++){ if(scaffolding.indexOf(extra[i]) === -1) scaffolding.push(extra[i]); }
+    if(scaffolding.length){
+      var det = root.querySelector('.mb-r17-adv');
+      if(!det){
+        det = document.createElement('details');
+        det.className = 'mb-r17-adv';
+        det.open = !!state._r17AdvOpen;
+        det.style.cssText = 'margin-top:var(--o3-space,8px);border:1px solid var(--border,#e2e8f0);'
+          + 'border-radius:var(--o3-radius-card,8px);background:var(--bg-surface,#fff);overflow:hidden';
+        var sum = document.createElement('summary');
+        sum.textContent = (typeof _t === 'function')
+          ? _t('🎨 Thiết kế nâng cao — preset · đồ hoạ runtime (tuỳ chọn)', '🎨 Advanced design — presets · runtime graphics (optional)')
+          : 'Advanced design';
+        sum.style.cssText = 'cursor:pointer;list-style:none;padding:var(--o3-space,8px) var(--o3-space-section,12px);'
+          + 'font-weight:var(--font-bold,700);font-size:var(--text-sm,13px);color:var(--text-secondary);user-select:none';
+        det.addEventListener('toggle', function(){ state._r17AdvOpen = det.open; });
+        det.appendChild(sum);
+        root.appendChild(det); // after the canvas — workspace leads
+      }
+      scaffolding.forEach(function(node){
+        if(node && node.parentNode !== det){ try { det.appendChild(node); } catch(_e){} }
+      });
     }
   }
 
