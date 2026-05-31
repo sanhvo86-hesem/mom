@@ -1,0 +1,456 @@
+{
+  "schema_version": "mda.v4.runtime_scenario_library.v1",
+  "runtime_mode": "transaction_sandbox_real_gateway",
+  "mock_only": false,
+  "scenario_count_policy": "blocker_complete",
+  "scenarios": [
+    {
+      "scenario_id": "V4-SIM-058-001",
+      "title": "StartJob missing machine evidence blocks before track-in",
+      "tags": ["P58", "P0", "readiness", "mes", "real_gateway"],
+      "p0_blockers": ["P0-RESOURCE-READINESS-NOT-WIRED", "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"],
+      "fixture": {
+        "readiness_missing_keys": ["machine_pm"],
+        "tooling_blocked": false
+      },
+      "command_envelope": {
+        "command_name": "StartJobCommand",
+        "idempotency_key": "p58-startjob-missing-machine",
+        "actor_id": "operator-1",
+        "actor_roles": ["production_operator"],
+        "actor_permissions": ["production.job.start"],
+        "reauth_at": "AUTO_NOW",
+        "payload": {
+          "work_order_ref": "WO-P58-001",
+          "job_number": "WO-P58-001",
+          "operation_seq": "10",
+          "equipment_id": "MILL-P58",
+          "tool_id": "TOOL-P58",
+          "item_id": "ITEM-P58"
+        }
+      },
+      "expected_acceptance": false,
+      "expected_problem_code": "resource_readiness_blocked",
+      "must_write_sql_contains": ["INSERT INTO resource_readiness_snapshot", "INSERT INTO audit_events"],
+      "must_not_write_sql_contains": ["INSERT INTO mes_job_execution"],
+      "must_emit_audit": true,
+      "must_emit_outbox": false
+    },
+    {
+      "scenario_id": "V4-SIM-058-002",
+      "title": "OQC failure creates canonical hold, quality order, NCR, audit and outbox",
+      "tags": ["P58", "P0", "quality", "eqms", "uom", "e-sign", "real_gateway"],
+      "p0_blockers": ["P0-QUALITY-HOLD-FRAGMENTATION", "P0-AUDIT-EVIDENCE-ESIGN-NOT-WIRED", "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"],
+      "signature_meaning": "inspection_result_record",
+      "fixture": {
+        "readiness_missing_keys": [],
+        "gage_blocked": false,
+        "qc_unit_code": "MM"
+      },
+      "command_envelope": {
+        "command_name": "RecordInspectionResultCommand",
+        "idempotency_key": "p58-oqc-fail",
+        "actor_id": "qa-1",
+        "actor_roles": ["quality_inspector"],
+        "actor_permissions": ["quality.inspection.record"],
+        "reauth_at": "AUTO_NOW",
+        "payload": {
+          "inspection_id": "INSP-P58-002",
+          "inspection_stage": "oqc",
+          "work_order_ref": "WO-P58-002",
+          "operation_seq": "30",
+          "item_id": "ITEM-P58",
+          "lot_number": "LOT-P58-OQC",
+          "shipment_id": "SHIP-P58",
+          "actual_value": "12.7",
+          "measurement_unit": "MM",
+          "passed": false,
+          "gage_id": "GAGE-P58",
+          "defect_code": "DIMENSION_OOS",
+          "severity": "critical"
+        }
+      },
+      "expected_acceptance": true,
+      "must_write_sql_contains": ["INSERT INTO quality_inspection_result_runtime", "INSERT INTO quality_hold", "INSERT INTO quality_nonconformance_runtime", "INSERT INTO domain_outbox_events"],
+      "must_emit_audit": true,
+      "must_emit_outbox": true,
+      "must_write_evidence": true
+    },
+    {
+      "scenario_id": "V4-SIM-058-003",
+      "title": "Duplicate material issue replays idempotently and writes one inventory ledger row",
+      "tags": ["P58", "P0", "inventory", "idempotency", "uom", "real_gateway"],
+      "p0_blockers": ["P0-INVENTORY-BALANCE-DIRECT-MUTATION", "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"],
+      "repeat": 2,
+      "fixture": {
+        "readiness_missing_keys": [],
+        "active_quality_hold": false
+      },
+      "command_envelope": {
+        "command_name": "IssueMaterialToWorkOrderCommand",
+        "idempotency_key": "p58-material-issue-duplicate",
+        "actor_id": "operator-1",
+        "actor_roles": ["inventory_clerk"],
+        "actor_permissions": ["inventory.material.issue"],
+        "reauth_at": "AUTO_NOW",
+        "payload": {
+          "work_order_ref": "WO-P58-003",
+          "item_id": "ITEM-P58",
+          "item_site_id": "ITEMSITE-P58",
+          "warehouse_id": "WH-P58",
+          "lot_number": "LOT-P58-003",
+          "issue_quantity": "2",
+          "material_uom": "BOX",
+          "trace_required": true
+        }
+      },
+      "expected_acceptance": true,
+      "must_write_sql_contains": ["INSERT INTO inventory_ledger", "INSERT INTO genealogy_edge_facts", "INSERT INTO domain_outbox_events"],
+      "must_not_write_sql_contains": ["UPDATE inventory_balance", "INSERT INTO inventory_balance"],
+      "exact_write_counts": {
+        "INSERT INTO inventory_ledger": 1
+      },
+      "expected_replay_count": 1,
+      "expected_operation_count": 1,
+      "must_emit_audit": true,
+      "must_emit_outbox": true
+    },
+    {
+      "scenario_id": "V4-SIM-058-004",
+      "title": "AI actor cannot release a governed engineering package",
+      "tags": ["P58", "P0", "security", "ai_governance", "real_gateway"],
+      "p0_blockers": ["P0-AI-GOVERNED-ACTION-ESCAPE", "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"],
+      "fixture": {},
+      "command_envelope": {
+        "command_name": "ReleaseEngineeringReleasePackageCommand",
+        "idempotency_key": "p58-ai-release-denied",
+        "actor_id": "ai:mda-agent",
+        "actor_type": "ai",
+        "actor_roles": ["admin"],
+        "actor_permissions": ["engineering.package.release"],
+        "reauth_at": "AUTO_NOW",
+        "payload": {
+          "package_id": "11111111-1111-4111-8111-111111111111"
+        }
+      },
+      "expected_acceptance": false,
+      "expected_problem_code": "ai_governed_action_forbidden",
+      "must_write_sql_contains": ["INSERT INTO audit_events"],
+      "must_not_write_sql_contains": ["UPDATE engineering_release_package"],
+      "must_emit_audit": true
+    },
+    {
+      "scenario_id": "V4-SIM-058-005",
+      "title": "Regulated quality hold release without signature meaning is blocked",
+      "tags": ["P58", "P0", "e-sign", "audit", "quality", "real_gateway"],
+      "p0_blockers": ["P0-AUDIT-EVIDENCE-ESIGN-NOT-WIRED", "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"],
+      "fixture": {
+        "active_quality_hold": true
+      },
+      "command_envelope": {
+        "command_name": "ReleaseQualityHoldCommand",
+        "idempotency_key": "p58-esign-missing-meaning",
+        "actor_id": "qa-manager-1",
+        "actor_roles": ["quality_manager"],
+        "actor_permissions": ["quality.hold.release"],
+        "reauth_at": "AUTO_NOW",
+        "signature_evidence": {
+          "auth_challenge_id": "challenge-p58",
+          "auth_method": "password_mfa",
+          "auth_result_hash_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "signer_ref": "qa-manager-1",
+          "signer_identity_snapshot": {
+            "signer_ref": "qa-manager-1",
+            "display_name": "QA Manager",
+            "source": "scenario_fixture"
+          },
+          "signature_manifestation": "Signed by QA Manager.",
+          "signed_payload_hash_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "displayed_record_hash_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "payload": {
+          "hold_number": "QH-P58-ACTIVE",
+          "release_reason": "MRB disposition accepted."
+        }
+      },
+      "expected_acceptance": false,
+      "expected_problem_code": "signature_meaning_required",
+      "must_write_sql_contains": ["INSERT INTO audit_events"],
+      "must_not_write_sql_contains": ["UPDATE quality_hold"],
+      "must_emit_audit": true
+    },
+    {
+      "scenario_id": "V4-SIM-058-006",
+      "title": "Valid work-order release binds released engineering package snapshot hash",
+      "tags": ["P58", "P0", "engineering", "work_order", "e-sign", "real_gateway"],
+      "p0_blockers": ["P0-ENGINEERING-PACKAGE-NOT-LIVE-GATED", "P0-AUDIT-EVIDENCE-ESIGN-NOT-WIRED", "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"],
+      "signature_meaning": "work_order_release",
+      "fixture": {
+        "manifest_hash_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "engineering_package_status": "released"
+      },
+      "command_envelope": {
+        "command_name": "ReleaseWorkOrderCommand",
+        "idempotency_key": "p58-wo-release-valid",
+        "actor_id": "prod-manager-1",
+        "actor_roles": ["production_director"],
+        "actor_permissions": ["production.work_order.release"],
+        "reauth_at": "AUTO_NOW",
+        "payload": {
+          "work_order_ref": "WO-P58-006",
+          "package_id": "11111111-1111-4111-8111-111111111111",
+          "package_manifest_hash_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      },
+      "expected_acceptance": true,
+      "must_write_sql_contains": ["INSERT INTO work_order_engineering_package_snapshot", "UPDATE work_orders", "INSERT INTO domain_outbox_events"],
+      "must_emit_audit": true,
+      "must_emit_outbox": true,
+      "must_write_evidence": true
+    },
+    {
+      "scenario_id": "V4-SIM-058-007",
+      "title": "Fallback read telemetry produces cutover no-go while command stack still runs",
+      "tags": ["P58", "P0", "telemetry", "cutover", "inventory", "real_gateway"],
+      "p0_blockers": ["P0-POSTGRES-ONLY-WITHOUT-RESTORE-DRILL", "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"],
+      "fixture": {},
+      "telemetry_metrics": [
+        {
+          "name": "hesem.mda.fallback.read.total",
+          "value": 1,
+          "dimensions": {
+            "command.name": "ReceiveInventoryCommand",
+            "command.outcome": "fallback_probe"
+          }
+        }
+      ],
+      "command_envelope": {
+        "command_name": "ReceiveInventoryCommand",
+        "idempotency_key": "p58-fallback-telemetry",
+        "actor_id": "warehouse-1",
+        "actor_roles": ["inventory_clerk"],
+        "actor_permissions": ["inventory.receive"],
+        "reauth_at": "AUTO_NOW",
+        "payload": {
+          "receipt_id": "RCV-P58-007",
+          "item_id": "ITEM-P58",
+          "item_site_id": "ITEMSITE-P58",
+          "warehouse_id": "WH-P58",
+          "lot_number": "LOT-P58-007",
+          "received_quantity": "1",
+          "supplier_uom": "BOX",
+          "trace_required": true
+        }
+      },
+      "expected_acceptance": true,
+      "must_write_sql_contains": ["INSERT INTO inventory_ledger", "INSERT INTO domain_outbox_events"],
+      "must_emit_audit": true,
+      "must_emit_outbox": true
+    },
+    {
+      "scenario_id": "V4-SIM-058-008",
+      "title": "Invalid command API payload returns Problem Details before mutation",
+      "tags": ["P58", "P0", "api_contract", "problem_details", "real_gateway"],
+      "p0_blockers": ["P0-MISSING-DOMAIN-COMMAND-HANDLER", "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"],
+      "fixture": {},
+      "command_envelope": {
+        "idempotency_key": "p58-invalid-payload",
+        "actor_id": "api-user-1",
+        "actor_roles": ["admin"],
+        "payload": {
+          "work_order_ref": "WO-P58-008"
+        }
+      },
+      "expected_acceptance": false,
+      "expected_problem_code": "command_name_required",
+      "must_not_write_sql_contains": ["INSERT INTO audit_events", "INSERT INTO domain_outbox_events"]
+    },
+    {
+      "scenario_id": "V4-SIM-058-009",
+      "title": "Missing UOM item policy blocks material issue before ledger write",
+      "tags": ["P58", "P0", "uom", "inventory", "real_gateway"],
+      "p0_blockers": ["P0-UOM-AUTHORITY-AMBIGUITY", "P0-INVENTORY-BALANCE-DIRECT-MUTATION", "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"],
+      "fixture": {
+        "uom_policy_missing": true
+      },
+      "command_envelope": {
+        "command_name": "IssueMaterialToWorkOrderCommand",
+        "idempotency_key": "p58-uom-policy-missing",
+        "actor_id": "operator-1",
+        "actor_roles": ["inventory_clerk"],
+        "actor_permissions": ["inventory.material.issue"],
+        "reauth_at": "AUTO_NOW",
+        "payload": {
+          "work_order_ref": "WO-P58-009",
+          "item_id": "ITEM-NO-UOM",
+          "item_site_id": "ITEMSITE-P58",
+          "warehouse_id": "WH-P58",
+          "lot_number": "LOT-P58-009",
+          "issue_quantity": "1",
+          "material_uom": "BOX"
+        }
+      },
+      "expected_acceptance": false,
+      "expected_problem_code": "uom_authority_resolution_failed",
+      "must_not_write_sql_contains": ["INSERT INTO inventory_ledger"],
+      "must_emit_audit": false
+    },
+    {
+      "scenario_id": "V4-SIM-058-010",
+      "title": "Canonical quality hold blocks inventory move before ledger write",
+      "tags": ["P58", "P0", "quality", "inventory", "real_gateway"],
+      "p0_blockers": ["P0-QUALITY-HOLD-FRAGMENTATION", "P0-INVENTORY-BALANCE-DIRECT-MUTATION", "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"],
+      "fixture": {
+        "active_quality_hold": true
+      },
+      "command_envelope": {
+        "command_name": "MoveInventoryCommand",
+        "idempotency_key": "p58-quality-hold-move",
+        "actor_id": "warehouse-1",
+        "actor_roles": ["inventory_clerk"],
+        "actor_permissions": ["inventory.move"],
+        "reauth_at": "AUTO_NOW",
+        "payload": {
+          "item_id": "ITEM-P58",
+          "item_site_id": "ITEMSITE-P58",
+          "warehouse_id": "WH-A",
+          "to_warehouse_id": "WH-B",
+          "lot_number": "LOT-HOLD",
+          "move_quantity": "5",
+          "inventory_uom": "PCS"
+        }
+      },
+      "expected_acceptance": false,
+      "expected_problem_code": "quality_hold_active",
+      "must_write_sql_contains": ["INSERT INTO resource_readiness_evidence_state", "INSERT INTO audit_events"],
+      "must_not_write_sql_contains": ["INSERT INTO inventory_ledger"],
+      "must_emit_audit": true
+    },
+    {
+      "scenario_id": "V4-SIM-058-011",
+      "title": "Receive inventory appends ledger and genealogy without direct balance mutation",
+      "tags": ["P58", "P0", "inventory", "genealogy", "uom", "real_gateway"],
+      "p0_blockers": ["P0-INVENTORY-BALANCE-DIRECT-MUTATION", "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"],
+      "fixture": {},
+      "command_envelope": {
+        "command_name": "ReceiveInventoryCommand",
+        "idempotency_key": "p58-receive-ledger-only",
+        "actor_id": "warehouse-1",
+        "actor_roles": ["inventory_clerk"],
+        "actor_permissions": ["inventory.receive"],
+        "reauth_at": "AUTO_NOW",
+        "payload": {
+          "receipt_id": "RCV-P58-011",
+          "supplier_ref": "SUP-P58",
+          "item_id": "ITEM-P58",
+          "item_site_id": "ITEMSITE-P58",
+          "warehouse_id": "WH-P58",
+          "lot_number": "LOT-P58-011",
+          "received_quantity": "3",
+          "supplier_uom": "BOX",
+          "trace_required": true
+        }
+      },
+      "expected_acceptance": true,
+      "must_write_sql_contains": ["INSERT INTO inventory_ledger", "INSERT INTO genealogy_edge_facts", "INSERT INTO domain_outbox_events"],
+      "must_not_write_sql_contains": ["UPDATE inventory_balance", "INSERT INTO inventory_balance"],
+      "must_emit_audit": true,
+      "must_emit_outbox": true
+    },
+    {
+      "scenario_id": "V4-SIM-058-012",
+      "title": "Blocked tooling state prevents tool load before MES life event",
+      "tags": ["P58", "P0", "tooling", "readiness", "real_gateway"],
+      "p0_blockers": ["P0-RESOURCE-READINESS-NOT-WIRED", "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"],
+      "fixture": {
+        "tooling_blocked": true
+      },
+      "command_envelope": {
+        "command_name": "LoadToolCommand",
+        "idempotency_key": "p58-tooling-blocked",
+        "actor_id": "operator-1",
+        "actor_roles": ["production_operator"],
+        "actor_permissions": ["tooling.load"],
+        "reauth_at": "AUTO_NOW",
+        "payload": {
+          "work_order_ref": "WO-P58-012",
+          "operation_seq": "20",
+          "equipment_id": "MILL-P58",
+          "tool_id": "TOOL-P58"
+        }
+      },
+      "expected_acceptance": false,
+      "expected_problem_code": "tooling_runtime_blocked",
+      "must_write_sql_contains": ["INSERT INTO resource_readiness_evidence_state", "INSERT INTO audit_events"],
+      "must_not_write_sql_contains": ["INSERT INTO mes_tool_life_events"],
+      "must_emit_audit": true
+    },
+    {
+      "scenario_id": "V4-SIM-058-013",
+      "title": "Expired gage blocks inspection result before quality result write",
+      "tags": ["P58", "P0", "gage", "quality", "e-sign", "real_gateway"],
+      "p0_blockers": ["P0-RESOURCE-READINESS-NOT-WIRED", "P0-AUDIT-EVIDENCE-ESIGN-NOT-WIRED", "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"],
+      "signature_meaning": "inspection_result_record",
+      "fixture": {
+        "gage_blocked": true
+      },
+      "command_envelope": {
+        "command_name": "RecordInspectionResultCommand",
+        "idempotency_key": "p58-gage-blocked",
+        "actor_id": "qa-1",
+        "actor_roles": ["quality_inspector"],
+        "actor_permissions": ["quality.inspection.record"],
+        "reauth_at": "AUTO_NOW",
+        "payload": {
+          "inspection_id": "INSP-P58-013",
+          "inspection_stage": "ipqc",
+          "work_order_ref": "WO-P58-013",
+          "operation_seq": "10",
+          "item_id": "ITEM-P58",
+          "actual_value": "10",
+          "measurement_unit": "MM",
+          "passed": true,
+          "gage_id": "GAGE-P58"
+        }
+      },
+      "expected_acceptance": false,
+      "expected_problem_code": "gage_runtime_blocked",
+      "must_write_sql_contains": ["INSERT INTO signature_events", "INSERT INTO resource_readiness_evidence_state", "INSERT INTO audit_events"],
+      "must_not_write_sql_contains": ["INSERT INTO quality_inspection_result_runtime"],
+      "must_emit_audit": true
+    },
+    {
+      "scenario_id": "V4-SIM-058-014",
+      "title": "Closed inventory period blocks direct ledger post before ledger append",
+      "tags": ["P58", "P0", "inventory", "e-sign", "period_close", "real_gateway"],
+      "p0_blockers": ["P0-INVENTORY-BALANCE-DIRECT-MUTATION", "P0-AUDIT-EVIDENCE-ESIGN-NOT-WIRED", "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"],
+      "signature_meaning": "inventory_ledger_post",
+      "fixture": {
+        "inventory_period_closed": true
+      },
+      "command_envelope": {
+        "command_name": "PostInventoryLedgerTransactionCommand",
+        "idempotency_key": "p58-period-closed-ledger-post",
+        "actor_id": "inventory-controller-1",
+        "actor_roles": ["inventory_controller"],
+        "actor_permissions": ["inventory.ledger.post"],
+        "reauth_at": "AUTO_NOW",
+        "payload": {
+          "period_code": "2026-05-01",
+          "item_id": "ITEM-P58",
+          "item_site_id": "ITEMSITE-P58",
+          "warehouse_id": "WH-P58",
+          "lot_number": "LOT-P58-014",
+          "quantity_delta": "1",
+          "inventory_uom": "PCS",
+          "movement_type": "manual_adjustment"
+        }
+      },
+      "expected_acceptance": false,
+      "expected_problem_code": "inventory_period_closed",
+      "must_write_sql_contains": ["INSERT INTO signature_events", "INSERT INTO audit_events"],
+      "must_not_write_sql_contains": ["INSERT INTO inventory_ledger"],
+      "must_emit_audit": true
+    }
+  ]
+}

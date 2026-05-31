@@ -1,0 +1,7 @@
+gap_id,severity,status,closure_evidence,next_owner,next_action
+P58-STATIC-SCENARIO-RUNNER,P0,CLOSED,"MdaRuntimeScenarioRunner dispatches 14 scenarios through DomainCommandGateway; runner probe passed 14/14",P59,"Consume dashboard for cutover/restore/browser smoke"
+P58-MOCK-ONLY-ACCEPTANCE,P0,CLOSED,"Scenario library has mock_only=false and integrity guard rejects mock_only scenarios",P59,"Keep scenario acceptance tied to gateway execution"
+P58-MISSING-DB-AUDIT-OUTBOX-ASSERTIONS,P0,CLOSED,"ScenarioAssertionEngine checks SQL writes, forbidden writes, audit, outbox, evidence and idempotency counts",P59,"Add restore/browser assertions"
+P58-UOM-RUNTIME-SCENARIO,P0,CLOSED,"UOM policy missing and valid UOM conversion scenarios run through UomRuntimeAuthorityService via UomCommandQuantityNormalizer",P59,"Keep UOM bridge out of command stack"
+P58-FALLBACK-CUTOVER-NOGO,P0,CONTROLLED_OPEN,"V4-SIM-058-007 intentionally injects fallback telemetry; dashboard cutover_decision=NO_GO_CUTOVER_FALLBACK_READ_PRESENT",P59,"Run clean cutover rehearsal and require fallback_read_total=0"
+P58-HTTP-BROWSER-MODE,P1,CONTROLLED_OPEN,"P58 direct gateway runner implemented; HTTP/browser smoke explicitly deferred to P60 per prompt sequence",P60,"Deploy and verify browser/operator smoke"

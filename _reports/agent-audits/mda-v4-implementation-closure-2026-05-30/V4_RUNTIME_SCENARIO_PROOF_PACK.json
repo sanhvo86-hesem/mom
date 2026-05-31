@@ -1,0 +1,68 @@
+{
+  "prompt": "P58",
+  "decision_token": "P58_PASS_READY_FOR_NEXT",
+  "posture": "pre-production runtime-readiness evidence, not production validation",
+  "runner": {
+    "class": "MOM\\Api\\Services\\Scenario\\MdaRuntimeScenarioRunner",
+    "gateway_mode": "direct_domain_command_gateway",
+    "runtime_mode": "transaction_sandbox_real_gateway",
+    "mock_only": false,
+    "scenario_library": "mom/data/registry/mda-v4-runtime-scenarios.json",
+    "dashboard": "mom/data/registry/mda-v4-runtime-scenario-dashboard.latest.json"
+  },
+  "latest_probe": {
+    "command": "php mom/tools/release/run_mda_runtime_scenarios.php",
+    "exit_code": 0,
+    "decision": "P58_PASS_READY_FOR_NEXT",
+    "scenario_total": 14,
+    "passed": 14,
+    "failed": 0,
+    "cutover_decision": "NO_GO_CUTOVER_FALLBACK_READ_PRESENT"
+  },
+  "coverage": {
+    "required_prompt_scenarios": [
+      "V4-SIM-058-001",
+      "V4-SIM-058-002",
+      "V4-SIM-058-003",
+      "V4-SIM-058-004",
+      "V4-SIM-058-005",
+      "V4-SIM-058-006",
+      "V4-SIM-058-007",
+      "V4-SIM-058-008"
+    ],
+    "additional_blocker_scenarios": [
+      "V4-SIM-058-009",
+      "V4-SIM-058-010",
+      "V4-SIM-058-011",
+      "V4-SIM-058-012",
+      "V4-SIM-058-013",
+      "V4-SIM-058-014"
+    ],
+    "p0_blockers_covered": [
+      "P0-RESOURCE-READINESS-NOT-WIRED",
+      "P0-QUALITY-HOLD-FRAGMENTATION",
+      "P0-INVENTORY-BALANCE-DIRECT-MUTATION",
+      "P0-UOM-AUTHORITY-AMBIGUITY",
+      "P0-AI-GOVERNED-ACTION-ESCAPE",
+      "P0-AUDIT-EVIDENCE-ESIGN-NOT-WIRED",
+      "P0-ENGINEERING-PACKAGE-NOT-LIVE-GATED",
+      "P0-MISSING-DOMAIN-COMMAND-HANDLER",
+      "P0-POSTGRES-ONLY-WITHOUT-RESTORE-DRILL",
+      "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"
+    ]
+  },
+  "validation": {
+    "php_lint": "PASS",
+    "scenario_runner": "PASS",
+    "json_parse": "PASS",
+    "ai_index_regeneration": "PASS",
+    "composer_test": "BLOCKED_VENDOR_PHPUNIT_MISSING",
+    "composer_analyse": "BLOCKED_VENDOR_PHPSTAN_MISSING",
+    "composer_check": "BLOCKED_VENDOR_PHPSTAN_MISSING"
+  },
+  "uom_authority": {
+    "runtime_adapter": "MOM\\Api\\Services\\DomainCommand\\UomCommandQuantityNormalizer",
+    "authority": "MOM\\Api\\Services\\Uom\\UomRuntimeAuthorityService",
+    "bridge_used": false
+  }
+}
