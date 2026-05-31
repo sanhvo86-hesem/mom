@@ -53,6 +53,8 @@ final class RuntimeAuthorityServiceTest extends TestCase
         $this->assertSame('authority_partial', $report['slices']['connected_governance']['readiness_state']);
         $this->assertSame('authority_partial', $report['slices']['planning_scenario']['readiness_state']);
         $this->assertSame('compatibility_only', $report['slices']['traceability_genealogy']['readiness_state']);
+        $this->assertSame('authoritative_ready', $report['slices']['uom_runtime_authority']['readiness_state']);
+        $this->assertTrue($report['slices']['uom_runtime_authority']['no_bridge_runtime_contract']);
         $this->assertSame('json_fallback', $report['slices']['order_workflow']['authority_mode']);
         $this->assertSame('json_fallback', $report['slices']['master_data']['authority_mode']);
         $this->assertSame('json_fallback', $report['slices']['manufacturing_events']['authority_mode']);
@@ -63,6 +65,7 @@ final class RuntimeAuthorityServiceTest extends TestCase
         $this->assertSame('json_fallback', $report['slices']['connected_governance']['authority_mode']);
         $this->assertSame('json_fallback', $report['slices']['planning_scenario']['authority_mode']);
         $this->assertSame('event_ledger_traceability_read_model', $report['slices']['traceability_genealogy']['authority_mode']);
+        $this->assertSame('postgres_primary_domain_command', $report['slices']['uom_runtime_authority']['authority_mode']);
     }
 
     public function testReportMarksExpectedPostgresIdempotencyFallbackAsDegraded(): void

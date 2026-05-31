@@ -12,11 +12,16 @@
     "domain_command_uom_measurement"
   ],
   "legacy_bridge_used_by_new_runtime_paths": false,
+  "legacy_bridge_removed_from_runtime_source": true,
   "code_changes": [
     "mom/database/migrations/269_uom_domain_command_runtime_authority.sql",
+    "mom/database/migrations/274_uom_direct_authority_system_registry.sql",
     "mom/api/services/DomainCommand/UomCommandQuantityNormalizer.php",
+    "mom/api/services/Uom/UomRuntimeAuthorityService.php",
     "mom/api/services/DomainCommand/MesRuntimeCommandHandler.php",
     "mom/api/services/DomainCommand/DomainCommandGateway.php",
+    "mom/api/services/RuntimeAuthorityService.php",
+    "mom/data/registry/mda-uom-direct-authority-system.json",
     "mom/tests/Unit/Services/DomainCommandUomRuntimeAuthorityTest.php"
   ],
   "manual_probe": {
@@ -41,12 +46,10 @@
     "P46-BLOCK-CMD-005"
   ],
   "controlled_gaps": [
-    "ReceiveInventoryCommand has direct UOM policy but no live command handler yet.",
-    "PutawayInventoryCommand has direct UOM policy but no live command handler yet.",
     "CostRollupCommand has direct UOM policy but no live command handler yet.",
     "ShipmentPackCommand has direct UOM policy but no live command handler yet.",
     "ToolPresetMeasurementCommand has direct UOM policy but no live command handler yet.",
-    "Alias ambiguity and rule lifecycle hardening remain UOM-internal branch work."
+    "Historical bridge staging reports are superseded by the direct authority registry and runtime report slice."
   ],
   "validation": {
     "php_lint": "PASS for new/modified PHP files",

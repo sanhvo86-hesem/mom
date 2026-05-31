@@ -158,7 +158,7 @@ Blocked:
 | Mobile UX lead | Operator sees opaque failure | P1 | Exception carries operator message and gate context |
 | Quality lead | Caller could disable qualification on release readiness | P0 | `require_qualification` is unset/ignored |
 | Inventory controller | Receipt/shipment commands are not wired yet | P0 | Keep open for P49/P54 |
-| UOM owner | MDA must not fork UOM logic | P0 | MDA only calls `MdaUomAuthorityBridge` to existing UOM services |
+| UOM owner | MDA must not fork UOM logic | P0 | MDA calls `UomRuntimeAuthorityService` directly through `UomCommandQuantityNormalizer`; `MdaUomAuthorityBridge` is removed from runtime source |
 | Security red-team | `require_*` nested under evidence could bypass policy | P0 | Resolver recursively rejects caller `require_*` in payload; evidence builder ignores evidence keys starting `require_` |
 | SRE | Policy table outage could allow work to proceed | P0 | Policy lookup failure returns `authority_lookup_failed` |
 | Migration lead | New migration number could collide | P1 | Prefix `265` is new; historical duplicates remain unrelated |

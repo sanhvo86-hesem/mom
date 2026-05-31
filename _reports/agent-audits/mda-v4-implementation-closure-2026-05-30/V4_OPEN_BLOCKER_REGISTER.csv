@@ -1,6 +1,6 @@
 blocker_id,severity,root,status,current_evidence,repair_owner_prompt,proof_required
 P0-MASTERDATA-COMPATIBILITY-ONLY,P0,Item/ItemRevision,open,"MasterDataService JsonMasterDataRepository reports compatibility_only JSON primary",P45,"PostgreSQL repository is authority and JSON is compatibility bridge only"
-P0-UOM-AUTHORITY-AMBIGUITY,P0,Foundation/UOM,open,"UOM route and services exist but no mandatory domain command resolver proof",P46,"All governed measurement writes use canonical UOM resolver inside command transaction"
+P0-UOM-AUTHORITY-AMBIGUITY,P0,Foundation/UOM,closed,"UomRuntimeAuthorityService is called directly by GateContextBuilder and UomCommandQuantityNormalizer; domain_command_uom_measurement/audit/outbox proof exists; MdaUomAuthorityBridge removed from runtime source",P46/P54/UOM_DIRECT,"Keep future governed quantity commands on UomRuntimeAuthorityService and domain_command_uom_measurement"
 P0-GENERIC-CRUD-GOVERNED-MUTATION,P0,GenericCrudBoundary,open,"Generic CRUD hard-stop exists but registry-wide proof and OpenAPI deny markers missing",P44,"All governed roots blocked at HTTP service and registry with tests"
 P0-REQUIREMENT-RESOLVER-CALLER-PROVIDED,P0,EngineeringReleasePackage,open,"No RuntimeRequirementResolver proof in current branch",P47,"Server-side resolver ignores caller require_* flags and fails closed"
 P0-MISSING-DOMAIN-COMMAND-HANDLER,P0,Item/ItemRevision,open,"No MDA DomainCommandGateway or root command handlers found",P49,"Command gateway handles envelope idempotency transaction audit evidence outbox problem details"

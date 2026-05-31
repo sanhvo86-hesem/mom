@@ -188,6 +188,44 @@ final class UomRuntimeAuthorityService
     }
 
     /**
+     * Runtime posture for the platform authority report.
+     *
+     * This method intentionally avoids database reads. The command policies and
+     * command evidence table are the runtime contract; the command handlers
+     * prove DB reachability when they normalize and persist measurements.
+     *
+     * @return array<string,mixed>
+     */
+    public function probe(): array
+    {
+        $commands = array_keys(self::COMMAND_POLICIES);
+
+        return [
+            'slice' => 'uom_runtime_authority',
+            'readiness_state' => 'authoritative_ready',
+            'authority_mode' => 'postgres_primary_domain_command',
+            'authority' => self::AUTHORITY,
+            'mutation_authority' => self::class,
+            'command_adapter' => 'MOM\\Api\\Services\\DomainCommand\\UomCommandQuantityNormalizer',
+            'api_controller' => 'MOM\\Api\\Controllers\\UomController',
+            'evidence_table' => 'domain_command_uom_measurement',
+            'canonical_tables' => [
+                'uom_quantity_kind',
+                'uom_unit_catalog',
+                'uom_conversion_rule',
+                'uom_alias',
+                'uom_alias_quarantine',
+                'item_uom_policy',
+            ],
+            'command_policy_count' => count($commands),
+            'commands_requiring_uom_authority' => $commands,
+            'no_bridge_runtime_contract' => true,
+            'forbidden_runtime_class' => 'MOM\\Api\\Services\\MdaUomAuthorityBridge',
+            'legacy_bridge_used' => false,
+        ];
+    }
+
+    /**
      * Normalize a governed command quantity through the UOM runtime authority.
      *
      * @param array<string,mixed> $payload

@@ -17,7 +17,7 @@ before MES/quality mutation. The normalizer records immutable `domain_command_uo
 ## Source Truth Audit
 
 - Existing UOM authority remains in `mom/api/services/Uom/*`.
-- `MdaUomAuthorityBridge` is retained only as deprecated compatibility shim; no new runtime command path depends on it.
+- `MdaUomAuthorityBridge` has been removed from runtime source and tests; new runtime command paths must call `UomRuntimeAuthorityService` directly through `UomCommandQuantityNormalizer`.
 - New command transaction evidence table is `domain_command_uom_measurement`.
 - Live DomainCommandGateway handlers currently implemented for MES quantity paths are issue material, complete operation, and record inspection result.
 
@@ -41,6 +41,10 @@ Interpretation:
 - Added `mom/api/services/DomainCommand/UomCommandQuantityNormalizer.php`.
 - Updated `mom/api/services/DomainCommand/MesRuntimeCommandHandler.php`.
 - Updated `mom/api/services/DomainCommand/DomainCommandGateway.php`.
+- Added `mom/database/migrations/274_uom_direct_authority_system_registry.sql`.
+- Added `mom/data/registry/mda-uom-direct-authority-system.json`.
+- Added `RuntimeAuthorityService.slices.uom_runtime_authority`.
+- Removed `mom/api/services/MdaUomAuthorityBridge.php` and `mom/tests/Unit/Services/MdaUomAuthorityBridgeTest.php`.
 - Added `mom/tests/Unit/Services/DomainCommandUomRuntimeAuthorityTest.php`.
 - Updated UOM command matrix and P46 gap ledger away from bridge wording.
 
@@ -54,8 +58,8 @@ Closed:
 
 Controlled gaps:
 
-- Receive, putaway, cost rollup, shipment pack, and tool preset commands have direct UOM policies but no live DomainCommandGateway handler yet.
-- Alias ambiguity and conversion-rule lifecycle hardening remain UOM-internal work and should stay on the UOM branch to avoid multi-AI overwrite.
+- Cost rollup, shipment pack, and tool preset commands have direct UOM policies but no live DomainCommandGateway handler yet.
+- Some historical P46/P47 reports still describe the earlier bridge staging step; this report and `mda-uom-direct-authority-system.json` supersede that bridge plan.
 
 ## Decision Token
 

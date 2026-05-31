@@ -14,21 +14,24 @@
   "roots": [
     {
       "root": "Foundation/UOM",
-      "maturity_level": 4,
-      "runtime_claim_allowed": false,
+      "maturity_level": 5,
+      "runtime_claim_allowed": "pre_production_candidate",
       "evidence_paths": [
         "mom/database/migrations/214_uom_quantity_kind.sql",
         "mom/database/migrations/231_uom_v3_lifecycle_governance.sql",
+        "mom/database/migrations/269_uom_domain_command_runtime_authority.sql",
+        "mom/database/migrations/274_uom_direct_authority_system_registry.sql",
         "mom/api/controllers/UomController.php",
         "mom/api/routes/uom-routes.php",
         "mom/api/services/Uom/ConversionEngine.php",
+        "mom/api/services/Uom/UomRuntimeAuthorityService.php",
+        "mom/api/services/DomainCommand/UomCommandQuantityNormalizer.php",
+        "mom/data/registry/mda-uom-direct-authority-system.json",
         "mom/tests/Unit/Uom"
       ],
       "missing_proof": [
-        "mandatory command-chain use across governed measurement writes",
-        "UOM OpenAPI paths in mom/api/openapi.yaml",
-        "real command-stack scenario",
-        "outbox and telemetry proof"
+        "P58 real command-stack scenario dashboard still pending",
+        "live deploy/browser smoke still pending"
       ]
     },
     {

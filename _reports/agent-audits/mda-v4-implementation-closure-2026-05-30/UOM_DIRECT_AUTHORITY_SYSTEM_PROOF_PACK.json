@@ -1,0 +1,68 @@
+{
+  "prompt": "UOM_DIRECT_SYSTEM_CONSOLIDATION",
+  "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
+  "date": "2026-05-31",
+  "decision_token": "UOM_DIRECT_AUTHORITY_SYSTEM_CONSOLIDATED_READY_FOR_P58",
+  "runtime_authority": {
+    "service": "MOM\\Api\\Services\\Uom\\UomRuntimeAuthorityService",
+    "command_adapter": "MOM\\Api\\Services\\DomainCommand\\UomCommandQuantityNormalizer",
+    "evidence_table": "domain_command_uom_measurement",
+    "runtime_report_slice": "uom_runtime_authority",
+    "bridge_removed": true
+  },
+  "probe": {
+    "command": "php /private/tmp/uom_system_probe.php",
+    "exit_code": 0,
+    "output": {
+      "slice": "uom_runtime_authority",
+      "readiness_state": "authoritative_ready",
+      "authority_mode": "postgres_primary_domain_command",
+      "command_policy_count": 16,
+      "no_bridge_runtime_contract": true,
+      "bridge_file_exists": false,
+      "normalizer_uses_uom_runtime_authority": true,
+      "normalizer_uses_mda_bridge": false
+    }
+  },
+  "direct_command_probe": {
+    "command": "php /private/tmp/uom_direct_probe.php",
+    "exit_code": 0,
+    "output": {
+      "ok": {
+        "converted": "500.000000",
+        "target_unit": "PCS",
+        "measurement_id": "uom-measurement-1",
+        "mes_writes": 1
+      },
+      "blocked": [
+        "uom_authority_resolution_failed",
+        "UOM_POLICY_NOT_FOUND",
+        0
+      ]
+    }
+  },
+  "files_changed": [
+    "mom/api/services/Uom/UomRuntimeAuthorityService.php",
+    "mom/api/services/RuntimeAuthorityService.php",
+    "mom/database/migrations/274_uom_direct_authority_system_registry.sql",
+    "mom/data/registry/mda-uom-direct-authority-system.json",
+    "mom/data/registry/uom-domain-integration-contracts.json",
+    "mom/tests/Unit/Uom/UomDirectAuthoritySystemTest.php",
+    "mom/tests/Unit/Services/RuntimeAuthorityServiceTest.php",
+    "mom/api/services/MdaUomAuthorityBridge.php",
+    "mom/tests/Unit/Services/MdaUomAuthorityBridgeTest.php"
+  ],
+  "validation": {
+    "php_lint": "PASS for changed PHP files",
+    "json_validation": "PASS for changed registry/proof JSON files",
+    "direct_probe": "PASS",
+    "system_probe": "PASS",
+    "composer_test": "BLOCKED_MISSING_mom/vendor/bin/phpunit",
+    "composer_analyse": "BLOCKED_MISSING_mom/vendor/bin/phpstan"
+  },
+  "controlled_gaps": [
+    "CostRollupCommand, ShipmentPackCommand, and ToolPresetMeasurementCommand still need live command handlers before those policies become runtime exercised.",
+    "Full PHPUnit/PHPStan remains blocked by missing local Composer vendor binaries.",
+    "P58/P59 live scenario and browser/deploy verification remain pending."
+  ]
+}

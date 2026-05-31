@@ -6,7 +6,8 @@
     "canonical_unit_required": true,
     "alias_policy": "external/free-text aliases must resolve through uom_alias or uom_alias_quarantine",
     "ai_policy": "analytics and AI may consume normalized facts for advisory use only; they cannot override authoritative measurements",
-    "pricing_policy": "commercial price/currency truth must not be silently converted by UoM display policy"
+    "pricing_policy": "commercial price/currency truth must not be silently converted by UoM display policy",
+    "mda_runtime_integration": "MDA/MES/EQMS command paths call UomRuntimeAuthorityService directly through UomCommandQuantityNormalizer; MdaUomAuthorityBridge is not a runtime authority path."
   },
   "domain_roots": {
     "ITEM": {
@@ -14,8 +15,8 @@
       "authority_owner": "ItemUomPolicyService",
       "measurement_fields": ["base_inventory_unit", "purchase_unit_code", "sales_unit_code", "recipe_unit_code", "qc_unit_code"],
       "required_contract": "{magnitude, unit_code, quantity_kind} for item policies; MEASVAL for measured item facts",
-      "existing_evidence": ["mom/api/services/Uom/ItemUomPolicyService.php", "mom/api/controllers/UomController.php:/api/v1/uom/item-policy/{item_id}"],
-      "integration_status": "contract_defined"
+      "existing_evidence": ["mom/api/services/Uom/ItemUomPolicyService.php", "mom/api/controllers/UomController.php:/api/v1/uom/item-policy/{item_id}", "mom/api/services/Uom/UomRuntimeAuthorityService.php"],
+      "integration_status": "runtime_authority_wired"
     },
     "CUST": {
       "domain": "master_data/commercial_customer",
@@ -54,8 +55,8 @@
       "authority_owner": "supplier purchase order command path",
       "measurement_fields": ["ordered_quantity", "received_quantity", "supplier_uom", "inventory_unit"],
       "required_contract": "supplier quantity/uom normalized to inventory MEASVAL at receipt; original supplier value preserved",
-      "existing_evidence": ["mom/contracts/objects/procurement_supplier_quality--supplier-purchase-orders/contract.json", "mom/contracts/objects/procurement_supplier_quality--purchase-receipts/contract.json"],
-      "integration_status": "backlog_required"
+      "existing_evidence": ["mom/contracts/objects/procurement_supplier_quality--supplier-purchase-orders/contract.json", "mom/contracts/objects/procurement_supplier_quality--purchase-receipts/contract.json", "mom/api/services/DomainCommand/InventoryCommandHandler.php", "mom/api/services/DomainCommand/UomCommandQuantityNormalizer.php"],
+      "integration_status": "runtime_command_wired"
     },
     "IREV": {
       "domain": "procurement_supplier_quality/inventory_logistics",
@@ -78,24 +79,24 @@
       "authority_owner": "work order and recipe command path",
       "measurement_fields": ["planned_quantity", "recipe_quantity", "actual_consumption", "potency_adjusted_quantity"],
       "required_contract": "recipe and actuals require MEASVAL; potency scaling delegates to contextual conversion",
-      "existing_evidence": ["mom/contracts/objects/planning_production--work-orders/contract.json", "mom/api/services/Uom/PotencyContextualConverter.php"],
-      "integration_status": "backlog_required"
+      "existing_evidence": ["mom/contracts/objects/planning_production--work-orders/contract.json", "mom/api/services/Uom/PotencyContextualConverter.php", "mom/api/services/DomainCommand/MesRuntimeCommandHandler.php", "mom/api/services/DomainCommand/UomCommandQuantityNormalizer.php"],
+      "integration_status": "runtime_command_wired"
     },
     "LOT": {
       "domain": "traceability_serialization",
       "authority_owner": "lot genealogy command path",
       "measurement_fields": ["lot_quantity", "genealogy_edge_quantity", "yield_quantity"],
       "required_contract": "lot quantity facts require original and normalized drill-through",
-      "existing_evidence": ["mom/contracts/objects/traceability_serialization--lot-genealogy/contract.json", "mom/api/services/Traceability/GenealogyGraphService.php"],
-      "integration_status": "backlog_required"
+      "existing_evidence": ["mom/contracts/objects/traceability_serialization--lot-genealogy/contract.json", "mom/api/services/Traceability/GenealogyGraphService.php", "mom/api/services/DomainCommand/InventoryCommandHandler.php", "mom/database/migrations/269_uom_domain_command_runtime_authority.sql"],
+      "integration_status": "runtime_command_wired"
     },
     "INSP": {
       "domain": "quality_improvement/procurement_supplier_quality",
       "authority_owner": "inspection result command path",
       "measurement_fields": ["spec_nominal", "spec_tolerance", "device_reading", "measurement_values"],
       "required_contract": "inspection values require MEASVAL with original device unit and normalized spec unit",
-      "existing_evidence": ["mom/api/controllers/EqmsInspectionController.php", "mom/api/services/Uom/QualityMeasurementBridge.php"],
-      "integration_status": "bridge_exists_backlog_remains"
+      "existing_evidence": ["mom/api/services/DomainCommand/MesRuntimeCommandHandler.php", "mom/api/services/DomainCommand/QualityHoldService.php", "mom/api/services/DomainCommand/UomCommandQuantityNormalizer.php", "mom/database/migrations/269_uom_domain_command_runtime_authority.sql"],
+      "integration_status": "runtime_command_wired"
     },
     "NQCASE": {
       "domain": "quality_improvement",
