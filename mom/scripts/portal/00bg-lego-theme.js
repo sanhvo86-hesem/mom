@@ -151,6 +151,8 @@
     setVar(el, '--master-gap', v + 'px');
     return true;
   }
+  // INNER / control radius (cấp 2-3): buttons, inputs, chips, tree nodes.
+  // HESEM standard default = 4px. Bound to --o3-radius / --master-radius.
   function setRadius(px, opts) {
     var el = (opts && opts.scope) || document.documentElement;
     var v = parseInt(px, 10);
@@ -158,6 +160,19 @@
     setVar(el, '--lego-radius', v + 'px');
     setVar(el, '--o3-radius', v + 'px');
     setVar(el, '--master-radius', v + 'px');
+    return true;
+  }
+  // OUTER / container radius (cấp 1): cards, panels, KPI tiles, drawers, the
+  // shell frame. HESEM standard default = 8px. Bound to --o3-radius-card /
+  // --card-radius / --lego-block-radius. Kept distinct from the inner radius so
+  // the two-level rounding (8 outer / 4 inner) holds across every theme.
+  function setCardRadius(px, opts) {
+    var el = (opts && opts.scope) || document.documentElement;
+    var v = parseInt(px, 10);
+    if (!isFinite(v) || v < 0 || v > 40) return false;
+    setVar(el, '--lego-block-radius', v + 'px');
+    setVar(el, '--o3-radius-card', v + 'px');
+    setVar(el, '--card-radius', v + 'px');
     return true;
   }
   function setControlHeight(px, opts) {
@@ -213,20 +228,29 @@
     if(!t) return { ok:false, error:'unknown theme: ' + name };
     var r = applyBrand(t.brand, opts);
     if(t.density != null) setDensity(t.density, opts);
-    if(t.radius != null) setRadius(t.radius, opts);
+    if(t.radius != null){
+      // preset.radius is the OUTER/container radius (cấp 1). The INNER/control
+      // radius (cấp 2-3) is half of it, so the HESEM standard 8→4 holds for the
+      // default and the two-level distinction scales for every other preset.
+      var cardR = parseInt(t.radius, 10);
+      var ctrlR = (t.radiusInner != null) ? parseInt(t.radiusInner, 10) : Math.max(2, Math.round(cardR / 2));
+      setRadius(ctrlR, opts);
+      setCardRadius(cardR, opts);
+    }
     if(t.controlH != null) setControlHeight(t.controlH, opts);
     setLayout({ frame: t.frame != null ? t.frame : t.density, radius: t.radius }, opts);
     return { ok: !!(r && r.ok), theme:name, ramp: r && r.ramp };
   }
 
   global.LegoTheme = {
-    version: '1.1.0',
+    version: '1.2.0',
     themes: THEMES,
     listThemes: listThemes,
     applyTheme: applyTheme,
     applyBrand: applyBrand,
     setDensity: setDensity,
     setRadius: setRadius,
+    setCardRadius: setCardRadius,
     setControlHeight: setControlHeight,
     setLayout: setLayout,
     deriveRamp: deriveRamp,
