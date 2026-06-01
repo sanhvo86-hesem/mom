@@ -308,10 +308,13 @@ final class GraphicsQaGateRunner
     private function persistRow(string $rolloutId, ?string $simRunId, array $result): void
     {
         try {
+            // PDO (native prepares) rejects Postgres $N placeholders and binds a
+            // PHP bool to ''/'1' — use ? + 1-indexed params, and pass blocker as
+            // a 'true'/'false' text bound through ?::boolean.
             $this->data->execute(
                 'INSERT INTO graphics_qa_gate_result
                     (rollout_id, simulation_run_id, gate_id, gate_name, status, score, findings, blocker, evaluator, evidence_url)
-                 VALUES ($1,$2,$3,$4,$5,$6,COALESCE($7::jsonb,\'[]\'::jsonb),$8,$9,$10)
+                 VALUES (?,?,?,?,?,?,COALESCE(?::jsonb,\'[]\'::jsonb),?::boolean,?,?)
                  ON CONFLICT (rollout_id, gate_id) DO UPDATE SET
                     status       = EXCLUDED.status,
                     score        = EXCLUDED.score,
@@ -320,7 +323,7 @@ final class GraphicsQaGateRunner
                     evaluator    = EXCLUDED.evaluator,
                     evaluated_at = NOW(),
                     evidence_url = EXCLUDED.evidence_url',
-                [
+                array_combine(range(1, 10), [
                     $rolloutId,
                     $simRunId,
                     $result['gate_id'],
@@ -328,10 +331,10 @@ final class GraphicsQaGateRunner
                     $result['status'],
                     $result['score'],
                     json_encode($result['findings']),
-                    (bool)$result['blocker'],
+                    !empty($result['blocker']) ? 'true' : 'false',
                     $result['evaluator'],
                     $result['evidence_url'],
-                ]
+                ])
             );
         } catch (Throwable $e) {
             // Evidence trail: audit table not reachable; fall silent, caller
