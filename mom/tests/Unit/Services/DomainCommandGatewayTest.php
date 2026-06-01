@@ -30,22 +30,31 @@ final class DomainCommandGatewayTest extends TestCase
         ]);
     }
 
-    public function testRegisteredButUnimplementedCommandFailsClosed(): void
+    public function testCreateItemCommandExecutesImplementedHandler(): void
     {
-        $gateway = new DomainCommandGateway(new DomainCommandFakeConnection());
+        $connection = new DomainCommandFakeConnection();
+        $gateway = new DomainCommandGateway(
+            $connection,
+            new CommandRegistry(),
+            new DomainCommandFakeIdempotencyReplayRepository()
+        );
 
-        try {
-            $gateway->dispatch([
-                'command_name' => 'CreateItemCommand',
-                'idempotency_key' => 'idem-start-1',
-                'actor_id' => 'operator',
-                'actor_roles' => ['admin'],
-                'payload' => ['work_order_ref' => 'WO-1'],
-            ]);
-            $this->fail('Expected fail-closed unimplemented command.');
-        } catch (DomainCommandException $e) {
-            $this->assertSame('command_handler_not_runtime_complete', $e->problemCode);
-        }
+        $result = $gateway->dispatch([
+            'command_name' => 'CreateItemCommand',
+            'idempotency_key' => 'idem-item-1',
+            'actor_id' => 'planner',
+            'actor_roles' => ['admin'],
+            'payload' => [
+                'item_code' => 'ITEM-GPT-PRO-001',
+                'item_name' => 'GPT Pro Closure Item',
+                'item_type' => 'manufactured',
+            ],
+        ]);
+
+        $this->assertFalse($result['replayed']);
+        $handler = (array)($result['payload']['result'] ?? []);
+        $this->assertSame('ITEM-GPT-PRO-001', $handler['item_code'] ?? null);
+        $this->assertNotEmpty($connection->executeCalls);
     }
 
     public function testIdempotencyReplayReturnsStoredPayloadWithoutHandlerExecution(): void
@@ -96,17 +105,87 @@ final class DomainCommandGatewayTest extends TestCase
 
 final class DomainCommandFakeConnection extends Connection
 {
+    /** @var list<array{sql:string,params:array<string,mixed>}> */
+    public array $executeCalls = [];
+
     public function __construct() {}
+
+    public function transactional(callable $callback): mixed
+    {
+        return $callback();
+    }
+
+    public function insertReturning(string $sql, array $params = []): ?array
+    {
+        if (str_contains($sql, 'INSERT INTO item_revision')) {
+            return [
+                'item_revision_id' => 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+                'item_id' => (string)($params[':item_id'] ?? '11111111-1111-1111-1111-111111111111'),
+                'revision_code' => (string)($params[':revision_code'] ?? 'A'),
+                'lifecycle_state' => 'draft',
+                'approval_state' => 'draft',
+                'drawing_reference' => (string)($params[':drawing_reference'] ?? ''),
+                'effective_from' => '2026-06-01T00:00:00+00:00',
+            ];
+        }
+
+        if (str_contains($sql, 'UPDATE item_revision')) {
+            return [
+                'item_revision_id' => (string)($params[':item_revision_id'] ?? 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+                'item_id' => '11111111-1111-1111-1111-111111111111',
+                'revision_code' => 'A',
+                'lifecycle_state' => 'released',
+                'approval_state' => 'approved',
+                'drawing_reference' => '',
+                'effective_from' => '2026-06-01T00:00:00+00:00',
+            ];
+        }
+
+        if (str_contains($sql, 'INSERT INTO item')) {
+            return [
+                'item_id' => '11111111-1111-1111-1111-111111111111',
+                'item_code' => (string)($params[':item_code'] ?? ''),
+                'item_name' => (string)($params[':item_name'] ?? ''),
+                'item_type' => (string)($params[':item_type'] ?? ''),
+                'base_uom_code' => (string)($params[':base_uom_code'] ?? ''),
+                'product_family_code' => (string)($params[':product_family_code'] ?? ''),
+                'status_code' => 'active',
+            ];
+        }
+
+        return null;
+    }
 
     public function queryOne(string $sql, array $params = []): ?array
     {
-        unset($sql, $params);
+        unset($params);
+        if (str_contains($sql, 'FROM item WHERE')) {
+            return [
+                'item_id' => '11111111-1111-1111-1111-111111111111',
+                'item_code' => 'ITEM-GPT-PRO-001',
+                'item_name' => 'GPT Pro Closure Item',
+                'item_type' => 'manufactured',
+                'base_uom_code' => '',
+                'status_code' => 'active',
+            ];
+        }
+        if (str_contains($sql, 'FROM item_revision')) {
+            return [
+                'item_revision_id' => 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+                'item_id' => '11111111-1111-1111-1111-111111111111',
+                'revision_code' => 'A',
+                'lifecycle_state' => 'draft',
+                'approval_state' => 'draft',
+                'drawing_reference' => '',
+                'effective_from' => '2026-06-01T00:00:00+00:00',
+            ];
+        }
         return ['created_by' => 'originator'];
     }
 
     public function execute(string $sql, array $params = []): int
     {
-        unset($sql, $params);
+        $this->executeCalls[] = ['sql' => $sql, 'params' => $params];
         return 1;
     }
 }
