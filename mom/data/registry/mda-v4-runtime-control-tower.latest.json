@@ -1,0 +1,205 @@
+{
+    "generated_at": "2026-06-01T15:51:17+00:00",
+    "status": "pre_production_candidate",
+    "metric_totals": {
+        "hesem.mda.command.outcome.total": 0,
+        "hesem.mda.idempotency.replay.total": 0,
+        "hesem.mda.idempotency.conflict.total": 0,
+        "hesem.mda.readiness.blocker.total": 0,
+        "hesem.mda.quality_hold.blocker.total": 0,
+        "hesem.mda.inventory.reconciliation.mismatch.total": 0,
+        "hesem.mda.uom.failure.total": 0,
+        "hesem.mda.fallback.read.total": 0,
+        "hesem.mda.drift.count": 0,
+        "hesem.mda.outbox.lag.seconds.p95": 0,
+        "hesem.mda.audit.failure.total": 0,
+        "hesem.mda.esign.failure.total": 0,
+        "hesem.mda.security.denial.total": 0,
+        "hesem.mda.direct_mutation.attempt.total": 0,
+        "hesem.mda.projection.staleness.seconds": 0,
+        "hesem.mda.scenario.result.total": 0,
+        "hesem.mda.scenario.failure.total": 0,
+        "hesem.mda.tooling.blocker.total": 0,
+        "hesem.mda.gage.blocker.total": 0
+    },
+    "fallback_telemetry": {
+        "fallback_read_total": 0,
+        "drift_incident_total": 0,
+        "telemetry_path": "mom/data/logs/master-data-fallback-telemetry.jsonl"
+    },
+    "database_signals": {
+        "metric_totals": [],
+        "probe_errors": []
+    },
+    "active_alerts": [],
+    "metric_catalog": {
+        "hesem.mda.command.outcome.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 730
+        },
+        "hesem.mda.idempotency.replay.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 730
+        },
+        "hesem.mda.idempotency.conflict.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 730
+        },
+        "hesem.mda.readiness.blocker.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 730
+        },
+        "hesem.mda.quality_hold.blocker.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 730
+        },
+        "hesem.mda.inventory.reconciliation.mismatch.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 730
+        },
+        "hesem.mda.uom.failure.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 730
+        },
+        "hesem.mda.fallback.read.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 180
+        },
+        "hesem.mda.drift.count": {
+            "unit": "1",
+            "kind": "gauge",
+            "retention_days": 730
+        },
+        "hesem.mda.outbox.lag.seconds.p95": {
+            "unit": "s",
+            "kind": "gauge",
+            "retention_days": 180
+        },
+        "hesem.mda.audit.failure.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 3650
+        },
+        "hesem.mda.esign.failure.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 3650
+        },
+        "hesem.mda.security.denial.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 3650
+        },
+        "hesem.mda.direct_mutation.attempt.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 3650
+        },
+        "hesem.mda.projection.staleness.seconds": {
+            "unit": "s",
+            "kind": "gauge",
+            "retention_days": 180
+        },
+        "hesem.mda.scenario.result.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 730
+        },
+        "hesem.mda.scenario.failure.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 730
+        },
+        "hesem.mda.tooling.blocker.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 730
+        },
+        "hesem.mda.gage.blocker.total": {
+            "unit": "1",
+            "kind": "counter",
+            "retention_days": 730
+        }
+    },
+    "alert_rules": {
+        "fallback_read_total": {
+            "metric": "hesem.mda.fallback.read.total",
+            "operator": ">",
+            "threshold": 0,
+            "severity": "P0"
+        },
+        "drift_count": {
+            "metric": "hesem.mda.drift.count",
+            "operator": ">",
+            "threshold": 0,
+            "severity": "P0"
+        },
+        "outbox_lag_p95": {
+            "metric": "hesem.mda.outbox.lag.seconds.p95",
+            "operator": ">",
+            "threshold": 300,
+            "severity": "P0"
+        },
+        "audit_store_down": {
+            "metric": "hesem.mda.audit.failure.total",
+            "operator": ">",
+            "threshold": 0,
+            "severity": "P0"
+        },
+        "direct_mutation_attempt": {
+            "metric": "hesem.mda.direct_mutation.attempt.total",
+            "operator": ">",
+            "threshold": 0,
+            "severity": "P0"
+        },
+        "scenario_failure": {
+            "metric": "hesem.mda.scenario.failure.total",
+            "operator": ">",
+            "threshold": 0,
+            "severity": "P0"
+        }
+    },
+    "redaction_policy": {
+        "classification": "safe_dimensions_only",
+        "allowed_plain_dimensions": [
+            "command.name",
+            "command.outcome",
+            "problem.code",
+            "http.status_code",
+            "metric.scope",
+            "scenario.status",
+            "source.authority"
+        ],
+        "hashed_dimensions": [
+            "scenario.id_hash",
+            "table.name_hash",
+            "aggregate.id_hash"
+        ],
+        "blocked_plain_dimensions": [
+            "actor_id",
+            "operator_id",
+            "employee_id",
+            "full_name",
+            "email",
+            "payload",
+            "password",
+            "signature_secret"
+        ],
+        "retention_days_default": 730,
+        "part11_related_retention_days": 3650
+    },
+    "p60_scorecard_input": {
+        "p0_alert_count": 0,
+        "active_alerts": [],
+        "required_metrics_present": true,
+        "decision": "GO_FOR_REVIEW"
+    }
+}
