@@ -514,43 +514,59 @@ html[data-color-mode="high-contrast"] {
 
 /* ============================================================================
  * P4 — Unified global sidebar (o3 master grid + theme brand)
+ *      [audit-fix 2026-06-01 — corrected selectors]
  * ----------------------------------------------------------------------------
- * The portal sidebar (.eqms-nav*) is styled in the FROZEN eqms-suite.css with
- * off-grid values (7px item padding) and the legacy --brand-2 active colour.
- * This file loads AFTER eqms-suite.css, so these rules win by source order at
- * equal specificity (no !important, no frozen-file edit). Re-skin only the
- * visual tokens — surfaces, borders, the 8/12 spacing grid, and a theme-following
- * brand active state — while preserving all structure / collapsed / mobile /
- * badge behaviour from eqms-suite.css.
+ * The LIVE portal sidebar is rendered as
+ *   aside#sidebar > nav#sidebar-nav > button.nav-item   (+ .nav-section-title)
+ * styled in the FROZEN portal.main.css. (The earlier .eqms-nav* rules here
+ * targeted 40-eqms-shell.js markup that this portal view never renders — a
+ * silent no-op. Replaced with the real selectors.)
+ *
+ * portal.main.css reads the active/hover colours from CSS custom properties
+ * whose FALLBACKS are a hardcoded legacy-blue gradient (--brand-light #1e88e5
+ * never follows the theme → grey→blue mismatch on non-blue presets) plus a
+ * hardcoded blue box-shadow. We:
+ *   1. define the --nav-item-* override vars as theme-aware o3 values so the
+ *      filled-gradient fallback is never used and every preset recolours
+ *      correctly (this also unifies .admin-tab-v2.active, same vars);
+ *   2. add equal/higher-specificity rules on the real selectors to snap the
+ *      8/12 grid, render a brand-soft active state with a 3px brand left
+ *      accent (matches the .o3-shell__rail Module-Sample contract), and
+ *      replace the hardcoded blue shadow with a token inset accent.
+ * No !important, no frozen-file edit; admin per-property overrides (inline vars
+ * set by 00b-theme-manager) still win over these :root defaults.
  * ========================================================================== */
-.eqms-nav {
-  background: var(--o3-surface-card);
-  border-right: 1px solid var(--o3-border-subtle);
+:root {
+  --nav-item-bg-active: var(--o3-brand-soft);
+  --nav-item-color-active: var(--o3-brand);
+  --nav-item-border-active: var(--o3-brand);
+  --nav-item-bg-hover: var(--o3-surface-muted);
+  --nav-item-color-hover: var(--o3-brand);
+  --nav-item-border-hover: var(--o3-border-default);
 }
-.eqms-nav-header {
-  color: var(--o3-text-strong);
-  border-bottom: 1px solid var(--o3-border-subtle);
-}
-.eqms-nav-group-label {
-  color: var(--o3-text-muted);
-}
-.eqms-nav-item {
+#sidebar { background: var(--o3-surface-card); }
+#sidebar-nav .nav-item {
   padding: var(--o3-space) var(--o3-space-section);
+  gap: var(--o3-space);
+  border-radius: var(--o3-radius);
   color: var(--o3-text-default);
-  border-radius: 0; /* full-row left-accent style — keep square */
 }
-.eqms-nav-item:hover {
+#sidebar-nav .nav-item:hover {
   background: var(--o3-surface-muted);
-  color: var(--o3-text-strong);
+  color: var(--o3-brand);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
-.eqms-nav-item.active {
+#sidebar-nav .nav-item.active {
   background: var(--o3-brand-soft);
   color: var(--o3-brand);
-  border-left-color: var(--o3-brand);
-  font-weight: var(--o3-font-weight-semi, 600);
+  border-color: var(--o3-border-subtle);
+  box-shadow: inset 3px 0 0 var(--o3-brand); /* theme brand left accent, no layout shift */
+  font-weight: 600;
 }
-.eqms-nav-toggle {
-  padding: var(--o3-space) var(--o3-space-section);
-  border-top: 1px solid var(--o3-border-subtle);
-  color: var(--o3-text-muted);
+#sidebar-nav .nav-item.active .badge {
+  background: var(--o3-brand);
+  color: var(--o3-text-inverse, #fff);
 }
+#sidebar .nav-section-title { color: var(--o3-text-muted); }
+/* unify admin tabs (same override vars) — drop the hardcoded blue glow */
+.admin-tab-v2.active { box-shadow: inset 0 -2px 0 var(--o3-brand); }

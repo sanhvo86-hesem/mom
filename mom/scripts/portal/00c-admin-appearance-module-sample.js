@@ -39,8 +39,8 @@
     var body = ''
       + '<div style="display:flex;flex-direction:column;gap:14px">'
       +   '<div style="font-size:12px;color:var(--text-secondary)">'
-      +     esc(L('SSOT chuẩn HESEM (2026-05-28): MỘT kích thước duy nhất = control.height.standard (36px). Không có sm/lg. Nếu cần kích thước khác phải đăng ký token mới qua Authority.',
-      +           'HESEM SSOT rule (2026-05-28): ONE size only = control.height.standard (36px). No sm/lg. Other sizes require a new Authority token.'))
+      +     esc(L('SSOT chuẩn HESEM (migration 230): MỘT kích thước duy nhất = control.height.standard (32px). Không có sm/lg. Nếu cần kích thước khác phải đăng ký token mới qua Authority.',
+      +           'HESEM SSOT rule (migration 230): ONE size only = control.height.standard (32px). No sm/lg. Other sizes require a new Authority token.'))
       +   '</div>'
       +   '<div style="display:flex;gap:var(--o3-space-sm,8px);align-items:center;flex-wrap:wrap">'
       +     '<button class="o3-btn o3-btn--primary">Primary</button>'
