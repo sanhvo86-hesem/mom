@@ -1,0 +1,66 @@
+{
+  "prompt_id": "P46_DIRECT_REPAIR",
+  "posture": "pre-production runtime-readiness evidence; not production-ready",
+  "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
+  "decision_token": "UOM_SYSTEM_SSOT_PASS",
+  "authority_path": [
+    "UomCommandQuantityNormalizer",
+    "UomRuntimeAuthorityService",
+    "ItemUomPolicyService",
+    "UomAliasResolutionService",
+    "ConversionEngine",
+    "domain_command_uom_measurement"
+  ],
+  "legacy_bridge_used_by_new_runtime_paths": false,
+  "legacy_bridge_removed_from_runtime_source": true,
+  "code_changes": [
+    "mom/database/migrations/277_uom_domain_command_runtime_authority.sql",
+    "mom/database/migrations/282_uom_direct_authority_system_registry.sql",
+    "mom/api/services/DomainCommand/UomCommandQuantityNormalizer.php",
+    "mom/api/services/Uom/UomRuntimeAuthorityService.php",
+    "mom/api/services/DomainCommand/MesRuntimeCommandHandler.php",
+    "mom/api/services/DomainCommand/InventoryCommandHandler.php",
+    "mom/api/services/DomainCommand/ToolingCommandHandler.php",
+    "mom/api/services/DomainCommand/DomainCommandGateway.php",
+    "mom/api/services/RuntimeAuthorityService.php",
+    "mom/data/registry/mda-uom-direct-authority-system.json",
+    "mom/tests/Unit/Services/DomainCommandUomRuntimeAuthorityTest.php"
+  ],
+  "manual_probe": {
+    "command": "php /private/tmp/uom_direct_probe.php",
+    "result": {
+      "ok": {
+        "converted": "500.000000",
+        "target_unit": "PCS",
+        "measurement_id": "uom-measurement-1",
+        "mes_writes": 1
+      },
+      "blocked": [
+        "uom_authority_resolution_failed",
+        "UOM_POLICY_NOT_FOUND",
+        0
+      ]
+    }
+  },
+  "closed_gaps": [
+    "P46-BLOCK-CMD-003",
+    "P46-BLOCK-CMD-004",
+    "P46-BLOCK-CMD-005",
+    "P46-BLOCK-CMD-006",
+    "P46-BLOCK-CMD-007",
+    "P46-BLOCK-CMD-008"
+  ],
+  "controlled_gaps": [
+    "Full PHPUnit/PHPStan remains blocked by missing local Composer vendor binaries.",
+    "Live VPS Chrome verification remains blocked outside this local branch run.",
+    "PostgreSQL restore drill target remains unconfigured."
+  ],
+  "validation": {
+    "php_lint": "PASS for new/modified PHP files",
+    "manual_probe": "PASS",
+    "uom_system_ssot_guard": "PASS",
+    "p58_runtime_scenarios": "PASS_14_OF_14",
+    "phpunit": "BLOCKED_MISSING_mom/vendor/bin/phpunit",
+    "phpstan": "BLOCKED_MISSING_mom/vendor/bin/phpstan"
+  }
+}

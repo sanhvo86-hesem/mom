@@ -1,0 +1,8 @@
+gap_id,severity,status,evidence,owner_prompt,next_step
+P0-AUDIT-EVIDENCE-ESIGN-NOT-WIRED,P0,closed_for_gateway,"DomainCommandGateway now runs RegulatedCommandEvidenceSpine for regulated commands; manual probes prove missing signature and hash mismatch block with audit.",P51,"P55/P58 must prove legacy routes cannot bypass gateway-equivalent controls"
+P0-SIGNATURE-LACKS-MEANING,P0,closed,"RegulatedActionPolicy allowed meanings and ElectronicSignatureService reject missing or disallowed meaning.",P51,"Extend policy rows when new regulated commands are implemented"
+P0-SIGNATURE-NOT-LINKED-TO-RECORD-HASH,P0,closed,"CommandRecordHasher recomputes server canonical hash; signed and displayed hashes must equal it.",P51,"P60 browser smoke should show displayed hash in operator shell"
+P0-AUDIT-UNAVAILABLE-BUT-COMMAND-PROCEEDS,P0,closed,"AuditEvidenceWriter throws regulated_audit_unavailable and blocks command if audit_events insert fails.",P51,"P58 should add DB outage telemetry scenario"
+P1-SIGNATURE-MANIFESTATION-API,P1,closed_for_gateway,"GET /api/v1/domain-commands/signature-manifestations reads signature_events and domain_command_evidence_links.",P51,"P18/P60 should wire record shell and Chrome smoke"
+P1-LEGACY-ROUTE-BYPASS,P1,open,"Domain command route is protected; legacy eQMS/order/mobile routes still require route-by-route proof.",P55/P58,"Migrate or wrap legacy routes with equivalent gateway/evidence spine"
+P1-LOCAL-VALIDATION-DEPENDENCIES,P1,blocked,"composer test/analyse/check cannot run because vendor/bin/phpunit and vendor/bin/phpstan are missing.",release,"Restore dependencies or use CI evidence"

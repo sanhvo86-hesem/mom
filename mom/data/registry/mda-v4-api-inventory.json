@@ -1,0 +1,57 @@
+{
+  "version": "mda-v4-p56",
+  "status": "pre_production_contract_candidate",
+  "authority": "mom/api/routes/rest-routes.php + mom/api/openapi.yaml",
+  "governed_command_surface": {
+    "mutation_route": {
+      "method": "POST",
+      "path": "/api/v1/domain-commands",
+      "controller": "DomainCommandController::submit",
+      "operationId": "submitDomainCommand",
+      "security": ["sessionCookie", "csrfHeader", "actor_scope.site_ids", "actor_scope.plant_ids"],
+      "error_contract": "application/problem+json",
+      "mutation_authority": "DomainCommandGateway"
+    },
+    "support_routes": [
+      {
+        "method": "GET",
+        "path": "/api/v1/domain-commands/registry",
+        "controller": "DomainCommandController::registry",
+        "operationId": "listDomainCommandRegistry",
+        "mutation_authority": "read_only_registry"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/domain-commands/signature-challenges",
+        "controller": "DomainCommandController::issueSignatureChallenge",
+        "operationId": "issueDomainCommandSignatureChallenge",
+        "error_contract": "application/problem+json",
+        "mutation_authority": "SignatureChallengeService"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/domain-commands/signature-manifestations",
+        "controller": "DomainCommandController::signatureManifestations",
+        "operationId": "listDomainCommandSignatureManifestations",
+        "mutation_authority": "read_only_signature_manifestation"
+      }
+    ]
+  },
+  "documented_problem_categories": [
+    "validation_failure",
+    "security_denial",
+    "readiness_block",
+    "quality_hold_block",
+    "idempotency_conflict",
+    "regulated_evidence_missing",
+    "authority_mode_blocked",
+    "tooling_block",
+    "gage_block",
+    "runtime_handler_missing"
+  ],
+  "legacy_endpoint_policy": {
+    "generic_crud": "Generic CRUD routes remain documented runtime access surfaces but must not own governed state transitions.",
+    "domain_commands": "No legacy action endpoint is allowed to bypass DomainCommandGateway for governed commands.",
+    "deprecation": "If a legacy governed mutation endpoint is later discovered, it must redirect, deny, or delegate to /api/v1/domain-commands and be added to this inventory."
+  }
+}

@@ -1,0 +1,11 @@
+root,maturity_level,maturity_label,runtime_claim_allowed,downstream_use,primary_evidence,blocking_reason,next_prompt
+Foundation/UOM,4,live read and conversion prototype,no,repair_only,"uom migrations services controller routes tests","not mandatory resolver for all governed measurement writes and no command-stack scenario",P46
+Party/UserIdentity,4,live controlled services partial,no,repair_only,"UserRepository IdentityRepository RbacService WorkforceQualificationGateService","no unified MDA party-user-operator command path",P50
+Item/ItemRevision,3,portal-safe prototype with JSON primary,no,repair_only,"MasterDataService JsonMasterDataRepository RuntimeAuthorityServiceTest","master data remains compatibility_only JSON primary",P45
+EngineeringReleasePackage,4,partial live gate,no,repair_only,"OrderWorkflowService TrustedReleaseRecordService OrderServiceEngineeringGateTest","package is not physicalized as live release command consumed by SO JO WO",P48
+ResourceReadiness/MES,3,partial evaluators,no,repair_only,"ManufacturingEventBackboneService WorkforceQualificationGateService MachineEventSpineService","no composite ResourceReadinessService wired to WO release/start",P52
+QualityHold/eQMS,3,fragmented runtime prototype,no,repair_only,"Eqms controllers LogisticsControllerQualityGateTest DecisionThresholdService hold_release","no canonical hold command graph across NCR MRB CAPA complaint SCAR lot shipment WO",P53
+Inventory/Ledger/Cost,3,schema-heavy prototype,no,repair_only,"inventory_ledger wip_ledger cost_ledger migrations TraceabilityGenealogyService","no ledger-only posting command and direct balance mutation proof missing",P54
+Evidence/eSign/Audit,5,controlled mutation for limited EQMS slice,no,repair_only,"ControlPlaneCommandService Evidence services CanonicalOutboxService openapi.yaml","not wired as mandatory spine for all regulated MDA commands",P51
+ScenarioRunner/RedTeam,2,static registry,no,repair_only,"ScenarioRegistryService scenario_registry.bootstrap.json","no real command-stack runner dashboard or audit evidence",P58
+GenericCrudBoundary,5,guarded deny boundary,no,dependency_for_repair,"GenericCrudControllerRuntimeSafetyTest GenericCrudController","deny coverage not recalculated against every governed root and OpenAPI deny markers missing",P44

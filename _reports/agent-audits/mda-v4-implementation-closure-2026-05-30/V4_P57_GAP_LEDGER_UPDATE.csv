@@ -1,0 +1,11 @@
+gap_id,severity,status,owner_prompt,evidence,next_step
+P57-BLOCK-METRICS-001,P0,closed,P57,"MdaRuntimeTelemetryService metric catalog includes fallback/drift/outbox/audit/security/direct-mutation/projection/scenario metrics","Use in P58 scenario runner and P60 scorecard"
+P57-BLOCK-P60-001,P0,closed,P57,"Probe shows required_metrics_present=true and p60_decision populated","P60 reads mda-v4-runtime-control-tower.latest.json"
+P57-BLOCK-FALLBACK-001,P0,closed,P57,"MasterDataFallbackTelemetry summary is consumed into hesem.mda.fallback.read.total and drift count","Keep fallback/drift as P0 alerts"
+P57-BLOCK-OUTBOX-001,P0,closed,P57,"Database signal probes domain_outbox_events p95 lag and alert threshold is 300 seconds","Run against deployed PostgreSQL in P59"
+P57-BLOCK-DIRECT-MUTATION-001,P0,closed,P57,"Database signal probes generic_crud_denial_event and direct mutation metric exists","Surface in P60 red-team"
+P57-BLOCK-SECURITY-001,P0,closed,P57,"Problem code object_scope_denied maps to security_denial_total","Add live BOLA denial scenario in P58"
+P57-BLOCK-REDACTION-001,P0,closed,P57,"Probe sensitive_leak_detected=false after actor/payload-bearing problem details","Keep redaction test with any new telemetry dimensions"
+P57-CONTROLLED-EXPORTER,P2,controlled_gap,P57,"No OpenTelemetry collector/exporter is installed locally; file/DB sinks implemented","Wire collector/dashboard in deploy environment"
+P57-CONTROLLED-VENDOR,P2,controlled_gap,P57,"composer test/analyse/check blocked by missing vendor/bin/phpunit and vendor/bin/phpstan","Install/restore vendor or use CI environment with dependencies"
+P57-CONTROLLED-SMOKE,P2,controlled_gap,P57,"Live dashboard/browser smoke not executed in local branch prompt","Run during P59 cutover/browser smoke"

@@ -1,0 +1,19 @@
+{
+  "version": "mda-v4-p57",
+  "status": "pre_production_contract_candidate",
+  "authority": "MdaRuntimeTelemetryService::redactionPolicy",
+  "classification": "safe_dimensions_only",
+  "allowed_plain_dimensions": [
+    "command.name",
+    "command.outcome",
+    "problem.code",
+    "http.status_code",
+    "metric.scope",
+    "scenario.status",
+    "source.authority"
+  ],
+  "hashed_dimensions": ["scenario.id_hash", "table.name_hash", "aggregate.id_hash"],
+  "blocked_plain_dimensions": ["actor_id", "operator_id", "employee_id", "full_name", "email", "payload", "password", "signature_secret"],
+  "retention_days_default": 730,
+  "part11_related_retention_days": 3650
+}

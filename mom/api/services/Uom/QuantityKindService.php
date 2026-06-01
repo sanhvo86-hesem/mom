@@ -9,8 +9,8 @@ use MOM\Database\Connection;
 /**
  * Quantity kind lookup and semantic compatibility checks.
  *
- * Enforces the core rule: two units may be converted ONLY if they belong
- * to the same quantity_kind_code (or a declared compatible pair).
+ * Enforces the core rule: two units may be converted only if they belong
+ * to the same quantity_kind_code or an explicit active compatibility rule.
  *
  * TemperatureDifference is NOT compatible with ThermodynamicTemperature:
  * you cannot add ΔK to an absolute temperature through this engine.
@@ -36,7 +36,8 @@ final class QuantityKindService
      * Look up the catalog row for a canonical code. Throws if not found or inactive.
      *
      * @return array{canonical_code:string, quantity_kind_code:string, si_factor:?string,
-     *               si_offset:?string, is_affine:bool, lifecycle_status:string, risk_level:string}
+     *               si_offset:?string, is_affine:bool, lifecycle_status:string, risk_level:string,
+     *               dimension_vector?:string, measurement_family?:string}
      */
     public function getUnit(string $code): array
     {
@@ -45,10 +46,12 @@ final class QuantityKindService
         }
 
         $row = $this->db->queryOne(
-            'SELECT canonical_code, quantity_kind_code, si_factor, si_offset,
-                    is_affine, lifecycle_status, risk_level
-             FROM uom_unit_catalog
-             WHERE canonical_code = :code',
+            'SELECT u.canonical_code, u.quantity_kind_code, u.si_factor, u.si_offset,
+                    u.is_affine, u.lifecycle_status, u.risk_level,
+                    k.dimension_vector, k.measurement_family
+             FROM uom_unit_catalog u
+             LEFT JOIN uom_quantity_kind k ON k.kind_code = u.quantity_kind_code
+             WHERE u.canonical_code = :code',
             [':code' => $code]
         );
 
@@ -68,7 +71,12 @@ final class QuantityKindService
      * @param array $fromUnit  Row from getUnit()
      * @param array $toUnit    Row from getUnit()
      */
-    public function assertCompatible(array $fromUnit, array $toUnit): void
+    public function assertCompatible(
+        array $fromUnit,
+        array $toUnit,
+        ?string $traceId = null,
+        ?\DateTimeInterface $asOf = null
+    ): void
     {
         $fromKind = $fromUnit['quantity_kind_code'];
         $toKind   = $toUnit['quantity_kind_code'];
@@ -77,11 +85,37 @@ final class QuantityKindService
             return;
         }
 
-        if ($this->isAncestorDescendantPair($fromKind, $toKind)) {
+        $compatibility = $this->activeCompatibilityRule($fromKind, $toKind, $asOf);
+        if ($compatibility !== null && (bool)$compatibility['allowed'] === true) {
+            if ($this->hasConditionalSchema($compatibility)) {
+                throw new UomKindMismatchException(
+                    $fromKind,
+                    $toKind,
+                    'conditional_compatibility_requires_handler',
+                    'Route this conversion through the governed handler named by condition_schema before enabling it.',
+                    $traceId
+                );
+            }
             return;
         }
 
-        throw new UomKindMismatchException($fromKind, $toKind);
+        if ($compatibility !== null && (bool)$compatibility['allowed'] === false) {
+            throw new UomKindMismatchException(
+                $fromKind,
+                $toKind,
+                (string)($compatibility['compatibility_type'] ?? 'explicit_compatibility_denied'),
+                (string)($compatibility['remediation_path'] ?? 'Use the business-correct quantity kind; do not rely on same dimension vectors.'),
+                $traceId
+            );
+        }
+
+        throw new UomKindMismatchException(
+            $fromKind,
+            $toKind,
+            'no_active_compatibility_rule',
+            'Create and approve a uom_quantity_kind_compatibility rule, or use units from the same quantity kind.',
+            $traceId
+        );
     }
 
     /**
@@ -99,17 +133,43 @@ final class QuantityKindService
         return in_array($kindCode, $nonNeg, true);
     }
 
-    /**
-     * Check the kind hierarchy: TemperatureDifference is a child of
-     * ThermodynamicTemperature but NOT compatible for absolute conversions.
-     * Only returns true when the pair is a valid same-ancestor relationship
-     * that the engine permits.
-     */
-    private function isAncestorDescendantPair(string $kindA, string $kindB): bool
+    private function activeCompatibilityRule(
+        string $fromKind,
+        string $toKind,
+        ?\DateTimeInterface $asOf
+    ): ?array {
+        $asOfDate = ($asOf ?? new \DateTimeImmutable('today'))->format('Y-m-d');
+
+        return $this->db->queryOne(
+            "SELECT from_kind, to_kind, compatibility_type, allowed,
+                    condition_schema, owner_role, approval_status, risk_level,
+                    remediation_path, effective_from, effective_to
+               FROM uom_quantity_kind_compatibility
+              WHERE from_kind = :from_kind
+                AND to_kind = :to_kind
+                AND approval_status = 'active'
+                AND effective_from <= :as_of::date
+                AND (effective_to IS NULL OR effective_to > :as_of::date)
+              ORDER BY effective_from DESC, created_at DESC
+              LIMIT 1",
+            [
+                ':from_kind' => $fromKind,
+                ':to_kind' => $toKind,
+                ':as_of' => $asOfDate,
+            ]
+        );
+    }
+
+    private function hasConditionalSchema(array $compatibility): bool
     {
-        // No cross-kind conversions are permitted in Phase 1.
-        // TemperatureDifference and ThermodynamicTemperature are intentionally
-        // kept incompatible even though they share the same dimension vector.
-        return false;
+        $schema = $compatibility['condition_schema'] ?? null;
+        if ($schema === null || $schema === '' || $schema === [] || $schema === '{}') {
+            return false;
+        }
+        if (is_string($schema)) {
+            $decoded = json_decode($schema, true);
+            return is_array($decoded) && $decoded !== [];
+        }
+        return is_array($schema) && $schema !== [];
     }
 }

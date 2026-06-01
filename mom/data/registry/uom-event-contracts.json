@@ -1,0 +1,30 @@
+{
+  "schema_version": "uom-event-contracts.v1",
+  "posture": "development/prototype -> pre-production readiness candidate",
+  "events": {
+    "uom.rule.submitted": {
+      "version": 1,
+      "required": ["event_id", "event_type", "occurred_at", "actor_id", "rule_code", "rule_version", "trace_id"]
+    },
+    "uom.rule.approved": {
+      "version": 1,
+      "required": ["event_id", "event_type", "occurred_at", "actor_id", "rule_code", "rule_version", "approval_id", "trace_id"]
+    },
+    "uom.rule.activated": {
+      "version": 1,
+      "required": ["event_id", "event_type", "occurred_at", "actor_id", "rule_code", "rule_version", "effective_from", "trace_id"]
+    },
+    "uom.alias.quarantined": {
+      "version": 1,
+      "required": ["event_id", "event_type", "occurred_at", "alias_code", "source_system", "quarantine_id", "reason", "trace_id"]
+    },
+    "uom.measval.created": {
+      "version": 1,
+      "required": ["event_id", "event_type", "occurred_at", "audit_hash", "from_unit_code", "to_unit_code", "linked_record_type", "linked_record_id", "trace_id"]
+    },
+    "uom.policy.changed": {
+      "version": 1,
+      "required": ["event_id", "event_type", "occurred_at", "actor_id", "policy_type", "policy_id", "change_reason", "trace_id"]
+    }
+  }
+}
