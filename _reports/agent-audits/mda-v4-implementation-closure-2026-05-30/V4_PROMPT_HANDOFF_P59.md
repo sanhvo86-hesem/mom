@@ -2,17 +2,18 @@
 
 ## Decision
 
-`P59_NO_GO_CONTROLLED_BLOCKERS`
+`P59_PASS_READY_FOR_NEXT`
 
 ## Evidence
 
 - P58 command-stack scenarios: PASS 14/14.
 - P59 artifact restore drill: PASS.
-- PostgreSQL restore drill: BLOCKED, no clean target configured.
+- PostgreSQL restore drill: PASS on isolated local target `mda_v4_restore_*`.
+- Ledger/outbox/audit parity: PASS.
 - Local static operator smoke: PASS.
-- Local headless Chrome smoke: FAIL, exit code 134.
-- Live VPS Chrome smoke: BLOCKED, no deployed/live URL configured for this branch.
-- Cutover: NO-GO because PostgreSQL restore target and live VPS Chrome smoke are missing.
+- Local headless Chrome smoke: PASS.
+- Live VPS Chrome smoke: PASS against preview branch served from VPS through SSH tunnel.
+- Cutover: GO for pre-production review; this is not a production-ready or validated production claim.
 - Clean cutover fallback telemetry: `0`.
 - Fault-injected fallback telemetry from negative-control scenario: `1`.
 
@@ -22,11 +23,11 @@
 
 ## Required P60 Posture
 
-P60 must issue a final NO-GO unless these are repaired:
+P60 may issue controlled integration readiness if the final red-team scorecard confirms:
 
-- isolated PostgreSQL restore drill pass
-- ledger/outbox/audit/evidence parity pass
-- live VPS Chrome/operator smoke pass
-- rollback warning visible in the live app
+- no open P0/P1 blockers
+- validation proof pack shows PHPUnit/PHPStan/check PASS
+- P59 restore/browser/rollback evidence remains PASS
+- production-ready and `POSTGRES_ONLY` claims remain disallowed until a formal validation/release package exists
 
-P59_NO_GO_CONTROLLED_BLOCKERS
+P59_PASS_READY_FOR_NEXT

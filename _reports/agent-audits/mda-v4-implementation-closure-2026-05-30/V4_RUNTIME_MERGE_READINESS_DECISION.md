@@ -2,24 +2,24 @@
 
 ## Decision
 
-`P60_NO_GO_REPAIR_REQUIRED`
+`P60_PASS_READY_FOR_CONTROLLED_INTEGRATION`
 
 ## Merge Readiness
 
-Blocked. Do not merge this branch as a runtime-closure claim.
+Controlled integration review is allowed. Do not treat this as a production-ready or formally validated release claim.
 
 ## What Can Be Reviewed
 
-The P58 scenario runner and P59/P60 evidence tools can be reviewed as controlled pre-production improvements. They should not be marketed as complete runtime authority closure.
+The P58 scenario runner, P59 restore/browser drill, and P60 scorecard can be reviewed as controlled pre-production runtime-closure evidence.
 
-## Why Merge Is Blocked
+## Remaining Claim Boundaries
 
-- P0 PostgreSQL restore target is missing.
-- P0 live VPS Chrome smoke is missing or failed.
-- P1 PHPUnit/PHPStan full suites are blocked by missing vendor binaries.
+- `POSTGRES_ONLY` remains a separate cutover decision.
+- Production readiness remains blocked until formal release/validation evidence exists.
+- The live smoke used a VPS preview branch served outside the dirty production worktree.
 
 ## Allowed Next Integration Path
 
-Cherry-pick only reviewed commits into a staging branch after deciding whether to accept the P58/P59/P60 tooling despite NO-GO. Do not delete compatibility/fallback paths, do not switch `POSTGRES_ONLY`, and do not claim production readiness.
+Cherry-pick reviewed commits into a clean staging/integration branch. Do not delete compatibility/fallback paths, do not switch `POSTGRES_ONLY`, and do not claim production readiness based only on this V4 evidence.
 
-P60_NO_GO_REPAIR_REQUIRED
+P60_PASS_READY_FOR_CONTROLLED_INTEGRATION

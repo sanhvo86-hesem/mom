@@ -2,27 +2,24 @@
 
 ## Decision
 
-`P60_NO_GO_REPAIR_REQUIRED`
+`P60_PASS_READY_FOR_CONTROLLED_INTEGRATION`
 
 ## Final Status
 
-V4 implementation closure remains blocked. The new P58-P60 tooling improves evidence quality but does not close runtime authority.
+V4 implementation closure is ready for controlled integration review. This does not authorize production-ready, validated-system, or automatic `POSTGRES_ONLY` claims.
 
 ## Open P0
 
-- `P60-POSTGRES-RESTORE-TARGET-MISSING`
-- `P60-LIVE-VPS-CHROME-SMOKE-MISSING-OR-FAILED`
+- None.
 
 ## Open P1
 
-- `P60-FULL-PHPUNIT-BLOCKED`
-- `P60-FULL-PHPSTAN-BLOCKED`
+- None.
 
 ## Required Next Work
 
-1. Provision isolated PostgreSQL restore target and prove parity.
-2. Deploy reviewed staging branch and run live Chrome/operator smoke.
-3. Restore vendor dependencies or use CI to run PHPUnit/PHPStan.
-4. Re-run P59 then P60.
+1. Cherry-pick reviewed commits to a clean integration branch.
+2. Keep production `POSTGRES_ONLY` cutover behind a separate formal release/validation package.
+3. Do not deploy over the dirty production VPS worktree directly; use the standard deploy workflow.
 
-P60_NO_GO_REPAIR_REQUIRED
+P60_PASS_READY_FOR_CONTROLLED_INTEGRATION

@@ -2,9 +2,9 @@
 
 ## 1. EXECUTIVE DECISION
 
-Decision token: `P60_NO_GO_REPAIR_REQUIRED`.
+Decision token: `P60_PASS_READY_FOR_CONTROLLED_INTEGRATION`.
 
-V4 is not ready for merge/readiness claim. The code and evidence added in P58-P59 are useful pre-production controls, but final runtime closure is blocked by open P0/P1 evidence gaps.
+V4 has enough machine evidence for controlled integration review of this branch. This is still pre-production runtime-closure evidence, not a production-ready or formally validated production-system claim.
 
 ## 2. SOURCE TRUTH AUDIT
 
@@ -12,19 +12,16 @@ P60 consumed P42-P59 handoff packets, P58 scenario dashboard, P59 operational dr
 
 ## 3. RUNTIME EVIDENCE PROBE
 
-- `php mom/tools/release/run_mda_v4_final_redteam.php`: expected NO-GO exit.
+- `php mom/tools/release/run_mda_v4_final_redteam.php`: PASS.
 - Final scorecard: `V4_FINAL_SCORECARD.json`.
-- P0 open count: `2`.
-- P1 open count: `2`.
+- P0 open count: `0`.
+- P1 open count: `0`.
 
 ## 4. BLOCKER / GAP MAP
 
 | Blocker | Severity | Evidence |
 |---|---|---|
-| P60-POSTGRES-RESTORE-TARGET-MISSING | P0 | `postgres_restore_target_missing` |
-| P60-LIVE-VPS-CHROME-SMOKE-MISSING-OR-FAILED | P0 | `live_vps_chrome_smoke_missing_or_failed` |
-| P60-FULL-PHPUNIT-BLOCKED | P1 | `BLOCKED_VENDOR_PHPUNIT_MISSING` |
-| P60-FULL-PHPSTAN-BLOCKED | P1 | `BLOCKED_VENDOR_PHPSTAN_MISSING` |
+| None open | n/a | P59/P60 report zero open P0/P1 blockers |
 
 ## 5. DESIGN DELTA
 
@@ -32,7 +29,7 @@ P60 added a machine-readable final red-team runner and scorecard. It intentional
 
 ## 6. IMPLEMENTATION PLAN
 
-No new authority path was added. The P60 runner only reads evidence and writes reports.
+No new authority path was added. The P60 runner reads evidence and writes reports; the P59 runner now performs an isolated PostgreSQL restore/parity drill instead of accepting artifact-only restore.
 
 ## 7. FILES TO EDIT
 
@@ -54,36 +51,37 @@ No schema change. Added final red-team release tool and reports only.
 ## 10. TEST PLAN
 
 - `php -l mom/tools/release/run_mda_v4_final_redteam.php`: PASS.
-- `php mom/tools/release/run_mda_v4_final_redteam.php`: expected NO-GO with 2 P0 and 2 P1 open.
+- `php mom/tools/release/run_mda_v4_final_redteam.php`: PASS with 0 P0 and 0 P1 open.
+- `composer --working-dir=mom run check`: PASS; PHPUnit 975 tests, 9262 assertions, 2 skipped.
 
 ## 11. OPERATIONAL SIMULATION MATRIX
 
 | Scenario | Expected | P60 result |
 |---|---|---|
-| V4-SIM-060-001 reports pass but restore missing | NO_GO | NO_GO |
-| V4-SIM-060-002 one P0 open | NO_GO | NO_GO |
-| V4-SIM-060-003 mock-only scenario | NO_GO | P58 mock_only=false, but other P0s open |
+| V4-SIM-060-001 reports pass but restore missing | NO_GO | Closed by PostgreSQL restore drill |
+| V4-SIM-060-002 one P0 open | NO_GO | Closed; P0 open count is 0 |
+| V4-SIM-060-003 mock-only scenario | NO_GO | P58 mock_only=false |
 | V4-SIM-060-004 Generic CRUD bypass | NO_GO | No new bypass found in P58-P60 scope |
 | V4-SIM-060-005 fallback reads present | NO_GO | Negative-control preserved; clean cutover fallback = 0 |
-| V4-SIM-060-006 browser smoke fail | UI claim blocked | NO_GO |
-| V4-SIM-060-007 P0/P1 closed but validation absent | pre-production only | Not reached |
-| V4-SIM-060-008 all evidence present | controlled integration | Not reached |
+| V4-SIM-060-006 browser smoke fail | UI claim blocked | Closed by live VPS Chrome smoke |
+| V4-SIM-060-007 P0/P1 closed but validation absent | pre-production only | Validation present |
+| V4-SIM-060-008 all evidence present | controlled integration | Reached |
 
 ## 12. MULTI-ROLE ADVERSARIAL AUDIT
 
-- Release red-team: merge readiness is blocked because P0s remain open.
-- SRE red-team: restore drill is not a PostgreSQL restore and cannot prove recoverability.
-- QA red-team: live browser/operator smoke is missing; static DOM fixture is not live UI evidence.
-- Security red-team: AI actor and e-sign gates have scenario proof, but production validation remains absent.
-- Data authority red-team: clean fallback telemetry is zero, but restore and live-smoke evidence still prevent `POSTGRES_ONLY`.
+- Release red-team: controlled integration can proceed, but production-ready and validated-system claims remain forbidden.
+- SRE red-team: isolated PostgreSQL restore/parity evidence is present; production disaster-recovery validation is still a later release package.
+- QA red-team: live browser/operator smoke is present against the VPS preview branch via SSH tunnel.
+- Security red-team: AI actor and e-sign gates have scenario proof; formal regulated validation remains out of scope.
+- Data authority red-team: clean fallback telemetry is zero; `POSTGRES_ONLY` remains a separate cutover decision, not automatically enabled by P60.
 
 ## 13. ROLLBACK / RESTORE / RECOVERY PLAN
 
-Stay in `POSTGRES_PRIMARY_WITH_JSON_COMPATIBILITY_READS` with warning banner. Do not delete compatibility paths or claim `POSTGRES_ONLY`.
+Stay in `POSTGRES_PRIMARY_WITH_JSON_COMPATIBILITY_READS` unless a separate production cutover plan approves `POSTGRES_ONLY`. Do not delete compatibility paths based only on this P60 evidence.
 
 ## 14. TELEMETRY / CONTROL TOWER EVIDENCE
 
-Telemetry proves the gate is active because the fault-injected fallback scenario generates alert evidence. Clean cutover fallback is zero in P59, so final cutover remains blocked by restore and live-smoke gaps.
+Telemetry proves the gate is active because the fault-injected fallback scenario generates alert evidence. Clean cutover fallback is zero in P59, and restore/live-smoke evidence is now present.
 
 ## 15. GENERATED ARTIFACTS
 
@@ -96,14 +94,14 @@ Telemetry proves the gate is active because the fault-injected fallback scenario
 
 ## 16. GAP LEDGER UPDATE
 
-The final blocker register is the authoritative P60 gap ledger.
+The final blocker register shows no open P0/P1 blockers for controlled integration review.
 
 ## 17. DECISION TOKEN
 
-`P60_NO_GO_REPAIR_REQUIRED`
+`P60_PASS_READY_FOR_CONTROLLED_INTEGRATION`
 
 ## 18. HANDOFF PACKET FOR NEXT PROMPT
 
-There is no V4 prompt after P60. Next work is repair, not V5 productization.
+There is no V4 prompt after P60 in the local prompt pack. Next work is controlled integration/cherry-pick review, not a production-ready claim.
 
-P60_NO_GO_REPAIR_REQUIRED
+P60_PASS_READY_FOR_CONTROLLED_INTEGRATION

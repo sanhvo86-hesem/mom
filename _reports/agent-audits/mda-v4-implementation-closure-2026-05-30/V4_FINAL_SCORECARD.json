@@ -1,12 +1,12 @@
 {
     "schema_version": "mda.v4.final_redteam_scorecard.v1",
-    "generated_at": "2026-06-01T03:07:57+00:00",
+    "generated_at": "2026-06-01T03:15:46+00:00",
     "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
-    "sha": "3f54ecc30",
-    "decision_token": "P60_NO_GO_REPAIR_REQUIRED",
-    "merge_readiness": "blocked_no_go",
+    "sha": "36538924a",
+    "decision_token": "P60_PASS_READY_FOR_CONTROLLED_INTEGRATION",
+    "merge_readiness": "controlled_integration_allowed",
     "production_ready_claim_allowed": false,
-    "p0_open_count": 1,
+    "p0_open_count": 0,
     "p1_open_count": 0,
     "handoff_audit": {
         "required_prompts": "P42-P59",
@@ -109,14 +109,14 @@
         "p58_decision": "P58_PASS_READY_FOR_NEXT",
         "p58_scenario_total": 14,
         "p58_failed": 0,
-        "p59_decision_token": "P59_NO_GO_CONTROLLED_BLOCKERS",
+        "p59_decision_token": "P59_PASS_READY_FOR_NEXT",
         "fallback_read_total": 1,
         "fault_injected_fallback_read_total": 1,
         "clean_cutover_fallback_read_total": 0,
         "artifact_restore_status": "pass",
         "postgres_restore_status": "pass",
         "local_chrome_status": "pass",
-        "live_vps_chrome_status": "blocked_live_url_not_configured"
+        "live_vps_chrome_status": "pass"
     },
     "category_scores": {
         "authority_clarity": 8,
@@ -133,13 +133,5 @@
         "browser_operator_proof": 2,
         "observability_cutover": 6
     },
-    "blockers": [
-        {
-            "blocker_id": "P60-LIVE-VPS-CHROME-SMOKE-MISSING-OR-FAILED",
-            "severity": "P0",
-            "status": "OPEN",
-            "source": "P59 operational drill",
-            "evidence": "live_vps_chrome_smoke_missing_or_failed"
-        }
-    ]
+    "blockers": []
 }
