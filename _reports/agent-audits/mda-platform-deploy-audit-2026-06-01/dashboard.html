@@ -135,7 +135,7 @@
         </div>
         <div class="finding">
           <span class="status warn">PUBLISH GAP</span>
-          <p>Đường dẫn raw <span class="mono">_reports/agent-audits/...</span> trả HTTP 403 trên web. Vì vậy trước trang này, nội dung tồn tại trên server nhưng Chrome không thể đọc trực tiếp.</p>
+          <p>Đường dẫn raw <span class="mono">_reports/agent-audits/...</span> trả HTTP 403 trên web. Vì vậy nội dung cần một bản runtime HTML dưới vùng tài liệu được bảo vệ để kiểm thử bằng Chrome.</p>
         </div>
         <div class="finding">
           <span class="status warn">V4 NOT LIVE</span>
@@ -173,10 +173,11 @@
         </tbody>
       </table>
       <p class="footer">
-        Machine-readable manifest is tracked on the server at
-        <span class="mono">mom/docs/system/agent-reports/mda-platform/deployment-audit-2026-06-01.json</span>.
-        Direct browser download is intentionally not linked because non-HTML documents under this protected path are controlled by the document streaming policy.
-        Raw source artifacts remain in <span class="mono">_reports/agent-audits/mda-prompt-os-2026-05-29</span>.
+        Source manifest is tracked at
+        <span class="mono">_reports/agent-audits/mda-platform-deploy-audit-2026-06-01/deployment-audit-2026-06-01.json</span>.
+        The Chrome-facing copy is runtime-published at
+        <span class="mono">mom/docs/system/agent-reports/mda-platform/index.html</span>
+        and intentionally not committed as controlled source.
       </p>
     </section>
   </main>
