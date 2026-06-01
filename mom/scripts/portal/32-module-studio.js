@@ -241,7 +241,9 @@
           '<td>' + esc(p.density_px != null ? p.density_px + 'px' : '—') + ' / ' + esc(p.control_h_px != null ? p.control_h_px + 'px' : '—') + '</td>' +
           '<td>' + (p.is_builtin ? '<span class="' + ROOT + '__bd ' + ROOT + '__bd--l4">builtin</span>' : '<span class="' + ROOT + '__st ' + ROOT + '__st--active">' + esc(p.status || 'published') + '</span>') + '</td>' +
           '<td><button class="' + ROOT + '__btn ' + ROOT + '__btn--sm" data-ms="theme-apply" data-key="' + esc(p.preset_key) + '">Áp dụng</button> ' +
-          '<button class="' + ROOT + '__btn ' + ROOT + '__btn--sm" data-ms="theme-clone" data-key="' + esc(p.preset_key) + '">⎘ Clone</button></td></tr>';
+          '<button class="' + ROOT + '__btn ' + ROOT + '__btn--sm" data-ms="theme-clone" data-key="' + esc(p.preset_key) + '">⎘ Clone</button>' +
+          (p.is_builtin ? '' : ' <button class="' + ROOT + '__btn ' + ROOT + '__btn--sm ' + ROOT + '__btn--dgr" data-ms="theme-delete" data-key="' + esc(p.preset_key) + '">Xoá</button>') +
+          '</td></tr>';
       }).join('');
     }
     return '<div class="' + ROOT + '__pad">' +
@@ -335,6 +337,13 @@
     delete clone.preset_id;
     post('graphics_theme_preset_save', { preset: clone }).then(function (r) { toast(r && r.ok !== false ? 'Đã clone preset “' + nk + '”.' : 'Clone thất bại.', r && r.ok !== false ? 'success' : 'error'); loadPresets(); }).catch(function (e) { toast('Clone lỗi: ' + e, 'error'); });
   }
+  function doDeleteTheme(key) {
+    if (!window.confirm('Xoá preset “' + key + '”? Không thể hoàn tác.')) { return; }
+    post('graphics_theme_preset_delete', { preset_key: key }).then(function (r) {
+      toast(r && r.ok !== false ? 'Đã xoá preset “' + key + '”.' : 'Xoá thất bại.', r && r.ok !== false ? 'success' : 'error');
+      loadPresets();
+    }).catch(function (e) { toast('Xoá preset lỗi: ' + e, 'error'); });
+  }
   function doSaveBlock() {
     var s = state.sel; if (!s || s.kind !== 'l3' || !s.data) { return; }
     var nameEl = hostEl.querySelector('[data-ms="edit-name"]'), stEl = hostEl.querySelector('[data-ms="edit-status"]');
@@ -382,6 +391,7 @@
       else if (k === 'theme-refresh') { loadPresets(); }
       else if (k === 'theme-apply') { doApplyTheme(t.getAttribute('data-key')); }
       else if (k === 'theme-clone') { doCloneTheme(t.getAttribute('data-key')); }
+      else if (k === 'theme-delete') { doDeleteTheme(t.getAttribute('data-key')); }
     });
     el.addEventListener('change', function (ev) {
       var t = ev.target;
@@ -396,5 +406,5 @@
     return el;
   }
 
-  window.ModuleStudio = { render: render, setMode: function (m) { state.mode = (m === 'author') ? 'author' : 'assemble'; }, _state: state, version: '0.4.1-batchfix' };
+  window.ModuleStudio = { render: render, setMode: function (m) { state.mode = (m === 'author') ? 'author' : 'assemble'; }, _state: state, version: '0.4.2-theme-delete' };
 })();
