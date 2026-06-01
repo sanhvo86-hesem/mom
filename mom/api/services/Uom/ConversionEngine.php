@@ -33,6 +33,99 @@ final class ConversionEngine
     private const DEFAULT_DISPLAY_PRECISION = 6;
     private const DEFAULT_ROUNDING_POLICY = 'ROUND_HALF_EVEN';
 
+    public const CATEGORY_DISPATCH = [
+        'identity' => [
+            'implemented' => true,
+            'handler' => 'IdentityHandler',
+            'allowed_without_context' => true,
+            'reverse_allowed' => true,
+        ],
+        'exact_linear' => [
+            'implemented' => true,
+            'handler' => 'LinearHandler',
+            'allowed_without_context' => true,
+            'reverse_allowed' => true,
+        ],
+        'defined_linear' => [
+            'implemented' => true,
+            'handler' => 'LinearHandler',
+            'allowed_without_context' => true,
+            'reverse_allowed' => true,
+        ],
+        'approximate_linear' => [
+            'implemented' => true,
+            'handler' => 'LinearHandlerApproximate',
+            'allowed_without_context' => true,
+            'reverse_allowed' => true,
+        ],
+        'affine' => [
+            'implemented' => true,
+            'handler' => 'AffineHandler',
+            'allowed_without_context' => true,
+            'reverse_allowed' => true,
+        ],
+        'si_base_hop' => [
+            'implemented' => true,
+            'handler' => 'SyntheticSiHop',
+            'allowed_without_context' => true,
+            'reverse_allowed' => false,
+        ],
+        'dimensionless_strict' => [
+            'implemented' => true,
+            'handler' => 'LinearHandlerDimensionless',
+            'allowed_without_context' => true,
+            'reverse_allowed' => true,
+        ],
+        'ratio' => [
+            'implemented' => true,
+            'handler' => 'LinearHandlerRatio',
+            'allowed_without_context' => true,
+            'reverse_allowed' => true,
+        ],
+        'logarithmic' => [
+            'implemented' => false,
+            'handler' => 'UnsupportedGuard',
+            'allowed_without_context' => false,
+            'reverse_allowed' => false,
+        ],
+        'derived_expression' => [
+            'implemented' => false,
+            'handler' => 'UnsupportedGuard',
+            'allowed_without_context' => false,
+            'reverse_allowed' => false,
+        ],
+        'density_based' => [
+            'implemented' => false,
+            'handler' => 'P08ContextualDensityHandler',
+            'allowed_without_context' => false,
+            'reverse_allowed' => false,
+        ],
+        'potency_assay' => [
+            'implemented' => false,
+            'handler' => 'P08PotencyHandler',
+            'allowed_without_context' => false,
+            'reverse_allowed' => false,
+        ],
+        'packaging_policy' => [
+            'implemented' => false,
+            'handler' => 'P08PackagingPolicyHandler',
+            'allowed_without_context' => false,
+            'reverse_allowed' => false,
+        ],
+        'arbitrary' => [
+            'implemented' => false,
+            'handler' => 'UnsupportedGuard',
+            'allowed_without_context' => false,
+            'reverse_allowed' => false,
+        ],
+        'device_display' => [
+            'implemented' => false,
+            'handler' => 'UnsupportedGuard',
+            'allowed_without_context' => false,
+            'reverse_allowed' => false,
+        ],
+    ];
+
     private readonly ExactLinearConverter $linearConverter;
     private readonly AffineConverter $affineConverter;
     private readonly LogarithmicConverter $logConverter;
@@ -41,6 +134,7 @@ final class ConversionEngine
         private readonly QuantityKindService  $kindService,
         private readonly ConversionRuleService $ruleService,
         private readonly MeasurementValueFactory $measvalFactory,
+        private readonly ?ContextualConversionPlanner $contextualPlanner = null,
         ?ExactLinearConverter $linear = null,
         ?AffineConverter $affine = null,
         ?LogarithmicConverter $log = null
@@ -89,8 +183,33 @@ final class ConversionEngine
 
         $fromUnitRow = $this->kindService->getUnit($fromUnit);
         $toUnitRow   = $this->kindService->getUnit($toUnit);
+        $asOf = $this->resolveAsOf($context['as_of'] ?? $context['effective_date'] ?? null);
+        $traceId = isset($context['trace_id']) ? (string)$context['trace_id'] : null;
+        $precision = $displayPrecision ?? self::DEFAULT_DISPLAY_PRECISION;
 
-        $this->kindService->assertCompatible($fromUnitRow, $toUnitRow);
+        if ((($fromUnitRow['quantity_kind_code'] ?? null) !== ($toUnitRow['quantity_kind_code'] ?? null)
+                || isset($context['packaging_level']))
+            && $this->contextualPlanner !== null
+        ) {
+            $plan = $this->contextualPlanner->classify($fromUnitRow, $toUnitRow, $context);
+            if ($plan['route'] !== ContextualConversionPlanner::ROUTE_FORBIDDEN
+                || isset($plan['context_required'])
+            ) {
+                return $this->convertContextual(
+                    $magnitude,
+                    $fromUnit,
+                    $toUnit,
+                    $fromUnitRow,
+                    $toUnitRow,
+                    $precision,
+                    $roundingPolicy,
+                    $context,
+                    $aiFlags
+                );
+            }
+        }
+
+        $this->kindService->assertCompatible($fromUnitRow, $toUnitRow, $traceId, $asOf);
 
         if ($this->kindService->isNonNegativeKind($fromUnitRow['quantity_kind_code'])
             && bccomp($magnitude, '0', ExactLinearConverter::BCMATH_SCALE) < 0
@@ -98,9 +217,15 @@ final class ConversionEngine
             throw new UomNegativeMagnitudeException($fromUnitRow['quantity_kind_code']);
         }
 
-        $rule      = $this->ruleService->resolve($fromUnit, $toUnit, $fromUnitRow, $toUnitRow);
-        $precision = $displayPrecision ?? self::DEFAULT_DISPLAY_PRECISION;
-
+        $contextHash = isset($context['context_hash']) ? (string)$context['context_hash'] : null;
+        $rule = $this->ruleService->resolve(
+            $fromUnit,
+            $toUnit,
+            $fromUnitRow,
+            $toUnitRow,
+            $asOf,
+            $contextHash
+        );
         $result = $this->dispatch($magnitude, $rule, $precision, $roundingPolicy);
 
         $measval = $this->measvalFactory->build(
@@ -118,6 +243,78 @@ final class ConversionEngine
         ];
     }
 
+    private function convertContextual(
+        string $magnitude,
+        string $fromUnit,
+        string $toUnit,
+        array $fromUnitRow,
+        array $toUnitRow,
+        int $precision,
+        string $roundingPolicy,
+        array $context,
+        array $aiFlags
+    ): array {
+        if ($this->contextualPlanner === null) {
+            throw new UomException('UOM_CONTEXT_REQUIRED', 'Contextual conversion planner is not configured.', 422);
+        }
+
+        $contextual = $this->contextualPlanner->execute(
+            $magnitude,
+            $fromUnit,
+            $toUnit,
+            $fromUnitRow,
+            $toUnitRow,
+            $context,
+            $precision,
+            $roundingPolicy
+        );
+        $route = (string)$contextual['route'];
+        $result = (string)$contextual['result'];
+        $rule = [
+            'rule_code' => 'CONTEXTUAL-' . strtoupper($route),
+            'rule_version' => 0,
+            'category' => match ($route) {
+                ContextualConversionPlanner::ROUTE_DENSITY => 'density_based',
+                ContextualConversionPlanner::ROUTE_POTENCY => 'potency_assay',
+                ContextualConversionPlanner::ROUTE_PACKAGING => 'packaging_policy',
+                default => 'derived_expression',
+            },
+            'factor' => 'contextual',
+            'offset_value' => '0',
+            'rounding_policy' => $roundingPolicy,
+            'factor_exact' => false,
+            'effective_from' => $contextual['effective_from'] ?? ($context['effective_date'] ?? null),
+            'effective_to' => $contextual['effective_to'] ?? null,
+            'context_required' => true,
+            'contextual_evidence' => $contextual,
+            'reversed' => false,
+            'risk_level' => 'medium',
+        ];
+
+        $measval = $this->measvalFactory->build(
+            $fromUnit,
+            $magnitude,
+            $toUnit,
+            $result,
+            $rule,
+            $fromUnitRow,
+            $toUnitRow,
+            $precision,
+            $roundingPolicy,
+            $context,
+            $aiFlags
+        );
+
+        return [
+            'result' => $result,
+            'from_unit' => $fromUnit,
+            'to_unit' => $toUnit,
+            'measval' => $measval,
+            'contextual_route' => $route,
+            'contextual_evidence' => $contextual,
+        ];
+    }
+
     /**
      * Dispatch to the appropriate converter based on rule category.
      */
@@ -127,33 +324,38 @@ final class ConversionEngine
         int    $precision,
         string $policy
     ): string {
-        $category = $rule['category'];
-        $factor   = $rule['factor'];
-        $offset   = $rule['offset_value'];
-        $reversed = $rule['reversed'];
-        $rp       = $rule['rounding_policy'] !== 'ROUND_HALF_EVEN' ? $rule['rounding_policy'] : $policy;
+        $category = (string)$rule['category'];
+        $factor   = (string)$rule['factor'];
+        $offset   = (string)$rule['offset_value'];
+        $reversed = (bool)$rule['reversed'];
+        $rp       = $rule['rounding_policy'] !== 'ROUND_HALF_EVEN' ? (string)$rule['rounding_policy'] : $policy;
 
-        return match (true) {
-            $category === 'identity'
-                => $magnitude,
+        if (!isset(self::CATEGORY_DISPATCH[$category])) {
+            throw new UomCategoryNotSupportedException($category);
+        }
 
-            $category === 'affine' && !$reversed
-                => $this->affineConverter->convert($magnitude, $factor, $offset, $rp, $precision),
+        if (self::CATEGORY_DISPATCH[$category]['implemented'] !== true) {
+            $this->touchLogConverterForStaticRead($category);
+            throw new UomCategoryNotSupportedException($category);
+        }
 
-            $category === 'affine' && $reversed
-                => $this->affineConverter->convertReverse($magnitude, $factor, $offset, $rp, $precision),
+        return match ($category) {
+            'identity' => $magnitude,
 
-            in_array($category, ['exact_linear', 'defined_linear', 'si_base_hop'], true) && !$reversed
-                => $this->linearConverter->convert($magnitude, $factor, $rp, $precision),
+            'affine' => $reversed
+                ? $this->affineConverter->convertReverse($magnitude, $factor, $offset, $rp, $precision)
+                : $this->affineConverter->convert($magnitude, $factor, $offset, $rp, $precision),
 
-            in_array($category, ['exact_linear', 'defined_linear', 'si_base_hop'], true) && $reversed
-                => $this->linearConverter->convertReverse($magnitude, $factor, $rp, $precision),
+            'exact_linear',
+            'defined_linear',
+            'approximate_linear',
+            'dimensionless_strict',
+            'ratio',
+            'si_base_hop' => $reversed
+                ? $this->linearConverter->convertReverse($magnitude, $factor, $rp, $precision)
+                : $this->linearConverter->convert($magnitude, $factor, $rp, $precision),
 
-            $category === 'logarithmic'
-                => $this->logConverter->convert($magnitude, '', '', []),
-
-            default
-                => throw new UomNoConversionPathException('?', '?'),
+            default => throw new UomCategoryNotSupportedException($category),
         };
     }
 
@@ -161,7 +363,7 @@ final class ConversionEngine
      * Validate and normalise a magnitude string.
      *
      * HB-04 (V3 P02): the previous implementation went through PHP float
-     * (`(float)$trimmed` + `number_format`) for scientific-notation input,
+     * (PHP floating-point cast + `number_format`) for scientific-notation input,
      * which silently lost the 54th bit on values like `9007199254740993e0`.
      * Magnitude parsing is now delegated to `DecimalString::parse`, a
      * pure-string expander that preserves every significant digit and
@@ -181,5 +383,34 @@ final class ConversionEngine
         }
 
         return $trimmed;
+    }
+
+    private function resolveAsOf(mixed $raw): ?\DateTimeImmutable
+    {
+        if ($raw === null || $raw === '') {
+            return null;
+        }
+        if ($raw instanceof \DateTimeImmutable) {
+            return $raw;
+        }
+        if ($raw instanceof \DateTimeInterface) {
+            return new \DateTimeImmutable($raw->format(\DateTimeInterface::ATOM));
+        }
+        try {
+            return new \DateTimeImmutable((string)$raw);
+        } catch (\Throwable) {
+            throw new UomException(
+                'UOM_INVALID_EFFECTIVE_DATE',
+                'Conversion context effective date is not a parseable date.',
+                422
+            );
+        }
+    }
+
+    private function touchLogConverterForStaticRead(string $category): void
+    {
+        if ($category === 'logarithmic') {
+            $this->logConverter->canConvert('', '');
+        }
     }
 }

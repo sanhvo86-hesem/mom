@@ -1,0 +1,90 @@
+{
+  "version": "mda-v4-p56",
+  "status": "pre_production_contract_candidate",
+  "authority": "DomainCommandController + ProblemDetailsFactory",
+  "content_type": "application/problem+json",
+  "schema_ref": "mom/api/openapi.yaml#/components/schemas/ProblemDetail",
+  "required_problem_members": ["type", "title", "status", "detail", "code"],
+  "problem_examples": [
+    {
+      "category": "validation_failure",
+      "http_status": 400,
+      "code": "command_name_required",
+      "type": "urn:hesem:problem:domain-command:command-name-required",
+      "detail": "Command name is required.",
+      "mutation_expected": false
+    },
+    {
+      "category": "security_denial",
+      "http_status": 403,
+      "code": "object_scope_denied",
+      "type": "urn:hesem:problem:domain-command:object-scope-denied",
+      "detail": "Actor is not authorized for the target site.",
+      "mutation_expected": false
+    },
+    {
+      "category": "readiness_block",
+      "http_status": 409,
+      "code": "resource_readiness_blocked",
+      "type": "urn:hesem:problem:domain-command:resource-readiness-blocked",
+      "detail": "Resource readiness blocks this command.",
+      "mutation_expected": false
+    },
+    {
+      "category": "quality_hold_block",
+      "http_status": 409,
+      "code": "quality_hold_active",
+      "type": "urn:hesem:problem:domain-command:quality-hold-active",
+      "detail": "Canonical quality hold blocks this command.",
+      "mutation_expected": false
+    },
+    {
+      "category": "idempotency_conflict",
+      "http_status": 409,
+      "code": "idempotency_conflict",
+      "type": "urn:hesem:problem:domain-command:idempotency-conflict",
+      "detail": "Idempotency key was reused with a different command payload.",
+      "mutation_expected": false
+    },
+    {
+      "category": "regulated_evidence_missing",
+      "http_status": 409,
+      "code": "regulated_evidence_missing",
+      "type": "urn:hesem:problem:domain-command:regulated-evidence-missing",
+      "detail": "Required regulated evidence or signature is missing.",
+      "mutation_expected": false
+    },
+    {
+      "category": "authority_mode_blocked",
+      "http_status": 409,
+      "code": "uom_authority_resolution_failed",
+      "type": "urn:hesem:problem:domain-command:uom-authority-resolution-failed",
+      "detail": "UOM authority resolution failed.",
+      "mutation_expected": false
+    },
+    {
+      "category": "tooling_block",
+      "http_status": 409,
+      "code": "tooling_runtime_blocked",
+      "type": "urn:hesem:problem:domain-command:tooling-runtime-blocked",
+      "detail": "Tooling runtime gate blocks this command.",
+      "mutation_expected": false
+    },
+    {
+      "category": "gage_block",
+      "http_status": 409,
+      "code": "gage_runtime_blocked",
+      "type": "urn:hesem:problem:domain-command:gage-runtime-blocked",
+      "detail": "Gage runtime gate blocks this command.",
+      "mutation_expected": false
+    },
+    {
+      "category": "runtime_handler_missing",
+      "http_status": 501,
+      "code": "command_handler_not_runtime_complete",
+      "type": "urn:hesem:problem:domain-command:command-handler-not-runtime-complete",
+      "detail": "Registered command has no runtime handler.",
+      "mutation_expected": false
+    }
+  ]
+}

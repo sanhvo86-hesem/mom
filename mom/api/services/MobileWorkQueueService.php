@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MOM\Services;
 
 use MOM\Api\Services\WorkforceQualificationGateService;
+use MOM\Api\Services\GateContextBuilder;
 use MOM\Database\Connection;
 use MOM\Database\DataLayer;
 use RuntimeException;
@@ -67,6 +68,7 @@ final class MobileWorkQueueService
         string $dataDir,
         ?object $db = null,
         ?WorkforceQualificationGateService $qualificationGate = null,
+        private readonly ?GateContextBuilder $gateContextBuilder = null,
     )
     {
         $this->dataDir   = rtrim(str_replace('\\', '/', $dataDir), '/');
@@ -216,17 +218,24 @@ final class MobileWorkQueueService
                     if ($currentStatus !== self::TASK_STATUSES[0]) {
                         throw new RuntimeException('invalid_task_start_transition');
                     }
+                    $runtimeRequirementGate = $this->gateContextBuilder?->buildOrFail(
+                        'StartJobCommand',
+                        $this->startJobGatePayload($task),
+                        ['actor_id' => $operatorId]
+                    );
                     $qualification = $this->qualificationGate->assertCanStartTask($operatorId, $task);
 
                     $queue[$idx] = array_merge($task, [
                         'task_status' => self::TASK_STATUSES[1],
                         'started_at'  => $now,
                         'updated_at'  => $now,
+                        'runtime_requirement_gate' => $runtimeRequirementGate,
                         'qualification_gate' => $qualification,
                     ]);
 
                     $this->persistWorkQueueMutationWithTaskEvent($queue, $previousQueue, $queue[$idx], 'mobile.task_started', [
                         'previous_status' => $currentStatus,
+                        'runtime_requirement_gate' => $runtimeRequirementGate,
                         'qualification_gate' => $qualification,
                     ]);
                     return $queue[$idx];
@@ -239,6 +248,32 @@ final class MobileWorkQueueService
         } finally {
             fclose($lockHandle);
         }
+    }
+
+    /**
+     * @param array<string,mixed> $task
+     * @return array<string,mixed>
+     */
+    private function startJobGatePayload(array $task): array
+    {
+        $metadata = is_array($task['metadata'] ?? null) ? (array)$task['metadata'] : [];
+        return array_merge($metadata, [
+            'queue_id' => (string)($task['queue_id'] ?? ''),
+            'wo_number' => (string)($task['wo_number'] ?? ''),
+            'jo_number' => (string)($task['jo_number'] ?? ''),
+            'operation_seq' => isset($task['operation_seq']) ? (string)$task['operation_seq'] : '',
+            'task_type' => (string)($task['task_type'] ?? ''),
+            'machine_id' => (string)($task['machine_id'] ?? ''),
+            'work_center_id' => (string)($task['work_center_id'] ?? ''),
+            'item_id' => (string)($task['item_id'] ?? $metadata['item_id'] ?? ''),
+            'part_number' => (string)($task['part_number'] ?? $metadata['part_number'] ?? ''),
+            'site_id' => (string)($task['site_id'] ?? $metadata['site_id'] ?? ''),
+            'customer_id' => (string)($task['customer_id'] ?? $metadata['customer_id'] ?? ''),
+            'supplier_id' => (string)($task['supplier_id'] ?? $metadata['supplier_id'] ?? ''),
+            'correlation_id' => (string)($task['queue_id'] ?? ''),
+            'domain' => 'mobile_start_task',
+            'evidence' => is_array($metadata['evidence'] ?? null) ? (array)$metadata['evidence'] : [],
+        ]);
     }
 
     /**

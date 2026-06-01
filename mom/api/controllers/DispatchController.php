@@ -7,6 +7,11 @@ namespace MOM\Api\Controllers;
 use InvalidArgumentException;
 use MOM\Api\Services\ConnectedGovernanceException;
 use MOM\Api\Services\ConnectedGovernanceService;
+use MOM\Api\Services\GateContextBuilder;
+use MOM\Api\Services\RuntimeRequirementGateException;
+use MOM\Api\Services\RuntimeRequirementResolverService;
+use MOM\Api\Services\Uom\UomRuntimeAuthorityService;
+use MOM\Database\Connection;
 use MOM\Services\ShopfloorExecutionService;
 use MOM\Services\ShopfloorExecutionPersistenceService;
 use RuntimeException;
@@ -37,10 +42,15 @@ class DispatchController extends BaseController
     private function shopfloor(): ShopfloorExecutionService
     {
         if ($this->shopfloorSvc === null) {
+            $db = Connection::getInstance();
             $this->shopfloorSvc = new ShopfloorExecutionService(
                 $this->dataDir,
                 $this->data,
                 connectedGovernance: new ConnectedGovernanceService($this->dataDir, $this->data),
+                gateContextBuilder: new GateContextBuilder(
+                    new RuntimeRequirementResolverService($db),
+                    new UomRuntimeAuthorityService($db)
+                ),
             );
         }
 
@@ -935,6 +945,10 @@ class DispatchController extends BaseController
             $this->error($e->getMessage(), 400);
         } catch (ConnectedGovernanceException $e) {
             $this->error($e->reasonCode(), 409, $e->getMessage(), ['entitlement' => $e->details()]);
+        } catch (RuntimeRequirementGateException $e) {
+            $this->error($e->reasonCode(), 409, $e->getMessage(), [
+                'runtime_requirement_gate' => $e->gateContext(),
+            ]);
         } catch (RuntimeException $e) {
             $this->rethrowResponse($e);
             if (in_array($e->getMessage(), ['forbidden_operator_assignment', 'missing_operator_assignment'], true)) {

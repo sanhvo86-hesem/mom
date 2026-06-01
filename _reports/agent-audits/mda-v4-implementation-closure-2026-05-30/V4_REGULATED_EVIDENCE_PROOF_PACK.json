@@ -1,0 +1,58 @@
+{
+  "prompt": "P51",
+  "decision_token": "P51_PASS_WITH_CONTROLLED_GAPS",
+  "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
+  "runtime_spine": {
+    "policy": "RegulatedActionPolicy",
+    "record_hash": "CommandRecordHasher",
+    "challenge": "SignatureChallengeService",
+    "signature": "ElectronicSignatureService",
+    "audit_evidence": "AuditEvidenceWriter",
+    "manifestation": "SignatureManifestationService",
+    "gateway_hook": "DomainCommandGateway"
+  },
+  "schema": [
+    "regulated_action_policy",
+    "domain_command_evidence_links",
+    "regulated_action_validation_protocol"
+  ],
+  "runtime_evidence": [
+    {
+      "probe": "php_lint_p51_files",
+      "result": "PASS",
+      "evidence": "No syntax errors detected in P51 services, controller, and tests."
+    },
+    {
+      "probe": "manual_missing_signature_hash_success",
+      "result": "PASS",
+      "evidence": "{\"missing_signature\":[\"signature_evidence_required\",1],\"display_hash_mismatch\":[\"signature_displayed_record_hash_mismatch\",1],\"success\":[\"sig-1\",\"link-1\",\"sig-1\",1]}"
+    },
+    {
+      "probe": "user_identity_ssot",
+      "result": "PASS",
+      "evidence": "user identity ssot clean"
+    },
+    {
+      "probe": "composer_test",
+      "result": "BLOCKED",
+      "evidence": "Could not open input file: vendor/bin/phpunit"
+    },
+    {
+      "probe": "composer_analyse_check",
+      "result": "BLOCKED",
+      "evidence": "Could not open input file: vendor/bin/phpstan"
+    }
+  ],
+  "controlled_gaps": [
+    {
+      "gap": "legacy_route_bypass",
+      "status": "open",
+      "next_prompt": "P55/P58"
+    },
+    {
+      "gap": "local_vendor_dependencies_missing",
+      "status": "blocked",
+      "next_prompt": "release/CI"
+    }
+  ]
+}

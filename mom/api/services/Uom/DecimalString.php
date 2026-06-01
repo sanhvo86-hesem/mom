@@ -9,7 +9,7 @@ namespace MOM\Api\Services\Uom;
  *
  * Closes V3 hard-blocker HB-04: the previous magnitude normaliser in
  * ConversionEngine::validateMagnitude went through PHP float for any
- * scientific-notation input (`(float)$trimmed` + `number_format`). That path
+ * scientific-notation input (PHP floating-point cast + `number_format`). That path
  * truncates anything beyond the IEEE 754 double-precision mantissa (53 bits,
  * about 15-17 significant decimal digits). The V3 simulation library makes
  * this concrete: SIM-006 requires `9007199254740993e0` (2^53 + 1) to round-
@@ -17,7 +17,8 @@ namespace MOM\Api\Services\Uom;
  * it to `9007199254740992`.
  *
  * This class re-implements scientific-to-plain-decimal expansion entirely as
- * string arithmetic. No `(float)`, no `number_format`, no `NaN`/`INF` paths.
+ * string arithmetic. No PHP floating-point cast, no `number_format`, no
+ * not-a-number/infinity paths.
  * The output is a BCMath-safe decimal string with no exponent and no leading
  * zeros (apart from the leading `0` on `|value| < 1`).
  *
@@ -55,7 +56,7 @@ final class DecimalString
             throw new UomInvalidMagnitudeException($raw);
         }
 
-        // Reject locale comma, hex, NaN/INF text and any non-grammar tokens
+        // Reject locale comma, hex, not-a-number/infinity text and any non-grammar tokens
         // explicitly — the regex below would already catch them, but the
         // explicit guard makes the intent obvious in the code.
         if (preg_match('/[a-df-zA-DF-Z,_]/', $trimmed)

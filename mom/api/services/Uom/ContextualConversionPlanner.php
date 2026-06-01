@@ -42,7 +42,9 @@ final class ContextualConversionPlanner
     public const ROUTE_FORBIDDEN     = 'forbidden';
 
     public function __construct(
-        private readonly DensityContextualConverter $densityConverter
+        private readonly DensityContextualConverter $densityConverter,
+        private readonly ?PotencyContextualConverter $potencyConverter = null,
+        private readonly ?PackagingContextualConverter $packagingConverter = null
     ) {}
 
     /**
@@ -66,6 +68,28 @@ final class ContextualConversionPlanner
         $fromKind = $fromUnitRow['quantity_kind_code'] ?? '';
         $toKind   = $toUnitRow['quantity_kind_code']   ?? '';
 
+        // Packaging policy: item-specific tiers, never a global factor.
+        if ($this->isPackagingPair($fromUnitRow, $toUnitRow, $context)) {
+            if (empty($context['item_id']) || empty($context['packaging_level'])) {
+                return [
+                    'route' => self::ROUTE_FORBIDDEN,
+                    'reason' => 'Packaging conversion requires item packaging policy context.',
+                    'context_required' => [
+                        'item_id' => 'string',
+                        'site_id' => 'string optional',
+                        'packaging_level' => 'inner|outer|pallet',
+                        'supplier_id' => 'string optional',
+                        'customer_id' => 'string optional',
+                        'effective_date' => 'date optional',
+                    ],
+                ];
+            }
+            return [
+                'route' => self::ROUTE_PACKAGING,
+                'reason' => 'Packaging route with item-specific policy.',
+            ];
+        }
+
         if ($fromKind === $toKind) {
             return [
                 'route'  => self::ROUTE_SAME_KIND,
@@ -73,37 +97,57 @@ final class ContextualConversionPlanner
             ];
         }
 
-        // Volume ↔ Mass via density
+        // Volume <-> Mass via density
         $volumeMassPair = ($fromKind === 'Volume' && $toKind === 'Mass')
                        || ($fromKind === 'Mass'   && $toKind === 'Volume');
         if ($volumeMassPair) {
-            if (empty($context['substance_code'])) {
+            if (!$this->hasDensityContext($context)) {
                 return [
                     'route'            => self::ROUTE_FORBIDDEN,
-                    'reason'           => 'Volume↔Mass requires substance density context.',
+                    'reason'           => 'Volume/Mass requires active density context.',
                     'context_required' => [
+                        'item_id_or_material_id' => 'string',
                         'substance_code' => 'string',
-                        'temperature_c'  => 'float (optional, default 20.0)',
+                        'density_value_or_registry' => 'decimal density with unit or active registry row',
+                        'lot_id' => 'string',
+                        'temperature_c'  => 'decimal string (optional, default 20.0)',
+                        'source_method' => 'string',
+                        'evidence_ref' => 'string',
                     ],
                 ];
             }
             return [
                 'route'  => self::ROUTE_DENSITY,
-                'reason' => 'Volume↔Mass with substance_code → density route.',
+                'reason' => 'Volume/Mass with density context.',
             ];
         }
 
-        // Mass ↔ AmountOfSubstance via potency/assay (forwarded — converter
-        // not yet built; planner records the requirement for P09).
-        if (($fromKind === 'Mass' && $toKind === 'AmountOfSubstance')
+        // Potency/assay: IU <-> mass requires lot-specific assay evidence.
+        if (($fromKind === 'PotencyUnit' && $toKind === 'Mass')
+         || ($fromKind === 'Mass' && $toKind === 'PotencyUnit')
+         || ($fromKind === 'Mass' && $toKind === 'AmountOfSubstance')
          || ($fromKind === 'AmountOfSubstance' && $toKind === 'Mass')
         ) {
+            if ($this->hasPotencyContext($context)) {
+                return [
+                    'route' => self::ROUTE_POTENCY,
+                    'reason' => 'Potency conversion with lot assay evidence.',
+                ];
+            }
             return [
                 'route'            => self::ROUTE_FORBIDDEN,
-                'reason'           => 'Mass↔Amount requires assay/potency context.',
+                'reason'           => 'Potency conversion requires assay evidence.',
                 'context_required' => [
-                    'assay_pct'  => 'numeric 0..100',
-                    'method_id'  => 'string',
+                    'substance' => 'string',
+                    'assay_method' => 'string',
+                    'potency_value' => 'decimal',
+                    'potency_unit' => 'IU_per_mg or equivalent',
+                    'assay_pct' => 'numeric 0..100 legacy alias',
+                    'method_id' => 'string legacy alias',
+                    'lot_id' => 'string',
+                    'certificate_ref' => 'string',
+                    'expiry_date' => 'date',
+                    'approved_by' => 'human approver id',
                 ],
             ];
         }
@@ -143,29 +187,28 @@ final class ContextualConversionPlanner
         }
 
         if ($plan['route'] === self::ROUTE_FORBIDDEN) {
-            // No context, no route. Surface the missing fields so the
-            // API layer can build a ProblemDetails payload.
-            $code = empty($context) || empty($context['substance_code'])
-                  ? 'UOM_CONTEXT_REQUIRED'
-                  : 'UOM_POLICY_NOT_FOUND';
-            throw new UomException($code, $plan['reason'], 422);
+            throw $this->contextException($plan, $context);
         }
 
         if ($plan['route'] === self::ROUTE_DENSITY) {
             $fromKind = $fromUnitRow['quantity_kind_code'] ?? '';
-            $substanceCode = (string)$context['substance_code'];
+            $substanceCode = (string)($context['substance_code'] ?? $context['material_id'] ?? $context['item_id'] ?? '');
             $tempC         = isset($context['temperature_c'])
-                ? (float)$context['temperature_c']
-                : 20.0;
+                ? DecimalString::parse((string)$context['temperature_c'])
+                : '20.0';
 
             $result = $fromKind === 'Volume'
-                ? $this->densityConverter->volumeToMass(
+                ? $this->densityConverter->volumeToMassWithContext(
                     $magnitude, $fromUnitCode, $toUnitCode,
-                    $substanceCode, $tempC, $roundingPolicy, $displayPrecision
+                    $context + ['substance_code' => $substanceCode, 'temperature_c' => $tempC],
+                    $roundingPolicy,
+                    $displayPrecision
                 )
-                : $this->densityConverter->massToVolume(
+                : $this->densityConverter->massToVolumeWithContext(
                     $magnitude, $fromUnitCode, $toUnitCode,
-                    $substanceCode, $tempC, $roundingPolicy, $displayPrecision
+                    $context + ['substance_code' => $substanceCode, 'temperature_c' => $tempC],
+                    $roundingPolicy,
+                    $displayPrecision
                 );
 
             return [
@@ -173,18 +216,89 @@ final class ContextualConversionPlanner
                 'result'          => $result['result'],
                 'density_kg_m3'   => $result['density_kg_m3'],
                 'density_source'  => $result['density_source'],
+                'evidence_ref'    => $result['evidence_ref'] ?? null,
+                'lot_id'          => $result['lot_id'] ?? ($context['lot_id'] ?? null),
                 'substance_code'  => $substanceCode,
                 'temperature_c'   => $tempC,
             ];
         }
 
-        // Potency/packaging routes deliberately not executable in P05;
-        // the planner classifier surfaces them so P09 and P11 can wire
-        // the actual converters when those domains are hardened.
+        if ($plan['route'] === self::ROUTE_POTENCY) {
+            if ($this->potencyConverter === null) {
+                throw new UomException('UOM_ROUTE_NOT_IMPLEMENTED', 'Potency converter is not configured.', 501);
+            }
+            return $this->potencyConverter->convert(
+                $magnitude,
+                $fromUnitCode,
+                $toUnitCode,
+                $context,
+                $roundingPolicy,
+                $displayPrecision
+            ) + ['route' => self::ROUTE_POTENCY];
+        }
+
+        if ($plan['route'] === self::ROUTE_PACKAGING) {
+            if ($this->packagingConverter === null) {
+                throw new UomException('UOM_ROUTE_NOT_IMPLEMENTED', 'Packaging converter is not configured.', 501);
+            }
+            return $this->packagingConverter->convert(
+                $magnitude,
+                $fromUnitCode,
+                $toUnitCode,
+                $context,
+                $roundingPolicy,
+                $displayPrecision
+            ) + ['route' => self::ROUTE_PACKAGING];
+        }
+
         throw new UomException(
             'UOM_ROUTE_NOT_IMPLEMENTED',
-            "Planner route '{$plan['route']}' is not executable in P05.",
+            "Planner route '{$plan['route']}' is not executable.",
             501
         );
+    }
+
+    private function hasDensityContext(array $context): bool
+    {
+        $hasSubject = !empty($context['substance_code']) || !empty($context['material_id']) || !empty($context['item_id']);
+        $hasDirectDensity = !empty($context['density_value']) && !empty($context['density_unit']);
+        return $hasSubject && ($hasDirectDensity || !empty($context['lot_id']) || !empty($context['source_method']) || !empty($context['substance_code']));
+    }
+
+    private function hasPotencyContext(array $context): bool
+    {
+        foreach (['substance', 'assay_method', 'potency_value', 'potency_unit', 'lot_id', 'certificate_ref', 'expiry_date', 'approved_by'] as $key) {
+            if (empty($context[$key])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function isPackagingPair(array $fromUnitRow, array $toUnitRow, array $context): bool
+    {
+        $from = (string)($fromUnitRow['canonical_code'] ?? '');
+        $to = (string)($toUnitRow['canonical_code'] ?? '');
+        $packagingCodes = ['BOX', 'CASE', 'PALLET'];
+        $eachCodes = ['EA', 'each', 'pcs'];
+        return in_array($from, $packagingCodes, true) && in_array($to, $eachCodes, true)
+            || in_array($to, $packagingCodes, true) && in_array($from, $eachCodes, true)
+            || !empty($context['packaging_level']);
+    }
+
+    private function contextException(array $plan, array $context): UomException
+    {
+        $required = $plan['context_required'] ?? [];
+        $reason = (string)($plan['reason'] ?? 'Contextual conversion cannot be planned.');
+        if (isset($required['density_value_or_registry'])) {
+            return new UomException('UOM_CONTEXT_REQUIRED', $reason . ' Remediation: provide active lot/material density evidence.', 422);
+        }
+        if (isset($required['certificate_ref'])) {
+            return new UomException('UOM_MISSING_ASSAY_EVIDENCE', $reason . ' Remediation: attach approved lot assay certificate.', 422);
+        }
+        if (isset($required['packaging_level'])) {
+            return new UomException('UOM_MISSING_PACKAGING_POLICY', $reason . ' Remediation: create an active item packaging policy.', 422);
+        }
+        return new UomException(empty($context) ? 'UOM_CONTEXT_REQUIRED' : 'UOM_POLICY_NOT_FOUND', $reason, 422);
     }
 }

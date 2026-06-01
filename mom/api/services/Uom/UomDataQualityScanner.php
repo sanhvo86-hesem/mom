@@ -236,7 +236,7 @@ final class UomDataQualityScanner
                     EXTRACT(DAY FROM now() - r.created_at)::int AS days_pending,
                     COUNT(a.id) AS steps_completed
              FROM uom_conversion_rule r
-             LEFT JOIN uom_rule_approval a ON a.rule_id = r.id AND a.rule_version = r.rule_version
+             LEFT JOIN uom_rule_approval a ON a.rule_id = r.id AND a.rule_version = r.version
              WHERE r.lifecycle_status = 'pending_review'
                AND r.created_at < now() - INTERVAL '" . self::STALE_REVIEW_DAYS . " days'
              GROUP BY r.id, r.rule_code, r.from_unit_code, r.to_unit_code, r.created_at

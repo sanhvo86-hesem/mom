@@ -1,0 +1,62 @@
+{
+  "prompt": "P49",
+  "decision_token": "P49_PASS_WITH_CONTROLLED_GAPS",
+  "implemented_gateway_commands": [
+    "CreateEngineeringReleasePackageCommand",
+    "AddPackageMemberCommand",
+    "SubmitEngineeringReleasePackageCommand",
+    "ApproveEngineeringReleasePackageCommand",
+    "ReleaseEngineeringReleasePackageCommand",
+    "SupersedeEngineeringReleasePackageCommand",
+    "WithdrawEngineeringReleasePackageCommand",
+    "BindEngineeringPackageToWorkOrderCommand",
+    "BindEngineeringPackageToJobOrderCommand",
+    "BindEngineeringPackageToSalesOrderCommand",
+    "ReleaseWorkOrderCommand"
+  ],
+  "fail_closed_registered_commands": [
+    "CreateItemCommand",
+    "CreateItemRevisionCommand",
+    "ReleaseItemRevisionCommand",
+    "StartJobCommand",
+    "IssueMaterialToWorkOrderCommand",
+    "LoadToolCommand",
+    "RecordInspectionResultCommand",
+    "CompleteOperationCommand",
+    "ApplyQualityHoldCommand",
+    "ReleaseQualityHoldCommand",
+    "PostInventoryLedgerTransactionCommand"
+  ],
+  "runtime_evidence": [
+    {
+      "probe": "unknown_command",
+      "result": "PASS",
+      "evidence": "[\"unknown_command\",404]"
+    },
+    {
+      "probe": "registered_unimplemented_command",
+      "result": "PASS",
+      "evidence": "[\"command_handler_not_runtime_complete\",501]"
+    },
+    {
+      "probe": "idempotency_replay_no_handler_execution",
+      "result": "PASS",
+      "evidence": "[true,\"pkg-1\",false]"
+    },
+    {
+      "probe": "openapi_operation",
+      "result": "PASS",
+      "evidence": "openapi_domain_command_probe_ok"
+    },
+    {
+      "probe": "composer_test",
+      "result": "BLOCKED",
+      "evidence": "Could not open input file: vendor/bin/phpunit"
+    },
+    {
+      "probe": "composer_analyse_check",
+      "result": "BLOCKED",
+      "evidence": "Could not open input file: vendor/bin/phpstan"
+    }
+  ]
+}

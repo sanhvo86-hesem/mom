@@ -38,16 +38,18 @@ class GenericCrudService
     private string $dataDir;
     private ?WorkflowEngine $workflowEngine = null;
     private ?EventBus $eventBus;
+    private ?GenericCrudGuardService $mutationGuard;
 
     /** @var array<string, array<string, mixed>> */
     private array $tables = [];
     /** @var array<string, array<string, mixed>>|null */
     private ?array $tableGovernanceOverlay = null;
 
-    public function __construct(string $dataDir, ?EventBus $eventBus = null)
+    public function __construct(string $dataDir, ?EventBus $eventBus = null, ?GenericCrudGuardService $mutationGuard = null)
     {
         $this->dataDir = $dataDir;
         $this->eventBus = $eventBus;
+        $this->mutationGuard = $mutationGuard;
         $portalRoot = dirname(__DIR__, 2);
         $config = (array)(require $portalRoot . '/database/config.php');
         $this->db = Connection::getInstance($config);
@@ -408,9 +410,10 @@ class GenericCrudService
      * @param array<string, mixed> $payload
      * @return array<string, mixed>
      */
-    public function create(string $domain, string $tableName, array $payload, string $userId = 'system', array $scope = []): array
+    public function create(string $domain, string $tableName, array $payload, string $userId = 'system', array $scope = [], array $guardContext = []): array
     {
         $table = $this->resolveTable($domain, $tableName);
+        $guardDecision = $this->assertGenericMutationAllowed($domain, $tableName, 'create', $table, $userId, $guardContext);
         $data = $this->filterWritableColumns($table, $this->applyScopeColumns($table, $payload, $scope), false);
         $this->validatePayload($domain, $tableName, $table, $data, 'create');
         $data = $this->applyAuditColumns($table, $data, $userId, true);
@@ -432,7 +435,7 @@ class GenericCrudService
             . ' (' . implode(', ', array_map(fn(string $column): string => $this->q($column), $columns)) . ')'
             . ' VALUES (' . implode(', ', $placeholders) . ') RETURNING *';
 
-        $row = $this->db->insertReturning($sql, $params);
+        $row = $this->withGenericCrudDbContext($guardDecision, fn(): ?array => $this->db->insertReturning($sql, $params));
         if (!is_array($row)) {
             throw new RuntimeException('Insert did not return a record');
         }
@@ -452,9 +455,10 @@ class GenericCrudService
      * @param array<string, mixed> $payload
      * @return array<string, mixed>
      */
-    public function update(string $domain, string $tableName, array $identity, array $payload, string $userId = 'system', array $scope = [], ?int $expectedVersion = null): array
+    public function update(string $domain, string $tableName, array $identity, array $payload, string $userId = 'system', array $scope = [], ?int $expectedVersion = null, array $guardContext = []): array
     {
         $table = $this->resolveTable($domain, $tableName);
+        $guardDecision = $this->assertGenericMutationAllowed($domain, $tableName, 'update', $table, $userId, $guardContext);
         $existing = $this->detail($domain, $tableName, $identity, $scope);
         if ($existing === null) {
             throw new RecordNotFoundException('Record not found');
@@ -485,7 +489,7 @@ class GenericCrudService
             . ' SET ' . implode(', ', $sets)
             . ' WHERE ' . $where['sql'] . ' RETURNING *';
 
-        $row = $this->db->insertReturning($sql, $params);
+        $row = $this->withGenericCrudDbContext($guardDecision, fn(): ?array => $this->db->insertReturning($sql, $params));
         if (!is_array($row)) {
             $this->assertMutationResult($tableName, $table, $identity, $scope, $expectedVersion, 'Update');
         }
@@ -511,9 +515,10 @@ class GenericCrudService
     /**
      * @return array<string, mixed>
      */
-    public function delete(string $domain, string $tableName, array $identity, array $scope = [], ?int $expectedVersion = null, string $userId = ''): array
+    public function delete(string $domain, string $tableName, array $identity, array $scope = [], ?int $expectedVersion = null, string $userId = '', array $guardContext = []): array
     {
         $table = $this->resolveTable($domain, $tableName);
+        $guardDecision = $this->assertGenericMutationAllowed($domain, $tableName, 'delete', $table, $userId, $guardContext);
         $deleteContract = $this->deleteContract($tableName, $table);
         $where = $this->combineWhereClauses(
             $this->identityWhereClause($table, $identity, 'delete'),
@@ -552,7 +557,7 @@ class GenericCrudService
             $sql = 'UPDATE ' . $this->q($tableName)
                 . ' SET ' . implode(', ', $sets)
                 . ' WHERE ' . $where['sql'] . ' RETURNING *';
-            $row = $this->db->insertReturning($sql, $params);
+            $row = $this->withGenericCrudDbContext($guardDecision, fn(): ?array => $this->db->insertReturning($sql, $params));
             if (!is_array($row)) {
                 $this->assertMutationResult($tableName, $table, $identity, $scope, $expectedVersion, 'Delete');
             }
@@ -570,7 +575,7 @@ class GenericCrudService
 
         $sql = 'DELETE FROM ' . $this->q($tableName)
             . ' WHERE ' . $where['sql'] . ' RETURNING *';
-        $row = $this->db->insertReturning($sql, $where['params']);
+        $row = $this->withGenericCrudDbContext($guardDecision, fn(): ?array => $this->db->insertReturning($sql, $where['params']));
         if (!is_array($row)) {
             $this->assertMutationResult($tableName, $table, $identity, $scope, $expectedVersion, 'Delete');
         }
@@ -584,6 +589,69 @@ class GenericCrudService
         ));
 
         return $record;
+    }
+
+    private function mutationGuard(): GenericCrudGuardService
+    {
+        if ($this->mutationGuard === null) {
+            $this->mutationGuard = new GenericCrudGuardService($this->dataDir);
+        }
+
+        return $this->mutationGuard;
+    }
+
+    /**
+     * @param array<string, mixed> $table
+     * @param array<string, mixed> $guardContext
+     * @return array<string, mixed>
+     */
+    private function assertGenericMutationAllowed(string $domain, string $tableName, string $operation, array $table, string $userId, array $guardContext): array
+    {
+        $context = array_merge([
+            'table_known' => true,
+            'source' => 'GenericCrudService',
+            'user_id' => $userId,
+            'table_meta' => $table,
+            'correlation_id' => (string)($_SERVER['HTTP_X_CORRELATION_ID'] ?? $_SERVER['HTTP_X_REQUEST_ID'] ?? ''),
+        ], $guardContext);
+
+        $guard = $this->mutationGuard();
+        $guard->assertMutationAllowed($domain, $tableName, $operation, $context);
+
+        return $guard->evaluate($domain, $tableName, $operation, $context);
+    }
+
+    /**
+     * @template T
+     * @param array<string, mixed> $guardDecision
+     * @param callable(): T $callback
+     * @return T
+     */
+    private function withGenericCrudDbContext(array $guardDecision, callable $callback): mixed
+    {
+        $run = function () use ($guardDecision, $callback): mixed {
+            $breakGlass = (($guardDecision['allowed_by'] ?? '') === 'migration_break_glass') ? '1' : '0';
+            $this->db->execute("SELECT set_config('hesem.generic_crud_context', '1', true)");
+            $this->db->execute("SELECT set_config('hesem.generic_crud_break_glass', :break_glass, true)", [
+                ':break_glass' => $breakGlass,
+            ]);
+            try {
+                return $callback();
+            } finally {
+                try {
+                    $this->db->execute("SELECT set_config('hesem.generic_crud_context', '0', true)");
+                    $this->db->execute("SELECT set_config('hesem.generic_crud_break_glass', '0', true)");
+                } catch (\Throwable $e) {
+                    @error_log('[GenericCrudService] Failed to clear generic CRUD DB guard context: ' . $e->getMessage());
+                }
+            }
+        };
+
+        if ($this->db->inTransaction()) {
+            return $run();
+        }
+
+        return $this->db->transactional($run);
     }
 
     private function workflowEngine(): WorkflowEngine
@@ -712,9 +780,17 @@ class GenericCrudService
      * @param array<int, string> $userRoles
      * @return array<string, mixed>
      */
-    public function transition(string $domain, string $tableName, array $identity, string $toStatus, string $userId, array $userRoles = [], array $scope = [], ?int $expectedVersion = null): array
+    public function transition(string $domain, string $tableName, array $identity, string $toStatus, string $userId, array $userRoles = [], array $scope = [], ?int $expectedVersion = null, array $guardContext = []): array
     {
         $table = $this->resolveTable($domain, $tableName);
+        $guardDecision = $this->assertGenericMutationAllowed(
+            $domain,
+            $tableName,
+            'transition',
+            $table,
+            $userId,
+            array_merge(['user_roles' => $userRoles], $guardContext)
+        );
         $runtime = $this->assertTransitionRuntimeSupported($domain, $tableName, $table);
         $statusColumn = $this->managedStatusField($table);
         if ($statusColumn === '') {
@@ -730,7 +806,7 @@ class GenericCrudService
         $this->assertValidStatus($table, $toStatus);
         $this->assertAllowedTransition($table, $currentStatus, $toStatus, $userRoles);
         if (strtolower(trim((string)($runtime['lifecycle_mode'] ?? ''))) === 'persisted') {
-            return $this->transitionViaWorkflowEngine(
+            return $this->withGenericCrudDbContext($guardDecision, fn(): array => $this->transitionViaWorkflowEngine(
                 $domain,
                 $tableName,
                 $table,
@@ -742,7 +818,7 @@ class GenericCrudService
                 $scope,
                 $expectedVersion,
                 $runtime
-            );
+            ));
         }
 
         $data = $this->applyAuditColumns($table, [$statusColumn => $toStatus], $userId, false);
@@ -767,7 +843,7 @@ class GenericCrudService
         $sql = 'UPDATE ' . $this->q($tableName)
             . ' SET ' . implode(', ', $sets)
             . ' WHERE ' . $where['sql'] . ' RETURNING *';
-        $row = $this->db->insertReturning($sql, $params);
+        $row = $this->withGenericCrudDbContext($guardDecision, fn(): ?array => $this->db->insertReturning($sql, $params));
         if (!is_array($row)) {
             $this->assertMutationResult($tableName, $table, $identity, $scope, $expectedVersion, 'Transition');
         }

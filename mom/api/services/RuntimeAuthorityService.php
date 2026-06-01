@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace MOM\Api\Services;
 
+use MOM\Api\Services\Uom\UomRuntimeAuthorityService;
+use MOM\Database\Connection;
 use MOM\Database\DataLayer;
 use MOM\Services\MasterDataService;
 use MOM\Services\OrderWorkflowService;
+use Throwable;
 
 /**
  * Central runtime authority posture report for promoted backend slices.
@@ -28,6 +31,8 @@ final class RuntimeAuthorityService
         private readonly ?ConnectedGovernanceService $connectedGovernance = null,
         private readonly ?PlanningScenarioService $planningScenario = null,
         private readonly ?TraceabilityGenealogyService $traceabilityGenealogy = null,
+        private readonly ?MdaRuntimeTelemetryService $mdaTelemetry = null,
+        private readonly ?UomRuntimeAuthorityService $uomAuthority = null,
     ) {
     }
 
@@ -50,6 +55,8 @@ final class RuntimeAuthorityService
         $connectedGovernance = ($this->connectedGovernance ?? new ConnectedGovernanceService($this->dataDir, $this->data, events: $eventBackbone))->probe();
         $planningScenario = ($this->planningScenario ?? new PlanningScenarioService($this->dataDir, $this->data))->probe();
         $traceabilityGenealogy = ($this->traceabilityGenealogy ?? new TraceabilityGenealogyService($this->dataDir, $this->data, $eventBackbone))->probe();
+        $runtimeTelemetry = ($this->mdaTelemetry ?? new MdaRuntimeTelemetryService($this->dataDir))->report();
+        $uomAuthority = $this->uomRuntimeAuthorityProbe();
         $canonicalGenealogy = (new \MOM\Services\Traceability\GenealogyGraphService($this->data))->probe();
         if (($canonicalGenealogy['authoritative'] ?? false) === true) {
             $traceabilityGenealogy = array_merge($traceabilityGenealogy, $canonicalGenealogy, [
@@ -70,6 +77,8 @@ final class RuntimeAuthorityService
             'connected_governance' => $this->normalizeOperationalSlice($connectedGovernance),
             'planning_scenario' => $this->normalizeOperationalSlice($planningScenario),
             'traceability_genealogy' => $this->normalizeOperationalSlice($traceabilityGenealogy),
+            'uom_runtime_authority' => $this->normalizeOperationalSlice($uomAuthority),
+            'mda_runtime_control_tower' => $this->normalizeOperationalSlice($this->normalizeTelemetrySlice($runtimeTelemetry)),
         ];
 
         $states = [];
@@ -81,7 +90,10 @@ final class RuntimeAuthorityService
             if ($state === 'degraded') {
                 $degraded[] = $slice;
             }
-            if ($state !== 'authoritative_ready') {
+            $authoritative = $state === 'authoritative_ready'
+                || str_starts_with($state, 'authoritative_ready')
+                || $state === 'postgres_authority_shadow_export';
+            if (!$authoritative) {
                 $nonAuthoritative[] = $slice;
             }
         }
@@ -163,15 +175,54 @@ final class RuntimeAuthorityService
     private function normalizeOperationalSlice(array $probe): array
     {
         $state = (string)($probe['readiness_state'] ?? 'degraded');
-        $authorityMode = trim((string)($probe['authority_mode'] ?? ''));
+        $rawAuthorityMode = $probe['authority_mode'] ?? '';
+        $authorityMode = is_scalar($rawAuthorityMode) ? trim((string)$rawAuthorityMode) : '';
         return array_merge($probe, [
             'authority_mode' => $authorityMode !== '' ? $authorityMode : match ($state) {
-                'authoritative_ready' => 'postgres_primary',
+                'authoritative_ready', 'authoritative_ready_postgres_only', 'authoritative_ready_with_fallback_telemetry' => 'postgres_primary',
+                'postgres_authority_shadow_export' => 'shadow_mode',
                 'authority_partial' => 'shadow_mode',
                 'compatibility_only' => 'json_fallback',
                 default => 'degraded',
             },
         ]);
+    }
+
+    /**
+     * @param array<string,mixed> $probe
+     * @return array<string,mixed>
+     */
+    private function normalizeTelemetrySlice(array $probe): array
+    {
+        $scorecard = is_array($probe['p60_scorecard_input'] ?? null) ? (array)$probe['p60_scorecard_input'] : [];
+        $metricsPresent = (bool)($scorecard['required_metrics_present'] ?? false);
+        $p0AlertCount = (int)($scorecard['p0_alert_count'] ?? 0);
+
+        return array_merge($probe, [
+            'slice' => 'mda_runtime_control_tower',
+            'readiness_state' => $metricsPresent && $p0AlertCount === 0 ? 'authoritative_ready' : 'degraded',
+            'authority_mode' => 'observability_only',
+            'degradation_reason' => $metricsPresent ? ($p0AlertCount > 0 ? 'active_p0_runtime_alerts' : '') : 'required_metrics_missing',
+        ]);
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private function uomRuntimeAuthorityProbe(): array
+    {
+        try {
+            return ($this->uomAuthority ?? new UomRuntimeAuthorityService(Connection::getInstance()))->probe();
+        } catch (Throwable $e) {
+            return [
+                'slice' => 'uom_runtime_authority',
+                'readiness_state' => 'degraded',
+                'authority_mode' => 'degraded',
+                'degradation_reason' => 'uom_runtime_authority_probe_failed',
+                'error' => $e->getMessage(),
+                'no_bridge_runtime_contract' => false,
+            ];
+        }
     }
 
     private function baseDir(): string

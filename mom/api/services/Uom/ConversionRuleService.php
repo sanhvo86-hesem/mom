@@ -10,18 +10,21 @@ use MOM\Database\Connection;
  * Resolves conversion rules for a (from_unit, to_unit) pair.
  *
  * Resolution order:
- *   1. Direct rule  — from=from, to=to, status='approved'
- *   2. Reverse rule — from=to, to=from, status='approved', bidirectional=true
+ *   1. Direct rule  — from=from, to=to, lifecycle active or legacy approved
+ *   2. Reverse rule — from=to, to=from, lifecycle active or legacy approved,
+ *      bidirectional=true
  *   3. SI base hop  — no rule; both units are non-affine; compute via si_factor
  *
- * Redis cache: key `uom:rule:{from}:{to}`, TTL 3600 s.
+ * Redis cache: key `uom:rule:v5:{from}:{to}:{as_of}:{context}:{policy}`, TTL 3600 s.
  * Cache is invalidated when a rule changes lifecycle_status (handled by
  * UomWorkflowService in IMPL-07).
  */
 final class ConversionRuleService
 {
     private const CACHE_TTL = 3600;
-    private const CACHE_PREFIX = 'uom:rule:';
+    public const CACHE_PREFIX = 'uom:rule:v5:';
+    public const LEGACY_CACHE_PREFIX = 'uom:rule:';
+    public const LIFECYCLE_POLICY_VERSION = 'active-approved-v1';
     private const BCMATH_SCALE = 30;
 
     public function __construct(
@@ -39,26 +42,43 @@ final class ConversionRuleService
      *   'factor'          => string,      // numeric string
      *   'offset_value'    => string,      // '0' for linear
      *   'rounding_policy' => string,      // policy_code
+     *   'factor_exact'    => bool,
+     *   'effective_from'  => string|null,
+     *   'effective_to'    => string|null,
      *   'reversed'        => bool,        // true when using a reverse path
      *   'risk_level'      => string,
      * ]
      *
      * @throws UomNoConversionPathException when no path is found
      */
-    public function resolve(string $fromCode, string $toCode, array $fromUnit, array $toUnit): array
-    {
+    public function resolve(
+        string $fromCode,
+        string $toCode,
+        array $fromUnit,
+        array $toUnit,
+        ?\DateTimeInterface $asOf = null,
+        ?string $contextHash = null
+    ): array {
         if ($fromCode === $toCode) {
             return $this->identityRule($fromCode);
         }
 
-        $cacheKey = self::CACHE_PREFIX . $fromCode . ':' . $toCode;
+        $asOfDate = ($asOf ?? new \DateTimeImmutable('today'))->format('Y-m-d');
+        $contextKey = $contextHash !== null && $contextHash !== '' ? $contextHash : 'none';
+        $cacheKey = implode(':', [
+            self::CACHE_PREFIX . $fromCode,
+            $toCode,
+            $asOfDate,
+            $contextKey,
+            self::LIFECYCLE_POLICY_VERSION,
+        ]);
         $cached   = $this->cacheGet($cacheKey);
         if ($cached !== null) {
             return $cached;
         }
 
-        $rule = $this->findDirectRule($fromCode, $toCode)
-            ?? $this->findReverseRule($fromCode, $toCode)
+        $rule = $this->findDirectRule($fromCode, $toCode, $asOfDate)
+            ?? $this->findReverseRule($fromCode, $toCode, $asOfDate)
             ?? $this->buildSiBaseHop($fromCode, $toCode, $fromUnit, $toUnit);
 
         if ($rule === null) {
@@ -69,19 +89,21 @@ final class ConversionRuleService
         return $rule;
     }
 
-    private function findDirectRule(string $from, string $to): ?array
+    private function findDirectRule(string $from, string $to, string $asOfDate): ?array
     {
         $row = $this->db->queryOne(
             "SELECT rule_code, version, category, factor, offset_value,
-                    rounding_policy_id, risk_level
+                    rounding_policy_id, risk_level, factor_exact,
+                    effective_from, effective_to, context_required
              FROM uom_conversion_rule
              WHERE from_unit_code = :from
                AND to_unit_code   = :to
-               AND lifecycle_status = 'approved'
-               AND (effective_to IS NULL OR effective_to >= CURRENT_DATE)
+               AND lifecycle_status IN ('active', 'approved')
+               AND effective_from <= :as_of::date
+               AND (effective_to IS NULL OR effective_to > :as_of::date)
              ORDER BY version DESC
              LIMIT 1",
-            [':from' => $from, ':to' => $to]
+            [':from' => $from, ':to' => $to, ':as_of' => $asOfDate]
         );
 
         if ($row === null) {
@@ -91,20 +113,22 @@ final class ConversionRuleService
         return $this->normalise($row, false);
     }
 
-    private function findReverseRule(string $from, string $to): ?array
+    private function findReverseRule(string $from, string $to, string $asOfDate): ?array
     {
         $row = $this->db->queryOne(
             "SELECT rule_code, version, category, factor, offset_value,
-                    rounding_policy_id, risk_level
+                    rounding_policy_id, risk_level, factor_exact,
+                    effective_from, effective_to, context_required
              FROM uom_conversion_rule
              WHERE from_unit_code = :to
                AND to_unit_code   = :from
-               AND lifecycle_status = 'approved'
+               AND lifecycle_status IN ('active', 'approved')
                AND bidirectional = true
-               AND (effective_to IS NULL OR effective_to >= CURRENT_DATE)
+               AND effective_from <= :as_of::date
+               AND (effective_to IS NULL OR effective_to > :as_of::date)
              ORDER BY version DESC
              LIMIT 1",
-            [':from' => $from, ':to' => $to]
+            [':from' => $from, ':to' => $to, ':as_of' => $asOfDate]
         );
 
         if ($row === null) {
@@ -127,6 +151,9 @@ final class ConversionRuleService
         array  $toUnit
     ): ?array {
         if ($fromUnit['is_affine'] || $toUnit['is_affine']) {
+            return null;
+        }
+        if (($fromUnit['quantity_kind_code'] ?? null) !== ($toUnit['quantity_kind_code'] ?? null)) {
             return null;
         }
         if (empty($fromUnit['si_factor']) || empty($toUnit['si_factor'])) {
@@ -155,6 +182,10 @@ final class ConversionRuleService
             'factor'          => $syntheticFactor,
             'offset_value'    => '0',
             'rounding_policy' => 'ROUND_HALF_EVEN',
+            'factor_exact'    => false,
+            'effective_from'  => null,
+            'effective_to'    => null,
+            'context_required'=> false,
             'reversed'        => false,
             'risk_level'      => $riskLevel,
         ];
@@ -169,6 +200,10 @@ final class ConversionRuleService
             'factor'          => '1',
             'offset_value'    => '0',
             'rounding_policy' => 'ROUND_NONE',
+            'factor_exact'    => true,
+            'effective_from'  => null,
+            'effective_to'    => null,
+            'context_required'=> false,
             'reversed'        => false,
             'risk_level'      => 'low',
         ];
@@ -183,6 +218,10 @@ final class ConversionRuleService
             'factor'          => (string)($row['factor'] ?? '1'),
             'offset_value'    => (string)($row['offset_value'] ?? '0'),
             'rounding_policy' => $row['rounding_policy_id'] ?? 'ROUND_HALF_EVEN',
+            'factor_exact'    => (bool)($row['factor_exact'] ?? false),
+            'effective_from'  => isset($row['effective_from']) ? (string)$row['effective_from'] : null,
+            'effective_to'    => isset($row['effective_to']) ? (string)$row['effective_to'] : null,
+            'context_required'=> (bool)($row['context_required'] ?? false),
             'reversed'        => $reversed,
             'risk_level'      => $row['risk_level'] ?? 'low',
         ];

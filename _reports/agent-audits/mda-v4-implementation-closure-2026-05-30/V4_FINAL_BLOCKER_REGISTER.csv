@@ -1,0 +1,5 @@
+blocker_id,severity,status,source,evidence,required_repair
+P60-POSTGRES-RESTORE-TARGET-MISSING,P0,CLOSED,P59 operational drill,postgres_restore_status=pass,"Closed by isolated PostgreSQL restore drill with artifact hash parity plus audit/outbox parity"
+P60-LIVE-VPS-CHROME-SMOKE-MISSING-OR-FAILED,P0,CLOSED,P59 operational drill,live_vps_chrome_status=pass,"Closed by Chrome smoke against VPS preview branch served through SSH tunnel"
+P60-FULL-PHPUNIT-BLOCKED,P1,CLOSED,P58 proof pack,composer_test=PASS,"Closed by composer test: 975 tests, 9262 assertions, 2 skipped"
+P60-FULL-PHPSTAN-BLOCKED,P1,CLOSED,P58 proof pack,composer_analyse=PASS,"Closed by PHPStan: 404 files, no errors"
