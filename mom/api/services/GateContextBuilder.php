@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MOM\Api\Services;
 
 use MOM\Api\Services\Uom\UomException;
+use MOM\Api\Services\Uom\UomRuntimeAuthorityService;
 use Throwable;
 
 /**
@@ -17,7 +18,7 @@ final class GateContextBuilder
 {
     public function __construct(
         private readonly RuntimeRequirementResolverService $resolver,
-        private readonly ?MdaUomAuthorityBridge $uomBridge = null,
+        private readonly ?UomRuntimeAuthorityService $uomAuthority = null,
     ) {}
 
     /**
@@ -31,9 +32,9 @@ final class GateContextBuilder
         $uomError = null;
         $preResolvedBlockers = [];
 
-        if ($this->uomBridge !== null && array_key_exists($commandName, $this->uomBridge->commandPolicyMatrix())) {
+        if ($this->uomAuthority !== null && array_key_exists($commandName, $this->uomAuthority->commandPolicyMatrix())) {
             try {
-                $candidateEvidence['uom'] = $this->uomBridge->normalizeCommandQuantity(
+                $candidateEvidence['uom'] = $this->uomAuthority->normalizeCommandQuantity(
                     $commandName,
                     $payload,
                     [

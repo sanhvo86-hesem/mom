@@ -6,9 +6,9 @@ namespace MOM\Api\Controllers;
 
 use MOM\Api\Controllers\BaseController;
 use MOM\Api\Services\GateContextBuilder;
-use MOM\Api\Services\MdaUomAuthorityBridge;
 use MOM\Api\Services\RuntimeRequirementGateException;
 use MOM\Api\Services\RuntimeRequirementResolverService;
+use MOM\Api\Services\Uom\UomRuntimeAuthorityService;
 use MOM\Api\Services\WorkforceQualificationException;
 use MOM\Database\Connection;
 use MOM\Services\MobileWorkQueueService;
@@ -47,7 +47,7 @@ class MobileController extends BaseController
             $db = Connection::getInstance();
             $gateContextBuilder = new GateContextBuilder(
                 new RuntimeRequirementResolverService($db),
-                new MdaUomAuthorityBridge($db)
+                new UomRuntimeAuthorityService($db)
             );
             $this->mobileSvc = new MobileWorkQueueService($this->dataDir, $this->data, null, $gateContextBuilder);
         }

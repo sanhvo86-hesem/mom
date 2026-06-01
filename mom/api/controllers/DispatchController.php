@@ -8,9 +8,9 @@ use InvalidArgumentException;
 use MOM\Api\Services\ConnectedGovernanceException;
 use MOM\Api\Services\ConnectedGovernanceService;
 use MOM\Api\Services\GateContextBuilder;
-use MOM\Api\Services\MdaUomAuthorityBridge;
 use MOM\Api\Services\RuntimeRequirementGateException;
 use MOM\Api\Services\RuntimeRequirementResolverService;
+use MOM\Api\Services\Uom\UomRuntimeAuthorityService;
 use MOM\Database\Connection;
 use MOM\Services\ShopfloorExecutionService;
 use MOM\Services\ShopfloorExecutionPersistenceService;
@@ -49,7 +49,7 @@ class DispatchController extends BaseController
                 connectedGovernance: new ConnectedGovernanceService($this->dataDir, $this->data),
                 gateContextBuilder: new GateContextBuilder(
                     new RuntimeRequirementResolverService($db),
-                    new MdaUomAuthorityBridge($db)
+                    new UomRuntimeAuthorityService($db)
                 ),
             );
         }
