@@ -90,6 +90,26 @@ assert_false() {
   fi
 }
 
+assert_file_contains() {
+  local file="$1"
+  local needle="$2"
+  if grep -Fq "$needle" "$file"; then
+    echo "  PASS ${file#$ROOT/} contains ${needle}"
+  else
+    fail_assert "expected ${file#$ROOT/} to contain ${needle}"
+  fi
+}
+
+assert_file_not_contains() {
+  local file="$1"
+  local needle="$2"
+  if grep -Fq "$needle" "$file"; then
+    fail_assert "expected ${file#$ROOT/} not to contain ${needle}"
+  else
+    echo "  PASS ${file#$ROOT/} does not contain ${needle}"
+  fi
+}
+
 assert_reason_contains() {
   local needle="$1"
   local actual
@@ -158,8 +178,9 @@ assert_true needs_frontend_js_safety
 assert_true needs_frontend_static_safety
 assert_true needs_graphics_safety
 assert_true needs_hmv4_safety
-assert_true needs_playwright_e2e
-assert_true needs_visual_e2e
+assert_true needs_portal_runtime_smoke
+assert_false needs_playwright_e2e
+assert_false needs_visual_e2e
 assert_false needs_phpstan
 assert_false needs_phpunit
 assert_false needs_doc_health
@@ -189,12 +210,14 @@ assert_false needs_graphics_safety
 assert_false needs_full_regression
 assert_false needs_phpunit
 assert_false needs_playwright_e2e
+assert_false needs_portal_runtime_smoke
 
 run_case "10 HMV4 behavior" "mom/scripts/portal/70-module-template-v4-hydration.js"
 assert_true needs_frontend_safety
 assert_true needs_frontend_js_safety
 assert_true needs_hmv4_safety
 assert_true needs_playwright_e2e
+assert_false needs_portal_runtime_smoke
 assert_false needs_phpunit
 assert_false needs_doc_health
 assert_false needs_raci
@@ -278,6 +301,8 @@ assert_true needs_frontend_safety
 assert_true needs_graphics_safety
 assert_false needs_security_light
 assert_false needs_playwright_e2e
+assert_false needs_visual_e2e
+assert_false needs_portal_runtime_smoke
 assert_false needs_full_regression
 
 run_case "23 HMV4 CSS-only" "mom/styles/module-template-v4.css"
@@ -321,14 +346,16 @@ run_case "30 Portal HTML only" "mom/portal.html"
 assert_true needs_frontend_static_safety
 assert_false needs_frontend_js_safety
 assert_false needs_playwright_e2e
+assert_false needs_portal_runtime_smoke
 assert_false needs_full_regression
 
 run_case "30b Critical portal runtime" "mom/scripts/portal/00-block-engine.js"
 assert_true needs_frontend_safety
 assert_true needs_frontend_js_safety
 assert_true needs_hmv4_safety
-assert_true needs_playwright_e2e
-assert_true needs_visual_e2e
+assert_true needs_portal_runtime_smoke
+assert_false needs_playwright_e2e
+assert_false needs_visual_e2e
 assert_false needs_full_regression
 
 run_case "31 Template only" "mom/templates/example.html"
@@ -366,6 +393,34 @@ if grep -q "visual_required" "$ROOT/.github/workflows/ci.yml" &&
 else
   fail_assert "expected visual_required input, visual-required label, and blocking summary policy in ci.yml"
 fi
+
+echo "CASE 36b Immutable migration base audit"
+assert_file_contains "$ROOT/.github/workflows/ci.yml" "github.event.pull_request.base.sha"
+assert_file_contains "$ROOT/.github/workflows/ci.yml" "Migration uniqueness base:"
+assert_file_not_contains "$ROOT/.github/workflows/ci.yml" "origin/main...HEAD"
+assert_file_not_contains "$ROOT/.github/workflows/ci.yml" "git ls-tree -r --name-only origin/main"
+
+echo "CASE 36c Portal runtime smoke workflow audit"
+assert_file_contains "$ROOT/.github/workflows/ci.yml" "needs_portal_runtime_smoke"
+assert_file_contains "$ROOT/.github/workflows/ci.yml" "Portal Runtime Smoke"
+assert_file_contains "$ROOT/.github/workflows/ci.yml" "node tools/scripts/smoke-portal-runtime.mjs"
+assert_file_contains "$ROOT/tools/scripts/smoke-portal-runtime.mjs" "PASS portal runtime smoke"
+
+echo "CASE 36d Branch protection governance audit"
+assert_file_contains "$ROOT/.github/workflows/ci.yml" "DO NOT MERGE until CI Summary is success"
+assert_file_contains "$ROOT/docs/ops/BRANCH_PROTECTION_REQUIRED.md" "CI Summary"
+assert_file_contains "$ROOT/docs/ops/BRANCH_PROTECTION_REQUIRED.md" "Do not require individual conditional Smart CI jobs"
+
+run_case "36e Migration plus critical portal runtime" $'mom/database/migrations/265_example.sql\nmom/scripts/portal/01-module-router.js'
+assert_true needs_db_migration_check
+assert_true needs_phpunit
+assert_true needs_frontend_safety
+assert_true needs_frontend_js_safety
+assert_true needs_hmv4_safety
+assert_true needs_portal_runtime_smoke
+assert_false needs_playwright_e2e
+assert_false needs_visual_e2e
+assert_false needs_full_regression
 
 echo "CASE 37 Parallel dependency audit"
 python3 - "$ROOT/.github/workflows/ci.yml" <<'PY' || FAILED=1
