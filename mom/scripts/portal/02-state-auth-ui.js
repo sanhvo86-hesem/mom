@@ -3427,7 +3427,11 @@ function navigateTo(page, filter, bypassGuard){
   if(page==='compliance-reports' && typeof window._renderComplianceReports==='function'){ var crp=document.getElementById('page-compliance-reports'); if(crp) window._renderComplianceReports(crp); }
   if(page==='template-demo'){
     var tdp=document.getElementById('page-template-demo');
-    if(tdp && window.HmModuleRouter){ window.HmModuleRouter.renderModuleById(tdp, 'M2-orders'); }
+    /* Module Studio (P2): the Lego Block Master workspace is the canonical content
+       of this page. Falls back to the legacy M2-orders demo preview if the shell
+       module is unavailable for any reason. */
+    if(tdp && window.ModuleStudio && typeof window.ModuleStudio.render==='function'){ window.ModuleStudio.render(tdp); }
+    else if(tdp && window.HmModuleRouter){ window.HmModuleRouter.renderModuleById(tdp, 'M2-orders'); }
     else if(tdp && typeof window._renderTemplateModule==='function'){ window._renderTemplateModule(tdp); }
   }
   if(page==='fmea' && typeof window._renderFmeaControlPlan==='function'){ var fmp=document.getElementById('page-fmea'); if(fmp) window._renderFmeaControlPlan(fmp); }
