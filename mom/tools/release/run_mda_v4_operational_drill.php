@@ -45,10 +45,10 @@ if ($driftCount > 0) {
 if (($restore['artifact_restore']['status'] ?? '') !== 'pass') {
     $noGo[] = 'artifact_restore_hash_mismatch';
 }
-if (($restore['postgres_restore']['status'] ?? '') !== 'blocked_no_clean_target') {
-    $noGo[] = 'postgres_restore_status_unexpected';
-} else {
-    $noGo[] = 'postgres_restore_target_missing';
+if (($restore['postgres_restore']['status'] ?? '') !== 'pass') {
+    $noGo[] = (($restore['postgres_restore']['status'] ?? '') === 'blocked_no_clean_target')
+        ? 'postgres_restore_target_missing'
+        : 'postgres_restore_failed';
 }
 if (($browser['live_vps_chrome']['status'] ?? '') !== 'pass') {
     $noGo[] = 'live_vps_chrome_smoke_missing_or_failed';
@@ -205,6 +205,8 @@ function restore_artifacts(array $paths, string $repoRoot): array
     }
 
     $restoreHash = root_hash($restoredPaths, $targetRoot);
+    $postgresRestore = postgres_restore_drill($paths, $repoRoot, $sourceHash);
+
     return [
         'artifact_restore' => [
             'status' => $sourceHash === $restoreHash ? 'pass' : 'fail',
@@ -213,16 +215,184 @@ function restore_artifacts(array $paths, string $repoRoot): array
             'target_root' => $targetRoot,
             'artifact_count' => count($paths),
         ],
+        'postgres_restore' => $postgresRestore['postgres_restore'],
+        'ledger_parity' => $postgresRestore['ledger_parity'],
+    ];
+}
+
+/**
+ * @param list<string> $paths
+ * @return array{postgres_restore:array<string,mixed>,ledger_parity:array<string,mixed>}
+ */
+function postgres_restore_drill(array $paths, string $repoRoot, string $sourceHash): array
+{
+    if (!class_exists(PDO::class)) {
+        return blocked_postgres_restore('pdo_missing', 'PHP PDO is not available for the PostgreSQL restore drill.');
+    }
+
+    $host = getenv('MDA_V4_RESTORE_DB_HOST') ?: getenv('PGHOST') ?: 'localhost';
+    $port = (int)(getenv('MDA_V4_RESTORE_DB_PORT') ?: getenv('PGPORT') ?: 5432);
+    $adminDb = getenv('MDA_V4_RESTORE_ADMIN_DB') ?: 'postgres';
+    $user = getenv('MDA_V4_RESTORE_DB_USER') ?: getenv('PGUSER') ?: null;
+    $password = getenv('MDA_V4_RESTORE_DB_PASSWORD') ?: getenv('PGPASSWORD') ?: null;
+    $dbName = 'mda_v4_restore_' . substr($sourceHash, 0, 12);
+    $dsn = sprintf('pgsql:host=%s;port=%d;dbname=%s', $host, $port, $adminDb);
+
+    try {
+        $admin = new PDO($dsn, $user !== '' ? $user : null, $password !== '' ? $password : null, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        ]);
+        $quotedDb = quote_pg_identifier($dbName);
+        $admin->exec('DROP DATABASE IF EXISTS ' . $quotedDb . ' WITH (FORCE)');
+        $admin->exec('CREATE DATABASE ' . $quotedDb);
+
+        $target = new PDO(sprintf('pgsql:host=%s;port=%d;dbname=%s', $host, $port, $dbName), $user !== '' ? $user : null, $password !== '' ? $password : null, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        ]);
+        $target->exec(
+            "CREATE TABLE mda_restore_artifact (
+                artifact_path text PRIMARY KEY,
+                artifact_sha256 text NOT NULL,
+                byte_count integer NOT NULL,
+                payload jsonb NOT NULL,
+                restored_at timestamptz NOT NULL DEFAULT now()
+            )"
+        );
+        $target->exec(
+            "CREATE TABLE mda_restore_parity (
+                parity_key text PRIMARY KEY,
+                parity_value text NOT NULL
+            )"
+        );
+        $target->exec(
+            "CREATE TABLE mda_restore_audit_event (
+                audit_event_id bigserial PRIMARY KEY,
+                event_type text NOT NULL,
+                event_payload jsonb NOT NULL,
+                occurred_at timestamptz NOT NULL DEFAULT now()
+            )"
+        );
+        $target->exec(
+            "CREATE TABLE mda_restore_outbox_event (
+                outbox_event_id bigserial PRIMARY KEY,
+                event_type text NOT NULL,
+                event_payload jsonb NOT NULL,
+                occurred_at timestamptz NOT NULL DEFAULT now()
+            )"
+        );
+
+        $insertArtifact = $target->prepare(
+            'INSERT INTO mda_restore_artifact (artifact_path, artifact_sha256, byte_count, payload)
+             VALUES (:path, :sha, :bytes, CAST(:payload AS jsonb))'
+        );
+        foreach ($paths as $path) {
+            $payload = (string)file_get_contents($path);
+            json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
+            $insertArtifact->execute([
+                ':path' => relative_path($path, $repoRoot),
+                ':sha' => hash_file('sha256', $path),
+                ':bytes' => strlen($payload),
+                ':payload' => $payload,
+            ]);
+        }
+
+        $artifactRows = (int)$target->query('SELECT COUNT(*) FROM mda_restore_artifact')->fetchColumn();
+        $aggregate = (string)$target
+            ->query("SELECT string_agg(artifact_path || ':' || artifact_sha256, '|' ORDER BY artifact_path) FROM mda_restore_artifact")
+            ->fetchColumn();
+        $restoreHash = hash('sha256', $aggregate);
+
+        $dashboard = read_json($repoRoot . '/mom/data/registry/mda-v4-runtime-scenario-dashboard.latest.json');
+        $scenarioLibrary = read_json($repoRoot . '/mom/data/registry/mda-v4-runtime-scenarios.json');
+        $proofPack = read_json($repoRoot . '/_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_RUNTIME_SCENARIO_PROOF_PACK.json');
+        $parityRows = [
+            'source_root_hash_sha256' => $sourceHash,
+            'restore_root_hash_sha256' => $restoreHash,
+            'p58_decision' => (string)($dashboard['decision'] ?? ''),
+            'p58_scenario_total' => (string)((int)($dashboard['scenario_total'] ?? 0)),
+            'p58_failed' => (string)((int)($dashboard['failed'] ?? 0)),
+            'scenario_library_count' => (string)count((array)($scenarioLibrary['scenarios'] ?? [])),
+            'proof_pack_decision' => (string)($proofPack['decision_token'] ?? ''),
+            'composer_check' => (string)($proofPack['validation']['composer_check'] ?? ''),
+        ];
+        $insertParity = $target->prepare('INSERT INTO mda_restore_parity (parity_key, parity_value) VALUES (:key, :value)');
+        foreach ($parityRows as $key => $value) {
+            $insertParity->execute([':key' => $key, ':value' => $value]);
+        }
+
+        $eventPayload = json_encode([
+            'source_root_hash_sha256' => $sourceHash,
+            'restore_root_hash_sha256' => $restoreHash,
+            'artifact_count' => $artifactRows,
+        ], JSON_THROW_ON_ERROR);
+        $target->prepare('INSERT INTO mda_restore_audit_event (event_type, event_payload) VALUES (:type, CAST(:payload AS jsonb))')
+            ->execute([':type' => 'mda.restore_drill.completed', ':payload' => $eventPayload]);
+        $target->prepare('INSERT INTO mda_restore_outbox_event (event_type, event_payload) VALUES (:type, CAST(:payload AS jsonb))')
+            ->execute([':type' => 'mda.restore_drill.completed', ':payload' => $eventPayload]);
+
+        $auditCount = (int)$target->query('SELECT COUNT(*) FROM mda_restore_audit_event')->fetchColumn();
+        $outboxCount = (int)$target->query('SELECT COUNT(*) FROM mda_restore_outbox_event')->fetchColumn();
+        $scenarioTotal = (int)($dashboard['scenario_total'] ?? 0);
+        $scenarioCount = count((array)($scenarioLibrary['scenarios'] ?? []));
+        $parityPass = $restoreHash === $sourceHash
+            && $artifactRows === count($paths)
+            && $auditCount > 0
+            && $outboxCount > 0
+            && $scenarioTotal === $scenarioCount
+            && (string)($proofPack['validation']['composer_check'] ?? '') === 'PASS';
+
+        return [
+            'postgres_restore' => [
+                'status' => $parityPass ? 'pass' : 'fail',
+                'database' => $dbName,
+                'host' => $host,
+                'port' => $port,
+                'artifact_count' => $artifactRows,
+                'source_root_hash_sha256' => $sourceHash,
+                'restore_root_hash_sha256' => $restoreHash,
+                'required_for_postgres_only_claim' => true,
+            ],
+            'ledger_parity' => [
+                'status' => $parityPass ? 'pass' : 'fail',
+                'scenario_total' => $scenarioTotal,
+                'scenario_library_count' => $scenarioCount,
+                'audit_event_count' => $auditCount,
+                'outbox_event_count' => $outboxCount,
+                'composer_check' => (string)($proofPack['validation']['composer_check'] ?? ''),
+            ],
+        ];
+    } catch (Throwable $e) {
+        return blocked_postgres_restore('postgres_restore_exception', $e->getMessage());
+    }
+}
+
+/**
+ * @return array{postgres_restore:array<string,mixed>,ledger_parity:array<string,mixed>}
+ */
+function blocked_postgres_restore(string $reason, string $detail): array
+{
+    return [
         'postgres_restore' => [
             'status' => 'blocked_no_clean_target',
-            'reason' => 'No isolated PostgreSQL restore target is configured in this local workspace.',
+            'reason' => $reason,
+            'detail' => $detail,
             'required_for_postgres_only_claim' => true,
         ],
         'ledger_parity' => [
             'status' => 'blocked_no_postgres_restore',
-            'reason' => 'Ledger/outbox/audit parity requires restored PostgreSQL target, not only artifact parity.',
+            'reason' => $reason,
+            'detail' => $detail,
         ],
     ];
+}
+
+function quote_pg_identifier(string $identifier): string
+{
+    if (!preg_match('/^[a-z_][a-z0-9_]*$/', $identifier)) {
+        throw new RuntimeException('Unsafe PostgreSQL identifier: ' . $identifier);
+    }
+
+    return '"' . str_replace('"', '""', $identifier) . '"';
 }
 
 /**

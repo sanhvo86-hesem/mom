@@ -210,7 +210,8 @@ final class DomainCommandRegulatedEvidenceFakeConnection extends Connection
             return $this->challengeRow();
         }
         if (str_contains($sql, 'UPDATE e_signature_auth_challenges')) {
-            if ($this->challengeState !== 'issued' || strtotime($this->challengeExpiresAt ?? '') <= time()) {
+            $expiresAt = $this->challengeExpiresAt ?? gmdate('c', time() + 300);
+            if ($this->challengeState !== 'issued' || strtotime($expiresAt) <= time()) {
                 return null;
             }
             return $this->challengeRow() + ['consumed_at' => gmdate('c')];

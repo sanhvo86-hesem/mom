@@ -164,8 +164,8 @@ final class UomRuntimeAuthorityService
     ];
 
     public function __construct(
-        private readonly Connection $db,
-        private readonly ?\Redis $redis = null,
+        Connection $db,
+        ?\Redis $redis = null,
         ?ItemUomPolicyService $itemPolicy = null,
         ?UomAliasResolutionService $aliasResolver = null,
         ?ConversionEngine $conversionEngine = null,
@@ -265,7 +265,7 @@ final class UomRuntimeAuthorityService
             'context_code' => $policy['context_code'],
         ]);
 
-        if (($policy['item_required'] ?? false) === true) {
+        if ($policy['item_required'] === true) {
             $itemId = $this->firstString($payload, ['item_id', 'part_number', 'material_id', 'sku']);
             if ($itemId === null) {
                 throw new UomException(

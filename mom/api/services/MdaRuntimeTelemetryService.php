@@ -407,11 +407,7 @@ final class MdaRuntimeTelemetryService
             $metric = (string)$rule['metric'];
             $value = (float)($totals[$metric] ?? 0);
             $threshold = (float)$rule['threshold'];
-            $active = match ((string)$rule['operator']) {
-                '>' => $value > $threshold,
-                '>=' => $value >= $threshold,
-                default => false,
-            };
+            $active = $this->thresholdActive((string)$rule['operator'], $value, $threshold);
             if ($active) {
                 $alerts[] = [
                     'rule_id' => $ruleId,
@@ -423,6 +419,15 @@ final class MdaRuntimeTelemetryService
             }
         }
         return $alerts;
+    }
+
+    private function thresholdActive(string $operator, float $value, float $threshold): bool
+    {
+        return match ($operator) {
+            '>' => $value > $threshold,
+            '>=' => $value >= $threshold,
+            default => false,
+        };
     }
 
     /**

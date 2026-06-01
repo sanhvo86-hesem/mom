@@ -351,7 +351,8 @@ final class DomainCommandInventoryFakeConnection extends Connection
     public function hasQuery(string $needle): bool
     {
         foreach ($this->queries as $query) {
-            if (str_contains($query['sql'], $needle)) {
+            $haystack = $query['sql'] . ' ' . json_encode($query['params'], JSON_THROW_ON_ERROR);
+            if (str_contains($haystack, $needle)) {
                 return true;
             }
         }

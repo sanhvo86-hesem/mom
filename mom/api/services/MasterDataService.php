@@ -229,7 +229,6 @@ final class MasterDataService
         $config = (array)(require dirname(__DIR__, 2) . '/database/config.php');
         $this->repository = new PostgresMasterDataRepository(
             \MOM\Database\Connection::getInstance($config),
-            $dataDir,
             $this->defaultStore(),
             $this->authorityMode->mode(),
             $jsonRepository,

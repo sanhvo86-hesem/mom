@@ -44,7 +44,7 @@ final class RuntimeAuthorityServiceTest extends TestCase
         $this->assertSame('JSON_ONLY', $report['profile']['data_layer_mode']);
         $this->assertSame('compatibility_only', $report['slices']['idempotency']['readiness_state']);
         $this->assertSame('compatibility_only', $report['slices']['order_workflow']['readiness_state']);
-        $this->assertSame('compatibility_only', $report['slices']['master_data']['readiness_state']);
+        $this->assertSame('blocked_postgres_required', $report['slices']['master_data']['readiness_state']);
         $this->assertSame('compatibility_only', $report['slices']['manufacturing_events']['readiness_state']);
         $this->assertSame('authoritative_ready', $report['slices']['canonical_manufacturing_spine']['readiness_state']);
         $this->assertSame('authoritative_ready', $report['slices']['production_history']['readiness_state']);
@@ -56,7 +56,7 @@ final class RuntimeAuthorityServiceTest extends TestCase
         $this->assertSame('authoritative_ready', $report['slices']['uom_runtime_authority']['readiness_state']);
         $this->assertTrue($report['slices']['uom_runtime_authority']['no_bridge_runtime_contract']);
         $this->assertSame('json_fallback', $report['slices']['order_workflow']['authority_mode']);
-        $this->assertSame('json_fallback', $report['slices']['master_data']['authority_mode']);
+        $this->assertSame('degraded', $report['slices']['master_data']['authority_mode']);
         $this->assertSame('json_fallback', $report['slices']['manufacturing_events']['authority_mode']);
         $this->assertSame('registry_primary', $report['slices']['canonical_manufacturing_spine']['authority_mode']);
         $this->assertSame('event_ledger_read_model', $report['slices']['production_history']['authority_mode']);

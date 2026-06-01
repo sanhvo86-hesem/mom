@@ -176,6 +176,15 @@ final class DomainCommandUomFakeConnection extends Connection
         return null;
     }
 
+    /**
+     * @return list<array<string,mixed>>
+     */
+    public function query(string $sql, array $params = []): array
+    {
+        $this->queries[] = ['sql' => $sql, 'params' => $params];
+        return [];
+    }
+
     public function execute(string $sql, array $params = []): int
     {
         $this->queries[] = ['sql' => $sql, 'params' => $params];

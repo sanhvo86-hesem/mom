@@ -14,7 +14,6 @@ final class PostgresMasterDataRepository implements MasterDataRepository
      */
     public function __construct(
         private readonly Connection $db,
-        private readonly string $dataDir,
         private readonly array $defaultStore,
         private readonly string $mode,
         private readonly ?JsonMasterDataRepository $jsonBridge = null,

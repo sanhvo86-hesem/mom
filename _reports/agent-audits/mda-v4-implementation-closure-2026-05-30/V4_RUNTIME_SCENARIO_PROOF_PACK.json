@@ -56,9 +56,15 @@
     "scenario_runner": "PASS",
     "json_parse": "PASS",
     "ai_index_regeneration": "PASS",
-    "composer_test": "BLOCKED_VENDOR_PHPUNIT_MISSING",
-    "composer_analyse": "BLOCKED_VENDOR_PHPSTAN_MISSING",
-    "composer_check": "BLOCKED_VENDOR_PHPSTAN_MISSING"
+    "composer_test": "PASS",
+    "composer_analyse": "PASS",
+    "composer_check": "PASS"
+  },
+  "validation_evidence": {
+    "composer_test": "PASS: 975 tests, 9262 assertions, 2 skipped",
+    "composer_analyse": "PASS: PHPStan 404/404 files, no errors",
+    "composer_check": "PASS: PHPStan no errors; PHPUnit 975 tests, 9262 assertions, 2 skipped",
+    "verified_at": "2026-06-01T03:12:00+00:00"
   },
   "uom_authority": {
     "runtime_adapter": "MOM\\Api\\Services\\DomainCommand\\UomCommandQuantityNormalizer",

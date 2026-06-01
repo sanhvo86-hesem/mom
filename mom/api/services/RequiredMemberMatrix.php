@@ -25,7 +25,7 @@ final class RequiredMemberMatrix
     ];
 
     public const CONDITIONAL_POLICY_FLAGS = [
-        'cnc_program' => 'cnc_required',
+        'nc_program' => 'cnc_required',
         'tool_requirement' => 'tool_required',
         'fixture_requirement' => 'fixture_required',
         'gage_requirement' => 'gage_required',

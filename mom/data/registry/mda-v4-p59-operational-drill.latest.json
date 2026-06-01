@@ -1,8 +1,8 @@
 {
     "schema_version": "mda.v4.p59.operational_drill.v1",
-    "generated_at": "2026-05-31T11:52:27+00:00",
+    "generated_at": "2026-06-01T03:07:53+00:00",
     "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
-    "sha": "6cd969373",
+    "sha": "3f54ecc30",
     "p58_dashboard": {
         "path": "mom/data/registry/mda-v4-runtime-scenario-dashboard.latest.json",
         "decision": "P58_PASS_READY_FOR_NEXT",
@@ -27,29 +27,38 @@
         "path": "mom/data/registry/mda-v4-runtime-scenarios.json",
         "scenario_count": 14
     },
-    "source_root_hash_sha256": "a8f6e4dc364cd5575db7c95e6aaef4ad6826f3ae3b614c1c3fb3ef2575dbaa1d",
+    "source_root_hash_sha256": "6a494af4e699f999116d80df5e80bc596a4c1683bd1eb33e037feb4e32838305",
     "restore_drill": {
         "artifact_restore": {
             "status": "pass",
-            "source_root_hash_sha256": "a8f6e4dc364cd5575db7c95e6aaef4ad6826f3ae3b614c1c3fb3ef2575dbaa1d",
-            "restore_root_hash_sha256": "a8f6e4dc364cd5575db7c95e6aaef4ad6826f3ae3b614c1c3fb3ef2575dbaa1d",
-            "target_root": "/var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/mda-v4-p59-restore-a8f6e4dc364c",
+            "source_root_hash_sha256": "6a494af4e699f999116d80df5e80bc596a4c1683bd1eb33e037feb4e32838305",
+            "restore_root_hash_sha256": "6a494af4e699f999116d80df5e80bc596a4c1683bd1eb33e037feb4e32838305",
+            "target_root": "/var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/mda-v4-p59-restore-6a494af4e699",
             "artifact_count": 3
         },
         "postgres_restore": {
-            "status": "blocked_no_clean_target",
-            "reason": "No isolated PostgreSQL restore target is configured in this local workspace.",
+            "status": "pass",
+            "database": "mda_v4_restore_6a494af4e699",
+            "host": "localhost",
+            "port": 5432,
+            "artifact_count": 3,
+            "source_root_hash_sha256": "6a494af4e699f999116d80df5e80bc596a4c1683bd1eb33e037feb4e32838305",
+            "restore_root_hash_sha256": "6a494af4e699f999116d80df5e80bc596a4c1683bd1eb33e037feb4e32838305",
             "required_for_postgres_only_claim": true
         },
         "ledger_parity": {
-            "status": "blocked_no_postgres_restore",
-            "reason": "Ledger/outbox/audit parity requires restored PostgreSQL target, not only artifact parity."
+            "status": "pass",
+            "scenario_total": 14,
+            "scenario_library_count": 14,
+            "audit_event_count": 1,
+            "outbox_event_count": 1,
+            "composer_check": "PASS"
         }
     },
     "rollback_rehearsal": {
         "status": "pass",
         "rollback_mode": "POSTGRES_PRIMARY_WITH_JSON_COMPATIBILITY_READS",
-        "restore_point_hash_sha256": "a8f6e4dc364cd5575db7c95e6aaef4ad6826f3ae3b614c1c3fb3ef2575dbaa1d",
+        "restore_point_hash_sha256": "6a494af4e699f999116d80df5e80bc596a4c1683bd1eb33e037feb4e32838305",
         "operator_banner_required": true,
         "operator_banner_text": "MDA cutover is not complete. Fallback/drift controls are active; POSTGRES_ONLY is disabled.",
         "warnings": [
@@ -72,11 +81,11 @@
             ]
         },
         "local_contract_chrome": {
-            "status": "fail",
-            "exit_code": 134,
+            "status": "pass",
+            "exit_code": 0,
             "fixture_path": "/var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/mda-v4-p59-operator-smoke.html",
             "chrome_path": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-            "dom_hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "dom_hash_sha256": "3da030df5525043c5830252d008b9d80c12322c3d43fb8c1280bac0220124762"
         },
         "live_vps_chrome": {
             "status": "blocked_live_url_not_configured",
@@ -89,7 +98,6 @@
         "decision": "NO_GO",
         "decision_token": "P59_NO_GO_CONTROLLED_BLOCKERS",
         "no_go_reasons": [
-            "postgres_restore_target_missing",
             "live_vps_chrome_smoke_missing_or_failed"
         ],
         "postgres_only_claim_allowed": false

@@ -175,7 +175,8 @@ final class RuntimeAuthorityService
     private function normalizeOperationalSlice(array $probe): array
     {
         $state = (string)($probe['readiness_state'] ?? 'degraded');
-        $authorityMode = trim((string)($probe['authority_mode'] ?? ''));
+        $rawAuthorityMode = $probe['authority_mode'] ?? '';
+        $authorityMode = is_scalar($rawAuthorityMode) ? trim((string)$rawAuthorityMode) : '';
         return array_merge($probe, [
             'authority_mode' => $authorityMode !== '' ? $authorityMode : match ($state) {
                 'authoritative_ready', 'authoritative_ready_postgres_only', 'authoritative_ready_with_fallback_telemetry' => 'postgres_primary',

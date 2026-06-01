@@ -62,7 +62,7 @@ final class ScenarioCommandDriver
         $last = $results[array_key_last($results)] ?? ['accepted' => false, 'problem' => ['code' => 'scenario_not_executed']];
 
         return [
-            'accepted' => (bool)($last['accepted'] ?? false),
+            'accepted' => (bool)$last['accepted'],
             'result' => $last['result'] ?? null,
             'problem' => $last['problem'] ?? null,
             'attempts' => $results,
