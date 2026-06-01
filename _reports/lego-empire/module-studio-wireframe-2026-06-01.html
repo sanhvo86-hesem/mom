@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Module Studio — Wireframe (duyệt thị giác) · HESEM MOM</title>
+<style>
+  /* ============================================================
+     SSOT TOKENS — bản mockup tự tuân luật no-hardcode:
+     mọi màu/khoảng cách/bo góc/chiều cao đọc từ token ở :root.
+     Canonical: brand #0c4a6e (mig 264) · gap 8/section 12 ·
+     radius control 4 / card 8 · control height 32px.
+     ============================================================ */
+  :root{
+    --brand:#0c4a6e; --brand-hover:#0a3d5c; --brand-soft:#e0f2fe; --brand-line:#bae6fd;
+    --on-brand:#ffffff;
+    --ok:#15803d; --ok-soft:#dcfce7; --warn:#b45309; --warn-soft:#fef3c7;
+    --danger:#b91c1c; --danger-soft:#fee2e2; --info:#1d4ed8;
+    --violet:#6d28d9; --teal:#0f766e; --amber:#b45309;
+    --bg:#f1f5f9; --surface:#ffffff; --surface-muted:#f8fafc; --surface-alt:#f1f5f9;
+    --text:#0f172a; --text-2:#475569; --text-3:#94a3b8;
+    --border:#e2e8f0; --border-strong:#cbd5e1;
+    --space:8px; --space-section:12px; --space-lg:16px;
+    --radius:4px; --radius-card:8px; --radius-pill:999px;
+    --ctrl-h:32px;
+    --shadow-1:0 1px 2px rgba(15,23,42,.06);
+    --shadow-2:0 4px 12px rgba(15,23,42,.10);
+    --font:'Inter',-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;line-height:1.45}
+  h1,h2,h3,h4{margin:0;font-weight:700}
+  .mut{color:var(--text-2)} .mut3{color:var(--text-3)}
+  .mono{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px}
+
+  /* shell */
+  .top{position:sticky;top:0;z-index:30;background:var(--brand);color:var(--on-brand);
+       padding:0 var(--space-lg);height:46px;display:flex;align-items:center;gap:var(--space-lg)}
+  .top .logo{font-weight:800;letter-spacing:.3px}
+  .top .crumb{opacity:.85;font-size:12px}
+  .segwrap{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+  .seg{appearance:none;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);
+       color:#fff;height:var(--ctrl-h);padding:0 12px;border-radius:var(--radius);font:inherit;font-size:12px;cursor:pointer}
+  .seg.active{background:#fff;color:var(--brand);border-color:#fff;font-weight:700}
+
+  .frame{display:none;padding:var(--space-lg);max-width:1680px;margin:0 auto}
+  .frame.show{display:block}
+  .frame > .lead{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--brand);
+       border-radius:var(--radius-card);padding:10px 14px;margin-bottom:var(--space-lg);font-size:12.5px}
+  .lead b{color:var(--brand)}
+
+  /* generic card / panel */
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-1)}
+  .panel__head{display:flex;align-items:center;gap:var(--space);padding:var(--space) var(--space-section);
+       border-bottom:1px solid var(--border);min-height:var(--ctrl-h)}
+  .panel__head h3{font-size:13px}
+  .panel__body{padding:var(--space-section)}
+  .badge{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;
+       padding:2px 8px;border-radius:var(--radius-pill);text-transform:uppercase;letter-spacing:.3px}
+  .b-ssot{background:var(--ok-soft);color:var(--ok)}
+  .b-engine{background:var(--surface-alt);color:var(--text-2)}
+  .b-l3{background:var(--brand-soft);color:var(--brand)}
+  .b-new{background:var(--violet);color:#fff}
+  .btn{appearance:none;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);
+       height:var(--ctrl-h);padding:0 12px;border-radius:var(--radius);font:inherit;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .btn:hover{background:var(--surface-muted)}
+  .btn--primary{background:var(--brand);border-color:var(--brand);color:var(--on-brand);font-weight:600}
+  .btn--primary:hover{background:var(--brand-hover)}
+  .btn--ghost{background:transparent;border-color:transparent;color:var(--text-2)}
+  .chip{display:inline-flex;align-items:center;height:24px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-pill);font-size:11px;background:var(--surface-muted)}
+  .input{height:var(--ctrl-h);border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font:inherit;font-size:12px;width:100%;background:var(--surface)}
+  .tabbar{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:var(--space-lg);flex-wrap:wrap}
+  .tabbar button{appearance:none;border:0;background:transparent;color:var(--text-2);font:inherit;font-size:12.5px;
+       padding:8px 12px;border-bottom:2px solid transparent;cursor:pointer}
+  .tabbar button.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:700}
+
+  /* === Module Studio 3-column === */
+  .studio-top{display:flex;align-items:center;gap:var(--space);margin-bottom:var(--space);
+       background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-card);padding:var(--space) var(--space-section)}
+  .studio-top .ti{font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px}
+  .studio-top .spacer{margin-left:auto}
+  .selpre{height:var(--ctrl-h);border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font:inherit;font-size:12px;background:var(--surface)}
+  .cols{display:grid;grid-template-columns:248px 1fr 312px;gap:var(--space);align-items:start}
+  @media(max-width:1200px){.cols{grid-template-columns:1fr}}
+
+  .lib-cat{margin-bottom:var(--space)}
+  .lib-cat__t{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:700;
+       text-transform:uppercase;letter-spacing:.4px;color:var(--text-3);padding:4px 2px}
+  .blk{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius);
+       background:var(--surface-muted);margin-bottom:6px;cursor:grab}
+  .blk:hover{border-color:var(--brand-line);background:var(--brand-soft)}
+  .blk .ic{width:22px;text-align:center}
+  .blk .nm{flex:1;font-size:12px}
+  .blk .nm small{display:block;color:var(--text-3);font-size:10.5px}
+
+  /* canvas */
+  .canvas{background:var(--surface-alt);border:1px dashed var(--border-strong);border-radius:var(--radius-card);padding:var(--space-section);min-height:520px}
+  .zone{border:1px dashed var(--border-strong);border-radius:var(--radius);background:var(--surface);margin-bottom:var(--space);overflow:hidden}
+  .zone__lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-3);padding:4px 10px;background:var(--surface-muted);border-bottom:1px dashed var(--border)}
+  .zone__body{padding:var(--space-section)}
+  .sel{outline:2px solid var(--brand);outline-offset:1px}
+  /* a tiny production-like KPI strip rendered inside canvas */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space)}
+  .kpi{border:1px solid var(--border);border-radius:var(--radius);padding:10px;background:var(--surface)}
+  .kpi .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-3)}
+  .kpi .v{font-size:20px;font-weight:800;margin-top:2px}
+  .kpi .v.ok{color:var(--ok)} .kpi .v.warn{color:var(--warn)}
+  .tbl{width:100%;border-collapse:collapse;font-size:12px}
+  .tbl th,.tbl td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border)}
+  .tbl th{font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;color:var(--text-3);background:var(--surface-muted)}
+  .toolbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+
+  /* inspector */
+  .insp-mode{display:flex;gap:4px;margin-bottom:var(--space)}
+  .insp-mode button{flex:1;height:28px;border:1px solid var(--border-strong);background:var(--surface);border-radius:var(--radius);font:inherit;font-size:11.5px;cursor:pointer}
+  .insp-mode button.active{background:var(--brand);color:#fff;border-color:var(--brand);font-weight:700}
+  .field{margin-bottom:10px}
+  .field > label{display:block;font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:4px}
+  .tokrow{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;background:var(--surface-muted)}
+  .tokrow .sw{width:18px;height:18px;border-radius:3px;border:1px solid var(--border-strong)}
+  .tokrow .tk{flex:1}
+  .tokrow .tk b{font-size:11.5px} .tokrow .tk small{display:block;color:var(--text-3);font-size:10px}
+  .lock{color:var(--text-3);font-size:11px}
+  .note{font-size:11.5px;background:var(--warn-soft);color:#7c4a02;border:1px solid #fde68a;border-radius:var(--radius);padding:8px 10px;margin-top:var(--space)}
+  .note.ok{background:var(--ok-soft);color:#14532d;border-color:#bbf7d0}
+
+  /* wizard */
+  .steps{display:flex;gap:var(--space);margin-bottom:var(--space-lg)}
+  .step{flex:1;border:1px solid var(--border);border-radius:var(--radius-card);background:var(--surface);padding:10px 14px}
+  .step.active{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-soft)}
+  .step .n{width:22px;height:22px;border-radius:var(--radius-pill);background:var(--surface-alt);color:var(--text-2);
+       display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;margin-right:8px}
+  .step.active .n{background:var(--brand);color:#fff}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space)}
+  .pick{border:1px solid var(--border);border-radius:var(--radius-card);background:var(--surface);padding:var(--space-section);cursor:pointer}
+  .pick:hover{border-color:var(--brand-line)} .pick.on{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-soft)}
+  .pick h4{font-size:13px;margin-bottom:4px} .pick .schema{font-size:10.5px;color:var(--text-3);margin-top:6px}
+  .mini-zone{height:14px;border-radius:2px;background:var(--surface-alt);border:1px solid var(--border);margin-bottom:3px}
+  .mini-zone.h{background:var(--brand-soft);border-color:var(--brand-line)}
+
+  /* theme screen */
+  .two{display:grid;grid-template-columns:1fr 360px;gap:var(--space-lg);align-items:start}
+  @media(max-width:1100px){.two{grid-template-columns:1fr}}
+  .seedrow{display:flex;align-items:center;gap:var(--space-section);margin-bottom:var(--space-lg)}
+  .seed{width:64px;height:64px;border-radius:var(--radius-card);border:1px solid var(--border-strong);background:var(--brand)}
+  .ramp{display:flex;gap:6px;margin-top:8px}
+  .ramp i{width:34px;height:24px;border-radius:3px;display:inline-block;border:1px solid var(--border)}
+  .knob{display:flex;align-items:center;gap:var(--space-section);margin-bottom:10px}
+  .knob .lab{width:150px;font-size:12px;font-weight:600;color:var(--text-2)}
+  .bar{flex:1;height:6px;background:var(--surface-alt);border-radius:var(--radius-pill);position:relative}
+  .bar i{position:absolute;top:-5px;width:16px;height:16px;border-radius:var(--radius-pill);background:var(--brand);border:2px solid #fff;box-shadow:var(--shadow-1)}
+  .wcag{font-size:11.5px}
+  .wcag .row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)}
+  .pass{color:var(--ok);font-weight:700} .fail{color:var(--danger);font-weight:700}
+
+  /* before/after */
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-lg)}
+  @media(max-width:1000px){.ba{grid-template-columns:1fr}}
+  .taglist{display:flex;flex-direction:column;gap:6px}
+  .tagline{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface)}
+  .tagline.kill{opacity:.55;text-decoration:line-through;text-decoration-color:var(--danger)}
+  .tagline.move{border-left:3px solid var(--violet)}
+  .tagline.keep{border-left:3px solid var(--ok)}
+  .arrow{color:var(--text-3);font-size:11px;margin-left:auto}
+  .legend{display:flex;gap:var(--space-lg);font-size:11.5px;margin:var(--space) 0 var(--space-lg)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:10px;height:10px;border-radius:2px;display:inline-block}
+  footer{max-width:1680px;margin:0 auto;padding:0 var(--space-lg) 40px;color:var(--text-3);font-size:11px}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <span class="logo">⬢ HESEM MOM</span>
+  <span class="crumb">Wireframe duyệt thị giác — chưa phải code</span>
+  <div class="segwrap">
+    <button class="seg active" data-f="studio">① Module Studio · Lego Block Master</button>
+    <button class="seg" data-f="wizard">② Tạo Module</button>
+    <button class="seg" data-f="theme">③ Theme (token toàn cục)</button>
+    <button class="seg" data-f="ba">④ Appearance: 9→3 tab</button>
+  </div>
+</div>
+
+<!-- ============ FRAME 1: MODULE STUDIO ============ -->
+<section class="frame show" id="f-studio">
+  <div class="lead"><b>Module Studio</b> = nơi DUY NHẤT chỉnh định nghĩa block + template + lắp ráp module. Bên dưới là <b>Lego Block Master</b> (gộp tab <i>Module Master</i> + <i>Cây module</i>): trái = thư viện block từ registry thật · giữa = canvas render production · phải = inspector sửa <i>instance</i> hoặc <i>định nghĩa</i> block.</div>
+
+  <div class="studio-top">
+    <span class="ti">🧩 Module Studio</span>
+    <div class="tabbar" style="border:0;margin:0">
+      <button class="active">Lego Block Master</button>
+      <button>Template Studio</button>
+      <button>Theme Template</button>
+      <button>Modules</button>
+    </div>
+    <span class="spacer"></span>
+    <span class="mut" style="font-size:12px">Theme:</span>
+    <select class="selpre"><option>HESEM mặc định (#0c4a6e)</option><option>Xưởng cảm ứng (teal 44px)</option><option>Tím đặc</option></select>
+    <button class="btn">⤺ Hoàn tác</button>
+    <button class="btn">👁 Mô phỏng</button>
+    <button class="btn btn--primary">Lưu &amp; Publish</button>
+  </div>
+
+  <div class="cols">
+    <!-- LEFT: library -->
+    <div class="panel">
+      <div class="panel__head"><h3>📚 Thư viện Lego</h3><span class="badge b-ssot">registry</span></div>
+      <div class="panel__body">
+        <input class="input" placeholder="🔍 Tìm block… (177)"/>
+        <div style="height:8px"></div>
+        <div class="lib-cat">
+          <div class="lib-cat__t"><span>Insight · 10</span></div>
+          <div class="blk sel"><span class="ic">📊</span><span class="nm">Dãy KPI <small>kpi.grid</small></span><span class="badge b-ssot">SSOT</span></div>
+          <div class="blk"><span class="ic">🎯</span><span class="nm">Scorecard <small>kpi.scorecard</small></span><span class="badge b-l3">L3</span></div>
+          <div class="blk"><span class="ic">📈</span><span class="nm">Sparkline <small>kpi.sparkline</small></span><span class="badge b-engine">engine</span></div>
+        </div>
+        <div class="lib-cat">
+          <div class="lib-cat__t"><span>Data · 25</span></div>
+          <div class="blk"><span class="ic">▦</span><span class="nm">Bảng dữ liệu <small>table.data</small></span><span class="badge b-ssot">SSOT</span></div>
+          <div class="blk"><span class="ic">🗂</span><span class="nm">Thẻ dữ liệu <small>data.cards</small></span><span class="badge b-engine">engine</span></div>
+          <div class="blk"><span class="ic">🌳</span><span class="nm">Cây phân cấp <small>data.tree</small></span><span class="badge b-engine">engine</span></div>
+        </div>
+        <div class="lib-cat">
+          <div class="lib-cat__t"><span>Action · 13</span></div>
+          <div class="blk"><span class="ic">🧰</span><span class="nm">Thanh công cụ <small>toolbar.filtered</small></span><span class="badge b-ssot">SSOT</span></div>
+        </div>
+        <button class="btn btn--primary" style="width:100%;justify-content:center;margin-top:6px">＋ Tạo block mới trong Studio</button>
+        <div class="note">Chỉ block <b>đã đăng ký</b> mới kéo được vào canvas. Thiếu → tạo ở đây trước (registry gác cổng).</div>
+      </div>
+    </div>
+
+    <!-- CENTER: canvas -->
+    <div class="panel">
+      <div class="panel__head">
+        <h3>🖼 Canvas — module “Đơn hàng” · tab Tổng quan</h3>
+        <span class="badge b-l3">archetype: workspace-projection</span>
+        <span class="spacer" style="margin-left:auto"></span>
+        <span class="chip">render = production thật</span>
+      </div>
+      <div class="panel__body">
+        <div class="canvas">
+          <div class="zone sel">
+            <div class="zone__lbl">zone: kpis — block: kpi.grid <span class="badge b-ssot" style="margin-left:6px">SSOT</span></div>
+            <div class="zone__body">
+              <div class="kpis">
+                <div class="kpi"><div class="k">SO hoạt động</div><div class="v">128</div></div>
+                <div class="kpi"><div class="k">JO hoạt động</div><div class="v">54</div></div>
+                <div class="kpi"><div class="k">OTD</div><div class="v ok">96.4%</div></div>
+                <div class="kpi"><div class="k">Backlog</div><div class="v warn">$1.2M</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="zone">
+            <div class="zone__lbl">zone: toolbar — block: toolbar.filtered</div>
+            <div class="zone__body"><div class="toolbar">
+              <input class="input" style="max-width:220px" placeholder="Tìm SO, khách hàng…"/>
+              <select class="selpre"><option>Tất cả trạng thái</option></select>
+              <button class="btn">📅 Khoảng ngày</button>
+              <button class="btn btn--primary" style="margin-left:auto">Áp dụng</button>
+            </div></div>
+          </div>
+          <div class="zone">
+            <div class="zone__lbl">zone: list — block: table.data</div>
+            <div class="zone__body"><table class="tbl">
+              <thead><tr><th>Mã SO</th><th>Khách hàng</th><th>Ngày giao</th><th>Trạng thái</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">SO-2041</td><td>VinFast</td><td>12/06</td><td><span class="badge b-ssot">Đúng hạn</span></td></tr>
+                <tr><td class="mono">SO-2042</td><td>THACO</td><td>14/06</td><td><span class="badge b-engine">Chờ duyệt</span></td></tr>
+                <tr><td class="mono">SO-2043</td><td>Hòa Phát</td><td>09/06</td><td><span class="badge" style="background:var(--danger-soft);color:var(--danger)">Trễ</span></td></tr>
+              </tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: inspector -->
+    <div class="panel">
+      <div class="panel__head"><h3>⚙ Inspector — kpi.grid</h3></div>
+      <div class="panel__body">
+        <div class="insp-mode">
+          <button>Instance (prop/data)</button>
+          <button class="active">Definition (lego master)</button>
+        </div>
+        <div class="field"><label>Tên block (VI / EN)</label><input class="input" value="Dãy KPI / KPI Grid"/></div>
+        <div class="field"><label>Composed of (L2 components)</label>
+          <div><span class="chip">o3-kpi</span> <span class="chip">o3-panel</span></div>
+        </div>
+        <div class="field"><label>Slots</label>
+          <div><span class="chip">tiles[]</span> <span class="chip">title</span></div>
+        </div>
+        <div class="field"><label>Hợp đồng token (overridable_tokens)</label>
+          <div class="tokrow"><span class="sw" style="background:var(--brand)"></span><span class="tk"><b>kpi.value.color</b><small>→ semantic: color.brand</small></span><span class="lock">🔒 contract</span></div>
+          <div class="tokrow"><span class="sw" style="background:var(--surface)"></span><span class="tk"><b>kpi.bg</b><small>→ semantic: color.bg.surface</small></span><span class="lock">🔒 contract</span></div>
+          <div class="tokrow"><span class="sw" style="background:var(--surface-alt)"></span><span class="tk"><b>kpi.radius</b><small>→ radius.master (4px)</small></span><span class="lock">🔒 contract</span></div>
+        </div>
+        <button class="btn" style="width:100%;justify-content:center">＋ Thêm token vào hợp đồng</button>
+        <div class="note">Không ô nào cho gõ <span class="mono">#hex</span> / <span class="mono">16px</span> tự do — chỉ chọn token. CI no-hardcode chặn literal.</div>
+        <div class="note ok">Sửa định nghĩa ở đây → mọi module dùng <b>kpi.grid</b> cập nhật theo. Bắt buộc <b>Mô phỏng</b> (ghi graphics_simulation_run) trước khi Lưu.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FRAME 2: WIZARD ============ -->
+<section class="frame" id="f-wizard">
+  <div class="lead"><b>Tạo Module mới</b> = chọn <b>template</b> + chọn <b>block</b> + chọn <b>theme preset</b>. Tất cả từ registry — không phát minh tại trang. Luật này áp cho cả người và AI.</div>
+  <div class="steps">
+    <div class="step active"><span class="n">1</span>Chọn loại Template (Archetype)</div>
+    <div class="step"><span class="n">2</span>Gắn Lego block vào zone</div>
+    <div class="step"><span class="n">3</span>Chọn Theme preset</div>
+  </div>
+
+  <div class="panel"><div class="panel__head"><h3>Bước 1 — Loại template</h3><span class="badge b-l3">Template Studio · L4/L5</span></div>
+    <div class="panel__body"><div class="grid3">
+      <div class="pick on"><h4>Workspace Projection</h4><div class="mut" style="font-size:12px">Màn hình tra cứu/điều phối: KPI + toolbar + list + empty.</div>
+        <div style="margin-top:8px"><div class="mini-zone h"></div><div class="mini-zone"></div><div class="mini-zone" style="height:40px"></div></div>
+        <div class="schema">zones: kpis · toolbar · list · empty</div></div>
+      <div class="pick"><h4>Authoritative Record</h4><div class="mut" style="font-size:12px">Hồ sơ 1 bản ghi: actions + main + aside + empty.</div>
+        <div style="margin-top:8px;display:grid;grid-template-columns:2fr 1fr;gap:3px"><div><div class="mini-zone h"></div><div class="mini-zone" style="height:40px"></div></div><div class="mini-zone" style="height:57px"></div></div>
+        <div class="schema">zones: actions · main · aside · empty</div></div>
+      <div class="pick"><h4>Analytics Overview</h4><div class="mut" style="font-size:12px">Bảng phân tích đa biểu đồ + bộ lọc thời gian.</div>
+        <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:3px"><div class="mini-zone" style="height:30px"></div><div class="mini-zone" style="height:30px"></div><div class="mini-zone" style="height:30px"></div><div class="mini-zone" style="height:30px"></div></div>
+        <div class="schema">zones: filter · grid(2×2)</div></div>
+    </div></div>
+  </div>
+
+  <div style="height:var(--space)"></div>
+  <div class="panel"><div class="panel__head"><h3>Bước 2 — Gắn block vào zone “kpis” (chỉ block hợp lệ)</h3></div>
+    <div class="panel__body"><div class="grid3">
+      <div class="pick on"><h4>📊 kpi.grid <span class="badge b-ssot">SSOT</span></h4><div class="mut" style="font-size:12px">Dãy thẻ KPI, density theo token.</div></div>
+      <div class="pick"><h4>🎯 kpi.scorecard <span class="badge b-l3">L3</span></h4><div class="mut" style="font-size:12px">Bảng điểm đa chỉ số.</div></div>
+      <div class="pick" style="border-style:dashed"><h4>＋ Block chưa có?</h4><div class="mut" style="font-size:12px">Mở Module Studio → tạo block → đăng ký → quay lại chèn. (kể cả AI)</div></div>
+    </div>
+    <div class="note ok" style="margin-top:var(--space-lg)">Module lưu ra = <span class="mono">{template_id, theme_preset_key, zones:[{block_key, slots, data}]}</span> — cây tham chiếu, KHÔNG bytes style. CI từ chối block lạ / literal hex-px.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FRAME 3: THEME ============ -->
+<section class="frame" id="f-theme">
+  <div class="lead"><b>Theme (Admin → Giao diện)</b> = bề mặt DUY NHẤT chỉnh <b>giá trị token toàn cục</b>. Hấp thụ <i>Trợ năng</i> (validator contrast) + export DTCG. Ghi <span class="mono">scope='global'</span>. Override cấp module thuộc Module Studio (scope khác) — không hai nơi ghi cùng scope.</div>
+  <div class="tabbar">
+    <button class="active">☾ Chế độ</button><button>🎨 Màu</button><button>🔤 Chữ</button><button>📐 Mật độ</button><button>⚡ Motion</button><button>🧩 Theme Template</button><button>♿ Kiểm trợ năng</button><button>⬇ Xuất token</button>
+  </div>
+  <div class="two">
+    <div class="panel"><div class="panel__head"><h3>🎨 Màu — một seed brand, palette tự sinh (OKLCH)</h3></div>
+      <div class="panel__body">
+        <div class="seedrow">
+          <div class="seed"></div>
+          <div>
+            <div style="font-weight:700">Brand seed</div>
+            <div class="mono">--brand = #0c4a6e</div>
+            <div class="ramp"><i style="background:#e0f2fe"></i><i style="background:#7dd3fc"></i><i style="background:#0c4a6e"></i><i style="background:#0a3d5c"></i><i style="background:#082f44"></i></div>
+            <div class="mut3" style="font-size:11px;margin-top:4px">hover / active / soft / on-brand <b>tự suy</b> — không chỉnh tay từng giá trị.</div>
+          </div>
+        </div>
+        <h4 style="font-size:12px;margin-bottom:8px">Mật độ — MỘT knob điều khiển toàn UI</h4>
+        <div class="knob"><span class="lab">space.master</span><div class="bar"><i style="left:32%"></i></div><span class="mono">8px</span></div>
+        <div class="knob"><span class="lab">radius.master</span><div class="bar"><i style="left:22%"></i></div><span class="mono">4px</span></div>
+        <div class="knob"><span class="lab">radius.card</span><div class="bar"><i style="left:40%"></i></div><span class="mono">8px</span></div>
+        <div class="knob"><span class="lab">control.height</span><div class="bar"><i style="left:30%"></i></div><span class="mono">32px</span></div>
+        <div class="note">Đây là token <b>primitive/semantic</b> (tier 1–2). Component chỉ tham chiếu, không định nghĩa lại → "định nghĩa một lần".</div>
+      </div>
+    </div>
+    <div class="panel"><div class="panel__head"><h3>♿ Validator (gập từ Trợ năng)</h3><span class="badge b-ssot">read-only</span></div>
+      <div class="panel__body wcag">
+        <div class="row"><span>brand trên surface</span><span class="pass">8.9 : 1 · AA ✓</span></div>
+        <div class="row"><span>on-brand trên brand</span><span class="pass">9.2 : 1 · AAA ✓</span></div>
+        <div class="row"><span>text-2 trên surface-muted</span><span class="pass">6.1 : 1 · AA ✓</span></div>
+        <div class="row"><span>warn trên warn-soft</span><span class="fail">2.8 : 1 · FAIL</span></div>
+        <div class="note" style="margin-top:var(--space-lg)">Chạy ngay trong <b>Mô phỏng</b> khi đổi màu. Theme fail contrast → gate chặn publish. Không ghi gì → không vi phạm SSOT.</div>
+        <button class="btn btn--primary" style="width:100%;justify-content:center;margin-top:var(--space)">⬇ Xuất tokens.json (DTCG)</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FRAME 4: BEFORE/AFTER ============ -->
+<section class="frame" id="f-ba">
+  <div class="lead"><b>Appearance: 9 tab → 3 tab.</b> Diệt trùng điều khiển (7 panel governance nhân đôi, contrast lặp, code chết) và chuyển lego/template về Module Studio.</div>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--ok)"></i> Giữ</span>
+    <span><i class="dot" style="background:var(--violet)"></i> Chuyển sang Module Studio</span>
+    <span><i class="dot" style="background:var(--danger)"></i> Gập / Xoá</span>
+  </div>
+  <div class="ba">
+    <div class="panel"><div class="panel__head"><h3>TRƯỚC — 9 tab (rối, trùng)</h3></div>
+      <div class="panel__body"><div class="taglist">
+        <div class="tagline keep">🎨 Theme</div>
+        <div class="tagline move">🧩 Module Master <span class="arrow">→ Module Studio</span></div>
+        <div class="tagline move">📐 Mẫu bố cục <span class="arrow">→ Template Studio</span></div>
+        <div class="tagline keep">🛡️ Quản trị tuân thủ</div>
+        <div class="tagline kill">🧩 Nâng cao <span class="arrow">7 panel trùng + Custom CSS</span></div>
+        <div class="tagline kill">♿ Trợ năng <span class="arrow">→ gập vào Theme</span></div>
+        <div class="tagline kill">📊 Xuất &amp; Phân tích <span class="arrow">tách: export→Theme, health→Gov</span></div>
+        <div class="tagline keep">📖 Chuẩn thiết kế</div>
+        <div class="tagline kill">👻 tokens / effects / overview <span class="arrow">code chết</span></div>
+      </div></div>
+    </div>
+    <div class="panel"><div class="panel__head"><h3>SAU — 3 tab (sạch, một write-path)</h3></div>
+      <div class="panel__body"><div class="taglist">
+        <div class="tagline keep">🎨 <b>Theme</b> — token toàn cục DUY NHẤT (+ Trợ năng validator + export DTCG)</div>
+        <div class="tagline keep">🛡️ <b>Governance</b> — gộp Quản trị tuân thủ + Nâng cao (compliance · rollout · audit · drift · debt · import/export)</div>
+        <div class="tagline keep">📖 <b>Chuẩn thiết kế</b> — reference read-only</div>
+        <div style="height:var(--space)"></div>
+        <div class="tagline move" style="border-left-color:var(--brand)">🧩 <b>Module Studio</b> (bề mặt riêng) — Lego Block Master · Template Studio · Theme Template · Modules</div>
+      </div>
+      <div class="note ok" style="margin-top:var(--space-lg)"><b>Custom CSS injection: bỏ hẳn.</b> Hai-authority HmTheme/GA: hợp nhất (làm trước — S4). Override cấp module = scope riêng trong Module Studio, không phải edit toàn cục lần hai.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Wireframe tĩnh để duyệt thị giác — token tự bind <span class="mono">:root</span> minh hoạ SSOT (brand #0c4a6e · gap 8/12 · radius 4/8 · control 32px). Layout/nhãn sẽ tinh chỉnh khi code. · 2026-06-01
+</footer>
+
+<script>
+  document.querySelectorAll('.seg').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('.seg').forEach(function(x){x.classList.remove('active')});
+      document.querySelectorAll('.frame').forEach(function(x){x.classList.remove('show')});
+      b.classList.add('active');
+      document.getElementById('f-'+b.dataset.f).classList.add('show');
+      window.scrollTo(0,0);
+    });
+  });
+  // demo: inspector mode + tab toggles (visual only)
+  document.querySelectorAll('.insp-mode button, .tabbar button').forEach(function(b){
+    b.addEventListener('click',function(){
+      var sibs=b.parentElement.querySelectorAll('button');
+      sibs.forEach(function(x){x.classList.remove('active')}); b.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,9 +1,9 @@
 {
   "$description": "GENERATED — do not edit. Source: tokens/lego.tokens.json",
-  "$sourceSha256": "589d54094dd185cb",
+  "$sourceSha256": "d4baba5b67fb3246",
   "color": {
     "seed": {
-      "brand": "#1565c0",
+      "brand": "#0c4a6e",
       "accent": "#f9a825",
       "success": "#16a34a",
       "warning": "#d97706",
@@ -13,14 +13,14 @@
     },
     "derived": {
       "brand": {
-        "base": "#1565c0",
-        "hover": "#0056af",
-        "active": "#00479f",
+        "base": "#0c4a6e",
+        "hover": "#003c5f",
+        "active": "#002f51",
         "on": "#fcfcfc",
         "oklch": {
-          "base": "oklch(0.513 0.16 255.67)",
-          "hover": "oklch(0.463 0.16 255.67)",
-          "active": "oklch(0.413 0.16 255.67)"
+          "base": "oklch(0.391 0.085 240.88)",
+          "hover": "oklch(0.341 0.085 240.88)",
+          "active": "oklch(0.291 0.085 240.88)"
         }
       },
       "accent": {

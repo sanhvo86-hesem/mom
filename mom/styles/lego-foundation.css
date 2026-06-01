@@ -8,15 +8,15 @@
  * progressive-enhancement @supports block upgrades the hex defaults to wide-gamut
  * OKLCH. Governed by @layer so tenant/runtime overrides win predictably.
  * ==========================================================================*/
-/* @source-sha256 589d54094dd185cb */
+/* @source-sha256 d4baba5b67fb3246 */
 @layer lego.tokens, lego.components;
 
 @layer lego.tokens {
   :root {
     /* ── derived brand/status ramps (hex, universal) ── */
-    --lego-brand: #1565c0;
-    --lego-brand-hover: #0056af;
-    --lego-brand-active: #00479f;
+    --lego-brand: #0c4a6e;
+    --lego-brand-hover: #003c5f;
+    --lego-brand-active: #002f51;
     --lego-brand-on: #fcfcfc;
     --lego-accent: #f9a825;
     --lego-accent-hover: #e89800;
@@ -153,10 +153,10 @@
   /* ── progressive enhancement: wide-gamut OKLCH on capable browsers ── */
   @supports (color: oklch(0.5 0.1 200)) {
     :root {
-    --lego-brand: oklch(0.513 0.16 255.67);
-    --lego-brand-hover: oklch(0.463 0.16 255.67);
-    --lego-brand-active: oklch(0.413 0.16 255.67);
-    --lego-brand-on: oklch(0.99 0 255.67);
+    --lego-brand: oklch(0.391 0.085 240.88);
+    --lego-brand-hover: oklch(0.341 0.085 240.88);
+    --lego-brand-active: oklch(0.291 0.085 240.88);
+    --lego-brand-on: oklch(0.99 0 240.88);
     --lego-accent: oklch(0.792 0.16 72.44);
     --lego-accent-hover: oklch(0.742 0.16 72.44);
     --lego-accent-active: oklch(0.692 0.16 72.44);

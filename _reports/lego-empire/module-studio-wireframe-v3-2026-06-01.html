@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Module Studio v3 — bản hội tụ · HESEM MOM</title>
+<style>
+  :root{
+    --brand:#0c4a6e;--brand-2:#0a3a57;--brand-soft:#e6f3fb;--brand-line:#bfe0f2;--on-brand:#fff;
+    --ok:#15803d;--ok-soft:#dcfce7;--warn:#b45309;--warn-soft:#fef3c7;--danger:#b91c1c;--danger-soft:#fde8e8;--violet:#6d28d9;
+    --bg:#eef2f6;--surface:#fff;--muted:#f6f8fa;--alt:#eef2f6;
+    --t1:#0f172a;--t2:#51607a;--t3:#9aa7bd;--line:#e4e9f0;--line-2:#cfd8e3;
+    --space:8px;--section:12px;--lg:16px;--radius:4px;--card:8px;--pill:999px;--h:32px;
+    --sh1:0 1px 2px rgba(15,23,42,.05);--f:'Inter',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;--mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0}html,body{height:100%}
+  body{font-family:var(--f);background:var(--bg);color:var(--t1);font-size:13px;line-height:1.4;display:flex;flex-direction:column}
+  .mono{font-family:var(--mono);font-size:11px}
+  .ml{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--t3)}
+  .bar{height:44px;background:var(--brand);color:var(--on-brand);display:flex;align-items:center;gap:var(--lg);padding:0 var(--section);flex:0 0 auto}
+  .bar .lg{font-weight:800;display:flex;gap:8px;align-items:center}
+  .bar .sx{height:26px;display:flex;align-items:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:var(--radius);padding:0 10px;color:#dbeafe;font-size:12px;width:240px}
+  .bar .rt{margin-left:auto;display:flex;gap:8px;align-items:center;font-size:12px}
+  .bar .av{width:26px;height:26px;border-radius:var(--pill);background:#bfe0f2;color:var(--brand);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px}
+  .app{flex:1;display:flex;min-height:0}
+  .rail{width:208px;flex:0 0 auto;background:var(--surface);border-right:1px solid var(--line);overflow:auto;padding:var(--space) 0}
+  .rsec{padding:10px var(--section) 2px}
+  .ritem{display:flex;align-items:center;gap:10px;height:30px;padding:0 var(--section);margin:1px 6px;border-radius:var(--radius);cursor:pointer;color:var(--t2);font-size:12.5px}
+  .ritem .i{width:16px;text-align:center}.ritem .c{margin-left:auto;font-size:10.5px;color:var(--t3)}
+  .ritem:hover{background:var(--muted);color:var(--t1)}
+  .ritem.on{background:var(--brand-soft);color:var(--brand);font-weight:600;box-shadow:inset 3px 0 0 var(--brand)}
+  .work{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+  .whead{flex:0 0 auto;background:var(--surface);border-bottom:1px solid var(--line);padding:0 var(--lg);display:flex;align-items:center;gap:var(--section);height:46px}
+  .whead .ttl{font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px}
+  .surfaces{display:flex;gap:2px;margin-left:8px}
+  .surfaces button{height:30px;padding:0 14px;border:0;background:transparent;color:var(--t2);font:inherit;font-size:13px;border-radius:var(--radius);cursor:pointer;font-weight:600}
+  .surfaces button.on{background:var(--brand);color:#fff}
+  .wact{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .modesw{display:flex;background:var(--alt);border-radius:var(--radius);padding:3px;gap:3px}
+  .modesw button{height:26px;padding:0 14px;border:0;background:transparent;border-radius:3px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;color:var(--t2)}
+  .modesw button.on{background:var(--surface);color:var(--brand);box-shadow:var(--sh1)}
+  .modesw button.auth.on{color:var(--violet)}
+  .sel,.in{height:var(--h);border:1px solid var(--line-2);border-radius:var(--radius);padding:0 10px;font:inherit;font-size:12px;background:var(--surface);color:var(--t1)}
+  .btn{height:var(--h);padding:0 12px;border:1px solid var(--line-2);border-radius:var(--radius);background:var(--surface);font:inherit;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--t1)}
+  .btn:hover{background:var(--muted)}.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}.btn.pri:hover{background:var(--brand-2)}
+  .btn.sm{height:26px;padding:0 9px;font-size:11.5px}
+  .view{flex:1;min-height:0;overflow:auto;display:none}.view.on{display:block}
+  .bd{display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:var(--pill);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+  .bd.ssot{background:var(--ok-soft);color:var(--ok)}.bd.l3{background:var(--brand-soft);color:var(--brand)}.bd.eng{background:var(--alt);color:var(--t2)}.bd.l4{background:#ede9fe;color:var(--violet)}.bd.l2{background:#fff7ed;color:var(--warn)}
+  .st{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:var(--pill);font-size:11px;font-weight:600}
+  .st.ok{background:var(--ok-soft);color:var(--ok)}.st.w{background:var(--warn-soft);color:var(--warn)}.st.d{background:var(--danger-soft);color:var(--danger)}
+
+  .lego{display:grid;grid-template-columns:230px 1fr 308px;height:100%}
+  .lcol{min-height:0;overflow:auto}
+  .lib{border-right:1px solid var(--line);background:var(--surface)}
+  .lib .top{position:sticky;top:0;background:var(--surface);padding:var(--space) var(--section);border-bottom:1px solid var(--line);z-index:2}
+  .lib .top .in{width:100%}
+  details.acc{border-bottom:1px solid var(--line)}
+  details.acc>summary{list-style:none;cursor:pointer;padding:7px var(--section);display:flex;align-items:center;gap:6px}
+  details.acc>summary::-webkit-details-marker{display:none}
+  .acc .cn{margin-left:auto;font-size:10.5px;color:var(--t3)}
+  .lrow{display:flex;align-items:center;gap:9px;padding:6px var(--section) 6px 22px;cursor:pointer;font-size:12px;color:var(--t1)}
+  .lrow:hover{background:var(--brand-soft)}.lrow.sel{background:var(--brand-soft);box-shadow:inset 2px 0 0 var(--brand)}
+  .lrow .ic{width:18px;text-align:center}.lrow .nm{flex:1}.lrow .nm small{display:block;color:var(--t3);font-size:10px}
+  .libfoot{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:var(--space) var(--section)}
+  .cv{background:var(--alt);padding:var(--section);min-height:100%}
+  .cvbar{display:flex;align-items:center;gap:8px;margin-bottom:var(--section)}
+  .ctab{height:26px;padding:0 10px;border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);font-size:11.5px;cursor:pointer;color:var(--t2)}
+  .ctab.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .surf{background:var(--surface);border:1px solid var(--line);border-radius:var(--card);overflow:hidden}
+  .zn{position:relative;border-bottom:1px solid var(--line);cursor:pointer}.zn:last-child{border-bottom:0}
+  .zn.sel{box-shadow:inset 0 0 0 2px var(--brand)}
+  .ztag{position:absolute;top:6px;right:6px;font-size:9.5px;font-weight:700;color:var(--t3);background:var(--muted);border:1px solid var(--line);border-radius:var(--pill);padding:1px 7px}
+  .zb{padding:var(--section)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space)}
+  .kpi{border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;background:var(--surface)}
+  .kpi .k{font-size:10px;letter-spacing:.4px;text-transform:uppercase;color:var(--t3)}
+  .kpi .v{font-size:22px;font-weight:800;margin-top:2px;letter-spacing:-.5px}.kpi .v.ok{color:var(--ok)}.kpi .v.w{color:var(--warn)}
+  .kpi .d{font-size:11px;color:var(--t3);margin-top:2px}
+  .tbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tbl{width:100%;border-collapse:collapse;font-size:12px}
+  .tbl th,.tbl td{padding:7px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  .tbl th{font-size:10px;letter-spacing:.3px;text-transform:uppercase;color:var(--t3);background:var(--muted)}
+  .tbl tbody tr:hover{background:var(--muted)}
+  .insp{border-left:1px solid var(--line);background:var(--surface)}
+  .insp .top{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:var(--space) var(--section);display:flex;align-items:center;gap:8px}
+  .insp .top .crumb{font-size:11px;color:var(--t3)}
+  .ibody{padding:var(--section)}
+  .ip{display:none}.ip.on{display:block}
+  .layerpill{display:inline-flex;align-items:center;height:20px;padding:0 9px;border-radius:var(--pill);font-size:10.5px;font-weight:800;letter-spacing:.4px}
+  .f{margin-bottom:11px}.f>label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+  .tk{display:flex;align-items:center;gap:9px;padding:6px 9px;border:1px solid var(--line);border-radius:var(--radius);margin-bottom:6px;background:var(--muted)}
+  .tk .sw{width:16px;height:16px;border-radius:3px;border:1px solid var(--line-2);flex:0 0 auto}
+  .tk .b{flex:1}.tk .b b{font-size:11.5px}.tk .b small{display:block;color:var(--t3);font-size:10px}.tk .lk{font-size:10px;color:var(--t3)}
+  .cs{display:inline-flex;align-items:center;height:22px;padding:0 8px;border:1px solid var(--line);border-radius:var(--pill);font-size:11px;background:var(--muted);margin:0 4px 4px 0}
+  .gate{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;padding:5px 0;border-bottom:1px solid var(--line)}.pass{color:var(--ok);font-weight:700}
+
+  /* theme + governance */
+  .pad{padding:var(--lg)}
+  .two{display:grid;grid-template-columns:1fr 300px;gap:var(--lg)}
+  @media(max-width:1100px){.two{grid-template-columns:1fr}}
+  .grp{background:var(--surface);border:1px solid var(--line);border-radius:var(--card);margin-bottom:var(--lg)}
+  .grp h3{font-size:12.5px;padding:var(--space) var(--section);border-bottom:1px solid var(--line)}.grp .gb{padding:var(--section)}
+  .seed{display:flex;align-items:center;gap:var(--section)}.seedsw{width:56px;height:56px;border-radius:var(--card);background:var(--brand);border:1px solid var(--line-2)}
+  .ramp{display:flex;gap:5px;margin-top:7px}.ramp i{width:30px;height:22px;border-radius:3px;border:1px solid var(--line);display:inline-block}
+  .knob{display:flex;align-items:center;gap:var(--section);padding:6px 0}.knob .l{width:160px;font-size:12px;color:var(--t2)}
+  .track{flex:1;height:5px;background:var(--alt);border-radius:var(--pill);position:relative}.track i{position:absolute;top:-5px;width:15px;height:15px;border-radius:var(--pill);background:var(--brand);border:2px solid #fff;box-shadow:var(--sh1)}
+  .wr{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;padding:6px 0;border-bottom:1px solid var(--line)}.failx{color:var(--danger);font-weight:700}
+  .govgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space)}
+  .glist .gi{display:flex;align-items:center;gap:10px;padding:8px var(--section);border-bottom:1px solid var(--line)}
+  .glist .gi .mono{flex:0 0 auto}.glist .gi .nm{flex:1}
+  .killed{font-size:11.5px;color:var(--danger);background:var(--danger-soft);border:1px solid #f6c9c9;border-radius:var(--radius);padding:7px 10px}
+</style>
+</head>
+<body>
+<div class="bar">
+  <span class="lg">⬢ HESEM MOM</span>
+  <span class="sx">🔍 Tìm…</span>
+  <div class="rt"><span>🇻🇳 VI</span><span>🔔</span><span class="av">SV</span></div>
+</div>
+<div class="app">
+  <nav class="rail">
+    <div class="rsec ml">Vận hành</div>
+    <div class="ritem"><span class="i">📦</span>Đơn hàng<span class="c">128</span></div>
+    <div class="ritem"><span class="i">🏭</span>Sản xuất<span class="c">54</span></div>
+    <div class="ritem"><span class="i">✓</span>Chất lượng</div>
+    <div class="ritem"><span class="i">📥</span>Kho vận</div>
+    <div class="rsec ml">Xưởng module</div>
+    <div class="ritem on"><span class="i">🧩</span>Module Studio</div>
+    <div class="rsec ml">Quản trị</div>
+    <div class="ritem"><span class="i">👥</span>Người dùng<span class="c">88</span></div>
+    <div class="ritem"><span class="i">🛡</span>Vai trò<span class="c">38</span></div>
+    <div class="ritem"><span class="i">📊</span>KPI</div>
+    <div class="rsec ml">Tài liệu</div>
+    <div class="ritem"><span class="i">📘</span>Sổ tay QMS</div>
+    <div class="ritem"><span class="i">📝</span>Biểu mẫu<span class="c">141</span></div>
+  </nav>
+  <main class="work">
+    <div class="whead">
+      <span class="ttl">🧩 Module Studio</span>
+      <div class="surfaces">
+        <button data-s="studio" class="on">Module Studio</button>
+        <button data-s="theme">Theme</button>
+        <button data-s="gov">Governance</button>
+      </div>
+      <div class="modesw" id="modesw">
+        <button id="m-assemble" class="on">⬡ Assemble</button>
+        <button id="m-author" class="auth">✎ Author</button>
+      </div>
+      <div class="wact">
+        <select class="sel"><option>HESEM mặc định</option><option>Xưởng cảm ứng · 44px</option></select>
+        <button class="btn">Mô phỏng</button><button class="btn pri" id="submitbtn">Submit</button>
+      </div>
+    </div>
+
+    <!-- ===== MODULE STUDIO ===== -->
+    <section class="view on" id="v-studio"><div class="lego">
+      <!-- library: L4/L3/L2 -->
+      <div class="lcol lib">
+        <div class="top"><input class="in" placeholder="🔍 Thư viện Lego"></div>
+        <details class="acc"><summary><span class="layerpill bd l4">L4</span><span class="ml">Archetypes</span><span class="cn">6</span></summary>
+          <div class="lrow" data-pick="L4"><span class="ic">▱</span><span class="nm">Workspace Projection<small>workspace-projection</small></span></div>
+          <div class="lrow" data-pick="L4"><span class="ic">▤</span><span class="nm">Authoritative Record<small>authoritative-record-shell</small></span></div>
+          <div class="lrow" data-pick="L4"><span class="ic">▦</span><span class="nm">Analytics Overview<small>analytics-overview</small></span></div>
+        </details>
+        <details class="acc" open><summary><span class="layerpill bd l3">L3</span><span class="ml">Lego Blocks</span><span class="cn">+196</span></summary>
+          <div class="lrow sel" data-pick="L3"><span class="ic">📊</span><span class="nm">Dãy KPI<small>kpi.grid</small></span><span class="bd ssot">ssot</span></div>
+          <div class="lrow" data-pick="L3"><span class="ic">▦</span><span class="nm">Data grid<small>data.grid</small></span><span class="bd ssot">ssot</span></div>
+          <div class="lrow" data-pick="L3"><span class="ic">🧰</span><span class="nm">Toolbar lọc<small>toolbar.filtered</small></span><span class="bd ssot">ssot</span></div>
+          <div class="lrow" data-pick="L3"><span class="ic">🌳</span><span class="nm">Traceability tree<small>tree.traceability</small></span><span class="bd eng">eng</span></div>
+        </details>
+        <details class="acc"><summary><span class="layerpill bd l2">L2</span><span class="ml">Components</span><span class="cn">27</span></summary>
+          <div class="lrow" data-pick="L2"><span class="ic">⬛</span><span class="nm">Button<small>o3.btn</small></span></div>
+          <div class="lrow" data-pick="L2"><span class="ic">▭</span><span class="nm">Input<small>o3.input</small></span></div>
+          <div class="lrow" data-pick="L2"><span class="ic">▦</span><span class="nm">Table<small>o3.table</small></span></div>
+        </details>
+        <div class="libfoot" id="libfoot"><button class="btn" style="width:100%;justify-content:center">＋ Mục mới</button></div>
+      </div>
+      <!-- canvas -->
+      <div class="lcol cv">
+        <div class="cvbar">
+          <button class="ctab on">Tổng quan</button><button class="ctab">Tạo SO</button><button class="ctab">Giao hàng</button><button class="ctab">＋</button>
+          <span style="margin-left:auto"></span><button class="btn sm">🖥</button><button class="btn sm">📱</button><button class="btn sm">100%</button>
+        </div>
+        <div class="surf">
+          <div class="zn sel" data-zone="L3"><span class="ztag">kpi.grid</span><div class="zb">
+            <div class="kpis">
+              <div class="kpi"><div class="k">SO hoạt động</div><div class="v">128</div><div class="d">+6 tuần này</div></div>
+              <div class="kpi"><div class="k">JO hoạt động</div><div class="v">54</div><div class="d">3 trễ</div></div>
+              <div class="kpi"><div class="k">OTD</div><div class="v ok">96.4%</div><div class="d">▲1.2%</div></div>
+              <div class="kpi"><div class="k">Backlog</div><div class="v w">1.24M $</div><div class="d">42 dòng</div></div>
+            </div>
+          </div></div>
+          <div class="zn" data-zone="L3"><span class="ztag">toolbar.filtered</span><div class="zb"><div class="tbar">
+            <input class="in" style="width:240px" placeholder="Mã SO, khách hàng"><select class="sel"><option>Tất cả trạng thái</option></select>
+            <input class="in" type="date" style="width:140px"><button class="btn pri" style="margin-left:auto">Áp dụng</button>
+          </div></div></div>
+          <div class="zn" data-zone="L3"><span class="ztag">data.grid</span><div class="zb" style="padding:0"><table class="tbl">
+            <thead><tr><th>Mã SO</th><th>Khách hàng</th><th>SL</th><th>Giao</th><th>Trạng thái</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">SO-2041</td><td>VinFast</td><td>1.200</td><td>12/06</td><td><span class="st ok">Đúng hạn</span></td></tr>
+              <tr><td class="mono">SO-2042</td><td>THACO</td><td>640</td><td>14/06</td><td><span class="st w">Chờ duyệt</span></td></tr>
+              <tr><td class="mono">SO-2043</td><td>Hòa Phát</td><td>2.000</td><td>09/06</td><td><span class="st d">Trễ</span></td></tr>
+            </tbody>
+          </table></div></div>
+        </div>
+      </div>
+      <!-- inspector: drill-down -->
+      <div class="lcol insp">
+        <div class="top"><span class="crumb" id="insp-crumb">module ▸ zone: kpis</span></div>
+        <div class="ibody">
+          <!-- Assemble (zone) -->
+          <div class="ip on" id="ip-assemble">
+            <div style="margin-bottom:10px"><span class="layerpill bd ssot">ASSEMBLE</span></div>
+            <div class="f"><label>Block trong zone</label><input class="in mono" value="kpi.grid"></div>
+            <div class="f"><label>Tiles (slot)</label><div><span class="cs">SO hoạt động</span><span class="cs">JO</span><span class="cs">OTD</span><span class="cs">Backlog</span></div></div>
+            <div class="f"><label>Data binding</label><input class="in mono" value="GET /api/orders/kpi"></div>
+            <div class="f"><label>Theme preset</label><input class="in" value="hesem-default"></div>
+            <div class="gate"><span>chỉ token · không hex/px</span><span class="pass">✓</span></div>
+            <div class="gate"><span>block published</span><span class="pass">✓</span></div>
+          </div>
+          <!-- L3 block definition -->
+          <div class="ip" id="ip-l3">
+            <div style="margin-bottom:10px"><span class="layerpill bd l3">L3 · BLOCK CONTRACT</span></div>
+            <div class="f"><label>Khoá</label><input class="in mono" value="kpi.grid"></div>
+            <div class="f"><label>composed_of (L2)</label><div><span class="cs">o3-kpi</span><span class="cs">o3-panel</span></div></div>
+            <div class="f"><label>slots</label><div><span class="cs">tiles[]</span><span class="cs">title</span></div></div>
+            <div class="f"><label>variant_axes</label><div><span class="cs">cols: 2·3·4</span><span class="cs">tone</span></div></div>
+            <div class="f"><label>required_tokens</label>
+              <div class="tk"><span class="sw" style="background:var(--brand)"></span><span class="b"><b>kpi.value.color</b><small>color.brand</small></span><span class="lk">🔒</span></div>
+              <div class="tk"><span class="sw" style="background:var(--alt)"></span><span class="b"><b>kpi.radius</b><small>radius.master·4</small></span><span class="lk">🔒</span></div>
+            </div>
+            <div class="gate"><span>a11y_contract</span><span class="pass">role=group</span></div>
+            <div class="gate"><span>preview_scene</span><span class="pass">kpi.grid.scene</span></div>
+          </div>
+          <!-- L2 component contract -->
+          <div class="ip" id="ip-l2">
+            <div style="margin-bottom:10px"><span class="layerpill bd l2">L2 · COMPONENT CONTRACT</span></div>
+            <div class="f"><label>component_key</label><input class="in mono" value="o3.btn"></div>
+            <div class="f"><label>overridable_tokens</label>
+              <div class="tk"><span class="sw" style="background:var(--brand)"></span><span class="b"><b>button.bg</b></span><span class="lk">🔒</span></div>
+              <div class="tk"><span class="sw" style="background:#fff"></span><span class="b"><b>button.fg</b></span><span class="lk">🔒</span></div>
+              <div class="tk"><span class="sw" style="background:var(--alt)"></span><span class="b"><b>control.height.standard</b><small>32</small></span><span class="lk">🔒</span></div>
+            </div>
+            <div class="f"><label>states</label><div><span class="cs">default</span><span class="cs">hover</span><span class="cs">active</span><span class="cs">disabled</span><span class="cs">focus</span></div></div>
+            <div class="gate"><span>a11y role</span><span class="pass">button · Enter/Space</span></div>
+            <div class="f" style="margin-top:10px"><label>⚠ không có slot — L2 không phải block</label></div>
+          </div>
+          <!-- L4 archetype -->
+          <div class="ip" id="ip-l4">
+            <div style="margin-bottom:10px"><span class="layerpill bd l4">L4 · ARCHETYPE</span></div>
+            <div class="f"><label>archetype_key</label><input class="in mono" value="workspace-projection"></div>
+            <div class="f"><label>route_class</label><input class="in mono" value="/ops/{domain}/{module}"></div>
+            <div class="f"><label>zones</label><div><span class="cs">kpis</span><span class="cs">toolbar</span><span class="cs">list</span><span class="cs">empty</span></div></div>
+            <div class="f"><label>required_blocks</label><div><span class="cs">shell.workspace</span></div></div>
+            <div class="f"><label>forbidden_patterns</label><div><span class="cs">raw-html</span><span class="cs">inline-style</span><span class="cs">density-override</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div></section>
+
+    <!-- ===== THEME ===== -->
+    <section class="view" id="v-theme"><div class="pad"><div class="two">
+      <div>
+        <div class="grp"><h3>Brand · seed OKLCH</h3><div class="gb"><div class="seed"><div class="seedsw"></div><div>
+          <div class="mono">--brand · #0c4a6e</div>
+          <div class="ramp"><i style="background:#e6f3fb"></i><i style="background:#7dd3fc"></i><i style="background:#0c4a6e"></i><i style="background:#0a3a57"></i><i style="background:#062538"></i></div>
+          <div class="ml" style="margin-top:6px">hover·active·soft·on-brand suy tự động</div>
+        </div></div></div></div>
+        <div class="grp"><h3>Mật độ · một knob</h3><div class="gb">
+          <div class="knob"><span class="l">space.master</span><div class="track"><i style="left:30%"></i></div><span class="mono">8</span></div>
+          <div class="knob"><span class="l">space.section</span><div class="track"><i style="left:42%"></i></div><span class="mono">12</span></div>
+          <div class="knob"><span class="l">radius.master</span><div class="track"><i style="left:20%"></i></div><span class="mono">4</span></div>
+          <div class="knob"><span class="l">radius.card</span><div class="track"><i style="left:40%"></i></div><span class="mono">8</span></div>
+          <div class="knob"><span class="l">control.height</span><div class="track"><i style="left:30%"></i></div><span class="mono">32</span></div>
+        </div></div>
+        <div class="grp"><h3>Chế độ · Chữ · Motion · Preset</h3><div class="gb"><div class="tbar">
+          <button class="btn">☀ Light</button><button class="btn">☾ Dark</button><button class="btn">◐ Auto</button><button class="btn">◑ High-contrast</button>
+          <button class="btn">Aa Typography</button><button class="btn">⚡ Motion</button><button class="btn">⬇ Export DTCG</button>
+        </div></div></div>
+      </div>
+      <div>
+        <div class="grp"><h3>Kiểm tương phản (Simulate)</h3><div class="gb">
+          <div class="wr"><span>brand/surface</span><span class="pass">8.9·AA</span></div>
+          <div class="wr"><span>on-brand/brand</span><span class="pass">9.2·AAA</span></div>
+          <div class="wr"><span>t2/muted</span><span class="pass">6.1·AA</span></div>
+          <div class="wr" style="border:0"><span>warn/warn-soft</span><span class="failx">2.8·FAIL</span></div>
+        </div></div>
+        <div class="grp"><h3>Custom CSS</h3><div class="gb"><div class="killed">✕ Đã gỡ bỏ — mọi giá trị thị giác qua token.</div></div></div>
+      </div>
+    </div></div></section>
+
+    <!-- ===== GOVERNANCE ===== -->
+    <section class="view" id="v-gov"><div class="pad"><div class="govgrid">
+      <div class="grp"><h3>Hàng đợi release</h3><div class="glist">
+        <div class="gi"><span class="mono">kpi.grid</span><span class="nm">v2 → publish</span><span class="st w">Review</span></div>
+        <div class="gi"><span class="mono">tree.traceability</span><span class="nm">block mới (AI request)</span><span class="st w">Gate</span></div>
+        <div class="gi"><span class="mono">shopfloor-cozy</span><span class="nm">theme preset 44px</span><span class="st ok">Published</span></div>
+      </div></div>
+      <div class="grp"><h3>Simulation runs</h3><div class="glist">
+        <div class="gi"><span class="mono">#4821</span><span class="nm">kpi.grid · WCAG</span><span class="st ok">Pass</span></div>
+        <div class="gi"><span class="mono">#4822</span><span class="nm">brand #0c4a6e</span><span class="st ok">Pass</span></div>
+        <div class="gi"><span class="mono">#4823</span><span class="nm">warn pair</span><span class="st d">Fail</span></div>
+      </div></div>
+      <div class="grp"><h3>Block usage map</h3><div class="glist">
+        <div class="gi"><span class="mono">kpi.grid</span><span class="nm">12 module</span></div>
+        <div class="gi"><span class="mono">data.grid</span><span class="nm">9 module</span></div>
+        <div class="gi"><span class="mono">toolbar.filtered</span><span class="nm">14 module</span></div>
+      </div></div>
+      <div class="grp"><h3>Deprecation · Rollback · Export</h3><div class="gb"><div class="tbar">
+        <button class="btn">Deprecate</button><button class="btn">↩ Rollback</button><button class="btn">⬇ DTCG</button><button class="btn">⬇ Registry</button><button class="btn">⬇ Docs</button>
+      </div></div></div>
+    </div></div></section>
+  </main>
+</div>
+<script>
+  function surface(s){
+    document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+s));
+    document.querySelectorAll('.surfaces button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));
+    document.getElementById('modesw').style.display=(s==='studio')?'flex':'none';
+  }
+  document.querySelectorAll('.surfaces button').forEach(b=>b.onclick=()=>surface(b.dataset.s));
+  // mode wall
+  function mode(m){
+    document.getElementById('m-assemble').classList.toggle('on',m==='assemble');
+    document.getElementById('m-author').classList.toggle('on',m==='author');
+    document.getElementById('submitbtn').textContent=(m==='assemble')?'Submit':'Publish';
+    document.getElementById('libfoot').querySelector('button').textContent=(m==='author')?'＋ Tạo block / contract':'＋ Thêm vào module';
+    inspect(m==='author'?'L3':'assemble', m==='author'?'block: kpi.grid':'module ▸ zone: kpis');
+  }
+  document.getElementById('m-assemble').onclick=()=>mode('assemble');
+  document.getElementById('m-author').onclick=()=>mode('author');
+  // drill-down inspector
+  function inspect(layer,crumb){
+    ['assemble','l3','l2','l4'].forEach(x=>document.getElementById('ip-'+x).classList.toggle('on',x===layer.toLowerCase()));
+    document.getElementById('insp-crumb').textContent=crumb;
+  }
+  document.querySelectorAll('.zn').forEach(z=>z.onclick=()=>{
+    document.querySelectorAll('.zn').forEach(x=>x.classList.remove('sel'));z.classList.add('sel');
+    var assemble=document.getElementById('m-assemble').classList.contains('on');
+    inspect(assemble?'assemble':'L3', assemble?'module ▸ zone':'block ▸ '+z.querySelector('.ztag').textContent);
+  });
+  document.querySelectorAll('.lrow').forEach(r=>r.onclick=()=>{
+    document.querySelectorAll('.lrow').forEach(x=>x.classList.remove('sel'));r.classList.add('sel');
+    inspect(r.dataset.pick, r.dataset.pick+' ▸ '+r.querySelector('small').textContent);
+  });
+  document.querySelectorAll('.ctab,.modesw button').forEach(()=>{});
+  surface('studio');document.getElementById('modesw').style.display='flex';
+</script>
+</body>
+</html>

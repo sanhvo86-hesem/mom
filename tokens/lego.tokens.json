@@ -5,7 +5,7 @@
     "$type": "color",
     "seed": {
       "$description": "Tier-1 brand/status seeds. One value each; the generator derives base/hover/active/subtle/border/on-* ramps in OKLCH.",
-      "brand":   { "$value": "#1565c0", "$description": "Primary brand" },
+      "brand":   { "$value": "#0c4a6e", "$description": "Primary brand (canonical HESEM, aligned with migration 264 + graphics_theme_preset)" },
       "accent":  { "$value": "#f9a825", "$description": "Accent / highlight" },
       "success": { "$value": "#16a34a" },
       "warning": { "$value": "#d97706" },
