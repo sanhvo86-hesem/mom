@@ -265,6 +265,63 @@ body.orders-v3-active #page-orders.active > .page-breadcrumb {
   gap: var(--o3-space);
 }
 
+/* ── o3-shell__rail — canonical sidebar navigation (P4 unified shell) ─────────
+   The single SSOT sidebar component for the unified shell. The global portal
+   sidebar (.eqms-nav, in frozen eqms-suite.css) is re-skinned to match these
+   exact tokens via graphics-authority.css; new surfaces should use this class
+   directly. Left-accent active style, 32px rows, 8/12 grid, theme brand. */
+.o3-shell__rail {
+  width: 240px;
+  min-width: 240px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--o3-surface-card);
+  border-right: 1px solid var(--o3-border-subtle);
+}
+.o3-shell__rail--collapsed { width: 56px; min-width: 56px; }
+.o3-shell__nav-group { padding: var(--o3-space) 0; }
+.o3-shell__nav-group-label {
+  padding: var(--o3-space-xs) var(--o3-space-section);
+  font-size: var(--o3-font-size-xs);
+  font-weight: var(--o3-font-weight-semi);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--o3-text-muted);
+  white-space: nowrap;
+}
+.o3-shell__nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--o3-space);
+  height: var(--o3-control-h-standard);
+  padding: 0 var(--o3-space-section);
+  font-size: var(--o3-font-size-md);
+  color: var(--o3-text-default);
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--o3-motion-fast) var(--o3-motion-ease),
+              color var(--o3-motion-fast) var(--o3-motion-ease);
+}
+.o3-shell__nav-item:hover { background: var(--o3-surface-muted); color: var(--o3-text-strong); }
+.o3-shell__nav-item--active {
+  background: var(--o3-brand-soft);
+  color: var(--o3-brand);
+  border-left-color: var(--o3-brand);
+  font-weight: var(--o3-font-weight-semi);
+}
+.o3-shell__nav-icon {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* ════════════════════════════════════════════════════════════════════════
  * KPI tile (a single number with label, optional delta, optional click)
  * ════════════════════════════════════════════════════════════════════════ */
