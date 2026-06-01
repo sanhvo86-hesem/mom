@@ -13,6 +13,7 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 
 RUN_DB_MIGRATIONS="${RUN_DB_MIGRATIONS:-1}"
 RUN_DB_SCHEMA_SMOKE="${RUN_DB_SCHEMA_SMOKE:-1}"
+RUN_MDA_RUNTIME_AUTHORITY_GATE="${RUN_MDA_RUNTIME_AUTHORITY_GATE:-1}"
 FPM_POOL_CONF="${FPM_POOL_CONF:-}"
 DB_SCHEMA="${DB_SCHEMA:-public}"
 
@@ -204,8 +205,22 @@ if ($failures !== []) {
 PHP
 }
 
+mda_runtime_authority_gate() {
+  if [ "$RUN_MDA_RUNTIME_AUTHORITY_GATE" != "1" ]; then
+    log "MDA runtime authority gate skipped (RUN_MDA_RUNTIME_AUTHORITY_GATE=$RUN_MDA_RUNTIME_AUTHORITY_GATE)"
+    return
+  fi
+
+  command -v php >/dev/null 2>&1 || die "php is required for MDA runtime authority gate"
+  local gate="${REPO_ROOT}/mom/tools/release/check_mda_runtime_authority_gate.php"
+  [ -f "$gate" ] || die "MDA runtime authority gate not found: $gate"
+  log "Running MDA runtime authority gate against live DB..."
+  php "$gate" --require-postgres 2>&1 | sed 's/^/    /'
+}
+
 cd "$REPO_ROOT"
 resolve_db_env
 migration_drift_check
 run_migrations
 schema_smoke
+mda_runtime_authority_gate

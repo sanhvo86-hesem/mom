@@ -65,6 +65,9 @@ $itemHandler = top30_read($repoRoot . '/mom/api/services/DomainCommand/ItemRevis
 $signatureService = top30_read($repoRoot . '/mom/api/services/DomainCommand/ElectronicSignatureService.php');
 $domainCommandController = top30_read($repoRoot . '/mom/api/controllers/DomainCommandController.php');
 $openapi = top30_read($repoRoot . '/mom/api/openapi.yaml');
+$authorityAudit = top30_read($repoRoot . '/mom/tools/audit_runtime_authority_consistency.php');
+$authorityGate = top30_read($repoRoot . '/mom/tools/release/check_mda_runtime_authority_gate.php');
+$vpsMigrationGate = top30_read($repoRoot . '/mom/ops/vps/run-db-migrations.sh');
 $scenarioRunner = top30_read($repoRoot . '/mom/api/services/Scenario/MdaRuntimeScenarioRunner.php');
 $scenarioDriver = top30_read($repoRoot . '/mom/api/services/Scenario/ScenarioCommandDriver.php');
 $scenarioRegistry = top30_json($repoRoot . '/mom/data/registry/mda-v4-runtime-scenarios.json');
@@ -119,9 +122,10 @@ top30_record($checks, 'MDA-F04', is_file($repoRoot . '/mom/database/migrations/2
 
 top30_record($checks, 'MDA-F05', is_file($repoRoot . '/mom/api/services/MasterDataDriftReconciliationRunner.php')
     && is_file($repoRoot . '/mom/api/services/MasterDataFallbackTelemetry.php')
-    && top30_contains_all(top30_read($repoRoot . '/mom/tools/audit_runtime_authority_consistency.php'), ['status', 'drift']),
-    'Runtime authority consistency audit exists and records drift/fallback posture.',
-    ['mom/tools/audit_runtime_authority_consistency.php', 'mom/api/services/MasterDataDriftReconciliationRunner.php']);
+    && top30_contains_all($authorityAudit, ['blocking_issue_count', 'advisory_issue_count', 'MODE_POSTGRES_ONLY', 'postgres_authority_rows_not_mirrored_to_json'])
+    && top30_contains_all($authorityGate, ['--require-postgres', 'MDA_RUNTIME_AUTHORITY_GATE_PASS']),
+    'Runtime authority audit is mode-aware, blocks authority drift, and separates Postgres-only JSON mirror advisory drift.',
+    ['mom/tools/audit_runtime_authority_consistency.php', 'mom/tools/release/check_mda_runtime_authority_gate.php', 'mom/api/services/MasterDataDriftReconciliationRunner.php']);
 
 top30_record($checks, 'MDA-F06', top30_contains_all(top30_read($repoRoot . '/mom/data/registry/mda-uom-direct-authority-system.json'), ['uom_runtime_authority', 'UomRuntimeAuthorityService'])
     && top30_contains_all($gateway, ['UomCommandQuantityNormalizer']),
@@ -248,9 +252,10 @@ top30_record($checks, 'MDA-F29', top30_contains_all(top30_read($repoRoot . '/mom
 top30_record($checks, 'MDA-F30', $migrationBlockOk
     && (string)($p60['decision_token'] ?? '') === 'P60_PASS_READY_FOR_CONTROLLED_INTEGRATION'
     && (int)($p60['p0_open_count'] ?? -1) === 0
-    && (int)($p60['p1_open_count'] ?? -1) === 0,
-    'DoD promotion gate is machine-enforced: continuous migrations 267-284 and no open P0/P1.',
-    ['mom/database/migrations/267-284', 'mom/tools/release/run_mda_v4_final_redteam.php']);
+    && (int)($p60['p1_open_count'] ?? -1) === 0
+    && top30_contains_all($vpsMigrationGate, ['RUN_MDA_RUNTIME_AUTHORITY_GATE', 'check_mda_runtime_authority_gate.php', '--require-postgres']),
+    'DoD promotion gate is machine-enforced: continuous migrations 267-284, no open P0/P1, and VPS deploy blocks without runtime authority proof.',
+    ['mom/database/migrations/267-284', 'mom/tools/release/run_mda_v4_final_redteam.php', 'mom/ops/vps/run-db-migrations.sh']);
 
 $failed = array_values(array_filter($checks, static fn(array $row): bool => !$row['ok']));
 $result = [

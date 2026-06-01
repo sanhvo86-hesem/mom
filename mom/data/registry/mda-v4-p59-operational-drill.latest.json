@@ -1,8 +1,8 @@
 {
     "schema_version": "mda.v4.p59.operational_drill.v1",
-    "generated_at": "2026-06-01T15:53:36+00:00",
-    "branch": "codex/mda-runtime-top30-f25-control-tower-20260601b",
-    "sha": "cbabf7c68",
+    "generated_at": "2026-06-01T17:01:49+00:00",
+    "branch": "codex/mda-runtime-authority-hard-gate-20260601",
+    "sha": "ed1ff8782",
     "p58_dashboard": {
         "path": "mom/data/registry/mda-v4-runtime-scenario-dashboard.latest.json",
         "decision": "P58_PASS_READY_FOR_NEXT",
@@ -27,23 +27,23 @@
         "path": "mom/data/registry/mda-v4-runtime-scenarios.json",
         "scenario_count": 14
     },
-    "source_root_hash_sha256": "3e7f58d1a9fa803524ee8acb61b17676b02f7c8ff4e6e364ec35949450387182",
+    "source_root_hash_sha256": "f5ae742907e23e64965f624f36f839aa2f5437a436b240e74245a1efb78cce33",
     "restore_drill": {
         "artifact_restore": {
             "status": "pass",
-            "source_root_hash_sha256": "3e7f58d1a9fa803524ee8acb61b17676b02f7c8ff4e6e364ec35949450387182",
-            "restore_root_hash_sha256": "3e7f58d1a9fa803524ee8acb61b17676b02f7c8ff4e6e364ec35949450387182",
-            "target_root": "/var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/mda-v4-p59-restore-3e7f58d1a9fa",
+            "source_root_hash_sha256": "f5ae742907e23e64965f624f36f839aa2f5437a436b240e74245a1efb78cce33",
+            "restore_root_hash_sha256": "f5ae742907e23e64965f624f36f839aa2f5437a436b240e74245a1efb78cce33",
+            "target_root": "/var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/mda-v4-p59-restore-f5ae742907e2",
             "artifact_count": 3
         },
         "postgres_restore": {
             "status": "pass",
-            "database": "mda_v4_restore_3e7f58d1a9fa",
+            "database": "mda_v4_restore_f5ae742907e2",
             "host": "localhost",
             "port": 5432,
             "artifact_count": 3,
-            "source_root_hash_sha256": "3e7f58d1a9fa803524ee8acb61b17676b02f7c8ff4e6e364ec35949450387182",
-            "restore_root_hash_sha256": "3e7f58d1a9fa803524ee8acb61b17676b02f7c8ff4e6e364ec35949450387182",
+            "source_root_hash_sha256": "f5ae742907e23e64965f624f36f839aa2f5437a436b240e74245a1efb78cce33",
+            "restore_root_hash_sha256": "f5ae742907e23e64965f624f36f839aa2f5437a436b240e74245a1efb78cce33",
             "required_for_postgres_only_claim": true
         },
         "ledger_parity": {
@@ -58,7 +58,7 @@
     "rollback_rehearsal": {
         "status": "pass",
         "rollback_mode": "POSTGRES_PRIMARY_WITH_JSON_COMPATIBILITY_READS",
-        "restore_point_hash_sha256": "3e7f58d1a9fa803524ee8acb61b17676b02f7c8ff4e6e364ec35949450387182",
+        "restore_point_hash_sha256": "f5ae742907e23e64965f624f36f839aa2f5437a436b240e74245a1efb78cce33",
         "operator_banner_required": true,
         "operator_banner_text": "MDA cutover is not complete. Fallback/drift controls are active; POSTGRES_ONLY is disabled.",
         "warnings": [
@@ -91,9 +91,9 @@
             "status": "pass",
             "url": "https://eqms.hesemeng.com",
             "exit_code": 0,
-            "dom_hash_sha256": "e88b188baf23fc6399512e19f33857b26a202e58c0023ce075a0db5554a05162"
+            "dom_hash_sha256": "a3e234c71cbbae2eb5c2dc4d54b490b8e6fbfccc782b57e0655bd294c2a42d27"
         },
-        "repo_root": "/Users/a10/Documents/mom-mda-runtime-top30-f25-control-tower-20260601b"
+        "repo_root": "/Users/a10/Documents/mom-mda-runtime-authority-hard-gate-20260601"
     },
     "go_no_go": {
         "decision": "GO_FOR_PRE_PRODUCTION_REVIEW",
