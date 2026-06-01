@@ -331,9 +331,9 @@ function statusChip(kind, label){
       color: 'var(--amber,#d97706)'
     },
     preview: {
-      bg: 'color-mix(in srgb,var(--brand-2,#1565c0) 12%,transparent)',
-      border: 'color-mix(in srgb,var(--brand-2,#1565c0) 24%,transparent)',
-      color: 'var(--brand-2,#1565c0)'
+      bg: 'color-mix(in srgb,var(--brand-2,#0c4a6e) 12%,transparent)',
+      border: 'color-mix(in srgb,var(--brand-2,#0c4a6e) 24%,transparent)',
+      color: 'var(--brand-2,#0c4a6e)'
     },
     admin: {
       bg: 'color-mix(in srgb,var(--brand,#0c2d48) 12%,transparent)',
@@ -358,9 +358,9 @@ function infoCard(title, body, kind){
       title: 'var(--amber,#d97706)'
     },
     preview: {
-      bg: 'color-mix(in srgb,var(--brand-2,#1565c0) 8%,transparent)',
-      border: 'color-mix(in srgb,var(--brand-2,#1565c0) 22%,transparent)',
-      title: 'var(--brand-2,#1565c0)'
+      bg: 'color-mix(in srgb,var(--brand-2,#0c4a6e) 8%,transparent)',
+      border: 'color-mix(in srgb,var(--brand-2,#0c4a6e) 22%,transparent)',
+      title: 'var(--brand-2,#0c4a6e)'
     },
     admin: {
       bg: 'color-mix(in srgb,var(--brand,#0c2d48) 8%,transparent)',
@@ -754,7 +754,7 @@ function previewAdminLayoutTemplate(){
     L('Xem trước layout admin', 'Preview admin layout'),
     '<div style="padding:var(--admin-panel-padding,18px);border:1px solid var(--border);border-radius:var(--admin-panel-radius,20px);background:var(--bg-page)">'
     + '<div style="display:grid;grid-template-columns:minmax(150px,190px) 1fr;gap:var(--admin-gap-lg,18px);align-items:start">'
-    + '<div style="display:grid;gap:var(--admin-gap-md,14px);padding:var(--admin-card-padding,18px);border:1px solid var(--border);border-radius:var(--admin-panel-radius,20px);background:linear-gradient(165deg,color-mix(in srgb, var(--bg-surface,#fff) 94%, var(--brand-2,#1565c0) 6%) 0%,color-mix(in srgb, var(--bg-surface,#fff) 95%, var(--brand-light,#60a5fa) 5%) 100%)">'
+    + '<div style="display:grid;gap:var(--admin-gap-md,14px);padding:var(--admin-card-padding,18px);border:1px solid var(--border);border-radius:var(--admin-panel-radius,20px);background:linear-gradient(165deg,color-mix(in srgb, var(--bg-surface,#fff) 94%, var(--brand-2,#0c4a6e) 6%) 0%,color-mix(in srgb, var(--bg-surface,#fff) 95%, var(--brand-light,#60a5fa) 5%) 100%)">'
     + '<div style="font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-secondary)">Rail</div>'
     + '<div style="display:grid;gap:var(--admin-gap-sm,8px)">'
     + '<div style="padding:var(--admin-row-padding,12px);border:1px solid var(--border);border-radius:var(--admin-nested-radius,14px);background:rgba(255,255,255,.78)">Section A</div>'
@@ -762,10 +762,10 @@ function previewAdminLayoutTemplate(){
     + '</div>'
     + '</div>'
     + '<div style="display:grid;gap:var(--admin-gap-lg,18px)">'
-    + '<div style="padding:var(--admin-card-padding,18px);border:1px solid var(--border);border-radius:var(--admin-surface-radius,18px);background:linear-gradient(135deg,color-mix(in srgb, var(--bg-surface,#fff) 90%, var(--brand-2,#1565c0) 6%) 0%,color-mix(in srgb, var(--bg-surface,#fff) 92%, var(--amber,#f59e0b) 8%) 100%);display:grid;gap:var(--admin-gap-sm,8px)">'
+    + '<div style="padding:var(--admin-card-padding,18px);border:1px solid var(--border);border-radius:var(--admin-surface-radius,18px);background:linear-gradient(135deg,color-mix(in srgb, var(--bg-surface,#fff) 90%, var(--brand-2,#0c4a6e) 6%) 0%,color-mix(in srgb, var(--bg-surface,#fff) 92%, var(--amber,#f59e0b) 8%) 100%);display:grid;gap:var(--admin-gap-sm,8px)">'
     + '<div style="font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-secondary)">Hero</div>'
-    + '<div style="height:10px;width:48%;border-radius:999px;background:color-mix(in srgb, var(--brand-2,#1565c0) 18%, transparent)"></div>'
-    + '<div style="height:10px;width:76%;border-radius:999px;background:color-mix(in srgb, var(--brand-2,#1565c0) 10%, transparent)"></div>'
+    + '<div style="height:10px;width:48%;border-radius:999px;background:color-mix(in srgb, var(--brand-2,#0c4a6e) 18%, transparent)"></div>'
+    + '<div style="height:10px;width:76%;border-radius:999px;background:color-mix(in srgb, var(--brand-2,#0c4a6e) 10%, transparent)"></div>'
     + '</div>'
     + '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--admin-gap-md,14px)">'
     + '<div style="padding:var(--admin-card-padding,18px);border:1px solid var(--border);border-radius:var(--admin-surface-radius,18px);background:var(--bg-surface);display:grid;gap:var(--admin-gap-md,14px)">'
@@ -1237,7 +1237,7 @@ var TEMPLATE_CATEGORIES = [
 ];
 
 var VISUAL_THEMES = [
-  { id:'professional-light', name:{vi:'Chuyên nghiệp Sáng',en:'Professional Light'}, colors:{brand:'#0c2d48',brand2:'#1565c0',bgPage:'#f8fafc',bgSurface:'#ffffff',accent:'#f9a825'}, desc:{vi:'Mặc định. Tương phản cao, dễ đọc.',en:'Default. High contrast, easy to read.'} },
+  { id:'professional-light', name:{vi:'Chuyên nghiệp Sáng',en:'Professional Light'}, colors:{brand:'#0c2d48',brand2:'#0c4a6e',bgPage:'#f8fafc',bgSurface:'#ffffff',accent:'#f9a825'}, desc:{vi:'Mặc định. Tương phản cao, dễ đọc.',en:'Default. High contrast, easy to read.'} },
   { id:'professional-dark', name:{vi:'Chuyên nghiệp Tối',en:'Professional Dark'}, colors:{brand:'#1e293b',brand2:'#60a5fa',bgPage:'#0f172a',bgSurface:'#1e293b',accent:'#f9a825'}, desc:{vi:'Surface tối, hợp dashboard đêm.',en:'Dark surfaces for night operations.'} },
   { id:'midnight-navy', name:{vi:'Nửa đêm',en:'Midnight Navy'}, colors:{brand:'#0f172a',brand2:'#0891b2',bgPage:'#020617',bgSurface:'#111827',accent:'#22d3ee'}, desc:{vi:'Navy sâu cho ca đêm và control room.',en:'Deep navy for night shift control rooms.'} },
   { id:'ocean-breeze', name:{vi:'Đại dương',en:'Ocean Breeze'}, colors:{brand:'#0369a1',brand2:'#0891b2',bgPage:'#f0f9ff',bgSurface:'#ffffff',accent:'#38bdf8'}, desc:{vi:'Sáng, tươi và nhiều cyan.',en:'Fresh cyan-heavy visual direction.'} },
@@ -2227,7 +2227,7 @@ function renderAuthorityStatusPanel(){
     var isPost = ep.method === 'POST';
     var methodCell = isPost
       ? '<span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:800;background:color-mix(in srgb,var(--amber,#f59e0b) 14%,var(--bg-surface,#fff));color:var(--amber-dark,#92400e);font-family:var(--font-mono)">POST</span>'
-      : '<span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:800;background:color-mix(in srgb,var(--brand-2,#1565c0) 10%,var(--bg-surface,#fff));color:var(--brand-2,#075985);font-family:var(--font-mono)">GET</span>';
+      : '<span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:800;background:color-mix(in srgb,var(--brand-2,#0c4a6e) 10%,var(--bg-surface,#fff));color:var(--brand-2,#075985);font-family:var(--font-mono)">GET</span>';
     var noteCell = isPost && state === 'not checked'
       ? '<span style="font-size:10px;color:var(--text-tertiary,#94a3b8);font-style:italic">mutation — probe to verify</span>'
       : (isPost ? '<span style="font-size:10px;color:var(--text-tertiary,#94a3b8);font-style:italic">mutation</span>' : '');
@@ -2798,7 +2798,7 @@ function renderApiContractPanel(){
 function densityChipStyle(density){
   if(density === 'dense') return 'background:color-mix(in srgb,var(--amber,#f57f17) 12%,transparent);color:color-mix(in srgb,var(--amber,#f57f17) 70%,#000 30%);border:1px solid color-mix(in srgb,var(--amber,#f57f17) 18%,transparent)';
   if(density === 'comfortable') return 'background:color-mix(in srgb,var(--green,#16a34a) 12%,transparent);color:var(--green,#15803d);border:1px solid color-mix(in srgb,var(--green,#16a34a) 18%,transparent)';
-  return 'background:color-mix(in srgb,var(--brand-2,#1565c0) 10%,transparent);color:var(--brand-2,#1565c0);border:1px solid color-mix(in srgb,var(--brand-2,#1565c0) 18%,transparent)';
+  return 'background:color-mix(in srgb,var(--brand-2,#0c4a6e) 10%,transparent);color:var(--brand-2,#0c4a6e);border:1px solid color-mix(in srgb,var(--brand-2,#0c4a6e) 18%,transparent)';
 }
 
 function renderTemplateSvg(tpl){
@@ -3057,7 +3057,7 @@ function renderTemplateCard(tpl){
 	      +     templateStatusChip(tpl)
 	      +     templateControlBadge(tpl)
 	      +     statusChip(templatePublishEligibility(tpl) === 'eligible' ? 'full' : (templatePublishEligibility(tpl) === 'blocked' ? 'partial' : 'preview'), templatePublishEligibility(tpl))
-	      +     '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:color-mix(in srgb,var(--brand-2,#1565c0) 10%,transparent);color:var(--brand-2,#1565c0);border:1px solid color-mix(in srgb,var(--brand-2,#1565c0) 18%,transparent);font-size:10px;font-weight:700">'+esc(String(tpl.zoneCount))+' zones</span>'
+	      +     '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:color-mix(in srgb,var(--brand-2,#0c4a6e) 10%,transparent);color:var(--brand-2,#0c4a6e);border:1px solid color-mix(in srgb,var(--brand-2,#0c4a6e) 18%,transparent);font-size:10px;font-weight:700">'+esc(String(tpl.zoneCount))+' zones</span>'
 	      +     '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;'+densityChipStyle(tpl.density)+'">'+esc(tpl.density)+'</span>'
 	      +   '</div>'
     +   '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px">'
@@ -3152,7 +3152,7 @@ function renderTemplateDetail(id){
   h += '</div>';
   h += '<div class="tpl-detail-header" style="display:grid;grid-template-columns:minmax(280px,360px) 1fr;align-items:stretch">';
   h += '<div class="tpl-detail-preview" style="width:auto"><div style="aspect-ratio:16/10;display:flex;align-items:center;justify-content:center">'+renderTemplateSvg(tpl)+'</div></div>';
-  h += '<div class="tpl-detail-meta"><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="hm-badge">'+esc(cat ? cat.label[lang === 'en' ? 'en' : 'vi'] : tpl.category)+'</span>'+templateStatusChip(tpl)+templateControlBadge(tpl)+'<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:color-mix(in srgb,var(--brand-2,#1565c0) 10%,transparent);color:var(--brand-2,#1565c0);border:1px solid color-mix(in srgb,var(--brand-2,#1565c0) 18%,transparent);font-size:10px;font-weight:700">'+esc(String(tpl.zoneCount))+' zones</span><span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;'+densityChipStyle(tpl.density)+'">'+esc(tpl.density)+'</span></div>'
+  h += '<div class="tpl-detail-meta"><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="hm-badge">'+esc(cat ? cat.label[lang === 'en' ? 'en' : 'vi'] : tpl.category)+'</span>'+templateStatusChip(tpl)+templateControlBadge(tpl)+'<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:color-mix(in srgb,var(--brand-2,#0c4a6e) 10%,transparent);color:var(--brand-2,#0c4a6e);border:1px solid color-mix(in srgb,var(--brand-2,#0c4a6e) 18%,transparent);font-size:10px;font-weight:700">'+esc(String(tpl.zoneCount))+' zones</span><span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;'+densityChipStyle(tpl.density)+'">'+esc(tpl.density)+'</span></div>'
     + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px">'
     + smallMeta('templateId', tpl.templateId || tpl.id)
     + smallMeta('version', tpl.version || '1.0.0')
@@ -3295,7 +3295,7 @@ function _computeContrast(hex1, hex2){
 function _wcagChip(ratio){
   var r=ratio?ratio.toFixed(2):'?';
   if(ratio>=7) return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:color-mix(in srgb,var(--green,#16a34a) 12%,var(--bg-surface,#fff));color:var(--green,#166534);border:1px solid color-mix(in srgb,var(--green,#16a34a) 28%,transparent)">AAA '+r+':1</span>';
-  if(ratio>=4.5) return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:color-mix(in srgb,var(--brand-2,#1565c0) 10%,var(--bg-surface,#fff));color:var(--brand-2,#1565c0);border:1px solid color-mix(in srgb,var(--brand-2,#1565c0) 25%,transparent)">AA '+r+':1</span>';
+  if(ratio>=4.5) return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:color-mix(in srgb,var(--brand-2,#0c4a6e) 10%,var(--bg-surface,#fff));color:var(--brand-2,#0c4a6e);border:1px solid color-mix(in srgb,var(--brand-2,#0c4a6e) 25%,transparent)">AA '+r+':1</span>';
   if(ratio>=3) return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:color-mix(in srgb,var(--amber,#f57f17) 10%,var(--bg-surface,#fff));color:color-mix(in srgb,var(--amber,#f57f17) 60%,#000 40%);border:1px solid color-mix(in srgb,var(--amber,#f57f17) 28%,transparent)">AA-Large '+r+':1</span>';
   return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:color-mix(in srgb,var(--red,#c62828) 10%,var(--bg-surface,#fff));color:var(--red,#991b1b);border:1px solid color-mix(in srgb,var(--red,#c62828) 25%,transparent)">FAIL '+r+':1</span>';
 }
@@ -3309,8 +3309,8 @@ function renderWcagContrastPanel(){
     {fg:cl.textPrimary||'#1e293b', bg:cl.bgPage||'#f8fafc', label:'Text Primary / Page'},
     {fg:cl.textSecondary||'#64748b', bg:cl.bgSurface||'#ffffff', label:'Text Secondary / Surface'},
     {fg:cl.textTertiary||'#94a3b8', bg:cl.bgSurface||'#ffffff', label:'Text Tertiary / Surface'},
-    {fg:cl.textLink||'#1565c0', bg:cl.bgSurface||'#ffffff', label:'Link / Surface'},
-    {fg:cl.textInverse||W, bg:br.primary||'#1565c0', label:'Inverse / Brand Primary'},
+    {fg:cl.textLink||'#0c4a6e', bg:cl.bgSurface||'#ffffff', label:'Link / Surface'},
+    {fg:cl.textInverse||W, bg:br.primary||'#0c4a6e', label:'Inverse / Brand Primary'},
     {fg:W, bg:st.success||'#16a34a', label:'White / Success'},
     {fg:W, bg:st.error||'#dc2626', label:'White / Error'},
     {fg:W, bg:st.warning||'#d97706', label:'White / Warning'},
@@ -3370,7 +3370,7 @@ function renderColorBlindnessPanel(){
   var _cbSc  = _cbAll.statusColors || {};
   var _cbCc  = _cbAll.colors || {};
   var _cbCl  = _cbAll.colorsLight || {};
-  var _cbBrand   = _cbCc.brand2 || '#1565c0';
+  var _cbBrand   = _cbCc.brand2 || '#0c4a6e';
   var _cbSuccess = _cbSc.success || '#22c55e';
   var _cbError   = _cbSc.error   || '#ef4444';
   var _cbWarning = _cbSc.warning || '#f59e0b';
@@ -3639,7 +3639,7 @@ function renderSpacingScalePanel(){
     var pct = Math.min(100, s/96*100);
     return '<div style="display:flex;align-items:center;gap:10px;padding:4px 0">'
       +'<div style="width:50px;font-size:11px;font-family:var(--font-mono);color:var(--text-secondary)">'+s+'px</div>'
-      +'<div style="height:20px;width:'+(pct)+'%;background:var(--brand-2,#1565c0);border-radius:3px;min-width:2px"></div>'
+      +'<div style="height:20px;width:'+(pct)+'%;background:var(--brand-2,#0c4a6e);border-radius:3px;min-width:2px"></div>'
       +'</div>';
   }).join('');
   return sect(L('Spacing & Type Scale','Spacing & Type Scale'),
@@ -3695,7 +3695,7 @@ function renderMotionCatalogPanel(){
       +'<div style="font-size:10px;color:var(--text-secondary);margin-bottom:8px;font-family:var(--font-mono)">'+esc(c.val)+'</div>'
       +'<div style="font-size:10px;color:var(--text-tertiary);margin-bottom:10px">'+esc(c.label)+'</div>'
       +'<div style="height:32px;background:var(--bg-surface-alt,var(--bg-hover));border-radius:6px;overflow:hidden;position:relative">'
-      +'<div style="position:absolute;top:8px;left:0;width:16px;height:16px;border-radius:50%;background:var(--brand-2,#1565c0);animation:admSlide 1.6s '+esc(c.val)+' infinite"></div>'
+      +'<div style="position:absolute;top:8px;left:0;width:16px;height:16px;border-radius:50%;background:var(--brand-2,#0c4a6e);animation:admSlide 1.6s '+esc(c.val)+' infinite"></div>'
       +'</div>'
       +'</div>';
   }).join('');
@@ -3703,7 +3703,7 @@ function renderMotionCatalogPanel(){
     return '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)">'
       +'<div style="width:70px;font-size:12px;font-weight:600;color:var(--text-primary)">'+esc(d.name)+'</div>'
       +'<div style="width:55px;font-size:11px;font-family:var(--font-mono);color:var(--text-secondary)">'+d.val+'ms</div>'
-      +'<div style="flex:1;height:6px;border-radius:3px;background:var(--border,#e2e8f0);overflow:hidden"><div style="height:100%;width:'+(Math.min(100,d.val/3))+'%;background:var(--brand-2,#1565c0);border-radius:3px"></div></div>'
+      +'<div style="flex:1;height:6px;border-radius:3px;background:var(--border,#e2e8f0);overflow:hidden"><div style="height:100%;width:'+(Math.min(100,d.val/3))+'%;background:var(--brand-2,#0c4a6e);border-radius:3px"></div></div>'
       +'<div style="font-size:10px;color:var(--text-tertiary)">'+esc(d.label)+'</div>'
       +'</div>';
   }).join('');
@@ -3759,7 +3759,7 @@ function renderColorPalettePanel(){
   var cfg = typeof HmTheme!=='undefined'&&HmTheme.getAdminConfig?HmTheme.getAdminConfig()||{}:{};
   var br = cfg.brand||{}; var st = cfg.statusColors||{};
   var paletteSources = [
-    {name:'Brand Primary', hex:br.primary||'#1565c0'},
+    {name:'Brand Primary', hex:br.primary||'#0c4a6e'},
     {name:'Brand Accent', hex:br.accent||'#f9a825'},
     {name:'Success', hex:st.success||'#16a34a'},
     {name:'Error', hex:st.error||'#dc2626'},
@@ -3790,7 +3790,7 @@ function renderColorPalettePanel(){
 
 function renderTokenSemanticMapPanel(){
   var layers = [
-    {name:L('Primitive Tokens','Primitive Tokens'), color:'#dbeafe', examples:['#1565c0','#22c55e','#f1f5f9','14px','600'], desc:L('Giá trị thô: hex, px, font-weight. Không dùng trực tiếp trong component.','Raw values: hex, px, font-weight. Never referenced directly in components.')},
+    {name:L('Primitive Tokens','Primitive Tokens'), color:'#dbeafe', examples:['#0c4a6e','#22c55e','#f1f5f9','14px','600'], desc:L('Giá trị thô: hex, px, font-weight. Không dùng trực tiếp trong component.','Raw values: hex, px, font-weight. Never referenced directly in components.')},
     {name:L('Semantic Tokens','Semantic Tokens'),   color:'#dcfce7', examples:['--text-primary','--bg-surface','--border','--status-success','--brand-primary'], desc:L('Gán vai trò ngữ nghĩa. Component chỉ được phép tham chiếu semantic tokens.','Role-assigned tokens. Components must only reference semantic tokens.')},
     {name:L('Component Tokens','Component Tokens'), color:'#fef9c3', examples:['--hds-btn-py','--hds-table-cell-py','--hds-badge-fw','--hds-modal-radius','--hds-nav-height'], desc:L('Override per-component nếu cần tách biệt khỏi semantic. Dùng ít nhất có thể.','Per-component overrides when separation from semantic is needed. Use sparingly.')},
   ];
@@ -3815,7 +3815,7 @@ function renderSideBySidePanel(){
   var sc   = all.statusColors     || {};
   var scd  = all.statusColorsDark || {};
   var cc   = all.colors           || {};
-  var btnBg = cc.brand2 || '#1565c0';
+  var btnBg = cc.brand2 || '#0c4a6e';
 
   var sampleHtml = function(mode){
     var isDark = mode==='dark';
@@ -4226,7 +4226,7 @@ function renderColors(){
   var ac = HmTheme.getAdminConfig();
 
   h += sect('🏢 '+T('brand'),
-    colorPick('Primary', '--brand-2', 'brand.primary', '#1565c0')
+    colorPick('Primary', '--brand-2', 'brand.primary', '#0c4a6e')
     + colorPick('Light', '--brand-light', 'brand.light', '#1e88e5')
     + colorPick('Dark', '--brand', 'brand.dark', '#0c2d48')
     + colorPick('Darkest', '--brand-dark', 'brand.darkest', '#0a1e32')
@@ -4281,7 +4281,7 @@ function renderColors(){
     colorPick('Primary', '--text-primary-light', 'colorsLight.textPrimary', '#1e293b')
     + colorPick('Secondary', '--text-secondary-light', 'colorsLight.textSecondary', '#64748b')
     + colorPick('Muted', '--text-tertiary-light', 'colorsLight.textTertiary', '#94a3b8')
-    + colorPick('Link', '--text-link-light', 'colorsLight.textLink', '#1565c0')
+    + colorPick('Link', '--text-link-light', 'colorsLight.textLink', '#0c4a6e')
     + colorPick('Inverse', '--text-inverse-light', 'colorsLight.textInverse', '#ffffff')
     + previewTextColors('light')
   , false);
@@ -4298,7 +4298,7 @@ function renderColors(){
   h += sect('🔲 '+T('borders'),
     '<strong style="font-size:11px">Light</strong>'
     + colorPick('Border', '--border-light', 'colorsLight.border', '#e2e8f0')
-    + colorPick('Focus', '--border-focus-light', 'colorsLight.borderFocus', '#1565c0')
+    + colorPick('Focus', '--border-focus-light', 'colorsLight.borderFocus', '#0c4a6e')
     + colorPick('Error', '--border-error-light', 'colorsLight.borderError', '#dc2626')
     + colorPick('Success', '--border-success-light', 'colorsLight.borderSuccess', '#16a34a')
     + '<strong style="font-size:11px;margin-top:8px;display:block">Dark</strong>'
@@ -4600,7 +4600,7 @@ function renderEffects(){
   , false);
 
   h += sect('✏️ '+T('caretColor'),
-    colorPick('Caret', '--caret-color', 'effects.caretColor', '#1565c0')
+    colorPick('Caret', '--caret-color', 'effects.caretColor', '#0c4a6e')
     + previewCaret()
   , false);
 
@@ -4725,7 +4725,7 @@ function renderComponents(){
     + slider(T('fontWeight'), '--tab-font-weight', 'components.tab.fontWeight', 400, 800, 600, '', 100)
     + slider(T('gap'), '--tab-gap', 'components.tab.gap', 0, 12, 4, 'px')
     + slider('Border radius', '--tab-radius', 'components.tab.radius', 0, 28, 14, 'px')
-    + colorPick('Active indicator', '--tab-active-indicator', 'components.tab.activeIndicator', '#1565c0')
+    + colorPick('Active indicator', '--tab-active-indicator', 'components.tab.activeIndicator', '#0c4a6e')
     + previewTabs()
   , false, statusChip('full', L('Shared tab', 'Shared tab')) + statusChip('admin', L('Panel này tự dùng lại', 'This panel self-consumes it')));
 
@@ -4774,10 +4774,10 @@ function renderComponents(){
     + '<div style="margin:14px 0 8px;font-size:11px;font-weight:700;color:var(--text-secondary);letter-spacing:.04em;text-transform:uppercase">🎨 '+L('Màu nền mục','Item BG Color')+'</div>'
     + colorPick(L('Bình thường','Normal'), '--nav-item-bg', 'components.nav.bgNormal', '#e8f0f9')
     + colorPick(L('Rê chuột','Hover'), '--nav-item-bg-hover', 'components.nav.bgHover', '#dbeafe')
-    + colorPick(L('Đang chọn','Active'), '--nav-item-bg-active', 'components.nav.bgActive', '#1565c0')
+    + colorPick(L('Đang chọn','Active'), '--nav-item-bg-active', 'components.nav.bgActive', '#0c4a6e')
     + '<div style="margin:14px 0 8px;font-size:11px;font-weight:700;color:var(--text-secondary);letter-spacing:.04em;text-transform:uppercase">📝 '+L('Màu chữ mục','Item Text Color')+'</div>'
     + colorPick(L('Bình thường','Normal'), '--nav-item-color', 'components.nav.colorNormal', '#475569')
-    + colorPick(L('Rê chuột','Hover'), '--nav-item-color-hover', 'components.nav.colorHover', '#1565c0')
+    + colorPick(L('Rê chuột','Hover'), '--nav-item-color-hover', 'components.nav.colorHover', '#0c4a6e')
     + colorPick(L('Đang chọn','Active'), '--nav-item-color-active', 'components.nav.colorActive', '#ffffff')
     + previewNav()
   , false, statusChip('full', L('Shared nav item', 'Shared nav item')));
@@ -5167,11 +5167,11 @@ function renderAdvanced(){
     +'<div style="font-size:11px;line-height:1.7;color:var(--text-secondary);margin-top:8px">'+esc(L('Template export/import ở đây chỉ thao tác draft cache. Controlled registry phải đến từ backend graphics_template_registry_get.', 'Template export/import here only touches draft cache. The controlled registry must come from backend graphics_template_registry_get.'))+'</div>'
   , true);
 
-	  h += sect('🖊️ '+T('customCSS'),
-	    '<textarea id="adm_custom_css" style="width:100%;min-height:120px;font-family:var(--font-mono);font-size:12px;padding:10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface-alt,#f8fafc);color:var(--text-primary);resize:vertical"'
-	    +' oninput="_hmSet(\'\',\'advanced.customCSS\',this.value)">'+(cfg('advanced.customCSS')||'')+'</textarea>'
-	    +'<div style="font-size:11px;color:var(--text-secondary);margin-top:6px;line-height:1.6">'+esc(L('Emergency/exception use only. Custom CSS must have a waiver, owner, expiry, and migration path back to shared token/component contracts before rollout.', 'Emergency/exception use only. Custom CSS must have a waiver, owner, expiry, and migration path back to shared token/component contracts before rollout.'))+'</div>'
-	  , false, statusChip('partial', L('Exception only', 'Exception only')));
+	  /* P0.4 (Module Studio SSOT): the global "Custom CSS Injection" panel is
+	     removed. Raw CSS injection is an unscoped escape hatch that defeats the
+	     token cascade and contradicts absolute SSOT. There is no replacement on
+	     any design surface; new visual parameters go through the token Authority
+	     (catalog row → component/block contract → simulate) instead. */
 
   h += sect('♿ WCAG '+T('wcag'),
     (function(){
@@ -5179,7 +5179,7 @@ function renderAdvanced(){
         ['Text Primary vs Surface', cfg('colorsLight.textPrimary')||'#1e293b', cfg('colorsLight.bgSurface')||'#ffffff'],
         ['Text Secondary vs Surface', cfg('colorsLight.textSecondary')||'#64748b', cfg('colorsLight.bgSurface')||'#ffffff'],
         ['Text Tertiary vs Surface', cfg('colorsLight.textTertiary')||'#94a3b8', cfg('colorsLight.bgSurface')||'#ffffff'],
-        ['Link vs Surface', cfg('colorsLight.textLink')||'#1565c0', cfg('colorsLight.bgSurface')||'#ffffff']
+        ['Link vs Surface', cfg('colorsLight.textLink')||'#0c4a6e', cfg('colorsLight.bgSurface')||'#ffffff']
       ];
       var out = '<table style="width:100%;font-size:11px;border-collapse:collapse">';
       out += '<tr><th style="text-align:left;padding:4px">Pair</th><th style="text-align:right;padding:4px">Ratio</th><th style="text-align:center;padding:4px">AA</th></tr>';
