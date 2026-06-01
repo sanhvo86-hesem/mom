@@ -700,10 +700,12 @@ function _applyCustomVars(){
   _setVarPx('--eqms-detail-sidebar', cfg, 'eqms.layout.detailSidebar');
   _setVarPx('--eqms-filter-height',  cfg, 'eqms.layout.filterHeight');
 
-  /* Custom CSS injection is emergency/exception-only. It remains under Admin
-     config and must be accompanied by waiver/governance evidence before rollout. */
-  var customCSS = _resolveDeep('advanced.customCSS');
-  _applyCustomCSS(customCSS || '');
+  /* P0.4 (Module Studio SSOT): the global Custom CSS injection is removed.
+     It was an unscoped, last-write-wins escape hatch that overrode the token
+     cascade — incompatible with absolute SSOT. Every visual value must resolve
+     from a token. Clean up any style previously injected from a stored
+     advanced.customCSS so stale config stops applying. */
+  _removeCustomCssInjection();
 
   _applyModuleOverrides(cfg);
 
@@ -854,19 +856,12 @@ function _applyModuleOverrides(cfg){
   el.textContent = blocks.join('\n\n');
 }
 
-function _applyCustomCSS(css){
-  var id = 'hm-theme-custom-css';
-  var el = document.getElementById(id);
-  if(!css){
-    if(el) el.remove();
-    return;
-  }
-  if(!el){
-    el = document.createElement('style');
-    el.id = id;
-    document.head.appendChild(el);
-  }
-  el.textContent = css;
+/* P0.4 (Module Studio SSOT): custom CSS injection removed. This helper only
+   tears down any previously-injected <style> so stale advanced.customCSS in
+   stored config no longer applies. No code path injects raw CSS anymore. */
+function _removeCustomCssInjection(){
+  var el = document.getElementById('hm-theme-custom-css');
+  if(el) el.remove();
 }
 
 /* ── Scheduled dark mode ────────────────────────────────────────────────── */
@@ -1176,7 +1171,7 @@ function importTheme(jsonStr){
 
 var VISUAL_THEME_PRESETS = {
   'professional-light': {
-    brandPrimary: '#1565c0',
+    brandPrimary: '#0c4a6e',
     brandLight: '#60a5fa',
     brandDark: '#0c2d48',
     brandDarkest: '#07121f',
