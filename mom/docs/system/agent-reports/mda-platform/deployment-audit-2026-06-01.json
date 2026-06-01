@@ -1,0 +1,61 @@
+{
+  "report_id": "mda-platform-deployment-audit-2026-06-01",
+  "generated_at": "2026-06-01T17:11:52+07:00",
+  "scope": "HESEM Master Data Authority Platform content only",
+  "branch": "codex/mda-content-deploy-audit-20260601",
+  "source_artifact_set": {
+    "path": "_reports/agent-audits/mda-prompt-os-2026-05-29",
+    "tracked_file_count": 182,
+    "server_file_count": 182,
+    "server_git_status_count_for_artifact_set": 0,
+    "aggregate_path_manifest_sha256": "d54dbbd5d5e5acbfd4c5e0a75a84f3d785e6a73cc5d819d8764535eec410a8e6",
+    "tracked_bytes": 692031
+  },
+  "key_artifacts": [
+    {
+      "path": "_reports/agent-audits/mda-prompt-os-2026-05-29/MDA_FINAL_MASTER_BUILD_PLAN.md",
+      "sha256": "320a2d5d24a7ba5630d9a2cdafde2fec21da5b3cd2aeeb2318326b2c6c8cfa71"
+    },
+    {
+      "path": "_reports/agent-audits/mda-prompt-os-2026-05-29/MDA_FINAL_ACCEPTANCE_DECISION.md",
+      "sha256": "6124a90307b234ef88de13e80b3522aaefcec4f008bae3c448d8ce423eeabe24"
+    },
+    {
+      "path": "_reports/agent-audits/mda-prompt-os-2026-05-29/MDA_EXTERNAL_REDTEAM_REPORT.md",
+      "sha256": "1e41c74c92941258a3deadb5677ba4213fe9de131376e04bf64ce7fed09d169e"
+    },
+    {
+      "path": "_reports/agent-audits/mda-prompt-os-2026-05-29/MDA_CONTROLLED_GAP_LEDGER_FINAL.csv",
+      "sha256": "ebc60cab2525b0ee81b37ea4c9a21fe5636a305ac7d7b99f4e448a84c8fedc50"
+    }
+  ],
+  "deployment_findings": [
+    {
+      "id": "MDA-DEPLOY-001",
+      "severity": "pass",
+      "finding": "MDA V1/P00-P21 artifact directory is present on the VPS with 182 tracked files and no dirty modifications."
+    },
+    {
+      "id": "MDA-DEPLOY-002",
+      "severity": "issue",
+      "finding": "Raw _reports paths return HTTP 403 in the browser, so repository artifacts existed on the server but were not publishable as web content before this served dashboard."
+    },
+    {
+      "id": "MDA-DEPLOY-003",
+      "severity": "open",
+      "finding": "MDA V4 runtime-closure branch artifacts are not on production main; they remain in the separate recovery branch and must not be treated as deployed runtime closure."
+    },
+    {
+      "id": "MDA-DEPLOY-004",
+      "severity": "risk",
+      "finding": "Production VPS working tree has unrelated dirty files. This audit avoids overwriting them and only publishes a new read-only MDA dashboard path."
+    }
+  ],
+  "acceptance_posture": {
+    "decision_token": "P21_PASS_WITH_CONTROLLED_GAPS",
+    "claim": "The MDA prompt OS sequence is complete as a design-and-governance package, not runtime-complete.",
+    "controlled_gap_count": 13,
+    "runtime_complete": false,
+    "production_validated": false
+  }
+}
