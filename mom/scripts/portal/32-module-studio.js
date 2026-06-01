@@ -281,9 +281,16 @@
           '</td></tr>';
       }).join('');
     }
+    // Phase B: global theme knobs (absorbed from the Appearance Theme tab) sit
+    // above the preset library. Reuses _renderAdmThemeHtml + _wireAdmTheme verbatim.
+    var knobs = (typeof window._renderAdmThemeHtml === 'function')
+      ? ('<div class="' + ROOT + '__cat">🎨 Token theme toàn cục (knob)</div><div id="adm-appearance-panel-theme" style="margin-bottom:var(--o3-space-section,12px)">' + window._renderAdmThemeHtml(L) + '</div>')
+      : '';
     return '<div class="' + ROOT + '__pad">' +
+      knobs +
+      '<div class="' + ROOT + '__cat">🗂️ Thư viện preset</div>' +
       '<div class="' + ROOT + '__toolbar"><button class="' + ROOT + '__btn" data-ms="theme-refresh">↻ Làm mới</button>' +
-      '<span style="font-size:11px;color:var(--o3-text-muted,#94a3b8)">Theme preset = bộ override token; module trỏ preset_key. Áp dụng dùng LegoTheme runtime.</span></div>' +
+      '<span style="font-size:11px;color:var(--o3-text-muted,#94a3b8)">Preset = bộ override token; “Áp dụng” lưu org-wide qua cùng authority với knob (SSOT).</span></div>' +
       '<table class="' + ROOT + '__tbl"><thead><tr><th>Preset</th><th>Brand</th><th>Density/Control</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody>' + rows + '</tbody></table>' +
       '<div id="ms-theme-detail">' + (state.editing && state.editing.kind === 'theme' ? renderThemeForm(state.editing.draft) : '') + '</div></div>';
   }
@@ -343,18 +350,53 @@
       : '';
     return '<div class="' + ROOT + '__bar">' +
         '<span class="' + ROOT + '__title">🧩 Module Studio</span>' +
-        '<div class="' + ROOT + '__surfaces">' + st('lego', '🧱 Lego') + st('modules', '📦 Modules') + st('theme', '🎨 Theme') + '</div>' +
+        '<div class="' + ROOT + '__surfaces">' + st('lego', '🧱 Lego') + st('tokens', '🎛️ Tokens') + st('modules', '📦 Modules') + st('theme', '🎨 Theme') + st('reference', '📖 Tham chiếu') + '</div>' +
         modes +
         '<div class="' + ROOT + '__act"><button class="' + ROOT + '__btn" data-ms="simulate">Mô phỏng</button></div>' +
       '</div>';
   }
+  // L() helper for the embedded Appearance renderers (they take an L(vi,en) fn).
+  function L(vi, en) { return (window.__lang === 'en') ? (en || vi) : (vi || en); }
+  /* Absorbed Appearance surfaces (Phase B): reuse the existing global renderers
+     verbatim so there is ONE implementation. The Module Master dock self-wires
+     via its MutationObserver; the Theme knobs need _wireAdmTheme() after mount.
+     Panel IDs match what the wiring queries (adm-appearance-panel-*). */
+  function renderTokens() {
+    var inner = (typeof window._renderAdmModuleSampleHtml === 'function')
+      ? window._renderAdmModuleSampleHtml(L)
+      : '<div class="' + ROOT + '__pad ' + ROOT + '__hint">Module Master renderer chưa nạp.</div>';
+    return '<div class="' + ROOT + '__pad" id="adm-appearance-panel-module-sample">' + inner + '</div>';
+  }
+  function renderReference() {
+    function blk(title, fn) {
+      var html = (typeof window[fn] === 'function') ? (window[fn]() || '') : '';
+      if (!html) { return ''; }
+      return '<details open style="margin-bottom:var(--o3-space-section,12px)"><summary class="' + ROOT + '__cat" style="cursor:pointer;padding:var(--o3-space,8px) 0">' + esc(title) + '</summary>' + html + '</details>';
+    }
+    var body = blk('♿ Trợ năng & WCAG', '_renderAdmAccessibility') +
+      blk('📊 Xuất & Phân tích', '_renderAdmAnalytics') +
+      blk('📖 Chuẩn thiết kế', '_renderAdmStandard');
+    return '<div class="' + ROOT + '__pad" id="adm-appearance-panel-reference">' + (body || '<div class="' + ROOT + '__hint">Reference renderers chưa nạp.</div>') + '</div>';
+  }
   function bodyHtml() {
     if (state.surface === 'modules') { return '<div class="' + ROOT + '__body ' + ROOT + '__body--single" data-ms="surfacebody">' + renderModules() + '</div>'; }
     if (state.surface === 'theme') { return '<div class="' + ROOT + '__body ' + ROOT + '__body--single" data-ms="surfacebody">' + renderTheme() + '</div>'; }
+    if (state.surface === 'tokens') { return '<div class="' + ROOT + '__body ' + ROOT + '__body--single" data-ms="surfacebody">' + renderTokens() + '</div>'; }
+    if (state.surface === 'reference') { return '<div class="' + ROOT + '__body ' + ROOT + '__body--single" data-ms="surfacebody">' + renderReference() + '</div>'; }
     return '<div class="' + ROOT + '__body" data-ms="surfacebody">' + renderLego() + '</div>';
   }
-  function paint() { if (!hostEl) { return; } hostEl.innerHTML = bar() + bodyHtml(); }
-  function paintBody() { if (!hostEl) { return; } var b = hostEl.querySelector('[data-ms="surfacebody"]'); if (b) { b.outerHTML = bodyHtml(); } }
+  function afterPaint() {
+    // Wire the absorbed Appearance renderers after their HTML is in the DOM.
+    if (state.surface === 'theme') {
+      setTimeout(function () { try { if (typeof window._wireAdmTheme === 'function') { window._wireAdmTheme(); } } catch (e) { /* noop */ } }, 0);
+    }
+    if (state.surface === 'tokens') {
+      // dock self-wires via MutationObserver; lazyHydrate seeds saved overrides from backend
+      setTimeout(function () { try { if (window._moduleMasterStore && window._moduleMasterStore.lazyHydrate) { window._moduleMasterStore.lazyHydrate(); } } catch (e) { /* noop */ } }, 0);
+    }
+  }
+  function paint() { if (!hostEl) { return; } hostEl.innerHTML = bar() + bodyHtml(); afterPaint(); }
+  function paintBody() { if (!hostEl) { return; } var b = hostEl.querySelector('[data-ms="surfacebody"]'); if (b) { b.outerHTML = bodyHtml(); afterPaint(); } }
 
   function loadModules(includeDeleted) {
     state.modules = null; paintBody();
@@ -646,5 +688,5 @@
     return el;
   }
 
-  window.ModuleStudio = { render: render, setMode: function (m) { state.mode = (m === 'author') ? 'author' : 'assemble'; }, _state: state, version: '0.5.2-themeA-fix' };
+  window.ModuleStudio = { render: render, setMode: function (m) { state.mode = (m === 'author') ? 'author' : 'assemble'; }, _state: state, version: '0.6.0-consolidate-BCD' };
 })();
