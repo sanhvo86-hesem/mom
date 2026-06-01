@@ -82,7 +82,8 @@
       R + '__btn--pri{background:' + br + ';border-color:' + br + ';color:#fff;font-weight:600}' +
       R + '__btn--pri:hover{background:' + br + ';filter:brightness(.94)}' +
       R + '__btn--dgr{color:' + dg + ';border-color:' + dg + '}' +
-      R + '__btn--sm{height:24px;padding:0 ' + sp + ';font-size:11px}' +
+      /* --sm keeps the single-standard control height (32); only padding/font tighten (no off-grid height literal) */
+      R + '__btn--sm{padding:0 ' + sp + ';font-size:11px}' +
       R + '__body{flex:1;min-height:0;display:grid;grid-template-columns:248px 1fr 312px}' +
       R + '__body--single{display:block;overflow:auto}' +
       R + '__col{min-height:0;overflow:auto}' +
@@ -282,6 +283,7 @@
     state.presets = null; paintBody();
     getJson('graphics_theme_preset_list').then(function (j) { state.presets = (j && (j.presets || j.data)) || []; paintBody(); });
   }
+  function incDelChecked() { var c = hostEl && hostEl.querySelector('[data-ms="mod-incdel"]'); return !!(c && c.checked); }
   function lookup(kind, key) {
     if (kind === 'l3') { return l3Blocks().filter(function (b) { return b.block_key === key; })[0] || null; }
     if (kind === 'l4') { return l4Archetypes().filter(function (a) { return a.archetype_key === key; })[0] || null; }
@@ -303,7 +305,7 @@
   }
   function doArchive(id) {
     if (!window.confirm('Archive (soft-delete) module ' + id + '? Có thể khôi phục.')) { return; }
-    post('module_schema_delete', { moduleId: id }).then(function (r) { toast(r && r.ok !== false ? 'Đã archive.' : 'Archive thất bại.', r && r.ok !== false ? 'success' : 'error'); loadModules(hostEl.querySelector('[data-ms="mod-incdel"]') && hostEl.querySelector('[data-ms="mod-incdel"]').checked); }).catch(function (e) { toast('Archive lỗi: ' + e, 'error'); });
+    post('module_schema_delete', { moduleId: id }).then(function (r) { toast(r && r.ok !== false ? 'Đã archive.' : 'Archive thất bại.', r && r.ok !== false ? 'success' : 'error'); loadModules(incDelChecked()); }).catch(function (e) { toast('Archive lỗi: ' + e, 'error'); });
   }
   function doRestore(id) {
     post('module_schema_restore', { moduleId: id }).then(function (r) { toast(r && r.ok !== false ? 'Đã khôi phục.' : 'Khôi phục thất bại.', r && r.ok !== false ? 'success' : 'error'); loadModules(true); }).catch(function (e) { toast('Khôi phục lỗi: ' + e, 'error'); });
@@ -356,6 +358,12 @@
     if (state.surface === 'modules' && state.modules == null) { loadModules(false); }
     if (state.surface === 'theme' && state.presets == null) { loadPresets(); }
 
+    // Listeners are delegated on `el` and read module-level state; attach exactly once
+    // per host node. 02-state-auth-ui re-invokes render() on every nav return, which
+    // would otherwise stack duplicate handlers → one click firing N times (double POST).
+    if (el.__msWired) { return el; }
+    el.__msWired = true;
+
     el.addEventListener('click', function (ev) {
       var t = (ev.target && ev.target.closest) ? ev.target.closest('[data-ms]') : null;
       if (!t || !el.contains(t)) { return; }
@@ -366,7 +374,7 @@
       else if (k === 'simulate') { doSimulate(); }
       else if (k === 'save-block') { doSaveBlock(); }
       else if (k === 'mod-create') { doCreateModule(); }
-      else if (k === 'mod-refresh') { loadModules(t && false); }
+      else if (k === 'mod-refresh') { loadModules(incDelChecked()); }
       else if (k === 'mod-archive') { doArchive(t.getAttribute('data-id')); }
       else if (k === 'mod-restore') { doRestore(t.getAttribute('data-id')); }
       else if (k === 'mod-versions') { doVersions(t.getAttribute('data-id')); }
@@ -388,5 +396,5 @@
     return el;
   }
 
-  window.ModuleStudio = { render: render, setMode: function (m) { state.mode = (m === 'author') ? 'author' : 'assemble'; }, _state: state, version: '0.4.0-integrated' };
+  window.ModuleStudio = { render: render, setMode: function (m) { state.mode = (m === 'author') ? 'author' : 'assemble'; }, _state: state, version: '0.4.1-batchfix' };
 })();
