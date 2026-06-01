@@ -24,7 +24,7 @@ final class CommandRegistry
             'idempotency_scope' => 'mda:item:create',
             'openapi_operation' => 'submitDomainCommand',
             'expected_events' => ['ItemCreated'],
-            'implemented' => false,
+            'implemented' => true,
         ],
         'CreateItemRevisionCommand' => [
             'root' => 'item_revision',
@@ -33,7 +33,7 @@ final class CommandRegistry
             'idempotency_scope' => 'mda:item_revision:create',
             'openapi_operation' => 'submitDomainCommand',
             'expected_events' => ['ItemRevisionCreated'],
-            'implemented' => false,
+            'implemented' => true,
         ],
         'ReleaseItemRevisionCommand' => [
             'root' => 'item_revision',
@@ -42,7 +42,7 @@ final class CommandRegistry
             'idempotency_scope' => 'mda:item_revision:release',
             'openapi_operation' => 'submitDomainCommand',
             'expected_events' => ['ItemRevisionReleased'],
-            'implemented' => false,
+            'implemented' => true,
         ],
         'CreateEngineeringReleasePackageCommand' => [
             'root' => 'engineering_release_package',

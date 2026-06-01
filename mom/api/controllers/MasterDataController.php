@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Services\MasterDataService;
-use MOM\Services\MasterDataAuthorityException;
-use MOM\Services\MasterDataResult;
 use MOM\Services\FoundationGovernanceService;
 use Throwable;
 
@@ -88,22 +86,21 @@ class MasterDataController extends BaseController
         $this->requireAnyRole($user, $this->shiftPlanningRoles());
     }
 
-    private function failMasterDataResult(MasterDataResult $result, string $fallback): never
+    private function denyLegacyGovernedMutation(string $operation, string $entity = ''): never
     {
-        $code = $result->errorCode ?? $fallback;
-        $status = $code === 'governed_master_data_postgres_authority_required' ? 409 : 400;
-        $extra = is_array($result->data ?? null) ? (array)$result->data : [];
-        $this->error($code, $status, $result->message, $extra);
-    }
-
-    private function handleMasterDataException(Throwable $e, string $fallback): never
-    {
-        $this->rethrowResponse($e);
-        if ($e instanceof MasterDataAuthorityException) {
-            $problem = $e->problemDetails();
-            $this->error($e->codeName(), (int)($problem['status'] ?? 409), $e->getMessage(), $problem);
-        }
-        $this->error($fallback, 500, $e->getMessage());
+        $this->error(
+            'domain_command_required',
+            409,
+            'Governed master-data mutations must use /api/v1/domain-commands. Legacy MasterDataController mutation actions are read-only/fail-closed.',
+            [
+                'type' => 'https://hesemeng.com/problems/domain-command-required',
+                'title' => 'Domain command required',
+                'status' => 409,
+                'operation' => $operation,
+                'entity' => $entity,
+                'command_endpoint' => '/api/v1/domain-commands',
+            ]
+        );
     }
 
     /**
@@ -215,23 +212,9 @@ class MasterDataController extends BaseController
 
         $body   = $this->jsonBody();
         $entity = trim((string)($body['entity'] ?? ''));
-        $data   = (array)($body['data'] ?? $body);
-        unset($data['entity']);
 
         if ($entity === '') $this->error('missing_entity', 400);
-
-        $uid = $this->userId($user);
-
-        try {
-            $result = $this->mdService()->create($entity, $data, $uid);
-            if (!$result->ok) {
-                $this->failMasterDataResult($result, 'create_failed');
-            }
-            $this->auditLog('master_data_create', ['entity' => $entity], $uid);
-            $this->success(['record' => $result->data ?? $data], 201);
-        } catch (Throwable $e) {
-            $this->handleMasterDataException($e, 'create_failed');
-        }
+        $this->denyLegacyGovernedMutation('create', $entity);
     }
 
     /**
@@ -253,34 +236,11 @@ class MasterDataController extends BaseController
 
         $body     = $this->jsonBody();
         $entity   = trim((string)($body['entity'] ?? ''));
-        $recordId = trim((string)($body['record_id'] ?? ''));
         $item     = is_array($body['item'] ?? null) ? $body['item'] : [];
 
         if ($entity === '') $this->error('missing_entity', 400);
         if (empty($item))   $this->error('missing_item', 400);
-
-        $uid    = $this->userId($user);
-        $reason = trim((string)($body['reason'] ?? 'Upserted'));
-
-        try {
-            if ($recordId === '') {
-                $result = $this->mdService()->create($entity, $item, $uid);
-                if (!$result->ok) {
-                    $this->failMasterDataResult($result, 'create_failed');
-                }
-                $this->auditLog('master_data_upsert_create', ['entity' => $entity], $uid);
-                $this->success(['record' => $result->data ?? $item], 201);
-            } else {
-                $result = $this->mdService()->update($entity, $recordId, $item, $uid, $reason);
-                if (!$result->ok) {
-                    $this->failMasterDataResult($result, 'update_failed');
-                }
-                $this->auditLog('master_data_upsert_update', ['entity' => $entity, 'id' => $recordId], $uid);
-                $this->success(['record' => $result->data ?? $item]);
-            }
-        } catch (Throwable $e) {
-            $this->handleMasterDataException($e, 'upsert_failed');
-        }
+        $this->denyLegacyGovernedMutation('upsert', $entity);
     }
 
     /**
@@ -296,24 +256,9 @@ class MasterDataController extends BaseController
         $body   = $this->jsonBody();
         $entity = trim((string)($body['entity'] ?? ''));
         $id     = trim((string)($body['id'] ?? ''));
-        $data   = (array)($body['data'] ?? $body);
-        unset($data['entity'], $data['id']);
 
         if ($entity === '' || $id === '') $this->error('missing_params', 400);
-
-        $uid    = $this->userId($user);
-        $reason = trim((string)($body['reason'] ?? 'Updated'));
-
-        try {
-            $result = $this->mdService()->update($entity, $id, $data, $uid, $reason);
-            if (!$result->ok) {
-                $this->failMasterDataResult($result, 'update_failed');
-            }
-            $this->auditLog('master_data_update', ['entity' => $entity, 'id' => $id], $uid);
-            $this->success(['record' => $result->data ?? $data]);
-        } catch (Throwable $e) {
-            $this->handleMasterDataException($e, 'update_failed');
-        }
+        $this->denyLegacyGovernedMutation('update', $entity);
     }
 
     /**
@@ -331,24 +276,7 @@ class MasterDataController extends BaseController
         $id     = trim((string)($body['id'] ?? ''));
 
         if ($entity === '' || $id === '') $this->error('missing_params', 400);
-
-        $uid = $this->userId($user);
-
-        try {
-            $deps = $this->mdService()->checkReferentialIntegrity($entity, $id);
-            if (!empty($deps)) {
-                $this->error('has_dependencies', 409, 'Record has ' . count($deps) . ' dependencies. Cannot delete.');
-            }
-
-            $delResult = $this->mdService()->delete($entity, $id, $uid);
-            if (!$delResult->ok) {
-                $this->failMasterDataResult($delResult, 'delete_failed');
-            }
-            $this->auditLog('master_data_delete', ['entity' => $entity, 'id' => $id], $uid);
-            $this->success(['deleted' => true]);
-        } catch (Throwable $e) {
-            $this->handleMasterDataException($e, 'delete_failed');
-        }
+        $this->denyLegacyGovernedMutation('delete', $entity);
     }
 
     /**
@@ -367,16 +295,7 @@ class MasterDataController extends BaseController
         $target = trim((string)($body['target_status'] ?? ''));
 
         if ($entity === '' || $id === '' || $target === '') $this->error('missing_params', 400);
-
-        $uid = $this->userId($user);
-
-        try {
-            $result = $this->mdService()->changeStatus($entity, $id, $target, $uid);
-            $this->auditLog('master_data_status_change', ['entity' => $entity, 'id' => $id, 'status' => $target], $uid);
-            $this->success(['record' => $result]);
-        } catch (Throwable $e) {
-            $this->handleMasterDataException($e, 'status_change_failed');
-        }
+        $this->denyLegacyGovernedMutation('status', $entity);
     }
 
     /**

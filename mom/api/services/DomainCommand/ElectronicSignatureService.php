@@ -43,6 +43,12 @@ final class ElectronicSignatureService
         $evidence['auth_result_hash_sha256'] = $this->requiredHash($evidence['auth_result_hash_sha256'] ?? null, 'auth_result_hash_sha256');
         $identity = $evidence['signer_identity_snapshot'] ?? null;
         if (!is_array($identity) || $identity === []) {
+            $identity = $this->canonicalSignerIdentitySnapshot($evidence, $actorId);
+            if ($identity !== []) {
+                $evidence['signer_identity_snapshot'] = $identity;
+            }
+        }
+        if (!is_array($identity) || $identity === []) {
             throw new DomainCommandException('signer_identity_snapshot_required', 'Signer identity snapshot is required.', 409);
         }
         $this->requiredText($evidence['signature_manifestation'] ?? null, 'signature_manifestation');
@@ -180,6 +186,82 @@ final class ElectronicSignatureService
     {
         $text = $this->text($value);
         return preg_match('/^[a-f0-9-]{36}$/i', $text) === 1 ? $text : null;
+    }
+
+    /**
+     * @param array<string,mixed> $evidence
+     * @return array<string,mixed>
+     */
+    private function canonicalSignerIdentitySnapshot(array $evidence, string $actorId): array
+    {
+        $actorRefs = array_values(array_filter(array_unique([
+            $this->text($evidence['signer_user_id'] ?? ''),
+            $this->text($evidence['user_id'] ?? ''),
+            $this->text($evidence['signer_ref'] ?? ''),
+            $this->text($evidence['actor_ref'] ?? ''),
+            $actorId,
+        ])));
+        if ($actorRefs === []) {
+            return [];
+        }
+
+        try {
+            $params = [':actor_id' => $actorId];
+            $valuePlaceholders = [];
+            foreach ($actorRefs as $idx => $actorRef) {
+                $placeholder = ':actor_ref_' . $idx;
+                $valuePlaceholders[] = '(' . $placeholder . ')';
+                $params[$placeholder] = $actorRef;
+            }
+            $actorRefValuesSql = implode(',', $valuePlaceholders);
+            $row = $this->db->queryOne(
+                "WITH actor_refs(ref) AS (VALUES {$actorRefValuesSql})
+                 SELECT user_id::text, employee_id, username, email, full_name, full_name_vi,
+                        dept_code, role_code, role_label, user_status, mfa_enabled,
+                        hcm_position_id, hcm_org_unit_id, employment_status, row_version
+                   FROM v_user_canonical
+                  WHERE EXISTS (
+                        SELECT 1
+                          FROM actor_refs
+                         WHERE actor_refs.ref IN (user_id::text, username, employee_id, email)
+                  )
+                  ORDER BY
+                        CASE
+                            WHEN user_id::text = :actor_id THEN 0
+                            WHEN username = :actor_id THEN 1
+                            WHEN employee_id = :actor_id THEN 2
+                            ELSE 3
+                        END
+                  LIMIT 1",
+                $params
+            );
+        } catch (Throwable $e) {
+            throw new DomainCommandException('signer_identity_lookup_failed', 'Signer identity must be resolved through v_user_canonical before signing.', 500, [
+                'identity_source' => 'v_user_canonical',
+            ], $e);
+        }
+
+        if (!is_array($row) || $row === []) {
+            return [];
+        }
+
+        return [
+            'identity_source' => 'v_user_canonical',
+            'user_id' => (string)($row['user_id'] ?? ''),
+            'employee_id' => (string)($row['employee_id'] ?? ''),
+            'username' => (string)($row['username'] ?? ''),
+            'email_hash_sha256' => hash('sha256', strtolower((string)($row['email'] ?? ''))),
+            'full_name_hash_sha256' => hash('sha256', (string)($row['full_name'] ?? '')),
+            'dept_code' => (string)($row['dept_code'] ?? ''),
+            'role_code' => (string)($row['role_code'] ?? ''),
+            'role_label' => (string)($row['role_label'] ?? ''),
+            'user_status' => (string)($row['user_status'] ?? ''),
+            'mfa_enabled' => (bool)($row['mfa_enabled'] ?? false),
+            'hcm_position_id' => (string)($row['hcm_position_id'] ?? ''),
+            'hcm_org_unit_id' => (string)($row['hcm_org_unit_id'] ?? ''),
+            'employment_status' => (string)($row['employment_status'] ?? ''),
+            'row_version' => (string)($row['row_version'] ?? ''),
+        ];
     }
 
     private function nullableText(mixed $value): ?string

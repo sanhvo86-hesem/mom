@@ -26,6 +26,7 @@ final class DomainCommandGateway
         private readonly ?QualityHoldService $qualityHolds = null,
         private readonly ?InventoryCommandHandler $inventory = null,
         private readonly ?ToolingCommandHandler $tooling = null,
+        private readonly ?ItemRevisionCommandHandler $itemRevisions = null,
     ) {}
 
     /**
@@ -152,9 +153,13 @@ final class DomainCommandGateway
         $tooling = $this->tooling ?? new ToolingCommandHandler($this->db, $qualityHolds, $this->uomNormalizer);
         $mesRuntime = $this->mesRuntime ?? new MesRuntimeCommandHandler($this->db, null, $this->uomNormalizer, $qualityHolds, $tooling);
         $inventory = $this->inventory ?? new InventoryCommandHandler($this->db, $this->uomNormalizer, $qualityHolds);
+        $itemRevisions = $this->itemRevisions ?? new ItemRevisionCommandHandler($this->db);
 
         try {
             return match ($commandName) {
+                'CreateItemCommand' => $itemRevisions->createItem($payload),
+                'CreateItemRevisionCommand' => $itemRevisions->createItemRevision($payload),
+                'ReleaseItemRevisionCommand' => $itemRevisions->releaseItemRevision($payload),
                 'CreateEngineeringReleasePackageCommand' => $engineering->createEngineeringReleasePackage($payload),
                 'AddPackageMemberCommand' => $engineering->addPackageMember($payload),
                 'SubmitEngineeringReleasePackageCommand' => $engineering->submitPackageForApproval($payload),
