@@ -460,9 +460,13 @@
     try { LS.setItem('o3-theme', JSON.stringify(theme)); } catch (e) { return false; }
     // exact control height via per-property override (lossless for off-step px)
     if (ch != null) {
+      // NOTE: these stores may already hold an empty ARRAY ("[]") from older seeds;
+      // setting a named prop on an array is dropped by JSON.stringify, so coerce to
+      // a plain object first (the override never persisted before this guard).
       var ov = {}, vals = {};
-      try { ov = JSON.parse(LS.getItem('o3-props-overrides') || '{}') || {}; } catch (e) { ov = {}; }
-      try { vals = JSON.parse(LS.getItem('o3-props-values') || '{}') || {}; } catch (e) { vals = {}; }
+      function asObj(raw) { var v; try { v = JSON.parse(raw || '{}'); } catch (e) { v = null; } return (v && typeof v === 'object' && !Array.isArray(v)) ? v : {}; }
+      ov = asObj(LS.getItem('o3-props-overrides'));
+      vals = asObj(LS.getItem('o3-props-values'));
       ov['control.height.standard'] = true;
       ['--o3-control-h-standard', '--o3-control-h-md', '--o3-control-h-sm', '--o3-control-h-lg'].forEach(function (cv) { vals[cv] = ch + 'px'; });
       try { LS.setItem('o3-props-overrides', JSON.stringify(ov)); LS.setItem('o3-props-values', JSON.stringify(vals)); } catch (e) { /* noop */ }
@@ -642,5 +646,5 @@
     return el;
   }
 
-  window.ModuleStudio = { render: render, setMode: function (m) { state.mode = (m === 'author') ? 'author' : 'assemble'; }, _state: state, version: '0.5.1-themeA-unify' };
+  window.ModuleStudio = { render: render, setMode: function (m) { state.mode = (m === 'author') ? 'author' : 'assemble'; }, _state: state, version: '0.5.2-themeA-fix' };
 })();
