@@ -556,6 +556,100 @@ class GraphicsGovernanceController extends BaseController
         $this->success(['ok' => true] + $result);
     }
 
+    public function themePresetClone(): never
+    {
+        $user = $this->requireWriteRequest();
+        $body = $this->jsonBody();
+        $sourceKey = trim((string)($body['source_key'] ?? $body['preset_key'] ?? ''));
+        $newKey = trim((string)($body['new_key'] ?? $body['target_key'] ?? ''));
+        if ($sourceKey === '' || $newKey === '') {
+            $this->error('source_key and new_key are required', 400);
+        }
+        $overlay = is_array($body['overlay'] ?? null) ? (array)$body['overlay'] : [];
+        $result = $this->call(fn(): array => $this->tokenCatalog()->cloneThemePreset(
+            $sourceKey,
+            $newKey,
+            $overlay,
+            (string)($user['username'] ?? '')
+        ));
+        $this->graphicsAudit('graphics.theme_preset.cloned', (string)($result['preset_key'] ?? ''), [
+            'source_key' => $sourceKey,
+            'preset_key' => $result['preset_key'] ?? '',
+        ], $user);
+        $this->success(['ok' => true, 'preset' => $result, '_meta' => ['authority' => 'graphics_theme_preset']]);
+    }
+
+    public function componentContractSave(): never
+    {
+        $user = $this->requireWriteRequest();
+        $body = $this->jsonBody();
+        $contract = is_array($body['contract'] ?? null) ? (array)$body['contract'] : $body;
+        $result = $this->call(fn(): array => $this->tokenCatalog()->saveComponentContract(
+            $contract,
+            (string)($user['username'] ?? '')
+        ));
+        $this->graphicsAudit('graphics.component_contract.saved', (string)($result['component_key'] ?? ''), [
+            'component_key' => $result['component_key'] ?? '',
+        ], $user);
+        $this->success(['ok' => true, 'contract' => $result, '_meta' => ['authority' => 'graphics_component_contract']]);
+    }
+
+    public function blockContractList(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $status = $this->queryParam('status');
+        $this->respond(fn(): array => [
+            'ok' => true,
+            'blocks' => $this->tokenCatalog()->listBlockContracts($status !== null ? (string)$status : null),
+            '_meta' => ['authority' => 'graphics_block_contract', 'mode' => $this->data->getMode()],
+        ]);
+    }
+
+    public function blockContractSave(): never
+    {
+        $user = $this->requireWriteRequest();
+        $body = $this->jsonBody();
+        $block = is_array($body['block'] ?? null) ? (array)$body['block'] : $body;
+        $result = $this->call(fn(): array => $this->tokenCatalog()->saveBlockContract(
+            $block,
+            (string)($user['username'] ?? '')
+        ));
+        $this->graphicsAudit('graphics.block_contract.saved', (string)($result['block_key'] ?? ''), [
+            'block_key' => $result['block_key'] ?? '',
+            'status' => $result['status'] ?? '',
+        ], $user);
+        $this->success(['ok' => true, 'block' => $result, '_meta' => ['authority' => 'graphics_block_contract']]);
+    }
+
+    public function moduleArchetypeList(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $status = $this->queryParam('status');
+        $this->respond(fn(): array => [
+            'ok' => true,
+            'archetypes' => $this->tokenCatalog()->listModuleArchetypes($status !== null ? (string)$status : null),
+            '_meta' => ['authority' => 'graphics_module_archetype', 'mode' => $this->data->getMode()],
+        ]);
+    }
+
+    public function moduleArchetypeSave(): never
+    {
+        $user = $this->requireWriteRequest();
+        $body = $this->jsonBody();
+        $archetype = is_array($body['archetype'] ?? null) ? (array)$body['archetype'] : $body;
+        $result = $this->call(fn(): array => $this->tokenCatalog()->saveModuleArchetype(
+            $archetype,
+            (string)($user['username'] ?? '')
+        ));
+        $this->graphicsAudit('graphics.module_archetype.saved', (string)($result['archetype_key'] ?? ''), [
+            'archetype_key' => $result['archetype_key'] ?? '',
+            'status' => $result['status'] ?? '',
+        ], $user);
+        $this->success(['ok' => true, 'archetype' => $result, '_meta' => ['authority' => 'graphics_module_archetype']]);
+    }
+
     public function simulationRunRecord(): never
     {
         $user = $this->requireWriteRequest();

@@ -610,6 +610,355 @@ final class DesignTokenCatalogService
     }
 
     /**
+     * Clone an existing theme preset into a new key, recording base_ref so the
+     * clone is linked to its parent (theme inheritance lineage). The clone is
+     * forced non-builtin, non-default, status=draft (unless the overlay says
+     * otherwise) so a clone never silently becomes the org default. Any overlay
+     * fields (brand, density, overrides, …) override the source values.
+     *
+     * @param array<string, mixed> $overlay
+     * @return array<string, mixed>
+     */
+    public function cloneThemePreset(string $sourceKey, string $newKey, array $overlay = [], string $user = ''): array
+    {
+        if (!$this->canWriteToDb()) {
+            throw new \RuntimeException('theme preset clone requires a Postgres data mode');
+        }
+        $newKeyClean = (string)preg_replace('/[^a-z0-9\-]/', '', strtolower($newKey));
+        if ($newKeyClean === '') {
+            throw new \InvalidArgumentException('new preset_key is required');
+        }
+        $source = $this->getThemePreset($sourceKey);
+        if ($source === null) {
+            throw new \InvalidArgumentException('source preset not found: ' . $sourceKey);
+        }
+        if ($this->getThemePreset($newKeyClean) !== null) {
+            throw new \RuntimeException('preset_key already exists: ' . $newKeyClean);
+        }
+        $input = array_merge($source, $overlay, [
+            'preset_key' => $newKeyClean,
+            'base_ref'   => $sourceKey,
+            'is_default' => false,
+            'is_builtin' => false,
+            'status'     => (string)($overlay['status'] ?? 'draft'),
+        ]);
+        if (empty($overlay['display_name_en'])) {
+            $input['display_name_en'] = ((string)($source['display_name_en'] ?? $sourceKey)) . ' (copy)';
+            $input['display_name_vi'] = ((string)($source['display_name_vi'] ?? $input['display_name_en'])) . ' (bản sao)';
+        }
+        return $this->saveThemePreset($input, $user);
+    }
+
+    // ── Registry contract writes (L2 component / L3 block / L4 archetype) ─────
+    // Author-mode editors of Module Studio. Same write discipline as theme
+    // presets: `?` placeholders + pgParams() (PDO rejects Postgres $N on writes),
+    // JSONB via json_encode + ::jsonb, TEXT[] via toPgTextArrayLiteral + ::text[].
+
+    /** @return array<string, mixed>|null */
+    public function getComponentContract(string $componentKey): ?array
+    {
+        foreach ($this->listComponentContracts(null) as $c) {
+            if (($c['component_key'] ?? null) === $componentKey) {
+                return $c;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Upsert an L2 component contract (SLDS Theming-Hook whitelist).
+     * @param array<string, mixed> $in
+     * @return array<string, mixed>
+     */
+    public function saveComponentContract(array $in, string $user = ''): array
+    {
+        if (!$this->canWriteToDb()) {
+            throw new \RuntimeException('component contract write requires a Postgres data mode');
+        }
+        $key = (string)preg_replace('/[^A-Za-z0-9_.\-]/', '', (string)($in['component_key'] ?? ''));
+        if ($key === '') {
+            throw new \InvalidArgumentException('component_key is required');
+        }
+        $en = trim((string)($in['display_name_en'] ?? $key)) ?: $key;
+        $vi = trim((string)($in['display_name_vi'] ?? $en)) ?: $en;
+        $desc = isset($in['description']) && $in['description'] !== '' ? (string)$in['description'] : null;
+        $tokens = $this->toPgTextArrayLiteral($this->normalizeStringList($in['overridable_tokens'] ?? [])) ?? '{}';
+        $inherits = !empty($in['inherits_from']) ? (string)$in['inherits_from'] : null;
+        $scene = !empty($in['preview_scene_key']) ? (string)$in['preview_scene_key'] : null;
+        $a11y = is_array($in['a11y_requirements'] ?? null) ? $in['a11y_requirements'] : [];
+        $this->data->execute(
+            'INSERT INTO graphics_component_contract
+                 (component_key, display_name_en, display_name_vi, description, overridable_tokens,
+                  inherits_from, preview_scene_key, is_operator_visible, a11y_requirements, updated_at)
+             VALUES (?,?,?,?,?::text[],?,?,?::boolean,?::jsonb,NOW())
+             ON CONFLICT (component_key) DO UPDATE SET
+                 display_name_en     = EXCLUDED.display_name_en,
+                 display_name_vi     = EXCLUDED.display_name_vi,
+                 description         = EXCLUDED.description,
+                 overridable_tokens  = EXCLUDED.overridable_tokens,
+                 inherits_from       = EXCLUDED.inherits_from,
+                 preview_scene_key   = EXCLUDED.preview_scene_key,
+                 is_operator_visible = EXCLUDED.is_operator_visible,
+                 a11y_requirements   = EXCLUDED.a11y_requirements,
+                 updated_at          = NOW()',
+            $this->pgParams([
+                $key, $en, $vi, $desc, $tokens, $inherits, $scene,
+                !empty($in['is_operator_visible']) ? 'true' : 'false',
+                (string)json_encode($a11y),
+            ])
+        );
+        return $this->getComponentContract($key) ?? ['component_key' => $key];
+    }
+
+    /**
+     * List L3 block contracts from the DB authority (graphics_block_contract).
+     * @return array<int, array<string, mixed>>
+     */
+    public function listBlockContracts(?string $status = null): array
+    {
+        if ($this->canReadFromDb()) {
+            try {
+                $rows = $this->data->query(
+                    'SELECT block_key, display_name_en, display_name_vi, category, status,
+                            composed_of, root_class, slots, variant_axes, required_tokens,
+                            a11y_contract, preview_scene_key, deprecation_note
+                       FROM graphics_block_contract
+                      WHERE ($1::text IS NULL OR status = $1)
+                   ORDER BY category, block_key',
+                    [$status]
+                ) ?? [];
+                return array_map([$this, 'hydrateBlockContract'], $rows);
+            } catch (Throwable $e) {
+                // fall through
+            }
+        }
+        return [];
+    }
+
+    /** @return array<string, mixed>|null */
+    public function getBlockContract(string $blockKey): ?array
+    {
+        foreach ($this->listBlockContracts(null) as $b) {
+            if (($b['block_key'] ?? null) === $blockKey) {
+                return $b;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Upsert an L3 block contract (reusable cluster of L2 components + slots).
+     * @param array<string, mixed> $in
+     * @return array<string, mixed>
+     */
+    public function saveBlockContract(array $in, string $user = ''): array
+    {
+        if (!$this->canWriteToDb()) {
+            throw new \RuntimeException('block contract write requires a Postgres data mode');
+        }
+        $key = (string)preg_replace('/[^A-Za-z0-9_.\-]/', '', (string)($in['block_key'] ?? ''));
+        if ($key === '') {
+            throw new \InvalidArgumentException('block_key is required');
+        }
+        $en = trim((string)($in['display_name_en'] ?? $key)) ?: $key;
+        $vi = trim((string)($in['display_name_vi'] ?? $en)) ?: $en;
+        $category = (string)($in['category'] ?? 'layout');
+        if (!in_array($category, ['layout', 'display', 'feedback', 'navigation', 'input'], true)) {
+            $category = 'layout';
+        }
+        $status = $this->normalizeContractStatus($in['status'] ?? 'draft');
+        $composedOf = $this->toPgTextArrayLiteral($this->normalizeStringList($in['composed_of'] ?? [])) ?? '{}';
+        $requiredTokens = $this->toPgTextArrayLiteral($this->normalizeStringList($in['required_tokens'] ?? [])) ?? '{}';
+        $rootClass = !empty($in['root_class']) ? (string)$in['root_class'] : null;
+        $slots = is_array($in['slots'] ?? null) ? $in['slots'] : [];
+        $variantAxes = is_array($in['variant_axes'] ?? null) ? $in['variant_axes'] : [];
+        $a11y = is_array($in['a11y_contract'] ?? null) ? $in['a11y_contract'] : [];
+        $scene = !empty($in['preview_scene_key']) ? (string)$in['preview_scene_key'] : null;
+        $deprNote = isset($in['deprecation_note']) && $in['deprecation_note'] !== '' ? (string)$in['deprecation_note'] : null;
+        $this->data->execute(
+            'INSERT INTO graphics_block_contract
+                 (block_key, display_name_en, display_name_vi, category, status, composed_of,
+                  root_class, slots, variant_axes, required_tokens, a11y_contract,
+                  preview_scene_key, deprecation_note, updated_at)
+             VALUES (?,?,?,?,?,?::text[],?,?::jsonb,?::jsonb,?::text[],?::jsonb,?,?,NOW())
+             ON CONFLICT (block_key) DO UPDATE SET
+                 display_name_en   = EXCLUDED.display_name_en,
+                 display_name_vi   = EXCLUDED.display_name_vi,
+                 category          = EXCLUDED.category,
+                 status            = EXCLUDED.status,
+                 composed_of       = EXCLUDED.composed_of,
+                 root_class        = EXCLUDED.root_class,
+                 slots             = EXCLUDED.slots,
+                 variant_axes      = EXCLUDED.variant_axes,
+                 required_tokens   = EXCLUDED.required_tokens,
+                 a11y_contract     = EXCLUDED.a11y_contract,
+                 preview_scene_key = EXCLUDED.preview_scene_key,
+                 deprecation_note  = EXCLUDED.deprecation_note,
+                 updated_at        = NOW()',
+            $this->pgParams([
+                $key, $en, $vi, $category, $status, $composedOf, $rootClass,
+                (string)json_encode($slots), (string)json_encode($variantAxes), $requiredTokens,
+                (string)json_encode($a11y), $scene, $deprNote,
+            ])
+        );
+        return $this->getBlockContract($key) ?? ['block_key' => $key];
+    }
+
+    /**
+     * List L4 module archetypes from the DB authority (graphics_module_archetype).
+     * @return array<int, array<string, mixed>>
+     */
+    public function listModuleArchetypes(?string $status = null): array
+    {
+        if ($this->canReadFromDb()) {
+            try {
+                $rows = $this->data->query(
+                    'SELECT archetype_key, display_name_en, display_name_vi, route_class, status,
+                            zones, zone_order, required_blocks, forbidden_patterns, a11y_contract,
+                            deprecation_note
+                       FROM graphics_module_archetype
+                      WHERE ($1::text IS NULL OR status = $1)
+                   ORDER BY route_class, archetype_key',
+                    [$status]
+                ) ?? [];
+                return array_map([$this, 'hydrateModuleArchetype'], $rows);
+            } catch (Throwable $e) {
+                // fall through
+            }
+        }
+        return [];
+    }
+
+    /** @return array<string, mixed>|null */
+    public function getModuleArchetype(string $archetypeKey): ?array
+    {
+        foreach ($this->listModuleArchetypes(null) as $a) {
+            if (($a['archetype_key'] ?? null) === $archetypeKey) {
+                return $a;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Upsert an L4 module archetype (complete shell arranging L3 blocks in zones).
+     * @param array<string, mixed> $in
+     * @return array<string, mixed>
+     */
+    public function saveModuleArchetype(array $in, string $user = ''): array
+    {
+        if (!$this->canWriteToDb()) {
+            throw new \RuntimeException('module archetype write requires a Postgres data mode');
+        }
+        $key = (string)preg_replace('/[^A-Za-z0-9_.\-]/', '', (string)($in['archetype_key'] ?? ''));
+        if ($key === '') {
+            throw new \InvalidArgumentException('archetype_key is required');
+        }
+        $en = trim((string)($in['display_name_en'] ?? $key)) ?: $key;
+        $vi = trim((string)($in['display_name_vi'] ?? $en)) ?: $en;
+        $routeClass = trim((string)($in['route_class'] ?? ''));
+        if ($routeClass === '') {
+            throw new \InvalidArgumentException('route_class is required');
+        }
+        $status = $this->normalizeContractStatus($in['status'] ?? 'draft');
+        $zones = is_array($in['zones'] ?? null) ? $in['zones'] : [];
+        $zoneOrder = $this->toPgTextArrayLiteral($this->normalizeStringList($in['zone_order'] ?? [])) ?? '{}';
+        $requiredBlocks = $this->toPgTextArrayLiteral($this->normalizeStringList($in['required_blocks'] ?? [])) ?? '{}';
+        $forbidden = $this->toPgTextArrayLiteral($this->normalizeStringList($in['forbidden_patterns'] ?? [])) ?? '{}';
+        $a11y = is_array($in['a11y_contract'] ?? null) ? $in['a11y_contract'] : [];
+        $deprNote = isset($in['deprecation_note']) && $in['deprecation_note'] !== '' ? (string)$in['deprecation_note'] : null;
+        $this->data->execute(
+            'INSERT INTO graphics_module_archetype
+                 (archetype_key, display_name_en, display_name_vi, route_class, status, zones,
+                  zone_order, required_blocks, forbidden_patterns, a11y_contract, deprecation_note, updated_at)
+             VALUES (?,?,?,?,?,?::jsonb,?::text[],?::text[],?::text[],?::jsonb,?,NOW())
+             ON CONFLICT (archetype_key) DO UPDATE SET
+                 display_name_en    = EXCLUDED.display_name_en,
+                 display_name_vi    = EXCLUDED.display_name_vi,
+                 route_class        = EXCLUDED.route_class,
+                 status             = EXCLUDED.status,
+                 zones              = EXCLUDED.zones,
+                 zone_order         = EXCLUDED.zone_order,
+                 required_blocks    = EXCLUDED.required_blocks,
+                 forbidden_patterns = EXCLUDED.forbidden_patterns,
+                 a11y_contract      = EXCLUDED.a11y_contract,
+                 deprecation_note   = EXCLUDED.deprecation_note,
+                 updated_at         = NOW()',
+            $this->pgParams([
+                $key, $en, $vi, $routeClass, $status, (string)json_encode($zones),
+                $zoneOrder, $requiredBlocks, $forbidden, (string)json_encode($a11y), $deprNote,
+            ])
+        );
+        return $this->getModuleArchetype($key) ?? ['archetype_key' => $key];
+    }
+
+    private function normalizeContractStatus(mixed $status): string
+    {
+        $s = strtolower(trim((string)$status));
+        return in_array($s, ['draft', 'review', 'published', 'deprecated'], true) ? $s : 'draft';
+    }
+
+    /**
+     * Coerce a value (array or comma string) into a clean list of non-empty
+     * strings for a TEXT[] column.
+     * @return array<int, string>
+     */
+    private function normalizeStringList(mixed $value): array
+    {
+        if (is_string($value)) {
+            $value = $value === '' ? [] : preg_split('/\s*,\s*/', $value);
+        }
+        if (!is_array($value)) {
+            return [];
+        }
+        return array_values(array_filter(
+            array_map(static fn($v): string => trim((string)$v), $value),
+            static fn(string $v): bool => $v !== ''
+        ));
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @return array<string, mixed>
+     */
+    private function hydrateBlockContract(array $row): array
+    {
+        $row['composed_of'] = $this->pgArrayToPhp($row['composed_of'] ?? null);
+        $row['required_tokens'] = $this->pgArrayToPhp($row['required_tokens'] ?? null);
+        $row['slots'] = $this->decodeJsonColumn($row['slots'] ?? null);
+        $row['variant_axes'] = $this->decodeJsonColumn($row['variant_axes'] ?? null);
+        $row['a11y_contract'] = $this->decodeJsonColumn($row['a11y_contract'] ?? null);
+        return $row;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @return array<string, mixed>
+     */
+    private function hydrateModuleArchetype(array $row): array
+    {
+        $row['zone_order'] = $this->pgArrayToPhp($row['zone_order'] ?? null);
+        $row['required_blocks'] = $this->pgArrayToPhp($row['required_blocks'] ?? null);
+        $row['forbidden_patterns'] = $this->pgArrayToPhp($row['forbidden_patterns'] ?? null);
+        $row['zones'] = $this->decodeJsonColumn($row['zones'] ?? null);
+        $row['a11y_contract'] = $this->decodeJsonColumn($row['a11y_contract'] ?? null);
+        return $row;
+    }
+
+    /** @return array<string, mixed> */
+    private function decodeJsonColumn(mixed $val): array
+    {
+        if (is_array($val)) {
+            return $val;
+        }
+        if (is_string($val) && $val !== '') {
+            $decoded = json_decode($val, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        return [];
+    }
+
+    /**
      * Re-key a positional value list to 1-based because
      * Connection::executeStatement binds each value via bindValue($key,…) and
      * PDO (native prepares, EMULATE_PREPARES=false) requires 1-based positions
