@@ -4094,6 +4094,14 @@ function _ensureBuilderStyles(){
   css += '.mb-block-tools{display:flex;gap:var(--o3-space);align-items:center;flex:0 0 auto}';
   css += '.mb-block-tools .hm-btn.hm-btn-sm{width:max(30px, calc((11px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 8px));height:max(30px, calc((11px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 8px));min-height:max(30px, calc((11px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 8px));padding:0;border-radius:var(--o3-radius);display:inline-flex;align-items:center;justify-content:center;font-size:calc(11px * var(--ui-icon-only-scale,1.4));line-height:1;font-family:Segoe UI Symbol,Segoe UI Emoji,Arial,sans-serif}';
   css += '.mb-block-body{padding:0 var(--o3-space-section) var(--o3-space-section)}';
+  /* [audit-fix 2026-06-01] Declutter the canvas block face: suppress the experimental
+     "round" semantic-taxonomy overlays (intent / lifecycle / signal / criticality /
+     interaction / governance) that stamp 6+ emoji chips on every block and produce the
+     "cấp 1 / thô kệch" look. This metadata is fully available in the Properties inspector
+     (Data/Style tabs). The functional intel strip (binding mode · column spans · warnings)
+     and the block's real rendered content are kept. Higher specificity than the round
+     overlays' own rules → wins without !important; purely visual, reversible. */
+  css += '.mb-block-card .mb-r3-block-aura,.mb-block-card .mb-r4-block-prime,.mb-block-card .mb-r5-block-chipline{display:none}';
   css += '.mb-drop-above:before,.mb-drop-below:after{content:\"\";position:absolute;left:10px;right:10px;height:2px;background:var(--o3-brand);border-radius:var(--o3-radius-pill)}';
   css += '.mb-drop-above:before{top:0}';
   css += '.mb-drop-below:after{bottom:0}';

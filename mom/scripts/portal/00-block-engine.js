@@ -6484,7 +6484,7 @@ function renderGaugeChart(config, data, state, blockId, block){
     return html;
   }
   html += '<div class="hm-chart-card hm-chart-card-gauge"><div class="hm-chart-shell" role="img" aria-label="' + _chartAttrText('Gauge chart') + '" data-chart-block-id="' + _esc(blockId || '') + '">';
-  html += '<div style="display:grid;grid-template-columns:minmax(180px, 220px) 1fr;gap:18px;align-items:center">';
+  html += '<div style="display:grid;grid-template-columns:minmax(180px, 220px) 1fr;gap:var(--o3-space-section);align-items:center">';
   html += '<div style="position:relative;width:100%;max-width:220px;height:120px;margin:0 auto;overflow:hidden">';
   html += '<div style="position:absolute;left:50%;top:0;width:220px;height:220px;border-radius:50%;transform:translateX(-50%);background:conic-gradient(' + gradientParts.join(',') + ')"></div>';
   html += '<div style="position:absolute;left:50%;top:26px;width:156px;height:156px;border-radius:50%;background:var(--bg-surface,#fff);transform:translateX(-50%)"></div>';
@@ -9378,7 +9378,7 @@ function renderStatusFlow(config, data, state, blockId, reactiveCtx){
       });
     }
   }
-  var html = '<div class="hm-status-flow" style="display:grid;gap:14px">';
+  var html = '<div class="hm-status-flow" style="display:grid;gap:var(--o3-space-section)">';
   if(!transitions.length){
     return '<div class="hm-empty">'+_t('Chưa cấu hình workflow cho block này', 'No workflow has been configured for this block')+'</div>';
   }
@@ -9410,7 +9410,7 @@ function renderStatusFlow(config, data, state, blockId, reactiveCtx){
   });
   html += '</div>';
   if(config.workflow && config.workflow.showSla !== false && workflow.sla && Object.keys(workflow.sla).length){
-    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">';
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:var(--o3-space)">';
     Object.keys(workflow.sla).slice(0, 4).forEach(function(key){
       var item = workflow.sla[key] || {};
       html += '<div style="padding:10px 12px;border:1px solid var(--border,#cbd5e1);border-radius:var(--o3-radius-card);background:#fff"><div style="font-size:11px;color:var(--text-tertiary)">'+_esc(key)+'</div><div style="font-size:18px;font-weight:700">'+_esc(String(item.hours || 0))+'h</div><div style="font-size:12px;color:var(--text-secondary)">'+_esc(item.escalateTo || '')+'</div></div>';
@@ -9772,7 +9772,7 @@ function renderLinkGrid(config, data){
   rows.forEach(function(item, i){
     var tag = item.href ? 'a' : 'button';
     var attrs = item.href ? ' href="'+_esc(_safeUrl(item.href))+'" rel="noopener noreferrer"' : ' type="button"';
-    html += '<'+tag+' class="hm-link-card"'+attrs+' style="display:flex;align-items:center;gap:10px;padding:var(--space-3,12px);border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius-card,8px);background:var(--bg-surface,#fff);cursor:pointer;text-align:left;width:100%;font:inherit;color:inherit;text-decoration:none">';
+    html += '<'+tag+' class="hm-link-card"'+attrs+' style="display:flex;align-items:center;gap:var(--o3-space);padding:var(--space-3,12px);border:1px solid var(--border,#e2e8f0);border-radius:var(--o3-radius-card,8px);background:var(--bg-surface,#fff);cursor:pointer;text-align:left;width:100%;font:inherit;color:inherit;text-decoration:none">';
     html += '<span style="font-size:22px" aria-hidden="true">'+_esc(item.icon || '🔗')+'</span>';
     html += '<span style="display:flex;flex-direction:column;min-width:0"><span style="font-weight:700;font-size:13px;color:var(--text-primary)">'+_esc(_scLabel(item, i))+'</span>';
     if(item.desc) html += '<span style="font-size:12px;color:var(--text-secondary)">'+_esc(_scText(item.desc, item.descEn))+'</span>';
@@ -13907,7 +13907,7 @@ Object.assign(window.HmBlockEngine, {
       '.hm-runtime-design-stage .hm-page-title{margin:0;font-size:var(--hmrt-title-size);line-height:1.08;font-weight:800;letter-spacing:-.02em;color:var(--hmrt-text)}',
       '.hm-runtime-design-stage .hm-page-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:var(--o3-radius-card);background:var(--hmrt-accent-soft);margin-right:10px}',
       '.hm-runtime-design-stage .hm-page-actions{display:flex;gap:8px;flex-wrap:wrap}',
-      '.hm-runtime-design-stage .hm-tab-bar{display:flex;flex-wrap:wrap;gap:10px;padding:8px;border-radius:999px;background:var(--hmrt-tabbar-bg);border:1px solid var(--hmrt-border);backdrop-filter:blur(calc(var(--hmrt-blur) * .75));-webkit-backdrop-filter:blur(calc(var(--hmrt-blur) * .75));margin-bottom:var(--hmrt-gap)}',
+      '.hm-runtime-design-stage .hm-tab-bar{display:flex;flex-wrap:wrap;gap:var(--o3-space);padding:8px;border-radius:999px;background:var(--hmrt-tabbar-bg);border:1px solid var(--hmrt-border);backdrop-filter:blur(calc(var(--hmrt-blur) * .75));-webkit-backdrop-filter:blur(calc(var(--hmrt-blur) * .75));margin-bottom:var(--hmrt-gap)}',
       '.hm-runtime-design-stage[data-rt-tabs="underline"] .hm-tab-bar{padding:0;border:0;border-radius:0;background:none;backdrop-filter:none;-webkit-backdrop-filter:none}',
       '.hm-runtime-design-stage .hm-tab{padding:10px 14px;border-radius:999px;border:1px solid transparent;background:transparent;color:var(--hmrt-text-muted);cursor:pointer;transition:all .16s ease}',
       '.hm-runtime-design-stage[data-rt-tabs="segment"] .hm-tab{background:var(--hmrt-surface-bg);border-color:var(--hmrt-border)}',
