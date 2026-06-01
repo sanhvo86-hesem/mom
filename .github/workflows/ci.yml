@@ -666,6 +666,8 @@ jobs:
         run: php mom/tools/release/check_graphics_block_registry.php
       - name: Graphics archetype registry gate
         run: php mom/tools/release/check_graphics_archetype_registry.php
+      - name: Module build-packet manifest gate
+        run: php mom/tools/release/check_module_manifest.php
 
   portal-runtime-smoke:
     name: Portal Runtime Smoke
