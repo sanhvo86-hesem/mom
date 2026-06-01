@@ -2736,6 +2736,7 @@ class DataLayer
             if ($feed === []) {
                 $connectorType = trim((string)($machine['connector_type'] ?? ($row['mtconnect_agent_url'] ? 'mtconnect' : ($row['opc_ua_endpoint'] ? 'opcua' : 'manual_bridge'))));
                 $feed = [
+                    'feed_id' => $machineId,
                     'machine_id' => $machineId,
                     'machine_name' => (string)($machine['machine_name'] ?? ''),
                     'work_center_id' => (string)($row['work_center_id'] ?? $machine['work_center_id'] ?? ''),
@@ -2752,8 +2753,10 @@ class DataLayer
                     'updated_by' => 'postgres-primary',
                 ];
             }
+            $feed['feed_id'] = trim((string)($feed['feed_id'] ?? '')) !== '' ? (string)$feed['feed_id'] : $machineId;
             if ($signal === []) {
                 $signal = [
+                    'signal_id' => $machineId,
                     'machine_id' => $machineId,
                     'machine_name' => (string)($machine['machine_name'] ?? ''),
                     'work_center_id' => (string)($row['work_center_id'] ?? $machine['work_center_id'] ?? ''),
@@ -2769,6 +2772,7 @@ class DataLayer
                     'updated_by' => 'postgres-primary',
                 ];
             }
+            $signal['signal_id'] = trim((string)($signal['signal_id'] ?? '')) !== '' ? (string)$signal['signal_id'] : $machineId;
 
             $feeds[] = $feed;
             $signals[] = $signal;

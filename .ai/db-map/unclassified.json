@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "unclassified",
         "table_count": 860,
-        "generated_at": "2026-06-01T15:30:15+00:00"
+        "generated_at": "2026-06-01T17:05:52+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -5565,6 +5565,7 @@
         "item_packaging_policy": {
             "defined_in": "221_item_packaging_policy.sql",
             "extended_in": [
+                "260_uom_v5_contextual_conversion_contract.sql",
                 "271_uom_v5_contextual_conversion_contract.sql"
             ],
             "primary_key": "id",
@@ -6239,6 +6240,7 @@
         "material_density_registry": {
             "defined_in": "222_material_density_registry.sql",
             "extended_in": [
+                "260_uom_v5_contextual_conversion_contract.sql",
                 "271_uom_v5_contextual_conversion_contract.sql"
             ],
             "primary_key": "id",
@@ -11898,6 +11900,7 @@
         "uom_alias_quarantine": {
             "defined_in": "219_uom_alias.sql",
             "extended_in": [
+                "258_uom_v5_alias_quarantine_contract.sql",
                 "269_uom_v5_alias_quarantine_contract.sql"
             ],
             "primary_key": "id",
@@ -11985,6 +11988,7 @@
         "uom_quantity_kind": {
             "defined_in": "214_uom_quantity_kind.sql",
             "extended_in": [
+                "259_uom_v5_quantity_kind_compatibility.sql",
                 "270_uom_v5_quantity_kind_compatibility.sql"
             ],
             "primary_key": "kind_code",
