@@ -65,7 +65,7 @@
         sh = 'var(--o3-shadow-card,0 1px 2px rgba(15,23,42,.06))';
     var R = '.' + ROOT;
     var css =
-      R + '{display:flex;flex-direction:column;height:100%;min-height:calc(100vh - 130px);color:' + ts + ';font-size:13px}' +
+      R + '{display:flex;flex-direction:column;height:100%;min-height:calc(100vh - 130px);color:' + ts + ';font-size:13px;border-left:1px solid ' + bsub + '}' +
       R + '__bar{display:flex;align-items:center;gap:' + sp + ';padding:' + sp + ' ' + sc + ';background:' + sf + ';border-bottom:1px solid ' + bsub + ';flex:0 0 auto}' +
       R + '__title{font-weight:800;font-size:15px;display:flex;align-items:center;gap:' + sp + '}' +
       R + '__modes{display:flex;gap:' + sp + ';margin-left:' + sp + '}' +
