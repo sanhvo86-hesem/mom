@@ -219,13 +219,95 @@ function audit_compare_row(array $jsonRow, array $pgRow): array
     return $diff;
 }
 
-function audit_collection(string $domain, string $collection, array $jsonRows, array $pgRows): array
+function audit_missing_in_json_is_blocking(string $mode): bool
+{
+    if (in_array($mode, [DataLayer::MODE_POSTGRES_PRIMARY, DataLayer::MODE_POSTGRES_ONLY], true)) {
+        return false;
+    }
+
+    return $mode === DataLayer::MODE_SHADOW_WRITE;
+}
+
+function audit_invalid_json_key_is_blocking(string $mode): bool
+{
+    return in_array($mode, [DataLayer::MODE_JSON_ONLY, DataLayer::MODE_SHADOW_WRITE], true);
+}
+
+function audit_invalid_postgres_key_is_blocking(string $mode): bool
+{
+    return $mode !== DataLayer::MODE_JSON_ONLY;
+}
+
+function audit_issue_count(array $ids): int
+{
+    return count($ids);
+}
+
+function audit_add_issue(array &$issues, string $code, int $count): void
+{
+    if ($count <= 0) {
+        return;
+    }
+    $issues[] = [
+        'code' => $code,
+        'count' => $count,
+    ];
+}
+
+function audit_index_rows_by_key(array $rows, string $key): array
+{
+    $map = [];
+    $invalid = [];
+    $duplicates = [];
+
+    foreach ($rows as $index => $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $id = trim((string)($row[$key] ?? ''));
+        if ($id === '') {
+            if (count($invalid) < 10) {
+                $invalid[] = [
+                    'index' => $index,
+                    'keys' => array_values(array_map('strval', array_keys($row))),
+                ];
+            }
+            continue;
+        }
+        if (isset($map[$id])) {
+            if (count($duplicates) < 10) {
+                $duplicates[] = $id;
+            }
+            continue;
+        }
+        $map[$id] = $row;
+    }
+
+    return [
+        'map' => $map,
+        'invalid_key_rows' => $invalid,
+        'duplicate_keys' => array_values(array_unique($duplicates)),
+    ];
+}
+
+function audit_collection(string $domain, string $collection, array $jsonRows, array $pgRows, string $mode): array
 {
     $jsonRows = array_values(array_filter($jsonRows, 'is_array'));
     $pgRows = array_values(array_filter($pgRows, 'is_array'));
     $key = audit_collection_key($domain, $collection, $jsonRows !== [] ? $jsonRows : $pgRows);
+    $blockingIssues = [];
+    $advisoryIssues = [];
 
     if ($key === null) {
+        $countMatches = count($jsonRows) === count($pgRows);
+        if (!$countMatches) {
+            if (count($jsonRows) > count($pgRows)) {
+                audit_add_issue($blockingIssues, 'legacy_json_rows_missing_in_postgres_authority', count($jsonRows) - count($pgRows));
+            } else {
+                audit_add_issue($advisoryIssues, 'postgres_authority_rows_not_mirrored_to_json', count($pgRows) - count($jsonRows));
+            }
+        }
+
         return [
             'collection' => $collection,
             'key' => null,
@@ -235,18 +317,19 @@ function audit_collection(string $domain, string $collection, array $jsonRows, a
             'missing_in_json' => [],
             'mismatch_count' => 0,
             'sample_mismatches' => [],
-            'status' => count($jsonRows) === count($pgRows) ? 'unkeyed_count_match' : 'unkeyed_count_mismatch',
+            'blocking_issues' => $blockingIssues,
+            'advisory_issues' => $advisoryIssues,
+            'blocking_issue_count' => array_sum(array_column($blockingIssues, 'count')),
+            'advisory_issue_count' => array_sum(array_column($advisoryIssues, 'count')),
+            'authority_status' => $blockingIssues === [] ? 'ok' : 'blocked',
+            'status' => $countMatches ? 'unkeyed_count_match' : ($blockingIssues === [] ? 'advisory_drift' : 'drift'),
         ];
     }
 
-    $jsonMap = [];
-    foreach ($jsonRows as $row) {
-        $jsonMap[(string)$row[$key]] = $row;
-    }
-    $pgMap = [];
-    foreach ($pgRows as $row) {
-        $pgMap[(string)$row[$key]] = $row;
-    }
+    $jsonIndex = audit_index_rows_by_key($jsonRows, $key);
+    $pgIndex = audit_index_rows_by_key($pgRows, $key);
+    $jsonMap = $jsonIndex['map'];
+    $pgMap = $pgIndex['map'];
 
     $jsonIds = array_keys($jsonMap);
     $pgIds = array_keys($pgMap);
@@ -272,6 +355,36 @@ function audit_collection(string $domain, string $collection, array $jsonRows, a
         }
     }
 
+    audit_add_issue($blockingIssues, 'legacy_json_rows_missing_in_postgres_authority', audit_issue_count($missingInPostgres));
+    if (audit_missing_in_json_is_blocking($mode)) {
+        audit_add_issue($blockingIssues, 'postgres_rows_missing_in_shadow_json', audit_issue_count($missingInJson));
+    } else {
+        audit_add_issue($advisoryIssues, 'postgres_authority_rows_not_mirrored_to_json', audit_issue_count($missingInJson));
+    }
+    audit_add_issue($blockingIssues, 'json_postgres_payload_mismatch', $mismatchCount);
+
+    $invalidJsonCount = count($jsonIndex['invalid_key_rows']);
+    $invalidPgCount = count($pgIndex['invalid_key_rows']);
+    $duplicateJsonCount = count($jsonIndex['duplicate_keys']);
+    $duplicatePgCount = count($pgIndex['duplicate_keys']);
+    if (audit_invalid_json_key_is_blocking($mode)) {
+        audit_add_issue($blockingIssues, 'json_rows_missing_collection_key', $invalidJsonCount);
+        audit_add_issue($blockingIssues, 'json_duplicate_collection_key', $duplicateJsonCount);
+    } else {
+        audit_add_issue($advisoryIssues, 'legacy_json_rows_missing_collection_key', $invalidJsonCount);
+        audit_add_issue($advisoryIssues, 'legacy_json_duplicate_collection_key', $duplicateJsonCount);
+    }
+    if (audit_invalid_postgres_key_is_blocking($mode)) {
+        audit_add_issue($blockingIssues, 'postgres_rows_missing_collection_key', $invalidPgCount);
+        audit_add_issue($blockingIssues, 'postgres_duplicate_collection_key', $duplicatePgCount);
+    } else {
+        audit_add_issue($advisoryIssues, 'postgres_rows_missing_collection_key', $invalidPgCount);
+        audit_add_issue($advisoryIssues, 'postgres_duplicate_collection_key', $duplicatePgCount);
+    }
+
+    $blockingIssueCount = array_sum(array_column($blockingIssues, 'count'));
+    $advisoryIssueCount = array_sum(array_column($advisoryIssues, 'count'));
+
     return [
         'collection' => $collection,
         'key' => $key,
@@ -279,13 +392,22 @@ function audit_collection(string $domain, string $collection, array $jsonRows, a
         'postgres_count' => count($pgRows),
         'missing_in_postgres' => $missingInPostgres,
         'missing_in_json' => $missingInJson,
+        'invalid_json_key_rows' => $jsonIndex['invalid_key_rows'],
+        'invalid_postgres_key_rows' => $pgIndex['invalid_key_rows'],
+        'duplicate_json_keys' => $jsonIndex['duplicate_keys'],
+        'duplicate_postgres_keys' => $pgIndex['duplicate_keys'],
         'mismatch_count' => $mismatchCount,
         'sample_mismatches' => $sampleMismatches,
-        'status' => ($missingInPostgres === [] && $missingInJson === [] && $mismatchCount === 0) ? 'ok' : 'drift',
+        'blocking_issues' => $blockingIssues,
+        'advisory_issues' => $advisoryIssues,
+        'blocking_issue_count' => $blockingIssueCount,
+        'advisory_issue_count' => $advisoryIssueCount,
+        'authority_status' => $blockingIssueCount === 0 ? 'ok' : 'blocked',
+        'status' => $blockingIssueCount > 0 ? 'drift' : ($advisoryIssueCount > 0 ? 'advisory_drift' : 'ok'),
     ];
 }
 
-function audit_domain(string $domain, array $jsonStore, array $pgStore): array
+function audit_domain(string $domain, array $jsonStore, array $pgStore, string $mode): array
 {
     $jsonStore = audit_store_normalize($domain, $jsonStore);
     $pgStore = audit_store_normalize($domain, $pgStore);
@@ -300,57 +422,84 @@ function audit_domain(string $domain, array $jsonStore, array $pgStore): array
         }
         $jsonRows = is_array($jsonStore[$collection] ?? null) ? $jsonStore[$collection] : [];
         $pgRows = is_array($pgStore[$collection] ?? null) ? $pgStore[$collection] : [];
-        $results[$collection] = audit_collection($domain, $collection, $jsonRows, $pgRows);
+        $results[$collection] = audit_collection($domain, $collection, $jsonRows, $pgRows, $mode);
+    }
+
+    $blockingIssueCount = 0;
+    $advisoryIssueCount = 0;
+    foreach ($results as $row) {
+        $blockingIssueCount += (int)($row['blocking_issue_count'] ?? 0);
+        $advisoryIssueCount += (int)($row['advisory_issue_count'] ?? 0);
     }
 
     return [
-        'status' => count(array_filter($results, static fn($row) => ($row['status'] ?? '') !== 'ok' && ($row['status'] ?? '') !== 'unkeyed_count_match')) === 0 ? 'ok' : 'drift',
+        'status' => $blockingIssueCount > 0 ? 'drift' : 'ok',
+        'advisory_status' => $advisoryIssueCount > 0 ? 'advisory_drift' : 'ok',
+        'blocking_issue_count' => $blockingIssueCount,
+        'advisory_issue_count' => $advisoryIssueCount,
         'collections' => $results,
     ];
 }
 
-$projectRoot = audit_project_root();
-$dataDir = $projectRoot . '/data';
-$config = audit_effective_config($projectRoot, $dataDir);
-$layer = new DataLayer($dataDir, $projectRoot, $config);
+function audit_runtime_authority_report(): array
+{
+    $projectRoot = audit_project_root();
+    $dataDir = $projectRoot . '/data';
+    $config = audit_effective_config($projectRoot, $dataDir);
+    $layer = new DataLayer($dataDir, $projectRoot, $config);
+    $modeSummary = $layer->getModeSummary();
+    $mode = (string)($modeSummary['mode'] ?? DataLayer::MODE_JSON_ONLY);
 
-$masterJson = audit_read_json($dataDir . '/master-data/master-data.json');
-$ordersJson = audit_read_json($dataDir . '/orders/orders.json');
-$mesJson = audit_read_json($dataDir . '/mes/mes-runtime.json');
-$epicorJson = audit_read_json($dataDir . '/erp/epicor-runtime.json');
+    $masterJson = audit_read_json($dataDir . '/master-data/master-data.json');
+    $ordersJson = audit_read_json($dataDir . '/orders/orders.json');
+    $mesJson = audit_read_json($dataDir . '/mes/mes-runtime.json');
+    $epicorJson = audit_read_json($dataDir . '/erp/epicor-runtime.json');
 
-$masterPg = $layer->getRuntimeMasterDataStore();
-$ordersPg = $layer->getRuntimeOrdersStore();
-$mesPg = $layer->getRuntimeMesRuntimeStore();
-$epicorPg = $layer->getRuntimeEpicorIntegrationStore();
+    $masterPg = $layer->getRuntimeMasterDataStore();
+    $ordersPg = $layer->getRuntimeOrdersStore();
+    $mesPg = $layer->getRuntimeMesRuntimeStore();
+    $epicorPg = $layer->getRuntimeEpicorIntegrationStore();
 
-$pending = audit_read_json($dataDir . '/master-data/master-data-pending.json');
-$pendingEntries = array_values(array_filter((array)($pending['entries'] ?? []), static fn($row) => is_array($row) && strtolower(trim((string)($row['status'] ?? ''))) === 'pending'));
+    $pending = audit_read_json($dataDir . '/master-data/master-data-pending.json');
+    $pendingEntries = array_values(array_filter((array)($pending['entries'] ?? []), static fn($row) => is_array($row) && strtolower(trim((string)($row['status'] ?? ''))) === 'pending'));
 
-$report = [
-    'generated_at' => date(DATE_ATOM),
-    'runtime_mode' => $layer->getModeSummary(),
-    'master_data_pending' => [
-        'pending_total' => count($pendingEntries),
-        'sample' => array_slice($pendingEntries, 0, 10),
-    ],
-    'domains' => [
-        'master_data' => audit_domain('master_data', $masterJson, $masterPg),
-        'orders' => audit_domain('orders', $ordersJson, $ordersPg),
-        'mes' => audit_domain('mes', $mesJson, $mesPg),
-        'epicor' => audit_domain('epicor', $epicorJson, $epicorPg),
-    ],
-];
+    $domains = [
+        'master_data' => audit_domain('master_data', $masterJson, $masterPg, $mode),
+        'orders' => audit_domain('orders', $ordersJson, $ordersPg, $mode),
+        'mes' => audit_domain('mes', $mesJson, $mesPg, $mode),
+        'epicor' => audit_domain('epicor', $epicorJson, $epicorPg, $mode),
+    ];
 
-echo json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . PHP_EOL;
-
-$hasPending = count($pendingEntries) > 0;
-$hasDrift = false;
-foreach ($report['domains'] as $domain) {
-    if (($domain['status'] ?? '') !== 'ok') {
-        $hasDrift = true;
-        break;
+    $blockingIssueCount = 0;
+    $advisoryIssueCount = 0;
+    foreach ($domains as $domain) {
+        $blockingIssueCount += (int)($domain['blocking_issue_count'] ?? 0);
+        $advisoryIssueCount += (int)($domain['advisory_issue_count'] ?? 0);
     }
+    $pendingTotal = count($pendingEntries);
+
+    return [
+        'generated_at' => date(DATE_ATOM),
+        'runtime_mode' => $modeSummary,
+        'summary' => [
+            'authority_gate_status' => ($pendingTotal === 0 && $blockingIssueCount === 0) ? 'pass' : 'fail',
+            'blocking_issue_count' => $blockingIssueCount,
+            'advisory_issue_count' => $advisoryIssueCount,
+            'pending_change_count' => $pendingTotal,
+        ],
+        'master_data_pending' => [
+            'pending_total' => $pendingTotal,
+            'sample' => array_slice($pendingEntries, 0, 10),
+        ],
+        'domains' => $domains,
+    ];
 }
 
-exit(($hasPending || $hasDrift) ? 2 : 0);
+if (realpath((string)($_SERVER['SCRIPT_FILENAME'] ?? '')) === __FILE__) {
+    $report = audit_runtime_authority_report();
+    echo json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . PHP_EOL;
+
+    $hasPending = ((int)($report['summary']['pending_change_count'] ?? 0)) > 0;
+    $hasBlockingDrift = ((int)($report['summary']['blocking_issue_count'] ?? 0)) > 0;
+    exit(($hasPending || $hasBlockingDrift) ? 2 : 0);
+}

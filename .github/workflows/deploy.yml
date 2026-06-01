@@ -326,6 +326,16 @@ jobs:
         env: { APP_ENV: test, DB_PASSWORD: test_password }
         run: php tools/release/check_workflow_status_authority.php
 
+      - name: Validate — MDA GPT Pro Top-30 closure
+        if: needs.classify.outputs.needs_php_validation == 'true'
+        env: { APP_ENV: test, DB_PASSWORD: test_password }
+        run: php mom/tools/release/check_mda_gpt_pro_top30_closure.php
+
+      - name: Validate — MDA runtime authority local gate
+        if: needs.classify.outputs.needs_php_validation == 'true'
+        env: { APP_ENV: test, DB_PASSWORD: test_password }
+        run: php mom/tools/release/check_mda_runtime_authority_gate.php
+
       - name: Verify governed promotion inputs (when configured)
         if: needs.classify.outputs.needs_php_validation == 'true'
         env:
