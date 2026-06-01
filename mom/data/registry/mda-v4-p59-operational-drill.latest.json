@@ -1,8 +1,8 @@
 {
     "schema_version": "mda.v4.p59.operational_drill.v1",
-    "generated_at": "2026-06-01T03:15:34+00:00",
+    "generated_at": "2026-06-01T03:18:55+00:00",
     "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
-    "sha": "36538924a",
+    "sha": "8e5895868",
     "p58_dashboard": {
         "path": "mom/data/registry/mda-v4-runtime-scenario-dashboard.latest.json",
         "decision": "P58_PASS_READY_FOR_NEXT",
@@ -91,7 +91,7 @@
             "status": "pass",
             "url": "http://127.0.0.1:18081/mom/portal.html",
             "exit_code": 0,
-            "dom_hash_sha256": "1362c26c1cf163683cdaac308669e57c11b3a66bc1002c5e99f59432ee46987b"
+            "dom_hash_sha256": "9e917642ff607a0ec94ebc7e39db3368d2b2230e3b26f3acae0ec0064667eebb"
         },
         "repo_root": "/private/tmp/mom-mda-v4-recovery"
     },
