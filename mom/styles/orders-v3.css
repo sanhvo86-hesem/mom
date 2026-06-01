@@ -93,6 +93,10 @@
   --o3-control-h-sm: var(--o3-control-h-standard);
   --o3-control-h-lg: var(--o3-control-h-standard);
 
+  /* Active-rail / tab accent bar thickness — single governed source (catalog: migration 265).
+     Used by the o3-shell rail, the global #sidebar-nav active item, and admin tab underlines. */
+  --o3-rail-accent-w:   3px;
+
   /* Shadows */
   --o3-shadow-card:     0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
   --o3-shadow-raised:   0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
@@ -300,7 +304,7 @@ body.orders-v3-active #page-orders.active > .page-breadcrumb {
   padding: 0 var(--o3-space-section);
   font-size: var(--o3-font-size-md);
   color: var(--o3-text-default);
-  border-left: 3px solid transparent;
+  border-left: var(--o3-rail-accent-w) solid transparent;
   cursor: pointer;
   white-space: nowrap;
   transition: background var(--o3-motion-fast) var(--o3-motion-ease),
