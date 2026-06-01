@@ -105,3 +105,28 @@ non-slice refactoring would require chmod toggle.
 ## History
 
 - 2026-04-25: Proposed and Accepted
+
+## Amendment 2026-06-01 — Module Studio program exception (founder-authorized)
+
+The forbidden-file immutability above scopes specifically to **HMV4 slice
+work** (the CI "Forbidden diff guard" only fails when a diff touches an HMV4
+slice file `70-74-module-template-v4-*` AND a forbidden file). It is NOT a
+blanket immutability for all programs.
+
+The **Module Studio rearchitecture program** (see
+`_reports/lego-empire/LOCKED-ARCHITECTURE-FINAL-2026-06-01.md`) is explicitly
+authorized by the founder (2026-06-01) to modify the global shell/nav/router
+files (`02-state-auth-ui.js`, `40-eqms-shell.js`, `01-module-router.js`,
+`portal.main.css`) as needed to deliver the Theme · Module Studio · Governance
+surfaces and the unified shell.
+
+Conditions for shell-level changes under this program:
+- Changes must NOT be co-mingled with HMV4 slice file edits in the same PR
+  (keeps the slice guard meaningful).
+- High-risk shell/router rebuilds (P6) ship feature-flag inert + E2E first.
+- Each change follows the Module Studio execution gate (audit · adversarial
+  review · simulate · deploy · Chrome verify), per MASTER-EXECUTION-PLAN.
+
+This amendment does not relax the HMV4-slice protection; it records that the
+Module Studio program is a sanctioned, founder-approved exception.
+- 2026-06-01: Amended — Module Studio program exception (founder-authorized shell edits)

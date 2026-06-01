@@ -782,7 +782,7 @@ function moduleAccessPortalCatalog(){
     {id:'energy-dashboard', group:'tools', icon:'⚡', labelEn:'Energy', labelVi:'Năng lượng', noteEn:'Energy and utility dashboards.', noteVi:'Dashboard năng lượng và tiện ích.', defaultAccess:'all'},
     {id:'customer-portal', group:'tools', icon:'🌐', labelEn:'Customer portal', labelVi:'Cổng khách hàng', noteEn:'Customer-facing workspace administration.', noteVi:'Quản trị không gian khách hàng.', defaultAccess:'all'},
     {id:'admin', group:'admin', icon:'⚙', labelEn:'Admin', labelVi:'Admin', noteEn:'System administration shell for the portal.', noteVi:'Không gian quản trị hệ thống portal.', defaultAccess:'admin'},
-    {id:'template-demo', group:'admin', icon:'🧩', labelEn:'Master module template', labelVi:'Master Module Template', noteEn:'Template lab preview workspace.', noteVi:'Không gian xem trước template lab.', defaultAccess:'admin'},
+    {id:'template-demo', group:'admin', icon:'🧩', labelEn:'Module Studio', labelVi:'Module Studio', noteEn:'Edit theme templates + Lego blocks; assemble modules.', noteVi:'Chỉnh theme template + Lego block; lắp ráp module.', defaultAccess:'admin'},
     {id:'module-builder', group:'admin', icon:'➕', labelEn:'Module builder', labelVi:'Tạo Module mới', noteEn:'Module creation workspace.', noteVi:'Không gian tạo module mới.', defaultAccess:'admin'}
   ].concat(
     /* Auto-discovery: modules self-register by pushing onto window._PORTAL_MODULE_REGISTRY.
@@ -3150,8 +3150,8 @@ function renderSidebar(){
   }
 
   if(canUserAccessModule('template-demo')){
-    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'TEMPLATE LAB':'TEMPLATE LAB'}</div>
-      <button class="nav-item ${currentPage==='template-demo'?'active':''}" onclick="navigateTo('template-demo')"><span class="icon">🧩</span><span>${lang==='en'?'Master Module Template':'Master Module Template'}</span></button>
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'MODULE STUDIO':'MODULE STUDIO'}</div>
+      <button class="nav-item ${currentPage==='template-demo'?'active':''}" onclick="navigateTo('template-demo')"><span class="icon">🧩</span><span>${lang==='en'?'Module Studio':'Module Studio'}</span></button>
     </div>`;
   }
 
@@ -3390,7 +3390,7 @@ function navigateTo(page, filter, bypassGuard){
   trackPageView(page + (filter ? '/'+filter : ''), (pageTitles[page]||page) + (filter ? ' — '+filter : ''));
   
   const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triển khai vận hành','vps-control':'VPS Control Tower',mes:lang==='en'?'MES Control Center':'Trung tâm điều hành MES',exceptions:lang==='en'?'Exception Dashboard':'Bảng ngoại lệ',orders:lang==='en'?'Order Management':'Quản lý đơn hàng',purchasing:lang==='en'?'Purchasing & IQC':'Mua hàng & IQC',forms:lang==='en'?'Evidence Control':'Kiểm soát chứng cứ','quality-exceptions':lang==='en'?'Quality Exception Hub':'Quản lý ngoại lệ chất lượng','supplier-quality':lang==='en'?'Supplier Quality':'Quản lý chất lượng NCC',quoting:lang==='en'?'Quoting & Estimation':'Báo giá & Ước tính',evidence:lang==='en'?'Evidence Vault':'Kho chứng cứ','customer-portal':lang==='en'?'Customer Portal Admin':'Quản trị cổng khách hàng','cnc-programs':lang==='en'?'CNC Programs':'Chương trình CNC','product-passport':lang==='en'?'Digital Product Passport':'Hộ chiếu sản phẩm số','ai-scheduling':lang==='en'?'AI Quality & Scheduling':'AI Chất lượng & Lịch trình','compliance-reports':lang==='en'?'Compliance Reports':'Báo cáo tuân thủ',fmea:lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan','apqp-ppap':lang==='en'?'APQP / PPAP':'APQP / PPAP','mobile-shopfloor':lang==='en'?'Shop Floor Mobile':'Xưởng di động','knowledge-base':lang==='en'?'Knowledge Base':'Kho kiến thức','continuous-improvement':lang==='en'?'Continuous Improvement':'Cải tiến liên tục','energy-dashboard':lang==='en'?'Energy Monitor':'Giám sát năng lượng','schema-studio':'Schema Studio'};
-  titles['template-demo'] = 'Master Module Template';
+  titles['template-demo'] = 'Module Studio';
   titles['module-builder'] = 'Module Builder';
   titles['doc-overview'] = lang==='en'?'Document Visual Map':'Sơ đồ Tài liệu';
   // Reset header breadcrumb for non-documents pages
