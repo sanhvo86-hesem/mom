@@ -1,8 +1,8 @@
 {
     "schema_version": "mda.v4.p59.operational_drill.v1",
-    "generated_at": "2026-06-01T03:18:55+00:00",
-    "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
-    "sha": "8e5895868",
+    "generated_at": "2026-06-01T03:37:37+00:00",
+    "branch": "cherry/20260601-mda-v4-implementation-closure-recovery-2",
+    "sha": "6222f4185",
     "p58_dashboard": {
         "path": "mom/data/registry/mda-v4-runtime-scenario-dashboard.latest.json",
         "decision": "P58_PASS_READY_FOR_NEXT",
@@ -27,23 +27,23 @@
         "path": "mom/data/registry/mda-v4-runtime-scenarios.json",
         "scenario_count": 14
     },
-    "source_root_hash_sha256": "5865891c16b1bbcd8eacf1bf8b023f8561561211c9d905106d969c9e96574bff",
+    "source_root_hash_sha256": "61aa563a724459e3e18274aae81cba3cfb4f654ece17647ac07d21b39b543ebe",
     "restore_drill": {
         "artifact_restore": {
             "status": "pass",
-            "source_root_hash_sha256": "5865891c16b1bbcd8eacf1bf8b023f8561561211c9d905106d969c9e96574bff",
-            "restore_root_hash_sha256": "5865891c16b1bbcd8eacf1bf8b023f8561561211c9d905106d969c9e96574bff",
-            "target_root": "/var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/mda-v4-p59-restore-5865891c16b1",
+            "source_root_hash_sha256": "61aa563a724459e3e18274aae81cba3cfb4f654ece17647ac07d21b39b543ebe",
+            "restore_root_hash_sha256": "61aa563a724459e3e18274aae81cba3cfb4f654ece17647ac07d21b39b543ebe",
+            "target_root": "/var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/mda-v4-p59-restore-61aa563a7244",
             "artifact_count": 3
         },
         "postgres_restore": {
             "status": "pass",
-            "database": "mda_v4_restore_5865891c16b1",
+            "database": "mda_v4_restore_61aa563a7244",
             "host": "localhost",
             "port": 5432,
             "artifact_count": 3,
-            "source_root_hash_sha256": "5865891c16b1bbcd8eacf1bf8b023f8561561211c9d905106d969c9e96574bff",
-            "restore_root_hash_sha256": "5865891c16b1bbcd8eacf1bf8b023f8561561211c9d905106d969c9e96574bff",
+            "source_root_hash_sha256": "61aa563a724459e3e18274aae81cba3cfb4f654ece17647ac07d21b39b543ebe",
+            "restore_root_hash_sha256": "61aa563a724459e3e18274aae81cba3cfb4f654ece17647ac07d21b39b543ebe",
             "required_for_postgres_only_claim": true
         },
         "ledger_parity": {
@@ -58,7 +58,7 @@
     "rollback_rehearsal": {
         "status": "pass",
         "rollback_mode": "POSTGRES_PRIMARY_WITH_JSON_COMPATIBILITY_READS",
-        "restore_point_hash_sha256": "5865891c16b1bbcd8eacf1bf8b023f8561561211c9d905106d969c9e96574bff",
+        "restore_point_hash_sha256": "61aa563a724459e3e18274aae81cba3cfb4f654ece17647ac07d21b39b543ebe",
         "operator_banner_required": true,
         "operator_banner_text": "MDA cutover is not complete. Fallback/drift controls are active; POSTGRES_ONLY is disabled.",
         "warnings": [
@@ -89,9 +89,9 @@
         },
         "live_vps_chrome": {
             "status": "pass",
-            "url": "http://127.0.0.1:18081/mom/portal.html",
+            "url": "http://127.0.0.1:18082/mom/portal.html",
             "exit_code": 0,
-            "dom_hash_sha256": "9e917642ff607a0ec94ebc7e39db3368d2b2230e3b26f3acae0ec0064667eebb"
+            "dom_hash_sha256": "c9f18226e6471bcb0033b2bb81c328ffbc83accf444d5fa0c01501b278914d7e"
         },
         "repo_root": "/private/tmp/mom-mda-v4-recovery"
     },
