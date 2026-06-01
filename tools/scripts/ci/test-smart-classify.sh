@@ -20,11 +20,36 @@ run_case() {
   echo "CASE $name"
   if [[ "$mode" == "base-unresolved" ]]; then
     GITHUB_OUTPUT="$CURRENT_OUTPUT" \
+      GITHUB_EVENT_NAME="" \
+      GITHUB_REF="" \
+      GITHUB_REF_NAME="" \
+      SMART_CI_EVENT_NAME="" \
+      SMART_CI_REF="" \
+      SMART_CI_REF_NAME="" \
+      SMART_CI_FULL_REASON="" \
       SMART_CI_CHANGED_FILES="" \
       SMART_CI_FORCE_BASE_UNRESOLVED=1 \
       "$CLASSIFIER" >/tmp/smart-ci-classifier.log
+  elif [[ "$mode" == "schedule" ]]; then
+    GITHUB_OUTPUT="$CURRENT_OUTPUT" \
+      GITHUB_EVENT_NAME="" \
+      GITHUB_REF="" \
+      GITHUB_REF_NAME="" \
+      SMART_CI_EVENT_NAME="schedule" \
+      SMART_CI_REF="" \
+      SMART_CI_REF_NAME="" \
+      SMART_CI_FULL_REASON="" \
+      SMART_CI_CHANGED_FILES="$files" \
+      "$CLASSIFIER" >/tmp/smart-ci-classifier.log
   else
     GITHUB_OUTPUT="$CURRENT_OUTPUT" \
+      GITHUB_EVENT_NAME="" \
+      GITHUB_REF="" \
+      GITHUB_REF_NAME="" \
+      SMART_CI_EVENT_NAME="" \
+      SMART_CI_REF="" \
+      SMART_CI_REF_NAME="" \
+      SMART_CI_FULL_REASON="" \
       SMART_CI_CHANGED_FILES="$files" \
       "$CLASSIFIER" >/tmp/smart-ci-classifier.log
   fi
@@ -369,6 +394,13 @@ if bad:
 
 print("  PASS independent jobs do not need repo-boundary; ci-summary still does.")
 PY
+
+run_case "38 Schedule event" "README.md" "schedule"
+assert_true is_full_required
+assert_true needs_full_regression
+assert_true needs_doc_health
+assert_true needs_playwright_e2e
+assert_reason_contains "schedule"
 
 if [[ "$FAILED" -ne 0 ]]; then
   echo "Smart classifier self-test FAILED"
