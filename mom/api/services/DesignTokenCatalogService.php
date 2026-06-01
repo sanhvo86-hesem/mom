@@ -69,11 +69,15 @@ final class DesignTokenCatalogService
                                alias_of, wcag_min_contrast, wcag_pair_token,
                                description, tags, is_deprecated
                           FROM graphics_token_catalog
-                         WHERE ($1::text IS NULL OR layer = $1)
-                           AND ($2::text IS NULL OR family = $2)
-                           AND ($3::text IS NULL OR component_scope = $3 OR ($3::text IS NULL AND component_scope IS NULL))
+                         WHERE (?::text IS NULL OR layer = ?)
+                           AND (?::text IS NULL OR family = ?)
+                           AND (?::text IS NULL OR component_scope = ?)
                       ORDER BY layer, family, subfamily NULLS FIRST, token_key';
-                $rows = $this->data->query($sql, [$layer, $family, $componentScope]) ?? [];
+                // PDO (native prepares) rejects Postgres $N placeholders — bind ?
+                // positionally, repeating each value for its two uses.
+                $rows = $this->data->query($sql, $this->pgParams([
+                    $layer, $layer, $family, $family, $componentScope, $componentScope,
+                ])) ?? [];
                 if ($rows !== []) {
                     return array_map([$this, 'hydrateCatalogRow'], $rows);
                 }
@@ -95,8 +99,8 @@ final class DesignTokenCatalogService
         if ($this->canReadFromDb()) {
             try {
                 $row = $this->data->row(
-                    'SELECT * FROM graphics_token_catalog WHERE token_key = $1 LIMIT 1',
-                    [$tokenKey]
+                    'SELECT * FROM graphics_token_catalog WHERE token_key = ? LIMIT 1',
+                    $this->pgParams([$tokenKey])
                 );
                 if (is_array($row) && $row !== []) {
                     return $this->hydrateCatalogRow($row);
@@ -131,10 +135,10 @@ final class DesignTokenCatalogService
                 foreach ($scopeChain as [$scopeType, $scopeId]) {
                     $row = $this->data->row(
                         'SELECT value FROM graphics_token_value
-                          WHERE token_key = $1 AND scope_type = $2 AND scope_id = $3
-                            AND color_mode = $4 AND is_published = TRUE
+                          WHERE token_key = ? AND scope_type = ? AND scope_id = ?
+                            AND color_mode = ? AND is_published = TRUE
                           LIMIT 1',
-                        [$tokenKey, $scopeType, $scopeId, $colorMode]
+                        $this->pgParams([$tokenKey, $scopeType, $scopeId, $colorMode])
                     );
                     if (is_array($row) && $row !== [] && $row['value'] !== null) {
                         return (string)$row['value'];
@@ -178,9 +182,9 @@ final class DesignTokenCatalogService
                 foreach (array_reverse($scopeChain) as [$scopeType, $scopeId]) {
                     $rows = $this->data->query(
                         'SELECT token_key, value FROM graphics_token_value
-                          WHERE scope_type = $1 AND scope_id = $2
-                            AND color_mode = $3 AND is_published = TRUE',
-                        [$scopeType, $scopeId, $colorMode]
+                          WHERE scope_type = ? AND scope_id = ?
+                            AND color_mode = ? AND is_published = TRUE',
+                        $this->pgParams([$scopeType, $scopeId, $colorMode])
                     ) ?? [];
                     foreach ($rows as $row) {
                         $result[(string)$row['token_key']] = (string)$row['value'];
@@ -230,12 +234,12 @@ final class DesignTokenCatalogService
             try {
                 $this->data->execute(
                     'INSERT INTO graphics_token_value (token_key, scope_type, scope_id, color_mode, value, draft_value, is_published, rollout_id, version)
-                          VALUES ($1,$2,$3,$4,$5,$5,FALSE,$6,1)
+                          VALUES (?,?,?,?,?,?,FALSE,?,1)
                      ON CONFLICT (token_key, scope_type, scope_id, color_mode) DO UPDATE
                             SET draft_value = EXCLUDED.draft_value,
                                 rollout_id  = EXCLUDED.rollout_id,
                                 updated_at  = NOW()',
-                    [$tokenKey, $scopeType, $scopeId, $colorMode, $value, $rolloutId]
+                    $this->pgParams([$tokenKey, $scopeType, $scopeId, $colorMode, $value, $value, $rolloutId])
                 );
             } catch (Throwable $e) {
                 // best-effort; JSON-only runtime will use simulation trail instead
@@ -268,11 +272,11 @@ final class DesignTokenCatalogService
                         draft_value = NULL,
                         is_published = TRUE,
                         published_at = NOW(),
-                        published_by = $2,
+                        published_by = ?,
                         version = version + 1,
                         updated_at = NOW()
-                  WHERE rollout_id = $1 AND (draft_value IS NOT NULL OR is_published = FALSE)',
-                [$rolloutId, $publishedBy]
+                  WHERE rollout_id = ? AND (draft_value IS NOT NULL OR is_published = FALSE)',
+                $this->pgParams([$publishedBy, $rolloutId])
             );
         } catch (Throwable $e) {
             return 0;
@@ -296,11 +300,11 @@ final class DesignTokenCatalogService
             try {
                 $count += $this->data->execute(
                     'UPDATE graphics_token_value
-                        SET value = $3, draft_value = NULL, is_published = TRUE,
-                            published_at = NOW(), published_by = $4,
+                        SET value = ?, draft_value = NULL, is_published = TRUE,
+                            published_at = NOW(), published_by = ?,
                             version = version + 1, updated_at = NOW()
-                      WHERE rollout_id = $1 AND token_key = $2',
-                    [$rolloutId, $tokenKey, $value, $revertedBy]
+                      WHERE rollout_id = ? AND token_key = ?',
+                    $this->pgParams([$value, $revertedBy, $rolloutId, $tokenKey])
                 );
             } catch (Throwable $e) {
                 continue;
@@ -372,12 +376,12 @@ final class DesignTokenCatalogService
                         color_mode, scenes_rendered, wcag_report, colorblind_reports,
                         screen_reader_findings, outcome, notes
                     ) VALUES (
-                        $1,$2, COALESCE($3::jsonb,'{}'::jsonb), $4, $5, $6,
-                        COALESCE($7::text[], '{}'::text[]),
-                        $8::jsonb, $9::jsonb, $10::jsonb, COALESCE($11,'reviewed'), $12
+                        ?,?, COALESCE(?::jsonb,'{}'::jsonb), ?, ?, ?,
+                        COALESCE(?::text[], '{}'::text[]),
+                        ?::jsonb, ?::jsonb, ?::jsonb, COALESCE(?,'reviewed'), ?
                     )
                     RETURNING run_id",
-                [
+                $this->pgParams([
                     $payload['label'] ?? null,
                     $payload['initiated_by'] ?? null,
                     isset($payload['staged_changes']) ? json_encode($payload['staged_changes']) : null,
@@ -390,7 +394,7 @@ final class DesignTokenCatalogService
                     isset($payload['screen_reader_findings']) ? json_encode($payload['screen_reader_findings']) : null,
                     $payload['outcome'] ?? 'reviewed',
                     $payload['notes'] ?? null,
-                ]
+                ])
             );
             return $runId !== '' ? $runId : $this->pseudoUuid();
         } catch (Throwable $e) {
@@ -432,9 +436,9 @@ final class DesignTokenCatalogService
                             description, renderer, tokens_observed, projection_mode,
                             colorblind_filter, sort_order, is_default
                        FROM graphics_preview_scene
-                      WHERE ($1::text IS NULL OR category = $1)
+                      WHERE (?::text IS NULL OR category = ?)
                    ORDER BY category, sort_order, scene_key',
-                    [$category]
+                    $this->pgParams([$category, $category])
                 ) ?? [];
                 return array_map([$this, 'hydratePreviewScene'], $rows);
             } catch (Throwable $e) {
@@ -457,9 +461,12 @@ final class DesignTokenCatalogService
                                overridable_tokens, inherits_from, preview_scene_key,
                                is_operator_visible, a11y_requirements
                           FROM graphics_component_contract
-                         WHERE ($1::boolean IS NULL OR is_operator_visible = $1)
+                         WHERE (?::boolean IS NULL OR is_operator_visible = ?::boolean)
                       ORDER BY component_key';
-                $rows = $this->data->query($sql, [$operatorVisibleOnly]) ?? [];
+                // Bind the boolean filter as a 'true'/'false'/NULL text param so
+                // PDO (which would stringify a PHP bool to ''/'1') casts cleanly.
+                $ov = $operatorVisibleOnly === null ? null : ($operatorVisibleOnly ? 'true' : 'false');
+                $rows = $this->data->query($sql, $this->pgParams([$ov, $ov])) ?? [];
                 return array_map([$this, 'hydrateComponentContract'], $rows);
             } catch (Throwable $e) {
                 // fall through
@@ -723,9 +730,9 @@ final class DesignTokenCatalogService
                             composed_of, root_class, slots, variant_axes, required_tokens,
                             a11y_contract, preview_scene_key, deprecation_note
                        FROM graphics_block_contract
-                      WHERE ($1::text IS NULL OR status = $1)
+                      WHERE (?::text IS NULL OR status = ?)
                    ORDER BY category, block_key',
-                    [$status]
+                    $this->pgParams([$status, $status])
                 ) ?? [];
                 return array_map([$this, 'hydrateBlockContract'], $rows);
             } catch (Throwable $e) {
@@ -817,9 +824,9 @@ final class DesignTokenCatalogService
                             zones, zone_order, required_blocks, forbidden_patterns, a11y_contract,
                             deprecation_note
                        FROM graphics_module_archetype
-                      WHERE ($1::text IS NULL OR status = $1)
+                      WHERE (?::text IS NULL OR status = ?)
                    ORDER BY route_class, archetype_key',
-                    [$status]
+                    $this->pgParams([$status, $status])
                 ) ?? [];
                 return array_map([$this, 'hydrateModuleArchetype'], $rows);
             } catch (Throwable $e) {
