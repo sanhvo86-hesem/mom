@@ -54,7 +54,7 @@ is_design_token_path() {
 
 is_critical_portal_runtime_path() {
   local file="$1"
-  matches "$file" '^mom/scripts/portal/(00-block-engine|00bb-graphics-authority|00bc-block-registry|00bd-blockkit|00be-archetype-registry|00bf-archetype-kit|00bh-blocks-facade|00bi-blocks-l3-map|01-module-router|02-state-auth-ui|40-eqms-shell)\.js$'
+  matches "$file" '^mom/scripts/portal/(00-block-engine|00bb-graphics-authority|00bc-block-registry|00bd-blockkit|00be-archetype-registry|00bf-archetype-kit|00bf-archetypekit|00bh-blocks-facade|00bi-blocks-l3-map|01-module-router|02-state-auth-ui|40-eqms-shell)\.js$'
 }
 
 resolve_changed_files() {
@@ -125,6 +125,7 @@ needs_frontend_js_safety=false
 needs_frontend_static_safety=false
 needs_graphics_safety=false
 needs_hmv4_safety=false
+needs_portal_runtime_smoke=false
 needs_playwright_e2e=false
 needs_visual_e2e=false
 needs_security_light=false
@@ -320,8 +321,7 @@ while IFS= read -r file; do
     set_flag needs_frontend_safety
     set_flag needs_frontend_js_safety
     set_flag needs_hmv4_safety
-    set_flag needs_playwright_e2e
-    set_flag needs_visual_e2e
+    set_flag needs_portal_runtime_smoke
   fi
 
   if matches "$file" '^mom/styles/module-template-v4'; then
@@ -380,6 +380,7 @@ if [[ "$is_full_required" == "true" ]]; then
   needs_frontend_static_safety=true
   needs_graphics_safety=true
   needs_hmv4_safety=true
+  needs_portal_runtime_smoke=true
   needs_playwright_e2e=true
   needs_visual_e2e=true
   needs_security_light=true
@@ -409,6 +410,7 @@ for key in \
   needs_frontend_static_safety \
   needs_graphics_safety \
   needs_hmv4_safety \
+  needs_portal_runtime_smoke \
   needs_playwright_e2e \
   needs_visual_e2e \
   needs_security_light \
@@ -422,6 +424,6 @@ for key in \
   fi
 done
 
-summary="files=${file_count}; full=${is_full_required}; reason=${SMART_CI_FULL_REASON:-none}; php=${needs_php_syntax}/${needs_phpstan}/${needs_phpunit}; kpi=${needs_kpi_tests}; db=${needs_db_migration_check}; openapi=${needs_openapi}; doc_light=${needs_doc_light}; docs=${needs_doc_health}; raci=${needs_raci}; frontend=${needs_frontend_safety}; frontend_js=${needs_frontend_js_safety}; frontend_static=${needs_frontend_static_safety}; graphics=${needs_graphics_safety}; hmv4=${needs_hmv4_safety}; e2e=${needs_playwright_e2e}; visual=${needs_visual_e2e}; security=${needs_security_light}; actionlint=${needs_actionlint}; selftest=${needs_classifier_selftest}"
+summary="files=${file_count}; full=${is_full_required}; reason=${SMART_CI_FULL_REASON:-none}; php=${needs_php_syntax}/${needs_phpstan}/${needs_phpunit}; kpi=${needs_kpi_tests}; db=${needs_db_migration_check}; openapi=${needs_openapi}; doc_light=${needs_doc_light}; docs=${needs_doc_health}; raci=${needs_raci}; frontend=${needs_frontend_safety}; frontend_js=${needs_frontend_js_safety}; frontend_static=${needs_frontend_static_safety}; graphics=${needs_graphics_safety}; hmv4=${needs_hmv4_safety}; portal_smoke=${needs_portal_runtime_smoke}; e2e=${needs_playwright_e2e}; visual=${needs_visual_e2e}; security=${needs_security_light}; actionlint=${needs_actionlint}; selftest=${needs_classifier_selftest}"
 write_output summary "$summary"
 echo "Smart CI summary: $summary"
