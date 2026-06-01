@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HESEM MDA Platform - Deployment Audit</title>
+  <style>
+    :root {
+      --ink: #0f172a;
+      --muted: #5b667a;
+      --line: #d8e0ea;
+      --panel: #ffffff;
+      --page: #f3f7fb;
+      --brand: #0c4a6e;
+      --cyan: #0e7490;
+      --amber: #b45309;
+      --green: #166534;
+      --red: #b91c1c;
+      --shadow: 0 18px 48px rgba(15, 23, 42, .10);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Aptos", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(14, 116, 144, .18), transparent 34%),
+        linear-gradient(135deg, #eef6fb 0%, var(--page) 46%, #e9eef5 100%);
+      min-height: 100vh;
+    }
+    main { width: min(1180px, calc(100vw - 32px)); margin: 0 auto; padding: 38px 0 56px; }
+    .hero {
+      border: 1px solid rgba(12, 74, 110, .18);
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(255,255,255,.94), rgba(248,250,252,.88));
+      box-shadow: var(--shadow);
+      padding: 30px;
+      display: grid;
+      gap: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero:after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: -110px;
+      width: 320px;
+      height: 320px;
+      border-radius: 999px;
+      background: conic-gradient(from 160deg, rgba(12,74,110,.22), rgba(14,116,144,.08), transparent);
+    }
+    .eyebrow { color: var(--cyan); font-weight: 800; letter-spacing: .11em; text-transform: uppercase; font-size: 12px; }
+    h1 { margin: 0; font-size: clamp(32px, 5vw, 58px); line-height: .96; letter-spacing: -.05em; max-width: 920px; }
+    .lead { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.62; max-width: 880px; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(255,255,255,.9);
+      padding: 18px;
+      box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
+    }
+    .label { color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+    .value { margin-top: 8px; font-size: 28px; font-weight: 900; letter-spacing: -.04em; }
+    .section { margin-top: 22px; display: grid; gap: 14px; }
+    h2 { margin: 0 0 6px; font-size: 22px; letter-spacing: -.03em; }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 900;
+      border: 1px solid transparent;
+    }
+    .pass { color: var(--green); background: #dcfce7; border-color: #bbf7d0; }
+    .warn { color: var(--amber); background: #ffedd5; border-color: #fed7aa; }
+    .fail { color: var(--red); background: #fee2e2; border-color: #fecaca; }
+    .mono { font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace; font-size: 12px; overflow-wrap: anywhere; }
+    .findings { display: grid; gap: 10px; }
+    .finding { display: grid; grid-template-columns: 120px 1fr; gap: 12px; align-items: start; }
+    .finding p { margin: 0; color: var(--muted); line-height: 1.55; }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 18px; }
+    th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; background: #f8fafc; }
+    tr:last-child td { border-bottom: 0; }
+    .footer { color: var(--muted); font-size: 12px; line-height: 1.6; margin-top: 18px; }
+    a { color: var(--brand); font-weight: 800; }
+    @media (max-width: 860px) {
+      main { width: min(100vw - 20px, 720px); padding-top: 18px; }
+      .hero { padding: 22px; border-radius: 22px; }
+      .grid { grid-template-columns: 1fr 1fr; }
+      .finding { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div class="eyebrow">Master Data Authority Platform</div>
+      <h1>Deployment audit cho bộ nội dung MDA</h1>
+      <p class="lead">
+        Trang này chỉ kiểm tra và publish phần nội dung Master Data Authority Platform đã tạo.
+        Nó không tuyên bố hệ thống đã runtime-complete hay production-validated.
+      </p>
+      <div class="grid">
+        <div class="card">
+          <div class="label">Artifact tracked</div>
+          <div class="value">182</div>
+        </div>
+        <div class="card">
+          <div class="label">VPS file count</div>
+          <div class="value">182</div>
+        </div>
+        <div class="card">
+          <div class="label">Dirty trong MDA set</div>
+          <div class="value">0</div>
+        </div>
+        <div class="card">
+          <div class="label">Decision token</div>
+          <div class="value" style="font-size:18px">PASS_WITH_GAPS</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section card">
+      <h2>Kết luận triển khai</h2>
+      <div class="findings">
+        <div class="finding">
+          <span class="status pass">PASS</span>
+          <p>Bộ MDA V1/P00-P21 có mặt trên VPS ở commit main hiện tại, đủ 182 file tracked, không có dấu hiệu bị overwrite trong thư mục artifact.</p>
+        </div>
+        <div class="finding">
+          <span class="status warn">PUBLISH GAP</span>
+          <p>Đường dẫn raw <span class="mono">_reports/agent-audits/...</span> trả HTTP 403 trên web. Vì vậy trước trang này, nội dung tồn tại trên server nhưng Chrome không thể đọc trực tiếp.</p>
+        </div>
+        <div class="finding">
+          <span class="status warn">V4 NOT LIVE</span>
+          <p>Bộ MDA V4 runtime-closure vẫn ở branch recovery riêng, chưa nằm trên production main. Không được coi là đã deploy hoặc đã đóng runtime authority.</p>
+        </div>
+        <div class="finding">
+          <span class="status fail">NO OVERCLAIM</span>
+          <p>Final package token là <span class="mono">P21_PASS_WITH_CONTROLLED_GAPS</span>: đây là design/governance package đã hoàn tất, không phải runtime-complete authority platform.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section card">
+      <h2>Nội dung chính của MDA package</h2>
+      <table>
+        <thead><tr><th>Vùng</th><th>Kết quả</th></tr></thead>
+        <tbody>
+          <tr><td>Kiến trúc</td><td>PostgreSQL authority, domain command mutation, generated workflow/status authority, append-only audit/evidence/outbox, frozen snapshots, projection-only workspaces.</td></tr>
+          <tr><td>Delivery waves</td><td>Authority freeze, core schema/command spine, resource readiness, quality/inventory/traceability, migration cutover, observability, simulation automation, red-team closure.</td></tr>
+          <tr><td>Red-team verdict</td><td>Enterprise-grade planning material, not runtime-complete. Critical design criteria clear threshold; runtime implementation remains explicit backlog.</td></tr>
+          <tr><td>Open controlled gaps</td><td>13 P2 implementation gaps remain, including PG-native command authority, engineering release package physicalization, readiness service, canonical holds, ledger reconciliation, scenario DSL, UI projection gating.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section card">
+      <h2>Evidence manifest</h2>
+      <table>
+        <thead><tr><th>Artifact</th><th>SHA-256</th></tr></thead>
+        <tbody>
+          <tr><td><span class="mono">MDA_FINAL_MASTER_BUILD_PLAN.md</span></td><td class="mono">320a2d5d24a7ba5630d9a2cdafde2fec21da5b3cd2aeeb2318326b2c6c8cfa71</td></tr>
+          <tr><td><span class="mono">MDA_FINAL_ACCEPTANCE_DECISION.md</span></td><td class="mono">6124a90307b234ef88de13e80b3522aaefcec4f008bae3c448d8ce423eeabe24</td></tr>
+          <tr><td><span class="mono">MDA_EXTERNAL_REDTEAM_REPORT.md</span></td><td class="mono">1e41c74c92941258a3deadb5677ba4213fe9de131376e04bf64ce7fed09d169e</td></tr>
+          <tr><td><span class="mono">MDA_CONTROLLED_GAP_LEDGER_FINAL.csv</span></td><td class="mono">ebc60cab2525b0ee81b37ea4c9a21fe5636a305ac7d7b99f4e448a84c8fedc50</td></tr>
+        </tbody>
+      </table>
+      <p class="footer">
+        Machine-readable manifest is tracked on the server at
+        <span class="mono">mom/docs/system/agent-reports/mda-platform/deployment-audit-2026-06-01.json</span>.
+        Direct browser download is intentionally not linked because non-HTML documents under this protected path are controlled by the document streaming policy.
+        Raw source artifacts remain in <span class="mono">_reports/agent-audits/mda-prompt-os-2026-05-29</span>.
+      </p>
+    </section>
+  </main>
+</body>
+</html>
