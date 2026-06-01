@@ -62,6 +62,16 @@ return static function (Router $router, string $dataDir): void {
         'graphics_theme_preset_list'           => [GraphicsGovernanceController::class, 'themePresetList'],
         'graphics_theme_preset_save'           => [GraphicsGovernanceController::class, 'themePresetSave'],
         'graphics_theme_preset_delete'         => [GraphicsGovernanceController::class, 'themePresetDelete'],
+        'graphics_theme_preset_clone'          => [GraphicsGovernanceController::class, 'themePresetClone'],
+
+        // ── Module Studio Author-mode registry editors (P3.B) ──
+        //    L2 component contract (mig 148), L3 block contract (mig 261),
+        //    L4 module archetype (mig 262). DB-backed read + upsert.
+        'graphics_component_contract_save'     => [GraphicsGovernanceController::class, 'componentContractSave'],
+        'graphics_block_contract_list'         => [GraphicsGovernanceController::class, 'blockContractList'],
+        'graphics_block_contract_save'         => [GraphicsGovernanceController::class, 'blockContractSave'],
+        'graphics_module_archetype_list'       => [GraphicsGovernanceController::class, 'moduleArchetypeList'],
+        'graphics_module_archetype_save'       => [GraphicsGovernanceController::class, 'moduleArchetypeSave'],
 
         // Backward-compatible Admin Appearance aliases. These override the
         // older platform-route mapping so Admin cannot bypass graphics-specific
