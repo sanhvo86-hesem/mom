@@ -1,0 +1,136 @@
+{
+  "prompt": "P55",
+  "title": "Tooling, Dao Cu, Fixture, Gage, Preset, OOT, and Breakage Runtime Closure",
+  "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
+  "date": "2026-05-31",
+  "posture": "pre-production runtime-readiness evidence; not production-ready",
+  "decision_token": "P55_PASS_WITH_CONTROLLED_GAPS_READY_FOR_P56",
+  "authority_paths": {
+    "tooling_readiness": "MesRuntimeCommandHandler -> ToolingCommandHandler -> tooling_runtime_state",
+    "gage_readiness": "MesRuntimeCommandHandler -> ToolingCommandHandler -> gage_runtime_state",
+    "breakage": "DomainCommandGateway -> ToolingCommandHandler -> tooling_breakage_event/tooling_breakage_containment + QualityHoldService",
+    "oot": "DomainCommandGateway -> ToolingCommandHandler -> gage_oot_investigation_runtime + QualityHoldService",
+    "quality_hold": "ToolingCommandHandler -> QualityHoldService",
+    "uom": "RecordInspectionResultCommand gage gate runs before UomCommandQuantityNormalizer"
+  },
+  "runtime_probe": {
+    "command": "php /private/tmp/tooling_probe.php",
+    "exit_code": 0,
+    "output": {
+      "tool_life_block": {
+        "problem": "tooling_runtime_blocked",
+        "mes_job_writes": 0,
+        "readiness_evidence_writes": 1
+      },
+      "gage_block": {
+        "problem": "gage_runtime_blocked",
+        "uom_writes": 0,
+        "quality_result_writes": 0,
+        "readiness_evidence_writes": 1
+      },
+      "breakage": {
+        "hold_writes": 4,
+        "hold_subject_refs": [
+          "LOT-31-50",
+          "WO-1"
+        ],
+        "ncr_writes": 1,
+        "containment_writes": 2,
+        "life_events": 1
+      },
+      "oot": {
+        "investigation_writes": 1,
+        "hold_writes": 6,
+        "hold_subject_refs": [
+          "LOT-1",
+          "SN-1",
+          "SHIP-1",
+          "WO-1"
+        ],
+        "ncr_writes": 1,
+        "trace_links": 1
+      }
+    }
+  },
+  "files_changed": [
+    "mom/database/migrations/272_tooling_gage_runtime_authority.sql",
+    "mom/api/services/DomainCommand/ToolingCommandHandler.php",
+    "mom/api/services/DomainCommand/MesRuntimeCommandHandler.php",
+    "mom/api/services/DomainCommand/DomainCommandGateway.php",
+    "mom/api/services/DomainCommand/CommandRegistry.php",
+    "mom/api/services/DomainCommand/RegulatedActionPolicy.php",
+    "mom/tests/Unit/Services/DomainCommandToolingCommandHandlerTest.php",
+    "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_TOOLING_GAGE_CLOSURE_REPORT.md",
+    "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_TOOLING_GAGE_PROOF_PACK.json",
+    "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_P55_GAP_LEDGER_UPDATE.csv",
+    "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P55.md"
+  ],
+  "validation": [
+    {
+      "command": "php -l mom/api/services/DomainCommand/ToolingCommandHandler.php",
+      "status": "pass"
+    },
+    {
+      "command": "php -l mom/api/services/DomainCommand/MesRuntimeCommandHandler.php",
+      "status": "pass"
+    },
+    {
+      "command": "php -l mom/api/services/DomainCommand/DomainCommandGateway.php",
+      "status": "pass"
+    },
+    {
+      "command": "php -l mom/api/services/DomainCommand/CommandRegistry.php",
+      "status": "pass"
+    },
+    {
+      "command": "php -l mom/api/services/DomainCommand/RegulatedActionPolicy.php",
+      "status": "pass"
+    },
+    {
+      "command": "php -l mom/tests/Unit/Services/DomainCommandToolingCommandHandlerTest.php",
+      "status": "pass"
+    },
+    {
+      "command": "php -l /private/tmp/tooling_probe.php",
+      "status": "pass"
+    },
+    {
+      "command": "php /private/tmp/tooling_probe.php",
+      "status": "pass"
+    },
+    {
+      "command": "php -r json_decode(file_get_contents('_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_TOOLING_GAGE_PROOF_PACK.json'), true, 512, JSON_THROW_ON_ERROR)",
+      "status": "pass"
+    },
+    {
+      "command": "git diff --check",
+      "status": "pass"
+    },
+    {
+      "command": "php tools/scripts/ai-index/generate.php --verbose",
+      "status": "pass",
+      "summary": "97 controllers, 181 services, 252 migrations, 948 tables, 284 PHP classes"
+    },
+    {
+      "command": "composer --working-dir=mom run test",
+      "status": "blocked",
+      "blocker": "Could not open input file: vendor/bin/phpunit"
+    },
+    {
+      "command": "composer --working-dir=mom run analyse",
+      "status": "blocked",
+      "blocker": "Could not open input file: vendor/bin/phpstan"
+    },
+    {
+      "command": "composer --working-dir=mom run check",
+      "status": "blocked",
+      "blocker": "Could not open input file: vendor/bin/phpstan"
+    }
+  ],
+  "controlled_gaps": [
+    "Real DB migration execution and browser/operator smoke remain pending integration/deploy stage.",
+    "Tool life consumption is count-based from completed quantity until a richer life policy resolver is introduced.",
+    "Full PHPUnit/PHPStan validation is blocked locally by missing Composer vendor binaries.",
+    "Control tower metrics are deferred to P57."
+  ]
+}

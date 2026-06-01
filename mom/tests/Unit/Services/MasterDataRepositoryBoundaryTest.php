@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MOM\Tests\Unit\Services;
 
 use MOM\Services\MasterDataRepository;
+use MOM\Services\MasterDataAuthorityModeService;
 use MOM\Services\MasterDataService;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +19,7 @@ final class MasterDataRepositoryBoundaryTest extends TestCase
                 'status' => 'draft',
             ]],
         ]);
-        $service = new MasterDataService(sys_get_temp_dir(), repository: $repository);
+        $service = $this->service($repository);
 
         $result = $service->create('parts', ['part_number' => 'PART-001'], 'planner');
 
@@ -36,7 +37,7 @@ final class MasterDataRepositoryBoundaryTest extends TestCase
                 'status' => 'active',
             ]],
         ]);
-        $service = new MasterDataService(sys_get_temp_dir(), repository: $repository);
+        $service = $this->service($repository);
 
         $queued = $service->update('parts', 'PART-002', ['description' => 'New description'], 'planner', 'drawing update');
 
@@ -58,7 +59,7 @@ final class MasterDataRepositoryBoundaryTest extends TestCase
             ['parts' => [['part_number' => 'PART-003', 'status' => 'draft']]],
             ['job_orders' => [['jo_number' => 'JO-001', 'part_number' => 'PART-003']]],
         );
-        $service = new MasterDataService(sys_get_temp_dir(), repository: $repository);
+        $service = $this->service($repository);
 
         $result = $service->delete('parts', 'PART-003', 'planner');
 
@@ -76,7 +77,7 @@ final class MasterDataRepositoryBoundaryTest extends TestCase
                 'status' => 'approved',
             ]],
         ]);
-        $service = new MasterDataService(sys_get_temp_dir(), repository: $repository);
+        $service = $this->service($repository);
 
         $result = $service->delete('suppliers', 'SUP-001', 'buyer');
 
@@ -84,6 +85,19 @@ final class MasterDataRepositoryBoundaryTest extends TestCase
         $this->assertSame([], $repository->store['suppliers']);
         $this->assertSame('SUP-001', $repository->archive['suppliers'][0]['supplier_id'] ?? null);
         $this->assertSame('delete', $repository->history['entries'][0]['action'] ?? null);
+    }
+
+    private function service(InMemoryMasterDataRepository $repository): MasterDataService
+    {
+        return new MasterDataService(
+            sys_get_temp_dir(),
+            repository: $repository,
+            authorityMode: new MasterDataAuthorityModeService(sys_get_temp_dir(), null, [
+                'use_postgres' => true,
+                'shadow_write' => false,
+                'json_fallback' => false,
+            ]),
+        );
     }
 }
 

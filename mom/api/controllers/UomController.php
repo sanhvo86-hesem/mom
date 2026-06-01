@@ -8,14 +8,18 @@ use MOM\Api\Services\Uom\AffineConverter;
 use MOM\Api\Services\Uom\ItemUomPolicyService;
 use MOM\Api\Services\Uom\ConversionEngine;
 use MOM\Api\Services\Uom\ConversionRuleService;
+use MOM\Api\Services\Uom\ContextualConversionPlanner;
 use MOM\Api\Services\Uom\DensityContextualConverter;
 use MOM\Api\Services\Uom\ExactLinearConverter;
 use MOM\Api\Services\Uom\LogarithmicConverter;
 use MOM\Api\Services\Uom\MeasurementValueFactory;
+use MOM\Api\Services\Uom\PackagingContextualConverter;
+use MOM\Api\Services\Uom\PotencyContextualConverter;
 use MOM\Api\Services\Uom\QuantityKindService;
 use MOM\Api\Services\Uom\UnitCatalogService;
 use MOM\Api\Services\Uom\UomAliasResolutionService;
 use MOM\Api\Services\Uom\UomException;
+use MOM\Api\Services\Uom\UomKindMismatchException;
 use MOM\Database\Connection;
 
 /**
@@ -50,6 +54,10 @@ final class UomController extends BaseController
         'UOM_EXTERNAL_CODE_UNKNOWN'                => 'Unknown External Unit Code',
         'UOM_RULE_NOT_ACTIVE'                      => 'Conversion Rule Not Active',
         'UOM_UNIT_ITUOM_ONLY_NO_PHYSICAL_CONVERSION' => 'Packaging Unit — No Physical Conversion',
+        'UOM_CONTEXT_REQUIRED'                    => 'Context Required',
+        'UOM_MISSING_PACKAGING_POLICY'            => 'Missing Packaging Policy',
+        'UOM_MISSING_ASSAY_EVIDENCE'              => 'Missing Assay Evidence',
+        'UOM_DENSITY_NOT_FOUND'                   => 'Missing Density Context',
     ];
 
     private function engine(): ConversionEngine
@@ -58,7 +66,12 @@ final class UomController extends BaseController
         return new ConversionEngine(
             new QuantityKindService($db),
             new ConversionRuleService($db, $this->getRedis()),
-            new MeasurementValueFactory()
+            new MeasurementValueFactory(),
+            new ContextualConversionPlanner(
+                new DensityContextualConverter($db),
+                new PotencyContextualConverter(),
+                new PackagingContextualConverter(new ItemUomPolicyService($db, $this->getRedis()))
+            )
         );
     }
 
@@ -132,9 +145,23 @@ final class UomController extends BaseController
             'actor_id'   => $user['user_id'] ?? null,
             'trace_id'   => $this->requestHeader('X-Trace-Id'),
             'request_id' => $this->requestHeader('X-Request-Id'),
+            'idempotency_key' => $this->requestHeader('Idempotency-Key'),
             'domain'     => $body['domain'] ?? null,
             'item_id'    => $body['item_id'] ?? null,
         ];
+        foreach ([
+            'source_system', 'entered_by', 'entered_at', 'unit_system', 'external_code',
+            'effective_date', 'as_of', 'context_hash', 'material_id', 'substance_code',
+            'density_value', 'density_unit', 'temperature_c', 'pressure_pa', 'lot_id',
+            'batch_id', 'source_method', 'evidence_ref', 'substance', 'assay_method',
+            'potency_value', 'potency_unit', 'certificate_ref', 'expiry_date',
+            'approved_by', 'site_id', 'supplier_id', 'customer_id', 'packaging_level',
+            'linked_record_type', 'linked_record_id',
+        ] as $key) {
+            if (array_key_exists($key, $body)) {
+                $context[$key] = $body[$key];
+            }
+        }
 
         try {
             $result = $this->engine()->convert(
@@ -233,7 +260,8 @@ final class UomController extends BaseController
      *   "supplier_id": null
      * }
      *
-     * Response 200: { "ok": true, "canonical_code": "kg" }
+     * Response 200: structured alias result with status resolved, ambiguous,
+     * unknown, rejected, or pending_review.
      */
     public function resolveAlias(): never
     {
@@ -248,13 +276,11 @@ final class UomController extends BaseController
             $this->error('missing_alias', 400, 'alias field is required');
         }
 
-        try {
-            $canonical = $this->aliasService()->resolve($alias, $scope, $suppId);
-        } catch (UomException $e) {
-            $this->uomProblemDetail($e, '/api/v1/uom/aliases/resolve');
-        }
+        $traceId = isset($body['trace_id']) ? (string)$body['trace_id'] : null;
+        $payload = is_array($body['source_payload'] ?? null) ? $body['source_payload'] : $body;
+        $result = $this->aliasService()->resolveDetailed($alias, $scope, $suppId, $payload, $traceId);
 
-        $this->success(['canonical_code' => $canonical]);
+        $this->success($result);
     }
 
     // ── GET /api/v1/uom/external-map/{system}/{code} ─────────────────────────
@@ -373,14 +399,28 @@ final class UomController extends BaseController
         $title  = self::HUMAN_TITLES[$code] ?? str_replace('_', ' ', ucfirst(strtolower($code)));
         $status = $e->getHttpStatus();
 
-        $this->json([
+        $payload = [
             'type'         => self::PROBLEM_BASE_URI . $code,
             'title'        => $title,
             'status'       => $status,
             'detail'       => $e->getMessage(),
             'instance'     => $instance,
             'problem_code' => $code,
-        ], $status);
+            'code'         => $code,
+            'trace_id'     => $this->requestHeader('X-Trace-Id'),
+            'field_errors' => [],
+            'remediation'  => $this->remediationFor($code),
+        ];
+
+        if ($e instanceof UomKindMismatchException) {
+            $payload['from_kind'] = $e->fromKind;
+            $payload['to_kind'] = $e->toKind;
+            $payload['reason'] = $e->reason;
+            $payload['remediation_path'] = $e->remediationPath;
+            $payload['trace_id'] = $e->traceId;
+        }
+
+        $this->json($payload, $status);
     }
 
     /**
@@ -393,7 +433,25 @@ final class UomController extends BaseController
             'title'        => str_replace('_', ' ', ucfirst(strtolower($code))),
             'status'       => $status,
             'detail'       => $detail,
+            'instance'     => $_SERVER['REQUEST_URI'] ?? null,
             'problem_code' => $code,
+            'code'         => $code,
+            'trace_id'     => $this->requestHeader('X-Trace-Id'),
+            'field_errors' => [],
+            'remediation'  => $this->remediationFor($code),
         ], $status);
+    }
+
+    private function remediationFor(string $code): string
+    {
+        return match ($code) {
+            'UOM_KIND_MISMATCH' => 'Use units from the same quantity kind or create an approved compatibility rule.',
+            'UOM_CONTEXT_REQUIRED' => 'Provide the required contextual evidence for density, potency, or packaging conversion.',
+            'UOM_MISSING_PACKAGING_POLICY' => 'Create or select an active item packaging policy for the item/site/supplier/customer context.',
+            'UOM_MISSING_ASSAY_EVIDENCE' => 'Attach approved lot assay evidence before potency conversion.',
+            'UOM_EXTERNAL_CODE_UNKNOWN' => 'Submit the external unit code for alias review or provide a verified external map.',
+            'UOM_MISSING_REQUIRED_FIELD' => 'Provide magnitude, from_unit, and to_unit.',
+            default => 'Correct the request according to the UoM API contract and retry.',
+        };
     }
 }

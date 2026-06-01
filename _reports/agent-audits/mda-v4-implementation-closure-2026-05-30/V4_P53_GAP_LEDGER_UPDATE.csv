@@ -1,0 +1,8 @@
+gap_id,severity,status,owner_prompt,evidence,next_step
+P53-BLOCK-QH-001,P0,closed,P53,"MesRuntimeCommandHandler calls QualityHoldService::assertNoActiveHoldsForCommand before start/issue/load/complete mutation","Carry same canonical hold gate into shipment and ledger handlers in P54/P55"
+P53-BLOCK-QH-002,P0,closed,P53,"RecordInspectionResultCommand writes quality_inspection_result_runtime, quality_hold, quality_order_runtime, quality_nonconformance_runtime, and quality_case_trace_link on failed inspection","Add real DB scenario execution in P59"
+P53-BLOCK-QH-003,P1,closed,P53,"Migration 270 registers new quality tables and reattaches trg_governed_generic_crud_guard where tables exist","Verify trigger behavior on deployed PostgreSQL during cutover rehearsal"
+P53-BLOCK-QH-004,P1,closed,P53,"RecordMrbDispositionCommand fails mrb_customer_approval_required for use_as_is when customer approval is required but missing","Extend MRB disposition scenario pack with signed approval success path"
+P53-CONTROLLED-SHIPMENT-HOLD,P1,controlled_gap,P54,"Shipment command handler is not live in this branch","Wire shipment pack/release to canonical quality_hold before mutation"
+P53-CONTROLLED-LEGACY-QUALITY,P2,controlled_gap,P53,"Legacy quality tables remain present and are not deleted by P53","Plan reconciliation/cutover mapping before POSTGRES_ONLY claim"
+P53-CONTROLLED-VENDOR,P2,controlled_gap,P53,"composer test/analyse/check blocked by missing vendor/bin/phpunit and vendor/bin/phpstan","Install/restore vendor dependencies or run in CI environment with vendor available"

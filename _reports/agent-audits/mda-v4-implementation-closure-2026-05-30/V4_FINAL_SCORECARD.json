@@ -1,0 +1,137 @@
+{
+    "schema_version": "mda.v4.final_redteam_scorecard.v1",
+    "generated_at": "2026-06-01T03:50:27+00:00",
+    "branch": "cherry/20260601-mda-v4-implementation-closure-recovery-2",
+    "sha": "7c61c05db",
+    "decision_token": "P60_PASS_READY_FOR_CONTROLLED_INTEGRATION",
+    "merge_readiness": "controlled_integration_allowed",
+    "production_ready_claim_allowed": false,
+    "p0_open_count": 0,
+    "p1_open_count": 0,
+    "handoff_audit": {
+        "required_prompts": "P42-P59",
+        "found_count": 18,
+        "missing": [],
+        "handoffs": [
+            {
+                "prompt": "P42",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P42.md",
+                "sha256": "bbe675f7791ba2c9ad6dc2a8df8dd9d2170db6670c26b4f2c722dd6f0e21cf49"
+            },
+            {
+                "prompt": "P43",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P43.md",
+                "sha256": "8626eac4bf4f1f340e62a47a19a532ddcd02f5bf91b54fac9938ac5b8ff67e18"
+            },
+            {
+                "prompt": "P44",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P44.md",
+                "sha256": "e2882f574ead92dd971b6a8f88987b606a992b05146ad78d192983c17737ea8c"
+            },
+            {
+                "prompt": "P45",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P45.md",
+                "sha256": "c4851906f89bce5907c2b498073ad3f5cfb46bb9e1aecc97c235d3d1d28678a9"
+            },
+            {
+                "prompt": "P46",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P46.md",
+                "sha256": "b04083153db3ee6a56e6bbd12dc82329fed0647670628e96bbab53f7102ad26d"
+            },
+            {
+                "prompt": "P47",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P47.md",
+                "sha256": "949446cdd656edf84fc32b1ec0a0a3247fa38a92acf6157cda5ee84d4d956b45"
+            },
+            {
+                "prompt": "P48",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P48.md",
+                "sha256": "61f53fc7520496a1a3445e6387c11678bc5946d96bae00686e1fe851f7f92ad9"
+            },
+            {
+                "prompt": "P49",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P49.md",
+                "sha256": "1cf2fd20d7bee3af1d764dde5fc943366f53bc44e4f1e06612886e8cb346db32"
+            },
+            {
+                "prompt": "P50",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P50.md",
+                "sha256": "19cc4d870ef1b7ebe7fbe3f842f3b774d61257274dea12bc7a0eb7a5067bb7fa"
+            },
+            {
+                "prompt": "P51",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P51.md",
+                "sha256": "11ec70474c62ef8edec107ea3a90cb58aec37bad1ceb818a396ad2a1d2465d41"
+            },
+            {
+                "prompt": "P52",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P52.md",
+                "sha256": "0c60d4bc770da3777d0f466324e47051cc9f1620e673112faa979be5938e9705"
+            },
+            {
+                "prompt": "P53",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P53.md",
+                "sha256": "5bc32352db1fe8a2885698422171891a51728f675341551ce8d482a19c8aecb4"
+            },
+            {
+                "prompt": "P54",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P54.md",
+                "sha256": "1e74c00e65d9f398f5e5987f99a0455380da1e88546db8330e679b48b2677130"
+            },
+            {
+                "prompt": "P55",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P55.md",
+                "sha256": "805fcc1d5c5d682b2a383acdc72a2d8083ccc1686d04175a0cf3355eabf937df"
+            },
+            {
+                "prompt": "P56",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P56.md",
+                "sha256": "86c63f12bac0e14ddef480e349722befa9aaa9b9321ba84a52123ae9d54ee617"
+            },
+            {
+                "prompt": "P57",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P57.md",
+                "sha256": "d43e521c312fbfe6fe9b5897672aa44d731b8b570da35c2cb24d09fbf90665bc"
+            },
+            {
+                "prompt": "P58",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P58.md",
+                "sha256": "6c18a379f34835cc30a1c0556aa2f730adf6cc5e26d5901fcc913973df4ed6ba"
+            },
+            {
+                "prompt": "P59",
+                "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P59.md",
+                "sha256": "c29628b1aa343b586ca93dab498be622ef6159226603b4800834181843c45c35"
+            }
+        ]
+    },
+    "evidence_inputs": {
+        "p58_decision": "P58_PASS_READY_FOR_NEXT",
+        "p58_scenario_total": 14,
+        "p58_failed": 0,
+        "p59_decision_token": "P59_PASS_READY_FOR_NEXT",
+        "fallback_read_total": 1,
+        "fault_injected_fallback_read_total": 1,
+        "clean_cutover_fallback_read_total": 0,
+        "artifact_restore_status": "pass",
+        "postgres_restore_status": "pass",
+        "local_chrome_status": "pass",
+        "live_vps_chrome_status": "pass"
+    },
+    "category_scores": {
+        "authority_clarity": 8,
+        "mutation_safety": 8,
+        "command_runtime": 8,
+        "uom_direct_authority": 9,
+        "security_ai_sod": 8,
+        "regulated_evidence_esign": 7,
+        "quality_hold_eqms": 8,
+        "inventory_ledger_genealogy": 8,
+        "resource_readiness": 8,
+        "scenario_proof": 8,
+        "restore_proof": 2,
+        "browser_operator_proof": 2,
+        "observability_cutover": 6
+    },
+    "blockers": []
+}

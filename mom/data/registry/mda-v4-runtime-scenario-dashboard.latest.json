@@ -1,0 +1,812 @@
+{
+    "generated_at": "2026-06-01T03:49:35+00:00",
+    "runtime_mode": "transaction_sandbox_real_gateway",
+    "mock_only": false,
+    "scenario_total": 14,
+    "passed": 14,
+    "failed": 0,
+    "duration_ms": 9,
+    "blockers_covered": [
+        "P0-RESOURCE-READINESS-NOT-WIRED",
+        "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE",
+        "P0-QUALITY-HOLD-FRAGMENTATION",
+        "P0-AUDIT-EVIDENCE-ESIGN-NOT-WIRED",
+        "P0-INVENTORY-BALANCE-DIRECT-MUTATION",
+        "P0-AI-GOVERNED-ACTION-ESCAPE",
+        "P0-ENGINEERING-PACKAGE-NOT-LIVE-GATED",
+        "P0-POSTGRES-ONLY-WITHOUT-RESTORE-DRILL",
+        "P0-MISSING-DOMAIN-COMMAND-HANDLER",
+        "P0-UOM-AUTHORITY-AMBIGUITY"
+    ],
+    "blocker_complete": true,
+    "decision": "P58_PASS_READY_FOR_NEXT",
+    "cutover_decision": "NO_GO_CUTOVER_FALLBACK_READ_PRESENT",
+    "p60_scorecard_input": {
+        "scenario_failure_count": 0,
+        "scenario_total": 14,
+        "fallback_read_total": 1,
+        "telemetry_decision": "NO_GO_RUNTIME_OBSERVABILITY",
+        "active_alert_count": 1
+    },
+    "telemetry": {
+        "required_metrics_present": true,
+        "active_alerts": [
+            {
+                "rule_id": "fallback_read_total",
+                "metric": "hesem.mda.fallback.read.total",
+                "value": 1,
+                "threshold": 0,
+                "severity": "P0"
+            }
+        ]
+    },
+    "results": [
+        {
+            "scenario_id": "V4-SIM-058-001",
+            "title": "StartJob missing machine evidence blocks before track-in",
+            "tags": [
+                "P58",
+                "P0",
+                "readiness",
+                "mes",
+                "real_gateway"
+            ],
+            "p0_blockers": [
+                "P0-RESOURCE-READINESS-NOT-WIRED",
+                "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"
+            ],
+            "status": "pass",
+            "seed": {
+                "mode": "transaction_sandbox",
+                "fixture_keys": [
+                    "readiness_missing_keys",
+                    "tooling_blocked"
+                ],
+                "mock_only": false
+            },
+            "gateway_mode": "direct_domain_command_gateway",
+            "accepted": false,
+            "problem": {
+                "type": "https://hesem.local/problems/domain-command/resource_readiness_blocked",
+                "title": "Resource readiness blocks this command.",
+                "status": 409,
+                "code": "resource_readiness_blocked",
+                "detail": "Resource readiness blocks this command.",
+                "command_name": "StartJobCommand",
+                "details": {
+                    "readiness_snapshot_id": "readiness-snapshot-1",
+                    "readiness_hash_sha256": "66bb7067c1b9c7f7f5ea11dede29b004d4bc78212a91676e58b264296d38900b",
+                    "blockers": [
+                        {
+                            "evidence_key": "machine_pm",
+                            "code": "readiness_evidence_missing",
+                            "operator_message": "Required readiness evidence is missing."
+                        }
+                    ],
+                    "operator_reason_payload": {
+                        "decision": "block",
+                        "blocked_actions": [
+                            "StartJobCommand"
+                        ],
+                        "reasons": [
+                            {
+                                "evidence_key": "machine_pm",
+                                "code": "readiness_evidence_missing",
+                                "operator_message": "Required readiness evidence is missing."
+                            }
+                        ]
+                    }
+                }
+            },
+            "idempotency": {
+                "operation_count": 1,
+                "replay_count": 0
+            },
+            "assertion": {
+                "status": "pass",
+                "failures": [],
+                "evidence": {
+                    "query_count": 23,
+                    "audit_write_count": 3,
+                    "outbox_write_count": 0,
+                    "evidence_link_write_count": 0,
+                    "problem_code": "resource_readiness_blocked"
+                }
+            }
+        },
+        {
+            "scenario_id": "V4-SIM-058-002",
+            "title": "OQC failure creates canonical hold, quality order, NCR, audit and outbox",
+            "tags": [
+                "P58",
+                "P0",
+                "quality",
+                "eqms",
+                "uom",
+                "e-sign",
+                "real_gateway"
+            ],
+            "p0_blockers": [
+                "P0-QUALITY-HOLD-FRAGMENTATION",
+                "P0-AUDIT-EVIDENCE-ESIGN-NOT-WIRED",
+                "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"
+            ],
+            "status": "pass",
+            "seed": {
+                "mode": "transaction_sandbox",
+                "fixture_keys": [
+                    "readiness_missing_keys",
+                    "gage_blocked",
+                    "qc_unit_code"
+                ],
+                "mock_only": false
+            },
+            "gateway_mode": "direct_domain_command_gateway",
+            "accepted": true,
+            "problem": null,
+            "idempotency": {
+                "operation_count": 1,
+                "replay_count": 0
+            },
+            "assertion": {
+                "status": "pass",
+                "failures": [],
+                "evidence": {
+                    "query_count": 49,
+                    "audit_write_count": 8,
+                    "outbox_write_count": 4,
+                    "evidence_link_write_count": 1,
+                    "problem_code": ""
+                }
+            }
+        },
+        {
+            "scenario_id": "V4-SIM-058-003",
+            "title": "Duplicate material issue replays idempotently and writes one inventory ledger row",
+            "tags": [
+                "P58",
+                "P0",
+                "inventory",
+                "idempotency",
+                "uom",
+                "real_gateway"
+            ],
+            "p0_blockers": [
+                "P0-INVENTORY-BALANCE-DIRECT-MUTATION",
+                "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"
+            ],
+            "status": "pass",
+            "seed": {
+                "mode": "transaction_sandbox",
+                "fixture_keys": [
+                    "readiness_missing_keys",
+                    "active_quality_hold"
+                ],
+                "mock_only": false
+            },
+            "gateway_mode": "direct_domain_command_gateway",
+            "accepted": true,
+            "problem": null,
+            "idempotency": {
+                "operation_count": 1,
+                "replay_count": 1
+            },
+            "assertion": {
+                "status": "pass",
+                "failures": [],
+                "evidence": {
+                    "query_count": 19,
+                    "audit_write_count": 4,
+                    "outbox_write_count": 2,
+                    "evidence_link_write_count": 1,
+                    "problem_code": ""
+                }
+            }
+        },
+        {
+            "scenario_id": "V4-SIM-058-004",
+            "title": "AI actor cannot release a governed engineering package",
+            "tags": [
+                "P58",
+                "P0",
+                "security",
+                "ai_governance",
+                "real_gateway"
+            ],
+            "p0_blockers": [
+                "P0-AI-GOVERNED-ACTION-ESCAPE",
+                "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"
+            ],
+            "status": "pass",
+            "seed": {
+                "mode": "transaction_sandbox",
+                "fixture_keys": [],
+                "mock_only": false
+            },
+            "gateway_mode": "direct_domain_command_gateway",
+            "accepted": false,
+            "problem": {
+                "type": "https://hesem.local/problems/domain-command/ai_governed_action_forbidden",
+                "title": "AI actors cannot execute governed mutations.",
+                "status": 403,
+                "code": "ai_governed_action_forbidden",
+                "detail": "AI actors cannot execute governed mutations.",
+                "command_name": "ReleaseEngineeringReleasePackageCommand",
+                "details": {
+                    "command_name": "ReleaseEngineeringReleasePackageCommand",
+                    "root": "engineering_release_package"
+                }
+            },
+            "idempotency": {
+                "operation_count": 0,
+                "replay_count": 0
+            },
+            "assertion": {
+                "status": "pass",
+                "failures": [],
+                "evidence": {
+                    "query_count": 1,
+                    "audit_write_count": 1,
+                    "outbox_write_count": 0,
+                    "evidence_link_write_count": 0,
+                    "problem_code": "ai_governed_action_forbidden"
+                }
+            }
+        },
+        {
+            "scenario_id": "V4-SIM-058-005",
+            "title": "Regulated quality hold release without signature meaning is blocked",
+            "tags": [
+                "P58",
+                "P0",
+                "e-sign",
+                "audit",
+                "quality",
+                "real_gateway"
+            ],
+            "p0_blockers": [
+                "P0-AUDIT-EVIDENCE-ESIGN-NOT-WIRED",
+                "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"
+            ],
+            "status": "pass",
+            "seed": {
+                "mode": "transaction_sandbox",
+                "fixture_keys": [
+                    "active_quality_hold"
+                ],
+                "mock_only": false
+            },
+            "gateway_mode": "direct_domain_command_gateway",
+            "accepted": false,
+            "problem": {
+                "type": "https://hesem.local/problems/domain-command/signature_meaning_required",
+                "title": "signature_meaning is required.",
+                "status": 409,
+                "code": "signature_meaning_required",
+                "detail": "signature_meaning is required.",
+                "command_name": "ReleaseQualityHoldCommand",
+                "details": []
+            },
+            "idempotency": {
+                "operation_count": 0,
+                "replay_count": 0
+            },
+            "assertion": {
+                "status": "pass",
+                "failures": [],
+                "evidence": {
+                    "query_count": 1,
+                    "audit_write_count": 1,
+                    "outbox_write_count": 0,
+                    "evidence_link_write_count": 0,
+                    "problem_code": "signature_meaning_required"
+                }
+            }
+        },
+        {
+            "scenario_id": "V4-SIM-058-006",
+            "title": "Valid work-order release binds released engineering package snapshot hash",
+            "tags": [
+                "P58",
+                "P0",
+                "engineering",
+                "work_order",
+                "e-sign",
+                "real_gateway"
+            ],
+            "p0_blockers": [
+                "P0-ENGINEERING-PACKAGE-NOT-LIVE-GATED",
+                "P0-AUDIT-EVIDENCE-ESIGN-NOT-WIRED",
+                "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"
+            ],
+            "status": "pass",
+            "seed": {
+                "mode": "transaction_sandbox",
+                "fixture_keys": [
+                    "manifest_hash_sha256",
+                    "engineering_package_status"
+                ],
+                "mock_only": false
+            },
+            "gateway_mode": "direct_domain_command_gateway",
+            "accepted": true,
+            "problem": null,
+            "idempotency": {
+                "operation_count": 1,
+                "replay_count": 0
+            },
+            "assertion": {
+                "status": "pass",
+                "failures": [],
+                "evidence": {
+                    "query_count": 15,
+                    "audit_write_count": 3,
+                    "outbox_write_count": 1,
+                    "evidence_link_write_count": 1,
+                    "problem_code": ""
+                }
+            }
+        },
+        {
+            "scenario_id": "V4-SIM-058-007",
+            "title": "Fallback read telemetry produces cutover no-go while command stack still runs",
+            "tags": [
+                "P58",
+                "P0",
+                "telemetry",
+                "cutover",
+                "inventory",
+                "real_gateway"
+            ],
+            "p0_blockers": [
+                "P0-POSTGRES-ONLY-WITHOUT-RESTORE-DRILL",
+                "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"
+            ],
+            "status": "pass",
+            "seed": {
+                "mode": "transaction_sandbox",
+                "fixture_keys": [],
+                "mock_only": false
+            },
+            "gateway_mode": "direct_domain_command_gateway",
+            "accepted": true,
+            "problem": null,
+            "idempotency": {
+                "operation_count": 1,
+                "replay_count": 0
+            },
+            "assertion": {
+                "status": "pass",
+                "failures": [],
+                "evidence": {
+                    "query_count": 19,
+                    "audit_write_count": 4,
+                    "outbox_write_count": 2,
+                    "evidence_link_write_count": 1,
+                    "problem_code": ""
+                }
+            }
+        },
+        {
+            "scenario_id": "V4-SIM-058-008",
+            "title": "Invalid command API payload returns Problem Details before mutation",
+            "tags": [
+                "P58",
+                "P0",
+                "api_contract",
+                "problem_details",
+                "real_gateway"
+            ],
+            "p0_blockers": [
+                "P0-MISSING-DOMAIN-COMMAND-HANDLER",
+                "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"
+            ],
+            "status": "pass",
+            "seed": {
+                "mode": "transaction_sandbox",
+                "fixture_keys": [],
+                "mock_only": false
+            },
+            "gateway_mode": "direct_domain_command_gateway",
+            "accepted": false,
+            "problem": {
+                "type": "https://hesem.local/problems/domain-command/command_name_required",
+                "title": "Command name is required.",
+                "status": 400,
+                "code": "command_name_required",
+                "detail": "Command name is required.",
+                "command_name": "",
+                "details": []
+            },
+            "idempotency": {
+                "operation_count": 0,
+                "replay_count": 0
+            },
+            "assertion": {
+                "status": "pass",
+                "failures": [],
+                "evidence": {
+                    "query_count": 0,
+                    "audit_write_count": 0,
+                    "outbox_write_count": 0,
+                    "evidence_link_write_count": 0,
+                    "problem_code": "command_name_required"
+                }
+            }
+        },
+        {
+            "scenario_id": "V4-SIM-058-009",
+            "title": "Missing UOM item policy blocks material issue before ledger write",
+            "tags": [
+                "P58",
+                "P0",
+                "uom",
+                "inventory",
+                "real_gateway"
+            ],
+            "p0_blockers": [
+                "P0-UOM-AUTHORITY-AMBIGUITY",
+                "P0-INVENTORY-BALANCE-DIRECT-MUTATION",
+                "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"
+            ],
+            "status": "pass",
+            "seed": {
+                "mode": "transaction_sandbox",
+                "fixture_keys": [
+                    "uom_policy_missing"
+                ],
+                "mock_only": false
+            },
+            "gateway_mode": "direct_domain_command_gateway",
+            "accepted": false,
+            "problem": {
+                "type": "https://hesem.local/problems/domain-command/uom_authority_resolution_failed",
+                "title": "UOM authority could not normalize the governed command quantity.",
+                "status": 409,
+                "code": "uom_authority_resolution_failed",
+                "detail": "UOM authority could not normalize the governed command quantity.",
+                "command_name": "IssueMaterialToWorkOrderCommand",
+                "details": {
+                    "command_name": "IssueMaterialToWorkOrderCommand",
+                    "quantity_role": "issue_quantity",
+                    "uom_problem_code": "UOM_POLICY_NOT_FOUND",
+                    "operator_message": "Resolve UOM policy, alias, conversion rule, effectivity, and dimensional compatibility before retrying."
+                }
+            },
+            "idempotency": {
+                "operation_count": 1,
+                "replay_count": 0
+            },
+            "assertion": {
+                "status": "pass",
+                "failures": [],
+                "evidence": {
+                    "query_count": 14,
+                    "audit_write_count": 1,
+                    "outbox_write_count": 0,
+                    "evidence_link_write_count": 0,
+                    "problem_code": "uom_authority_resolution_failed"
+                }
+            }
+        },
+        {
+            "scenario_id": "V4-SIM-058-010",
+            "title": "Canonical quality hold blocks inventory move before ledger write",
+            "tags": [
+                "P58",
+                "P0",
+                "quality",
+                "inventory",
+                "real_gateway"
+            ],
+            "p0_blockers": [
+                "P0-QUALITY-HOLD-FRAGMENTATION",
+                "P0-INVENTORY-BALANCE-DIRECT-MUTATION",
+                "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"
+            ],
+            "status": "pass",
+            "seed": {
+                "mode": "transaction_sandbox",
+                "fixture_keys": [
+                    "active_quality_hold"
+                ],
+                "mock_only": false
+            },
+            "gateway_mode": "direct_domain_command_gateway",
+            "accepted": false,
+            "problem": {
+                "type": "https://hesem.local/problems/domain-command/quality_hold_active",
+                "title": "Canonical quality hold blocks this command.",
+                "status": 409,
+                "code": "quality_hold_active",
+                "detail": "Canonical quality hold blocks this command.",
+                "command_name": "MoveInventoryCommand",
+                "details": {
+                    "subjects_checked": [
+                        {
+                            "subject_type": "lot",
+                            "subject_ref": "LOT-HOLD"
+                        },
+                        {
+                            "subject_type": "item",
+                            "subject_ref": "ITEM-P58"
+                        }
+                    ],
+                    "active_holds": [
+                        {
+                            "hold_id": "hold-p58-active",
+                            "hold_number": "QH-P58-ACTIVE",
+                            "hold_scope": "ipqc",
+                            "hold_status": "active",
+                            "severity": "critical",
+                            "reason_code": "P58_HOLD",
+                            "operator_message": "P58 canonical quality hold is active.",
+                            "subject_type": "lot",
+                            "subject_ref": "LOT-HOLD"
+                        }
+                    ],
+                    "operator_reason_payload": {
+                        "decision": "block",
+                        "blocked_actions": [
+                            "MoveInventoryCommand"
+                        ],
+                        "reasons": [
+                            {
+                                "code": "quality_hold_active",
+                                "hold_number": "QH-P58-ACTIVE",
+                                "subject_type": "lot",
+                                "subject_ref": "LOT-HOLD",
+                                "severity": "critical",
+                                "message": "P58 canonical quality hold is active."
+                            }
+                        ]
+                    }
+                }
+            },
+            "idempotency": {
+                "operation_count": 1,
+                "replay_count": 0
+            },
+            "assertion": {
+                "status": "pass",
+                "failures": [],
+                "evidence": {
+                    "query_count": 6,
+                    "audit_write_count": 2,
+                    "outbox_write_count": 0,
+                    "evidence_link_write_count": 0,
+                    "problem_code": "quality_hold_active"
+                }
+            }
+        },
+        {
+            "scenario_id": "V4-SIM-058-011",
+            "title": "Receive inventory appends ledger and genealogy without direct balance mutation",
+            "tags": [
+                "P58",
+                "P0",
+                "inventory",
+                "genealogy",
+                "uom",
+                "real_gateway"
+            ],
+            "p0_blockers": [
+                "P0-INVENTORY-BALANCE-DIRECT-MUTATION",
+                "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"
+            ],
+            "status": "pass",
+            "seed": {
+                "mode": "transaction_sandbox",
+                "fixture_keys": [],
+                "mock_only": false
+            },
+            "gateway_mode": "direct_domain_command_gateway",
+            "accepted": true,
+            "problem": null,
+            "idempotency": {
+                "operation_count": 1,
+                "replay_count": 0
+            },
+            "assertion": {
+                "status": "pass",
+                "failures": [],
+                "evidence": {
+                    "query_count": 19,
+                    "audit_write_count": 4,
+                    "outbox_write_count": 2,
+                    "evidence_link_write_count": 1,
+                    "problem_code": ""
+                }
+            }
+        },
+        {
+            "scenario_id": "V4-SIM-058-012",
+            "title": "Blocked tooling state prevents tool load before MES life event",
+            "tags": [
+                "P58",
+                "P0",
+                "tooling",
+                "readiness",
+                "real_gateway"
+            ],
+            "p0_blockers": [
+                "P0-RESOURCE-READINESS-NOT-WIRED",
+                "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"
+            ],
+            "status": "pass",
+            "seed": {
+                "mode": "transaction_sandbox",
+                "fixture_keys": [
+                    "tooling_blocked"
+                ],
+                "mock_only": false
+            },
+            "gateway_mode": "direct_domain_command_gateway",
+            "accepted": false,
+            "problem": {
+                "type": "https://hesem.local/problems/domain-command/tooling_runtime_blocked",
+                "title": "Tooling runtime gate blocks this command.",
+                "status": 409,
+                "code": "tooling_runtime_blocked",
+                "detail": "Tooling runtime gate blocks this command.",
+                "command_name": "LoadToolCommand",
+                "details": {
+                    "tool_id": "TOOL-P58",
+                    "blockers": [
+                        {
+                            "code": "tool_status_broken",
+                            "message": "Tool or assembly is not active."
+                        },
+                        {
+                            "code": "tool_preset_not_approved",
+                            "message": "Tool preset is not approved."
+                        },
+                        {
+                            "code": "tool_calibration_not_valid",
+                            "message": "Tool calibration is not valid."
+                        },
+                        {
+                            "code": "tool_life_stop_threshold",
+                            "message": "Tool life is at or above stop threshold."
+                        }
+                    ]
+                }
+            },
+            "idempotency": {
+                "operation_count": 1,
+                "replay_count": 0
+            },
+            "assertion": {
+                "status": "pass",
+                "failures": [],
+                "evidence": {
+                    "query_count": 7,
+                    "audit_write_count": 2,
+                    "outbox_write_count": 0,
+                    "evidence_link_write_count": 0,
+                    "problem_code": "tooling_runtime_blocked"
+                }
+            }
+        },
+        {
+            "scenario_id": "V4-SIM-058-013",
+            "title": "Expired gage blocks inspection result before quality result write",
+            "tags": [
+                "P58",
+                "P0",
+                "gage",
+                "quality",
+                "e-sign",
+                "real_gateway"
+            ],
+            "p0_blockers": [
+                "P0-RESOURCE-READINESS-NOT-WIRED",
+                "P0-AUDIT-EVIDENCE-ESIGN-NOT-WIRED",
+                "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"
+            ],
+            "status": "pass",
+            "seed": {
+                "mode": "transaction_sandbox",
+                "fixture_keys": [
+                    "gage_blocked"
+                ],
+                "mock_only": false
+            },
+            "gateway_mode": "direct_domain_command_gateway",
+            "accepted": false,
+            "problem": {
+                "type": "https://hesem.local/problems/domain-command/gage_runtime_blocked",
+                "title": "Gage runtime gate blocks this command.",
+                "status": 409,
+                "code": "gage_runtime_blocked",
+                "detail": "Gage runtime gate blocks this command.",
+                "command_name": "RecordInspectionResultCommand",
+                "details": {
+                    "gage_id": "GAGE-P58",
+                    "blockers": [
+                        {
+                            "code": "gage_not_active",
+                            "message": "Gage is not active."
+                        },
+                        {
+                            "code": "gage_calibration_not_valid",
+                            "message": "Gage calibration is not valid."
+                        },
+                        {
+                            "code": "gage_calibration_expired",
+                            "message": "Gage calibration is expired."
+                        }
+                    ]
+                }
+            },
+            "idempotency": {
+                "operation_count": 1,
+                "replay_count": 0
+            },
+            "assertion": {
+                "status": "pass",
+                "failures": [],
+                "evidence": {
+                    "query_count": 9,
+                    "audit_write_count": 2,
+                    "outbox_write_count": 0,
+                    "evidence_link_write_count": 0,
+                    "problem_code": "gage_runtime_blocked"
+                }
+            }
+        },
+        {
+            "scenario_id": "V4-SIM-058-014",
+            "title": "Closed inventory period blocks direct ledger post before ledger append",
+            "tags": [
+                "P58",
+                "P0",
+                "inventory",
+                "e-sign",
+                "period_close",
+                "real_gateway"
+            ],
+            "p0_blockers": [
+                "P0-INVENTORY-BALANCE-DIRECT-MUTATION",
+                "P0-AUDIT-EVIDENCE-ESIGN-NOT-WIRED",
+                "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE"
+            ],
+            "status": "pass",
+            "seed": {
+                "mode": "transaction_sandbox",
+                "fixture_keys": [
+                    "inventory_period_closed"
+                ],
+                "mock_only": false
+            },
+            "gateway_mode": "direct_domain_command_gateway",
+            "accepted": false,
+            "problem": {
+                "type": "https://hesem.local/problems/domain-command/inventory_period_closed",
+                "title": "Inventory period is closed for ledger posting.",
+                "status": 409,
+                "code": "inventory_period_closed",
+                "detail": "Inventory period is closed for ledger posting.",
+                "command_name": "PostInventoryLedgerTransactionCommand",
+                "details": {
+                    "period_code": "2026-05-01"
+                }
+            },
+            "idempotency": {
+                "operation_count": 1,
+                "replay_count": 0
+            },
+            "assertion": {
+                "status": "pass",
+                "failures": [],
+                "evidence": {
+                    "query_count": 7,
+                    "audit_write_count": 1,
+                    "outbox_write_count": 0,
+                    "evidence_link_write_count": 0,
+                    "problem_code": "inventory_period_closed"
+                }
+            }
+        }
+    ]
+}

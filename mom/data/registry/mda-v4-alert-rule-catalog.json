@@ -1,0 +1,13 @@
+{
+  "version": "mda-v4-p57",
+  "status": "pre_production_contract_candidate",
+  "authority": "MdaRuntimeTelemetryService::alertRules",
+  "rules": [
+    {"rule_id": "fallback_read_total", "metric": "hesem.mda.fallback.read.total", "operator": ">", "threshold": 0, "severity": "P0"},
+    {"rule_id": "drift_count", "metric": "hesem.mda.drift.count", "operator": ">", "threshold": 0, "severity": "P0"},
+    {"rule_id": "outbox_lag_p95", "metric": "hesem.mda.outbox.lag.seconds.p95", "operator": ">", "threshold": 300, "severity": "P0"},
+    {"rule_id": "audit_store_down", "metric": "hesem.mda.audit.failure.total", "operator": ">", "threshold": 0, "severity": "P0"},
+    {"rule_id": "direct_mutation_attempt", "metric": "hesem.mda.direct_mutation.attempt.total", "operator": ">", "threshold": 0, "severity": "P0"},
+    {"rule_id": "scenario_failure", "metric": "hesem.mda.scenario.failure.total", "operator": ">", "threshold": 0, "severity": "P0"}
+  ]
+}

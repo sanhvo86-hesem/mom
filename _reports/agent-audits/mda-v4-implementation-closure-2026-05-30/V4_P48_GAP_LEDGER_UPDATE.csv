@@ -1,0 +1,7 @@
+gap_id,severity,status,evidence,owner_prompt,next_step
+P0-ENGINEERING-PACKAGE-NOT-LIVE-GATED,P0,closed_for_schema_and_handler,"EngineeringReleasePackageCommandHandler and migration 266 add package release invariants, immutable released package triggers, and SO/JO/WO snapshot release gates.",P48,"P49 must route live release commands through handler and prove legacy release routes cannot bypass DB triggers"
+P0-WO-RELEASE-LATEST-MASTER-DATA,P0,closed_by_db_trigger,"work_orders release/in_production requires engineering_package_id, manifest hash, and work_order_engineering_package_snapshot.",P48,"P49/P55 must bind package before WO release command"
+P0-SO-JO-RELEASE-LATEST-MASTER-DATA,P0,closed_by_db_trigger,"sales_order engineering_ready/in_production/shipped/closed and job_orders released/active/completed/closed require engineering package snapshot columns.",P48,"P49 must wire SO/JO release command handlers to bindPackageToSalesOrder/bindPackageToJobOrder"
+P1-COMMAND-GATEWAY-REGISTRATION,P1,open,"P48 created handler class but did not build the full DomainCommandGateway/API operation inventory.",P49,"Expose controlled command entrypoints with idempotency envelope and Problem Details"
+P1-LOCAL-VALIDATION-DEPENDENCIES,P1,blocked,"composer test/analyse/check cannot run because vendor/bin/phpunit and vendor/bin/phpstan are missing.",release,"Restore dependencies or use CI evidence"
+P1-TELEMETRY-DASHBOARD,P1,open,"Events/audit/outbox are written but no control tower metrics were added.",P58,"Add blocked release, mismatch, and snapshot freshness metrics"

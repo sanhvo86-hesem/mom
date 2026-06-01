@@ -1,0 +1,35 @@
+{
+  "version": "mda-v4-p57",
+  "status": "pre_production_contract_candidate",
+  "authority": "MdaRuntimeTelemetryService::metricCatalog",
+  "metrics": [
+    "hesem.mda.command.outcome.total",
+    "hesem.mda.idempotency.replay.total",
+    "hesem.mda.idempotency.conflict.total",
+    "hesem.mda.readiness.blocker.total",
+    "hesem.mda.quality_hold.blocker.total",
+    "hesem.mda.inventory.reconciliation.mismatch.total",
+    "hesem.mda.uom.failure.total",
+    "hesem.mda.fallback.read.total",
+    "hesem.mda.drift.count",
+    "hesem.mda.outbox.lag.seconds.p95",
+    "hesem.mda.audit.failure.total",
+    "hesem.mda.esign.failure.total",
+    "hesem.mda.security.denial.total",
+    "hesem.mda.direct_mutation.attempt.total",
+    "hesem.mda.projection.staleness.seconds",
+    "hesem.mda.scenario.result.total",
+    "hesem.mda.scenario.failure.total",
+    "hesem.mda.tooling.blocker.total",
+    "hesem.mda.gage.blocker.total"
+  ],
+  "required_for_p60_scorecard": [
+    "hesem.mda.fallback.read.total",
+    "hesem.mda.drift.count",
+    "hesem.mda.outbox.lag.seconds.p95",
+    "hesem.mda.audit.failure.total",
+    "hesem.mda.security.denial.total",
+    "hesem.mda.direct_mutation.attempt.total",
+    "hesem.mda.scenario.failure.total"
+  ]
+}

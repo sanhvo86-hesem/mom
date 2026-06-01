@@ -194,6 +194,8 @@ final class MasterDataService
     private const APPROVAL_REQUIRED_STATUSES = ['active', 'approved', 'released'];
 
     private readonly MasterDataRepository $repository;
+    private readonly MasterDataAuthorityModeService $authorityMode;
+    private readonly MasterDataFallbackTelemetry $fallbackTelemetry;
 
     // ── Construction ────────────────────────────────────────────────────────
 
@@ -204,11 +206,34 @@ final class MasterDataService
         string $dataDir,
         mixed $rootDirOrRepository = null,
         ?MasterDataRepository $repository = null,
+        ?MasterDataAuthorityModeService $authorityMode = null,
     )
     {
-        $this->repository = $repository
-            ?? ($rootDirOrRepository instanceof MasterDataRepository ? $rootDirOrRepository : null)
-            ?? new JsonMasterDataRepository($dataDir, $this->defaultStore());
+        $rootDir = is_string($rootDirOrRepository) ? $rootDirOrRepository : null;
+        $this->authorityMode = $authorityMode ?? new MasterDataAuthorityModeService($dataDir, $rootDir);
+        $this->fallbackTelemetry = new MasterDataFallbackTelemetry($dataDir);
+        $explicitRepository = $repository
+            ?? ($rootDirOrRepository instanceof MasterDataRepository ? $rootDirOrRepository : null);
+
+        if ($explicitRepository instanceof MasterDataRepository) {
+            $this->repository = $explicitRepository;
+            return;
+        }
+
+        $jsonRepository = new JsonMasterDataRepository($dataDir, $this->defaultStore());
+        if (!$this->authorityMode->usesPostgresRepository()) {
+            $this->repository = $jsonRepository;
+            return;
+        }
+
+        $config = (array)(require dirname(__DIR__, 2) . '/database/config.php');
+        $this->repository = new PostgresMasterDataRepository(
+            \MOM\Database\Connection::getInstance($config),
+            $this->defaultStore(),
+            $this->authorityMode->mode(),
+            $jsonRepository,
+            $this->fallbackTelemetry,
+        );
     }
 
     /**
@@ -227,21 +252,28 @@ final class MasterDataService
                 'primary_backend' => 'custom',
             ];
 
+        $modeSummary = $this->authorityMode->summary();
         $primary = strtolower(trim((string)($repoProbe['primary_backend'] ?? 'custom')));
-        $readiness = match ($primary) {
-            'postgres' => 'authoritative_ready',
-            'json' => 'compatibility_only',
+        $mode = (string)($modeSummary['mode'] ?? '');
+        $readiness = match (true) {
+            $primary === 'postgres' && $mode === MasterDataAuthorityModeService::MODE_POSTGRES_ONLY => 'authoritative_ready_postgres_only',
+            $primary === 'postgres' && $mode === MasterDataAuthorityModeService::MODE_POSTGRES_PRIMARY => 'authoritative_ready_with_fallback_telemetry',
+            $primary === 'postgres' && $mode === MasterDataAuthorityModeService::MODE_SHADOW_WRITE => 'postgres_authority_shadow_export',
+            $mode === MasterDataAuthorityModeService::MODE_JSON_ONLY => 'blocked_postgres_required',
+            $primary === 'json' => 'blocked_postgres_required',
             default => 'degraded',
         };
 
         return array_merge($repoProbe, [
             'slice' => 'master_data',
             'readiness_state' => $readiness,
-            'authoritative_primary' => $readiness === 'authoritative_ready',
+            'authoritative_primary' => str_starts_with($readiness, 'authoritative_ready') || $readiness === 'postgres_authority_shadow_export',
             'data_layer_mode' => (string)($dataLayerSummary['mode'] ?? ''),
             'postgres_configured' => (bool)($dataLayerSummary['use_postgres'] ?? false),
-            'notes' => $readiness === 'compatibility_only'
-                ? 'Master data governance is repository-bound but JSON primary; PostgreSQL-native repository remains deferred.'
+            'authority_mode' => $modeSummary,
+            'fallback_telemetry' => $this->fallbackTelemetry->summary(),
+            'notes' => $readiness === 'blocked_postgres_required'
+                ? 'Master data governance commands are blocked until PostgreSQL authority mode is enabled. JSON is compatibility/read-only for governed roots.'
                 : (string)($repoProbe['notes'] ?? ''),
         ]);
     }
@@ -291,6 +323,9 @@ final class MasterDataService
     {
         if (!$this->isValidEntity($entityType)) {
             return new MasterDataResult(false, 'Invalid entity type.', errorCode: 'invalid_entity');
+        }
+        if (($blocked = $this->blockedGovernedCommandResult('create', $entityType)) !== null) {
+            return $blocked;
         }
 
         $idKey = self::ENTITY_KEYS[$entityType];
@@ -362,6 +397,9 @@ final class MasterDataService
         if (!$this->isValidEntity($entityType)) {
             return new MasterDataResult(false, 'Invalid entity type.', errorCode: 'invalid_entity');
         }
+        if (($blocked = $this->blockedGovernedCommandResult('update', $entityType)) !== null) {
+            return $blocked;
+        }
 
         $store  = $this->loadStore();
         $idKey  = self::ENTITY_KEYS[$entityType];
@@ -396,6 +434,9 @@ final class MasterDataService
     {
         if (!$this->isValidEntity($entityType)) {
             return new MasterDataResult(false, 'Invalid entity type.', errorCode: 'invalid_entity');
+        }
+        if (($blocked = $this->blockedGovernedCommandResult('delete', $entityType)) !== null) {
+            return $blocked;
         }
 
         // Referential integrity
@@ -451,6 +492,7 @@ final class MasterDataService
         if (!$this->isValidEntity($entityType)) {
             return false;
         }
+        $this->authorityMode->assertGovernedCommandAllowed('changeStatus:' . $entityType);
 
         $validStatuses = self::STATUS_MAP[$entityType] ?? [];
         if (!in_array($newStatus, $validStatuses, true)) {
@@ -1197,6 +1239,21 @@ final class MasterDataService
         $archive[$entityType]   = $archive[$entityType] ?? [];
         $archive[$entityType][] = $record;
         $this->saveArchive($archive);
+    }
+
+    private function blockedGovernedCommandResult(string $operation, string $entityType): ?MasterDataResult
+    {
+        try {
+            $this->authorityMode->assertGovernedCommandAllowed($operation . ':' . $entityType);
+            return null;
+        } catch (MasterDataAuthorityException $e) {
+            return new MasterDataResult(
+                false,
+                $e->getMessage(),
+                data: $e->problemDetails(),
+                errorCode: $e->codeName(),
+            );
+        }
     }
 
     // ── File I/O helpers ────────────────────────────────────────────────────

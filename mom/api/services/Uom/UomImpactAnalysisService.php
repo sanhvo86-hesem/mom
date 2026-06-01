@@ -93,7 +93,8 @@ final class UomImpactAnalysisService
     {
         $rule = $this->db->queryOne(
             "SELECT id, rule_code, from_unit_code, to_unit_code,
-                    factor, offset_value, category, rule_version, lifecycle_status
+                    factor, offset_value, category,
+                    version AS rule_version, lifecycle_status
              FROM uom_conversion_rule WHERE id = :id",
             [':id' => $ruleId]
         );

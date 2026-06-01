@@ -6,6 +6,7 @@ namespace MOM\Services;
 
 use InvalidArgumentException;
 use MOM\Api\Services\ConnectedGovernanceService;
+use MOM\Api\Services\GateContextBuilder;
 use MOM\Api\Services\ManufacturingEventBackboneService;
 use MOM\Database\Connection;
 use MOM\Database\DataLayer;
@@ -74,6 +75,7 @@ final class ShopfloorExecutionService
         ?ManufacturingEventBackboneService $eventBackbone = null,
         ?ConnectedGovernanceService $connectedGovernance = null,
         ?GenealogyGraphService $genealogyGraph = null,
+        private readonly ?GateContextBuilder $gateContextBuilder = null,
     ) {
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->eventBackbone = $eventBackbone;
@@ -570,6 +572,18 @@ final class ShopfloorExecutionService
         if ($quantityTotal > 0 && $actualRun > 0.0) {
             $actualCycleTimeAvg = round($actualRun / $quantityTotal, 2);
         }
+        $runtimeRequirementGate = null;
+        if (
+            $this->gateContextBuilder !== null
+            && $quantityTotal > 0
+            && in_array((string)($target['status'] ?? ''), ['planned', 'dispatched'], true)
+        ) {
+            $runtimeRequirementGate = $this->gateContextBuilder->buildOrFail(
+                'StartJobCommand',
+                $this->startJobGatePayload($body, $target),
+                ['actor_id' => $operatorId]
+            );
+        }
         $qualityGate = $this->evaluateQualityGate($body, $target, $executionEventType, $quantityTotal, $actualRun, $hasPlannerOverride, $now);
         $traceability5MGate = $this->evaluateProductionTraceability5MGate(
             $body,
@@ -612,6 +626,7 @@ final class ShopfloorExecutionService
             'first_piece_required' => $this->truthy($target['first_piece_required'] ?? false),
             'quality_gate_policy' => $this->normalizeQualityGatePolicy($target['quality_gate_policy'] ?? null, $this->truthy($target['first_piece_required'] ?? false)),
             'quality_gate' => $qualityGate,
+            'runtime_requirement_gate' => $runtimeRequirementGate,
             'quality_override_reason' => $this->stringValue($body['quality_override_reason'] ?? ''),
             'traceability_5m_gate' => $traceability5MGate,
             'material_lot_number' => (string)($target['material_lot_number'] ?? ''),
@@ -675,6 +690,39 @@ final class ShopfloorExecutionService
         $log['advisory_projection'] = $this->buildAdvisoryProjection($log, $target);
 
         return $log;
+    }
+
+    /**
+     * @param array<string,mixed> $body
+     * @param array<string,mixed> $target
+     * @return array<string,mixed>
+     */
+    private function startJobGatePayload(array $body, array $target): array
+    {
+        $metadata = is_array($target['metadata'] ?? null) ? (array)$target['metadata'] : [];
+        $evidence = is_array($body['evidence'] ?? null) ? (array)$body['evidence'] : [];
+        if (is_array($metadata['evidence'] ?? null)) {
+            $evidence = array_merge((array)$metadata['evidence'], $evidence);
+        }
+
+        return array_merge($metadata, [
+            'target_id' => (string)($target['target_id'] ?? ''),
+            'wo_number' => (string)($target['wo_number'] ?? ''),
+            'jo_number' => (string)($target['jo_number'] ?? ''),
+            'operation_seq' => isset($target['operation_seq']) ? (string)$target['operation_seq'] : '',
+            'operation_id' => (string)($target['operation_id'] ?? ''),
+            'machine_id' => (string)($target['machine_id'] ?? ''),
+            'equipment_id' => (string)($target['equipment_id'] ?? $target['machine_id'] ?? ''),
+            'work_center_id' => (string)($target['work_center_id'] ?? ''),
+            'item_id' => (string)($target['item_id'] ?? ''),
+            'part_number' => (string)($target['part_number'] ?? $target['item_id'] ?? ''),
+            'site_id' => (string)($target['site_id'] ?? $target['org_site_id'] ?? ''),
+            'customer_id' => (string)($target['customer_id'] ?? ''),
+            'supplier_id' => (string)($target['supplier_id'] ?? ''),
+            'correlation_id' => (string)($body['idempotency_key'] ?? $target['target_id'] ?? ''),
+            'domain' => 'dispatch_report_production',
+            'evidence' => $evidence,
+        ]);
     }
 
     /**

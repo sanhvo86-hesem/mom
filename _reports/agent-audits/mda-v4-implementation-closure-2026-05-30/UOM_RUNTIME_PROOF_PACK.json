@@ -1,0 +1,44 @@
+{
+  "prompt_id": "P46",
+  "prompt_name": "UOM Measurement Authority Integration Closure",
+  "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
+  "date": "2026-05-31",
+  "posture": "pre-production runtime-readiness evidence; not production-ready",
+  "decision_token": "UOM_SYSTEM_SSOT_PASS",
+  "runtime_authority": {
+    "service": "MOM\\Api\\Services\\Uom\\UomRuntimeAuthorityService",
+    "command_adapter": "MOM\\Api\\Services\\DomainCommand\\UomCommandQuantityNormalizer",
+    "quality_measurement_authority": "MOM\\Api\\Services\\Uom\\QualityMeasurementAuthorityService",
+    "command_evidence_table": "domain_command_uom_measurement",
+    "measurement_thread_table": "uom_measurement_thread",
+    "forbidden_runtime_classes": [
+      "MOM\\Api\\Services\\MdaUomAuthorityBridge",
+      "MOM\\Api\\Services\\Uom\\QualityMeasurementBridge"
+    ]
+  },
+  "runtime_evidence_probe": {
+    "uom_system_ssot_guard": "PASS",
+    "runtime_scenarios_p58": "PASS_14_OF_14",
+    "forbidden_bridge_files_absent": "PASS",
+    "command_policy_count": 16,
+    "composer_test": "BLOCKED_MISSING_VENDOR_BIN_PHPUNIT",
+    "composer_analyse": "BLOCKED_MISSING_VENDOR_BIN_PHPSTAN"
+  },
+  "closed_blockers": [
+    "P0-UOM-AUTHORITY-AMBIGUITY",
+    "P46-BLOCK-CMD-001",
+    "P46-BLOCK-CMD-002",
+    "P46-BLOCK-CMD-003",
+    "P46-BLOCK-CMD-004",
+    "P46-BLOCK-CMD-005",
+    "P46-BLOCK-CMD-006",
+    "P46-BLOCK-CMD-007",
+    "P46-BLOCK-CMD-008"
+  ],
+  "remaining_non_uom_blockers": [
+    "postgres_restore_target_missing",
+    "live_vps_chrome_smoke_missing_or_failed",
+    "missing_local_composer_vendor_bins"
+  ],
+  "handoff": "Treat UOM as system-wide SSOT. New governed physical quantity writes must resolve through UomRuntimeAuthorityService and persist UOM evidence atomically before mutation."
+}

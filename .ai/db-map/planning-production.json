@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "planning_production",
         "table_count": 10,
-        "generated_at": "2026-05-30T07:47:09+00:00"
+        "generated_at": "2026-06-01T03:49:04+00:00"
     },
     "tables": {
         "aps_capacity_buckets": {
@@ -114,7 +114,8 @@
                 "113_audit_columns.sql",
                 "113_audit_columns.sql",
                 "113_audit_columns.sql",
-                "113_audit_columns.sql"
+                "113_audit_columns.sql",
+                "266_engineering_release_package_runtime_closure.sql"
             ],
             "primary_key": "job_order_id",
             "foreign_keys": [
@@ -187,7 +188,9 @@
         },
         "work_orders": {
             "defined_in": "084_execution_quality_projection.sql",
-            "extended_in": [],
+            "extended_in": [
+                "266_engineering_release_package_runtime_closure.sql"
+            ],
             "primary_key": "work_order_id",
             "foreign_keys": [
                 {

@@ -161,8 +161,280 @@ tags:
       Canonical portal-first EQMS control-plane endpoints for document control,
       form issuance/submission/finalization, evidence packages, publication
       monitor, audit packs, change authority, and genealogy graph reads.
+  - name: UoM Measurement Intelligence
+    description: |
+      Unit-of-measure conversion, unit catalog, quantity-kind, alias resolution,
+      external mapping, item policy, packaging, and health endpoints. Conversion
+      is a governed preview/read operation and never creates approved rules.
+  - name: Domain Commands
+    description: |
+      Runtime gateway for governed ERP/MOM/MES/eQMS mutations. All business
+      transitions that own execution truth must enter through
+      `/api/v1/domain-commands`; generic CRUD and workspaces are not mutation
+      authorities. Failures are returned as RFC 9457 Problem Details.
 
 paths:
+  # UoM Measurement Intelligence (contract-first P10)
+  /api/v1/uom/convert:
+    post:
+      operationId: uomConvertPreview
+      tags: [UoM Measurement Intelligence]
+      summary: Preview a governed unit conversion
+      description: |
+        Computes a conversion preview through the MOM/MES UoM service path.
+        This endpoint does not create or approve conversion rules. Contextual
+        conversions require explicit evidence such as density, potency, or
+        packaging policy fields. Errors use RFC 9457 Problem Details with
+        `type`, `title`, `status`, `detail`, `instance`, `trace_id`, `code`,
+        `field_errors`, and `remediation`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: X-Trace-Id
+          in: header
+          required: false
+          schema: { type: string }
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema: { type: string }
+          description: Optional client key for replay-aware mutation-safe contract checks. Conversion remains preview-only.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [magnitude, from_unit, to_unit]
+              properties:
+                magnitude: { type: number }
+                from_unit: { type: string }
+                to_unit: { type: string }
+                item_id: { type: string }
+                domain: { type: string }
+                density_value: { type: number }
+                density_unit: { type: string }
+                potency_value: { type: number }
+                potency_unit: { type: string }
+                packaging_level: { type: string }
+                linked_record_type: { type: string }
+                linked_record_id: { type: string }
+              additionalProperties: true
+      responses:
+        '200':
+          description: Conversion preview result with measurement evidence.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/uom/units:
+    get:
+      operationId: uomUnitsList
+      tags: [UoM Measurement Intelligence]
+      summary: List canonical units
+      description: Read-only canonical UoM catalog endpoint.
+      responses:
+        '200':
+          description: Canonical unit list.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/uom/units/{code}:
+    parameters:
+      - name: code
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: uomUnitDetail
+      tags: [UoM Measurement Intelligence]
+      summary: Get canonical unit detail
+      description: Read-only detail for a canonical UoM code.
+      responses:
+        '200':
+          description: Unit detail.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/uom/kinds:
+    get:
+      operationId: uomKindsList
+      tags: [UoM Measurement Intelligence]
+      summary: List quantity kinds
+      description: Read-only quantity-kind catalog including compatibility governance.
+      responses:
+        '200':
+          description: Quantity-kind list.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/uom/rules:
+    get:
+      operationId: uomRulesList
+      tags: [UoM Measurement Intelligence]
+      summary: List conversion rules
+      description: Read-only rule catalog. Rule submission, approval, and activation are governed outside this preview API.
+      responses:
+        '200':
+          description: Conversion rule list.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/uom/aliases/resolve:
+    post:
+      operationId: uomAliasResolve
+      tags: [UoM Measurement Intelligence]
+      summary: Resolve or quarantine an external alias
+      description: |
+        Resolves an alias without silently inventing authority. Ambiguous or
+        unsafe aliases return structured quarantine data including `ambiguous`
+        and `quarantine_id`; the `uom.alias.quarantined` event contract is
+        defined in `mom/data/registry/uom-event-contracts.json`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: X-Trace-Id
+          in: header
+          required: false
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [alias]
+              properties:
+                alias: { type: string }
+                source_system: { type: string }
+                context: { type: object, additionalProperties: true }
+              additionalProperties: true
+      responses:
+        '200':
+          description: Alias resolution or quarantine result.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [resolved, ambiguous, quarantined, unknown]
+                  ambiguous:
+                    type: boolean
+                  quarantine_id:
+                    type: string
+                additionalProperties: true
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/uom/external-map/{system}/{code}:
+    parameters:
+      - name: system
+        in: path
+        required: true
+        schema: { type: string }
+      - name: code
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: uomExternalMapResolve
+      tags: [UoM Measurement Intelligence]
+      summary: Resolve an external unit map
+      description: Read-only external-system code mapping lookup.
+      responses:
+        '200':
+          description: External map resolution.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/uom/health:
+    get:
+      operationId: uomHealth
+      tags: [UoM Measurement Intelligence]
+      summary: Check UoM service health
+      description: Read-only service readiness and registry health check.
+      responses:
+        '200':
+          description: UoM service health.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/uom/item-policy/{item_id}:
+    parameters:
+      - name: item_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: uomItemPolicyGet
+      tags: [UoM Measurement Intelligence]
+      summary: Get item UoM policy
+      description: Read-only item UoM policy resolved through the governed priority chain.
+      responses:
+        '200':
+          description: Item UoM policy result.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/uom/item-packaging/{item_id}:
+    parameters:
+      - name: item_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: uomItemPackagingGet
+      tags: [UoM Measurement Intelligence]
+      summary: Get item packaging policy
+      description: Read-only item packaging resolution for contextual packaging conversions.
+      responses:
+        '200':
+          description: Item packaging policy result.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   # Transactional plural-form canonical paths (ADR-0008, Stream C.2)
   /api/v1/sales-orders:
     get:
@@ -7050,6 +7322,193 @@ paths:
 # COMPONENTS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+  /api/v1/domain-commands:
+    post:
+      operationId: submitDomainCommand
+      tags:
+        - Domain Commands
+      summary: Submit a governed domain command
+      description: >
+        Fail-closed command gateway for governed ERP/MOM/MES/eQMS mutations.
+        Unknown or unimplemented commands return RFC 9457 Problem Details and
+        perform no business mutation. Implemented commands run through
+        PostgreSQL transaction authority, idempotency replay, security boundary,
+        regulated evidence, audit, and outbox paths. Caller-provided readiness,
+        hold, UOM, tool/gage, inventory, or release state is not trusted as
+        authority; the command handler resolves those requirements from
+        PostgreSQL-backed services.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+          description: Required replay key. Also accepted in the JSON envelope for legacy clients, but the header remains the HTTP contract.
+        - in: header
+          name: X-CSRF-Token
+          required: true
+          schema:
+            type: string
+          description: CSRF token for session-authenticated state-changing command submission.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainCommandEnvelope'
+            examples:
+              startJob:
+                summary: Start a job through MES runtime gates.
+                value:
+                  command_name: StartJobCommand
+                  idempotency_key: idem-startjob-001
+                  actor_id: operator-1
+                  actor_roles: [operator]
+                  actor_scope:
+                    site_ids: [SITE-1]
+                    plant_ids: [PLANT-1]
+                  payload:
+                    work_order_ref: WO-1001
+                    operation_seq: "10"
+                    equipment_id: MILL-1
+                    machine_family: VMC
+                    item_id: PART-1
+                    tool_id: TOOL-1
+              reportToolBreakage:
+                summary: Report tool breakage and start canonical containment.
+                value:
+                  command_name: ReportToolBreakageCommand
+                  idempotency_key: idem-breakage-001
+                  actor_id: operator-1
+                  actor_roles: [operator]
+                  payload:
+                    tool_id: TOOL-1
+                    work_order_ref: WO-1001
+                    equipment_id: MILL-1
+                    detected_piece_no: 50
+                    last_good_piece_no: 30
+                    affected_lots: [LOT-31-50]
+                    signature_event_id: 00000000-0000-0000-0000-000000000901
+      responses:
+        '202':
+          description: Command accepted and executed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainCommandSubmitResponse'
+        '200':
+          description: Idempotent replay of a completed command.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainCommandSubmitResponse'
+        '400':
+          $ref: '#/components/responses/DomainCommandBadRequestProblem'
+        '403':
+          $ref: '#/components/responses/DomainCommandForbiddenProblem'
+        '404':
+          $ref: '#/components/responses/DomainCommandNotFoundProblem'
+        '409':
+          $ref: '#/components/responses/DomainCommandConflictProblem'
+        '501':
+          $ref: '#/components/responses/DomainCommandNotImplementedProblem'
+
+  /api/v1/domain-commands/registry:
+    get:
+      operationId: listDomainCommandRegistry
+      tags:
+        - Domain Commands
+      summary: List governed command registry entries
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Command registry returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, registry]
+                properties:
+                  ok:
+                    type: boolean
+                  registry:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/DomainCommandRegistryEntry'
+
+  /api/v1/domain-commands/signature-challenges:
+    post:
+      operationId: issueDomainCommandSignatureChallenge
+      tags:
+        - Domain Commands
+      summary: Issue a server-authoritative e-signature challenge for a regulated command
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: false
+          schema:
+            type: string
+        - in: header
+          name: X-CSRF-Token
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainCommandSignatureChallengeRequest'
+      responses:
+        '201':
+          description: Signature challenge issued.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          $ref: '#/components/responses/DomainCommandBadRequestProblem'
+        '409':
+          $ref: '#/components/responses/DomainCommandConflictProblem'
+
+  /api/v1/domain-commands/signature-manifestations:
+    get:
+      operationId: listDomainCommandSignatureManifestations
+      tags:
+        - Domain Commands
+      summary: Retrieve signature manifestations linked to a command record
+      security:
+        - sessionCookie: []
+      parameters:
+        - in: query
+          name: record_type
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: record_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Signature manifestations returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          $ref: '#/components/responses/DomainCommandBadRequestProblem'
+
 components:
   securitySchemes:
     sessionCookie:
@@ -7142,6 +7601,143 @@ components:
           type: string
           format: date-time
           description: Server UTC timestamp (ISO 8601).
+
+    DomainCommandEnvelope:
+      type: object
+      required: [command_name, payload]
+      additionalProperties: true
+      properties:
+        command_name:
+          type: string
+          enum:
+            - CreateItemCommand
+            - CreateItemRevisionCommand
+            - ReleaseItemRevisionCommand
+            - CreateEngineeringReleasePackageCommand
+            - ReleaseEngineeringReleasePackageCommand
+            - AddPackageMemberCommand
+            - SubmitEngineeringReleasePackageCommand
+            - ApproveEngineeringReleasePackageCommand
+            - SupersedeEngineeringReleasePackageCommand
+            - WithdrawEngineeringReleasePackageCommand
+            - BindEngineeringPackageToWorkOrderCommand
+            - BindEngineeringPackageToJobOrderCommand
+            - BindEngineeringPackageToSalesOrderCommand
+            - ReleaseWorkOrderCommand
+            - StartJobCommand
+            - IssueMaterialToWorkOrderCommand
+            - LoadToolCommand
+            - RecordInspectionResultCommand
+            - CompleteOperationCommand
+            - ApplyQualityHoldCommand
+            - ReleaseQualityHoldCommand
+            - RecordMrbDispositionCommand
+            - ReceiveInventoryCommand
+            - PutawayInventoryCommand
+            - MoveInventoryCommand
+            - SplitLotCommand
+            - MergeLotCommand
+            - CompleteToStockCommand
+            - ScrapInventoryCommand
+            - ReworkInventoryCommand
+            - AdjustInventoryWithApprovalCommand
+            - CloseInventoryPeriodCommand
+            - RunInventoryReconciliationCommand
+            - ExportRecallTraceCommand
+            - ReportToolBreakageCommand
+            - GageOOTInvestigationCommand
+            - PostInventoryLedgerTransactionCommand
+          description: Governed command registered by `CommandRegistry`. Unimplemented registered commands fail closed.
+        idempotency_key:
+          type: string
+          description: Replay key copied from the Idempotency-Key header when omitted.
+        actor_id:
+          type: string
+          description: Authenticated actor. Server auth context remains authoritative.
+        actor_roles:
+          type: array
+          items:
+            type: string
+          description: Actor roles resolved from session; caller-supplied values are constrained by server auth.
+        actor_scope:
+          type: object
+          description: Object authorization scope used by the security boundary for site/plant-limited mutations.
+          properties:
+            org_ids:
+              type: array
+              items: { type: string }
+            site_ids:
+              type: array
+              items: { type: string }
+            plant_ids:
+              type: array
+              items: { type: string }
+          additionalProperties: true
+        payload:
+          type: object
+          additionalProperties: true
+          description: Command payload. Runtime requirements are resolved by command handlers from PostgreSQL authority, not trusted from caller-provided flags.
+
+    DomainCommandSubmitResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          required: [domain_command]
+          properties:
+            domain_command:
+              type: object
+              required: [accepted, command_name, replayed, payload]
+              properties:
+                accepted:
+                  type: boolean
+                command_name:
+                  type: string
+                replayed:
+                  type: boolean
+                stored_at:
+                  type: string
+                payload:
+                  type: object
+                  additionalProperties: true
+
+    DomainCommandRegistryEntry:
+      type: object
+      required: [root, permission, regulated_action, idempotency_scope, openapi_operation, expected_events, implemented]
+      properties:
+        root:
+          type: string
+        permission:
+          type: string
+        regulated_action:
+          type: boolean
+        idempotency_scope:
+          type: string
+        openapi_operation:
+          type: string
+          const: submitDomainCommand
+        expected_events:
+          type: array
+          items:
+            type: string
+        implemented:
+          type: boolean
+
+    DomainCommandSignatureChallengeRequest:
+      type: object
+      required: [command_name, signature_meaning, payload]
+      additionalProperties: true
+      properties:
+        command_name:
+          type: string
+        signature_meaning:
+          type: string
+        actor_id:
+          type: string
+        idempotency_key:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true
 
     RegistryDocumentEnvelope:
       allOf:
@@ -9142,6 +9738,10 @@ components:
         trace_id:
           type: string
           description: Distributed trace identifier for correlation.
+        details:
+          type: object
+          additionalProperties: true
+          description: Machine-readable extension members for gate blockers, affected subjects, evidence requirements, or security scope.
         current_etag:
           type: string
           description: Current ETag value when a concurrency conflict occurs.
@@ -9160,6 +9760,15 @@ components:
                 type: string
                 description: Machine-readable validation error code.
           description: Detailed validation errors for 422 responses.
+        field_errors:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          description: Field-level validation details returned by UoM and contract-first APIs.
+        remediation:
+          type: string
+          description: Operator-safe remediation guidance for the failed request.
 
     # ── Foundation Items ──
 
@@ -10145,6 +10754,111 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
+
+    DomainCommandBadRequestProblem:
+      description: Domain command envelope or required field validation failed.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          examples:
+            commandNameRequired:
+              summary: Missing command name.
+              value:
+                type: urn:hesem:problem:domain-command:command-name-required
+                title: Command Name Required
+                status: 400
+                detail: Command name is required.
+                code: command_name_required
+                trace_id: trace-123
+
+    DomainCommandForbiddenProblem:
+      description: Actor is not authorized, AI actor is blocked, SoD failed, or object/property scope is denied.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          examples:
+            objectScopeDenied:
+              summary: Site or plant object scope denied.
+              value:
+                type: urn:hesem:problem:domain-command:object-scope-denied
+                title: Object Scope Denied
+                status: 403
+                detail: Actor is not authorized for the target site.
+                code: object_scope_denied
+                details:
+                  target_site: SITE-2
+
+    DomainCommandNotFoundProblem:
+      description: Command is not registered in the governed command registry.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          examples:
+            unknownCommand:
+              value:
+                type: urn:hesem:problem:domain-command:unknown-command
+                title: Unknown Command
+                status: 404
+                detail: Command 'UnsafeDirectMutationCommand' is not registered.
+                code: unknown_command
+
+    DomainCommandConflictProblem:
+      description: Command was rejected by idempotency, readiness, quality hold, UOM authority, regulated evidence, e-signature, tooling/gage, inventory, or release gate.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          examples:
+            readinessBlocked:
+              value:
+                type: urn:hesem:problem:domain-command:resource-readiness-blocked
+                title: Resource Readiness Blocked
+                status: 409
+                detail: Resource readiness blocks this command.
+                code: resource_readiness_blocked
+                details:
+                  blockers:
+                    - evidence_key: tool_life
+                      code: readiness_evidence_missing
+            qualityHoldActive:
+              value:
+                type: urn:hesem:problem:domain-command:quality-hold-active
+                title: Quality Hold Active
+                status: 409
+                detail: Canonical quality hold blocks this command.
+                code: quality_hold_active
+            idempotencyConflict:
+              value:
+                type: urn:hesem:problem:domain-command:idempotency-conflict
+                title: Idempotency Conflict
+                status: 409
+                detail: Idempotency key was reused with a different command payload.
+                code: idempotency_conflict
+            regulatedEvidenceMissing:
+              value:
+                type: urn:hesem:problem:domain-command:regulated-evidence-missing
+                title: Regulated Evidence Missing
+                status: 409
+                detail: Required regulated evidence or signature is missing.
+                code: regulated_evidence_missing
+
+    DomainCommandNotImplementedProblem:
+      description: Command is registered for contract visibility but no runtime handler is wired.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          examples:
+            handlerMissing:
+              value:
+                type: urn:hesem:problem:domain-command:command-handler-not-runtime-complete
+                title: Command Handler Not Runtime Complete
+                status: 501
+                detail: Command 'CreateItemCommand' is registered but its runtime handler is not yet wired.
+                code: command_handler_not_runtime_complete
 
     BadRequestProblem:
       description: Bad request -- the request body or parameters are invalid.

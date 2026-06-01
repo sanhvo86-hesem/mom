@@ -1,0 +1,7 @@
+gap_id,severity,status,evidence,owner_prompt,next_step
+P0-MISSING-DOMAIN-COMMAND-GATEWAY,P0,closed,"DomainCommandGateway validates registry, actor, permission, idempotency, implementation status, then dispatches implemented handlers.",P49,"P50/P51 harden security/evidence middleware around gateway"
+P0-UNKNOWN-GOVERNED-COMMAND-MUTATION,P0,closed,"Unknown command probe returns unknown_command 404 before handler execution.",P49,"Keep Generic CRUD hard stop active"
+P0-IDEMPOTENCY-UNDEFINED,P0,closed_for_gateway,"Gateway uses PostgresIdempotencyReplayRepository with request fingerprint; replay and conflict probes pass.",P49,"P58 must run real DB replay scenario"
+P1-CORE-COMMANDS-NOT-ALL-IMPLEMENTED,P1,fail_closed,"Registry includes P49 core commands; non-engineering commands return command_handler_not_runtime_complete.",P52/P53/P54/P55/P56,"Implement each domain command only with transaction/audit/evidence/outbox proof"
+P1-LEGACY-ROUTE-BYPASS,P1,open,"Existing order/mobile/quality routes still exist; DB triggers and P47 gates mitigate but route-by-route migration remains.",P52/P55/P58,"Add command-stack scenarios proving legacy routes cannot bypass"
+P1-LOCAL-VALIDATION-DEPENDENCIES,P1,blocked,"composer test/analyse/check cannot run because vendor/bin/phpunit and vendor/bin/phpstan are missing.",release,"Restore dependencies or use CI evidence"

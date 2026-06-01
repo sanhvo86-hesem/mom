@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Api\Controllers\BaseController;
+use MOM\Api\Services\GateContextBuilder;
+use MOM\Api\Services\RuntimeRequirementGateException;
+use MOM\Api\Services\RuntimeRequirementResolverService;
+use MOM\Api\Services\Uom\UomRuntimeAuthorityService;
 use MOM\Api\Services\WorkforceQualificationException;
+use MOM\Database\Connection;
 use MOM\Services\MobileWorkQueueService;
 use Throwable;
 
@@ -39,7 +44,12 @@ class MobileController extends BaseController
     private function mobileService(): MobileWorkQueueService
     {
         if ($this->mobileSvc === null) {
-            $this->mobileSvc = new MobileWorkQueueService($this->dataDir, $this->data);
+            $db = Connection::getInstance();
+            $gateContextBuilder = new GateContextBuilder(
+                new RuntimeRequirementResolverService($db),
+                new UomRuntimeAuthorityService($db)
+            );
+            $this->mobileSvc = new MobileWorkQueueService($this->dataDir, $this->data, null, $gateContextBuilder);
         }
         return $this->mobileSvc;
     }
@@ -238,6 +248,10 @@ class MobileController extends BaseController
         } catch (WorkforceQualificationException $e) {
             $this->error($e->reasonCode(), 403, $e->getMessage(), [
                 'qualification_gate' => $e->details(),
+            ]);
+        } catch (RuntimeRequirementGateException $e) {
+            $this->error($e->reasonCode(), 409, $e->getMessage(), [
+                'runtime_requirement_gate' => $e->gateContext(),
             ]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);

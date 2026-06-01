@@ -1,0 +1,112 @@
+{
+  "prompt": "P54",
+  "title": "Inventory, Lot, Serial, Genealogy, WIP, and Cost Ledger Runtime Closure",
+  "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
+  "date": "2026-05-31",
+  "posture": "pre-production runtime-readiness evidence; not production-ready",
+  "decision_token": "P54_PASS_WITH_CONTROLLED_GAPS_READY_FOR_P55",
+  "authority_paths": {
+    "inventory_mutation": "DomainCommandGateway -> InventoryCommandHandler -> inventory_ledger/wip_ledger/cost_ledger",
+    "uom": "InventoryCommandHandler -> UomCommandQuantityNormalizer -> UomRuntimeAuthorityService",
+    "quality_hold": "InventoryCommandHandler -> QualityHoldService",
+    "projection": "stock_balances/inventory_balance_snapshot/location_balance are guarded projections"
+  },
+  "runtime_probe": {
+    "command": "php /private/tmp/inventory_probe.php",
+    "exit_code": 0,
+    "output": {
+      "held_lot": {
+        "problem": "quality_hold_active",
+        "ledger_writes": 0,
+        "uom_writes": 0
+      },
+      "expired_lot": {
+        "problem": "inventory_lot_expired",
+        "ledger_writes": 0
+      },
+      "split_lot": {
+        "ledger_rows": 2,
+        "genealogy_writes": 1,
+        "projection_writes": 0
+      },
+      "period_close": {
+        "problem": "inventory_reconciliation_mismatch",
+        "mismatch_writes": 1,
+        "period_close_writes": 0
+      }
+    }
+  },
+  "files_changed": [
+    "mom/database/migrations/271_inventory_ledger_runtime_authority.sql",
+    "mom/api/services/DomainCommand/InventoryCommandHandler.php",
+    "mom/api/services/DomainCommand/DomainCommandGateway.php",
+    "mom/api/services/DomainCommand/CommandRegistry.php",
+    "mom/api/services/DomainCommand/RegulatedActionPolicy.php",
+    "mom/api/services/Uom/UomRuntimeAuthorityService.php",
+    "mom/tests/Unit/Services/DomainCommandInventoryCommandHandlerTest.php",
+    "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_INVENTORY_LEDGER_CLOSURE_REPORT.md",
+    "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_INVENTORY_LEDGER_PROOF_PACK.json",
+    "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_P54_GAP_LEDGER_UPDATE.csv",
+    "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P54.md"
+  ],
+  "validation": [
+    {
+      "command": "php -l mom/api/services/DomainCommand/InventoryCommandHandler.php",
+      "status": "pass"
+    },
+    {
+      "command": "php -l mom/api/services/DomainCommand/DomainCommandGateway.php",
+      "status": "pass"
+    },
+    {
+      "command": "php -l mom/api/services/DomainCommand/CommandRegistry.php",
+      "status": "pass"
+    },
+    {
+      "command": "php -l mom/api/services/DomainCommand/RegulatedActionPolicy.php",
+      "status": "pass"
+    },
+    {
+      "command": "php -l mom/api/services/Uom/UomRuntimeAuthorityService.php",
+      "status": "pass"
+    },
+    {
+      "command": "php -l mom/tests/Unit/Services/DomainCommandInventoryCommandHandlerTest.php",
+      "status": "pass"
+    },
+    {
+      "command": "php -l /private/tmp/inventory_probe.php",
+      "status": "pass"
+    },
+    {
+      "command": "php /private/tmp/inventory_probe.php",
+      "status": "pass"
+    },
+    {
+      "command": "php tools/scripts/ai-index/generate.php --verbose",
+      "status": "pass",
+      "summary": "97 controllers, 181 services, 251 migrations, 943 tables, 284 PHP classes"
+    },
+    {
+      "command": "composer --working-dir=mom run test",
+      "status": "blocked",
+      "blocker": "Could not open input file: vendor/bin/phpunit"
+    },
+    {
+      "command": "composer --working-dir=mom run analyse",
+      "status": "blocked",
+      "blocker": "Could not open input file: vendor/bin/phpstan"
+    },
+    {
+      "command": "composer --working-dir=mom run check",
+      "status": "blocked",
+      "blocker": "Could not open input file: vendor/bin/phpstan"
+    }
+  ],
+  "controlled_gaps": [
+    "Full recursive recall graph expansion remains a scenario-runner/control-tower task.",
+    "Cost ledger writes require caller/domain-provided cost context and are skipped when no cost amount is provided.",
+    "Full PHPUnit/PHPStan validation is blocked locally by missing Composer vendor binaries.",
+    "VPS migration/browser smoke is pending integration/deploy stage."
+  ]
+}

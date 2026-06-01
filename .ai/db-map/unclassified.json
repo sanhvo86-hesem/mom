@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 816,
-        "generated_at": "2026-05-30T07:47:09+00:00"
+        "table_count": 860,
+        "generated_at": "2026-06-01T03:49:04+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -1242,7 +1242,9 @@
         "cost_ledger": {
             "defined_in": "077_canonical_inventory_cost_traceability.sql",
             "extended_in": [
-                "091_runtime_governance_continuity.sql"
+                "091_runtime_governance_continuity.sql",
+                "271_inventory_ledger_runtime_authority.sql",
+                "275_uom_system_ssot_closure.sql"
             ],
             "primary_key": "cost_ledger_id",
             "foreign_keys": [],
@@ -1845,6 +1847,25 @@
                     "ref": "departments(dept_code)"
                 }
             ],
+            "contract": null
+        },
+        "domain_command_evidence_links": {
+            "defined_in": "267_regulated_domain_command_evidence_spine.sql",
+            "extended_in": [],
+            "primary_key": "evidence_link_id",
+            "foreign_keys": [
+                {
+                    "col": "signature_event_id",
+                    "ref": "signature_events(signature_event_id)"
+                }
+            ],
+            "contract": null
+        },
+        "domain_command_uom_measurement": {
+            "defined_in": "269_uom_domain_command_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "measurement_id",
+            "foreign_keys": [],
             "contract": null
         },
         "domain_outbox_events": {
@@ -2665,6 +2686,54 @@
                 {
                     "col": "linked_record_id",
                     "ref": "records(record_id)"
+                }
+            ],
+            "contract": null
+        },
+        "engineering_release_package": {
+            "defined_in": "266_engineering_release_package_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "package_id",
+            "foreign_keys": [
+                {
+                    "col": "superseded_by_package_id",
+                    "ref": "engineering_release_package(package_id)"
+                }
+            ],
+            "contract": null
+        },
+        "engineering_release_package_approval": {
+            "defined_in": "266_engineering_release_package_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "approval_id",
+            "foreign_keys": [
+                {
+                    "col": "package_id",
+                    "ref": "engineering_release_package(package_id)"
+                }
+            ],
+            "contract": null
+        },
+        "engineering_release_package_event": {
+            "defined_in": "266_engineering_release_package_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "package_event_id",
+            "foreign_keys": [
+                {
+                    "col": "package_id",
+                    "ref": "engineering_release_package(package_id)"
+                }
+            ],
+            "contract": null
+        },
+        "engineering_release_package_member": {
+            "defined_in": "266_engineering_release_package_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "member_id",
+            "foreign_keys": [
+                {
+                    "col": "package_id",
+                    "ref": "engineering_release_package(package_id)"
                 }
             ],
             "contract": null
@@ -4500,6 +4569,20 @@
             ],
             "contract": null
         },
+        "gage_oot_investigation_runtime": {
+            "defined_in": "272_tooling_gage_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "oot_runtime_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "gage_runtime_state": {
+            "defined_in": "272_tooling_gage_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "gage_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "genealogy_edge_facts": {
             "defined_in": "109_control_plane_cutover_hardening.sql",
             "extended_in": [
@@ -4560,6 +4643,13 @@
             "foreign_keys": [],
             "contract": null
         },
+        "generic_crud_denial_event": {
+            "defined_in": "254_governed_generic_crud_guard.sql",
+            "extended_in": [],
+            "primary_key": "denial_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "gl_transactions": {
             "defined_in": "015_finance.sql",
             "extended_in": [
@@ -4578,12 +4668,26 @@
             ],
             "contract": null
         },
+        "governed_entity_registry": {
+            "defined_in": "254_governed_generic_crud_guard.sql",
+            "extended_in": [],
+            "primary_key": "registry_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "governed_route_registry": {
             "defined_in": "109_control_plane_cutover_hardening.sql",
             "extended_in": [
                 "109_control_plane_cutover_hardening.sql"
             ],
             "primary_key": "governed_route_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "graphics_block_contract": {
+            "defined_in": "261_graphics_block_contract_l3.sql",
+            "extended_in": [],
+            "primary_key": "block_contract_id",
             "foreign_keys": [],
             "contract": null
         },
@@ -4620,6 +4724,13 @@
                     "ref": "graphics_token_catalog(token_key)"
                 }
             ],
+            "contract": null
+        },
+        "graphics_module_archetype": {
+            "defined_in": "262_graphics_module_archetype_l4.sql",
+            "extended_in": [],
+            "primary_key": "archetype_id",
+            "foreign_keys": [],
             "contract": null
         },
         "graphics_module_binding": {
@@ -5281,7 +5392,9 @@
         },
         "inventory_ledger": {
             "defined_in": "077_canonical_inventory_cost_traceability.sql",
-            "extended_in": [],
+            "extended_in": [
+                "271_inventory_ledger_runtime_authority.sql"
+            ],
             "primary_key": "inventory_ledger_id",
             "foreign_keys": [
                 {
@@ -5319,6 +5432,48 @@
                     "ref": "warehouses(warehouse_id)"
                 }
             ],
+            "contract": null
+        },
+        "inventory_period_close": {
+            "defined_in": "271_inventory_ledger_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "inventory_period_close_id",
+            "foreign_keys": [
+                {
+                    "col": "reconciliation_run_id",
+                    "ref": "inventory_reconciliation_run(reconciliation_run_id)"
+                },
+                {
+                    "col": "signature_event_id",
+                    "ref": "signature_events(signature_event_id)"
+                }
+            ],
+            "contract": null
+        },
+        "inventory_recall_trace_export": {
+            "defined_in": "271_inventory_ledger_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "recall_trace_export_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "inventory_reconciliation_mismatch": {
+            "defined_in": "271_inventory_ledger_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "mismatch_id",
+            "foreign_keys": [
+                {
+                    "col": "reconciliation_run_id",
+                    "ref": "inventory_reconciliation_run(reconciliation_run_id)"
+                }
+            ],
+            "contract": null
+        },
+        "inventory_reconciliation_run": {
+            "defined_in": "271_inventory_ledger_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "reconciliation_run_id",
+            "foreign_keys": [],
             "contract": null
         },
         "inventory_transactions": {
@@ -5409,7 +5564,9 @@
         },
         "item_packaging_policy": {
             "defined_in": "221_item_packaging_policy.sql",
-            "extended_in": [],
+            "extended_in": [
+                "260_uom_v5_contextual_conversion_contract.sql"
+            ],
             "primary_key": "id",
             "foreign_keys": [
                 {
@@ -6003,10 +6160,46 @@
             ],
             "contract": null
         },
+        "master_data_archive_store": {
+            "defined_in": "264_master_data_postgres_authority_bridge.sql",
+            "extended_in": [],
+            "primary_key": "archive_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "master_data_drift_snapshot": {
+            "defined_in": "264_master_data_postgres_authority_bridge.sql",
+            "extended_in": [],
+            "primary_key": "snapshot_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "master_data_fallback_telemetry": {
+            "defined_in": "264_master_data_postgres_authority_bridge.sql",
+            "extended_in": [],
+            "primary_key": "fallback_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "master_data_history_event": {
+            "defined_in": "264_master_data_postgres_authority_bridge.sql",
+            "extended_in": [],
+            "primary_key": "event_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "master_data_pending_change": {
+            "defined_in": "264_master_data_postgres_authority_bridge.sql",
+            "extended_in": [],
+            "primary_key": "pending_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "master_data_store": {
             "defined_in": "080_seed_master_data_from_json.sql",
             "extended_in": [
-                "091_runtime_governance_continuity.sql"
+                "091_runtime_governance_continuity.sql",
+                "264_master_data_postgres_authority_bridge.sql"
             ],
             "primary_key": "id",
             "foreign_keys": [],
@@ -6045,7 +6238,9 @@
         },
         "material_density_registry": {
             "defined_in": "222_material_density_registry.sql",
-            "extended_in": [],
+            "extended_in": [
+                "260_uom_v5_contextual_conversion_contract.sql"
+            ],
             "primary_key": "id",
             "foreign_keys": [
                 {
@@ -6079,6 +6274,20 @@
                     "ref": "users(user_id)"
                 }
             ],
+            "contract": null
+        },
+        "mda_runtime_control_tower_snapshot": {
+            "defined_in": "273_mda_runtime_telemetry_control_tower.sql",
+            "extended_in": [],
+            "primary_key": "snapshot_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "mda_runtime_telemetry_event": {
+            "defined_in": "273_mda_runtime_telemetry_control_tower.sql",
+            "extended_in": [],
+            "primary_key": "telemetry_event_id",
+            "foreign_keys": [],
             "contract": null
         },
         "mdm_approval_policies": {
@@ -6883,6 +7092,26 @@
             ],
             "contract": null
         },
+        "mrb_disposition_runtime": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "disposition_id",
+            "foreign_keys": [
+                {
+                    "col": "ncr_id",
+                    "ref": "quality_nonconformance_runtime(ncr_id)"
+                },
+                {
+                    "col": "hold_id",
+                    "ref": "quality_hold(hold_id)"
+                },
+                {
+                    "col": "signature_event_id",
+                    "ref": "signature_events(signature_event_id)"
+                }
+            ],
+            "contract": null
+        },
         "mrp_signal": {
             "defined_in": "075_canonical_planning_erp_orchestration.sql",
             "extended_in": [
@@ -7113,6 +7342,18 @@
                 {
                     "col": "received_by",
                     "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
+        "order_engineering_package_snapshot": {
+            "defined_in": "266_engineering_release_package_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "snapshot_id",
+            "foreign_keys": [
+                {
+                    "col": "package_id",
+                    "ref": "engineering_release_package(package_id)"
                 }
             ],
             "contract": null
@@ -9052,6 +9293,87 @@
             ],
             "contract": null
         },
+        "quality_case_trace_link": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "trace_link_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "quality_hold": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "hold_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "quality_hold_release": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "release_id",
+            "foreign_keys": [
+                {
+                    "col": "hold_id",
+                    "ref": "quality_hold(hold_id)"
+                },
+                {
+                    "col": "signature_event_id",
+                    "ref": "signature_events(signature_event_id)"
+                }
+            ],
+            "contract": null
+        },
+        "quality_hold_source": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "hold_source_id",
+            "foreign_keys": [
+                {
+                    "col": "hold_id",
+                    "ref": "quality_hold(hold_id)"
+                }
+            ],
+            "contract": null
+        },
+        "quality_hold_subject": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "hold_subject_id",
+            "foreign_keys": [
+                {
+                    "col": "hold_id",
+                    "ref": "quality_hold(hold_id)"
+                }
+            ],
+            "contract": null
+        },
+        "quality_inspection_result_runtime": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "result_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "quality_nonconformance_runtime": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "ncr_id",
+            "foreign_keys": [
+                {
+                    "col": "quality_order_id",
+                    "ref": "quality_order_runtime(quality_order_id)"
+                },
+                {
+                    "col": "hold_id",
+                    "ref": "quality_hold(hold_id)"
+                },
+                {
+                    "col": "source_result_id",
+                    "ref": "quality_inspection_result_runtime(result_id)"
+                }
+            ],
+            "contract": null
+        },
         "quality_order": {
             "defined_in": "078_canonical_eqms_compliance_backbone.sql",
             "extended_in": [
@@ -9062,6 +9384,18 @@
                 {
                     "col": "owner_party_id",
                     "ref": "party(party_id)"
+                }
+            ],
+            "contract": null
+        },
+        "quality_order_runtime": {
+            "defined_in": "270_quality_hold_eqms_transaction_chain.sql",
+            "extended_in": [],
+            "primary_key": "quality_order_id",
+            "foreign_keys": [
+                {
+                    "col": "source_result_id",
+                    "ref": "quality_inspection_result_runtime(result_id)"
                 }
             ],
             "contract": null
@@ -9181,6 +9515,25 @@
             ],
             "contract": null
         },
+        "regulated_action_policy": {
+            "defined_in": "267_regulated_domain_command_evidence_spine.sql",
+            "extended_in": [],
+            "primary_key": "policy_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "regulated_action_validation_protocol": {
+            "defined_in": "267_regulated_domain_command_evidence_spine.sql",
+            "extended_in": [],
+            "primary_key": "protocol_id",
+            "foreign_keys": [
+                {
+                    "col": "approved_signature_event_id",
+                    "ref": "signature_events(signature_event_id)"
+                }
+            ],
+            "contract": null
+        },
         "release_manifests": {
             "defined_in": "108_world_class_control_plane_execution.sql",
             "extended_in": [],
@@ -9199,6 +9552,20 @@
                     "ref": "users(user_id)"
                 }
             ],
+            "contract": null
+        },
+        "resource_readiness_evidence_state": {
+            "defined_in": "268_resource_readiness_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "evidence_state_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "resource_readiness_snapshot": {
+            "defined_in": "268_resource_readiness_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "readiness_snapshot_id",
+            "foreign_keys": [],
             "contract": null
         },
         "retention_class_assignment": {
@@ -9440,10 +9807,25 @@
             ],
             "contract": null
         },
+        "runtime_requirement_policy": {
+            "defined_in": "265_runtime_requirement_resolver.sql",
+            "extended_in": [],
+            "primary_key": "policy_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "runtime_requirement_snapshot": {
+            "defined_in": "265_runtime_requirement_resolver.sql",
+            "extended_in": [],
+            "primary_key": "snapshot_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "sales_order": {
             "defined_in": "075_canonical_planning_erp_orchestration.sql",
             "extended_in": [
-                "091_runtime_governance_continuity.sql"
+                "091_runtime_governance_continuity.sql",
+                "266_engineering_release_package_runtime_closure.sql"
             ],
             "primary_key": "sales_order_id",
             "foreign_keys": [
@@ -10806,6 +11188,25 @@
             ],
             "contract": null
         },
+        "tooling_breakage_containment": {
+            "defined_in": "272_tooling_gage_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "containment_id",
+            "foreign_keys": [
+                {
+                    "col": "breakage_event_id",
+                    "ref": "tooling_breakage_event(breakage_event_id)"
+                }
+            ],
+            "contract": null
+        },
+        "tooling_breakage_event": {
+            "defined_in": "272_tooling_gage_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "breakage_event_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "tooling_calibration_links": {
             "defined_in": "057_tooling_lifecycle_management.sql",
             "extended_in": [],
@@ -10921,7 +11322,8 @@
         "tooling_life_measurements": {
             "defined_in": "057_tooling_lifecycle_management.sql",
             "extended_in": [
-                "070_enterprise_governance_uplift.sql"
+                "070_enterprise_governance_uplift.sql",
+                "275_uom_system_ssot_closure.sql"
             ],
             "primary_key": "tooling_life_measurement_id",
             "foreign_keys": [
@@ -10944,7 +11346,8 @@
         "tooling_presets": {
             "defined_in": "057_tooling_lifecycle_management.sql",
             "extended_in": [
-                "070_enterprise_governance_uplift.sql"
+                "070_enterprise_governance_uplift.sql",
+                "275_uom_system_ssot_closure.sql"
             ],
             "primary_key": "tooling_preset_id",
             "foreign_keys": [
@@ -10975,6 +11378,13 @@
                     "ref": "vendors(vendor_id)"
                 }
             ],
+            "contract": null
+        },
+        "tooling_runtime_state": {
+            "defined_in": "272_tooling_gage_runtime_authority.sql",
+            "extended_in": [],
+            "primary_key": "tool_id",
+            "foreign_keys": [],
             "contract": null
         },
         "trace_dispatch_events": {
@@ -11487,7 +11897,9 @@
         },
         "uom_alias_quarantine": {
             "defined_in": "219_uom_alias.sql",
-            "extended_in": [],
+            "extended_in": [
+                "258_uom_v5_alias_quarantine_contract.sql"
+            ],
             "primary_key": "id",
             "foreign_keys": [
                 {
@@ -11558,9 +11970,23 @@
             "foreign_keys": [],
             "contract": null
         },
+        "uom_potency_assay_registry": {
+            "defined_in": "260_uom_v5_contextual_conversion_contract.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
         "uom_quantity_kind": {
             "defined_in": "214_uom_quantity_kind.sql",
-            "extended_in": [],
+            "extended_in": [
+                "259_uom_v5_quantity_kind_compatibility.sql"
+            ],
             "primary_key": "kind_code",
             "foreign_keys": [
                 {
@@ -11732,7 +12158,8 @@
         "wip_ledger": {
             "defined_in": "077_canonical_inventory_cost_traceability.sql",
             "extended_in": [
-                "091_runtime_governance_continuity.sql"
+                "091_runtime_governance_continuity.sql",
+                "271_inventory_ledger_runtime_authority.sql"
             ],
             "primary_key": "wip_ledger_id",
             "foreign_keys": [
@@ -12073,6 +12500,18 @@
                 {
                     "col": "operation_id",
                     "ref": "operation(operation_id)"
+                }
+            ],
+            "contract": null
+        },
+        "work_order_engineering_package_snapshot": {
+            "defined_in": "266_engineering_release_package_runtime_closure.sql",
+            "extended_in": [],
+            "primary_key": "snapshot_id",
+            "foreign_keys": [
+                {
+                    "col": "package_id",
+                    "ref": "engineering_release_package(package_id)"
                 }
             ],
             "contract": null

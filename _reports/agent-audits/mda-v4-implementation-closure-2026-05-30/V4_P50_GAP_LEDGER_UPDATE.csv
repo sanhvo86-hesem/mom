@@ -1,0 +1,9 @@
+gap_id,severity,status,evidence,owner_prompt,next_step
+P0-AI-GOVERNED-ACTION-ESCAPE,P0,closed,"AIActorFirewall blocks AI/copilot/LLM actors from governed domain commands; manual probe returns ai_governed_action_forbidden with denial audit.",P50,"Keep AI advisory routes outside mutation authority"
+P0-GOVERNED-COMMAND-SECURITY-MIDDLEWARE-MISSING,P0,closed_for_gateway,"DomainCommandGateway invokes SecurityBoundaryMiddleware before implementation status idempotency replay or handler execution.",P50,"P55/P58 must prove legacy routes cannot bypass equivalent controls"
+P1-BOLA-COVERAGE,P1,closed_for_gateway,"ObjectAuthorizationPolicy enforces site/plant scope and unit test covers cross-site denial.",P50,"Add controller/API integration test when vendor dependencies are restored"
+P1-SENSITIVE-PROPERTY-AUTHORIZATION,P1,closed_for_gateway,"PropertyAuthorizationPolicy recursively blocks sensitive cost/price fields without finance permission/role.",P50,"Extend field registry as domain-specific command handlers are implemented"
+P1-SOD-REAUTH-OT-TRUST,P1,closed_for_gateway,"SoD re-auth and OT trust policies deny unsafe regulated command envelopes before mutation.",P50,"P51/P56 must add e-signature meaning and evidence record hash"
+P1-SECURITY-DENIAL-OBSERVABILITY,P1,closed_for_gateway,"Denied commands write audit_events event_type domain_command.security_denied; manual probes show one audit event per denial.",P50,"P58 should add metrics and DB failure scenario"
+P1-LOCAL-VALIDATION-DEPENDENCIES,P1,blocked,"composer test/analyse/check cannot run because vendor/bin/phpunit and vendor/bin/phpstan are missing.",release,"Restore dependencies or use CI evidence"
+P1-LEGACY-ROUTE-BYPASS,P1,open,"Gateway commands are protected but old order/mobile/quality routes still require route-by-route proof.",P55/P58,"Migrate or wrap legacy routes with equivalent command/security boundary"

@@ -1,0 +1,48 @@
+{
+  "schema_version": "uom-vertical-packs.v1",
+  "posture": "development/prototype -> pre-production readiness candidate",
+  "packs": {
+    "electronics": {
+      "quantity_kinds": ["Length", "ElectricCurrent", "Voltage", "Resistance", "TemperatureDifference"],
+      "allowed_units": ["mm", "um", "A", "mA", "V", "mV", "ohm", "Cel"],
+      "contextual_rules": ["device_display", "inspection_tolerance"],
+      "validation_needs": ["MSA evidence", "inspection copy", "device unit map"]
+    },
+    "metal_mechanical": {
+      "quantity_kinds": ["Length", "Mass", "Pressure", "Torque", "TemperatureDifference"],
+      "allowed_units": ["mm", "inch", "kg", "lb", "bar", "N_m", "Cel"],
+      "contextual_rules": ["affine_temperature", "supplier_alias", "machine_sensor_unit"],
+      "validation_needs": ["FAI evidence", "tool offset units", "lot genealogy drill-through"]
+    },
+    "food_beverage": {
+      "quantity_kinds": ["Mass", "Volume", "TemperatureDifference", "ConcentrationPercentage"],
+      "allowed_units": ["kg", "g", "L", "mL", "Cel", "percent"],
+      "contextual_rules": ["density_based", "batch_recipe_scaling"],
+      "validation_needs": ["batch record", "recipe scaling", "allergen/lot traceability"]
+    },
+    "pharma_biotech": {
+      "quantity_kinds": ["Mass", "Volume", "PotencyUnit", "Molarity", "TemperatureDifference"],
+      "allowed_units": ["mg", "ug", "mL", "L", "IU", "mol_L", "Cel"],
+      "contextual_rules": ["potency_assay", "lot_specific_evidence", "controlled_release"],
+      "validation_needs": ["Part 11 evidence", "Annex 11 evidence", "lot potency certificate"]
+    },
+    "medical_device": {
+      "quantity_kinds": ["Length", "Mass", "Force", "Pressure", "TemperatureDifference"],
+      "allowed_units": ["mm", "um", "g", "N", "kPa", "Cel"],
+      "contextual_rules": ["inspection_tolerance", "device_calibration_unit"],
+      "validation_needs": ["DHR evidence", "calibration traceability", "inspection copy"]
+    },
+    "chemical": {
+      "quantity_kinds": ["Mass", "Volume", "Molarity", "MassConcentration", "Pressure"],
+      "allowed_units": ["kg", "g", "L", "mL", "mol_L", "kg_L", "bar"],
+      "contextual_rules": ["density_based", "concentration_context", "temperature_pressure_context"],
+      "validation_needs": ["COA evidence", "density source", "temperature/pressure context"]
+    },
+    "apparel": {
+      "quantity_kinds": ["Length", "Area", "CountOrQuantity", "Mass"],
+      "allowed_units": ["m", "cm", "mm", "m2", "EA", "kg", "g"],
+      "contextual_rules": ["roll_length", "size_table_context", "packaging_policy"],
+      "validation_needs": ["size spec evidence", "roll lot traceability", "customer display unit policy"]
+    }
+  }
+}
