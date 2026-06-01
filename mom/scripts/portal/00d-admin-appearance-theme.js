@@ -272,7 +272,7 @@
   var _tpDraft = null;
   var _tpWarmed = false;
   function _tpBlank(){
-    return { preset_key:'', display_name_vi:'', display_name_en:'', brand:'#1565c0',
+    return { preset_key:'', display_name_vi:'', display_name_en:'', brand:'#0c4a6e',
       density_px:8, radius_outer_px:8, radius_inner_px:4, control_h_px:32, frame_px:8, is_builtin:false, _new:true };
   }
   function _tpFromTheme(key){
@@ -281,7 +281,7 @@
     var outer = (th.radius != null) ? th.radius : 8;
     return { preset_key:key,
       display_name_vi:(th.label && th.label.vi) || key, display_name_en:(th.label && th.label.en) || key,
-      brand:th.brand || '#1565c0', density_px:(th.density != null) ? th.density : 8,
+      brand:th.brand || '#0c4a6e', density_px:(th.density != null) ? th.density : 8,
       radius_outer_px:outer, radius_inner_px:(th.radiusInner != null) ? th.radiusInner : Math.max(2, Math.round(outer/2)),
       control_h_px:(th.controlH != null) ? th.controlH : 32, frame_px:(th.frame != null) ? th.frame : ((th.density != null) ? th.density : 8),
       is_builtin:!!th._builtin, _new:false };
