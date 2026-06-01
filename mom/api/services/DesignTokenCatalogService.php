@@ -656,9 +656,9 @@ final class DesignTokenCatalogService
         if (!in_array($scopeType, ['organization', 'tenant', 'role', 'user', 'module'], true)) {
             $scopeType = 'organization';
         }
-        $brand = (string)($in['brand'] ?? '#1565c0');
+        $brand = (string)($in['brand'] ?? '#0c4a6e');
         if (!preg_match('/^#[0-9a-fA-F]{6}$/', $brand)) {
-            $brand = '#1565c0';
+            $brand = '#0c4a6e';
         }
         $en = trim((string)($in['display_name_en'] ?? $key));
         $vi = trim((string)($in['display_name_vi'] ?? $en));
@@ -694,9 +694,9 @@ final class DesignTokenCatalogService
             ];
         };
         return [
-            $mk('hesem-default', 'HESEM Default', 'HESEM mặc định', '#1565c0', 8, 8, 4, 32, 8, true, 10),
-            $mk('industrial-dense', 'Industrial Dense', 'Công nghiệp dày', '#1565c0', 6, 4, 2, 28, 6, false, 20),
-            $mk('comfortable', 'Comfortable', 'Thoáng', '#1565c0', 12, 10, 5, 36, 12, false, 30),
+            $mk('hesem-default', 'HESEM Default', 'HESEM mặc định', '#0c4a6e', 8, 8, 4, 32, 8, true, 10),
+            $mk('industrial-dense', 'Industrial Dense', 'Công nghiệp dày', '#0c4a6e', 6, 4, 2, 28, 6, false, 20),
+            $mk('comfortable', 'Comfortable', 'Thoáng', '#0c4a6e', 12, 10, 5, 36, 12, false, 30),
             $mk('shop-floor', 'Shop-floor (touch)', 'Xưởng (cảm ứng)', '#0f766e', 10, 8, 4, 44, 10, false, 40),
             $mk('violet', 'Violet', 'Tím', '#7c3aed', 8, 8, 4, 32, 8, false, 50),
             $mk('slate', 'Slate', 'Xám đen', '#334155', 8, 6, 3, 32, 8, false, 60),
