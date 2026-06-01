@@ -94,3 +94,13 @@ Ghi chú binding: `dataSource.api` là action-key. `notInGenericCatalog` = khôn
 - **Gate:** `mom/tools/release/check_module_manifest.php` wired vào CI `graphics-safety` (job step 4). Reject (P0) cho packet MỚI: hex/px literal, inline `"style"`, raw HTML, density-px override, dotted `block_key` chưa published trong L3 registry. Advisory: thiếu `a11yProfile`/`previewScene`.
 - **Grandfather:** `M2-orders.json` + `M4-purchasing.json` allowlisted → findings advisory, gate xanh. Packet MỚI (ngoài allowlist) bị block ngay. Thu allowlist dần khi migrate.
 - **Trigger:** `smart-classify.sh` set `needs_graphics_safety=true` khi đụng `build-packets/**`, schema, hoặc checker. A thêm/sửa manifest sẽ tự chạy gate.
+
+---
+
+### B→A (2026-06-02) — FIX: snapshot/registry reads nay ĐỌC DB thật (PDO $N defeat)
+**Audit phát hiện:** `DesignTokenCatalogService` còn dùng `$N` placeholder → `DataLayer` bind theo key mảng → `bindValue Argument #1 must be >= 1` → mọi read/write `$N` **nuốt catch → fallback**. ⇒ `graphics_token_catalog_snapshot` TỪ TRƯỚC tới giờ trả **JSON config**, KHÔNG phải graphics_token_value (P0.B2 chưa thật sự áp); `graphics_block_contract_list`/`graphics_module_archetype_list` trả rỗng; save trả fallback `{key}` thay full row.
+**Fix:** chuyển hết `$N`→`?`+pgParams (1-indexed). **Tác động FE cần biết:**
+- `graphics_token_catalog_snapshot` nay trả ~**143 governed key từ DB** (graphics_token_value) thay ~353 key JSON. `tokens.read` cho ~210 key ngoài-catalog **vẫn rơi `HmTheme.getDeep`** (fallback 00bb:145 GIỮ NGUYÊN — chưa cắt). 143 key shared: giá trị DB==JSON (diverge=0) → không nhảy màu/size. CSS var vẫn do HmTheme áp → render không đổi.
+- `graphics_block_contract_list`/`graphics_module_archetype_list`/`graphics_component_contract_save`/`_block_/_archetype_` nay trả **rows/full row thật** (trước rỗng/fallback).
+- Graphics rollout write (stage/apply/rollback) + simulation-run nay **persist DB thật** (trước no-op) — FE Theme UI nên E2E lại flow rollout.
+- **A re-verify Chrome:** portal load sạch console, brand #0c4a6e / control 32px không đổi, Module Studio L3/L4 library đọc list mới có data.
