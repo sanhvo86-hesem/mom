@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Module Studio — Production shell · HESEM MOM</title>
+<style>
+  :root{
+    --brand:#0c4a6e;--brand-2:#0a3a57;--brand-soft:#e6f3fb;--brand-line:#bfe0f2;--on-brand:#fff;
+    --ok:#15803d;--ok-soft:#dcfce7;--warn:#b45309;--warn-soft:#fef3c7;--danger:#b91c1c;--danger-soft:#fde8e8;
+    --bg:#eef2f6;--surface:#fff;--muted:#f6f8fa;--alt:#eef2f6;
+    --t1:#0f172a;--t2:#51607a;--t3:#9aa7bd;
+    --line:#e4e9f0;--line-2:#cfd8e3;
+    --space:8px;--section:12px;--lg:16px;--radius:4px;--card:8px;--pill:999px;--h:32px;
+    --sh1:0 1px 2px rgba(15,23,42,.05);--sh2:0 6px 20px rgba(15,23,42,.10);
+    --f:'Inter',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0}
+  html,body{height:100%}
+  body{font-family:var(--f);background:var(--bg);color:var(--t1);font-size:13px;line-height:1.4;display:flex;flex-direction:column}
+  .mono{font-family:var(--mono);font-size:11px}
+  .ml{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--t3)}
+
+  /* ── top bar ── */
+  .bar{height:44px;background:var(--brand);color:var(--on-brand);display:flex;align-items:center;gap:var(--lg);padding:0 var(--section);flex:0 0 auto}
+  .bar .lg{font-weight:800;letter-spacing:.3px;display:flex;gap:8px;align-items:center}
+  .bar .sx{height:26px;display:flex;align-items:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:var(--radius);padding:0 10px;color:#dbeafe;font-size:12px;width:260px}
+  .bar .rt{margin-left:auto;display:flex;gap:8px;align-items:center;font-size:12px}
+  .bar .av{width:26px;height:26px;border-radius:var(--pill);background:#bfe0f2;color:var(--brand);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px}
+
+  .app{flex:1;display:flex;min-height:0}
+
+  /* ── left rail ── */
+  .rail{width:212px;flex:0 0 auto;background:var(--surface);border-right:1px solid var(--line);overflow:auto;padding:var(--space) 0}
+  .rsec{padding:10px var(--section) 2px}
+  .ritem{display:flex;align-items:center;gap:10px;height:30px;padding:0 var(--section);margin:1px 6px;border-radius:var(--radius);cursor:pointer;color:var(--t2);font-size:12.5px}
+  .ritem .i{width:16px;text-align:center;opacity:.85}
+  .ritem .c{margin-left:auto;font-size:10.5px;color:var(--t3)}
+  .ritem:hover{background:var(--muted);color:var(--t1)}
+  .ritem.on{background:var(--brand-soft);color:var(--brand);font-weight:600;box-shadow:inset 3px 0 0 var(--brand)}
+
+  /* ── work area ── */
+  .work{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+  .whead{flex:0 0 auto;background:var(--surface);border-bottom:1px solid var(--line);padding:0 var(--lg);display:flex;align-items:center;gap:var(--section);height:46px}
+  .whead .ttl{font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px}
+  .crumb{color:var(--t3);font-size:12px}
+  .stabs{display:flex;gap:2px;margin-left:8px}
+  .stab{height:30px;padding:0 12px;border:0;background:transparent;color:var(--t2);font:inherit;font-size:12.5px;border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;gap:6px}
+  .stab.on{background:var(--brand);color:#fff;font-weight:600}
+  .wact{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .sel,.in{height:var(--h);border:1px solid var(--line-2);border-radius:var(--radius);padding:0 10px;font:inherit;font-size:12px;background:var(--surface);color:var(--t1)}
+  .btn{height:var(--h);padding:0 12px;border:1px solid var(--line-2);border-radius:var(--radius);background:var(--surface);font:inherit;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--t1)}
+  .btn:hover{background:var(--muted)}
+  .btn.pri{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}.btn.pri:hover{background:var(--brand-2)}
+  .btn.sm{height:26px;padding:0 9px;font-size:11.5px}
+  .icbtn{width:var(--h);height:var(--h);border:1px solid var(--line-2);border-radius:var(--radius);background:var(--surface);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+  .icbtn:hover{background:var(--muted)}
+
+  .view{flex:1;min-height:0;overflow:auto;display:none}
+  .view.on{display:block}
+
+  /* badges & chips */
+  .bd{display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:var(--pill);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+  .bd.ssot{background:var(--ok-soft);color:var(--ok)} .bd.l3{background:var(--brand-soft);color:var(--brand)} .bd.eng{background:var(--alt);color:var(--t2)}
+  .st{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:var(--pill);font-size:11px;font-weight:600}
+  .st.ok{background:var(--ok-soft);color:var(--ok)} .st.w{background:var(--warn-soft);color:var(--warn)} .st.d{background:var(--danger-soft);color:var(--danger)}
+
+  /* ====== LEGO (3-col) ====== */
+  .lego{display:grid;grid-template-columns:236px 1fr 300px;height:100%}
+  .lcol{min-height:0;overflow:auto}
+  .lib{border-right:1px solid var(--line);background:var(--surface)}
+  .lib .top{position:sticky;top:0;background:var(--surface);padding:var(--space) var(--section);border-bottom:1px solid var(--line);z-index:2}
+  .lib .top .in{width:100%}
+  .acc{border-bottom:1px solid var(--line)}
+  .acc>summary{list-style:none;cursor:pointer;padding:7px var(--section);display:flex;align-items:center;gap:6px}
+  .acc>summary::-webkit-details-marker{display:none}
+  .acc .cn{margin-left:auto;font-size:10.5px;color:var(--t3)}
+  .lrow{display:flex;align-items:center;gap:9px;padding:6px var(--section) 6px 26px;cursor:grab;font-size:12px;color:var(--t1)}
+  .lrow:hover{background:var(--brand-soft)} .lrow.sel{background:var(--brand-soft);box-shadow:inset 2px 0 0 var(--brand)}
+  .lrow .ic{width:18px;text-align:center}.lrow .nm{flex:1}.lrow .nm small{display:block;color:var(--t3);font-size:10px}
+  .libfoot{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:var(--space) var(--section)}
+
+  /* canvas */
+  .cv{background:var(--alt);padding:var(--section);min-height:100%}
+  .cvbar{display:flex;align-items:center;gap:8px;margin-bottom:var(--section)}
+  .ctab{height:26px;padding:0 10px;border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);font-size:11.5px;cursor:pointer;color:var(--t2)}
+  .ctab.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .surf{background:var(--surface);border:1px solid var(--line);border-radius:var(--card);overflow:hidden}
+  .zn{position:relative;border-bottom:1px solid var(--line)}
+  .zn:last-child{border-bottom:0}
+  .zn.sel{box-shadow:inset 0 0 0 2px var(--brand)}
+  .ztag{position:absolute;top:6px;right:6px;font-size:9.5px;font-weight:700;letter-spacing:.3px;color:var(--t3);background:var(--muted);border:1px solid var(--line);border-radius:var(--pill);padding:1px 7px}
+  .zb{padding:var(--section)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space)}
+  .kpi{border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;background:var(--surface)}
+  .kpi .k{font-size:10px;letter-spacing:.4px;text-transform:uppercase;color:var(--t3)}
+  .kpi .v{font-size:22px;font-weight:800;margin-top:2px;letter-spacing:-.5px}
+  .kpi .v.ok{color:var(--ok)}.kpi .v.w{color:var(--warn)}
+  .kpi .d{font-size:11px;color:var(--t3);margin-top:2px}
+  .tbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tbl{width:100%;border-collapse:collapse;font-size:12px}
+  .tbl th,.tbl td{padding:7px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  .tbl th{font-size:10px;letter-spacing:.3px;text-transform:uppercase;color:var(--t3);background:var(--muted)}
+  .tbl tbody tr:hover{background:var(--muted)}
+
+  /* inspector */
+  .insp{border-left:1px solid var(--line);background:var(--surface)}
+  .insp .top{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:var(--space) var(--section)}
+  .seg{display:flex;gap:3px;background:var(--alt);border-radius:var(--radius);padding:3px}
+  .seg button{flex:1;height:24px;border:0;background:transparent;border-radius:3px;font:inherit;font-size:11px;cursor:pointer;color:var(--t2)}
+  .seg button.on{background:var(--surface);color:var(--brand);font-weight:700;box-shadow:var(--sh1)}
+  .ibody{padding:var(--section)}
+  .f{margin-bottom:11px}
+  .f>label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+  .tk{display:flex;align-items:center;gap:9px;padding:6px 9px;border:1px solid var(--line);border-radius:var(--radius);margin-bottom:6px;background:var(--muted)}
+  .tk .sw{width:16px;height:16px;border-radius:3px;border:1px solid var(--line-2);flex:0 0 auto}
+  .tk .b{flex:1}.tk .b b{font-size:11.5px}.tk .b small{display:block;color:var(--t3);font-size:10px}
+  .tk .lk{font-size:10px;color:var(--t3)}
+  .cs{display:inline-flex;align-items:center;height:22px;padding:0 8px;border:1px solid var(--line);border-radius:var(--pill);font-size:11px;background:var(--muted);margin:0 4px 4px 0}
+
+  /* ====== generic list (modules / templates) ====== */
+  .pad{padding:var(--lg)}
+  .toolrow{display:flex;align-items:center;gap:8px;margin-bottom:var(--section)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:var(--space)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--card);padding:var(--section);cursor:pointer}
+  .card:hover{border-color:var(--brand-line);box-shadow:var(--sh1)}
+  .card.dash{border-style:dashed;display:flex;align-items:center;justify-content:center;color:var(--brand);font-weight:600;min-height:104px}
+  .card h4{font-size:13px;margin-bottom:3px;display:flex;align-items:center;gap:8px}
+  .card .meta{font-size:11px;color:var(--t3);margin-top:8px;display:flex;gap:10px}
+  .skel{display:flex;flex-direction:column;gap:3px;margin-top:10px}
+  .skel i{height:10px;border-radius:2px;background:var(--alt)} .skel i.h{background:var(--brand-soft)}
+
+  /* ====== theme ====== */
+  .thwrap{display:grid;grid-template-columns:1fr 300px;gap:var(--lg);padding:var(--lg)}
+  .grp{background:var(--surface);border:1px solid var(--line);border-radius:var(--card);margin-bottom:var(--lg)}
+  .grp h3{font-size:12.5px;padding:var(--space) var(--section);border-bottom:1px solid var(--line)}
+  .grp .gb{padding:var(--section)}
+  .seed{display:flex;align-items:center;gap:var(--section)}
+  .seedsw{width:56px;height:56px;border-radius:var(--card);background:var(--brand);border:1px solid var(--line-2)}
+  .ramp{display:flex;gap:5px;margin-top:7px}.ramp i{width:30px;height:22px;border-radius:3px;border:1px solid var(--line);display:inline-block}
+  .knob{display:flex;align-items:center;gap:var(--section);padding:6px 0}
+  .knob .l{width:160px;font-size:12px;color:var(--t2)}
+  .track{flex:1;height:5px;background:var(--alt);border-radius:var(--pill);position:relative}
+  .track i{position:absolute;top:-5px;width:15px;height:15px;border-radius:var(--pill);background:var(--brand);border:2px solid #fff;box-shadow:var(--sh1)}
+  .wr{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;padding:6px 0;border-bottom:1px solid var(--line)}
+  .pass{color:var(--ok);font-weight:700}.failx{color:var(--danger);font-weight:700}
+
+  .switcher{display:flex;gap:5px;margin-left:8px}
+  .switcher .s{height:24px;padding:0 9px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;border-radius:var(--radius);font-size:11px;cursor:pointer}
+  .switcher .s.on{background:#fff;color:var(--brand);font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="lg">⬢ HESEM MOM</span>
+  <span class="sx">🔍 Tìm module, đơn hàng, tài liệu…</span>
+  <div class="rt">
+    <span>🇻🇳 VI</span><span>🔔</span><span class="av">SV</span>
+  </div>
+</div>
+
+<div class="app">
+  <!-- ── unified rail (freeze gỡ) ── -->
+  <nav class="rail">
+    <div class="rsec ml">Vận hành</div>
+    <div class="ritem"><span class="i">📦</span>Đơn hàng<span class="c">128</span></div>
+    <div class="ritem"><span class="i">🏭</span>Sản xuất<span class="c">54</span></div>
+    <div class="ritem"><span class="i">✓</span>Chất lượng<span class="c">12</span></div>
+    <div class="ritem"><span class="i">📥</span>Kho vận</div>
+    <div class="ritem"><span class="i">🛒</span>Mua hàng</div>
+    <div class="rsec ml">Xưởng module</div>
+    <div class="ritem on" data-view="lego"><span class="i">🧩</span>Module Studio</div>
+    <div class="rsec ml">Quản trị</div>
+    <div class="ritem" data-view="theme"><span class="i">🎨</span>Giao diện</div>
+    <div class="ritem"><span class="i">👥</span>Người dùng<span class="c">88</span></div>
+    <div class="ritem"><span class="i">🛡</span>Vai trò<span class="c">38</span></div>
+    <div class="ritem"><span class="i">📊</span>KPI</div>
+    <div class="rsec ml">Tài liệu</div>
+    <div class="ritem"><span class="i">📘</span>Sổ tay QMS<span class="c">1</span></div>
+    <div class="ritem"><span class="i">📋</span>Quy trình<span class="c">37</span></div>
+    <div class="ritem"><span class="i">📝</span>Biểu mẫu<span class="c">141</span></div>
+  </nav>
+
+  <!-- ── work ── -->
+  <main class="work">
+    <div class="whead">
+      <span class="ttl">🧩 Module Studio</span>
+      <div class="stabs">
+        <button class="stab" data-view="modules">Modules</button>
+        <button class="stab" data-view="templates">Bố cục</button>
+        <button class="stab on" data-view="lego">Lego</button>
+        <button class="stab" data-view="theme">Theme</button>
+      </div>
+      <div class="wact" id="wact-lego">
+        <span class="crumb">Đơn hàng ·</span>
+        <select class="sel"><option>HESEM mặc định</option><option>Xưởng cảm ứng · 44px</option><option>Tím đặc</option></select>
+        <button class="btn">⤺</button><button class="btn">↻</button>
+        <button class="btn">Mô phỏng</button>
+        <button class="btn pri">Lưu</button>
+      </div>
+    </div>
+
+    <!-- ===== VIEW: LEGO BLOCK MASTER ===== -->
+    <section class="view on" id="v-lego">
+      <div class="lego">
+        <!-- library -->
+        <div class="lcol lib">
+          <div class="top"><input class="in" placeholder="🔍 Block · 177"></div>
+          <details class="acc" open><summary><span class="ml">Insight</span><span class="cn">10</span></summary>
+            <div class="lrow sel"><span class="ic">📊</span><span class="nm">Dãy KPI<small>kpi.grid</small></span><span class="bd ssot">ssot</span></div>
+            <div class="lrow"><span class="ic">🎯</span><span class="nm">Scorecard<small>kpi.scorecard</small></span><span class="bd l3">l3</span></div>
+            <div class="lrow"><span class="ic">📉</span><span class="nm">Sparkline<small>kpi.sparkline</small></span><span class="bd eng">eng</span></div>
+          </details>
+          <details class="acc" open><summary><span class="ml">Data</span><span class="cn">25</span></summary>
+            <div class="lrow"><span class="ic">▦</span><span class="nm">Bảng dữ liệu<small>table.data</small></span><span class="bd ssot">ssot</span></div>
+            <div class="lrow"><span class="ic">🗂</span><span class="nm">Thẻ dữ liệu<small>data.cards</small></span><span class="bd eng">eng</span></div>
+            <div class="lrow"><span class="ic">🌳</span><span class="nm">Cây phân cấp<small>data.tree</small></span><span class="bd eng">eng</span></div>
+            <div class="lrow"><span class="ic">📅</span><span class="nm">Lịch / Gantt<small>data.schedule</small></span><span class="bd eng">eng</span></div>
+          </details>
+          <details class="acc"><summary><span class="ml">Action</span><span class="cn">13</span></summary>
+            <div class="lrow"><span class="ic">🧰</span><span class="nm">Thanh công cụ<small>toolbar.filtered</small></span><span class="bd ssot">ssot</span></div>
+          </details>
+          <details class="acc"><summary><span class="ml">Industrial</span><span class="cn">14</span></summary>
+            <div class="lrow"><span class="ic">🟢</span><span class="nm">Trạng thái máy<small>mfg.machine-status</small></span><span class="bd eng">eng</span></div>
+            <div class="lrow"><span class="ic">🚨</span><span class="nm">Andon / cảnh báo<small>mfg.andon</small></span><span class="bd eng">eng</span></div>
+          </details>
+          <div class="libfoot"><button class="btn pri" style="width:100%;justify-content:center">＋ Block</button></div>
+        </div>
+
+        <!-- canvas -->
+        <div class="lcol cv">
+          <div class="cvbar">
+            <button class="ctab on">Tổng quan</button>
+            <button class="ctab">Tạo SO</button>
+            <button class="ctab">Giao hàng</button>
+            <button class="ctab">＋</button>
+            <span style="margin-left:auto"></span>
+            <button class="btn sm">🖥 Desktop</button><button class="btn sm">📱</button><button class="btn sm">100%</button>
+          </div>
+          <div class="surf">
+            <div class="zn sel"><span class="ztag">kpi.grid</span><div class="zb">
+              <div class="kpis">
+                <div class="kpi"><div class="k">SO hoạt động</div><div class="v">128</div><div class="d">+6 tuần này</div></div>
+                <div class="kpi"><div class="k">JO hoạt động</div><div class="v">54</div><div class="d">3 trễ tiến độ</div></div>
+                <div class="kpi"><div class="k">OTD</div><div class="v ok">96.4%</div><div class="d">▲ 1.2%</div></div>
+                <div class="kpi"><div class="k">Backlog</div><div class="v w">1.24M $</div><div class="d">42 dòng</div></div>
+              </div>
+            </div></div>
+            <div class="zn"><span class="ztag">toolbar.filtered</span><div class="zb">
+              <div class="tbar">
+                <input class="in" style="width:240px" placeholder="Mã SO, khách hàng">
+                <select class="sel"><option>Tất cả trạng thái</option></select>
+                <input class="in" type="date" style="width:140px">
+                <button class="btn pri" style="margin-left:auto">Áp dụng</button>
+              </div>
+            </div></div>
+            <div class="zn"><span class="ztag">table.data</span><div class="zb" style="padding:0">
+              <table class="tbl">
+                <thead><tr><th>Mã SO</th><th>Khách hàng</th><th>Số lượng</th><th>Ngày giao</th><th>Trạng thái</th></tr></thead>
+                <tbody>
+                  <tr><td class="mono">SO-2041</td><td>VinFast</td><td>1.200</td><td>12/06</td><td><span class="st ok">Đúng hạn</span></td></tr>
+                  <tr><td class="mono">SO-2042</td><td>THACO</td><td>640</td><td>14/06</td><td><span class="st w">Chờ duyệt</span></td></tr>
+                  <tr><td class="mono">SO-2043</td><td>Hòa Phát</td><td>2.000</td><td>09/06</td><td><span class="st d">Trễ</span></td></tr>
+                  <tr><td class="mono">SO-2044</td><td>Trường Hải</td><td>880</td><td>18/06</td><td><span class="st ok">Đúng hạn</span></td></tr>
+                </tbody>
+              </table>
+            </div></div>
+          </div>
+        </div>
+
+        <!-- inspector -->
+        <div class="lcol insp">
+          <div class="top">
+            <div class="seg"><button>Thuộc tính</button><button class="on">Định nghĩa</button></div>
+          </div>
+          <div class="ibody">
+            <div class="f"><label>Tên</label><input class="in" value="Dãy KPI"></div>
+            <div class="f"><label>Khoá</label><input class="in mono" value="kpi.grid"></div>
+            <div class="f"><label>Cấu thành</label><div><span class="cs">o3-kpi</span><span class="cs">o3-panel</span></div></div>
+            <div class="f"><label>Slot</label><div><span class="cs">tiles[]</span><span class="cs">title</span></div></div>
+            <div class="f"><label>Hợp đồng token</label>
+              <div class="tk"><span class="sw" style="background:var(--brand)"></span><span class="b"><b>kpi.value.color</b><small>color.brand</small></span><span class="lk">🔒</span></div>
+              <div class="tk"><span class="sw" style="background:var(--surface)"></span><span class="b"><b>kpi.bg</b><small>color.bg.surface</small></span><span class="lk">🔒</span></div>
+              <div class="tk"><span class="sw" style="background:var(--alt)"></span><span class="b"><b>kpi.radius</b><small>radius.master · 4</small></span><span class="lk">🔒</span></div>
+              <div class="tk"><span class="sw" style="background:var(--muted)"></span><span class="b"><b>kpi.gap</b><small>space.master · 8</small></span><span class="lk">🔒</span></div>
+            </div>
+            <button class="btn" style="width:100%;justify-content:center">＋ Token</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: MODULES ===== -->
+    <section class="view" id="v-modules"><div class="pad">
+      <div class="toolrow">
+        <input class="in" style="width:280px" placeholder="🔍 Lọc module">
+        <select class="sel"><option>Mọi trạng thái</option><option>Published</option><option>Draft</option></select>
+        <button class="btn pri" style="margin-left:auto">＋ Tạo module</button>
+      </div>
+      <div class="cards">
+        <div class="card"><h4>📦 Đơn hàng</h4><div class="ml">workspace-projection</div><div class="meta"><span class="st ok">Published</span><span>v4</span><span>9 block</span></div></div>
+        <div class="card"><h4>🏭 Sản xuất</h4><div class="ml">workspace-projection</div><div class="meta"><span class="st ok">Published</span><span>v7</span><span>12 block</span></div></div>
+        <div class="card"><h4>✓ Hồ sơ NCR</h4><div class="ml">authoritative-record</div><div class="meta"><span class="st w">Draft</span><span>v2</span><span>6 block</span></div></div>
+        <div class="card"><h4>📊 Phân tích KPI</h4><div class="ml">analytics-overview</div><div class="meta"><span class="st ok">Published</span><span>v3</span><span>8 block</span></div></div>
+        <div class="card dash">＋ Tạo module</div>
+      </div>
+    </div></section>
+
+    <!-- ===== VIEW: TEMPLATES (bố cục) ===== -->
+    <section class="view" id="v-templates"><div class="pad">
+      <div class="toolrow">
+        <input class="in" style="width:280px" placeholder="🔍 Lọc template">
+        <button class="btn" style="margin-left:auto">Sao chép</button>
+        <button class="btn pri">＋ Template</button>
+      </div>
+      <div class="cards">
+        <div class="card"><h4>Workspace Projection</h4><div class="skel"><i class="h"></i><i></i><i style="height:34px"></i></div><div class="meta"><span class="ml">kpis·toolbar·list·empty</span></div></div>
+        <div class="card"><h4>Authoritative Record</h4><div class="skel" style="display:grid;grid-template-columns:2fr 1fr;gap:3px"><i class="h"></i><i style="grid-row:span 2"></i><i style="height:34px"></i></div><div class="meta"><span class="ml">actions·main·aside</span></div></div>
+        <div class="card"><h4>Analytics Overview</h4><div class="skel" style="display:grid;grid-template-columns:1fr 1fr;gap:3px"><i style="height:24px"></i><i style="height:24px"></i><i style="height:24px"></i><i style="height:24px"></i></div><div class="meta"><span class="ml">filter·grid 2×2</span></div></div>
+        <div class="card"><h4>Wizard</h4><div class="skel"><i class="h"></i><i style="height:30px"></i><i></i></div><div class="meta"><span class="ml">stepper·form·summary</span></div></div>
+        <div class="card dash">＋ Template</div>
+      </div>
+    </div></section>
+
+    <!-- ===== VIEW: THEME ===== -->
+    <section class="view" id="v-theme">
+      <div class="whead" style="border-top:1px solid var(--line)">
+        <div class="stabs">
+          <button class="stab on">Màu</button><button class="stab">Chữ</button><button class="stab">Mật độ</button>
+          <button class="stab">Motion</button><button class="stab">Preset</button><button class="stab">Trợ năng</button>
+        </div>
+        <div class="wact"><button class="btn">⬇ Xuất DTCG</button><button class="btn">Mô phỏng</button><button class="btn pri">Lưu</button></div>
+      </div>
+      <div class="thwrap">
+        <div>
+          <div class="grp"><h3>Brand</h3><div class="gb">
+            <div class="seed"><div class="seedsw"></div><div>
+              <div class="mono">--brand · #0c4a6e</div>
+              <div class="ramp"><i style="background:#e6f3fb"></i><i style="background:#7dd3fc"></i><i style="background:#0c4a6e"></i><i style="background:#0a3a57"></i><i style="background:#062538"></i></div>
+              <div class="ml" style="margin-top:6px">hover · active · soft · on-brand — suy tự động (OKLCH)</div>
+            </div></div>
+          </div></div>
+          <div class="grp"><h3>Mật độ · một knob</h3><div class="gb">
+            <div class="knob"><span class="l">space.master</span><div class="track"><i style="left:30%"></i></div><span class="mono">8</span></div>
+            <div class="knob"><span class="l">space.section</span><div class="track"><i style="left:42%"></i></div><span class="mono">12</span></div>
+            <div class="knob"><span class="l">radius.master</span><div class="track"><i style="left:20%"></i></div><span class="mono">4</span></div>
+            <div class="knob"><span class="l">radius.card</span><div class="track"><i style="left:40%"></i></div><span class="mono">8</span></div>
+            <div class="knob"><span class="l">control.height</span><div class="track"><i style="left:30%"></i></div><span class="mono">32</span></div>
+          </div></div>
+        </div>
+        <div>
+          <div class="grp"><h3>Kiểm tương phản</h3><div class="gb">
+            <div class="wr"><span>brand / surface</span><span class="pass">8.9 · AA</span></div>
+            <div class="wr"><span>on-brand / brand</span><span class="pass">9.2 · AAA</span></div>
+            <div class="wr"><span>t2 / muted</span><span class="pass">6.1 · AA</span></div>
+            <div class="wr" style="border:0"><span>warn / warn-soft</span><span class="failx">2.8 · FAIL</span></div>
+          </div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  function show(v){
+    document.querySelectorAll('.view').forEach(function(x){x.classList.toggle('on',x.id==='v-'+v)});
+    document.querySelectorAll('.stab').forEach(function(x){x.classList.toggle('on',x.dataset.view===v)});
+    document.querySelectorAll('.ritem[data-view]').forEach(function(x){x.classList.toggle('on',x.dataset.view===v)});
+    // keep Module Studio rail item active for studio views
+    if(['lego','modules','templates'].indexOf(v)>=0){
+      document.querySelectorAll('.ritem[data-view]').forEach(function(x){x.classList.remove('on')});
+      document.querySelector('.ritem[data-view="lego"]').classList.add('on');
+    }
+    document.getElementById('wact-lego').style.display = (v==='lego')?'flex':'none';
+  }
+  document.querySelectorAll('[data-view]').forEach(function(b){b.addEventListener('click',function(){show(b.dataset.view)})});
+  // visual toggles
+  document.querySelectorAll('.seg button,.ctab').forEach(function(b){b.addEventListener('click',function(){
+    var s=b.parentElement.querySelectorAll('button,.ctab');s.forEach(function(x){x.classList.remove('on')});b.classList.add('on');
+  })});
+  document.querySelectorAll('.lrow').forEach(function(r){r.addEventListener('click',function(){
+    document.querySelectorAll('.lrow').forEach(function(x){x.classList.remove('sel')});r.classList.add('sel');
+  })});
+</script>
+</body>
+</html>

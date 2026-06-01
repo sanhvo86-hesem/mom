@@ -5,7 +5,7 @@
  * rounding; outer canvas is flush (0px) and square. Defaults to the master density
  * knob; overridable via LegoTheme.setLayout / theme presets / Module Master.
  * ==========================================================================*/
-/* @source-sha256 589d54094dd185cb */
+/* @source-sha256 d4baba5b67fb3246 */
 :root{
   /* Theme Layout knobs (one uniform spacing + block rounding) */
   --lego-frame: var(--o3-space, 8px);

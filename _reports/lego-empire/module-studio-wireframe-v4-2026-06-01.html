@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Module Studio v4 — vận hành đầy đủ · HESEM MOM</title>
+<style>
+  :root{
+    --brand:#0c4a6e;--brand-2:#0a3a57;--brand-soft:#e6f3fb;--brand-line:#bfe0f2;--on-brand:#fff;
+    --ok:#15803d;--ok-soft:#dcfce7;--warn:#b45309;--warn-soft:#fef3c7;--danger:#b91c1c;--danger-soft:#fde8e8;--violet:#6d28d9;--violet-soft:#ede9fe;
+    --bg:#eef2f6;--surface:#fff;--muted:#f6f8fa;--alt:#eef2f6;--t1:#0f172a;--t2:#51607a;--t3:#9aa7bd;--line:#e4e9f0;--line-2:#cfd8e3;
+    --space:8px;--section:12px;--lg:16px;--radius:4px;--card:8px;--pill:999px;--h:32px;--sh1:0 1px 2px rgba(15,23,42,.05);--sh2:0 12px 40px rgba(15,23,42,.22);
+    --f:'Inter',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;--mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0}html,body{height:100%}
+  body{font-family:var(--f);background:var(--bg);color:var(--t1);font-size:13px;line-height:1.4;display:flex;flex-direction:column}
+  .mono{font-family:var(--mono);font-size:11px}.ml{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--t3)}
+  .bar{height:44px;background:var(--brand);color:#fff;display:flex;align-items:center;gap:var(--lg);padding:0 var(--section);flex:0 0 auto;position:relative;z-index:20}
+  .bar .lg{font-weight:800;display:flex;gap:8px;align-items:center}
+  .bar .rt{margin-left:auto;display:flex;gap:8px;align-items:center;font-size:12px}
+  .bar .av{width:26px;height:26px;border-radius:var(--pill);background:#bfe0f2;color:var(--brand);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px}
+  .scn{position:relative}
+  .scn>button{height:28px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;border-radius:var(--radius);padding:0 10px;font:inherit;font-size:12px;cursor:pointer}
+  .scn .menu{display:none;position:absolute;right:0;top:32px;background:var(--surface);border:1px solid var(--line);border-radius:var(--card);box-shadow:var(--sh2);min-width:280px;padding:6px;z-index:50}
+  .scn.open .menu{display:block}
+  .scn .menu button{display:block;width:100%;text-align:left;border:0;background:transparent;color:var(--t1);font:inherit;font-size:12px;padding:7px 10px;border-radius:var(--radius);cursor:pointer}
+  .scn .menu button:hover{background:var(--brand-soft);color:var(--brand)}
+  .scn .menu .ml{padding:8px 10px 3px}
+  .app{flex:1;display:flex;min-height:0}
+  .rail{width:200px;flex:0 0 auto;background:var(--surface);border-right:1px solid var(--line);overflow:auto;padding:var(--space) 0}
+  .rsec{padding:9px var(--section) 2px}
+  .ritem{display:flex;align-items:center;gap:9px;height:29px;padding:0 var(--section);margin:1px 6px;border-radius:var(--radius);cursor:pointer;color:var(--t2);font-size:12.5px}
+  .ritem .i{width:16px;text-align:center}.ritem .c{margin-left:auto;font-size:10.5px;color:var(--t3)}
+  .ritem:hover{background:var(--muted)}.ritem.on{background:var(--brand-soft);color:var(--brand);font-weight:600;box-shadow:inset 3px 0 0 var(--brand)}
+  .work{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+  .whead{flex:0 0 auto;background:var(--surface);border-bottom:1px solid var(--line);padding:0 var(--lg);display:flex;align-items:center;gap:var(--section);height:46px}
+  .whead .ttl{font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px}
+  .surfaces{display:flex;gap:2px;margin-left:6px}
+  .surfaces button{height:30px;padding:0 13px;border:0;background:transparent;color:var(--t2);font:inherit;font-size:13px;border-radius:var(--radius);cursor:pointer;font-weight:600}
+  .surfaces button.on{background:var(--brand);color:#fff}
+  .modesw{display:flex;background:var(--alt);border-radius:var(--radius);padding:3px;gap:3px;margin-left:4px}
+  .modesw button{height:26px;padding:0 12px;border:0;background:transparent;border-radius:3px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;color:var(--t2)}
+  .modesw button.on{background:var(--surface);color:var(--brand);box-shadow:var(--sh1)}.modesw button.auth.on{color:var(--violet)}
+  .wact{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .verchip{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border:1px solid var(--line);border-radius:var(--pill);font-size:11px;background:var(--muted);color:var(--t2)}
+  .lock{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:var(--pill);font-size:11px;background:var(--warn-soft);color:var(--warn);font-weight:600}
+  .sel,.in{height:var(--h);border:1px solid var(--line-2);border-radius:var(--radius);padding:0 10px;font:inherit;font-size:12px;background:var(--surface);color:var(--t1)}
+  .btn{height:var(--h);padding:0 12px;border:1px solid var(--line-2);border-radius:var(--radius);background:var(--surface);font:inherit;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--t1)}
+  .btn:hover{background:var(--muted)}.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}.btn.pri:hover{background:var(--brand-2)}
+  .btn.dgr{color:var(--danger);border-color:#f0c4c4}.btn.dgr:hover{background:var(--danger-soft)}
+  .btn.sm{height:26px;padding:0 9px;font-size:11.5px}.btn.warn{color:var(--warn);border-color:#f3d9a6}
+  .view{flex:1;min-height:0;overflow:auto;display:none}.view.on{display:block}
+  .subtabs{display:flex;gap:4px;padding:8px var(--lg);background:var(--surface);border-bottom:1px solid var(--line)}
+  .subtabs button{height:28px;padding:0 11px;border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);font:inherit;font-size:12px;cursor:pointer;color:var(--t2)}
+  .subtabs button.on{background:var(--brand-soft);color:var(--brand);border-color:var(--brand-line);font-weight:600}
+  .pane{display:none}.pane.on{display:block}
+  .bd{display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:var(--pill);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+  .bd.ssot{background:var(--ok-soft);color:var(--ok)}.bd.l3{background:var(--brand-soft);color:var(--brand)}.bd.eng{background:var(--alt);color:var(--t2)}.bd.l4{background:var(--violet-soft);color:var(--violet)}.bd.l2{background:#fff7ed;color:var(--warn)}.bd.dep{background:var(--danger-soft);color:var(--danger)}
+  .st{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:var(--pill);font-size:11px;font-weight:600}
+  .st.ok{background:var(--ok-soft);color:var(--ok)}.st.w{background:var(--warn-soft);color:var(--warn)}.st.d{background:var(--danger-soft);color:var(--danger)}.st.dr{background:var(--alt);color:var(--t2)}.st.arc{background:#f1f0fb;color:var(--violet)}
+  /* lego 3-col */
+  .lego{display:grid;grid-template-columns:228px 1fr 304px;height:100%}.lcol{min-height:0;overflow:auto}
+  .lib{border-right:1px solid var(--line);background:var(--surface)}
+  .lib .top{position:sticky;top:0;background:var(--surface);padding:var(--space) var(--section);border-bottom:1px solid var(--line);z-index:2}.lib .top .in{width:100%}
+  details.acc{border-bottom:1px solid var(--line)}details.acc>summary{list-style:none;cursor:pointer;padding:7px var(--section);display:flex;align-items:center;gap:6px}details.acc>summary::-webkit-details-marker{display:none}.acc .cn{margin-left:auto;font-size:10.5px;color:var(--t3)}
+  .lrow{display:flex;align-items:center;gap:8px;padding:6px var(--section) 6px 20px;cursor:pointer;font-size:12px}.lrow:hover{background:var(--brand-soft)}.lrow.sel{background:var(--brand-soft);box-shadow:inset 2px 0 0 var(--brand)}
+  .lrow .ic{width:16px;text-align:center}.lrow .nm{flex:1}.lrow .nm small{display:block;color:var(--t3);font-size:10px}
+  .libfoot{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:var(--space) var(--section)}
+  .cv{background:var(--alt);padding:var(--section);min-height:100%}.cvbar{display:flex;align-items:center;gap:8px;margin-bottom:var(--section)}
+  .ctab{height:26px;padding:0 10px;border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);font-size:11.5px;cursor:pointer;color:var(--t2)}.ctab.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .surf{background:var(--surface);border:1px solid var(--line);border-radius:var(--card);overflow:hidden}
+  .zn{position:relative;border-bottom:1px solid var(--line);cursor:pointer}.zn:last-child{border-bottom:0}.zn.sel{box-shadow:inset 0 0 0 2px var(--brand)}
+  .ztag{position:absolute;top:6px;right:6px;font-size:9.5px;font-weight:700;color:var(--t3);background:var(--muted);border:1px solid var(--line);border-radius:var(--pill);padding:1px 7px}.zb{padding:var(--section)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space)}
+  .kpi{border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;background:var(--surface)}.kpi .k{font-size:10px;letter-spacing:.4px;text-transform:uppercase;color:var(--t3)}.kpi .v{font-size:22px;font-weight:800;margin-top:2px;letter-spacing:-.5px}.kpi .v.ok{color:var(--ok)}.kpi .v.w{color:var(--warn)}.kpi .d{font-size:11px;color:var(--t3);margin-top:2px}
+  .tbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tbl{width:100%;border-collapse:collapse;font-size:12px}.tbl th,.tbl td{padding:7px 12px;text-align:left;border-bottom:1px solid var(--line)}.tbl th{font-size:10px;letter-spacing:.3px;text-transform:uppercase;color:var(--t3);background:var(--muted)}.tbl tbody tr:hover{background:var(--muted)}
+  .errstate{padding:16px;display:flex;gap:12px;align-items:center;background:var(--danger-soft);border:1px dashed #f0c4c4;border-radius:var(--radius);color:#7f1d1d}
+  .insp{border-left:1px solid var(--line);background:var(--surface)}.insp .top{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:var(--space) var(--section)}.insp .top .crumb{font-size:11px;color:var(--t3)}.ibody{padding:var(--section)}
+  .ip{display:none}.ip.on{display:block}.layerpill{display:inline-flex;align-items:center;height:20px;padding:0 9px;border-radius:var(--pill);font-size:10.5px;font-weight:800;letter-spacing:.4px}
+  .f{margin-bottom:11px}.f>label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+  .tk{display:flex;align-items:center;gap:9px;padding:6px 9px;border:1px solid var(--line);border-radius:var(--radius);margin-bottom:6px;background:var(--muted)}.tk .sw{width:16px;height:16px;border-radius:3px;border:1px solid var(--line-2);flex:0 0 auto}.tk .b{flex:1}.tk .b b{font-size:11.5px}.tk .b small{display:block;color:var(--t3);font-size:10px}.tk .lk{font-size:10px;color:var(--t3)}
+  .cs{display:inline-flex;align-items:center;height:22px;padding:0 8px;border:1px solid var(--line);border-radius:var(--pill);font-size:11px;background:var(--muted);margin:0 4px 4px 0}
+  .gate{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;padding:5px 0;border-bottom:1px solid var(--line)}.pass{color:var(--ok);font-weight:700}.failx{color:var(--danger);font-weight:700}
+  /* generic */
+  .pad{padding:var(--lg)}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--space)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--card);padding:var(--section)}
+  .grp{background:var(--surface);border:1px solid var(--line);border-radius:var(--card);margin-bottom:var(--lg)}.grp h3{font-size:12.5px;padding:var(--space) var(--section);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}.grp .gb{padding:var(--section)}
+  .li{display:flex;align-items:center;gap:10px;padding:8px var(--section);border-bottom:1px solid var(--line)}.li:last-child{border:0}.li .nm{flex:1}.li .mono{flex:0 0 auto}
+  .two{display:grid;grid-template-columns:1fr 300px;gap:var(--lg)}@media(max-width:1100px){.two{grid-template-columns:1fr}}
+  .seed{display:flex;align-items:center;gap:var(--section)}.seedsw{width:52px;height:52px;border-radius:var(--card);background:var(--brand);border:1px solid var(--line-2)}.ramp{display:flex;gap:5px;margin-top:7px}.ramp i{width:28px;height:20px;border-radius:3px;border:1px solid var(--line);display:inline-block}
+  .knob{display:flex;align-items:center;gap:var(--section);padding:6px 0}.knob .l{width:150px;font-size:12px;color:var(--t2)}.track{flex:1;height:5px;background:var(--alt);border-radius:var(--pill);position:relative}.track i{position:absolute;top:-5px;width:15px;height:15px;border-radius:var(--pill);background:var(--brand);border:2px solid #fff;box-shadow:var(--sh1)}
+  .wr{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;padding:6px 0;border-bottom:1px solid var(--line)}.killed{font-size:11.5px;color:var(--danger);background:var(--danger-soft);border:1px solid #f6c9c9;border-radius:var(--radius);padding:7px 10px}
+  /* timeline */
+  .tl{position:relative;padding-left:18px}.tl::before{content:'';position:absolute;left:5px;top:4px;bottom:4px;width:2px;background:var(--line)}
+  .tlrow{position:relative;padding:7px 0;display:flex;gap:10px;align-items:center}.tlrow::before{content:'';position:absolute;left:-16px;top:12px;width:8px;height:8px;border-radius:var(--pill);background:var(--brand-line);border:2px solid #fff}.tlrow.cur::before{background:var(--brand)}
+  .tlrow .v{font-weight:700;width:42px}.tlrow .m{flex:1;color:var(--t2);font-size:12px}
+  /* overlay/modal/drawer */
+  .ov{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:60;align-items:center;justify-content:center;padding:24px}.ov.on{display:flex}
+  .modal{background:var(--surface);border-radius:var(--card);box-shadow:var(--sh2);width:560px;max-width:100%;max-height:88vh;overflow:auto}
+  .modal.wide{width:760px}.modal .mh{padding:var(--section) var(--lg);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;font-weight:800}.modal .mh .x{margin-left:auto;cursor:pointer;color:var(--t3);font-size:18px;line-height:1}
+  .modal .mb{padding:var(--lg)}.modal .mf{padding:var(--section) var(--lg);border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
+  .steps{display:flex;gap:6px;margin-bottom:var(--lg)}.steps .s{flex:1;border:1px solid var(--line);border-radius:var(--radius);padding:7px 10px;font-size:11.5px}.steps .s.on{border-color:var(--brand);background:var(--brand-soft);color:var(--brand);font-weight:700}
+  .pick{border:1px solid var(--line);border-radius:var(--radius);padding:10px;cursor:pointer}.pick.on{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-soft)}.pick.dash{border-style:dashed;color:var(--brand)}
+  .gaterow{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid var(--line);border-radius:var(--radius);margin-bottom:6px;font-size:12px}
+  .banner{padding:10px 12px;border-radius:var(--radius);font-size:12px;margin-bottom:var(--section)}.banner.w{background:var(--warn-soft);color:#7c4a02;border:1px solid #fde68a}.banner.d{background:var(--danger-soft);color:#7f1d1d;border:1px solid #f0c4c4}.banner.ok{background:var(--ok-soft);color:#14532d;border:1px solid #bbf7d0}
+</style></head>
+<body>
+<div class="bar">
+  <span class="lg">⬢ HESEM MOM</span>
+  <div class="rt">
+    <div class="scn" id="scn"><button onclick="document.getElementById('scn').classList.toggle('open')">⚙ Tình huống ▾</button>
+      <div class="menu">
+        <div class="ml">Module lifecycle</div>
+        <button onclick="openModal('m-create')">Tạo module (wizard + gate)</button>
+        <button onclick="go('studio');openDrawer('dr-version')">Lịch sử version + rollback</button>
+        <button onclick="openModal('m-archive')">Archive / xoá (impact check)</button>
+        <button onclick="openModal('m-conflict')">Xung đột đồng thời (concurrency)</button>
+        <button onclick="openModal('m-binderr')">Binding hỏng (error state)</button>
+        <div class="ml">Block / theme</div>
+        <button onclick="openModal('m-request')">Block Request (block chưa có)</button>
+        <button onclick="go('studio');setMode('author')">Author: sửa định nghĩa block</button>
+        <button onclick="openModal('m-simulate')">Simulate + WCAG gate (chặn)</button>
+        <button onclick="go('theme');setSub('theme','presets')">Clone theme preset</button>
+        <button onclick="go('theme');setSub('theme','mod')">Override scope=module</button>
+        <button onclick="go('theme');setSub('theme','sched')">Theme theo ca (day/night)</button>
+        <div class="ml">Governance</div>
+        <button onclick="go('gov');setSub('gov','dep')">Deprecate + usage map</button>
+        <button onclick="go('gov');setSub('gov','queue')">Review queue (AI hàng loạt)</button>
+        <button onclick="go('gov');setSub('gov','roll')">Rollback release</button>
+      </div>
+    </div>
+    <span>🇻🇳 VI</span><span class="av">SV</span>
+  </div>
+</div>
+<div class="app">
+  <nav class="rail">
+    <div class="rsec ml">Vận hành</div>
+    <div class="ritem"><span class="i">📦</span>Đơn hàng<span class="c">128</span></div>
+    <div class="ritem"><span class="i">🏭</span>Sản xuất</div>
+    <div class="ritem"><span class="i">✓</span>Chất lượng</div>
+    <div class="rsec ml">Xưởng module</div>
+    <div class="ritem on"><span class="i">🧩</span>Module Studio</div>
+    <div class="rsec ml">Quản trị</div>
+    <div class="ritem"><span class="i">👥</span>Người dùng</div>
+    <div class="ritem"><span class="i">🛡</span>Vai trò</div>
+    <div class="rsec ml">Tài liệu</div>
+    <div class="ritem"><span class="i">📝</span>Biểu mẫu<span class="c">141</span></div>
+  </nav>
+  <main class="work">
+    <div class="whead">
+      <span class="ttl">🧩 Module Studio</span>
+      <div class="surfaces">
+        <button data-s="studio" class="on" onclick="go('studio')">Module Studio</button>
+        <button data-s="theme" onclick="go('theme')">Theme</button>
+        <button data-s="gov" onclick="go('gov')">Governance</button>
+      </div>
+      <div class="modesw" id="modesw">
+        <button id="m-assemble" class="on" onclick="setMode('assemble')">⬡ Assemble</button>
+        <button id="m-author" class="auth" onclick="setMode('author')">✎ Author</button>
+      </div>
+      <div class="wact" id="wact-studio">
+        <span class="lock" title="Một admin khác đang giữ draft">🔒 dunglt đang sửa</span>
+        <span class="verchip">v3 · draft <button class="btn sm" onclick="openDrawer('dr-version')">Lịch sử</button></span>
+        <button class="btn" onclick="openModal('m-simulate')">Mô phỏng</button>
+        <button class="btn pri" id="submitbtn" onclick="openModal('m-validate')">Submit</button>
+      </div>
+    </div>
+
+    <!-- ================= MODULE STUDIO ================= -->
+    <section class="view on" id="v-studio">
+      <div class="subtabs" id="st-studio">
+        <button class="on" data-p="canvas" onclick="setSub('studio','canvas')">Canvas</button>
+        <button data-p="modules" onclick="setSub('studio','modules')">Modules</button>
+      </div>
+
+      <!-- canvas pane -->
+      <div class="pane on" id="studio-canvas"><div class="lego">
+        <div class="lcol lib">
+          <div class="top"><input class="in" placeholder="🔍 Thư viện Lego"></div>
+          <details class="acc"><summary><span class="layerpill bd l4">L4</span><span class="ml">Archetypes</span><span class="cn">6</span></summary>
+            <div class="lrow" data-pick="L4"><span class="ic">▱</span><span class="nm">Workspace Projection<small>workspace-projection</small></span></div></details>
+          <details class="acc" open><summary><span class="layerpill bd l3">L3</span><span class="ml">Lego Blocks</span><span class="cn">+196</span></summary>
+            <div class="lrow sel" data-pick="L3"><span class="ic">📊</span><span class="nm">Dãy KPI<small>kpi.grid</small></span><span class="bd ssot">ssot</span></div>
+            <div class="lrow" data-pick="L3"><span class="ic">▦</span><span class="nm">Data grid<small>data.grid</small></span><span class="bd ssot">ssot</span></div>
+            <div class="lrow" data-pick="L3"><span class="ic">🌳</span><span class="nm">Traceability<small>tree.traceability</small></span><span class="bd dep">deprecated</span></div></details>
+          <details class="acc"><summary><span class="layerpill bd l2">L2</span><span class="ml">Components</span><span class="cn">27</span></summary>
+            <div class="lrow" data-pick="L2"><span class="ic">⬛</span><span class="nm">Button<small>o3.btn</small></span></div></details>
+          <div class="libfoot"><button class="btn" style="width:100%;justify-content:center" id="libbtn" onclick="openModal('m-request')">＋ Thêm vào module</button></div>
+        </div>
+        <div class="lcol cv">
+          <div class="cvbar"><button class="ctab on">Tổng quan</button><button class="ctab">Tạo SO</button><button class="ctab">＋</button>
+            <span style="margin-left:auto"></span><button class="btn sm">🖥</button><button class="btn sm">📱</button></div>
+          <div class="surf">
+            <div class="zn sel" data-zone="L3"><span class="ztag">kpi.grid</span><div class="zb"><div class="kpis">
+              <div class="kpi"><div class="k">SO hoạt động</div><div class="v">128</div></div>
+              <div class="kpi"><div class="k">JO hoạt động</div><div class="v">54</div></div>
+              <div class="kpi"><div class="k">OTD</div><div class="v ok">96.4%</div></div>
+              <div class="kpi"><div class="k">Backlog</div><div class="v w">1.24M$</div></div></div></div></div>
+            <div class="zn" data-zone="L3"><span class="ztag">toolbar.filtered</span><div class="zb"><div class="tbar">
+              <input class="in" style="width:220px" placeholder="Mã SO, khách hàng"><select class="sel"><option>Trạng thái</option></select><button class="btn pri" style="margin-left:auto">Áp dụng</button></div></div></div>
+            <div class="zn" data-zone="L3" onclick="openModal('m-binderr')"><span class="ztag">data.grid ⚠</span><div class="zb">
+              <div class="errstate"><span style="font-size:20px">⚠</span><div><b>Không tải được dữ liệu</b><div class="mono">GET /api/orders/list → 502</div><div style="font-size:11px;margin-top:2px">Bấm để xem xử lý binding lỗi.</div></div></div></div></div>
+          </div>
+        </div>
+        <div class="lcol insp">
+          <div class="top"><span class="crumb" id="crumb">module ▸ zone: kpis</span></div>
+          <div class="ibody">
+            <div class="ip on" id="ip-assemble"><div style="margin-bottom:10px"><span class="layerpill bd ssot">ASSEMBLE</span></div>
+              <div class="f"><label>Block</label><input class="in mono" value="kpi.grid"></div>
+              <div class="f"><label>Tiles (slot)</label><div><span class="cs">SO</span><span class="cs">JO</span><span class="cs">OTD</span><span class="cs">Backlog</span></div></div>
+              <div class="f"><label>Data binding</label><input class="in mono" value="GET /api/orders/kpi"></div>
+              <div class="f"><label>Theme preset</label><input class="in" value="hesem-default"></div>
+              <div class="gate"><span>chỉ token · không hex/px</span><span class="pass">✓</span></div>
+              <div class="gate"><span>block published</span><span class="pass">✓</span></div></div>
+            <div class="ip" id="ip-l3"><div style="margin-bottom:10px"><span class="layerpill bd l3">L3 · BLOCK CONTRACT</span> <span class="verchip" style="margin-left:6px">v5</span></div>
+              <div class="banner w" style="font-size:11px">Sửa định nghĩa → ảnh hưởng <b>12 module</b> dùng kpi.grid. Bắt buộc Simulate + review.</div>
+              <div class="f"><label>composed_of</label><div><span class="cs">o3-kpi</span><span class="cs">o3-panel</span></div></div>
+              <div class="f"><label>slots</label><div><span class="cs">tiles[]</span><span class="cs">title</span></div></div>
+              <div class="f"><label>required_tokens</label>
+                <div class="tk"><span class="sw" style="background:var(--brand)"></span><span class="b"><b>kpi.value.color</b><small>color.brand</small></span><span class="lk">🔒</span></div>
+                <div class="tk"><span class="sw" style="background:var(--alt)"></span><span class="b"><b>kpi.radius</b><small>radius.master·4</small></span><span class="lk">🔒</span></div></div>
+              <div style="display:flex;gap:6px;margin-top:6px"><button class="btn warn" onclick="go('gov');setSub('gov','dep')">Deprecate</button><button class="btn" onclick="go('gov');setSub('gov','dep')">Usage map (12)</button></div></div>
+            <div class="ip" id="ip-l2"><div style="margin-bottom:10px"><span class="layerpill bd l2">L2 · COMPONENT CONTRACT</span></div>
+              <div class="f"><label>component_key</label><input class="in mono" value="o3.btn"></div>
+              <div class="f"><label>overridable_tokens</label><div class="tk"><span class="sw" style="background:var(--brand)"></span><span class="b"><b>button.bg</b></span><span class="lk">🔒</span></div><div class="tk"><span class="sw" style="background:var(--alt)"></span><span class="b"><b>control.height.standard</b><small>32</small></span><span class="lk">🔒</span></div></div>
+              <div class="f"><label>states</label><div><span class="cs">default</span><span class="cs">hover</span><span class="cs">disabled</span><span class="cs">focus</span></div></div></div>
+            <div class="ip" id="ip-l4"><div style="margin-bottom:10px"><span class="layerpill bd l4">L4 · ARCHETYPE</span></div>
+              <div class="f"><label>zones</label><div><span class="cs">kpis</span><span class="cs">toolbar</span><span class="cs">list</span><span class="cs">empty</span></div></div>
+              <div class="f"><label>forbidden_patterns</label><div><span class="cs">raw-html</span><span class="cs">inline-style</span><span class="cs">density-override</span></div></div></div>
+          </div>
+        </div>
+      </div></div>
+
+      <!-- modules pane (lifecycle list) -->
+      <div class="pane" id="studio-modules"><div class="pad">
+        <div class="tbar" style="margin-bottom:var(--section)"><input class="in" style="width:280px" placeholder="🔍 Lọc module"><select class="sel"><option>Mọi trạng thái</option><option>Active</option><option>Draft</option><option>Archived</option></select><button class="btn pri" style="margin-left:auto" onclick="openModal('m-create')">＋ Tạo module</button></div>
+        <div class="grp"><div class="gb" style="padding:0">
+          <table class="tbl"><thead><tr><th>Module</th><th>Archetype</th><th>Version</th><th>Trạng thái</th><th>Sửa cuối</th><th></th></tr></thead><tbody>
+            <tr><td>📦 Đơn hàng</td><td class="mono">workspace-projection</td><td>v7</td><td><span class="st ok">Active</span></td><td>SV · 2h</td><td><button class="btn sm" onclick="openDrawer('dr-version')">Lịch sử</button> <button class="btn sm warn" onclick="openModal('m-archive')">Archive</button></td></tr>
+            <tr><td>🏭 Sản xuất</td><td class="mono">workspace-projection</td><td>v12</td><td><span class="st ok">Active</span></td><td>dunglt · 1d</td><td><button class="btn sm" onclick="openDrawer('dr-version')">Lịch sử</button> <button class="btn sm warn" onclick="openModal('m-archive')">Archive</button></td></tr>
+            <tr><td>✓ Hồ sơ NCR</td><td class="mono">authoritative-record</td><td>v2</td><td><span class="st dr">Draft</span></td><td>SV · 5m</td><td><button class="btn sm">Tiếp tục</button></td></tr>
+            <tr><td>📊 KPI cũ</td><td class="mono">analytics-overview</td><td>v4</td><td><span class="st arc">Archived · còn 23 ngày</span></td><td>—</td><td><button class="btn sm">Khôi phục</button> <button class="btn sm dgr">Purge</button></td></tr>
+          </tbody></table>
+        </div></div>
+      </div></div>
+    </section>
+
+    <!-- ================= THEME ================= -->
+    <section class="view" id="v-theme">
+      <div class="subtabs" id="st-theme">
+        <button class="on" data-p="global" onclick="setSub('theme','global')">Token toàn cục</button>
+        <button data-p="presets" onclick="setSub('theme','presets')">Theme preset</button>
+        <button data-p="mod" onclick="setSub('theme','mod')">Override theo module</button>
+        <button data-p="sched" onclick="setSub('theme','sched')">Theo ca</button>
+      </div>
+      <div class="pane on" id="theme-global"><div class="pad"><div class="two">
+        <div>
+          <div class="grp"><h3>Brand · seed OKLCH</h3><div class="gb"><div class="seed"><div class="seedsw"></div><div>
+            <div class="mono">--brand · #0c4a6e</div><div class="ramp"><i style="background:#e6f3fb"></i><i style="background:#7dd3fc"></i><i style="background:#0c4a6e"></i><i style="background:#0a3a57"></i><i style="background:#062538"></i></div>
+            <div class="ml" style="margin-top:6px">hover·active·soft·on-brand suy tự động</div></div></div></div></div>
+          <div class="grp"><h3>Mật độ · một knob</h3><div class="gb">
+            <div class="knob"><span class="l">space.master</span><div class="track"><i style="left:30%"></i></div><span class="mono">8</span></div>
+            <div class="knob"><span class="l">radius.master</span><div class="track"><i style="left:20%"></i></div><span class="mono">4</span></div>
+            <div class="knob"><span class="l">radius.card</span><div class="track"><i style="left:40%"></i></div><span class="mono">8</span></div>
+            <div class="knob"><span class="l">control.height</span><div class="track"><i style="left:30%"></i></div><span class="mono">32</span></div></div></div>
+        </div>
+        <div>
+          <div class="grp"><h3>Áp dụng</h3><div class="gb"><div class="banner w">Đổi token toàn cục lan tới <b>MỌI module</b>. Bắt buộc Simulate.</div>
+            <button class="btn pri" style="width:100%;justify-content:center;margin-bottom:6px" onclick="openModal('m-simulate')">Mô phỏng &amp; Áp dụng (scope=global)</button>
+            <button class="btn" style="width:100%;justify-content:center">⬇ Xuất DTCG</button></div></div>
+          <div class="grp"><h3>Custom CSS</h3><div class="gb"><div class="killed">✕ Đã gỡ bỏ — mọi giá trị qua token.</div></div></div>
+        </div>
+      </div></div></div>
+      <div class="pane" id="theme-presets"><div class="pad">
+        <div class="tbar" style="margin-bottom:var(--section)"><input class="in" style="width:260px" placeholder="🔍 Preset"><button class="btn pri" style="margin-left:auto" onclick="openModal('m-clone')">⎘ Clone preset</button></div>
+        <div class="grid">
+          <div class="card"><h3 style="border:0;padding:0;display:flex;gap:8px;align-items:center">HESEM mặc định <span class="bd l3">builtin</span></h3><div class="ml" style="margin:6px 0">brand #0c4a6e · 8/4/8 · 32px</div><div class="tbar"><button class="btn sm" onclick="openModal('m-clone')">Clone</button><span class="st ok">Published</span></div></div>
+          <div class="card"><h3 style="border:0;padding:0;display:flex;gap:8px;align-items:center">Xưởng cảm ứng <span class="bd l2">tenant</span></h3><div class="ml" style="margin:6px 0">teal · 8/4/8 · 44px cozy</div><div class="tbar"><button class="btn sm">Sửa</button><span class="st ok">Published</span></div></div>
+          <div class="card" style="border-style:dashed;display:flex;align-items:center;justify-content:center;color:var(--brand);cursor:pointer" onclick="openModal('m-clone')">⎘ Clone từ preset có sẵn</div>
+        </div>
+      </div></div>
+      <div class="pane" id="theme-mod"><div class="pad">
+        <div class="banner ok">Override <b>chỉ module này</b> (scope=module:orders), không đụng global. Kiểu Figma mode.</div>
+        <div class="grp"><h3>orders ▸ override token</h3><div class="gb">
+          <div class="tk"><span class="sw" style="background:#0f766e"></span><span class="b"><b>brand</b><small>global #0c4a6e → override #0f766e</small></span><button class="btn sm dgr">Gỡ</button></div>
+          <button class="btn" style="margin-top:6px"><span>＋ Override token (chỉ từ catalog)</span></button>
+          <div class="banner w" style="margin-top:10px">Muốn giá trị catalog chưa có? → thêm token ở Author + Simulate. KHÔNG custom CSS.</div></div></div>
+      </div></div>
+      <div class="pane" id="theme-sched"><div class="pad">
+        <div class="grp"><h3>Theme theo ca (andon)</h3><div class="gb" style="padding:0"><table class="tbl"><thead><tr><th>Ca</th><th>Giờ</th><th>Color mode</th><th>Trạng thái</th></tr></thead><tbody>
+          <tr><td>A · Ngày</td><td class="mono">06:00–14:00</td><td>light</td><td><span class="st ok">Active</span></td></tr>
+          <tr><td>B · Chiều</td><td class="mono">14:00–22:00</td><td>light</td><td><span class="st ok">Active</span></td></tr>
+          <tr><td>C · Đêm</td><td class="mono">22:00–06:00</td><td>dark</td><td><span class="st ok">Active</span></td></tr>
+          <tr><td>Bảo trì</td><td class="mono">sự kiện</td><td>amber</td><td><span class="st w">Standby</span></td></tr>
+        </tbody></table></div></div>
+      </div></div>
+    </section>
+
+    <!-- ================= GOVERNANCE ================= -->
+    <section class="view" id="v-gov">
+      <div class="subtabs" id="st-gov">
+        <button class="on" data-p="queue" onclick="setSub('gov','queue')">Review queue</button>
+        <button data-p="dep" onclick="setSub('gov','dep')">Deprecate · Usage</button>
+        <button data-p="roll" onclick="setSub('gov','roll')">Rollback · Audit</button>
+        <button data-p="mon" onclick="setSub('gov','mon')">Giám sát runtime</button>
+      </div>
+      <div class="pane on" id="gov-queue"><div class="pad"><div class="grp"><h3>Hàng đợi duyệt (người + AI)</h3><div class="gb" style="padding:0">
+        <div class="li"><span class="mono">tree.traceability</span><span class="nm">Block mới — <b>AI request</b></span><span class="st w">Chờ gate</span><button class="btn sm" onclick="openModal('m-request')">Xem</button></div>
+        <div class="li"><span class="mono">kpi.grid v6</span><span class="nm">Sửa định nghĩa (12 module)</span><span class="st w">Review</span><button class="btn sm" onclick="openModal('m-simulate')">Simulate</button></div>
+        <div class="li"><span class="mono">orders v8</span><span class="nm">Module draft — AI dựng</span><span class="st w">Review</span><button class="btn sm" onclick="openModal('m-validate')">Validate</button></div>
+        <div class="li"><span class="mono">shopfloor-cozy</span><span class="nm">Theme preset 44px</span><span class="st ok">Published</span><span></span></div>
+      </div></div></div></div>
+      <div class="pane" id="gov-dep"><div class="pad"><div class="two">
+        <div class="grp"><h3>Deprecate block <span class="bd dep">tree.traceability</span></h3><div class="gb">
+          <div class="banner d">Còn <b>3 module</b> đang dùng — không xoá cứng. Gắn alias + migrate trước.</div>
+          <div class="f"><label>Block thay thế (alias)</label><select class="sel"><option>tree.genealogy (v2)</option></select></div>
+          <button class="btn warn">Đánh dấu deprecated</button> <button class="btn" disabled>Purge (khi 0 module)</button></div></div>
+        <div class="grp"><h3>Usage map</h3><div class="gb" style="padding:0">
+          <div class="li"><span class="mono">Truy xuất lô</span><span class="nm">tab Chi tiết</span><button class="btn sm">Migrate</button></div>
+          <div class="li"><span class="mono">CAPA</span><span class="nm">tab Genealogy</span><button class="btn sm">Migrate</button></div>
+          <div class="li"><span class="mono">QC lô</span><span class="nm">tab Trace</span><button class="btn sm">Migrate</button></div>
+        </div></div>
+      </div></div></div>
+      <div class="pane" id="gov-roll"><div class="pad"><div class="grp"><h3>Release &amp; rollback</h3><div class="gb" style="padding:0">
+        <div class="li"><span class="mono">#R-318</span><span class="nm">brand #1565c0→#0c4a6e (global)</span><span class="st ok">Applied</span><button class="btn sm dgr" onclick="openModal('m-rollback')">Rollback</button></div>
+        <div class="li"><span class="mono">#R-317</span><span class="nm">density 32px (global)</span><span class="st ok">Applied</span><button class="btn sm dgr" onclick="openModal('m-rollback')">Rollback</button></div>
+        <div class="li"><span class="mono">#R-316</span><span class="nm">warn color (FAIL WCAG)</span><span class="st d">Rolled-back</span><span class="ml">prior_snapshot khôi phục</span></div>
+      </div></div>
+      <div class="grp"><h3>Audit (mọi mutation)</h3><div class="gb" style="padding:0">
+        <div class="li"><span class="mono">10:42</span><span class="nm">SV · publish kpi.grid v6</span><span class="ml">sim #4821 pass</span></div>
+        <div class="li"><span class="mono">09:15</span><span class="nm">dunglt · archive “KPI cũ”</span><span class="ml">snapshot giữ</span></div>
+      </div></div></div></div>
+      <div class="pane" id="gov-mon"><div class="pad"><div class="grid">
+        <div class="grp"><h3>Binding lỗi (runtime)</h3><div class="gb" style="padding:0"><div class="li"><span class="mono">orders</span><span class="nm">/api/orders/list → 502</span><span class="st d">3 lần/5m</span></div><div class="li"><span class="mono">QC</span><span class="nm">schema mismatch</span><span class="st w">1</span></div></div></div>
+        <div class="grp"><h3>Performance budget</h3><div class="gb"><div class="wr"><span>LCP</span><span class="pass">1.9s ✓</span></div><div class="wr"><span>INP</span><span class="pass">120ms ✓</span></div><div class="wr" style="border:0"><span>data.grid 2k dòng</span><span class="pass">virtualized ✓</span></div></div></div>
+        <div class="grp"><h3>Simulation runs</h3><div class="gb" style="padding:0"><div class="li"><span class="mono">#4821</span><span class="nm">kpi.grid · WCAG</span><span class="st ok">Pass</span></div><div class="li"><span class="mono">#4823</span><span class="nm">warn pair</span><span class="st d">Fail</span></div></div></div>
+      </div></div></div>
+    </section>
+  </main>
+</div>
+
+<!-- ===== MODALS ===== -->
+<div class="ov" id="m-create"><div class="modal wide"><div class="mh">＋ Tạo module<span class="x" onclick="closeAll()">×</span></div><div class="mb">
+  <div class="steps"><div class="s on">1 · Archetype</div><div class="s">2 · Block vào zone</div><div class="s">3 · Bind data</div><div class="s">4 · Theme</div></div>
+  <div class="grid"><div class="pick on"><b>Workspace Projection</b><div class="ml" style="margin-top:4px">kpis·toolbar·list·empty</div></div><div class="pick"><b>Authoritative Record</b><div class="ml" style="margin-top:4px">actions·main·aside</div></div><div class="pick"><b>Analytics Overview</b><div class="ml" style="margin-top:4px">filter·grid 2×2</div></div></div>
+</div><div class="mf"><button class="btn" onclick="closeAll()">Huỷ</button><button class="btn pri" onclick="closeAll();openModal('m-validate')">Tiếp → chọn block</button></div></div></div>
+
+<div class="ov" id="m-validate"><div class="modal"><div class="mh">Validate trước Submit<span class="x" onclick="closeAll()">×</span></div><div class="mb">
+  <div class="gaterow"><span>Mọi block đã published</span><span class="pass">✓</span></div>
+  <div class="gaterow"><span>Không hex/px/HTML thô</span><span class="pass">✓</span></div>
+  <div class="gaterow"><span>Slot khớp data_contract</span><span class="pass">✓</span></div>
+  <div class="gaterow"><span>Không density override ngoài theme</span><span class="pass">✓</span></div>
+  <div class="gaterow" style="border-color:#f0c4c4"><span>Block <span class="mono">tree.traceability</span> deprecated</span><span class="failx">⚠ cảnh báo</span></div>
+</div><div class="mf"><button class="btn" onclick="closeAll()">Sửa lại</button><button class="btn pri" onclick="closeAll()">Submit (draft)</button></div></div></div>
+
+<div class="ov" id="m-simulate"><div class="modal wide"><div class="mh">Mô phỏng + WCAG gate<span class="x" onclick="closeAll()">×</span></div><div class="mb">
+  <div class="banner d">⛔ Gate CHẶN publish: 1 cặp tương phản dưới AA.</div>
+  <div class="two"><div><div class="grp"><h3>Scene</h3><div class="gb"><div class="kpis"><div class="kpi"><div class="k">OTD</div><div class="v ok">96.4%</div></div><div class="kpi"><div class="k">Backlog</div><div class="v w">1.24M</div></div></div></div></div></div>
+  <div><div class="grp"><h3>Tương phản</h3><div class="gb"><div class="wr"><span>brand/surface</span><span class="pass">8.9·AA</span></div><div class="wr"><span>on-brand/brand</span><span class="pass">9.2·AAA</span></div><div class="wr" style="border:0"><span>warn/warn-soft</span><span class="failx">2.8·FAIL</span></div></div></div></div></div>
+</div><div class="mf"><button class="btn" onclick="closeAll()">Bỏ</button><button class="btn warn" onclick="closeAll()">Waiver (audit+expiry)</button><button class="btn pri" disabled>Commit (bị khoá)</button></div></div></div>
+
+<div class="ov" id="m-request"><div class="modal"><div class="mh">Block Request — block chưa có<span class="x" onclick="closeAll()">×</span></div><div class="mb">
+  <div class="banner w">Người &amp; AI cùng luật: không tự đẻ HTML. Đăng ký block trước.</div>
+  <div class="f"><label>block_key</label><input class="in mono" value="tree.traceability"></div>
+  <div class="f"><label>composed_of (L2)</label><div><span class="cs">o3-tree</span><span class="cs">o3-panel</span></div></div>
+  <div class="f"><label>slots</label><div><span class="cs">root</span><span class="cs">children[]</span></div></div>
+  <div class="f"><label>required_tokens</label><div><span class="cs">tree.line.color</span><span class="cs">status.*</span></div></div>
+  <div class="f"><label>a11y</label><input class="in" value="role=treegrid · Arrow/Enter"></div>
+  <div class="gaterow"><span>preview_scene + fixture</span><span class="pass">✓</span></div>
+</div><div class="mf"><button class="btn" onclick="closeAll()">Huỷ</button><button class="btn pri" onclick="closeAll();go('gov');setSub('gov','queue')">Gửi review</button></div></div></div>
+
+<div class="ov" id="m-archive"><div class="modal"><div class="mh">Archive module “Đơn hàng”<span class="x" onclick="closeAll()">×</span></div><div class="mb">
+  <div class="banner w">Soft-delete: gỡ khỏi nav ngay, giữ tombstone route, grace 30 ngày rồi mới purge. Khôi phục được.</div>
+  <div class="grp"><h3>Impact check</h3><div class="gb" style="padding:0">
+    <div class="li"><span class="nm">Route <span class="mono">/ops/sales/orders</span></span><span class="st w">3 link nội bộ</span></div>
+    <div class="li"><span class="nm">Đang có người dùng</span><span class="st w">12 phiên/24h</span></div>
+    <div class="li"><span class="nm">Redirect tới</span><select class="sel"><option>orders-v2</option></select></div>
+  </div></div>
+</div><div class="mf"><button class="btn" onclick="closeAll()">Huỷ</button><button class="btn warn" onclick="closeAll()">Archive (giữ 30 ngày)</button></div></div></div>
+
+<div class="ov" id="m-conflict"><div class="modal"><div class="mh">⚠ Xung đột chỉnh sửa<span class="x" onclick="closeAll()">×</span></div><div class="mb">
+  <div class="banner d"><b>dunglt</b> đã lưu “Đơn hàng” lúc 10:42 (v8) trong khi bạn đang sửa v7. Lưu đè sẽ mất việc của họ.</div>
+  <div class="grp"><h3>Khác biệt</h3><div class="gb" style="padding:0"><div class="li"><span class="nm">zone list · block</span><span class="mono">của bạn: data.cards</span><span class="mono">v8: data.grid</span></div><div class="li"><span class="nm">theme preset</span><span class="mono">của bạn: tím</span><span class="mono">v8: mặc định</span></div></div></div>
+</div><div class="mf"><button class="btn" onclick="closeAll()">Tải lại v8</button><button class="btn warn" onclick="closeAll()">Merge thủ công</button><button class="btn dgr" onclick="closeAll()">Ghi đè (cần lý do)</button></div></div></div>
+
+<div class="ov" id="m-binderr"><div class="modal"><div class="mh">Binding lỗi — data.grid<span class="x" onclick="closeAll()">×</span></div><div class="mb">
+  <div class="banner d">Runtime KHÔNG fail im lặng: hiện error state rõ + log + alert Governance.</div>
+  <div class="grp"><h3>Chi tiết</h3><div class="gb">
+    <div class="wr"><span>Endpoint</span><span class="mono">GET /api/orders/list</span></div>
+    <div class="wr"><span>Mã lỗi</span><span class="failx">502 · 3 lần/5m</span></div>
+    <div class="wr"><span>data_contract slot</span><span class="pass">khớp</span></div>
+    <div class="wr" style="border:0"><span>Hành vi UI</span><span>error state + nút Thử lại (không hiện data cũ)</span></div></div></div>
+</div><div class="mf"><button class="btn" onclick="closeAll()">Đóng</button><button class="btn pri" onclick="closeAll()">Thử lại</button></div></div></div>
+
+<div class="ov" id="m-clone"><div class="modal"><div class="mh">⎘ Clone theme preset<span class="x" onclick="closeAll()">×</span></div><div class="mb">
+  <div class="f"><label>Clone từ</label><select class="sel"><option>HESEM mặc định (#0c4a6e · 8/4/8 · 32)</option></select></div>
+  <div class="f"><label>Tên preset mới</label><input class="in mono" value="xuong-cam-ung"></div>
+  <div class="knob"><span class="l">brand seed</span><div class="track"><i style="left:55%"></i></div><span class="mono">#0f766e</span></div>
+  <div class="knob"><span class="l">control.height</span><div class="track"><i style="left:62%"></i></div><span class="mono">44</span></div>
+  <div class="f"><label>Scope</label><div><span class="cs">org</span><span class="cs">role: operator</span><span class="cs">device: tablet</span></div></div>
+</div><div class="mf"><button class="btn" onclick="closeAll()">Huỷ</button><button class="btn pri" onclick="closeAll();openModal('m-simulate')">Simulate → publish</button></div></div></div>
+
+<div class="ov" id="m-rollback"><div class="modal"><div class="mh">↩ Rollback release<span class="x" onclick="closeAll()">×</span></div><div class="mb">
+  <div class="banner w">Khôi phục <span class="mono">prior_snapshot</span>. Audit giữ nguyên (không xoá row).</div>
+  <div class="f"><label>Lý do</label><input class="in" placeholder="VD: brand mới gây nhảy màu sidebar"></div>
+</div><div class="mf"><button class="btn" onclick="closeAll()">Huỷ</button><button class="btn dgr" onclick="closeAll()">Rollback</button></div></div></div>
+
+<!-- ===== DRAWER: version history ===== -->
+<div class="ov" id="dr-version"><div class="modal"><div class="mh">🕑 Lịch sử version — “Đơn hàng”<span class="x" onclick="closeAll()">×</span></div><div class="mb">
+  <div class="tl">
+    <div class="tlrow cur"><span class="v">v7</span><span class="m">SV · 2h trước · đổi block list → data.grid</span><span class="st ok">Live</span></div>
+    <div class="tlrow"><span class="v">v6</span><span class="m">dunglt · 1d · thêm zone Giao hàng</span><button class="btn sm" onclick="closeAll();openModal('m-rollback')">Khôi phục</button></div>
+    <div class="tlrow"><span class="v">v5</span><span class="m">SV · 3d · đổi theme preset</span><button class="btn sm" onclick="closeAll();openModal('m-rollback')">Khôi phục</button></div>
+    <div class="tlrow"><span class="v">v4</span><span class="m">AI · 5d · dựng từ archetype</span><button class="btn sm" onclick="closeAll();openModal('m-rollback')">Khôi phục</button></div>
+  </div>
+</div><div class="mf"><button class="btn" onclick="closeAll()">Đóng</button></div></div></div>
+
+<script>
+  function go(s){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+s));document.querySelectorAll('.surfaces button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));document.getElementById('modesw').style.display=(s==='studio')?'flex':'none';document.getElementById('wact-studio').style.display=(s==='studio')?'flex':'none';document.getElementById('scn').classList.remove('open');}
+  function setSub(s,p){document.querySelectorAll('#st-'+s+' button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));document.querySelectorAll('#v-'+s+' .pane').forEach(pa=>pa.classList.toggle('on',pa.id===s+'-'+p));}
+  function setMode(m){document.getElementById('m-assemble').classList.toggle('on',m==='assemble');document.getElementById('m-author').classList.toggle('on',m==='author');document.getElementById('submitbtn').textContent=(m==='assemble')?'Submit':'Publish';document.getElementById('libbtn').textContent=(m==='author')?'＋ Tạo block / contract':'＋ Thêm vào module';inspect(m==='author'?'l3':'assemble',m==='author'?'block ▸ kpi.grid':'module ▸ zone: kpis');go('studio');setSub('studio','canvas');}
+  function inspect(layer,crumb){['assemble','l3','l2','l4'].forEach(x=>document.getElementById('ip-'+x).classList.toggle('on',x===layer));document.getElementById('crumb').textContent=crumb;}
+  function openModal(id){document.getElementById(id).classList.add('on');document.getElementById('scn').classList.remove('open');}
+  function openDrawer(id){openModal(id);}
+  function closeAll(){document.querySelectorAll('.ov').forEach(o=>o.classList.remove('on'));}
+  document.querySelectorAll('.zn').forEach(z=>z.addEventListener('click',function(e){if(e.target.closest('.errstate'))return;document.querySelectorAll('.zn').forEach(x=>x.classList.remove('sel'));z.classList.add('sel');var a=document.getElementById('m-assemble').classList.contains('on');inspect(a?'assemble':'l3',a?'module ▸ zone':'block ▸ '+z.querySelector('.ztag').textContent);}));
+  document.querySelectorAll('.lrow').forEach(r=>r.addEventListener('click',()=>{document.querySelectorAll('.lrow').forEach(x=>x.classList.remove('sel'));r.classList.add('sel');inspect(r.dataset.pick.toLowerCase(),r.dataset.pick+' ▸ '+r.querySelector('small').textContent);}));
+  document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeAll();}));
+  go('studio');document.getElementById('modesw').style.display='flex';
+</script>
+</body></html>
