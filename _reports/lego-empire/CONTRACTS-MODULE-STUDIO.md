@@ -42,3 +42,28 @@
 **A ĐƯỢC PHÉP ngay:** tin snapshot là authority cho 143 governed key (vd `brand.primary`, `control.height.standard`, `space.master`, `radius.master`, `semantic.color.role.*`, `status.*.soft`) — với các key này snapshot luôn có mặt mọi mode, không cần rơi HmTheme. Khuyến nghị giữ nhánh fallback per-key tới khi P0.B2b xanh, vì cắt toàn cục sớm sẽ trả null cho ~180 key ngoài-catalog.
 
 **Chi tiết + verify:** `_reports/lego-empire/exec/P0.B2-token-convergence-2026-06-01.md`. Pre-merge: catalog default_light vs live JSON cho 40 key thiếu → diverge=0.
+
+---
+
+### B→A (2026-06-01) — P3.B registry editor SAVE actions (L2/L3/L4 + theme preset clone)
+**Đáp ứng yêu cầu A→B "graphics_block_contract_save trả full row để refresh inspector":** ✅ mọi save trả full row sau ghi.
+
+Backend mới (`GraphicsGovernanceController` + `DesignTokenCatalogService`, DB-backed, write qua `?`+pgParams, audit_events mỗi mutation). Tất cả write cần `requireWriteRequest` (CSRF + write perm); read cần `requireGraphicsRead`.
+
+| action_key | method | body (POST JSON) | trả về |
+|---|---|---|---|
+| `graphics_component_contract_save` | POST | `{contract:{component_key, display_name_en, display_name_vi, description?, overridable_tokens:[token_key…], inherits_from?, preview_scene_key?, is_operator_visible?:bool, a11y_requirements?:{}}}` (hoặc field phẳng) | `{ok, contract:<full row>}` |
+| `graphics_block_contract_list` | GET `&status=` | — | `{ok, blocks:[…]}` |
+| `graphics_block_contract_save` | POST | `{block:{block_key, display_name_en, display_name_vi, category:layout\|display\|feedback\|navigation\|input, status:draft\|review\|published\|deprecated, composed_of:[o3-class…], root_class?, slots:{}, variant_axes:{}, required_tokens:[token_key…], a11y_contract:{}, preview_scene_key?, deprecation_note?}}` | `{ok, block:<full row>}` |
+| `graphics_module_archetype_list` | GET `&status=` | — | `{ok, archetypes:[…]}` |
+| `graphics_module_archetype_save` | POST | `{archetype:{archetype_key, display_name_en, display_name_vi, route_class, status, zones:{zone:{block,required,desc}}, zone_order:[zone…], required_blocks:[block_key…], forbidden_patterns:[…], a11y_contract:{}, deprecation_note?}}` | `{ok, archetype:<full row>}` |
+| `graphics_theme_preset_clone` | POST | `{source_key, new_key, overlay?:{brand,density_px,…}}` | `{ok, preset:<full row, base_ref=source_key>}` |
+
+Ghi chú shape:
+- `overridable_tokens`/`composed_of`/`required_tokens`/`zone_order`/`required_blocks`/`forbidden_patterns` nhận **mảng string** hoặc **chuỗi CSV** (backend normalize). Mảng rỗng OK.
+- `slots`/`variant_axes`/`a11y_contract`/`zones`/`a11y_requirements` là **object JSON** (JSONB). Mặc định `{}`.
+- `status` ngoài enum → ép `draft`. `category` ngoài enum → ép `layout`. Save là **upsert** theo key (tạo mới nếu chưa có).
+- **theme preset clone**: clone luôn `is_default=false, is_builtin=false, status=draft` (trừ khi overlay đặt khác), set `base_ref=source_key` (lineage kế thừa). new_key trùng key đã có → lỗi 4xx.
+- A có thể chuyển L3/L4 library rail từ `__HM_BLOCK_REGISTRY__`/`__HM_ARCHETYPE_REGISTRY__` (JS static) sang đọc `graphics_block_contract_list`/`graphics_module_archetype_list` (DB authority) khi sẵn sàng — shape row khớp cột bảng (mig 261/262).
+
+**SQL validate:** cả 3 upsert chạy thử trên live schema (BEGIN…ROLLBACK) — casts text[]/jsonb/boolean + tên cột đúng.
