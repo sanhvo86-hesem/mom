@@ -3943,26 +3943,16 @@ function render(el, subTab, currentLang){
   ensureGraphicsRefresh();
   _subTab = normalizeSubTab(subTab || _subTab);
 
+  /* CONSOLIDATION 2026-06-02 (Phase C/D): Module Master, Theme, Accessibility,
+   * Analytics and Design Standard moved INTO Module Studio (SSOT — one home for
+   * design authoring + reference). This admin keeps only the release / governance
+   * control plane (template registry lifecycle, Standard-36 compliance, release &
+   * waiver workflow). Their renderers are still loaded and exposed as window._renderAdm*
+   * so Module Studio consumes them; do not delete the renderer files. */
   var tabs = [
     {key:'templates',    icon:'📐', label:T('templates')},
-    /* Tokens + Effects tabs REMOVED 2026-05-29 (v3-G11): their content
-     * lives inside Module Master under sections "🌐 Global tokens",
-     * "🔠 Typography" and "✨ Effects". Single source of truth: one
-     * Properties dock for ALL design tokens, no parallel edit paths. */
-    /* Module Master — SSOT showcase of every reusable v3 component +
-     * global token ramp (typography + colours + status + effects).
-     * Every new frontend module must consume tokens validated here.
-     * Renderer lives in 00c-admin-appearance-module-sample.js. */
-    {key:'module-sample',icon:'🧩', label:L('Module Master','Module Master')},
-    /* Global Theme tab (v3-G14) — controls font/density/motion/dark
-     * mode for ALL Module Master sections. Per-property overrides
-     * live in the Module Master dock via "Custom" checkbox. */
-    {key:'theme',        icon:'🎨', label:L('Theme','Theme')},
-    {key:'accessibility',icon:'♿', label:L('Trợ năng','Accessibility')},
-    {key:'analytics',    icon:'📊', label:L('Xuất & Phân tích','Export & Analytics')},
     {key:'governance',   icon:'🛡️', label:T('governance')},
-    {key:'advanced',     icon:'🧩', label:T('advanced')},
-    {key:'standard',     icon:'📖', label:L('Chuẩn thiết kế','Design Standard')}
+    {key:'advanced',     icon:'🧩', label:T('advanced')}
   ];
 
   /* Width-cap removed 2026-05-28 per HESEM space-utilization rule:
@@ -3972,7 +3962,7 @@ function render(el, subTab, currentLang){
 
   /* Title */
 	  h += '<div class="hm-page-header" style="align-items:flex-start;margin-bottom:16px">';
-	  h += '<div style="width:100%"><h3 class="hm-page-title" style="margin:0;font-size:18px">'+esc(L('Mặt phẳng điều khiển đồ họa', 'Graphics Control Plane'))+'</h3>';
+	  h += '<div style="width:100%"><h3 class="hm-page-title" style="margin:0;font-size:18px">'+esc(L('Quản trị đồ họa & Phát hành', 'Graphics Governance & Release'))+'</h3>';
 	  h += '<div style="margin-top:6px;padding:5px 10px;background:var(--bg-surface-alt,var(--bg-hover));border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text-secondary)">'+esc(L('Authority: Standard 36 + lớp token dùng chung/Admin. Cache template tại máy chỉ để xem trước hoặc lưu nháp.', 'Authority: Standard 36 + admin/shared token layer. Local template cache is preview/draft only.'))+'</div></div>';
 	  h += '</div>';
 	  h += '<div id="adm-graphics-live" role="status" aria-live="polite" aria-atomic="true" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">'+esc(_graphicsLiveMessage)+'</div>';
@@ -4025,6 +4015,14 @@ function render(el, subTab, currentLang){
   h += '</div>';
   el.innerHTML = h;
 }
+
+/* Consolidation 2026-06-02: expose the read-only reference renderers so Module
+   Studio's "Tham chiếu" surface can host them (WCAG checker, export/analytics,
+   design standard) without duplicating logic. Function declarations hoist, so
+   these are safe to assign here inside the IIFE. */
+window._renderAdmAccessibility = function(){ try { return renderAccessibility(); } catch(e){ return ''; } };
+window._renderAdmAnalytics     = function(){ try { return renderAnalytics(); } catch(e){ return ''; } };
+window._renderAdmStandard      = function(){ try { return renderStandard(); } catch(e){ return ''; } };
 
 /* ── Dirty-state helpers ─────────────────────────────────────────────────── */
 window._admAppearanceClearDirty = function(){
