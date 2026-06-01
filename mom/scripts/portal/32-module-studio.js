@@ -79,7 +79,7 @@
       R + '__lib{border-right:1px solid ' + bsub + ';background:' + sf + '}' +
       R + '__search{position:sticky;top:0;background:' + sf + ';padding:' + sp + ' ' + sc + ';border-bottom:1px solid ' + bsub + ';z-index:1}' +
       R + '__in{height:' + ch + ';width:100%;box-sizing:border-box;border:1px solid ' + bdef + ';border-radius:' + rd + ';padding:0 ' + sc + ';font:inherit;font-size:12px;background:' + sf + ';color:' + ts + '}' +
-      R + '__cat{padding:' + sc + ' ' + sc + ' 0;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:' + tm + '}' +
+      R + '__cat{padding:' + sp + ' ' + sc + ' 0;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:' + tm + '}' +
       R + '__cat--sub{padding:' + sp + ' ' + sc + ' 0}' +
       R + '__blk{display:flex;align-items:center;gap:' + sp + ';cursor:pointer;padding:' + sp + ' ' + sc + ';font-size:12px;color:' + ts + '}' +
       R + '__blk:hover{background:' + brs + '}' +
@@ -90,7 +90,7 @@
       R + '__bd{display:inline-flex;align-items:center;height:16px;padding:0 ' + sp + ';border-radius:' + pill + ';font-size:9px;font-weight:700;text-transform:uppercase}' +
       R + '__bd--ssot{background:' + oks + ';color:' + ok + '}' +
       R + '__bd--l4{background:' + brs + ';color:' + br + '}' +
-      R + '__cv{background:' + sfm + ';padding:' + sc + '}' +
+      R + '__cv{background:' + sfm + ';padding:' + sp + '}' +
       R + '__surf{background:' + sf + ';border:1px solid ' + bsub + ';border-radius:' + rc + ';padding:' + sc + ';min-height:200px}' +
       R + '__hint{color:' + tm + ';font-size:12px;text-align:center;padding:' + sc + '}' +
       R + '__zone{border:1px dashed ' + bdef + ';border-radius:' + rd + ';margin-bottom:' + sp + ';overflow:hidden}' +
@@ -98,7 +98,7 @@
       R + '__zbody{padding:' + sp + ' ' + sc + ';font-size:11px;color:' + td + '}' +
       R + '__insp{border-left:1px solid ' + bsub + ';background:' + sf + '}' +
       R + '__insp .hd{position:sticky;top:0;background:' + sf + ';border-bottom:1px solid ' + bsub + ';padding:' + sp + ' ' + sc + ';font-size:11px;color:' + tm + '}' +
-      R + '__insp .bd{padding:' + sc + '}' +
+      R + '__insp .bd{padding:' + sp + '}' +
       R + '__f{margin-bottom:' + sc + '}' +
       R + '__f label{display:block;font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:' + tm + ';margin-bottom:' + sp + '}' +
       R + '__pill{display:inline-flex;align-items:center;height:' + sc + ';padding:0 ' + sp + ';border-radius:' + pill + ';font-size:10px;font-weight:800;letter-spacing:.4px;background:' + brs + ';color:' + br + '}' +
@@ -222,6 +222,9 @@
     if (!el) { return; }
     ensureStyle();
     el.classList.add(ROOT);
+    /* edge-to-edge: drop the host page container's 24px gutter (no orphan gutters,
+       per HESEM space-utilization rule). Removal only — not a tunable gap. */
+    el.style.padding = '0';
     el.innerHTML = shellHtml();
     el.addEventListener('click', function (ev) {
       var t = (ev.target && ev.target.closest) ? ev.target.closest('[data-ms]') : null;
