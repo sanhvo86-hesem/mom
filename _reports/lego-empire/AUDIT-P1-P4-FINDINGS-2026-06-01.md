@@ -58,10 +58,14 @@ Posture: record ALL first, root-cause, fix triệt để, then re-audit.
 - **F9 gaps** — block-engine.js component gaps snapped to tokens.
 
 ## DEFERRED (documented, need decision / higher risk)
-- **F5 theme-authority divergence** — live default brand #0c4a6e (admin config) ≠ Lego "HESEM mặc định" preset #1565c0 (DB seed). Reconcile by aligning the preset seed to the live brand — needs a NEW migration (UPDATE graphics_theme_preset) + builtin-fallback edit; backend-gated. Needs confirmation of the canonical brand before changing.
+- **F5 theme-authority divergence** — RESOLVED (founder chose #0c4a6e as canonical, 2026-06-01). Re-pointed the HESEM-family presets (hesem-default / industrial-dense / comfortable) #1565c0→#0c4a6e in 3 places: migration 264 (UPDATE graphics_theme_preset, idempotent), 00bg-lego-theme.js THEMES + fallback, DesignTokenCatalogService.php builtinThemePresets + defaults. Distinct presets (shop-floor teal, violet, slate) untouched. Now picking "HESEM mặc định" no longer jumps the brand; sidebar active fill + text both resolve to the #0c4a6e family.
 - **F4 block padding 10px / saved gap 16** — minor; offer to migrate existing modules' gap 16→8.
 - **F6 9 junk "New Module" rows** — data cleanup, not code.
 - **F9 residual off-grid paddings** — niche block renderers; focused pass with per-block verify.
 
-## RE-AUDIT (after deploy)
-- pending: verify sidebar active recolors per theme + 8/12 grid on live; verify builder block face clean on live; confirm no console errors.
+## RE-AUDIT (after deploy — PR #130 merged 046d1c4d7, deploy 26745049459 success) ✅
+- **F1/F2/F8 sidebar — VERIFIED LIVE**: active `.nav-item` now bg=brand-soft (rgb 224,242,254), `background-image:none` (gradient gone), color=brand, `box-shadow: inset 3px 0 0 brand` (hardcoded blue glow gone), padding-left 8 / gap 8 / radius 4 (on-grid). Visual: clean brand-soft pill + brand text + 3px left accent — matches the o3-shell contract. Switching Lego preset recolours the active bg.
+  - NOTE surfaced: the active TEXT/accent resolves to the admin-config brand #0c4a6e while the bg (brand-soft) follows the Lego :root authority — the F5 divergence. Default state still looks unified (both #0c4a6e family); only diverges when Lego presets are switched. Documented; not a regression.
+- **F3 builder declutter — VERIFIED LIVE**: `.mb-r3-block-aura/.mb-r4-block-prime/.mb-r5-block-chipline` = display:none; intel strip kept (flex); zero noise taxonomy chips visible. Block face = header + Manual/spans/⚠ + real KPI content. Professional.
+- **Console — VERIFIED**: no JS errors/exceptions after fixes.
+- F7 / F9 shipped in the same build (static, correct-by-construction).

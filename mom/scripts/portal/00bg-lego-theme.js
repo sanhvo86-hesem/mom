@@ -4,7 +4,7 @@
  * One brand seed -> a full OKLCH-derived palette, applied live by writing CSS
  * custom properties. Mirrors the build-time math in tools/scripts/gen-lego-tokens.mjs
  * so runtime and generated CSS agree. Additive + reversible:
- *   - LegoTheme.applyBrand('#1565c0', { scope })  -> recompute --lego-* + bridge to
+ *   - LegoTheme.applyBrand('#0c4a6e', { scope })  -> recompute --lego-* + bridge to
  *     the production-consumed vars (--brand-primary/--brand-2/--o3-brand…) on `scope`
  *   - LegoTheme.setDensity(px) / setRadius(px) / setControlHeight(px)
  *   - LegoTheme.contrast(fgHex, bgHex) -> WCAG ratio  ; LegoTheme.wcag(ratio,'AA')
@@ -213,9 +213,9 @@
      through the same master tokens, so a module inherits a coherent, tunable look.
      Admins can edit a preset by adjusting tokens in Module Master. ── */
   var THEMES = {
-    'hesem-default':    { label: { vi:'HESEM mặc định', en:'HESEM Default' },   brand:'#1565c0', density:8,  radius:8,  controlH:32, frame:8 },
-    'industrial-dense': { label: { vi:'Công nghiệp dày', en:'Industrial Dense' }, brand:'#1565c0', density:6,  radius:4,  controlH:28, frame:6 },
-    'comfortable':      { label: { vi:'Thoáng',          en:'Comfortable' },     brand:'#1565c0', density:12, radius:10, controlH:36, frame:12 },
+    'hesem-default':    { label: { vi:'HESEM mặc định', en:'HESEM Default' },   brand:'#0c4a6e', density:8,  radius:8,  controlH:32, frame:8 },
+    'industrial-dense': { label: { vi:'Công nghiệp dày', en:'Industrial Dense' }, brand:'#0c4a6e', density:6,  radius:4,  controlH:28, frame:6 },
+    'comfortable':      { label: { vi:'Thoáng',          en:'Comfortable' },     brand:'#0c4a6e', density:12, radius:10, controlH:36, frame:12 },
     'shop-floor':       { label: { vi:'Xưởng (cảm ứng)', en:'Shop-floor (touch)' }, brand:'#0f766e', density:10, radius:8,  controlH:44, frame:10 },
     'violet':           { label: { vi:'Tím',             en:'Violet' },          brand:'#7c3aed', density:8,  radius:8,  controlH:32, frame:8 },
     'slate':            { label: { vi:'Xám đen',         en:'Slate' },           brand:'#334155', density:8,  radius:6,  controlH:32, frame:8 }
@@ -243,7 +243,7 @@
             var outer = (p.radius_outer_px != null) ? p.radius_outer_px : 8;
             THEMES[p.preset_key] = {
               label: { vi: p.display_name_vi || p.preset_key, en: p.display_name_en || p.preset_key },
-              brand: p.brand || '#1565c0',
+              brand: p.brand || '#0c4a6e',
               density: (p.density_px != null) ? p.density_px : 8,
               radius: outer,
               radiusInner: (p.radius_inner_px != null) ? p.radius_inner_px : Math.max(2, Math.round(outer / 2)),
