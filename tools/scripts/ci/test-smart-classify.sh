@@ -157,6 +157,9 @@ assert_true needs_frontend_safety
 assert_true needs_frontend_js_safety
 assert_true needs_frontend_static_safety
 assert_true needs_graphics_safety
+assert_true needs_hmv4_safety
+assert_true needs_playwright_e2e
+assert_true needs_visual_e2e
 assert_false needs_phpstan
 assert_false needs_phpunit
 assert_false needs_doc_health
@@ -164,7 +167,6 @@ assert_false needs_raci
 assert_false needs_openapi
 assert_false needs_kpi_tests
 assert_false needs_db_migration_check
-assert_false needs_playwright_e2e
 assert_false needs_full_regression
 
 run_case "08 Design token generator" "tools/scripts/gen-lego-tokens.mjs"
@@ -319,6 +321,14 @@ run_case "30 Portal HTML only" "mom/portal.html"
 assert_true needs_frontend_static_safety
 assert_false needs_frontend_js_safety
 assert_false needs_playwright_e2e
+assert_false needs_full_regression
+
+run_case "30b Critical portal runtime" "mom/scripts/portal/00-block-engine.js"
+assert_true needs_frontend_safety
+assert_true needs_frontend_js_safety
+assert_true needs_hmv4_safety
+assert_true needs_playwright_e2e
+assert_true needs_visual_e2e
 assert_false needs_full_regression
 
 run_case "31 Template only" "mom/templates/example.html"
