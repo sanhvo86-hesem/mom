@@ -9,6 +9,17 @@ This repository uses Smart CI with many conditional jobs. Branch protection for 
 - Pull requests must not merge until `CI Summary` is success.
 - Auto-merge is recommended so GitHub waits for `CI Summary` before integration.
 
+## Verification
+
+- Admin UI path: `Settings -> Branches -> main -> Require status checks -> CI Summary`.
+- Local/API audit: `GH_TOKEN=... tools/scripts/ci/verify-branch-protection.sh`.
+- The audit must pass when branch protection metadata is readable. If the token cannot read protection metadata, the script prints a warning and exits without failing local developer runs.
+- The Smart CI performance audit also checks that this verification script exists and that the documentation names the command.
+
+## Pinned CI Tools
+
+- OpenAPI validation uses `@stoplight/spectral-cli@6.15.0` through `npx` with npm cache, not a floating global install.
+
 ## Deploy Verification
 
 - The deploy workflow or VPS smoke evidence may be tracked as an additional release gate, but it must not replace `CI Summary`.

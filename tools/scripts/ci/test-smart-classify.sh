@@ -177,7 +177,7 @@ assert_true needs_frontend_safety
 assert_true needs_frontend_js_safety
 assert_true needs_frontend_static_safety
 assert_true needs_graphics_safety
-assert_true needs_hmv4_safety
+assert_false needs_hmv4_safety
 assert_true needs_portal_runtime_smoke
 assert_false needs_playwright_e2e
 assert_false needs_visual_e2e
@@ -352,7 +352,7 @@ assert_false needs_full_regression
 run_case "30b Critical portal runtime" "mom/scripts/portal/00-block-engine.js"
 assert_true needs_frontend_safety
 assert_true needs_frontend_js_safety
-assert_true needs_hmv4_safety
+assert_false needs_hmv4_safety
 assert_true needs_portal_runtime_smoke
 assert_false needs_playwright_e2e
 assert_false needs_visual_e2e
@@ -416,7 +416,7 @@ assert_true needs_db_migration_check
 assert_true needs_phpunit
 assert_true needs_frontend_safety
 assert_true needs_frontend_js_safety
-assert_true needs_hmv4_safety
+assert_false needs_hmv4_safety
 assert_true needs_portal_runtime_smoke
 assert_false needs_playwright_e2e
 assert_false needs_visual_e2e
@@ -439,6 +439,7 @@ def block(job):
 
 bad = []
 for job in (
+    "branch-protection-audit",
     "php-syntax", "phpstan", "phpunit", "kpi-guard", "db-migration-check",
     "openapi", "doc-health", "doc-light", "raci-integrity",
     "frontend-js-safety", "frontend-static-safety", "graphics-safety",
@@ -466,6 +467,84 @@ assert_true needs_full_regression
 assert_true needs_doc_health
 assert_true needs_playwright_e2e
 assert_reason_contains "schedule"
+
+run_case "39 Generic critical portal runtime fast lane" "mom/scripts/portal/00-block-engine.js"
+assert_true needs_frontend_js_safety
+assert_true needs_portal_runtime_smoke
+assert_false needs_hmv4_safety
+assert_false needs_playwright_e2e
+assert_false needs_visual_e2e
+assert_false needs_full_regression
+
+run_case "40 HMV4 behavior stays heavy" "mom/scripts/portal/70-module-template-v4-hydration.js"
+assert_true needs_hmv4_safety
+assert_true needs_playwright_e2e
+assert_false needs_portal_runtime_smoke
+
+echo "CASE 41 Frontend static checkout optimized audit"
+python3 - "$ROOT/.github/workflows/ci.yml" <<'PY' || FAILED=1
+import re
+import sys
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text()
+match = re.search(r"(?ms)^  frontend-static-safety:\n.*?(?=^  [A-Za-z0-9_-]+:\n|\Z)", text)
+block = match.group(0) if match else ""
+if "fetch-depth: 0" in block:
+    print("  FAIL frontend-static-safety still uses fetch-depth: 0")
+    sys.exit(1)
+print("  PASS frontend-static-safety avoids fetch-depth: 0")
+PY
+
+echo "CASE 42 Classify checkout optimized audit"
+python3 - "$ROOT/.github/workflows/ci.yml" <<'PY' || FAILED=1
+import re
+import sys
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text()
+match = re.search(r"(?ms)^  classify:\n.*?(?=^  [A-Za-z0-9_-]+:\n|\Z)", text)
+block = match.group(0) if match else ""
+if "fetch-depth: 0" in block:
+    print("  FAIL classify still uses fetch-depth: 0")
+    sys.exit(1)
+if "Fetch immutable base for classifier" not in block:
+    print("  FAIL classify does not fetch immutable base by SHA")
+    sys.exit(1)
+print("  PASS classify checkout is shallow with immutable base fetch")
+PY
+
+echo "CASE 43 HMV4 PR immutable base audit"
+python3 - "$ROOT/.github/workflows/ci.yml" <<'PY' || FAILED=1
+import re
+import sys
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text()
+match = re.search(r"(?ms)^  hmv4-safety:\n.*?(?=^  [A-Za-z0-9_-]+:\n|\Z)", text)
+block = match.group(0) if match else ""
+required = [
+    "BASE_SHA:",
+    'git fetch --no-tags --depth=1 origin "$BASE"',
+    "Unable to resolve immutable pull request base SHA",
+    'BASE="origin/main"',
+]
+missing = [item for item in required if item not in block]
+if "fetch-depth: 0" in block:
+    missing.append("no fetch-depth: 0")
+if missing:
+    print("  FAIL HMV4 immutable PR base audit missing:", ", ".join(missing))
+    sys.exit(1)
+print("  PASS HMV4 PR base is immutable and fail-closed")
+PY
+
+echo "CASE 44 Branch protection verify script audit"
+assert_file_contains "$ROOT/tools/scripts/ci/verify-branch-protection.sh" "required_status_checks"
+assert_file_contains "$ROOT/tools/scripts/ci/verify-branch-protection.sh" "CI Summary"
+assert_file_contains "$ROOT/docs/ops/BRANCH_PROTECTION_REQUIRED.md" "tools/scripts/ci/verify-branch-protection.sh"
+
+echo "CASE 45 Smart CI performance audit script"
+bash "$ROOT/tools/scripts/ci/audit-smart-ci-performance.sh"
 
 if [[ "$FAILED" -ne 0 ]]; then
   echo "Smart classifier self-test FAILED"
