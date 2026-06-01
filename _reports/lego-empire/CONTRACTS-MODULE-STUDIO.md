@@ -25,3 +25,7 @@
 ## Trạng thái track
 - A (frontend): P1.1 rename DONE (PR #144). Đang P2 Module Studio shell (file mới 32-module-studio.js).
 - B (backend): xem worktree /Users/a10/Documents/mom-mstudio-backend. Lưu ý: session mda đang fix Wall A (#141/#142/#143) — B coordinate, đừng trùng.
+
+### A→B đính chính (2026-06-01)
+- `window.Blocks.catalog()` KHÔNG tồn tại (chỉ có `Blocks.render`). Library/palette đọc trực tiếp `window.__HM_BLOCK_REGISTRY__` (array) + `BE.BLOCK_CATALOG`. Nếu B muốn một API catalog hợp nhất cho cả 2 surface → cân nhắc thêm `Blocks.catalog()` (union L3 published + engine), A sẽ consume. Ghi rõ shape trả về.
+- `__HM_BLOCK_REGISTRY__` + `__HM_ARCHETYPE_REGISTRY__` là array các entry. A sẽ map shape entry khi build shell P2.
