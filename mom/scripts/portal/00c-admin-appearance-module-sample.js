@@ -978,10 +978,34 @@
       body_html: html, tokens:['radius.card','space.master','brand.primary','control.height.standard'] };
   }
 
+  /* v3-G28 (2026-06-01): canonical unified-shell sidebar (.o3-shell__rail).
+   * The global portal sidebar (.eqms-nav) is re-skinned to these exact tokens
+   * via graphics-authority.css; new surfaces use this class directly. */
+  function shellRailSection(L){
+    var item = function(icon, label, active){
+      return '<div class="o3-shell__nav-item' + (active ? ' o3-shell__nav-item--active' : '') + '">'
+        + '<span class="o3-shell__nav-icon">' + icon + '</span>' + esc(label) + '</div>';
+    };
+    var body = '<div style="display:flex;gap:var(--o3-space);align-items:flex-start">'
+      + '<div class="o3-shell__rail" style="height:auto;min-height:220px;border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius-card);overflow:hidden;flex:0 0 240px">'
+      +   '<div class="o3-shell__nav-group"><div class="o3-shell__nav-group-label">' + esc(L('Sản xuất','Production')) + '</div>'
+      +     item('📦', L('Đơn hàng','Orders'), true) + item('🏭', L('Xưởng sản xuất','Workshop'), false) + item('📋', L('Phân công','Dispatch'), false) + '</div>'
+      +   '<div class="o3-shell__nav-group"><div class="o3-shell__nav-group-label">' + esc(L('Chất lượng','Quality')) + '</div>'
+      +     item('🛡️', 'EQMS', false) + item('📈', L('Báo cáo','Reports'), false) + '</div>'
+      + '</div>'
+      + '<div style="flex:1;font-size:12px;color:var(--text-secondary);line-height:1.6">'
+      +   esc(L('Sidebar SSOT (.o3-shell__rail). Sidebar portal toàn cục đã re-skin về đúng các token này. Active = nền brand-soft + viền/chữ brand theo theme; hàng 32px; lưới khe hở 8/12.',
+              'Canonical sidebar (.o3-shell__rail). The global portal sidebar is re-skinned to these exact tokens. Active = brand-soft fill + brand accent/text (theme-following); 32px rows; 8/12 gap grid.'))
+      + '</div></div>';
+    return { id:'shell-rail', label_vi:'🧭 Shell · Sidebar', label_en:'Shell · Sidebar', body_html: body,
+      tokens:['control.height.standard','space.master','space.section','radius.card','brand.primary','brand.primarySoft','colorsLight.bgSurface'] };
+  }
+
   function sections(L){
     return [
       blocksSection(L),
       engineCatalogSection(L),
+      shellRailSection(L),
       archetypesSection(L),
       /* v3-G15 (2026-05-29): Global sections REMOVED from Module Master.
        * Density (Khe hở Master), Global tokens, Typography, Effects are
