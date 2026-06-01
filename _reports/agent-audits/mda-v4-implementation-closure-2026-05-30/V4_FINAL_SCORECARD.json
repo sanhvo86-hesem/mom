@@ -1,8 +1,8 @@
 {
     "schema_version": "mda.v4.final_redteam_scorecard.v1",
-    "generated_at": "2026-06-01T15:32:19+00:00",
-    "branch": "codex/mda-runtime-top30-closure-audit-20260601",
-    "sha": "24a9ae7b8",
+    "generated_at": "2026-06-01T15:53:36+00:00",
+    "branch": "codex/mda-runtime-top30-f25-control-tower-20260601b",
+    "sha": "cbabf7c68",
     "decision_token": "P60_PASS_READY_FOR_CONTROLLED_INTEGRATION",
     "merge_readiness": "controlled_integration_allowed",
     "production_ready_claim_allowed": false,
