@@ -320,7 +320,6 @@ while IFS= read -r file; do
   if is_critical_portal_runtime_path "$file"; then
     set_flag needs_frontend_safety
     set_flag needs_frontend_js_safety
-    set_flag needs_hmv4_safety
     set_flag needs_portal_runtime_smoke
   fi
 

@@ -73,7 +73,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
+      - name: Fetch immutable base for classifier
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha != '' }}
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          if ! git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$BASE_SHA"
+          fi
       - id: classify
         name: Compute Smart CI flags
         env:
@@ -101,7 +110,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run Smart CI path matrix self-test
-        run: bash tools/scripts/ci/test-smart-classify.sh
+        run: |
+          bash tools/scripts/ci/test-smart-classify.sh
+          bash tools/scripts/ci/audit-smart-ci-performance.sh
+
+  branch-protection-audit:
+    name: Branch Protection Audit
+    runs-on: ubuntu-latest
+    needs: classify
+    if: ${{ always() && !failure() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || needs.classify.outputs.needs_full_regression == 'true') }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify main branch protection requires CI Summary
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: tools/scripts/ci/verify-branch-protection.sh
 
   repo-boundary:
     name: Controlled Source Boundary
@@ -311,10 +335,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install spectral
-        run: npm install -g @stoplight/spectral-cli
+      - name: Cache pinned Spectral npm package
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-spectral-cli-6.15.0
       - name: Validate OpenAPI spec
-        run: spectral lint mom/api/openapi.yaml --fail-severity warn
+        run: npx --yes @stoplight/spectral-cli@6.15.0 lint mom/api/openapi.yaml --fail-severity warn
 
   doc-health:
     name: Doc Health
@@ -499,8 +526,6 @@ jobs:
     if: ${{ always() && !failure() && needs.classify.outputs.needs_frontend_static_safety == 'true' }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Static HTML/template sanity
         run: |
           set -euo pipefail
@@ -665,7 +690,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -701,12 +726,29 @@ jobs:
           fi
           echo "PASS no fixture production load"
       - name: Forbidden diff guard
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
-          BASE="${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}"
-          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
-            BASE="origin/main"
+          BASE="${BASE_SHA:-}"
+          if [ -n "$BASE" ] && [ "$BASE" != "0000000000000000000000000000000000000000" ] && ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$BASE" || true
           fi
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
+            if [ "$EVENT_NAME" = "pull_request" ]; then
+              echo "Unable to resolve immutable pull request base SHA for HMV4 forbidden diff guard."
+              exit 1
+            fi
+            if git cat-file -e 'HEAD~1^{commit}' 2>/dev/null; then
+              BASE="HEAD~1"
+            else
+              echo "::warning::Unable to resolve event base; falling back to origin/main for non-PR HMV4 diff guard."
+              git fetch --no-tags --depth=1 origin main
+              BASE="origin/main"
+            fi
+          fi
+          echo "HMV4 forbidden diff base: $BASE"
           DIFF="$(git diff --name-only "$BASE" HEAD || true)"
           HMV4_DIFF="$(printf '%s\n' "$DIFF" | grep -E '^mom/scripts/portal/7[0-4]-module-template-v4-.*\.js$|^mom/styles/module-template-v4|^tests/fixtures/module-template-v4/|^tests/e2e/|(^|/)playwright\.config\.(ts|js)$' || true)"
           if [ -z "$HMV4_DIFF" ]; then
@@ -831,6 +873,7 @@ jobs:
       - classify
       - actionlint
       - classifier-selftest
+      - branch-protection-audit
       - repo-boundary
       - php-syntax
       - phpstan
@@ -894,6 +937,7 @@ jobs:
           | classify | ${{ needs.classify.result }} |
           | actionlint | ${{ needs.actionlint.result }} |
           | classifier-selftest | ${{ needs.classifier-selftest.result }} |
+          | branch-protection-audit | ${{ needs.branch-protection-audit.result }} |
           | repo-boundary | ${{ needs.repo-boundary.result }} |
           | php-syntax | ${{ needs.php-syntax.result }} |
           | phpstan | ${{ needs.phpstan.result }} |
@@ -933,6 +977,9 @@ jobs:
           [ '${{ needs.classify.outputs.needs_repo_boundary }}' = 'true' ] && echo "  - repo-boundary"
           [ '${{ needs.classify.outputs.needs_actionlint }}' = 'true' ] && echo "  - actionlint"
           [ '${{ needs.classify.outputs.needs_classifier_selftest }}' = 'true' ] && echo "  - classifier-selftest"
+          if [ '${{ github.event_name }}' = 'workflow_dispatch' ] || [ '${{ github.event_name }}' = 'schedule' ] || [ '${{ needs.classify.outputs.needs_full_regression }}' = 'true' ]; then
+            echo "  - branch-protection-audit"
+          fi
           [ '${{ needs.classify.outputs.needs_php_syntax }}' = 'true' ] && echo "  - php-syntax"
           [ '${{ needs.classify.outputs.needs_phpstan }}' = 'true' ] && echo "  - phpstan"
           [ '${{ needs.classify.outputs.needs_phpunit }}' = 'true' ] && echo "  - phpunit"
@@ -1011,6 +1058,7 @@ jobs:
             '${{ needs.classify.result }}' \
             '${{ needs.actionlint.result }}' \
             '${{ needs.classifier-selftest.result }}' \
+            '${{ needs.branch-protection-audit.result }}' \
             '${{ needs.repo-boundary.result }}' \
             '${{ needs.php-syntax.result }}' \
             '${{ needs.phpstan.result }}' \
