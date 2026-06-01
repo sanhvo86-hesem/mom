@@ -511,3 +511,46 @@ html[data-color-mode="high-contrast"] {
     color: CanvasText !important;
   }
 }
+
+/* ============================================================================
+ * P4 — Unified global sidebar (o3 master grid + theme brand)
+ * ----------------------------------------------------------------------------
+ * The portal sidebar (.eqms-nav*) is styled in the FROZEN eqms-suite.css with
+ * off-grid values (7px item padding) and the legacy --brand-2 active colour.
+ * This file loads AFTER eqms-suite.css, so these rules win by source order at
+ * equal specificity (no !important, no frozen-file edit). Re-skin only the
+ * visual tokens — surfaces, borders, the 8/12 spacing grid, and a theme-following
+ * brand active state — while preserving all structure / collapsed / mobile /
+ * badge behaviour from eqms-suite.css.
+ * ========================================================================== */
+.eqms-nav {
+  background: var(--o3-surface-card);
+  border-right: 1px solid var(--o3-border-subtle);
+}
+.eqms-nav-header {
+  color: var(--o3-text-strong);
+  border-bottom: 1px solid var(--o3-border-subtle);
+}
+.eqms-nav-group-label {
+  color: var(--o3-text-muted);
+}
+.eqms-nav-item {
+  padding: var(--o3-space) var(--o3-space-section);
+  color: var(--o3-text-default);
+  border-radius: 0; /* full-row left-accent style — keep square */
+}
+.eqms-nav-item:hover {
+  background: var(--o3-surface-muted);
+  color: var(--o3-text-strong);
+}
+.eqms-nav-item.active {
+  background: var(--o3-brand-soft);
+  color: var(--o3-brand);
+  border-left-color: var(--o3-brand);
+  font-weight: var(--o3-font-weight-semi, 600);
+}
+.eqms-nav-toggle {
+  padding: var(--o3-space) var(--o3-space-section);
+  border-top: 1px solid var(--o3-border-subtle);
+  color: var(--o3-text-muted);
+}
