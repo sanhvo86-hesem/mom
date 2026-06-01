@@ -1,9 +1,0 @@
-Package posture: validation-ready package candidate
-Risk ID,Failure Mode,Effect,Cause,Severity,Occurrence,Detection,RPN,Controls,Test Evidence
-RISK-01,Wrong degF conversion,Incorrect quality/production decision,Factor-only affine math,10,2,2,40,Affine handler and negative tests,OQ-03
-RISK-02,Naked number accepted,Loss of measurement meaning,Missing unit/kind binding,9,4,3,108,Widget/API contracts and backlog,P11/P12 tests
-RISK-03,Alias ambiguity auto-mapped,Wrong canonical unit,External supplier/customer alias collision,9,3,3,81,Alias quarantine service and UI quarantine,OQ-04
-RISK-04,Stale rule used,Wrong replay result,Cache not invalidated or wrong effective date,8,3,4,96,as_of/context cache key and workflow invalidation,P13 cache contract
-RISK-05,Unauthorized approval,Uncontrolled rule authority,Permission/signature bypass,10,2,2,40,Human permission and signature meaning checks,OQ-05
-RISK-06,Audit tamper,Non-replayable evidence,Hash or trail mismatch,10,2,3,60,SHA-256 audit hash and verifier,OQ-06
-RISK-07,AI overreach,Unapproved rule or action,Advisory route treated as authority,9,2,3,54,AI advisory-only policy,OQ-07

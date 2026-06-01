@@ -14,7 +14,7 @@
 - Added `GenericCrudGuardService` and `GenericCrudMutationDeniedException`.
 - Wired `GenericCrudController` to return RFC 9457-style Problem Details fields while preserving legacy `error=domain_command_required`.
 - Wired `GenericCrudService` so direct service-layer create/update/delete/transition calls fail before payload validation and before DB writes for governed tables.
-- Added migration `263_governed_generic_crud_guard.sql` with `governed_entity_registry`, `generic_crud_denial_event`, and `hesem_governed_generic_crud_guard()` trigger rollout for tables that exist.
+- Added migration `254_governed_generic_crud_guard.sql` with `governed_entity_registry`, `generic_crud_denial_event`, and `hesem_governed_generic_crud_guard()` trigger rollout for tables that exist.
 - Added focused tests for guard behavior and migration shape.
 
 ## Runtime Evidence Probe

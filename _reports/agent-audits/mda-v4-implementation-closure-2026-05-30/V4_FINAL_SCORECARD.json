@@ -1,8 +1,8 @@
 {
     "schema_version": "mda.v4.final_redteam_scorecard.v1",
-    "generated_at": "2026-06-01T03:37:51+00:00",
+    "generated_at": "2026-06-01T03:50:27+00:00",
     "branch": "cherry/20260601-mda-v4-implementation-closure-recovery-2",
-    "sha": "6222f4185",
+    "sha": "7c61c05db",
     "decision_token": "P60_PASS_READY_FOR_CONTROLLED_INTEGRATION",
     "merge_readiness": "controlled_integration_allowed",
     "production_ready_claim_allowed": false,
@@ -26,7 +26,7 @@
             {
                 "prompt": "P44",
                 "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P44.md",
-                "sha256": "0512f4632c26e8d525e901d10c614d370812e4dc2cebba787e475e2db9d84683"
+                "sha256": "e2882f574ead92dd971b6a8f88987b606a992b05146ad78d192983c17737ea8c"
             },
             {
                 "prompt": "P45",

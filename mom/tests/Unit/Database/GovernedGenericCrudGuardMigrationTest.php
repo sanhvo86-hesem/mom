@@ -10,7 +10,7 @@ final class GovernedGenericCrudGuardMigrationTest extends TestCase
 {
     public function testMigrationDefinesRegistryDenialEventFunctionAndTriggerRollout(): void
     {
-        $path = (string)constant('QMS_TEST_BASE_DIR') . '/database/migrations/263_governed_generic_crud_guard.sql';
+        $path = (string)constant('QMS_TEST_BASE_DIR') . '/database/migrations/254_governed_generic_crud_guard.sql';
         $sql = (string)file_get_contents($path);
 
         $this->assertStringContainsString('CREATE TABLE IF NOT EXISTS governed_entity_registry', $sql);

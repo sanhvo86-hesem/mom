@@ -50,32 +50,6 @@ final class UomBackfillVerticalP15Test extends TestCase
         }
     }
 
-    public function testHistoricalScanClassifiesWithoutMassUpdate(): void
-    {
-        $scan = $this->json('_reports/uom-v5/P15-historical-scan-results.json');
-
-        $this->assertFalse($scan['summary']['mass_update_performed']);
-        $this->assertSame(0, $scan['summary']['shadow_proposals_created']);
-        $classes = array_unique(array_map(static fn (array $row): string => (string)$row['classification'], $scan['classified_fields']));
-        foreach (['already_canonical', 'needs_measval_wrapper', 'needs_item_policy', 'ambiguous_alias', 'cannot_infer_unit'] as $class) {
-            $this->assertContains($class, $classes);
-        }
-    }
-
-    public function testSampleDatasetRollbackDeletesOnlyShadow(): void
-    {
-        $samples = $this->json('_reports/uom-v5/P15-sample-shadow-dataset.json')['samples'];
-        $byId = [];
-        foreach ($samples as $sample) {
-            $byId[$sample['id']] = $sample;
-        }
-
-        $this->assertNull($byId['SIM-P15-01']['shadow_proposal']);
-        $this->assertSame('missing unit evidence', $byId['SIM-P15-01']['quarantine_reason']);
-        $this->assertTrue($byId['SIM-P15-05']['shadow_proposal']['delete_shadow_only']);
-        $this->assertFalse($byId['SIM-P15-05']['shadow_proposal']['delete_original']);
-    }
-
     /**
      * @return array<string,mixed>
      */

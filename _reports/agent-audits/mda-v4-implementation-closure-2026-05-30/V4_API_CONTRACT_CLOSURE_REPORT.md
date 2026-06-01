@@ -73,7 +73,7 @@ Implemented as one P56 unit after P55. P57 must consume the API inventory and pr
 - `mom/api/openapi.yaml`
 - `mom/data/registry/mda-v4-problem-details-catalog.json`
 - `mom/data/registry/mda-v4-api-inventory.json`
-- `mom/data/registry/workflow-contracts/mda-v4-command-workflows.yaml`
+- `mom/data/registry/mda-v4-command-workflows.yaml`
 - `mom/tests/Unit/Services/DomainCommandApiContractClosureTest.php`
 
 ## 8. Files Forbidden Or High-risk

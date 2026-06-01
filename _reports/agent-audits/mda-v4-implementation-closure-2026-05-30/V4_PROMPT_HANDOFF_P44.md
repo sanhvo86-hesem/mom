@@ -11,7 +11,7 @@
 - `mom/api/services/GenericCrudMutationDeniedException.php`
 - `mom/api/services/GenericCrudService.php`
 - `mom/api/controllers/GenericCrudController.php`
-- `mom/database/migrations/263_governed_generic_crud_guard.sql`
+- `mom/database/migrations/254_governed_generic_crud_guard.sql`
 - `mom/tests/Unit/Services/GenericCrudGuardServiceTest.php`
 - `mom/tests/Unit/Database/GovernedGenericCrudGuardMigrationTest.php`
 - `_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_GENERIC_CRUD_HARD_STOP_REPORT.md`

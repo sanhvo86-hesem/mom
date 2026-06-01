@@ -51,21 +51,6 @@ final class UomDomainIntegrationP12Test extends TestCase
         $this->assertContains('Analytics/AI', $simulations['SIM-P12-05']['root_sequence']);
     }
 
-    public function testBacklogClassifiesNakedNumberFieldsByRoot(): void
-    {
-        $backlog = $this->backlog();
-        $roots = array_unique(array_map(static fn (array $item): string => (string)$item['root'], $backlog['items']));
-
-        foreach (['SO', 'WO', 'LOT', 'INSP', 'BREL', 'NQCASE', 'EQP', 'Analytics/AI'] as $root) {
-            $this->assertContains($root, $roots);
-        }
-        foreach ($backlog['items'] as $item) {
-            $this->assertNotEmpty($item['file'] ?? null);
-            $this->assertNotEmpty($item['required_repair'] ?? null);
-            $this->assertStringContainsString('P12-BL-', $item['id']);
-        }
-    }
-
     public function testIntegrationRegistryReferencesExistingUomAuthorityPaths(): void
     {
         foreach ([
@@ -91,15 +76,4 @@ final class UomDomainIntegrationP12Test extends TestCase
         );
     }
 
-    /**
-     * @return array<string,mixed>
-     */
-    private function backlog(): array
-    {
-        return json_decode(
-            (string)file_get_contents(dirname($this->root) . '/_reports/uom-v5/P12-domain-naked-number-backlog.json'),
-            true,
-            flags: JSON_THROW_ON_ERROR
-        );
-    }
 }

@@ -10,7 +10,7 @@
     "problem_details": "DomainCommandController -> ProblemDetailsFactory -> application/problem+json",
     "openapi": "mom/api/openapi.yaml",
     "api_inventory": "mom/data/registry/mda-v4-api-inventory.json",
-    "workflow_contracts": "mom/data/registry/workflow-contracts/mda-v4-command-workflows.yaml"
+    "workflow_contracts": "mom/data/registry/mda-v4-command-workflows.yaml"
   },
   "runtime_probe": {
     "command": "php /private/tmp/p56_contract_probe.php",
@@ -36,7 +36,7 @@
     "mom/api/openapi.yaml",
     "mom/data/registry/mda-v4-problem-details-catalog.json",
     "mom/data/registry/mda-v4-api-inventory.json",
-    "mom/data/registry/workflow-contracts/mda-v4-command-workflows.yaml",
+    "mom/data/registry/mda-v4-command-workflows.yaml",
     "mom/tests/Unit/Services/DomainCommandApiContractClosureTest.php",
     "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_API_CONTRACT_CLOSURE_REPORT.md",
     "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_API_CONTRACT_PROOF_PACK.json",

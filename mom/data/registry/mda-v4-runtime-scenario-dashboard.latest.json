@@ -1,11 +1,11 @@
 {
-    "generated_at": "2026-06-01T03:37:51+00:00",
+    "generated_at": "2026-06-01T03:49:35+00:00",
     "runtime_mode": "transaction_sandbox_real_gateway",
     "mock_only": false,
     "scenario_total": 14,
     "passed": 14,
     "failed": 0,
-    "duration_ms": 65,
+    "duration_ms": 9,
     "blockers_covered": [
         "P0-RESOURCE-READINESS-NOT-WIRED",
         "P0-SCENARIO-MOCK-ONLY-FINAL-ACCEPTANCE",
@@ -75,7 +75,7 @@
                 "command_name": "StartJobCommand",
                 "details": {
                     "readiness_snapshot_id": "readiness-snapshot-1",
-                    "readiness_hash_sha256": "f62467bc10c3ed19b004b0c2e049d73ecba0476c732a8beb1f1b9e1140655ceb",
+                    "readiness_hash_sha256": "66bb7067c1b9c7f7f5ea11dede29b004d4bc78212a91676e58b264296d38900b",
                     "blockers": [
                         {
                             "evidence_key": "machine_pm",

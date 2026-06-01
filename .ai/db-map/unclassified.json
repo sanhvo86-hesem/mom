@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "unclassified",
         "table_count": 860,
-        "generated_at": "2026-06-01T03:34:18+00:00"
+        "generated_at": "2026-06-01T03:49:04+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -4644,7 +4644,7 @@
             "contract": null
         },
         "generic_crud_denial_event": {
-            "defined_in": "263_governed_generic_crud_guard.sql",
+            "defined_in": "254_governed_generic_crud_guard.sql",
             "extended_in": [],
             "primary_key": "denial_id",
             "foreign_keys": [],
@@ -4669,7 +4669,7 @@
             "contract": null
         },
         "governed_entity_registry": {
-            "defined_in": "263_governed_generic_crud_guard.sql",
+            "defined_in": "254_governed_generic_crud_guard.sql",
             "extended_in": [],
             "primary_key": "registry_id",
             "foreign_keys": [],

@@ -98,7 +98,7 @@ final class DomainCommandApiContractClosureTest extends TestCase
     public function testWorkflowCommandsExistInRegistryAndUseGatewayOperation(): void
     {
         $repoRoot = dirname(__DIR__, 4);
-        $workflow = file_get_contents($repoRoot . '/mom/data/registry/workflow-contracts/mda-v4-command-workflows.yaml') ?: '';
+        $workflow = file_get_contents($repoRoot . '/mom/data/registry/mda-v4-command-workflows.yaml') ?: '';
         preg_match_all('/command_name:\s*([A-Za-z0-9_]+)/', $workflow, $matches);
         $commands = array_values(array_unique($matches[1] ?? []));
         $registry = (new CommandRegistry())->all();
