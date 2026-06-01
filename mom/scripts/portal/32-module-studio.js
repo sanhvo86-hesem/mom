@@ -433,9 +433,74 @@
   function doRestoreVersion(id, ver) {
     post('module_schema_restore_version', { moduleId: id, version: parseInt(ver, 10) }).then(function (r) { toast(r && r.ok !== false ? 'Đã rollback về v' + ver : 'Rollback thất bại.', r && r.ok !== false ? 'success' : 'error'); loadModules(false); }).catch(function (e) { toast('Rollback lỗi: ' + e, 'error'); });
   }
+  /* Phase A SSOT unification: applying a preset must PERSIST org-wide through the
+     SAME authority the Appearance Theme tab uses (o3-theme + per-property overrides
+     → _moduleMasterStore.persist → cfg.moduleMaster → boot hydrate), not just a
+     runtime re-skin. Projects the preset onto the canonical o3-theme shape; exact
+     off-grid control heights (e.g. 28/44px) ride the per-property override layer so
+     nothing is lost to the 3-step density quantization. */
+  function persistPresetAsOrgTheme(p) {
+    var LS;
+    try { LS = window.localStorage; } catch (e) { return false; }
+    if (!LS) { return false; }
+    var theme = {};
+    try { theme = JSON.parse(LS.getItem('o3-theme') || '{}') || {}; } catch (e) { theme = {}; }
+    theme['color-mode'] = theme['color-mode'] || 'light';
+    theme['font-family'] = theme['font-family'] || 'Inter, -apple-system, "SF Pro Text", system-ui, sans-serif';
+    theme['font-base'] = theme['font-base'] || 13; theme['font-scale'] = theme['font-scale'] || 1;
+    theme['motion'] = theme['motion'] || 'standard';
+    theme['motion-fast'] = theme['motion-fast'] || 120; theme['motion-base'] = theme['motion-base'] || 200; theme['motion-slow'] = theme['motion-slow'] || 320;
+    if (p.brand) { theme['brand'] = p.brand; }
+    if (p.density_px != null) { theme['master-gap'] = p.density_px; }
+    theme['section-gap'] = theme['section-gap'] || 12;
+    if (p.radius_inner_px != null) { theme['master-radius'] = p.radius_inner_px; }
+    if (p.radius_outer_px != null) { theme['card-radius'] = p.radius_outer_px; }
+    var ch = p.control_h_px;
+    if (ch != null) { theme['density'] = ({ 32: 'compact', 36: 'cozy', 40: 'comfortable' })[ch] || 'compact'; }
+    try { LS.setItem('o3-theme', JSON.stringify(theme)); } catch (e) { return false; }
+    // exact control height via per-property override (lossless for off-step px)
+    if (ch != null) {
+      var ov = {}, vals = {};
+      try { ov = JSON.parse(LS.getItem('o3-props-overrides') || '{}') || {}; } catch (e) { ov = {}; }
+      try { vals = JSON.parse(LS.getItem('o3-props-values') || '{}') || {}; } catch (e) { vals = {}; }
+      ov['control.height.standard'] = true;
+      ['--o3-control-h-standard', '--o3-control-h-md', '--o3-control-h-sm', '--o3-control-h-lg'].forEach(function (cv) { vals[cv] = ch + 'px'; });
+      try { LS.setItem('o3-props-overrides', JSON.stringify(ov)); LS.setItem('o3-props-values', JSON.stringify(vals)); } catch (e) { /* noop */ }
+    }
+    // push org-wide via the canonical shared store (identical path to Theme tab Save)
+    if (window._moduleMasterStore && typeof window._moduleMasterStore.persist === 'function') {
+      window._moduleMasterStore.persist(function (ok, mode) {
+        toast(ok ? ('Đã áp dụng + lưu theme “' + p.preset_key + '” cho tổ chức.') : 'Áp dụng runtime OK; lưu org thất bại.', ok ? 'success' : 'warning');
+      });
+      return true;
+    }
+    // fallback: the module-sample store isn't loaded (Module Studio is its own nav);
+    // replicate persistModuleMaster's read-merge-write into cfg.moduleMaster directly.
+    var HmTheme = window.HmTheme;
+    if (HmTheme && typeof HmTheme.getAdminConfig === 'function' && typeof HmTheme.saveAdminConfig === 'function') {
+      var blob = {
+        theme: theme,
+        overrides: (function () { try { return JSON.parse(LS.getItem('o3-props-overrides') || '{}') || {}; } catch (e) { return {}; } })(),
+        values: (function () { try { return JSON.parse(LS.getItem('o3-props-values') || '{}') || {}; } catch (e) { return {}; } })(),
+        _savedAt: new Date().toISOString()
+      };
+      var cfg; try { cfg = HmTheme.getAdminConfig() || {}; } catch (e) { cfg = {}; }
+      var next = {}; Object.keys(cfg).forEach(function (k) { next[k] = cfg[k]; });
+      next.moduleMaster = blob;
+      try {
+        HmTheme.saveAdminConfig(next, function (ok) { toast(ok ? ('Đã áp dụng + lưu theme “' + p.preset_key + '” cho tổ chức.') : 'Áp dụng runtime OK; lưu org thất bại.', ok ? 'success' : 'warning'); });
+        return true;
+      } catch (e) { return false; }
+    }
+    return false;
+  }
   function doApplyTheme(key) {
-    try { if (window.LegoTheme && typeof window.LegoTheme.applyTheme === 'function') { window.LegoTheme.applyTheme(key); toast('Đã áp dụng theme “' + key + '” (runtime preview).', 'success'); return; } } catch (e) { /* noop */ }
-    toast('LegoTheme chưa sẵn sàng.', 'warning');
+    // 1) instant runtime re-skin
+    try { if (window.LegoTheme && typeof window.LegoTheme.applyTheme === 'function') { window.LegoTheme.applyTheme(key); } } catch (e) { /* noop */ }
+    var p = (state.presets || []).filter(function (x) { return x.preset_key === key; })[0];
+    // 2) persist org-wide through the unified authority
+    if (p && persistPresetAsOrgTheme(p)) { return; }
+    toast('Đã áp dụng theme “' + key + '” (runtime). Lưu org chưa sẵn sàng.', 'warning');
   }
   function doCloneTheme(key) {
     var src = (state.presets || []).filter(function (p) { return p.preset_key === key; })[0];
@@ -577,5 +642,5 @@
     return el;
   }
 
-  window.ModuleStudio = { render: render, setMode: function (m) { state.mode = (m === 'author') ? 'author' : 'assemble'; }, _state: state, version: '0.5.0-render-edit' };
+  window.ModuleStudio = { render: render, setMode: function (m) { state.mode = (m === 'author') ? 'author' : 'assemble'; }, _state: state, version: '0.5.1-themeA-unify' };
 })();
