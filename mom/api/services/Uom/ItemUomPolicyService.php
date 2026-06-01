@@ -132,8 +132,10 @@ final class ItemUomPolicyService
         string  $itemId,
         ?string $siteId     = null,
         ?string $supplierId = null,
-        ?string $customerId = null
+        ?string $customerId = null,
+        ?\DateTimeInterface $asOf = null
     ): ?array {
+        $asOfDate = ($asOf ?? new \DateTimeImmutable('today'))->format('Y-m-d');
         $row = $this->db->queryOne(
             "SELECT id, item_id, site_id, supplier_id, customer_id,
                     inner_pack_label, inner_pack_label_vi, inner_pack_qty,
@@ -147,7 +149,9 @@ final class ItemUomPolicyService
                AND (site_id = :site OR site_id IS NULL)
                AND (supplier_id = :supp OR supplier_id IS NULL)
                AND (customer_id = :cust OR customer_id IS NULL)
-               AND (effective_to IS NULL OR effective_to >= CURRENT_DATE)
+               AND effective_from <= :as_of::date
+               AND (effective_to IS NULL OR effective_to > :as_of::date)
+               AND COALESCE(lifecycle_status, 'active') = 'active'
              ORDER BY
                (CASE WHEN site_id     IS NOT NULL THEN 1 ELSE 0 END) DESC,
                (CASE WHEN supplier_id IS NOT NULL THEN 1 ELSE 0 END) DESC,
@@ -159,6 +163,7 @@ final class ItemUomPolicyService
                 ':site' => $siteId,
                 ':supp' => $supplierId,
                 ':cust' => $customerId,
+                ':as_of' => $asOfDate,
             ]
         );
 

@@ -1,0 +1,11 @@
+gap_id,severity,status,owner_prompt,evidence,next_step
+P56-BLOCK-ROUTE-OPENAPI-001,P0,closed,P56,"P56 probe shows route_openapi_gap_count=0 for domain command routes","Keep route/OpenAPI parity in P57/P58"
+P56-BLOCK-OPENAPI-ROUTE-001,P0,closed,P56,"P56 probe shows openapi_route_gap_count=0","Reject future orphan OpenAPI operations unless planned/future"
+P56-BLOCK-PROBLEM-001,P0,closed,P56,"DomainCommandController now emits application/problem+json and probe validates content-type string","Add live HTTP smoke in P59"
+P56-BLOCK-CODE-001,P0,closed,P56,"ProblemDetailsFactory and catalog include machine-readable code for idempotency/readiness/hold/security/evidence failures","Use code as telemetry dimension in P57"
+P56-BLOCK-SCOPE-001,P1,closed,P56,"OpenAPI DomainCommandEnvelope documents actor_scope, site_ids, plant_ids and object_scope_denied","Keep scope enforcement in SecurityBoundaryMiddleware"
+P56-BLOCK-WORKFLOW-001,P0,closed,P56,"Workflow YAML references 14 commands and probe shows missing_workflow_commands=[]","Convert to real command-stack scenarios in P58"
+P56-BLOCK-TEST-001,P0,closed,P56,"Added DomainCommandApiContractClosureTest and standalone p56_contract_probe","Run PHPUnit when vendor is restored"
+P56-CONTROLLED-VALIDATOR,P2,controlled_gap,P56,"No OpenAPI semantic validator dependency is installed locally","Run spectral/openapi-cli or equivalent in CI when dependencies are available"
+P56-CONTROLLED-VENDOR,P2,controlled_gap,P56,"composer test/analyse/check blocked by missing vendor/bin/phpunit and vendor/bin/phpstan","Install/restore vendor or use CI environment with dependencies"
+P56-CONTROLLED-SMOKE,P2,controlled_gap,P56,"Live HTTP/browser smoke not executed in local branch prompt","Run during P59 cutover/browser smoke"

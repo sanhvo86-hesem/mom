@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Api\Services\GenericCrudService;
+use MOM\Api\Services\GenericCrudGuardService;
+use MOM\Api\Services\GenericCrudMutationDeniedException;
 use MOM\Api\Services\IdempotencyService;
 use MOM\Api\Services\MissingScopeContextException;
 use MOM\Api\Services\PreconditionRequiredException;
@@ -111,6 +113,7 @@ class GenericCrudController extends BaseController
     ];
 
     private ?GenericCrudService $service = null;
+    private ?GenericCrudGuardService $genericCrudGuard = null;
     private ?IdempotencyService $idempotencyService = null;
     private ?array $runtimeAccessPolicy = null;
 
@@ -121,6 +124,15 @@ class GenericCrudController extends BaseController
         }
 
         return $this->service;
+    }
+
+    private function genericCrudGuard(): GenericCrudGuardService
+    {
+        if ($this->genericCrudGuard === null) {
+            $this->genericCrudGuard = new GenericCrudGuardService($this->dataDir);
+        }
+
+        return $this->genericCrudGuard;
     }
 
     private function idempotency(): IdempotencyService
@@ -863,6 +875,10 @@ class GenericCrudController extends BaseController
         if ($e instanceof WorkflowBridgeRequiredException) {
             $this->error('workflow_engine_required', 409, $e->getMessage());
         }
+        if ($e instanceof GenericCrudMutationDeniedException) {
+            $problem = $e->problemDetails();
+            $this->error((string)($problem['code'] ?? 'domain_command_required'), (int)($problem['status'] ?? 409), (string)($problem['detail'] ?? $e->getMessage()), $problem);
+        }
 
         $this->rethrowResponse($e);
         $this->error($fallbackError, 400, $e->getMessage());
@@ -1109,31 +1125,24 @@ class GenericCrudController extends BaseController
     }
 
     /**
+     * @param array<string, mixed> $ctx
      * @param array<string, mixed> $user
+     * @return array<string, mixed>
      */
-    private function governedGenericMutationOverrideEnabled(array $user): bool
+    private function genericMutationContext(array $ctx, array $user, bool $migrationContext = false): array
     {
-        $configured = strtolower(trim((string)(getenv('HESEM_ALLOW_GOVERNED_GENERIC_MUTATION') ?: '')));
-        if ($configured !== 'break_glass_for_migration_only') {
-            return false;
-        }
-
-        $roles = array_map('strval', (array)($user['roles'] ?? []));
-        $role = trim((string)($user['role'] ?? ''));
-        if ($role !== '') {
-            $roles[] = $role;
-        }
-
-        $isAdmin = in_array('admin', $roles, true) || in_array('it_admin', $roles, true);
-        if (!$isAdmin) {
-            return false;
-        }
-
-        $releaseManifest = trim((string)($this->requestHeader('X-HESEM-Release-Manifest') ?? ''));
-        $commandId = trim((string)($this->requestHeader('X-HESEM-Command-Id') ?? ''));
-
-        return preg_match('/^REL-[A-Z0-9._:-]+$/', $releaseManifest) === 1
-            && preg_match('/^[a-f0-9-]{36}$/i', $commandId) === 1;
+        return [
+            'table_known' => true,
+            'source' => 'GenericCrudController',
+            'user_id' => (string)($user['username'] ?? $user['user_id'] ?? 'system'),
+            'user_roles' => $this->currentRoles($user),
+            'table_meta' => is_array($ctx['tableMeta'] ?? null) ? (array)$ctx['tableMeta'] : [],
+            'migration_context' => $migrationContext,
+            'internal_override' => trim((string)($this->requestHeader('X-HESEM-Internal-Generic-Override') ?? '')),
+            'release_manifest' => trim((string)($this->requestHeader('X-HESEM-Release-Manifest') ?? '')),
+            'command_id' => trim((string)($this->requestHeader('X-HESEM-Command-Id') ?? '')),
+            'correlation_id' => trim((string)($this->requestHeader('X-Correlation-Id') ?? $this->requestHeader('X-Request-Id') ?? '')),
+        ];
     }
 
     /**
@@ -1141,16 +1150,39 @@ class GenericCrudController extends BaseController
      */
     private function enforceDomainCommandBoundary(array $ctx, array $user): void
     {
-        if (!$this->requiresDomainCommand($ctx) || $this->governedGenericMutationOverrideEnabled($user)) {
+        $context = $this->genericMutationContext($ctx, $user);
+        $decision = $this->genericCrudGuard()->evaluate(
+            (string)($ctx['domain'] ?? ''),
+            (string)($ctx['table'] ?? ''),
+            (string)($ctx['kind'] ?? ''),
+            $context
+        );
+
+        if (($decision['allowed'] ?? false) === true && (!$this->requiresDomainCommand($ctx) || ($decision['allowed_by'] ?? '') === 'migration_break_glass')) {
             return;
         }
 
-        $this->error('domain_command_required', 409, 'Generic CRUD mutation is disabled for governed runtime domains. Use a dedicated process command API so business gates, transaction boundaries, idempotency, ledger posting, audit, and evidence are enforced.', [
+        if (!$this->requiresDomainCommand($ctx) && (($decision['allowed'] ?? false) === true)) {
+            return;
+        }
+
+        if (($decision['allowed'] ?? false) === true) {
+            $decision = array_merge($decision, [
+                'allowed' => false,
+                'status' => 409,
+                'code' => 'domain_command_required',
+                'detail' => 'Generic CRUD mutation is disabled for governed runtime domains. Use a dedicated process command API so business gates, transaction boundaries, idempotency, ledger posting, audit, and evidence are enforced.',
+            ]);
+        }
+
+        $problem = $this->genericCrudGuard()->problemDetails($decision);
+        $this->genericCrudGuard()->recordDeniedMutation($decision, $context);
+        $this->error((string)($problem['code'] ?? 'domain_command_required'), (int)($problem['status'] ?? 409), (string)($problem['detail'] ?? ''), array_merge($problem, [
             'domain' => (string)($ctx['domain'] ?? ''),
             'table' => (string)($ctx['table'] ?? ''),
             'kind' => (string)($ctx['kind'] ?? ''),
             'policy' => 'frontend_must_not_call_raw_runtime_mutations_for_governed_domains',
-        ]);
+        ]));
     }
 
     /**
@@ -1302,7 +1334,8 @@ class GenericCrudController extends BaseController
                     $ctx['table'],
                     $payload,
                     (string)($user['username'] ?? 'system'),
-                    $ctx['scope']
+                    $ctx['scope'],
+                    $this->genericMutationContext($ctx, $user)
                 );
                 $this->auditLog('generic_crud_create', ['domain' => $ctx['domain'], 'table' => $ctx['table']], (string)($user['username'] ?? ''));
                 return [
@@ -1354,7 +1387,8 @@ class GenericCrudController extends BaseController
                     $payload,
                     (string)($user['username'] ?? 'system'),
                     $ctx['scope'],
-                    $ctx['expected_row_version']
+                    $ctx['expected_row_version'],
+                    $this->genericMutationContext($ctx, $user)
                 );
                 $this->auditLog('generic_crud_update', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity']], (string)($user['username'] ?? ''));
                 return [
@@ -1402,7 +1436,8 @@ class GenericCrudController extends BaseController
                     $ctx['identity'],
                     $ctx['scope'],
                     $ctx['expected_row_version'],
-                    (string)($user['username'] ?? 'system')
+                    (string)($user['username'] ?? 'system'),
+                    $this->genericMutationContext($ctx, $user)
                 );
                 $this->auditLog('generic_crud_delete', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity']], (string)($user['username'] ?? ''));
                 return [
@@ -1453,7 +1488,8 @@ class GenericCrudController extends BaseController
                     (string)($user['username'] ?? 'system'),
                     $this->currentRoles($user),
                     $ctx['scope'],
-                    $ctx['expected_row_version']
+                    $ctx['expected_row_version'],
+                    $this->genericMutationContext($ctx, $user)
                 );
                 $this->auditLog('generic_crud_transition', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity'], 'to' => $toStatus], (string)($user['username'] ?? ''));
                 return [

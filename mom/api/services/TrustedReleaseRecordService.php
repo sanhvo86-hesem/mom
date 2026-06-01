@@ -420,7 +420,7 @@ final class TrustedReleaseRecordService
         $quality = $this->qualityAssertion($events, $sections['quality'] ?? []);
         $evidence = $this->evidenceAssertion($events, $sections['evidence'] ?? []);
         $approval = $this->approvalAssertion($events, $sections['approvals'] ?? []);
-        $qualification = $this->qualificationAssertion($events, $sections['workforce'] ?? [], $criteria);
+        $qualification = $this->qualificationAssertion($events, $sections['workforce'] ?? []);
         $genealogy = $this->canonicalGenealogyAssertion($criteria, $sections['genealogy'] ?? []);
 
         $assertions = [
@@ -564,20 +564,10 @@ final class TrustedReleaseRecordService
     /**
      * @param list<array<string, mixed>> $events
      * @param list<array<string, mixed>> $section
-     * @param array<string, mixed> $criteria
      * @return array<string, mixed>
      */
-    private function qualificationAssertion(array $events, array $section, array $criteria): array
+    private function qualificationAssertion(array $events, array $section): array
     {
-        $required = !in_array((string)($criteria['require_qualification'] ?? 'true'), ['false', '0', 'no'], true);
-        if (!$required) {
-            return [
-                'satisfied' => true,
-                'event_count' => count($section),
-                'reason_code' => 'qualification_not_required',
-            ];
-        }
-
         $qualified = false;
         $blocked = false;
         foreach ($events as $event) {

@@ -1,0 +1,56 @@
+{
+  "prompt": "P50",
+  "decision_token": "P50_PASS_WITH_CONTROLLED_GAPS",
+  "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
+  "security_boundary": {
+    "gateway_hook": "DomainCommandGateway dispatch calls SecurityBoundaryMiddleware before implementation status, idempotency replay, or handler execution.",
+    "denial_audit_event": "domain_command.security_denied",
+    "policies": [
+      "AIActorFirewall",
+      "ObjectAuthorizationPolicy",
+      "PropertyAuthorizationPolicy",
+      "SoDPolicy",
+      "PrivilegedReauthPolicy",
+      "OTTrustPolicy"
+    ]
+  },
+  "runtime_evidence": [
+    {
+      "probe": "php_lint_p50_files",
+      "result": "PASS",
+      "evidence": "No syntax errors detected in all P50 service and test files."
+    },
+    {
+      "probe": "manual_bola_ai_reauth",
+      "result": "PASS",
+      "evidence": "{\"bola\":[\"object_scope_denied\",1],\"ai\":[\"ai_governed_action_forbidden\",1],\"reauth\":[\"reauth_required\",1]}"
+    },
+    {
+      "probe": "unit_tests_added",
+      "result": "PASS",
+      "evidence": "DomainCommandSecurityBoundaryTest covers BOLA, property authorization, AI firewall, SoD, reauth, and OT trust denials."
+    },
+    {
+      "probe": "composer_test",
+      "result": "BLOCKED",
+      "evidence": "Could not open input file: vendor/bin/phpunit"
+    },
+    {
+      "probe": "composer_analyse_check",
+      "result": "BLOCKED",
+      "evidence": "Could not open input file: vendor/bin/phpstan"
+    }
+  ],
+  "controlled_gaps": [
+    {
+      "gap": "legacy_route_bypass",
+      "status": "open",
+      "next_prompt": "P55/P58"
+    },
+    {
+      "gap": "local_vendor_dependencies_missing",
+      "status": "blocked",
+      "next_prompt": "release/CI"
+    }
+  ]
+}

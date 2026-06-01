@@ -1,0 +1,92 @@
+arazzo: 1.0.1
+info:
+  title: HESEM MDA V4 governed command workflows
+  version: mda-v4-p56
+  summary: Arazzo-like workflow contracts for domain command gateway sequences.
+sourceDescriptions:
+  - name: hesem-mda-v4-openapi
+    type: openapi
+    url: ../../api/openapi.yaml
+workflows:
+  - workflowId: engineering-package-to-work-order-start
+    summary: Release engineering package, release work order, start job, inspect, and complete operation.
+    dependsOn: []
+    steps:
+      - stepId: create-package
+        operationId: submitDomainCommand
+        command_name: CreateEngineeringReleasePackageCommand
+        expectedProblemCodes: [regulated_evidence_missing, command_permission_denied]
+      - stepId: add-package-member
+        operationId: submitDomainCommand
+        command_name: AddPackageMemberCommand
+        expectedProblemCodes: [regulated_evidence_missing, command_permission_denied]
+      - stepId: submit-package
+        operationId: submitDomainCommand
+        command_name: SubmitEngineeringReleasePackageCommand
+        expectedProblemCodes: [regulated_evidence_missing, command_permission_denied]
+      - stepId: approve-package
+        operationId: submitDomainCommand
+        command_name: ApproveEngineeringReleasePackageCommand
+        expectedProblemCodes: [sod_violation, regulated_evidence_missing]
+      - stepId: release-package
+        operationId: submitDomainCommand
+        command_name: ReleaseEngineeringReleasePackageCommand
+        expectedProblemCodes: [regulated_evidence_missing, idempotency_conflict]
+      - stepId: release-work-order
+        operationId: submitDomainCommand
+        command_name: ReleaseWorkOrderCommand
+        expectedProblemCodes: [engineering_package_required, regulated_evidence_missing]
+      - stepId: start-job
+        operationId: submitDomainCommand
+        command_name: StartJobCommand
+        expectedProblemCodes: [resource_readiness_blocked, quality_hold_active, tooling_runtime_blocked]
+      - stepId: record-inspection
+        operationId: submitDomainCommand
+        command_name: RecordInspectionResultCommand
+        expectedProblemCodes: [gage_runtime_blocked, uom_authority_resolution_failed]
+      - stepId: complete-operation
+        operationId: submitDomainCommand
+        command_name: CompleteOperationCommand
+        expectedProblemCodes: [resource_readiness_blocked, quality_hold_active, uom_authority_resolution_failed]
+  - workflowId: receipt-iqc-putaway
+    summary: Receive inventory, record IQC result, release or hold, then put away.
+    steps:
+      - stepId: receive-inventory
+        operationId: submitDomainCommand
+        command_name: ReceiveInventoryCommand
+        expectedProblemCodes: [regulated_evidence_missing, uom_authority_resolution_failed]
+      - stepId: record-iqc
+        operationId: submitDomainCommand
+        command_name: RecordInspectionResultCommand
+        expectedProblemCodes: [gage_runtime_blocked, uom_authority_resolution_failed]
+      - stepId: apply-hold-if-failed
+        operationId: submitDomainCommand
+        command_name: ApplyQualityHoldCommand
+        expectedProblemCodes: [regulated_evidence_missing, quality_hold_subject_required]
+      - stepId: release-hold-if-disposition-approved
+        operationId: submitDomainCommand
+        command_name: ReleaseQualityHoldCommand
+        expectedProblemCodes: [regulated_evidence_missing, quality_hold_not_active]
+      - stepId: putaway-inventory
+        operationId: submitDomainCommand
+        command_name: PutawayInventoryCommand
+        expectedProblemCodes: [quality_hold_active, inventory_lot_expired, uom_authority_resolution_failed]
+  - workflowId: oqc-shipment-containment-release
+    summary: Record OQC result, hold shipment subject if failed, complete MRB, and release hold before shipment release by downstream logistics.
+    steps:
+      - stepId: record-oqc
+        operationId: submitDomainCommand
+        command_name: RecordInspectionResultCommand
+        expectedProblemCodes: [gage_runtime_blocked, uom_authority_resolution_failed]
+      - stepId: apply-shipment-hold
+        operationId: submitDomainCommand
+        command_name: ApplyQualityHoldCommand
+        expectedProblemCodes: [regulated_evidence_missing, quality_hold_subject_required]
+      - stepId: record-mrb-disposition
+        operationId: submitDomainCommand
+        command_name: RecordMrbDispositionCommand
+        expectedProblemCodes: [regulated_evidence_missing, quality_hold_not_active]
+      - stepId: release-quality-hold
+        operationId: submitDomainCommand
+        command_name: ReleaseQualityHoldCommand
+        expectedProblemCodes: [regulated_evidence_missing, quality_hold_not_active]

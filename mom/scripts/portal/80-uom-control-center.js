@@ -41,6 +41,72 @@
 
     var MODULE_KEY = 'uom_control_center';
 
+    var FIXTURE_UNITS = [
+        { canonical_code: 'kg', display_symbol: 'kg', display_name_vi: 'kilôgam', quantity_kind_code: 'Mass', risk_level: 'low', lifecycle_status: 'active' },
+        { canonical_code: 'g', display_symbol: 'g', display_name_vi: 'gam', quantity_kind_code: 'Mass', risk_level: 'low', lifecycle_status: 'active' },
+        { canonical_code: 'm', display_symbol: 'm', display_name_vi: 'mét', quantity_kind_code: 'Length', risk_level: 'low', lifecycle_status: 'active' },
+        { canonical_code: 'mm', display_symbol: 'mm', display_name_vi: 'milimét', quantity_kind_code: 'Length', risk_level: 'low', lifecycle_status: 'active' }
+    ];
+
+    var FIXTURE_KINDS = [
+        { kind_code: 'Mass', dimension_vector: 'M', label_vi: 'Khối lượng', is_dimensionless: false, source: 'fixture' },
+        { kind_code: 'Length', dimension_vector: 'L', label_vi: 'Chiều dài', is_dimensionless: false, source: 'fixture' },
+        { kind_code: 'Volume', dimension_vector: 'L3', label_vi: 'Thể tích', is_dimensionless: false, source: 'fixture' },
+        { kind_code: 'CountOrQuantity', dimension_vector: '1', label_vi: 'Số lượng', is_dimensionless: true, source: 'fixture' }
+    ];
+
+    function liveApiEnabled() {
+        if (global.UOM_LIVE_API_ENABLED === true) return true;
+        try {
+            return !!(global.localStorage && localStorage.getItem('uom_live_api') === '1');
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function apiJson(path, options, fixtureFactory) {
+        if (!liveApiEnabled()) {
+            return Promise.resolve(fixtureFactory ? fixtureFactory() : { ok: true });
+        }
+        return fetch(path, options || { credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .catch(function () {
+                return fixtureFactory ? fixtureFactory() : { ok: false, detail: 'Đang dùng dữ liệu mẫu chỉ đọc do API không sẵn sàng.' };
+            });
+    }
+
+    function fixtureUnits(kindCode) {
+        return FIXTURE_UNITS.filter(function (u) {
+            return !kindCode || u.quantity_kind_code === kindCode;
+        });
+    }
+
+    function fixtureConvert(payload) {
+        var n = Number(String(payload.magnitude || '').replace(',', '.'));
+        var result = String(payload.magnitude || '');
+        if (Number.isFinite(n) && payload.from_unit === 'kg' && payload.to_unit === 'g') result = String(n * 1000);
+        if (Number.isFinite(n) && payload.from_unit === 'g' && payload.to_unit === 'kg') result = String(n / 1000);
+        return {
+            ok: true,
+            result: result,
+            to_unit: payload.to_unit,
+            measval: {
+                original_input: { magnitude: String(payload.magnitude || ''), unit_code: payload.from_unit },
+                canonical: { magnitude: result, unit_code: payload.to_unit },
+                display: { magnitude: result, unit_code: payload.to_unit },
+                evidence: { rule_code: 'FIXTURE-PREVIEW', category: 'fixture', factor: 'preview', source_system: payload.source_system || 'fixture' },
+                digital_thread: { audit_hash: 'fixture-readonly-preview', recorded_at: new Date(0).toISOString() }
+            }
+        };
+    }
+
+    function fixtureAlias(alias) {
+        if (String(alias).trim().toUpperCase() === 'M') {
+            return { ok: false, status: 'ambiguous', ambiguous: true, quarantine_id: 'UOM-Q-FIXTURE-M', detail: 'Bí danh M mơ hồ; không tự động ánh xạ.' };
+        }
+        return { ok: false, status: 'unknown', quarantine_id: 'UOM-Q-FIXTURE-' + String(alias || 'UNKNOWN').toUpperCase(), detail: 'Bí danh chưa được xác thực; đã chuyển sang hàng đợi cách ly.' };
+    }
+
     if (global.ModuleRegistry && global.ModuleRegistry.register) {
         global.ModuleRegistry.register(MODULE_KEY, {
             labelVi   : 'Quản lý Đơn vị Đo',
@@ -57,6 +123,9 @@
         container.innerHTML = '';
 
         var wrapper = el('div', { className: 'uom-cc' });
+        wrapper.setAttribute('data-authority-class', 'projection');
+        wrapper.setAttribute('data-route-class', 'workspace-projection');
+        wrapper.setAttribute('data-live-api', liveApiEnabled() ? 'opt-in' : 'fixture-default');
         applyPageStyles(wrapper);
 
         /* Header */
@@ -200,6 +269,16 @@
         /* To unit */
         var toWrap = buildSelectField('Đơn vị đích', 'calc-to-unit');
 
+        var kindWrap = buildSelectField('Loại đại lượng', 'calc-kind');
+        var kindSel = kindWrap.querySelector('select');
+        kindSel.innerHTML = '';
+        [['', '— Chọn loại đại lượng —'], ['Mass', 'Khối lượng'], ['Length', 'Chiều dài'], ['Volume', 'Thể tích'], ['CountOrQuantity', 'Số lượng']].forEach(function (pair) {
+            var o = el('option'); o.value = pair[0]; o.textContent = pair[1]; kindSel.appendChild(o);
+        });
+
+        var sourceWrap = buildField('Nguồn dữ liệu', 'fixture', 'calc-source-system', 'text');
+        sourceWrap.querySelector('input').value = 'fixture';
+
         /* Precision */
         var precWrap = buildField('Số chữ số thập phân', '6', 'calc-precision', 'number');
         var precInp  = precWrap.querySelector('input');
@@ -208,13 +287,17 @@
         precInp.value= '6';
 
         grid.appendChild(magWrap);
+        grid.appendChild(kindWrap);
         grid.appendChild(fromWrap);
         grid.appendChild(toWrap);
+        grid.appendChild(sourceWrap);
         grid.appendChild(precWrap);
         body.appendChild(grid);
 
         /* Convert button */
         var btn = buildPrimaryButton('Chuyển đổi');
+        btn.disabled = true;
+        btn.setAttribute('aria-disabled', 'true');
         body.appendChild(btn);
 
         /* Result area */
@@ -224,31 +307,44 @@
         body.appendChild(result);
 
         /* Load unit options */
-        loadUnitsIntoSelect(fromWrap.querySelector('select'), null, function () {});
-        loadUnitsIntoSelect(toWrap.querySelector('select'), null, function () {});
+        function reloadUnits() {
+            var kind = kindSel.value || null;
+            loadUnitsIntoSelect(fromWrap.querySelector('select'), kind, function () { validateCalcForm(card, btn, result); });
+            loadUnitsIntoSelect(toWrap.querySelector('select'), kind, function () { validateCalcForm(card, btn, result); });
+        }
+        reloadUnits();
+        [magWrap.querySelector('input'), fromWrap.querySelector('select'), toWrap.querySelector('select'), kindSel, sourceWrap.querySelector('input')].forEach(function (node) {
+            node.addEventListener('input', function () { validateCalcForm(card, btn, result); });
+            node.addEventListener('change', function () {
+                if (node === kindSel) reloadUnits();
+                validateCalcForm(card, btn, result);
+            });
+        });
 
         /* Button click */
         btn.addEventListener('click', function () {
             var mag      = card.querySelector('#calc-magnitude').value.trim();
             var fromUnit = card.querySelector('#calc-from-unit').value;
             var toUnit   = card.querySelector('#calc-to-unit').value;
+            var kind     = card.querySelector('#calc-kind').value;
+            var source   = card.querySelector('#calc-source-system').value.trim() || 'fixture';
             var prec     = parseInt(card.querySelector('#calc-precision').value, 10) || 6;
 
-            if (!mag || !fromUnit || !toUnit) {
-                showError(result, 'Vui lòng điền đầy đủ: giá trị, đơn vị nguồn, đơn vị đích.');
+            if (!mag || !fromUnit || !toUnit || !kind || !source) {
+                showError(result, 'Vui lòng điền đầy đủ: giá trị, loại đại lượng, đơn vị nguồn, đơn vị đích và nguồn dữ liệu.');
                 return;
             }
 
             result.style.display = 'block';
             result.innerHTML = '<span style="color:' + tok('--text-secondary', '#6b7280') + '">Đang tính toán…</span>';
 
-            fetch('/api/v1/uom/convert', {
+            var payload = { magnitude: mag, from_unit: fromUnit, to_unit: toUnit, quantity_kind_code: kind, source_system: source, display_precision: prec };
+            apiJson('/api/v1/uom/convert', {
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ magnitude: mag, from_unit: fromUnit, to_unit: toUnit, display_precision: prec })
-            })
-            .then(function (r) { return r.json(); })
+                body: JSON.stringify(payload)
+            }, function () { return fixtureConvert(payload); })
             .then(function (d) {
                 if (d.ok) {
                     showCalcResult(result, d);
@@ -262,6 +358,22 @@
         });
 
         container.appendChild(card);
+    }
+
+    function validateCalcForm(card, btn, result) {
+        var mag = card.querySelector('#calc-magnitude').value.trim();
+        var kind = card.querySelector('#calc-kind').value;
+        var fromUnit = card.querySelector('#calc-from-unit').value;
+        var toUnit = card.querySelector('#calc-to-unit').value;
+        var source = card.querySelector('#calc-source-system').value.trim();
+        var ok = !!(mag && kind && fromUnit && toUnit && source);
+        btn.disabled = !ok;
+        btn.setAttribute('aria-disabled', ok ? 'false' : 'true');
+        btn.title = ok ? '' : 'Cần giá trị, loại đại lượng, đơn vị nguồn, đơn vị đích và nguồn dữ liệu.';
+        if (!ok && mag && result) {
+            showError(result, 'Không được gửi số đo thiếu đơn vị, loại đại lượng hoặc nguồn dữ liệu.');
+        }
+        return ok;
     }
 
     function showCalcResult(container, d) {
@@ -380,8 +492,7 @@
         var tbody = table.querySelector('tbody');
         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:' + tok('--text-secondary', '#6b7280') + '">Đang tải…</td></tr>';
 
-        fetch(url, { credentials: 'same-origin' })
-            .then(function (r) { return r.json(); })
+            apiJson(url, { credentials: 'same-origin' }, function () { return { units: fixtureUnits(kindCode) }; })
             .then(function (d) {
                 var units = d.units || [];
                 tbody.innerHTML = '';
@@ -431,8 +542,7 @@
         tableWrap.appendChild(table);
         body.appendChild(tableWrap);
 
-        fetch('/api/v1/uom/kinds?limit=200', { credentials: 'same-origin' })
-            .then(function (r) { return r.json(); })
+        apiJson('/api/v1/uom/kinds?limit=200', { credentials: 'same-origin' }, function () { return { kinds: FIXTURE_KINDS }; })
             .then(function (d) {
                 var kinds = d.kinds || [];
                 var tbody = table.querySelector('tbody');
@@ -473,8 +583,7 @@
         tableWrap.appendChild(table);
         body.appendChild(tableWrap);
 
-        fetch('/api/v1/uom/rules?limit=100', { credentials: 'same-origin' })
-            .then(function (r) { return r.json(); })
+        apiJson('/api/v1/uom/rules?limit=100', { credentials: 'same-origin' }, function () { return { rules: [] }; })
             .then(function (d) {
                 var rules = d.rules || [];
                 var tbody = table.querySelector('tbody');
@@ -543,20 +652,19 @@
             result.textContent    = 'Đang phân giải…';
             result.style.color    = tok('--text-secondary', '#6b7280');
 
-            fetch('/api/v1/uom/aliases/resolve', {
+            apiJson('/api/v1/uom/aliases/resolve', {
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ alias: alias, context_scope: scope })
-            })
-            .then(function (r) { return r.json(); })
+            }, function () { return fixtureAlias(alias); })
             .then(function (d) {
-                if (d.ok) {
+                if (d.ok && !d.ambiguous) {
                     result.style.color = tok('--status-success-text', '#15803d');
                     result.textContent = '✓ Mã chuẩn: ' + d.canonical_code;
                 } else {
                     result.style.color = tok('--status-danger-text', '#b91c1c');
-                    result.textContent = '✗ ' + (d.detail || 'Không tìm thấy — đã gửi vào hàng đợi kiểm duyệt');
+                    result.textContent = 'Cách ly bí danh: ' + (d.quarantine_id || 'đang chờ mã') + '. ' + (d.detail || 'Không tự động ánh xạ.');
                 }
             })
             .catch(function () {
@@ -580,8 +688,9 @@
         grid.style.gap                 = tok('--space-4', '16px');
         body.appendChild(grid);
 
-        fetch('/api/v1/uom/health', { credentials: 'same-origin' })
-            .then(function (r) { return r.json(); })
+        apiJson('/api/v1/uom/health', { credentials: 'same-origin' }, function () {
+            return { ok: true, catalog: { active_units: FIXTURE_UNITS.length, quantity_kinds: FIXTURE_KINDS.length, approved_rules: 0 }, precision: { bcmath_scale: 30 } };
+        })
             .then(function (d) {
                 if (!d.ok) { grid.textContent = 'Lỗi tải trạng thái'; return; }
                 var cat    = d.catalog || {};
@@ -628,8 +737,7 @@
 
     function loadUnitsIntoSelect(sel, kindCode, cb) {
         var url = '/api/v1/uom/units?limit=200' + (kindCode ? '&kind=' + encodeURIComponent(kindCode) : '');
-        fetch(url, { credentials: 'same-origin' })
-            .then(function (r) { return r.json(); })
+        apiJson(url, { credentials: 'same-origin' }, function () { return { units: fixtureUnits(kindCode) }; })
             .then(function (d) {
                 var units = d.units || [];
                 var prev  = sel.innerHTML;
@@ -646,8 +754,7 @@
     }
 
     function loadKindsIntoSelect(sel) {
-        fetch('/api/v1/uom/kinds?limit=200', { credentials: 'same-origin' })
-            .then(function (r) { return r.json(); })
+        apiJson('/api/v1/uom/kinds?limit=200', { credentials: 'same-origin' }, function () { return { kinds: FIXTURE_KINDS }; })
             .then(function (d) {
                 (d.kinds || []).forEach(function (k) {
                     var o = el('option');

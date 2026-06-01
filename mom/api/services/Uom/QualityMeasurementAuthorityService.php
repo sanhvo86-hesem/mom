@@ -7,46 +7,42 @@ namespace MOM\Api\Services\Uom;
 use MOM\Database\Connection;
 
 /**
- * Bridges QC inspection and MES inline measurements to the MEASVAL evidence envelope.
+ * Direct QC/MES measurement authority for MEASVAL evidence envelopes.
  *
  * Responsibilities:
- *   - Resolve PostgreSQL measurement_unit enum values to canonical UoM codes
+ *   - Resolve source measurement units through UomRuntimeAuthorityService
  *   - Optionally convert measurement to a display/reporting unit
  *   - Generate MEASVAL envelope with SHA-256 audit hash via MeasurementValueFactory
  *   - Persist envelope + display value back to source table (inspection_results / mes_inline_measurements)
  *   - Write a row to uom_measurement_thread for the digital thread
  *
  * Usage (QC flow):
- *   $bridge->wrapInspectionResult($resultId, displayUnit: 'IN');
+ *   $authority->wrapInspectionResult($resultId, displayUnit: 'IN');
  *
  * Usage (MES inline):
- *   $bridge->wrapInlineMeasurement($measurementId, displayUnit: null); // raw wrap, no conversion
+ *   $authority->wrapInlineMeasurement($measurementId, displayUnit: null); // raw wrap, no conversion
  *
  * ISA-88 note: Any characteristic with kpc_flag or ctq_flag SHOULD be wrapped
  * before the inspection record is closed — the MEASVAL hash is evidence for
  * regulated dimensional and safety-critical characteristics.
  *
  * Hardness (HRC/HRB) and surface roughness (Ra) are marked is_conversion_blocked
- * in the unit catalog. The bridge wraps them but does NOT attempt inter-scale
+ * in the unit catalog. The authority wraps them but does NOT attempt inter-scale
  * conversion. Attempting conversion raises UomBlockedConversionException.
  */
-final class QualityMeasurementBridge
+final class QualityMeasurementAuthorityService
 {
-    /** PostgreSQL measurement_unit enum → canonical UoM code */
-    private const ENUM_TO_CANONICAL = [
-        'mm'  => 'MM',
-        'in'  => 'IN',
-        'deg' => 'DEG',
-        'Ra'  => 'RA_UM',
-        'HRC' => 'HRC',
-        'HRB' => 'HRB',
-    ];
+    private readonly UomRuntimeAuthorityService $authority;
+    private readonly MeasurementValueFactory $measvalFactory;
 
     public function __construct(
-        private readonly Connection             $db,
-        private readonly ConversionEngine       $engine,
-        private readonly MeasurementValueFactory $measvalFactory,
-    ) {}
+        private readonly Connection $db,
+        ?UomRuntimeAuthorityService $authority = null,
+        ?MeasurementValueFactory $measvalFactory = null,
+    ) {
+        $this->authority = $authority ?? new UomRuntimeAuthorityService($db);
+        $this->measvalFactory = $measvalFactory ?? new MeasurementValueFactory();
+    }
 
     /**
      * Wrap an inspection_results row in a MEASVAL envelope.
@@ -78,7 +74,11 @@ final class QualityMeasurementBridge
                 "Inspection result '{$resultId}' has no actual_value.", 422);
         }
 
-        $canonicalUnit = $this->resolveEnumUnit((string)($row['measurement_unit'] ?? ''));
+        $canonicalUnit = $this->resolveSourceUnit((string)($row['measurement_unit'] ?? ''), [
+            'source_table' => 'inspection_results',
+            'source_id' => $resultId,
+            'context_code' => 'QC',
+        ]);
         $magnitude     = (string)$row['actual_value'];
 
         $measval = $this->buildMeasval(
@@ -130,7 +130,11 @@ final class QualityMeasurementBridge
                 "Inline measurement '{$measurementId}' not found.", 404);
         }
 
-        $canonicalUnit = $this->resolveEnumUnit((string)($row['unit'] ?? ''));
+        $canonicalUnit = $this->resolveSourceUnit((string)($row['unit'] ?? ''), [
+            'source_table' => 'mes_inline_measurements',
+            'source_id' => (string)$measurementId,
+            'context_code' => 'MES',
+        ]);
         $magnitude     = (string)$row['measured_value'];
 
         $measval = $this->buildMeasval(
@@ -181,33 +185,21 @@ final class QualityMeasurementBridge
     }
 
     /**
-     * Resolve PostgreSQL measurement_unit enum to a canonical UoM code.
+     * Resolve source unit text to a canonical UoM code through the direct UOM authority.
      *
-     * Falls back to alias table (SYSTEM scope) for values not in the hardcoded map.
+     * @param array<string,mixed> $context
      */
-    private function resolveEnumUnit(string $pgEnum): string
+    private function resolveSourceUnit(string $sourceUnit, array $context): string
     {
-        if (isset(self::ENUM_TO_CANONICAL[$pgEnum])) {
-            return self::ENUM_TO_CANONICAL[$pgEnum];
-        }
-
-        // Try alias table for extended enum values added after migration 001
-        $row = $this->db->queryOne(
-            "SELECT canonical_code FROM uom_alias
-             WHERE lower(alias_code) = lower(:a) AND context_scope = 'SYSTEM'
-               AND (effective_to IS NULL OR effective_to >= CURRENT_DATE)
-             LIMIT 1",
-            [':a' => $pgEnum]
+        $resolved = $this->authority->resolveCanonicalUnit(
+            $sourceUnit,
+            'SYSTEM',
+            null,
+            $context + ['uom_authority' => UomRuntimeAuthorityService::AUTHORITY],
+            isset($context['trace_id']) ? (string)$context['trace_id'] : null
         );
 
-        if ($row !== null) {
-            return $row['canonical_code'];
-        }
-
-        throw new UomException('UOM_QC_UNKNOWN_ENUM_UNIT',
-            "Cannot resolve measurement_unit enum value '{$pgEnum}' to a canonical UoM code. "
-            . "Add an alias via uom_alias (context_scope='SYSTEM') or extend QualityMeasurementBridge::ENUM_TO_CANONICAL.",
-            422);
+        return $resolved['canonical_unit_code'];
     }
 
     /**
@@ -220,16 +212,14 @@ final class QualityMeasurementBridge
         array   $context
     ): array {
         if ($displayUnit !== null && $displayUnit !== $fromUnit) {
-            // Full conversion path — returns ['result', 'from_unit', 'to_unit', 'measval']
-            $converted = $this->engine->convert(
-                magnitude:       $magnitude,
-                fromUnit:        $fromUnit,
-                toUnit:          $displayUnit,
-                displayPrecision: 6,
-                roundingPolicy:  'ROUND_HALF_EVEN',
-                context:         $context
+            $converted = $this->authority->convertCanonical(
+                magnitude: $magnitude,
+                inputUnit: $fromUnit,
+                targetUnit: $displayUnit,
+                context: $context + ['uom_authority' => UomRuntimeAuthorityService::AUTHORITY]
             );
-            return $converted['measval'];
+            $conversion = is_array($converted['conversion'] ?? null) ? (array)$converted['conversion'] : [];
+            return is_array($conversion['measval'] ?? null) ? (array)$conversion['measval'] : [];
         }
 
         // Wrap-only path — no conversion, just envelope

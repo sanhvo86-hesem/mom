@@ -1,0 +1,164 @@
+{
+  "prompt": "P43",
+  "generated_at": "2026-05-30",
+  "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
+  "head": "2bfe981da",
+  "base_head": "2d25f7375aa2ffe43c496596a0ef4f0b47fe4925",
+  "posture": "pre-production runtime-readiness planning; not production-ready",
+  "test_environment": {
+    "composer_wrapper": "missing ./composer in worktree",
+    "vendor_dir": "missing mom/vendor",
+    "phpunit_result": "blocked",
+    "migration_drift": "0 P1 + 3 P2"
+  },
+  "roots": [
+    {
+      "root": "Foundation/UOM",
+      "maturity_level": 5,
+      "runtime_claim_allowed": "pre_production_candidate",
+      "evidence_paths": [
+        "mom/database/migrations/214_uom_quantity_kind.sql",
+        "mom/database/migrations/231_uom_v3_lifecycle_governance.sql",
+        "mom/database/migrations/277_uom_domain_command_runtime_authority.sql",
+        "mom/database/migrations/282_uom_direct_authority_system_registry.sql",
+        "mom/api/controllers/UomController.php",
+        "mom/api/routes/uom-routes.php",
+        "mom/api/services/Uom/ConversionEngine.php",
+        "mom/api/services/Uom/UomRuntimeAuthorityService.php",
+        "mom/api/services/DomainCommand/UomCommandQuantityNormalizer.php",
+        "mom/data/registry/mda-uom-direct-authority-system.json",
+        "mom/tests/Unit/Uom"
+      ],
+      "missing_proof": [
+        "P58 real command-stack scenario dashboard still pending",
+        "live deploy/browser smoke still pending"
+      ]
+    },
+    {
+      "root": "Party/UserIdentity",
+      "maturity_level": 4,
+      "runtime_claim_allowed": false,
+      "evidence_paths": [
+        ".ai/USER_IDENTITY_SSOT.md",
+        "mom/api/services/UserRepository.php",
+        "mom/api/services/IdentityRepository.php",
+        "mom/api/services/RbacService.php",
+        "mom/api/services/WorkforceQualificationGateService.php"
+      ],
+      "missing_proof": [
+        "unified party-user-employee-operator command path",
+        "MDA audit/evidence/outbox for person authority changes"
+      ]
+    },
+    {
+      "root": "Item/ItemRevision",
+      "maturity_level": 3,
+      "runtime_claim_allowed": false,
+      "evidence_paths": [
+        "mom/api/services/MasterDataService.php",
+        "mom/api/services/JsonMasterDataRepository.php",
+        "mom/contracts/objects/inventory_logistics--inventory-items/contract.json",
+        "mom/tests/Unit/Services/MasterDataRepositoryBoundaryTest.php"
+      ],
+      "missing_proof": [
+        "PostgreSQL authoritative repository",
+        "CreateItem CreateItemRevision ReleaseItemRevision command handlers",
+        "transactional audit evidence outbox"
+      ]
+    },
+    {
+      "root": "EngineeringReleasePackage",
+      "maturity_level": 4,
+      "runtime_claim_allowed": false,
+      "evidence_paths": [
+        "mom/api/services/TrustedReleaseRecordService.php",
+        "mom/api/services/OrderWorkflowService.php",
+        "mom/tests/Unit/Services/OrderServiceEngineeringGateTest.php",
+        "docs/backend/DOMAIN_COMMAND_SPEC.md"
+      ],
+      "missing_proof": [
+        "physical engineering release package command handler",
+        "SO JO WO release command consumption",
+        "frozen snapshot proof"
+      ]
+    },
+    {
+      "root": "ResourceReadiness/MES",
+      "maturity_level": 3,
+      "runtime_claim_allowed": false,
+      "evidence_paths": [
+        "mom/api/services/ManufacturingEventBackboneService.php",
+        "mom/api/services/WorkforceQualificationGateService.php",
+        "mom/api/services/Mes/MachineEventSpineService.php"
+      ],
+      "missing_proof": [
+        "ResourceReadinessService",
+        "WO release/start command wiring",
+        "operator machine tool material program composite gate"
+      ]
+    },
+    {
+      "root": "QualityHold/eQMS",
+      "maturity_level": 3,
+      "runtime_claim_allowed": false,
+      "evidence_paths": [
+        "mom/api/controllers/EqmsNcrController.php",
+        "mom/api/controllers/EqmsCapaController.php",
+        "mom/tests/Unit/Controllers/LogisticsControllerQualityGateTest.php",
+        "docs/backend/DOMAIN_COMMAND_SPEC.md"
+      ],
+      "missing_proof": [
+        "canonical quality_holds transaction graph",
+        "ApplyQualityHold ReleaseQualityHold command handlers",
+        "movement shipment job gates query canonical holds"
+      ]
+    },
+    {
+      "root": "Inventory/Ledger/Cost",
+      "maturity_level": 3,
+      "runtime_claim_allowed": false,
+      "evidence_paths": [
+        "mom/database/migrations/077_canonical_inventory_cost_traceability.sql",
+        "mom/api/services/TraceabilityGenealogyService.php",
+        "mom/contracts/objects/inventory_logistics--stock-balances/contract.json"
+      ],
+      "missing_proof": [
+        "ledger-only posting command",
+        "direct stock balance mutation blocker",
+        "period close and cost ledger command tests"
+      ]
+    },
+    {
+      "root": "Evidence/eSign/Audit",
+      "maturity_level": 5,
+      "runtime_claim_allowed": false,
+      "evidence_paths": [
+        "mom/api/services/ControlPlane/ControlPlaneCommandService.php",
+        "mom/api/services/ControlPlane/ControlPlaneCommandGuard.php",
+        "mom/api/services/ControlPlane/CanonicalOutboxService.php",
+        "mom/api/services/Evidence/ElectronicSignatureService.php",
+        "mom/api/openapi.yaml"
+      ],
+      "missing_proof": [
+        "mandatory use by all regulated MDA commands",
+        "SoD re-auth record hash signature meaning for every regulated command"
+      ]
+    },
+    {
+      "root": "ScenarioRunner/RedTeam",
+      "maturity_level": 2,
+      "runtime_claim_allowed": false,
+      "evidence_paths": [
+        "mom/api/services/ScenarioRegistryService.php",
+        "mom/data/config/scenario_registry.bootstrap.json",
+        "mom/tests/ScenarioRegistryServiceTest.php"
+      ],
+      "missing_proof": [
+        "real command-stack execution runner",
+        "acceptance dashboard",
+        "scenario audit/evidence records"
+      ]
+    }
+  ],
+  "decision_token": "P43_PASS_READY_FOR_NEXT"
+}

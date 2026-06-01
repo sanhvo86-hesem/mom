@@ -1,0 +1,59 @@
+{
+  "schema_version": "mda-uom-direct-authority-system.v1",
+  "posture": "pre_production_runtime_authority_candidate",
+  "decision": "UOM is a first-class runtime authority, not an MDA compatibility bridge.",
+  "runtime_authority": {
+    "service": "MOM\\Api\\Services\\Uom\\UomRuntimeAuthorityService",
+    "command_adapter": "MOM\\Api\\Services\\DomainCommand\\UomCommandQuantityNormalizer",
+    "api_controller": "MOM\\Api\\Controllers\\UomController",
+    "quality_measurement_authority": "MOM\\Api\\Services\\Uom\\QualityMeasurementAuthorityService",
+    "authority_token": "uom_runtime_authority",
+    "forbidden_runtime_classes": [
+      "MOM\\Api\\Services\\MdaUomAuthorityBridge",
+      "MOM\\Api\\Services\\Uom\\QualityMeasurementBridge"
+    ]
+  },
+  "authoritative_storage": {
+    "catalog_tables": [
+      "uom_quantity_kind",
+      "uom_unit_catalog",
+      "uom_conversion_rule",
+      "uom_rounding_policy",
+      "uom_external_code_map",
+      "uom_alias",
+      "uom_alias_quarantine",
+      "uom_standard_library_manifest",
+      "item_uom_policy"
+    ],
+    "command_evidence_table": "domain_command_uom_measurement",
+    "measurement_thread_table": "uom_measurement_thread",
+    "audit_event_type": "uom.command_quantity_normalized",
+    "outbox_event_type": "UomCommandQuantityNormalized"
+  },
+  "command_policy_surface": [
+    "ReceiveInventoryCommand",
+    "PutawayInventoryCommand",
+    "MoveInventoryCommand",
+    "IssueMaterialToWorkOrderCommand",
+    "SplitLotCommand",
+    "MergeLotCommand",
+    "CompleteToStockCommand",
+    "ScrapInventoryCommand",
+    "ReworkInventoryCommand",
+    "AdjustInventoryWithApprovalCommand",
+    "PostInventoryLedgerTransactionCommand",
+    "CompleteOperationCommand",
+    "RecordInspectionResultCommand",
+    "CostRollupCommand",
+    "ShipmentPackCommand",
+    "ToolPresetMeasurementCommand"
+  ],
+  "fail_closed_rules": [
+    "No governed quantity mutation may use caller-provided unit truth directly.",
+    "No governed quantity mutation may instantiate MdaUomAuthorityBridge.",
+    "No governed measurement wrapper may instantiate QualityMeasurementBridge.",
+    "Missing item UOM policy, alias resolution, compatibility rule, or contextual evidence blocks before mutation.",
+    "Every successful governed command quantity writes domain_command_uom_measurement before MES, quality, inventory, or cost truth."
+  ],
+  "runtime_report_slice": "RuntimeAuthorityService.slices.uom_runtime_authority"
+}

@@ -1,0 +1,148 @@
+{
+  "schema_version": "mda.v4.governed_entity_registry.v1",
+  "generated_by": "P44_governed_entity_registry_and_triple_layer_generic_crud_hard_stop",
+  "generated_at": "2026-05-30T00:00:00Z",
+  "authority_statement": "Generic CRUD is read/projection access only for governed runtime roots. Mutations require dedicated domain command services with idempotency, gates, audit/evidence, outbox, and transaction ownership.",
+  "defaults": {
+    "known_non_governed_mutation": "allow_with_runtime_access_policy",
+    "unknown_table_mutation": "deny",
+    "governed_mutation": "domain_command_required",
+    "projection_mutation": "deny"
+  },
+  "break_glass": {
+    "env": "HESEM_ALLOW_GOVERNED_GENERIC_MUTATION",
+    "value": "break_glass_for_migration_only",
+    "internal_override_header": "X-HESEM-Internal-Generic-Override",
+    "internal_override_value": "domain-command-backfill",
+    "release_manifest_header": "X-HESEM-Release-Manifest",
+    "command_id_header": "X-HESEM-Command-Id",
+    "allowed_roles": ["admin", "it_admin"],
+    "required_use": "migration_backfill_only"
+  },
+  "governed_roots": [
+    {
+      "root": "sales_order",
+      "name": "Sales Order",
+      "domains": ["sales", "commercial_contracts"],
+      "tables": ["sales_orders", "sales_order", "sales_order_line", "quotes", "quote"],
+      "generic_mutation_policy": "domain_command_required",
+      "domain_wide_generic_mutation_policy": "domain_command_required",
+      "allowed_commands": ["CreateSalesOrderCommand", "ReviseSalesOrderCommand", "ReleaseSalesOrderCommand", "HoldSalesOrderCommand", "CancelSalesOrderCommand"],
+      "active": true
+    },
+    {
+      "root": "job_order_work_order",
+      "name": "Job Order and Work Order",
+      "domains": ["production", "mes_execution"],
+      "tables": ["job_orders", "job_order", "work_orders", "work_order", "material_consumption", "mes_material_consumption"],
+      "generic_mutation_policy": "domain_command_required",
+      "domain_wide_generic_mutation_policy": "domain_command_required",
+      "allowed_commands": ["CreateJobOrderCommand", "ReleaseJobOrderCommand", "ReleaseWorkOrderCommand", "StartOperationCommand", "ReportProductionCommand", "IssueMaterialToWorkOrderCommand"],
+      "active": true
+    },
+    {
+      "root": "inventory_lot_serial_ledger",
+      "name": "Inventory Lot Serial Ledger",
+      "domains": ["inventory", "warehouse_management", "traceability_serialization"],
+      "tables": ["inventory_transactions", "inventory_ledger", "stock_balances", "lot", "serial", "genealogy_link", "dpp_passports"],
+      "generic_mutation_policy": "domain_command_required",
+      "domain_wide_generic_mutation_policy": "domain_command_required",
+      "allowed_commands": ["ReceiveInventoryCommand", "MoveInventoryCommand", "IssueInventoryCommand", "AdjustInventoryCommand", "CreateLotCommand", "CreateSerialCommand", "LinkGenealogyCommand"],
+      "active": true
+    },
+    {
+      "root": "quality_hold_ncr_capa",
+      "name": "Quality Hold NCR MRB CAPA",
+      "domains": ["quality_management", "quality_lab", "supplier_relationship"],
+      "tables": ["inspection_lot", "inspection_result", "incoming_inspections", "ncr_records", "nonconformance", "ncr", "capa", "capa_records", "scar", "approved_supplier_list", "supplier_scorecards"],
+      "generic_mutation_policy": "domain_command_required",
+      "domain_wide_generic_mutation_policy": "domain_command_required",
+      "allowed_commands": ["CreateQualityHoldCommand", "ReleaseQualityHoldCommand", "CreateNcrCommand", "DispositionMrbCommand", "OpenCapaCommand", "CloseCapaCommand", "IssueScarCommand"],
+      "active": true
+    },
+    {
+      "root": "master_data_item_revision",
+      "name": "Master Data Item Revision",
+      "domains": ["master_data", "master_data_governance"],
+      "tables": ["items", "item", "item_revision", "item_revisions", "part_numbers", "part_revisions", "materials", "material_master", "item_uom_policy"],
+      "generic_mutation_policy": "domain_command_required",
+      "domain_wide_generic_mutation_policy": "domain_command_required",
+      "allowed_commands": ["CreateItemCommand", "ReviseItemCommand", "ReleaseItemRevisionCommand", "ArchiveItemRevisionCommand"],
+      "active": true
+    },
+    {
+      "root": "engineering_release_package",
+      "name": "Engineering Release Package",
+      "domains": ["mfg_engineering"],
+      "tables": ["bom_library", "routing_library", "control_plans", "inspection_plans", "traveler_templates", "nc_program_releases", "engineering_release_package"],
+      "generic_mutation_policy": "domain_command_required",
+      "domain_wide_generic_mutation_policy": "domain_command_required",
+      "allowed_commands": ["CreateEngineeringPackageCommand", "SubmitEngineeringPackageCommand", "ApproveEngineeringPackageCommand", "ReleaseEngineeringPackageCommand", "SupersedeEngineeringPackageCommand"],
+      "active": true
+    },
+    {
+      "root": "equipment_readiness",
+      "name": "Equipment Machine Work Center Readiness",
+      "domains": ["plant_maintenance", "calibration_equipment"],
+      "tables": ["work_centers", "machines", "equipment_assets", "maintenance_work_orders", "calibration_records", "calibration_equipment"],
+      "generic_mutation_policy": "domain_command_required",
+      "domain_wide_generic_mutation_policy": "domain_command_required",
+      "allowed_commands": ["CreateEquipmentCommand", "ReleaseEquipmentCommand", "RecordMaintenanceCommand", "RecordCalibrationCommand", "BlockEquipmentCommand"],
+      "active": true
+    },
+    {
+      "root": "audit_evidence_esign",
+      "name": "Audit Evidence E-Signature",
+      "domains": ["document_control", "evidence_vault", "record_system", "audit_risk"],
+      "tables": ["electronic_signature", "audit_trail", "audit_events", "evidence_records", "dcc_document_revision", "dcc_change_request"],
+      "generic_mutation_policy": "domain_command_required",
+      "domain_wide_generic_mutation_policy": "domain_command_required",
+      "allowed_commands": ["CaptureEvidenceCommand", "ApplyElectronicSignatureCommand", "ApproveControlledRecordCommand", "RecordAuditEventCommand"],
+      "active": true
+    },
+    {
+      "root": "finance_ledger_period",
+      "name": "Finance Ledger Period Close",
+      "domains": ["finance", "finance_extended", "finance_treasury"],
+      "tables": ["period_closes", "backdate_exceptions", "ap_invoices", "ap_invoice_lines"],
+      "generic_mutation_policy": "domain_command_required",
+      "domain_wide_generic_mutation_policy": "domain_command_required",
+      "allowed_commands": ["PostJournalCommand", "ClosePeriodCommand", "ApproveBackdateExceptionCommand"],
+      "active": true
+    },
+    {
+      "root": "uom_measurement",
+      "name": "UOM Measurement Authority",
+      "domains": ["uom", "measurement"],
+      "tables": ["uom_quantity_kind", "uom_unit_catalog", "uom_conversion_rule", "uom_rounding_policy", "uom_external_code_map", "uom_alias", "uom_alias_quarantine", "uom_rule_approval", "uom_standard_library_manifest", "uom_measurement_thread"],
+      "generic_mutation_policy": "domain_command_required",
+      "domain_wide_generic_mutation_policy": "domain_command_required",
+      "allowed_commands": ["CreateUomUnitCommand", "ApproveUomConversionRuleCommand", "QuarantineUomAliasCommand", "ReleaseUomPolicyCommand"],
+      "active": true
+    },
+    {
+      "root": "kpi_definition",
+      "name": "KPI Definition Governance",
+      "domains": ["bi_datawarehouse", "analytics"],
+      "tables": ["kpi_definitions"],
+      "generic_mutation_policy": "domain_command_required",
+      "domain_wide_generic_mutation_policy": "deny_by_table_only",
+      "allowed_commands": ["ProposeKpiDefinitionCommand", "ApproveKpiDefinitionCommand", "RetireKpiDefinitionCommand"],
+      "active": true
+    }
+  ],
+  "read_only_projections": [
+    "mda_runtime_authority_projection",
+    "resource_readiness_projection",
+    "quality_hold_projection",
+    "inventory_balance_projection",
+    "work_order_readiness_projection",
+    "kpi_runtime_projection"
+  ],
+  "import_staging_tables": [
+    "mda_import_staging_records",
+    "master_data_import_staging",
+    "uom_import_staging",
+    "engineering_package_import_staging"
+  ]
+}

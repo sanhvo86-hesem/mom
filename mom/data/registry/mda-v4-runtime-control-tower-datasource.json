@@ -1,0 +1,27 @@
+{
+  "version": "mda-v4-p57",
+  "status": "pre_production_contract_candidate",
+  "authority": "MdaRuntimeTelemetryService::report",
+  "data_sources": {
+    "telemetry_event_log": "mom/data/logs/mda-runtime-telemetry.jsonl",
+    "master_data_fallback_log": "mom/data/logs/master-data-fallback-telemetry.jsonl",
+    "database_tables": [
+      "mda_runtime_telemetry_event",
+      "mda_runtime_control_tower_snapshot",
+      "domain_outbox_events",
+      "generic_crud_denial_event"
+    ],
+    "p60_scorecard_input": "mom/data/registry/mda-v4-runtime-control-tower.latest.json#/p60_scorecard_input"
+  },
+  "dashboard_tiles": [
+    "command_outcome",
+    "readiness_blockers",
+    "quality_holds",
+    "fallback_and_drift",
+    "outbox_lag",
+    "audit_esign_security",
+    "direct_mutation_attempts",
+    "scenario_results",
+    "projection_staleness"
+  ]
+}

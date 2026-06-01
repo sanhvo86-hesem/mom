@@ -1,0 +1,52 @@
+{
+  "schema_version": "uom-backfill-shadow-policy.v1",
+  "posture": "development/prototype -> pre-production readiness candidate",
+  "policy": {
+    "mode": "shadow_proposal_only",
+    "overwrite_original_fields": false,
+    "guess_units_from_field_name": false,
+    "require_unit_evidence_for_shadow_measval": true,
+    "missing_unit_action": "quarantine_backlog",
+    "rollback_scope": "delete shadow proposals only; never delete or rewrite original source records"
+  },
+  "classification_values": [
+    "already_canonical",
+    "needs_measval_wrapper",
+    "needs_item_policy",
+    "ambiguous_alias",
+    "cannot_infer_unit",
+    "out_of_scope"
+  ],
+  "simulation_rules": {
+    "SIM-P15-01": {
+      "input": {"field": "weight", "value": "12", "unit": null},
+      "classification": "cannot_infer_unit",
+      "action": "quarantine_backlog"
+    },
+    "SIM-P15-02": {
+      "input": {"field": "supplier_unit", "value": "LB", "source": "supplier_contract"},
+      "classification": "needs_measval_wrapper",
+      "action": "propose_shadow_measval_with_lb_canonical_mapping"
+    },
+    "SIM-P15-03A": {
+      "input": {"item": "A", "packaging": "box", "count": 10},
+      "classification": "needs_item_policy",
+      "action": "propose_shadow_packaging_conversion"
+    },
+    "SIM-P15-03B": {
+      "input": {"item": "B", "packaging": "box", "count": null},
+      "classification": "cannot_infer_unit",
+      "action": "quarantine_backlog"
+    },
+    "SIM-P15-04": {
+      "input": {"unit": "IU", "lot_potency_evidence": null},
+      "classification": "ambiguous_alias",
+      "action": "quarantine_backlog_until_lot_potency_evidence"
+    },
+    "SIM-P15-05": {
+      "input": {"rollback": "requested"},
+      "classification": "rollback",
+      "action": "delete_shadow_proposals_only"
+    }
+  }
+}

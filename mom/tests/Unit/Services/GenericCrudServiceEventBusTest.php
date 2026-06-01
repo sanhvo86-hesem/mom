@@ -107,6 +107,8 @@ final class GenericCrudFakeConnection extends Connection
     public array $queryOneResults = [];
     /** @var list<array<string, mixed>|null> */
     public array $insertReturningResults = [];
+    /** @var list<array{sql:string,params:array<string,mixed>}> */
+    public array $executed = [];
 
     public function __construct()
     {
@@ -114,11 +116,29 @@ final class GenericCrudFakeConnection extends Connection
 
     public function queryOne(string $sql, array $params = []): ?array
     {
+        $this->executed[] = ['sql' => $sql, 'params' => $params];
         return array_shift($this->queryOneResults);
     }
 
     public function insertReturning(string $sql, array $params = []): ?array
     {
+        $this->executed[] = ['sql' => $sql, 'params' => $params];
         return array_shift($this->insertReturningResults);
+    }
+
+    public function execute(string $sql, array $params = []): int
+    {
+        $this->executed[] = ['sql' => $sql, 'params' => $params];
+        return 1;
+    }
+
+    public function inTransaction(): bool
+    {
+        return false;
+    }
+
+    public function transactional(callable $callback): mixed
+    {
+        return $callback();
     }
 }

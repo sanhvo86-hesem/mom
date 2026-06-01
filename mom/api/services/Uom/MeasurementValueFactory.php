@@ -67,13 +67,28 @@ final class MeasurementValueFactory
             $fromUnitRow['quantity_kind_code'] ?? null
         );
         // HB-06 (V3 P03): hash canonical-JSON over the full evidence payload.
+        $hashRule = $rule + [
+            'trace_id' => $context['trace_id'] ?? null,
+            'linked_record_type' => $context['linked_record_type'] ?? $context['source_table'] ?? null,
+            'linked_record_id' => $context['linked_record_id'] ?? $context['source_id'] ?? null,
+            'ai_advisory_refs' => $this->aiAdvisoryRefs($aiFlags),
+        ];
         $auditHash = $this->computeEvidenceHash(
             $fromUnit, $magnitude, $toUnit, $result,
             $siNormalised, $canonicalUnit,
-            $rule, $displayPrecision, $roundingPolicy
+            $hashRule, $displayPrecision, $roundingPolicy
         );
 
         return [
+            'original_input' => [
+                'magnitude' => $magnitude,
+                'unit_code' => $fromUnit,
+                'unit_system' => $context['unit_system'] ?? null,
+                'external_code' => $context['external_code'] ?? null,
+                'source_system' => $context['source_system'] ?? null,
+                'entered_by' => $context['entered_by'] ?? $context['actor_id'] ?? null,
+                'entered_at' => $context['entered_at'] ?? $context['recorded_at'] ?? null,
+            ],
             'input' => [
                 'magnitude'  => $magnitude,
                 'unit_code'  => $fromUnit,
@@ -82,16 +97,32 @@ final class MeasurementValueFactory
             'normalization' => [
                 'si_value'   => $siNormalised,
                 'si_unit'    => $canonicalUnit,
+                'canonical_magnitude' => $siNormalised,
+                'canonical_unit_code' => $canonicalUnit,
+                'quantity_kind' => $fromUnitRow['quantity_kind_code'],
+                'conversion_rule_code' => $rule['rule_code'] ?? null,
+                'conversion_rule_version' => $rule['rule_version'] ?? null,
+                'conversion_rule_category' => $rule['category'] ?? null,
+                'as_of' => $context['as_of'] ?? $context['effective_date'] ?? null,
+                'rounding_policy' => $roundingPolicy,
                 'derivation' => 'from_input_via_affine_triplet',
             ],
             'display' => [
                 'magnitude'  => $result,
                 'unit_code'  => $toUnit,
+                'display_magnitude' => $result,
+                'display_unit' => $toUnit,
+                'locale' => $context['locale'] ?? null,
             ],
             'precision_envelope' => [
-                'bcmath_scale'    => ExactLinearConverter::BCMATH_SCALE,
-                'display_scale'   => $displayPrecision,
-                'rounding_policy' => $roundingPolicy,
+                'input_precision'    => $this->decimalPrecision($magnitude),
+                'calculation_scale'  => ExactLinearConverter::BCMATH_SCALE,
+                'output_precision'   => $displayPrecision,
+                'rounding_policy_id' => $roundingPolicy,
+                'factor_exact'       => (bool)($rule['factor_exact'] ?? false),
+                'bcmath_scale'       => ExactLinearConverter::BCMATH_SCALE,
+                'display_scale'      => $displayPrecision,
+                'rounding_policy'    => $roundingPolicy,
             ],
             'semantic_context' => [
                 'quantity_kind'     => $fromUnitRow['quantity_kind_code'],
@@ -107,6 +138,20 @@ final class MeasurementValueFactory
                 'factor'        => $rule['factor'],
                 'offset_value'  => $rule['offset_value'],
                 'reversed'      => $rule['reversed'],
+                'rounding_policy' => $rule['rounding_policy'] ?? $roundingPolicy,
+                'factor_exact'   => (bool)($rule['factor_exact'] ?? false),
+                'effective_from' => $rule['effective_from'] ?? null,
+                'effective_to'   => $rule['effective_to'] ?? null,
+                'context_required' => (bool)($rule['context_required'] ?? false),
+                'contextual_evidence' => $rule['contextual_evidence'] ?? null,
+                'trace_id' => $context['trace_id'] ?? null,
+                'linked_record_type' => $context['linked_record_type'] ?? $context['source_table'] ?? null,
+                'linked_record_id' => $context['linked_record_id'] ?? $context['source_id'] ?? null,
+                'audit_hash' => $auditHash,
+                'hash_algorithm' => strtoupper(self::HASH_ALGORITHM),
+                'rule_manifest_ref' => $rule['standard_library_manifest_id'] ?? $rule['rule_manifest_ref'] ?? null,
+                'esign_ref' => $rule['esign_manifest_hash'] ?? $rule['esign_ref'] ?? null,
+                'ai_advisory_refs' => $this->aiAdvisoryRefs($aiFlags),
             ],
             'digital_thread' => [
                 'audit_hash'       => $auditHash,
@@ -114,6 +159,7 @@ final class MeasurementValueFactory
                 'trace_id'         => $context['trace_id']   ?? null,
                 'request_id'       => $context['request_id'] ?? null,
                 'actor_id'         => $context['actor_id']   ?? null,
+                'links'            => $this->digitalThreadLinks($context),
                 'recorded_at'      => (new \DateTimeImmutable())->format(\DateTimeInterface::RFC3339_EXTENDED),
             ],
             'ai_flags' => $aiFlags,
@@ -123,8 +169,8 @@ final class MeasurementValueFactory
     /**
      * Build a MEASVAL envelope for a measurement that requires no conversion.
      *
-     * Used by QualityMeasurementBridge when wrapping an existing inspection
-     * measurement in-situ (no unit change). The audit hash uses the same
+     * Used by QualityMeasurementAuthorityService when wrapping an existing
+     * inspection measurement in-situ (no unit change). The audit hash uses the same
      * format with from_unit == to_unit and rule_code = 'IDENTITY'.
      *
      * @param string $magnitude  The measurement value (numeric string)
@@ -168,9 +214,14 @@ final class MeasurementValueFactory
                 'unit_code' => $unitCode,
             ],
             'precision_envelope' => [
-                'bcmath_scale'    => ExactLinearConverter::BCMATH_SCALE,
-                'display_scale'   => null,
-                'rounding_policy' => 'ROUND_HALF_EVEN',
+                'input_precision'    => $this->decimalPrecision($magnitude),
+                'calculation_scale'  => ExactLinearConverter::BCMATH_SCALE,
+                'output_precision'   => null,
+                'rounding_policy_id' => 'ROUND_HALF_EVEN',
+                'factor_exact'       => true,
+                'bcmath_scale'       => ExactLinearConverter::BCMATH_SCALE,
+                'display_scale'      => null,
+                'rounding_policy'    => 'ROUND_HALF_EVEN',
             ],
             'semantic_context' => [
                 'quantity_kind'   => null,
@@ -241,6 +292,15 @@ final class MeasurementValueFactory
                 'factor'       => (string)($rule['factor']       ?? ''),
                 'offset_value' => (string)($rule['offset_value'] ?? ''),
                 'reversed'     => (bool)  ($rule['reversed']     ?? false),
+                'rounding_policy' => (string)($rule['rounding_policy'] ?? $roundingPolicy),
+                'factor_exact' => (bool)($rule['factor_exact'] ?? false),
+                'effective_from' => $rule['effective_from'] ?? null,
+                'effective_to' => $rule['effective_to'] ?? null,
+                'contextual_evidence' => $rule['contextual_evidence'] ?? null,
+                'trace_id' => $rule['trace_id'] ?? null,
+                'linked_record_type' => $rule['linked_record_type'] ?? null,
+                'linked_record_id' => $rule['linked_record_id'] ?? null,
+                'ai_advisory_refs' => $rule['ai_advisory_refs'] ?? [],
             ],
             'precision' => [
                 'display_scale'   => $displayScale,
@@ -298,5 +358,59 @@ final class MeasurementValueFactory
             'AmountOfSubstance'          => 'mol',
             default                      => null,
         };
+    }
+
+    private function digitalThreadLinks(array $context): array
+    {
+        $map = [
+            'ITEM' => 'item_id',
+            'PO' => 'purchase_order_id',
+            'SO' => 'sales_order_id',
+            'WO' => 'work_order_id',
+            'LOT' => 'lot_id',
+            'INSP' => 'inspection_id',
+            'NQCASE' => 'nonconformance_case_id',
+            'CAPA' => 'capa_id',
+            'BREL' => 'batch_release_id',
+            'CDOC' => 'controlled_document_id',
+            'TRAIN' => 'training_record_id',
+            'EQP' => 'equipment_id',
+            'MDEV' => 'measurement_device_id',
+        ];
+        $links = [];
+        foreach ($map as $type => $key) {
+            if (isset($context[$key]) && (string)$context[$key] !== '') {
+                $links[] = ['type' => $type, 'id' => (string)$context[$key]];
+            }
+        }
+        return $links;
+    }
+
+    private function aiAdvisoryRefs(array $aiFlags): array
+    {
+        $refs = [];
+        foreach (['advisory_ref', 'advisory_id', 'model_trace_id'] as $key) {
+            if (isset($aiFlags[$key]) && (string)$aiFlags[$key] !== '') {
+                $refs[] = ['type' => $key, 'id' => (string)$aiFlags[$key], 'authority' => 'advisory_only'];
+            }
+        }
+        return $refs;
+    }
+
+    /**
+     * @return array{digits:int, scale:int, sign:string}
+     */
+    private function decimalPrecision(string $decimal): array
+    {
+        $sign = str_starts_with($decimal, '-') ? '-' : '+';
+        $unsigned = ltrim($decimal, '+-');
+        $parts = explode('.', $unsigned, 2);
+        $integerDigits = strlen(ltrim($parts[0] === '' ? '0' : $parts[0], '0'));
+        $fractionDigits = isset($parts[1]) ? strlen($parts[1]) : 0;
+        return [
+            'digits' => max(1, $integerDigits + $fractionDigits),
+            'scale' => $fractionDigits,
+            'sign' => $decimal === '0' ? '+' : $sign,
+        ];
     }
 }

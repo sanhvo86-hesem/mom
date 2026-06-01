@@ -1,0 +1,50 @@
+{
+  "prompt": "P52",
+  "decision_token": "P52_PASS_WITH_CONTROLLED_GAPS",
+  "branch": "codex/mda-v4-implementation-closure-recovery-20260530",
+  "implemented_commands": [
+    "StartJobCommand",
+    "IssueMaterialToWorkOrderCommand",
+    "LoadToolCommand",
+    "RecordInspectionResultCommand",
+    "CompleteOperationCommand"
+  ],
+  "runtime_evidence": [
+    {
+      "probe": "php_lint_p52_files",
+      "result": "PASS",
+      "evidence": "No syntax errors detected in P52 services, gateway, registry, and tests."
+    },
+    {
+      "probe": "manual_readiness_block_and_allow",
+      "result": "PASS",
+      "evidence": "{\"expired_training\":[\"resource_readiness_blocked\",\"readiness_evidence_expired\",true,false],\"start_ok\":[\"allow\",15,19,true]}"
+    },
+    {
+      "probe": "composer_test",
+      "result": "BLOCKED",
+      "evidence": "Could not open input file: vendor/bin/phpunit"
+    },
+    {
+      "probe": "composer_analyse_check",
+      "result": "BLOCKED",
+      "evidence": "Could not open input file: vendor/bin/phpstan"
+    }
+  ],
+  "schema": [
+    "resource_readiness_evidence_state",
+    "resource_readiness_snapshot"
+  ],
+  "controlled_gaps": [
+    {
+      "gap": "readiness_evidence_state_population",
+      "status": "open",
+      "next_prompt": "P53/P54/P55"
+    },
+    {
+      "gap": "legacy_route_bypass",
+      "status": "open",
+      "next_prompt": "P55/P58"
+    }
+  ]
+}

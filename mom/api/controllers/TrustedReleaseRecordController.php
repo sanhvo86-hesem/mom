@@ -153,7 +153,8 @@ final class TrustedReleaseRecordController extends BaseController
                     $criteria[$field] = trim($value);
                 }
             }
-        foreach (['correlation_id', 'request_id', 'traceparent', 'limit', 'require_qualification'] as $field) {
+        unset($criteria['require_qualification']);
+        foreach (['correlation_id', 'request_id', 'traceparent', 'limit'] as $field) {
             $value = $this->input($field);
             if ($value !== null && trim($value) !== '') {
                 $criteria[$field] = trim($value);

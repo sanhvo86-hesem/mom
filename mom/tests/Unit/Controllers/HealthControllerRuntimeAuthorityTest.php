@@ -65,7 +65,7 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
         $this->assertFalse($payload['health_evaluation']['components_ok']['runtime_authority_strict'] ?? true);
         $this->assertSame('compatibility_only', $payload['authority']['slices']['idempotency']['readiness_state'] ?? null);
         $this->assertSame('compatibility_only', $payload['authority']['slices']['order_workflow']['readiness_state'] ?? null);
-        $this->assertSame('compatibility_only', $payload['authority']['slices']['master_data']['readiness_state'] ?? null);
+        $this->assertSame('blocked_postgres_required', $payload['authority']['slices']['master_data']['readiness_state'] ?? null);
         $this->assertSame('compatibility_only', $payload['authority']['slices']['manufacturing_events']['readiness_state'] ?? null);
         $this->assertSame('authoritative_ready', $payload['authority']['slices']['canonical_manufacturing_spine']['readiness_state'] ?? null);
         $this->assertSame('authoritative_ready', $payload['authority']['slices']['production_history']['readiness_state'] ?? null);

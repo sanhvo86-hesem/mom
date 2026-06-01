@@ -1,0 +1,6 @@
+gap_id,severity,status,evidence,next_step
+P0-JSON-PRIMARY-GOVERNED-MDA,P0,closed_for_masterdata_service_commands,"JSON_ONLY MasterDataService create returned governed_master_data_postgres_authority_required.","Verify all legacy non-MasterDataService JSON writers in later route inventory."
+P0-MASTERDATA-COMPATIBILITY-ONLY,P0,closed_for_authority_probe_language,"MasterDataService authorityProbe now returns blocked_postgres_required instead of compatibility_only when PG authority is not enabled.","Enable PG authority mode and run live DB probe before production claim."
+P1-LIVE-PG-MIGRATION-EXECUTION,P1,controlled_gap,"Migration 264 added but not applied to a live DB in this worktree.","Apply in staging/VPS cutover rehearsal and capture migration receipt."
+P1-RESTORE-DRILL,P1,controlled_gap,"Root hash restore/reconcile scenario remains simulated only.","Close in P59 restore drill."
+P2-PHPUNIT-VENDOR-MISSING,P2,environment_blocked,"composer --working-dir=mom run test failed because vendor/bin/phpunit is absent.","Install/bootstrap vendor and rerun focused + full tests."

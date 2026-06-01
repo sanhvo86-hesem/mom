@@ -1,0 +1,33 @@
+{
+  "schema": "migration-prefix-collision-ledger.v1",
+  "description": "Approved immutable historical migration prefix collisions. This ledger is read by mom/tools/release/check_migration_drift.php so new collisions still fail while known production-history collisions remain explicit.",
+  "approved_prefix_collisions": [
+    {
+      "prefix": "108",
+      "files": [
+        "108_mobile_inspection_execution_bridge.sql",
+        "108_world_class_control_plane_execution.sql"
+      ],
+      "classification": "historical_branch_merge_collision",
+      "rationale": "Both files are already present on origin/main and are referenced by schema/contract evidence. Renumbering would create fresh pending migrations for already-governed history."
+    },
+    {
+      "prefix": "115",
+      "files": [
+        "115_missing_fk_indexes.sql",
+        "115_order_workflow_status_authority.sql"
+      ],
+      "classification": "historical_branch_merge_collision",
+      "rationale": "Both files are already present on origin/main and are idempotent historical schema changes. Keep explicit allow-list instead of renumbering applied history."
+    },
+    {
+      "prefix": "188",
+      "files": [
+        "188_enforce_single_primary_position_assignment.sql",
+        "188_error_code_registry.sql"
+      ],
+      "classification": "historical_restoration_collision",
+      "rationale": "188_error_code_registry is a forensic restoration for a live schema_migrations row; preserving the filename prevents reintroducing the ghost-migration failure documented by the drift detector."
+    }
+  ]
+}
