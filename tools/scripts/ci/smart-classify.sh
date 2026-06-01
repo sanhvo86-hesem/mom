@@ -52,6 +52,11 @@ is_design_token_path() {
     matches "$file" '(lego-token|design-token|theme-token)'
 }
 
+is_critical_portal_runtime_path() {
+  local file="$1"
+  matches "$file" '^mom/scripts/portal/(00-block-engine|00bb-graphics-authority|00bc-block-registry|00bd-blockkit|00be-archetype-registry|00bf-archetype-kit|00bh-blocks-facade|00bi-blocks-l3-map|01-module-router|02-state-auth-ui|40-eqms-shell)\.js$'
+}
+
 resolve_changed_files() {
   if [[ "${SMART_CI_FORCE_BASE_UNRESOLVED:-}" == "1" ]]; then
     printf '%s\n' '__SMART_CI_UNRESOLVED_BASE__'
@@ -309,6 +314,14 @@ while IFS= read -r file; do
     set_flag needs_frontend_js_safety
     set_flag needs_hmv4_safety
     set_flag needs_playwright_e2e
+  fi
+
+  if is_critical_portal_runtime_path "$file"; then
+    set_flag needs_frontend_safety
+    set_flag needs_frontend_js_safety
+    set_flag needs_hmv4_safety
+    set_flag needs_playwright_e2e
+    set_flag needs_visual_e2e
   fi
 
   if matches "$file" '^mom/styles/module-template-v4'; then
