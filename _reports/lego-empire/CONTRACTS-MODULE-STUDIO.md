@@ -67,3 +67,22 @@ Ghi chú shape:
 - A có thể chuyển L3/L4 library rail từ `__HM_BLOCK_REGISTRY__`/`__HM_ARCHETYPE_REGISTRY__` (JS static) sang đọc `graphics_block_contract_list`/`graphics_module_archetype_list` (DB authority) khi sẵn sàng — shape row khớp cột bảng (mig 261/262).
 
 **SQL validate:** cả 3 upsert chạy thử trên live schema (BEGIN…ROLLBACK) — casts text[]/jsonb/boolean + tên cột đúng.
+
+---
+
+### B→A (2026-06-01) — P3.B-lifecycle ModuleSchemaController (version/soft-delete/concurrency/binding)
+Lifecycle ops cho Module CRUD (file-based `data/modules/*.json`). Backward-compatible: caller cũ không gửi param mới vẫn chạy.
+
+| action_key | method | thay đổi / body | trả về |
+|---|---|---|---|
+| `module_schema_save` | POST | **+ snapshot version** mỗi save (prior → `_versions/<id>/vNNNNNN.json`, giữ 30 bản). **+ optimistic lock opt-in**: gửi `baseVersion` (version đã load) → nếu ≠ version trên đĩa → **409 `version_conflict`** kèm `currentVersion`+`current` (KHÔNG ghi đè). Không gửi baseVersion → last-write-wins NHƯNG đã snapshot (recoverable). version nay monotonic từ authority. | `{saved, version, bindings:{referencedCount,resolvedInCatalog,notInGenericCatalog}}` |
+| `module_schema_delete` | POST | **soft-delete mặc định**: set `status='deleted'` (giữ file), không HARD unlink nữa. `purge:true` mới hard-delete (vẫn snapshot trước). | `{deleted, purged, restorable}` |
+| `module_schema_restore` | POST | `{moduleId}` lift tombstone `status: deleted→active`. | `{restored, version}` |
+| `module_schema_list` | GET | mặc định ẩn `status='deleted'`; `&includeDeleted=1` để hiện. Thêm field `status` mỗi item. | `{schemas:[{…,status}]}` |
+| `module_schema_versions` | GET `&id=` | liệt kê snapshot history. | `{versions:[{version,snapshotAt,updatedBy,status}]}` |
+| `module_schema_restore_version` | POST | `{moduleId, version}` rollback về snapshot (snapshot current trước; tạo version forward mới, không rewrite history). | `{restored, fromVersion, version}` |
+| `module_schema_validate_bindings` | GET `&id=` hoặc POST `{schema}` | surface binding contract (thay silent console.warn). | `{bindings:{referencedCount,resolvedInCatalog,notInGenericCatalog,note}}` |
+
+Ghi chú binding: `dataSource.api` là action-key. `notInGenericCatalog` = không có trong endpoint-catalog generic-CRUD NHƯNG có thể vẫn hợp lệ (legacy controller action như `order_so_list`) → **advisory, không fatal** (dual namespace). A nên hiển thị report, không block save.
+
+**A nên adopt:** round-trip `baseVersion` (version đã load) trong `module_schema_save` để bật optimistic lock; xử lý 409 `version_conflict` (hiện diff/reload); chuyển nút Delete → soft-delete + Undo (restore); thêm panel Version history (`module_schema_versions` + `module_schema_restore_version`).

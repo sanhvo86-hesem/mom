@@ -9,12 +9,18 @@ use MOM\Api\Router;
 return static function (Router $router, string $dataDir): void {
     // Module Schema Builder
     $router->actions([
-        'module_schema_list'    => [ModuleSchemaController::class, 'listSchemas'],
-        'module_schema_get'     => [ModuleSchemaController::class, 'getSchema'],
-        'module_schema_save'    => [ModuleSchemaController::class, 'saveSchema'],
-        'module_schema_delete'  => [ModuleSchemaController::class, 'deleteSchema'],
-        'module_schema_reset'   => [ModuleSchemaController::class, 'resetSchema'],
-        'module_api_catalog'    => [ModuleSchemaController::class, 'apiCatalog'],
+        'module_schema_list'        => [ModuleSchemaController::class, 'listSchemas'],
+        'module_schema_get'         => [ModuleSchemaController::class, 'getSchema'],
+        'module_schema_save'        => [ModuleSchemaController::class, 'saveSchema'],
+        'module_schema_delete'      => [ModuleSchemaController::class, 'deleteSchema'],
+        'module_schema_reset'       => [ModuleSchemaController::class, 'resetSchema'],
+        'module_api_catalog'        => [ModuleSchemaController::class, 'apiCatalog'],
+        // Lifecycle ops (P3.B-lifecycle): soft-delete restore, version history,
+        // version rollback, binding-contract surfacing.
+        'module_schema_restore'         => [ModuleSchemaController::class, 'restoreSchema'],
+        'module_schema_versions'        => [ModuleSchemaController::class, 'listVersions'],
+        'module_schema_restore_version' => [ModuleSchemaController::class, 'restoreVersion'],
+        'module_schema_validate_bindings' => [ModuleSchemaController::class, 'validateBindings'],
     ]);
     
     // Schema Studio
