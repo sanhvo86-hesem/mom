@@ -218,6 +218,14 @@ while IFS= read -r file; do
     set_flag needs_php_syntax
   fi
 
+  # Module build-packet (L5 manifest) gate: checker, schema, or any manifest.
+  if matches "$file" '^mom/tools/release/check_module_manifest\.php$' ||
+    matches "$file" '^mom/contracts/module\.build-packet\.schema\.json$' ||
+    matches "$file" '^mom/design/build-packets/'; then
+    set_flag needs_graphics_safety
+    set_flag needs_php_syntax
+  fi
+
   if ! is_design_token_path "$file" && {
     matches "$file" '^mom/tools/release/check_(user_identity_ssot|authorization_invariants)\.php$' ||
       matches "$file" '([Aa]dmin|[Aa]uth|authorization|permission|user_identity|csrf|xss|session|password|access[-_]?token|api[-_]?token|auth[-_]?token|session[-_]?token|csrf[-_]?token|sanitize|upload)'

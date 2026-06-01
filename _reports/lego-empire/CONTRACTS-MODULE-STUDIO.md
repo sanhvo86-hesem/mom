@@ -86,3 +86,11 @@ Lifecycle ops cho Module CRUD (file-based `data/modules/*.json`). Backward-compa
 Ghi chú binding: `dataSource.api` là action-key. `notInGenericCatalog` = không có trong endpoint-catalog generic-CRUD NHƯNG có thể vẫn hợp lệ (legacy controller action như `order_so_list`) → **advisory, không fatal** (dual namespace). A nên hiển thị report, không block save.
 
 **A nên adopt:** round-trip `baseVersion` (version đã load) trong `module_schema_save` để bật optimistic lock; xử lý 409 `version_conflict` (hiện diff/reload); chuyển nút Delete → soft-delete + Undo (restore); thêm panel Version history (`module_schema_versions` + `module_schema_restore_version`).
+
+---
+
+### B→A (2026-06-01) — P4.B Build Packet schema + CI manifest gate
+- **Schema:** `mom/contracts/module.build-packet.schema.json` — canonical L5 manifest: `moduleId` + `moduleArchetype` (archetype_key) + `themePresetKey` + `zones{zone:[block_key | {block, slots, data, a11y}]}`. **Zero style** (không hex/px/inline-style/HTML/density literal). A khi Assemble xuất manifest theo shape này.
+- **Gate:** `mom/tools/release/check_module_manifest.php` wired vào CI `graphics-safety` (job step 4). Reject (P0) cho packet MỚI: hex/px literal, inline `"style"`, raw HTML, density-px override, dotted `block_key` chưa published trong L3 registry. Advisory: thiếu `a11yProfile`/`previewScene`.
+- **Grandfather:** `M2-orders.json` + `M4-purchasing.json` allowlisted → findings advisory, gate xanh. Packet MỚI (ngoài allowlist) bị block ngay. Thu allowlist dần khi migrate.
+- **Trigger:** `smart-classify.sh` set `needs_graphics_safety=true` khi đụng `build-packets/**`, schema, hoặc checker. A thêm/sửa manifest sẽ tự chạy gate.

@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://qms.hesem.com.vn/contracts/module.build-packet.schema.json",
+  "title": "Module Build Packet (L5 manifest)",
+  "description": "Canonical Module Studio Assemble output. A build packet references an archetype (L4), a theme preset (L0/Theme), and arranges PUBLISHED blocks (L3) into the archetype's zones, binding data to named slots. It carries ZERO style: no hex/px literals, no inline style, no HTML, no density override — every visual parameter is owned by the Theme/token authority, not the manifest. Deep literal checks are enforced by mom/tools/release/check_module_manifest.php; this schema fixes the structural shape.",
+  "type": "object",
+  "required": ["moduleId", "moduleArchetype", "zones"],
+  "properties": {
+    "moduleId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+      "description": "Stable module identifier (e.g. M2-orders)."
+    },
+    "moduleName": {
+      "type": "object",
+      "description": "Localized display name.",
+      "properties": {
+        "vi": { "type": "string" },
+        "en": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "route": { "type": "string" },
+    "moduleArchetype": {
+      "type": "string",
+      "minLength": 1,
+      "description": "archetype_key of the L4 archetype this module instantiates (graphics_module_archetype)."
+    },
+    "themePresetKey": {
+      "type": "string",
+      "description": "preset_key of the theme this module renders under (graphics_theme_preset). Visual identity lives here, never inline in the manifest."
+    },
+    "version": { "type": "string" },
+    "templateId": { "type": "string" },
+    "templateVersion": { "type": "string" },
+    "contractRefs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "zones": {
+      "type": "object",
+      "description": "archetype zone name -> ordered list of block placements. Each placement is either a published block_key (string) or an object binding slots/data to a block.",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "A published L3 block reference (block_key or block-instance id)."
+            },
+            {
+              "type": "object",
+              "required": ["block"],
+              "properties": {
+                "block": {
+                  "type": "string",
+                  "description": "Published L3 block_key (graphics_block_contract.status='published')."
+                },
+                "slots": {
+                  "type": "object",
+                  "description": "Named slot -> content/binding. No raw HTML, no inline style."
+                },
+                "data": {
+                  "type": "object",
+                  "description": "Data binding for the block (e.g. dataSource.api + params). No style.",
+                  "properties": {
+                    "dataSource": { "type": "object" }
+                  }
+                },
+                "a11y": {
+                  "type": "object",
+                  "description": "Per-placement accessibility overrides (role/label) when the block contract allows."
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        }
+      }
+    },
+    "a11yProfile": {
+      "type": "object",
+      "description": "Module-level accessibility contract (landmarks, focus order). Required by check_module_manifest for newly authored packets."
+    },
+    "previewScene": {
+      "type": "string",
+      "description": "PreviewScenes key used to render this manifest in simulation before submit."
+    }
+  },
+  "additionalProperties": true
+}
