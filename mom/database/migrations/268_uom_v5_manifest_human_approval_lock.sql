@@ -60,6 +60,31 @@ ON CONFLICT (permission_code) DO UPDATE
        metadata = permission_catalog.metadata || EXCLUDED.metadata,
        updated_at = now();
 
+-- Live databases may still retain the original 217 constraint name even
+-- after historical governance migrations were recorded. Normalize the rule
+-- lifecycle CHECK before quarantining legacy seed approvals to pending_review.
+ALTER TABLE uom_conversion_rule
+    DROP CONSTRAINT IF EXISTS uom_conversion_rule_lifecycle_status_check;
+ALTER TABLE uom_conversion_rule
+    DROP CONSTRAINT IF EXISTS uom_cr_lifecycle_v3;
+ALTER TABLE uom_conversion_rule
+    DROP CONSTRAINT IF EXISTS uom_cr_lifecycle_v5_manifest_lock;
+ALTER TABLE uom_conversion_rule
+    ADD CONSTRAINT uom_cr_lifecycle_v5_manifest_lock
+    CHECK (lifecycle_status IN (
+        'draft',
+        'pending_tech_review',
+        'pending_qa_approval',
+        'pending_esign',
+        'pending_review',
+        'review',
+        'approved',
+        'active',
+        'deprecated',
+        'retired',
+        'rejected'
+    ));
+
 -- Grant by canonical capability evidence, not by hardcoded role strings:
 -- only roles that already have both document approval and audit export
 -- authority get the UoM manifest approval privilege. Explicit denies still
