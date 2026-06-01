@@ -167,6 +167,13 @@ final class DesignTokenCatalogService
 
         if ($this->canReadFromDb()) {
             try {
+                // resolveScopeChain() always terminates with organization:default,
+                // so once that scope is seeded for every governed token (migration
+                // 284 backfills it as a total mirror of the catalog) $result is
+                // never empty in POSTGRES_* modes — the JSON fallback below is then
+                // a cold-start / JSON_ONLY safety net only, never the runtime
+                // authority. Most-specific scope wins: we overlay from base
+                // (organization:default) up to the most specific scope.
                 $scopeChain = $this->resolveScopeChain($scope);
                 foreach (array_reverse($scopeChain) as [$scopeType, $scopeId]) {
                     $rows = $this->data->query(
@@ -179,6 +186,21 @@ final class DesignTokenCatalogService
                         $result[(string)$row['token_key']] = (string)$row['value'];
                     }
                 }
+                // Completion pass: a non-light snapshot must still be total per
+                // mode. If a token lacks a row in the requested mode (e.g. a
+                // mode-agnostic spacing token, or a future catalog key seeded
+                // without all-mode values) fill it from the light baseline so the
+                // snapshot map covers every governed key and the per-key
+                // GraphicsAuthority.tokens.read() JSON fallback never fires for a
+                // governed token. Only adds missing keys; never overrides a
+                // mode-specific value already resolved above.
+                if ($colorMode !== 'light') {
+                    foreach ($this->snapshotEffective($scope, 'light') as $key => $value) {
+                        if (!array_key_exists($key, $result)) {
+                            $result[$key] = $value;
+                        }
+                    }
+                }
                 if ($result !== []) {
                     return $result;
                 }
@@ -187,7 +209,7 @@ final class DesignTokenCatalogService
             }
         }
 
-        // Fallback: walk JSON config
+        // Fallback: walk JSON config (cold-start / JSON_ONLY only — see note above)
         $config = $this->repo->readDesignConfig();
         return $this->flattenJson($config);
     }
