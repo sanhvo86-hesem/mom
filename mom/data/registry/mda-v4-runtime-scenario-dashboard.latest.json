@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-06-01T12:50:41+00:00",
+    "generated_at": "2026-06-01T15:33:16+00:00",
     "runtime_mode": "transaction_sandbox_real_gateway",
     "mock_only": false,
     "scenario_total": 14,
@@ -75,7 +75,7 @@
                 "command_name": "StartJobCommand",
                 "details": {
                     "readiness_snapshot_id": "readiness-snapshot-1",
-                    "readiness_hash_sha256": "6d7789d249f27ca95bf35e2118100b4f9dd30f7ce9a68d3c65d597aac6d4fea9",
+                    "readiness_hash_sha256": "b9785e781eccda401b3fd3b0d370af4257421e9f57f54aac52e4eadf19abe811",
                     "blockers": [
                         {
                             "evidence_key": "machine_pm",

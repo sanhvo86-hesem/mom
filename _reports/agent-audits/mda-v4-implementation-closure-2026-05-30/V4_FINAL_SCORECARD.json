@@ -1,8 +1,8 @@
 {
     "schema_version": "mda.v4.final_redteam_scorecard.v1",
-    "generated_at": "2026-06-01T12:51:37+00:00",
-    "branch": "codex/mda-runtime-top30-closure-20260601",
-    "sha": "2f2b0f4e2",
+    "generated_at": "2026-06-01T15:32:19+00:00",
+    "branch": "codex/mda-runtime-top30-closure-audit-20260601",
+    "sha": "24a9ae7b8",
     "decision_token": "P60_PASS_READY_FOR_CONTROLLED_INTEGRATION",
     "merge_readiness": "controlled_integration_allowed",
     "production_ready_claim_allowed": false,
@@ -46,27 +46,27 @@
             {
                 "prompt": "P48",
                 "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P48.md",
-                "sha256": "37b411269a4baea02669699c4f8cdae30fea9492f88f31d999479e299e759b9f"
+                "sha256": "25d078bd5e2991e5426781c8eebda285e2d25d5dcc9cab711907e112077e5b31"
             },
             {
                 "prompt": "P49",
                 "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P49.md",
-                "sha256": "1cf2fd20d7bee3af1d764dde5fc943366f53bc44e4f1e06612886e8cb346db32"
+                "sha256": "9ae8803fba778eb2decd8a02952a0b0194b218a1fcedc59788afcfc6aa96a135"
             },
             {
                 "prompt": "P50",
                 "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P50.md",
-                "sha256": "19cc4d870ef1b7ebe7fbe3f842f3b774d61257274dea12bc7a0eb7a5067bb7fa"
+                "sha256": "71c16a436df1b669599ba2059e52694ca8780e1304349102710d286fc2f3fd73"
             },
             {
                 "prompt": "P51",
                 "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P51.md",
-                "sha256": "11ec70474c62ef8edec107ea3a90cb58aec37bad1ceb818a396ad2a1d2465d41"
+                "sha256": "a7583018a80b487aa146e1ffaa203e6a5f70f8b372352631fd49ca60f2522154"
             },
             {
                 "prompt": "P52",
                 "path": "_reports/agent-audits/mda-v4-implementation-closure-2026-05-30/V4_PROMPT_HANDOFF_P52.md",
-                "sha256": "0c60d4bc770da3777d0f466324e47051cc9f1620e673112faa979be5938e9705"
+                "sha256": "b0d310b1106779bc18a1041cf072418cf3978f99ccc130c88951a0c82648bc8c"
             },
             {
                 "prompt": "P53",
