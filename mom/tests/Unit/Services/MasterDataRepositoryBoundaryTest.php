@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 final class MasterDataRepositoryBoundaryTest extends TestCase
 {
-    public function testDuplicateCreateRejectsThroughRepositoryBoundary(): void
+    public function testDirectCreateRequiresDomainCommandGateway(): void
     {
         $repository = new InMemoryMasterDataRepository([
             'parts' => [[
@@ -24,11 +24,11 @@ final class MasterDataRepositoryBoundaryTest extends TestCase
         $result = $service->create('parts', ['part_number' => 'PART-001'], 'planner');
 
         $this->assertFalse($result->ok);
-        $this->assertSame('duplicate', $result->errorCode);
-        $this->assertSame('PART-001', $result->data['existing_id'] ?? null);
+        $this->assertSame('domain_command_required', $result->errorCode);
+        $this->assertSame('DomainCommandGateway', $result->data['authority'] ?? null);
     }
 
-    public function testActiveUpdateQueuesApprovalAndApproveAppliesChange(): void
+    public function testDirectUpdateRequiresDomainCommandGateway(): void
     {
         $repository = new InMemoryMasterDataRepository([
             'parts' => [[
@@ -41,19 +41,12 @@ final class MasterDataRepositoryBoundaryTest extends TestCase
 
         $queued = $service->update('parts', 'PART-002', ['description' => 'New description'], 'planner', 'drawing update');
 
-        $this->assertTrue($queued->ok, $queued->message);
-        $this->assertSame('pending', $queued->data['status'] ?? null);
-        $changeId = (string)($queued->data['change_id'] ?? '');
-        $this->assertNotSame('', $changeId);
+        $this->assertFalse($queued->ok);
+        $this->assertSame('domain_command_required', $queued->errorCode);
         $this->assertSame('Old description', $repository->store['parts'][0]['description'] ?? null);
-
-        $this->assertTrue($service->approvePendingChange($changeId, 'qa-manager'));
-        $this->assertSame('New description', $repository->store['parts'][0]['description'] ?? null);
-        $this->assertSame('approved', $repository->pending['entries'][0]['status'] ?? null);
-        $this->assertGreaterThanOrEqual(2, count((array)($repository->history['entries'] ?? [])));
     }
 
-    public function testReferentialDeleteBlockUsesRepositoryReferenceStores(): void
+    public function testDirectDeleteRequiresDomainCommandGatewayBeforeReferentialChecks(): void
     {
         $repository = new InMemoryMasterDataRepository(
             ['parts' => [['part_number' => 'PART-003', 'status' => 'draft']]],
@@ -64,11 +57,11 @@ final class MasterDataRepositoryBoundaryTest extends TestCase
         $result = $service->delete('parts', 'PART-003', 'planner');
 
         $this->assertFalse($result->ok);
-        $this->assertSame('referential_integrity', $result->errorCode);
+        $this->assertSame('domain_command_required', $result->errorCode);
         $this->assertSame('PART-003', $repository->store['parts'][0]['part_number'] ?? null);
     }
 
-    public function testDeleteArchivesUnreferencedRecordThroughRepositoryBoundary(): void
+    public function testReadDetailRemainsAllowedForProjectionUse(): void
     {
         $repository = new InMemoryMasterDataRepository([
             'suppliers' => [[
@@ -79,12 +72,10 @@ final class MasterDataRepositoryBoundaryTest extends TestCase
         ]);
         $service = $this->service($repository);
 
-        $result = $service->delete('suppliers', 'SUP-001', 'buyer');
+        $result = $service->getRecord('suppliers', 'SUP-001');
 
-        $this->assertTrue($result->ok, $result->message);
-        $this->assertSame([], $repository->store['suppliers']);
-        $this->assertSame('SUP-001', $repository->archive['suppliers'][0]['supplier_id'] ?? null);
-        $this->assertSame('delete', $repository->history['entries'][0]['action'] ?? null);
+        $this->assertSame('SUP-001', $result['supplier_id'] ?? null);
+        $this->assertSame('Supplier One', $result['supplier_name'] ?? null);
     }
 
     private function service(InMemoryMasterDataRepository $repository): MasterDataService

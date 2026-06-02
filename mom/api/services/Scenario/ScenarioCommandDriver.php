@@ -92,6 +92,11 @@ final class ScenarioCommandDriver
         $payload['idempotency_key'] = $payload['idempotency_key'] ?? $idempotencyKey;
         $prepared['payload'] = $payload;
 
+        if ($commandName !== '' && !isset($prepared['reauth_evidence'])) {
+            $prepared['reauth_evidence'] = ['challenge_id' => 'reauth-' . $idempotencyKey];
+            unset($prepared['reauth_at'], $prepared['reauthenticated_at'], $prepared['payload']['reauth_at']);
+        }
+
         if ($commandName !== '' && !isset($prepared['signature_evidence']) && !isset($prepared['signature']) && isset($scenario['signature_meaning'])) {
             $entry = ($this->registry ?? new CommandRegistry())->require($commandName);
             $hash = ($this->hasher ?? new CommandRecordHasher())->hash($entry, $payload);

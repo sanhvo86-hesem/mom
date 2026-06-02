@@ -130,7 +130,7 @@ final class DomainCommandSecurityBoundaryTest extends TestCase
                 'idempotency_key' => 'idem-ot-1',
                 'actor_id' => 'operator-1',
                 'actor_permissions' => ['production.operation.complete'],
-                'reauth_at' => date(DATE_ATOM),
+                'reauth_evidence' => ['challenge_id' => 'reauth-ot-1'],
                 'source_type' => 'ot',
                 'source_system' => 'mtconnect-adapter-1',
                 'payload' => [
@@ -142,6 +142,51 @@ final class DomainCommandSecurityBoundaryTest extends TestCase
             $this->fail('Expected OT trust denial.');
         } catch (DomainCommandException $e) {
             $this->assertSame('ot_trust_required', $e->problemCode);
+            $this->assertTrue($db->hasAuditEvent('domain_command.security_denied'));
+        }
+    }
+
+    public function testPayloadOnlySodExceptionApprovalIsDenied(): void
+    {
+        $db = new DomainCommandSecurityFakeConnection('originator-1');
+        $gateway = new DomainCommandGateway($db, new CommandRegistry());
+
+        try {
+            $gateway->dispatch([
+                'command_name' => 'ApproveEngineeringReleasePackageCommand',
+                'idempotency_key' => 'idem-sod-payload-1',
+                'actor_id' => 'originator-1',
+                'actor_permissions' => ['engineering.package.approve'],
+                'payload' => [
+                    'package_id' => 'pkg-1',
+                    'sod_exception_id' => 'SOD-1',
+                    'sod_exception_approved' => true,
+                ],
+            ]);
+            $this->fail('Expected payload-only SoD exception denial.');
+        } catch (DomainCommandException $e) {
+            $this->assertSame('sod_payload_exception_untrusted', $e->problemCode);
+            $this->assertTrue($db->hasAuditEvent('domain_command.security_denied'));
+        }
+    }
+
+    public function testTimestampOnlyReauthenticationIsDenied(): void
+    {
+        $db = new DomainCommandSecurityFakeConnection('originator-1');
+        $gateway = new DomainCommandGateway($db, new CommandRegistry());
+
+        try {
+            $gateway->dispatch([
+                'command_name' => 'ReleaseEngineeringReleasePackageCommand',
+                'idempotency_key' => 'idem-reauth-ts-1',
+                'actor_id' => 'qa-1',
+                'actor_permissions' => ['engineering.package.release'],
+                'reauth_at' => date(DATE_ATOM),
+                'payload' => ['package_id' => 'pkg-1'],
+            ]);
+            $this->fail('Expected timestamp-only re-authentication denial.');
+        } catch (DomainCommandException $e) {
+            $this->assertSame('reauth_payload_timestamp_untrusted', $e->problemCode);
             $this->assertTrue($db->hasAuditEvent('domain_command.security_denied'));
         }
     }
@@ -158,6 +203,19 @@ final class DomainCommandSecurityFakeConnection extends Connection
 
     public function queryOne(string $sql, array $params = []): ?array
     {
+        if (str_contains($sql, 'domain_command_reauth_challenge')) {
+            return [
+                'challenge_id' => (string)($params[':challenge_id'] ?? 'reauth-1'),
+                'actor_id' => (string)($params[':actor_id'] ?? 'operator-1'),
+                'command_name' => (string)($params[':command_name'] ?? 'CompleteOperationCommand'),
+                'payload_hash_sha256' => '',
+                'intent_hash_sha256' => '',
+                'issued_at' => gmdate('c'),
+                'expires_at' => gmdate('c', time() + 300),
+                'consumed_at' => gmdate('c'),
+                'result' => 'consumed',
+            ];
+        }
         unset($sql, $params);
         return ['created_by' => $this->packageOriginator];
     }

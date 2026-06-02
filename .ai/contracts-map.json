@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "generated_at": "2026-06-01T17:05:52+00:00",
+        "generated_at": "2026-06-02T01:56:19+00:00",
         "description": "Domain contract objects: canonical resource, primary table, lifecycle status, workflow state model.",
         "contracts_dir": "mom/contracts/objects/",
         "usage": "Find which domain owns a resource and which table stores it. Use primary_table for SQL queries."
