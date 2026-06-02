@@ -264,126 +264,10 @@
       + '</div>';
   }
 
-  /* ── Theme Template editor (graphics_theme_preset, migration 263) ──────────
-     Create / edit / save named themes; Simulate applies live to the whole app;
-     Save persists via the DB-backed API. The Module Builder picker + runtime
-     applyTheme() read the SAME store, so a saved preset ripples everywhere. New
-     presets default to the locked HESEM standard (gap 8 / outer 8 / inner 4). */
-  var _tpDraft = null;
-  var _tpWarmed = false;
-  function _tpBlank(){
-    return { preset_key:'', display_name_vi:'', display_name_en:'', brand:'#0c4a6e',
-      density_px:8, radius_outer_px:8, radius_inner_px:4, control_h_px:32, frame_px:8, is_builtin:false, _new:true };
-  }
-  function _tpFromTheme(key){
-    var LT = window.LegoTheme, th = LT && LT.themes && LT.themes[key];
-    if (!th) return _tpBlank();
-    var outer = (th.radius != null) ? th.radius : 8;
-    return { preset_key:key,
-      display_name_vi:(th.label && th.label.vi) || key, display_name_en:(th.label && th.label.en) || key,
-      brand:th.brand || '#0c4a6e', density_px:(th.density != null) ? th.density : 8,
-      radius_outer_px:outer, radius_inner_px:(th.radiusInner != null) ? th.radiusInner : Math.max(2, Math.round(outer/2)),
-      control_h_px:(th.controlH != null) ? th.controlH : 32, frame_px:(th.frame != null) ? th.frame : ((th.density != null) ? th.density : 8),
-      is_builtin:!!th._builtin, _new:false };
-  }
-  function _tpApi(action){ return 'api.php?action=' + encodeURIComponent(action); }
-  function _tpToast(m, k){ if (typeof window.showToast === 'function') window.showToast(m, k || 'info'); }
-  function _tpEN(){ return window.__lang === 'en'; }
-  function _tpRerender(){
-    var panel = document.getElementById('adm-appearance-panel-theme');
-    if (!panel) return;
-    panel.innerHTML = window._renderAdmThemeHtml(_tpEN() ? function(vi,en){return en||vi;} : function(vi,en){return vi||en;});
-    if (typeof window._wireAdmTheme === 'function') window._wireAdmTheme();
-  }
-  window._admTpSelect = function(key){ _tpDraft = (key === '__new__') ? _tpBlank() : _tpFromTheme(key); _tpRerender(); };
-  window._admTpNew = function(){ _tpDraft = _tpBlank(); _tpRerender(); };
-  window._admTpField = function(id){
-    var el = document.getElementById(id); if (!el || !_tpDraft) return;
-    var map = { 'tp-key':'preset_key','tp-name-vi':'display_name_vi','tp-name-en':'display_name_en','tp-brand':'brand',
-      'tp-density':'density_px','tp-outer':'radius_outer_px','tp-inner':'radius_inner_px','tp-ctrl':'control_h_px' };
-    var f = map[id]; if (!f) return;
-    var v = el.value;
-    if (f.slice(-3) === '_px') v = parseInt(v, 10) || 0;
-    if (f === 'preset_key') v = String(v).toLowerCase().replace(/[^a-z0-9\-]/g, '');
-    _tpDraft[f] = v;
-  };
-  window._admTpSimulate = function(){
-    var LT = window.LegoTheme, d = _tpDraft; if (!LT || !d) return;
-    var root = document.documentElement;
-    try {
-      if (LT.applyBrand)      LT.applyBrand(d.brand, { scope: root });
-      if (LT.setDensity)      LT.setDensity(d.density_px, { scope: root });
-      if (LT.setRadius)       LT.setRadius(d.radius_inner_px, { scope: root });
-      if (LT.setCardRadius)   LT.setCardRadius(d.radius_outer_px, { scope: root });
-      if (LT.setControlHeight)LT.setControlHeight(d.control_h_px, { scope: root });
-      _tpToast(_tpEN() ? 'Simulating theme live' : 'Đang mô phỏng theme trực tiếp', 'success');
-    } catch (e) { _tpToast('Simulate error: ' + e, 'error'); }
-  };
-  window._admTpSave = function(){
-    var d = _tpDraft; if (!d) return;
-    if (!d.preset_key){ _tpToast(_tpEN() ? 'Enter a preset key' : 'Nhập mã preset', 'warning'); return; }
-    fetch(_tpApi('graphics_theme_preset_save'), { method:'POST', credentials:'same-origin',
-      headers:{'Content-Type':'application/json','Accept':'application/json'}, body: JSON.stringify({ preset: d }) })
-      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return { ok:r.ok, j:j }; }); })
-      .then(function(res){
-        if (!res.ok){ _tpToast((_tpEN() ? 'Save failed: ' : 'Lưu lỗi: ') + ((res.j && (res.j.error || res.j.detail)) || ''), 'error'); return; }
-        _tpToast(_tpEN() ? 'Theme saved' : 'Đã lưu theme', 'success');
-        var LT = window.LegoTheme;
-        (LT && LT.loadPresets ? LT.loadPresets(true) : Promise.resolve()).then(function(){ _tpDraft = _tpFromTheme(d.preset_key); _tpRerender(); });
-      })
-      .catch(function(e){ _tpToast('Save error: ' + e, 'error'); });
-  };
-  window._admTpDelete = function(){
-    var d = _tpDraft; if (!d || !d.preset_key) return;
-    if (d.is_builtin){ _tpToast(_tpEN() ? 'Built-in presets cannot be deleted' : 'Không thể xoá preset mặc định', 'warning'); return; }
-    fetch(_tpApi('graphics_theme_preset_delete'), { method:'POST', credentials:'same-origin',
-      headers:{'Content-Type':'application/json','Accept':'application/json'}, body: JSON.stringify({ preset_key: d.preset_key }) })
-      .then(function(r){ return r.ok; })
-      .then(function(ok){
-        _tpToast(ok ? (_tpEN() ? 'Deleted' : 'Đã xoá') : (_tpEN() ? 'Delete failed' : 'Xoá lỗi'), ok ? 'success' : 'error');
-        var LT = window.LegoTheme;
-        (LT && LT.loadPresets ? LT.loadPresets(true) : Promise.resolve()).then(function(){ _tpDraft = null; _tpRerender(); });
-      });
-  };
-  function renderTemplatesTab(L, t){
-    var LT = window.LegoTheme;
-    if (!_tpWarmed && LT && LT.loadPresets){ _tpWarmed = true; LT.loadPresets(true).then(function(){ _tpRerender(); }); }
-    var themes = (LT && LT.themes) || {};
-    var keys = Object.keys(themes);
-    if (!_tpDraft) _tpDraft = _tpFromTheme(keys[0] || 'hesem-default');
-    var d = _tpDraft, en = _tpEN();
-    function inp(id, val, type, attrs){
-      attrs = attrs || '';
-      var base = (attrs.indexOf('style=') >= 0) ? ''
-        : ' style="padding:6px 8px;border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius,4px);font-size:12px;background:var(--o3-surface-card);color:var(--text-primary,#0f172a)"';
-      return '<input id="' + id + '" type="' + (type || 'text') + '" value="' + esc(val) + '" ' + attrs + base + ' oninput="_admTpField(\'' + id + '\')">';
-    }
-    var optHtml = keys.map(function(k){
-      var lab = (themes[k].label && (en ? themes[k].label.en : themes[k].label.vi)) || k;
-      return '<option value="' + esc(k) + '"' + (k === d.preset_key ? ' selected' : '') + '>' + esc(lab) + (themes[k]._builtin ? (en ? ' · built-in' : ' · mặc định') : '') + '</option>';
-    }).join('') + '<option value="__new__">' + esc(L('➕ Tạo preset mới', '➕ New preset')) + '</option>';
-    var h = '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5">'
-      + esc(L('🎭 Tạo/sửa Theme Template lưu vào DB (graphics_theme_preset). Module Builder + runtime dùng đúng các preset này. Chuẩn mặc định: khe hở 8 · bo ngoài 8 · bo trong 4.',
-              '🎭 Create/edit DB-backed theme templates. Module Builder + runtime use these. Default standard: gap 8 · outer 8 · inner 4.')) + '</div>';
-    h += renderRow(L('Preset', 'Preset'),
-      '<select id="tp-select" onchange="_admTpSelect(this.value)" style="padding:6px 8px;border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius,4px);font-size:12px;min-width:240px">' + optHtml + '</select>'
-      + (d.is_builtin ? ' <span class="o3-chip">built-in</span>' : ''));
-    h += renderRow(L('Mã (key)', 'Key'), inp('tp-key', d.preset_key, 'text', d.is_builtin ? 'readonly' : ''), d.is_builtin ? L('Built-in: khoá cố định', 'Built-in: key fixed') : L('chữ thường, gạch ngang', 'lowercase, dashes'));
-    h += renderRow(L('Tên (VN)', 'Name (VN)'), inp('tp-name-vi', d.display_name_vi));
-    h += renderRow(L('Tên (EN)', 'Name (EN)'), inp('tp-name-en', d.display_name_en));
-    h += renderRow(L('Màu thương hiệu', 'Brand color'), inp('tp-brand', d.brand, 'color', 'style="width:54px;height:32px;padding:2px;border:1px solid var(--o3-border-subtle);border-radius:var(--o3-radius,4px);cursor:pointer"'));
-    h += renderRow(L('Khe hở (gap) px', 'Gap px'), inp('tp-density', d.density_px, 'number', 'min="2" max="24"'), 'space.master');
-    h += renderRow(L('Bo góc NGOÀI cấp 1 px', 'Outer radius (lvl 1) px'), inp('tp-outer', d.radius_outer_px, 'number', 'min="0" max="40"'), L('thẻ / khung / panel', 'cards / panels'));
-    h += renderRow(L('Bo góc TRONG cấp 2/3 px', 'Inner radius (lvl 2/3) px'), inp('tp-inner', d.radius_inner_px, 'number', 'min="0" max="32"'), L('nút / input / chip', 'buttons / inputs'));
-    h += renderRow(L('Cao control px', 'Control height px'), inp('tp-ctrl', d.control_h_px, 'number', 'min="24" max="56"'));
-    h += '<div style="display:flex;gap:10px;flex-wrap:wrap;padding-top:14px">'
-      + '<button type="button" onclick="_admTpSimulate()" style="padding:8px 14px;border:1px solid var(--o3-border-subtle);background:var(--o3-surface-card);border-radius:var(--o3-radius,4px);cursor:pointer;font-size:12px">🔬 ' + esc(L('Mô phỏng', 'Simulate')) + '</button>'
-      + '<button type="button" onclick="_admTpNew()" style="padding:8px 14px;border:1px solid var(--o3-border-subtle);background:var(--o3-surface-card);border-radius:var(--o3-radius,4px);cursor:pointer;font-size:12px">➕ ' + esc(L('Mới', 'New')) + '</button>'
-      + (d.is_builtin ? '' : '<button type="button" onclick="_admTpDelete()" style="padding:8px 14px;border:1px solid var(--o3-danger,#b91c1c);color:var(--o3-danger,#b91c1c);background:var(--o3-surface-card);border-radius:var(--o3-radius,4px);cursor:pointer;font-size:12px">🗑 ' + esc(L('Xoá', 'Delete')) + '</button>')
-      + '<button type="button" onclick="_admTpSave()" style="padding:8px 14px;border:0;background:var(--o3-brand);color:#fff;border-radius:var(--o3-radius,4px);cursor:pointer;font-size:12px;font-weight:600">💾 ' + esc(L('Lưu Template', 'Save template')) + '</button>'
-      + '</div>';
-    return h;
-  }
+  /* Theme Template editor retired (2026-06-02): preset create/edit/save/clone/delete
+     is now owned by 32a-mstudio-presets-settings.js (Module Studio Presets surface).
+     The _admTpXxx globals and renderTemplatesTab function have been removed to preserve
+     the SSOT rule: gap/radius/control/brand edited in exactly one place. */
 
   window._renderAdmThemeHtml = function(L){
     L = L || function(vi, en){ return vi || en; };
@@ -394,7 +278,6 @@
       { id: 'typography', vi: '🔠 Chữ',     en: '🔠 Typography',render: renderTypographyTab },
       { id: 'density',    vi: '📐 Mật độ',  en: '📐 Density',   render: renderDensityTab },
       { id: 'motion',     vi: '⚡ Chuyển động','en': '⚡ Motion', render: renderMotionTab },
-      { id: 'templates',  vi: '🎭 Theme Template', en: '🎭 Theme Templates', render: renderTemplatesTab }
     ];
     var active = SUBTABS.find(function(x){ return x.id === _activeThemeSubtab; }) || SUBTABS[0];
 
