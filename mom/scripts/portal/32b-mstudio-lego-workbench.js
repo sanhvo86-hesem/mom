@@ -9,6 +9,7 @@
  *   L4 Templates   — __HM_ARCHETYPE_REGISTRY__ zone skeletons
  *   L5 Build Packets — assembled module_schema
  * Modes: Browse | Assemble | Author | Validate
+ * CRUD: Create (new-l3/new-l4), Edit (Author), Deprecate (soft), Clone, Restore
  * SSOT: --o3-* tokens; spacing 8/12; control 32; radius 4/8/pill. No hex/px.
  * ==========================================================================*/
 (function () {
@@ -43,7 +44,10 @@
     demo: null,     // { byType:{…} }
     validateResults: null,
     validateRunning: false,
-    modules: null
+    modules: null,
+    l3Cache: null,       /* populated from DB after mutations; null = use __HM_BLOCK_REGISTRY__ */
+    l4Cache: null,
+    deprecatePanel: false  /* show inline deprecate confirm form in Browse */
   };
 
   /* ── level config ────────────────────────────────────────────────────── */
@@ -98,8 +102,34 @@
   function post(action, body) { var a = getApi(); return a ? a.post(action, body) : Promise.reject(new Error('api unavailable')); }
   function getJson(action, qs) { var a = getApi(); return a ? a.getJson(action, qs) : Promise.reject(new Error('api unavailable')); }
   function toast(m, t) { var a = getApi(); if (a) { a.toast(m, t); } }
-  function l3Blocks() { var r = window.__HM_BLOCK_REGISTRY__; return (r && Array.isArray(r.blocks)) ? r.blocks.filter(function(b){ return b && b.status === 'published'; }) : []; }
-  function l4Archetypes() { var r = window.__HM_ARCHETYPE_REGISTRY__; return (r && Array.isArray(r.archetypes)) ? r.archetypes.filter(function(a){ return a && a.status === 'published'; }) : []; }
+
+  /* cache-backed registry accessors */
+  function l3All() { if (ls.l3Cache) { return ls.l3Cache; } var r = window.__HM_BLOCK_REGISTRY__; return (r && Array.isArray(r.blocks)) ? r.blocks : []; }
+  function l3Blocks() { return l3All().filter(function(b){ return b && b.status === 'published'; }); }
+  function l4All() { if (ls.l4Cache) { return ls.l4Cache; } var r = window.__HM_ARCHETYPE_REGISTRY__; return (r && Array.isArray(r.archetypes)) ? r.archetypes : []; }
+  function l4Archetypes() { return l4All().filter(function(a){ return a && a.status === 'published'; }); }
+  function findL3(key) { return l3All().filter(function(b){ return b.block_key === key; })[0] || null; }
+  function findL4(key) { return l4All().filter(function(a){ return a.archetype_key === key; })[0] || null; }
+
+  function reloadL3(cb) {
+    getJson('graphics_block_contract_list').then(function(j) {
+      var bl = (j && (j.blocks || j.data)) || [];
+      ls.l3Cache = bl;
+      if (window.__HM_BLOCK_REGISTRY__) { window.__HM_BLOCK_REGISTRY__.blocks = bl; }
+      else { window.__HM_BLOCK_REGISTRY__ = { blocks: bl }; }
+      if (cb) { cb(); }
+    }).catch(function() { if (cb) { cb(); } });
+  }
+  function reloadL4(cb) {
+    getJson('graphics_module_archetype_list').then(function(j) {
+      var al = (j && (j.archetypes || j.data)) || [];
+      ls.l4Cache = al;
+      if (window.__HM_ARCHETYPE_REGISTRY__) { window.__HM_ARCHETYPE_REGISTRY__.archetypes = al; }
+      else { window.__HM_ARCHETYPE_REGISTRY__ = { archetypes: al }; }
+      if (cb) { cb(); }
+    }).catch(function() { if (cb) { cb(); } });
+  }
+
   function engineCatalog() { var be = window.HmBlockEngine; return (be && be.BLOCK_CATALOG) ? be.BLOCK_CATALOG : {}; }
   function safeRender(type, cfg) { try { if (window.Blocks && window.Blocks.render) { return window.Blocks.render(type, cfg || {}, { preview: true }) || ''; } } catch(e){} return ''; }
   function chips(arr) { if (!arr || !arr.length) { return '<span class="' + R + '__chip">—</span>'; } return arr.map(function(x){ return '<span class="' + R + '__chip">' + esc(x) + '</span>'; }).join(''); }
@@ -148,6 +178,16 @@
       '.' + R + '__badge--ssot{background:' + oks + ';color:' + ok + '}',
       '.' + R + '__badge--l4{background:' + brs + ';color:' + br + '}',
       '.' + R + '__badge--default{background:' + sfm + ';color:' + td + '}',
+      '.' + R + '__badge--deprecated{background:' + wns + ';color:' + wn + '}',
+      '.' + R + '__badge--draft{background:' + sfm + ';color:' + td + '}',
+      '.' + R + '__item--deprecated{opacity:.6}',
+      '.' + R + '__libToolbar{display:flex;align-items:center;justify-content:space-between;padding:' + sp + ' ' + sc + ';background:' + sfm + ';border-bottom:1px solid ' + bsub + ';position:sticky;top:36px;z-index:1}',
+      '.' + R + '__actionBar{display:flex;gap:' + sp + ';align-items:center;margin-bottom:' + sc + ';flex-wrap:wrap}',
+      '.' + R + '__btn--warn{background:' + wns + ';border-color:' + wn + ';color:' + wn + '}',
+      '.' + R + '__btn--warn:hover{background:' + wn + ';color:' + ti + '}',
+      '.' + R + '__btn--ok{background:' + oks + ';border-color:' + ok + ';color:' + ok + '}',
+      '.' + R + '__btn--ok:hover{background:' + ok + ';color:' + ti + '}',
+      '.' + R + '__deprPanel{background:' + wns + ';border:1px solid ' + wn + ';border-radius:' + rd + ';padding:' + sc + ';margin-bottom:' + sc + '}',
       '.' + R + '__vpass{color:' + ok + ';font-weight:700}',
       '.' + R + '__vwarn{color:' + wn + ';font-weight:700}',
       '.' + R + '__vfail{color:' + dg + ';font-weight:700}',
@@ -176,9 +216,9 @@
     return '<button type="button" class="' + R + '__item' + on + '" data-lw="sel" data-kind="token" data-key="' + esc(tk) + '">' +
       '<span class="ic" aria-hidden="true">◈</span><span class="nm">' + esc(tk) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</span></button>';
   }
-  function blockItem(kind, key, label, sub, icon, bdg) {
+  function blockItem(kind, key, label, sub, icon, bdg, extraCls) {
     var on = ls.sel && ls.sel.kind === kind && ls.sel.key === key ? ' on' : '';
-    return '<button type="button" class="' + R + '__item' + on + '" data-lw="sel" data-kind="' + esc(kind) + '" data-key="' + esc(key) + '">' +
+    return '<button type="button" class="' + R + '__item' + on + (extraCls ? ' ' + extraCls : '') + '" data-lw="sel" data-kind="' + esc(kind) + '" data-key="' + esc(key) + '">' +
       '<span class="ic" aria-hidden="true">' + (icon || '▫') + '</span>' +
       '<span class="nm">' + esc(label) + '<small>' + esc(sub) + '</small></span>' + (bdg || '') + '</button>';
   }
@@ -218,25 +258,47 @@
         items.forEach(function(b) { h += blockItem('engine', b.key, b.label, b.key, b.icon, ''); });
       });
     } else if (ls.level === 'l3') {
-      var l3 = l3Blocks();
-      if (l3.length) {
-        h += '<div class="' + R + '__sec">Curated · L3 SSOT · ' + l3.length + '</div>';
-        l3.filter(function(b) { return vis(b.block_key) || vis(b.display_name_vi || ''); })
-          .forEach(function(b) { h += blockItem('l3', b.block_key, b.display_name_vi || b.block_key, b.block_key, '🧱', badge('ssot','ssot')); });
+      /* ── L3: show ALL blocks (published + draft + deprecated) ─────────── */
+      h += '<div class="' + R + '__libToolbar">' +
+        '<span style="font-size:10px;font-weight:700;color:' + tm + ';text-transform:uppercase;letter-spacing:.4px">L3 Blocks</span>' +
+        '<button type="button" class="' + R + '__btn" data-lw="new-l3" style="height:24px;padding:0 ' + sp + ';font-size:11px">＋ Block mới</button>' +
+        '</div>';
+      var l3all = l3All();
+      var l3vis = l3all.filter(function(b) { return vis(b.block_key) || vis(b.display_name_vi || ''); });
+      if (l3all.length) {
+        h += '<div class="' + R + '__sec">Curated · L3 · ' +
+          l3all.filter(function(b){return b.status==='published';}).length + ' published / ' + l3all.length + ' total</div>';
+        l3vis.forEach(function(b) {
+          var depr = b.status === 'deprecated', isDraft = b.status === 'draft';
+          var bdg = depr ? badge('deprecated','deprecated') : isDraft ? badge('draft','draft') : badge('ssot','ssot');
+          h += blockItem('l3', b.block_key, b.display_name_vi || b.block_key, b.block_key, '🧱', bdg,
+            depr ? R + '__item--deprecated' : '');
+        });
       } else { h += '<div class="' + R + '__hint">Chưa có L3 blocks.</div>'; }
       var eng = Object.keys(engineCatalog()).filter(function(k) {
-        var m = engineCatalog()[k]; return vis(m.label||k) && !l3.some(function(b){return b.block_key===k;});
+        var m = engineCatalog()[k]; return vis(m.label||k) && !l3all.some(function(b){return b.block_key===k;});
       }).slice(0,30);
       if (eng.length) {
         h += '<div class="' + R + '__sec">Engine (chưa curate)</div>';
         eng.forEach(function(k){ var m=engineCatalog()[k]||{}; h+=blockItem('engine',k,m.label||k,k,m.icon||'▫',''); });
       }
     } else if (ls.level === 'l4') {
-      var l4 = l4Archetypes();
-      if (l4.length) {
-        h += '<div class="' + R + '__sec">Archetypes · L4 · ' + l4.length + '</div>';
-        l4.filter(function(a) { return vis(a.archetype_key) || vis(a.display_name_vi || ''); })
-          .forEach(function(a) { h += blockItem('l4', a.archetype_key, a.display_name_vi || a.archetype_key, a.archetype_key, '▱', badge('l4','l4')); });
+      /* ── L4: show ALL archetypes (published + draft + deprecated) ────── */
+      h += '<div class="' + R + '__libToolbar">' +
+        '<span style="font-size:10px;font-weight:700;color:' + tm + ';text-transform:uppercase;letter-spacing:.4px">L4 Archetypes</span>' +
+        '<button type="button" class="' + R + '__btn" data-lw="new-l4" style="height:24px;padding:0 ' + sp + ';font-size:11px">＋ Archetype mới</button>' +
+        '</div>';
+      var l4all = l4All();
+      var l4vis = l4all.filter(function(a) { return vis(a.archetype_key) || vis(a.display_name_vi || ''); });
+      if (l4all.length) {
+        h += '<div class="' + R + '__sec">Archetypes · L4 · ' +
+          l4all.filter(function(a){return a.status==='published';}).length + ' published / ' + l4all.length + ' total</div>';
+        l4vis.forEach(function(a) {
+          var depr = a.status === 'deprecated', isDraft = a.status === 'draft';
+          var bdg = depr ? badge('deprecated','deprecated') : isDraft ? badge('draft','draft') : badge('l4','l4');
+          h += blockItem('l4', a.archetype_key, a.display_name_vi || a.archetype_key, a.archetype_key, '▱', bdg,
+            depr ? R + '__item--deprecated' : '');
+        });
       } else { h += '<div class="' + R + '__hint">Chưa có L4 archetypes.</div>'; }
     } else if (ls.level === 'l5') {
       var mods = ls.modules;
@@ -340,6 +402,37 @@
       }).join('') + '</div>';
   }
 
+  /* ── Browse action bar (L3 / L4 only) ──────────────────────────────── */
+  function renderBrowseActions(s) {
+    if (!s || (s.kind !== 'l3' && s.kind !== 'l4')) { return ''; }
+    var d = s.data || {};
+    var isDepr = d.status === 'deprecated';
+    var cloneAct  = s.kind === 'l3' ? 'clone-l3'   : 'clone-l4';
+    var restoreAct = s.kind === 'l3' ? 'restore-l3' : 'restore-l4';
+    var deprAct   = s.kind === 'l3' ? 'deprecate-l3' : 'deprecate-l4';
+    return '<div class="' + R + '__actionBar">' +
+      '<button type="button" class="' + R + '__btn" data-lw="switch-author">✎ Chỉnh sửa</button>' +
+      '<button type="button" class="' + R + '__btn" data-lw="' + cloneAct + '">⎘ Clone</button>' +
+      (isDepr
+        ? '<button type="button" class="' + R + '__btn ' + R + '__btn--ok" data-lw="' + restoreAct + '">✓ Restore</button>'
+        : '<button type="button" class="' + R + '__btn ' + R + '__btn--warn" data-lw="' + deprAct + '">⚠ Deprecate</button>') +
+      '</div>' +
+      (ls.deprecatePanel && !isDepr ? renderDeprecatePanel() : '');
+  }
+
+  function renderDeprecatePanel() {
+    return '<div class="' + R + '__deprPanel">' +
+      '<div style="font-size:11px;font-weight:700;color:' + wn + ';margin-bottom:' + sp + '">⚠ Xác nhận Deprecate</div>' +
+      '<div class="' + R + '__f"><label>Ghi chú deprecate' +
+        '<input class="' + R + '__in" data-lw-ef="depr_note" type="text" placeholder="Lý do…"></label></div>' +
+      '<div class="' + R + '__f"><label>Thay thế bằng (key tuỳ chọn)' +
+        '<input class="' + R + '__in" data-lw-ef="depr_replacement" type="text" placeholder="block-key mới…"></label></div>' +
+      '<div class="' + R + '__toolbar">' +
+        '<button type="button" class="' + R + '__btn ' + R + '__btn--warn" data-lw="confirm-deprecate">⚠ Xác nhận</button>' +
+        '<button type="button" class="' + R + '__btn" data-lw="cancel-deprecate">Huỷ</button>' +
+      '</div></div>';
+  }
+
   /* ── Browse ───────────────────────────────────────────────────────────── */
   function renderBrowse(s) {
     if (s.kind === 'token') {
@@ -355,7 +448,10 @@
     }
     if (s.kind === 'l4') {
       var a = s.data || {}; var zones = a.zones ? Object.keys(a.zones) : [];
-      return '<div class="' + R + '__card"><div class="' + R + '__cardHd">▱ ' + esc(s.key) + ' ' + badge('L4','l4') + '</div><div class="' + R + '__cardBd">' +
+      var deprBdg = a.status === 'deprecated' ? (' ' + badge('deprecated','deprecated')) : a.status === 'draft' ? (' ' + badge('draft','draft')) : '';
+      return '<div class="' + R + '__card"><div class="' + R + '__cardHd">▱ ' + esc(s.key) + ' ' + badge('L4','l4') + deprBdg + '</div><div class="' + R + '__cardBd">' +
+        renderBrowseActions(s) +
+        (a.status === 'deprecated' && a.deprecation_note ? '<div style="font-size:11px;background:' + wns + ';border:1px solid ' + wn + ';border-radius:' + rd + ';padding:' + sp + ' ' + sc + ';margin-bottom:' + sc + '">⚠ Deprecated: ' + esc(a.deprecation_note) + '</div>' : '') +
         '<div class="' + R + '__f"><label>Zones (' + zones.length + ')</label>' +
         zones.map(function(z){ var v=a.zones[z]; var allowed=Array.isArray(v)?v:(v&&v.allowed?[].concat(v.allowed):[]);
           return '<div class="' + R + '__zoneBlock"><div class="' + R + '__zoneLbl">zone: ' + esc(z) + '</div><div class="' + R + '__zoneBd">' + (allowed.length?'blocks: '+chips(allowed):'—') + '</div></div>'; }).join('') + '</div>' +
@@ -384,7 +480,10 @@
     var inner = tc ? safeRender(tc.type, tc.cfg) : '';
     if (!inner) { var meta = engineCatalog()[s.key]||{}; inner = '<div class="' + R + '__hint">' + esc(meta.icon||'🧱') + ' ' + esc(meta.label||s.key) + '</div>'; }
     var b = s.kind === 'l3' ? (s.data || {}) : {};
-    return '<div class="' + R + '__card"><div class="' + R + '__cardHd">🧱 ' + esc(s.key) + ' ' + (s.kind==='l3'?badge('L3 SSOT','ssot'):badge('Engine','default')) + '</div><div class="' + R + '__cardBd">' +
+    var deprBadge = b.status === 'deprecated' ? (' ' + badge('deprecated','deprecated')) : b.status === 'draft' ? (' ' + badge('draft','draft')) : '';
+    return '<div class="' + R + '__card"><div class="' + R + '__cardHd">🧱 ' + esc(s.key) + ' ' + (s.kind==='l3'?badge('L3 SSOT','ssot'):badge('Engine','default')) + deprBadge + '</div><div class="' + R + '__cardBd">' +
+      (s.kind==='l3' ? renderBrowseActions(s) : '') +
+      (b.status === 'deprecated' && b.deprecation_note ? '<div style="font-size:11px;background:' + wns + ';border:1px solid ' + wn + ';border-radius:' + rd + ';padding:' + sp + ' ' + sc + ';margin-bottom:' + sc + '">⚠ Deprecated: ' + esc(b.deprecation_note) + (b.replacement_key ? ' → ' + esc(b.replacement_key) : '') + '</div>' : '') +
       (ls.demo == null ? '<div style="font-size:11px;color:' + tm + ';margin-bottom:' + sp + '">Đang nạp demo…</div>' : '') +
       '<div class="' + R + '__preview">' + inner + '</div>' +
       (s.kind==='l3' ? '<div class="' + R + '__f" style="margin-top:' + sc + '"><label>Composed of (L2)</label>' + chips(b.composed_of) + '</div><div class="' + R + '__f"><label>Required tokens</label>' + chips(b.required_tokens) + '</div>' + renderDepGraph() : '') +
@@ -404,13 +503,15 @@
         slots.map(function(slot){ return '<div class="' + R + '__f"><label>' + esc(slot) + '</label><input class="' + R + '__in" data-lw-slot="' + esc(slot) + '" type="text"></div>'; }).join('') +
         '</div></div>';
     }
-    /* l4 — scaffold new module */
+    /* l4 — scaffold new module; only show non-deprecated L3 blocks in zone hint */
     var a = s.data || {}; var zones = a.zones ? Object.keys(a.zones) : [];
     return '<div class="' + R + '__card"><div class="' + R + '__cardHd">⬡ Assemble · L4 · ' + esc(s.key) + '</div><div class="' + R + '__cardBd">' +
       '<div class="' + R + '__f"><label>Module ID</label><input class="' + R + '__in" data-lw-ef="moduleId" placeholder="custom-xxx" type="text"></div>' +
       '<div class="' + R + '__f"><label>Tên (VI)</label><input class="' + R + '__in" data-lw-ef="title_vi" placeholder="Tên module…" type="text"></div>' +
       zones.map(function(z){ var v=a.zones[z]; var al=Array.isArray(v)?v:(v&&v.allowed?[].concat(v.allowed):[]);
-        return '<div class="' + R + '__zoneBlock"><div class="' + R + '__zoneLbl">zone: ' + esc(z) + '</div><div class="' + R + '__zoneBd">Blocks: ' + chips(al) + '</div></div>'; }).join('') +
+        /* filter deprecated from allowed hint */
+        var nonDeprAl = al.filter(function(k){ var found = findL3(k); return !found || found.status !== 'deprecated'; });
+        return '<div class="' + R + '__zoneBlock"><div class="' + R + '__zoneLbl">zone: ' + esc(z) + '</div><div class="' + R + '__zoneBd">Blocks: ' + chips(nonDeprAl) + '</div></div>'; }).join('') +
       '<div class="' + R + '__toolbar" style="margin-top:' + sc + '"><button class="' + R + '__btn ' + R + '__btn--pri" data-lw="assemble-create">＋ Tạo module từ archetype</button></div>' +
       '</div></div>';
   }
@@ -425,31 +526,36 @@
   }
 
   function renderAuthorL3(s) {
-    var b = s.data || { block_key: s.key, status: 'draft' };
-    return '<div class="' + R + '__card"><div class="' + R + '__cardHd">✎ Author · L3 Contract · ' + esc(s.key) + '</div><div class="' + R + '__cardBd">' +
-      field('block_key',        'block_key',       b.block_key || s.key, 'text') +
+    var isNew = s.key === '--new--' || (!s.data || !s.data.block_key);
+    var b = s.data || { block_key: '', status: 'draft' };
+    return '<div class="' + R + '__card"><div class="' + R + '__cardHd">' + (isNew ? '＋ Block mới' : ('✎ Author · L3 Contract · ' + esc(s.key))) + '</div><div class="' + R + '__cardBd">' +
+      field('block_key',        'block_key',       b.block_key || '', 'text') +
       field('Tên hiển thị (VI)', 'display_name_vi', b.display_name_vi || '', 'text') +
-      selectField('Trạng thái', 'status', b.status || 'draft', ['published','draft','deprecated']) +
+      selectField('Trạng thái', 'status', b.status || 'draft', ['draft','published','deprecated']) +
       field('composed_of (L2, dấu phẩy)', 'composed_of', (b.composed_of||[]).join(', '), 'text') +
       field('required_tokens (dấu phẩy)', 'required_tokens', (b.required_tokens||[]).join(', '), 'text') +
       field('preview_scene_key', 'preview_scene_key', b.preview_scene_key || '', 'text') +
       textareaField('slots (JSON)', 'slots_json', JSON.stringify(b.slots || {}, null, 2)) +
       textareaField('variant_axes (JSON)', 'variant_axes_json', JSON.stringify(b.variant_axes || [], null, 2)) +
       textareaField('a11y_contract (JSON)', 'a11y_json', JSON.stringify(b.a11y_contract || {}, null, 2)) +
+      field('Ghi chú deprecate', 'deprecation_note', b.deprecation_note || '', 'text') +
+      field('Thay thế bằng (key)', 'replacement_key', b.replacement_key || '', 'text') +
       '<div class="' + R + '__toolbar"><button class="' + R + '__btn ' + R + '__btn--pri" data-lw="save-l3">Lưu L3 contract</button>' +
         '<span style="font-size:11px;color:' + tm + '">→ graphics_block_contract_save + audit_events</span></div>' +
       '</div></div>';
   }
 
   function renderAuthorL4(s) {
-    var a = s.data || { archetype_key: s.key, status: 'draft' };
-    return '<div class="' + R + '__card"><div class="' + R + '__cardHd">✎ Author · L4 Archetype · ' + esc(s.key) + '</div><div class="' + R + '__cardBd">' +
-      field('archetype_key', 'archetype_key', a.archetype_key || s.key, 'text') +
+    var isNew = s.key === '--new--' || (!s.data || !s.data.archetype_key);
+    var a = s.data || { archetype_key: '', status: 'draft' };
+    return '<div class="' + R + '__card"><div class="' + R + '__cardHd">' + (isNew ? '＋ Archetype mới' : ('✎ Author · L4 Archetype · ' + esc(s.key))) + '</div><div class="' + R + '__cardBd">' +
+      field('archetype_key', 'archetype_key', a.archetype_key || '', 'text') +
       field('Tên hiển thị (VI)', 'display_name_vi', a.display_name_vi || '', 'text') +
-      selectField('Trạng thái', 'status', a.status || 'draft', ['published','draft','deprecated']) +
+      selectField('Trạng thái', 'status', a.status || 'draft', ['draft','published','deprecated']) +
       textareaField('zones (JSON)', 'zones_json', JSON.stringify(a.zones || {}, null, 2)) +
       field('required_blocks (dấu phẩy)', 'required_blocks', (a.required_blocks||[]).join(', '), 'text') +
       field('forbidden_patterns (dấu phẩy)', 'forbidden_patterns', (a.forbidden_patterns||[]).join(', '), 'text') +
+      field('Ghi chú deprecate', 'deprecation_note', a.deprecation_note || '', 'text') +
       '<div class="' + R + '__toolbar"><button class="' + R + '__btn ' + R + '__btn--pri" data-lw="save-l4">Lưu L4 archetype</button>' +
         '<span style="font-size:11px;color:' + tm + '">→ graphics_module_archetype_save + audit_events</span></div>' +
       '</div></div>';
@@ -536,7 +642,7 @@
       return post('graphics_simulation_run_record', { target_key:s.key, target_kind:s.kind, gate_results:results, run_at:new Date().toISOString() }).catch(function(){});
     }).then(function() {
       ls.validateRunning = false; ls.validateResults = results; repaintMain();
-    }).catch(function(e) {
+    }).catch(function() {
       /* PERF-003: always unlock the validate button, even if the chain throws */
       ls.validateRunning = false; ls.validateResults = results; repaintMain();
     });
@@ -589,6 +695,15 @@
     var c = h.querySelector('[data-lw-zone="lib"]');
     if (c) { c.innerHTML = renderLibrary(); }
   }
+  function setModebar(mode) {
+    var host = getHost(); if (!host) { return; }
+    ls.mode = mode;
+    host.querySelectorAll('.' + R + '__modeBtn').forEach(function(b){
+      var on = b.getAttribute('data-mode') === mode;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
   function wirePreview(container) {
     if (!container) { return; }
     container.querySelectorAll('[role="tab"],.o3-shell__tab,[data-tab-id]').forEach(function(btn) {
@@ -626,8 +741,8 @@
 
   /* ── lookup ───────────────────────────────────────────────────────────── */
   function lookupData(kind, key) {
-    if (kind==='l3') { return l3Blocks().filter(function(b){return b.block_key===key;})[0]||null; }
-    if (kind==='l4') { return l4Archetypes().filter(function(a){return a.archetype_key===key;})[0]||null; }
+    if (kind==='l3') { return findL3(key); }
+    if (kind==='l4') { return findL4(key); }
     if (kind==='l5') { return (ls.modules||[]).filter(function(m){return (m.moduleId||m.id)===key;})[0]||null; }
     if (kind==='l2-comp') { var ss=(window._moduleMasterLevelSections&&window._moduleMasterLevelSections['l2'])||[]; return ss.filter(function(s){return s.id===key;})[0]||null; }
     if (kind==='engine') { return engineCatalog()[key]||null; }
@@ -639,41 +754,241 @@
   function splitList(s) { return s.split(',').map(function(x){return x.trim();}).filter(Boolean); }
   function parseJson(host, name) { try { return JSON.parse(efVal(host, name) || '{}'); } catch(e) { return null; } }
 
+  /* ── Save L3 ─────────────────────────────────────────────────────────── */
   function doSaveL3(host) {
     var s = ls.sel; if (!s) { return; }
     var slots    = parseJson(host, 'slots_json');
     var varAxes  = parseJson(host, 'variant_axes_json');
     var a11y     = parseJson(host, 'a11y_json');
     if (!slots || !varAxes || !a11y) { toast('JSON không hợp lệ.', 'error'); return; }
+    var bk = efVal(host,'block_key').trim() || (s.key !== '--new--' ? s.key : '');
+    if (!bk) { toast('Vui lòng nhập block_key.', 'error'); return; }
     var block = {
-      block_key:         efVal(host,'block_key') || s.key,
+      block_key:         bk,
       display_name_vi:   efVal(host,'display_name_vi'),
       status:            efVal(host,'status') || 'draft',
       composed_of:       splitList(efVal(host,'composed_of')),
       required_tokens:   splitList(efVal(host,'required_tokens')),
       preview_scene_key: efVal(host,'preview_scene_key'),
-      slots: slots, variant_axes: varAxes, a11y_contract: a11y
+      slots: slots, variant_axes: varAxes, a11y_contract: a11y,
+      deprecation_note:  efVal(host,'deprecation_note'),
+      replacement_key:   efVal(host,'replacement_key')
     };
     post('graphics_block_contract_save', { block: block })
-      .then(function(r){ toast(r&&r.ok!==false ? 'Đã lưu L3 contract "'+block.block_key+'".':'Lưu thất bại'+(r&&r.error?': '+r.error:''), r&&r.ok!==false?'success':'error'); })
-      .catch(function(e){ toast('Lỗi: '+e,'error'); });
+      .then(function(r) {
+        if (r && r.ok !== false) {
+          toast('Đã lưu L3 "' + block.block_key + '".', 'success');
+          reloadL3(function() {
+            ls.sel = { kind: 'l3', key: block.block_key, data: findL3(block.block_key) };
+            repaintLib();
+            repaintMain();
+          });
+        } else {
+          toast('Lưu thất bại' + (r && r.error ? ': ' + r.error : ''), 'error');
+        }
+      })
+      .catch(function(e){ toast('Lỗi: ' + e, 'error'); });
   }
+
+  /* ── Save L4 ─────────────────────────────────────────────────────────── */
   function doSaveL4(host) {
     var s = ls.sel; if (!s) { return; }
     var zones = parseJson(host,'zones_json');
-    if (!zones) { toast('JSON zones không hợp lệ.','error'); return; }
+    if (!zones) { toast('JSON zones không hợp lệ.', 'error'); return; }
+    var ak = efVal(host,'archetype_key').trim() || (s.key !== '--new--' ? s.key : '');
+    if (!ak) { toast('Vui lòng nhập archetype_key.', 'error'); return; }
     var arch = {
-      archetype_key:    efVal(host,'archetype_key') || s.key,
+      archetype_key:    ak,
       display_name_vi:  efVal(host,'display_name_vi'),
       status:           efVal(host,'status') || 'draft',
       zones:            zones,
       required_blocks:  splitList(efVal(host,'required_blocks')),
-      forbidden_patterns: splitList(efVal(host,'forbidden_patterns'))
+      forbidden_patterns: splitList(efVal(host,'forbidden_patterns')),
+      deprecation_note: efVal(host,'deprecation_note')
     };
     post('graphics_module_archetype_save', { archetype: arch })
-      .then(function(r){ toast(r&&r.ok!==false ? 'Đã lưu L4 "'+arch.archetype_key+'".':'Lưu thất bại'+(r&&r.error?': '+r.error:''), r&&r.ok!==false?'success':'error'); })
-      .catch(function(e){ toast('Lỗi: '+e,'error'); });
+      .then(function(r) {
+        if (r && r.ok !== false) {
+          toast('Đã lưu L4 "' + arch.archetype_key + '".', 'success');
+          reloadL4(function() {
+            ls.sel = { kind: 'l4', key: arch.archetype_key, data: findL4(arch.archetype_key) };
+            repaintLib();
+            repaintMain();
+          });
+        } else {
+          toast('Lưu thất bại' + (r && r.error ? ': ' + r.error : ''), 'error');
+        }
+      })
+      .catch(function(e){ toast('Lỗi: ' + e, 'error'); });
   }
+
+  /* ── Clone L3 ────────────────────────────────────────────────────────── */
+  function doCloneL3(s) {
+    if (!s) { return; }
+    var b = s.data || {};
+    var newKey = (s.key || b.block_key || 'block') + '-copy';
+    var cloned = {
+      block_key: newKey,
+      display_name_vi: (b.display_name_vi || s.key) + ' (bản sao)',
+      status: 'draft',
+      composed_of:     [].concat(b.composed_of     || []),
+      required_tokens: [].concat(b.required_tokens || []),
+      preview_scene_key: b.preview_scene_key || '',
+      slots:           b.slots           || {},
+      variant_axes:    b.variant_axes    || [],
+      a11y_contract:   b.a11y_contract   || {}
+    };
+    post('graphics_block_contract_save', { block: cloned })
+      .then(function(r) {
+        if (r && r.ok !== false) {
+          toast('Đã clone thành "' + newKey + '" (draft).', 'success');
+          reloadL3(function() {
+            ls.sel = { kind: 'l3', key: newKey, data: findL3(newKey) };
+            setModebar('author');
+            repaintLib();
+            repaintMain();
+          });
+        } else { toast('Clone thất bại' + (r && r.error ? ': ' + r.error : ''), 'error'); }
+      })
+      .catch(function(e){ toast('Lỗi clone: ' + e, 'error'); });
+  }
+
+  /* ── Clone L4 ────────────────────────────────────────────────────────── */
+  function doCloneL4(s) {
+    if (!s) { return; }
+    var a = s.data || {};
+    var newKey = (s.key || a.archetype_key || 'arch') + '-copy';
+    var cloned = {
+      archetype_key: newKey,
+      display_name_vi: (a.display_name_vi || s.key) + ' (bản sao)',
+      status: 'draft',
+      zones:              a.zones              || {},
+      required_blocks:    [].concat(a.required_blocks    || []),
+      forbidden_patterns: [].concat(a.forbidden_patterns || [])
+    };
+    post('graphics_module_archetype_save', { archetype: cloned })
+      .then(function(r) {
+        if (r && r.ok !== false) {
+          toast('Đã clone thành "' + newKey + '" (draft).', 'success');
+          reloadL4(function() {
+            ls.sel = { kind: 'l4', key: newKey, data: findL4(newKey) };
+            setModebar('author');
+            repaintLib();
+            repaintMain();
+          });
+        } else { toast('Clone thất bại' + (r && r.error ? ': ' + r.error : ''), 'error'); }
+      })
+      .catch(function(e){ toast('Lỗi clone: ' + e, 'error'); });
+  }
+
+  /* ── Confirm deprecate ───────────────────────────────────────────────── */
+  function doConfirmDeprecate(s, note, replacement) {
+    if (!s) { return; }
+    if (s.kind === 'l3') {
+      var b = s.data || {};
+      var block = {
+        block_key:         s.key,
+        display_name_vi:   b.display_name_vi || s.key,
+        status:            'deprecated',
+        composed_of:       [].concat(b.composed_of     || []),
+        required_tokens:   [].concat(b.required_tokens || []),
+        preview_scene_key: b.preview_scene_key || '',
+        slots:             b.slots             || {},
+        variant_axes:      b.variant_axes      || [],
+        a11y_contract:     b.a11y_contract     || {},
+        deprecation_note:  note || 'Deprecated',
+        replacement_key:   replacement || ''
+      };
+      post('graphics_block_contract_save', { block: block })
+        .then(function(r) {
+          ls.deprecatePanel = false;
+          if (r && r.ok !== false) {
+            toast('"' + s.key + '" đã được deprecate.', 'success');
+            reloadL3(function() {
+              ls.sel = { kind: 'l3', key: s.key, data: findL3(s.key) };
+              repaintLib(); repaintMain();
+            });
+          } else { toast('Deprecate thất bại.', 'error'); repaintMain(); }
+        })
+        .catch(function(e) { ls.deprecatePanel = false; toast('Lỗi: ' + e, 'error'); repaintMain(); });
+    } else if (s.kind === 'l4') {
+      var a = s.data || {};
+      var arch = {
+        archetype_key:    s.key,
+        display_name_vi:  a.display_name_vi || s.key,
+        status:           'deprecated',
+        zones:            a.zones              || {},
+        required_blocks:  [].concat(a.required_blocks    || []),
+        forbidden_patterns: [].concat(a.forbidden_patterns || []),
+        deprecation_note: note || 'Deprecated'
+      };
+      post('graphics_module_archetype_save', { archetype: arch })
+        .then(function(r) {
+          ls.deprecatePanel = false;
+          if (r && r.ok !== false) {
+            toast('"' + s.key + '" đã được deprecate.', 'success');
+            reloadL4(function() {
+              ls.sel = { kind: 'l4', key: s.key, data: findL4(s.key) };
+              repaintLib(); repaintMain();
+            });
+          } else { toast('Deprecate thất bại.', 'error'); repaintMain(); }
+        })
+        .catch(function(e) { ls.deprecatePanel = false; toast('Lỗi: ' + e, 'error'); repaintMain(); });
+    }
+  }
+
+  /* ── Restore (undo deprecate) ─────────────────────────────────────────── */
+  function doRestore(s) {
+    if (!s) { return; }
+    if (s.kind === 'l3') {
+      var b = s.data || {};
+      var block = {
+        block_key:         s.key,
+        display_name_vi:   b.display_name_vi || s.key,
+        status:            'published',
+        composed_of:       [].concat(b.composed_of     || []),
+        required_tokens:   [].concat(b.required_tokens || []),
+        preview_scene_key: b.preview_scene_key || '',
+        slots:             b.slots             || {},
+        variant_axes:      b.variant_axes      || [],
+        a11y_contract:     b.a11y_contract     || {}
+      };
+      post('graphics_block_contract_save', { block: block })
+        .then(function(r) {
+          if (r && r.ok !== false) {
+            toast('"' + s.key + '" đã restore về published.', 'success');
+            reloadL3(function() {
+              ls.sel = { kind: 'l3', key: s.key, data: findL3(s.key) };
+              repaintLib(); repaintMain();
+            });
+          } else { toast('Restore thất bại.', 'error'); }
+        })
+        .catch(function(e){ toast('Lỗi: ' + e, 'error'); });
+    } else if (s.kind === 'l4') {
+      var a = s.data || {};
+      var arch = {
+        archetype_key:    s.key,
+        display_name_vi:  a.display_name_vi || s.key,
+        status:           'published',
+        zones:            a.zones              || {},
+        required_blocks:  [].concat(a.required_blocks    || []),
+        forbidden_patterns: [].concat(a.forbidden_patterns || [])
+      };
+      post('graphics_module_archetype_save', { archetype: arch })
+        .then(function(r) {
+          if (r && r.ok !== false) {
+            toast('"' + s.key + '" đã restore về published.', 'success');
+            reloadL4(function() {
+              ls.sel = { kind: 'l4', key: s.key, data: findL4(s.key) };
+              repaintLib(); repaintMain();
+            });
+          } else { toast('Restore thất bại.', 'error'); }
+        })
+        .catch(function(e){ toast('Lỗi: ' + e, 'error'); });
+    }
+  }
+
+  /* ── Assemble create ─────────────────────────────────────────────────── */
   function doAssembleCreate(host) {
     var s = ls.sel; if (!s || s.kind !== 'l4') { return; }
     var mid = efVal(host,'moduleId').trim(); if (!mid) { toast('Vui lòng nhập Module ID.','error'); return; }
@@ -689,7 +1004,7 @@
     var host = getHost();
     if (k === 'level') {
       ls.level = target.getAttribute('data-level') || 'l0a';
-      ls.sel = null; ls.validateResults = null;
+      ls.sel = null; ls.validateResults = null; ls.deprecatePanel = false;
       if (ls.level==='l5' && !ls.modules) { loadModules(); }
       var lib = host && host.querySelector('[data-lw-zone="lib"]');
       if (lib) { lib.innerHTML = renderLibrary(); }
@@ -704,7 +1019,7 @@
     }
     if (k === 'mode') {
       ls.mode = target.getAttribute('data-mode') || 'browse';
-      ls.validateResults = null;
+      ls.validateResults = null; ls.deprecatePanel = false;
       /* A11Y-002: keep aria-pressed in sync */
       host && host.querySelectorAll('.' + R + '__modeBtn').forEach(function(b){
         var on = b.getAttribute('data-mode')===ls.mode;
@@ -716,24 +1031,61 @@
     }
     /* BUG-2: intercept shell 'simulate' action — redirect to Validate mode per DEC-002 */
     if (k === 'simulate') {
-      ls.mode = 'validate';
+      setModebar('validate');
       repaintMain();
-      host && host.querySelectorAll('.' + R + '__modeBtn').forEach(function(b){
-        var on = b.getAttribute('data-mode') === 'validate';
-        b.classList.toggle('on', on);
-        b.setAttribute('aria-pressed', on ? 'true' : 'false');
-      });
       return true;
     }
     if (k === 'sel') {
       var kind = target.getAttribute('data-kind'), key = target.getAttribute('data-key');
       ls.sel = { kind: kind, key: key, data: lookupData(kind, key) };
-      ls.validateResults = null;
+      ls.validateResults = null; ls.deprecatePanel = false;
       host && host.querySelectorAll('.' + R + '__item').forEach(function(i){ i.classList.toggle('on', i.getAttribute('data-kind')===kind && i.getAttribute('data-key')===key); });
       repaintMain();
       return true;
     }
     if (k === 'search') { ls.q = target.value || ''; repaintLib(); return true; }
+
+    /* ── CRUD actions ─────────────────────────────────────────────────── */
+    if (k === 'new-l3') {
+      ls.sel = { kind: 'l3', key: '--new--', data: { block_key: '', status: 'draft' } };
+      ls.validateResults = null; ls.deprecatePanel = false;
+      setModebar('author');
+      repaintMain();
+      return true;
+    }
+    if (k === 'new-l4') {
+      ls.sel = { kind: 'l4', key: '--new--', data: { archetype_key: '', status: 'draft' } };
+      ls.validateResults = null; ls.deprecatePanel = false;
+      setModebar('author');
+      repaintMain();
+      return true;
+    }
+    if (k === 'switch-author') {
+      ls.deprecatePanel = false;
+      setModebar('author');
+      repaintMain();
+      return true;
+    }
+    if (k === 'clone-l3') { doCloneL3(ls.sel); return true; }
+    if (k === 'clone-l4') { doCloneL4(ls.sel); return true; }
+    if (k === 'deprecate-l3' || k === 'deprecate-l4') {
+      ls.deprecatePanel = true;
+      repaintMain();
+      return true;
+    }
+    if (k === 'cancel-deprecate') {
+      ls.deprecatePanel = false;
+      repaintMain();
+      return true;
+    }
+    if (k === 'confirm-deprecate') {
+      var note = efVal(host, 'depr_note');
+      var replacement = efVal(host, 'depr_replacement');
+      doConfirmDeprecate(ls.sel, note, replacement);
+      return true;
+    }
+    if (k === 'restore-l3' || k === 'restore-l4') { doRestore(ls.sel); return true; }
+
     if (k === 'save-l3') { doSaveL3(host); return true; }
     if (k === 'save-l4') { doSaveL4(host); return true; }
     if (k === 'assemble-create') { doAssembleCreate(host); return true; }
