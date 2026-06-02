@@ -603,7 +603,8 @@
   }
   function doNew() {
     _ps.editing = '__new__';
-    _ps.draft = { preset_key: '', display_name_vi: '', display_name_en: '', brand: '#0c4a6e', density_px: 8, radius_outer_px: 8, radius_inner_px: 4, control_h_px: 32, frame_px: 8, is_builtin: false, status: 'draft', overrides: {} };
+    /* status:'published' so it appears in the list immediately after save (list API filters drafts) */
+    _ps.draft = { preset_key: '', display_name_vi: '', display_name_en: '', brand: '#0c4a6e', density_px: 8, radius_outer_px: 8, radius_inner_px: 4, control_h_px: 32, frame_px: 8, is_builtin: false, status: 'published', overrides: {} };
     _ps.validateResult = null;
     repaintBody();
     setTimeout(function () { var slot = document.getElementById('p2-editor-slot'); if (slot) { slot.scrollIntoView({ block: 'nearest' }); } var host = api() && api().host(); if (host) { wirePresetLivePreview(host); } }, 50);
