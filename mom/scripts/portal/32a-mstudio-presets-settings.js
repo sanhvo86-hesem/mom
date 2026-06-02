@@ -3,7 +3,7 @@
  * ----------------------------------------------------------------------------
  * Registers TWO surfaces over the shell (32-module-studio.js):
  *
- *   🎨 Thư viện preset  (key: 'theme', order 40)
+ *   🎨 Thư viện preset  (key: 'presets', order 40)
  *     – full preset library table + RICH grouped attribute editor (16 T2 groups)
  *     – OKLCH brand-seed derivation via LegoTheme._color helpers
  *     – DTCG export, Validate (pass/warn/fail), Apply org-wide round-trip
@@ -95,8 +95,8 @@
     if (p.radius_outer_px != null) { theme['card-radius'] = p.radius_outer_px; }
     var ch = p.control_h_px;
     if (ch != null) { theme['density'] = ({ 32: 'compact', 36: 'cozy', 40: 'comfortable' })[ch] || 'compact'; }
-    /* Apply motion durations from overrides if present */
-    var ov = (p.overrides && typeof p.overrides === 'object') ? p.overrides : {};
+    /* Apply motion durations from overrides if present (normalize [] → {}) */
+    var ov = (p.overrides && !Array.isArray(p.overrides) && typeof p.overrides === 'object') ? p.overrides : {};
     if (ov['motion.fast'] != null) { theme['motion-fast'] = parseInt(ov['motion.fast'], 10) || theme['motion-fast']; }
     if (ov['motion.base'] != null) { theme['motion-base'] = parseInt(ov['motion.base'], 10) || theme['motion-base']; }
     if (ov['motion.slow'] != null) { theme['motion-slow'] = parseInt(ov['motion.slow'], 10) || theme['motion-slow']; }
@@ -138,7 +138,7 @@
   /* ── DTCG export ─────────────────────────────────────────────────────── */
   function dtcgExport(preset) {
     var p = preset || {};
-    var ov = (p.overrides && typeof p.overrides === 'object') ? p.overrides : {};
+    var ov = (p.overrides && !Array.isArray(p.overrides) && typeof p.overrides === 'object') ? p.overrides : {};
     var out = {
       '$schema': 'https://design-tokens.community/schema.json',
       '$description': 'HESEM theme preset: ' + (p.display_name_vi || p.preset_key || 'unnamed'),
@@ -174,7 +174,7 @@
   /* ── Validate preset ─────────────────────────────────────────────────── */
   function validatePreset(p) {
     var issues = [];
-    var ov = (p.overrides && typeof p.overrides === 'object') ? p.overrides : {};
+    var ov = (p.overrides && !Array.isArray(p.overrides) && typeof p.overrides === 'object') ? p.overrides : {};
     /* 1. Required fields */
     if (!p.preset_key) { issues.push({ level: 'fail', msg: 'preset_key bắt buộc (chữ thường + gạch ngang).' }); }
     if (!p.brand || !/^#[0-9a-fA-F]{6}$/.test(p.brand)) { issues.push({ level: 'fail', msg: 'brand phải là hex 6 ký tự hợp lệ (ví dụ #0c4a6e).' }); }
@@ -441,9 +441,10 @@
     /* If an editor is open, re-wire its inputs */
     if (_ps.editing && _ps.draft) { wirePresetLivePreview(host); }
   }
-  function onSettingsMount() {
+  function onSettingsMount(host) {
     ensureStyle();
     _ss.settings = readOrgSettings();
+    setTimeout(function () { wireSettingsControls(host || (api() && api().host())); }, 0);
   }
 
   /* Live preview: any change to the rich editor inputs immediately re-skins
@@ -481,12 +482,54 @@
         applyDraftLivePreview(host);
       });
     });
-    /* Settings segmented buttons */
-    host.querySelectorAll('[data-p2s-key]').forEach(function (el) {
-      if (el.getAttribute('data-p2-wired') === '1') { return; }
-      el.setAttribute('data-p2-wired', '1');
-      el.addEventListener('change', function () { applySettingsLivePreview(host); });
+  }
+
+  /* ── Wire Settings surface controls (Bug 2+3 fix) ───────────────────────
+     Shell only routes [data-ms] clicks to onAction. Mode/motion seg buttons
+     have no data-ms, so they must be wired directly here.               */
+  function wireSettingsControls(host) {
+    if (!host) { return; }
+    /* Color-mode segmented buttons */
+    host.querySelectorAll('[data-p2s="color-mode"]').forEach(function (btn) {
+      if (btn.getAttribute('data-p2-wired') === '1') { return; }
+      btn.setAttribute('data-p2-wired', '1');
+      btn.addEventListener('click', function () {
+        var val = btn.getAttribute('data-p2v');
+        var root = document.documentElement;
+        if (val === 'auto') { root.removeAttribute('data-color-mode'); } else { root.setAttribute('data-color-mode', val); }
+        var seg = btn.closest('.p2-seg');
+        if (seg) { seg.querySelectorAll('[data-p2s="color-mode"]').forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-p2v') === val); }); }
+      });
     });
+    /* Motion-intensity segmented buttons */
+    host.querySelectorAll('[data-p2s="motion"]').forEach(function (btn) {
+      if (btn.getAttribute('data-p2-wired') === '1') { return; }
+      btn.setAttribute('data-p2-wired', '1');
+      btn.addEventListener('click', function () {
+        var val = btn.getAttribute('data-p2v');
+        var seg = btn.closest('.p2-seg');
+        if (seg) { seg.querySelectorAll('[data-p2s="motion"]').forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-p2v') === val); }); }
+        /* Apply multiplied durations immediately */
+        var mult = { subtle: 0.7, standard: 1.0, expressive: 1.4 }[val] || 1.0;
+        var base = { fast: 120, base: 200, slow: 320 };
+        var root = document.documentElement;
+        root.style.setProperty('--o3-motion-fast', Math.round(base.fast * mult) + 'ms');
+        root.style.setProperty('--o3-motion-base', Math.round(base.base * mult) + 'ms');
+        root.style.setProperty('--o3-motion-slow', Math.round(base.slow * mult) + 'ms');
+      });
+    });
+    /* Font family select */
+    var fontEl = host.querySelector('#p2-s-font');
+    if (fontEl && !fontEl.getAttribute('data-p2-wired')) {
+      fontEl.setAttribute('data-p2-wired', '1');
+      fontEl.addEventListener('change', function () { applySettingsLivePreview(host); });
+    }
+    /* Font base size */
+    var fbEl = host.querySelector('#p2-s-fontbase');
+    if (fbEl && !fbEl.getAttribute('data-p2-wired')) {
+      fbEl.setAttribute('data-p2-wired', '1');
+      fbEl.addEventListener('input', function () { applySettingsLivePreview(host); });
+    }
   }
 
   function collectDraft(host) {
@@ -501,8 +544,9 @@
     if (gv('p2-radius-inner') !== null) { d.radius_inner_px = parseInt(gv('p2-radius-inner'), 10) || 4; }
     /* control height from segment */
     var chSeg = host.querySelector('[data-p2s="p2-ctrl-h"].is-on'); if (chSeg) { d.control_h_px = parseInt(chSeg.getAttribute('data-p2v'), 10) || 32; }
-    /* overrides */
-    var ov = d.overrides || {}; d.overrides = ov;
+    /* overrides — ensure plain object (backend may have returned []) */
+    if (!d.overrides || Array.isArray(d.overrides) || typeof d.overrides !== 'object') { d.overrides = {}; }
+    var ov = d.overrides;
     var ovKeys = ['status.success', 'status.warning', 'status.danger', 'status.info', 'status.neutral', 'surface.card', 'surface.muted', 'text.strong', 'text.default', 'text.muted', 'space.section', 'type.heading-weight', 'type.scale-ratio', 'motion.fast', 'motion.base', 'motion.slow'];
     ovKeys.forEach(function (k) { var el = host.querySelector('#p2-ov-' + k.replace(/\./g, '\\.')); if (el) { var v = el.value; if (v === '' || v === null) { delete ov[k]; } else { ov[k] = (el.type === 'number' || el.type === 'range') ? (parseFloat(v) || 0) : v; } } });
     /* elevation segment */
@@ -550,7 +594,9 @@
   function doEdit(key) {
     var p = (_ps.list || []).filter(function (x) { return x.preset_key === key; })[0];
     if (!p) { toast('Không tìm thấy preset.', 'error'); return; }
-    _ps.editing = key; _ps.draft = JSON.parse(JSON.stringify(p)); if (!_ps.draft.overrides || typeof _ps.draft.overrides !== 'object') { _ps.draft.overrides = {}; }
+    _ps.editing = key; _ps.draft = JSON.parse(JSON.stringify(p));
+    /* Normalize overrides: backend may return [] (empty array) — coerce to plain object */
+    if (!_ps.draft.overrides || Array.isArray(_ps.draft.overrides) || typeof _ps.draft.overrides !== 'object') { _ps.draft.overrides = {}; }
     _ps.validateResult = null;
     repaintBody();
     setTimeout(function () { var slot = document.getElementById('p2-editor-slot'); if (slot) { slot.scrollIntoView({ block: 'nearest' }); } var host = api() && api().host(); if (host) { wirePresetLivePreview(host); } }, 50);
@@ -678,24 +724,11 @@
     }
     return false;
   }
-  function onSettingsAction(k, t) {
+  function onSettingsAction(k) {
     var host = api() && api().host();
     if (k === 'p2-settings-save') { doSettingsSave(host); return true; }
     if (k === 'p2-settings-reset') { doSettingsReset(host); return true; }
-    /* Color-mode segment buttons wired here */
-    var seg = t.getAttribute('data-p2s');
-    if (seg === 'color-mode') {
-      var val = t.getAttribute('data-p2v');
-      var root = document.documentElement;
-      if (val === 'auto') { root.removeAttribute('data-color-mode'); } else { root.setAttribute('data-color-mode', val); }
-      /* update visual */
-      var parent = t.closest('.p2-seg'); if (parent) { parent.querySelectorAll('[data-p2s="color-mode"]').forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-p2v') === val); }); }
-      return true;
-    }
-    if (seg === 'motion') {
-      var parent2 = t.closest('.p2-seg'); if (parent2) { parent2.querySelectorAll('[data-p2s="motion"]').forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-p2v') === t.getAttribute('data-p2v')); }); }
-      return true;
-    }
+    /* mode/motion seg buttons are wired directly by wireSettingsControls (no data-ms needed) */
     return false;
   }
 
