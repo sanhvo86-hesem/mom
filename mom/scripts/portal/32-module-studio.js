@@ -19,14 +19,15 @@
   var STYLE_ID = 'module-studio-css';
   var ROOT = 'mstudio';
   var state = {
-    surface: 'lego',     // 'lego' | 'modules' | 'theme'
-    mode: 'assemble',    // lego mode: 'assemble' | 'author'
-    sel: null,           // lego selection { kind, key, data }
-    modules: null,       // cached module list
-    presets: null,       // cached theme presets
-    demo: null,          // { byType:{engineType→config} } harvested from Lego Showcase
-    editing: null,       // { kind:'module'|'theme', id, draft } inline edit buffer
-    msg: ''              // transient status line
+    surface: 'lego',        // 'lego' | 'modules' | 'presets' | 'settings' | 'governance' | 'reference'
+    mode: 'assemble',       // lego mode: 'assemble' | 'author'
+    sel: null,              // lego selection { kind, key, data }
+    modules: null,          // cached module list
+    presets: null,          // cached theme presets
+    demo: null,             // { byType:{engineType→config} } harvested from Lego Showcase
+    editing: null,          // { kind:'module'|'theme', id, draft } inline edit buffer
+    includeDeleted: false,  // module list filter — SSOT for the archive checkbox
+    msg: ''                 // transient status line
   };
   var hostEl = null;
 
@@ -40,9 +41,15 @@
      built-in surfaces below remain as fallback until each is migrated out. */
   window.MStudio = window.MStudio || {};
   var SURFACE_META = {
-    lego: { label: '🧱 Lego', order: 10 }, tokens: { label: '🎛️ Tokens', order: 20 },
-    modules: { label: '📦 Modules', order: 30 }, theme: { label: '🎨 Theme', order: 40 },
-    reference: { label: '📖 Tham chiếu', order: 50 }
+    lego:       { label: '🧱 Lego',          order: 10 },
+    modules:    { label: '📦 Modules',        order: 30 },
+    presets:    { label: '🎨 Presets',        order: 40 },
+    settings:   { label: '⚙ Settings',        order: 45 },
+    governance: { label: '🏛 Governance',     order: 47 },
+    reference:  { label: '📖 Tham chiếu',     order: 50 },
+    // Legacy aliases — hidden from tab bar; navigating to them redirects silently
+    tokens: { label: '🎛️ Tokens', order: 20, hidden: true, redirectTo: 'lego' },
+    theme:  { label: '🎨 Theme',  order: 40, hidden: true, redirectTo: 'presets' }
   };
   window.MStudio._ext = window.MStudio._ext || {};
   window.MStudio.registerSurface = function (key, def) {
@@ -58,7 +65,7 @@
       var oa = (extSurface(a) && extSurface(a).order != null) ? extSurface(a).order : (SURFACE_META[a] ? SURFACE_META[a].order : 999);
       var ob = (extSurface(b) && extSurface(b).order != null) ? extSurface(b).order : (SURFACE_META[b] ? SURFACE_META[b].order : 999);
       return oa - ob;
-    }).filter(function (k) { var e = extSurface(k); return !(e && e.hidden); });
+    }).filter(function (k) { var e = extSurface(k); var m = SURFACE_META[k]; return !(e && e.hidden) && !(m && m.hidden); });
   }
   function surfaceLabel(key) {
     var e = extSurface(key); if (e && e.label) { return e.label; }
@@ -168,7 +175,13 @@
       R + '__st{display:inline-flex;align-items:center;height:20px;padding:0 ' + sp + ';border-radius:' + pill + ';font-size:11px;font-weight:600}' +
       R + '__st--active{background:' + oks + ';color:' + ok + '}' + R + '__st--deleted{background:' + dgs + ';color:' + dg + '}' + R + '__st--draft{background:' + wns + ';color:' + wn + '}' +
       R + '__sw{width:20px;height:20px;border-radius:' + rd + ';border:1px solid ' + bdef + ';display:inline-block;vertical-align:middle;margin-right:' + sp + '}' +
-      R + '__toolbar{display:flex;gap:' + sp + ';align-items:center;margin-bottom:' + sc + ';flex-wrap:wrap}';
+      R + '__toolbar{display:flex;gap:' + sp + ';align-items:center;margin-bottom:' + sc + ';flex-wrap:wrap}' +
+      /* modal overlay */
+      R + '__mback{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9100;display:flex;align-items:center;justify-content:center}' +
+      R + '__modal{background:' + sf + ';border-radius:' + rc + ';box-shadow:0 8px 32px rgba(15,23,42,.22);padding:' + sc + ';min-width:440px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto}' +
+      R + '__modal-hd{font-size:14px;font-weight:800;color:' + ts + ';margin-bottom:' + sc + '}' +
+      R + '__modal-ft{display:flex;gap:' + sp + ';margin-top:' + sc + ';justify-content:flex-end}' +
+      R + '__modal .mstudio__in{appearance:none;-webkit-appearance:none;transition:none}';
     var el = document.createElement('style'); el.id = STYLE_ID; el.textContent = css; document.head.appendChild(el);
   }
 
@@ -278,7 +291,8 @@
         var stcls = st === 'deleted' ? 'deleted' : (st === 'draft' ? 'draft' : 'active');
         var acts = (st === 'deleted')
           ? '<button class="' + ROOT + '__btn ' + ROOT + '__btn--sm" data-ms="mod-restore" data-id="' + esc(id) + '">↩ Khôi phục</button>'
-          : '<button class="' + ROOT + '__btn ' + ROOT + '__btn--sm ' + ROOT + '__btn--pri" data-ms="mod-edit" data-id="' + esc(id) + '">✎ Sửa</button> ' +
+          : '<button class="' + ROOT + '__btn ' + ROOT + '__btn--sm ' + ROOT + '__btn--pri" data-ms="mod-edit-meta" data-id="' + esc(id) + '">✎ Thông tin</button> ' +
+            '<button class="' + ROOT + '__btn ' + ROOT + '__btn--sm ' + ROOT + '__btn--pri" data-ms="mod-edit-content" data-id="' + esc(id) + '">🧩 Nội dung</button> ' +
             '<button class="' + ROOT + '__btn ' + ROOT + '__btn--sm" data-ms="mod-versions" data-id="' + esc(id) + '">Lịch sử</button> ' +
             '<button class="' + ROOT + '__btn ' + ROOT + '__btn--sm ' + ROOT + '__btn--dgr" data-ms="mod-archive" data-id="' + esc(id) + '">Archive</button>';
         return '<tr><td><b>' + esc(moduleTitle(m)) + '</b><br><small style="color:var(--o3-text-muted,#94a3b8)">' + esc(id) + '</small></td>' +
@@ -292,7 +306,7 @@
       '<div class="' + ROOT + '__toolbar">' +
         '<button class="' + ROOT + '__btn ' + ROOT + '__btn--pri" data-ms="mod-create">＋ Tạo module</button>' +
         '<button class="' + ROOT + '__btn" data-ms="mod-refresh">↻ Làm mới</button>' +
-        '<label style="display:inline-flex;align-items:center;gap:var(--o3-space,8px);font-size:12px"><input type="checkbox" data-ms="mod-incdel"> hiện đã archive</label>' +
+        '<label style="display:inline-flex;align-items:center;gap:var(--o3-space,8px);font-size:12px"><input type="checkbox" data-ms="mod-incdel"' + (state.includeDeleted ? ' checked' : '') + '> hiện đã archive</label>' +
       '</div>' +
       '<table class="' + ROOT + '__tbl"><thead><tr><th>Module</th><th>Archetype</th><th>Ver</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody>' + rows + '</tbody></table>' +
       '<div id="ms-mod-detail">' + (state.editing && state.editing.kind === 'module' ? renderModuleForm(state.editing.draft) : '') + '</div></div>';
@@ -421,16 +435,19 @@
       return '<div class="' + ROOT + '__body' + single + '" data-ms="surfacebody">' + html + '</div>';
     }
     if (state.surface === 'modules') { return '<div class="' + ROOT + '__body ' + ROOT + '__body--single" data-ms="surfacebody">' + renderModules() + '</div>'; }
-    if (state.surface === 'theme') { return '<div class="' + ROOT + '__body ' + ROOT + '__body--single" data-ms="surfacebody">' + renderTheme() + '</div>'; }
+    if (state.surface === 'presets' || state.surface === 'theme') { return '<div class="' + ROOT + '__body ' + ROOT + '__body--single" data-ms="surfacebody">' + renderTheme() + '</div>'; }
     if (state.surface === 'tokens') { return '<div class="' + ROOT + '__body ' + ROOT + '__body--single" data-ms="surfacebody">' + renderTokens() + '</div>'; }
     if (state.surface === 'reference') { return '<div class="' + ROOT + '__body ' + ROOT + '__body--single" data-ms="surfacebody">' + renderReference() + '</div>'; }
+    if (state.surface === 'settings' || state.surface === 'governance') {
+      return '<div class="' + ROOT + '__body ' + ROOT + '__body--single" data-ms="surfacebody"><div class="' + ROOT + '__pad ' + ROOT + '__hint">Surface <b>' + esc(state.surface) + '</b> — đang cài đặt bởi session P2.</div></div>';
+    }
     return '<div class="' + ROOT + '__body" data-ms="surfacebody">' + renderLego() + '</div>';
   }
   function afterPaint() {
     var ext = extSurface(state.surface);
     if (ext && typeof ext.onMount === 'function') { setTimeout(function () { try { ext.onMount(hostEl); } catch (e) { /* noop */ } }, 0); }
     // Wire the absorbed Appearance renderers after their HTML is in the DOM.
-    if (state.surface === 'theme') {
+    if (state.surface === 'theme' || state.surface === 'presets') {
       setTimeout(function () { try { if (typeof window._wireAdmTheme === 'function') { window._wireAdmTheme(); } } catch (e) { /* noop */ } }, 0);
     }
     if (state.surface === 'tokens') {
@@ -442,8 +459,9 @@
   function paintBody() { if (!hostEl) { return; } var b = hostEl.querySelector('[data-ms="surfacebody"]'); if (b) { b.outerHTML = bodyHtml(); afterPaint(); } }
 
   function loadModules(includeDeleted) {
+    state.includeDeleted = !!includeDeleted; // SSOT — set before repaint so checkbox re-renders correctly
     state.modules = null; paintBody();
-    getJson('module_schema_list', includeDeleted ? '&includeDeleted=1' : '').then(function (j) {
+    getJson('module_schema_list', state.includeDeleted ? '&includeDeleted=1' : '').then(function (j) {
       state.modules = (j && (j.schemas || j.data || j.modules)) || []; paintBody();
     });
   }
@@ -480,7 +498,7 @@
     var c = hostEl.querySelector('[data-ms="cvcol"]');
     if (c) { c.innerHTML = renderCanvas(); }
   }
-  function incDelChecked() { var c = hostEl && hostEl.querySelector('[data-ms="mod-incdel"]'); return !!(c && c.checked); }
+  function incDelChecked() { return state.includeDeleted; }
   function lookup(kind, key) {
     if (kind === 'l3') { return l3Blocks().filter(function (b) { return b.block_key === key; })[0] || null; }
     if (kind === 'l4') { return l4Archetypes().filter(function (a) { return a.archetype_key === key; })[0] || null; }
@@ -489,23 +507,81 @@
 
   /* ── actions ─────────────────────────────────────────────────────────── */
   function doCreateModule() {
-    var name = window.prompt('Tên module mới (VI):', 'Module mới');
-    if (!name) { return; }
-    var arche = (l4Archetypes()[0] || {}).archetype_key || 'workspace-projection';
-    var id = 'custom-' + Date.now().toString(36);
-    var schema = { moduleId: id, title: { vi: name, en: name }, subtitle: { vi: '', en: '' }, icon: '📦',
-      route: '/' + id, roles: ['it_admin'], version: 1, moduleArchetype: arche, config: { theme: 'hesem-default' }, tabs: [] };
-    post('module_schema_save', { schema: schema }).then(function (r) {
-      toast(r && r.ok !== false ? 'Đã tạo module “' + name + '”.' : 'Tạo module thất bại.', r && r.ok !== false ? 'success' : 'error');
-      loadModules(false);
-    }).catch(function (e) { toast('Tạo module lỗi: ' + e, 'error'); });
+    var l4opts = l4Archetypes().map(function (a) { return { v: a.archetype_key, t: a.display_name_vi || a.archetype_key }; });
+    if (!l4opts.length) { l4opts = [{ v: 'workspace-projection', t: 'workspace-projection' }]; }
+    var pOpts = (state.presets || []).map(function (p) { return { v: p.preset_key, t: p.display_name_vi || p.preset_key }; });
+    if (!pOpts.length) { pOpts = [{ v: 'hesem-default', t: 'hesem-default' }]; }
+
+    var html = '<div class=”' + ROOT + '__mback” id=”ms-create-back”>' +
+      '<div class=”' + ROOT + '__modal”>' +
+      '<div class=”' + ROOT + '__modal-hd”>＋ Tạo module mới</div>' +
+      field('Tên (VI) *', 'cm-title-vi', '') +
+      field('Tên (EN)', 'cm-title-en', '') +
+      field('Phụ đề (VI)', 'cm-subtitle-vi', '') +
+      field('Icon', 'cm-icon', '📦') +
+      field('Route', 'cm-route', '/') +
+      field('Roles (phân cách bằng dấu phẩy)', 'cm-roles', 'it_admin') +
+      selectField('Archetype', 'cm-archetype', l4opts[0].v, l4opts) +
+      selectField('Theme preset', 'cm-theme', pOpts[0].v, pOpts) +
+      field('Domain', 'cm-domain', '') +
+      '<div class=”' + ROOT + '__modal-ft”>' +
+      '<button class=”' + ROOT + '__btn ' + ROOT + '__btn--pri” id=”ms-create-ok”>Tạo module</button>' +
+      '<button class=”' + ROOT + '__btn” id=”ms-create-cancel”>Huỷ</button></div></div></div>';
+
+    var wrap = document.createElement('div'); wrap.innerHTML = html;
+    var back = wrap.firstChild; document.body.appendChild(back);
+
+    var titleF = back.querySelector('[data-ef=”cm-title-vi”]');
+    var routeF = back.querySelector('[data-ef=”cm-route”]');
+    if (titleF) { setTimeout(function () { titleF.focus(); }, 40); }
+    if (titleF && routeF) {
+      titleF.addEventListener('input', function () {
+        if (routeF.dataset.manual) { return; }
+        var slug = titleF.value.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]/g, '');
+        routeF.value = slug ? '/' + slug : '/';
+      });
+      routeF.addEventListener('input', function () { routeF.dataset.manual = '1'; });
+    }
+    back.addEventListener('click', function (ev) { if (ev.target === back) { back.remove(); } });
+    var cancelBtn = back.querySelector('#ms-create-cancel');
+    if (cancelBtn) { cancelBtn.addEventListener('click', function () { back.remove(); }); }
+    var okBtn = back.querySelector('#ms-create-ok');
+    if (okBtn) {
+      okBtn.addEventListener('click', function () {
+        var vi = (titleF || {}).value || '';
+        if (!vi.trim()) { if (titleF) { titleF.style.borderColor = 'var(--o3-danger,#b91c1c)'; titleF.focus(); } return; }
+        var route = (routeF || {}).value || '/' + vi.trim().toLowerCase().replace(/\s+/g, '-');
+        var id = 'custom-' + route.replace(/^\//, '').replace(/[^\w\-]/g, '') || 'custom-' + Date.now().toString(36);
+        var schema = {
+          moduleId: id,
+          title: { vi: vi, en: back.querySelector('[data-ef=”cm-title-en”]').value || '' },
+          subtitle: { vi: back.querySelector('[data-ef=”cm-subtitle-vi”]').value || '', en: '' },
+          icon: back.querySelector('[data-ef=”cm-icon”]').value || '📦',
+          route: route,
+          roles: (back.querySelector('[data-ef=”cm-roles”]').value || 'it_admin').split(',').map(function (x) { return x.trim(); }).filter(Boolean),
+          moduleArchetype: back.querySelector('[data-ef=”cm-archetype”]').value || 'workspace-projection',
+          config: { theme: back.querySelector('[data-ef=”cm-theme”]').value || 'hesem-default' },
+          domain: back.querySelector('[data-ef=”cm-domain”]').value || '',
+          version: 1, tabs: []
+        };
+        okBtn.disabled = true; okBtn.textContent = 'Đang tạo…';
+        post('module_schema_save', { schema: schema }).then(function (r) {
+          if (r && r.ok !== false) {
+            toast('Đã tạo module “' + vi + '”.', 'success'); back.remove(); loadModules(state.includeDeleted);
+          } else {
+            okBtn.disabled = false; okBtn.textContent = 'Tạo module';
+            toast('Tạo module thất bại' + (r && r.error ? ': ' + r.error : '') + '.', 'error');
+          }
+        }).catch(function (e) { okBtn.disabled = false; okBtn.textContent = 'Tạo module'; toast('Tạo module lỗi: ' + e, 'error'); });
+      });
+    }
   }
   function doArchive(id) {
     if (!window.confirm('Archive (soft-delete) module ' + id + '? Có thể khôi phục.')) { return; }
-    post('module_schema_delete', { moduleId: id }).then(function (r) { toast(r && r.ok !== false ? 'Đã archive.' : 'Archive thất bại.', r && r.ok !== false ? 'success' : 'error'); loadModules(incDelChecked()); }).catch(function (e) { toast('Archive lỗi: ' + e, 'error'); });
+    post('module_schema_delete', { moduleId: id }).then(function (r) { toast(r && r.ok !== false ? 'Đã archive.' : 'Archive thất bại.', r && r.ok !== false ? 'success' : 'error'); loadModules(state.includeDeleted); }).catch(function (e) { toast('Archive lỗi: ' + e, 'error'); });
   }
   function doRestore(id) {
-    post('module_schema_restore', { moduleId: id }).then(function (r) { toast(r && r.ok !== false ? 'Đã khôi phục.' : 'Khôi phục thất bại.', r && r.ok !== false ? 'success' : 'error'); loadModules(true); }).catch(function (e) { toast('Khôi phục lỗi: ' + e, 'error'); });
+    post('module_schema_restore', { moduleId: id }).then(function (r) { toast(r && r.ok !== false ? 'Đã khôi phục.' : 'Khôi phục thất bại.', r && r.ok !== false ? 'success' : 'error'); loadModules(state.includeDeleted); }).catch(function (e) { toast('Khôi phục lỗi: ' + e, 'error'); });
   }
   function doVersions(id) {
     var box = document.getElementById('ms-mod-detail'); if (box) { box.innerHTML = '<div class="' + ROOT + '__note">Đang tải lịch sử…</div>'; }
@@ -610,6 +686,15 @@
       } else { toast('Clone thất bại.', 'error'); }
     }).catch(function (e) { toast('Clone lỗi: ' + e, 'error'); });
   }
+  function doEditModuleMeta(id) { doEditModule(id); }
+  function doEditModuleContent(id) {
+    // Hands off to Lego Assemble surface (P3 — 32c-mstudio-modules.js).
+    // Until P3 ships, delegate through the api so any registered handler can intercept.
+    if (window.MStudio && window.MStudio.api && typeof window.MStudio.api.openModuleContent === 'function') {
+      window.MStudio.api.openModuleContent(id); return;
+    }
+    toast('Sửa nội dung module ' + id + ' — Lego Assemble surface (P3) chưa nạp.', 'info');
+  }
   function doEditModule(id) {
     var box = document.getElementById('ms-mod-detail'); if (box) { box.innerHTML = '<div class="' + ROOT + '__note">Đang tải schema…</div>'; }
     // ensure the Theme dropdown has the full preset list
@@ -631,7 +716,7 @@
     var payload = { schema: d };
     if (d.version != null) { payload.baseVersion = d.version; } // optimistic lock
     post('module_schema_save', payload).then(function (r) {
-      if (r && r.ok !== false) { toast('Đã lưu module “' + (d.title.vi || d.moduleId) + '” (v' + (r.version || '?') + ').', 'success'); state.editing = null; loadModules(incDelChecked()); }
+      if (r && r.ok !== false) { toast('Đã lưu module “' + (d.title.vi || d.moduleId) + '” (v' + (r.version || '?') + ').', 'success'); state.editing = null; loadModules(state.includeDeleted); }
       else { toast('Lưu module thất bại' + (r && r.error ? ': ' + r.error : '') + '.', 'error'); }
     }).catch(function (e) { toast('Lưu module lỗi: ' + e, 'error'); });
   }
@@ -684,8 +769,8 @@
     hostEl = el; ensureStyle(); el.classList.add(ROOT); el.style.padding = '0';
     paint();
     loadDemo();
-    if (state.surface === 'modules' && state.modules == null) { loadModules(false); }
-    if (state.surface === 'theme' && state.presets == null) { loadPresets(); }
+    if (state.surface === 'modules' && state.modules == null) { loadModules(state.includeDeleted); }
+    if ((state.surface === 'presets' || state.surface === 'theme') && state.presets == null) { loadPresets(); }
 
     // Listeners are delegated on `el` and read module-level state; attach exactly once
     // per host node. 02-state-auth-ui re-invokes render() on every nav return, which
@@ -697,7 +782,14 @@
       var t = (ev.target && ev.target.closest) ? ev.target.closest('[data-ms]') : null;
       if (!t || !el.contains(t)) { return; }
       var k = t.getAttribute('data-ms');
-      if (k === 'surface') { state.surface = t.getAttribute('data-surface'); paint(); if (state.surface === 'modules') { loadModules(false); } if (state.surface === 'theme') { loadPresets(); } return; }
+      if (k === 'surface') {
+        var tgt = t.getAttribute('data-surface');
+        var smeta = SURFACE_META[tgt]; if (smeta && smeta.redirectTo) { tgt = smeta.redirectTo; }
+        state.surface = tgt; paint();
+        if (state.surface === 'modules') { loadModules(state.includeDeleted); }
+        if (state.surface === 'presets' || state.surface === 'theme') { loadPresets(); }
+        return;
+      }
       // give a registered (external) surface first chance to handle its own actions
       var _ext = extSurface(state.surface);
       if (_ext && typeof _ext.onAction === 'function') { var handled = false; try { handled = _ext.onAction(k, t, ev); } catch (e) { /* noop */ } if (handled) { return; } }
@@ -706,10 +798,12 @@
       else if (k === 'simulate') { doSimulate(); }
       else if (k === 'save-block') { doSaveBlock(); }
       else if (k === 'mod-create') { doCreateModule(); }
-      else if (k === 'mod-edit') { doEditModule(t.getAttribute('data-id')); }
+      else if (k === 'mod-edit-meta') { doEditModuleMeta(t.getAttribute('data-id')); }
+      else if (k === 'mod-edit-content') { doEditModuleContent(t.getAttribute('data-id')); }
+      else if (k === 'mod-edit') { doEditModule(t.getAttribute('data-id')); } // legacy compat
       else if (k === 'mod-save') { doSaveModuleEdit(); }
       else if (k === 'edit-cancel') { doCancelEdit(); }
-      else if (k === 'mod-refresh') { loadModules(incDelChecked()); }
+      else if (k === 'mod-refresh') { loadModules(state.includeDeleted); }
       else if (k === 'mod-archive') { doArchive(t.getAttribute('data-id')); }
       else if (k === 'mod-restore') { doRestore(t.getAttribute('data-id')); }
       else if (k === 'mod-versions') { doVersions(t.getAttribute('data-id')); }
@@ -723,6 +817,7 @@
     });
     el.addEventListener('change', function (ev) {
       var t = ev.target;
+      // state.includeDeleted is the SSOT; loadModules() sets it before repainting
       if (t && t.getAttribute && t.getAttribute('data-ms') === 'mod-incdel') { loadModules(t.checked); }
     });
     el.addEventListener('input', function (ev) {
@@ -741,6 +836,25 @@
     getJson: getJson, post: post, toast: toast, esc: esc,
     state: state, host: function () { return hostEl; },
     repaint: function () { if (hostEl) { paint(); } },
-    repaintBody: function () { if (hostEl) { paintBody(); } }
+    repaintBody: function () { if (hostEl) { paintBody(); } },
+    selectSurface: function (key) {
+      var m = SURFACE_META[key]; if (m && m.redirectTo) { key = m.redirectTo; }
+      state.surface = key; if (hostEl) { paint(); }
+      if (key === 'modules') { loadModules(state.includeDeleted); }
+      if (key === 'presets' || key === 'theme') { loadPresets(); }
+    },
+    openModuleContent: function (id) {
+      // P3 (32c-mstudio-modules.js) overrides this when it registers its surface.
+      // Placeholder: switch to modules surface and show a toast.
+      state.surface = 'modules'; if (hostEl) { paint(); }
+      loadModules(state.includeDeleted);
+      toast('Mở nội dung module ' + id + ' — Lego Assemble (P3) chưa nạp.', 'info');
+    },
+    openModuleMetadata: function (id) { doEditModule(id); },
+    validateModule: function (schema) {
+      if (!schema || !schema.moduleId) { return { ok: false, errors: ['moduleId required'] }; }
+      if (!schema.title || (!schema.title.vi && !schema.title.en)) { return { ok: false, errors: ['title required'] }; }
+      return { ok: true, errors: [] };
+    }
   };
 })();
