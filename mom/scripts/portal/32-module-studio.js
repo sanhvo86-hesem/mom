@@ -512,9 +512,9 @@
     var pOpts = (state.presets || []).map(function (p) { return { v: p.preset_key, t: p.display_name_vi || p.preset_key }; });
     if (!pOpts.length) { pOpts = [{ v: 'hesem-default', t: 'hesem-default' }]; }
 
-    var html = '<div class=”' + ROOT + '__mback” id=”ms-create-back”>' +
-      '<div class=”' + ROOT + '__modal”>' +
-      '<div class=”' + ROOT + '__modal-hd”>＋ Tạo module mới</div>' +
+    var html = '<div class="' + ROOT + '__mback" id="ms-create-back">' +
+      '<div class="' + ROOT + '__modal">' +
+      '<div class="' + ROOT + '__modal-hd">＋ Tạo module mới</div>' +
       field('Tên (VI) *', 'cm-title-vi', '') +
       field('Tên (EN)', 'cm-title-en', '') +
       field('Phụ đề (VI)', 'cm-subtitle-vi', '') +
@@ -524,15 +524,15 @@
       selectField('Archetype', 'cm-archetype', l4opts[0].v, l4opts) +
       selectField('Theme preset', 'cm-theme', pOpts[0].v, pOpts) +
       field('Domain', 'cm-domain', '') +
-      '<div class=”' + ROOT + '__modal-ft”>' +
-      '<button class=”' + ROOT + '__btn ' + ROOT + '__btn--pri” id=”ms-create-ok”>Tạo module</button>' +
-      '<button class=”' + ROOT + '__btn” id=”ms-create-cancel”>Huỷ</button></div></div></div>';
+      '<div class="' + ROOT + '__modal-ft">' +
+      '<button class="' + ROOT + '__btn ' + ROOT + '__btn--pri" id="ms-create-ok">Tạo module</button>' +
+      '<button class="' + ROOT + '__btn" id="ms-create-cancel">Huỷ</button></div></div></div>';
 
     var wrap = document.createElement('div'); wrap.innerHTML = html;
     var back = wrap.firstChild; document.body.appendChild(back);
 
-    var titleF = back.querySelector('[data-ef=”cm-title-vi”]');
-    var routeF = back.querySelector('[data-ef=”cm-route”]');
+    var titleF = back.querySelector('[data-ef="cm-title-vi"]');
+    var routeF = back.querySelector('[data-ef="cm-route"]');
     if (titleF) { setTimeout(function () { titleF.focus(); }, 40); }
     if (titleF && routeF) {
       titleF.addEventListener('input', function () {
@@ -554,20 +554,20 @@
         var id = 'custom-' + route.replace(/^\//, '').replace(/[^\w\-]/g, '') || 'custom-' + Date.now().toString(36);
         var schema = {
           moduleId: id,
-          title: { vi: vi, en: back.querySelector('[data-ef=”cm-title-en”]').value || '' },
-          subtitle: { vi: back.querySelector('[data-ef=”cm-subtitle-vi”]').value || '', en: '' },
-          icon: back.querySelector('[data-ef=”cm-icon”]').value || '📦',
+          title: { vi: vi, en: back.querySelector('[data-ef="cm-title-en"]').value || '' },
+          subtitle: { vi: back.querySelector('[data-ef="cm-subtitle-vi"]').value || '', en: '' },
+          icon: back.querySelector('[data-ef="cm-icon"]').value || '📦',
           route: route,
-          roles: (back.querySelector('[data-ef=”cm-roles”]').value || 'it_admin').split(',').map(function (x) { return x.trim(); }).filter(Boolean),
-          moduleArchetype: back.querySelector('[data-ef=”cm-archetype”]').value || 'workspace-projection',
-          config: { theme: back.querySelector('[data-ef=”cm-theme”]').value || 'hesem-default' },
-          domain: back.querySelector('[data-ef=”cm-domain”]').value || '',
+          roles: (back.querySelector('[data-ef="cm-roles"]').value || 'it_admin').split(',').map(function (x) { return x.trim(); }).filter(Boolean),
+          moduleArchetype: back.querySelector('[data-ef="cm-archetype"]').value || 'workspace-projection',
+          config: { theme: back.querySelector('[data-ef="cm-theme"]').value || 'hesem-default' },
+          domain: back.querySelector('[data-ef="cm-domain"]').value || '',
           version: 1, tabs: []
         };
         okBtn.disabled = true; okBtn.textContent = 'Đang tạo…';
         post('module_schema_save', { schema: schema }).then(function (r) {
           if (r && r.ok !== false) {
-            toast('Đã tạo module “' + vi + '”.', 'success'); back.remove(); loadModules(state.includeDeleted);
+            toast('Đã tạo module "' + vi + '".', 'success'); back.remove(); loadModules(state.includeDeleted);
           } else {
             okBtn.disabled = false; okBtn.textContent = 'Tạo module';
             toast('Tạo module thất bại' + (r && r.error ? ': ' + r.error : '') + '.', 'error');
