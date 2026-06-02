@@ -777,6 +777,17 @@ const migrationDomainDefaults = new Map([
   ['203_email_intake_infrastructure.sql', 'system_infrastructure'],
   ['204_email_intake_harden_defaults.sql', 'system_infrastructure'],
   ['205_email_intake_order_case_upgrade.sql', 'system_infrastructure'],
+  ['267_governed_generic_crud_guard.sql', 'master_data_governance'],
+  ['272_master_data_postgres_authority_bridge.sql', 'master_data_governance'],
+  ['273_runtime_requirement_resolver.sql', 'production'],
+  ['274_engineering_release_package_runtime_closure.sql', 'mfg_engineering'],
+  ['275_regulated_domain_command_evidence_spine.sql', 'master_data_governance'],
+  ['276_resource_readiness_runtime_closure.sql', 'production'],
+  ['278_quality_hold_eqms_transaction_chain.sql', 'quality_management'],
+  ['279_inventory_ledger_runtime_authority.sql', 'inventory'],
+  ['280_tooling_gage_runtime_authority.sql', 'tooling_lifecycle'],
+  ['281_mda_runtime_telemetry_control_tower.sql', 'master_data_governance'],
+  ['286_mda_runtime_authority_no_p0p1_guard.sql', 'master_data_governance'],
 ]);
 
 const tableDomainOverrides = {
@@ -816,6 +827,7 @@ const tableDomainOverrides = {
   item_site: 'master_data',
   item_attr: 'master_data',
   item_spec: 'master_data',
+  domain_command_uom_measurement: 'master_data',
   bom: 'mfg_engineering',
   bom_version: 'mfg_engineering',
   bom_line: 'mfg_engineering',
@@ -2556,6 +2568,7 @@ function inferDomain(tableName, migration) {
   if (/^lean_/.test(tableName)) return 'lean_manufacturing';
   if (/^eqms_/.test(tableName)) return 'quality_management';
   if (/^dcc_/.test(tableName)) return 'document_control';
+  if (/^domain_command_/.test(tableName)) return 'master_data_governance';
   if (/^graphics_/.test(tableName)) return 'system_infrastructure';
   if (/^uom_/.test(tableName)) return 'master_data';
   if (/^aeoi_/.test(tableName)) return 'sales';

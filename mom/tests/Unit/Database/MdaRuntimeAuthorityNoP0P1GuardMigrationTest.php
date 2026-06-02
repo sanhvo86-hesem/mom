@@ -23,4 +23,25 @@ final class MdaRuntimeAuthorityNoP0P1GuardMigrationTest extends TestCase
         $this->assertStringContainsString('domain_command_required: governed table', $sql);
         $this->assertStringContainsString('trg_governed_generic_crud_guard', $sql);
     }
+
+    public function testRuntimeEvidenceStoresAreInDataSchemaAuthorityRegistry(): void
+    {
+        $path = (string)constant('QMS_TEST_DATA_DIR') . '/registry/table-registry.json';
+        $registry = json_decode((string)file_get_contents($path), true);
+        $this->assertIsArray($registry);
+
+        $tables = (array)($registry['tables'] ?? []);
+        foreach ([
+            'domain_command_sod_exception',
+            'domain_command_reauth_challenge',
+            'domain_command_break_glass_grant',
+        ] as $tableName) {
+            $this->assertArrayHasKey($tableName, $tables);
+            $this->assertSame(
+                '286_mda_runtime_authority_no_p0p1_guard.sql',
+                (string)($tables[$tableName]['migration'] ?? '')
+            );
+            $this->assertSame('master_data_governance', (string)($tables[$tableName]['domain'] ?? ''));
+        }
+    }
 }

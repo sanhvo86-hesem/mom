@@ -1,13 +1,13 @@
 {
     "schema_authority": {
         "version": "1.0.0",
-        "declared_at": "2026-05-27T06:14:29+00:00",
-        "authoritative_schema_source": "database/migrations/*.sql (001–205)",
+        "declared_at": "2026-06-02T02:16:13+00:00",
+        "authoritative_schema_source": "database/migrations/*.sql (001–286)",
         "authoritative_schema_file": "database/schema.sql",
         "authority_scope": "platform_global",
         "table_count": 869,
-        "registry_table_count": 889,
-        "registry_contract_table_count": 889,
+        "registry_table_count": 955,
+        "registry_contract_table_count": 955,
         "schema_snapshot_create_table_count": 894,
         "schema_snapshot_physical_table_count": 890,
         "schema_snapshot_logical_table_count": 869,
@@ -35,9 +35,9 @@
             "labor_txn_2026_h2",
             "labor_txn_default"
         ],
-        "migration_range": "001–205",
-        "migration_count": 205,
-        "migrations_role": "executable_source_of_truth — sequential DDL applied in order 001–205",
+        "migration_range": "001–286",
+        "migration_count": 263,
+        "migrations_role": "executable_source_of_truth — sequential DDL applied in order 001–286",
         "snapshot_role": "generated_aggregate — built by build_schema_snapshot.php from migrations, for quick reference only",
         "snapshot_generator": "database/build_schema_snapshot.php",
         "reference_sql_artifacts": [
