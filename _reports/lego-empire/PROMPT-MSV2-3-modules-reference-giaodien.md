@@ -1,3 +1,5 @@
+> **SUPERSEDED 2026-06-02** by the reconciled vNext prompts (PROMPT-VNEXT-P1/P2/P3) after merging GPT Pro feedback. See MODULE-STUDIO-VNEXT-RECONCILIATION-2026-06-02.md. Kept for history.
+
 # PROMPT — Module Studio v2 · Session 3 of 3 (Modules lifecycle · Tham chiếu rebuild · Giao diện audit)
 
 You are ONE of three AI sessions upgrading HESEM "Module Studio" in parallel. You own
