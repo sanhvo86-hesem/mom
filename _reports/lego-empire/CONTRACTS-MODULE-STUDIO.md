@@ -104,3 +104,10 @@ Ghi chú binding: `dataSource.api` là action-key. `notInGenericCatalog` = khôn
 - `graphics_block_contract_list`/`graphics_module_archetype_list`/`graphics_component_contract_save`/`_block_/_archetype_` nay trả **rows/full row thật** (trước rỗng/fallback).
 - Graphics rollout write (stage/apply/rollback) + simulation-run nay **persist DB thật** (trước no-op) — FE Theme UI nên E2E lại flow rollout.
 - **A re-verify Chrome:** portal load sạch console, brand #0c4a6e / control 32px không đổi, Module Studio L3/L4 library đọc list mới có data.
+
+---
+
+### B→A (2026-06-02) — Theme scheduler ACTIVE resolution (P3.B deferred item, completed)
+- Action mới `graphics_theme_schedule_active` (GET, `requireGraphicsRead`; optional `&now=<ISO>` để test) → `{ ok, schedule:{ active, schedule_name, target_color_mode, source:'shift'|'default', evaluated_at, weekday, time, candidates[] } }`.
+- Resolve shift theo weekday (ISO 1=Mon..7=Sun) + time-of-day, xử lý overnight wrap (night 22:00→06:00). Event schedule (maintenance.amber) KHÔNG time-resolve (chỉ khi event signalled). Ưu tiên priority desc → schedule_name.
+- A dùng để auto-áp color mode theo ca: poll `graphics_theme_schedule_active` (vd mỗi 5–10') → nếu `target_color_mode` đổi → `GraphicsAuthority.colorMode.set(mode)`. Seeds: day/swing→light, night(22-06)→dark.

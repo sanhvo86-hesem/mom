@@ -54,6 +54,7 @@ return static function (Router $router, string $dataDir): void {
         'graphics_preview_scenes_list'         => [GraphicsGovernanceController::class, 'previewScenesList'],
         'graphics_component_contract_list'     => [GraphicsGovernanceController::class, 'componentContractRegistry'],
         'graphics_theme_schedule_list'         => [GraphicsGovernanceController::class, 'themeScheduleList'],
+        'graphics_theme_schedule_active'       => [GraphicsGovernanceController::class, 'themeScheduleActive'],
         'graphics_simulation_run_record'       => [GraphicsGovernanceController::class, 'simulationRunRecord'],
         'graphics_qa_gate_run'                 => [GraphicsGovernanceController::class, 'qaGateRun'],
 

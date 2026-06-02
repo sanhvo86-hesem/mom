@@ -504,6 +504,81 @@ final class DesignTokenCatalogService
         return [];
     }
 
+    /**
+     * Resolve the theme schedule that is ACTIVE right now (shift-based day/night
+     * enforcement). Walks the 'shift' schedules, matches the current weekday +
+     * time-of-day (handling overnight windows that wrap midnight, e.g. night
+     * 22:00→06:00), and returns the highest-priority match's target color mode.
+     * Event-triggered schedules (maintenance.amber) are NOT time-resolved here —
+     * they activate only when their event is signalled.
+     *
+     * @param string|null $nowIso optional ISO-8601 instant for testing; defaults to server now.
+     * @return array<string, mixed>
+     */
+    public function resolveActiveSchedule(?string $nowIso = null): array
+    {
+        try {
+            $now = $nowIso !== null && $nowIso !== ''
+                ? new \DateTimeImmutable($nowIso)
+                : new \DateTimeImmutable('now');
+        } catch (Throwable $e) {
+            $now = new \DateTimeImmutable('now');
+        }
+        $weekday = (int)$now->format('N');   // 1=Mon … 7=Sun (ISO; matches daysOfWeek seeds)
+        $hhmm = $now->format('H:i');
+
+        $candidates = [];
+        $winner = null;
+        foreach ($this->listThemeSchedules() as $sched) {
+            if (($sched['trigger_type'] ?? '') !== 'shift') {
+                continue;
+            }
+            if (array_key_exists('is_active', $sched) && $sched['is_active'] === false) {
+                continue;
+            }
+            $cfg = is_array($sched['trigger_config'] ?? null) ? $sched['trigger_config'] : [];
+            $start = (string)($cfg['startTime'] ?? '');
+            $end = (string)($cfg['endTime'] ?? '');
+            $days = is_array($cfg['daysOfWeek'] ?? null) ? array_map('intval', $cfg['daysOfWeek']) : [];
+            if ($start === '' || $end === '' || $days === []) {
+                continue;
+            }
+            if (!in_array($weekday, $days, true)) {
+                continue;
+            }
+            // Overnight window (end <= start) wraps past midnight.
+            $inWindow = ($start < $end)
+                ? ($hhmm >= $start && $hhmm < $end)
+                : ($hhmm >= $start || $hhmm < $end);
+            if (!$inWindow) {
+                continue;
+            }
+            $match = [
+                'schedule_name'    => (string)($sched['schedule_name'] ?? ''),
+                'target_color_mode'=> $this->normalizeColorMode((string)($sched['target_color_mode'] ?? 'light')),
+                'priority'         => (int)($sched['priority'] ?? 0),
+                'window'           => $start . '–' . $end,
+            ];
+            $candidates[] = $match;
+            if ($winner === null
+                || $match['priority'] > $winner['priority']
+                || ($match['priority'] === $winner['priority'] && $match['schedule_name'] < $winner['schedule_name'])) {
+                $winner = $match;
+            }
+        }
+
+        return [
+            'active'            => $winner !== null,
+            'schedule_name'     => $winner['schedule_name'] ?? null,
+            'target_color_mode' => $winner['target_color_mode'] ?? 'light',
+            'source'            => $winner !== null ? 'shift' : 'default',
+            'evaluated_at'      => $now->format(\DateTimeInterface::ATOM),
+            'weekday'           => $weekday,
+            'time'              => $hhmm,
+            'candidates'        => $candidates,
+        ];
+    }
+
     // ── Theme presets (graphics_theme_preset, migration 263) ─────────────────
     // A theme preset = brand seed + the master knobs density(gap)/radius_outer
     // (cấp1)/radius_inner(cấp2-3)/control_h/frame + a free-form token overrides
