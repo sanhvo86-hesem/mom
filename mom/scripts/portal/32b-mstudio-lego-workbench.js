@@ -31,7 +31,8 @@
   var ok  = 'var(--o3-success,#15803d)', oks = 'var(--o3-success-soft,#dcfce7)';
   var wn  = 'var(--o3-warning,#b45309)', wns = 'var(--o3-warning-soft,#fef3c7)';
   var dg  = 'var(--o3-danger,#b91c1c)',  dgs = 'var(--o3-danger-soft,#fee2e2)';
-  var info= 'var(--o3-info,#0369a1)',    infos = 'var(--o3-info-soft,#e0f2fe)';
+  var info= 'var(--o3-info,#0369a1)';
+  var ti  = 'var(--o3-text-inverse,#fff)';
 
   /* ── surface state ───────────────────────────────────────────────────── */
   var ls = {
@@ -123,7 +124,8 @@
       '.' + R + '__in{height:' + ch + ';width:100%;box-sizing:border-box;border:1px solid ' + bdef + ';border-radius:' + rd + ';padding:0 ' + sc + ';font:inherit;font-size:12px;background:' + sf + ';color:' + ts + ';appearance:none}',
       '.' + R + '__in:focus{outline:2px solid ' + br + ';outline-offset:-1px}',
       '.' + R + '__sec{padding:' + sp + ' ' + sc + ' 0;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:' + tm + '}',
-      '.' + R + '__item{display:flex;align-items:flex-start;gap:' + sp + ';cursor:pointer;padding:' + sp + ' ' + sc + ';font-size:12px;color:' + ts + '}',
+      /* A11Y-010: button reset so items are keyboard-navigable */
+      '.' + R + '__item{display:flex;align-items:flex-start;gap:' + sp + ';cursor:pointer;padding:' + sp + ' ' + sc + ';font-size:12px;color:' + ts + ';background:none;border:none;text-align:left;width:100%;font-family:inherit;font-size:inherit}',
       '.' + R + '__item:hover{background:' + brs + '}',
       '.' + R + '__item.on{background:' + brs + ';box-shadow:inset 3px 0 0 ' + br + '}',
       '.' + R + '__item .ic{font-size:16px;margin-top:1px;flex-shrink:0}',
@@ -139,7 +141,7 @@
       '.' + R + '__textarea{width:100%;box-sizing:border-box;border:1px solid ' + bdef + ';border-radius:' + rd + ';padding:' + sp + ' ' + sc + ';font:inherit;font-size:11px;font-family:var(--o3-font-mono,monospace);background:' + sf + ';color:' + ts + ';min-height:80px;resize:vertical}',
       '.' + R + '__btn{height:' + ch + ';padding:0 ' + sc + ';border:1px solid ' + bdef + ';background:' + sf + ';cursor:pointer;border-radius:' + rd + ';font:inherit;font-size:12px;color:' + ts + '}',
       '.' + R + '__btn:hover{background:' + sfm + '}',
-      '.' + R + '__btn--pri{background:' + br + ';border-color:' + br + ';color:#fff;font-weight:600}',
+      '.' + R + '__btn--pri{background:' + br + ';border-color:' + br + ';color:' + ti + ';font-weight:600}',
       '.' + R + '__btn--pri:hover{filter:brightness(.94)}',
       '.' + R + '__chip{display:inline-flex;align-items:center;height:20px;padding:0 ' + sp + ';margin:0 ' + sp + ' 2px 0;border:1px solid ' + bsub + ';border-radius:' + pill + ';font-size:10px;background:' + sfm + ';color:' + ts + '}',
       '.' + R + '__badge{display:inline-flex;align-items:center;height:16px;padding:0 ' + sp + ';border-radius:' + pill + ';font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}',
@@ -168,16 +170,17 @@
   }
 
   /* ── library ──────────────────────────────────────────────────────────── */
+  /* A11Y-010: use <button> so items are keyboard-reachable (WCAG 2.1.1 Keyboard) */
   function tokenItem(tk, sub) {
     var on = ls.sel && ls.sel.key === tk ? ' on' : '';
-    return '<div class="' + R + '__item' + on + '" data-lw="sel" data-kind="token" data-key="' + esc(tk) + '">' +
-      '<span class="ic">◈</span><span class="nm">' + esc(tk) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</span></div>';
+    return '<button type="button" class="' + R + '__item' + on + '" data-lw="sel" data-kind="token" data-key="' + esc(tk) + '">' +
+      '<span class="ic" aria-hidden="true">◈</span><span class="nm">' + esc(tk) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</span></button>';
   }
   function blockItem(kind, key, label, sub, icon, bdg) {
     var on = ls.sel && ls.sel.kind === kind && ls.sel.key === key ? ' on' : '';
-    return '<div class="' + R + '__item' + on + '" data-lw="sel" data-kind="' + esc(kind) + '" data-key="' + esc(key) + '">' +
-      '<span class="ic">' + (icon || '▫') + '</span>' +
-      '<span class="nm">' + esc(label) + '<small>' + esc(sub) + '</small></span>' + (bdg || '') + '</div>';
+    return '<button type="button" class="' + R + '__item' + on + '" data-lw="sel" data-kind="' + esc(kind) + '" data-key="' + esc(key) + '">' +
+      '<span class="ic" aria-hidden="true">' + (icon || '▫') + '</span>' +
+      '<span class="nm">' + esc(label) + '<small>' + esc(sub) + '</small></span>' + (bdg || '') + '</button>';
   }
 
   function renderLibrary() {
@@ -452,19 +455,20 @@
       '</div></div>';
   }
 
+  /* A11Y-004: wrap control inside label for implicit for/id association (WCAG 1.3.1) */
   function field(label, name, value, type) {
-    return '<div class="' + R + '__f"><label>' + esc(label) + '</label>' +
-      '<input class="' + R + '__in" data-lw-ef="' + esc(name) + '" type="' + (type||'text') + '" value="' + esc(value||'') + '"></div>';
+    return '<div class="' + R + '__f"><label>' + esc(label) +
+      '<input class="' + R + '__in" data-lw-ef="' + esc(name) + '" type="' + (type||'text') + '" value="' + esc(value||'') + '"></label></div>';
   }
   function selectField(label, name, value, opts) {
-    return '<div class="' + R + '__f"><label>' + esc(label) + '</label>' +
+    return '<div class="' + R + '__f"><label>' + esc(label) +
       '<select class="' + R + '__in" data-lw-ef="' + esc(name) + '">' +
       opts.map(function(o){ return '<option value="' + esc(o) + '"' + (value===o?' selected':'') + '>' + esc(o) + '</option>'; }).join('') +
-      '</select></div>';
+      '</select></label></div>';
   }
   function textareaField(label, name, value) {
-    return '<div class="' + R + '__f"><label>' + esc(label) + '</label>' +
-      '<textarea class="' + R + '__textarea" data-lw-ef="' + esc(name) + '">' + esc(value||'') + '</textarea></div>';
+    return '<div class="' + R + '__f"><label>' + esc(label) +
+      '<textarea class="' + R + '__textarea" data-lw-ef="' + esc(name) + '">' + esc(value||'') + '</textarea></label></div>';
   }
 
   /* ── Validate ─────────────────────────────────────────────────────────── */
@@ -476,7 +480,8 @@
       (ls.validateRunning ? ' disabled' : '') + '>' + (ls.validateRunning ? '⏳ Đang chạy…' : '▶ Chạy Validate') + '</button>' +
       '<span style="font-size:11px;color:' + tm + '">Ghi evidence → graphics_qa_gate_run + graphics_simulation_run_record</span></div>';
     if (results) {
-      h += '<table class="' + R + '__vtbl"><thead><tr><th>Gate</th><th>Status</th><th>Chi tiết</th></tr></thead><tbody>' +
+      /* A11Y-005: scope="col" for screen reader column association */
+      h += '<table class="' + R + '__vtbl"><thead><tr><th scope="col">Gate</th><th scope="col">Status</th><th scope="col">Chi tiết</th></tr></thead><tbody>' +
         results.map(function(row) {
           var cls = row.status === 'PASS' ? 'vpass' : row.status === 'WARN' ? 'vwarn' : row.status === 'FAIL_BLOCK' ? 'vfail' : row.status === 'BACKEND_GAP' ? 'vgap' : 'vnr';
           return '<tr><td>' + esc(row.label) + '</td><td><span class="' + R + '__' + cls + '">' + esc(row.status) + '</span></td><td style="font-size:11px">' + esc(row.detail||'—') + '</td></tr>';
@@ -529,15 +534,25 @@
 
     bPromise.then(function() {
       return post('graphics_simulation_run_record', { target_key:s.key, target_kind:s.kind, gate_results:results, run_at:new Date().toISOString() }).catch(function(){});
-    }).then(function() { ls.validateRunning=false; ls.validateResults=results; repaintMain(); });
+    }).then(function() {
+      ls.validateRunning = false; ls.validateResults = results; repaintMain();
+    }).catch(function(e) {
+      /* PERF-003: always unlock the validate button, even if the chain throws */
+      ls.validateRunning = false; ls.validateResults = results; repaintMain();
+    });
   }
 
   /* ── rail ─────────────────────────────────────────────────────────────── */
   function renderRail() {
-    return '<div class="' + R + '__rail">' +
+    return '<div class="' + R + '__rail" role="tablist" aria-label="Lego levels" aria-orientation="vertical">' +
       LEVELS.map(function(lv) {
-        return '<button class="' + R + '__railBtn' + (ls.level===lv.key?' on':'') + '" data-lw="level" data-level="' + lv.key + '" title="' + esc(lv.label+' — '+lv.desc) + '">' +
-          '<span class="ic">' + lv.icon + '</span>' + esc(lv.key.toUpperCase()) + '</button>';
+        /* A11Y-001/003: explicit aria-label, aria-hidden icon, aria-pressed state */
+        return '<button type="button" class="' + R + '__railBtn' + (ls.level===lv.key?' on':'') + '"' +
+          ' data-lw="level" data-level="' + lv.key + '"' +
+          ' aria-label="' + esc(lv.label) + '"' +
+          ' aria-pressed="' + (ls.level===lv.key ? 'true' : 'false') + '"' +
+          ' title="' + esc(lv.label+' — '+lv.desc) + '">' +
+          '<span class="ic" aria-hidden="true">' + lv.icon + '</span>' + esc(lv.key.toUpperCase()) + '</button>';
       }).join('') + '</div>';
   }
 
@@ -546,7 +561,8 @@
     var lv = LEVELS.filter(function(l){return l.key===ls.level;})[0]||{};
     return '<div class="' + R + '__modebar">' +
       '<span style="font-size:11px;font-weight:700;color:' + tm + ';text-transform:uppercase;letter-spacing:.5px;margin-right:' + sp + '">Mode</span>' +
-      modes.map(function(m){ return '<button class="' + R + '__modeBtn' + (ls.mode===m.key?' on':'') + '" data-lw="mode" data-mode="' + m.key + '">' + m.label + '</button>'; }).join('') +
+      /* A11Y-002: aria-pressed conveys active state to screen readers */
+      modes.map(function(m){ return '<button type="button" class="' + R + '__modeBtn' + (ls.mode===m.key?' on':'') + '" data-lw="mode" data-mode="' + m.key + '" aria-pressed="' + (ls.mode===m.key ? 'true' : 'false') + '">' + m.label + '</button>'; }).join('') +
       '<span style="margin-left:auto;font-size:11px;color:' + tm + '">' + (lv.icon||'') + ' ' + esc(lv.label||'') + '</span>' +
       '</div>';
   }
@@ -678,14 +694,35 @@
       var lib = host && host.querySelector('[data-lw-zone="lib"]');
       if (lib) { lib.innerHTML = renderLibrary(); }
       repaintMain();
-      host && host.querySelectorAll('.' + R + '__railBtn').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-level')===ls.level); });
+      /* A11Y-003: keep aria-pressed in sync */
+      host && host.querySelectorAll('.' + R + '__railBtn').forEach(function(b){
+        var on = b.getAttribute('data-level')===ls.level;
+        b.classList.toggle('on', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
       return true;
     }
     if (k === 'mode') {
       ls.mode = target.getAttribute('data-mode') || 'browse';
       ls.validateResults = null;
-      host && host.querySelectorAll('.' + R + '__modeBtn').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-mode')===ls.mode); });
+      /* A11Y-002: keep aria-pressed in sync */
+      host && host.querySelectorAll('.' + R + '__modeBtn').forEach(function(b){
+        var on = b.getAttribute('data-mode')===ls.mode;
+        b.classList.toggle('on', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
       repaintMain();
+      return true;
+    }
+    /* BUG-2: intercept shell 'simulate' action — redirect to Validate mode per DEC-002 */
+    if (k === 'simulate') {
+      ls.mode = 'validate';
+      repaintMain();
+      host && host.querySelectorAll('.' + R + '__modeBtn').forEach(function(b){
+        var on = b.getAttribute('data-mode') === 'validate';
+        b.classList.toggle('on', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
       return true;
     }
     if (k === 'sel') {
