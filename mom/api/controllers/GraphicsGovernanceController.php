@@ -517,6 +517,18 @@ class GraphicsGovernanceController extends BaseController
         ]);
     }
 
+    public function themeScheduleActive(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $nowIso = $this->queryParam('now');
+        $this->respond(fn(): array => [
+            'ok' => true,
+            'schedule' => $this->tokenCatalog()->resolveActiveSchedule($nowIso !== null ? (string)$nowIso : null),
+            '_meta' => ['authority' => 'graphics_theme_schedule'],
+        ]);
+    }
+
     public function themePresetList(): never
     {
         $user = $this->requireAuth();
