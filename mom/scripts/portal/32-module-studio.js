@@ -30,6 +30,41 @@
   };
   var hostEl = null;
 
+  /* ── Surface registry (v2 parallelization) ───────────────────────────────
+     External files (32a/32b/32c-mstudio-*.js) register or REPLACE a surface from
+     their own file via window.MStudio.registerSurface(key, def) — so parallel
+     sessions never edit this shell or each other's files. A registered surface:
+       { label, icon, render():string, onMount(host), onAction(key,target,ev):bool,
+         order:number }
+     onAction returns true when it fully handled the click (shell then stops). The
+     built-in surfaces below remain as fallback until each is migrated out. */
+  window.MStudio = window.MStudio || {};
+  var SURFACE_META = {
+    lego: { label: '🧱 Lego', order: 10 }, tokens: { label: '🎛️ Tokens', order: 20 },
+    modules: { label: '📦 Modules', order: 30 }, theme: { label: '🎨 Theme', order: 40 },
+    reference: { label: '📖 Tham chiếu', order: 50 }
+  };
+  window.MStudio._ext = window.MStudio._ext || {};
+  window.MStudio.registerSurface = function (key, def) {
+    if (!key) { return; }
+    window.MStudio._ext[key] = def || {};
+    if (hostEl) { paint(); }
+  };
+  function extSurface(key) { return window.MStudio._ext[key]; }
+  function surfaceList() {
+    var keys = {}; Object.keys(SURFACE_META).forEach(function (k) { keys[k] = true; });
+    Object.keys(window.MStudio._ext).forEach(function (k) { keys[k] = true; });
+    return Object.keys(keys).sort(function (a, b) {
+      var oa = (extSurface(a) && extSurface(a).order != null) ? extSurface(a).order : (SURFACE_META[a] ? SURFACE_META[a].order : 999);
+      var ob = (extSurface(b) && extSurface(b).order != null) ? extSurface(b).order : (SURFACE_META[b] ? SURFACE_META[b].order : 999);
+      return oa - ob;
+    }).filter(function (k) { var e = extSurface(k); return !(e && e.hidden); });
+  }
+  function surfaceLabel(key) {
+    var e = extSurface(key); if (e && e.label) { return e.label; }
+    return SURFACE_META[key] ? SURFACE_META[key].label : key;
+  }
+
   /* L3 curated block_key → representative engine type(s) to borrow demo content
      from, so the canvas paints a populated preview (L3 and its engine equivalent
      are visually identical — L3 is the curated wrapper). */
@@ -350,7 +385,7 @@
       : '';
     return '<div class="' + ROOT + '__bar">' +
         '<span class="' + ROOT + '__title">🧩 Module Studio</span>' +
-        '<div class="' + ROOT + '__surfaces">' + st('lego', '🧱 Lego') + st('tokens', '🎛️ Tokens') + st('modules', '📦 Modules') + st('theme', '🎨 Theme') + st('reference', '📖 Tham chiếu') + '</div>' +
+        '<div class="' + ROOT + '__surfaces">' + surfaceList().map(function (k) { return st(k, surfaceLabel(k)); }).join('') + '</div>' +
         modes +
         '<div class="' + ROOT + '__act"><button class="' + ROOT + '__btn" data-ms="simulate">Mô phỏng</button></div>' +
       '</div>';
@@ -379,6 +414,12 @@
     return '<div class="' + ROOT + '__pad" id="adm-appearance-panel-reference">' + (body || '<div class="' + ROOT + '__hint">Reference renderers chưa nạp.</div>') + '</div>';
   }
   function bodyHtml() {
+    var ext = extSurface(state.surface);
+    if (ext && typeof ext.render === 'function') {
+      var single = (ext.layout === 'grid') ? '' : (' ' + ROOT + '__body--single');
+      var html = ''; try { html = ext.render() || ''; } catch (e) { html = '<div class="' + ROOT + '__pad ' + ROOT + '__hint">Lỗi render surface.</div>'; }
+      return '<div class="' + ROOT + '__body' + single + '" data-ms="surfacebody">' + html + '</div>';
+    }
     if (state.surface === 'modules') { return '<div class="' + ROOT + '__body ' + ROOT + '__body--single" data-ms="surfacebody">' + renderModules() + '</div>'; }
     if (state.surface === 'theme') { return '<div class="' + ROOT + '__body ' + ROOT + '__body--single" data-ms="surfacebody">' + renderTheme() + '</div>'; }
     if (state.surface === 'tokens') { return '<div class="' + ROOT + '__body ' + ROOT + '__body--single" data-ms="surfacebody">' + renderTokens() + '</div>'; }
@@ -386,6 +427,8 @@
     return '<div class="' + ROOT + '__body" data-ms="surfacebody">' + renderLego() + '</div>';
   }
   function afterPaint() {
+    var ext = extSurface(state.surface);
+    if (ext && typeof ext.onMount === 'function') { setTimeout(function () { try { ext.onMount(hostEl); } catch (e) { /* noop */ } }, 0); }
     // Wire the absorbed Appearance renderers after their HTML is in the DOM.
     if (state.surface === 'theme') {
       setTimeout(function () { try { if (typeof window._wireAdmTheme === 'function') { window._wireAdmTheme(); } } catch (e) { /* noop */ } }, 0);
@@ -654,8 +697,11 @@
       var t = (ev.target && ev.target.closest) ? ev.target.closest('[data-ms]') : null;
       if (!t || !el.contains(t)) { return; }
       var k = t.getAttribute('data-ms');
-      if (k === 'surface') { state.surface = t.getAttribute('data-surface'); paint(); if (state.surface === 'modules') { loadModules(false); } if (state.surface === 'theme') { loadPresets(); } }
-      else if (k === 'mode') { state.mode = t.getAttribute('data-mode') || 'assemble'; paintBody(); }
+      if (k === 'surface') { state.surface = t.getAttribute('data-surface'); paint(); if (state.surface === 'modules') { loadModules(false); } if (state.surface === 'theme') { loadPresets(); } return; }
+      // give a registered (external) surface first chance to handle its own actions
+      var _ext = extSurface(state.surface);
+      if (_ext && typeof _ext.onAction === 'function') { var handled = false; try { handled = _ext.onAction(k, t, ev); } catch (e) { /* noop */ } if (handled) { return; } }
+      if (k === 'mode') { state.mode = t.getAttribute('data-mode') || 'assemble'; paintBody(); }
       else if (k === 'sel') { state.sel = { kind: t.getAttribute('data-kind'), key: t.getAttribute('data-key'), data: lookup(t.getAttribute('data-kind'), t.getAttribute('data-key')) }; paintBody(); }
       else if (k === 'simulate') { doSimulate(); }
       else if (k === 'save-block') { doSaveBlock(); }
@@ -688,5 +734,13 @@
     return el;
   }
 
-  window.ModuleStudio = { render: render, setMode: function (m) { state.mode = (m === 'author') ? 'author' : 'assemble'; }, _state: state, version: '0.6.0-consolidate-BCD' };
+  window.ModuleStudio = { render: render, setMode: function (m) { state.mode = (m === 'author') ? 'author' : 'assemble'; }, _state: state, version: '0.7.0-surface-registry' };
+  /* Shell API for registered (external) surfaces — so 32a/32b/32c can reuse the
+     shell's data + repaint without importing closure internals. */
+  window.MStudio.api = {
+    getJson: getJson, post: post, toast: toast, esc: esc,
+    state: state, host: function () { return hostEl; },
+    repaint: function () { if (hostEl) { paint(); } },
+    repaintBody: function () { if (hostEl) { paintBody(); } }
+  };
 })();
