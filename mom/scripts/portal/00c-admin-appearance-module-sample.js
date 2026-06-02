@@ -1001,8 +1001,24 @@
       tokens:['control.height.standard','space.master','space.section','radius.card','brand.primary','brand.primarySoft','colorsLight.bgSurface'] };
   }
 
+  /* Level taxonomy per DTCG three-tier model (Foundation §1/§3). Consumed by
+     32b-mstudio-lego-workbench.js to group sections by Lego level.
+     Exported as window._moduleMasterLevelSections after each sections() call. */
+  var SECTION_LEVELS = {
+    blocks:'L3', 'engine-catalog':'L2', 'shell-rail':'L2', archetypes:'L4',
+    buttons:'L2', form:'L2', tabs:'L2', kpi:'L2', sparkline:'L2', progress:'L2',
+    chips:'L2', status:'L2', avatar:'L2', toolbar:'L2', table:'L2', tree:'L2',
+    kanban:'L3', timeline:'L2', stepper:'L2', pagination:'L2', filter:'L2',
+    panel:'L2', modal:'L2', dropdown:'L2', tooltip:'L2', skeleton:'L2',
+    'empty-toast':'L2', 'record-header':'L2', datagrid:'L2', breadcrumb:'L2',
+    banner:'L2', segmented:'L2', accordion:'L2', 'desc-list':'L2', slider:'L2',
+    'tag-input':'L2', 'file-upload':'L2', microchart:'L2', 'list-actions':'L2',
+    esignature:'L2', 'audit-trail':'L2', 'workflow-pill':'L2',
+    'global-tokens':'L0b', typography:'L0b', effects:'L0a', density:'L0b'
+  };
+
   function sections(L){
-    return [
+    var raw = [
       blocksSection(L),
       engineCatalogSection(L),
       shellRailSection(L),
@@ -1055,6 +1071,12 @@
       auditTrailSection(L),
       workflowPillSection(L)
     ];
+    var enriched = raw.map(function(s){ return s ? Object.assign({}, s, { level: SECTION_LEVELS[s.id] || 'L2' }) : s; });
+    if (!window._moduleMasterLevelSections) { window._moduleMasterLevelSections = {}; }
+    ['L0a','L0b','L2','L3','L4'].forEach(function(lv){
+      window._moduleMasterLevelSections[lv.toLowerCase()] = enriched.filter(function(s){ return s && s.level === lv; });
+    });
+    return enriched;
   }
 
   // Internal state — which inner tab is active inside the Module Sample tab.

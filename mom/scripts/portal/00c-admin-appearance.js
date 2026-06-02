@@ -4023,6 +4023,11 @@ function render(el, subTab, currentLang){
 window._renderAdmAccessibility = function(){ try { return renderAccessibility(); } catch(e){ return ''; } };
 window._renderAdmAnalytics     = function(){ try { return renderAnalytics(); } catch(e){ return ''; } };
 window._renderAdmStandard      = function(){ try { return renderStandard(); } catch(e){ return ''; } };
+/* vNext P3: expose governance/templates/advanced for Module Studio 32c to reuse.
+   renderAdvanced de-duped: rollout buttons (Publish/Stage/Rollback) removed — templates owns rollout. */
+window._renderAdmGovernance    = function(){ try { return renderGovernance(); } catch(e){ return ''; } };
+window._renderAdmTemplates     = function(){ try { return renderTemplates(); } catch(e){ return ''; } };
+window._renderAdmAdvanced      = function(){ try { return renderAdvanced(); } catch(e){ return ''; } };
 
 /* ── Dirty-state helpers ─────────────────────────────────────────────────── */
 window._admAppearanceClearDirty = function(){
@@ -5144,9 +5149,9 @@ function renderGovernance(){
 /* ── SUB-TAB 8: ADVANCED ────────────────────────────────────────────────── */
 /* ══════════════════════════════════════════════════════════════════════════ */
 function renderAdvanced(){
-  var selected = _selectedTemplate ? getTemplateById(_selectedTemplate) : null;
-  var h = renderRolloutControls(selected);
-  h += renderChangeSetPanel();
+  /* vNext P3 de-dup: rollout controls (Publish/Stage/Rollback) owned by Templates tab.
+     Advanced owns changeset / release / waiver / import-export only. */
+  var h = renderChangeSetPanel();
   h += renderReleaseDashboardPanel();
   h += renderReleaseLinkagePanel();
   h += renderPolicyPacksPanel();
