@@ -583,8 +583,12 @@
   function loadPresets() {
     _ps.list = null; repaintBody();
     getJson('graphics_theme_preset_list').then(function (j) {
-      _ps.list = (j && (j.presets || j.data)) || []; repaintBody();
-    }).catch(function () { _ps.list = []; repaintBody(); });
+      if (!j || j.ok === false) {
+        /* unauthorized or error — reset to null so onMount retries on next visit */
+        _ps.list = null; repaintBody(); return;
+      }
+      _ps.list = (j.presets || j.data) || []; repaintBody();
+    }).catch(function () { _ps.list = null; repaintBody(); });
   }
   function doApply(key) {
     var p = (_ps.list || []).filter(function (x) { return x.preset_key === key; })[0];
