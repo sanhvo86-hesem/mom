@@ -551,17 +551,19 @@
         var vi = (titleF || {}).value || '';
         if (!vi.trim()) { if (titleF) { titleF.style.borderColor = 'var(--o3-danger,#b91c1c)'; titleF.focus(); } return; }
         var route = (routeF || {}).value || '/' + vi.trim().toLowerCase().replace(/\s+/g, '-');
-        var id = 'custom-' + route.replace(/^\//, '').replace(/[^\w\-]/g, '') || 'custom-' + Date.now().toString(36);
+        var slug = route.replace(/^\//, '').replace(/[^\w\-]/g, '');
+        var id = 'custom-' + (slug || Date.now().toString(36));
+        function fv(name, def) { var el = back.querySelector('[data-ef="' + name + '"]'); return el ? el.value : (def || ''); }
         var schema = {
           moduleId: id,
-          title: { vi: vi, en: back.querySelector('[data-ef="cm-title-en"]').value || '' },
-          subtitle: { vi: back.querySelector('[data-ef="cm-subtitle-vi"]').value || '', en: '' },
-          icon: back.querySelector('[data-ef="cm-icon"]').value || '📦',
+          title: { vi: vi, en: fv('cm-title-en') },
+          subtitle: { vi: fv('cm-subtitle-vi'), en: '' },
+          icon: fv('cm-icon', '📦') || '📦',
           route: route,
-          roles: (back.querySelector('[data-ef="cm-roles"]').value || 'it_admin').split(',').map(function (x) { return x.trim(); }).filter(Boolean),
-          moduleArchetype: back.querySelector('[data-ef="cm-archetype"]').value || 'workspace-projection',
-          config: { theme: back.querySelector('[data-ef="cm-theme"]').value || 'hesem-default' },
-          domain: back.querySelector('[data-ef="cm-domain"]').value || '',
+          roles: fv('cm-roles', 'it_admin').split(',').map(function (x) { return x.trim(); }).filter(Boolean),
+          moduleArchetype: fv('cm-archetype', 'workspace-projection') || 'workspace-projection',
+          config: { theme: fv('cm-theme', 'hesem-default') || 'hesem-default' },
+          domain: fv('cm-domain'),
           version: 1, tabs: []
         };
         okBtn.disabled = true; okBtn.textContent = 'Đang tạo…';
@@ -592,7 +594,7 @@
     });
   }
   function doRestoreVersion(id, ver) {
-    post('module_schema_restore_version', { moduleId: id, version: parseInt(ver, 10) }).then(function (r) { toast(r && r.ok !== false ? 'Đã rollback về v' + ver : 'Rollback thất bại.', r && r.ok !== false ? 'success' : 'error'); loadModules(false); }).catch(function (e) { toast('Rollback lỗi: ' + e, 'error'); });
+    post('module_schema_restore_version', { moduleId: id, version: parseInt(ver, 10) }).then(function (r) { toast(r && r.ok !== false ? 'Đã rollback về v' + ver : 'Rollback thất bại.', r && r.ok !== false ? 'success' : 'error'); loadModules(state.includeDeleted); }).catch(function (e) { toast('Rollback lỗi: ' + e, 'error'); });
   }
   /* Phase A SSOT unification: applying a preset must PERSIST org-wide through the
      SAME authority the Appearance Theme tab uses (o3-theme + per-property overrides
@@ -771,6 +773,9 @@
     loadDemo();
     if (state.surface === 'modules' && state.modules == null) { loadModules(state.includeDeleted); }
     if ((state.surface === 'presets' || state.surface === 'theme') && state.presets == null) { loadPresets(); }
+    // Pre-load presets in background so the create-module modal dropdown is populated
+    // even when the user hasn't visited the Presets surface yet.
+    if (state.presets == null) { getJson('graphics_theme_preset_list').then(function (j) { if (state.presets == null) { state.presets = (j && (j.presets || j.data)) || []; } }); }
 
     // Listeners are delegated on `el` and read module-level state; attach exactly once
     // per host node. 02-state-auth-ui re-invokes render() on every nav return, which
@@ -845,9 +850,8 @@
     },
     openModuleContent: function (id) {
       // P3 (32c-mstudio-modules.js) overrides this when it registers its surface.
-      // Placeholder: switch to modules surface and show a toast.
-      state.surface = 'modules'; if (hostEl) { paint(); }
-      loadModules(state.includeDeleted);
+      // Placeholder: ensure modules surface is visible, avoid redundant reload.
+      if (state.surface !== 'modules') { state.surface = 'modules'; if (hostEl) { paint(); } loadModules(state.includeDeleted); }
       toast('Mở nội dung module ' + id + ' — Lego Assemble (P3) chưa nạp.', 'info');
     },
     openModuleMetadata: function (id) { doEditModule(id); },
