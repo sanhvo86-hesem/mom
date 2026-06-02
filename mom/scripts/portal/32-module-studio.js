@@ -392,7 +392,12 @@
   /* ── shell + render ──────────────────────────────────────────────────── */
   function bar() {
     var st = function (k, lbl) { return '<button class="' + ROOT + '__surf-tab' + (state.surface === k ? ' is-on' : '') + '" data-ms="surface" data-surface="' + k + '">' + lbl + '</button>'; };
-    var modes = state.surface === 'lego'
+    // Integration fix 2026-06-02: only the BUILT-IN lego fallback uses the bar-level
+    // mode strip. When an external surface is registered (vNext: P3's Lego owns its own
+    // Browse/Assemble/Author/Validate modes inside its body), the shell must NOT render a
+    // second, stale mode strip. The global "Mô phỏng" button is retired entirely —
+    // validation now lives inside Lego's Validate mode (see VNEXT reconciliation §4).
+    var modes = (state.surface === 'lego' && !extSurface('lego'))
       ? '<div class="' + ROOT + '__modes">' +
           '<button class="' + ROOT + '__mode' + (state.mode === 'assemble' ? ' is-on' : '') + '" data-ms="mode" data-mode="assemble">⬡ Assemble</button>' +
           '<button class="' + ROOT + '__mode' + (state.mode === 'author' ? ' is-on' : '') + '" data-ms="mode" data-mode="author">✎ Author</button></div>'
@@ -401,7 +406,6 @@
         '<span class="' + ROOT + '__title">🧩 Module Studio</span>' +
         '<div class="' + ROOT + '__surfaces">' + surfaceList().map(function (k) { return st(k, surfaceLabel(k)); }).join('') + '</div>' +
         modes +
-        '<div class="' + ROOT + '__act"><button class="' + ROOT + '__btn" data-ms="simulate">Mô phỏng</button></div>' +
       '</div>';
   }
   // L() helper for the embedded Appearance renderers (they take an L(vi,en) fn).
@@ -834,7 +838,7 @@
     return el;
   }
 
-  window.ModuleStudio = { render: render, setMode: function (m) { state.mode = (m === 'author') ? 'author' : 'assemble'; }, _state: state, version: '0.7.0-surface-registry' };
+  window.ModuleStudio = { render: render, setMode: function (m) { state.mode = (m === 'author') ? 'author' : 'assemble'; }, _state: state, version: '0.7.1-bar-cleanup' };
   /* Shell API for registered (external) surfaces — so 32a/32b/32c can reuse the
      shell's data + repaint without importing closure internals. */
   window.MStudio.api = {
