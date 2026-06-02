@@ -472,8 +472,11 @@
 <script charset="UTF-8" src="./scripts/portal/31-module-builder.js?v=20260531r16theme"></script>
   <!-- Module Studio shell (P2). Inert: exposes window.ModuleStudio.render(el); does not auto-mount. -->
   <script charset="UTF-8" src="./scripts/portal/32-module-studio.js?v=20260601p2"></script>
-  <!-- Module Studio v2 surface modules load here (registry-based). Each parallel session
-       appends its own <script> tag for the file it owns (32a/32b/32c), AFTER this shell. -->
+  <!-- Module Studio v2 surface modules (registry-based, loaded after shell). -->
+  <!-- P1 stubs — replaced by real implementations from each session (32a=P2/lego, 32b=P2/presets, 32c=P3/modules). -->
+  <script charset="UTF-8" src="./scripts/portal/32a-mstudio-lego.js?v=20260602p1s"></script>
+  <script charset="UTF-8" src="./scripts/portal/32b-mstudio-presets.js?v=20260602p1s"></script>
+  <script charset="UTF-8" src="./scripts/portal/32c-mstudio-modules.js?v=20260602p1s"></script>
   <script charset="UTF-8" src="./scripts/portal/32-schema-studio.js?v=20260414a"></script>
 <script charset="UTF-8" src="./scripts/portal/10-eqms-form-runtime.js?v=20260410d"></script>
 <script charset="UTF-8" src="./scripts/portal/09-online-forms.js?v=20260409b"></script>
