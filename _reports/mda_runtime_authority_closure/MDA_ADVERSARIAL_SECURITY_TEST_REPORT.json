@@ -1,0 +1,30 @@
+{
+    "gate": "mda_adversarial_security",
+    "status": "PASS",
+    "passed": 4,
+    "total": 4,
+    "results": {
+        "role_spoof_admin_no_permission": {
+            "status": "PASS",
+            "expected_problem": "command_permission_denied",
+            "actual_problem": "command_permission_denied"
+        },
+        "timestamp_only_reauth": {
+            "status": "PASS",
+            "expected_problem": "reauth_payload_timestamp_untrusted",
+            "actual_problem": "reauth_payload_timestamp_untrusted"
+        },
+        "payload_only_sod_exception": {
+            "status": "PASS",
+            "expected_problem": "sod_payload_exception_untrusted",
+            "actual_problem": "sod_payload_exception_untrusted"
+        },
+        "ai_actor_release_hold": {
+            "status": "PASS",
+            "expected_problem": "ai_governed_action_forbidden",
+            "actual_problem": "ai_governed_action_forbidden"
+        }
+    },
+    "audit_denial_events_written": 3,
+    "generated_at": "2026-06-02T01:56:20+00:00"
+}

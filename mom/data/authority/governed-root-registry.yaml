@@ -1,0 +1,371 @@
+version: 1
+registry: MDA governed root authority
+generated_from: mom/data/authority/workflow-status-authority.yaml
+decision_scope: pre-production runtime-closure candidate
+authority_rules:
+  transactional_authority: PostgreSQL
+  mutation_path: DomainCommandGateway
+  projection_rule: frontend_and_json_are_read_models_only
+  denial_problem_code: domain_command_required
+  denial_content_type: application/problem+json
+roots:
+  - root: item
+    domain: master_data
+    isa95_category: Material
+    owner: master_data
+    authority_storage: item,item_revision
+    projection_storage: master_data_store
+    mutation_path: DomainCommandGateway
+    read_path: PostgresMasterDataRepository
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,domain_command_evidence_link
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,reauth_for_release,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, active, released, blocked, superseded, obsolete]
+  - root: item_revision
+    domain: master_data
+    isa95_category: MaterialDefinition
+    owner: engineering
+    authority_storage: item_revision,item_revision_event
+    projection_storage: master_data_store
+    mutation_path: DomainCommandGateway
+    read_path: PostgresMasterDataRepository
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,signature_events,domain_command_evidence_link
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,reauth,signature,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, submitted, approved, released, superseded, obsolete]
+  - root: engineering_release_package
+    domain: planning_production
+    isa95_category: WorkDefinition
+    owner: engineering
+    authority_storage: engineering_release_package,engineering_release_package_member
+    projection_storage: release_package_snapshot
+    mutation_path: DomainCommandGateway
+    read_path: EngineeringReleasePackageCommandHandler
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,signature_events,domain_command_evidence_link
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,sod,reauth,signature,readiness,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, submitted, approved, released, superseded, withdrawn]
+  - root: party
+    domain: master_data
+    isa95_category: PersonnelOrPartner
+    owner: master_data
+    authority_storage: party,party_role
+    projection_storage: master_data_store
+    mutation_path: DomainCommandGateway_or_fail_closed
+    read_path: MasterDataService
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, active, inactive, merged, blocked]
+  - root: supplier
+    domain: procurement_supplier_quality
+    isa95_category: Partner
+    owner: supplier_quality
+    authority_storage: supplier,party_role
+    projection_storage: master_data_store
+    mutation_path: DomainCommandGateway_or_fail_closed
+    read_path: MasterDataService
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,quality_approval,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, approved, conditional, blocked, inactive, obsolete]
+  - root: customer
+    domain: commercial_customer
+    isa95_category: Partner
+    owner: commercial
+    authority_storage: customer,party_role
+    projection_storage: master_data_store
+    mutation_path: DomainCommandGateway_or_fail_closed
+    read_path: MasterDataService
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, active, inactive, blocked, obsolete]
+  - root: organization
+    domain: master_data
+    isa95_category: EnterpriseSiteArea
+    owner: master_data
+    authority_storage: organizations,sites,work_centers
+    projection_storage: master_data_store
+    mutation_path: DomainCommandGateway_or_fail_closed
+    read_path: MasterDataService
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, active, inactive, retired]
+  - root: shift_calendar
+    domain: mes_execution
+    isa95_category: WorkSchedule
+    owner: production_control
+    authority_storage: shift_calendars,shift_definitions,shift_assignments,holiday_calendars
+    projection_storage: released_shift_calendar_snapshot
+    mutation_path: DomainCommandGateway_or_fail_closed
+    read_path: MES readiness frozen snapshot
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,readiness,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, active, released, superseded, retired]
+  - root: equipment
+    domain: maintenance_ehs
+    isa95_category: Equipment
+    owner: maintenance
+    authority_storage: equipment,maintenance_work_orders
+    projection_storage: master_data_store
+    mutation_path: DomainCommandGateway
+    read_path: PostgresMasterDataRepository
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,domain_command_evidence_link
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,quality_hold,readiness,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, active, maintenance, down, blocked, retired]
+  - root: tooling
+    domain: mes_execution
+    isa95_category: EquipmentAsset
+    owner: tooling
+    authority_storage: tooling_runtime_state,tooling_presets,tooling_breakage
+    projection_storage: tooling_runtime_projection
+    mutation_path: DomainCommandGateway
+    read_path: ToolingCommandHandler
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,signature_events,domain_command_evidence_link
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,quality_hold,reauth,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, active, loaded, quarantine, retired]
+  - root: gage
+    domain: quality_improvement
+    isa95_category: TestEquipment
+    owner: quality
+    authority_storage: gage,gage_calibration,gage_oot_investigation
+    projection_storage: master_data_store
+    mutation_path: DomainCommandGateway
+    read_path: ToolingCommandHandler
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,signature_events,domain_command_evidence_link
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,quality_hold,signature,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, active, due, out_of_tolerance, quarantined, retired]
+  - root: quality_hold
+    domain: quality_improvement
+    isa95_category: QualityTestSpecification
+    owner: quality
+    authority_storage: quality_hold,quality_hold_subject,quality_hold_release
+    projection_storage: quality_hold_chain_projection
+    mutation_path: DomainCommandGateway
+    read_path: QualityHoldService
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,signature_events,domain_command_evidence_link
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,subject_required,reauth,signature,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, active, released, revoked]
+  - root: ncr
+    domain: quality_improvement
+    isa95_category: QualityTestResult
+    owner: quality
+    authority_storage: ncr_records,quality_events
+    projection_storage: quality_projection
+    mutation_path: DomainCommandGateway_or_fail_closed
+    read_path: Quality services
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,signature_events
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,sod,signature,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, open, containment, mrb_review, dispositioned, closed]
+  - root: mrb
+    domain: quality_improvement
+    isa95_category: QualityDisposition
+    owner: quality
+    authority_storage: mrb_records,mrb_disposition
+    projection_storage: quality_projection
+    mutation_path: DomainCommandGateway
+    read_path: QualityHoldService
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,signature_events
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,sod,signature,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, review, approved, rejected, closed]
+  - root: capa
+    domain: quality_improvement
+    isa95_category: CorrectiveAction
+    owner: quality
+    authority_storage: capa_records,capa_action_events
+    projection_storage: quality_projection
+    mutation_path: DomainCommandGateway_or_fail_closed
+    read_path: Quality services
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,signature_events
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,sod,signature,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, open, in_progress, effectiveness_check, closed, cancelled]
+  - root: complaint
+    domain: quality_improvement
+    isa95_category: QualityComplaint
+    owner: quality
+    authority_storage: complaint_records,complaint_events
+    projection_storage: quality_projection
+    mutation_path: DomainCommandGateway_or_fail_closed
+    read_path: Quality services
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,signature_events
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,sod,signature,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, intake, investigation, response, closed, reopened]
+  - root: scar
+    domain: procurement_supplier_quality
+    isa95_category: SupplierQualityAction
+    owner: supplier_quality
+    authority_storage: scar_records,scar_events
+    projection_storage: supplier_quality_projection
+    mutation_path: DomainCommandGateway_or_fail_closed
+    read_path: Supplier quality services
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,signature_events
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,sod,signature,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, issued, supplier_response, verification, closed]
+  - root: inventory_period
+    domain: inventory_logistics
+    isa95_category: MaterialAccounting
+    owner: inventory
+    authority_storage: inventory_period_close,cost_ledger
+    projection_storage: inventory_period_projection
+    mutation_path: DomainCommandGateway
+    read_path: InventoryCommandHandler
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,signature_events,domain_command_evidence_link
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,reauth,signature,ai_firewall
+    frontend_projection: generated_read_only
+    states: [open, closing, closed, reopened]
+  - root: lot
+    domain: traceability_serialization
+    isa95_category: MaterialLot
+    owner: inventory
+    authority_storage: inventory_lot,inventory_ledger,genealogy_edge
+    projection_storage: traceability_projection
+    mutation_path: DomainCommandGateway
+    read_path: InventoryCommandHandler
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,domain_command_evidence_link
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,trace_policy,quality_hold,ai_firewall
+    frontend_projection: generated_read_only
+    states: [created, active, on_hold, consumed, shipped, closed]
+  - root: serial
+    domain: traceability_serialization
+    isa95_category: MaterialSublot
+    owner: inventory
+    authority_storage: inventory_serial,inventory_ledger,genealogy_edge
+    projection_storage: traceability_projection
+    mutation_path: DomainCommandGateway
+    read_path: InventoryCommandHandler
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,domain_command_evidence_link
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,trace_policy,quality_hold,ai_firewall
+    frontend_projection: generated_read_only
+    states: [created, active, on_hold, consumed, shipped, closed]
+  - root: container
+    domain: inventory_logistics
+    isa95_category: MaterialContainer
+    owner: warehouse
+    authority_storage: inventory_container,shipment_packages,genealogy_edge
+    projection_storage: logistics_projection
+    mutation_path: DomainCommandGateway
+    read_path: InventoryCommandHandler
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,domain_command_evidence_link
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,quality_hold,ai_firewall
+    frontend_projection: generated_read_only
+    states: [created, active, on_hold, packed, shipped, closed]
+  - root: work_order
+    domain: planning_production
+    isa95_category: WorkRequest
+    owner: production_control
+    authority_storage: work_orders,work_order_snapshot,production_completion
+    projection_storage: work_order_projection
+    mutation_path: DomainCommandGateway
+    read_path: PostgresMasterDataRepository
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,signature_events,domain_command_evidence_link
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,readiness,quality_hold,snapshot,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, planned, released, in_production, on_hold, completed, closed]
+  - root: sales_order
+    domain: commercial_customer
+    isa95_category: WorkScheduleDemand
+    owner: commercial
+    authority_storage: sales_orders,sales_order_snapshot
+    projection_storage: sales_order_projection
+    mutation_path: DomainCommandGateway
+    read_path: PostgresMasterDataRepository
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,signature_events,domain_command_evidence_link
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,snapshot,quality_hold,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, confirmed, released, on_hold, shipped, closed, cancelled]
+  - root: job_order
+    domain: planning_production
+    isa95_category: WorkOrder
+    owner: production_control
+    authority_storage: job_orders,job_order_snapshot
+    projection_storage: job_order_projection
+    mutation_path: DomainCommandGateway
+    read_path: PostgresMasterDataRepository
+    state_source: workflow-status-authority
+    event_owner: domain_outbox_events
+    audit_evidence: audit_events,signature_events,domain_command_evidence_link
+    problem_details: application/problem+json
+    security_gates: permission,object_scope,readiness,snapshot,quality_hold,ai_firewall
+    frontend_projection: generated_read_only
+    states: [draft, planned, released, in_production, on_hold, completed, closed]

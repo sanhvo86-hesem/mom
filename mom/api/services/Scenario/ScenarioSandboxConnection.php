@@ -71,6 +71,19 @@ final class ScenarioSandboxConnection extends Connection
         $this->record('queryOne', $sql, $params);
         $normalized = $this->normalizeSql($sql);
 
+        if (str_contains($normalized, 'domain_command_reauth_challenge')) {
+            return [
+                'challenge_id' => (string)($params[':challenge_id'] ?? 'reauth-p58'),
+                'actor_id' => (string)($params[':actor_id'] ?? 'scenario-actor'),
+                'command_name' => (string)($params[':command_name'] ?? ''),
+                'payload_hash_sha256' => '',
+                'intent_hash_sha256' => '',
+                'issued_at' => gmdate(DATE_ATOM),
+                'expires_at' => gmdate(DATE_ATOM, time() + 300),
+                'consumed_at' => gmdate(DATE_ATOM),
+                'result' => 'issued',
+            ];
+        }
         if (str_contains($normalized, 'from e_signature_auth_challenges')) {
             return $this->signatureChallengeRow();
         }

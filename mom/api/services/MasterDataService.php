@@ -188,11 +188,6 @@ final class MasterDataService
         'obsolete'    => [],
     ];
 
-    /**
-     * Statuses that require approval before a field-level change takes effect.
-     */
-    private const APPROVAL_REQUIRED_STATUSES = ['active', 'approved', 'released'];
-
     private readonly MasterDataRepository $repository;
     private readonly MasterDataAuthorityModeService $authorityMode;
     private readonly MasterDataFallbackTelemetry $fallbackTelemetry;
@@ -324,58 +319,7 @@ final class MasterDataService
         if (!$this->isValidEntity($entityType)) {
             return new MasterDataResult(false, 'Invalid entity type.', errorCode: 'invalid_entity');
         }
-        if (($blocked = $this->blockedGovernedCommandResult('create', $entityType)) !== null) {
-            return $blocked;
-        }
-
-        $idKey = self::ENTITY_KEYS[$entityType];
-        $id    = trim((string)($data[$idKey] ?? ''));
-        if ($id === '') {
-            return new MasterDataResult(false, "Missing required key field: {$idKey}.", errorCode: 'missing_key');
-        }
-
-        // Duplicate detection
-        $existingId = $this->checkDuplicate($entityType, $data);
-        if ($existingId !== null) {
-            return new MasterDataResult(
-                false,
-                "Duplicate detected: existing record {$existingId}.",
-                errorCode: 'duplicate',
-                data: ['existing_id' => $existingId],
-            );
-        }
-
-        $store = $this->loadStore();
-
-        // Ensure no record with same primary key
-        foreach (($store[$entityType] ?? []) as $row) {
-            if (is_array($row) && (string)($row[$idKey] ?? '') === $id) {
-                return new MasterDataResult(false, "Record with {$idKey} = {$id} already exists.", errorCode: 'duplicate_key');
-            }
-        }
-
-        $now = $this->nowIso();
-        $validStatuses = self::STATUS_MAP[$entityType] ?? [];
-        $requestedStatus = trim((string)($data['status'] ?? 'draft'));
-        if ($requestedStatus === '' || !in_array($requestedStatus, $validStatuses, true)) {
-            $requestedStatus = 'draft';
-        }
-        $record = array_merge($data, [
-            $idKey       => $id,
-            'status'     => $requestedStatus,
-            'created_at' => $now,
-            'created_by' => $userId,
-            'updated_at' => $now,
-            'updated_by' => $userId,
-        ]);
-
-        $store[$entityType]   = array_values($store[$entityType] ?? []);
-        $store[$entityType][] = $record;
-        $this->saveStore($store);
-
-        $this->logHistory($entityType, $id, 'create', [], $record, $userId, 'Initial creation');
-
-        return new MasterDataResult(true, 'Record created.', data: $record);
+        return $this->blockedGovernedCommandResult('create', $entityType);
     }
 
     /**
@@ -397,27 +341,7 @@ final class MasterDataService
         if (!$this->isValidEntity($entityType)) {
             return new MasterDataResult(false, 'Invalid entity type.', errorCode: 'invalid_entity');
         }
-        if (($blocked = $this->blockedGovernedCommandResult('update', $entityType)) !== null) {
-            return $blocked;
-        }
-
-        $store  = $this->loadStore();
-        $idKey  = self::ENTITY_KEYS[$entityType];
-        $record = $this->findRecord($store, $entityType, $entityId);
-
-        if ($record === null) {
-            return new MasterDataResult(false, 'Record not found.', errorCode: 'not_found');
-        }
-
-        $currentStatus = (string)($record['status'] ?? 'draft');
-
-        // If status requires approval, queue changes
-        if (in_array($currentStatus, self::APPROVAL_REQUIRED_STATUSES, true)) {
-            return $this->queuePendingChange($entityType, $entityId, $changes, $userId, $reason, $record);
-        }
-
-        // Direct update
-        return $this->applyUpdate($store, $entityType, $entityId, $changes, $userId, $reason);
+        return $this->blockedGovernedCommandResult('update', $entityType);
     }
 
     /**
@@ -435,44 +359,7 @@ final class MasterDataService
         if (!$this->isValidEntity($entityType)) {
             return new MasterDataResult(false, 'Invalid entity type.', errorCode: 'invalid_entity');
         }
-        if (($blocked = $this->blockedGovernedCommandResult('delete', $entityType)) !== null) {
-            return $blocked;
-        }
-
-        // Referential integrity
-        $refs = $this->checkReferentialIntegrity($entityType, $entityId);
-        if (!empty($refs)) {
-            return new MasterDataResult(
-                false,
-                'Cannot delete: record is referenced by other entities.',
-                errorCode: 'referential_integrity',
-                data: ['references' => $refs],
-            );
-        }
-
-        $store  = $this->loadStore();
-        $record = $this->findRecord($store, $entityType, $entityId);
-        if ($record === null) {
-            return new MasterDataResult(false, 'Record not found.', errorCode: 'not_found');
-        }
-
-        // Remove from active store
-        $idKey = self::ENTITY_KEYS[$entityType];
-        $store[$entityType] = array_values(array_filter(
-            $store[$entityType] ?? [],
-            static fn ($r) => is_array($r) && (string)($r[$idKey] ?? '') !== $entityId,
-        ));
-        $this->saveStore($store);
-
-        // Archive
-        $record['status']      = 'obsolete';
-        $record['deleted_at']  = $this->nowIso();
-        $record['deleted_by']  = $userId;
-        $this->archiveRecord($entityType, $record);
-
-        $this->logHistory($entityType, $entityId, 'delete', $record, [], $userId, 'Record deleted and archived');
-
-        return new MasterDataResult(true, 'Record deleted and archived.', data: $record);
+        return $this->blockedGovernedCommandResult('delete', $entityType);
     }
 
     /**
@@ -492,7 +379,7 @@ final class MasterDataService
         if (!$this->isValidEntity($entityType)) {
             return false;
         }
-        $this->authorityMode->assertGovernedCommandAllowed('changeStatus:' . $entityType);
+        $this->assertLegacyMutationBlocked('changeStatus', $entityType);
 
         $validStatuses = self::STATUS_MAP[$entityType] ?? [];
         if (!in_array($newStatus, $validStatuses, true)) {
@@ -995,6 +882,7 @@ final class MasterDataService
      */
     public function approvePendingChange(string $changeId, string $approverId): bool
     {
+        $this->assertLegacyMutationBlocked('approvePendingChange', 'pending_change');
         $pending = $this->loadPending();
         $entries = $pending['entries'] ?? [];
         $found   = null;
@@ -1047,6 +935,7 @@ final class MasterDataService
      */
     public function rejectPendingChange(string $changeId, string $approverId, string $reason): bool
     {
+        $this->assertLegacyMutationBlocked('rejectPendingChange', 'pending_change');
         $pending = $this->loadPending();
         $entries = $pending['entries'] ?? [];
 
@@ -1142,56 +1031,6 @@ final class MasterDataService
     }
 
     /**
-     * Queue a change for approval.
-     */
-    private function queuePendingChange(
-        string $entityType,
-        string $entityId,
-        array  $changes,
-        string $userId,
-        string $reason,
-        array  $currentRecord,
-    ): MasterDataResult {
-        $now      = $this->nowIso();
-        $changeId = 'CHG-' . substr(md5($entityType . $entityId . $now . random_int(0, 99999)), 0, 12);
-
-        // Build field-level diff
-        $fieldChanges = [];
-        foreach ($changes as $field => $newValue) {
-            $fieldChanges[] = [
-                'field_name' => $field,
-                'old_value'  => $currentRecord[$field] ?? null,
-                'new_value'  => $newValue,
-            ];
-        }
-
-        $entry = [
-            'change_id'    => $changeId,
-            'entity_type'  => $entityType,
-            'entity_id'    => $entityId,
-            'changes'      => $changes,
-            'field_changes' => $fieldChanges,
-            'reason'       => $reason,
-            'requested_by' => $userId,
-            'requested_at' => $now,
-            'status'       => 'pending',
-        ];
-
-        $pending = $this->loadPending();
-        $pending['entries']   = $pending['entries'] ?? [];
-        $pending['entries'][] = $entry;
-        $this->savePending($pending);
-
-        $this->logHistory($entityType, $entityId, 'change_requested', [], $changes, $userId, "Pending approval: {$reason}");
-
-        return new MasterDataResult(
-            true,
-            'Change queued for approval.',
-            data: ['change_id' => $changeId, 'status' => 'pending'],
-        );
-    }
-
-    /**
      * Log a change-history entry.
      */
     private function logHistory(
@@ -1241,11 +1080,10 @@ final class MasterDataService
         $this->saveArchive($archive);
     }
 
-    private function blockedGovernedCommandResult(string $operation, string $entityType): ?MasterDataResult
+    private function blockedGovernedCommandResult(string $operation, string $entityType): MasterDataResult
     {
         try {
             $this->authorityMode->assertGovernedCommandAllowed($operation . ':' . $entityType);
-            return null;
         } catch (MasterDataAuthorityException $e) {
             return new MasterDataResult(
                 false,
@@ -1254,6 +1092,40 @@ final class MasterDataService
                 errorCode: $e->codeName(),
             );
         }
+
+        return new MasterDataResult(
+            false,
+            'Governed master-data mutation requires DomainCommandGateway.',
+            data: $this->domainCommandRequiredProblem($operation, $entityType),
+            errorCode: 'domain_command_required',
+        );
+    }
+
+    private function assertLegacyMutationBlocked(string $operation, string $entityType): void
+    {
+        $this->authorityMode->assertGovernedCommandAllowed($operation . ':' . $entityType);
+        throw new MasterDataAuthorityException(
+            'domain_command_required',
+            'Governed master-data mutation requires DomainCommandGateway.',
+            $this->domainCommandRequiredProblem($operation, $entityType),
+        );
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private function domainCommandRequiredProblem(string $operation, string $entityType): array
+    {
+        return [
+            'type' => 'https://hesemeng.com/problems/domain-command-required',
+            'title' => 'Domain command required',
+            'status' => 409,
+            'code' => 'domain_command_required',
+            'detail' => 'Legacy MasterDataService mutation is read-only for governed roots. Use DomainCommandGateway.',
+            'operation' => $operation,
+            'entity_type' => $entityType,
+            'authority' => 'DomainCommandGateway',
+        ];
     }
 
     // ── File I/O helpers ────────────────────────────────────────────────────

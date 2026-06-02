@@ -18,10 +18,9 @@ final class ObjectAuthorizationPolicy
         $actorScope = is_array($envelope['actor_scope'] ?? null) ? (array)$envelope['actor_scope'] : [];
         $allowedSites = $this->strings($actorScope['site_ids'] ?? $actorScope['sites'] ?? []);
         $allowedPlants = $this->strings($actorScope['plant_ids'] ?? $actorScope['plants'] ?? []);
-        $privileged = $this->hasPrivilegedRole($envelope);
 
         $targetSite = $this->first($payload, ['site_id', 'site_ref', 'org_site_id']);
-        if ($targetSite !== '' && $allowedSites === [] && !$privileged) {
+        if ($targetSite !== '' && $allowedSites === []) {
             return $this->deny('object_scope_missing', 'Actor site scope is required for target-site mutation.', [
                 'target_site' => $targetSite,
             ]);
@@ -33,7 +32,7 @@ final class ObjectAuthorizationPolicy
         }
 
         $targetPlant = $this->first($payload, ['plant_id', 'org_plant_id']);
-        if ($targetPlant !== '' && $allowedPlants === [] && !$privileged) {
+        if ($targetPlant !== '' && $allowedPlants === []) {
             return $this->deny('object_scope_missing', 'Actor plant scope is required for target-plant mutation.', [
                 'target_plant' => $targetPlant,
             ]);
@@ -73,20 +72,6 @@ final class ObjectAuthorizationPolicy
         }
 
         return array_values(array_filter(array_map(static fn (mixed $item): string => trim((string)$item), $value)));
-    }
-
-    /**
-     * @param array<string,mixed> $envelope
-     */
-    private function hasPrivilegedRole(array $envelope): bool
-    {
-        return array_intersect($this->strings($envelope['actor_roles'] ?? []), [
-            'admin',
-            'super_admin',
-            'production_director',
-            'quality_manager',
-            'engineering_manager',
-        ]) !== [];
     }
 
     /**

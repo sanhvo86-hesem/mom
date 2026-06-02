@@ -43,7 +43,7 @@ final class DomainCommandGatewayTest extends TestCase
             'command_name' => 'CreateItemCommand',
             'idempotency_key' => 'idem-item-1',
             'actor_id' => 'planner',
-            'actor_roles' => ['admin'],
+            'actor_permissions' => ['master_data.item.write'],
             'payload' => [
                 'item_code' => 'ITEM-GPT-PRO-001',
                 'item_name' => 'GPT Pro Closure Item',
@@ -69,8 +69,8 @@ final class DomainCommandGatewayTest extends TestCase
             'command_name' => 'CreateEngineeringReleasePackageCommand',
             'idempotency_key' => 'idem-release-1',
             'actor_id' => 'qa',
-            'actor_roles' => ['admin'],
-            'reauth_at' => date(DATE_ATOM),
+            'actor_permissions' => ['engineering.package.write'],
+            'reauth_evidence' => ['challenge_id' => 'reauth-1'],
             'payload' => ['package_id' => 'pkg-1'],
         ]);
 
@@ -92,13 +92,61 @@ final class DomainCommandGatewayTest extends TestCase
                 'command_name' => 'CreateEngineeringReleasePackageCommand',
                 'idempotency_key' => 'idem-release-1',
                 'actor_id' => 'qa',
-                'actor_roles' => ['admin'],
-                'reauth_at' => date(DATE_ATOM),
+                'actor_permissions' => ['engineering.package.write'],
+                'reauth_evidence' => ['challenge_id' => 'reauth-1'],
                 'payload' => ['package_id' => 'pkg-2'],
             ]);
             $this->fail('Expected idempotency conflict.');
         } catch (DomainCommandException $e) {
             $this->assertSame('idempotency_conflict', $e->problemCode);
+        }
+    }
+
+    public function testRoleOnlyPermissionBypassIsDenied(): void
+    {
+        $gateway = new DomainCommandGateway(
+            new DomainCommandFakeConnection(),
+            new CommandRegistry(),
+            new DomainCommandFakeIdempotencyReplayRepository()
+        );
+
+        try {
+            $gateway->dispatch([
+                'command_name' => 'CreateItemCommand',
+                'idempotency_key' => 'idem-role-bypass-1',
+                'actor_id' => 'admin-user',
+                'actor_roles' => ['admin'],
+                'payload' => ['item_code' => 'ITEM-ROLE-BYPASS', 'item_name' => 'Role Bypass', 'item_type' => 'manufactured'],
+            ]);
+            $this->fail('Expected role-only permission denial.');
+        } catch (DomainCommandException $e) {
+            $this->assertSame('command_permission_denied', $e->problemCode);
+        }
+    }
+
+    public function testClientBreakGlassFlagWithoutServerGrantIsDenied(): void
+    {
+        $gateway = new DomainCommandGateway(
+            new DomainCommandFakeConnection(),
+            new CommandRegistry(),
+            new DomainCommandFakeIdempotencyReplayRepository()
+        );
+
+        try {
+            $gateway->dispatch([
+                'command_name' => 'CreateItemCommand',
+                'idempotency_key' => 'idem-client-break-glass-1',
+                'actor_id' => 'operator-1',
+                'break_glass' => [
+                    'server_verified' => true,
+                    'permission' => 'master_data.item.write',
+                    'expires_at' => gmdate('c', time() + 300),
+                ],
+                'payload' => ['item_code' => 'ITEM-BG-BYPASS', 'item_name' => 'Break Glass Bypass', 'item_type' => 'manufactured'],
+            ]);
+            $this->fail('Expected client break-glass flag denial.');
+        } catch (DomainCommandException $e) {
+            $this->assertSame('command_permission_denied', $e->problemCode);
         }
     }
 }
@@ -158,7 +206,19 @@ final class DomainCommandFakeConnection extends Connection
 
     public function queryOne(string $sql, array $params = []): ?array
     {
-        unset($params);
+        if (str_contains($sql, 'domain_command_reauth_challenge')) {
+            return [
+                'challenge_id' => (string)($params[':challenge_id'] ?? 'reauth-1'),
+                'actor_id' => (string)($params[':actor_id'] ?? 'qa'),
+                'command_name' => (string)($params[':command_name'] ?? 'CreateEngineeringReleasePackageCommand'),
+                'payload_hash_sha256' => '',
+                'intent_hash_sha256' => '',
+                'issued_at' => gmdate('c'),
+                'expires_at' => gmdate('c', time() + 300),
+                'consumed_at' => gmdate('c'),
+                'result' => 'consumed',
+            ];
+        }
         if (str_contains($sql, 'FROM item WHERE')) {
             return [
                 'item_id' => '11111111-1111-1111-1111-111111111111',

@@ -1,0 +1,188 @@
+version: 1
+authority: MDA workflow/status SSOT
+generated_from: mom/data/authority/workflow-status-authority.yaml
+decision_scope: pre-production runtime-closure candidate
+problem_details_contract: application/problem+json
+immutable_states:
+  - released
+  - in_production
+  - closed
+  - superseded
+transition_rule:
+  released_direct_mutation: denied
+  released_change_path: revision_or_effectivity_or_change_control
+  mutation_authority: DomainCommandGateway
+roots:
+  - root: item
+    domain: master_data
+    isa95_category: Material
+    owner: master_data
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, active, released, blocked, superseded, obsolete]
+  - root: item_revision
+    domain: master_data
+    isa95_category: MaterialDefinition
+    owner: engineering
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, submitted, approved, released, superseded, obsolete]
+  - root: engineering_release_package
+    domain: planning_production
+    isa95_category: WorkDefinition
+    owner: engineering
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, submitted, approved, released, superseded, withdrawn]
+  - root: party
+    domain: master_data
+    isa95_category: PersonnelOrPartner
+    owner: master_data
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, active, inactive, merged, blocked]
+  - root: supplier
+    domain: procurement_supplier_quality
+    isa95_category: Partner
+    owner: supplier_quality
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, approved, conditional, blocked, inactive, obsolete]
+  - root: customer
+    domain: commercial_customer
+    isa95_category: Partner
+    owner: commercial
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, active, inactive, blocked, obsolete]
+  - root: organization
+    domain: master_data
+    isa95_category: EnterpriseSiteArea
+    owner: master_data
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, active, inactive, retired]
+  - root: shift_calendar
+    domain: mes_execution
+    isa95_category: WorkSchedule
+    owner: production_control
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, active, released, superseded, retired]
+  - root: equipment
+    domain: maintenance_ehs
+    isa95_category: Equipment
+    owner: maintenance
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, active, maintenance, down, blocked, retired]
+  - root: tooling
+    domain: mes_execution
+    isa95_category: EquipmentAsset
+    owner: tooling
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, active, loaded, quarantine, retired]
+  - root: gage
+    domain: quality_improvement
+    isa95_category: TestEquipment
+    owner: quality
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, active, due, out_of_tolerance, quarantined, retired]
+  - root: quality_hold
+    domain: quality_improvement
+    isa95_category: QualityTestSpecification
+    owner: quality
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, active, released, revoked]
+  - root: ncr
+    domain: quality_improvement
+    isa95_category: QualityTestResult
+    owner: quality
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, open, containment, mrb_review, dispositioned, closed]
+  - root: mrb
+    domain: quality_improvement
+    isa95_category: QualityDisposition
+    owner: quality
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, review, approved, rejected, closed]
+  - root: capa
+    domain: quality_improvement
+    isa95_category: CorrectiveAction
+    owner: quality
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, open, in_progress, effectiveness_check, closed, cancelled]
+  - root: complaint
+    domain: quality_improvement
+    isa95_category: QualityComplaint
+    owner: quality
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, intake, investigation, response, closed, reopened]
+  - root: scar
+    domain: procurement_supplier_quality
+    isa95_category: SupplierQualityAction
+    owner: supplier_quality
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, issued, supplier_response, verification, closed]
+  - root: inventory_period
+    domain: inventory_logistics
+    isa95_category: MaterialAccounting
+    owner: inventory
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [open, closing, closed, reopened]
+  - root: lot
+    domain: traceability_serialization
+    isa95_category: MaterialLot
+    owner: inventory
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [created, active, on_hold, consumed, shipped, closed]
+  - root: serial
+    domain: traceability_serialization
+    isa95_category: MaterialSublot
+    owner: inventory
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [created, active, on_hold, consumed, shipped, closed]
+  - root: container
+    domain: inventory_logistics
+    isa95_category: MaterialContainer
+    owner: warehouse
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [created, active, on_hold, packed, shipped, closed]
+  - root: work_order
+    domain: planning_production
+    isa95_category: WorkRequest
+    owner: production_control
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, planned, released, in_production, on_hold, completed, closed]
+  - root: sales_order
+    domain: commercial_customer
+    isa95_category: WorkScheduleDemand
+    owner: commercial
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, confirmed, released, on_hold, shipped, closed, cancelled]
+  - root: job_order
+    domain: planning_production
+    isa95_category: WorkOrder
+    owner: production_control
+    command_owner: DomainCommandGateway
+    event_owner: domain_outbox_events
+    states: [draft, planned, released, in_production, on_hold, completed, closed]
+generated_artifacts:
+  php_registry: mom/api/services/DomainCommand/CommandRegistry.php
+  openapi: mom/api/openapi.yaml
+  frontend_projection: mom/data/authority/governed-root-registry.yaml
+  scenario_matrix: mom/scripts/check_mda_workflow_status_parity.php

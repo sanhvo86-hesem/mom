@@ -97,6 +97,7 @@ final class DomainCommandGateway
                         $regulatedSpine,
                         $regulatedContext
                     ): array {
+                        $this->activateDomainCommandContext($commandName, $idempotencyKey);
                         $regulatedCapture = $regulatedSpine->recordBeforeMutation($entry, $payload, $regulatedContext, $actorId, $idempotencyKey);
                         $handlerResult = $this->executeHandler($commandName, $payload);
                         $evidenceLink = $regulatedSpine->recordAfterMutation(
@@ -216,17 +217,94 @@ final class DomainCommandGateway
         }
 
         $permissions = $this->stringList($envelope['actor_permissions'] ?? []);
-        $roles = $this->stringList($envelope['actor_roles'] ?? []);
-        if (in_array($required, $permissions, true) || in_array('*', $permissions, true)) {
-            return;
+        foreach ($permissions as $permission) {
+            if ($this->permissionMatches($required, $permission)) {
+                return;
+            }
         }
-        if (array_intersect($roles, ['admin', 'super_admin', 'production_director', 'quality_manager', 'engineering_manager']) !== []) {
+
+        if ($this->hasActiveBreakGlass($envelope, $required)) {
             return;
         }
 
         throw new DomainCommandException('command_permission_denied', 'Actor lacks permission for governed command.', 403, [
             'required_permission' => $required,
         ]);
+    }
+
+    private function activateDomainCommandContext(string $commandName, string $idempotencyKey): void
+    {
+        $commandId = hash('sha256', $commandName . '|' . $idempotencyKey);
+        $this->db->execute("SELECT set_config('hesem.domain_command_context', '1', true)");
+        $this->db->execute("SELECT set_config('hesem.domain_command_name', :command_name, true)", [
+            ':command_name' => $commandName,
+        ]);
+        $this->db->execute("SELECT set_config('hesem.domain_command_id', :command_id, true)", [
+            ':command_id' => $commandId,
+        ]);
+    }
+
+    private function permissionMatches(string $required, string $grant): bool
+    {
+        $grant = trim($grant);
+        if ($grant === '*' || $grant === $required) {
+            return true;
+        }
+        if (str_ends_with($grant, '.*')) {
+            return str_starts_with($required, substr($grant, 0, -1));
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array<string,mixed> $envelope
+     */
+    private function hasActiveBreakGlass(array $envelope, string $requiredPermission): bool
+    {
+        $breakGlass = is_array($envelope['break_glass'] ?? null) ? (array)$envelope['break_glass'] : [];
+        $grantId = $this->text($envelope['break_glass_id'] ?? $breakGlass['grant_id'] ?? $breakGlass['break_glass_id'] ?? '');
+        if ($grantId === '') {
+            return false;
+        }
+
+        try {
+            $row = $this->db->queryOne(
+                "UPDATE domain_command_break_glass_grant
+                    SET consumed_at = COALESCE(consumed_at, now())
+                  WHERE grant_id = :grant_id
+                    AND actor_id = :actor_id
+                    AND status = 'approved'
+                    AND valid_until > now()
+                    AND (consumed_at IS NULL OR one_time = FALSE)
+                  RETURNING grant_id, actor_id, permission, reason, approved_by,
+                            approval_signature_event_id, valid_until, consumed_at, one_time",
+                [
+                    ':grant_id' => $grantId,
+                    ':actor_id' => $this->text($envelope['actor_id'] ?? $envelope['actor_ref'] ?? ''),
+                ]
+            );
+        } catch (Throwable) {
+            return false;
+        }
+
+        if (!is_array($row) || $row === []) {
+            return false;
+        }
+
+        $permission = $this->text($row['permission'] ?? '');
+        $reason = $this->text($row['reason'] ?? '');
+        $approvedBy = $this->text($row['approved_by'] ?? '');
+        $signatureEventId = $this->text($row['approval_signature_event_id'] ?? '');
+        $expiresAt = $this->text($row['valid_until'] ?? '');
+        if ($permission === '' || $reason === '' || $approvedBy === '' || $signatureEventId === '' || $expiresAt === '') {
+            return false;
+        }
+        if (!$this->permissionMatches($requiredPermission, $permission)) {
+            return false;
+        }
+
+        return strtotime($expiresAt) !== false && (int)strtotime($expiresAt) > time();
     }
 
     /**

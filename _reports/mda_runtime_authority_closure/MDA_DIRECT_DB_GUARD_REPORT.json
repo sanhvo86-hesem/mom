@@ -1,0 +1,26 @@
+{
+    "gate": "mda_direct_db_guard",
+    "status": "PASS",
+    "checks": {
+        "universal_guard_reads_domain_context": true,
+        "universal_guard_requires_command_name": true,
+        "universal_guard_requires_command_id": true,
+        "break_glass_requires_server_store": true,
+        "generic_crud_context_still_denied": true,
+        "gateway_sets_domain_context": true,
+        "gateway_sets_command_name": true,
+        "gateway_sets_command_id": true,
+        "repository_no_delete_all_master_data_store": true,
+        "repository_no_delete_all_history": true,
+        "repository_no_delete_all_pending": true,
+        "repository_no_delete_all_archive": true,
+        "pg_only_orders_read_pg": true,
+        "pg_only_mes_runtime_read_pg": true,
+        "master_data_service_legacy_mutation_denied": true,
+        "domain_command_controller_rejects_client_actor_claims": true,
+        "frontend_workspace_is_projection": true,
+        "frontend_create_control_disabled": true
+    },
+    "failed": [],
+    "generated_at": "2026-06-02T01:56:20+00:00"
+}

@@ -31,8 +31,8 @@ final class SecurityBoundaryMiddleware
         $this->assertDecision(($this->propertyAuthorization ?? new PropertyAuthorizationPolicy())->evaluate($entry, $envelope, $payload), $entry, $envelope, $payload, $actorId);
 
         $payloadWithOriginator = $this->withPersistedOriginator($entry, $payload);
-        $this->assertDecision(($this->soDPolicy ?? new SoDPolicy())->evaluate($entry, $envelope, $payloadWithOriginator), $entry, $envelope, $payloadWithOriginator, $actorId);
-        $this->assertDecision(($this->privilegedReauthPolicy ?? new PrivilegedReauthPolicy())->evaluate($entry, $envelope, $payload), $entry, $envelope, $payload, $actorId);
+        $this->assertDecision(($this->soDPolicy ?? new SoDPolicy($this->db))->evaluate($entry, $envelope, $payloadWithOriginator), $entry, $envelope, $payloadWithOriginator, $actorId);
+        $this->assertDecision(($this->privilegedReauthPolicy ?? new PrivilegedReauthPolicy($this->db))->evaluate($entry, $envelope, $payload), $entry, $envelope, $payload, $actorId);
         $this->assertDecision(($this->otTrustPolicy ?? new OTTrustPolicy())->evaluate($entry, $envelope, $payload), $entry, $envelope, $payload, $actorId);
     }
 

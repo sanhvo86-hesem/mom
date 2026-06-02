@@ -18,6 +18,12 @@ var _mdState = {
   draft: null
 };
 
+var MASTER_DATA_CONTROL_PROJECTION = {
+  routeClass: 'WS',
+  authorityClass: 'projection',
+  requiresReanchor: 'true'
+};
+
 var ENTITY_CONFIG = {
   customers: {
     key: 'customer_id',
@@ -982,6 +988,9 @@ function _renderModal(){
   var overlay = document.createElement('div');
   overlay.className = 'mdc-overlay';
   overlay.id = 'mdc-overlay';
+  overlay.setAttribute('data-route-class', MASTER_DATA_CONTROL_PROJECTION.routeClass);
+  overlay.setAttribute('data-authority-class', MASTER_DATA_CONTROL_PROJECTION.authorityClass);
+  overlay.setAttribute('data-requires-reanchor', MASTER_DATA_CONTROL_PROJECTION.requiresReanchor);
   overlay.innerHTML = '' +
     '<div class="mdc-shell">' +
       '<div class="mdc-header">' +
@@ -990,7 +999,7 @@ function _renderModal(){
       '</div>' +
       '<div class="mdc-body">' +
         '<aside class="mdc-rail" id="mdc-rail"></aside>' +
-        '<section class="mdc-list"><div class="mdc-toolbar"><input type="search" class="mdc-search" id="mdc-search" placeholder="' + _escHtml(_t(scope.searchVi, scope.searchEn)) + '"><button type="button" class="mdc-btn mdc-btn-primary" id="mdc-create">' + _escHtml(_t('Tạo mới', 'Create')) + '</button></div><div id="mdc-grid"></div></section>' +
+        '<section class="mdc-list"><div class="mdc-toolbar"><input type="search" class="mdc-search" id="mdc-search" placeholder="' + _escHtml(_t(scope.searchVi, scope.searchEn)) + '"><button type="button" class="mdc-btn mdc-btn-primary" id="mdc-create" disabled aria-disabled="true">' + _escHtml(_t('Tạo mới', 'Create')) + '</button></div><div id="mdc-grid"></div></section>' +
         '<section class="mdc-editor" id="mdc-editor"></section>' +
       '</div>' +
     '</div>';
@@ -1005,6 +1014,8 @@ function _renderModal(){
     }
   });
   document.getElementById('mdc-create').addEventListener('click', function(){
+    _toast(_t('Dữ liệu nền được cập nhật qua command có kiểm soát.', 'Master data is changed through controlled commands.'), 'warn');
+    return;
     if(_isExternalAuthorityEntity(_mdState.entity)){
       _toast(_t('Thực thể này được quản trị trong Admin, không nhập tại Dữ liệu nền.', 'This entity is governed in Admin, not edited in Master Data.'), 'warn');
       return;
@@ -1104,6 +1115,30 @@ function _renderField(field, value){
   return '<input class="mdc-input" type="' + _escHtml(field.type || 'text') + '" name="' + field.key + '" value="' + _escHtml(value || '') + '"' + (field.required ? ' required' : '') + '>';
 }
 
+function _renderProjectionDetails(cfg){
+  var row = null;
+  if(_mdState.selectedId){
+    row = _getEntityRows(_mdState.entity).find(function(item){ return String(item[cfg.key] || '') === String(_mdState.selectedId || ''); }) || null;
+  }
+  if(!row){
+    return '' +
+      '<div class="mdc-editor-head">' +
+        '<div class="mdc-editor-title">' + _escHtml(cfg.labelEn || cfg.labelVi || _mdState.entity) + '</div>' +
+        '<div class="mdc-editor-sub">' + _escHtml(_t('Chọn một bản ghi để xem chi tiết.', 'Select a record to view details.')) + '</div>' +
+      '</div>';
+  }
+  var html = '' +
+    '<div class="mdc-editor-head">' +
+      '<div class="mdc-editor-title">' + _escHtml(_optionLabel(_mdState.entity, row) || row[cfg.key] || '') + '</div>' +
+      '<div class="mdc-editor-sub">' + _escHtml(_mdState.entity) + ' · ' + _escHtml(String(row[cfg.key] || '')) + '</div>' +
+    '</div><div class="mdc-editor-body">';
+  cfg.fields.forEach(function(field){
+    html += '<div class="mdc-field"><label class="mdc-label">' + _escHtml(field.label) + '</label><div class="mdc-input" aria-readonly="true">' + _escHtml(row[field.key] || '—') + '</div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+
 function _renderEditor(){
   var editor = document.getElementById('mdc-editor');
   if(!editor) return;
@@ -1112,6 +1147,11 @@ function _renderEditor(){
     editor.innerHTML = '<div class="mdc-editor-head"><div class="mdc-editor-title">' + _escHtml(_t('Dữ liệu được quản trị bên ngoài', 'Externally governed data')) + '</div><div class="mdc-editor-sub">' + _escHtml(_t('Người vận hành được lấy từ Admin > Người dùng / Sơ đồ tổ chức để tránh tạo hai nguồn sự thật.', 'Operators are sourced from Admin > Users / Org chart to avoid two sources of truth.')) + '</div></div>';
     return;
   }
+  editor.setAttribute('data-route-class', MASTER_DATA_CONTROL_PROJECTION.routeClass);
+  editor.setAttribute('data-authority-class', MASTER_DATA_CONTROL_PROJECTION.authorityClass);
+  editor.setAttribute('data-requires-reanchor', MASTER_DATA_CONTROL_PROJECTION.requiresReanchor);
+  editor.innerHTML = _renderProjectionDetails(cfg);
+  return;
   var draft = _mdState.draft || _defaultDraft(_mdState.entity);
   _mdState.draft = draft;
   var isUpdate = !!_mdState.selectedId;

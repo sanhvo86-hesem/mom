@@ -118,6 +118,9 @@ final class RepoBoundaryScanner
         // target architecture, and roadmap. Mirrors .gitignore
         // `!_reports/lego-empire/`.
         '#^_reports/lego-empire/.*$#',
+        // MDA runtime authority closure evidence bundle. Mirrors .gitignore
+        // `!_reports/mda_runtime_authority_closure/`.
+        '#^_reports/mda_runtime_authority_closure/.*$#',
     ];
 
     /**
