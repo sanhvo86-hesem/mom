@@ -4029,6 +4029,61 @@ window._renderAdmGovernance    = function(){ try { return renderGovernance(); } 
 window._renderAdmTemplates     = function(){ try { return renderTemplates(); } catch(e){ return ''; } };
 window._renderAdmAdvanced      = function(){ try { return renderAdvanced(); } catch(e){ return ''; } };
 
+/* ─── Rollout section — exposed for Module Studio Governance "🚀 Rollout" tab ─────
+   Renders template selector + rollout controls + change-set + blockers + audit.
+   Reuses internal renderRolloutControls/renderChangeSetPanel/renderReleaseBlockersPanel/
+   renderAuditHistoryPanel — same proven absorb-by-reuse pattern as Module Master v0.6.
+   After every action (_admGraphicsTemplateAction / _admGraphicsStageCanary), the caller
+   (32c govOnMount) patches window.renderAdminAppearance to also call MStudio.api.repaintBody()
+   so the governance tab stays in sync without duplicating action logic. ─────────────── */
+window._renderAdmRolloutSection = function(){
+  try {
+    var all = getAllTemplates();
+    var sel = _selectedTemplate ? getTemplateById(_selectedTemplate) : null;
+    var h = renderControlledRegistrySummary();
+
+    /* Compact template selector */
+    h += sect(
+      L('Template — chọn để xem rollout controls', 'Template — select to view rollout controls'),
+      '<div style="display:flex;flex-direction:column;gap:4px;max-height:200px;overflow:auto;padding:2px">'
+      + (all.length ? all.map(function(tpl){
+          var id = tpl.templateId || tpl.id;
+          var isSelected = _selectedTemplate === id;
+          return '<button type="button" onclick="_admTplPick(\''+esc(id)+'\')" '
+            + 'style="text-align:left;display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);border-radius:4px;'
+            + 'background:'+(isSelected?'var(--bg-surface-alt,#f1f5f9)':'var(--bg-surface,#fff)')+';cursor:pointer;font-size:12px;font-family:inherit">'
+            + '<strong style="color:var(--text-primary);min-width:48px">'+esc(id)+'</strong>'
+            + '<span style="color:var(--text-secondary);flex:1">'+esc(tpl.name&&tpl.name.vi||tpl.id)+'</span>'
+            + templateStatusChip(tpl)
+            + '</button>';
+        }).join('')
+        : '<div style="font-size:12px;color:var(--text-secondary);padding:8px">'+L('Không có template — registry trống hoặc chưa tải.','No templates — registry empty or not yet loaded.')+'</div>')
+      + '</div>',
+      true
+    );
+
+    /* Rollout controls for selected template */
+    if(sel){
+      h += renderRolloutControls(sel);
+    } else {
+      h += sect(L('Rollout controls', 'Rollout controls'),
+        '<div style="font-size:12px;color:var(--text-secondary);padding:12px 0">'
+        + L('↑ Chọn một template ở trên để xem các nút Publish / Stage / Canary / Apply / Rollback.',
+            '↑ Select a template above to see Publish / Stage / Canary / Apply / Rollback controls.')
+        + '</div>',
+        false
+      );
+    }
+
+    h += renderChangeSetPanel();
+    h += renderReleaseBlockersPanel(6);
+    h += renderAuditHistoryPanel(8);
+    return h;
+  } catch(e){
+    return '<div style="padding:12px;font-size:12px;color:var(--red,#b91c1c)">Rollout section error: '+esc(String(e))+'</div>';
+  }
+};
+
 /* ── Dirty-state helpers ─────────────────────────────────────────────────── */
 window._admAppearanceClearDirty = function(){
   var el = document.getElementById('adm-appearance-dirty-notice');
