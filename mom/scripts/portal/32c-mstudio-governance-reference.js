@@ -78,16 +78,27 @@
 
   var govState = { tab: 'wcag' }; // 'wcag' | 'governance' | 'templates' | 'advanced'
 
+  /* A11Y-006: full ARIA tablist pattern for governance tabs */
+  var GOV_TABS = [
+    { key: 'wcag', label: '♿ WCAG Evidence' },
+    { key: 'governance', label: '🛡️ Governance' },
+    { key: 'templates', label: '📐 Templates' },
+    { key: 'advanced', label: '🧩 Advanced' }
+  ];
+  var VALID_GOV_TABS = {};
+  GOV_TABS.forEach(function(t){ VALID_GOV_TABS[t.key] = true; });
+
   function renderGovernanceTabs() {
-    var tabs = [
-      { key: 'wcag', label: '♿ WCAG Evidence' },
-      { key: 'governance', label: '🛡️ Governance' },
-      { key: 'templates', label: '📐 Templates' },
-      { key: 'advanced', label: '🧩 Advanced' }
-    ];
-    return '<div class="' + R + '__tabs">' +
-      tabs.map(function (t) {
-        return '<button class="' + R + '__tab' + (govState.tab === t.key ? ' on' : '') + '" data-gc="tab" data-tab="' + t.key + '">' + esc(t.label) + '</button>';
+    return '<div class="' + R + '__tabs" role="tablist" aria-label="Governance sections">' +
+      GOV_TABS.map(function (t) {
+        var active = govState.tab === t.key;
+        return '<button type="button" role="tab"' +
+          ' class="' + R + '__tab' + (active ? ' on' : '') + '"' +
+          ' data-gc="tab" data-tab="' + t.key + '"' +
+          ' aria-selected="' + (active ? 'true' : 'false') + '"' +
+          ' aria-controls="ms-gov-panel-' + t.key + '"' +
+          ' id="ms-gov-tab-' + t.key + '">' +
+          esc(t.label) + '</button>';
       }).join('') +
       '</div>';
   }
@@ -121,34 +132,18 @@
     return '<span class="' + R + '__badge ' + R + '__badge--fail">FAIL ' + ratio.toFixed(1) + ':1</span>';
   }
   function apcaLc(textHex, bgHex) {
-    /* Simplified APCA-W3 Lc approximation (guidance only, not WCAG-3 compliance) */
+    /* Simplified APCA-W3 Lc approximation (guidance only, not WCAG-3 compliance).
+       BUG-003 fix: sign must flip for dark-on-light vs light-on-dark. */
     var c1 = hexToRgb(textHex), c2 = hexToRgb(bgHex); if (!c1 || !c2) { return null; }
     function sRGB(c) { return ['r','g','b'].reduce(function (s,k,i){ var v=c[k]/255; v=v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4); return s+[0.2126,0.7152,0.0722][i]*v; },0); }
     var sa = sRGB(c2), sb = sRGB(c1);
     var Sapc = Math.pow(sa, 0.56) - Math.pow(sb, 0.57);
-    return (Sapc > 0 ? 1.14 : 1.14) * Sapc * 100; // simplified
+    return (Sapc > 0 ? 1.14 : -1.14) * Sapc * 100;
   }
 
   function renderWcagPanel() {
-    var cs = getComputedStyle(document.documentElement);
-    var textStrong  = cs.getPropertyValue('--o3-text-strong').trim()   || '#0f172a';
-    var textDefault = cs.getPropertyValue('--o3-text-default').trim()  || '#475569';
-    var textMuted   = cs.getPropertyValue('--o3-text-muted').trim()    || '#94a3b8';
-    var brand       = cs.getPropertyValue('--o3-brand').trim()         || '#0c4a6e';
-    var surfCard    = cs.getPropertyValue('--o3-surface-card').trim()  || '#ffffff';
-    var surfMuted   = cs.getPropertyValue('--o3-surface-muted').trim() || '#f1f5f9';
-    var dangerColor = cs.getPropertyValue('--o3-danger').trim()        || '#b91c1c';
-    var successColor= cs.getPropertyValue('--o3-success').trim()       || '#15803d';
-
-    var pairs = [
-      { label: 'Text Strong / Surface Card',    fg: textStrong,  bg: surfCard  },
-      { label: 'Text Strong / Surface Muted',   fg: textStrong,  bg: surfMuted },
-      { label: 'Text Default / Surface Card',   fg: textDefault, bg: surfCard  },
-      { label: 'Text Muted / Surface Card',     fg: textMuted,   bg: surfCard  },
-      { label: 'Brand (White text / Brand bg)', fg: '#ffffff',   bg: brand     },
-      { label: 'Danger text / Surface Card',    fg: dangerColor, bg: surfCard  },
-      { label: 'Success text / Surface Card',   fg: successColor,bg: surfCard  }
-    ];
+    /* Use shared buildWcagPairs() so panel and evidence record are always consistent */
+    var pairs = buildWcagPairs();
 
     var allPass = pairs.every(function (p) { var r = contrastRatio(p.fg, p.bg); return r >= 4.5 || (r >= 3); });
     var failCount = pairs.filter(function (p) { return contrastRatio(p.fg, p.bg) < 3; }).length;
@@ -224,17 +219,30 @@
   /* ── Governance render entry ─────────────────────────────────────────── */
   function renderGovernance() {
     ensureStyle();
+    var panelContent = {
+      wcag: renderWcagPanel(),
+      governance: govState.tab === 'governance' ? renderGovPanel() : '',
+      templates:  govState.tab === 'templates'  ? renderTemplatesPanel() : '',
+      advanced:   govState.tab === 'advanced'   ? renderAdvancedPanel() : ''
+    };
     var h = '<div class="' + R + '">' + renderGovernanceTabs();
-    h += '<div class="' + R + '__panel' + (govState.tab === 'wcag' ? ' on' : '') + '" data-gc-panel="wcag">' + renderWcagPanel() + '</div>';
-    h += '<div class="' + R + '__panel' + (govState.tab === 'governance' ? ' on' : '') + '" data-gc-panel="governance">' + (govState.tab === 'governance' ? renderGovPanel() : '') + '</div>';
-    h += '<div class="' + R + '__panel' + (govState.tab === 'templates' ? ' on' : '') + '" data-gc-panel="templates">' + (govState.tab === 'templates' ? renderTemplatesPanel() : '') + '</div>';
-    h += '<div class="' + R + '__panel' + (govState.tab === 'advanced' ? ' on' : '') + '" data-gc-panel="advanced">' + (govState.tab === 'advanced' ? renderAdvancedPanel() : '') + '</div>';
+    GOV_TABS.forEach(function(t) {
+      var active = govState.tab === t.key;
+      /* A11Y-006: role=tabpanel with matching id/aria-labelledby */
+      h += '<div class="' + R + '__panel' + (active ? ' on' : '') + '"' +
+        ' role="tabpanel"' +
+        ' id="ms-gov-panel-' + t.key + '"' +
+        ' aria-labelledby="ms-gov-tab-' + t.key + '"' +
+        (active ? '' : ' hidden aria-hidden="true"') +
+        '>' + (panelContent[t.key] || '') + '</div>';
+    });
     h += '</div>';
     return h;
   }
 
   function govOnMount(host) {
-    if (host.__govDelegated) { return; }
+    /* BUG-001: guard against null host (mirrors refOnMount pattern) */
+    if (!host || host.__govDelegated) { return; }
     host.__govDelegated = true;
     host.addEventListener('click', function(ev) {
       var t = ev.target && ev.target.closest ? ev.target.closest('[data-gc]') : null;
@@ -242,27 +250,56 @@
     });
   }
 
+  /* BUG-002: shared helper builds all 7 pairs so renderWcagPanel and evidence record
+     are always consistent — one source of truth for pair definitions. */
+  function buildWcagPairs() {
+    var cs = getComputedStyle(document.documentElement);
+    var textStrong  = cs.getPropertyValue('--o3-text-strong').trim()   || '#0f172a';
+    var textDefault = cs.getPropertyValue('--o3-text-default').trim()  || '#475569';
+    var textMuted   = cs.getPropertyValue('--o3-text-muted').trim()    || '#94a3b8';
+    var brand       = cs.getPropertyValue('--o3-brand').trim()         || '#0c4a6e';
+    var surfCard    = cs.getPropertyValue('--o3-surface-card').trim()  || '#ffffff';
+    var surfMuted   = cs.getPropertyValue('--o3-surface-muted').trim() || '#f1f5f9';
+    var dangerColor = cs.getPropertyValue('--o3-danger').trim()        || '#b91c1c';
+    var successColor= cs.getPropertyValue('--o3-success').trim()       || '#15803d';
+    var textInverse = cs.getPropertyValue('--o3-text-inverse').trim()  || '#ffffff';
+    return [
+      { id: 'text-strong-card',    label: 'Text Strong / Surface Card',  fg: textStrong,  bg: surfCard   },
+      { id: 'text-strong-muted',   label: 'Text Strong / Surface Muted', fg: textStrong,  bg: surfMuted  },
+      { id: 'text-default-card',   label: 'Text Default / Surface Card', fg: textDefault, bg: surfCard   },
+      { id: 'text-muted-card',     label: 'Text Muted / Surface Card',   fg: textMuted,   bg: surfCard   },
+      { id: 'inverse-brand',       label: 'Text Inverse / Brand bg',     fg: textInverse, bg: brand      },
+      { id: 'danger-card',         label: 'Danger text / Surface Card',  fg: dangerColor, bg: surfCard   },
+      { id: 'success-card',        label: 'Success text / Surface Card', fg: successColor,bg: surfCard   }
+    ];
+  }
+
   function govOnAction(k, target, ev) {
     var a = api();
     if (k === 'tab') {
+      /* BUG-010: validate tab key before accepting */
       var newTab = target.getAttribute('data-tab') || 'wcag';
+      if (!VALID_GOV_TABS[newTab]) { newTab = 'wcag'; }
       govState.tab = newTab;
-      /* repaint body so lazy panels load */
       if (a) { a.repaintBody(); }
       return true;
     }
     if (k === 'record-wcag-evidence') {
-      var pairs2 = [];
-      var cs = getComputedStyle(document.documentElement);
-      var textStrong2 = cs.getPropertyValue('--o3-text-strong').trim() || '#0f172a';
-      var surfCard2   = cs.getPropertyValue('--o3-surface-card').trim() || '#ffffff';
-      pairs2.push({ pair: 'text-strong/surface-card', ratio: contrastRatio(textStrong2, surfCard2).toFixed(2) });
-      var body = { target_key: 'wcag-live-audit', target_kind: 'governance', gate_results: pairs2.map(function (p) { return { id: p.pair, label: p.pair, status: p.ratio >= 4.5 ? 'PASS' : p.ratio >= 3 ? 'WARN' : 'FAIL_BLOCK', detail: p.ratio + ':1' }; }), run_at: new Date().toISOString() };
+      /* BUG-002: record ALL 7 pairs, not just 1 */
+      var pairs2 = buildWcagPairs();
+      var gateResults = pairs2.map(function (p) {
+        var ratio = contrastRatio(p.fg, p.bg);
+        return { id: p.id, label: p.label, status: ratio >= 4.5 ? 'PASS' : ratio >= 3 ? 'WARN' : 'FAIL_BLOCK', detail: ratio.toFixed(2) + ':1' };
+      });
+      var body = { target_key: 'wcag-live-audit', target_kind: 'governance', gate_results: gateResults, run_at: new Date().toISOString() };
       if (a) {
         a.post('graphics_simulation_run_record', body).then(function (r) {
           var el = document.getElementById('ms-gov-wcag-status');
-          if (el) { el.textContent = r && r.ok !== false ? '✅ Evidence ghi xong.' : '⚠ Ghi thất bại.'; }
-        }).catch(function () { var el = document.getElementById('ms-gov-wcag-status'); if (el) { el.textContent = '⚠ Backend chưa implement — evidence local only.'; } });
+          if (el) { el.textContent = r && r.ok !== false ? '✅ Evidence ghi xong (' + gateResults.length + ' pairs).' : '⚠ Ghi thất bại.'; }
+        }).catch(function () {
+          var el = document.getElementById('ms-gov-wcag-status');
+          if (el) { el.textContent = '⚠ Backend chưa implement — evidence local only.'; }
+        });
       }
       return true;
     }
@@ -284,9 +321,15 @@
   ];
 
   function renderRefNav() {
-    return '<div style="display:flex;flex-wrap:wrap;gap:' + sp + ';margin-bottom:' + sc + ';border-bottom:1px solid ' + bsub + ';padding-bottom:1px">' +
+    /* A11Y-006: ARIA tablist for reference section navigation */
+    return '<div style="display:flex;flex-wrap:wrap;gap:' + sp + ';margin-bottom:' + sc + ';border-bottom:1px solid ' + bsub + ';padding-bottom:1px" role="tablist" aria-label="Reference sections">' +
       REF_SECTIONS.map(function (s) {
-        return '<button class="' + R + '__tab' + (refState.section === s.key ? ' on' : '') + '" data-rf="section" data-sec="' + s.key + '">' + s.icon + ' ' + esc(s.label) + '</button>';
+        var active = refState.section === s.key;
+        return '<button type="button" role="tab"' +
+          ' class="' + R + '__tab' + (active ? ' on' : '') + '"' +
+          ' data-rf="section" data-sec="' + s.key + '"' +
+          ' aria-selected="' + (active ? 'true' : 'false') + '">' +
+          '<span aria-hidden="true">' + s.icon + '</span> ' + esc(s.label) + '</button>';
       }).join('') +
       '</div>';
   }
