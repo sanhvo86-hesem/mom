@@ -71,9 +71,6 @@ final class PostgresMasterDataRepository implements MasterDataRepository
         $this->db->transactional(function () use ($data): void {
             foreach ($this->entityNames($data) as $entity) {
                 $rows = array_values(array_filter((array)($data[$entity] ?? []), 'is_array'));
-                $this->db->execute('DELETE FROM master_data_store WHERE entity_type = :entity_type', [
-                    ':entity_type' => $entity,
-                ]);
                 foreach ($rows as $row) {
                     $entityId = $this->entityIdForRecord($entity, $row);
                     if ($entityId === '') {
@@ -134,7 +131,6 @@ final class PostgresMasterDataRepository implements MasterDataRepository
     {
         $entries = array_values(array_filter((array)($data['entries'] ?? []), 'is_array'));
         $this->db->transactional(function () use ($entries): void {
-            $this->db->execute('DELETE FROM master_data_history_event');
             foreach ($entries as $entry) {
                 $json = json_encode($entry, JSON_UNESCAPED_SLASHES);
                 if (!is_string($json)) {
@@ -180,7 +176,6 @@ final class PostgresMasterDataRepository implements MasterDataRepository
     {
         $entries = array_values(array_filter((array)($data['entries'] ?? []), 'is_array'));
         $this->db->transactional(function () use ($entries): void {
-            $this->db->execute('DELETE FROM master_data_pending_change');
             foreach ($entries as $entry) {
                 $json = json_encode($entry, JSON_UNESCAPED_SLASHES);
                 if (!is_string($json)) {
@@ -230,7 +225,6 @@ final class PostgresMasterDataRepository implements MasterDataRepository
     public function saveArchive(array $data): void
     {
         $this->db->transactional(function () use ($data): void {
-            $this->db->execute('DELETE FROM master_data_archive_store');
             foreach ($this->entityNames($data) as $entity) {
                 foreach (array_values(array_filter((array)($data[$entity] ?? []), 'is_array')) as $row) {
                     $entityId = $this->entityIdForRecord($entity, $row);
@@ -259,11 +253,34 @@ final class PostgresMasterDataRepository implements MasterDataRepository
 
     public function loadOrders(): array
     {
+        if ($this->mode === MasterDataAuthorityModeService::MODE_POSTGRES_ONLY) {
+            return [
+                'sales_orders' => $this->queryAuthorityRows('sales_orders'),
+                'job_orders' => $this->queryAuthorityRows('job_orders'),
+                'work_orders' => $this->queryAuthorityRows('work_orders'),
+            ];
+        }
+
         return $this->jsonBridge()?->loadOrders() ?? ['sales_orders' => [], 'job_orders' => [], 'work_orders' => []];
     }
 
     public function loadMesRuntime(): array
     {
+        if ($this->mode === MasterDataAuthorityModeService::MODE_POSTGRES_ONLY) {
+            return [
+                'downtime_events' => $this->queryAuthorityRows('downtime_event'),
+                'maintenance_requests' => $this->queryAuthorityRows('maintenance_work_orders'),
+                'progress_reports' => $this->queryAuthorityRows('production_completion'),
+                'tooling_status' => $this->queryAuthorityRows('tooling_runtime_state'),
+                'connector_feeds' => $this->queryAuthorityRows('mes_connectivity_events'),
+                'machine_signals' => $this->queryAuthorityRows('machine_event'),
+                'mes_connectivity_events' => $this->queryAuthorityRows('mes_connectivity_events'),
+                'machine_alarm_events' => $this->queryAuthorityRows('mes_machine_alarms'),
+                'nc_download_receipts' => $this->queryAuthorityRows('mes_nc_download_receipts'),
+                'mes_tool_preset_offsets' => $this->queryAuthorityRows('tooling_presets'),
+            ];
+        }
+
         return $this->jsonBridge()?->loadMesRuntime() ?? [
             'downtime_events' => [],
             'maintenance_requests' => [],
@@ -334,6 +351,25 @@ final class PostgresMasterDataRepository implements MasterDataRepository
     private function jsonBridge(): ?JsonMasterDataRepository
     {
         return $this->jsonBridge;
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function queryAuthorityRows(string $tableName): array
+    {
+        if (preg_match('/^[a-z_][a-z0-9_]*$/', $tableName) !== 1) {
+            throw new RuntimeException("Invalid authority table name {$tableName}");
+        }
+
+        try {
+            return $this->db->query("SELECT * FROM {$tableName} LIMIT 1000");
+        } catch (\Throwable $e) {
+            $this->telemetry?->recordFallbackRead($tableName, 'postgres_only_authority_read_failed', [
+                'error' => $e->getMessage(),
+            ]);
+            throw new RuntimeException("POSTGRES_ONLY authority table {$tableName} is unavailable.", previous: $e);
+        }
     }
 
     /**

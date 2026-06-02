@@ -27,7 +27,7 @@ final class DomainCommandRegulatedEvidenceSpineTest extends TestCase
                 'idempotency_key' => 'idem-missing-meaning',
                 'actor_id' => 'qa-1',
                 'actor_permissions' => ['master_data.item_revision.release'],
-                'reauth_at' => date(DATE_ATOM),
+                'reauth_evidence' => ['challenge_id' => 'reauth-signature-1'],
                 'payload' => ['item_ref' => 'ITEM-1', 'revision_ref' => 'A'],
             ]);
             $this->fail('Expected missing signature evidence to block.');
@@ -114,7 +114,7 @@ final class DomainCommandRegulatedEvidenceSpineTest extends TestCase
                 'idempotency_key' => 'idem-audit-down',
                 'actor_id' => 'qa-1',
                 'actor_permissions' => ['master_data.item_revision.release'],
-                'reauth_at' => date(DATE_ATOM),
+                'reauth_evidence' => ['challenge_id' => 'reauth-audit-1'],
                 'payload' => ['item_ref' => 'ITEM-1', 'revision_ref' => 'A'],
             ]);
             $this->fail('Expected audit unavailable to block.');
@@ -208,6 +208,19 @@ final class DomainCommandRegulatedEvidenceFakeConnection extends Connection
         $this->executed[] = ['sql' => $sql, 'params' => $params];
         if (str_contains($sql, 'FROM e_signature_auth_challenges')) {
             return $this->challengeRow();
+        }
+        if (str_contains($sql, 'domain_command_reauth_challenge')) {
+            return [
+                'challenge_id' => (string)($params[':challenge_id'] ?? 'reauth-1'),
+                'actor_id' => (string)($params[':actor_id'] ?? 'qa-1'),
+                'command_name' => (string)($params[':command_name'] ?? 'ReleaseItemRevisionCommand'),
+                'payload_hash_sha256' => '',
+                'intent_hash_sha256' => '',
+                'issued_at' => gmdate('c'),
+                'expires_at' => gmdate('c', time() + 300),
+                'consumed_at' => gmdate('c'),
+                'result' => 'consumed',
+            ];
         }
         if (str_contains($sql, 'UPDATE e_signature_auth_challenges')) {
             $expiresAt = $this->challengeExpiresAt ?? gmdate('c', time() + 300);

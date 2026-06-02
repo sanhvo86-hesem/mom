@@ -52,6 +52,9 @@ tests/e2e/node_modules/
 # Lego Empire master strategy — world-class component-system research +
 # architecture + roadmap (current-state audit + web-platform + enterprise benchmark).
 !_reports/lego-empire/
+# Whitelist MDA runtime authority closure evidence for the no-P0/P1 gate.
+!_reports/mda_runtime_authority_closure/
+!_reports/mda_runtime_authority_closure/**
 _build/
 _Deleted/
 .tmp/
@@ -130,6 +133,10 @@ mom/data/
 !mom/data/
 mom/data/*
 !mom/data/registry/
+!mom/data/authority/
+mom/data/authority/*
+!mom/data/authority/workflow-status-authority.yaml
+!mom/data/authority/governed-root-registry.yaml
 
 # Keep empty runtime directories so VPS deploy doesn't lose them on a
 # fresh git reset/clone. .gitkeep is a 0-byte sentinel; actual runtime

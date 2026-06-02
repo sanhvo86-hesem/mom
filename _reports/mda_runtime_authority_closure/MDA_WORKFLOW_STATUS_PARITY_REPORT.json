@@ -1,0 +1,24 @@
+{
+    "gate": "mda_workflow_status_parity",
+    "status": "PASS",
+    "required_root_count": 24,
+    "workflow_root_count": 24,
+    "registry_root_count": 24,
+    "missing_workflow_roots": [],
+    "missing_registry_roots": [],
+    "checks": {
+        "workflow_file_exists": true,
+        "registry_file_exists": true,
+        "workflow_has_required_roots": true,
+        "registry_has_required_roots": true,
+        "workflow_roots_have_isa95_owner_command_event_states": true,
+        "registry_roots_have_authority_contract": true,
+        "workflow_declares_generated_artifacts": true,
+        "registry_declares_projection_read_model": true,
+        "frontend_workspace_marked_projection": true,
+        "frontend_create_disabled": true,
+        "frontend_submit_short_circuits_before_upsert": true
+    },
+    "failed": [],
+    "generated_at": "2026-06-02T01:35:55+00:00"
+}

@@ -1,0 +1,36 @@
+{
+    "gate": "mda_traceability_performance",
+    "status": "PASS",
+    "dataset": {
+        "nodes": 2870,
+        "edges": 7200,
+        "source": "deterministic_synthetic_local_gate"
+    },
+    "measurements_ms": {
+        "adjacency_lookup": {
+            "p50": 0,
+            "p95": 0.0001,
+            "p99": 0.0028
+        },
+        "trace_export_page_500": {
+            "p50": 0.0274,
+            "p95": 0.0285,
+            "p99": 0.0394
+        }
+    },
+    "checks": {
+        "synthetic_dataset_seeded": true,
+        "cursor_export_uses_continuation_or_complete": true,
+        "inventory_service_mentions_wip_ledger": true,
+        "inventory_service_mentions_genealogy_or_recall": true,
+        "quality_hold_service_uses_subject_graph": true,
+        "command_gateway_uses_idempotency": true,
+        "migration_index_for_reauth_or_sod": true
+    },
+    "failed": [],
+    "known_limits": [
+        "No live PostgreSQL seed was started by this local gate; production-like P95/P99 still requires the validation package dataset.",
+        "Synthetic trace graph proves cursor semantics and local algorithm cost only."
+    ],
+    "generated_at": "2026-06-02T01:35:55+00:00"
+}

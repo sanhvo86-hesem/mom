@@ -47,6 +47,7 @@ final class ProblemDetailsFactory
             'detail' => $detail,
             'code' => $code,
             'trace_id' => $traceId,
+            'correlation_id' => $traceId,
             'details' => $details,
         ];
 
