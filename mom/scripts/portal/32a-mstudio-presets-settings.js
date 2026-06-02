@@ -704,7 +704,8 @@
     if (!(window.MStudio && typeof window.MStudio.registerSurface === 'function')) {
       setTimeout(register, 40); return;
     }
-    window.MStudio.registerSurface('theme', {
+    /* Register under 'presets' — P1 shell marks theme:{hidden:true,redirectTo:'presets'} */
+    window.MStudio.registerSurface('presets', {
       label: '🎨 Thư viện preset',
       order: 40,
       render: renderPresets,
